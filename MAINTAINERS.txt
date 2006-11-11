@@ -1,0 +1,5 @@
+Bermi Ferrer Martinez <bermi-a.t-akelos-d.ot-co.m> Lead developer
+
+Niels Ganser <niels.ganser.nospam-gmail-d.ot-co.m> Core Contributor
+
+...your name here? Send your patches to http://www.akelos.org

@@ -1,0 +1,1 @@
+<?='<?='?>$active_record_helper->all_input_tags($<?=$model_name?>, '<?=$singular_name?>', array()) ?>

@@ -1,0 +1,185 @@
+<?php
+
+require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
+
+require_once(AK_LIB_DIR.DS.'AkRouter.php');
+
+class Test_of_AkRouter_Class extends  UnitTestCase
+{
+
+    var $Router;
+    var $url_prefix = '';
+    
+    function Test_of_AkRouter_Class()
+    {
+        $this->Router =& new AkRouter();
+        
+        $this->Router->_loadUrlRewriteSettings();
+        $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
+        
+        $this->Router->connect('/lists/:action/:id/:option', array('controller'=>'todo','option'=>COMPULSORY));
+        $this->Router->connect('/setup/*config_settings',array('controller'=>'setup'));
+        $this->Router->connect('/redirect/:url',array('controller'=>'redirect'));
+        $this->Router->connect('/regex/:text/:int',array('text'=>'/[A-Za-z]+/','int'=>'/[0-9]+/','controller'=>'regex'));
+        $this->Router->connect('/customize/*options/:action',array('controller'=>'themes','options'=>3));
+        $this->Router->connect('/blog/:action/:id',array('controller'=>'post','action'=>'list','id'=>OPTIONAL, 'requirements'=>array('id'=>'/\d{1,}/')));
+        $this->Router->connect('/:year/:month/:day',
+        array('controller' => 'articles','action' => 'view_headlines','year' => COMPULSORY,'month' => 'all','day' => OPTIONAL) ,
+        array('year'=>'/(20){1}\d{2}/','month'=>'/((1)?\d{1,2}){2}/','day'=>'/(([1-3])?\d{1,2}){2}/'));
+        $this->Router->connect('/:webpage', array('controller' => 'page', 'action' => 'view_page', 'webpage' => 'index'),array('webpage'=>'/(\w|_)+/'));
+        $this->Router->connect('/', array('controller' => 'page', 'action' => 'view_page', 'webpage'=>'index'));
+        $this->Router->connect('/:controller/:action/:id');
+    }
+
+
+    function Test_connect()
+    {
+        $this->assertFalse(count($this->Router->getRoutes()) != 10,'The number of loaded in the class internals did not match');
+    }
+
+    function Test_toParams()
+    {
+        $input_value = '/lists/show/123/featured=1';
+        $expected = array('controller'=>'todo','action'=>'show','id'=>123,'option'=>'featured=1');
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+        $input_value = '/lists/show/123';
+        $expected = array('controller'=>'lists','action'=>'show','id'=>123);
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+
+        $input_value = '/redirect/'.urlencode('http://www.akelos.com/buscar_dominio');
+        $expected = array('controller'=>'redirect','url'=>'http://www.akelos.com/buscar_dominio');
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+        $input_value = '/regex/abc/123';
+        $expected = array('controller'=>'regex','text'=>'abc','int'=>'123');
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+        $input_value = '/regex/abc1/123';
+        $not_expected = array('controller'=>'regex','text'=>'abc1','int'=>'123');
+        $this->assertNotEqual($this->Router->toParams($input_value),$not_expected);
+
+        $input_value = '/regex/abc/text';
+        $not_expected = array('controller'=>'regex','text'=>'abc','int'=>'text');
+        $this->assertNotEqual($this->Router->toParams($input_value),$not_expected);
+
+        $input_value = '/contact_us';
+        $expected = array('controller'=>'page','action'=>'view_page','webpage'=>'contact_us');
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+        $input_value = '/';
+        $expected = array('controller'=>'page','action'=>'view_page','webpage'=>'index');
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+        $input_value = '';
+        $expected = array('controller'=>'page','action'=>'view_page','webpage'=>'index');
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+        $input_value = '/blog/';
+        $expected = array('controller'=>'post','action'=>'list','id'=>null);
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+
+        $input_value = '/blog/view';
+        $expected = array('controller'=>'post','action'=>'view','id'=>null);
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+        $input_value = '/blog/view/10/';
+        $expected = array('controller'=>'post','action'=>'view','id'=>'10');
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+        $input_value = '/blog/view/newest/';
+        $expected = array('controller'=>'blog','action'=>'view','id'=>'newest');
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+        $input_value = '/2005/10/';
+        $expected = array('controller' => 'articles','action' => 'view_headlines','year' => '2005','month' => '10', 'day' => null);
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+        $input_value = '/2006/';
+        $expected = array('controller' => 'articles','action' => 'view_headlines','year' => '2006','month' => 'all', 'day' => null);
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+        $input_value = '/user/list/12';
+        $expected = array('controller' => 'user','action' => 'list','id' => '12');
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+        $input_value = '/setup/themes/clone/12/';
+        $expected = array('controller' => 'setup','config_settings' => array('themes','clone','12'));
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+        $input_value = '/customize/blue/css/sans_serif/clone/';
+        $expected = array('controller' => 'themes','options' => array('blue','css','sans_serif'), 'action'=>'clone');
+        $this->assertEqual($this->Router->toParams($input_value),$expected);
+
+        $input_value = '/customize/blue/css/invalid/sans_serif/clone/';
+        $not_expected = array('controller' => 'themes','options' => array('blue','css','invalid','sans_serif'), 'action'=>'clone');
+        $this->assertNotEqual($this->Router->toParams($input_value),$not_expected);
+
+    }
+
+
+    function Test_toUrl()
+    {
+        $input_value = array('controller'=>'page','action'=>'view_page','webpage'=>'index');
+        $expected = '/';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+
+        $input_value = array('controller'=>'page','action'=>'view_page','webpage'=>'contact_us');
+        $expected = $this->url_prefix.'/contact_us/';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+
+
+        $input_value = array('controller'=>'post','action'=>'list','id'=>null);
+        $expected = $this->url_prefix.'/blog/';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+
+        $input_value = array('controller'=>'post','action'=>'view','id'=>null);
+        $expected = $this->url_prefix.'/blog/view/';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+
+        $input_value = array('controller'=>'error','action'=>'database', 'id'=>null);
+        $expected = $this->url_prefix.'/error/database/';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+
+        $input_value = array('controller'=>'post','action'=>'view','id'=>'10');
+        $expected = $this->url_prefix.'/blog/view/10/';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+
+        $input_value = array('controller'=>'blog','action'=>'view','id'=>'newest');
+        $expected = $this->url_prefix.'/blog/view/newest/';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+        
+        $input_value = array('controller'=>'blog','action'=>'view','id'=>'newest','format'=>'printer_friendly');
+        $expected = AK_URL_REWRITE_ENABLED ? '/blog/view/newest/?format=printer_friendly' : '/?ak=/blog/view/newest/&format=printer_friendly';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+
+        $input_value = array('controller' => 'articles','action' => 'view_headlines','year' => '2005','month' => '10', 'day' => null);
+        $expected = $this->url_prefix.'/2005/10/';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+
+        $input_value = array('controller' => 'articles','action' => 'view_headlines','year' => '2006','month' => 'all', 'day' => null);
+        $expected = $this->url_prefix. '/2006/';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+
+        $input_value = array('controller' => 'user','action' => 'list','id' => '12');
+        $expected = $this->url_prefix.'/user/list/12/';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+
+        $input_value = array('controller' => 'setup','config_settings' => array('themes','clone','12'));
+        $expected = $this->url_prefix.'/setup/themes/clone/12/';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+
+        $input_value = array('controller' => 'themes','options' => array('blue','css','sans_serif'), 'action'=>'clone');
+        $expected = $this->url_prefix.'/customize/blue/css/sans_serif/clone/';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+
+    }
+
+
+}
+
+Ak::test('Test_of_AkRouter_Class');
+
+?>

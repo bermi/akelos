@@ -1,0 +1,55 @@
+DirectoryIndex index.php
+
+<IfModule sapi_apache2.c>
+   php_value register_globals        0
+   php_value magic_quotes_gpc        0
+   php_value magic_quotes_runtime    0
+   php_value magic_quotes_sybase     0
+   php_value arg_separator.output    "&amp;"
+   php_value default_charset    "utf-8"
+   php_value session.name           "AK_SESSID"
+</IfModule>
+
+<IfModule mod_php4.c>
+   php_value register_globals        0
+   php_value magic_quotes_gpc        0
+   php_value magic_quotes_runtime    0
+   php_value magic_quotes_sybase     0
+   php_value arg_separator.output    "&amp;"
+   php_value default_charset    "utf-8"
+   php_value session.name           "AK_SESSID"
+</IfModule>
+
+# On some servers this directive might be needed
+# Options +FollowSymLinks
+  
+# Various rewrite rules
+<IfModule mod_rewrite.c>
+  RewriteEngine on
+
+  # If your Akelos Framework application is accessed via an Alias directive,
+  # then you MUST also set the RewriteBase in this htaccess file.
+  #
+  # Example:
+  #   Alias /myakelosapp /path/to/myakelosapp/public
+  # RewriteBase /test/fixtures/public
+
+  # If you don't want The Akelos Framework to look in certain directories,
+  # use the following rewrite rules so that Apache won't rewrite certain requests
+  # 
+  # Example:
+  #   RewriteCond %{REQUEST_URI} ^/notakelos.*
+  #   RewriteRule .* - [L]
+  
+
+  RewriteRule ^mod_rewrite_test$ mod_rewrite_test_file.txt [L]
+  
+  # Rewrite URLs of the form 'index.php?ak=x':
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ index.php?ak=$1 [L,QSA]  
+  
+</IfModule>
+
+ErrorDocument 400 /400.html
+ErrorDocument 500 /500.html

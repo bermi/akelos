@@ -1,0 +1,61 @@
+#!/usr/bin/env php
+<?php
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
+
+// +----------------------------------------------------------------------+
+// | Akelos Framework - http://www.akelos.org                             |
+// +----------------------------------------------------------------------+
+// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
+// | Released under the GNU Lesser General Public License, see LICENSE.txt|
+// +----------------------------------------------------------------------+
+
+/**
+ * @package AkelosFramework
+ * @subpackage Installer
+ * @author Bermi Ferrer <bermi a.t akelos c.om>
+ * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
+ * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
+ */
+
+defined('AK_ENVIRONMENT') ? null : define('AK_ENVIRONMENT', 'development');
+include(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
+error_reporting(defined('AK_ERROR_REPORTING_ON_SCRIPTS') ? AK_ERROR_REPORTING_ON_SCRIPTS : 0);
+require_once(AK_LIB_DIR.DS.'Ak.php');
+require_once(AK_LIB_DIR.DS.'AkObject.php');
+require_once(AK_LIB_DIR.DS.'AkInflector.php');
+defined('AK_SKIP_DB_CONNECTION') && AK_SKIP_DB_CONNECTION ? ($dsn='') : Ak::db(&$dsn);
+array_shift($argv);
+$options = $argv;
+
+require_once(AK_LIB_DIR.DS.'AkInstaller.php');
+require_once(AK_SCRIPT_DIR.DS.'generators'.DS.'AkelosGenerator.php');
+
+$installer_name = AkInflector::camelize(array_shift($options)).'Installer';
+$command = count($options) > 0 ? array_shift($options) : 'usage';
+
+
+$file = AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'.php';
+
+if($installer_name == 'Installer'){
+    echo "\n  You must supply a valid installer name  \n";
+}elseif(!file_exists($file)){
+    echo Ak::t("\n\n  Could not locate the installer file %file\n\n",array('%file'=>$file));
+}else{
+    require_once($file);
+    if(!class_exists($installer_name)){
+        echo Ak::t("\n\n  Could not find load the installer. Class doesn't exists\n\n");
+    }else{
+        $installer = new $installer_name();
+        if(!method_exists($installer,$command)){
+            echo Ak::t("\n\n  Could not find the method %method for the installer %installer\n\n",
+            array('%method'=>$command,'%installer'=>$installer_name));
+        }else{
+            $installer->$command($options);
+        }
+    }
+}
+
+
+echo "\n";
+
+?>

@@ -1,0 +1,41 @@
+#!/usr/bin/env php
+<?php
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
+
+// +----------------------------------------------------------------------+
+// | Akelos Framework - http://www.akelos.org                             |
+// +----------------------------------------------------------------------+
+// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
+// | Released under the GNU Lesser General Public License, see LICENSE.txt|
+// +----------------------------------------------------------------------+
+
+/**
+ * @package AkelosFramework
+ * @subpackage Testing
+ * @author Bermi Ferrer <bermi a.t akelos c.om>
+ * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
+ * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
+ */
+
+
+error_reporting(E_ALL);
+
+$argv = array_map('trim',$argv);
+array_shift($argv);
+
+$tests_dir = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'test');
+foreach ($argv as $test){
+    $test = strstr($test,'.php') ? $test : $test.'.php';
+    $test = $tests_dir.DIRECTORY_SEPARATOR.$test;
+    if(!file_exists($test)){
+        echo "\nCould not load $test test file\n";
+    }else{
+        require($test);
+    }
+}
+
+echo $test;
+
+echo "\n";
+
+?>
