@@ -599,7 +599,7 @@ class AkHasMany extends AkAssociation
     }
 
 
-    function find()
+    function &find()
     {
         $result =& $GLOBALS['false'];
         if(!$this->Owner->isNewRecord()){
