@@ -2302,20 +2302,13 @@ Examples for find all:
 
     function loadColumnsSettings()
     {
-        if(empty($this->_columnsSettings)){
-            $model_name = $this->getModelName();
-            /**
-            * @todo Change cache container to dynamic config once implemented
-            */
-            if(!empty($_SESSION['__activeRecordColumnsSettingsCache'][$model_name])){
-                $this->_columnsSettings = $_SESSION['__activeRecordColumnsSettingsCache'][$model_name];
-                return $this->_columnsSettings;
-            }
+        $model_name = $this->getModelName();
 
-            if(is_null($this->_db)){
-                $this->setConnection();
-            }
+        if(is_null($this->_db)){
+            $this->setConnection();
+        }
 
+        if((empty($this->_columnsSettings) && empty($_SESSION['__activeRecordColumnsSettingsCache'][$model_name.'_column_settings'])) || (AK_ENVIRONMENT != 'development' && !defined('AK_AVOID_ACTIVE_RECORD_DB_SCHEMA_CACHE'))){
             if(empty($this->_dataDictionary)){
                 $this->_dataDictionary =& NewDataDictionary($this->_db);
             }
@@ -2327,19 +2320,15 @@ Examples for find all:
                 return false;
             }else{
                 foreach ($column_objects as $column_object){
-                    $this->setColumnSettings($column_object->name, $column_object);//$this->_dataDictionary->MetaType($column_object);
+                    $this->setColumnSettings($column_object->name, $column_object);
                 }
             }
-            //primaryKey
-
-            if(AK_ENVIRONMENT != 'development' && !defined('AK_AVOID_ACTIVE_RECORD_DB_SCHEMA_CACHE')){
-                $_SESSION['__activeRecordColumnsSettingsCache'][$model_name] = $this->_columnsSettings;
-            }
-            return $this->_columnsSettings;
-
+            $_SESSION['__activeRecordColumnsSettingsCache'][$model_name.'_column_settings'] = $this->_columnsSettings;
         }else{
-            return $this->_columnsSettings;
+            $this->_columnsSettings = $_SESSION['__activeRecordColumnsSettingsCache'][$model_name.'_column_settings'];
         }
+
+        return $this->_columnsSettings;
     }
 
 
@@ -4492,16 +4481,14 @@ Examples for find all:
 
     /**
      * Gets information from the database engine about a single table
-     *
-     * @todo Add cache support for production environment
      */
     function _databaseTableInternals($table)
     {
-        static $cache;
-
-        if(!isset($cache[$table])){
-            $cache[$table] = $this->_db->MetaColumns($table);
+        if(empty($_SESSION['__activeRecordColumnsSettingsCache']['database_table_'.$table.'_internals']) || (AK_ENVIRONMENT != 'development' && !defined('AK_AVOID_ACTIVE_RECORD_DB_SCHEMA_CACHE'))){
+            $_SESSION['__activeRecordColumnsSettingsCache']['database_table_'.$table.'_internals'] = $this->_db->MetaColumns($table);
         }
+        $cache[$table] = $_SESSION['__activeRecordColumnsSettingsCache']['database_table_'.$table.'_internals'];
+
         return $cache[$table];
     }
 

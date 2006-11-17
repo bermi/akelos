@@ -652,12 +652,22 @@ class AkHasAndBelongsToMany extends AkAssociation
         }
 
         $finder_options['selection'] = trim($finder_options['selection'], ', ');
+
+        /**
+         * @todo Refactorize me. This is too confusing
+         */
         $finder_options['conditions'] =
-        ' '.$Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id,
-        (empty($owner_id) ? '' : $options['foreign_key']).' = '.$owner_id).' '.
+        // If owner is not available we build the searcher without an specific id
+        (empty($owner_id) ? '' :
+
+        // We have an Id so we add it to the conditions
+        ' '.$Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['foreign_key']).' = '.$owner_id.' '.
+        // After adding the Id we need to add AND in case we have a previous contidion available
+        (!empty($options['conditions']) ? ' AND ' : ' ')).
+
+        // We add previous conditions
         (!empty($options['conditions']) ?
-        ' AND '.$Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ' :
-        '');
+        $Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ' : '');
 
         return $finder_options;
     }
