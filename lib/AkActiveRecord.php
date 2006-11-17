@@ -1576,8 +1576,8 @@ Examples for find all:
         }
         return true;
     }
-    
-    
+
+
 
 
     function set($attribute, $value = null, $inspect_for_callback_child_method = true, $compose_after_set = true)
@@ -2304,7 +2304,6 @@ Examples for find all:
     {
         if(empty($this->_columnsSettings)){
             $model_name = $this->getModelName();
-
             /**
             * @todo Change cache container to dynamic config once implemented
             */
@@ -2333,7 +2332,7 @@ Examples for find all:
             }
             //primaryKey
 
-            if(AK_ENVIRONMENT != 'development'){
+            if(AK_ENVIRONMENT != 'development' && !defined('AK_AVOID_ACTIVE_RECORD_DB_SCHEMA_CACHE')){
                 $_SESSION['__activeRecordColumnsSettingsCache'][$model_name] = $this->_columnsSettings;
             }
             return $this->_columnsSettings;
@@ -2375,15 +2374,15 @@ Examples for find all:
             $this->_columnsSettings[$column_name]['defaultValue'] = $column_object->default_value;
         }
     }
-    
-    
-    
+
+
+
     /**
      * Active Record localization support methods
      */
-    
-    
-    
+
+
+
     function _isInternationalizeCandidate($column_name)
     {
         $pos = strpos($column_name,'_');
@@ -2452,7 +2451,7 @@ Examples for find all:
             return $this->getAttribute($locale.'_'.$attribute);
         }
     }
-    
+
     function getAttributeLocales($attribute)
     {
         $attribute_locales = array();
@@ -2463,8 +2462,8 @@ Examples for find all:
         }
         return $attribute_locales;
     }
-    
-    
+
+
 
     /**
      * Adds an internationalized attribute to an array containing other locales for the same column name
@@ -2486,30 +2485,30 @@ Examples for find all:
             }
         }
     }
-    
-    
+
+
     function setAttributeByLocale($attribute, $value, $locale)
     {
         $internationalizable_columns = $this->getInternationalizedColumns();
-        
+
         if($this->_isInternationalizeCandidate($locale.'_'.$attribute) && !empty($internationalizable_columns[$attribute]) && is_array($internationalizable_columns[$attribute]) && in_array($locale, $internationalizable_columns[$attribute])){
             $this->setAttribute($locale.'_'.$attribute, $value);
         }
-        
+
     }
-    
+
     function setAttributeLocales($attribute, $values = array())
     {
         foreach ($values as $locale=>$value){
             $this->setAttributeByLocale($attribute, $value, $locale);
         }
     }
-    
-    
+
+
     /**/
-    
-    
-    
+
+
+
 
     function initiateAttributeToNull($attribute)
     {
@@ -2793,7 +2792,10 @@ Examples for find all:
                 if(!isset($this->_db)){
                     $this->setConnection();
                 }
-                $available_tables = $this->_db->MetaTables();
+                if(empty($_SESSION['__activeRecordColumnsSettingsCache']['available_tables']) || (AK_ENVIRONMENT != 'development' && !defined('AK_AVOID_ACTIVE_RECORD_DB_SCHEMA_CACHE'))){
+                    $_SESSION['__activeRecordColumnsSettingsCache']['available_tables'] = $this->_db->MetaTables();
+                }
+                $available_tables = $_SESSION['__activeRecordColumnsSettingsCache']['available_tables'];
             }
             if(!in_array($table_name,(array)$available_tables)){
                 if(!$check_mode){
