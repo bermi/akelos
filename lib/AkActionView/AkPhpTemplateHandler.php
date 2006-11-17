@@ -131,8 +131,11 @@ class AkPhpTemplateHandler
 
         foreach ($_class_calls as $_class_name=>$_method_calls){
             foreach (array_keys($_method_calls) as $_method_call){
+                if(empty($_method_call)){
+                    continue;
+                }
                 $_method_name = $_class_name.($_class_name[0]=='$'?'->':'::').$_method_call;
-                if(@$_method_call[0] === '_' || in_array(@$_method_name,(array)@$this->_options['forbidden_methods'])){
+                if($_method_call[0] === '_' || in_array($_method_name,(array)@$this->_options['forbidden_methods'])){
                     $_invalid['methods'][] = $_method_name;
                 }
             }
