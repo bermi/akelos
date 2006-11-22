@@ -1600,7 +1600,7 @@ Examples for find all:
             $watchdog[@$attribute] = @$watchdog[$attribute]+1;
             if($watchdog[$attribute] == 66){
                 if((!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')) || defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') && AK_ACTIVE_RECORD_PROTECT_GET_RECURSION){
-                    trigger_error(Ak::t('You are calling recursivelly AkActiveRecord::getAttribute by placing parent::getAttribute() or  parent::get() on your model "%method" method. In order to avoid this, set the 3rd paramenter of parent::getAttribute to FALSE. If this was the behaviour you expected, please define the constant AK_ACTIVE_RECORD_PROTECT_GET_RECURSION and set it to false',array('%method'=>'get'.ucfirst($attribute))),E_USER_ERROR);
+                    trigger_error(Ak::t('You are calling recursivelly AkActiveRecord::getAttribute by placing parent::getAttribute() or  parent::get() on your model "%method" method. In order to avoid this, set the 2nd paramenter of parent::getAttribute to FALSE. If this was the behaviour you expected, please define the constant AK_ACTIVE_RECORD_PROTECT_GET_RECURSION and set it to false',array('%method'=>'get'.ucfirst($attribute))),E_USER_ERROR);
                     return false;
                 }
             }
