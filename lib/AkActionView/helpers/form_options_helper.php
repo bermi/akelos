@@ -55,7 +55,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php');
 class FormOptionsHelper extends AkActionViewHelper
 {
 
-    
+
     /**
      * Create a select tag and a series of contained option tags for the provided object and method.
      * The option currently held by the object will be selected, provided that the object is available.
@@ -83,7 +83,7 @@ class FormOptionsHelper extends AkActionViewHelper
      * or 'selected' => null to leave all options unselected.
      */
     function select($object_name,  $column_name, $choices, $options = array(), $html_options = array())
-    {        
+    {
         $InstanceTag = new AkFormHelperOptionsInstanceTag($object_name,  $column_name, $this, null, $this->_object[$object_name]);
         return $InstanceTag->to_select_tag($choices, Ak::delete($options,'object'), $html_options);
     }
@@ -153,11 +153,11 @@ class FormOptionsHelper extends AkActionViewHelper
             return '';
         }
         $text_is_value = count(array_diff(array_keys($container),range(0,count($container)))) == 0;
-        
+
         $selected = (array)$selected;
         $options_for_select = '';
         foreach ($container as $text=>$value){
-            $options_for_select .= TagHelper::content_tag('option',$text_is_value ? $value : $text, 
+            $options_for_select .= TagHelper::content_tag('option',$text_is_value ? $value : $text,
             array_merge($options,in_array($value,$selected) ? array('value'=>$value,'selected'=>'selected') : array('value'=>$value))
             )."\n";
         }
@@ -184,11 +184,8 @@ class FormOptionsHelper extends AkActionViewHelper
             return '';
         }else{
             foreach ($collection as $item){
-                if(method_exists($item,$value_column_name) && method_exists($item,$text_column_name)){
-                    $collection_options[$item->$text_column_name()] = $item->$value_column_name();
-                }else{
-                    $collection_options[$item->get($text_column_name)] = $item->get($value_column_name);
-                }
+                $name = method_exists($item,$text_column_name) ? $item->$text_column_name() : $item->get($text_column_name);
+                $collection_options[$name] = method_exists($item,$value_column_name) ? $item->$value_column_name() : $item->get($value_column_name);
             }
             return $this->options_for_select($collection_options,$selected_value,$options);
         }
@@ -232,15 +229,26 @@ class FormOptionsHelper extends AkActionViewHelper
       */
     function option_groups_from_collection_for_select($collection, $group_method, $group_label_method, $option_key_method, $option_value_method, $selected_key = null)
     {
-        
+
         if($group_label_method[0] == '_' || $group_label_method[0] == '_' || $option_key_method[0] == '_' || $option_value_method[0] == '_'){
             trigger_error(Ak::t('You cannot call private methods from %helper_name helper',array('%helper_name'=>'option_groups_from_collection_for_select'),'helpers/form'), E_USER_ERROR);
         }else{
             $options_for_select = '';
             foreach ($collection as $group){
+
+                if(method_exists($group, $group_method)){
+                    $options_group = $group->{$group_method}();
+                }elseif(isset($group->$group_method)){
+                    $options_group =& $group->$group_method;
+                }
+
                 $options_for_select .= TagHelper::content_tag('optgroup',
-                $this->options_from_collection_for_select($group->{$group_method}(), $option_key_method, $option_value_method, $selected_key),
-                array('label'=>$group->{$group_label_method}()));
+                $this->options_from_collection_for_select($options_group, $option_key_method, $option_value_method, $selected_key),
+                array('label'=>
+                method_exists($group, $group_label_method) ?
+                $group->{$group_label_method}() :
+                $group->get($group_label_method)
+                ));
             }
             return $options_for_select;
         }
@@ -305,7 +313,7 @@ class FormOptionsHelper extends AkActionViewHelper
         }else{
             $zones_form_method = $model->all();
         }
-        
+
         $zones = array();
         foreach ($zones_form_method as $description=>$gmt){
             $k = Ak::t('(%gmt) %description',array('%gmt'=>$gmt,'%description'=>$description),'localize/timezones');
@@ -320,7 +328,7 @@ class FormOptionsHelper extends AkActionViewHelper
 
         $zone_options .= $this->options_for_select(array_diff($zones,$priority_zones), $selected);
         return $zone_options;
-        
+
     }
 
 }
@@ -336,7 +344,7 @@ class AkFormHelperOptionsInstanceTag extends AkFormHelperInstanceTag
     {
         $this->add_default_name_and_id($html_options);
         $selected_value = !empty($options['selected']) ? $options['selected'] : $this->getValue();
-        
+
         return TagHelper::content_tag('select', $this->_addOptions($this->_template_object->options_for_select($choices, $selected_value, $options),
         $html_options, $this->getValue()), array_diff($html_options,array('prompt'=>true)));
     }
@@ -344,7 +352,7 @@ class AkFormHelperOptionsInstanceTag extends AkFormHelperInstanceTag
     function to_collection_select_tag($collection, $value_column_name, $text_column_name = null, $options = array(), $html_options = array())
     {
         $this->add_default_name_and_id($html_options);
-        
+
         return TagHelper::content_tag('select', $this->_addOptions(
         $this->_template_object->options_from_collection_for_select($collection, $value_column_name, $text_column_name, $this->getValue(), array_diff($options,array('prompt'=>true))),
         $options, $this->getValue()), $html_options);
@@ -360,7 +368,7 @@ class AkFormHelperOptionsInstanceTag extends AkFormHelperInstanceTag
     function to_time_zone_select_tag($priority_zones = array(), $options = array(), $html_options = array())
     {
         $this->add_default_name_and_id($html_options);
-        
+
         return TagHelper::content_tag('select',
         $this->_addOptions($this->_template_object->time_zone_options_for_select(
         $this->getValue(),$priority_zones,(empty($options['model'])?'AkTimeZone':$options['model'])),$options,$this->getValue()),$html_options);
