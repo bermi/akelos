@@ -439,19 +439,21 @@ class AkHasMany extends AkAssociation
         $options = $this->getOptions($this->association_id);
         $Associated =& $this->getAssociatedModelInstance();
         $owner_id = $this->Owner->quotedId();
+        
+        $table_name = empty($options['include']) ? $Associated->getTableName() : '__owner';
         if(empty($options['finder_sql'])){
-            $options['finder_sql'] = ' '.$Associated->getTableName().'.'.$options['foreign_key'].' = '.(empty($owner_id) ? 'null' : $owner_id).' ';
+            $options['finder_sql'] = ' '.$table_name.'.'.$options['foreign_key'].' = '.(empty($owner_id) ? 'null' : $owner_id).' ';
             $options['finder_sql'] .= !empty($options['conditions']) ? ' AND '.$options['conditions'].' ' : '';
         }
         if(empty($options['counter_sql']) && !empty($options['finder_sql'])){
             $options['counter_sql'] = $options['finder_sql'];
         }elseif(empty($options['counter_sql'])){
-            $options['counter_sql'] = ' '.$Associated->getTableName().'.'.$options['foreign_key'].' = '.(empty($owner_id) ? 'null' : $owner_id).' ';
+            $options['counter_sql'] = ' '.$table_name.'.'.$options['foreign_key'].' = '.(empty($owner_id) ? 'null' : $owner_id).' ';
             $options['counter_sql'] .= !empty($options['conditions']) ? ' AND '.$options['conditions'].' ' : '';
         }
 
         if(!empty($options['counter_sql']) && strtoupper(substr($options['counter_sql'],0,6)) != 'SELECT'){
-            $options['counter_sql'] = 'SELECT COUNT(*) FROM '.$Associated->getTableName().' WHERE '.$options['counter_sql'];
+            $options['counter_sql'] = 'SELECT COUNT(*) FROM '.$table_name.' WHERE '.$options['counter_sql'];
         }
 
         $this->setOptions($this->association_id, $options);
@@ -626,9 +628,9 @@ class AkHasMany extends AkAssociation
                 $options['conditions'] .= ' AND '. $has_many_options['finder_sql'];
             }
 
-
             $options['order'] = empty($options['order']) ? @$has_many_options['order'] : $options['order'];
-
+            $options['include'] = empty($options['include']) ? @$has_many_options['include'] : $options['include'];
+            
             if($options_in_args){
                 $args[$num_args-1] = $options;
             }else{

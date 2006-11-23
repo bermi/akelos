@@ -265,7 +265,7 @@ class AkAssociatedActiveRecord extends AkObject
 
         foreach ($avaliable_associated_options as $option=>$values){
             if(!empty($values)){
-                $separator = $option == 'joins' ? ' ' : ($option == 'selection' ? ', ': ' AND ');
+                $separator = $option == 'joins' ? ' ' : (in_array($option, array('selection','order')) ? ', ': ' AND ');
                 $values = array_map('trim', $values);
                 $options[$option] = empty($options[$option]) ?
                 join($separator, $values) :
