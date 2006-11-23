@@ -269,10 +269,10 @@ class AkAssociatedActiveRecord extends AkObject
                 $values = array_map('trim', $values);
                 $options[$option] = empty($options[$option]) ?
                 join($separator, $values) :
-                trim($options['conditions']).$separator.join($separator, $values);
+                trim($options[$option]).$separator.join($separator, $values);
             }
         }
-
+        
         $sql = trim($this->constructFinderSqlWithAssociations($options));
         $sql = substr($sql, -5) == 'AND =' ? substr($sql, 0,-5) : $sql;
 
