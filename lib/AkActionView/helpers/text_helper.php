@@ -17,6 +17,7 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
+require_once(AK_VENDOR_DIR.DS.'utf8'.DS.'phputf8.php');
 
 defined('AK_VALID_URL_CHARS_REGEX') ? null : define('AK_VALID_URL_CHARS_REGEX','A-Z-a-z0-9:=?&\/\.\-\\%~#_;,+');
 defined('AK_AUTO_LINK_REGEX') ? null : define('AK_AUTO_LINK_REGEX', '/((?:http[s]?|:\/\/)|(?:ftp[s]?|:\/\/)|(?:www\.))(['.AK_VALID_URL_CHARS_REGEX.']+)/x');
@@ -52,13 +53,13 @@ class  TextHelper
     */
     function truncate($text, $length = 30, $truncate_string = '...', $break = ' ')
     {
-        if(strlen($text) <= $length){
+        if(utf8_strlen($text) <= $length){
             return $text;
         }
 
-        if(false !== ($breakpoint = empty($break) ? $length : strpos($text, $break, $length))) {
-            if($breakpoint < strlen($text) - 1) {
-                $text = substr($text, 0, $breakpoint) . $truncate_string;
+        if(false !== ($breakpoint = empty($break) ? $length : utf8_strpos($text, $break, $length))) {
+            if($breakpoint < utf8_strlen($text) - 1) {
+                $text = utf8_substr($text, 0, $breakpoint) . $truncate_string;
             }
         }
         return $text;
@@ -87,7 +88,7 @@ class  TextHelper
     function highlight($text, $phrase, $highlighter = '<strong class="highlight">\1</strong>')
     {
         $phrase = is_array($phrase) ? join('|',array_map('preg_quote',$phrase)) : preg_quote($phrase);
-        return !empty($phrase) ? preg_replace('/('.$phrase.')/i', $highlighter, $text) : $text;
+        return !empty($phrase) ? preg_replace('/('.$phrase.')/iu', $highlighter, $text) : $text;
     }
 
     /**
@@ -108,15 +109,15 @@ class  TextHelper
         }
         $phrase = preg_quote($phrase);
 
-        if(preg_match('/('.$phrase.')/i',$text, $found)){
-            $found_pos = strpos($text, $found[0]);
+        if(preg_match('/('.$phrase.')/iu',$text, $found)){
+            $found_pos = utf8_strpos($text, $found[0]);
             $start_pos = max($found_pos - $radius, 0);
-            $end_pos = min($found_pos + strlen($phrase) + $radius, strlen($text));
+            $end_pos = min($found_pos + utf8_strlen($phrase) + $radius, utf8_strlen($text));
 
             $prefix  = $start_pos > 0 ? $excerpt_string : '';
-            $postfix = $end_pos < strlen($text) ? $excerpt_string : '';
+            $postfix = $end_pos < utf8_strlen($text) ? $excerpt_string : '';
 
-            return $prefix.trim(substr($text,$start_pos,$end_pos-$start_pos)).$postfix;
+            return $prefix.trim(utf8_substr($text,$start_pos,$end_pos-$start_pos)).$postfix;
         }
         return '';
     }
@@ -138,9 +139,10 @@ class  TextHelper
     /**
      * Word wrap long lines to line_width.
      */
-    function word_wrap($text, $line_width = 80)
+    function word_wrap($text, $line_width = 80, $break = "\n")
     {
-        return trim(wordwrap($text, $line_width,"\n"));
+        // No need to use an UTF-8 wordwrap function as we are using the default cut character.
+        return trim(wordwrap($text, $line_width, $break));
     }
 
     /**
@@ -162,7 +164,7 @@ class  TextHelper
      */
     function textilize_without_paragraph($text)
     {
-        return preg_replace('/^<p([A-Za-z0-9& ;\-=",\/:\.\']+)?>(.+)<\/p>$/','\2', TextHelper::textilize($text));
+        return preg_replace('/^<p([A-Za-z0-9& ;\-=",\/:\.\']+)?>(.+)<\/p>$/u','\2', TextHelper::textilize($text));
     }
 
     /**
@@ -279,12 +281,12 @@ class  TextHelper
         $text = array_shift($args);
         $tags = func_num_args() > 2 ? array_diff($args,array($text))  : (array)$tags;
         foreach ($tags as $tag){
-            if(preg_match_all('/<'.$tag.'[^>]*>(.*)<\/'.$tag.'>/iU', $text, $found)){
+            if(preg_match_all('/<'.$tag.'[^>]*>((\\n|\\r|.)*)<\/'.$tag.'>/iu', $text, $found)){
                 $text = str_replace($found[0],$found[1],$text);
             }
         }
 
-        return $text;
+        return preg_replace('/(<('.join('|',$tags).')(\\n|\\r|.)*\/>)/iu', '', $text);
     }
 
 
