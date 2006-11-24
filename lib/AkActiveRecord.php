@@ -2587,7 +2587,8 @@ Examples for find all:
         }
 
         if($this->_getDatabaseType() == 'mysql'){
-            if($result == 'integer' && (int)$adodb_column_object->max_length === 1 && stristr($adodb_column_object->type, 'TINYINT')){
+            if($result == 'integer' && (int)$adodb_column_object->max_length === 1 && 
+            stristr($adodb_column_object->type, 'TINYINT')){
                 return 'boolean';
             }
         }elseif($this->_getDatabaseType() == 'postgre'){

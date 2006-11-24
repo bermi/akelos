@@ -461,16 +461,12 @@ class AkHasMany extends AkAssociation
     }
 
 
-    /**
-     * Enter description here...
-     *
-     * @return unknown
-     */
-    function count()
+
+    function count($force_count = false)
     {
         $count = 0;
         $options = $this->getOptions($this->association_id);
-        if(empty($this->Owner->{$options['handler_name']}->_loaded) && !$this->Owner->isNewRecord()){
+        if($force_count || (empty($this->Owner->{$options['handler_name']}->_loaded) && !$this->Owner->isNewRecord())){
             $this->constructSql(false);
             $options = $this->getOptions($this->association_id);
             $Associated =& $this->getAssociatedModelInstance();

@@ -290,7 +290,7 @@ class AkInstaller
         '/([ \n\r,]+)text([( \n\r,]+)/'=> '\1 XL \2',
         '/([ \n\r,]+)string([( \n\r,]+)/'=> '\1 C \2',
         '/([ \n\r,]+)binary([( \n\r,]+)/'=> '\1 B \2',
-        '/([ \n\r,]+)boolean([( \n\r,]+)/'=> '\1 I(1) \2',
+        '/([ \n\r,]+)boolean([( \n\r,]+)/'=> '\1 I1(1) \2',
         '/ NOT( |_)?NULL/i'=> ' NOTNULL',
         '/ AUTO( |_)?INCREMENT/i'=> ' AUTO ',
         '/ +/'=> ' ',
