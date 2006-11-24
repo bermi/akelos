@@ -17,7 +17,7 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-require_once(AK_VENDOR_DIR.DS.'utf8'.DS.'phputf8.php');
+require_once(AK_VENDOR_DIR.DS.'phputf8'.DS.'utf8.php');
 
 defined('AK_VALID_URL_CHARS_REGEX') ? null : define('AK_VALID_URL_CHARS_REGEX','A-Z-a-z0-9:=?&\/\.\-\\%~#_;,+');
 defined('AK_AUTO_LINK_REGEX') ? null : define('AK_AUTO_LINK_REGEX', '/((?:http[s]?|:\/\/)|(?:ftp[s]?|:\/\/)|(?:www\.))(['.AK_VALID_URL_CHARS_REGEX.']+)/x');
