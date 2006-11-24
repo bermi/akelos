@@ -160,7 +160,7 @@ class AkHasMany extends AkAssociation
         $options = $this->getOptions($this->association_id);
         if($force_reload || empty($this->Owner->{$options['handler_name']}->_loaded)){
             if(!$this->Owner->isNewRecord()){
-                $this->constructSql();
+                $this->constructSql(false);
                 $options = $this->getOptions($this->association_id);
                 $Associated =& $this->getAssociatedModelInstance();
                 $finder_options = array('conditions'=>$options['finder_sql']);
@@ -434,13 +434,14 @@ class AkHasMany extends AkAssociation
 
 
 
-    function constructSql()
+    function constructSql($set_owner_table_has_included = true)
     {
         $options = $this->getOptions($this->association_id);
         $Associated =& $this->getAssociatedModelInstance();
         $owner_id = $this->Owner->quotedId();
         
-        $table_name = empty($options['include']) ? $Associated->getTableName() : '__owner';
+        $table_name = empty($options['include']) ? $Associated->getTableName() : ($set_owner_table_has_included ? '__owner' : $Associated->getTableName());
+
         if(empty($options['finder_sql'])){
             $options['finder_sql'] = ' '.$table_name.'.'.$options['foreign_key'].' = '.(empty($owner_id) ? 'null' : $owner_id).' ';
             $options['finder_sql'] .= !empty($options['conditions']) ? ' AND '.$options['conditions'].' ' : '';
@@ -470,7 +471,7 @@ class AkHasMany extends AkAssociation
         $count = 0;
         $options = $this->getOptions($this->association_id);
         if(empty($this->Owner->{$options['handler_name']}->_loaded) && !$this->Owner->isNewRecord()){
-            $this->constructSql();
+            $this->constructSql(false);
             $options = $this->getOptions($this->association_id);
             $Associated =& $this->getAssociatedModelInstance();
 
