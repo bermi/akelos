@@ -605,7 +605,7 @@ class AkHasMany extends AkAssociation
             $this->constructSql();
             $has_many_options = $this->getOptions($this->association_id);
             $Associated =& $this->getAssociatedModelInstance();
-
+            
             $args = func_get_args();
             $num_args = func_num_args();
 
@@ -624,7 +624,7 @@ class AkHasMany extends AkAssociation
             } elseif (!empty($has_many_options['finder_sql']) && !strstr($options['conditions'], $has_many_options['finder_sql'])) {
                 $options['conditions'] .= ' AND '. $has_many_options['finder_sql'];
             }
-
+        
             $options['order'] = empty($options['order']) ? @$has_many_options['order'] : $options['order'];
             $options['include'] = empty($options['include']) ? @$has_many_options['include'] : $options['include'];
             

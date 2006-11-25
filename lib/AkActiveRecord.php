@@ -4407,6 +4407,15 @@ Examples for find all:
         }
         $this->_db->debug = $this->_db->debug ? false : true;
     }
+    
+    function dbuging($trace_this_on_debug_mode = null)
+    {
+        if(!empty($this->_db->debug) && !empty($message)){
+            $message = !is_scalar($trace_this_on_debug_mode) ? var_export($trace_this_on_debug_mode, true) : (string)$trace_this_on_debug_mode;
+            Ak::trace($message);
+        }
+        return !empty($this->_db->debug);
+    }
 
 
     function extractOptionsFromArgs(&$args)
