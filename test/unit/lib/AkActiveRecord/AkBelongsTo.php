@@ -115,6 +115,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
         $this->assertReference($CarletPic->main_thumbnail->_AssociationHandler->Owner, $CarletPic);
 
         $this->assertTrue($SimoPic->destroy());
+
         $this->assertFalse($Picture->findFirstBy('title:has','SIMO', array('include'=>'main_thumbnail')));
 
         $this->assertFalse($Thumbnail->findFirstBy('caption','SIMO 2005'));
@@ -128,8 +129,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
         $this->assertReference($CarletPic->main_thumbnail, $Thumbnail);
         //$this->assertReference($CarletPic->prueba, $Thumbnail);
 
-
-        $CarletPic->save();
+        $this->assertTrue($CarletPic->save());
 
         $this->assertFalse($Thumbnail->findFirstBy('caption','Carlet'));
 
@@ -141,18 +141,20 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
         $CarletPic =& $Picture->findFirstBy('title:has','Carlet', array('include'=>'main_thumbnail'));
         $this->assertEqual($CarletPic->main_thumbnail->caption, 'Lucky (our pet)');
 
-
         $CarletPic =& $Picture->findFirstBy('title:has','Carlet');
         $CarletPic->main_thumbnail->load();
         $this->assertEqual($CarletPic->main_thumbnail->caption, 'Lucky (our pet)');
 
-        //$this->assertFalse($Thumbnail->findFirstBy('caption','Our Office'));
+        $this->assertFalse($Thumbnail->findFirstBy('caption','Our Office'));
 
     }
 
     function test_for_belongs_to_association()
     {
-        $Thumbnail =& new Thumbnail(5);
+        $Thumbnail =& new Thumbnail();
+        $Thumbnail =& $Thumbnail->findFirstBy('caption','Lucky (our pet)');
+        $Thumbnail =& new Thumbnail($Thumbnail->getId());
+
         $this->assertEqual($Thumbnail->picture->getType(), 'belongsTo');
 
         $Thumbnail = $Thumbnail->findFirstBy('caption:has','Lucky');
@@ -179,7 +181,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
         $this->assertReference($Alicia->picture, $MyGirl);
         $this->assertFalse($MyGirl->isNewRecord());
         $this->assertEqual($Alicia->get('photo_id'), $MyGirl->getId());
-        $Alicia->save();
+        $this->assertTrue($Alicia->save());
 
         $Thumbnail =& new Thumbnail();
         $Thumbnail->caption = 'Party 2005';
@@ -204,15 +206,15 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
         $this->assertEqual($Picture->getType(), 'Picture');
         $this->assertFalse($Picture->isNewRecord());
         $this->assertTrue($Thumbnail->isNewRecord());
-        
-        
+
+
         $Thumbnail =& new Thumbnail(array('title'=>'Akelos new office'));
         $Thumbnail->loadAssociations();
         $Thumbnail->picture->assign($Picture);
         $this->assertTrue($Thumbnail->save());
-        
+
         $this->assertEqual($Thumbnail->photo_id, $Picture->id);
-        
+
     }
 
     function test_for_multiple_hasone_and_belongsto()
@@ -231,7 +233,6 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
         $this->assertEqual($Altea->main_thumbnail->getType(), 'Thumbnail');
         $this->assertTrue($Altea->save());
 
-
         $Altea =& new Picture(array('title'=>'Altea3'));
         $Altea->main_thumbnail->assign(new Thumbnail(array('caption'=>'Altea3')));
         $this->assertTrue($Altea->main_thumbnail->isNewRecord());
@@ -246,11 +247,11 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
         $this->assertFalse($Thumbnail->findFirstBy('caption','Altea3'));
 
         $Panorama =& new Panorama(array('title'=>'Views from the old town'));
-        $Panorama->save();
+        $this->assertTrue($Panorama->save());
         $Panorama->thumbnail->build(array('caption'=>'Altea paronamic views from the Old town'));
         $this->assertEqual($Panorama->thumbnail->getType(), 'Thumbnail');
         $this->assertTrue($Panorama->thumbnail->isNewRecord());
-        $Panorama->save();
+        $this->assertTrue($Panorama->save());
         $this->assertFalse($Panorama->thumbnail->isNewRecord());
 
         $Thumbnail =& new Thumbnail();
@@ -258,7 +259,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
         $this->assertEqual($Thumbnail->panorama->title, 'Views from the old town');
     }
 
-
+    /**/
 }
 
 

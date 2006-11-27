@@ -199,6 +199,10 @@ class AkHasOne extends AkAssociation
     {
         $Associated =& $this->loadAssociated($association_id);
 
+        if(!empty($Associated->__activeRecordObject) && !empty($NewAssociated->__activeRecordObject) && $Associated->getId() == $NewAssociated->getId()){
+            return $NewAssociated;
+        }
+        
         if(!empty($Associated->__activeRecordObject)){
             if ($Associated->getAssociationOption('dependent') && !$dont_save){
                 if(!$Associated->isNewRecord()){
@@ -294,6 +298,7 @@ class AkHasOne extends AkAssociation
                 $object->hasOne->replace($associated_id, $object->$associated_id, false);
                 $object->$associated_id->set($object->hasOne->getOption($associated_id, 'foreign_key'), $object->getId());
                 $success = $object->$associated_id->save() ? $success : false;
+                
             }elseif($object->$associated_id->getType() == 'hasOne'){
                 $attributes = array();
                 foreach ((array)$object->$associated_id as $k=>$v){

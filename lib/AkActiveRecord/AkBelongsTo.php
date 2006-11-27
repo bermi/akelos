@@ -239,7 +239,7 @@ class AkBelongsTo extends AkAssociation
         ' ON '.
         '__owner.'.$this->Owner->$association_id->getAssociationOption('primary_key_name').
         ' = '.
-        '_'.$association_id.'.'.$this->Owner->getPrimaryKey().' ';
+        '_'.$association_id.'.'.$this->Owner->$association_id->getPrimaryKey().' ';
     }
 
 

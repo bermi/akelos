@@ -281,12 +281,12 @@ class  TextHelper
         $text = array_shift($args);
         $tags = func_num_args() > 2 ? array_diff($args,array($text))  : (array)$tags;
         foreach ($tags as $tag){
-            if(preg_match_all('/<'.$tag.'[^>]*>((\\n|\\r|.)*)<\/'.$tag.'>/iu', $text, $found)){
+            if(preg_match_all('/<'.$tag.'[^>]*>([^<]*)<\/'.$tag.'>/iU', $text, $found)){
                 $text = str_replace($found[0],$found[1],$text);
             }
         }
 
-        return preg_replace('/(<('.join('|',$tags).')(\\n|\\r|.)*\/>)/iu', '', $text);
+        return preg_replace('/(<('.join('|',$tags).')(\\n|\\r|.)*\/>)/iU', '', $text);
     }
 
 
