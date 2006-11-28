@@ -31,6 +31,10 @@
 if(defined('AK_DEBUG') && AK_DEBUG){
 
 
+    /**
+     * @package AkelosFramework
+     * @subpackage Reporting
+     */
     class AkDevelopmentErrorHandler {
 
         /**

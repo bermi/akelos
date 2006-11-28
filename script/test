@@ -25,7 +25,8 @@ array_shift($argv);
 
 $tests_dir = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'test');
 foreach ($argv as $test){
-    $test = strstr($test,'.php') ? $test : $test.'.php';
+    $test = strstr($test,'.php') ? trim($test, '/') : $test.'.php';
+    $test = substr($test,0,5) == 'test/' ? substr($test,5) : $test;
     $test = $tests_dir.DIRECTORY_SEPARATOR.$test;
     if(!file_exists($test)){
         echo "\nCould not load $test test file\n";

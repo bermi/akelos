@@ -1919,28 +1919,6 @@ Examples for find all:
         }
     }
 
-    /*
-    foreach ($this->_combinedAttributes as $attribute=>$rule){
-    $pattern = array_shift($rule);
-    if(method_exists(&$this, $pattern.'Decompose')){
-    $pieces = $this->{$pattern.'Decompose'}($this->$attribute);
-    if(is_array($pieces)){
-    foreach ($pieces as $k=>$v){
-    $this->setAttribute($k, $v);
-    }
-    }
-    }else{
-    $ary = sscanf($this->$attribute, $pattern);
-    for ($x=0;$x<count($ary);$x++){
-    $subattribute = $rule[$x];
-    if(!isset($subattribute_override_protection[$subattribute])){
-    $subattribute_override_protection[$subattribute] = $ary[$x];
-    $this->setAttribute($subattribute, $ary[$x], true, !$this->isCombinedAttribute($subattribute));
-    }
-    }
-    }
-    }
-    */
 
 
     /**
