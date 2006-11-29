@@ -20,7 +20,7 @@ class JavaScriptHelperTests extends HelpersUnitTester
         $this->assertEqual($javascript->button_to_function("Delete", "if confirm('Really?'){ do_delete(); }",array('id'=>'confirm')),'<input id="confirm" onclick="if confirm(\'Really?\'){ do_delete(); };" type="button" value="Delete" />');
         
         
-        $this->assertEqual($javascript->javascript_tag("alert('All is good')"), "<script type=\"text/javascript\"><![CDATA[\nalert('All is good')\n]]></script>");
+        $this->assertEqual($javascript->javascript_tag("alert('All is good')"), "<script type=\"text/javascript\">\n//<![CDATA[\nalert('All is good')\n//]]>\n</script>");
         
         $input = "
         <div id='meesage'

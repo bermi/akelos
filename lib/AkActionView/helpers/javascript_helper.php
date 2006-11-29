@@ -118,7 +118,7 @@ class JavascriptHelper extends AkActionViewHelper
 
     function javascript_cdata_section($content)
     {
-        return TagHelper::cdata_section("\n$content\n");
+        return "\n//<![CDATA[\n".$content."\n//]]>\n";
     }
 
     function _options_for_javascript($options)
