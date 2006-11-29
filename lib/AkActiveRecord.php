@@ -3428,6 +3428,7 @@ Examples for find all:
     //////////          VALIDATION      ////////////////////////////////
     ////////////////////////////////////////////////////////////////////
 
+    
     /**
     * Active Records implement validation by overwriting AkActiveRecord::validate (or the variations, validateOnCreate and
     * validateOnUpdate). Each of these methods can inspect the state of the object, which usually means ensuring
@@ -3460,13 +3461,13 @@ Examples for find all:
     *       }
     *   }
     * 
-    *   $Person = new Person("first_name" => "David", "phone_number" => "what?");
-    *   $Person->save();                    * => false (and doesn't do the save);
-    *   $Person->Errors->hasErrors();         * => false
-    *   $Person->Errors->countErrors();          * => 2
-    *   $Person->Errors->getErrorsOn("last_name");       * => "can't be empty"
-    *   $Person->Errors->getErrorsOn("phone_number");    * => "has invalid format"
-    *   $Person->Errors->yieldEachFullError();        * => "Last name can't be empty \n Phone number has invalid format"
+    *   $Person = new Person(array("first_name" => "David", "phone_number" => "what?"));
+    *   $Person->save();                    // => false (and doesn't do the save);
+    *   $Person->hasErrors();         // => false
+    *   $Person->countErrors();          // => 2
+    *   $Person->getErrorsOn("last_name");       // => "can't be empty"
+    *   $Person->getErrorsOn("phone_number");    // => "has invalid format"
+    *   $Person->yieldEachFullError();        // => "Last name can't be empty \n Phone number has invalid format"
     * 
     *   $Person->setAttributes(array("last_name" => "Heinemeier", "phone_number" => "555-555"));
     *   $Person->save(); // => true (and person is now saved in the database)
@@ -3474,7 +3475,7 @@ Examples for find all:
     * An "Errors" object is automatically created for every Active Record.
     * 
     */
-
+    
     /**
       * Encapsulates the pattern of wanting to validate a password or email address field with a confirmation. Example:
       * 
@@ -3489,8 +3490,8 @@ Examples for find all:
       *    }
       * 
       *  View:
-      *    <php password_field("person", "password"); ?>
-      *    <php password_field("person", "password_confirmation"); ?>
+      *    <?=$form_helper->password_field("person", "password"); ?>
+      *    <?=$form_helper->password_field("person", "password_confirmation"); ?>
       * 
       * The person has to already have a password attribute (a column in the people table), but the password_confirmation is virtual.
       * It exists only as an in-memory variable for validating the password. This check is performed only if password_confirmation
