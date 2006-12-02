@@ -662,7 +662,6 @@ class AkCharset
     function _CharToUtf8(&$char, $mapping_array)
     {
         if(!isset($mapping_array[$char])){
-            //echo "$char\n<hr>";
             return;
         }else{
             $c = (int)$mapping_array[$char];

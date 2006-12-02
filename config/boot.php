@@ -73,6 +73,7 @@ ak_define('DEBUG', AK_ENVIRONMENT == 'production' ? 0 : 1);
 ak_define('CACHE_HANDLER', 2);
 
 ak_define('APP_DIR', AK_BASE_DIR.DS.'app');
+ak_define('APIS_DIR', AK_APP_DIR.DS.'apis');
 ak_define('MODELS_DIR', AK_APP_DIR.DS.'models');
 ak_define('CONTROLLERS_DIR', AK_APP_DIR.DS.'controllers');
 ak_define('VIEWS_DIR', AK_APP_DIR.DS.'views');
@@ -199,11 +200,13 @@ ak_define('CHARSET', 'UTF-8');
 
 require_once(AK_LIB_DIR.DS.'Ak.php');
 
+/*
 if(!AK_CLI && (AK_DEBUG || AK_ENVIRONMENT == 'setup')){
     include_once(AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php');
     $__AkDevelopmentErrorHandler = new AkDevelopmentErrorHandler();
     set_error_handler(array(&$__AkDevelopmentErrorHandler, 'raiseError'));
 }
+*/
 
 ak_define('ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE', 'web_request');
 ak_define('ACTION_CONTROLLER_DEFAULT_ACTION', 'index');
