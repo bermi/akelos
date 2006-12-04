@@ -5,6 +5,7 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 
 require_once(AK_LIB_DIR.DS.'AkActionWebservice'.DS.'AkActionWebserviceApi.php');
+require_once(AK_LIB_DIR.DS.'AkActionWebservice.php');
 require_once(AK_APIS_DIR.DS.'todo_api.php');
 
 
@@ -16,13 +17,13 @@ class AkActionWebServiceApiTests extends  UnitTestCase
         $TodoApi =& new TodoApi();
 
         // hasApiMethod
-        $this->assertTrue($TodoApi->hasApiMethod('create list'));
+        $this->assertTrue($TodoApi->hasApiMethod('create_list'));
         $this->assertFalse($TodoApi->hasApiMethod('call the queen'));
         $this->assertFalse($TodoApi->hasApiMethod('CreateList'));
         
         // hasPublicApiMethod
         $this->assertTrue($TodoApi->hasPublicApiMethod('CreateList'));
-        $this->assertFalse($TodoApi->hasPublicApiMethod('create list'));
+        $this->assertFalse($TodoApi->hasPublicApiMethod('create_list'));
         $this->assertFalse($TodoApi->hasPublicApiMethod('CallAlice'));
 
         // getPublicApiMethodName
@@ -32,7 +33,7 @@ class AkActionWebServiceApiTests extends  UnitTestCase
         $TodoApi->inflect_names = true;
         
         // getApiMethodName
-        $this->assertEqual($TodoApi->getApiMethodName('CreateList'), 'create list');
+        $this->assertEqual($TodoApi->getApiMethodName('CreateList'), 'create_list');
         
         $api_methods =& $TodoApi->getApiMethods();
         $methods = array_keys($api_methods);
@@ -60,6 +61,26 @@ class AkActionWebServiceApiTests extends  UnitTestCase
         $this->assertEqual($TodoApi->_getApiPublicMethodNames(), array_map(array($TodoApi, 'getPublicApiMethodName'), $methods));
         
         //echo "<pre>".print_r($TodoApi,true)."</pre>";
+    }
+    
+    function test_service_generator()
+    {
+        $TodoApi =& new TodoApi();
+        
+        exec(AK_SCRIPT_DIR.DS.'generate service Todo');
+
+        require_once(AK_MODELS_DIR.DS.'todo_service.php');
+        $TodoService =& new TodoService();
+        
+        foreach (array_keys($TodoApi->getApiMethods()) as $method){
+            $this->assertTrue(method_exists($TodoService, $method));
+        }
+        
+    }
+    
+    function test_clear()
+    {
+        Ak::file_delete(AK_MODELS_DIR.DS.'todo_service.php');
     }
 }
 
