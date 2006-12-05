@@ -64,7 +64,7 @@ class ServiceGenerator extends  AkelosGenerator
         $api_methods =& $Api->getApiMethods();
         $methods = array_keys($api_methods);
         foreach ($methods as $method_name){
-            $this->api_methods[$method_name] =& $this->_getFunctionParamsAsText($api_methods[$method_name]);
+            $this->api_methods[$method_name] = $this->_getFunctionParamsAsText($api_methods[$method_name]);
             $this->_addDocBlock($api_methods[$method_name]);
         }
         
