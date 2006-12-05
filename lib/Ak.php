@@ -69,19 +69,19 @@ class Ak
     function &db($dsn = null, $connection_id = null)
     {
         static $db;
-        
+
         // In order to retrieve a database connection we just need to provide its identifier
-        $connection_id = empty($connection_id) ? 
-            (empty($dsn) || strstr($dsn,':') ? 'default' : $dsn) : 
-            $connection_id;
-        
+        $connection_id = empty($connection_id) ?
+        (empty($dsn) || strstr($dsn,':') ? 'default' : $dsn) :
+        $connection_id;
+
         if(empty($db[$connection_id])){
             require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb.inc.php');
-            
+
             if(substr($dsn, 0, 6) == 'mysql:'){
                 $dsn = substr_replace($dsn, 'mysqlt:', 0, 6);
             }
-            
+
             if (!$db[$connection_id] = (AK_DEBUG ? NewADOConnection($dsn) : @NewADOConnection($dsn))){
                 trigger_error(Ak::t('Connection to the database failed'), E_USER_ERROR);
                 exit;
@@ -108,7 +108,7 @@ class Ak
         return $cache;
     }
 
-    
+
     function toUrl($options, $set_routes = false)
     {
         static $Map;
@@ -335,7 +335,7 @@ class Ak
 
     function file_put_contents($file_name, $content, $options = array())
     {
-        
+
         $default_options = array(
         'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
         'base_path' => AK_BASE_DIR,
@@ -355,13 +355,13 @@ class Ak
             if(!AkFtp::is_dir(dirname($file_name))){
                 AkFtp::make_dir(dirname($file_name));
             }
-                        
+
             return AkFtp::put_contents($file_name, $content);
         }else{
             if(!is_dir(dirname($options['base_path'].DS.$file_name))){
                 Ak::make_dir(dirname($options['base_path'].DS.$file_name), $options);
             }
-           
+
             if(!$result = file_put_contents($options['base_path'].DS.$file_name, $content)){
                 Ak::trace("Please change file/dir permissions or enable FTP file handling by".
                 " setting the following on your config/".AK_ENVIRONMENT.".php file \n<pre>define('AK_UPLOAD_FILES_USING_FTP', true);\n".
@@ -1730,7 +1730,7 @@ Options are:
             }
         }
     }
-    
+
     /**
      * Use this function for securing includes. This way you can prevent file inclusion attacks
      */
@@ -1742,6 +1742,24 @@ Options are:
         );
         $mode = array_key_exists($mode,$rules) ? $mode : 'normal';
         return preg_replace($rules[$mode],'',$include);
+    }
+
+    /**
+     * Returns a PHP Object from an API resource
+     * 
+     */
+    function client_api($resource, $options = array())
+    {
+        $default_options = array(
+        'protocol' => 'xml_rpc',
+        'build' => true
+        );
+        $options = array_merge($default_options, $options);
+
+        require(AK_LIB_DIR.DS.'AkActionWebService'.DS.'AkActionWebServiceClient.php');
+        $Client =& new AkActionWebServiceClient($options['protocol']);
+        $Client->init($resource, $options);
+        return $Client;
     }
 
 }
@@ -1758,6 +1776,5 @@ function translate($string, $args = null, $controller = null)
 AK_PHP5 ? null : eval('function clone($object){return $object;}');
 
 Ak::profile('Ak.php class included'.__FILE__);
-
 
 ?>

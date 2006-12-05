@@ -16,17 +16,8 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-require_once('vendor'.DS.'incutio'.DS.'IXR_Library.inc.php');
+require_once(AK_VENDOR_DIR.DS.'incutio'.DS.'IXR_Library.inc.php');
 
-/**
- * //$Client = new AkXmlRpcClient('http://localhost:8888', array('debug'=>true, 'remote_methods'=>array('Calendar'=>array('getMonth'))));
-$Client = new AkXmlRpcClient('http://localhost:8888', array(
-'debug'=>false,
-'build'=>true));
-
-echo $Client->Num->div(2006, 20);
- *
- */
 
 class AkXmlRpcClient extends IXR_Client
 {
@@ -34,20 +25,27 @@ class AkXmlRpcClient extends IXR_Client
     var $options = array();
     var $errors = array();
     var $_IxrParameters = array();
+    var $WebServiceClient;
 
-    function AkXmlRpcClient()
+
+    function AkXmlRpcClient(&$WebServiceClient)
     {
-        $args = func_get_args();
-        $num_args = func_num_args();
+        $this->WebServiceClient =& $WebServiceClient;
+    }
 
-        if(is_array($args[$num_args-1])){
-            $this->options = array_pop($args);
+    function init()
+    {
+        $options = func_get_args();
+        $num_args = count($options);
+
+        if(!empty($options[$num_args-1]) && is_array($options[$num_args-1])){
+            $this->options = array_pop($options);
         }
 
         $default_options = array(
         'user_agent' => 'Akelos XML-RPC Client',
         'build' => false,
-        'remote_object_prefix' => 'Remote_',
+        'remote_object_prefix' => 'AkRemote_',
         'debug' => false,
         /**
          * @todo add a better cache system for remote methods
@@ -56,8 +54,7 @@ class AkXmlRpcClient extends IXR_Client
          );
 
          $this->options = array_merge($default_options, $this->options);
-
-         $this->_setIxrParameters($args);
+         $this->_setIxrParameters($options);
          $this->_getIxrInstance();
          $this->_addOptionsToIxrInstance();
 
@@ -98,59 +95,59 @@ class AkXmlRpcClient extends IXR_Client
         $objects = array_keys($methods);
         foreach ($methods as $class=>$methods){
             $class_code = $this->_buildClass($class, $methods);
-
-            eval('?>'.$class_code.'<?');
+            eval(' ?>'.$class_code.'<?php ');
         }
 
         foreach ($objects as $object){
             $class_name = $this->options['remote_object_prefix'].$object;
             $remote_attribute_name = $object;
             $remote_attribute_name_camelized = ucfirst($object);
-            $this->$remote_attribute_name =& new $class_name($this);
-            $this->$remote_attribute_name_camelized =& $this->$remote_attribute_name;
+            $this->WebServiceClient->$remote_attribute_name =& new $class_name($this);
+            $this->WebServiceClient->$remote_attribute_name_camelized =& $this->WebServiceClient->$remote_attribute_name;
         }
     }
 
     function _buildClass($class_name, $methods)
     {
+        $reserved_words = array('and', 'as', 'break', 'case', 'cfunction', 'class', 'continue', 'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif', 'empty', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endswitch', 'endwhile', 'eval', 'exit', 'extends', 'false', 'for', 'foreach', 'function', 'global', 'if', 'include', 'include_once', 'list', 'new', 'not', 'null', 'old_function', 'or', 'parent', 'print', 'require', 'require_once', 'return', 'static', 'stdclass', 'switch', 'true', 'var', 'virtual', 'while', 'xor');
+        
         $class_methods = '';
         foreach ($methods as $method){
+            $function_name = in_array(strtolower($method),$reserved_words) ? 'get'.ucfirst($method) : $method;
             $method_implementation = "
-            \$args = func_num_args() > 0 ? func_get_args() : array();
-            array_unshift(\$args, '$class_name.$method');
-            if(!call_user_func_array(array(&\$this->XmlRpcClient,'query'), \$args)){
-                \$this->addError(\$this->XmlRpcClient->getErrorCode().' : '.\$this->XmlRpcClient->getErrorMessage());
-            }
-            return !\$this->hasErrors() ? \$this->XmlRpcClient->getResponse() : false;
-            ";
-            $class_methods .= ' function '.$method."(){ $method_implementation } ";
+    \$args = func_num_args() > 0 ? func_get_args() : array();
+    array_unshift(\$args, '$class_name.$method');
+    if(!call_user_func_array(array(&\$this->XmlRpcClient,'query'), \$args)){
+        \$this->addError(\$this->XmlRpcClient->getErrorCode().' : '.\$this->XmlRpcClient->getErrorMessage());
+    }
+    return !\$this->hasErrors() ? \$this->XmlRpcClient->getResponse() : false;
+    ";
+            $class_methods .= ' function '.$function_name."()\n    { $method_implementation \n    } ";
         }
 
-        $ixr_vars = array();
-        foreach ($this->_getIxrOptions() as $option){
+        $ixr_options = $this->_getIxrOptions();
+        foreach ($ixr_options as $option){
             $ixr_vars[] = var_export($option, true);
         }
 
 
-        return "<?php class {$this->options['remote_object_prefix']}$class_name {
+        return "<?php \nclass {$this->options['remote_object_prefix']}$class_name \n{
         var \$XmlRpcClient;
         var \$errors;
-        function {$this->options['remote_object_prefix']}$class_name(&\$XmlRpcClient){ 
-            \$options = \$XmlRpcClient->_getIxrOptions();
-            
-            \$this->XmlRpcClient =& new IXR_Client(".join(',', $ixr_vars).");
+    function {$this->options['remote_object_prefix']}$class_name(&\$XmlRpcClient)\n    { 
+    \$this->XmlRpcClient =& new IXR_Client(".join(',', $ixr_vars).");
 
-             foreach (\$XmlRpcClient->options as \$k=>\$v){
-                 \$k = strtolower(str_replace('_','',\$k));
-                 \$this->XmlRpcClient->\$k = \$v;
-             }
-        }
-        function addError(\$error) { \$this->errors[\$error] = '';}
-        function hasErrors(){ return !empty(\$this->errors);}
-        function getErrors(){ return array_keys(\$this->errors);} 
-        function getMethods(){ return ".var_export($methods,true)."; }
+     foreach (\$XmlRpcClient->options as \$k=>\$v){
+         \$k = strtolower(str_replace('_','',\$k));
+         \$this->XmlRpcClient->\$k = \$v;
+     }
+    }
+        function addError(\$error)\n    {\n        \$this->errors[\$error] = '';\n    }
+        function hasErrors(){\n        return !empty(\$this->errors);\n    }
+        function getErrors(){\n        return array_keys(\$this->errors);\n    } 
+        function getMethods(){\n        return ".var_export($methods,true).";\n    }
         $class_methods 
-        } ?>";
+}\n?>";
     }
 
     function _getRemoteMethods()
@@ -211,6 +208,7 @@ class AkXmlRpcClient extends IXR_Client
     {
         return md5($this->server.$this->port.$this->path);
     }
+
 }
 
 ?>
