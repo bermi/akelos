@@ -318,10 +318,12 @@ class AkHasAndBelongsToMany extends AkAssociation
     function add(&$Associated)
     {
         if(is_array($Associated)){
+            $external_key = '__associated_to_model_'.$this->Owner->getModelName().'_as_'.$this->association_id;
             $succes = true;
             $succes = $this->Owner->notifyObservers('beforeAdd') ? $succes : false;
             foreach (array_keys($Associated) as $k){
-                if(!$this->_hasAssociatedMember($Associated[$k])){
+                if(empty($Associated[$k]->$external_key) && !$this->_hasAssociatedMember($Associated[$k])){
+                    $Associated[$k]->$external_key = $Associated[$k]->isNewRecord();
                     $this->Owner->{$this->association_id}[] =& $Associated[$k];
                     $this->_setAssociatedMemberId($Associated[$k]);
                     $succes = $this->_relateAssociatedWithOwner($Associated[$k]) ? $succes : false;
@@ -388,7 +390,7 @@ class AkHasAndBelongsToMany extends AkAssociation
     function addId($id)
     {
         $AssociatedModel =& $this->getAssociatedModelInstance();
-        if($NewAssociated = $AssociatedModel->find($id)){
+        if($NewAssociated =& $AssociatedModel->find($id)){
             return $this->add($NewAssociated);
         }
         return false;
@@ -505,7 +507,8 @@ class AkHasAndBelongsToMany extends AkAssociation
 
     function _hasAssociatedMember(&$Member)
     {
-        return !empty($Member->__hasAndBelongsToManyMemberId);
+        $id = $this->_getAssociatedMemberId($Member);
+        return !empty($id);
     }
 
 

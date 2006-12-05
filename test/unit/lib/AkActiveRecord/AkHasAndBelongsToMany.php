@@ -55,8 +55,6 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
         $Property->property_type->add($Chalet);
         $this->assertEqual($Property->property_type->count(), 1);
 
-
-
         $Condo =& new PropertyType(array('description'=>'Condominium'));
         $Property->property_type->add($Condo);
 
@@ -254,7 +252,7 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
         }
     }
 
-
+    /**/
     function test_clean_up_dependencies()
     {
         $Property =& new Property('description->','Luxury Estate');
@@ -276,6 +274,25 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
         $this->assertTrue(empty($PropertyType->properties[0]));
         $this->assertEqual($PropertyType->property->count(), 0);
 
+    }
+
+    /**/
+    function test_double_assignation()
+    {
+        $AkelosOffice =& new Property(array('description'=>'Akelos new Office'));
+        $this->assertTrue($AkelosOffice->save());
+
+        $PalafollsOffice =& new Property(array('description'=>"Bermi's home office"));
+        $this->assertTrue($PalafollsOffice->save());
+
+        $CoolOffice =& new PropertyType(array('description'=>'Cool office'));
+        $this->assertTrue($CoolOffice->save());
+
+        $AkelosOffice->property_type->add($CoolOffice);
+        $this->assertEqual($CoolOffice->property->count(), 1);
+
+        $PalafollsOffice->property_type->add($CoolOffice);
+        $this->assertEqual($CoolOffice->property->count(), 2);
     }
 
     /**
