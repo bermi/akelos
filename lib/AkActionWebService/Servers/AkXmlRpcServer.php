@@ -10,103 +10,139 @@
 
 /**
  * @package AkelosFramework
- * @subpackage AkActionWebService
+ * @subpackage AkActionWebservice
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-/**
- * ActionWebservice enables .... (add docs)
- *
- */
-class AkActionWebService extends AkObject
+class AkXmlRpcServer extends AkObject
 {
-    var $_controller;
-    var $_callback_settings = array();
-    var $_serverClassCode = '';
+    var $_ActionWebServiceServer;
+    var $options = array();
 
-    function AkActionWebService(&$Controller)
+    function AkXmlRpcServer(&$ActionWebServiceServer)
     {
-        $this->_controller =& $Controller;
+        $this->_ActionWebServiceServer =& $ActionWebServiceServer;
     }
 
-    function _loadCallbackSettings()
+    function init($options = array())
     {
-        $options = $this->_getDefaultCallbackSettings();
+        $default_options = array(
+        'dynamic_server_class_name' => 'AkDynamicXmlRpcServer'
+        );
 
-        if(is_array($this->_controller->api)){
-            $options = array_merge($options, $this->_controller->api);
-        }
-        $this->_callback_settings = $options;
-    }
+        $this->options = array_merge($default_options, $options);
 
-    function _getDefaultCallbackSettings()
-    {
-        $methods = get_class_methods($this->_controller);
-        $callback_settings = array();
-        foreach ($methods as $method){
-            if(substr($method,0, 5) == '_api_'){
-                $api_method = substr($method, 5);
-                $callback_settings[AkInflector::variablize($api_method)] = array(
-                'method'=>$method,
-                'doc' => 'nodoc',
-                'returns' => array('string')
-                );
+        if(!empty($this->_ActionWebServiceServer->_services)){
+            foreach (array_keys($this->_ActionWebServiceServer->_services) as $name_space){
+                $this->_addWebService($name_space, $this->_ActionWebServiceServer->_services[$name_space]);
             }
         }
-
-        return $callback_settings;
     }
+
+    function _addWebService($service_name, &$WebService)
+    {
+        $Apis =& $WebService->getApis();
+
+        foreach (array_keys($Apis) as $k){
+            $api_methods =& $Apis[$k]->getApiMethods();
+            foreach (array_keys($api_methods) as $k){
+                $api_method =& $api_methods[$k];
+                $public_name = AkInflector::variablize($api_method->public_name);
+                $signatures = var_export(array_merge($api_method->returns, $api_method->expects),  true);
+                $documentation = var_export($this->_getDocumentationForMethod($api_method), true);
+
+                $this->_callbacks[] = "
+                
+        \$this->addCallback(
+        '$service_name.$public_name',
+        'this:_{$service_name}_{$api_method->name}_call',
+        $signatures,
+        $documentation
+        );
+            ";
+
+                $this->_methods[] = "
+                
+    function _{$service_name}_{$api_method->name}_call()
+    {
+        \$args = func_get_args();
+        return call_user_func_array(array(&\$this->_{$service_name}, '".$api_method->name."'), (array)\$args[0]); 
+    }
+                    ";
+
+            }
+        }
+    }
+
+    function _getDocumentationForMethod($ApiMethod)
+    {
+
+        $doc = !empty($ApiMethod->documentation)? $ApiMethod->documentation."\n" : '';
+        foreach (array('expects', 'returns') as $expects_or_returns){
+            if(!empty($ApiMethod->{$expects_or_returns})){
+                foreach ($ApiMethod->{$expects_or_returns} as $k=>$type){
+                    $doc .= "\n".(
+                    $expects_or_returns == 'expects' ?
+                    Ak::t(AkInflector::ordinalize($k+1)).' parameter as' : 'Returns'
+                    )." $type:";
+                    if(!empty($ApiMethod->{$expects_or_returns.'_documentation'}[$k])){
+                        $doc .= ' '.$ApiMethod->{$expects_or_returns.'_documentation'}[$k];
+                    }
+                }
+            }
+        }
+        return $doc;
+
+    }
+
 
     function _generateServerClassCode()
     {
         $this->_serverClassCode = "<?php
-class AkActionWebServer extends AkIxrInstrospectionServer {
-    var \$_controller;
-    function AkActionWebServer(&\$Controller) {
-        \$this->_controller =& \$Controller;
-        \$this->_controller->_ApiServer =& \$this;
-        \$this->IXR_IntrospectionServer();";
+class {$this->options['dynamic_server_class_name']} extends AkIxrInstrospectionServer 
+{
+    function {$this->options['dynamic_server_class_name']}() 
+    {
+        \$this->IXR_IntrospectionServer();
+    }
+    ";
 
-        $init = '';
-        $methods = '';
-        foreach ($this->_callback_settings as $method_name=>$details){
-            $details['method'] = !empty($details['method']) ? $details['method'] : 
-            (is_numeric($method_name) && is_string($details) ? $details : $method_name);
+        $this->_serverClassCode .= join("\n", $this->_methods);
 
-            if(strstr($method_name, '.')){
-                $method_parts = explode('.',$method_name);
-                $method_name = AkInflector::variablize(array_shift($method_parts));
-                $namespace = AkInflector::variablize(array_shift($method_parts));
-            }else{
-                $method_name = AkInflector::variablize($method_name);
-                $namespace = AkInflector::variablize($this->_controller->getControllerName());
-            }
+        $this->_serverClassCode .= '
+    function init()
+    {
+    '. join("\n", $this->_callbacks).'
+    
+        $this->serve();
+    }
+        
+}
 
-            $init .= "\$this->addCallback(
-            '".$namespace.'.'.$method_name."',
-            'this:".@$details['method']."',".
-            var_export(@is_array(@$details['returns'])?@$details['returns']:array(@$details['returns']), true).','.
-            "'".str_replace("'","\\'", @$details['doc'])."');\n";
-            
-                $methods .= "function ".$details['method']."(){\$args = func_get_args(); ".
-                "return call_user_func_array(array(&\$this->_controller, '".$details['method']."'), \$args); }\n";
-           
-        }
+?>';
 
-        $this->_serverClassCode .= $init.' $this->serve(); } '.$methods.'} ?>';
 
     }
 
-    function _runServer()
+    function serve()
     {
+
+        $this->_generateServerClassCode();
         eval('?>'.$this->_serverClassCode.'<?');
+        $Server =& new $this->options['dynamic_server_class_name'];
+        $this->_linkWebServicesToServer($Server);
+        $Server->init();
+    }
 
-        $Server = new AkActionWebServer($this->_controller);
-
-        return $this->_controller->afterAction('api');
-        exit;
+    function _linkWebServicesToServer(&$Server)
+    {
+        if(!empty($this->_ActionWebServiceServer->_services)){
+            foreach (array_keys($this->_ActionWebServiceServer->_services) as $name_space){
+                $Server->{'_'.$name_space} =& $this->_ActionWebServiceServer->_services[$name_space];
+            }
+        }
     }
 
 }
@@ -115,6 +151,8 @@ require_once(AK_VENDOR_DIR.DS.'incutio'.DS.'IXR_Library.inc.php');
 
 class AkIxrInstrospectionServer extends IXR_IntrospectionServer
 {
+    var $_services = array();
+
     function output($xml)
     {
         $xml = '<?xml version="1.0"?>'."\n".$xml;
@@ -124,6 +162,12 @@ class AkIxrInstrospectionServer extends IXR_IntrospectionServer
         header('Content-Type: text/xml');
         header('Date: '.date('r'));
         echo $xml;
+        exit;
+    }
+
+    function _addService($service_name, &$ServiceInstance)
+    {
+        $this->_services[$service_name] =& $ServiceInstance;
     }
 }
 

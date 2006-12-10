@@ -147,6 +147,12 @@ class AkActionController extends AkObject
 
     var $app_helpers;
 
+    var $web_service;
+    var $web_services = array();
+
+    var $web_service_api;
+    var $web_service_apis = array();
+
     function handleRequest($options = array())
     {
         $default_options = array(
@@ -740,7 +746,7 @@ class AkActionController extends AkObject
     }
 
 
-    
+
 
 
     /**
@@ -2472,6 +2478,26 @@ class AkActionController extends AkObject
             }
         }
         return false;
+    }
+
+
+    function api($protocol = 'xml_rpc')
+    {
+        $web_services = array_merge(Ak::toArray($this->web_services), Ak::toArray($this->web_service));
+        if(!empty($web_services)){
+            $web_services = array_unique($web_services);
+            require_once(AK_LIB_DIR.DS.'AkActionWebService.php');
+            require_once(AK_LIB_DIR.DS.'AkActionWebService'.DS.'AkActionWebServiceServer.php');
+            $Server =& new AkActionWebServiceServer($protocol);
+            foreach ($web_services as $web_service){
+                $Server->addService($web_service);
+            }
+            $Server->init();
+            $Server->serve(); 
+            exit;
+        }else{
+            die(Ak::t('There is not any webservice configured at this endpoint'));
+        }
     }
 }
 
