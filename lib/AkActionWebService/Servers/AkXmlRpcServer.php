@@ -10,7 +10,7 @@
 
 /**
  * @package AkelosFramework
- * @subpackage AkActionWebservice
+ * @subpackage AkActionWebService
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
@@ -128,7 +128,6 @@ class {$this->options['dynamic_server_class_name']} extends AkIxrInstrospectionS
 
     function serve()
     {
-
         $this->_generateServerClassCode();
         eval('?>'.$this->_serverClassCode.'<?');
         $Server =& new $this->options['dynamic_server_class_name'];
