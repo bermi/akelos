@@ -210,6 +210,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     var $_automated_validators_enabled = true;
     var $_automated_not_null_validator = false;
     var $_set_default_attribute_values_automatically = true;
+    
+    var $_automated_password_obfuscation = true;
 
     // This is needed for enabling support for static active record instantation under php
     var $_activeRecordHasBeenInstantiated = true;
@@ -2987,6 +2989,7 @@ Examples for find all:
             break;
 
             default:
+            $value = ($column_name=='password' && !empty($value)) ? $this->_castPassword($value) : $value;
             $result = $add_quotes ? $this->_db->qstr($value) : $value;
             break;
         }
@@ -2994,6 +2997,13 @@ Examples for find all:
         return empty($this->_columns[$column_name]['notNull']) ? ($result === '' ? "''" : $result) : ($result == 'null' ? '' : $result);
     }
 
+    function _castPassword($password)
+    {
+        if(!empty($this->_automated_password_obfuscation)){
+            $password = md5($password);
+        }
+        return $password;
+    }
 
     function castAttributeFromDatabase($column_name, $value)
     {
@@ -3017,7 +3027,7 @@ Examples for find all:
                 break;
 
                 default:
-                return $value;
+                return $column_name == 'password' ? '' : $value;
                 break;
             }
         }
@@ -4387,9 +4397,9 @@ Examples for find all:
         $this->_db->debug = $this->_db->debug ? false : true;
     }
     
-    function dbuging($trace_this_on_debug_mode = null)
+    function dbugging($trace_this_on_debug_mode = null)
     {
-        if(!empty($this->_db->debug) && !empty($message)){
+        if(!empty($this->_db->debug) && !empty($trace_this_on_debug_mode)){
             $message = !is_scalar($trace_this_on_debug_mode) ? var_export($trace_this_on_debug_mode, true) : (string)$trace_this_on_debug_mode;
             Ak::trace($message);
         }
