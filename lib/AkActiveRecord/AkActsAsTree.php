@@ -157,8 +157,19 @@ class AkActsAsTree extends AkObserver
 
     function getScopeCondition()
     {
-        if(empty($this->_scope_condition)){
-            $this->setScopeCondition((substr($this->_ActiveRecordInstance->_db->databaseType,0,4) == 'post') ? 'true' : '1');
+        // An allways true condition in case no scope has been specified
+        if(empty($this->_scope_condition) && empty($this->scope)){
+            $this->_scope_condition = (substr($this->_ActiveRecordInstance->_db->databaseType,0,4) == 'post') ? 'true' : '1';
+        }elseif (!empty($this->scope)){
+            $scoped = array();
+            foreach ((array)$this->scope as $column){
+                if($this->_ActiveRecordInstance->hasColumn($column)){
+                    $scoped[] =  $column.' = '.$this->_ActiveRecordInstance->castAttributeForDatabase($column, $this->_ActiveRecordInstance->get($column));
+                }else{
+                    $scoped[] = $column;
+                }
+            }
+            $this->setScopeCondition(join(' AND ',$scoped));
         }
         return  $this->_scope_condition;
     }

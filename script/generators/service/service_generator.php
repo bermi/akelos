@@ -90,7 +90,7 @@ class ServiceGenerator extends  AkelosGenerator
                 foreach ($ApiMethod->{$expects_or_returns} as $k=>$type){
                     $this->api_method_doc[$ApiMethod->name] .= "\n\t*  ".(
                         $expects_or_returns == 'expects' ? 
-                        '@param param'.($k+1) : '@returns '
+                        '@param param'.($k+1) : '@return '
                         )." $type";
                     if(!empty($ApiMethod->{$expects_or_returns.'_documentation'}[$k])){
                         $this->api_method_doc[$ApiMethod->name] .= ' '.$ApiMethod->{$expects_or_returns.'_documentation'}[$k];

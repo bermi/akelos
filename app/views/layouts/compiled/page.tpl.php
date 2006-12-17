@@ -132,7 +132,7 @@
   <body>
     <div id="page">
       <div id="content">
-      <?= $text_helper->flash();?>
+      <?php echo $text_helper->flash();?>
       <?php echo $content_for_layout; ?>
       
       </div>

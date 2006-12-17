@@ -242,7 +242,10 @@ class AkSintags
 
     function _tokenizeTemplate()
     {
-        $this->_code = str_replace(array('{_','{?','?}','{loop ','{end}'),array('{AKTRANSVAR__','{AKNOTEMPTY__','__AKPRINTIFISSET}','{AKPERFLOOP__','<?php } ?>'), $this->_code);
+        $this->_code = str_replace(
+        array('{_','{?','?}','{loop ','{end}','<?xml','<?=','<? ',"<?\n","<?\t"),
+        array('{AKTRANSVAR__','{AKNOTEMPTY__','__AKPRINTIFISSET}','{AKPERFLOOP__','<?php } ?>','AKXMLOPENTAG','AKPHPOPENSHORTTAGECHO','AKPHPOPENSHORTTAG','AKPHPOPENSHORTTAG','AKPHPOPENSHORTTAG'), 
+        $this->_code);
         if(preg_match_all('/{[A-Za-z0-9_]+((\.|-){1}[A-Za-z0-9_]+){0,}}/i',$this->_code,$match)){
             $this->_tokens = $match[0];
         }
@@ -253,7 +256,11 @@ class AkSintags
 
     function _untokenizeTemplate()
     {
-        $this->_code = str_replace(array('{AKTRANSVAR__','{AKNOTEMPTY__','__AKPRINTIFISSET}','{AKPERFLOOP__'),array('{_','{?','?}','{loop '), $this->_code);
+        $this->_code = str_replace(
+        array('{AKTRANSVAR__','{AKNOTEMPTY__','__AKPRINTIFISSET}','{AKPERFLOOP__',
+        'AKXMLOPENTAG','AKPHPOPENSHORTTAGECHO','AKPHPOPENSHORTTAG'),
+        array('{_','{?','?}','{loop ',
+        '<?php echo \'<?xml\'; ?>','<?php echo ','<?php '), $this->_code);
     }
 
     function _loadTokenReplacementOptions()
