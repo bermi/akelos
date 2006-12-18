@@ -83,9 +83,9 @@ class AkHasOne extends AkAssociation
         $this->setAssociatedId($association_id, $associated->getId());
 
         $associated =& $this->_build($association_id, &$associated, false);
-        
+
         $this->_saveLoadedHandler($association_id, $associated);
-        
+
         if($options['instantiate']){
             $associated =& $this->addModel($association_id,  new $options['class_name']($options['foreign_key'].' = '.$this->Owner->quotedId()));
         }
@@ -202,7 +202,7 @@ class AkHasOne extends AkAssociation
         if(!empty($Associated->__activeRecordObject) && !empty($NewAssociated->__activeRecordObject) && $Associated->getId() == $NewAssociated->getId()){
             return $NewAssociated;
         }
-        
+
         if(!empty($Associated->__activeRecordObject)){
             if ($Associated->getAssociationOption('dependent') && !$dont_save){
                 if(!$Associated->isNewRecord()){
@@ -217,12 +217,12 @@ class AkHasOne extends AkAssociation
         }
 
         $result = false;
-        
+
         if (!empty($NewAssociated->__activeRecordObject)){
             if(!$this->Owner->isNewRecord()){
                 $NewAssociated->set($Associated->getAssociationOption('foreign_key'), $this->Owner->getId());
             }
-                        
+
             $NewAssociated =& $this->_build($association_id, &$NewAssociated);
 
             $NewAssociated->_loaded = true;
@@ -290,23 +290,26 @@ class AkHasOne extends AkAssociation
     function afterSave(&$object)
     {
         $success = true;
-        
+
         $associated_ids = $object->getAssociatedIds();
-        
+
         foreach ($associated_ids as $associated_id){
-            if(strtolower($object->hasOne->getOption($associated_id, 'class_name')) == strtolower($object->$associated_id->getType())){
-                $object->hasOne->replace($associated_id, $object->$associated_id, false);
-                $object->$associated_id->set($object->hasOne->getOption($associated_id, 'foreign_key'), $object->getId());
-                $success = $object->$associated_id->save() ? $success : false;
-                
-            }elseif($object->$associated_id->getType() == 'hasOne'){
-                $attributes = array();
-                foreach ((array)$object->$associated_id as $k=>$v){
-                    $k[0] != '_' ? $attributes[$k] = $v : null;
-                }
-                $attributes = array_diff($attributes, array(''));
-                if(!empty($attributes)){
-                    $object->hasOne->build($associated_id, $attributes);
+            if(!empty($object->$associated_id->__activeRecordObject)){
+
+                if(strtolower($object->hasOne->getOption($associated_id, 'class_name')) == strtolower($object->$associated_id->getType())){
+                    $object->hasOne->replace($associated_id, $object->$associated_id, false);
+                    $object->$associated_id->set($object->hasOne->getOption($associated_id, 'foreign_key'), $object->getId());
+                    $success = $object->$associated_id->save() ? $success : false;
+
+                }elseif($object->$associated_id->getType() == 'hasOne'){
+                    $attributes = array();
+                    foreach ((array)$object->$associated_id as $k=>$v){
+                        $k[0] != '_' ? $attributes[$k] = $v : null;
+                    }
+                    $attributes = array_diff($attributes, array(''));
+                    if(!empty($attributes)){
+                        $object->hasOne->build($associated_id, $attributes);
+                    }
                 }
             }
         }
@@ -319,9 +322,9 @@ class AkHasOne extends AkAssociation
         $success = true;
         $associated_ids = $object->getAssociatedIds();
         foreach ($associated_ids as $associated_id){
-            if( isset($object->$associated_id->_associatedAs) && 
-                $object->$associated_id->_associatedAs == 'hasOne' && 
-                $object->$associated_id->getAssociationOption('dependent')){
+            if( isset($object->$associated_id->_associatedAs) &&
+            $object->$associated_id->_associatedAs == 'hasOne' &&
+            $object->$associated_id->getAssociationOption('dependent')){
                 if(method_exists($object->$associated_id, 'destroy')){
                     $success = $object->$associated_id->destroy() ? $success : false;
                 }
