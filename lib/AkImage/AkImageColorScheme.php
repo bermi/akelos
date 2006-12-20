@@ -22,7 +22,7 @@ class AkImageColorScheme extends AkObject
 {
     var $number_of_colors = 12;
     var $calculate_negatives = true;
-    var $minimum_hits_for_negative = 20;
+    var $minimum_hits_for_negative = 50;
     var $Image;
     var $_tmp_file;
     var $_frequentColors = array();
