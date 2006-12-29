@@ -221,7 +221,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         if(file_exists($join_model_file)){
             require_once($join_model_file);
             if(class_exists($options['join_class_name'])){
-                $this->JoinObject =& new $options['join_class_name']();
+                $this->JoinObject = new $options['join_class_name']();
                 $this->JoinObject->setPrimaryKey($options['foreign_key']);
                 return true;
             }
@@ -255,7 +255,8 @@ class AkHasAndBelongsToMany extends AkAssociation
         \$attributes = (array)func_get_args();
         \$this->_generateSequence = false;
         \$this->setTableName('{$options['join_table']}', true, true);
-        return \$this->init(\$attributes);
+        \${$options['join_class_name']} =& \$this->init(\$attributes);
+        return \${$options['join_class_name']};
     }
 }";
             $class_file_code .= $class_code. "\n\n?>";

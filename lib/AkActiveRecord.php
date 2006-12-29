@@ -210,7 +210,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     var $_automated_validators_enabled = true;
     var $_automated_not_null_validator = false;
     var $_set_default_attribute_values_automatically = true;
-    
+
     var $_automated_password_obfuscation = true;
 
     // This is needed for enabling support for static active record instantation under php
@@ -2164,7 +2164,7 @@ Examples for find all:
 
 
     /**
-    * Defines the primary key field ? can be overridden in subclasses.
+    * Returns the primary key field.
     */
     function getPrimaryKey()
     {
@@ -2567,7 +2567,7 @@ Examples for find all:
         }
 
         if($this->_getDatabaseType() == 'mysql'){
-            if($result == 'integer' && (int)$adodb_column_object->max_length === 1 && 
+            if($result == 'integer' && (int)$adodb_column_object->max_length === 1 &&
             stristr($adodb_column_object->type, 'TINYINT')){
                 return 'boolean';
             }
@@ -3049,6 +3049,17 @@ Examples for find all:
         }
     }
 
+    function getAttributeCondition($argument)
+    {
+        if(is_array($argument)){
+            return 'IN (?)';
+        }elseif (is_null($argument)){
+            return 'IS ?';
+        }else{
+            return '= ?';
+        }
+    }
+
     function getValueForDateColumn($column_name, $value)
     {
         if(!$this->isNewRecord()){
@@ -3438,7 +3449,7 @@ Examples for find all:
     //////////          VALIDATION      ////////////////////////////////
     ////////////////////////////////////////////////////////////////////
 
-    
+
     /**
     * Active Records implement validation by overwriting AkActiveRecord::validate (or the variations, validateOnCreate and
     * validateOnUpdate). Each of these methods can inspect the state of the object, which usually means ensuring
@@ -3485,7 +3496,7 @@ Examples for find all:
     * An "Errors" object is automatically created for every Active Record.
     * 
     */
-    
+
     /**
       * Encapsulates the pattern of wanting to validate a password or email address field with a confirmation. Example:
       * 
@@ -3700,34 +3711,73 @@ Examples for find all:
     *       }
     *   }
     *
+    * It can also validate whether the value of the specified attributes are unique based on multiple scope parameters.  For example,
+    * making sure that a teacher can only be on the schedule once per semester for a particular class. 
+    *
+    *   class TeacherSchedule extends AkActiveRecord
+    *   {
+    *       function validate()
+    *       {
+    *           $this->validatesUniquenessOf('passport_number');
+    *           $this->validatesUniquenessOf('teacher_id', array('scope' => array("semester_id", "class_id"));
+    *       }
+    *   }
+    * 
+    * 
     * When the record is created, a check is performed to make sure that no record exist in the database with the given value for the specified
     * attribute (that maps to a column). When the record is updated, the same check is made but disregarding the record itself.
     *
     * Configuration options:
     * <tt>message</tt> - Specifies a custom error message (default is: "has already been taken")
     * <tt>scope</tt> - Ensures that the uniqueness is restricted to a condition of "scope = record.scope"
-    * <tt>if</tt> - Specifies a method, proc or string to call to determine if the validation should
+    * <tt>case_sensitive</tt> - Looks for an exact match.  Ignored by non-text columns (true by default).
+    * <tt>if</tt> - Specifies a method to call or a string to evaluate to determine if the validation should
+    * occur (e.g. 'if' => 'allowValidation', or 'if' => '$this->signup_step > 2').  The
+    * method, or string should return or evaluate to a true or false value.
     */
-    function validatesUniquenessOf($attribute_names, $options = array('message'=>'taken'))
+    function validatesUniquenessOf($attribute_names, $options = array())
     {
-        $message = empty($options['message']) ? 'taken' : $options['message'];
-        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
+        $default_options = array('case_sensitive'=>true, 'message'=>'taken');
+        $options = array_merge($default_options, $options);
 
-        $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
-        foreach ($attribute_names as $attribute_name){
-            if(!empty($options['scope']) && $this->find('first', array('conditions' =>($this->isNewRecord() ?
-            array("$attribute_name = ? AND {$options['scope']} = ?", $this->$attribute_name, $this->$options['scope']) :
-            array("$attribute_name = ? AND ".$this->getPrimaryKey()." <> ? AND {$options['scope']} = ?", $this->$attribute_name, $this->getId(), $this->$options['scope'])
-            )))){
-                $this->addError($attribute_name, $message);
-            }elseif (empty($options['scope']) && $this->find('first', array('conditions' =>($this->isNewRecord() ?
-            array("$attribute_name = ?", $this->$attribute_name) :
-            array("$attribute_name = ? AND ".$this->getPrimaryKey()." <> ?", $this->$attribute_name, $this->getId())
-            )))){
+        if(!empty($options['if']) && (method_exists($this,$options['if']) ? $this->{$options['if']}() : eval($options['if'])) === false){
+            return true;
+        }
+
+        $message = isset($this->_defaultErrorMessages[$options['message']]) ? $this->t($this->_defaultErrorMessages[$options['message']]) : $options['message'];
+        unset($options['message']);
+
+        foreach ((array)$attribute_names as $attribute_name){
+            $value = isset($this->$attribute_name) ? $this->$attribute_name : null;
+
+            if($value === null || ($options['case_sensitive'] || !$this->hasColumn($attribute_name))){
+                $condition_sql = $this->getTableName().'.'.$attribute_name.' '.$this->getAttributeCondition($value);
+                $condition_params = array($value);
+            }else{
+                $condition_sql = 'LOWER('.$this->getTableName().'.'.$attribute_name.') '.$this->getAttributeCondition($value);
+                $condition_params = array(is_array($value) ? array_map('utf8_strtolower',$value) : utf8_strtolower($value));
+            }
+
+            if(!empty($options['scope'])){
+                foreach ((array)$options['scope'] as $scope_item){
+                    $scope_value = $this->get($scope_item);
+                    $condition_sql .= ' AND '.$this->getTableName().'.'.$scope_item.' '.$this->getAttributeCondition($scope_value);
+                    $condition_params[] = $scope_value;
+                }
+            }
+
+            if(!$this->isNewRecord()){
+                $condition_sql .= ' AND '.$this->getTableName().'.'.$this->getPrimaryKey().' <> ?';
+                $condition_params[] = $this->getId();
+            }
+            array_unshift($condition_params,$condition_sql);
+            if ($this->find('first', array('conditions' => $condition_params))){
                 $this->addError($attribute_name, $message);
             }
         }
     }
+
+
 
     /**
     * Validates whether the value of the specified attribute is of the correct form by matching it against the regular expression
@@ -3890,34 +3940,35 @@ Examples for find all:
     */
     function isValid()
     {
-        $this->notifyObservers('beforeValidation');
+        if($this->beforeValidation() && $this->notifyObservers('beforeValidation')){
 
-        $this->clearErrors();
+            $this->clearErrors();
 
-        if($this->_set_default_attribute_values_automatically){
-            $this->_setDefaultAttributeValuesAutomatically();
-        }
-
-        $this->validate();
-
-        if($this->_automated_validators_enabled){
-            $this->_runAutomatedValidators();
-        }
-
-        if ($this->isNewRecord()){
-            if($this->beforeValidationOnCreate()){
-                $this->notifyObservers('beforeValidationOnCreate');
-                $this->validateOnCreate();
-                $this->notifyObservers('afterValidationOnCreate');
+            if($this->_set_default_attribute_values_automatically){
+                $this->_setDefaultAttributeValuesAutomatically();
             }
-        }else{
-            if($this->beforeValidationOnUpdate()){
-                $this->notifyObservers('beforeValidationOnUpdate');
-                $this->validateOnUpdate();
-                $this->notifyObservers('afterValidationOnUpdate');
+
+            $this->validate();
+
+            if($this->_automated_validators_enabled){
+                $this->_runAutomatedValidators();
             }
+
+            if ($this->isNewRecord()){
+                if($this->beforeValidationOnCreate()){
+                    $this->notifyObservers('beforeValidationOnCreate');
+                    $this->validateOnCreate();
+                    $this->notifyObservers('afterValidationOnCreate');
+                }
+            }else{
+                if($this->beforeValidationOnUpdate()){
+                    $this->notifyObservers('beforeValidationOnUpdate');
+                    $this->validateOnUpdate();
+                    $this->notifyObservers('afterValidationOnUpdate');
+                }
+            }
+            $this->notifyObservers('afterValidation');
         }
-        $this->notifyObservers('afterValidation');
 
         return !$this->hasErrors();
     }
@@ -4396,7 +4447,7 @@ Examples for find all:
         }
         $this->_db->debug = $this->_db->debug ? false : true;
     }
-    
+
     function dbugging($trace_this_on_debug_mode = null)
     {
         if(!empty($this->_db->debug) && !empty($trace_this_on_debug_mode)){

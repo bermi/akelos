@@ -534,6 +534,39 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         
     }
     
+    function Test_of_validatesUniquenessOfUsingMultipleScopes()
+    {
+        $Person = new AkTestPerson('user_name->','admin','first_name->','Sam','last_name->','','country->','ES','tos->',1);
+        $this->assertTrue($Person->save());
+        
+        $Person = new AkTestPerson('user_name->','admin','first_name->','Sam','last_name->','','country->','FR','tos->',1);
+        $Person->validatesUniquenessOf("user_name",array('scope'=>'first_name'));        
+        $this->assertTrue($Person->hasErrors());
+        
+        $Person = new AkTestPerson('user_name->','admin','first_name->','Sam','last_name->','','country->','FR','tos->',1);
+        $Person->validatesUniquenessOf("user_name",array('scope'=>array('first_name','country')));        
+        $this->assertFalse($Person->hasErrors());
+        
+    }
+        
+    function Test_of_validatesUniquenessOfConditionally()
+    {
+        $Person = new AkTestPerson('user_name->','james','first_name->','James','last_name->','','country->','ES','tos->',1);
+        $this->assertTrue($Person->save());
+        
+        $Person = new AkTestPerson('user_name->','james','first_name->','James','last_name->','','country->','ES','tos->',1);
+        $Person->validatesUniquenessOf("user_name");        
+        $this->assertTrue($Person->hasErrors());
+        
+        $Person = new AkTestPerson('user_name->','james','first_name->','James','last_name->','','country->','ES','tos->',1);
+        $Person->force_validation = false;
+        $Person->validatesUniquenessOf("user_name", array('if'=>'$Person->force_validation'));        
+        $this->assertFalse($Person->hasErrors());
+        
+    }
+    
+    
+    
     function Test_of_validatesFormatOf()
     {
         $Person = new AkTestPerson();
