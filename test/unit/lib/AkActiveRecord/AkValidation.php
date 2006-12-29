@@ -560,7 +560,7 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         
         $Person = new AkTestPerson('user_name->','james','first_name->','James','last_name->','','country->','ES','tos->',1);
         $Person->force_validation = false;
-        $Person->validatesUniquenessOf("user_name", array('if'=>'$Person->force_validation'));        
+        $Person->validatesUniquenessOf("user_name", array('if'=>'$this->force_validation'));        
         $this->assertFalse($Person->hasErrors());
         
     }

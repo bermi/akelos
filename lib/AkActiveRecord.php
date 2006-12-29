@@ -3740,8 +3740,17 @@ Examples for find all:
         $default_options = array('case_sensitive'=>true, 'message'=>'taken');
         $options = array_merge($default_options, $options);
 
-        if(!empty($options['if']) && (method_exists($this,$options['if']) ? $this->{$options['if']}() : eval($options['if'])) === false){
-            return true;
+        if(!empty($options['if'])){
+            if(method_exists($this,$options['if'])){
+                if($this->{$options['if']}() === false){
+                    return true;
+                }
+            }else {
+                eval('$__eval_result = ('.rtrim($options['if'],';').');');
+                if(empty($__eval_result)){
+                    return true;
+                }
+            }
         }
 
         $message = isset($this->_defaultErrorMessages[$options['message']]) ? $this->t($this->_defaultErrorMessages[$options['message']]) : $options['message'];
