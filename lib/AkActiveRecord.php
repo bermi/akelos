@@ -1543,16 +1543,16 @@ Examples for find all:
             return false;
         }
 
-        if($inspect_for_callback_child_method === true && method_exists($this,'set'.ucfirst($attribute))){
+        if($inspect_for_callback_child_method === true && method_exists($this,'set'.AkInflector::camelize($attribute))){
             $watchdog[$attribute] = @$watchdog[$attribute]+1;
             if($watchdog[$attribute] == 5000){
                 if((!defined('AK_ACTIVE_RECORD_PROTECT_SET_RECURSION')) || defined('AK_ACTIVE_RECORD_PROTECT_SET_RECURSION') && AK_ACTIVE_RECORD_PROTECT_SET_RECURSION){
-                    trigger_error(Ak::t('You are calling recursivelly AkActiveRecord::setAttribute by placing parent::setAttribute() or  parent::set() on your model "%method" method. In order to avoid this, set the 3rd paramenter of parent::setAttribute to FALSE. If this was the behaviour you expected, please define the constant AK_ACTIVE_RECORD_PROTECT_SET_RECURSION and set it to false',array('%method'=>'set'.ucfirst($attribute))),E_USER_ERROR);
+                    trigger_error(Ak::t('You are calling recursivelly AkActiveRecord::setAttribute by placing parent::setAttribute() or  parent::set() on your model "%method" method. In order to avoid this, set the 3rd paramenter of parent::setAttribute to FALSE. If this was the behaviour you expected, please define the constant AK_ACTIVE_RECORD_PROTECT_SET_RECURSION and set it to false',array('%method'=>'set'.AkInflector::camelize($attribute))),E_USER_ERROR);
                     return false;
                 }
             }
             $this->{$attribute.'_before_type_cast'} = $value;
-            return $this->{'set'.ucfirst($attribute)}($value);
+            return $this->{'set'.AkInflector::camelize($attribute)}($value);
         }
         if($this->hasAttribute($attribute)){
             $this->{$attribute.'_before_type_cast'} = $value;
@@ -1602,11 +1602,11 @@ Examples for find all:
             $watchdog[@$attribute] = @$watchdog[$attribute]+1;
             if($watchdog[$attribute] == 66){
                 if((!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')) || defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') && AK_ACTIVE_RECORD_PROTECT_GET_RECURSION){
-                    trigger_error(Ak::t('You are calling recursivelly AkActiveRecord::getAttribute by placing parent::getAttribute() or  parent::get() on your model "%method" method. In order to avoid this, set the 2nd paramenter of parent::getAttribute to FALSE. If this was the behaviour you expected, please define the constant AK_ACTIVE_RECORD_PROTECT_GET_RECURSION and set it to false',array('%method'=>'get'.ucfirst($attribute))),E_USER_ERROR);
+                    trigger_error(Ak::t('You are calling recursivelly AkActiveRecord::getAttribute by placing parent::getAttribute() or  parent::get() on your model "%method" method. In order to avoid this, set the 2nd paramenter of parent::getAttribute to FALSE. If this was the behaviour you expected, please define the constant AK_ACTIVE_RECORD_PROTECT_GET_RECURSION and set it to false',array('%method'=>'get'.AkInflector::camelize($attribute))),E_USER_ERROR);
                     return false;
                 }
             }
-            $value = $this->{'get'.ucfirst($attribute)}();
+            $value = $this->{'get'.AkInflector::camelize($attribute)}();
             return $this->getInheritanceColumn() != false  ? AkInflector::demodulize($value) : $value;
         }
         if(isset($this->$attribute) || (!isset($this->$attribute) && $this->isCombinedAttribute($attribute))){

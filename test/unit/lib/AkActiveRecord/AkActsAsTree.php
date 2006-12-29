@@ -1,337 +1,365 @@
 <?php
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
+// +----------------------------------------------------------------------+
+// | Akelos Framework - http://www.akelos.org                             |
+// +----------------------------------------------------------------------+
+// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
+// | Released under the GNU Lesser General Public License, see LICENSE.txt|
+// +----------------------------------------------------------------------+
+// | Acts as Tree                                                         |
+// +----------------------------------------------------------------------+
+// | Copyright (c) 2006, Raw Ideas Pty Ltd & Niels Ganser                 |
+// | Released under the GNU Lesser General Public License, see LICENSE.txt|
+// | If the Akelos Framework License is changed to another one as or less |
+// | restrictive as the LGPL, permission is granted to also re-license    |
+// | this file.                                                           |
+// +----------------------------------------------------------------------+
 
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
+/**
+ * @package AkelosFramework
+ * @subpackage AkActiveRecord
+ * @author Niels Ganser <ng a.t depoll d.e>
+ * @copyright Copyright (c) 2006, Raw Ideas Pty Ltd
+ * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
+ */
 
-if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
-    define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-}
+require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
 
 
-class test_AkActiveRecord_actAsTree extends  UnitTestCase
+/**
+ * acts_as_tree
+ * 
+ * Makes your model acts as a tree (surprise!). Consider the following example:
+ * 
+ * class Category extends ActiveRecord {
+ *   var $acts_as = 'tree';
+ * }
+ * 
+ * $Category = new Category;
+ * 
+ * $CategoryA = $Category.create()
+ * $CategoryAa = $Category.create()
+ * $CategoryAa1 = $Category.create()
+ * $CategoryAa2 = $Category.create()
+ * $CategoryAb = $Category.create()
+ * $CategoryB = $Category.create()
+ * 
+ * $CategoryA->tree->addChild($CategoryAa)
+ * $CategoryA->tree->addChild($CategoryAb)
+ * $CategoryAa->tree->addChild($CategoryAa1)
+ * $CategoryAa->tree->addChild($CategoryAa2)
+ * 
+ * 
+ * This will effectively give you:
+ * 
+ * Category A
+ *  \_ Category Aa
+ *      \_ Category Aa1
+ *      \_ Category Aa2
+ *  \_ Category Ab
+ * Category B
+ * 
+ * 
+ * OK. Admittedly you won't get a graph in real life. But at least the following functions:
+ * 
+ * $CategoryA->tree->hasChildren()		# ==> true
+ * $CategoryA->tree->childrenCount()	# ==> 2
+ * $CategoryA->tree->getChildren() 		# ==> array($CategoryAa, $CategoryAb)
+ * // fairly expensive operation follows
+ * // (yes, array(parent, array_of_children) is not nice but unfortunately PHP doesn't allow for objects as keys)
+ * $CategoryA->tree->getDescendants()	# ==> array(array($CategoryAa, array($CategoryAa1, $CategoryAa2)), $CategoryAb)
+ * 
+ * $CategoryAa->tree->getChildren()		# ==> array($CategoryAa1, $CategoryAa2)
+ * $CategoryAa->tree->getSiblings()		# ==> array($CategoryAb)
+ * $CategoryAa->tree->hasParent()		# ==> true
+ * $CategoryAa->tree->getParent()		# ==> $CategoryA
+ * 
+ * $CatagoryAa1->tree->hasChildren()	# ==> false
+ * $CategoryAa1->tree->getParent()		# ==> $CategoryAa
+ * // fairly expensive operation follows
+ * $CategoryAa1->tree->getAncestors()	# ==> array($CategoryAa, $CategoryA)
+ * // fairly expensive operation follows
+ * $CategoryAa1->tree->getAncestors(1)	# ==> array($CategoryAa)
+ *  
+ * 
+ * To make this work your model needs a parent_id column (whose name can be overriden with +parent_column+. Furthermore
+ * you can set the +dependent+ option to automatically delete all children if their parent gets deleted. Otherwise they
+ * will become orphants (i.e. have parent_id = NULL)
+ * 
+ * (Note that on adding a child it will be saved. If the parent has been unsaved until now it will also be saved.)
+ */
+class AkActsAsTree extends AkObserver
 {
-    var $_testing_models_to_delete = array();
-    var $_testing_model_databases_to_delete = array();
 
-    function test_AkActiveRecord_actAsTree()
+
+
+    /**
+    * Configuration options are:
+    *
+    * * +parent_column+ - specifies the column name to use for keeping the position integer (default: parent_id)
+    * * +dependent+ - set to true to automatically delete all children when its parent is deleted
+    * * +scope+ - restricts what is to be considered a list. Given a symbol, it'll attach "_id" 
+    *   (if that hasn't been already) and use that as the foreign key restriction. It's also possible 
+    *   to give it an entire string that is interpolated if you need a tighter scope than just a foreign key.
+    *   Example: <tt>actsAsTree(array('scope' => array('todo_list_id = ? AND completed = 0',$todo_list_id)));</tt>
+    */
+
+    var $scope = '';
+    var $parent_column = 'parent_id';
+    
+    var $_scope_condition;
+    var $_parent_column_name = 'parent_id';
+    var $_dependent = false;
+
+    var $_ActiveRecordInstance;
+
+    function AkActsAsTree(&$ActiveRecordInstance)
     {
-        parent::UnitTestCase();
-        $this->_createNewTestingModelDatabase('AkTestCategory');
-        $this->_createNewTestingModel('AkTestCategory');
-        $this->_createNewTestingModel('AkDependentTestCategory');         
+        $this->_ActiveRecordInstance =& $ActiveRecordInstance;
     }
 
-    function setUp()
+    function init($options = array())
     {
-    	$this->_resetTable();
+        empty($options['parent_column']) ? null : ($this->_parent_column_name = $options['parent_column']);
+        empty($options['dependent']) ? null : ($this->_dependent = $options['dependent']);
+        empty($options['scope']) ? null : $this->setScopeCondition($options['scope']);
+        $this->scope = !empty($options['scope']) ? $options['scope'] : $this->scope;
+        $this->parent_column = !empty($options['parent_column']) ? $options['parent_column'] : $this->parent_column;
+        return $this->_ensureIsActiveRecordInstance($this->_ActiveRecordInstance);
     }
 
-    function tearDown()
+
+    function _ensureIsActiveRecordInstance(&$ActiveRecordInstance)
     {
-        unset($_SESSION['__activeRecordColumnsSettingsCache']);
-    }
-
-    function _createNewTestingModel($test_model_name)
-    {
-
-        static $shutdown_called;
-        switch ($test_model_name) {
-
-            case 'AkTestCategory':
-            $model_source =
-            '<?php
-    class AkTestCategory extends AkActiveRecord 
-    {
-        var $act_as = "tree";
-    } 
-?>';
-            break;
-            
-			case 'AkDependentTestCategory':
-            $model_source =
-            '<?php
-    class AkDependentTestCategory extends AkActiveRecord 
-    {
-        var $act_as = array("tree" => array("dependent" => true));
-        var $table_name = "ak_test_categories";
-    } 
-?>';
-            break;
-
-            default:
-            $model_source = '<?php class '.$test_model_name.' extends AkActiveRecord { } ?>';
-            break;
-        }
-
-        $file_name = AkInflector::toModelFilename($test_model_name);
-
-        if(!Ak::file_put_contents($file_name,$model_source)){
-            die('Ooops!, in order to perform this test, you must set your app/model permissions so this can script can create and delete files into/from it');
-        }
-        if(!in_array($file_name, get_included_files()) && !class_exists($test_model_name)){
-            include($file_name);
-        }else {
+        if(is_object($ActiveRecordInstance) && method_exists($ActiveRecordInstance,'actsLike')){
+            $this->_ActiveRecordInstance =& $ActiveRecordInstance;
+            if(!$this->_ActiveRecordInstance->hasColumn($this->_parent_column_name)){
+                trigger_error(Ak::t(
+                'The following columns are required in the table "%table" for the model "%model" to act as a Tree: "%columns".',array(
+                '%columns'=>$this->getParentColumnName(),'%table'=>$this->_ActiveRecordInstance->getTableName(),'%model'=>$this->_ActiveRecordInstance->getModelName())),E_USER_ERROR);
+                unset($this->_ActiveRecordInstance->tree);
+                return false;
+            }else{
+                $this->observe(&$ActiveRecordInstance);
+            }
+        }else{
+            trigger_error(Ak::t('You are trying to set an object that is not an active record.'), E_USER_ERROR);
             return false;
-        }
-        $this->_testing_models_to_delete[] = $file_name;
-        if(!isset($shutdown_called)){
-            $shutdown_called = true;
-            register_shutdown_function(array(&$this,'_deleteTestingModels'));
         }
         return true;
     }
 
-    function _deleteTestingModels()
+    function reloadActiveRecordInstance(&$nodeInstance)
     {
-        foreach ($this->_testing_models_to_delete as $file){
-            Ak::file_delete($file);
+        AK_PHP5 ? null : $nodeInstance->tree->_ensureIsActiveRecordInstance($nodeInstance);
+    }
+
+    function getType()
+    {
+        return 'tree';
+    }
+
+    function getScopeCondition()
+    {
+        // An allways true condition in case no scope has been specified
+        if(empty($this->_scope_condition) && empty($this->scope)){
+            $this->_scope_condition = (substr($this->_ActiveRecordInstance->_db->databaseType,0,4) == 'post') ? 'true' : '1';
+        }elseif (!empty($this->scope)){
+            $scoped = array();
+            foreach ((array)$this->scope as $column){
+                if($this->_ActiveRecordInstance->hasColumn($column)){
+                    $scoped[] =  $column.' = '.$this->_ActiveRecordInstance->castAttributeForDatabase($column, $this->_ActiveRecordInstance->get($column));
+                }else{
+                    $scoped[] = $column;
+                }
+            }
+            $this->setScopeCondition(join(' AND ',$scoped));
+        }
+        return  $this->_scope_condition;
+    }
+
+    function setScopeCondition($scope_condition)
+    {
+        $this->_scope_condition = $scope_condition;
+    }
+
+    function getParentColumnName()
+    {
+        return $this->_parent_column_name;
+    }
+
+    function setParentColumnName($parent_column_name)
+    {
+        $this->_parent_column_name = $parent_column_name;
+    }
+
+    function getDependent()
+    {
+        return $this->_dependent;
+    }
+
+    function setDependent($val)
+    {
+        $this->_dependent = (bool)$val;
+    }
+
+    function hasChildren()
+    {
+        return $this->childrenCount() > 0;
+    }
+
+    function hasParent()
+    {
+        $parent_id = $this->_ActiveRecordInstance->{$this->getParentColumnName()};
+        return !empty($parent_id);
+    }
+
+    function addChild( &$child )
+    {
+        $this->_ActiveRecordInstance->transactionStart();
+
+        if ($this->_ActiveRecordInstance->isNewRecord()){
+            if (!$this->_ActiveRecordInstance->save()) {
+                $this->_ActiveRecordInstance->transactionFail();
+                $this->_ActiveRecordInstance->transactionComplete();
+                return false;
+            }
+        }
+
+        if ($this->_ActiveRecordInstance->getId() == $child->getId()) {
+            $this->_ActiveRecordInstance->transactionFail();
+            $this->_ActiveRecordInstance->transactionComplete();
+            trigger_error(Ak::t('Cannot add myself as a child to myself'), E_USER_ERROR);
+            return false;
+        }
+
+        $child->{$this->getParentColumnName()} = $this->_ActiveRecordInstance->getId();
+        if (!$child->save()) {
+            $this->_ActiveRecordInstance->transactionFail();
+            $this->_ActiveRecordInstance->transactionComplete();
+            return false;
+        }
+
+        $this->_ActiveRecordInstance->transactionComplete();
+
+        $this->reloadActiveRecordInstance($child);
+        return $child;
+    }
+
+    function childrenCount()
+    {
+        return $this->_ActiveRecordInstance->count(" ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." = ".$this->_ActiveRecordInstance->getId());
+    }
+
+    function getChildren()
+    {
+        return $this->_ActiveRecordInstance->findAll(" ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." = ".$this->_ActiveRecordInstance->getId());
+    }
+
+    function getParent()
+    {
+        if (!$this->hasParent()){
+            return false;
+        } else {
+            return $this->_ActiveRecordInstance->find('first',
+            array('conditions' => ' '.$this->getScopeCondition().' AND '.$this->_ActiveRecordInstance->getPrimaryKey()." = ".$this->_ActiveRecordInstance->{$this->getParentColumnName()}));
         }
     }
 
-
-
-
-    function _createNewTestingModelDatabase($test_model_name)
+    /**
+     * @param	integer	$level	How deep do you want to search? everything <= 0 means infinite deep
+     */
+    function getAncestors($level=0)
     {
-        static $shutdown_called;
-        // Create a data dictionary object, using this connection
-        $db =& AK::db();
-        //$db->debug = true;
-        $table_name = AkInflector::tableize($test_model_name);
-        if(in_array($table_name, (array)$db->MetaTables())){
+        if (!$this->hasParent()) {
+            return array();
+        }
+
+        $last = $this->getParent();
+        $ancestors = array($last);
+        --$level;
+
+        // we can't do end($ancestors)->hasParent() due to PHP4 compatibility
+        while ($level != 0 && $last->tree->hasParent()) {
+            $last = $last->tree->getParent();
+            $ancestors[]= $last;
+            --$level;
+        }
+
+        return $ancestors;
+    }
+
+
+    function getSiblings($options = array())
+    {
+        $default_options = array('include_self'=>false);
+        $options = array_merge($default_options, $options);
+        $parent_condition = (is_null($this->_ActiveRecordInstance->{$this->getParentColumnName()})) ? 'ISNULL('. $this->getParentColumnName() .")" : $this->getParentColumnName() .' = '. $this->_ActiveRecordInstance->{$this->getParentColumnName()};
+        $id_condition = !empty($options['include_self']) ? '' : ' AND '. $this->_ActiveRecordInstance->getPrimaryKey() .' != '. $this->_ActiveRecordInstance->getId();
+        return $this->_ActiveRecordInstance->findAll(' '. $this->getScopeCondition().
+        ' AND '. $parent_condition.$id_condition);
+    }
+    
+    function getSelfAndSiblings()
+    {
+        return $this->getSiblings(array('include_self'=>true));
+    }
+
+    /**
+     * @param	integer	$level	How deep do you want to search? everything <= 0 means infinite deep
+     */
+    function getDescendants($level=0)
+    {
+        if (!$this->hasChildren()) {
+            return array();
+        }
+
+        return $this->_recursiveGetDescendants($level, $this->getChildren());
+    }
+    function _recursiveGetDescendants($level, $from) {
+        --$level;
+
+        if ($level == 0) {
+            return $from;
+        }
+
+        $children = array();
+        foreach ($from as $item) {
+            if ($item->tree->hasChildren()) {
+                $children[] = array($item, $this->_recursiveGetDescendants($level, $item->tree->getChildren()));
+            } else {
+                $children[] = $item;
+            }
+        }
+
+        return $children;
+    }
+
+    function beforeDestroy(&$object)
+    {
+        if(!$object->tree->hasChildren()){
+            return true;
+        }
+
+        $object->transactionStart();
+
+        if ($this->getDependent()){
+            $object->deleteAll($this->getScopeCondition().' AND '.$this->getParentColumnName().' = '.$object->getId());
+        }else{
+            $object->updateAll(	$this->getParentColumnName() .' = NULL', $this->getScopeCondition().' AND '.$this->getParentColumnName().' = '.$object->getId() );
+        }
+
+        if($object->transactionHasFailed()){
+            $object->transactionComplete();
             return false;
         }
-        switch ($table_name) {
-            case 'ak_test_categories':
-            $table =
-            array(
-            'table_name' => 'ak_test_categories',
-            'fields' =>
-            'id I AUTO KEY,
-            parent_id I(11),
-            description C(250),
-            department C(25)',
-            'index_fileds' => 'id',
-            'table_options' => array('mysql' => 'TYPE=InnoDB', 'REPLACE')
-            );
+        $object->transactionComplete();
 
-            break;
-            default:
-            return false;
-            break;
-        }
-
-        $dict = NewDataDictionary($db);
-        $sqlarray = $dict->CreateTableSQL($table['table_name'], $table['fields'], $table['table_options']);
-        $dict->ExecuteSQLArray($sqlarray);
-        if(isset($table['index_fileds'])){
-            $sqlarray = $dict->CreateIndexSQL('idx_'.$table['table_name'], $table['table_name'], $table['index_fileds']);
-            $dict->ExecuteSQLArray($sqlarray);
-        }
-
-        $db->CreateSequence('seq_'.$table['table_name']);
-
-        $this->_testing_model_databases_to_delete[] = $table_name;
-        if(!isset($shutdown_called)){
-            $shutdown_called = true;
-            register_shutdown_function(array(&$this,'_deleteTestingModelDatabases'));
-        }
-        //$db->debug = false;
         return true;
     }
 
-    function _deleteTestingModelDatabases()
-    {
-        $db =& AK::db();
-        foreach ($this->_testing_model_databases_to_delete as $table_name){
-            $db->Execute('DROP TABLE '.$table_name);
-            $db->DropSequence('seq_'.$table_name);
-        }
-    }
-
-    function Test_of_actsAsTree_instatiation()
-    {
-        $Categories =& new AkTestCategory();
-        $this->assertEqual($Categories->actsLike(), 'active record,tree');
-
-        $this->assertEqual($Categories->tree->_parent_column_name,'parent_id');
-
-        $Categories =& new AkTestCategory();
-
-        $this->assertErrorPattern('/columns are required/',$Categories->actsAs('tree', array('parent_column'=>'not_available')));
-
-        $this->assertEqual($Categories->actsLike(), 'active record');
-
-    }
-
-    function Test_of_Test_of_init()
-    {
-        $Categories =& new AkTestCategory();
-        $Categories->tree->init(array('scope'=>array('category_id = ? AND completed = 0',$Categories->getId()),'custom_attribute'=>'This is not allowed here'));
-
-        $this->assertEqual($Categories->tree->getScopeCondition(), array ( 0 => 'category_id = ? AND completed = 0', 1 => null));
-        $this->assertTrue(empty($Categories->tree->custom_attribute));
-    }
-
-    
-    function Test_of__ensureIsActiveRecordInstance()
-    {
-        $Categories =& new AkTestCategory();
-        $Object =& new AkObject();
-        $this->assertErrorPattern('/is not an active record/',$Categories->tree->_ensureIsActiveRecordInstance(&$Object));
-    }
-
-    function Test_of_getType()
-    {
-        $Categories =& new AkTestCategory();
-        $this->assertEqual($Categories->tree->getType(), 'tree');
-    }
-
-
-    function Test_of_getScopeCondition_and_setScopeCondition()
-    {
-        $Categories =& new AkTestCategory();
-        $this->assertEqual($Categories->tree->getScopeCondition(), (substr($Categories->_db->databaseType,0,4) == 'post') ? 'true' : '1');
-        $Categories->tree->setScopeCondition('true');
-        $this->assertEqual($Categories->tree->getScopeCondition(), 'true');
-    }
-
-    function Test_of_getters_and_setters()
-    {
-        $Categories =& new AkTestCategory();
-
-        $Categories->tree->setParentColumnName('column_name');
-        $this->assertEqual($Categories->tree->getParentColumnName(), 'column_name');
-        
-        $Categories->tree->setDependent(true);
-        $this->assertTrue($Categories->tree->getDependent());
-        $Categories->tree->setDependent(false);
-        $this->assertFalse($Categories->tree->getDependent());
-    }
-
-    function Test_of_hasChildren_and_hasParent()
-    {        
-        $CategoryA =& new AkTestCategory();
-        $CategoryA->description = "Cat A";
-        
-        $CategoryAa =& new AkTestCategory();
-        $CategoryAa->description = "Cat Aa";
-        
-        $this->assertFalse($CategoryA->tree->hasChildren());
-        $this->assertFalse($CategoryA->tree->hasParent());
-        $this->assertFalse($CategoryAa->tree->hasChildren());
-        $this->assertFalse($CategoryAa->tree->hasParent());
-        
-        $CategoryA->tree->addChild($CategoryAa);
-        
-        $this->assertTrue($CategoryA->tree->hasChildren());
-        $this->assertFalse($CategoryA->tree->hasParent());
-        $this->assertFalse($CategoryAa->tree->hasChildren());
-        $this->assertTrue($CategoryAa->tree->hasParent());
-    }
-
-
-    function Test_of_addChild_and_children()
-    {        
-    	$CategoryA =& new AkTestCategory();
-        $CategoryA->description = "Cat A";
-        
-        $CategoryAa =& new AkTestCategory();
-        $CategoryAa->description = "Cat Aa";
-        
-        $CategoryAb =& new AkTestCategory();
-        $CategoryAb->description = "Cat Ab";
-        
-        $CategoryA->tree->addChild($CategoryAa);
-        $CategoryA->tree->addChild($CategoryAb);
-        
-        $children = $CategoryA->tree->getChildren();
-        $this->assertEqual($CategoryAa->getId(), $children[0]->getId());
-        $this->assertEqual($CategoryAb->getId(), $children[1]->getId());
-        
-        $this->assertErrorPattern('/Cannot add myself as a child to myself/', $CategoryA->tree->addChild($CategoryA));
-    }
-
-    function Test_of_childrenCount()
-    {
-    	$CategoryA =& new AkTestCategory();
-        $CategoryA->description = "Cat A";
-        
-        $CategoryB =& new AkTestCategory();
-        $CategoryB->description = "Cat B";
-        
-        $CategoryAa =& new AkTestCategory();
-        $CategoryAa->description = "Cat Aa";
-        
-        $CategoryAb =& new AkTestCategory();
-        $CategoryAb->description = "Cat Ab";
-
-        $CategoryA->tree->addChild($CategoryAa);
-        $CategoryA->tree->addChild($CategoryAb);
-        
-        $this->assertEqual(2, $CategoryA->tree->childrenCount());
-        $this->assertEqual(0, $CategoryB->tree->childrenCount());
-        $this->assertEqual(0, $CategoryAa->tree->childrenCount());
-        $this->assertEqual(0, $CategoryAb->tree->childrenCount());        
-    }
-    
-    function Test_of_parent()
-    {
-    	$CategoryA =& new AkTestCategory();
-        $CategoryA->description = "Cat A";
-        
-        $CategoryAa =& new AkTestCategory();
-        $CategoryAa->description = "Cat Aa";
-        
-        $CategoryAb =& new AkTestCategory();
-        $CategoryAb->description = "Cat Ab";
-
-        $CategoryA->tree->addChild($CategoryAa);
-        $CategoryA->tree->addChild($CategoryAb);
-        
-        $catAaParent = $CategoryAa->tree->getParent();
-        $catAbParent = $CategoryAb->tree->getParent();
-        $this->assertEqual($CategoryA->getId(), $catAaParent->getId());
-        $this->assertEqual($CategoryA->getId(), $catAbParent->getId());
-    }
-
-    function Test_of_beforeDestroy()
-    {
-    	$CategoryA =& new AkDependentTestCategory();
-        $CategoryA->description = "Cat A";
-        
-        $CategoryB =& new AkTestCategory();
-        $CategoryB->description = "Cat B";
-        
-        $CategoryAa =& new AkDependentTestCategory();
-        $CategoryAa->description = "Cat Aa";
-        
-        $CategoryBa =& new AkTestCategory();
-        $CategoryBa->description = "Cat Ba";
-
-        $CategoryA->tree->addChild($CategoryAa);
-        $CategoryB->tree->addChild($CategoryBa);
-        
-        $CategoryA->destroy();
-        $this->assertFalse($CategoryAa->reload());
-        
-        $CategoryB->destroy();
-        $this->assertTrue($CategoryBa->reload());
-        $this->assertFalse($CategoryBa->tree->hasParent());
-    }
-
-
-    function _resetTable()
-    {
-        $this->_deleteTestingModelDatabases();
-        $this->_createNewTestingModelDatabase('AkTestCategory');
-    }
-    
 }
 
-
-Ak::test('test_AkActiveRecord_actAsTree',true);
 
 ?>
