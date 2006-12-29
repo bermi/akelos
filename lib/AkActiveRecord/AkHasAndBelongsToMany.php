@@ -129,6 +129,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         'association_foreign_key' => false,
         'conditions' => false,
         'order' => false,
+        'join_class_extends' => 'AkActiveRecord',
         'finder_sql' => false,
         'delete_sql' => false,
         'insert_sql' => false,
@@ -248,15 +249,14 @@ class AkHasAndBelongsToMany extends AkAssociation
         if(!class_exists($options['join_class_name'])){
             $class_file_code = "<?php \n\n//This code was generated automatically by the active record hasAndBelongsToMany Method\n\n";
             $class_code =
-            "class {$options['join_class_name']} extends AkActiveRecord {
+            "class {$options['join_class_name']} extends {$options['join_class_extends']} {
     function {$options['join_class_name']}()
     {
         \$this->setModelName(\"{$options['join_class_name']}\");
         \$attributes = (array)func_get_args();
         \$this->_generateSequence = false;
         \$this->setTableName('{$options['join_table']}', true, true);
-        \${$options['join_class_name']} =& \$this->init(\$attributes);
-        return \${$options['join_class_name']};
+        \$this->init(\$attributes);
     }
 }";
             $class_file_code .= $class_code. "\n\n?>";
