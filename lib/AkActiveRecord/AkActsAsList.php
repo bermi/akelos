@@ -214,7 +214,7 @@ class AkActsAsList extends AkObserver
     function getBottomItem($except = null)
     {
         $conditions = $this->getScopeCondition();
-        
+
         if(isset($except)){
             $conditions .= " AND id != $except";
         }
@@ -338,15 +338,7 @@ class AkActsAsList extends AkObserver
         if(empty($this->scope_condition) && empty($this->scope)){
             $this->scope_condition = (substr($this->_ActiveRecordInstance->_db->databaseType,0,4) == 'post') ? 'true' : '1';
         }elseif (!empty($this->scope)){
-            $scoped = array();
-            foreach ((array)$this->scope as $column){
-                if($this->_ActiveRecordInstance->hasColumn($column)){
-                    $scoped[] =  $column.' = '.$this->_ActiveRecordInstance->castAttributeForDatabase($column, $this->_ActiveRecordInstance->get($column));
-                }else{
-                    $scoped[] = $column;
-                }
-            }
-            $this->setScopeCondition(join(' AND ',$scoped));
+            $this->setScopeCondition(join(' AND ',array_map(array(&$this,'getScopedColumn'),(array)$this->scope)));
         }
         return  $this->scope_condition;
     }
@@ -357,6 +349,17 @@ class AkActsAsList extends AkObserver
         $this->scope_condition  = $scope_condition;
     }
 
+    function getScopedColumn($column)
+    {
+        if($this->_ActiveRecordInstance->hasColumn($column)){
+            $value = $this->_ActiveRecordInstance->get($column);
+            $condition = $this->_ActiveRecordInstance->getAttributeCondition($value);
+            $value = $this->_ActiveRecordInstance->castAttributeForDatabase($column, $value);
+            return $column.' '.str_replace('?', $value, $condition);
+        }else{
+            return $column;
+        }
+    }
 
 
     /**

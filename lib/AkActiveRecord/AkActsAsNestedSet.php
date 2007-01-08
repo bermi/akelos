@@ -151,18 +151,33 @@ class AkActsAsNestedSet extends AkObserver
         return 'nested set';
     }
 
-
     function getScopeCondition()
     {
-        if(empty($this->_scope_condition)){
-            $this->setScopeCondition((substr($this->_ActiveRecordInstance->_db->databaseType,0,4) == 'post') ? 'true' : '1');
+        // An allways true condition in case no scope has been specified
+        if(empty($this->scope_condition) && empty($this->scope)){
+            $this->scope_condition = (substr($this->_ActiveRecordInstance->_db->databaseType,0,4) == 'post') ? 'true' : '1';
+        }elseif (!empty($this->scope)){
+            $this->setScopeCondition(join(' AND ',array_map(array(&$this,'getScopedColumn'),(array)$this->scope)));
         }
-        return  $this->_scope_condition;
+        return  $this->scope_condition;
     }
+
 
     function setScopeCondition($scope_condition)
     {
-        $this->_scope_condition = $scope_condition;
+        $this->scope_condition  = $scope_condition;
+    }
+
+    function getScopedColumn($column)
+    {
+        if($this->_ActiveRecordInstance->hasColumn($column)){
+            $value = $this->_ActiveRecordInstance->get($column);
+            $condition = $this->_ActiveRecordInstance->getAttributeCondition($value);
+            $value = $this->_ActiveRecordInstance->castAttributeForDatabase($column, $value);
+            return $column.' '.str_replace('?', $value, $condition);
+        }else{
+            return $column;
+        }
     }
 
     function getLeftColumnName()

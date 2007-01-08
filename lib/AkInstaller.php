@@ -17,6 +17,8 @@
  */
 
 require_once(AK_LIB_DIR.DS.'Ak.php');
+require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
+file_exists(AK_APP_DIR.DS.'shared_model.php') ? require_once(AK_APP_DIR.DS.'shared_model.php') : null;
 
 class AkInstaller
 {
@@ -176,13 +178,51 @@ class AkInstaller
     }
     
 
+    function modifyTable($table_name, $column_options = null, $table_options = array())
+    {
+        return $this->_createOrModifyTable($table_name, $column_options, $table_options);
+    }
+    
+    /**
+     * Adds a new column to the table called $table_name 
+     */
+    function addColumn($table_name, $column_details)
+    {
+        $column_details = $this->_getColumnsAsAdodbDataDictionaryString($column_details);
+        return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->AddColumnSQL($table_name, $column_details));
+    }
+    
+    function changeColumn($table_name, $column_details)
+    {
+        $column_details = $this->_getColumnsAsAdodbDataDictionaryString($column_details);
+        return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->AlterColumnSQL($table_name, $column_details));
+    }
+    
+    function removeColumn($table_name, $column_name)
+    {
+        return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->DropColumnSQL($table_name, $column_details));
+    }
+    
+    function renameColumn($table_name, $old_column_name, $new_column_name)
+    {
+        if(!strstr($this->db->databaseType,'mysql')){
+            trigger_error(Ak::t('Column renaming is only supported when using MySQL databases'), E_USER_ERROR);
+        }
+        return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->RenameColumnSQL($table_name, $old_column_name, $new_column_name));
+    }
+    
+
     function createTable($table_name, $column_options = null, $table_options = array())
     {
         if($this->tableExists($table_name)){
             trigger_error(Ak::t('Table %table_name already exists on the database', array('%table_name'=>$table_name)), E_USER_NOTICE);
             return false;
         }
-
+        return $this->_createOrModifyTable($table_name, $column_options, $table_options);
+    }
+    
+    function _createOrModifyTable($table_name, $column_options = null, $table_options = array())
+    {
         if(empty($column_options) && $this->_loadDbDesignerDbSchema()){
             $column_options = $this->db_designer_schema[$table_name];
         }elseif(empty($column_options)){
@@ -205,7 +245,7 @@ class AkInstaller
 
         $column_string = $this->_getColumnsAsAdodbDataDictionaryString($column_options['columns']);
 
-        $result = $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->CreateTableSQL($table_name, str_replace(array(' UNIQUE ', ' INDEX '), '', $column_string), $table_options));
+        $result = $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->ChangeTableSQL($table_name, str_replace(array(' UNIQUE ', ' INDEX '), '', $column_string), $table_options));
         
         if($result){
             $this->available_tables[] = $table_name;
@@ -243,6 +283,11 @@ class AkInstaller
     function addIndex($table_name, $columns)
     {
         return $this->tableExists($table_name) ? $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->CreateIndexSQL('idx_'.$table_name.'_'.$columns, $table_name, $columns)) : false;
+    }
+    
+    function removeIndex($table_name, $columns)
+    {
+        return $this->tableExists($table_name) ? $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->DropIndexSQL('idx_'.$table_name.'_'.$columns, $table_name)) : false;
     }
 
     function createSequence($table_name)
@@ -422,15 +467,7 @@ Example:
 
 ");
     }
-    /**
-     * @todo Implement these methods
-    * addColumn(table_name, column_name, type, options): Adds a new column to the table called table_name named column_name specified to be one of the following types: :string, :text, :integer, :float, :datetime, :timestamp, :time, :date, :binary, :boolean. A default value can be specified by passing an options hash like { :default => 11 }.
-    * renameColumn(table_name, column_name, new_column_name): Renames a column but keeps the type and content.
-    * changeColumn(table_name, column_name, type, options): Changes the column to a different type using the same parameters as add_column.
-    * removeColumn(table_name, column_name): Removes the column named column_name from the table called table_name.
-    * add_index(table_name, column_name, index_type): Add a new index with the name of the column on the column. Specify an optional index_type (e.g. UNIQUE).
-    * removeIndex(table_name, column_name): Remove the index called the same as the column.
-    */
+
 
 }
 

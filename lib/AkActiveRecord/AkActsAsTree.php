@@ -105,6 +105,9 @@ class AkActsAsTree extends AkObserver
     *   Example: <tt>actsAsTree(array('scope' => array('todo_list_id = ? AND completed = 0',$todo_list_id)));</tt>
     */
 
+    var $scope = '';
+    var $parent_column = 'parent_id';
+    
     var $_scope_condition;
     var $_parent_column_name = 'parent_id';
     var $_dependent = false;
@@ -121,6 +124,8 @@ class AkActsAsTree extends AkObserver
         empty($options['parent_column']) ? null : ($this->_parent_column_name = $options['parent_column']);
         empty($options['dependent']) ? null : ($this->_dependent = $options['dependent']);
         empty($options['scope']) ? null : $this->setScopeCondition($options['scope']);
+        $this->scope = !empty($options['scope']) ? $options['scope'] : $this->scope;
+        $this->parent_column = !empty($options['parent_column']) ? $options['parent_column'] : $this->parent_column;
         return $this->_ensureIsActiveRecordInstance($this->_ActiveRecordInstance);
     }
 
@@ -154,29 +159,34 @@ class AkActsAsTree extends AkObserver
     {
         return 'tree';
     }
-
+    
     function getScopeCondition()
     {
         // An allways true condition in case no scope has been specified
-        if(empty($this->_scope_condition) && empty($this->scope)){
-            $this->_scope_condition = (substr($this->_ActiveRecordInstance->_db->databaseType,0,4) == 'post') ? 'true' : '1';
+        if(empty($this->scope_condition) && empty($this->scope)){
+            $this->scope_condition = (substr($this->_ActiveRecordInstance->_db->databaseType,0,4) == 'post') ? 'true' : '1';
         }elseif (!empty($this->scope)){
-            $scoped = array();
-            foreach ((array)$this->scope as $column){
-                if($this->_ActiveRecordInstance->hasColumn($column)){
-                    $scoped[] =  $column.' = '.$this->_ActiveRecordInstance->castAttributeForDatabase($column, $this->_ActiveRecordInstance->get($column));
-                }else{
-                    $scoped[] = $column;
-                }
-            }
-            $this->setScopeCondition(join(' AND ',$scoped));
+            $this->setScopeCondition(join(' AND ',array_map(array(&$this,'getScopedColumn'),(array)$this->scope)));
         }
-        return  $this->_scope_condition;
+        return  $this->scope_condition;
     }
+
 
     function setScopeCondition($scope_condition)
     {
-        $this->_scope_condition = $scope_condition;
+        $this->scope_condition  = $scope_condition;
+    }
+
+    function getScopedColumn($column)
+    {
+        if($this->_ActiveRecordInstance->hasColumn($column)){
+            $value = $this->_ActiveRecordInstance->get($column);
+            $condition = $this->_ActiveRecordInstance->getAttributeCondition($value);
+            $value = $this->_ActiveRecordInstance->castAttributeForDatabase($column, $value);
+            return $column.' '.str_replace('?', $value, $condition);
+        }else{
+            return $column;
+        }
     }
 
     function getParentColumnName()
