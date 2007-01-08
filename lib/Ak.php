@@ -901,7 +901,7 @@ Options are:
             if (defined('AK_SENDMAIL')) {
                 // Using Sendmail daemon without parameters.
                 $mail_connector = Mail::factory('sendmail');
-            } else if (defined('AK_SMTP')) {
+            } else if (defined('AK_SMTP') && AK_SMTP) {
                 // Using external SMTP server.
                 $params['host'] = AK_SMTP_SERVER;
                 $params['username'] = AK_SMTP_USER;
