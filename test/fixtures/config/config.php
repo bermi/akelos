@@ -2,7 +2,7 @@
 
 error_reporting(E_ALL);
 
-define('AK_ENVIRONMENT', 'testing');
+defined('AK_ENVIRONMENT') ? null : define('AK_ENVIRONMENT', 'testing');
 
 defined('AK_TEST_DIR') ? null : define('AK_TEST_DIR', str_replace(DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php','',__FILE__));
 
