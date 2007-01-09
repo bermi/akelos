@@ -196,7 +196,7 @@ class ADODB_DataDict {
                 return $this->connection->MetaTables();
         }
 
-        function &MetaColumns($tab, $upper=true, $schema=false)
+        function MetaColumns($tab, $upper=true, $schema=false)
         {
                 if (!$this->connection->IsConnected()) return array();
                 return $this->connection->MetaColumns($this->TableName($tab), $upper, $schema);

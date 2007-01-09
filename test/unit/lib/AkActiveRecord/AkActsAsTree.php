@@ -171,7 +171,7 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
         $Categories =& new AkTestCategory();
         $Categories->tree->init(array('scope'=>array('category_id = ? AND completed = 0',$Categories->getId()),'custom_attribute'=>'This is not allowed here'));
 
-        $this->assertEqual($Categories->tree->getScopeCondition(), array ( 0 => 'category_id = ? AND completed = 0', 1 => null));
+        $this->assertEqual($Categories->tree->getScopeCondition(), 'category_id = ? AND completed = 0');
         $this->assertTrue(empty($Categories->tree->custom_attribute));
     }
 
