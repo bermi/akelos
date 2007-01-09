@@ -720,7 +720,7 @@ class ADODB_DataDict {
                 // check table exists
                 $save_handler = $this->connection->raiseErrorFn;
                 $this->connection->raiseErrorFn = '';
-                $cols = &$this->MetaColumns($tablename);
+                $cols = $this->MetaColumns($tablename);
                 $this->connection->raiseErrorFn = $save_handler;
 
                 if (isset($savem)) $this->connection->SetFetchMode($savem);
