@@ -106,7 +106,7 @@ class AkBelongsTo extends AkAssociation
 
     function &findAssociated($association_id)
     {
-        $result = false;
+        $result =& $GLOBALS['false'];
         $primary_key_name = $this->Owner->$association_id->getAssociationOption('primary_key_name');
         $primary_key_name_value = $this->Owner->get($primary_key_name);
         if(!$primary_key_name_value){
@@ -115,9 +115,9 @@ class AkBelongsTo extends AkAssociation
         if(empty($this->Owner->$association_id->__activeRecordObject)){
             $this->build($association_id, array(), false);
         }
-        if(!$result = $this->Owner->$association_id->find('first', $primary_key_name_value)){
-            $result = false;
-        }
+
+        $result =& $this->Owner->$association_id->find('first', $primary_key_name_value);
+        
         return $result;
     }
 
@@ -134,7 +134,7 @@ class AkBelongsTo extends AkAssociation
     function &build($association_id, $attributes = array(), $replace = true)
     {
         $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
-        $record = new $class_name($attributes);
+        $record =& new $class_name($attributes);
         $record =& $this->Owner->$association_id->replace($record);
         return $record;
     }
