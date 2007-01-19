@@ -322,12 +322,23 @@ class AkHasAndBelongsToMany extends AkAssociation
             $external_key = '__associated_to_model_'.$this->Owner->getModelName().'_as_'.$this->association_id;
             $succes = true;
             $succes = $this->Owner->notifyObservers('beforeAdd') ? $succes : false;
+            $options = $this->getOptions($this->association_id);
             foreach (array_keys($Associated) as $k){
                 if(empty($Associated[$k]->$external_key) && !$this->_hasAssociatedMember($Associated[$k])){
-                    $Associated[$k]->$external_key = $Associated[$k]->isNewRecord();
-                    $this->Owner->{$this->association_id}[] =& $Associated[$k];
-                    $this->_setAssociatedMemberId($Associated[$k]);
-                    $succes = $this->_relateAssociatedWithOwner($Associated[$k]) ? $succes : false;
+                    if(!empty($options['before_add']) && method_exists($this->Owner, $options['before_add']) && $this->Owner->{$options['before_add']}($Associated[$k]) === false ){
+                        $succes = false;
+                    }else{
+                        $Associated[$k]->$external_key = $Associated[$k]->isNewRecord();
+                        $this->Owner->{$this->association_id}[] =& $Associated[$k];
+                        $this->_setAssociatedMemberId($Associated[$k]);
+                        if($this->_relateAssociatedWithOwner($Associated[$k])){
+                            if($succes && !empty($options['after_add']) && method_exists($this->Owner, $options['after_add']) && $this->Owner->{$options['after_add']}($Associated[$k]) === false ){
+                                $succes = false;
+                            }
+                        }else{
+                            $succes = false;
+                        }
+                    }
                 }
             }
             $succes = $this->Owner->notifyObservers('afterAdd') ? $succes : false;
@@ -449,7 +460,13 @@ class AkHasAndBelongsToMany extends AkAssociation
             $this->delete($records_array);
         }else{
             $this->Owner->notifyObservers('beforeRemove');
+            $options = $this->getOptions($this->association_id);
             foreach (array_keys($records) as $k){
+
+                if(!empty($options['before_remove']) && method_exists($this->Owner, $options['before_remove']) && $this->Owner->{$options['before_remove']}($records[$k]) === false ){
+                    continue;
+                }
+
                 if(isset($records[$k]->__activeRecordObject)){
                     $record_id = $records[$k]->getId();
                 }else{
@@ -471,6 +488,9 @@ class AkHasAndBelongsToMany extends AkAssociation
                     }
                 }
                 $this->_unsetAssociatedMemberId($records[$k]);
+                if(!empty($options['after_remove']) && method_exists($this->Owner, $options['after_remove'])){
+                    $this->Owner->{$options['after_remove']}($records[$k]);
+                }
             }
             $this->Owner->notifyObservers('afterRemove');
         }
@@ -516,19 +536,33 @@ class AkHasAndBelongsToMany extends AkAssociation
     function _relateAssociatedWithOwner(&$Associated)
     {
         if(!$this->Owner->isNewRecord()){
+            $options = $this->getOptions($this->association_id);
+            if(strtolower($options['join_class_name']) != strtolower(get_class($this->JoinObject))){
+                return false;
+            }
             if($Associated->isNewRecord() ? $Associated->save() : true){
                 if(!$this->_getAssociatedMemberId($Associated)){
                     $this->_setAssociatedMemberId($Associated);
                 }
-                $options = $this->getOptions($this->association_id);
-                $this->JoinObject->_newRecord = true;
-                $this->JoinObject->setAttributes(array($options['foreign_key']=> $this->Owner->getId(), $options['association_foreign_key']=> $Associated->getId()));
 
-                if($success = $this->JoinObject->save()){
-                    $Associated->hasAndBelongsToMany->__joined = true;
+                $foreign_key = $this->Owner->getId();
+                $association_foreign_key = $Associated->getId();
+                if($foreign_key != $this->JoinObject->get($options['foreign_key']) ||
+                $association_foreign_key != $this->JoinObject->get($options['association_foreign_key'])){
+
+
+                    $this->JoinObject->_newRecord = true;
+                    $this->JoinObject->setAttributes(array($options['foreign_key']=> $foreign_key, $options['association_foreign_key']=> $association_foreign_key));
+
+                    $success = $this->JoinObject->save();
+                }else{
+                    $success = true;
                 }
-                return $success;
             }
+            if($success){
+                $Associated->hasAndBelongsToMany->__joined = true;
+            }
+            return $success;
         }
         return false;
     }

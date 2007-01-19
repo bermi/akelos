@@ -191,12 +191,19 @@ class AkHasMany extends AkAssociation
         if(is_array($Associated)){
             $succes = true;
             $succes = $this->Owner->notifyObservers('beforeAdd') ? $succes : false;
+            $options = $this->getOptions($this->association_id);
             foreach (array_keys($Associated) as $k){
+                if($succes && !empty($options['before_add']) && method_exists($this->Owner, $options['before_add']) && $this->Owner->{$options['before_add']}($Associated[$k]) === false ){
+                    $succes = false;
+                }
                 if($succes && !$this->_hasAssociatedMember($Associated[$k])){
                     $this->Owner->{$this->association_id}[] =& $Associated[$k];
                     $this->_setAssociatedMemberId($Associated[$k]);
                     if($this->_relateAssociatedWithOwner($Associated[$k])){
                         $succes = $Associated[$k]->save() ? $succes : false;
+                        if($succes && !empty($options['after_add']) && method_exists($this->Owner, $options['after_add']) && $this->Owner->{$options['after_add']}($Associated[$k]) === false ){
+                            $succes = false;
+                        }
                     }
                 }
             }
@@ -344,7 +351,13 @@ class AkHasMany extends AkAssociation
             $this->delete($records_array);
         }else{
             $this->Owner->notifyObservers('beforeRemove');
+            $options = $this->getOptions($this->association_id);
             foreach (array_keys($records) as $k){
+
+                if(!empty($options['before_remove']) && method_exists($this->Owner, $options['before_remove']) && $this->Owner->{$options['before_remove']}($records[$k]) === false ){
+                    continue;
+                }
+                
                 if(isset($records[$k]->__activeRecordObject)){
                     $record_id = $records[$k]->getId();
                 }else{
@@ -365,7 +378,13 @@ class AkHasMany extends AkAssociation
                         unset($this->Owner->{$this->association_id}[$kk]);
                     }
                 }
+                
                 $this->_unsetAssociatedMemberId($records[$k]);
+                
+                if(!empty($options['after_remove']) && method_exists($this->Owner, $options['after_remove'])){
+                    $this->Owner->{$options['after_remove']}($records[$k]);
+                }
+                
             }
             $this->Owner->notifyObservers('afterRemove');
         }
@@ -411,6 +430,9 @@ class AkHasMany extends AkAssociation
     {
         if(!$this->Owner->isNewRecord()){
             $foreign_key = $this->getOption($this->association_id, 'foreign_key');
+            if($this->getOption($this->association_id, 'class_name') != $Associated->getModelName() || $foreign_key == $Associated->get($foreign_key)){
+                return false;
+            }
             $Associated->set($foreign_key, $this->Owner->getId());
             return true;
         }
@@ -439,7 +461,7 @@ class AkHasMany extends AkAssociation
         $options = $this->getOptions($this->association_id);
         $Associated =& $this->getAssociatedModelInstance();
         $owner_id = $this->Owner->quotedId();
-        
+
         $table_name = empty($options['include']) ? $Associated->getTableName() : ($set_owner_table_has_included ? '__owner' : $Associated->getTableName());
 
         if(empty($options['finder_sql'])){
@@ -605,7 +627,7 @@ class AkHasMany extends AkAssociation
             $this->constructSql();
             $has_many_options = $this->getOptions($this->association_id);
             $Associated =& $this->getAssociatedModelInstance();
-            
+
             $args = func_get_args();
             $num_args = func_num_args();
 
@@ -624,10 +646,10 @@ class AkHasMany extends AkAssociation
             } elseif (!empty($has_many_options['finder_sql']) && !strstr($options['conditions'], $has_many_options['finder_sql'])) {
                 $options['conditions'] .= ' AND '. $has_many_options['finder_sql'];
             }
-        
+
             $options['order'] = empty($options['order']) ? @$has_many_options['order'] : $options['order'];
             $options['include'] = empty($options['include']) ? @$has_many_options['include'] : $options['include'];
-            
+
             if($options_in_args){
                 $args[$num_args-1] = $options;
             }else{
