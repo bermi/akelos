@@ -1,5 +1,4 @@
 <?php
-
 //
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
@@ -17,7 +16,7 @@
 // | Author: Chuck Hagenbuch <chuck@horde.org>                            |
 // +----------------------------------------------------------------------+
 //
-// $Id: Mail.php,v 1.11 2005/06/26 23:37:18 jon Exp $
+// $Id: Mail.php,v 1.17 2006/09/15 03:41:18 jon Exp $
 
 require_once 'PEAR.php';
 
@@ -27,7 +26,7 @@ require_once 'PEAR.php';
  * useful in multiple mailer backends.
  *
  * @access public
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.17 $
  * @package Mail
  */
 class Mail
@@ -53,11 +52,11 @@ class Mail
         @include_once 'Mail/' . $driver . '.php';
         $class = 'Mail_' . $driver;
         if (class_exists($class)) {
-            $mailer = &new $class($params);
+            $mailer = new $class($params);
+            return $mailer;
         } else {
-            $mailer = PEAR::raiseError('Unable to find class for driver ' . $driver);
+            return PEAR::raiseError('Unable to find class for driver ' . $driver);
         }
-        return $mailer;
     }
 
     /**
@@ -88,6 +87,8 @@ class Mail
      */
     function send($recipients, $headers, $body)
     {
+        $this->_sanitizeHeaders($headers);
+
         // if we're passed an array of recipients, implode it.
         if (is_array($recipients)) {
             $recipients = implode(', ', $recipients);
@@ -106,6 +107,24 @@ class Mail
 
         return mail($recipients, $subject, $body, $text_headers);
 
+    }
+
+    /**
+     * Sanitize an array of mail headers by removing any additional header
+     * strings present in a legitimate header's value.  The goal of this
+     * filter is to prevent mail injection attacks.
+     *
+     * @param array $headers The associative array of headers to sanitize.
+     *
+     * @access private
+     */
+    function _sanitizeHeaders(&$headers)
+    {
+        foreach ($headers as $key => $value) {
+            $headers[$key] =
+                preg_replace('=((<CR>|<LF>|0x0A/%0A|0x0D/%0D|\\n|\\r)\S).*=i',
+                             null, $value);
+        }
     }
 
     /**
@@ -142,6 +161,7 @@ class Mail
 
                 // Reject envelope From: addresses with spaces.
                 if (strstr($from, ' ')) {
+                    die('Aquiii');
                     return false;
                 }
 
@@ -170,8 +190,7 @@ class Mail
             }
         }
 
-        !isset($this->sep) ? $this->sep = "\r\n" : $this->sep = $this->sep;
-        return array($from, join($this->sep, $lines) . $this->sep);
+        return array($from, join($this->sep, $lines));
     }
 
     /**
@@ -183,7 +202,8 @@ class Mail
      *              (RFC822 compliant), or an array of recipients,
      *              each RFC822 valid.
      *
-     * @return array An array of forward paths (bare addresses).
+     * @return mixed An array of forward paths (bare addresses) or a PEAR_Error
+     *               object if the address list could not be parsed.
      * @access private
      */
     function parseRecipients($recipients)
@@ -200,6 +220,12 @@ class Mail
         // for smtp recipients, etc. All relevant personal information
         // should already be in the headers.
         $addresses = Mail_RFC822::parseAddressList($recipients, 'localhost', false);
+
+        // If parseAddressList() returned a PEAR_Error object, just return it.
+        if (PEAR::isError($addresses)) {
+            return $addresses;
+        }
+
         $recipients = array();
         if (is_array($addresses)) {
             foreach ($addresses as $ob) {
