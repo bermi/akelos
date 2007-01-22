@@ -671,7 +671,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
     function getAssociatedFinderSqlOptions($association_id, $options = array())
     {
-        $options = $this->getOptions($association_id);
+        $options = $this->getOptions($this->association_id);
         $Associated =& $this->getAssociatedModelInstance();
         $table_name = $Associated->getTableName();
         $owner_id = $this->Owner->quotedId();
@@ -680,7 +680,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         
         foreach ($options as $option=>$value) {
             if(!empty($value)){
-                $finder_options[$option] = trim($Associated->_addTableAliasesToAssociatedSql('_'.$association_id, $value));
+                $finder_options[$option] = trim($Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $value));
             }
         }
 
@@ -688,7 +688,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         $finder_options['selection'] = '';
 
         foreach (array_keys($Associated->getColumns()) as $column_name){
-            $finder_options['selection'] .= '_'.$association_id.'.'.$column_name.' AS _'.$association_id.'_'.$column_name.', ';
+            $finder_options['selection'] .= '_'.$this->association_id.'.'.$column_name.' AS _'.$this->association_id.'_'.$column_name.', ';
         }
 
         $finder_options['selection'] = trim($finder_options['selection'], ', ');
@@ -701,13 +701,13 @@ class AkHasAndBelongsToMany extends AkAssociation
         (empty($owner_id) ? '' :
 
         // We have an Id so we add it to the conditions
-        ' '.$Associated->_addTableAliasesToAssociatedSql('_'.$association_id, $options['foreign_key']).' = '.$owner_id.' '.
+        ' '.$Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['foreign_key']).' = '.$owner_id.' '.
         // After adding the Id we need to add AND in case we have a previous contidion available
         (!empty($options['conditions']) ? ' AND ' : ' ')).
 
         // We add previous conditions
         (!empty($options['conditions']) ?
-        $Associated->_addTableAliasesToAssociatedSql('_'.$association_id, $options['conditions']).' ' : '');
+        $Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ' : '');
 
         return $finder_options;
     }
