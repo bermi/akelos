@@ -523,6 +523,7 @@ class AkHasMany extends AkAssociation
     function &build($attributes = array(), $set_as_new_record = true)
     {
         $options = $this->getOptions($this->association_id);
+        Ak::import($options['class_name']);
         $record =& new $options['class_name']($attributes);
         $record->_newRecord = $set_as_new_record;
         $this->Owner->{$this->association_id}[] =& $record;

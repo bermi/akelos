@@ -195,9 +195,9 @@ class  TextHelper
     *
     * Example:
     * 
-    *   <?=$text_helper->auto_link("Go to http://www.akelos.org and say hello to bermi@akelos.org");?>
+    *   <?=$text_helper->auto_link("Go to http://www.akelos.org and say hello to bermi@example.com");?>
     *   //outputs: Go to <a href="http://www.akelos.org">http://www.akelos.org</a> and
-    *     say hello to <a href="mailto:bermi@akelos.org">bermi@akelos.org</a>
+    *     say hello to <a href="mailto:example.com">bermi@example.com</a>
     *
     */
     function auto_link($text, $link = 'all', $href_options = array(), $email_link_options = array())
@@ -346,7 +346,22 @@ class  TextHelper
     }
 
 
-
+    /**
+     * Returns an array with the image urls found on a text 
+     *  
+     *  Example: 
+     * $text_helper->get_linked_urls_from_text('<a href="http://akelos.com">Akelos.com</a>');
+     * //returns: array('http://akelos.com/images/logo.gif');
+     */
+    function get_image_urls_from_html($text)
+    {
+        $linked_urls = array();
+        if(preg_match_all('/<img [^>]*src[ ]?=[ \'"]?(['.AK_VALID_URL_CHARS_REGEX.']+)[ \'"]?[^>]*>/i', $text, $linked_urls_pieces)){
+            $linked_urls = array_unique($linked_urls_pieces[1]);
+        }
+        return $linked_urls;
+    }
+    
 
     /**
      * Cycles through items of an array every time it is called. 

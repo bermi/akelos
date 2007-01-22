@@ -200,7 +200,7 @@ class AkInstaller
     
     function removeColumn($table_name, $column_name)
     {
-        return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->DropColumnSQL($table_name, $column_details));
+        return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->DropColumnSQL($table_name, $column_name));
     }
     
     function renameColumn($table_name, $old_column_name, $new_column_name)

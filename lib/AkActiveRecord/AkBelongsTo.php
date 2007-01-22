@@ -134,6 +134,7 @@ class AkBelongsTo extends AkAssociation
     function &build($association_id, $attributes = array(), $replace = true)
     {
         $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
+        Ak::import($class_name);
         $record =& new $class_name($attributes);
         $record =& $this->Owner->$association_id->replace($record);
         return $record;

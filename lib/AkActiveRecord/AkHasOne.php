@@ -170,6 +170,7 @@ class AkHasOne extends AkAssociation
         $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
         $foreign_key = $this->Owner->$association_id->getAssociationOption('foreign_key');
 
+        Ak::import($class_name);
         $record =& new $class_name($attributes);
         if ($replace_existing){
             $record =& $this->replace($association_id, $record, true);

@@ -954,7 +954,14 @@ Examples for find all:
                 break;
 
                 default:
-                $result =& $this->find('all', array_merge($options, array('conditions' => $this->getTableName().'.'.$this->getPrimaryKey().' IN ('.join(', ',$ids).')'.$conditions)));
+                
+                if(empty($options) && !empty($args[0]) && !empty($args[1]) && is_array($args[0]) && is_array($args[1])){
+                    $options = array_pop($args);
+                }
+                
+                
+                $result =& $this->find('all', array_merge($options, array('conditions' => 
+                $this->getPrimaryKey().' IN ('.join(', ',$ids).')'.$conditions)));
                 if(is_array($result) && count($result) == $num_ids){
                     if($result === false){
                         $_result =& $GLOBALS['false'];
