@@ -550,17 +550,17 @@ Options are:
             //return;
         }
 
-        $line = isset($line) ? "Line: $line<br />" : "";
-        $file = isset($file) ? "File: $file<br />" : "";
+        $line = isset($line) ? "Line: $line".(AK_CLI?"\n":"<br />") : "";
+        $file = isset($file) ? "File: $file".(AK_CLI?"\n":"<br />") : "";
 
         if(!isset($text)){
             $counter++;
             $text = '';
         }else {
-            $text = '<b>---&gt;</b>'.$text;
+            $text = AK_CLI?'---> '.$text:'<b>---&gt;</b>'.$text;
         }
 
-        echo "<hr /><div>$line $file $text</div><hr />\n";
+        echo AK_CLI?"----------------\n$line $file $text\n----------------\n":"<hr /><div>$line $file $text</div><hr />\n";
 
     }
 
@@ -582,14 +582,19 @@ Options are:
         if(!AK_DEBUG && !AK_DEV_MODE){
             return;
         }
-
+        
         if($_functions!=0) {
             $sf=1;
         } else {
             $sf=0 ;
         }
         if(is_object($data) && method_exists($data, 'debug')){
-            echo "<hr /><h2>Entering on ".get_class($data)." debug() method</h2>";
+            echo AK_CLI ? 
+            "\n------------------------------------\nEntering on ".get_class($data)." debug() method\n\n":
+            "<hr /><h2>Entering on ".get_class($data)." debug() method</h2>";
+            if(!empty($data->__activeRecordObject)){
+                $data->toString(true);
+            }
             $data->debug();
             return ;
         }
@@ -597,24 +602,30 @@ Options are:
             if (is_array($data) || is_object($data)) {
 
                 if (count ($data)) {
-                    echo "<ol>\n";
+                    echo AK_CLI ? "/--\n" : "<ol>\n";
                     while (list ($key,$value) = each ($data)) {
                         $type=gettype($value);
                         if ($type=="array" || $type == "object") {
-                            printf ("<li>(%s) <b>%s</b>:\n",$type, $key);
-                            Ak::debug ($value,$sf);
+                                ob_start();
+                                Ak::debug ($value,$sf);
+                                $lines = explode("\n",ob_get_clean()."\n");
+                                foreach ($lines as $line){
+                                    echo "\t".$line."\n";
+                                }
                         } elseif (eregi ("function", $type)) {
                             if ($sf) {
+                                AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key, $value) :
                                 printf ("<li>(%s) <b>%s</b> </li>\n",$type, $key, $value);
                             }
                         } else {
                             if (!$value) {
                                 $value="(none)";
                             }
+                            AK_CLI ? printf ("\t* (%s) %s = %s\n",$type, $key, $value) :
                             printf ("<li>(%s) <b>%s</b> = %s</li>\n",$type, $key, $value);
                         }
                     }
-                    echo "</ol>fin.\n";
+                    echo AK_CLI ? "\n--/\n" : "</ol>fin.\n";
                 } else {
                     echo "(empty)";
                 }

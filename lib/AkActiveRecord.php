@@ -934,6 +934,10 @@ Examples for find all:
 
             $conditions = !empty($options['conditions']) ? ' AND '.$options['conditions'] : '';
 
+            if(empty($options) && !empty($args[0]) && !empty($args[1]) && is_array($args[0]) && is_array($args[1])){
+                $options = array_pop($args);
+            }
+                
             switch ($num_ids){
                 case 0 :
                 trigger_error($this->t('Couldn\'t find %object_name without an ID%conditions',array('%object_name'=>$this->getModelName(),'%conditions'=>$conditions)), E_USER_ERROR);
@@ -941,27 +945,30 @@ Examples for find all:
 
                 case 1 :
 
-                $result =& $this->find('first', array_merge($options, array('conditions' => $this->getTableName().'.'.$this->getPrimaryKey().' = '.$ids[0].$conditions)));
-                if(is_array($args[0]) && $result !== false){
-                    //This is a dirty hack for avoiding PHP4 pass by reference error
-                    $result_for_ref = array(&$result);
-                    $_result =& $result_for_ref;
-                }else{
-                    $_result =& $result;
+                if(empty($options['include'])){
+                    $result =& $this->find('first', array_merge($options, array('conditions' => $this->getTableName().'.'.$this->getPrimaryKey().' = '.$ids[0].$conditions)));
+                    if(is_array($args[0]) && $result !== false){
+                        //This is a dirty hack for avoiding PHP4 pass by reference error
+                        $result_for_ref = array(&$result);
+                        $_result =& $result_for_ref;
+                    }else{
+                        $_result =& $result;
+                    }
+                    return  $_result;
+    
+                    break;
                 }
-                return  $_result;
-
-                break;
-
                 default:
+                                
+                $ids_condition = $this->getPrimaryKey().' IN ('.join(', ',$ids).')';
                 
-                if(empty($options) && !empty($args[0]) && !empty($args[1]) && is_array($args[0]) && is_array($args[1])){
-                    $options = array_pop($args);
+                if(!empty($options['conditions']) && is_array($options['conditions'])){
+                    $options['conditions'][0] .= ' AND '.$ids_condition;
+                }else {
+                    $options['conditions'] = $ids_condition;
                 }
                 
-                
-                $result =& $this->find('all', array_merge($options, array('conditions' => 
-                $this->getPrimaryKey().' IN ('.join(', ',$ids).')'.$conditions)));
+                $result =& $this->find('all', $options);
                 if(is_array($result) && count($result) == $num_ids){
                     if($result === false){
                         $_result =& $GLOBALS['false'];
@@ -2841,7 +2848,6 @@ Examples for find all:
 
     function debug ($data = 'active_record_class', $_functions=0)
     {
-
         if(!AK_DEBUG && !AK_DEV_MODE){
             return;
         }
@@ -2858,32 +2864,47 @@ Examples for find all:
             if (is_array($data) || is_object($data)) {
 
                 if (count ($data)) {
-                    echo "<ol>\n";
+                    echo AK_CLI ? "/--\n" : "<ol>\n";
                     while (list ($key,$value) = each ($data)) {
                         if($key{0} == '_'){
                             continue;
                         }
                         $type=gettype($value);
                         if ($type=="array") {
+                            AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key) :
                             printf ("<li>(%s) <b>%s</b>:\n",$type, $key);
-                            Ak::debug ($value,$sf);
+                                ob_start();
+                                Ak::debug ($value,$sf);
+                                $lines = explode("\n",ob_get_clean()."\n");
+                                foreach ($lines as $line){
+                                    echo "\t".$line."\n";
+                                }
                         }elseif($type == "object"){
                             if(method_exists($value,'hasColumn') && $value->hasColumn($key)){
+                                $value->toString(true);
+                                AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key) :
                                 printf ("<li>(%s) <b>%s</b>:\n",$type, $key);
+                                ob_start();
                                 Ak::debug ($value,$sf);
+                                $lines = explode("\n",ob_get_clean()."\n");
+                                foreach ($lines as $line){
+                                    echo "\t".$line."\n";
+                                }
                             }
                         }elseif (eregi ("function", $type)) {
                             if ($sf) {
+                                AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key, $value) :
                                 printf ("<li>(%s) <b>%s</b> </li>\n",$type, $key, $value);
                             }
                         } else {
                             if (!$value) {
                                 $value="(none)";
                             }
+                            AK_CLI ? printf ("\t* (%s) %s = %s\n",$type, $key, $value) :
                             printf ("<li>(%s) <b>%s</b> = %s</li>\n",$type, $key, $value);
                         }
                     }
-                    echo "</ol>fin.\n";
+                    echo AK_CLI ? "\n--/\n" : "</ol>fin.\n";
                 } else {
                     echo "(empty)";
                 }
@@ -3374,7 +3395,7 @@ Examples for find all:
     function toString($print = false)
     {
         $result = '';
-        if(!AK_CLI || AK_ENVIRONMENT == 'testing'){
+        if(!AK_CLI || (AK_ENVIRONMENT == 'testing' && !AK_CLI)){
             $result = "<h2>Details for ".AkInflector::humanize(AkInflector::underscore($this->getModelName()))." with ".$this->getPrimaryKey()." ".$this->getId()."</h2>\n<dl>\n";
             foreach ($this->getColumnNames() as $column=>$caption){
                 $result .= "<dt>$caption</dt>\n<dd>".$this->getAttribute($column)."</dd>\n";
@@ -3396,6 +3417,15 @@ Examples for find all:
             $result .= "\n";
             echo $result;
             return '';
+        }elseif (AK_CLI){
+            $result = "\n-------\n Details for ".AkInflector::humanize(AkInflector::underscore($this->getModelName()))." with ".$this->getPrimaryKey()." ".$this->getId()." ==\n\n/==\n";
+            foreach ($this->getColumnNames() as $column=>$caption){
+                $result .= "\t * $caption: ".$this->getAttribute($column)."\n";
+            }
+            $result .= "\n\n-------\n";
+            if($print){
+                echo $result;
+            }
         }
         return $result;
     }

@@ -254,7 +254,7 @@ class AkAssociatedActiveRecord extends AkObject
 
             $handler_name = $this->getCollectionHandlerName($association_id);
             $handler_name = empty($handler_name) ? $association_id : (in_array($handler_name, $included_associations) ? $association_id : $handler_name);
-            $associated_options = $this->$handler_name->getAssociatedFinderSqlOptions($association_options);
+            $associated_options = $this->$handler_name->getAssociatedFinderSqlOptions($association_id, $association_options);
 
             foreach (array_keys($avaliable_associated_options) as $associated_option){
                 if(!empty($associated_options[$associated_option])){
