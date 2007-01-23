@@ -72,13 +72,14 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
         'include'=>array('tags')
         ));
 
-        foreach ($Files as $File){
-            foreach ($File->tags as $Tag){
-                $this->assertEqual($Tag->name, $LogTag->name);
-                $Tag->tagging->load();
-                foreach ($Tag->taggings as $Tagging){
-                    $this->assertEqual($Tagging->tag_id, $LogTag->id);
-                }
+
+        foreach (array_keys($Files) as $k){
+            $File =& $Files[$k];
+            foreach (array_keys($File->taggings) as $l){
+                $Tagging =& $File->taggings[$l];
+                $Tagging->tag->load();
+                $this->assertEqual($Tagging->tag->name, $LogTag->name);
+                $this->assertEqual($Tagging->tag_id, $LogTag->id);
             }
         }
 

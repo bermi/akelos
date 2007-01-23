@@ -361,7 +361,7 @@ class  TextHelper
         }
         return $linked_urls;
     }
-    
+
 
     /**
      * Cycles through items of an array every time it is called. 
@@ -422,11 +422,14 @@ class  TextHelper
 
     /**
     * Returns the text with all the Markdown codes turned into HTML-tags.
-    * <i>This method is only available if BlueCloth can be required</i>.
     */
     function markdown($text)
     {
-        die('Implement me on lib/AkActionView/helpers/text_helper.php');
+        if (!empty($text)) {
+            require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'markdown.php');
+            $text = trim(Markdown($text));
+        }
+        return $text;
     }
 
 
