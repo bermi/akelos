@@ -16,8 +16,6 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-require_once(AK_LIB_DIR.DS.'Ak.php');
-require_once(AK_LIB_DIR.DS.'AkInflector.php');
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php');
 
 if(!defined('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES')){
@@ -174,7 +172,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     var $_db;
     var $_newRecord;
     var $_freeze;
-    var $_modelName;
     var $_dataDictionary;
     var $_primaryKey;
     var $_inheritanceColumn;
@@ -939,6 +936,7 @@ Examples for find all:
             }
                 
             switch ($num_ids){
+                
                 case 0 :
                 trigger_error($this->t('Couldn\'t find %object_name without an ID%conditions',array('%object_name'=>$this->getModelName(),'%conditions'=>$conditions)), E_USER_ERROR);
                 break;
@@ -963,13 +961,16 @@ Examples for find all:
                 $ids_condition = $this->getPrimaryKey().' IN ('.join(', ',$ids).')';
                 
                 if(!empty($options['conditions']) && is_array($options['conditions'])){
-                    $options['conditions'][0] .= ' AND '.$ids_condition;
-                }else {
+                    $options['conditions'][0] = $ids_condition.' AND '.$options['conditions'][0];
+                }elseif(!empty($options['conditions'])){
+                    $options['conditions'] = $ids_condition.' AND '.$options['conditions'];
+                }else{
+                    $without_conditions = true;
                     $options['conditions'] = $ids_condition;
                 }
                 
                 $result =& $this->find('all', $options);
-                if(is_array($result) && count($result) == $num_ids){
+                if(is_array($result) && (count($result) == $num_ids || empty($without_conditions))){
                     if($result === false){
                         $_result =& $GLOBALS['false'];
                     }else{
@@ -2609,59 +2610,8 @@ Examples for find all:
     }
 
 
-    /**
-    * Returns current model name
-    */
-    function getModelName()
-    {
-        if(!isset($this->_modelName)){
-            if(!$this->setModelName()){
-                trigger_error(Ak::t('Unable to fetch current model name'),E_USER_NOTICE);
-            }
-        }
-        return $this->_modelName;
-    }
 
-    /**
-    * Sets current model name
-    *
-    * Use this option if the model name can't be guessed by the Active Record
-    */
-    function setModelName($model_name = null)
-    {
-        if(!empty($model_name)){
-            $this->_modelName = $model_name;
-        }else{
-            $this->_modelName = $this->_getModelName(get_class($this));
-        }
-        return true;
-    }
-
-    /**
-     * This method will nicely handle model names even  on 
-     * PHP where class names are all lowercased
-     */
-    function _getModelName($class_name)
-    {
-        if(AK_PHP5){
-            return $class_name;
-        }
-        $included_models = $this->_getIncludedModelNames();
-        if(!in_array($class_name, $included_models)){
-            $class_name = strtolower($class_name);
-            foreach ($included_models as $included_model){
-                if($class_name == strtolower($included_model)){
-                    return $included_model;
-                }
-            }
-
-            trigger_error(Ak::t('The Akelos Framework could not automatically configure your model name.'.
-            ' This might be caused because your model file is not located on %path. Please call $this->setModelName("YourModelName");'.
-            ' in your model constructor in order to make this work.',array('%path'=>AK_MODELS_DIR.DS)), E_USER_ERROR);
-            return false;
-        }
-    }
-
+    
     /**
      * This method retrieves current class name that will be used to map 
      * your database to this object.
@@ -2686,67 +2636,7 @@ Examples for find all:
 
         return $class_name;
     }
-
-
-
-
-
-
-
-
-    function getParentModelName()
-    {
-        if(!isset($this->_parentModelName)){
-            if(!$this->setParentModelName()){
-                return false;
-            }
-        }
-        return $this->_parentModelName;
-    }
-
-    function setParentModelName($model_name = null)
-    {
-        $got_errors = false;
-        if(!empty($model_name)){
-            $this->_parentModelName = $model_name;
-        }else{
-            $class_name = AkInflector::modulize(get_parent_class($this));
-            if(!AK_PHP5){
-                $included_models = $this->_getIncludedModelNames();
-                if(!in_array($class_name, $included_models)){
-                    $class_name = strtolower($class_name);
-                    foreach ($included_models as $included_model){
-                        if($class_name == strtolower($included_model)){
-                            $this->_parentModelName = $included_model;
-                            return true;
-                        }
-                    }
-                    $got_errors = true;
-                }
-            }
-            if($got_errors || $class_name == 'AkActiveRecord'){
-                trigger_error(Ak::t('The Akelos Framework could not automatically configure your model name.'.
-                ' This might be caused because your model file is not located on %path. Please call $this->setParentModelName("YourParentModelName");'.
-                ' in your model constructor in order to make this work.',array('%path'=>AK_MODELS_DIR.DS)), E_USER_ERROR);
-                return false;
-            }
-            $this->_parentModelName = $class_name;
-        }
-        return true;
-    }
-
-    function _getIncludedModelNames()
-    {
-        $included_files = get_included_files();
-        $models = array();
-        foreach ($included_files as $file_name){
-            if(strstr($file_name,AK_MODELS_DIR)){
-                $models[] = AkInflector::modulize(str_replace(array(AK_MODELS_DIR.DS,'.php'),'',$file_name));
-            }
-        }
-        return $models;
-    }
-
+    
 
     function getTableName($modify_for_associations = true)
     {
