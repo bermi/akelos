@@ -16,9 +16,9 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-require_once(AK_LIB_DIR.DS.'AkObject.php');
+require_once(AK_LIB_DIR.DS.'AkBaseModel.php');
 
-/*
+/**
 Adds the following methods for retrieval and query of a single associated object. association is replaced with the symbol passed as the first argument, so has_one :manager would add among others manager.nil?.
 
 * association(force_reload = false) - returns the associated object. Nil is returned if none is found.
@@ -37,7 +37,7 @@ Example: An Account class declares has_one :beneficiary, which will add:
 */
 
 
-class AkAssociatedActiveRecord extends AkObject
+class AkAssociatedActiveRecord extends AkBaseModel
 {
     var $__activeRecordObject = false;
     var $_AssociationHandler;
