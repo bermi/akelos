@@ -1037,28 +1037,6 @@ Options are:
         return $resulting_array;
     }
 
-    /**
-     * Collect is a function for selecting items from double depth array
-     * like the ones returned by the AkActiveRecord. This is useful when you just need some
-     * fields for generating tables, select lists with only desired fields.
-     *
-     *   $People = array(
-     *    array('id'=>'10','email'=>'jose@example.com','address'=>'Colon, 52'),
-     *    array('id'=>'15','email'=>'alicia@example.com','address'=>'Mayor, 45'),
-     *    array('id'=>'16','email'=>'hilario@example.com','address'=>'Carlet, 78'),
-     *    array('id'=>'18','email'=>'bermi@example.com','address'=>'Vilanova, 33'),
-     *   );
-     * 
-     *    $people_for_select = Ak::select($People,'id','email');
-     *    
-     *    Now $people_for_select will hold an array with
-     *    array (
-     *        array ('10' => 'jose@example.com'),
-     *        array ('15' => 'alicia@example.com'),
-     *        array ('16' => 'hilario@example.com'),
-     *        array ('18' => 'bermi@example.com')
-     *    );
-     */
     function collect(&$source_array, $key_index, $value_index)
     {
         $resulting_array = array();
