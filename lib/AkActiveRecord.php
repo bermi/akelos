@@ -1293,7 +1293,7 @@ Examples for find all:
     * eager loading associations.
     * that makes it possible to create objects of different types from the same table.
     */
-    function &instantiate($record, $set_as_new = true)
+    function &instantiateinstantiate($record, $set_as_new = true)
     {
         $inheritance_column = $this->getInheritanceColumn();
         if(!empty($record[$inheritance_column])){
@@ -1311,14 +1311,10 @@ Examples for find all:
 
         $model_name = isset($inheritance_model_name) ? $inheritance_model_name : $this->getModelName();
         $object =& new $model_name('attributes', $record);
-        $avoid_loading_associations = isset($record['load_associations']) ? true : !empty($this->disableAutomatedAssociationLoading);
-        
+
         $object->_newRecord = $set_as_new;
 
         (AK_CLI && AK_ENVIRONMENT == 'development') ? $object ->toString() : null;
-
-        //$object->_buildFinders();
-        //empty($avoid_loading_associations) ? $this->loadAssociations() : null;
 
         return $object;
     }

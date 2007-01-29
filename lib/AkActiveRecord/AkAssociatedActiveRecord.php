@@ -323,6 +323,9 @@ class AkAssociatedActiveRecord extends AkBaseModel
     }
 
 
+    /**
+     * @todo Refactor in order to increase performance of associated inclussions
+     */
     function &_findBySqlWithAssociations($sql, $limit = null, $offset = null, $included_associations = array())
     {
         if(is_array($sql)){
