@@ -167,7 +167,7 @@ Ak::compat('array_combine');
 */
 class AkActiveRecord extends AkAssociatedActiveRecord
 {
-
+    //var $disableAutomatedAssociationLoading = true;
     var $_tableName;
     var $_db;
     var $_newRecord;
@@ -285,6 +285,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             foreach($attributes[1] as $k=>$v){
                 $attributes[1][$k] = $this->castAttributeFromDatabase($k, $v);
             }
+            $avoid_loading_associations = isset($attributes[1]['load_associations']) ? false : !empty($this->disableAutomatedAssociationLoading);
             $this->setAttributes($attributes[1]);
         }else{
             $this->_newRecord = true;
@@ -306,7 +307,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
 
         $this->_buildFinders();
-        $this->loadAssociations();
+        empty($avoid_loading_associations) ? $this->loadAssociations() : null;
     }
 
     function __destruct()
@@ -1309,15 +1310,15 @@ Examples for find all:
         }
 
         $model_name = isset($inheritance_model_name) ? $inheritance_model_name : $this->getModelName();
-
         $object =& new $model_name('attributes', $record);
-
+        $avoid_loading_associations = isset($record['load_associations']) ? true : !empty($this->disableAutomatedAssociationLoading);
+        
         $object->_newRecord = $set_as_new;
 
         (AK_CLI && AK_ENVIRONMENT == 'development') ? $object ->toString() : null;
 
-        $object->_buildFinders();
-        $object->loadAssociations();
+        //$object->_buildFinders();
+        //empty($avoid_loading_associations) ? $this->loadAssociations() : null;
 
         return $object;
     }
