@@ -1293,7 +1293,7 @@ Examples for find all:
     * eager loading associations.
     * that makes it possible to create objects of different types from the same table.
     */
-    function &instantiateinstantiate($record, $set_as_new = true)
+    function &instantiate($record, $set_as_new = true)
     {
         $inheritance_column = $this->getInheritanceColumn();
         if(!empty($record[$inheritance_column])){
