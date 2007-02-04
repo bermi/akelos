@@ -74,6 +74,7 @@ class ScaffoldGenerator extends  AkelosGenerator
         'model_fixtures.yml'=>AK_TEST_DIR.DS.'fixtures'.DS.$this->plural_name.'.yml'
         );
 
+        $this->_template_vars = (array)$this;
         foreach ($model_files as $template=>$file_path){
             if(!file_exists($file_path)){
                 $this->save($file_path, $this->render($template));
