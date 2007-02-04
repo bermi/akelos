@@ -144,7 +144,43 @@ class  TextHelper
         // No need to use an UTF-8 wordwrap function as we are using the default cut character.
         return trim(wordwrap($text, $line_width, $break));
     }
+    
+    /**
+     * Like word wrap but allows defining text indenting  and boby indenting
+     */
+    function format($text, $options = array())
+    {
+        $default_options = array(
+        'columns' => 72,
+        'first_indent' => 4,
+        'body_indent' => 0,
+        'cut_words' => false
+        );
 
+        $options = array_merge($default_options, $options);
+
+        $text = empty($text) && !empty($options['text']) ? $options['text'] : $text;
+        if(empty($text)) {
+            return '';
+        }
+        $text = str_replace(array("\r","\t",'  ','  '),array("\n",' ',' ',' '),$text);
+        $formated_text = '';
+        foreach(explode("\n",$text."\n") as $paragraph) {
+            if(empty($paragraph)) {
+                continue;
+            }
+            $paragraph = ($options['first_indent'] > 0 ? str_repeat(' ',$options['first_indent']) : '' ).$paragraph;
+            $paragraph = wordwrap($paragraph, $options['columns']-$options['body_indent'], "\n", $options['cut_words']);
+
+            if($options['body_indent'] > 0) {
+                $paragraph = preg_replace('!^!m',str_repeat(' ',$options['body_indent']),$paragraph);
+            }
+            $formated_text .= $paragraph . "\n\n";
+        }
+        return $formated_text;
+    }
+    
+    
     /**
      * Returns the "$text" with all the Textile codes turned into HTML-tags.
      */

@@ -26,7 +26,7 @@ body
 	font-family:Verdana, Arial, Helvetica, sans-serif;
 	font-size:80%;
 	background-color:#eee;
-	background-image:url('/aequus/images/bg_page.png');
+	background-image:url('/images/bg_page.png');
 	background-repeat:repeat-x;
 	padding:10px 12px;
 }
@@ -57,7 +57,7 @@ th
 	vertical-align:bottom;
 	padding:3px 5px;
 	background-color:#eee;
-	background-image:url('/aequus/images/bg_header.png');
+	background-image:url('/images/bg_header.png');
 	border-left: 1px solid #c4c4c4;
 }
 th>a:link, th>a:visited

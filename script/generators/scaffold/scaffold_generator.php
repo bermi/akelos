@@ -15,6 +15,7 @@
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
+ak_define('ACTIVE_RECORD_VALIDATE_TABLE_NAMES', false);
 
 class ScaffoldGenerator extends  AkelosGenerator
 {
@@ -66,16 +67,6 @@ class ScaffoldGenerator extends  AkelosGenerator
 
     function generate()
     {
-        $this->_template_vars = (array)$this;
-
-        foreach ($this->files as $template=>$file_path){
-            $this->save($file_path, $this->render($template));
-        }
-        foreach ($this->user_actions as $action=>$file_path){
-            $this->assignVarToTemplate('action',$action);
-            $this->save($file_path, $this->render('view'));
-        }
-
         //Generate models if they don't exist
         $model_files = array(
         'model'=>$this->model_file_path,
@@ -88,6 +79,45 @@ class ScaffoldGenerator extends  AkelosGenerator
                 $this->save($file_path, $this->render($template));
             }
         }
+
+        if(file_exists($this->model_file_path)){
+            require_once(AK_APP_DIR.DS.'shared_model.php');
+            require_once($this->model_file_path);
+            if(class_exists($this->model_name)){
+                $ModelInstance =& new $this->model_name;
+                $table_name = $ModelInstance->getTableName();
+                if(!empty($table_name)){
+                    $this->content_columns = $ModelInstance->getContentColumns();
+                    unset(
+                    $this->content_columns['updated_at'],
+                    $this->content_columns['updated_on'],
+                    $this->content_columns['created_at'],
+                    $this->content_columns['created_on']
+                    );
+                }
+                $internationalized_columns = $ModelInstance->getInternationalizedColumns();
+                foreach ($internationalized_columns as $column_name=>$languages){
+                    foreach ($languages as $lang){
+                        $this->content_columns[$column_name] = $this->content_columns[$lang.'_'.$column_name];
+                        $this->content_columns[$column_name]['name'] = $column_name;
+                        unset($this->content_columns[$lang.'_'.$column_name]);
+                    }
+                }
+
+
+            }
+        }
+
+        $this->_template_vars = (array)$this;
+        foreach ($this->files as $template=>$file_path){
+            $this->save($file_path, $this->render($template));
+        }
+        foreach ($this->user_actions as $action=>$file_path){
+            $this->assignVarToTemplate('action',$action);
+            $this->save($file_path, $this->render('view'));
+        }
+
+
 
     }
 }

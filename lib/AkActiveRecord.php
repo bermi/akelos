@@ -2486,6 +2486,11 @@ Examples for find all:
     }
 
 
+    function _delocalizeAttribute($attribute)
+    {
+        return $this->_isInternationalizeCandidate($attribute) ? substr($attribute,3) : $attribute;
+    }
+    
     /**/
 
 
@@ -3446,7 +3451,7 @@ Examples for find all:
     function validatesConfirmationOf($attribute_names, $message = 'confirmation')
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
-        $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
+        $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
             $attribute_accessor = $attribute_name.'_confirmation';
             if(isset($this->$attribute_accessor) && @$this->$attribute_accessor != @$this->$attribute_name){
@@ -3478,7 +3483,7 @@ Examples for find all:
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
-        $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
+        $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
             if(@$this->$attribute_name != $accept){
                 $this->addError($attribute_name, $message);
@@ -3498,7 +3503,7 @@ Examples for find all:
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
-        $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
+        $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
             $this->addErrorOnBlank($attribute_name, $message);
         }
@@ -4115,7 +4120,7 @@ Examples for find all:
     function addErrorOnEmpty($attribute_names, $message = 'empty')
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
-        $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
+        $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute){
             if(empty($this->$attribute)){
                 $this->addError($attribute, $message);
@@ -4129,7 +4134,7 @@ Examples for find all:
     function addErrorOnBlank($attribute_names, $message = 'blank')
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
-        $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
+        $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute){
             if($this->isBlank(@$this->$attribute)){
                 $this->addError($attribute, $message);
@@ -4146,7 +4151,7 @@ Examples for find all:
         $too_long_message = isset($this->_defaultErrorMessages[$too_long_message]) ? $this->_defaultErrorMessages[$too_long_message] : $too_long_message;
         $too_short_message = isset($this->_defaultErrorMessages[$too_short_message]) ? $this->_defaultErrorMessages[$too_short_message] : $too_short_message;
 
-        $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
+        $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute){
             if(@$this->$attribute < $range_begin){
                 $this->addError($attribute, $too_short_message);
@@ -4240,7 +4245,10 @@ Examples for find all:
         foreach ($this->_errors as $attribute=>$errors){
             $full_messages[$attribute] = array();
             foreach ($errors as $error){
-                $full_messages[$attribute][] = $this->t(AkInflector::humanize($attribute)).' '.$error;
+                $full_messages[$attribute][] = $this->t('%attribute_name %error', array(
+                '%attribute_name'=>AkInflector::humanize($this->_delocalizeAttribute($attribute)),
+                '%error'=>$error
+                ));
             }
         }
         return $full_messages;

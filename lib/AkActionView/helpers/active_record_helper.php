@@ -25,7 +25,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php');
 * is a great of making the record quickly available for editing, but likely to prove lackluster for a complicated real-world form.
 * In that case, it's better to use the input method and the specialized form methods from the FormHelper
 */
-class ActiveRecordHelper extends AkActionViewHelper 
+class ActiveRecordHelper extends AkActionViewHelper
 {
 
     /**
@@ -132,8 +132,8 @@ class ActiveRecordHelper extends AkActionViewHelper
                     $error_list .= TagHelper::content_tag('li',$error);
                 }
             }
-            $error_list .= '</ul>';            
-            return 
+            $error_list .= '</ul>';
+            return
             TagHelper::content_tag('div',
             TagHelper::content_tag(
             (!empty($options['header_tag']) ? $options['header_tag'] :'h2'),
@@ -171,10 +171,10 @@ class ActiveRecordHelper extends AkActionViewHelper
 class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
 {
     var $method_name;
-    
+
     function ActiveRecordInstanceTag($object_name, $column_name, &$template_object)
-    {        
-        $this->method_name = $column_name;
+    {
+        $column_name = $this->method_name = $this->_getColumnName($column_name, $object_name,  $template_object);
         $this->AkFormHelperInstanceTag($object_name, $column_name, $template_object);
     }
     function to_tag($options = array())
@@ -278,8 +278,21 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
     }
 
     function get_column_type()
-    {        
+    {
         return $this->object->getColumnType($this->method_name);
+    }
+
+    function _getColumnName($column_name, $object_name, &$template_object)
+    {
+        $object =& $template_object->_controller->{$object_name};
+        $internationalized_columns = $object->getInternationalizedColumns();
+        if(!empty($internationalized_columns[$column_name]))  {
+            $current_locale = $object->getCurrentLocale();
+            if(in_array($current_locale, $internationalized_columns[$column_name]))  {
+                $column_name = $current_locale.'_'.$column_name;
+            }
+        }
+        return $column_name;
     }
 }
 

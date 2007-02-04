@@ -171,8 +171,8 @@ class AkActionView
         if(is_string($options)){
             return $this->renderFile($options, true);
         }elseif(is_array($options)){
-            empty($options['locals']) ? array() : $options['locals'];
-            empty($options['use_full_path']) ? true : false;
+            $options['locals'] = empty($options['locals']) ? array() : $options['locals'];
+            $options['use_full_path'] = empty($options['use_full_path']) ? true : false;
 
             if (!empty($options['file'])){
                 return $this->renderFile($options['file'], $options['use_full_path'], $options['locals']);
@@ -193,7 +193,8 @@ class AkActionView
     */
     function renderTemplate($____template_extension, $____template, $____file_path = null, $____local_assigns = array(), $____save_content_in_attribute_as = 'layout')
     {
-        $____local_assigns = array_merge((array)@$this->_local_assigns,array_merge((array)$____local_assigns,array('controller_name' => $this->controller,'controller' => &$this->_controllerInstance)));
+        $____local_assigns = array_merge((array)@$this->assigns,array_merge((array)@$this->_local_assigns,
+                                array_merge((array)$____local_assigns,array('controller_name' => $this->controller,'controller' => &$this->_controllerInstance))));
 
         if(!empty($this->_template_handlers[$____template_extension])){
             $____handler =& $this->_template_handlers[$____template_extension];
