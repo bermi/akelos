@@ -9,14 +9,17 @@ class Test_of_AkRouter_Class extends  UnitTestCase
 
     var $Router;
     var $url_prefix = '';
-    
+
     function Test_of_AkRouter_Class()
     {
         $this->Router =& new AkRouter();
-        
+
         $this->Router->_loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
-        
+
+        $this->Router->connect('/topic/:id', array('controller' => 'topic', 'action'=>'view', 'id'=>COMPULSORY), array('id'=>'[0-9]+'));
+        $this->Router->connect('/topic/:id/unread', array('controller' => 'topic','action'=>'unread','id'=>COMPULSORY), array('id'=>'[0-9]+'));
+
         $this->Router->connect('/lists/:action/:id/:option', array('controller'=>'todo','option'=>COMPULSORY));
         $this->Router->connect('/setup/*config_settings',array('controller'=>'setup'));
         $this->Router->connect('/redirect/:url',array('controller'=>'redirect'));
@@ -34,7 +37,7 @@ class Test_of_AkRouter_Class extends  UnitTestCase
 
     function Test_connect()
     {
-        $this->assertFalse(count($this->Router->getRoutes()) != 10,'The number of loaded in the class internals did not match');
+        $this->assertEqual(count($this->Router->getRoutes()) , 12,'Wrong number of routes loaded. We expected 12');
     }
 
     function Test_toParams()
@@ -150,7 +153,7 @@ class Test_of_AkRouter_Class extends  UnitTestCase
         $input_value = array('controller'=>'blog','action'=>'view','id'=>'newest');
         $expected = $this->url_prefix.'/blog/view/newest/';
         $this->assertEqual($this->Router->toUrl($input_value),$expected);
-        
+
         $input_value = array('controller'=>'blog','action'=>'view','id'=>'newest','format'=>'printer_friendly');
         $expected = AK_URL_REWRITE_ENABLED ? '/blog/view/newest/?format=printer_friendly' : '/?ak=/blog/view/newest/&format=printer_friendly';
         $this->assertEqual($this->Router->toUrl($input_value),$expected);
@@ -173,6 +176,18 @@ class Test_of_AkRouter_Class extends  UnitTestCase
 
         $input_value = array('controller' => 'themes','options' => array('blue','css','sans_serif'), 'action'=>'clone');
         $expected = $this->url_prefix.'/customize/blue/css/sans_serif/clone/';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+
+    }
+    
+    function test_url_with_optional_variables()
+    {
+        $input_value = array('controller'=>'topic','action'=>'view','id'=>4);
+        $expected = $this->url_prefix.'/topic/4/';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+        
+        $input_value = array('controller'=>'topic','action'=>'unread','id'=>4);
+        $expected = $this->url_prefix.'/topic/4/unread/';
         $this->assertEqual($this->Router->toUrl($input_value),$expected);
 
     }
