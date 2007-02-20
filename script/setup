@@ -43,7 +43,7 @@ class AkelosInstaller
         $this->source_tree = Ak::dir($this->options['source'],array('dirs'=>true,'recurse'=>true));
 
         if(empty($this->options['dependencies'])){
-            $this->framework_dirs = array('lib', 'vendor', 'docs');
+            $this->framework_dirs = array('lib', 'vendor', 'docs', 'test');
 
             foreach ($this->framework_dirs as $framework_dir){
                 foreach ($this->source_tree as $k => $v){

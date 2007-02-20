@@ -1,26 +1,28 @@
 <?='<?php'?>
 
-require_once('..'.DIRECTORY_SEPARATOR.'config.php');
-
+defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
+require_once(AK_APP_DIR.DS.'shared_model.php');
 require_once(AK_MODELS_DIR.DS.'<?=$singular_name?>.php');
 
-class Test_of_<?=$model_name?> extends UnitTestCase
+class <?=$model_name?>Test extends  AkUnitTest
 {
-    var $fixtures = '<?=$plural_name?>';
+    function test_setup()
+    {
+        require_once(AK_APP_DIR.DS.'installers'.DS.'<?=$singular_name?>_installer.php');
+        $installer = new <?=$model_name?>Installer();
+        $installer->uninstall();
+        $installer->install();    
+    }
     
-    // Replace this with your real tests.
-    function test_implement_tests_please()
+    function test_<?=$model_name?>()
     {
         $this->assertTrue(false,'Unit test for <?=$model_name?> not implemented');
     }
-    
 }
 
-if(!defined("ALL_TESTS_CALL")){
-	$test = &new Test_of_<?=$model_name?>();
-	$test->run(new HtmlReporter());
-}
 
+Ak::test('<?=$model_name?>Test',true);
 
 ?>

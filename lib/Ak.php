@@ -363,12 +363,14 @@ class Ak
             }
 
             if(!$result = file_put_contents($options['base_path'].DS.$file_name, $content)){
-                Ak::trace("Please change file/dir permissions or enable FTP file handling by".
-                " setting the following on your config/".AK_ENVIRONMENT.".php file \n<pre>define('AK_UPLOAD_FILES_USING_FTP', true);\n".
-                "define('AK_READ_FILES_USING_FTP', false);\n".
-                "define('AK_DELETE_FILES_USING_FTP', true);\n".
-                "define('AK_FTP_PATH', 'ftp://username:password@example.com/path_to_the_framework');\n".
-                "define('AK_FTP_AUTO_DISCONNECT', true);\n</pre>");
+                if(!empty($content)){
+                    Ak::trace("Please change file/dir permissions or enable FTP file handling by".
+                    " setting the following on your config/".AK_ENVIRONMENT.".php file \n<pre>define('AK_UPLOAD_FILES_USING_FTP', true);\n".
+                    "define('AK_READ_FILES_USING_FTP', false);\n".
+                    "define('AK_DELETE_FILES_USING_FTP', true);\n".
+                    "define('AK_FTP_PATH', 'ftp://username:password@example.com/path_to_the_framework');\n".
+                    "define('AK_FTP_AUTO_DISCONNECT', true);\n</pre>");
+                }
             }
             return $result;
         }
@@ -582,14 +584,14 @@ Options are:
         if(!AK_DEBUG && !AK_DEV_MODE){
             return;
         }
-        
+
         if($_functions!=0) {
             $sf=1;
         } else {
             $sf=0 ;
         }
         if(is_object($data) && method_exists($data, 'debug')){
-            echo AK_CLI ? 
+            echo AK_CLI ?
             "\n------------------------------------\nEntering on ".get_class($data)." debug() method\n\n":
             "<hr /><h2>Entering on ".get_class($data)." debug() method</h2>";
             if(!empty($data->__activeRecordObject)){
@@ -606,12 +608,12 @@ Options are:
                     while (list ($key,$value) = each ($data)) {
                         $type=gettype($value);
                         if ($type=="array" || $type == "object") {
-                                ob_start();
-                                Ak::debug ($value,$sf);
-                                $lines = explode("\n",ob_get_clean()."\n");
-                                foreach ($lines as $line){
-                                    echo "\t".$line."\n";
-                                }
+                            ob_start();
+                            Ak::debug ($value,$sf);
+                            $lines = explode("\n",ob_get_clean()."\n");
+                            foreach ($lines as $line){
+                                echo "\t".$line."\n";
+                            }
                         } elseif (eregi ("function", $type)) {
                             if ($sf) {
                                 AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key, $value) :
@@ -1712,7 +1714,7 @@ Options are:
         if(!defined('ALL_TESTS_CALL')){
             $use_sessions ? @session_start() : null;
             $test = &new $test_case_name();
-            if (TextReporter::inCli() || (defined('AK_CONSOLE_MODE') && AK_CONSOLE_MODE) || (defined('AK_WEB_REQUEST') && !AK_WEB_REQUEST)) {
+            if (defined('AK_CLI') && AK_CLI || TextReporter::inCli() || (defined('AK_CONSOLE_MODE') && AK_CONSOLE_MODE) || (defined('AK_WEB_REQUEST') && !AK_WEB_REQUEST)) {
                 $test->run(new TextReporter());
             }else{
                 $test->run(new HtmlReporter());

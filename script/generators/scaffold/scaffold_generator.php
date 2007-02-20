@@ -36,10 +36,14 @@ class ScaffoldGenerator extends  AkelosGenerator
 
         $this->files = array(
         'controller.php' => $this->controller_file_path,
-        'functional_test.php' => AK_TEST_DIR.DS.'functional'.DS.'test_'.$this->controller_class_name.'.php',
+        /**
+         * @todo Implement generic functional tests
+         */
+        // 'functional_test.php' => AK_TEST_DIR.DS.'functional'.DS.'test_'.$this->controller_class_name.'.php',
         'helper.php' => AK_HELPERS_DIR.DS.trim($this->helper_var_name,'$').'.php',
         'layout' => AK_VIEWS_DIR.DS.'layouts'.DS.$this->singular_name.'.tpl',
-        'style.css' => AK_PUBLIC_DIR.DS.'stylesheets'.DS.'scaffold.css',
+        // scaffold.css is included by default in the public path
+        // 'style.css' => AK_PUBLIC_DIR.DS.'stylesheets'.DS.'scaffold.css',
         'view_add' => AK_VIEWS_DIR.DS.$this->singular_name.DS.'add.tpl',
         'view_destroy' => AK_VIEWS_DIR.DS.$this->singular_name.DS.'destroy.tpl',
         'view_edit' => AK_VIEWS_DIR.DS.$this->singular_name.DS.'edit.tpl',
@@ -70,14 +74,28 @@ class ScaffoldGenerator extends  AkelosGenerator
         //Generate models if they don't exist
         $model_files = array(
         'model'=>$this->model_file_path,
-        'model_unit_test'=>AK_TEST_DIR.DS.'unit'.DS.'test_'.$this->singular_name.'.php',
-        'model_fixtures.yml'=>AK_TEST_DIR.DS.'fixtures'.DS.$this->plural_name.'.yml'
+        'installer'=>AK_APP_DIR.DS.'installers'.DS.$this->singular_name.'_installer.php',
+        'model_unit_test'=>AK_TEST_DIR.DS.'unit'.DS.'app'.DS.'models'.DS.$this->singular_name.'.php',
+        'model_fixture'=>    AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'models'.DS.$this->singular_name.'.php',
+        'installer_fixture'=>AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'installers'.DS.$this->singular_name.'_installer.php'
         );
 
         $this->_template_vars = (array)$this;
         foreach ($model_files as $template=>$file_path){
             if(!file_exists($file_path)){
                 $this->save($file_path, $this->render($template));
+            }
+        }
+
+        // We check for common testing files
+        $common_testing_files = array(
+        'fixtures'.DS.'config'.DS.'config.php',
+        'fixtures'.DS.'app'.DS.'shared_model.php'
+        );
+        foreach ($common_testing_files as $common_testing_file){
+            if(!file_exists(AK_TEST_DIR.DS.$common_testing_file)){
+                $this->save(AK_TEST_DIR.DS.$common_testing_file,
+                file_get_contents(AK_FRAMEWORK_DIR.DS.'test'.DS.$common_testing_file));
             }
         }
 

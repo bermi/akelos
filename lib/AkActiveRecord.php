@@ -1751,6 +1751,10 @@ Examples for find all:
             //Here we set email_link so compose_email_link() will be triggered for building up the field and parse_email_link will
             // be used for getting the fields out
             $User->addCombinedAttributeConfiguration('email_link', array("compose_email_link","parse_email_link"), 'email', 'name');
+            
+            // We need to tell the ActiveRecord to load it's magic (see the example below for a simpler solution)
+            $attributes = (array)func_get_args();
+            return $this->init($attributes);
 
         }
         function compose_email_link()
@@ -1766,6 +1770,22 @@ Examples for find all:
         
     } 
 ?>
+/*
+/* You can also simplify your live by declaring the combined attributes as a class variable like:
+    <?php 
+    class User extends ActiveRecord 
+    { 
+    	var $combined_attributes array(
+		array('name', array("%s, %s","%[^,], %s"), 'last_name', 'first_name')
+		array('email_link', array("compose_email_link","parse_email_link"), 'email', 'name')
+		);
+		
+		// ....
+    } 
+    ?>
+
+    This way you can get rid calling the parent constructor
+    
     * @param $attribute
     * @param $mapping
     */
