@@ -200,25 +200,24 @@ class AkRouter extends AkObject
                     if(
                         !empty($route['url_pieces']) && 
                         isset($route['options'][$option]) && 
-                        array_search(':'. $option, $route['url_pieces']) === false && 
+                        array_search(':'.$option, $route['url_pieces']) === false && 
                         array_search('*'.$option, $route['url_pieces']) === false && 
                         (
                             is_string($value) ||
+                            is_integer($value)) && 
                             (
-                                is_integer($value)) && 
                                 !isset($params_copy[$option]
-                             ) ||
+                            ) ||
                             $params_copy[$option] != $value
                         )
-                     ){
+                    )
+                    {
                         continue 2;
                     }
-                    if(
-                        isset($params_copy[$option]) && 
-                        $value == $params_copy[$option] && 
-                        $value !== OPTIONAL && 
-                        $value !== COMPULSORY
-                    )
+                    if(isset($params_copy[$option]) && 
+                    $value == $params_copy[$option] && 
+                    $value !== OPTIONAL && 
+                    $value !== COMPULSORY)
                     {
                         if($option == 'controller'){
                             $_controller = $value;
