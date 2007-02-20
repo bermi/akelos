@@ -179,22 +179,54 @@ class Test_of_AkRouter_Class extends  UnitTestCase
         $this->assertEqual($this->Router->toUrl($input_value),$expected);
 
     }
-    
+
     function test_url_with_optional_variables()
     {
         $input_value = array('controller'=>'topic','action'=>'view','id'=>4);
         $expected = $this->url_prefix.'/topic/4/';
         $this->assertEqual($this->Router->toUrl($input_value),$expected);
-        
+
         $input_value = array('controller'=>'topic','action'=>'unread','id'=>4);
         $expected = $this->url_prefix.'/topic/4/unread/';
         $this->assertEqual($this->Router->toUrl($input_value),$expected);
 
     }
+}
 
+class Test_for_default_routes extends  UnitTestCase
+{
+
+    var $Router;
+    var $url_prefix = '';
+
+    function Test_for_default_routes()
+    {
+        $this->Router =& new AkRouter();
+
+        $this->Router->_loadUrlRewriteSettings();
+        $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
+
+        $this->Router->connect('/:controller/:action/:id', array('controller' => 'page', 'action' => 'index'));
+        $this->Router->connect('/', array('controller' => 'page', 'action' => 'index'));
+
+    }
+
+
+    function Test_connect()
+    {
+        $this->assertEqual(count($this->Router->getRoutes()) , 2,'Wrong number of routes loaded. We expected 12');
+    }
+
+    function Test_toUrl()
+    {
+        $input_value = array('controller'=>'page','action'=>'listing');
+        $expected = '/page/listing';
+        $this->assertEqual($this->Router->toUrl($input_value),$expected);
+    }
 
 }
 
 Ak::test('Test_of_AkRouter_Class');
+Ak::test('Test_for_default_routes');
 
 ?>
