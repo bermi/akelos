@@ -29,10 +29,10 @@ class NumberHelper
       * The area code can be surrounded by parentheses by setting +area_code+ to true; default is false
       * The delimiter can be set using +delimiter+; default is "-"
       * Examples:
-      *   $number->number_to_phone(1235551234)   => 123-555-1234
-      *   $number->number_to_phone(1235551234, array('area_code' => true))   => (123) 555-1234
-      *   $number->number_to_phone(1235551234, array('delimiter' => " "))    => 123 555 1234
-      *   $number->number_to_phone(1235551234, array('area_code' => true, 'extension' => 555))  => (123) 555-1234 x 555
+      *   $number_helper->number_to_phone(1235551234)   => 123-555-1234
+      *   $number_helper->number_to_phone(1235551234, array('area_code' => true))   => (123) 555-1234
+      *   $number_helper->number_to_phone(1235551234, array('delimiter' => " "))    => 123 555 1234
+      *   $number_helper->number_to_phone(1235551234, array('area_code' => true, 'extension' => 555))  => (123) 555-1234 x 555
       */
     function number_to_phone($number, $options = array())
     {
@@ -60,11 +60,11 @@ class NumberHelper
       * The unit separator can be set using the +separator+ key; default is "."
       * The delimiter can be set using the +delimiter+ key; default is ","
       * Examples:
-      *    $number->number_to_currency(1234567890.50)     => $1,234,567,890.50
-      *    $number->number_to_currency(1234567890.506)    => $1,234,567,890.51
-      *    $number->number_to_currency(1234567890.50, 
+      *    $number_helper->number_to_currency(1234567890.50)     => $1,234,567,890.50
+      *    $number_helper->number_to_currency(1234567890.506)    => $1,234,567,890.51
+      *    $number_helper->number_to_currency(1234567890.50, 
       * 	array('unit' => "&pound;", 'separator' => ",", 'delimiter' => "")) => &pound;1234567890,50
-      *    $number->number_to_currency(1234567890.50, 
+      *    $number_helper->number_to_currency(1234567890.50, 
       * 	array('unit' => " &euro;", 'separator' => ",", 'delimiter' => ".",
       * 			'unit_position' => 'right')) => 1.234.567.890,50 &euro;
       */
@@ -89,9 +89,9 @@ class NumberHelper
       * The +number+ can contain a level of precision using the +precision+ key; default is 2
       * The unit separator can be set using the +separator+ key; default is "."
       * Examples:
-      *   $number->number_to_percentage(100)    => 100.00%
-      *   $number->number_to_percentage(100, array('precision' => 0)) => 100%
-      *   $number->number_to_percentage(302.0576, array('precision' => 3))  => 302.058%
+      *   $number_helper->number_to_percentage(100)    => 100.00%
+      *   $number_helper->number_to_percentage(100, array('precision' => 0)) => 100%
+      *   $number_helper->number_to_percentage(302.0576, array('precision' => 3))  => 302.058%
       */
     function number_to_percentage($number, $options = array())
     {
@@ -109,7 +109,7 @@ class NumberHelper
     /**
       * Formats a +number+ with a +delimiter+.
       * Example:
-      *    $number->number_with_delimiter(12345678) => 12,345,678
+      *    $number_helper->number_with_delimiter(12345678) => 12,345,678
       */
     function number_with_delimiter($number, $delimiter=',')
     {
@@ -120,11 +120,11 @@ class NumberHelper
     * Returns a formatted-for-humans file size.
     *
     * Examples:
-    *   $number->human_size(123)          => 123 Bytes
-    *   $number->human_size(1234)         => 1.2 KB
-    *   $number->human_size(12345)        => 12.1 KB
-    *   $number->human_size(1234567)      => 1.2 MB
-    *   $number->human_size(1234567890)   => 1.1 GB
+    *   $number_helper->human_size(123)          => 123 Bytes
+    *   $number_helper->human_size(1234)         => 1.2 KB
+    *   $number_helper->human_size(12345)        => 12.1 KB
+    *   $number_helper->human_size(1234567)      => 1.2 MB
+    *   $number_helper->human_size(1234567890)   => 1.1 GB
     */
 
     function number_to_human_size($size, $decimal = 1)
@@ -160,7 +160,7 @@ class NumberHelper
     /**
       * Formats a +number+ with a level of +precision+.
       * Example:
-      *    $number->number_with_precision(111.2345) => 111.235
+      *    $number_helper->number_with_precision(111.2345) => 111.235
       */
 
     function number_with_precision($number, $precision=3)
@@ -182,7 +182,7 @@ class NumberHelper
     /**
     * Add zeros to the begining of the string until it reaches desired length
     * Example:
-    *   $number->zeropad(123, 6) => 000123
+    *   $number_helper->zeropad(123, 6) => 000123
     */
     function zeropad($number, $length)
     {

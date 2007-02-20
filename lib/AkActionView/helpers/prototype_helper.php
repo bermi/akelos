@@ -271,7 +271,7 @@ class PrototypeHelper extends AkActionViewHelper
     *   specify one of the following positions: 'before', 'top', 'bottom', 'after'.
     *
     * Examples:
-    *   <?= $this->_controller->javascript_helper->javascript_tag($prototype->update_element_function('products', array('position' => 'bottom'), array('content' => '<p>New product!</p>')) ?>
+    *   <?= $javascript_helper->javascript_tag($prototype_helper->update_element_function('products', array('position' => 'bottom'), array('content' => '<p>New product!</p>')) ?>
     *
     *   <% replacement_function = update_element_function("products") do %>
     *     <p>Product 1</p>

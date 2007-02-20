@@ -63,8 +63,8 @@ class JavascriptHelper extends AkActionViewHelper
     * onclick handler and return false after the fact.
     *
     * Examples:
-    *   $javascript->link_to_function("Greeting", "alert('Hello world!')");
-    *   $javascript->link_to_function($tag->image_tag("delete"), "if confirm('Really?'){ do_delete(); }");
+    *   $javascript_helper->link_to_function("Greeting", "alert('Hello world!')");
+    *   $javascript_helper->link_to_function($tag->image_tag("delete"), "if confirm('Really?'){ do_delete(); }");
     */
     function link_to_function($name, $function, $html_options = array())
     {
@@ -83,8 +83,8 @@ class JavascriptHelper extends AkActionViewHelper
     * onclick handler.
     *
     * Examples:
-    *   $javascript->button_to_function("Greeting", "alert('Hello world!')");
-    *   $javascript->button_to_function("Delete", "if confirm('Really?'){ do_delete(); }"));
+    *   $javascript_helper->button_to_function("Greeting", "alert('Hello world!')");
+    *   $javascript_helper->button_to_function("Delete", "if confirm('Really?'){ do_delete(); }"));
     */
     function button_to_function($name, $function, $html_options = array())
     {

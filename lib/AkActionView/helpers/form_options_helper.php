@@ -28,7 +28,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php');
 *
 * * <tt>include_blank</tt> - set to true if the first option element of the select element is a blank. Useful if there is not a default value required for the select element. For example,
 *
-*   $form_options->select('post','category', $Post->categories, array('include_blank'=>true));
+*   $form_options_helper->select('post','category', $Post->categories, array('include_blank'=>true));
 *
 * could become:
 *
@@ -42,7 +42,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php');
 *
 * Another common case is a select tag for an <tt>belongs_to</tt>-associated object. For example,
 *
-*   $form_options->select('post', 'person_id', $Person->collect($Person->find(), 'name', 'id'));
+*   $form_options_helper->select('post', 'person_id', $Person->collect($Person->find(), 'name', 'id'));
 *
 * could become:
 *
@@ -62,7 +62,7 @@ class FormOptionsHelper extends AkActionViewHelper
      * See options_for_select for the required format of the choices parameter.
      *
      * Example with $Post->person_id => 1:
-     *   $form_options->select('post', 'person_id', $Person->collect($Person->find(), 'name', 'id'), array('include_blank'=>true));
+     *   $form_options_helper->select('post', 'person_id', $Person->collect($Person->find(), 'name', 'id'), array('include_blank'=>true));
      *
      * could become:
      *
@@ -130,16 +130,16 @@ class FormOptionsHelper extends AkActionViewHelper
        * a multiple select.
        *
        * Examples (call, result):
-       *   $form_options->options_for_select(array('Dollar'=>'$', 'Kroner'=>'DKK'));
+       *   $form_options_helper->options_for_select(array('Dollar'=>'$', 'Kroner'=>'DKK'));
        *     <option value="$">Dollar</option><option value="DKK">Kroner</option>
        *
-       *   $form_options->options_for_select(array('VISA', 'MasterCard'), 'MasterCard');
+       *   $form_options_helper->options_for_select(array('VISA', 'MasterCard'), 'MasterCard');
        *     <option value="VISA">VISA</option><option selected="selected" value="MasterCard">MasterCard</option>
        *
-       *   $form_options->options_for_select(array('Basic'=>'$20','Plus'=>'$40'), '$40');
+       *   $form_options_helper->options_for_select(array('Basic'=>'$20','Plus'=>'$40'), '$40');
        *     <option value="$20">Basic</option><option selected="selected" value="$40">Plus</option>
        *
-       *   $form_options->options_for_select(array('VISA','MasterCard','Discover'), array('VISA','Discover'));
+       *   $form_options_helper->options_for_select(array('VISA','MasterCard','Discover'), array('VISA','Discover'));
        *     <option selected="selected" value="VISA">VISA</option>
        *     <option value="MasterCard">MasterCard</option>
        *     <option selected="selected" value="Discover">Discover</option>
@@ -170,7 +170,7 @@ class FormOptionsHelper extends AkActionViewHelper
        * If +$selected_value+ is specified, the element returning a match on +value_column_name+ will get the selected option tag.
        *
        * Example (call, result). Imagine a loop iterating over each +person+ in <tt>$Project->People</tt> to generate an input tag:
-       *   $form_options->options_from_collection_for_select($Project->People,'id','name');
+       *   $form_options_helper->options_from_collection_for_select($Project->People,'id','name');
        *     <option value="{$Person->id}">{$Person->name}</option>
        *
        * NOTE: Only the option tags are returned, you have to wrap this call in a regular HTML select tag.
@@ -197,7 +197,7 @@ class FormOptionsHelper extends AkActionViewHelper
       * An array of group objects are passed. Each group should return an array of options when calling group_method
       * Each group should return its name when calling group_label_method.
       *
-      * $form_options->option_groups_from_collection_for_select($continents, 'getCountries', 'getContinentName', 'getCountryId', 'getCountryName', $selected_country->id);
+      * $form_options_helper->option_groups_from_collection_for_select($continents, 'getCountries', 'getContinentName', 'getCountryId', 'getCountryName', $selected_country->id);
       *
       * Could become:
       *     <optgroup label="Africa">

@@ -27,16 +27,16 @@ require_once(AK_LIB_DIR.DS.'AkInflector.php');
 * with all the form helpers. The <tt>$person</tt> object was assigned by an action on the controller:
 *   <form action="save_person" method="post">
 *     Name:
-*     <?= $form->text_field("person", "name", array("size" => 20)) ?>
+*     <?= $form_helper->text_field("person", "name", array("size" => 20)) ?>
 *
 *     Password:
-*     <?= $form->password_field("person", "password", array("maxsize" => 20)) ?>
+*     <?= $form_helper->password_field("person", "password", array("maxsize" => 20)) ?>
 *
 *     Single?:
-*     <?= $form->check_box("person", "single") ?>
+*     <?= $form_helper->check_box("person", "single") ?>
 *
 *     Description:
-*     <?= $form->text_area("person", "description", array("cols" => 20)) ?>
+*     <?= $form_helper->text_area("person", "description", array("cols" => 20)) ?>
 *
 *     <input type="submit" value="Save" />
 *   </form>
@@ -65,7 +65,7 @@ require_once(AK_LIB_DIR.DS.'AkInflector.php');
 *
 * If the object name contains square brackets the id for the object will be inserted. Example:
 *
-*   <?= $form->textfield("person[]", "name") ?> 
+*   <?= $form_helper->textfield("person[]", "name") ?> 
 * 
 * ...becomes:
 *
@@ -74,7 +74,7 @@ require_once(AK_LIB_DIR.DS.'AkInflector.php');
 * If the helper is being used to generate a repetitive sequence of similar form elements, for example in a partial
 * used by render_collection_of_partials, the "index" option may come in handy. Example:
 *
-*   <?= $form->text_field("person", "name", "index" => 1) ?>
+*   <?= $form_helper->text_field("person", "name", "index" => 1) ?>
 *
 * becomes
 *
@@ -92,7 +92,7 @@ class FormHelper extends AkActionViewHelper
       * Creates a form and a scope around a specific model object, which is then used as a base for questioning about
       * values for the fields. Examples:
       *
-      *   <? $f = $form->form_for('person', $Person, array('url' => array('action' => 'update'))); ?>
+      *   <? $f = $form_helper->form_for('person', $Person, array('url' => array('action' => 'update'))); ?>
       *     First name: <?= $f->text_field('first_name'); ?>
       *     Last name : <?= $f->text_field('last_name'); ?>
       *     Biography : <?= $f->text_area('biography'); ?>
@@ -100,11 +100,11 @@ class FormHelper extends AkActionViewHelper
       *   <?= $f->end_form_tag(); ?>
       *
       * The form_for yields a form_builder object, in this example as $f, which emulates the API for the stand-alone 
-      * FormHelper methods, but without the object name. So instead of <tt>$form->text_field('person', 'name');</tt>,
+      * FormHelper methods, but without the object name. So instead of <tt>$form_helper->text_field('person', 'name');</tt>,
       * you get away with <tt>$f->text_field('name');</tt>. 
       *
       * That in itself is a modest increase in comfort. The big news is that form_for allows us to more easily escape the instance
-      * variable convention, so while the stand-alone approach would require <tt>$form->text_field('person', 'name', array('object' => $Person));</tt> 
+      * variable convention, so while the stand-alone approach would require <tt>$form_helper->text_field('person', 'name', array('object' => $Person));</tt> 
       * to work with local variables instead of instance ones, the form_for calls remain the same. You simply declare once with 
       * <tt>'person', $Person</tt> and all subsequent field calls save <tt>'person'</tt> and <tt>'object' => $Person</tt>.
       *
@@ -115,7 +115,7 @@ class FormHelper extends AkActionViewHelper
       *     First name: <?= $f->text_field('first_name'); ?>
       *     Last name : <?= $f->text_field('last_name'); ?>
       *     Biography : <?= $f->text_area('person', $Biography); ?>
-      *     Admin?    : <?= $form->check_box_tag('person[admin]', $Person->company->isAdmin()); ?>
+      *     Admin?    : <?= $form_helper->check_box_tag('person[admin]', $Person->company->isAdmin()); ?>
       *   <?= $f->end_form_tag(); ?>
       *
       * Note: This also works for the methods in FormOptionHelper and DateHelper that are designed to work with an object as base.
@@ -136,7 +136,7 @@ class FormHelper extends AkActionViewHelper
       *     First name: <?= $person_form->text_field('first_name'); ?>
       *     Last name : <?= person_form->text_field('last_name'); ?>
       *     
-      *     <? $permission_fields = $form->fields_for('permission', $Person->permission); ?>
+      *     <? $permission_fields = $form_helper->fields_for('permission', $Person->permission); ?>
       *       Admin?  : <?= $permission_fields->check_box('admin'); ?>
       *   <?= $person_form->end_form_tag(); ?>
       *
@@ -158,7 +158,7 @@ class FormHelper extends AkActionViewHelper
       * array with +options+.
       *
       * Examples (call, result):
-      *   $form->text_field("post", "title", array("size" => 20));
+      *   $form_helper->text_field("post", "title", array("size" => 20));
       *     <input type="text" id="post_title" name="post[title]" size="20" value="{post.title}" />
       */
     function text_field($object_name, $column_name = null, $options = array())
@@ -197,7 +197,7 @@ class FormHelper extends AkActionViewHelper
       * array with +options+.
       *
       * Example (call, result):
-      *   $form->text_area('post', 'body', array('cols' => 20, 'rows' => 40));
+      *   $form_helper->text_area('post', 'body', array('cols' => 20, 'rows' => 40));
       *     <textarea cols="20" rows="40" id="post_body" name="post[body]">
       *       {post.body}
       *     </textarea>
@@ -216,12 +216,12 @@ class FormHelper extends AkActionViewHelper
       * We work around this problem by adding a hidden value with the same name as the checkbox.
       *
       * Example (call, result). Imagine that $Post->validate() returns 1:
-      *   $form->check_box("post", "validate");
+      *   $form_helper->check_box("post", "validate");
       *     <input type="checkbox" id="post_validate" name="post[validate]" value="1" checked="checked" />
       *     <input name="post[validated]" type="hidden" value="0" />
       *
       * Example (call, result). Imagine that $Puppy->gooddog() returns no:
-      *   $form->check_box("puppy", "gooddog", array(), "yes", "no");
+      *   $form_helper->check_box("puppy", "gooddog", array(), "yes", "no");
       *     <input type="checkbox" id="puppy_gooddog" name="puppy[gooddog]" value="yes" />
       *     <input name="puppy[gooddog]" type="hidden" value="no" />
       */
@@ -236,8 +236,8 @@ class FormHelper extends AkActionViewHelper
       * radio button will be checked. Additional options on the input tag can be passed as an
       * array with +options+.
       * Example (call, result). Imagine that $Post->category() returns "PHP":
-      *   $form->radio_button("post", "category", "PHP");
-      *   $form->radio_button("post", "category", "Ruby");
+      *   $form_helper->radio_button("post", "category", "PHP");
+      *   $form_helper->radio_button("post", "category", "Ruby");
       *     <input type="radio" id="post_category" name="post[category]" value="PHP" checked="checked" />
       *     <input type="radio" id="post_category" name="post[category]" value="Ruby" />
       */

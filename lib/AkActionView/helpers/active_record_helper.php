@@ -31,7 +31,7 @@ class ActiveRecordHelper extends AkActionViewHelper
     /**
     * Returns a default input tag for the type of object returned by the method. Example
     * (title is a VARCHAR column and holds "Hello World"):
-    *   $active_record->input('post', 'title'); =>
+    *   $active_record_helper->input('post', 'title'); =>
     *     <input id="post_title" name="post[title]" size="30" type="text" value="Hello World" />
     */
     function input($record_name, $method, $options = array())
@@ -43,7 +43,7 @@ class ActiveRecordHelper extends AkActionViewHelper
     /**
     * Returns an entire form with input tags and everything for a specified Active Record object. Example
     * (post is a new record that has a title using VARCHAR and a body using TEXT):
-    *   $active_record->form('post'); =>
+    *   $active_record_helper->form('post'); =>
     *     <form action='/post/create' method='post'>
     *       <p>
     *         <label for="post_title">Title</label><br />
@@ -62,7 +62,7 @@ class ActiveRecordHelper extends AkActionViewHelper
     * block renderer that will be evaled by PHP. 
     * Example (entry is a new record that has a message attribute using VARCHAR):
     *
-    *   $active_record->form('entry', array('action'=>'sign','input_block' => 
+    *   $active_record_helper->form('entry', array('action'=>'sign','input_block' => 
     *  '<p><?=AkInflector::humanize($column)?>: <?=$this->input($record_name, $column)?></p><br />'
     *   );
     *
@@ -96,10 +96,10 @@ class ActiveRecordHelper extends AkActionViewHelper
     * to properly introduce the error and a +css_class+ to style it accordingly. Examples (post has an error message
     * "can't be empty" on the title attribute):
     *
-    *   <?= $active_record->error_message_on('post', 'title'); ?>
+    *   <?= $active_record_helper->error_message_on('post', 'title'); ?>
     *     <div class="formError">can't be empty</div>
     *
-    *   <?=$active_record->error_message_on('post','title','Title simply ', " (or it won't work)", 'inputError') ?> =>
+    *   <?=$active_record_helper->error_message_on('post','title','Title simply ', " (or it won't work)", 'inputError') ?> =>
     *     <div class="inputError">Title simply can't be empty (or it won't work)</div>
     */
     function error_message_on($object_name, $method, $prepend_text = '', $append_text = '', $css_class = 'formError')

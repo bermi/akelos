@@ -78,7 +78,7 @@ class FormTagHelper  extends AkActionViewHelper
       *
       * <tt>option_tags</tt> is a string containing the option tags for the select box:
       *   # Outputs <select id="people" name="people"><option>David</option></select>
-      *  $form_tag->select_tag('people', '<option>David</option>');
+      *  $form_tag_helper->select_tag('people', '<option>David</option>');
       *
       * Options:
       * * <tt>'multiple'</tt> - If set to true the selection will allow multiple choices.
@@ -117,10 +117,10 @@ class FormTagHelper  extends AkActionViewHelper
       * Creates a file upload field.
       *
       * If you are using file uploads then you will also need to set the multipart option for the form:
-      *   <?= $form->form_tag(array('action'=>'post'),array('multipart'=>true)); ?>
-      *     <label for="file">File to Upload</label> <?= $form->file_field_tag('file'); ?>
-      *     <?= $form->submit_tag(); ?>
-      *   <?= $form->end_form_tag(); ?>
+      *   <?= $form_tag_helper->form_tag(array('action'=>'post'),array('multipart'=>true)); ?>
+      *     <label for="file">File to Upload</label> <?= $form_tag_helper->file_field_tag('file'); ?>
+      *     <?= $form_tag_helper->submit_tag(); ?>
+      *   <?= $form_tag_helper->end_form_tag(); ?>
       */
     function file_field_tag($name, $options = array())
     {
@@ -143,7 +143,7 @@ class FormTagHelper  extends AkActionViewHelper
       * Options:
       * * <tt>'size'</tt> - A string specifying the dimensions of the textarea.
       *     # Outputs <textarea name="body" id="body" cols="25" rows="10"></textarea>
-      *     <?= $form->text_area_tag('body', null, array('size'=>'25x10')); ?>
+      *     <?= $form_tag_helper->text_area_tag('body', null, array('size'=>'25x10')); ?>
       */
     function text_area_tag($name, $content = null, $options = array())
     {

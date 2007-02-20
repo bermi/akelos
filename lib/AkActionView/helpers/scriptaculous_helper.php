@@ -42,17 +42,17 @@ class ScriptaculousHelper extends AkActionViewHelper
     * starting visual effects.
     *
     * Example:
-    *   <?= PrototypeHelper::link_to_remote(
+    *   <?= $prototype_helper->link_to_remote(
     *         'Reload', 
     *         'update' => 'posts', 
     *         'url' => array('action' => 'reload'), 
-    *         'complete' => ScriptaculousHelper::visual_effect('highlight', 'posts', 'duration' => 0.5)
+    *         'complete' => $scriptaculous_helper->visual_effect('highlight', 'posts', array('duration' => 0.5))) ?>
     *
     * If no element_id is given, it assumes "element" which should be a local
     * variable in the generated JavaScript execution context. This can be 
     * used for example with drop_receiving_element:
     *
-    *   <?= drop_receving_element (...), 'loading' => ScriptaculousHelper::visual_effect('fade') ?>
+    *   <?= $scriptaculous_helper->drop_receiving_element (..., array('loading' => $scriptaculous_helper->visual_effect('fade'))) ?>
     *
     * This would fade the element that was dropped on the drop receiving 
     * element.
@@ -95,7 +95,7 @@ class ScriptaculousHelper extends AkActionViewHelper
     * element as parameters.
     *
     * Example:
-    *   <?= $scriptaculous->sortable_element('my_list', 'url' => array('action' => 'order')) ?>
+    *   <?= $scriptaculous_helper->sortable_element('my_list', 'url' => array('action' => 'order')) ?>
     *
     * In the example, the action gets a "my_list" array parameter 
     * containing the values of the ids of elements the sortable consists 
@@ -146,7 +146,7 @@ class ScriptaculousHelper extends AkActionViewHelper
     * Makes the element with the DOM ID specified by +element_id+ draggable.
     *
     * Example:
-    *   <?= draggable_element("my_image", 'revert' => true)
+    *   <?= $scriptaculous_helper->draggable_element("my_image", 'revert' => true)
     * 
     * You can change the behaviour with various options, see
     * http://script.aculo.us for more documentation. 
@@ -169,8 +169,8 @@ class ScriptaculousHelper extends AkActionViewHelper
     * of the element as parameter.
     *
     * Example:
-    *   <%= drop_receiving_element("my_cart", :url => 
-    *     { :controller => "cart", :action => "add" }) %>
+    *   <?= $scriptaculous_helper->drop_receiving_element("my_cart", array('url' => 
+    *     array('controller' => "cart", 'action' => "add" ))) ?>
     *
     * You can change the behaviour with various options, see
     * http://script.aculo.us for more documentation.

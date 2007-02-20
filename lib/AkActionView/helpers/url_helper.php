@@ -26,8 +26,8 @@ class UrlHelper
     }
 
     /**
-    * Returns the URL for the set of +options+ provided. This takes the same options 
-    * as url_for. For a list, see the documentation for AKActionController/Base#url_for.
+    * Returns the URL for the set of +$options+ provided. This takes the same options 
+    * as url_for. For a list, see the documentation for AKActionController::urlFor.
     * Note that it'll set ('only_path' => true) so you'll get /controller/action instead of the 
     * http://example.com/controller/action part (makes it harder to parse httpd log files)
     */
@@ -56,7 +56,7 @@ class UrlHelper
 
     /**
     * Creates a link tag of the given +name+ using an URL created by the set of +options+. See the valid options in
-    * the documentation for ActionController::Base*url_for. It's also possible to pass a string instead of an array of options
+    * the documentation for ActionController::urlFor. It's also possible to pass a string instead of an array of options
     * to get a link tag that just points without consideration. If null is passed as a name, the link itself will become 
     * the name.
     *
@@ -74,10 +74,10 @@ class UrlHelper
     * at the same time (an exception will be thrown).
     *
     * Examples:
-    *   $url->link_to('Delete this page', array('action' => 'destroy', 'id' => $page->id ), array('confirm' => 'Are you sure?'));
-    *   $url->link_to('Help', array('action' => 'help'), array('popup' => true));
-    *   $url->link_to('Busy loop', array('action' => 'busy'), array('popup' => ['new_window', 'height=300,width=600']));
-    *   $url->link_to('Destroy account', array('action' => 'destroy'), array('confirm' => 'Are you sure?'), array('post' => true));
+    *   $url_helper->link_to('Delete this page', array('action' => 'destroy', 'id' => $page->id ), array('confirm' => 'Are you sure?'));
+    *   $url_helper->link_to('Help', array('action' => 'help'), array('popup' => true));
+    *   $url_helper->link_to('Busy loop', array('action' => 'busy'), array('popup' => array('new_window', 'height=300,width=600')));
+    *   $url_helper->link_to('Destroy account', array('action' => 'destroy'), array('confirm' => 'Are you sure?'), array('post' => true));
     */
     function link_to($name = null, $options = array(), $html_options = array(), $parameters_for_method_reference = null)
     {
@@ -95,7 +95,7 @@ class UrlHelper
 
     /**
     * Generates a form containing a sole button that submits to the
-    * URL given by _options_.  Use this method instead of +link_to+
+    * URL given by _$options_.  Use this method instead of +link_to+
     * for actions that do not have the safe HTTP GET semantics
     * implied by using a hypertext link.
     *
@@ -113,7 +113,7 @@ class UrlHelper
     * Example 1:
     *
     *   // inside of controller for "feeds"
-    *   $url->button_to('Edit', array('action' => 'edit', 'id' => 3));
+    *   $url_helper->button_to('Edit', array('action' => 'edit', 'id' => 3));
     *
     * Generates the following HTML (sans formatting):
     *
@@ -123,7 +123,7 @@ class UrlHelper
     *
     * Example 2:
     *
-    *   $url->button_to('Destroy', array('action' => 'destroy', 'id' => 3 , 'confirm' => 'Are you sure?'));
+    *   $url_helper->button_to('Destroy', array('action' => 'destroy', 'id' => 3 , 'confirm' => 'Are you sure?'));
     *
     * Generates the following HTML (sans formatting):
     *
@@ -159,9 +159,9 @@ class UrlHelper
 
 
     /**
-    * Creates a link tag of the given +name+ using an URL created by the set of +options+, unless the current
-    * request uri is the same as the link's, in which case only the name is returned (or the
-    * given block is yielded, if one exists). This is useful for creating link bars where you don't want to link
+    * Creates a link tag of the given +$name+ using an URL created by the set of +$options+, unless the current
+    * request uri is the same as the link's, in which case only the name is returned. 
+    * This is useful for creating link bars where you don't want to link
     * to the page currently being viewed.
     */
     function link_to_unless_current($name, $options = array(), $html_options = array(), $parameters_for_method_reference)
@@ -170,8 +170,8 @@ class UrlHelper
     }
 
     /**
-    * Create a link tag of the given +name+ using an URL created by the set of +options+, unless +condition+
-    * is true, in which case only the name is returned (or the given block is yielded, if one exists). 
+    * Create a link tag of the given +$name+ using an URL created by the set of +options+, unless +condition+
+    * is true, in which case only the name is returned. 
     */
     function link_to_unless($condition, $name, $options = array(), $html_options = array(), $parameters_for_method_reference)
     {
@@ -182,8 +182,8 @@ class UrlHelper
     }
 
     /**
-    * Create a link tag of the given +name+ using an URL created by the set of +options+, if +condition+
-    * is true, in which case only the name is returned (or the given block is yielded, if one exists). 
+    * Create a link tag of the given +name+ using an URL created by the set of +$options+, if +$condition+
+    * is true, in which case only the name is returned. 
     */      
     function link_to_if($condition, $name, $options = array(), $html_options = array(), $parameters_for_method_reference)
     {
@@ -200,15 +200,15 @@ class UrlHelper
 
     /**
     * Creates a link tag for starting an email to the specified <tt>email_address</tt>, which is also used as the name of the
-    * link unless +name+ is specified. Additional HTML options, such as class or id, can be passed in the 
-    * <tt>html_options</tt> array.
+    * link unless +$name+ is specified. Additional HTML options, such as class or id, can be passed in the 
+    * <tt>$html_options</tt> array.
     *
     * You can also make it difficult for spiders to harvest email address by obfuscating them.
     * Examples:
-    *   $url->mail_to('me@domain.com', 'My email', array('encode' => 'javascript')) =>
+    *   $url_helper->mail_to('me@domain.com', 'My email', array('encode' => 'javascript')) =>
     *     <script type="text/javascript" language="javascript">eval(unescape('%64%6f%63%75%6d%65%6e%74%2e%77%72%69%74%65%28%27%3c%61%20%68%72%65%66%3d%22%6d%61%69%6c%74%6f%3a%6d%65%40%64%6f%6d%61%69%6e%2e%63%6f%6d%22%3e%4d%79%20%65%6d%61%69%6c%3c%2f%61%3e%27%29%3b'))</script>
     *
-    *   $url->mail_to('me@domain.com', 'My email', array('encode' => 'hex')) =>
+    *   $url_helper->mail_to('me@domain.com', 'My email', array('encode' => 'hex')) =>
     *     <a href="mailto:%6d%65@%64%6f%6d%61%69%6e.%63%6f%6d">My email</a>
     *
     * You can also specify the cc address, bcc address, subject, and body parts of the message header to create a complex e-mail 
@@ -217,7 +217,7 @@ class UrlHelper
     * escaped and may break this feature when encoding with javascript.</b>
     * 
     * Examples:
-    *   mail_to "me@domain.com", "My email", :cc => "ccaddress@domain.com", :bcc => "bccaddress@domain.com", :subject => "This is an example email", :body => "This is the body of the message."   # =>
+    *   $url_helper->mail_to("me@domain.com", "My email", array('cc' => "ccaddress@domain.com", 'bcc' => "bccaddress@domain.com", 'subject' => "This is an example email", 'body' => "This is the body of the message."))   # =>
     *     <a href="mailto:me@domain.com?cc="ccaddress@domain.com"&bcc="bccaddress@domain.com"&body="This%20is%20the%20body%20of%20the%20message."&subject="This%20is%20an%20example%20email">My email</a>
     */
     function mail_to($email_address, $name = null, $html_options = array())
@@ -333,29 +333,29 @@ class UrlHelper
     }
 
     /**
-    * processes the _html_options_ hash, converting the boolean
+    * processes the _html_options_ array, converting the boolean
     * attributes from true/false form into the form required by
     * html/xhtml.  (an attribute is considered to be boolean if
-    * its name is listed in the given _bool_attrs_ array.)
+    * its name is listed in the given _$boolean_attributes_ array.)
     *
-    * more specifically, for each boolean attribute in _html_options_
+    * more specifically, for each boolean attribute in _$html_option_
     * given as:
     *
     *     "attr" => bool_value
     *
     * if the associated _bool_value_ evaluates to true, it is
     * replaced with the attribute's name; otherwise the attribute is
-    * removed from the _html_options_ hash.  (see the xhtml 1.0 spec,
+    * removed from the _html_options_ array.  (see the xhtml 1.0 spec,
     * section 4.5 "attribute minimization" for more:
     * http://www.w3.org/tr/xhtml1/    *h-4.5)
     *
-    * returns the updated _html_options_ hash, which is also modified
+    * returns the updated _$html_options_ array, which is also modified
     * in place.
     *
     * example:
     *
-    *   $url->convert_boolean_attributes( html_options,
-    *                                %w( checked disabled readonly ) )
+    *   $url_helper->convert_boolean_attributes( $html_options,
+    *                                array('checked','disabled','readonly' ) );
     */
     function _convert_boolean_attributes(&$html_options, $boolean_attributes)
     {

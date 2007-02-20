@@ -41,7 +41,7 @@ class DateHelper extends AkActionViewHelper
     * "about 1 hour". See the source for the complete wording list.
     *
     * Integers are interpreted as seconds. So,
-    * <tt>distance_of_time_in_words(50)</tt> returns "less than a minute".
+    * <tt>$date_helper->distance_of_time_in_words(50)</tt> returns "less than a minute".
     *
     * Set <tt>include_seconds</tt> to true if you want more detailed approximations if distance < 1 minute
     */
@@ -109,12 +109,12 @@ class DateHelper extends AkActionViewHelper
       *
       * Examples:
       *
-      *   date_select("post", "written_on");
-      *   date_select("post", "written_on", array('start_year' => 1995));
-      *   date_select("post", "written_on", array('start_year' => 1995, 'use_month_numbers' => true,
+      *   $date_helper->date_select("post", "written_on");
+      *   $date_helper->date_select("post", "written_on", array('start_year' => 1995));
+      *   $date_helper->date_select("post", "written_on", array('start_year' => 1995, 'use_month_numbers' => true,
       *                                     'discard_day' => true, 'include_blank' => true)));
-      *   date_select("post", "written_on", array('order' => array('day', 'month', 'year')));
-      *   date_select("user", "birthday",   array('order' => array('month', 'day')));
+      *   $date_helper->date_select("post", "written_on", array('order' => array('day', 'month', 'year')));
+      *   $date_helper->date_select("user", "birthday",   array('order' => array('month', 'day')));
       *
       * The selects are prepared for multi-parameter assignment to an Active Record object.
       */
@@ -269,9 +269,9 @@ class DateHelper extends AkActionViewHelper
       * set the <tt>use_month_numbers</tt> key in +options+ to true for this to happen. If you want both numbers and names,
       * set the <tt>add_month_numbers</tt> key in +options+ to true. Examples:
       *
-      *   select_month(Ak::getDate()); // Will use keys like "January", "March"
-      *   select_month(Ak::getDate(), array('use_month_numbers' => true)); // Will use keys like "1", "3"
-      *   select_month(Ak::getDate(), array('add_month_numbers' => true)); // Will use keys like "1 - January", "3 - March"
+      *   $date_helper->select_month(Ak::getDate()); // Will use keys like "January", "March"
+      *   $date_helper->select_month(Ak::getDate(), array('use_month_numbers' => true)); // Will use keys like "1", "3"
+      *   $date_helper->select_month(Ak::getDate(), array('add_month_numbers' => true)); // Will use keys like "1 - January", "3 - March"
       *
       * Override the field name using the <tt>field_name</tt> option, 'month' by default.
       *
@@ -302,8 +302,8 @@ class DateHelper extends AkActionViewHelper
       * lists are supported by making <tt>start_year</tt> less than or greater than <tt>end_year</tt>. The <tt>date</tt> can also be
       * substituted for a year given as a number. Example:
       *
-      *   select_year(Ak::getDate(), array('start_year' => 1992, 'end_year' => 2007)); // ascending year values
-      *   select_year(Ak::getDate(), array('start_year' => 2005, 'end_year' => 1900)); //  descending year values
+      *   $date_helper->select_year(Ak::getDate(), array('start_year' => 1992, 'end_year' => 2007)); // ascending year values
+      *   $date_helper->select_year(Ak::getDate(), array('start_year' => 2005, 'end_year' => 1900)); //  descending year values
       *
       * Override the field name using the <tt>field_name</tt> option, 'year' by default.
       */

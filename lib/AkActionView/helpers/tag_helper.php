@@ -24,8 +24,8 @@ class TagHelper
 {
     /**
        * Examples:
-       * <tt>$tag->tag('br'); => <br /></tt>
-       * <tt>$tag->tag('input', array('type' => 'text')); => <input type="text" /></tt>
+       * <tt>$tag_helper->tag('br'); => <br /></tt>
+       * <tt>$tag_helper->tag('input', array('type' => 'text')); => <input type="text" /></tt>
        */
     function tag($name, $options = null, $open = false)
     {
@@ -34,8 +34,8 @@ class TagHelper
 
     /**
        * Examples:
-       * <tt>$tag->content_tag("p", "Hello world!") => <p>Hello world!</p></tt>
-       * <tt>$tag->content_tag("div", content_tag("p", "Hello world!"), "class" => "strong") => </tt>
+       * <tt>$tag_helper->content_tag("p", "Hello world!") => <p>Hello world!</p></tt>
+       * <tt>$tag_helper->content_tag("div", content_tag("p", "Hello world!"), "class" => "strong") => </tt>
        *<tt><div class="strong"><p>Hello world!</p></div></tt>
        * */
     function content_tag($name, $content, $options = null)
