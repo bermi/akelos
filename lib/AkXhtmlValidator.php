@@ -824,7 +824,7 @@ class AkXhtmlValidator
 
     function validateAttribute($tag, $attribute, $value = null)
     {
-        if (isset($this->_tags[$tag]['attributes'][$attribute]) && !empty($value)) {
+        if (isset($this->_tags[$tag]['attributes'][$attribute]) && (strlen($value) > 0)) {
             if (!preg_match($this->_tags[$tag]['attributes'][$attribute], $value)) {
                 $this->addError(Ak::t("Invalid value on &lt;%tag %attribute=\"%value\"... Valid values must match the pattern \"%pattern\"", array(
                 '%tag' => $tag,
@@ -839,7 +839,7 @@ class AkXhtmlValidator
                 ));
             }
         }
-        if (isset($this->_tags[$tag]['required']) && in_array($attribute, $this->_tags[$tag]['required']) && empty($value)) {
+        if (isset($this->_tags[$tag]['required']) && in_array($attribute, $this->_tags[$tag]['required']) && (strlen($value) == 0)) {
             $this->addError(Ak::t("Missing required attribute %attribute on &lt;%tag&gt;", array(
             '%tag' => $tag,
             '%attribute' => $attribute
