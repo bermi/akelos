@@ -33,6 +33,7 @@ class ScaffoldGenerator extends  AkelosGenerator
 
         $this->singular_name = AkInflector::underscore($this->model_name);
         $this->plural_name = AkInflector::pluralize($this->singular_name);
+        $this->singular_controller_name = AkInflector::underscore($this->controller_name);
 
         $this->files = array(
         'controller.php' => $this->controller_file_path,
@@ -41,20 +42,18 @@ class ScaffoldGenerator extends  AkelosGenerator
          */
         // 'functional_test.php' => AK_TEST_DIR.DS.'functional'.DS.'test_'.$this->controller_class_name.'.php',
         'helper.php' => AK_HELPERS_DIR.DS.trim($this->helper_var_name,'$').'.php',
-        'layout' => AK_VIEWS_DIR.DS.'layouts'.DS.$this->singular_name.'.tpl',
-        // scaffold.css is included by default in the public path
-        // 'style.css' => AK_PUBLIC_DIR.DS.'stylesheets'.DS.'scaffold.css',
-        'view_add' => AK_VIEWS_DIR.DS.$this->singular_name.DS.'add.tpl',
-        'view_destroy' => AK_VIEWS_DIR.DS.$this->singular_name.DS.'destroy.tpl',
-        'view_edit' => AK_VIEWS_DIR.DS.$this->singular_name.DS.'edit.tpl',
-        'view_listing' => AK_VIEWS_DIR.DS.$this->singular_name.DS.'listing.tpl',
-        'view_show' => AK_VIEWS_DIR.DS.$this->singular_name.DS.'show.tpl',
-        'form' => AK_VIEWS_DIR.DS.$this->singular_name.DS.'_form.tpl',
+        'layout' => AK_VIEWS_DIR.DS.'layouts'.DS.$this->singular_controller_name.'.tpl',
+        'view_add' => AK_VIEWS_DIR.DS.$this->singular_controller_name.DS.'add.tpl',
+        'view_destroy' => AK_VIEWS_DIR.DS.$this->singular_controller_name.DS.'destroy.tpl',
+        'view_edit' => AK_VIEWS_DIR.DS.$this->singular_controller_name.DS.'edit.tpl',
+        'view_listing' => AK_VIEWS_DIR.DS.$this->singular_controller_name.DS.'listing.tpl',
+        'view_show' => AK_VIEWS_DIR.DS.$this->singular_controller_name.DS.'show.tpl',
+        'form' => AK_VIEWS_DIR.DS.$this->singular_controller_name.DS.'_form.tpl',
         );
 
         $this->user_actions = array();
         foreach ((array)@$this->actions as $action){
-            $this->user_actions[$action] = AK_VIEWS_DIR.DS.$this->singular_name.DS.$action.'.tpl';
+            $this->user_actions[$action] = AK_VIEWS_DIR.DS.$this->singular_controller_name.DS.$action.'.tpl';
         }
     }
 

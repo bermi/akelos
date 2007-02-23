@@ -3,6 +3,11 @@
 
 class <?=$controller_class_name?> extends ApplicationController
 {
+<?php 
+    if($model_name != $controller_name){ // if equal will be handled by the Akelos directly
+        echo "    var \$models = '$singular_name';";
+    }
+?>
     function index()
     {
         $this->renderAction('listing');
