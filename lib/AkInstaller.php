@@ -429,7 +429,7 @@ class AkInstaller
     {
         return array(
         '/^\*(.*)$/i' => array(&$this,'_castToMultilingualColumn'),
-        '/^(description)$/i' => '\1 text',
+        '/^(description|body)$/i' => '\1 text',
         '/^(id)$/i' => 'id integer not null auto_increment primary_key',
         '/^(.+)_id$/i' => '\1_id integer index',
         '/^(position)$/i' => '\1 integer index',

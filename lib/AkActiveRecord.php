@@ -278,7 +278,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             if(!$record){
                 return false;
             }else {
-                $this->setAttributes($record->getAttributes());
+                $this->setAttributes($record->getAttributes(), true);
             }
             // This option is only used internally for loading found objects
         }elseif(isset($attributes[0]) && isset($attributes[1]) && $attributes[0] == 'attributes' && is_array($attributes[1])){
@@ -286,7 +286,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 $attributes[1][$k] = $this->castAttributeFromDatabase($k, $v);
             }
             $avoid_loading_associations = isset($attributes[1]['load_associations']) ? false : !empty($this->disableAutomatedAssociationLoading);
-            $this->setAttributes($attributes[1]);
+            $this->setAttributes($attributes[1], true);
         }else{
             $this->_newRecord = true;
             // new AkActiveRecord('username->','bermi','pass->','mypass'); // Sets attributes for creating a new entry or finding a new record using an special sintax
@@ -2951,7 +2951,13 @@ Examples for find all:
             switch ($this->getColumnType($column_name)) {
                 case 'date':
                 if(!empty($value) && strstr(trim($value),' ')){
-                    return str_replace(substr($value,strpos($value,' ')), '', $value);
+                    return substr($value,0,10) == '0000-00-00' ? null : str_replace(substr($value,strpos($value,' ')), '', $value);
+                }
+                break;
+
+                case 'datetime':
+                if(!empty($value) && substr($value,0,10) == '0000-00-00'){
+                    return null;
                 }
                 break;
 
