@@ -35,25 +35,25 @@ class AkInstaller
         }else {
             $this->db =& $db_connection;
         }
-        
+
         $this->available_tables = $this->getAvailableTables();
-        
+
         $this->db->debug =& $this->debug;
 
         $this->data_dictionary = NewDataDictionary($this->db);
     }
-    
+
     function install($version = null, $options = array())
     {
         return $this->_upgradeOrDowngrade('up', $version, $options);
     }
-    
-    
+
+
     function uninstall($version = null, $options = array())
     {
         return $this->_upgradeOrDowngrade('down', $version, $options);
     }
-    
+
 
     function _upgradeOrDowngrade($action, $version = null, $options = array())
     {
@@ -62,20 +62,20 @@ class AkInstaller
         }elseif(!empty($this->vervose) && AK_ENVIRONMENT == 'development'){
             $this->db->debug = true;
         }
-        
+
         $current_version = $this->getInstalledVersion();
         $available_versions = $this->getAvailableVersions();
-        
+
         $action = stristr($action,'down') ? 'down' : 'up';
-        
+
         if($action == 'up'){
             $newest_version = max($available_versions);
             $version = is_numeric($version) ? $version : $newest_version;
-            
+
             if($version <= $newest_version && $version > $current_version){
                 $versions = array_slice($available_versions, array_shift(array_keys($available_versions,$current_version))+($current_version ? 1 : 0));
             }
-            
+
         }else{
             $version = is_numeric($version) ? $version : 1;
             $installed_versions = array_slice(array_reverse($available_versions), array_shift(array_keys(array_reverse($available_versions),$current_version)));
@@ -84,11 +84,11 @@ class AkInstaller
                 return false;
             }
         }
-        
+
         if(AK_CLI && !empty($this->vervose) && AK_ENVIRONMENT == 'development'){
             echo Ak::t(ucfirst($action).'grading');
         }
-        
+
         if(!empty($versions) && is_array($versions)){
             foreach ($versions as $version){
                 if(!$this->_runInstallerMethod($action, $version, $options)){
@@ -101,18 +101,18 @@ class AkInstaller
 
         return true;
     }
-    
-    
+
+
     function installVersion($version, $options = array())
     {
         return $this->_runInstallerMethod('up', $version, $options);
     }
-    
+
     function uninstallVersion($version, $options = array())
     {
         return $this->_runInstallerMethod('down', $version, $options);
     }
-    
+
     /**
      * Runs a a dow_1, up_3 method and wraps it into a transaction.
      */
@@ -122,9 +122,9 @@ class AkInstaller
         if(!method_exists($this, $method_name)){
             return false;
         }
-        
+
         $version_number = empty($version_number) ? ($method_prefix=='down' ? $version-1 : $version) : $version_number;
-        
+
         $this->transactionStart();
         if($this->$method_name($options) === false){
             $this->transactionFail();
@@ -136,19 +136,19 @@ class AkInstaller
         }
         return $success;
     }
-    
+
     function getInstallerName()
     {
         return str_replace('installer','',strtolower(get_class($this)));
     }
 
-    
+
     function _versionPath()
     {
         return AK_APP_DIR.DS.'installers'.DS.$this->getInstallerName().'_version.txt';
     }
 
-    
+
     function getInstalledVersion()
     {
         $version_file = $this->_versionPath();
@@ -158,13 +158,13 @@ class AkInstaller
         return Ak::file_get_contents($this->_versionPath());
     }
 
-    
+
     function setInstalledVersion($version)
     {
         return Ak::file_put_contents($this->_versionPath(), $version);
     }
 
-    
+
     function getAvailableVersions()
     {
         $versions = array();
@@ -176,13 +176,13 @@ class AkInstaller
         sort($versions);
         return $versions;
     }
-    
+
 
     function modifyTable($table_name, $column_options = null, $table_options = array())
     {
         return $this->_createOrModifyTable($table_name, $column_options, $table_options);
     }
-    
+
     /**
      * Adds a new column to the table called $table_name 
      */
@@ -191,18 +191,18 @@ class AkInstaller
         $column_details = $this->_getColumnsAsAdodbDataDictionaryString($column_details);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->AddColumnSQL($table_name, $column_details));
     }
-    
+
     function changeColumn($table_name, $column_details)
     {
         $column_details = $this->_getColumnsAsAdodbDataDictionaryString($column_details);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->AlterColumnSQL($table_name, $column_details));
     }
-    
+
     function removeColumn($table_name, $column_name)
     {
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->DropColumnSQL($table_name, $column_name));
     }
-    
+
     function renameColumn($table_name, $old_column_name, $new_column_name)
     {
         if(!strstr($this->db->databaseType,'mysql')){
@@ -210,7 +210,7 @@ class AkInstaller
         }
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->RenameColumnSQL($table_name, $old_column_name, $new_column_name));
     }
-    
+
 
     function createTable($table_name, $column_options = null, $table_options = array())
     {
@@ -220,7 +220,7 @@ class AkInstaller
         }
         return $this->_createOrModifyTable($table_name, $column_options, $table_options);
     }
-    
+
     function _createOrModifyTable($table_name, $column_options = null, $table_options = array())
     {
         if(empty($column_options) && $this->_loadDbDesignerDbSchema()){
@@ -229,7 +229,7 @@ class AkInstaller
             trigger_error(Ak::t('You must supply details for the table you are creating.'), E_USER_ERROR);
             return false;
         }
-        
+
         $column_options = is_string($column_options) ? array('columns'=>$column_options) : $column_options;
 
         $default_column_options = array(
@@ -245,17 +245,16 @@ class AkInstaller
 
         $column_string = $this->_getColumnsAsAdodbDataDictionaryString($column_options['columns']);
 
-        $result = $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->ChangeTableSQL($table_name, str_replace(array(' UNIQUE ', ' INDEX '), '', $column_string), $table_options));
-        
+        $result = $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->ChangeTableSQL($table_name, str_replace(array(' UNIQUE', ' INDEX', ' FULLTEXT', ' HASH'), '', $column_string), $table_options));
+
         if($result){
             $this->available_tables[] = $table_name;
         }
-        
-        $columns_to_index = $this->_getColumnsToIndex($column_string);
-        $unique_value_columns = $this->_getUniqueValueColumns($column_string);
 
-        foreach ($columns_to_index as $column_to_index){
-            $this->addIndex($table_name, $column_to_index.(in_array($column_to_index, $unique_value_columns) ? ' UNIQUE' : ''));
+        $columns_to_index = $this->_getColumnsToIndex($column_string);
+
+        foreach ($columns_to_index as $column_to_index => $index_type){
+            $this->addIndex($table_name, $column_to_index.($index_type != 'INDEX' ? ' '.$index_type : ''));
         }
 
         if(isset($column_options['index_columns'])){
@@ -280,14 +279,45 @@ class AkInstaller
         }
     }
 
-    function addIndex($table_name, $columns)
+    function dropTables()
     {
-        return $this->tableExists($table_name) ? $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->CreateIndexSQL('idx_'.$table_name.'_'.$columns, $table_name, $columns)) : false;
+        $args = func_get_args();
+        if(!empty($args)){
+            $num_args = count($args);
+            $options = $num_args > 1 && is_array($args[$num_args-1]) ? array_shift($args) : array();
+            $tables = count($args) > 1 ? $args : (is_array($args[0]) ? $args[0] : Ak::toArray($args[0]));
+            foreach ($tables as $table){
+                $this->dropTable($table, $options);
+            }
+        }
     }
-    
-    function removeIndex($table_name, $columns)
+
+    function addIndex($table_name, $columns, $index_name = '')
     {
-        return $this->tableExists($table_name) ? $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->DropIndexSQL('idx_'.$table_name.'_'.$columns, $table_name)) : false;
+        $index_name = ($index_name == '') ? 'idx_'.$table_name.'_'.$columns : $index_name;
+        $index_options = array();
+        if (preg_match('/(UNIQUE|FULLTEXT|HASH)/',$columns,$match)) {
+            $columns = trim(str_replace($match[1],'',$columns),' ');
+            $index_options[] = $match[1];
+        }
+        return $this->tableExists($table_name) ? $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->CreateIndexSQL($index_name, $table_name, $columns, $index_options)) : false;
+    }
+
+    function removeIndex($table_name, $columns_or_index_name)
+    {
+        if (!$this->tableExists($table_name)) return false;
+        $available_indexes =& $this->db->MetaIndexes($table_name);
+        $index_name = isset($available_indexes[$columns_or_index_name]) ? $columns_or_index_name : 'idx_'.$table_name.'_'.$columns_or_index_name;
+        if (!isset($available_indexes[$index_name])) {
+            trigger_error(Ak::t('Index %index_name does not exist.', array('%index_name'=>$index_name)), E_USER_NOTICE);
+            return false;
+        }
+        return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->DropIndexSQL($index_name, $table_name));
+    }
+
+    function dropIndex($table_name, $columns_or_index_name)
+    {
+        return $this->removeIndex($table_name,$columns_or_index_name);
     }
 
     function createSequence($table_name)
@@ -311,10 +341,10 @@ class AkInstaller
     {
         if(empty($this->available_tables)){
             $this->available_tables = array_diff((array)$this->db->MetaTables(), array(''));
-        }        
+        }
         return $this->available_tables;
     }
-    
+
     function tableExists($table_name)
     {
         return in_array($table_name,$this->getAvailableTables());
@@ -322,7 +352,7 @@ class AkInstaller
 
     function _getColumnsAsAdodbDataDictionaryString($columns)
     {
-        $columns_string = is_array($columns) ? join(', ',$columns) : $columns;
+        $columns = $this->_setColumnDefaults($columns);
         $equivalences = array(
         '/ ((limit|max|length) ?= ?)([0-9]+)([ \n\r,]+)/'=> ' (\3) ',
         '/([ \n\r,]+)default([ =]+)([^\'^,^\n]+)/i'=> ' DEFAULT \'\3\'',
@@ -341,18 +371,91 @@ class AkInstaller
         '/ +/'=> ' ',
         '/ ([\(,]+)/'=> '\1',
         '/ INDEX| IDX/i'=> ' INDEX ',
+        '/ UNIQUE/i'=> ' UNIQUE ',
+        '/ HASH/i'=> ' HASH ',
+        '/ FULL_?TEXT/i'=> ' FULLTEXT ',
         '/ ((PRIMARY( |_)?)?KEY|pk)/i'=> ' KEY',
         );
-        
+
         return trim(preg_replace(array_keys($equivalences),array_values($equivalences), ' '.$columns.' '), ' ');
+    }
+
+    function _setColumnDefaults($columns)
+    {
+        if(is_string($columns)){
+            if(strstr($columns,"\n")){
+                $columns = explode("\n",$columns);
+            }elseif (strstr($columns,',')){
+                $columns = explode(',',$columns);
+            }
+        }
+        foreach ((array)$columns as $column){
+            $column = trim($column, "\n\r, ");
+            if(!empty($column)){
+                $single_columns[$column] = $this->_setColumnDefault($column);
+            }
+        }
+        return join(",\n", $single_columns);
+    }
+
+    function _setColumnDefault($column)
+    {
+        return $this->_needsDefaultAttributes($column) ? $this->_setDefaultAttributes($column) : $column;
+    }
+
+    function _needsDefaultAttributes($column)
+    {
+        return preg_match('/^(([A-Z0-9_]+)|(.+ string[^\(.]*)|(\*.*))$/i',$column);
+    }
+
+    function _setDefaultAttributes($column)
+    {
+        $rules = $this->getDefaultColumnAttributesRules();
+        foreach ($rules as $regex=>$replacement){
+            if(is_string($replacement)){
+                $column = preg_replace($regex,$replacement,$column);
+            }elseif (preg_match($regex,$column,$match)){
+                $column = call_user_func_array($replacement,$match);
+            }
+        }
+        return $column;
+    }
+
+    /**
+     * Returns a key => value pair of regular expressions that will trigger methods 
+     * to cast database columns to their respective default values or a replacement expression.
+     */
+    function getDefaultColumnAttributesRules()
+    {
+        return array(
+        '/^\*(.*)$/i' => array(&$this,'_castToMultilingualColumn'),
+        '/^(description)$/i' => '\1 text',
+        '/^(id)$/i' => 'id integer not null auto_increment primary_key',
+        '/^(.+)_id$/i' => '\1_id integer index',
+        '/^(position)$/i' => '\1 integer index',
+        '/^(.+_at)$/i' => '\1 datetime',
+        '/^(.+_on)$/i' => '\1 date',
+        '/^(is_|has_|do_|does_|are_)([A-Z0-9_]+)$/i' => '\1\2 boolean not null default \'0\' index', //
+        '/^([A-Z0-9_]+)$/i' => '\1 string', // Everything else will default to string
+        '/^((.+ )string([^\(.]*))$/i' => '\2string(255)\3', // If we don't set the string lenght it will ail, so if not present will set it to 255
+        );
+    }
+
+    function _castToMultilingualColumn($found, $column)
+    {
+        $columns = array();
+        foreach (Ak::langs() as $lang){
+            $columns[] = $lang.'_'.ltrim($column);
+        }
+        return $this->_setColumnDefaults($columns);
     }
 
     function _getColumnsToIndex($column_string)
     {
         $columns_to_index = array();
         foreach (explode(',',$column_string.',') as $column){
-            if(preg_match('/([A-Za-z0-9_]+) (.*) INDEX (.*)$/',$column,$match)){
-                $columns_to_index[] = $match[1];
+            if(preg_match('/([A-Za-z0-9_]+) (.*) (INDEX|UNIQUE|FULLTEXT|HASH) ?(.*)$/i',$column,$match)){
+                $columns_to_index[$match[1]] = $match[3];
             }
         }
         return $columns_to_index;
@@ -362,7 +465,7 @@ class AkInstaller
     {
         $unique_columns = array();
         foreach (explode(',',$column_string.',') as $column){
-            if(preg_match('/([A-Za-z0-9_]+) (.*) UNIQUE (.*)$/',$column,$match)){
+            if(preg_match('/([A-Za-z0-9_]+) (.*) UNIQUE ?(.*)$/',$column,$match)){
                 $unique_columns[] = $match[1];
             }
         }
@@ -384,8 +487,8 @@ class AkInstaller
         }
         return false;
     }
-    
-    
+
+
     /**
     * Transaction support for database operations
     *
@@ -420,8 +523,8 @@ class AkInstaller
     {
         return $this->db->HasFailedTrans();
     }
-    
-    
+
+
     function _loadDbDesignerDbSchema()
     {
         if($path = $this->_getDbDesignerFilePath()){
@@ -430,19 +533,19 @@ class AkInstaller
         }
         return false;
     }
-    
+
     function _getDbDesignerFilePath()
     {
         $path = AK_APP_DIR.DS.'installers'.DS.$this->getInstallerName().'.xml';
         return file_exists($path) ? $path : false;
     }
-    
+
     function execute($sql)
     {
         return $this->db->Execute($sql);
     }
-    
-    
+
+
     function usage()
     {
         return Ak::t("Description:

@@ -125,7 +125,7 @@ class ADODB_sqlite extends ADOConnection {
             $fld = new ADOFieldObject();
             $fld->name = $rs->fields[1];
             $type = $rs->fields[2];
-    
+
             // split type into type(length):
             $fld->scale = null;
             if (preg_match("/^(.+)\((\d+),(\d+)/", $type, $query_array)) {
@@ -169,9 +169,9 @@ class ADODB_sqlite extends ADOConnection {
 
             $rs->MoveNext();
         }
-        
+
         $rs->Close();
-        
+
         return $retarr;
     }
 
@@ -334,22 +334,15 @@ class ADODB_sqlite extends ADOConnection {
         $indexes = array ();
         while ($row = $rs->FetchRow()) {
             if ($primary && preg_match("/primary/i",$row[1]) == 0) continue;
-            if (!isset($indexes[$row[0]])) {
-
-                $indexes[$row[0]] = array(
-                'unique' => preg_match("/unique/i",$row[1]),
-                'columns' => array());
+            preg_match('/\(([^\)]+)\)$/',$row[1],$match);
+            if(!empty($match[1])){
+                if (!isset($indexes[$row[0]])) {
+                    $indexes[$row[0]] = array(
+                    'unique' => preg_match("/unique/i",$row[1]),
+                    'columns' => array());
+                }
+                $indexes[$row[0]]['columns'] = array_diff(array_map('trim', explode(',', $match[1].',')), array(''));
             }
-            /**
-			  * There must be a more elegant way of doing this,
-			  * the index elements appear in the SQL statement
-			  * in cols[1] between parentheses
-			  * e.g CREATE UNIQUE INDEX ware_0 ON warehouse (org,warehouse)
-			  */
-            $cols = explode("(",$row[1]);
-            $cols = explode(")",$cols[1]);
-            array_pop($cols);
-            $indexes[$row[0]]['columns'] = $cols;
         }
         if (isset($savem)) {
             $this->SetFetchMode($savem);
@@ -357,7 +350,6 @@ class ADODB_sqlite extends ADOConnection {
         }
         return $indexes;
     }
-
 }
 
 /*--------------------------------------------------------------------------------------
