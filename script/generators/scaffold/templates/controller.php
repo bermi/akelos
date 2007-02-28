@@ -47,7 +47,13 @@ class <?=$controller_class_name?> extends ApplicationController
          $this->redirectToAction('listing');
         }
         if(!empty($this->params['<?=$singular_name?>']) && !empty($this->params['id'])){
-            $this-><?=$singular_name?> = $this-><?=$model_name?>->find($this->params['id']);
+            <?php 
+            if($model_name != $controller_name){ // if equal will be handled by the Akelos directly
+                ?>if(empty($this-><?=$singular_name?>->id) || $this-><?=$singular_name?>->id != $this->params['id'])){
+                    $this-><?=$singular_name?> =& $this-><?=$model_name?>->find($this->params['id']);
+                }<?php
+            }
+            ?>
             $this-><?=$singular_name?>->setAttributes($this->params['<?=$singular_name?>']);
             if($this->Request->isPost() && $this-><?=$singular_name?>->save()){
                 $this->flash['notice'] = $this->t('<?=$model_name?> was successfully updated.');

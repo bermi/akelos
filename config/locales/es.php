@@ -121,9 +121,9 @@ $dictionary['Showing page %page of %number_of_pages'] = 'Mostrando página %page
 $dictionary['first'] = 'primera';
 $dictionary['last'] = 'última';
 $dictionary['You can\'t use ${ within templates'] = 'No es posible utilizar ${ en las vistas/plantillas';
-$dictionary['You must set the settings for current locale first by calling Ak::locale(null, $locale, $settings)'] = 'You must set the settings for current locale first by calling Ak::locale(null, $locale, $settings)';
+$dictionary['You must set the settings for current locale first by calling Ak::locale(null, $locale, $settings)'] = 'Tiene que establecer la configuración de la local llamando Ak::locale(null, $locale, $settings) antes de nada';
 $dictionary['Akelos'] = 'Akelos';
-$dictionary['Could not load %converter_class_name converter class'] = 'Could not load %converter_class_name converter class';
+$dictionary['Could not load %converter_class_name converter class'] = 'No se ha podido cargar la clase del conversor %converter_class_name';
 $dictionary['Could not locate %from to %to converter on %file_name'] = 'No se ha encontrado el conversor de %from a %to en %file_name';
 $dictionary['Xdoc2Text is a windows only application. Please use wvWare instead'] = 'Xdoc2Text is a windows only application. Please use wvWare instead';
 $dictionary['Could not find xdoc2txt.exe on %path. Please download it from http://www31.ocn.ne.jp/~h_ishida/xdoc2txt.html'] = 'Could not find xdoc2txt.exe on %path. Please download it from http://www31.ocn.ne.jp/~h_ishida/xdoc2txt.html';
@@ -137,5 +137,8 @@ $dictionary['Could not connect to the FTP server'] = 'No se ha podido conectar c
 $dictionary['Could not change to the FTP base directory %directory'] = 'Error de FTP. No se ha podido cambiar al directorio base %directory al iniciar sesión en el servidor.';
 $dictionary['Could not change to the FTP directory %directory'] = 'Error de FTP. No se ha podido cambiar al directorio %directory';
 $dictionary['Ooops! Could not fetch details for the table %table_name.'] = '¡Uysss!. No hemos encontrado los detalles de la tabla %table_name.';
+
+$dictionary['Upgrading'] = 'Actualizando';
+$dictionary['Could not find the file /app/controllers/<i>%controller_file_name</i> for the controller %controller_class_name'] = 'No se ha encontrado el fichero /app/controllers/<i>%controller_file_name</i> del controlador %controller_class_name';
 
 ?>

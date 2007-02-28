@@ -144,4 +144,7 @@ $dictionary['Could not change to the FTP base directory %directory'] = 'Could no
 $dictionary['Could not change to the FTP directory %directory'] = 'Could not change to the FTP directory %directory';
 $dictionary['Ooops! Could not fetch details for the table %table_name.'] = 'Ooops! Could not fetch details for the table %table_name.';
 
+$dictionary['Upgrading'] = 'Upgrading';
+$dictionary['Could not find the file /app/controllers/<i>%controller_file_name</i> for the controller %controller_class_name'] = 'Could not find the file /app/controllers/<i>%controller_file_name</i> for the controller %controller_class_name';
+
 ?>

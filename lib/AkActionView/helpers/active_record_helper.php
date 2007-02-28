@@ -177,6 +177,7 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
         $column_name = $this->method_name = $this->_getColumnName($column_name, $object_name,  $template_object);
         $this->AkFormHelperInstanceTag($object_name, $column_name, $template_object);
     }
+    
     function to_tag($options = array())
     {
         switch ($this->get_column_type()) {
@@ -221,7 +222,7 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
 
     function tag_without_error_wrapping($name, $options)
     {
-        return $this->tag($name, $options);
+        return parent::tag($name, $options);
     }
 
 
@@ -236,7 +237,7 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
 
     function content_tag_without_error_wrapping($name, $value, $options)
     {
-        return $this->content_tag($name, $value, $options);
+        return parent::content_tag($name, $value, $options);
     }
 
     function to_date_select_tag($options = array())
@@ -250,7 +251,7 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
 
     function to_date_select_tag_without_error_wrapping($options = array())
     {
-        return $this->to_date_select_tag($options);
+        return parent::to_date_select_tag($options);
     }
 
     function to_datetime_select_tag($options = array())
@@ -264,7 +265,7 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
 
     function to_datetime_select_tag_without_error_wrapping($options = array())
     {
-        return $this->to_datetime_select_tag($options);
+        return parent::to_datetime_select_tag($options);
     }
 
     function error_wrapping($html_tag, $has_error)

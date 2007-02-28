@@ -403,20 +403,22 @@ class AkFormHelperInstanceTag extends TagHelper
       {
         require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'date_helper.php');
         $DateHelper =& new DateHelper();
+        $object_name = empty($this->_object_name) ? $this->object_name : $this->_object_name;
         if(isset($this->object)){
-            $DateHelper->_object[$this->_object_name] =& $this->object;
+            $DateHelper->_object[$object_name] =& $this->object;
         }
-        return $DateHelper->date_select($this->_object_name, $this->_column_name, $options);          
+        return $DateHelper->date_select($object_name, $this->_column_name, $options);          
       }
 
       function to_datetime_select_tag($options = array())
       {
         require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'date_helper.php');
         $DateHelper =& new DateHelper();
+        $object_name = empty($this->_object_name) ? $this->object_name : $this->_object_name;
         if(isset($this->object)){
-            $DateHelper->_object[$this->_object_name] =& $this->object;
-        }
-        return $DateHelper->datetime_select($this->_object_name, $this->_column_name, $options);
+            $DateHelper->_object[$object_name] =& $this->object;
+        }        
+        return $DateHelper->datetime_select($object_name, $this->_column_name, $options);
       }
 
 

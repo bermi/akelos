@@ -48,19 +48,19 @@ class DateHelperTests extends HelpersUnitTester
 <option value="1983">1983</option>
 </select>
 <select name="person[date(2i)]">
-<option value="January">January</option>
-<option value="February">February</option>
-<option value="March">March</option>
-<option value="April">April</option>
-<option value="May">May</option>
-<option value="June" selected="selected">June</option>
-<option value="July">July</option>
-<option value="August">August</option>
+<option value="1">January</option>
+<option value="2">February</option>
+<option value="3">March</option>
+<option value="4">April</option>
+<option value="5">May</option>
+<option value="6" selected="selected">June</option>
+<option value="7">July</option>
+<option value="8">August</option>
 
-<option value="September">September</option>
-<option value="October">October</option>
-<option value="November">November</option>
-<option value="December">December</option>
+<option value="9">September</option>
+<option value="10">October</option>
+<option value="11">November</option>
+<option value="12">December</option>
 </select>
 
 <select name="person[date(3i)]">
@@ -106,20 +106,20 @@ class DateHelperTests extends HelpersUnitTester
 
         $this->assertEqual(join(array_diff(explode("\n",$DateHelper->date_select('person','date',array('include_blank'=>true,'discard_day'=>true,'order'=>array('month','year')))),array(''))),join(array_diff(explode("\n",'<select name="person[date(2i)]">
 <option value=""></option>
-<option value="January">January</option>
-<option value="February">February</option>
+<option value="1">January</option>
+<option value="2">February</option>
 
-<option value="March">March</option>
-<option value="April">April</option>
-<option value="May">May</option>
-<option value="June" selected="selected">June</option>
-<option value="July">July</option>
-<option value="August">August</option>
-<option value="September">September</option>
-<option value="October">October</option>
-<option value="November">November</option>
+<option value="3">March</option>
+<option value="4">April</option>
+<option value="5">May</option>
+<option value="6" selected="selected">June</option>
+<option value="7">July</option>
+<option value="8">August</option>
+<option value="9">September</option>
+<option value="10">October</option>
+<option value="11">November</option>
 
-<option value="December">December</option>
+<option value="12">December</option>
 </select>
 
 <select name="person[date(1i)]">
@@ -155,19 +155,19 @@ class DateHelperTests extends HelpersUnitTester
 </select>
 
 <select name="person[date(2i)]">
-<option value="January">January</option>
-<option value="February">February</option>
-<option value="March">March</option>
-<option value="April">April</option>
-<option value="May">May</option>
-<option value="June" selected="selected">June</option>
-<option value="July">July</option>
-<option value="August">August</option>
+<option value="1">January</option>
+<option value="2">February</option>
+<option value="3">March</option>
+<option value="4">April</option>
+<option value="5">May</option>
+<option value="6" selected="selected">June</option>
+<option value="7">July</option>
+<option value="8">August</option>
 
-<option value="September">September</option>
-<option value="October">October</option>
-<option value="November">November</option>
-<option value="December">December</option>
+<option value="9">September</option>
+<option value="10">October</option>
+<option value="11">November</option>
+<option value="12">December</option>
 </select>
 
 <select name="person[date(3i)]">
@@ -338,19 +338,19 @@ class DateHelperTests extends HelpersUnitTester
 </select>
 
 <select name="datemonth">
-<option value="January">January</option>
-<option value="February">February</option>
-<option value="March">March</option>
-<option value="April">April</option>
-<option value="May">May</option>
-<option value="June" selected="selected">June</option>
-<option value="July">July</option>
-<option value="August">August</option>
+<option value="1">January</option>
+<option value="2">February</option>
+<option value="3">March</option>
+<option value="4">April</option>
+<option value="5">May</option>
+<option value="6" selected="selected">June</option>
+<option value="7">July</option>
+<option value="8">August</option>
 
-<option value="September">September</option>
-<option value="October">October</option>
-<option value="November">November</option>
-<option value="December">December</option>
+<option value="9">September</option>
+<option value="10">October</option>
+<option value="11">November</option>
+<option value="12">December</option>
 </select>
 <select name="dateday">
 <option value="1">1</option>
@@ -502,19 +502,19 @@ class DateHelperTests extends HelpersUnitTester
 </select>
 
 <select name="datemonth">
-<option value="January">January</option>
-<option value="February">February</option>
-<option value="March">March</option>
-<option value="April">April</option>
-<option value="May">May</option>
-<option value="June" selected="selected">June</option>
-<option value="July">July</option>
-<option value="August">August</option>
+<option value="1">January</option>
+<option value="2">February</option>
+<option value="3">March</option>
+<option value="4">April</option>
+<option value="5">May</option>
+<option value="6" selected="selected">June</option>
+<option value="7">July</option>
+<option value="8">August</option>
 
-<option value="September">September</option>
-<option value="October">October</option>
-<option value="November">November</option>
-<option value="December">December</option>
+<option value="9">September</option>
+<option value="10">October</option>
+<option value="11">November</option>
+<option value="12">December</option>
 </select>
 <select name="dateday">
 <option value="1">1</option>
@@ -854,19 +854,19 @@ class DateHelperTests extends HelpersUnitTester
 <option value="31">31</option>
 </select>
 <select name="datemonth">
-<option value="January">January</option>
-<option value="February">February</option>
-<option value="March">March</option>
+<option value="1">January</option>
+<option value="2">February</option>
+<option value="3">March</option>
 
-<option value="April">April</option>
-<option value="May">May</option>
-<option value="June" selected="selected">June</option>
-<option value="July">July</option>
-<option value="August">August</option>
-<option value="September">September</option>
-<option value="October">October</option>
-<option value="November">November</option>
-<option value="December">December</option>
+<option value="4">April</option>
+<option value="5">May</option>
+<option value="6" selected="selected">June</option>
+<option value="7">July</option>
+<option value="8">August</option>
+<option value="9">September</option>
+<option value="10">October</option>
+<option value="11">November</option>
+<option value="12">December</option>
 
 </select>
 <select name="dateyear">

@@ -127,11 +127,13 @@ class DateHelper extends AkActionViewHelper
             $date = $this->_controller->$object_name->$column_name();
         }elseif(!empty($this->_controller->$object_name)) {
             $date = $this->_controller->$object_name->get($column_name);
+        }elseif(!empty($this->_object[$object_name])){
+            $date = $this->_object[$object_name]->get($column_name);
         }
         
         $date = !empty($options['include_blank']) ? (!empty($date) ? $date : 0) : (!empty($date) ? $date : Ak::getDate());
-        
-        $options['order'] = empty($options['order']) ? array('year','month','day') : $options['order'];
+
+        $options['order'] = empty($options['order']) ? explode(',',Ak::t('year,month,day',array(),'localize/date')) : $options['order'];
 
         $discard = array(
         'year'=>!empty($options['discard_year']),
@@ -161,7 +163,7 @@ class DateHelper extends AkActionViewHelper
       */
     function datetime_select($object_name, $column_name, $options = array())
     {
-        $defaults = array('discard_type' => true, 'order'=>array('year','month','day','hour','minute'));
+        $defaults = array('discard_type' => true, 'order'=>explode(',',Ak::t('year,month,day,hour,minute',array(),'localize/date')));
         $options  = array_merge($defaults, $options);
 
         if(!empty($this->_controller->$object_name) && $column_name[0] != '_' && method_exists($this->_controller->$object_name,$column_name)){
@@ -329,7 +331,7 @@ class DateHelper extends AkActionViewHelper
         foreach ($range as $k=>$time_unit){
             if(is_string($time_unit)){
                 $k = !empty($unit_format_callback) ? DateHelper::$unit_format_callback($k) : $k;
-                $options_array[] = '<option value="'.$time_unit.'"'.($k == $datetime_unit ? ' selected="selected"' : '').">$time_unit</option>";                
+                $options_array[] = '<option value="'.$k.'"'.($k == $datetime_unit ? ' selected="selected"' : '').">$time_unit</option>";                
             }else{
                 $time_unit = !empty($unit_format_callback) ? DateHelper::$unit_format_callback($time_unit) : $time_unit;
                 $options_array[] = '<option value="'.$time_unit.'"'.($time_unit == $datetime_unit ? ' selected="selected"' : '').">$time_unit</option>";
