@@ -6,7 +6,6 @@ $dictionary['Welcome aboard'] = 'Bienvenidos a bordo';
 $dictionary['You&rsquo;re using The Akelos Framework!'] = 'Estás utilizando el Akelos Framework!';
 $dictionary['Getting started'] = 'Comenzando a usar el Framework';
 $dictionary['Configure your environment'] = 'Configuración del entorno';
-$dictionary['<a href="%url">Run a step by step wizard for creating a configuration file</a> or read INSTALL.txt instead.'] = '<a href="%url">Ejecuta el asistente paso a paso para generar el fichero de configuración</a> o realiza la instalación siguiendo los pasos que figuran en el fichero INSTALL.txt.';
 $dictionary['Start the configuration wizard'] = 'Iniciar el asistente de configuración';
 $dictionary['Akelos Framework'] = 'Akelos Framework';
 
@@ -70,7 +69,6 @@ $dictionary['DB admin password'] = 'Contraseña (administrador base de datos)';
 $dictionary['Could not connect to %database database'] = 'No se ha podido conectar con la base de datos %database database';
 
 
-
 $dictionary['If you can\'t change the web server or file system permissions the Akelos Framework has an alternate way to access the file system by using an FTP account that points to your application path.'] = 'Si no puede modificar los privilegios del servidor o del sistema de ficheros el Akelos Framework ofrece la posibilidad de utilizar una cuenta FTP que apunte a la aplicación para realizar las operaciones con ficheros.';
 $dictionary['This is possible because the Framework uses a special version of file_get_contents and file_put_contents functions that are located under the class Ak, which acts as a namespace for some PHP functions. If you are concerned about distributing applications done using the Akelos Framework, you should use Ak::file_get_contents() and Ak::file_put_contents() and this functions will automatically select the best way to handle files. Additional methods like LDAP might be added in a future.'] = '
 Esto es posible gracias a la utilización de de una versión especial de las funciones de PHP "file_get_contents" y "file_put_contents" que están definidas como un método dentro del la clase Ak; lacual actual como un espacio de nombre para algunas funciones de PHP. Si va a distribuir aplicaciones realizadas con el Akelos Framework debería utilizar Ak::file_get_contents() y Ak::file_put_contents() en sus aplicaciones ya que estas determinarán la mejor manera de trabajar con los ficheros. Otros métodos como LDAP se podrán implementar en el fututo.';
@@ -82,5 +80,29 @@ $dictionary['Application path from FTP initial path'] = 'Ruta de la aplicación 
 $dictionary['Could not change to the FTP base directory %directory'] = 
 'No se ha podido cambiar al direcitorio base de la aplicación %directory';
 
+$dictionary['<a href="%url">Run a step by step wizard for creating a configuration file</a> or read README.txt instead.'] = 
+'<a href="%url">Ejecute el asistente para crear el fichero de configuración</a> o lea el fichero README.txt ';
+$dictionary['The framework_setup.php found that you already have a configuration file at config/config.php. You need to remove that file first in order to run the setup.'] = 
+'framework_setup.php ha detectado que ya existe un fichero de configuración en config/config.php. 
+Tiene que eliminar el fichero para poder ejecutar el asistente de configuración.';
+
+$dictionary['Save Configuration.'] = 'Guardar configuración.';
+$dictionary['Final Steps.'] = 'Últimos pasos.';
+$dictionary['You are about to complete the installation process. Please follow the steps bellow.'] =
+ 'Estás a punto de finalizar el proceso de instalación. Por favor sigue los siguientes pasos.';
+$dictionary['Copy the following configuration file contents to <b>config/config.php</b>.'] = 
+'Cree el fichero <b>config/config.php</b> y copie la siguiente configuración.';
+$dictionary['Copy the file <b>config/DEFAULT-routes.php</b> to <b>config/routes.php</b>'] = 
+'Copie el fichero <b>config/DEFAULT-routes.php</b> como <b>config/routes.php</b>';
+$dictionary['Your application is not on the host main path, so you might need to edit 
+    your .htaccess files in order to enable nice URL\'s. Edit <b>/.htaccess</b> and 
+    <b>/public/.htaccess</b> and replace the line <br />'] = '
+    Su aplicación no está en la raíz del servidor web. Deberá editar los ficheros  .htaccess para activar la opción de URLs elegantes. 
+    Edite <b>/.htaccess</b> y <b>/public/.htaccess</b> y sustituya la linea <br />';
+$dictionary['with'] = 'con';
+$dictionary['Now you can start generating models and controllers by running <b>./script/generate model</b>, <b>./script/generate controller</b> and , <b>./script/generate scaffold</b>. Run them without parameters to get the instructions.'] = 
+'Ahora ya puede comenzar a generar modelos y controladores ejecutando 
+<b>./script/generate model</b>, <b>./script/generate controller</b> y , <b>./script/generate scaffold</b>.
+ Ejecutalos sin parametros para ver las instrucciones de uso.';
 
 ?>

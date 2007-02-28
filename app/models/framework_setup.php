@@ -356,7 +356,7 @@ CONFIG;
 
             $settings['%locales'] = $this->getLocales();
             $settings['%AK_FRAMEWORK_DIR'] = defined('AK_FRAMEWORK_DIR') ?
-            "define('AK_FRAMEWORK_DIR', '".AK_FRAMEWORK_DIR."');" : '';
+            "defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '".AK_FRAMEWORK_DIR."');" : '';
         }
 
         return str_replace(array_keys($settings), array_values($settings), $configuration_template);
@@ -394,7 +394,7 @@ CONFIG;
 
     function modifyHtaccessFiles()
     {
-        if(!$this->isUrlRewriteEnabled()){
+        if($this->isUrlRewriteEnabled()){
             return true;
         }
 
@@ -403,13 +403,11 @@ CONFIG;
         }
         $file_1 = AK_BASE_DIR.DS.'.htaccess';
         $file_2 = AK_PUBLIC_DIR.DS.'.htaccess';
-
-        return  @Ak::file_put_contents($file_1,
-        str_replace('# RewriteBase /framework',' RewriteBase '.$this->getUrlSuffix(),
-        @Ak::file_get_contents($file_1))) &&
-        @Ak::file_put_contents($file_2,
-        str_replace('# RewriteBase /framework',' RewriteBase '.$this->getUrlSuffix(),
-        @Ak::file_get_contents($file_2)));
+        $file_1_content = @Ak::file_get_contents($file_1);
+        $file_2_content = @Ak::file_get_contents($file_2);
+        
+        empty($file_1_content) ? null : @Ak::file_put_contents($file_1, str_replace('# RewriteBase /framework',' RewriteBase '.$this->getUrlSuffix(), $file_1_content));
+        empty($file_2_content) ? null : @Ak::file_put_contents($file_2, str_replace('# RewriteBase /framework',' RewriteBase '.$this->getUrlSuffix(), $file_2_content));
     }
 
     function isUrlRewriteEnabled()

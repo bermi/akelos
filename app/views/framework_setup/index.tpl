@@ -8,7 +8,7 @@
           <ol>
             <li>
               <h2>_{Configure your environment}</h2>
-              <p><?=$text_helper->translate('<a href="%url">Run a step by step wizard for creating a configuration file</a> or read INSTALL.txt instead.',array('%url'=>$url_helper->url_for(array('action'=>'select_database'))))?></p>
+              <p><?=$text_helper->translate('<a href="%url">Run a step by step wizard for creating a configuration file</a> or read README.txt instead.',array('%url'=>$url_helper->url_for(array('action'=>'select_database'))))?></p>
             </li>
             
           </ol>

@@ -43,6 +43,9 @@ class <?=$controller_class_name?> extends ApplicationController
 
     function edit()
     {
+        if (empty($this->params['id'])){
+         $this->redirectToAction('listing');
+        }
         if(!empty($this->params['<?=$singular_name?>']) && !empty($this->params['id'])){
             $this-><?=$singular_name?> = $this-><?=$model_name?>->find($this->params['id']);
             $this-><?=$singular_name?>->setAttributes($this->params['<?=$singular_name?>']);

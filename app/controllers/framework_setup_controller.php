@@ -177,8 +177,7 @@ class FrameworkSetupController extends AkActionController
     {
         $this->configuration_file = $this->FrameworkSetup->getConfigurationFile();
         if($this->FrameworkSetup->canWriteConfigurationFile()){
-            if( $this->FrameworkSetup->modifyHtaccessFiles() &&
-            $this->FrameworkSetup->writeConfigurationFile($this->configuration_file) &&
+            if( $this->FrameworkSetup->writeConfigurationFile($this->configuration_file) &&
             $this->FrameworkSetup->writeRoutesFile() &&
             $this->FrameworkSetup->runFrameworkInstaller()){
 

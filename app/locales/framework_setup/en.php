@@ -6,7 +6,6 @@ $dictionary['Welcome aboard'] = 'Welcome aboard';
 $dictionary['You&rsquo;re using The Akelos Framework!'] = 'You&rsquo;re using The Akelos Framework!';
 $dictionary['Getting started'] = 'Getting started';
 $dictionary['Configure your environment'] = 'Configure your environment';
-$dictionary['<a href="%url">Run a step by step wizard for creating a configuration file</a> or read INSTALL.txt instead.'] = '<a href="%url">Run a step by step wizard for creating a configuration file</a> or read INSTALL.txt instead.';
 $dictionary['Use <tt>script/generate</tt> to create your models and controllers'] = 'Use <tt>script/generate</tt> to create your models and controllers';
 $dictionary['To see all available options, run it without parameters.'] = 'To see all available options, run it without parameters.';
 $dictionary['Start the configuration wizard'] = 'Start the configuration wizard';
@@ -83,5 +82,20 @@ $dictionary['Could not connect to selected ftp server'] = 'Could not connect to 
 $dictionary['Could not change to the FTP base directory %directory'] = 
 'Could not change to the FTP base directory %directory';
 
+$dictionary['<a href="%url">Run a step by step wizard for creating a configuration file</a> or read README.txt instead.'] = '<a href="%url">Run a step by step wizard for creating a configuration file</a> or read README.txt instead.';
+$dictionary['The framework_setup.php found that you already have a configuration file at config/config.php. You need to remove that file first in order to run the setup.'] = 'The framework_setup.php found that you already have a configuration file at config/config.php. You need to remove that file first in order to run the setup.';
+
+$dictionary['Save Configuration.'] = 'Save Configuration.';
+$dictionary['Final Steps.'] = 'Final Steps.';
+$dictionary['You are about to complete the installation process. Please follow the steps bellow.'] = 'You are about to complete the installation process. Please follow the steps bellow.';
+$dictionary['Copy the following configuration file contents to <b>config/config.php</b>.'] = 'Copy the following configuration file contents to <b>config/config.php</b>.';
+$dictionary['Copy the file <b>config/DEFAULT-routes.php</b> to <b>config/routes.php</b>'] = 'Copy the file <b>config/DEFAULT-routes.php</b> to <b>config/routes.php</b>';
+$dictionary['Your application is not on the host main path, so you might need to edit 
+    your .htaccess files in order to enable nice URL\'s. Edit <b>/.htaccess</b> and 
+    <b>/public/.htaccess</b> and replace the line <br />'] = 'Your application is not on the host main path, so you might need to edit 
+    your .htaccess files in order to enable nice URL\'s. Edit <b>/.htaccess</b> and 
+    <b>/public/.htaccess</b> and replace the line <br />';
+$dictionary['with'] = 'with';
+$dictionary['Now you can start generating models and controllers by running <b>./script/generate model</b>, <b>./script/generate controller</b> and , <b>./script/generate scaffold</b>. Run them without parameters to get the instructions.'] = 'Now you can start generating models and controllers by running <b>./script/generate model</b>, <b>./script/generate controller</b> and , <b>./script/generate scaffold</b>. Run them without parameters to get the instructions.';
 
 ?>
