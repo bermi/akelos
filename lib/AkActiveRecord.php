@@ -1602,7 +1602,10 @@ Examples for find all:
             if ($compose_after_set && $this->isCombinedAttribute($attribute)){
                 $this->decomposeCombinedAttribute($attribute);
             }
+        }elseif(substr($attribute,-12) == 'confirmation' && $this->hasAttribute(substr($attribute,0,-13))){
+            $this->$attribute = $value;
         }
+        
         if($this->_internationalize){
             if(is_array($value)){
                 $this->setAttributeLocales($attribute, $value);

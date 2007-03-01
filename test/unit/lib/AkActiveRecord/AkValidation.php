@@ -382,6 +382,11 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person->user_name_confirmation = 'bermi';
         $Person->validatesConfirmationOf('user_name');
         $this->assertEqual($Person->getErrorsOn('user_name'),$Person->_defaultErrorMessages['confirmation']);
+        
+        $Person = new AkTestPerson();
+        $Person->setAttributes(array('password'=>'abc','password_confirmation'=>'ake'));
+        $Person->validatesConfirmationOf('password');
+        $this->assertEqual($Person->getErrorsOn('password'), $Person->_defaultErrorMessages['confirmation']);
     }
 
 
