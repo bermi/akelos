@@ -1,196 +1,201 @@
 :link, :visited {
- text-decoration : none;
+  text-decoration: none;
 }
+
 ul, ol {
- list-style : none;
+  list-style: none;
 }
+
 h1, h2, h3, h4, h5, h6, pre, code {
- font-size : 1em;
+  font-size: 1em;
 }
-ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, body, html, p, blockquote, fieldset, input, label, textarea{
- margin : 0;
- padding : 0;
+
+ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, body, html, p, blockquote, fieldset, input, label, textarea {
+  margin: 0;
+  padding: 0;
 }
+
 a img, :link img, :visited img {
- border : none;
+  border: none;
 }
+
 address {
- font-style : normal;
+  font-style: normal;
 }
-input{margin:0}
+
+input {
+  margin: 0
+}
+
 /**/
 
-
-body
-{
-	font-family:Verdana, Arial, Helvetica, sans-serif;
-	font-size:80%;
-	background-color:#eee;
-	background-image:url('/images/bg_page.png');
-	background-repeat:repeat-x;
-	padding:10px 12px;
-}
-h1
-{
-	font-size:140%;
-	font-weight:bold;
-        margin:10px;
-}
-h2
-{
-	font-size:140%;
-	font-weight:bold;
-}
-table 
-{
-	width: 100%;
-	background-color:#eee;
-	border-bottom: 1px solid #D9D9D9;
-	border-right: 1px solid #D9D9D9;
-	border-top: 1px solid #c4c4c4;
-}
-th
-{
-	font-weight:bold;
-	color: #000;
-	text-align:left;
-	vertical-align:bottom;
-	padding:3px 5px;
-	background-color:#eee;
-	background-image:url('/images/bg_header.png');
-	border-left: 1px solid #c4c4c4;
-}
-th>a:link, th>a:visited
-{
-	color: #000;
-        text-decoration:none
+body {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 80%;
+  background-color: #eee;
+  background-image: url('/images/bg_page.png');
+  background-repeat: repeat-x;
+  padding: 10px 12px;
 }
 
-th>a:hover
-{
-        text-decoration:underline
-}
-td 
-{
-	text-align:left;
-	vertical-align:top;
-	padding:3px 5px;
-	background-color:#fff;
-	border-left: 1px solid #D9D9D9;
-}
-tr.odd td
-{
-	background-color:#edf3fe;
-	border-left: 1px solid #D9D9D9;
+h1 {
+  font-size: 140%;
+  font-weight: bold;
+  margin: 10px;
 }
 
-
-.form
-{
-	background-color: #fff;
-	width: 380px;
-	padding:10px 10px 15px 10px;
-	border: 1px solid #D9D9D9;
-}
-.form label
-{
-        display:block;
-        width:99%;
-	font-weight:bold;
-        margin:10px 0 -15px 3px;
-}
-.form textarea, .form input
-{
-	width: 99%;
-	font-family:Verdana, Arial, Helvetica, sans-serif;
-	font-size:100%;
+h2 {
+  font-size: 140%;
+  font-weight: bold;
 }
 
-#operations
-{
-      width:380px;;
-      text-align:right;
-}
-#operations input
-{
-      margin:10px 0 10px 0;
-      padding:0 10px 0 10px;
-      font-size:130%;
-}
-#operations input.primary
-{
-	font-weight:bold;
+table {
+  width: 100%;
+  background-color: #eee;
+  border-bottom: 1px solid #D9D9D9;
+  border-right: 1px solid #D9D9D9;
+  border-top: 1px solid #c4c4c4;
 }
 
-.auraltext
-{
-   position: absolute;
-   font-size: 0;
-   left: -1000px;
+th {
+  font-weight: bold;
+  color: #000;
+  text-align: left;
+  vertical-align: bottom;
+  padding: 3px 5px;
+  background-color: #eee;
+  background-image: url('/images/bg_header.png');
+  border-left: 1px solid #c4c4c4;
 }
 
+th>a:link, th>a:visited {
+  color: #000;
+  text-decoration: none
+}
 
+th>a:hover {
+  text-decoration: underline
+}
+
+td {
+  text-align: left;
+  vertical-align: top;
+  padding: 3px 5px;
+  background-color: #fff;
+  border-left: 1px solid #D9D9D9;
+}
+
+tr.odd td {
+  background-color: #edf3fe;
+  border-left: 1px solid #D9D9D9;
+}
+
+.form {
+  background-color: #fff;
+  width: 380px;
+  padding: 10px 10px 15px 10px;
+  border: 1px solid #D9D9D9;
+}
+
+.form label {
+  display: block;
+  font-weight: bold;
+  margin: 10px 0 -15px 3px;
+}
+
+.form textarea, .form input {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 100%;
+}
+
+#operations {
+  width: 380px;
+  ;
+      text-align: right;
+}
+
+#operations input {
+  margin: 10px 0 10px 0;
+  padding: 0 10px 0 10px;
+  font-size: 130%;
+}
+
+#operations input.primary {
+  font-weight: bold;
+}
+
+.auraltext {
+  position: absolute;
+  font-size: 0;
+  left: -1000px;
+}
 
 div.flash_notice {
-	margin: 15px 0 10px 0;
-	padding: 6px 8px;
-	border: 1px solid #e11;
-	background-color:#fff;
-	color: #e11;
-}
-div.flash_notice h2 {
-	font-size: 100%;
-	margin: 0 0 5px 0;
-	color: #e11;
-}
-div.flash_notice p {
-	margin: 0 0 5px 0;
-	padding:0;
-}
-div.flash_notice ul {
-	margin: 0 0 5px 0;
-	padding-left: 30px;
-}
-div.flash_notice ul li {
-	padding-left: 0;
+  margin: 15px 0 10px 0;
+  padding: 6px 8px;
+  border: 1px solid #e11;
+  background-color: #fff;
+  color: #e11;
 }
 
-#paginationHeader{
-	font-size:100%;
-	font-weight:bold;
-        margin:2px 10px 0 0;
-        float:right;
+div.flash_notice h2 {
+  font-size: 100%;
+  margin: 0 0 5px 0;
+  color: #e11;
 }
-.paginationLink{
-	font-size:90%;
-        margin:5px;
+
+div.flash_notice p {
+  margin: 0 0 5px 0;
+  padding: 0;
 }
-.paginationCurrent{
-	font-size:100%;
-	font-weight:bold;
-        margin:5px;
+
+div.flash_notice ul {
+  margin: 0 0 5px 0;
+  padding-left: 30px;
 }
-a:link.paginationLink
-{
-	color: #000;
+
+div.flash_notice ul li {
+  padding-left: 0;
 }
-a:hover.paginationLink
-{
-	text-decoration:underline
+
+#paginationHeader {
+  font-size: 100%;
+  font-weight: bold;
+  margin: 2px 10px 0 0;
+  float: right;
 }
-a:visited.paginationLink
-{
-	color: #000;
+
+.paginationLink {
+  font-size: 90%;
+  margin: 5px;
+}
+
+.paginationCurrent {
+  font-size: 100%;
+  font-weight: bold;
+  margin: 5px;
+}
+
+a:link.paginationLink {
+  color: #000;
+}
+
+a:hover.paginationLink {
+  text-decoration: underline
+}
+
+a:visited.paginationLink {
+  color: #000;
 }
 
 .cls {
- clear : both;
-}
-hr{
-margin:50px 0 0 0;
-border: 1px solid #eee;
+  clear: both;
 }
 
+hr {
+  margin: 50px 0 0 0;
+  border: 1px solid #eee;
+}
 
 .fieldWithErrors {
   padding: 2px;
@@ -203,7 +208,7 @@ border: 1px solid #eee;
   border: 2px solid #c00;
   padding: 7px;
   padding-bottom: 12px;
-  margin:10px 0 10px 0;
+  margin: 10px 0 10px 0;
   background-color: #f0f0f0;
 }
 
@@ -222,9 +227,9 @@ border: 1px solid #eee;
   margin-bottom: 0;
   padding: 5px;
 }
-#errorExplanation ul
-{
-  margin:0 0 0 25px;
+
+#errorExplanation ul {
+  margin: 0 0 0 25px;
 }
 
 #errorExplanation li {
@@ -232,15 +237,13 @@ border: 1px solid #eee;
   list-style: square;
 }
 
-.show
-{
-	background-color: #fff;
-	width: 380px;
-	padding:10px 10px 15px 10px;
-	border: 1px solid #D9D9D9;
+.show {
+  background-color: #fff;
+  width: 380px;
+  padding: 10px 10px 15px 10px;
+  border: 1px solid #D9D9D9;
 }
 
-.show label
-{
-	font-weight:bold;
+.show label {
+  font-weight: bold;
 }

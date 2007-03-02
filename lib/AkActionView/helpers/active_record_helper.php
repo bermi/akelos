@@ -204,6 +204,10 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
             case 'timestamp':
             return $this->to_datetime_select_tag($options);
             break;
+            
+            case 'boolean':
+            return $this->to_check_box_tag($options);
+            break;
 
             default:
             return '';
@@ -266,6 +270,20 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
     function to_datetime_select_tag_without_error_wrapping($options = array())
     {
         return parent::to_datetime_select_tag($options);
+    }
+
+    function to_check_box_tag($options = array())
+    {
+        if($this->object->hasErrors()){
+            return $this->error_wrapping($this->to_check_box_tag_without_error_wrapping($options), $this->object->getErrorsOn($this->method_name));
+        }else{
+            return $this->to_check_box_tag_without_error_wrapping($options);
+        }
+    }
+
+    function to_check_box_tag_without_error_wrapping($options = array())
+    {
+        return parent::to_check_box_tag($options);
     }
 
     function error_wrapping($html_tag, $has_error)

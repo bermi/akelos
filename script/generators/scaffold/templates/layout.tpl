@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
  <head>
   <title><?='<?='?>$text_helper->translate('<?= $controller_human_name ?>',array(),'layout');?>: <?='<?='?> $text_helper->translate($controller->getActionName(),array(),'layout');?></title>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
   <?='<?='?> $asset_tag_helper->stylesheet_link_tag('scaffold') ?>
  </head>
  <body>
