@@ -291,28 +291,27 @@ class UrlHelper
             unset($html_options[$option]);
         }
 
+        $onclick = '';
         if ($popup && $post){
             trigger_error(Ak::t("You can't use popup and post in the same link"), E_USER_ERROR);
+            
+        }elseif($confirm && $popup){
+            $onclick = 'if ('.$this->_confirm_javascript_function($confirm).') { '.$this->_popup_javascript_function($popup).' };return false;';
+            
+        }elseif ($confirm && $post) {
+            $onclick = 'if ('.$this->_confirm_javascript_function($confirm).') { '.$this->_post_javascript_function().' };return false;';
+            
+        }elseif ($confirm) {
+            $onclick = 'return '.$this->_confirm_javascript_function($confirm).';';
+            
+        }elseif ($post) {
+            $onclick = $this->_post_javascript_function().'return false;';
+            
+        }elseif ($popup) {
+            $onclick = $this->_popup_javascript_function($popup).'return false;';
+            
         }
-        elseif($confirm && $popup){
-            $html_options['onclick'] = 'if ('.$this->_confirm_javascript_function($confirm).') { '.$this->_popup_javascript_function($popup).' };return false;';
-        }
-        elseif ($confirm && $post) {
-            $html_options['onclick'] = 'if ('.$this->_confirm_javascript_function($confirm).') { '.$this->_post_javascript_function().' };return false;';
-        }
-        elseif ($confirm) {
-            $html_options['onclick'] = 'return '.$this->_confirm_javascript_function($confirm).';';
-        }
-        elseif ($post) {
-            $html_options['onclick'] = $this->_post_javascript_function().'return false;';
-        }
-        elseif ($popup) {
-            $html_options['onclick'] = $this->_popup_javascript_function($popup).'return false;';
-        }
-        else{
-            $html_options['onclick'] = null;
-        }
-        return;
+        $html_options['onclick'] = empty($html_options['onclick']) ? $onclick : $html_options['onclick'].$onclick;
     }
 
     function _confirm_javascript_function($confirm)
