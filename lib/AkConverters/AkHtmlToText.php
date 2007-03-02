@@ -18,12 +18,12 @@
 
 class AkHtmlToText
 {
-
     function convert()
     {
-        return strip_tags(html_entity_decode($this->source));
+        require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'html2text.php');
+        $Converter = new html2text(true, 0, false);
+        return $Converter->load_string($this->source);
     }
-
 }
 
 ?>
