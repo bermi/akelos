@@ -20,11 +20,12 @@ This setting can be found on most Linux boxes and hosting providers. Akelos work
 
 Download and installation
 ---------------------------
-We highly recommend you to get the trunk version of Akelos until we hit version 1.0. You need to have installed [subversion](http://subversion.tigris.org/) in order to do this and run the this from your command line:
+We highly recommend you to get the trunk version of Akelos until we hit version 1.0. You need to have installed [subversion](http://subversion.tigris.org/).
+You can checkout a working copy of the Akelos source code with the command:
 
     svn co http://akelosframework.googlecode.com/svn/trunk/ akelos
 
-If you cant or don't want to checkout the code from subversion, you can get the [latest stable version](http://www.akelos.org/akelos_framework-dev_preview.tar.gz) generated automatically by the Continuous Integration system, and untar it by typing:
+If you can't or don't want to checkout the code from subversion, you can get the [latest stable version](http://www.akelos.org/akelos_framework-dev_preview.tar.gz) generated automatically by the Continuous Integration system, and untar it by typing:
 
     tar zxvf akelos_framework-dev_preview.tar.gz;mv akelos_framework-dev_preview akelos
 
@@ -136,11 +137,11 @@ Follow the steps in the wizard to set up your database, locales and file permiss
 
 Save the files `config/DEFAULT-config.php` and `config/DEFAULT-routes.php` as  `config/config.php` and `config/routes.php` and edit them following them as needed.
 
-You might also need to set the base rewrite path manually is you want to be able to use nice URLs by editing the file `public/.htaccess` and setting RewriteBase like:
+You might also need to set the base rewrite path manually if you want to be able to use nice URLs by editing the file `public/.htaccess` and setting RewriteBase like:
 
     RewriteBase /booklink
 
-After your application has been installed correctly you'll see a welcome message at http://localhost/booklink. Now you can safely remove the framework setup files (it won't be available is you have a `/configconfig.php` file)
+After your application has been installed correctly you'll see a welcome message at http://localhost/booklink. Now you can safely remove the framework setup files (they won't be accessible if a `/config/config.php` file exists)
 
 The booklink database structure
 ---------------------------------
@@ -256,7 +257,7 @@ and
 
     ./script/generate scaffold Author
 
-This will generate a brunch of files and folder with code that really works!, don't trust me? try it yourself. Point your browser to [http://localhost/booklink/author](http://localhost/booklink/author) and [http://localhost/booklink/books](http://localhost/booklink/books) to start adding authors and books. Create some records and come back for an explanation of what is going under the hood.
+This will generate a brunch of files and folder with code that really works!. Don't trust me? Try it yourself. Point your browser to [http://localhost/booklink/author](http://localhost/booklink/author) and [http://localhost/booklink/books](http://localhost/booklink/books) to start adding authors and books. Create some records and come back for an explanation of what is going under the hood.
 
 
 The Akelos Workflow
@@ -286,7 +287,7 @@ This might help you understanding the way Akelos handles your requests, so we ar
 Relating Books and Authors
 ----------------------------
 
-Now you are going to link **boolink** authors and books (complex associations in upcoming tutorials). In order to achieve this you will use the `author_id` column you added to your database.
+Now you are going to link authors and books (complex associations in upcoming tutorials). In order to achieve this you will use the `author_id` column you added to your database.
 
 So you will need to tell your models how they relate to each other like 
 
@@ -344,7 +345,7 @@ You must be screaming now about the rare `_{Author}` and `{book.author.name?}` s
 Colophon
 --------------------
 
-This is all for know, I'll be improving this tutorial from time to time to add some missing features to this and other documents like:
+This is all for now, I'll be improving this tutorial from time to time to add some missing features to this and other documents like:
                                 
  * validations
  * routes

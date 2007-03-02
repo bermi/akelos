@@ -1,4 +1,20 @@
 <?php
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
+
+// +----------------------------------------------------------------------+
+// | Akelos Framework - http://www.akelos.org                             |
+// +----------------------------------------------------------------------+
+// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
+// | Released under the GNU Lesser General Public License, see LICENSE.txt|
+// +----------------------------------------------------------------------+
+
+/**
+ * @package AkelosFramework
+ * @subpackage Utils
+ * @author Bermi Ferrer <bermi a.t akelos c.om>
+ * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
+ * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
+ */
 
 require_once(AK_LIB_DIR.DS.'Ak.php');
 require_once(AK_LIB_DIR.DS.'AkInflector.php');
@@ -10,7 +26,12 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
  * we to work around to find the real case of the methos to apply conventions.
  * 
  * See also <AkActiveRecord> and <AkActionMailer> as those are the ones you will usually inherit from
- */
+*
+* @package AkelosFramework
+* @author Bermi Ferrer <bermi a.t akelos c.om>
+* @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
+* @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
+*/
 class AkBaseModel extends AkObject 
 {
     var $_modelName;
