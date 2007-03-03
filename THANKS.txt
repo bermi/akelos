@@ -1,0 +1,44 @@
+Thanks to all the people who has tried the Akelos Framework in it's chilhood.
+You are all helping Akelos to become the best framework for the PHP community.
+
+Here is a list of the people who is being helping to create a better Akelos. 
+Some in form of patch, new feature or doccumentation, they are all listed 
+here (if you contributed and are not listed, let me know it). 
+If you need to contact them, drop me a line and I'll give you their contact
+email I don't whant them to be spammed for being in this list.
+
+
+Core contributors (new features)
+---------------------------------------
+
+Jose Salavert
+
+ - Multiple Action View helpers and many core contributions since 2005
+
+Niels Ganser
+
+ - AkActsAsTree.php unit tested new feature 2006-09-20
+
+
+
+Contributions submitted as patches
+---------------------------------------
+
+Naixn
+
+ - Scaffold generator patch. 2007-02-22
+ 
+Stephen Reay
+
+ - AkXhtmlValidator.php patch. 2007-02-23
+
+Kaste
+
+  - AkInstaller patch and new unit test. 2007-02-25
+  - AkActiveRecord::accessibleAttributes patch and new unit test. 2007-02-26
+
+
+Special thanks to David Heinemeier Hansson and the Rails community for creating 
+the great Ruby on Rails framework.
+
+Many thanks to all the Anonymous people wich has helped us in many different forms :D
