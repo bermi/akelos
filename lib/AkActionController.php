@@ -964,9 +964,12 @@ class AkActionController extends AkObject
 
         if(empty($options['skip_url_locale'])){
             $locale = $this->Request->getLocaleFromUrl();
-            $rewritten_url .= (empty($locale) ? '' : '/').$locale;
+            if(empty($options['lang'])){
+                $rewritten_url .= (empty($locale) ? '' : '/').$locale;
+            }
+            
         }
-
+        
         $rewritten_url .= (substr($rewritten_url,-1) == '/' ? '' : (AK_URL_REWRITE_ENABLED ? '' : '/'));
         $rewritten_url .= $path;
         $rewritten_url .= empty($options['trailing_slash']) ? '' : '/';
