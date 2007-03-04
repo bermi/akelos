@@ -250,6 +250,7 @@ class AkHasAndBelongsToMany extends AkAssociation
             $class_file_code = "<?php \n\n//This code was generated automatically by the active record hasAndBelongsToMany Method\n\n";
             $class_code =
             "class {$options['join_class_name']} extends {$options['join_class_extends']} {
+    var \$_avoidTableNameValidation = true;
     function {$options['join_class_name']}()
     {
         \$this->setModelName(\"{$options['join_class_name']}\");

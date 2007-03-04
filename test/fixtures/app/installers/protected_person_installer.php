@@ -9,6 +9,7 @@ class ProtectedPersonInstaller extends AkInstaller
           name string(32) not null,
           birthday datetime,
           is_active boolean not null default 1,
+			 credit_points int default 1000,
           created_by int default null,
           created_at,
           updated_at

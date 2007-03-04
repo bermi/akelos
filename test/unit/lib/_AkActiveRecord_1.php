@@ -85,8 +85,8 @@ class test_AkActiveRecord extends  UnitTestCase
             '<?php class AkTestMember extends AkTestUser { 
             //var $_inheritanceColumn = "ak_test_user_id";
                 function AkTestMember(){
-                    $this->init(@(array)func_get_args());
                     $this->setTableName("ak_test_members");
+                    $this->init(@(array)func_get_args());
                 }
             } ?>';
             break;
@@ -276,10 +276,10 @@ class test_AkActiveRecord extends  UnitTestCase
         $this->assertErrorPattern('/ak_test_user/',$AkTestUser->setTableName('ak_test_user'));
 
         $this->_createNewTestingModel('AkTestUnavailableDatabase');
-        $AkTestUnavailableDatabase = new AkTestUnavailableDatabase();
-        $this->assertEqual($AkTestUnavailableDatabase->getModelName(), 'AkTestUnavailableDatabase');
-        define('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES', true);
-        $this->assertErrorPattern('/AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES/',$AkTestUnavailableDatabase->getTableName());
+        //$AkTestUnavailableDatabase = new AkTestUnavailableDatabase();
+        //$this->assertEqual($AkTestUnavailableDatabase->getModelName(), 'AkTestUnavailableDatabase');
+        ak_define('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES', true);
+        //$this->assertErrorPattern('/Ooops! Could not fetch details for the table ak_test_unavailable_database./',$AkTestUnavailableDatabase->getTableName());
     }
 
     function Test_of_attributesFromColumnDefinition()
@@ -287,12 +287,12 @@ class test_AkActiveRecord extends  UnitTestCase
         $User = new AkTestUser();
         $input = array('first_name'=>'Bermi','last_name'=>'Ferrer Martinez','not_valid'=>'Invalid value','id'=>123);
         $expected = array('first_name'=>'Bermi','last_name'=>'Ferrer Martinez','id'=>123);
-        $got = $User->attributesFromColumnDefinition($input);
+        $got = $User->filterForeignAndProtectedAttributes($input);
         $this->assertEqual($got,$expected);
 
         $User->setProtectedAttributes('last_name');
         $expected = array('first_name'=>'Bermi','id'=>123);
-        $got = $User->attributesFromColumnDefinition($input);
+        $got = $User->filterForeignAndProtectedAttributes($input);
         $this->assertEqual($got,$expected);
 
     }
@@ -310,23 +310,13 @@ class test_AkActiveRecord extends  UnitTestCase
         $this->assertFalse($User->descendsFromActiveRecord($Object));
     }
     
-    function Test_of_set_and_getModelName()
+    function Test_of_getModelName()
     {
         $AkTestUser = new AkTestUser();
         $this->assertEqual($AkTestUser->getModelName(), 'AkTestUser');
 
         $AkTestField = new AkTestField();
         $this->assertEqual($AkTestField->getModelName(), 'AkTestField');
-
-        if(AK_PHP5){
-            $AkInvalidModel = new AkActiveRecord();
-            $this->assertEqual($AkInvalidModel->getModelName(), 'AkActiveRecord');
-        }else{
-            $AkInvalidModel = new AkActiveRecord();
-            $AkInvalidModel->setModelName('CustomModelName');
-            $this->assertEqual($AkInvalidModel->getModelName(), 'CustomModelName');
-        }
-
     }
     
     
@@ -828,7 +818,7 @@ class test_AkActiveRecord extends  UnitTestCase
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $User->setProtectedAttributes('first_name','last_name','name','country','email');
         $expected = array('first_name', 'last_name', 'name', 'country', 'email');
-        $this->assertEqual($expected, $User->_protectedAtributes);
+        $this->assertEqual($expected, $User->_protectedAttributes);
     }
 
     function Test_of_setAttribute()

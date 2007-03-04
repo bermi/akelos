@@ -19,6 +19,11 @@ Niels Ganser
 
  - AkActsAsTree.php unit tested new feature 2006-09-20
 
+ Kaste
+
+  - AkInstaller patch and new unit test. 2007-02-25
+  - AkActiveRecord::accessibleAttributes patch and new unit test. 2007-02-26
+  - AkActiveRecord refactoring and improvement. 2007-03-03
 
 
 Contributions submitted as patches
@@ -31,11 +36,6 @@ Naixn
 Stephen Reay
 
  - AkXhtmlValidator.php patch. 2007-02-23
-
-Kaste
-
-  - AkInstaller patch and new unit test. 2007-02-25
-  - AkActiveRecord::accessibleAttributes patch and new unit test. 2007-02-26
 
 
 Special thanks to David Heinemeier Hansson and the Rails community for creating 

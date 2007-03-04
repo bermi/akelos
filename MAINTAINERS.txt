@@ -4,6 +4,8 @@ Jose Salavert <salavert-a-t-akelos-d.ot-co.m> Core Contributor
 
 Niels Ganser <niels.ganser.nospam-gmail-d.ot-co.m> Core Contributor
 
+Kaste <thdz DOT x gmx net> Core Contributor
+
 See THANKS.txt for the complete list of people who has made Akelos possible
 
 ...your name here? Send your patches to http://www.akelos.org

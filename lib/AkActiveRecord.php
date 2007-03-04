@@ -11,40 +11,24 @@
 /**
  * @package AkelosFramework
  * @subpackage AkActiveRecord
- * @author Bermi Ferrer <bermi a.t akelos c.om>
+ * @author Bermi Ferrer <bermi a.t akelos c.om> 2004 - 2007
+ * @author Kaste 2007
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php');
 
-if(!defined('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES')){
-    define('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES', true);
-}
-if(!defined('AK_ACTIVE_RECORD_ENABLE_PERSISTENCE')){
-    define('AK_ACTIVE_RECORD_ENABLE_PERSISTENCE', true);
-}
-if(!defined('AK_NOT_EMPTY_REGULAR_EXPRESSION')){
-    define('AK_NOT_EMPTY_REGULAR_EXPRESSION','/.+/');
-}
-if(!defined('AK_EMAIL_REGULAR_EXPRESSION')){
-    define('AK_EMAIL_REGULAR_EXPRESSION',"/^([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)$/i");
-}
-if(!defined('AK_NUMBER_REGULAR_EXPRESSION')){
-    define('AK_NUMBER_REGULAR_EXPRESSION',"/^[0-9]+$/");
-}
-if(!defined('AK_PHONE_REGULAR_EXPRESSION')){
-    define('AK_PHONE_REGULAR_EXPRESSION',"/^([\+]?[(]?[\+]?[ ]?[0-9]{2,3}[)]?[ ]?)?[0-9 ()\-]{4,25}$/");
-}
-if(!defined('AK_DATE_REGULAR_EXPRESSION')){
-    define('AK_DATE_REGULAR_EXPRESSION',"/^(([0-9]{1,2}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{2,4})|([0-9]{2,4}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{1,2})){1}$/");
-}
-if(!defined('AK_IP4_REGULAR_EXPRESSION')){
-    define('AK_IP4_REGULAR_EXPRESSION',"/^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/");
-}
-if(!defined('AK_POST_CODE_REGULAR_EXPRESSION')){
-    define('AK_POST_CODE_REGULAR_EXPRESSION',"/^[0-9A-Za-z  -]{2,9}$/");
-}
+ak_define('ACTIVE_RECORD_VALIDATE_TABLE_NAMES', true);
+ak_define('ACTIVE_RECORD_ENABLE_PERSISTENCE', true);
+ak_define('ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS', false);
+ak_define('NOT_EMPTY_REGULAR_EXPRESSION','/.+/');
+ak_define('EMAIL_REGULAR_EXPRESSION',"/^([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)$/i");
+ak_define('NUMBER_REGULAR_EXPRESSION',"/^[0-9]+$/");
+ak_define('PHONE_REGULAR_EXPRESSION',"/^([\+]?[(]?[\+]?[ ]?[0-9]{2,3}[)]?[ ]?)?[0-9 ()\-]{4,25}$/");
+ak_define('DATE_REGULAR_EXPRESSION',"/^(([0-9]{1,2}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{2,4})|([0-9]{2,4}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{1,2})){1}$/");
+ak_define('IP4_REGULAR_EXPRESSION',"/^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/");
+ak_define('POST_CODE_REGULAR_EXPRESSION',"/^[0-9A-Za-z  -]{2,9}$/");
 
 Ak::compat('array_combine');
 
@@ -184,7 +168,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     var $_attributes = array();
 
-    var $_protectedAtributes = array();
+    var $_protectedAttributes = array();
     var $_accessibleAttributes = array();
 
     var $_recordTimestamps = true;
@@ -259,14 +243,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         if(!empty($this->combined_attributes)){
             foreach ($this->combined_attributes as $combined_attribute){
-                call_user_func_array(array(&$this,'addCombinedAttributeConfiguration'), $combined_attribute);
+                $this->addCombinedAttributeConfiguration($combined_attribute);
             }
         }
 
-        //$this->initiateAssociations();
-
-
-        // new AkActiveRecord(array('username'=>'bermi','pass'=>'mypass')); Sets attributes for creating a new entry or finding a new record
         if(isset($attributes[0]) && is_array($attributes[0]) && count($attributes) === 1){
             $attributes = $attributes[0];
             $this->_newRecord = true;
@@ -288,22 +268,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $avoid_loading_associations = isset($attributes[1]['load_associations']) ? false : !empty($this->disableAutomatedAssociationLoading);
             $this->setAttributes($attributes[1], true);
         }else{
-            $this->_newRecord = true;
-            // new AkActiveRecord('username->','bermi','pass->','mypass'); // Sets attributes for creating a new entry or finding a new record using an special sintax
-            if(isset($attributes[0]) && !is_array($attributes[0])){
-                $this->parseAkelosArgs($attributes);
-            }
-            $attributes = $this->attributesFromColumnDefinition($attributes);
-
-            foreach ($attributes as $k=>$v){
-                $this->setAttribute($k, $v);
-            }
-
-            $this->composeCombinedAttributes();
-        }
-
-        if(count($attributes) === 0){
-            $this->_newRecord = true;
+            $this->newRecord($attributes);
         }
 
         $this->_buildFinders();
@@ -318,7 +283,11 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
 
     /**
-    * If this macro is used, only those attributed named in it will be accessible for mass-assignment, such as new ModelName($attributes) and $this->attributes($attributes). This is the more conservative choice for mass-assignment protection. If you?d rather start from an all-open default and restrict attributes as needed, have a look at AkActiveRecord::attrProtected.
+    * If this macro is used, only those attributed named in it will be accessible 
+    * for mass-assignment, such as new ModelName($attributes) and $this->attributes($attributes). 
+    * This is the more conservative choice for mass-assignment protection. 
+    * If you'd rather start from an all-open default and restrict attributes as needed, 
+    * have a look at AkActiveRecord::setProtectedAttributes().
     */
     function setAccessibleAttributes()
     {
@@ -327,29 +296,34 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
     /**
-Attributes named in this macro are protected from mass-assignment, such as new ModelName($attributes) and $this->attributes(attributes). Their assignment will simply be ignored. Instead, you can use the direct writer methods to do assignment. This is meant to protect sensitive attributes to be overwritten by URL/form hackers. Example:
-<code>
-  class Customer extends AkActiveRecord
-  {
-    function Customer()
-    {
-        $this->setProtectedAttributes('credit_rating');
-    }
-  }
-
-  $Customer = new Customer('name' => 'David', 'credit_rating' => 'Excellent');
-  $Customer->credit_rating // => null
-  $Customer->attributes(array('description' => 'Jolly fellow', 'credit_rating' => 'Superb'));
-  $Customer->credit_rating // => null
-
-  $Customer->credit_rating = 'Average'
-  $Customer->credit_rating // => 'Average'
-</code>
-*/    
+     * Attributes named in this macro are protected from mass-assignment, such as 
+     * new ModelName($attributes) and $this->attributes(attributes). Their assignment 
+     * will simply be ignored. Instead, you can use the direct writer methods to do assignment. 
+     * This is meant to protect sensitive attributes to be overwritten by URL/form hackers. 
+     * 
+     * Example:
+     * <code>
+     *   class Customer extends AkActiveRecord
+     *    {
+     *      function Customer()
+     *      {
+     *          $this->setProtectedAttributes('credit_rating');
+     *      }
+     *    }
+     *  
+     *    $Customer = new Customer('name' => 'David', 'credit_rating' => 'Excellent');
+     *    $Customer->credit_rating // => null
+     *    $Customer->attributes(array('description' => 'Jolly fellow', 'credit_rating' => 'Superb'));
+     *    $Customer->credit_rating // => null
+     *  
+     *    $Customer->credit_rating = 'Average'
+     *    $Customer->credit_rating // => 'Average'
+     *  </code>
+     */    
     function setProtectedAttributes()
     {
         $args = func_get_args();
-        $this->_protectedAtributes = array_unique(array_merge((array)$this->_protectedAtributes, $args));
+        $this->_protectedAttributes = array_unique(array_merge((array)$this->_protectedAttributes, $args));
     }
 
 
@@ -362,7 +336,8 @@ Attributes named in this macro are protected from mass-assignment, such as new M
     }
 
     /**
-    * Returns the connection currently associated with the class. This can also be used to "borrow" the connection to do database work unrelated to any of the specific Active Records.
+    * Returns the connection currently associated with the class. This can also be used to 
+    * "borrow" the connection to do database work unrelated to any of the specific Active Records.
     */
     function &getConnection()
     {
@@ -378,7 +353,8 @@ Attributes named in this macro are protected from mass-assignment, such as new M
     }
 
     /**
-    * Returns an array of columns objects where the primary id, all columns ending in "_id" or "_count", and columns used for single table inheritance has been removed.
+    * Returns an array of columns objects where the primary id, all columns ending in "_id" or "_count", 
+    * and columns used for single table inheritance has been removed.
     */
     function getContentColumns()
     {
@@ -396,7 +372,8 @@ Attributes named in this macro are protected from mass-assignment, such as new M
 
 
     /**
-    * Creates an object, instantly saves it as a record (if the validation permits it), and returns it. If the save fail under validations, the unsaved object is still returned.
+    * Creates an object, instantly saves it as a record (if the validation permits it), and returns it. 
+    * If the save fail under validations, the unsaved object is still returned.
     */
     function &create($attributes = null)
     {
@@ -407,7 +384,6 @@ Attributes named in this macro are protected from mass-assignment, such as new M
         if(func_num_args() > 1){
             $attributes = func_get_args();
         }
-        $this->parseAkelosArgs($attributes);
         $model = $this->getModelName();
 
         $object =& new $model();
@@ -418,7 +394,9 @@ Attributes named in this macro are protected from mass-assignment, such as new M
 
 
     /**
-      * Returns the number of records that meet the 'conditions'. Zero is returned if no records match. Example:
+      * Returns the number of records that meet the 'conditions'. Zero is returned if no records match. 
+      * 
+      * Example:
       *   $Product->count("sales > 1");
       */
     function count($conditions = null, $joins = null)
@@ -437,6 +415,7 @@ Attributes named in this macro are protected from mass-assignment, such as new M
 
     /**
       * Returns the result of an SQL statement that should only include a COUNT(*) in the SELECT part.
+      * 
       *   $Product->countBySql("SELECT COUNT(*) FROM sales s, customers c WHERE s.customer_id = c.id");
       */
     function countBySql($sql)
@@ -456,7 +435,11 @@ Attributes named in this macro are protected from mass-assignment, such as new M
     }
 
     /**
-    * Increments the specified counter by one. So $DiscussionBoard->incrementCounter("post_count", $discussion_board_id); would increment the "post_count" counter on the board responding to $discussion_board_id. This is used for caching aggregate values, so that they doesn't need to be computed every time. Especially important for looping over a collection where each element require a number of aggregate values. Like the $DiscussionBoard that needs to list both the number of posts and comments.
+    * Increments the specified counter by one. So $DiscussionBoard->incrementCounter("post_count", 
+    * $discussion_board_id); would increment the "post_count" counter on the board responding to 
+    * $discussion_board_id. This is used for caching aggregate values, so that they doesn't need to 
+    * be computed every time. Especially important for looping over a collection where each element 
+    * require a number of aggregate values. Like the $DiscussionBoard that needs to list both the number of posts and comments.
     */
     function incrementCounter($counter_name, $id, $difference = 1)
     {
@@ -483,7 +466,8 @@ Attributes named in this macro are protected from mass-assignment, such as new M
 
 
     /**
-    * Finds the record from the passed id, instantly saves it with the passed attributes (if the validation permits it), and returns it. If the save fail under validations, the unsaved object is still returned.
+    * Finds the record from the passed id, instantly saves it with the passed attributes (if the validation permits it), 
+    * and returns it. If the save fail under validations, the unsaved object is still returned.
     */
     function update($id, $attributes)
     {
@@ -492,19 +476,21 @@ Attributes named in this macro are protected from mass-assignment, such as new M
         }
         if(is_array($id)){
             $results = array();
-            foreach ($id as $single_id){
-                $results[] = $this->update($single_id, $attributes);
+            foreach ($id as $idx=>$single_id){
+                $results[] = $this->update($single_id, isset($attributes[$idx]) ? $attributes[$idx] : $attributes);
             }
             return $results;
         }else{
-            $object = $this->find($id);
-            $object->updateAttributes($attributes, $object);
+            $object =& $this->find($id);
+            $object->updateAttributes($attributes);
             return $object;
         }
     }
 
     /**
-    * Updates a single attribute and saves the record. This is especially useful for boolean flags on existing records. Note: Make sure that updates made with this method doesn't get subjected to validation checks. Hence, attributes can be updated even if the full object isn't valid.
+    * Updates a single attribute and saves the record. This is especially useful for boolean flags on existing records. 
+    * Note: Make sure that updates made with this method doesn't get subjected to validation checks. 
+    * Hence, attributes can be updated even if the full object isn't valid.
     */
     function updateAttribute($name, $value)
     {
@@ -514,13 +500,12 @@ Attributes named in this macro are protected from mass-assignment, such as new M
 
 
     /**
-    * Updates all the attributes in from the passed array and saves the record. If the object is invalid, the saving will fail and false will be returned.
+    * Updates all the attributes in from the passed array and saves the record. If the object is 
+    * invalid, the saving will fail and false will be returned.
     */
     function updateAttributes($attributes, $object = null)
     {
-        foreach ($attributes as $attribute=>$value){
-            isset($object) ? $object->setAttribute($attribute, $value) : $this->setAttribute($attribute, $value);
-        }
+        isset($object) ? $object->setAttributes($attributes) : $this->setAttributes($attributes);
 
         return isset($object) ? $object->save() : $this->save();
     }
@@ -529,8 +514,12 @@ Attributes named in this macro are protected from mass-assignment, such as new M
 
 
     /**
-    * Updates all records with the SET-part of an SQL update statement in updates and returns an integer with the number of rows updates. A subset of the records can be selected by specifying conditions. Example:
+    * Updates all records with the SET-part of an SQL update statement in updates and returns an 
+    * integer with the number of rows updates. A subset of the records can be selected by specifying conditions. Example:
     * <code>$Billing->updateAll("category = 'authorized', approved = 1", "author = 'David'");</code>
+    * 
+    * Important note: Condifitons are not sanitized yet so beware of accepting 
+    * variable conditions when using this function
     */
     function updateAll($updates, $conditions = null)
     {
@@ -550,7 +539,8 @@ Attributes named in this macro are protected from mass-assignment, such as new M
 
 
     /**
-    * Deletes the record with the given id without instantiating an object first. If an array of ids is provided, all of them are deleted.
+    * Deletes the record with the given id without instantiating an object first. If an array of 
+    * ids is provided, all of them are deleted.
     */
     function delete($id)
     {
@@ -589,8 +579,13 @@ Attributes named in this macro are protected from mass-assignment, such as new M
 
 
     /**
-    * Deletes all the records that matches the condition without instantiating the objects first (and hence not calling the destroy method). Example:
+    * Deletes all the records that matches the condition without instantiating the objects first 
+    * (and hence not calling the destroy method). Example:
+    * 
     * <code>$Post->destroyAll("person_id = 5 AND (category = 'Something' OR category = 'Else')");</code>
+    * 
+    * Important note: Condifitons are not sanitized yet so beware of accepting 
+    * variable conditions when using this function
     */
     function deleteAll($conditions = null)
     {
@@ -611,8 +606,10 @@ Attributes named in this macro are protected from mass-assignment, such as new M
 
 
     /**
-    * Destroys the record with the given id by instantiating the object and calling destroy (all the callbacks are the triggered). If an array of ids is provided, all of them are destroyed.
-    * Deletes the record in the database and freezes this instance to reflect that no changes should be made (since they can't be persisted).
+    * Destroys the record with the given id by instantiating the object and calling destroy 
+    * (all the callbacks are the triggered). If an array of ids is provided, all of them are destroyed.
+    * Deletes the record in the database and freezes this instance to reflect that no changes should be 
+    * made (since they can't be persisted).
     */
     function destroy($id = null)
     {
@@ -643,9 +640,7 @@ Attributes named in this macro are protected from mass-assignment, such as new M
             if(!$this->isNewRecord()){
                 if($this->beforeDestroy()){
                     $this->notifyObservers('beforeDestroy');
-                    /**
-                    * @todo sanitize and quote id
-                    */
+
                     $sql = 'DELETE FROM '.$this->getTableName().' WHERE '.$this->getPrimaryKey().' = '.$this->_db->qstr($this->getId());
 
                     if(!$this->_db->Execute($sql) && AK_DEBUG){
@@ -683,8 +678,12 @@ Attributes named in this macro are protected from mass-assignment, such as new M
 
 
     /**
-    * Destroys the objects for all the records that matches the condition by instantiating each object and calling the destroy method. Example:
-    * $Person->destroyAll("last_login < '2004-04-04'");
+    * Destroys the objects for all the records that matches the condition by instantiating 
+    * each object and calling the destroy method. 
+    * 
+    * Example:
+    * 
+    *   $Person->destroyAll("last_login < '2004-04-04'");
     */    
     function destroyAll($conditions)
     {
@@ -707,26 +706,27 @@ Attributes named in this macro are protected from mass-assignment, such as new M
 
 
     /**
-    * Establishes the connection to the database. Accepts an array as input where the 'adapter' key must be specified with the name of a database adapter (in lower-case) example for regular databases (MySQL, Postgresql, etc):
-
-      $AkActiveRecord->establishConnection(
-        array(
-        'adapter'  => "mysql",
-        'host'     => "localhost",
-        'username' => "myuser",
-        'password' => "mypass",
-        'database' => "somedatabase"
-        )
-    )
-
-    Example for SQLite database:
-
-      $AkActiveRecord->establishConnection(
-        array(
-        'adapter' => "sqlite",
-        'dbfile'  => "path/to/dbfile"
-        )
-      )
+    * Establishes the connection to the database. Accepts an array as input where the 'adapter' 
+    * key must be specified with the name of a database adapter (in lower-case) example for regular 
+    * databases (MySQL, Postgresql, etc):
+    * 
+    *   $AkActiveRecord->establishConnection(
+    *       array(
+    *       'adapter'  => "mysql",
+    *       'host'     => "localhost",
+    *       'username' => "myuser",
+    *       'password' => "mypass",
+    *       'database' => "somedatabase"
+    *       ));
+    *
+    *    Example for SQLite database:
+    *
+    *     $AkActiveRecord->establishConnection(
+    *       array(
+    *       'adapter' => "sqlite",
+    *       'dbfile'  => "path/to/dbfile"
+    *       )
+    *     )
     */
     function &establishConnection($spec = null)
     {
@@ -773,21 +773,25 @@ Attributes named in this macro are protected from mass-assignment, such as new M
 
 
     /**
-Find operates with three different retrieval approaches:
-
-    * Find by id: This can either be a specific id find(1), a list of ids find(1, 5, 6), or an array of ids find(array(5, 6, 10)). If no record can be found for all of the listed ids, then RecordNotFound will be raised.
-    * Find first: This will return the first record matched by the options used. These options can either be specific conditions or merely an order. If no record can matched, false is returned.
-    * Find all: This will return all the records matched by the options used. If no records are found, an empty array is returned.
-
-All approaches accepts an $option array as their last parameter. The options are:
-
+     * Find operates with three different retrieval approaches:
+    * * Find by id: This can either be a specific id find(1), a list of ids find(1, 5, 6), 
+    *   or an array of ids find(array(5, 6, 10)). If no record can be found for all of the listed ids, 
+    *   then RecordNotFound will be raised.
+    * * Find first: This will return the first record matched by the options used. These options 
+    *   can either be specific conditions or merely an order. 
+    *   If no record can matched, false is returned.
+    * * Find all: This will return all the records matched by the options used. If no records are found, an empty array is returned.
+    * 
+    * All approaches accepts an $option array as their last parameter. The options are:
+    * 
     * 'conditions' => An SQL fragment like "administrator = 1" or array("user_name = ?" => $username). See conditions in the intro.
     * 'order' => An SQL fragment like "created_at DESC, name".
     * 'limit' => An integer determining the limit on the number of rows that should be returned.
     * 'offset' => An integer determining the offset from where the rows should be fetched. So at 5, it would skip the first 4 rows.
     * 'joins' => An SQL fragment for additional joins like "LEFT JOIN comments ON comments.post_id = $id". (Rarely needed).
-    * 'include' => Names associations that should be loaded alongside using LEFT OUTER JOINs. The symbols named refer to already defined associations. See eager loading under Associations.
-
+    * 'include' => Names associations that should be loaded alongside using LEFT OUTER JOINs. The symbols 
+    * named refer to already defined associations. See eager loading under Associations.
+    * 
 Examples for find by id:
 
   $Person->find(1);       // returns the object for ID = 1
@@ -1547,23 +1551,23 @@ Examples for find all:
 
     /**
     * New objects can be instantiated as either empty (pass no construction parameter) or pre-set with attributes but not yet saved
-    * (pass a hash with key names matching the associated table column names). 
+    * (pass an array with key names matching the associated table column names). 
     * In both instances, valid attribute keys are determined by the column names of the associated table ? hence you can't 
     * have attributes that aren't part of the table columns.
     */
     function newRecord($attributes)
     {
         $this->_newRecord = true;
+        
+        if(AK_ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS && empty($attributes)){
+            return;
+        }
+
         if(isset($attributes) && !is_array($attributes)){
             $attributes = func_get_args();
-            $this->parseAkelosArgs($attributes);
         }
-        $attributes = $this->attributesFromColumnDefinition($attributes);
-
-        foreach ($attributes as $k=>$v){
-            $this->setAttribute($k, $v);
-        }
-        $this->composeCombinedAttributes();
+        $this->setAttributes($this->attributesFromColumnDefinition(),true);
+        $this->setAttributes($attributes);
     }
 
 
@@ -1704,7 +1708,12 @@ Examples for find all:
 
 
     /**
-    * Allows you to set all the attributes at once by passing in an array with keys matching the attribute names (which again matches the column names). Sensitive attributes can be protected from this form of mass-assignment by using the $this->setProtectedAttributes method. Or you can alternatively specify which attributes can be accessed in with the $this->setAccessibleAttributes method. Then all the attributes not included in that won?t be allowed to be mass-assigned.
+    * Allows you to set all the attributes at once by passing in an array with 
+    * keys matching the attribute names (which again matches the column names). 
+    * Sensitive attributes can be protected from this form of mass-assignment by 
+    * using the $this->setProtectedAttributes method. Or you can alternatively 
+    * specify which attributes can be accessed in with the $this->setAccessibleAttributes method. 
+    * Then all the attributes not included in that won?t be allowed to be mass-assigned.
     */
     function setAttributes($attributes, $override_attribute_protection = false)
     {
@@ -1727,9 +1736,9 @@ Examples for find all:
                     unset($attributes[$k]);
                 }
             }
-        }elseif (!empty($this->_protectedAtributes) && is_array($this->_protectedAtributes) &&  is_array($attributes)){
+        }elseif (!empty($this->_protectedAttributes) && is_array($this->_protectedAttributes) &&  is_array($attributes)){
             foreach (array_keys($attributes) as $k){
-                if(in_array($k,$this->_protectedAtributes)){
+                if(in_array($k,$this->_protectedAttributes)){
                     unset($attributes[$k]);
                 }
             }
@@ -1833,7 +1842,7 @@ Examples for find all:
         }else{
             $attribute = array_shift($args);
             $this->_combinedAttributes[$attribute] = $args;
-            $this->composeCombinedAttributes();
+            $this->composeCombinedAttribute($attribute);
         }
     }
 
@@ -2202,25 +2211,41 @@ Examples for find all:
         return null;
     }
 
-
     /**
-        Quote strings appropriately for SQL statements.
-        that a new instance, or one populated from a passed-in array, still has all the attributes
-        that instances loaded from the database would.
+    * unused function; misleading named attributesFromColumnDefinition
     */
-    function attributesFromColumnDefinition($attributes)
+    function filterForeignAndProtectedAttributes($attributes)
     {
         $filtered_attributes = array();
         if(is_array($attributes)){
             foreach ($attributes as $k=>$v){
-                if($this->hasAttribute($k) &&  !in_array($k, $this->_protectedAtributes)){
+                if($this->hasAttribute($k) &&  !in_array($k, $this->_protectedAttributes)){
                     $filtered_attributes[$k] = $v;
-                }
+                } 
             }
         }
         return $filtered_attributes;
     }
-
+    
+    /**
+    * Initializes the attributes array with keys matching the columns from the linked table and
+    * the values matching the corresponding default value of that column, so
+    * that a new instance, or one populated from a passed-in Hash, still has all the attributes
+    * that instances loaded from the database would.
+    */
+    function attributesFromColumnDefinition()
+    {
+        $attributes = array();
+        $availableColumns = $this->getColumns();
+        foreach ($availableColumns as $column_name=>$column_settings){
+            if (!isset($column_settings['primaryKey']) && isset($column_settings['hasDefault'])) {
+                $attributes[$column_name] = $column_settings['defaultValue'];
+            } else {
+                $attributes[$column_name] = null;
+            }
+        }
+        return $attributes;
+    }
 
     /**
     * Returns the primary key field.
@@ -2336,7 +2361,7 @@ Examples for find all:
             $this->loadColumnsSettings();
             $this->initiateColumnsToNull();
         }
-        return $this->_columnsSettings;
+        return isset($this->_columnsSettings) ? $this->_columnsSettings : array();
     }
 
     function loadColumnsSettings()
@@ -2354,20 +2379,22 @@ Examples for find all:
 
             $column_objects = $this->_databaseTableInternals($this->getTableName());
 
-            if(!is_array($column_objects)){
+            if(!isset($this->_avoidTableNameValidation) && !is_array($column_objects)){
                 trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())), E_USER_ERROR);
                 return false;
-            }else{
+            }elseif(is_array($column_objects)){
                 foreach ($column_objects as $column_object){
                     $this->setColumnSettings($column_object->name, $column_object);
                 }
             }
-            $_SESSION['__activeRecordColumnsSettingsCache'][$model_name.'_column_settings'] = $this->_columnsSettings;
+            if(!empty($this->_columnsSettings)){
+                $_SESSION['__activeRecordColumnsSettingsCache'][$model_name.'_column_settings'] = $this->_columnsSettings;
+            }
         }else{
             $this->_columnsSettings = $_SESSION['__activeRecordColumnsSettingsCache'][$model_name.'_column_settings'];
         }
 
-        return $this->_columnsSettings;
+        return isset($this->_columnsSettings) ? $this->_columnsSettings : array();
     }
 
 
@@ -2552,7 +2579,7 @@ Examples for find all:
 
     function initiateColumnsToNull()
     {
-        array_map(array(&$this,'initiateAttributeToNull'),array_keys($this->_columnsSettings));
+        array_map(array(&$this,'initiateAttributeToNull'),array_keys(isset($this->_columnsSettings) ? $this->_columnsSettings : array()));
     }
 
 
