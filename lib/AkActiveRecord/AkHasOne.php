@@ -105,7 +105,7 @@ class AkHasOne extends AkAssociation
         }
 
         $this->_build($association_id, &$Associated);
-
+        $this->Owner->$association_id->_loaded = true;
         return $Associated;
     }
 
@@ -174,7 +174,8 @@ class AkHasOne extends AkAssociation
         $record =& new $class_name($attributes);
         if ($replace_existing){
             $record =& $this->replace($association_id, $record, true);
-        }elseif(!$this->Owner->isNewRecord()){
+        }
+        if(!$this->Owner->isNewRecord()){
             $record->set($foreign_key, $this->Owner->getId());
         }
 
@@ -193,6 +194,7 @@ class AkHasOne extends AkAssociation
     {
         $this->build($association_id, $attributes, $replace_existing);
         $this->Owner->$association_id->save();
+        $this->Owner->$association_id->_loaded = true;
         return $this->Owner->$association_id;
     }
 
@@ -291,7 +293,6 @@ class AkHasOne extends AkAssociation
     function afterSave(&$object)
     {
         $success = true;
-
         $associated_ids = $object->getAssociatedIds();
 
         foreach ($associated_ids as $associated_id){

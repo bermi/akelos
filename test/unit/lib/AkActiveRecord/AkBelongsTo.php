@@ -10,7 +10,7 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
 {
-
+    /**/
     function test_start()
     {
         require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
@@ -130,9 +130,13 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
         //$this->assertReference($CarletPic->prueba, $Thumbnail);
 
         $this->assertTrue($CarletPic->save());
+        
+        $this->assertEqual($CarletPic->main_thumbnail->caption, 'Our Office');
 
         $this->assertFalse($Thumbnail->findFirstBy('caption','Carlet'));
-
+        
+        $this->assertTrue($OfficeThumbnail =& $Thumbnail->findFirstBy('caption', 'Our Office'));
+        $this->assertEqual($OfficeThumbnail->getId(), $CarletPic->main_thumbnail->getId());
         $Thumbnail =& new Thumbnail(array('caption'=>'Lucky (our pet)'));
 
         $CarletPic->main_thumbnail->replace($Thumbnail);
@@ -235,9 +239,11 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
 
         $Altea =& new Picture(array('title'=>'Altea3'));
         $Altea->main_thumbnail->assign(new Thumbnail(array('caption'=>'Altea3')));
+        
         $this->assertTrue($Altea->main_thumbnail->isNewRecord());
         $this->assertEqual($Altea->main_thumbnail->getType(), 'Thumbnail');
         $this->assertTrue($Altea->save());
+
         $this->assertFalse($Altea->main_thumbnail->isNewRecord());
 
         $Altea->main_thumbnail->replace(new  Thumbnail(array('caption'=>'3rd Altea pic')));

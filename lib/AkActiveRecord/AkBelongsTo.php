@@ -267,22 +267,6 @@ class AkBelongsTo extends AkAssociation
         return true;
     }
 
-    function afterCreate(&$object)
-    {
-        $association_ids = $object->getAssociatedIds();
-        foreach ($association_ids as $association_id){
-            if(
-            (!empty($object->$association_id) && is_object($object->$association_id)) &&
-            strtolower($object->belongsTo->getOption($association_id, 'class_name')) == strtolower($object->$association_id->getType())){
-                $primary_key_name = $this->Owner->belongsTo->getOption($association_id, 'primary_key_name');
-                if($this->Owner->belongsTo->getOption($association_id, 'counter_cache')){
-                    $object->$association_id->incrementCounter(AkInflector::pluralize($association_id).'_count', $object->get($primary_key_name));
-                }
-            }
-        }
-        return true;
-    }
-
     function beforeDestroy(&$object)
     {
         $association_ids = $object->getAssociatedIds();

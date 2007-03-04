@@ -12,6 +12,11 @@ if(!defined('ALL_TESTS_RUNNER') && empty($test)){
     @session_start();
 }
 
+if(!ALL_TESTS_RUNNER){
+    foreach (Ak::dir(AK_LIB_TESTS_DIRECTORY.DS.'AkActiveRecord') as $active_record_test){
+        $test->addTestFile(AK_LIB_TESTS_DIRECTORY.DS.'AkActiveRecord'.DS.$active_record_test);
+    }
+}
 
 $partial_tests = array(
 'AkActiveRecord_1',

@@ -2383,7 +2383,7 @@ Examples for find all:
 
         $this->_columnsSettings[$column_name]['type'] = $this->getAkelosDataType($column_object);
         if(!empty($column_object->primary_key)){
-            $this->_primaryKey = $column_object->name;
+            $this->_primaryKey = empty($this->_primaryKey) ? $column_object->name : $this->_primaryKey;
             $this->_columnsSettings[$column_name]['primaryKey'] = true;
         }
         if(!empty($column_object->auto_increment)){
