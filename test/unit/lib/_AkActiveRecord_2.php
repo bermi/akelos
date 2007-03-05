@@ -19,8 +19,8 @@ class test_AkActiveRecord_2 extends  UnitTestCase
         $User = new AkTestUser();
         $User->newRecord('last_name->','Ferrer','date->','1978-06-16','expires_on->','2120-06-16');
         $User->set('first_name','Bermi');
-        $User->set('last_name',$User->get('last_name').' Mart’nez');
-        $this->assertEqual($User->getAttributes(), array('id'=>null,'user_name'=>null,'first_name'=>'Bermi','last_name'=>'Ferrer Mart’nez','email'=>null,'country'=>null,'password'=>'*********','created_at'=>null,'updated_at'=>null,'expires_on'=>'2120-06-16'));
+        $User->set('last_name',$User->get('last_name').' MartÃ­nez');
+        $this->assertEqual($User->getAttributes(), array('id'=>null,'user_name'=>null,'first_name'=>'Bermi','last_name'=>'Ferrer MartÃ­nez','email'=>null,'country'=>null,'password'=>'*********','created_at'=>null,'updated_at'=>null,'expires_on'=>'2120-06-16'));
         $this->assertTrue($User->isNewRecord());
         
         $User = new AkTestUser();
@@ -87,22 +87,22 @@ class test_AkActiveRecord_2 extends  UnitTestCase
     */
     function Test_of_find()
     {
-        $User = new AkTestUser('first_name=>','Bermi','last_name->','Ferrer Mart’nez','user_name->','bermi','email->','bermi@example.com');
+        $User = new AkTestUser('first_name=>','Bermi','last_name->','Ferrer MartÃ­nez','user_name->','bermi','email->','bermi@example.com');
         $User->_create();
                 
-        $User = new AkTestUser('first_name=>','Hilario','last_name->','Herv‡s A–—','user_name->','hilario','email->','hilario@example.com');
+        $User = new AkTestUser('first_name=>','Hilario','last_name->','HervÃ¡s AÃ±Ã³','user_name->','hilario','email->','hilario@example.com');
         $User->_create();
                
         $Users = new AkTestUser();
         $User = $Users->find(3);
-        $this->assertTrue($User->first_name=='Bermi' && $User->last_name == 'Ferrer Mart’nez' && $User->user_name == 'bermi' && $User->email == 'bermi@example.com');
+        $this->assertTrue($User->first_name=='Bermi' && $User->last_name == 'Ferrer MartÃ­nez' && $User->user_name == 'bermi' && $User->email == 'bermi@example.com');
         
         $Users = new AkTestUser();
         $FoundUsers = $Users->find(3, 4);
         
         foreach ($FoundUsers as $User){
-            $expected1 = ($User->first_name=='Hilario' && $User->last_name == 'Herv‡s A–—' && $User->user_name == 'hilario' && $User->email == 'hilario@example.com');
-            $expected2 = ($User->first_name=='Bermi' && $User->last_name == 'Ferrer Mart’nez' && $User->user_name == 'bermi' && $User->email == 'bermi@example.com');
+            $expected1 = ($User->first_name=='Hilario' && $User->last_name == 'HervÃ¡s AÃ±Ã³' && $User->user_name == 'hilario' && $User->email == 'hilario@example.com');
+            $expected2 = ($User->first_name=='Bermi' && $User->last_name == 'Ferrer MartÃ­nez' && $User->user_name == 'bermi' && $User->email == 'bermi@example.com');
             $this->assertTrue($expected1 || $expected2);
         }
         
@@ -115,14 +115,14 @@ class test_AkActiveRecord_2 extends  UnitTestCase
         $Users = new AkTestUser();
         $GotUser = $Users->find(array(3));
         $User = $GotUser[0];
-        $this->assertTrue($User->first_name=='Bermi' && $User->last_name == 'Ferrer Mart’nez' && $User->user_name == 'bermi' && $User->email == 'bermi@example.com');
+        $this->assertTrue($User->first_name=='Bermi' && $User->last_name == 'Ferrer MartÃ­nez' && $User->user_name == 'bermi' && $User->email == 'bermi@example.com');
         
         $Users = new AkTestUser();
         $FoundUsers = $Users->find(array(3, 4));
         
         foreach ($FoundUsers as $User){
-            $expected1 = ($User->first_name=='Hilario' && $User->last_name == 'Herv‡s A–—' && $User->user_name == 'hilario' && $User->email == 'hilario@example.com');
-            $expected2 = ($User->first_name=='Bermi' && $User->last_name == 'Ferrer Mart’nez' && $User->user_name == 'bermi' && $User->email == 'bermi@example.com');
+            $expected1 = ($User->first_name=='Hilario' && $User->last_name == 'HervÃ¡s AÃ±Ã³' && $User->user_name == 'hilario' && $User->email == 'hilario@example.com');
+            $expected2 = ($User->first_name=='Bermi' && $User->last_name == 'Ferrer MartÃ­nez' && $User->user_name == 'bermi' && $User->email == 'bermi@example.com');
             $this->assertTrue($expected1 || $expected2);
         }
         
@@ -135,12 +135,12 @@ class test_AkActiveRecord_2 extends  UnitTestCase
         
         $Users = new AkTestUser();
         $User = $Users->find(3, array('conditions' => "user_name = 'bermi'", 'order' => "created_at DESC"));
-        $this->assertTrue($User->first_name=='Bermi' && $User->last_name == 'Ferrer Mart’nez' && $User->user_name == 'bermi' && $User->email == 'bermi@example.com');
+        $this->assertTrue($User->first_name=='Bermi' && $User->last_name == 'Ferrer MartÃ­nez' && $User->user_name == 'bermi' && $User->email == 'bermi@example.com');
 
 
         $Users = new AkTestUser();
         $User = $Users->find('first', array('conditions' => array("user_name = :user_name", ':user_name' => 'hilario')));
-        $this->assertTrue($User->first_name=='Hilario' && $User->last_name == 'Herv‡s A–—' && $User->user_name == 'hilario' && $User->email == 'hilario@example.com');
+        $this->assertTrue($User->first_name=='Hilario' && $User->last_name == 'HervÃ¡s AÃ±Ã³' && $User->user_name == 'hilario' && $User->email == 'hilario@example.com');
         
         $User = new AkTestUser('first_name=>','test_name','last_name->','A');
         $User->_create();
@@ -161,7 +161,7 @@ class test_AkActiveRecord_2 extends  UnitTestCase
         
         $Users = new AkTestUser();
         $User = $Users->find('first', array('order' => "last_name ASC", 'offset' => 2));
-        $this->assertTrue($User->first_name=='Hilario' && $User->last_name == 'Herv‡s A–—' && $User->user_name == 'hilario' && $User->email == 'hilario@example.com');
+        $this->assertTrue($User->first_name=='Hilario' && $User->last_name == 'HervÃ¡s AÃ±Ã³' && $User->user_name == 'hilario' && $User->email == 'hilario@example.com');
 
         $Users = new AkTestUser();
         $FoundUsers = $Users->find('all');
@@ -283,7 +283,7 @@ class test_AkActiveRecord_2 extends  UnitTestCase
         $Got = $Users->findFirst("last_name = 'Williams'");
         $this->assertEqual($Got->first_name, 'Jane');
         
-        $Got = $Users->findFirst("last_name = 'Ferrer Mart’nez'");
+        $Got = $Users->findFirst("last_name = 'Ferrer MartÃ­nez'");
         $this->assertEqual($Got->first_name, 'Bermi');
         
         $Got = $Users->findFirst();
@@ -350,18 +350,18 @@ class test_AkActiveRecord_2 extends  UnitTestCase
     {
         $Users = new AkTestUser();
         $Bermi = $Users->findFirst("first_name = 'Bermi'");
-        $Bermi->last_name = 'Ferrer Mart’nez';
+        $Bermi->last_name = 'Ferrer MartÃ­nez';
         $Bermi->createOrUpdate();
         
         $Bermi = $Users->findFirst("first_name = 'Bermi'");
-        $this->assertEqual($Bermi->last_name,'Ferrer Mart’nez');
+        $this->assertEqual($Bermi->last_name,'Ferrer MartÃ­nez');
         
         $User = new AkTestUser();
         $User->first_name = 'Vero';
-        $User->last_name = 'Mach’';
+        $User->last_name = 'MachÃ­';
         $User->createOrUpdate();
         
-        $Vero = $Users->findFirst("last_name = 'Mach’'");
+        $Vero = $Users->findFirst("last_name = 'MachÃ­'");
         $this->assertEqual($Vero->first_name,'Vero');
     }
 
@@ -370,11 +370,11 @@ class test_AkActiveRecord_2 extends  UnitTestCase
     {
         $Users = new AkTestUser();
         $Bermi = $Users->findFirst("first_name = 'Bermi'");
-        $this->assertEqual($Bermi->last_name,'Ferrer Mart’nez');
+        $this->assertEqual($Bermi->last_name,'Ferrer MartÃ­nez');
         $Bermi->set('last_name','Ferrer');
         $this->assertEqual($Bermi->last_name,'Ferrer');
         $Bermi->reload();
-        $this->assertEqual($Bermi->last_name,'Ferrer Mart’nez');
+        $this->assertEqual($Bermi->last_name,'Ferrer MartÃ­nez');
     }
     
     
@@ -399,10 +399,10 @@ class test_AkActiveRecord_2 extends  UnitTestCase
     {
         $Users = new AkTestUser();
         $Alicia = $Users->findFirst("first_name = 'Alicia'");
-        $Alicia->updateAttribute('last_name','Sadurn’');
+        $Alicia->updateAttribute('last_name','SadurnÃ­');
         
         $Alicia = $Users->findFirst("first_name = 'Alicia'");
-        $this->assertTrue($Alicia->last_name == 'Sadurn’');
+        $this->assertTrue($Alicia->last_name == 'SadurnÃ­');
         
     }
     
@@ -410,15 +410,15 @@ class test_AkActiveRecord_2 extends  UnitTestCase
     {
         $Users = new AkTestUser();
         $Hilario = $Users->findFirst("first_name = 'Hilario'");
-        $Hilario->updateAttributes(array('last_name'=>'Herv‡s'));
+        $Hilario->updateAttributes(array('last_name'=>'HervÃ¡s'));
         
         $Hilario = $Users->findFirst("first_name = 'Hilario'");
-        $this->assertTrue($Hilario->last_name == 'Herv‡s');
+        $this->assertTrue($Hilario->last_name == 'HervÃ¡s');
         
-        $Users->updateAttributes(array('last_name'=>'Herv‡s A–—'), $Hilario);
+        $Users->updateAttributes(array('last_name'=>'HervÃ¡s AÃ±Ã³'), $Hilario);
         
         $Hilario = $Users->findFirst("first_name = 'Hilario'");
-        $this->assertTrue($Hilario->last_name == 'Herv‡s A–—');
+        $this->assertTrue($Hilario->last_name == 'HervÃ¡s AÃ±Ã³');
         
     }    
 
@@ -434,18 +434,18 @@ class test_AkActiveRecord_2 extends  UnitTestCase
         $Users = new AkTestUser();
         
         $FoundUsers = $Users->findBySql("SELECT * FROM ak_test_users WHERE first_name = 'Hilario'");
-        $this->assertTrue($FoundUsers[0]->last_name == 'Herv‡s A–—');
+        $this->assertTrue($FoundUsers[0]->last_name == 'HervÃ¡s AÃ±Ã³');
         
         $FoundUsers = $Users->findBySql(array("SELECT * FROM ak_test_users WHERE first_name = ?",array('Hilario')));
-        $this->assertTrue($FoundUsers[0]->last_name == 'Herv‡s A–—');
+        $this->assertTrue($FoundUsers[0]->last_name == 'HervÃ¡s AÃ±Ã³');
         
         $FoundUsers = $Users->findBySql(array("SELECT * FROM ak_test_users WHERE first_name = ?",'Hilario'));
-        $this->assertTrue($FoundUsers[0]->last_name == 'Herv‡s A–—');
+        $this->assertTrue($FoundUsers[0]->last_name == 'HervÃ¡s AÃ±Ã³');
         
-        $FoundUsers = $Users->findBySql(array("SELECT * FROM ak_test_users WHERE last_name = ?",array('last_name'=>'Ferrer Mart’nez')));
+        $FoundUsers = $Users->findBySql(array("SELECT * FROM ak_test_users WHERE last_name = ?",array('last_name'=>'Ferrer MartÃ­nez')));
         $this->assertTrue($FoundUsers[0]->first_name == 'Bermi');
         
-        $FoundUsers = $Users->findBySql(array("SELECT * FROM ak_test_users WHERE last_name = ? AND first_name = ?",array('Ferrer Mart’nez','Bermi')));
+        $FoundUsers = $Users->findBySql(array("SELECT * FROM ak_test_users WHERE last_name = ? AND first_name = ?",array('Ferrer MartÃ­nez','Bermi')));
         $this->assertTrue($FoundUsers[0]->first_name == 'Bermi');
         
         $FoundUsers = $Users->findBySql("SELECT * FROM ak_test_users",6);
