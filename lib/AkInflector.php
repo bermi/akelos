@@ -151,6 +151,7 @@ class AkInflector
         'man' => 'men',
         'child' => 'children',
         'sex' => 'sexes',
+        'database' => 'databases',
         'move' => 'moves');
 
         $lowercased_word = strtolower($word);
