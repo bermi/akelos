@@ -52,6 +52,8 @@ class Test_of_AkInflector extends  UnitTestCase
 
     "node_child"  => "node_children",
     "child"       => "children",
+    
+    "database"    => "databases",
 
     "experience"  => "experiences",
     "day"         => "days",

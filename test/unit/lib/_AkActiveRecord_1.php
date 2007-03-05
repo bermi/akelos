@@ -587,6 +587,14 @@ class test_AkActiveRecord extends  UnitTestCase
         $User->first_name = 'Hilario';
         $User->set('last_name', 'Hervas');
         $this->assertEqual($User->get('reversed_name'), 'Hervas, Hilario');
+        
+        $User = new AkTestUser();
+        $User->addCombinedAttributeConfiguration(array('name', "%s %s", 'first_name', 'last_name')); // This is how combined attributes are added when they are set trhough a model variable
+        $User->first_name = 'Bermi';
+        $User->last_name = 'Ferrer';
+
+        $User->composeCombinedAttribute('name');
+        $this->assertEqual($User->name,'Bermi Ferrer');
 
     }
 
