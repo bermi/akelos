@@ -1110,7 +1110,7 @@ Examples for find all:
         }else{
             $objects = array();
             while ($record = $results->FetchRow()) {
-                $objects[] =& $this->instantiate($this->removeUnavailableAttributes($record), false);
+                $objects[] =& $this->instantiate($this->getOnlyAvailableAtrributes($record), false);
             }
         }
 
@@ -2883,7 +2883,7 @@ Examples for find all:
 
 
 
-    function removeUnavailableAttributes($attributes)
+    function getOnlyAvailableAtrributes($attributes)
     {
         $table_name = $this->getTableName();
         $ret_attributes = array();
@@ -2899,7 +2899,7 @@ Examples for find all:
         return $ret_attributes;
     }
 
-    function removeUnavailableColumns(&$attributes)
+    function getColumnsForAtrributes($attributes)
     {
         $ret_attributes = array();
         $table_name = $this->getTableName();
@@ -3206,7 +3206,7 @@ Examples for find all:
                 }
             }
 
-            $attributes = $this->removeUnavailableColumns($this->getAttributes());
+            $attributes = $this->getColumnsForAtrributes($this->getAttributes());
 
             if($this->isLockingEnabled()){
                 $attributes['lock_version'] = 1;

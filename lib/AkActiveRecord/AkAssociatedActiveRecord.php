@@ -378,7 +378,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 $object_id = $this_item_attributes[$this->getPrimaryKey()];
                 if(!isset($ids[$object_id])){
                     $ids[$object_id] = $i;
-                    $attributes_for_instantation = $this->removeUnavailableAttributes($this_item_attributes);
+                    $attributes_for_instantation = $this->getOnlyAvailableAtrributes($this_item_attributes);
                     $attributes_for_instantation['load_associations'] = true;
                     $objects[$i] =& $this->instantiate($attributes_for_instantation, false);
                 }else{

@@ -721,21 +721,21 @@ class test_AkActiveRecord extends  UnitTestCase
     }
 
 
-    function Test_of_removeUnavailableAttributes()
+    function Test_of_getOnlyAvailableAtrributes()
     {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $attributes = array('name'=>'Bermi Ferrer', 'email' => 'bermi@example.com', 'invalid_field'=>'value');
-        $attributes = $User->removeUnavailableAttributes($attributes);
+        $attributes = $User->getOnlyAvailableAtrributes($attributes);
         $this->assertEqual($attributes,array('name'=>'Bermi Ferrer', 'email' => 'bermi@example.com'));
     }
     
-    function Test_of_removeUnavailableColumns()
+    function Test_of_getColumnsForAtrributes()
     {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $attributes = array('name'=>'Bermi Ferrer', 'email' => 'bermi@example.com', 'invalid_field'=>'value');
-        $attributes = $User->removeUnavailableColumns($attributes);
+        $attributes = $User->getColumnsForAtrributes($attributes);
         $this->assertEqual($attributes,array('email' => 'bermi@example.com'));
     }
 
