@@ -337,15 +337,18 @@ class AkActionController extends AkObject
     * rendered within the current layout (if one exists).
     * 
     * * Renders the template for the action "goal" within the current controller
-    *   $this->render(array('action'=>'goal'));
+    *   
+    *       $this->render(array('action'=>'goal'));
     * 
     * * Renders the template for the action "short_goal" within the current controller,
-    * * but without the current active layout
-    *   $this->render(array('action'=>'short_goal','layout'=>false));
+    *   but without the current active layout
+    *   
+    *       $this->render(array('action'=>'short_goal','layout'=>false));
     * 
     * * Renders the template for the action "long_goal" within the current controller,
-    * * but with a custom layout
-    *   $this->render(array('action'=>'long_goal','layout'=>'spectacular'));
+    *   but with a custom layout
+    *   
+    *       $this->render(array('action'=>'long_goal','layout'=>'spectacular'));
     * 
     * === Rendering partials
     * 
@@ -357,21 +360,26 @@ class AkActionController extends AkObject
     * By default, the current layout is not used.
     * 
     * * Renders the partial located at app/views/controller/_win.tpl
-    *   $this->render(array('partial'=>'win'));
+    * 
+    *       $this->render(array('partial'=>'win'));
     * 
     * * Renders the partial with a status code of 500 (internal error)
-    *   $this->render(array('partial'=>'broken','status'=>500));
+    * 
+    *       $this->render(array('partial'=>'broken','status'=>500));
     * 
     * * Renders the same partial but also makes a local variable available to it
-    *   $this->render(array('partial' => 'win', 'locals' => array('name'=>'david')));
+    *   
+    *       $this->render(array('partial' => 'win', 'locals' => array('name'=>'david')));
     * 
     * * Renders a collection of the same partial by making each element of $wins available through 
-    * * the local variable "win" as it builds the complete Response
-    *   $this->render(array('partial'=>'win','collection'=>$wins));
+    *   the local variable "win" as it builds the complete Response
+    * 
+    *       $this->render(array('partial'=>'win','collection'=>$wins));
     * 
     * * Renders the same collection of partials, but also renders the win_divider partial in between
-    * * each win partial.
-    *   $this->render(array('partial'=>'win','collection'=>$wins,'spacer_template'=>'win_divider'));
+    *   each win partial.
+    *   
+    *       $this->render(array('partial'=>'win','collection'=>$wins,'spacer_template'=>'win_divider'));
     * 
     * === Rendering a template
     * 
@@ -451,7 +459,7 @@ class AkActionController extends AkObject
     {
         Ak::profile('Entering into '.__CLASS__.'::'.__FUNCTION__.' '.__FILE__.' on line '.__LINE__);
 
-        if($this->_hasPerformed()){
+        if(empty($options['partial']) && $this->_hasPerformed()){
             $this->_doubleRenderError(Ak::t("Can only render or redirect once per action"));
             return false;
         }
@@ -559,9 +567,7 @@ class AkActionController extends AkObject
         $this->variables_added = false;
         $this->performed_render = false;
         $this->_addVariablesToAssigns();
-        if(empty($object)){
-            $object =& $this;
-        }
+        $this->Template->controller =& $this;
         $this->$partial_path = $this->renderText($this->Template->renderPartial($partial_path, $object, $local_assigns), $status);
         return $this->$partial_path;
     }

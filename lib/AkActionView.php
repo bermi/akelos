@@ -34,9 +34,9 @@
 * Using sub templates allows you to sidestep tedious replication and extract common display structures in shared templates. The
 * classic example is the use of a header and footer (even though the Action Pack-way would be to use Layouts):
 *
-*   <?= $template->render("shared/header") ?>
+*   <?= $controller->render("shared/header") ?>
 *   Something really specific and terrific
-*   <?= $template->render("shared/footer") ?>
+*   <?= $controller->render("shared/footer") ?>
 *
 * As you see, we use the output embeddings for the render methods. The render call itself will just return a string holding the
 * result of the rendering. The output embedding writes it to the current template.
@@ -45,7 +45,7 @@
 * variables defined using the regular embedding tags. Like this:
 *
 *   <? $shared->page_title = "A Wonderful Hello" ?>
-*   <?= $template->render("shared/header") ?>
+*   <?= $controller->render("shared/header") ?>
 *
 * Now the header can pick up on the $page_title variable and use it for outputting a title tag:
 *
@@ -55,7 +55,7 @@
 * 
 * You can pass local variables to sub templates by using an array with the variable names as keys and the objects as values:
 *
-*   <?= $template->render("shared/header", array('headline'=>'Welcome','person'=> $person )) ?>
+*   <?= $controller->render("shared/header", array('headline'=>'Welcome','person'=> $person )) ?>
 *
 * These can now be accessed in shared/header with:
 *
@@ -89,7 +89,7 @@
 */
 class AkActionView
 {
-    var $first_render, $base_path, $assigns, $template_extension, $controller, 
+    var $first_render, $base_path, $assigns, $template_extension, $controller,
     $logger, $params, $request, $response, $session, $headers, $flash;
     var $_template_handlers = array();
     var $template_args = array();
@@ -132,7 +132,7 @@ class AkActionView
 
     function AkActionView($base_path = null, $assigns_for_first_render = array(), $controller = null)
     {
-        $this->base_path = empty($base_path) ? AK_APP_DIR.DS.'views' : $base_path;
+        $this->base_path = empty($base_path) ? AK_VIEWS_DIR : $base_path;
         $this->assigns = $assigns_for_first_render;
         $this->assigns_added = null;
         $this->controller = $controller;
@@ -177,16 +177,15 @@ class AkActionView
             if (!empty($options['file'])){
                 return $this->renderFile($options['file'], $options['use_full_path'], $options['locals']);
             }elseif (!empty($options['partial']) && !empty($options['collection'])){
-                return $this->renderPartialCollection($options['partial'], $options['collection'], $options['spacer_template'], $options['locals']);
+                return $this->renderPartialCollection($options['partial'], $options['collection'], @$options['spacer_template'], @$options['locals']);
             }elseif (!empty($options['partial'])){
-                return $this->renderPartial($options['partial'], $options['object'], $options['locals']);
+                return $this->renderPartial($options['partial'], @$options['object'], @$options['locals']);
             }elseif ($options['inline']){
-                return $this->renderTemplate(empty($options['type']) ? 'tpl.php' : $options['type'], $options['inline'], null, empty($options['locals']) ? array() : $options['locals']);
+                return $this->_renderTemplate(empty($options['type']) ? 'tpl.php' : $options['type'], $options['inline'], null, empty($options['locals']) ? array() : $options['locals']);
             }
         }
     }
 
-    //Checked
     /*
     * Renders the +template+ which is given as a string as tpl.php or js.tpl depending on <tt>template_extension</tt>.
     * The array in <tt>local_assigns</tt> is made available as local variables.
@@ -194,7 +193,7 @@ class AkActionView
     function renderTemplate($____template_extension, $____template, $____file_path = null, $____local_assigns = array(), $____save_content_in_attribute_as = 'layout')
     {
         $____local_assigns = array_merge((array)@$this->assigns,array_merge((array)@$this->_local_assigns,
-                                array_merge((array)$____local_assigns,array('controller_name' => $this->controller,'controller' => &$this->_controllerInstance))));
+        array_merge((array)$____local_assigns,array('controller_name' => $this->controller,'controller' => &$this->_controllerInstance))));
 
         if(!empty($this->_template_handlers[$____template_extension])){
             $____handler =& $this->_template_handlers[$____template_extension];
@@ -205,22 +204,13 @@ class AkActionView
                 $____result = $____result[1];
             }
         }else{
-            $____template_extension == 'js.tpl' && empty($this->Response->_headers['Content-Type']) ? $this->Response->_headers['Content-Type'] = 'text/javascript' : null;
-
-            extract($____local_assigns, EXTR_SKIP);
-            ob_start();
-            if(empty($____file_path) && !empty($____template) && strrchr($____template_extension,'.') == '.php'){
-                eval('?>'.$____template.'<?');
-            }else{
-                include($this->getFullTemplatePath($____file_path, $____template_extension));
-            }
-            $____result = ob_get_clean();
+            trigger_error(Ak::t('Could not find a template engine for delegating templates with the extension %extension',array('%extension'=>$____template_extension)), E_USER_ERROR);
         }
         $this->{'content_for_'.$____save_content_in_attribute_as} = $____result;
-        
+
         return $____result;
     }
-    
+
     function addSharedAttributes(&$local_assigns)
     {
         $this->_local_assigns =& $local_assigns;
@@ -260,12 +250,14 @@ class AkActionView
 
     function getFullTemplatePath($template_path, $extension)
     {
-        return substr($template_path,-1*strlen($extension)) == $extension ? $template_path : $this->base_path.DS.$template_path.'.'.$extension;
+        $template_path = substr($template_path,-1*strlen($extension)) == $extension ? $template_path : $template_path.'.'.$extension;
+        return substr($template_path,0,strlen(AK_VIEWS_DIR)) == AK_VIEWS_DIR ? $template_path : $this->base_path.DS.$template_path;
     }
 
     function _templateExists($template_path, $extension)
     {
         $file_path = $this->getFullTemplatePath($template_path, $extension);
+
         return !empty($this->_method_names[$file_path]) || file_exists($file_path);
     }
 
@@ -310,19 +302,19 @@ class AkActionView
     *  (we call this kind of sub templates for partials). It relies on the fact that partials should follow the naming convention of being 
     *  prefixed with an underscore -- as to separate them from regular templates that could be rendered on their own. 
     * 
-    *  In a template for Advertiser::account:
+    *  In a template for AdvertiserController::account:
     * 
-    *   <?= $this->render(array('partial' => 'account')); ?>
+    *   <?= $controller->render(array('partial' => 'account')); ?>
     * 
-    *  This would render "advertiser/_account.tpl" and pass the instance variable $this->account in as a local variable $account to 
+    *  This would render "advertiser/_account.tpl" and pass the instance variable $controller->account in as a local variable $account to 
     *  the template for display.
     * 
     *  In another template for Advertiser::buy, we could have:
     * 
-    *    <?= $this->render(array('partial' =>'account','locals'=>array('account'=>$buyer)));  ?>
+    *    <?= $controller->render(array('partial' =>'account','locals'=>array('account'=>$buyer)));  ?>
     * 
     *    <? foreach($advertisements as $ad) : ?>
-    *      <?= $this->render(array('partial'=>'ad','locals'=>array('ad'=>$ad))); ?>
+    *      <?= $controller->render(array('partial'=>'ad','locals'=>array('ad'=>$ad))); ?>
     *    <? endforeach; ?>
     * 
     *  This would first render "advertiser/_account.tpl" with $buyer passed in as the local variable $account, then render 
@@ -335,7 +327,7 @@ class AkActionView
     *  a partial by the same name as the elements contained within. So the three-lined example in "Using partials" can be rewritten
     *  with a single line:
     * 
-    *    <?= $this->render(array('partial'=>'ad','collection'=>array($advertisements))); ?>
+    *    <?= $controller->render(array('partial'=>'ad','collection'=>(array)$advertisements)); ?>
     * 
     *  This will render "advertiser/_ad.tpl" and pass the local variable +ad+ to the template for display. An iteration counter
     *  will automatically be made available to the template with a name of the form +partial_name_counter+. In the case of the 
@@ -345,22 +337,18 @@ class AkActionView
     * 
     *  Two controllers can share a set of partials and render them like this:
     * 
-    *    <?= $this->render(array('partial'=>'advertisement/ad', 'locals' => array('ad' => $advertisement ))); ?>
+    *    <?= $controller->render(array('partial'=>'advertiser/ad', 'locals' => array('ad' => $advertisement ))); ?>
     * 
-    *  This will render the partial "advertisement/_ad.tpl" regardless of which controller this is being called from.
+    *  This will render the partial "advertiser/_ad.tpl" regardless of which controller this is being called from.
     */
-
-    
-    function renderPartial($partial_path, $local_assigns = null)
+    function renderPartial($partial_path, $object, $local_assigns = array())
     {
         $path = $this->_partialPathPiece($partial_path);
         $partial_name = $this->_partialPathName($partial_path);
-        //$object = $this->_extractingObject($partial_name, $local_assigns);
-        (array)$local_assigns;
-        //$local_assigns = !empty($local_assigns) ? $local_assigns : array();
-        //$this->_addCounterToLocalAssigns($partial_name, &$local_assigns);
-        //$this->_addObjectToLocalAssigns($partial_name, $local_assigns, &$object);
         
+        $object =& $this->_extractingObject($partial_name, $local_assigns);
+        $local_assigns = array_merge((array)@$this->_controllerInstance->_assigns, (array)$local_assigns);
+        $this->_addObjectToLocalAssigns_($partial_name, $local_assigns, $object);
         return $this->renderFile((empty($path) ? '' : $path.DS).'_'.$partial_name, true, $local_assigns);
     }
 
@@ -374,13 +362,12 @@ class AkActionView
         }
 
         foreach ($collection as $counter=>$element){
-            $local_assigns[$partial_name] = $element;
             $local_assigns[$counter_name] = $counter+1;
-            $collection_of_partials[] = $this->renderPartial($partial_name, $local_assigns);
+            $collection_of_partials[] = $this->renderPartial($partial_name, $element, $local_assigns);
         }
-        
+
         Ak::profile('Finished rendering partial Collection'.$partial_name);
-        
+
         if (empty($collection_of_partials)) {
             return ' ';
         }
@@ -398,8 +385,8 @@ class AkActionView
     {
         return $this->renderPartialCollection($partial_name, $collection, $partial_spacer_template, $local_assigns);
     }
-    
-    
+
+
     function _partialPathPiece($partial_path)
     {
         if(strstr($partial_path, '/')){
@@ -424,13 +411,12 @@ class AkActionView
         return array_pop(explode('/',$partial_name)).'_counter';
     }
 
-    function &_extractingObject($partial_name, $local_assigns)
+    function &_extractingObject($partial_name, &$deprecated_local_assigns)
     {
-        if(is_array($local_assigns) || empty($local_assigns)){
+        if(is_array($deprecated_local_assigns)){
             return $this->controller->$partial_name;
         }else{
-            // deprecated form where object could be passed in as second parameter
-            return $local_assigns;
+            return $deprecated_local_assigns;
         }
     }
 
@@ -438,6 +424,17 @@ class AkActionView
     {
         $local_assigns[$partial_name] = empty($object) ? $this->controller->$partial_name : $object;
     }
+
+    function _addObjectToLocalAssigns_($partial_name, &$local_assigns, $object)
+    {
+        if(!empty($object)){
+            $local_assigns[$partial_name] = $object;
+        }elseif(!empty($this->controller->$partial_name)){
+            $local_assigns[$partial_name] = $this->controller->$partial_name;
+        }
+
+    }
+
 
 }
 
