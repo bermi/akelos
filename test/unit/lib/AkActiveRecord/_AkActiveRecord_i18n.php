@@ -2,7 +2,7 @@
 
 defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 
-require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class test_AkActiveRecord_i18n extends  AkUnitTest
 {

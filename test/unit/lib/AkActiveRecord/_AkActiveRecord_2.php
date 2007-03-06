@@ -1,7 +1,7 @@
 <?php
 
 defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 
@@ -81,15 +81,10 @@ class test_AkActiveRecord_2 extends  UnitTestCase
     
     
 
-
-    /**
-    * @todo Find with associations
-    */
     function Test_of_find()
     {
         $User = new AkTestUser('first_name=>','Bermi','last_name->','Ferrer Martínez','user_name->','bermi','email->','bermi@example.com');
         $User->_create();
-                
         $User = new AkTestUser('first_name=>','Hilario','last_name->','Hervás Añó','user_name->','hilario','email->','hilario@example.com');
         $User->_create();
                

@@ -3,7 +3,7 @@
 defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
 defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 
-require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
 {

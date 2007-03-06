@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 require_once(AK_LIB_DIR.DS.'Ak.php');
 
 class test_Ak_var_manipulation extends  UnitTestCase

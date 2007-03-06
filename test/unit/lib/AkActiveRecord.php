@@ -24,13 +24,15 @@ $partial_tests = array(
 );
 
 foreach ($partial_tests as $partial_test){
-    $test->addTestFile(AK_LIB_TESTS_DIRECTORY.DS.'_'.$partial_test.'.php');
+    $test->addTestFile(AK_LIB_TESTS_DIRECTORY.DS.'AkActiveRecord'.DS.'_'.$partial_test.'.php');
 }
 
 // Acts as, Validators, Associations and Observer tests
 if(!ALL_TESTS_RUNNER){
     foreach (Ak::dir(AK_LIB_TESTS_DIRECTORY.DS.'AkActiveRecord') as $active_record_test){
-        $test->addTestFile(AK_LIB_TESTS_DIRECTORY.DS.'AkActiveRecord'.DS.$active_record_test);
+        if($active_record_test[0] != '_'){
+            $test->addTestFile(AK_LIB_TESTS_DIRECTORY.DS.'AkActiveRecord'.DS.$active_record_test);
+        }
     }
 }
 

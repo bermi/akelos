@@ -15,11 +15,12 @@ if(!defined('ALL_TESTS_RUNNER') && empty($test)){
 
 $partial_tests = array(
 'AkActionController_filters',
-'AkActionController_locale_detection'
+'AkActionController_locale_detection',
+'AkActionController_partials',
 );
 
 foreach ($partial_tests as $partial_test){
-    $test->addTestFile(AK_LIB_TESTS_DIRECTORY.DS.'_'.$partial_test.'.php');
+    $test->addTestFile(AK_LIB_TESTS_DIRECTORY.DS.'AkActionController'.DS.'_'.$partial_test.'.php');
 }
 
 if(!ALL_TESTS_RUNNER){

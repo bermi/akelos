@@ -1,7 +1,7 @@
 <?php
 
 defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 
@@ -97,7 +97,7 @@ class test_AkActiveRecord extends  UnitTestCase
         }
 
         $file_name = AkInflector::toModelFilename($test_model_name);
-
+        
         if(!Ak::file_put_contents($file_name,$model_source)){
             die('Ooops!, in order to perform this test, you must set your app/model permissions so this can script can create and delete files into/from it');
         }

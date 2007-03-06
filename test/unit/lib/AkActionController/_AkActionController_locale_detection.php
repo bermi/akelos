@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class _AkActionController_locale_detection extends AkWebTestCase 
 {
