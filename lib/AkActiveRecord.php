@@ -1650,7 +1650,7 @@ Examples for find all:
                 }
             }
             $value = $this->{'get'.AkInflector::camelize($attribute)}();
-            return $this->getInheritanceColumn() != false  ? AkInflector::demodulize($value) : $value;
+            return $this->getInheritanceColumn() === $attribute ? AkInflector::demodulize($value) : $value;
         }
         if(isset($this->$attribute) || (!isset($this->$attribute) && $this->isCombinedAttribute($attribute))){
             if($this->hasAttribute($attribute)){
@@ -1830,7 +1830,7 @@ Examples for find all:
     */
     function addCombinedAttributeConfiguration($attribute)
     {
-        $args = func_get_args();
+        $args = is_array($attribute) ? $attribute : func_get_args();
         $columns = array_slice($args,2);
         $invalid_columns = array();
         foreach ($columns as $colum){
@@ -1842,15 +1842,9 @@ Examples for find all:
             trigger_error(Ak::t('There was an error while setting the composed field "%field_name", the following mapping column/s "%columns" do not exist',
             array('%field_name'=>$args[0],'%columns'=>join(', ',$invalid_columns))), E_USER_ERROR);
         }else{
-            if(!empty($args[0]) && is_array($args[0])){
-                foreach ($args as $attribute){
-                    call_user_func_array(array(&$this,'addCombinedAttributeConfiguration'),$attribute);
-                }
-            }else{
-                $attribute = array_shift($args);
-                $this->_combinedAttributes[$attribute] = $args;
-                $this->composeCombinedAttribute($attribute);
-            }
+            $attribute = array_shift($args);
+            $this->_combinedAttributes[$attribute] = $args;
+            $this->composeCombinedAttribute($attribute);
         }
     }
 
