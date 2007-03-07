@@ -26,11 +26,12 @@ class AkHtmlToText
 
         require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'smartypants.php');
         $Smartypants = new SmartyPantsTypographer_Parser();
-
-        $markdown = html_entity_decode(strip_tags($Smartypants->transform($markdown)),ENT_QUOTES,'UTF-8');
+        $markdown = Ak::html_entity_decode(strip_tags($Smartypants->transform($markdown)));
 
         return trim($this->_simplifyMarkdown($markdown));
     }
+
+
 
     function _simplifyMarkdown($markdown)
     {

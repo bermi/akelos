@@ -1753,6 +1753,24 @@ Options are:
         return $Client;
     }
 
+
+    /**
+     * Cross PHP version replacement for html_entity_decode. Emulates PHP5 behaviour on PHP4 on UTF-8 entities
+     */
+    function html_entity_decode($html, $translation_table_or_quote_style = null)
+    {
+        if(AK_PHP5){
+            return html_entity_decode($html,empty($translation_table_or_quote_style) ? ENT_QUOTES : $translation_table_or_quote_style,'UTF-8');
+        }
+        require_once(AK_LIB_DIR.DS.'AkCharset.php');
+        $html = preg_replace('~&#x([0-9a-f]+);~ei', 'AkCharset::_CharToUtf8(hexdec("\\1"))', $html);
+        $html = preg_replace('~&#([0-9]+);~e', 'AkCharset::_CharToUtf8("\\1")', $html);
+        if(empty($translation_table_or_quote_style)){
+            $translation_table_or_quote_style = get_html_translation_table(HTML_ENTITIES);
+            $translation_table_or_quote_style = array_flip($translation_table_or_quote_style);
+        }
+        return strtr($html, $translation_table_or_quote_style);
+    }
 }
 
 

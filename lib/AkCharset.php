@@ -620,7 +620,12 @@ class AkCharset
         $chars = unpack('C*', $string);
         $count = count($chars);
         for($i=1;$i<=$count;$i++){
-            $this->_CharToUtf8($chars[$i],$mapping_array);
+            if(!isset($mapping_array[$chars[$i]])){
+                continue;
+            }else{
+                $char = (int)$mapping_array[$chars[$i]];
+            }
+            $chars[$i] = $this->_CharToUtf8($char);
         }
         return implode('',$chars);
     }// -- end of &_Utf8StringEncode -- //
@@ -653,32 +658,28 @@ class AkCharset
     /**
 	* Converts a single character to its UTF8 representation
 	*
-	* @access private
+	* @access protected
 	* @see _Utf8StringEncode
-	* @param    string    &$char    Char to be converted
-	* @param    array    $mapping_array    Mapping array
+	* @param    string    $char    Char to be converted
 	* @return    string    UTF8 char
 	*/
-    function _CharToUtf8(&$char, $mapping_array)
+    function _CharToUtf8($char)
     {
-        if(!isset($mapping_array[$char])){
-            return;
-        }else{
-            $c = (int)$mapping_array[$char];
-        }
-        if ($c < 0x80){
-            $char = chr($c);
+        if ($char < 0x80){
+            $utf8_char = chr($char);
             // 2 bytes
-        }else if($c<0x800){
-            $char = (chr(0xC0 | $c>>6) . chr(0x80 | $c & 0x3F));
+        }else if($char<0x800){
+            $utf8_char = (chr(0xC0 | $char>>6) . chr(0x80 | $char & 0x3F));
             // 3 bytes
-        }else if($c<0x10000){
-            $char = (chr(0xE0 | $c>>12) . chr(0x80 | $c>>6 & 0x3F) . chr(0x80 | $c & 0x3F));
+        }else if($char<0x10000){
+            $utf8_char = (chr(0xE0 | $char>>12) . chr(0x80 | $char>>6 & 0x3F) . chr(0x80 | $char & 0x3F));
             // 4 bytes
-        }else if($c<0x200000){
-            $char = (chr(0xF0 | $c>>18) . chr(0x80 | $c>>12 & 0x3F) . chr(0x80 | $c>>6 & 0x3F) . chr(0x80 | $c & 0x3F));
+        }else if($char<0x200000){
+            $utf8_char = (chr(0xF0 | $char>>18) . chr(0x80 | $char>>12 & 0x3F) . chr(0x80 | $char>>6 & 0x3F) . chr(0x80 | $char & 0x3F));
         }
+        return $utf8_char;
     }// -- end of &_CharToUtf8 -- //
+
 
 
     /**

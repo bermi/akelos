@@ -429,15 +429,15 @@ class AkInstaller
     {
         return array(
         '/^\*(.*)$/i' => array(&$this,'_castToMultilingualColumn'),
-        '/^(description|body)$/i' => '\1 text',
+        '/^(description|content|body)$/i' => '\1 text',
         '/^(id)$/i' => 'id integer not null auto_increment primary_key',
-        '/^(.+)_id$/i' => '\1_id integer index',
+        '/^(.+)_(id|by)$/i' => '\1_\2 integer index',
         '/^(position)$/i' => '\1 integer index',
         '/^(.+_at)$/i' => '\1 datetime',
         '/^(.+_on)$/i' => '\1 date',
         '/^(is_|has_|do_|does_|are_)([A-Z0-9_]+)$/i' => '\1\2 boolean not null default \'0\' index', //
-        '/^([A-Z0-9_]+)$/i' => '\1 string', // Everything else will default to string
-        '/^((.+ )string([^\(.]*))$/i' => '\2string(255)\3', // If we don't set the string lenght it will ail, so if not present will set it to 255
+        '/^([A-Z0-9_]+) *(\([0-9]+\))?$/i' => '\1 string\2', // Everything else will default to string
+        '/^((.+ )string([^\(.]*))$/i' => '\2string(255)\3', // If we don't set the string lenght it will fail, so if not present will set it to 255
         );
     }
 
@@ -552,7 +552,7 @@ class AkInstaller
     Database migrations is a sort of SCM like subversion, but for database settings.
 
     The migration command takes the name of an installer located on your 
-    /app/intallers folder and runs one of the folowing commands:
+    /app/installers folder and runs one of the following commands:
     
     - \"install\" + (options version number): Will update to the provided version 
     number or to the latest one in no version is given.
@@ -560,7 +560,7 @@ class AkInstaller
     - \"uninstall\" + (options version number): Will downgrade to the provided 
     version number or to the lowest one in no version is given.
 
-    Current version number will be sored at app/installers/installer_name_version.txt.
+    Current version number will be sorted at app/installers/installer_name_version.txt.
 
 Example:
     >> migrate framework install
