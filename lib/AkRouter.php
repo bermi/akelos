@@ -524,10 +524,6 @@ class AkRouter extends AkObject
 
             $piece = $is_constant ? $piece : substr($piece,1);
 
-            if(isset($requirements[$piece]) && $requirements[$piece][0] == '/'){
-                //$options[$piece] = COMPULSORY;
-            }
-
             if($is_var && !isset($options[$piece])){
                 $options[$piece] = OPTIONAL;
             }
@@ -538,10 +534,12 @@ class AkRouter extends AkObject
 
             //COMPULSORY
 
-            if(isset($requirements[$piece])){
-                if ($options[$piece] !== COMPULSORY){
+            if($is_constant){
+                $regex_arr[] = array('_constant_'.$piece => '('.$piece.'){1}');
+            }elseif(isset($requirements[$piece])){
+                if (isset($options[$piece]) && $options[$piece] !== COMPULSORY){
                     $regex_arr[] = array($piece=> '(('.trim($requirements[$piece],'/').'){1})?');
-                }elseif($options[$piece] !== OPTIONAL){
+                }elseif(isset($options[$piece]) && $options[$piece] !== OPTIONAL){
                     $regex_arr[] = array($piece=> '(('.trim($requirements[$piece],'/').'){1}|('.$options[$piece].'){1}){1}');
                 }else{
                     $regex_arr[] = array($piece=> '('.trim($requirements[$piece],'/').'){1}');
@@ -559,7 +557,7 @@ class AkRouter extends AkObject
                     $optional_pieces[$piece] = $piece;
                 }
             }else{
-                $regex_arr[] = array($piece=> $is_constant ? '('.$piece.'){1}' : $piece);
+                $regex_arr[] = array($piece => $piece);
             }
 
 

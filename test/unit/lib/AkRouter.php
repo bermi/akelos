@@ -226,7 +226,45 @@ class Test_for_default_routes extends  UnitTestCase
 
 }
 
+# Fixes issue 27 reported by Jacek Jedrzejewski
+class Tests_for_url_constants_named_as_url_variables extends  UnitTestCase
+{
+
+    var $Router;
+    var $url_prefix = '';
+
+    function setup()
+    {
+        $this->Router =& new AkRouter();
+        $this->Router->_loadUrlRewriteSettings();
+        $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
+    }
+
+    function test_same_pieces_1()
+    {
+        $this->Router->connect('/foo/id/:id', array('controller'=>'some'), array('id'=>'[0-9]+'));
+        $this->assertEqual($this->Router->toParams('/foo/id/1'), array('controller'=>'some', 'id'=>'1'));
+    }
+
+    function test_same_pieces_4()
+    {
+        $this->Router->connect('/foo/bar/*bar', array('controller'=>'some'));
+        $this->assertEqual($this->Router->toParams('/foo/bar/foobar'), array ('bar' => array ( 0 => 'foobar'), 'controller' => 'some'));
+        $this->assertEqual($this->Router->toParams('/foo/bar/foobar/foobar2'), array('controller'=>'some', 'bar'=>array(0=>'foobar',1=>'foobar2')));
+    }
+
+    function test_same_pieces_5()
+    {
+        $this->Router->connect('/foo/bar/*bar', array('controller'=>'some', 'bar'=>1));
+        $this->assertEqual($this->Router->toParams('/foo/bar/foobar'), array('controller'=>'some', 'bar'=>array(0=>'foobar')));
+    }
+
+
+}
+
+
 Ak::test('Test_of_AkRouter_Class');
 Ak::test('Test_for_default_routes');
+Ak::test('Tests_for_url_constants_named_as_url_variables');
 
 ?>
