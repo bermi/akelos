@@ -405,7 +405,7 @@ class AkInstaller
 
     function _needsDefaultAttributes($column)
     {
-        return preg_match('/^(([A-Z0-9_]+)|(.+ string[^\(.]*)|(\*.*))$/i',$column);
+        return preg_match('/^(([A-Z0-9_\(\)]+)|(.+ string[^\(.]*)|(\*.*))$/i',$column);
     }
 
     function _setDefaultAttributes($column)

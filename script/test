@@ -24,18 +24,18 @@ $argv = array_map('trim',$argv);
 array_shift($argv);
 
 $tests_dir = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'test');
-foreach ($argv as $test){
-    $test = strstr($test,'.php') ? trim($test, '/') : $test.'.php';
-    $test = substr($test,0,5) == 'test/' ? substr($test,5) : $test;
-    $test = $tests_dir.DIRECTORY_SEPARATOR.$test;
-    if(!file_exists($test)){
-        echo "\nCould not load $test test file\n";
+foreach ($argv as $_test_file){
+    $_test_file = strstr($_test_file,'.php') ? trim($_test_file, '/') : $_test_file.'.php';
+    $_test_file = substr($_test_file,0,5) == 'test/' ? substr($_test_file,5) : $_test_file;
+    $_test_file = $tests_dir.DIRECTORY_SEPARATOR.$_test_file;
+    if(!file_exists($_test_file)){
+        echo "\nCould not load $_test_file test file\n";
     }else{
-        require($test);
+        require($_test_file);
     }
 }
 
-echo $test;
+echo $_test_file;
 
 echo "\n";
 

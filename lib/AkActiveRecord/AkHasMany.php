@@ -388,7 +388,6 @@ class AkHasMany extends AkAssociation
             }
             $this->Owner->notifyObservers('afterRemove');
         }
-        $this->Owner->{$this->association_id} = array_diff($this->Owner->{$this->association_id},array(null));
     }
 
 
