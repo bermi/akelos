@@ -34,7 +34,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
         unset($_SESSION['__activeRecordColumnsSettingsCache']);
     }
 
-/**/
+    /**/
     function test_for_single_has_one_association()
     {
         $Picture =& new Picture(array('title'=>'The Akelos Media Team at SIMO'));
@@ -134,7 +134,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
         $this->assertEqual($CarletPic->main_thumbnail->caption, 'Our Office');
 
         $this->assertFalse($Thumbnail->findFirstBy('caption','Carlet'));
-        
+                
         $this->assertTrue($OfficeThumbnail =& $Thumbnail->findFirstBy('caption', 'Our Office'));
         $this->assertEqual($OfficeThumbnail->getId(), $CarletPic->main_thumbnail->getId());
         $Thumbnail =& new Thumbnail(array('caption'=>'Lucky (our pet)'));
@@ -265,38 +265,51 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
         $this->assertEqual($Thumbnail->panorama->title, 'Views from the old town');
     }
     
-    /**/
-    
+
     function test_primary_key_setting()
     {
-        $Jose =& new Person('first_name->','Jose','last_name->','Salavert','email->','salavert@example.com');
         $Hilario =& new Person('first_name->','Hilario','last_name->','Hervás','email->','hilario@example.com');
+        $Jose =& new Person('first_name->','Jose','last_name->','Salavert','email->','salavert@example.com');
         $Vero =& new Person('first_name->','Vero','last_name->','Machí','email->','vero@example.com');
         $Bermi =& new Person('first_name->','Bermi','last_name->','Ferrer','email->','bermi@example.com');
 
         $this->assertTrue($Hilario->save() && $Bermi->save());
-        
+
         $BermisAccount =& new Account('username->','bermi','password->','pass');
         $Bermi->account->assign($BermisAccount);
-        
+
         $this->assertEqual($BermisAccount->person_id,$Bermi->id);
-        
+
         $SalavertsAccount =& new Account('username->','salavert','password->','pass');
         $Jose->account->assign($SalavertsAccount);
-        
+
         $Jose->save();
-        
+
         $this->assertEqual($SalavertsAccount->person_id,$Jose->id);
-        
+
         $VerosAccount =& new Account('username->','vero','password->','pass');
-        
+
         $this->assertTrue($VerosAccount->save());
-        
+
         $VerosAccount->person->assign($Vero);
-        
+
         $VerosAccount->save();
-        $this->assertEqual($VerosAccount->person_id,$Vero->id);
+        $this->assertEqual($VerosAccount->person_id, $Vero->id);
+
+        $HilariosAccount =& new Account('username->','hilario','password->','pass');
+        $Hilario->account->assign($HilariosAccount);
+        $Hilario->save();
+
+        $this->assertEqual($HilariosAccount->id, $Hilario->account->id);
+
+        $Hilario =& $Hilario->findFirstBy('first_name','Hilario');
+        $Hilario->account->load();
+
+        $this->assertEqual($HilariosAccount->id, $Hilario->account->id);
+
     }
+    
+        /**/
 }
 
 

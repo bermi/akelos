@@ -271,7 +271,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 trim($options[$option]).$separator.join($separator, $values);
             }
         }
-        
+
         $sql = trim($this->constructFinderSqlWithAssociations($options));
         $sql = substr($sql, -5) == 'AND =' ? substr($sql, 0,-5) : $sql;
 
@@ -301,16 +301,25 @@ class AkAssociatedActiveRecord extends AkBaseModel
     }
 
 
-    function constructFinderSqlWithAssociations($options, $columns = array())
+    /**
+     * Used for generating custom selections for habtm, has_many and has_one queries
+     */
+    function constructFinderSqlWithAssociations($options, $include_owner_as_selection = true)
     {
         $selection = '';
-        foreach (array_keys($this->getColumns()) as $column_name){
-            $selection .= '__owner.'.$column_name.' AS __owner_'.$column_name.', ';
-        }
+        if($include_owner_as_selection){
+            foreach (array_keys($this->getColumns()) as $column_name){
+                $selection .= '__owner.'.$column_name.' AS __owner_'.$column_name.', ';
+            }
 
-        $sql  = 'SELECT '.trim($selection.@$options['selection'], ', ').' '.
-        'FROM '.$this->getTableName().' AS __owner '.
-        (!empty($options['joins']) ? $options['joins'].' ' : '');
+            $sql  = 'SELECT '.trim($selection.@$options['selection'], ', ').' '.
+            'FROM '.$this->getTableName().' AS __owner '.
+            (!empty($options['joins']) ? $options['joins'].' ' : '');
+        }else{
+            $sql  = 'SELECT '.$options['selection'].'.* '.
+            'FROM '.$options['selection'].' '.
+            (!empty($options['joins']) ? $options['joins'].' ' : '');
+        }
 
         empty($options['conditions']) ? null : $this->addConditions($sql, $options['conditions']);
 
@@ -372,7 +381,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                     }
                 }
 
-                
+
                 // We need to keep a pointer to unique parent elements in order to add associates to the first loaded item
                 $e = null;
                 $object_id = $this_item_attributes[$this->getPrimaryKey()];
@@ -404,7 +413,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                         return $GLOBALS['false'];
                     }
                 }
-                
+
                 $i = !is_null($e) ? $e : $i+1;
             }
         }

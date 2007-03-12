@@ -242,7 +242,7 @@ class AkHasOne extends AkAssociation
 
     function &findAssociated($association_id)
     {
-        $result = false;
+        $result =& $GLOBALS['false'];
         if(!$this->Owner->getId()){
             return $result;
         }
@@ -253,17 +253,20 @@ class AkHasOne extends AkAssociation
 
         $table_name = $this->Owner->$association_id->getAssociationOption('table_name');
 
-        $result =& $this->Owner->$association_id->find(
-        'first',
-        array(
+        $finder_options =         array(
         'conditions' => trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($table_name, $this->constructSqlConditions($association_id))),
+        'selection' => $table_name,
         'joins' => trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($table_name, $this->constructSql($association_id))),
         'order' => trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($table_name, $this->Owner->$association_id->getAssociationOption('order')))
-        )
         );
+        
+        if($results =& $this->Owner->$association_id->findBySql($this->Owner->constructFinderSqlWithAssociations($finder_options, false),1)){
+            $result =& $results[0];
+        }
 
         return $result;
     }
+
 
     function constructSqlConditions($association_id)
     {
