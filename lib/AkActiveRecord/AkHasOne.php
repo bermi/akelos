@@ -100,7 +100,7 @@ class AkHasOne extends AkAssociation
     function &assign($association_id, &$Associated)
     {
         if(!$this->Owner->isNewRecord()){
-            $Associated->set($Associated->getAssociationOption('foreign_key'), $this->Owner->getId());
+            $Associated->set($this->Owner->$association_id->getAssociationOption('foreign_key'), $this->Owner->getId());
             $Associated->save();
         }
 
