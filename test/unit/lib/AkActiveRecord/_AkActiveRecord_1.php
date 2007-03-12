@@ -784,7 +784,7 @@ class test_AkActiveRecord extends  UnitTestCase
         'last_name' => "last_name='O\'Reilly'",
         'email' => "email=''",
         'country' => "country=null",
-        'password' => "password='b8020e8e15c5362a7ac49800e3e86e99'",
+        'password' => "password='*********'",
         'created_at' => "created_at=null",
         'updated_at' => "updated_at=null",
         'expires_on' => "expires_on='2089-06-16'"
