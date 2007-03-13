@@ -1,39 +1,39 @@
-Comment cr√©er une application simple gr√¢ce au framework Akelos
+Comment créer une application simple grâce au framework Akelos
 =========================================================
 
 Introduction
 --------------------------
 
-Ce tutorial va vous permettre de cr√©er une application √† l'aide du framework Akelos.
-Nous allons donc cr√©er **booklink**, une application de gestion de livres et de leurs auteurs.
+Ce tutoriel va vous permettre de créer une application à l'aide du framework Akelos.
+Nous allons donc créer **booklink**, une application de gestion de livres et de leurs auteurs.
 
-Configuration n√©c√©ssaire
+Configuration nécessaire
 ---------------------------
 
- - Une base de donn√©es de type MySQL ou SQLite
+ - Une base de données de type MySQL ou SQLite
  - Un serveur web Apache
- - Un acc√®s shell √† votre serveur ('cmd' sur Windows)
+ - Un accès shell à votre serveur ('cmd' sur Windows)
  - PHP4 or PHP5
 
-Cette configuration est plut√¥t commune et se retrouve sur la plupart des serveurs web ou machines *nix.
-Bien s√ªr, Akelos fonctionne sur plusieurs types de configuration, mais pour ce tutorial, nous nous concentrerons sur celle-ci.
+Cette configuration est plutôt commune et se retrouve sur la plupart des serveurs web ou machines *NIX.
+Bien sûr, Akelos fonctionne sur plusieurs types de configuration, mais pour ce tutoriel, nous nous concentrerons sur celle-ci.
 
-T√©l√©chargement et installation
+Téléchargement et installation
 ---------------------------
 
-Tant qu'Akelos n'est pas sorti dans sa version finale (1.0), nous vous recommendons de toujours utiliser la derni√®re r√©vision SVN.
-Pour cela, il vous faudra poss√©der un client [subversion](http://subversion.tigris.org).
+Tant qu'Akelos n'est pas sorti dans sa version finale (1.0), nous vous recommandons de toujours utiliser la dernière révision SVN.
+Pour cela, il vous faudra posséder un client [subversion](http://subversion.tigris.org).
 
-Pour r√©cup√©rer la derni√®re r√©vision d'Akelos, tappez la commande :
+Pour récupérer la dernière révision d'Akelos, tapez la commande :
 
     svn co http://akelosframework.googlecode.com/svn/trunk/ akelos
 
-Si jamais vous ne pouvez ou ne voulez pas utiliser subversion, vous pouvez toujours t√©l√©charger la [derni√®re version stable](http://www.akelos.org/akelos_framework-dev_preview.tar.gz).
-Vous pouvez ensuite l'extraire en tappant :
+Si jamais vous ne pouvez ou ne voulez pas utiliser subversion, vous pouvez toujours télécharger la [dernière version stable](http://www.akelos.org/akelos_framework-dev_preview.tar.gz).
+Vous pouvez ensuite l'extraire en tapant :
 
     tar zxvf akelos_framework-dev_preview.tar.gz ; mv akelos_framework-dev_preview akelos
 
-Il faut maintenant s'assurer qu'Akelos sera capable d'utiliser PHP sur votre syst√®me. Tappez donc :
+Il faut maintenant s'assurer qu'Akelos sera capable d'utiliser PHP sur votre système. Tapez donc :
 
     /usr/bin/env php -v
 
@@ -43,13 +43,13 @@ Si vous voyez quelque chose de ce genre :
     Copyright (c) 1997-2006 The PHP Group
     Zend Engine v2.1.0, Copyright (c) 1998-2006 Zend Technologies
     
-alors vous √™tes pr√™ts √† utiliser Akelos, vous pouvez donc passer au paragraphe suivant.
+alors vous êtes prêts à utiliser Akelos, vous pouvez donc passer au paragraphe suivant.
 
-Cependant, si ce n'est pas le cas, il vous faudra trouver le chemin complet vers votre binaire PHP. En g√©n√©, il suffit de tapper :
+Cependant, si ce n'est pas le cas, il vous faudra trouver le chemin complet vers votre binaire PHP. En général, il suffit de taper :
 
     which php
 
-Ensuite, changez le chemin dans le shebang `#!/usr/bin/env php` par le votre, et ce au d√©but de chacun de ces fichiers :
+Ensuite, changez le chemin dans le shebang `#!/usr/bin/env php` par le votre, et ce, au début de chacun de ces fichiers :
 
  * script/console
  * script/generate
@@ -58,24 +58,24 @@ Ensuite, changez le chemin dans le shebang `#!/usr/bin/env php` par le votre, et
  * script/setup
  * script/test
 
-**Pour les utilisateur de Windows :** Les shebang ne sont pas pris en compte sur Windows. Il vous faudra donc appeler les scripts directement avec le binaire php :
+**Pour les utilisateurs de Windows :** Les shebang ne sont pas pris en compte sur Windows. Il vous faudra donc appeler les scripts directement avec le binaire php :
 
     C:\wamp\php\php.exe ./script/generate scaffold
 
 Mise en place d'une nouvelle application Akelos
 ---------------------------------------------
 
-A ce point, vous devez avoir Akelos mis en place, et devez √™tre capable de lancer les scripts PHP depuis une console. Bien que ces scripts ne soient pas absolument n√©c√©ssaires au fonctionnement d'Akelos, ils le seront pour ce tutorial.
+A ce point, vous devez avoir Akelos mis en place, et devez être capable de lancer les scripts PHP depuis une console. Bien que ces scripts ne soient pas absolument nécessaires au fonctionnement d'Akelos, ils le seront pour ce tutoriel.
 
-Vous avez maintenant deux possibilit√©es :
+Vous avez maintenant deux possibilités :
 
- 1. Cr√©er une application Akelos dans un dossier diff√©rent et lier ce dernier aux librairies du Framework.
- 2. Commencer √† travailler directement depuis le dossier t√©l√©charg√©, avec la s√©curit√© que cela implique : il n'est jamais recommend√© de rendre visible les sources de votre application.
+ 1. Créer une application Akelos dans un dossier différent et lier ce dernier aux librairies du Framework.
+ 2. Commencer à travailler directement depuis le dossier téléchargé, avec la sécurité que cela implique : il n'est jamais recommandé de rendre visibles les sources de votre application.
 
-Vous l'aurez s√ªrement devin√©, nous utiliserons la premi√®re m√©thode qui consiste √† cr√©er un lien (symbolique par exemple) vers le dossier `public` de notre application. Il est aussi tr√®s simple de configurer les dossiers du framework, puisqu'il suffit de d√©finir l'emplacement de chacun des composants. Cependant, ce n'est pas le sujet de cette explication, et laissons cette partie √† un prochain tutorial expliquant la mise en place et en production d'une application.
+Vous l'aurez sûrement deviné, nous utiliserons la première méthode qui consiste à créer un lien (symbolique par exemple) vers le dossier `public` de notre application. Il est aussi très simple de configurer les dossiers du framework, puisqu'il suffit de définir l'emplacement de chacun des composants. Cependant, ce n'est pas le sujet de cette explication, et laissons cette partie à un prochain tutoriel expliquant la mise en place et en production d'une application.
 
-Nous supposerons que vous avez t√©l√©charg√© Akelos dans le dossier `HOME_DIR/akelos` et que vous vous situez √† la racine du dossier `akelos`.
-D'ici, vous pouvez obtenier les diff√©rentes options d'installation du framework en tappant :
+Nous supposerons que vous avez téléchargé Akelos dans le dossier `HOME_DIR/akelos` et que vous vous situez à la racine du dossier `akelos`.
+D'ici, vous pouvez obtenir les différentes options d'installation du framework en tapant :
 
     ./script/setup -h
 
@@ -97,29 +97,29 @@ Dont voici la traduction :
 
     Utilisation: setup [-sqphf --dependencies] <-d> 
 
-    -deps --dependencies      Inclut une copie du framework dans le r√©pertoire de
+    -deps --dependencies      Inclut une copie du framework dans le répertoire de
                               l'application. (true)
     -d --directory=<value>    Dossier d'installation de l'application.
-    -f --force                Ecraser les fichier existants. (false)
+    -f --force                Écraser les fichiers existants. (false)
     -h --help                 Affiche cette aide.
-    -p --public_html=<value>  Dossier par lequel le serveur web va acc√©der √†
+    -p --public_html=<value>  Dossier par lequel le serveur web va accéder à
                               l'application.
     -q --quiet                N'affiche rien. (false)
-    -s --skip                 Ne copie pas les fichiers d√©j√† existants. (false)
+    -s --skip                 Ne copie pas les fichiers déjà existants. (false)
 
 Voici un exemple de commande d'installation : (remplacez `/www/htdocs` par le chemin vers votre serveur web)
 
     ./script/setup -d ~/booklink -p /www/htdocs/booklink
 
-Cela va g√©n√©rer l'architecure suivante pour l'application **booklink** :
+Cela va générer l'architecture suivante pour l'application **booklink** :
 
     booklink/
-        app/ << L'application (mod√®les, vues, controlleurs, et installeurs)
+        app/ << L'application (modèles, vues, contrôleurs, et installeurs)
         config/ << Des machins de configuration, mais tout sera fait via navigateur.
         public/ << Le seul dossier rendu public
-        script/ << Outils de g√©n√©ration de code, de lancement de tests, etc.
+        script/ << Outils de génération de code, de lancement de tests, etc.
 
-**Pour les utilisateur de Windows :** Les liens symboliques ne fonctionnent pas non plus sous Windows. Il va donc faloir renseigner Apache sur le chemin vers votre application. Editez le fichier `httpd.conf` et rajouter ceci (en modifiant, bien entendu, au pr√©alable selon votre configuration) :
+**Pour les utilisateurs de Windows :** Les liens symboliques ne fonctionnent pas non plus sous Windows. Il va donc falloir renseigner Apache sur le chemin vers votre application. Éditez le fichier `httpd.conf` et rajoutez ceci (en modifiant, bien entendu, au préalable selon votre configuration) :
 
     Alias /booklink "/chemin/vers/booklink/public"
 
@@ -130,17 +130,17 @@ Cela va g√©n√©rer l'architecure suivante pour l'application **booklink** :
         Allow from all
     </Directory>
 
-N'oubliez pas de red√©marrer le serveur Apache.
+N'oubliez pas de redémarrer le serveur Apache.
 
-### Cr√©ation de la base de donn√©es (MySQL) ###
+### Création de la base de données (MySQL) ###
 
-**/!\ Si vous comptez utiliser SQLite, sautez cette √©tape /!\\**
+**/!\ Si vous comptez utiliser SQLite, sautez cette étape /!\\**
 
-La prochaine √©tape consite √† cr√©er la base de donn√©es relative √† votre application.
+La prochaine étape consiste à créer la base de données relative à votre application.
 
-Le but de ce tutorial n'est bien √©videmment pas de vous apprendre √† cr√©er une base de donn√©es. Si vous ne savez pas comment faire, faites des recherches sur Google, vous trouverez s√ªrement quelquechose :).
+Le but de ce tutoriel n'est bien évidemment pas de vous apprendre à créer une base de données. Si vous ne savez pas comment faire, faites des recherches sur Google, vous trouverez sûrement quelquechose :).
 
-Cependant, vous pouvez tout simplement essayer de cr√©er 3 bases diff√©rentes, pour chacun des 3 environnements (production, d√©vellopement, tests)
+Cependant, vous pouvez tout simplement essayer de créer 3 bases différentes, pour chacun des 3 environnements (production, développement, tests)
 
     $> mysql -u root -p
     
@@ -151,36 +151,36 @@ Cependant, vous pouvez tout simplement essayer de cr√©er 3 bases diff√©rentes, p
     mysql> FLUSH PRIVILEGES;
     mysql> exit
 
-Vous pouvez bien √©videmment passer par une interface graphique, telle phpMyAdmin, pour cr√©er ces tables.
+Vous pouvez bien évidemment passer par une interface graphique, telle phpMyAdmin, pour créer ces tables.
 
-### Cr√©ation des fichiers de configuration ###
+### Création des fichiers de configuration ###
 
-#### A l'aide de l'installeur ####
+#### À l'aide de l'installeur ####
 
-Vous pouvez ouvrir votre navigateur et vous rendre sur le script d'installation en allant √† l'adresse `http://localhost/booklink`.
+Vous pouvez ouvrir votre navigateur et vous rendre sur le script d'installation en allant à l'adresse `http://localhost/booklink`.
 
-Vous allez donc pouvoir configurer votre base de donn√©es, vos diff√©rents langages, et les permissions de vos fichiers. Le fichier de configuration sera enfin g√©n√©r√©. Pendant que bermi s'occupe de prendre un caf√© en attendant que les anglais et les espagnols configurent leur application **booklink**, je pencherais plut√¥t pour un p'tit chocolat chaud.
+Vous allez donc pouvoir configurer votre base de données, vos différents langages, et les permissions de vos fichiers. Le fichier de configuration sera enfin généré. Pendant que bermi s'occupe de prendre un café en attendant que les Anglais et les Espagnols configurent leur application **booklink**, je pencherais plutôt pour un p'tit chocolat chaud.
 
-#### Configuration manuelle (non, pas le pr√©nom) ####
+#### Configuration manuelle (non, pas le prénom) ####
 
-Copiez les fichiers `config/DEFAULT-config.php` et `config/DEFAULT-routes.php` en tant que `config/config.php` et `config/routes.php`, respectivement, et √©ditez-les √† vos soins.
+Copiez les fichiers `config/DEFAULT-config.php` et `config/DEFAULT-routes.php` en tant que `config/config.php` et `config/routes.php`, respectivement, et éditez-les à vos soins.
 
-Il vous faudra probablement aussi d√©finir le dossier √† partir duquel s'effectue la r√©-√©criture d'URL (afin de pouvoir utiliser des URL propres). Editez donc le fichier `public/.htaccess`, et changez la valeur de RewriteBase :
+Il vous faudra probablement aussi définir le dossier à partir duquel s'effectue la ré-écriture d'URL (afin de pouvoir utiliser des URL propres). Éditez donc le fichier `public/.htaccess`, et changez la valeur de RewriteBase :
 
     RewriteBase /booklink
 
-Une fois votre application install√©e, vous pouvez ouvrir un navigateur et aller sur `http://localhost/booklink`. Un message d'accueil s'affichera, et vous pourrez alors supprimer les fichiers d'installation du framework.
+Une fois votre application installée, vous pouvez ouvrir un navigateur et aller sur `http://localhost/booklink`. Un message d'accueil s'affichera, et vous pourrez alors supprimer les fichiers d'installation du framework.
 
-Structure de la base de don√©es
+Structure de la base de données
 ---------------------------------
 
-Il va maintenant faloir d√©finir les tables que **booklink** va utiliser pour stocker les informations sur les livres et leurs auteurs.
+Il va maintenant falloir définir les tables que **booklink** va utiliser pour stocker les informations sur les livres et leurs auteurs.
 
-La plupart du temps, lorsque l'on travaille avec d'autres d√©veloppeurs, le sch√©ma de la base de donn√©es est susceptible de changer. Il devient alors compliqu√© de maintenir cette base identique pour chaque personnes du projet. Akelos propose donc une solution √† ce probl√®me, appel√©e *installer*, ou *migration*.
+La plupart du temps, lorsque l'on travaille avec d'autres développeurs, le schéma de la base de données est susceptible de changer. Il devient alors compliqué de maintenir cette base identique pour chaque personne du projet. Akelos propose donc une solution à ce problème, appelée *installer*, ou *migration*.
 
-Gr√¢ce √† cet outil de migration, vous allez non seulement pouvoir cr√©er vos base de donn√©es, mais aussi g√©n√©rer un installeur, qui pourra √™tre utilis√© pour enregistrer tous les diff√©rents changements que vous effectuerez sur la base.
+Grâce à cet outil de migration, vous allez non seulement pouvoir créer vos bases de données, mais aussi générer un installeur, qui pourra être utilisé pour enregistrer tous les différents changements que vous effectuerez sur la base.
 
-Pour ce tutorial, cr√©ez le fichier `app/installers/booklink_installer.php`, et copiez-y le contenu suivant :
+Pour ce tutoriel, créez le fichier `app/installers/booklink_installer.php`, et copiez-y le contenu suivant :
  
      <?php
      
@@ -189,15 +189,15 @@ Pour ce tutorial, cr√©ez le fichier `app/installers/booklink_installer.php`, et 
          function up_1(){
              
              $this->createTable('books',
-                'id,'.          // La cl√© primaire
+                'id,'.          // La clé primaire
                 'title,'.       // Le titre du livre
                 'description,'. // La description du livre
-                'author_id,'.   // L'identifiant de l'auteur. C'est gr√¢ce √† cela qu'Akelos va pouvoir faire le lien entre les deux.
+                'author_id,'.   // L'identifiant de l'auteur. C'est grâce à cela qu'Akelos va pouvoir faire le lien entre les deux.
                 'published_on'  // La date de publication
             );
             
              $this->createTable('authors', 
-                'id,'.      // La cl√© primaire
+                'id,'.      // La clé primaire
                 'name'      // Le nom de l'auteur
                 );
          }
@@ -209,13 +209,13 @@ Pour ce tutorial, cr√©ez le fichier `app/installers/booklink_installer.php`, et 
      
      ?>
 
-Ce peu de donn√©es suffisent √† Akelos pour cr√©er la base de donn√©s. En ne sp√©cifiant que le nom des colonnes, Akelos choisira lui-m√™me leur type en se basant sur les conventions de nommage des tables SQL. Cependant, vous avez bien √©videmment la possibilit√© de d√©finir vous-m√™me le typages des colonnes gr√¢ce a la [syntaxe de php Adodb](http://phplens.com/lens/adodb/docs-datadict.htm)
+Ce peu de données suffit à Akelos pour créer la base de données. En ne spécifiant que le nom des colonnes, Akelos choisira lui-même leur type en se basant sur les conventions de nommage des tables SQL. Cependant, vous avez bien évidemment la possibilité de définir vous-même le typages des colonnes grâce à la [syntaxe de PHP Adodb](http://phplens.com/lens/adodb/docs-datadict.htm)
 
-Maintenant que nous avons d√©fini les tables, il ne reste plus qu'√† les installer. Tappez la commande :
+Maintenant que nous avons défini les tables, il ne reste plus qu'à les installer. Tapez la commande :
 
     ./script/migrate Booklink install
 
-Et pouf ! Les tables sont insall√©es automagiquement ! Avec MySQL, vous devriez obtenir quelque chose du genre :
+Et pouf ! Les tables sont installées automagiquement ! Avec MySQL, vous devriez obtenir quelque chose du genre :
 
 **TABLE "BOOKS"**
 
@@ -239,27 +239,27 @@ Et pouf ! Les tables sont insall√©es automagiquement ! Avec MySQL, vous devriez 
     +-------+--------------+------+-----+----------------+
 
 
-Mod√®les, Vues, et Controlleurs
+Modèles, Vues, et Controlleurs
 ------------------------------------------------------
 
-Pour faire fonctionner vos applications, Akelos utilise le [motif de conception appel√© MVC](http://fr.wikipedia.org/wiki/Motif_de_conception).
+Pour faire fonctionner vos applications, Akelos utilise le [motif de conception appelé MVC](http://fr.wikipedia.org/wiki/Motif_de_conception).
 
-### Les conventions de nomage dans Akelos ###
+### Les conventions de nommage dans Akelos ###
 
-Le nommage de chaque objet dans Akelos est tr√®s important, puisqu'il permet l'automatisation de son fonctionnement.
+Le nommage de chaque objet dans Akelos est très important, puisqu'il permet l'automatisation de son fonctionnement.
 
-#### Mod√®les ####
+#### Modèles ####
 
  * **Dossier :** /app/models/
  * **Nom des classes :** au singulier, au format [CamelCase](http://fr.wikipedia.org/wiki/CamelCase) *(BankAccount, User, etc.)*
- * **Nom des fichiers :** au singulier, s√©par√© par des underscore *(bank_account.php.php, user.php, etc.)*
- * **Nom des tables :** au pluriel, s√©par√© par des underscore *(bank_accounts, users)*
+ * **Nom des fichiers :** au singulier, séparé par des underscore *(bank_account.php.php, user.php, etc.)*
+ * **Nom des tables :** au pluriel, séparé par des underscore *(bank_accounts, users)*
 
-#### Controlleurs ####
+#### Contrôleurs ####
 
  * **Dossier :** */app/controllers/*
  * **Nom des classes :** Au singulier ou au pluriel, au format CamelCase, fini par `Controller` *(AccountController, UserController)*
- * **Nom des fichiers :** Au singulier ou au pluriel, s√©par√© par des underscore, fini par `_controller` *(account_controller.php, user_controller.php)*
+ * **Nom des fichiers :** Au singulier ou au pluriel, séparé par des underscore, fini par `_controller` *(account_controller.php, user_controller.php)*
 
 #### Vues ####
 
@@ -270,49 +270,49 @@ Le nommage de chaque objet dans Akelos est tr√®s important, puisqu'il permet l'a
 Utilisation du scaffolding dans Akelos
 ------------------------------------------
 
-Akelos fourni une m√©thode de **scaffold**, √† savoir une g√©n√©rateur de code qui vous fera non seulement gagner du temps, mais pourra aussi servir de point de d√©part √† la construction de votre application, ou √† votre apprentissage.
+Akelos fournit une méthode de **scaffold**, à savoir une générateur de code qui vous fera non seulement gagner du temps, mais pourra aussi servir de point de départ à la construction de votre application, ou à votre apprentissage.
 
 ### La magie du scaffold ###
 
-A l'aide du scaffolding, vous allez g√©n√©rer le squelette d'une interface d'administration pour **booklink**, ce qui va vous permettre d'ajouter/editer/supprimer des entr√©es dans la base de donn√©es.
-Tappez ces deux commandes :
+À l'aide du scaffolding, vous allez générer le squelette d'une interface d'administration pour **booklink**, ce qui va vous permettre d'ajouter/éditer/supprimer des entrées dans la base de données.
+Tapez ces deux commandes :
 
     ./script/generate scaffold Book
     ./script/generate scaffold Author
 
-Cela va cr√©er une multitudes de fichiers l√† o√π il faut, et le tout va fonctionner directement ! Sceptique ?
-Allez donc sur [http://localhost/booklink/author](http://localhost/booklink/author) et sur [http://localhost/booklink/books](http://localhost/booklink/books), et vous pourrez d'ores et d√©j√† g√©rer les livres et les auteurs dans votre base de donn√©es.
-Allez, je vous laisse un peu de temps pour vous amuser, et revenez me voir d√®s que vous √™tes pr√™ts √† continuer.
+Cela va créer une multitude de fichiers là où il le faut, et le tout va fonctionner directement ! Sceptique ?
+Allez donc sur [http://localhost/booklink/author](http://localhost/booklink/author) et sur [http://localhost/booklink/books](http://localhost/booklink/books), et vous pourrez d'ores et déjà gérer les livres et les auteurs dans votre base de données.
+Allez, je vous laisse un peu de temps pour vous amuser, et revenez me voir dès que vous êtes prêts à continuer.
 
 Le fonctionnement d'Akelos
 ------------------------------------------
 
-Voici une description rapide de comment Akelos r√©agi lorsqu'il r√©pond √† l'adresse : `http://localhost/booklink/book/show/2`
+Voici une description rapide de comment Akelos réagi lorsqu'il répond à l'adresse : `http://localhost/booklink/book/show/2`
   
- 1. Akelos va r√©cuperer trois param√®tres, en fonction de ce que vous avez d√©fini dans le fichier `/config/routes.php` (tutorial est √† venir) :
+ 1. Akelos va récupérer trois paramètres, en fonction de ce que vous avez défini dans le fichier `/config/routes.php` (tutoriel est à venir) :
 
-  * controlleur : *book*
+  * contrôleur : *book*
   * action : *show*
   * id : 2
 
  2. Il va ensuite chercher le fichier `/app/controllers/book_controller.php`. S'il existe, il instanciera la classe `BookController`.
 
- 3. Le controlleur instanci√© va chercher le mod√®le lui correspondant, ici `/app/models/book.php`. Si le mod√®le existe, il en cr√©e une instance, disponible ici via l'attribut `$this->Book`. Il va ensuite chercher dans la base de donn√©es Books l'entr√©e avec un `id = 2` qui √©crasera l'attribut `$this->Book`.
+ 3. Le contrôleur instancié va chercher le modèle lui correspondant, ici `/app/models/book.php`. Si le modèle existe, il en crée une instance, disponible ici via l'attribut `$this->Book`. Il va ensuite chercher dans la base de données Books l'entrée avec un `id = 2` qui écrasera l'attribut `$this->Book`.
 
  4. Akelos appelle enfin l'action `show` de la classe `BookController`.
 
- 5. A la fin de l'action, Akelos chercher le fichier de vue `/app/views/book/show.tpl` et cr√©e le rendu de ce fichier, ce dernier √©tant aussi disponible dans la variable `$content_for_layout` dans les layouts.
+ 5. A la fin de l'action, Akelos chercher le fichier de vue `/app/views/book/show.tpl` et crée le rendu de ce fichier, ce dernier étant aussi disponible dans la variable `$content_for_layout` dans les layouts.
 
- 6. Akelos va enfin chercher le fichier layout appel√© `/app/views/layouts/book.tpl`. Si ce fichier est trouv√©, Akelos cr√©r le rendu du layout, et assigne le contenu de la vue dans `$content_for_layout`. Le tout est enfin envoy√© au navigateur.
+ 6. Akelos va enfin chercher le fichier layout appelé `/app/views/layouts/book.tpl`. Si ce fichier est trouvé, Akelos crée le rendu du layout, et assigne le contenu de la vue dans `$content_for_layout`. Le tout est enfin envoyé au navigateur.
 
-Si vous avez compris ce fonctionnement, je pense que vous pouvez d'ores et d√©j√† commencer √† modifier votre application.
+Si vous avez compris ce fonctionnement, je pense que vous pouvez d'ores et déjà commencer à modifier votre application.
 
 Faire la relation entre *Books* et *Authors*
 ----------------------------
 
-Il va maintenant falloir cr√©er le lien entre la classe *Book* et la classe *Author*. Pour cela, il vous faudra utiliser la colonne `author_id` dans la base *books*
+Il va maintenant falloir créer le lien entre la classe *Book* et la classe *Author*. Pour cela, il vous faudra utiliser la colonne `author_id` dans la base *books*
 
-Pour renseigner chacun des mod√®les sur la relation entre *books* et *authors*, il vous suffit de faire :
+Pour renseigner chacun des modèles sur la relation entre *books* et *authors*, il vous suffit de faire :
 
 `/app/models/book.php`
 
@@ -320,7 +320,7 @@ Pour renseigner chacun des mod√®les sur la relation entre *books* et *authors*, 
     
     class Book extends ActiveRecord
     {
-        var $belongs_to = 'author'; // Un livre correspond √† un auteur
+        var $belongs_to = 'author'; // Un livre correspond à un auteur
     }
     
     ?>
@@ -331,12 +331,12 @@ Pour renseigner chacun des mod√®les sur la relation entre *books* et *authors*, 
     
     class Author extends ActiveRecord
     {
-        var $has_many = 'books'; // Un auteur peut poss√©der plusieurs livres
+        var $has_many = 'books'; // Un auteur peut posséder plusieurs livres
     }
     
     ?>
 
-Les mod√®les savent maintenant comment ils sont li√©s, mais il faut que le controlleur `BookController` puisse charger les deux mod√®les, `author` et `book`.
+Les modèles savent maintenant comment ils sont liés, mais il faut que le contrôleur `BookController` puisse charger les deux modèles, `author` et `book`.
 
 `/app/models/author.php`
 
@@ -344,15 +344,15 @@ Les mod√®les savent maintenant comment ils sont li√©s, mais il faut que le contr
     
     class BookController extends ApplicationController
     {
-        var $models = 'book, author'; // Cette ligne suffit √† indiquer quels mod√®les utiliser
+        var $models = 'book, author'; // Cette ligne suffit à indiquer quels modèles utiliser
         
         // ... code du controlleur
     }
 
-La prochaine √©tape consiste √† afficher les auteurs disponibles dans la base lors de l'ajout/√©dition d'un livre. Il suffit pour cel√† d'utiliser, dans la vue,
+La prochaine étape consiste à afficher les auteurs disponibles dans la base lors de l'ajout/édition d'un livre. Il suffit pour cela d'utiliser, dans la vue,
 la variable `$form_options_helper`.
 
-Juste apr√®s `<?=$active_record_helper->error_messages_for('book');?>`, dans le fichier */app/views/book/_form.tpl*, rajoutez le code suivant :
+Juste après `<?=$active_record_helper->error_messages_for('book');?>`, dans le fichier */app/views/book/_form.tpl*, rajoutez le code suivant :
 
 `/app/views/book/_form.tpl`
 
@@ -361,18 +361,18 @@ Juste apr√®s `<?=$active_record_helper->error_messages_for('book');?>`, dans le 
         <?=$form_options_helper->select('book', 'author_id', $Author->collect($Author->find(), 'name', 'id'));?>
     </p>
 
-Si vous n'avez pas encore ajout√© d'auteurs dans votre base de donn√©es (vilain garnement), c'est le moment de le faire.
+Si vous n'avez pas encore ajouté d'auteurs dans votre base de données (vilain garnement), c'est le moment de le faire.
 
-Vous pouvez donc d√©sormais choisir l'auteur de chaque livre. C'est magnifique ! Mais vous avez s√ªrement remarqu√© que vous ne voyez pas l'auteur des livres dans la liste des livres.
-Ouvrez donc le fichier `app/views/book/show.tpl`, et juste apr√®s `<? $content_columns = array_keys($Book->getContentColumns()); ?>`, rajoutez :
+Vous pouvez donc désormais choisir l'auteur de chaque livre. C'est magnifique ! Mais vous avez sûrement remarqué que vous ne voyez pas l'auteur des livres dans la liste des livres.
+Ouvrez donc le fichier `app/views/book/show.tpl`, et juste après `<? $content_columns = array_keys($Book->getContentColumns()); ?>`, rajoutez :
 
     <label>_{Author}:</label> <span class="static">{book.author.name?}</span><br />
 
-Vous vous demandez s√ªrement ce que ces `_{Author}` ou autre `{book.author.name?}`. C'est en fait la syntaxe utilis√©e par [Sintags](http://www.bermi.org/projects/sintags) dans les templates d'Akelos.
+Vous vous demandez sûrement ce que ces `_{Author}` ou autre `{book.author.name?}`. C'est en fait la syntaxe utilisée par [Sintags](http://www.bermi.org/projects/sintags) dans les templates d'Akelos.
 
 
 Petite conclusion
 --------------------
 
-C'est tout pour le moment. Ce tutorial continuera bien s√ªr d'√©voluer, et il y en aura d'autres, car ce ne sont pas l√† les seuls fonctionnalit√©s d'Akelos !
-Si vous voyez une faute de frappe ou de fran√ßais, n'h√©sitez pas √† me le faire savoir !
+C'est tout pour le moment. Ce tutoriel continuera bien sûr d'évoluer, et il y en aura d'autres, car ce ne sont pas là les seules fonctionnalités d'Akelos !
+Si vous voyez une faute de frappe ou de français, n'hésitez pas à me le faire savoir !

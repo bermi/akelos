@@ -32,6 +32,7 @@ Contributions submitted as patches
 Naixn
 
  - Scaffold generator patch. 2007-02-22
+ - French translation of the tutorial . 2007-03-10
  
 Stephen Reay
 
