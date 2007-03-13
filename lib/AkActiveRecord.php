@@ -192,8 +192,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     var $_automated_not_null_validator = false;
     var $_set_default_attribute_values_automatically = true;
 
-    var $_automated_password_obfuscation = true;
-
     // This is needed for enabling support for static active record instantation under php
     var $_activeRecordHasBeenInstantiated = true;
 
@@ -2980,20 +2978,11 @@ Examples for find all:
             break;
 
             default:
-            $value = ($column_name=='password' && !empty($value)) ? $this->_castPassword($value) : $value;
             $result = $add_quotes ? $this->_db->qstr($value) : $value;
             break;
         }
 
         return empty($this->_columns[$column_name]['notNull']) ? ($result === '' ? "''" : $result) : ($result == 'null' ? '' : $result);
-    }
-
-    function _castPassword($password)
-    {
-        if(!empty($this->_automated_password_obfuscation)){
-            $password = md5($password);
-        }
-        return $password;
     }
 
     function castAttributeFromDatabase($column_name, $value)
@@ -3024,7 +3013,7 @@ Examples for find all:
                 break;
 
                 default:
-                return $column_name == 'password' ? '' : $value;
+                return $value;
                 break;
             }
         }

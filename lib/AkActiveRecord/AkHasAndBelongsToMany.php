@@ -130,6 +130,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         'conditions' => false,
         'order' => false,
         'join_class_extends' => 'AkActiveRecord',
+        'join_class_primary_key' => 'id', // Used for removing items from the collection
         'finder_sql' => false,
         'delete_sql' => false,
         'insert_sql' => false,
@@ -222,7 +223,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         if(file_exists($join_model_file)){
             require_once($join_model_file);
             if(class_exists($options['join_class_name'])){
-                $this->JoinObject = new $options['join_class_name']();
+                $this->JoinObject =& new $options['join_class_name']();
                 $this->JoinObject->setPrimaryKey($options['foreign_key']);
                 return true;
             }
@@ -255,7 +256,6 @@ class AkHasAndBelongsToMany extends AkAssociation
     {
         \$this->setModelName(\"{$options['join_class_name']}\");
         \$attributes = (array)func_get_args();
-        \$this->_generateSequence = false;
         \$this->setTableName('{$options['join_table']}', true, true);
         \$this->init(\$attributes);
     }
@@ -279,12 +279,13 @@ class AkHasAndBelongsToMany extends AkAssociation
         }
         return false;
     }
-    
+
     function _createJoinTable()
     {
         $options = $this->getOptions($this->association_id);
         require_once(AK_LIB_DIR.DS.'AkDbManager.php');
-        AkDbManager::createTable($options['join_table'], "{$options['foreign_key']} I, {$options['association_foreign_key']} I",array('mysql' => 'TYPE=InnoDB'),false,
+
+        AkDbManager::createTable($options['join_table'], "id I AUTO KEY,{$options['foreign_key']} I, {$options['association_foreign_key']} I",array('mysql' => 'TYPE=InnoDB'),false,
         "{$options['foreign_key']},{$options['association_foreign_key']}");
         return $this->_hasJoinTable();
     }
@@ -436,14 +437,20 @@ class AkHasAndBelongsToMany extends AkAssociation
 
             $owner_type = $this->_findOwnerTypeForAssociation($AssociatedModel, $this->Owner);
 
-            $this->JoinObject->setPrimaryKey($options['association_foreign_key']);
+            $this->JoinObject->setPrimaryKey($options['join_class_primary_key']);
             foreach (array_keys($Associated) as $k){
-                $items_to_remove_from_collection[] = $Associated[$k]->getId();
-                $this->JoinObject->delete($Associated[$k]->getId());
+                $id = $Associated[$k]->getId();
+                $JoinObjectToDelete =& $this->JoinObject->findFirstBy($options['association_foreign_key'],$id);
+                if($JoinObjectToDelete->destroy()){
+                    $items_to_remove_from_collection[] = $id;
+                }else{
+                    $success = false;
+                }
             }
+
             $this->JoinObject->setPrimaryKey($options['foreign_key']);
 
-            $this->removeFromCollection($items_to_remove_from_collection);
+            $success ? $this->removeFromCollection($items_to_remove_from_collection) : null;
         }
 
         return $success;
@@ -551,11 +558,8 @@ class AkHasAndBelongsToMany extends AkAssociation
                 if($foreign_key != $this->JoinObject->get($options['foreign_key']) ||
                 $association_foreign_key != $this->JoinObject->get($options['association_foreign_key'])){
 
-
-                    $this->JoinObject->_newRecord = true;
-                    $this->JoinObject->setAttributes(array($options['foreign_key']=> $foreign_key, $options['association_foreign_key']=> $association_foreign_key));
-
-                    $success = $this->JoinObject->save();
+                    $this->JoinObject =& $this->JoinObject->create(array($options['foreign_key']=> $foreign_key, $options['association_foreign_key']=> $association_foreign_key));
+                    $success = !$this->JoinObject->isNewRecord();
                 }else{
                     $success = true;
                 }
@@ -675,9 +679,9 @@ class AkHasAndBelongsToMany extends AkAssociation
         $Associated =& $this->getAssociatedModelInstance();
         $table_name = $Associated->getTableName();
         $owner_id = $this->Owner->quotedId();
-        
+
         $finder_options = array();
-        
+
         foreach ($options as $option=>$value) {
             if(!empty($value)){
                 $finder_options[$option] = trim($Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $value));
@@ -861,9 +865,10 @@ class AkHasAndBelongsToMany extends AkAssociation
                             $joined_items[] = $AssociatedItem->__hasAndBelongsToManyMemberId;
                             if(empty($AssociatedItem->hasAndBelongsToMany->__joined) && $AssociatedItem->isNewRecord()? $AssociatedItem->save() : true){
                                 $AssociatedItem->hasAndBelongsToMany->__joined = true;
-                                $CollectionHandler->JoinObject->_newRecord = true;
-                                $CollectionHandler->JoinObject->setAttributes(array($options['foreign_key'] => $object_id ,$options['association_foreign_key'] => $AssociatedItem->getId()));
-                                $success = $CollectionHandler->JoinObject->save() ? $success : false;
+                                $CollectionHandler->JoinObject =& $CollectionHandler->JoinObject->create(array($options['foreign_key'] => $object_id ,$options['association_foreign_key'] => $AssociatedItem->getId()));
+
+
+                                $success = !$CollectionHandler->JoinObject->isNewRecord() ? $success : false;
 
                             }else{
                                 $success = false;

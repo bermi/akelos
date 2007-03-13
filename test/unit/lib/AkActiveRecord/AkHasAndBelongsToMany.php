@@ -295,6 +295,45 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
         $this->assertEqual($CoolOffice->property->count(), 2);
     }
 
+
+    function test_scope_for_multiple_member_deletion()
+    {
+        $PisoJose =& new Property('description->','Piso Jose');
+        $PisoBermi =& new Property('description->','Piso Bermi');
+
+        $Atico =& new PropertyType('description->','çtico');
+        $Apartamento =& new PropertyType('description->','Apartamento');
+
+        $this->assertTrue($PisoJose->save() && $PisoBermi->save() && $Atico->save() && $Apartamento->save());
+
+        $PisoJose->property_type->add($Atico);
+        $PisoJose->property_type->add($Apartamento);
+
+        $PisoBermi->property_type->add($Atico);
+        $PisoBermi->property_type->add($Apartamento);
+        
+
+        $this->assertTrue($PisoJose =& $PisoJose->findFirstBy('description','Piso Jose'));
+        $this->assertTrue($Atico =& $Atico->findFirstBy('description','çtico'));
+
+        $PisoJose->property_type->load();
+
+        $PisoJose->property_type->delete($Atico);
+
+        $this->assertTrue($PisoBermi =& $PisoBermi->findFirstBy('description','Piso Bermi'));
+        
+        $this->assertTrue($PisoJose =& $PisoJose->findFirstBy('description','Piso Jose'));
+        $PisoJose->property_type->load();
+        
+        $this->assertTrue($Atico =& $Atico->findFirstBy('description','çtico'));
+        $this->assertTrue($Apartamento =& $Apartamento->findFirstBy('description','Apartamento'));
+        
+        $this->assertEqual($PisoJose->property_types[0]->getId(), $Apartamento->getId());
+        $this->assertEqual($PisoBermi->property_type->count(), 2);
+        
+        
+    }
+
     /**
      * @todo Implement support for unique elements
      */
