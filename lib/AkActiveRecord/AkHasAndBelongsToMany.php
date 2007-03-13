@@ -99,6 +99,7 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 * * <tt>offset</tt>: An integer determining the offset from where the rows should be fetched. So at 5, it would skip the first 4 rows.
 * * <tt>select</tt>: By default, this is * as in SELECT * FROM, but can be changed if you for example want to do a join, but not
 *   include the joined columns.
+* * <tt>unique</tt> - if set to true, duplicates will be omitted from the collection.
 *
 * Option examples:
 *   $has_and_belongs_to_many = 'projects';
@@ -140,7 +141,8 @@ class AkHasAndBelongsToMany extends AkAssociation
         'offset' => false,
         'handler_name' => strtolower(AkInflector::underscore(AkInflector::singularize($association_id))),
         'select' => false,
-        'instantiate' => false
+        'instantiate' => false,
+        'unique' => false
         /*
         'include_conditions_when_included' => true,
         'include_order_when_included' => true,
@@ -471,7 +473,6 @@ class AkHasAndBelongsToMany extends AkAssociation
             $this->Owner->notifyObservers('beforeRemove');
             $options = $this->getOptions($this->association_id);
             foreach (array_keys($records) as $k){
-
                 if(!empty($options['before_remove']) && method_exists($this->Owner, $options['before_remove']) && $this->Owner->{$options['before_remove']}($records[$k]) === false ){
                     continue;
                 }
@@ -481,7 +482,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                 }else{
                     $record_id = $records[$k];
                 }
-
+                
                 foreach (array_keys($this->Owner->{$this->association_id}) as $kk){
                     if(
                     (
@@ -496,6 +497,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                         unset($this->Owner->{$this->association_id}[$kk]);
                     }
                 }
+                unset($this->asssociated_ids[$record_id]);
                 $this->_unsetAssociatedMemberId($records[$k]);
                 if(!empty($options['after_remove']) && method_exists($this->Owner, $options['after_remove'])){
                     $this->Owner->{$options['after_remove']}($records[$k]);
@@ -536,6 +538,10 @@ class AkHasAndBelongsToMany extends AkAssociation
 
     function _hasAssociatedMember(&$Member)
     {
+        $options = $this->getOptions($this->association_id);
+        if($options['unique'] && !$Member->isNewRecord() && isset($this->asssociated_ids[$Member->getId()])){
+            return true;
+        }
         $id = $this->_getAssociatedMemberId($Member);
         return !empty($id);
     }
