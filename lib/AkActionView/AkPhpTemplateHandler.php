@@ -40,16 +40,15 @@ class AkPhpTemplateHandler
         if($this->_templateNeedsCompilation()){
             require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'TemplateEngines'.DS.$this->_templateEngine.'.php');
             $____template_engine_name = $this->_templateEngine;
-            
-            $TemplateEngine = new $____template_engine_name();
-            
+
+            $TemplateEngine =& new $____template_engine_name();
+
             $TemplateEngine->init(array(
-                'code' => $____code,
-                'file_path' => $____file_path,
-                ));
-            
+            'code' => $____code,
+            ));
+
             $____code = $TemplateEngine->toPhp();
-            
+
             if($____code === false){
                 trigger_error(join("\n",$TemplateEngine->getErrors()), E_USER_ERROR);
                 return false;
@@ -72,10 +71,10 @@ class AkPhpTemplateHandler
         include($this->_getCompiledTemplatePath());
 
         !empty($shared) ? $this->_AkActionView->addSharedAttributes($shared) : null;
-        
+
         return  ob_get_clean();
     }
-    
+
 
     function _assertForValidTemplate()
     {
@@ -87,10 +86,10 @@ class AkPhpTemplateHandler
         $_analyzer = new PHPCodeAnalyzer();
         $_analyzer->source = '?>'.$this->_options['code'].'<?php';
         $_analyzer->analyze();
-        
+
         //echo '<pre>'.print_r($_analyzer, true).'</pre>';
-        
-        
+
+
         if(strstr($this->_options['code'],'${')){
             $_errors[] = Ak::t('You can\'t use ${ within templates');
         }
@@ -124,7 +123,7 @@ class AkPhpTemplateHandler
 
         $_forbidden['functions'] = array_merge($this->getForbiddenFunctions(),$this->_getFuntionsAsVariables($_used_functions));
         $_invalid['functions'] = array_diff($_used_functions, array_diff($_used_functions,$_forbidden['functions']));
-        
+
         $_invalid['classes'] = array_diff(array_keys((array)$_analyzer->calledStaticMethods),(array)@$this->_options['classes']);
 
         $_class_calls = array_merge((array)$_analyzer->calledStaticMethods, (array)@$_analyzer->calledMethods);
@@ -163,7 +162,7 @@ class AkPhpTemplateHandler
                 '<h2>'.Ak::t('Showing template source from %file:',array('%file'=>$this->_options['file_path'])).'</h2><pre>'.
                 htmlentities(Ak::file_get_contents($this->_options['file_path'])).'</pre><hr />'.
                 '<h2>'.Ak::t('Showing compiled template source:').'</h2>'.highlight_string($this->_options['code'],true);
-                
+
                 //echo '<pre>'.print_r($_analyzer, true).'</pre>';
                 die();
             }else{
@@ -199,7 +198,10 @@ class AkPhpTemplateHandler
 
     function _getTemplateBasePath()
     {
-        $this->_options['template_base_path'] = empty($this->_options['template_base_path']) ? rtrim(str_replace($this->_getTemplateFilename(),'',$this->_options['file_path']),'\/') : $this->_options['template_base_path'];
+        if(empty($this->_options['template_base_path'])){
+            $this->_options['template_base_path'] = rtrim(str_replace($this->_getTemplateFilename(),'',$this->_options['file_path']),'\/');
+        }
+
         return $this->_options['template_base_path'];
     }
 
@@ -217,16 +219,19 @@ class AkPhpTemplateHandler
 
     function _getCompiledTemplateBasePath()
     {
-        $this->_options['compiled_template_base_path'] = empty($this->_options['compiled_template_base_path']) ? $this->_getTemplateBasePath().DS.'compiled' : $this->_options['compiled_template_base_path'];
+        if(empty($this->_options['compiled_template_base_path'])){
+            $this->_options['compiled_template_base_path'] = $this->_getTemplateBasePath().DS.'compiled';
+        }
         return $this->_options['compiled_template_base_path'];
     }
 
     function _getCompiledTemplatePath()
     {
-        $template_filename = $this->_getTemplateFilename();
-        $this->_options['compiled_file_name'] = empty($this->_options['compiled_file_name']) ? $this->_getCompiledTemplateBasePath().DS.
-        (empty($template_filename) ? 'tpl_'.md5($this->_options['code']) : $template_filename)
-        .'.php' : $this->_options['compiled_file_name'];
+        if(empty($this->_options['compiled_file_name'])){
+            $template_filename = $this->_getTemplateFilename();
+            $this->_options['compiled_file_name'] =  $this->_getCompiledTemplateBasePath().DS.
+            (empty($template_filename) ? 'tpl_'.md5($this->_options['code']) : $template_filename).'.php';
+        }
         return $this->_options['compiled_file_name'];
     }
 

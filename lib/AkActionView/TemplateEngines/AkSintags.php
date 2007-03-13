@@ -4,7 +4,7 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
+// | Copyright (c) 2002-2007, Akelos Media, S.L.  & Bermi Ferrer Martinez |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
@@ -17,6 +17,15 @@
  */
 
 require_once(AK_LIB_DIR.DS.'Ak.php');
+require_once(AK_LIB_DIR.DS.'AkLexer.php');
+require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'TemplateEngines'.DS.'AkSintags'.DS.'AkSintagsLexer.php');
+require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'TemplateEngines'.DS.'AkSintags'.DS.'AkSintagsParser.php');
+
+ak_define('SINTAGS_REMOVE_PHP_SILENTLY', false);
+ak_define('SINTAGS_HIDDEN_COMMENTS_TAG', 'hidden');
+
+ak_define('SINTAGS_OPEN_HELPER_TAG', '<%');
+ak_define('SINTAGS_CLOSE_HELPER_TAG', '%>');
 
 /**
  * Sintags, The Akelos Framework special syntax for view Templates
@@ -189,245 +198,22 @@ require_once(AK_LIB_DIR.DS.'Ak.php');
  *       You just need to add a backslash before open and close curly brackets in order to escape it
  *       Colophon
  * 
- *       Remember that Sintags is not meant to replace PHP, but to speed up development. It's good to use this syntax because it keeps views more clear. So if you start to seeing to much PHP code on your view, consider moving some view logic
+ *       Remember that Sintags is not meant to replace PHP, but to speed up development. It's good to use this syntax because it keeps views more clear. So if you start to seeing to much PHP code on your view, consider moving some view logic into the helpers
  */
 class AkSintags
 {
     var $_code;
-    var $_tokens = array();
-    var $_token_options = array();
-    var $_Inflector;
 
     function init($options = array())
     {
-        $default_options = array(
-        'inflector' => 'AkInflector',
-        'file_path' => false
-        );
-
-        $options = array_merge($default_options, $options);
-
-        $this->_code = $options['code'];
-        require_once(AK_LIB_DIR.DS.$options['inflector'].'.php');
-        $this->_Inflector = Ak::singleton('AkInflector', $options['inflector']);
-
-        $this->options = $options;
+        $this->_code =& $options['code'];
     }
 
     function toPhp()
     {
-        $this->_code = str_replace(array('\{','\}'),array(':~AKBO~:',':~AKBC~:'), $this->_code);
-        $this->_renderMultilingualText();
-        $this->_tokenizeTemplate();
-        $this->_loadTokenReplacementOptions();
-        $this->_LoadReplacementCode();
-        $this->_replaceTokensWithPhpCode();
-        $this->_code = str_replace(array(':~AKBO~:',':~AKBC~:'),array('{','}'),$this->_code);
-        $this->_untokenizeTemplate();
-
-        return $this->hasErrors() ? false : $this->_code;
-    }
-
-    function hasErrors()
-    {
-        return false;
-    }
-
-    function getErrors()
-    {
-        return array();
-    }
-
-
-
-    function _tokenizeTemplate()
-    {
-        $this->_code = str_replace(
-        array('{_','{?','?}','{loop ','{end}','<?xml','<?=','<? ',"<?\n","<?\t"),
-        array('{AKTRANSVAR__','{AKNOTEMPTY__','__AKPRINTIFISSET}','{AKPERFLOOP__','<?php } ?>','AKXMLOPENTAG','AKPHPOPENSHORTTAGECHO','AKPHPOPENSHORTTAG','AKPHPOPENSHORTTAG','AKPHPOPENSHORTTAG'), 
-        $this->_code);
-        if(preg_match_all('/{[A-Za-z0-9_]+((\.|-){1}[A-Za-z0-9_]+){0,}}/i',$this->_code,$match)){
-            $this->_tokens = $match[0];
-        }
-        $this->_tokens = array_unique($this->_tokens);
-
-
-    }
-
-    function _untokenizeTemplate()
-    {
-        $this->_code = str_replace(
-        array('{AKTRANSVAR__','{AKNOTEMPTY__','__AKPRINTIFISSET}','{AKPERFLOOP__',
-        'AKXMLOPENTAG','AKPHPOPENSHORTTAGECHO','AKPHPOPENSHORTTAG'),
-        array('{_','{?','?}','{loop ',
-        '<?php echo \'<?xml\'; ?>','<?php echo ','<?php '), $this->_code);
-    }
-
-    function _loadTokenReplacementOptions()
-    {
-        $_open_tags = array('AKTRANSVAR','AKNOTEMPTY','AKPERFLOOP');
-        $_close_tag = 'AKPRINTIFISSET';
-
-        foreach ($this->_tokens as $token){
-            $_open = substr($token,1,10);
-            $_close = substr($token,-15,14);
-
-            $_token_options = array();
-            $_token_options['loop'] = $_open == 'AKPERFLOOP';
-            $_token_options['not_empty'] = $_open == 'AKNOTEMPTY' | $_token_options['loop'];
-            $_token_options['translate'] = $_open == 'AKTRANSVAR';
-            $_token_options['print_if_set'] = $_close == 'AKPRINTIFISSET' && !$_token_options['loop'];
-
-            $var = trim($token,'{}');
-            $var = in_array($_open,$_open_tags) ? str_replace($_open.'__','',$var) : $var;
-            $var = $_close == 'AKPRINTIFISSET' ? str_replace('__'.$_close,'',$var) : $var;
-
-            if($_token_options['loop']){
-                $_token_options['loop_singular'] = $this->_getSingularVariableNameForLoop($var);
-            }
-
-            $_token_options['php_var'] = $this->_convertSintagsVarToPhp($var);
-
-            $this->_token_options[$token] = $_token_options;
-        }
-    }
-
-    function _getSingularVariableNameForLoop($plural)
-    {
-        return '$'.AkInflector::singularize(substr($plural,max(strpos($plural,'.'),strpos($plural,'-'),-1)+1));
-    }
-
-    function _convertSintagsVarToPhp($var)
-    {
-        $var = str_replace(array('-','.'),array('~','->'),$var);
-        if(strstr($var,'~')){
-            $pieces = explode('~',$var);
-            $var = array_shift($pieces);
-            if(!empty($pieces)){
-                foreach ($pieces as $piece){
-                    $array_start = strpos($piece,'-');
-                    $array_key = $array_start ? substr($piece,0,$array_start) : substr($piece,0);
-                    $var .= str_replace($array_key, (is_numeric($array_key) ? '['.$array_key.']' : '[\''.$array_key.'\']'),$piece);
-                }
-            }
-        }
-        return '$'.$var;
-    }
-
-    function _LoadReplacementCode()
-    {
-        foreach ($this->_token_options as $token=>$options){
-            $options['Sintags'] = str_replace(array('{AKTRANSVAR__','{AKNOTEMPTY__','__AKPRINTIFISSET}','{AKPERFLOOP__','<?php } ?>'),array('{_','{?','?}','{loop ','{end}'), $token);
-            if(!empty($options['loop'])){
-                $this->_token_options[$token]['code'] = $this->_renderLoop($options);
-            }elseif(!empty($options['translate'])){
-                $this->_token_options[$token]['code'] = $this->_renderTranslateVar($options);
-            }elseif(!empty($options['print_if_set'])){
-                $this->_token_options[$token]['code'] = $this->_renderPrintIfSet($options);
-            }elseif(!empty($options['not_empty'])){
-                $this->_token_options[$token]['code'] = $this->_renderIsNotEmpty($options);
-            }else{
-                $this->_token_options[$token]['code'] = $this->_renderPrint($options);
-            }
-        }
-    }
-
-    function _renderLoop($options = array())
-    {
-        return
-        "<?php ".
-        "\n empty({$options['php_var']}) ? null : {$options['loop_singular']}_loop_counter = 0;".
-        "\n empty({$options['php_var']}) ? null : {$options['php_var']}_available = count({$options['php_var']});".
-        "\n if(!empty({$options['php_var']}))".
-        "\n     foreach ({$options['php_var']} as {$options['loop_singular']}_loop_key=>{$options['loop_singular']}){".
-        "\n         {$options['loop_singular']}_loop_counter++;".
-        "\n         {$options['loop_singular']}_is_first = {$options['loop_singular']}_loop_counter === 1;".
-        "\n         {$options['loop_singular']}_is_last = {$options['loop_singular']}_loop_counter === {$options['php_var']}_available;".
-        "\n         {$options['loop_singular']}_odd_position = {$options['loop_singular']}_loop_counter%2;".
-        "\n?>";
-    }
-
-    function _renderIsNotEmpty($options = array())
-    {
-        return
-        "<?php ".
-        "\n if(!empty({$options['php_var']})) { ".
-        "\n?>";
-
-    }
-
-    function _renderPrint($options = array())
-    {
-        return
-        "<?php ".
-        "\n echo {$options['php_var']};".
-        "\n?>";
-    }
-
-    function _renderPrintIfSet($options = array())
-    {
-        return
-        "<?php ".
-        "\n echo isset({$options['php_var']}) ? {$options['php_var']} : '';".
-        "\n?>";
-    }
-
-    function _renderTranslateVar($options = array())
-    {
-        $namespace = $this->_getTemplateNamespace();
-
-        return
-        "<?php ".
-        "\n echo empty({$options['php_var']}) || !is_array({$options['php_var']}) ? '' : \$text_helper->translate({$options['php_var']}". (empty($namespace) ? '' : ', null, \''.$namespace.'\'').");".
-        "\n?>";
-    }
-
-    function _getTemplateNamespace()
-    {
-        if(!empty($this->options['template_namespace'])){
-            return $this->options['template_namespace'];
-        }
-        if(strstr($this->options['file_path'], AK_VIEWS_DIR.DS.'layouts')){
-            return 'layouts';
-        }
-        return '';
-    }
-
-    function _renderMultilingualText()
-    {
-        $namespace = $this->_getTemplateNamespace();
-        
-        if(preg_match_all('/(\_{[^\}]+\})+/', $this->_code, $match)){
-            foreach ($match[0] as $matched_text){
-                $tmp_variables = array();
-                $new_text = str_replace('\%','AKBINDINGESCAPE',$matched_text);
-
-                if(preg_match_all('/(%([A-Za-z0-9_])+){1}/',$new_text,$bindings)){
-                    foreach ($bindings[0] as $binding){
-                        $tmp_variables[] = "'$binding'=>".str_replace('%','$',$binding);
-                    }
-                }
-                $new_text = str_replace('AKBINDINGESCAPE','%',$new_text);
-                $this->_code = str_replace($matched_text,
-                '<?php echo $text_helper->translate(\''.str_replace("'","\'",trim($new_text,'_{}')).'\''.
-                (!empty($tmp_variables) ? ', array('.join(',',$tmp_variables).')' : ', array()').
-                (empty($namespace) ? '' : ', \''.$namespace.'\'')
-                .'); ?>'
-                , $this->_code);
-            }
-        }
-
-    }
-
-    function _replaceTokensWithPhpCode()
-    {
-        $code_replacements = array();
-        foreach ($this->_token_options as $token=>$options){
-            $code_replacements[] = $options['code'];
-        }
-        $this->_code = str_replace(array_keys($this->_token_options), $code_replacements, $this->_code);
+        $Parser =& new AkSintagsParser();
+        return $Parser->parse($this->_code);
     }
 }
-
 
 ?>

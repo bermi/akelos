@@ -1,0 +1,204 @@
+
+<%= render :partial => "account", :locals => { :account => @buyer } %>
+
+-----------------------------------
+
+<?php echo $controller->render( array('partial' => "account", 'locals' => array('account' => $buyer))); ?>
+
+
+===================================
+
+<%= link_to(document.title, :controller => "document", :action => "show", :id => document.id) %>
+
+
+-----------------------------------
+
+<?php echo $url_helper->link_to($document->title, array('controller' => "document", 'action' => "show", 'id' => $document->id)); ?>
+
+
+
+===================================
+
+
+<%= link_to (translate("Visit Other Site"), "http://www.akelos.org/", :confirm => "Are you sure?" ) %>
+
+-----------------------------------
+
+
+<?php echo $url_helper->link_to($text_helper->translate("Visit Other Site"), "http://www.akelos.org/", array('confirm' => "Are you sure?")); ?>
+
+
+===================================
+
+<?php echo $text_helper->translate('I\'m anxious', 'I\'m Testing'); ?>
+
+-----------------------------------
+
+<?php echo $text_helper->translate('I\'m anxious', 'I\'m Testing'); ?>
+
+
+
+===================================
+
+
+<%= translate 'Write me home' %>
+
+-----------------------------------
+
+<?php echo $text_helper->translate('Write me home'); ?>
+
+
+
+
+===================================
+
+
+<%= translate 'I\'m anxious', 'I\'m Testing' %>
+
+-----------------------------------
+
+<?php echo $text_helper->translate('I\'m anxious', 'I\'m Testing'); ?>
+
+
+
+===================================
+
+
+
+<%= translate "Let's \"Jump\"", "D'Akelos Way" %>
+
+-----------------------------------
+
+<?php echo $text_helper->translate("Let's \"Jump\"", "D'Akelos Way"); ?>
+
+
+
+
+===================================
+
+
+<%= translate "Use helpers like this: 
+<%= translate 'This text' %>" %>
+
+-----------------------------------
+
+<?php echo $text_helper->translate("Use helpers like this: 
+<%= translate 'This text' %>"); ?>
+
+
+
+
+===================================
+
+
+<%= translate :page_title %>
+
+-----------------------------------
+
+<?php echo $text_helper->translate('page_title'); ?>
+
+
+
+===================================
+
+<%= translate @weekday %>
+
+-----------------------------------
+
+<?php echo $text_helper->translate($weekday); ?>
+
+
+
+===================================
+
+<%= translate @date-weekday %>
+
+-----------------------------------
+
+<?php echo $text_helper->translate($date['weekday']); ?>
+
+
+
+===================================
+
+<%= link_to ("Visit Other Site", "http://www.akelos.org/", {:confirm => "Are you sure?"} ) %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to("Visit Other Site", "http://www.akelos.org/", array('confirm' => "Are you sure?")); ?>
+
+===================================
+
+<%=link_to "Delete Image", { :action => "delete", :id => @image.id }, :confirm => "Are you sure?", :method => :delete %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to("Delete Image", array('action' => "delete", 'id' => $image->id), array('confirm' => "Are you sure?", 'method' => 'delete')); ?>
+
+===================================
+
+<%= link_to "Visit Other Site", "http://www.akelos.org/", :confirm => "Are you sure?" %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to("Visit Other Site", "http://www.akelos.org/", array('confirm' => "Are you sure?")); ?>
+
+===================================
+
+<%= link_to "Visit Other Site", "http://www.akelos.org/", :confirm => "Are you sure?", :options => ["Yes", 'No'] %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to("Visit Other Site", "http://www.akelos.org/", array('confirm' => "Are you sure?", 'options' => array("Yes", 'No'))); ?>
+
+===================================
+
+<%=mail_to "me@domain.com", "My email", :encode => "javascript"%>
+
+-----------------------------------
+
+<?php echo $url_helper->mail_to("me@domain.com", "My email", array('encode' => "javascript")); ?>
+
+===================================
+
+<%= link_to ( translate("Visit Other Site"), "http://www.akelos.org/", {:confirm => "Are you sure?"} ) %>
+
+-----------------------------------
+
+
+<?php echo $url_helper->link_to($text_helper->translate("Visit Other Site"), "http://www.akelos.org/", array('confirm' => "Are you sure?")); ?>
+
+
+
+
+
+===================================
+
+<%=mail_to: 'bermi@example.com'%>
+
+-----------------------------------
+
+<?php echo $url_helper->mail_to('bermi@example.com'); ?>
+
+
+
+
+===================================
+
+<%=email_link: 'bermi@example.com', 'Click to email'%>
+
+-----------------------------------
+
+
+<?php echo $url_helper->email_link('bermi@example.com', 'Click to email'); ?>
+
+
+===================================
+
+<%=distance_of_time_in_words: 300, 100%>
+
+-----------------------------------
+
+
+<?php echo $date_helper->distance_of_time_in_words(300, 100); ?>
+

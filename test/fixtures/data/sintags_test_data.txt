@@ -1,0 +1,280 @@
+
+<?php 
+echo "{@url_for controller:page}";
+?>
+
+-----------------------------------
+
+<?php 
+echo "{@url_for controller:page}";
+?>
+
+
+===================================
+
+<h1>_{Ain't easy to translate text?}</h1>
+
+-----------------------------------
+
+<h1><?php echo $text_helper->translate('Ain\'t easy to translate text?', array()); ?></h1>
+
+
+
+===================================
+
+_{<p>It's really simple even to add 
+<a href='http://google.co.uk'>Localized links</a>
+</p>}
+
+-----------------------------------
+
+<?php echo $text_helper->translate('<p>It\'s really simple even to add 
+<a href=\'http://google.co.uk\'>Localized links</a>
+</p>', array()); ?>
+
+
+
+===================================
+
+_{I need to print \{something_inside_curly_brackets\}. _\{Maybe a multilingual text example\} }
+
+-----------------------------------
+
+<?php echo $text_helper->translate('I need to print {something_inside_curly_brackets}. _{Maybe a multilingual text example} ', array()); ?>
+
+
+
+===================================
+
+{comment}
+
+-----------------------------------
+
+<?php echo $comment; ?>
+
+
+
+===================================
+
+{post.Comments}
+
+-----------------------------------
+
+<?php echo $post->Comments; ?>
+
+
+
+===================================
+
+{post.Comments.latest}
+
+-----------------------------------
+
+<?php echo $post->Comments->latest; ?>
+
+
+
+===================================
+
+{people-members}
+
+-----------------------------------
+
+<?php echo $people['members']; ?>
+
+
+
+===================================
+
+{people-0-member}
+
+-----------------------------------
+
+<?php echo $people[0]['member']; ?>
+
+
+
+===================================
+
+{people.members-0.name}
+
+-----------------------------------
+
+<?php echo $people->members[0]->name; ?>
+
+
+
+===================================
+
+{posts-latest.created_at}
+
+-----------------------------------
+
+<?php echo $posts['latest']->created_at; ?>
+
+
+
+===================================
+
+<hidden>
+<?php Running secret stuff ?>
+</hidden>
+
+-----------------------------------
+
+
+
+
+
+===================================
+
+{posts-cc._number}
+
+-----------------------------------
+
+
+{posts-cc._number}
+
+
+
+===================================
+
+{_post.comment}
+
+-----------------------------------
+
+
+{_post.comment}
+
+
+
+===================================
+
+{comment?}
+
+-----------------------------------
+
+<?php echo empty($comment) ? '' : $comment; ?>
+
+
+
+
+===================================
+
+{comment._pass?}
+
+-----------------------------------
+
+{comment._pass?}
+
+
+
+
+===================================
+
+{?comment}Hello world{end}
+
+-----------------------------------
+
+<?php if(!empty($comment)) { ?>Hello world<?php } ?>
+
+
+
+===================================
+
+{?comment.author}
+    {comment.author}
+{end}
+
+-----------------------------------
+
+<?php if(!empty($comment->author)) { ?>
+    <?php echo $comment->author; ?>
+<?php } ?>
+
+
+
+===================================
+
+{?comment.author}
+    {comment.author}
+    {?comment.author-name}
+        {comment.author-name}
+    {end}
+{end}
+
+-----------------------------------
+
+<?php if(!empty($comment->author)) { ?>
+    <?php echo $comment->author; ?>
+    <?php if(!empty($comment->author['name'])) { ?>
+        <?php echo $comment->author['name']; ?>
+    <?php } ?>
+<?php } ?>
+
+
+
+===================================
+
+{?comment.author}
+    {comment.author}
+{end}
+{?comment.author-name}
+    {comment.author-name}
+{end}
+
+-----------------------------------
+
+
+<?php if(!empty($comment->author)) { ?>
+    <?php echo $comment->author; ?>
+<?php } ?>
+<?php if(!empty($comment->author['name'])) { ?>
+    <?php echo $comment->author['name']; ?>
+<?php } ?>
+
+
+
+===================================
+
+{?comment.author}
+    {comment.author}
+{else}
+    Anonymous coward
+{end}
+
+-----------------------------------
+
+
+<?php if(!empty($comment->author)) { ?>
+    <?php echo $comment->author; ?>
+<?php } else { ?>
+    Anonymous coward
+<?php } ?>
+
+
+
+===================================
+
+{loop posts}
+<q> {post.comment?} {post.author?} </q>
+{end}
+
+-----------------------------------
+
+
+<?php 
+ empty($posts) ? null : $post_loop_counter = 0;
+ empty($posts) ? null : $posts_available = count($posts);
+ if(!empty($posts))
+     foreach ($posts as $post_loop_key=>$post){
+         $post_loop_counter++;
+         $post_is_first = $post_loop_counter === 1;
+         $post_is_last = $post_loop_counter === $posts_available;
+         $post_odd_position = $post_loop_counter%2;
+?>
+<q> <?php echo empty($post->comment) ? '' : $post->comment; ?> <?php echo empty($post->author) ? '' : $post->author; ?> </q>
+<?php } ?>
+
+
+
