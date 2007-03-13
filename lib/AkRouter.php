@@ -236,11 +236,11 @@ class AkRouter extends AkObject
             }
 
             $_url_pieces = array();
-            foreach ($route['url_pieces'] as $v){
+            foreach (array_reverse($route['url_pieces']) as $v){
                 if(strstr($v,':') || strstr($v,'*')){
                     $v = substr($v,1);
                     if(isset($params[$v])){
-                        if (isset($route['options'][$v]) && $params[$v] != $route['options'][$v] || !isset($route['options'][$v]) || isset($route['options'][$v]) && $route['options'][$v] === COMPULSORY){
+                        if (count($_url_pieces) || isset($route['options'][$v]) && $params[$v] != $route['options'][$v] || !isset($route['options'][$v]) || isset($route['options'][$v]) && $route['options'][$v] === COMPULSORY){
                             $_url_pieces[] = is_array($params[$v]) ? join('/',$params[$v]) : $params[$v];
                         }
                     }
@@ -248,7 +248,9 @@ class AkRouter extends AkObject
                     $_url_pieces[] = is_array($v) ? join('/',$v) : $v;
                 }
             }
-            $parsed = str_replace('//','/','/'.join('/',$_url_pieces).'/');
+            
+
+            $parsed = str_replace('//','/','/'.join('/',array_reverse($_url_pieces)).'/');
 
             // This might be faster but using eval here might cause security issues
             //@eval('$parsed = "/".trim(str_replace("//","/","'.str_replace(array('/:','/*'),'/$','/'.join('/',$route['url_pieces']).'/').'"),"/")."/";');
@@ -262,7 +264,7 @@ class AkRouter extends AkObject
                     if($parsed == '/' && count(array_diff($params,$parsed_arr)) == 0){
                         return '/';
                     }
-
+                    
                     if( isset($parsed_arr['controller']) &&
                     ((isset($controller) && $parsed_arr['controller'] == $controller) ||
                     (isset($_controller) && $parsed_arr['controller'] == $_controller))){
@@ -277,7 +279,7 @@ class AkRouter extends AkObject
                         }
 
                         $url_params = array_merge($parsed_arr,$params_copy);
-
+                        
                         if($parsed != '/'){
                             foreach ($parsed_arr as $k=>$v){
                                 if(isset($url_params[$k]) && $url_params[$k] == $v){
@@ -285,8 +287,8 @@ class AkRouter extends AkObject
                                 }
                             }
                         }
-
-                        foreach ($route['url_pieces'] as $piece){
+                        
+                        foreach (array_reverse($route['url_pieces'], true) as $position => $piece){
                             $piece = str_replace(array(':','*'),'', $piece);
                             if(isset($$piece)){
                                 if(strstr($parsed,'/'.$$piece.'/')){
