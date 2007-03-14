@@ -57,15 +57,6 @@ class Test_of_AkSintags extends  UnitTestCase
 }
 
 
-class Tests_for_RenderedSintags extends AkWebTestCase 
-{
-    function test_rendered_view()
-    {
-        $this->assertEqual($this->get(AK_TESTING_URL.'/page/setup'), file_get_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'sintags_rendered_view.txt'));
-    }
-}
-
 Ak::test('Test_of_AkSintags');
-Ak::test('Tests_for_RenderedSintags');
 
 ?>
