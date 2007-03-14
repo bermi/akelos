@@ -6,6 +6,10 @@ class PageController extends AkActionController
     {
         
     }
+    function setup()
+    {
+        
+    }
 }
 
 

@@ -1,4 +1,5 @@
 
+
 <%= render :partial => "account", :locals => { :account => @buyer } %>
 
 -----------------------------------
@@ -201,4 +202,24 @@
 
 
 <?php echo $date_helper->distance_of_time_in_words(300, 100); ?>
+
+
+===================================
+
+<%= url_for :action => 'select_database' %>
+
+-----------------------------------
+
+
+<?php echo $url_helper->url_for( array('action' => 'select_database')); ?>
+
+
+===================================
+
+<?= "Hola" ?>
+
+-----------------------------------
+
+
+<?php echo "Hola" ?>
 

@@ -17,7 +17,7 @@
          $database_odd_position = $database_loop_counter%2;
 ?>
             <li>
-              <h2><a href="<?=$url_helper->url_for(array('action'=>'set_database_details','database_type'=>$database['type']))?>"><?php 
+              <h2><a href="<?php echo $url_helper->url_for(array('action'=>'set_database_details','database_type'=>$database['type']))?>"><?php 
  echo $database['name'];
 ?></h2>
             </li>

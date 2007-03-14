@@ -18,14 +18,14 @@
         <div id="main-content">
           <h1><?php echo $text_helper->translate('Please set your database details', array()); ?></h1>
         
-          <?= $form_tag_helper->start_form_tag(array('controller'=>'framework_setup','action'=>'set_database_details')) ?>
+          <?php echo  $form_tag_helper->start_form_tag(array('controller'=>'framework_setup','action'=>'set_database_details')) ?>
 
-          <? foreach (array('development','production','testing') as $mode) : ?>
+          <?php foreach (array('development','production','testing') as $mode) : ?>
           
               <fieldset>
-              <legend><?=$text_helper->translate(ucfirst($mode))?> Database Details</legend>
+              <legend><?php echo $text_helper->translate(ucfirst($mode))?> Database Details</legend>
               
-              <? if($FrameworkSetup->database_type != 'sqlite') : ?>
+              <?php if($FrameworkSetup->database_type != 'sqlite') : ?>
        
               <label for='<?php 
  echo $mode;
@@ -35,7 +35,7 @@
 ?>_database_host' id='<?php 
  echo $mode;
 ?>_database_host' 
-                        value='<?=$FrameworkSetup->getDatabaseHost($mode)?>' />
+                        value='<?php echo $FrameworkSetup->getDatabaseHost($mode)?>' />
                         
                     <label for='<?php 
  echo $mode;
@@ -45,7 +45,7 @@
 ?>_database_name' id='<?php 
  echo $mode;
 ?>_database_name' 
-                        value='<?=$FrameworkSetup->getDatabaseName($mode)?>' />
+                        value='<?php echo $FrameworkSetup->getDatabaseName($mode)?>' />
                         
                     <label for='<?php 
  echo $mode;
@@ -55,7 +55,7 @@
 ?>_database_user' id='<?php 
  echo $mode;
 ?>_database_user' 
-                        value='<?=$FrameworkSetup->getDatabaseUser($mode)?>' />
+                        value='<?php echo $FrameworkSetup->getDatabaseUser($mode)?>' />
                         
                     <label for='<?php 
  echo $mode;
@@ -65,9 +65,9 @@
 ?>_database_password' id='<?php 
  echo $mode;
 ?>_database_password' 
-                        value='<?=$FrameworkSetup->getDatabasePassword($mode)?>' />
+                        value='<?php echo $FrameworkSetup->getDatabasePassword($mode)?>' />
                         
-            <? else : ?>
+            <?php else : ?>
            
               <label for='<?php 
  echo $mode;
@@ -78,15 +78,15 @@
 ?>_database_name' id='<?php 
  echo $mode;
 ?>_database_name' 
-                        value='<?=$FrameworkSetup->getDatabaseName($mode)?>' /><b>.sqlite</b>
+                        value='<?php echo $FrameworkSetup->getDatabaseName($mode)?>' /><b>.sqlite</b>
             
-            <? endif; ?>
+            <?php endif; ?>
                 
             </fieldset>           
             <br />
             <br />
                 
-        <? endforeach; ?>
+        <?php endforeach; ?>
         
         
         <?php
@@ -100,16 +100,16 @@
             <legend><?php echo $text_helper->translate('(optional) Try to create databases using the following privileged account:', array()); ?></legend>
                 <label for='admin_database_user'><?php echo $text_helper->translate('DB admin user name', array()); ?></label>
                     <input type='text' name='admin_database_user' id='admin_database_user' 
-                    value='<?=$FrameworkSetup->getDatabaseAdminUser()?>' />
+                    value='<?php echo $FrameworkSetup->getDatabaseAdminUser()?>' />
                     
                 <label for='admin_database_password'><?php echo $text_helper->translate('DB admin password', array()); ?></label>
                     <input type='password' name='admin_database_password' id='admin_database_password' 
-                    value='<?=$FrameworkSetup->getDatabaseAdminPassword()?>' />
+                    value='<?php echo $FrameworkSetup->getDatabaseAdminPassword()?>' />
         </fieldset>
         <br />
         <br />
         
-        <? endif; ?>
+        <?php endif; ?>
                 
                 <input type="submit" value="<?php echo $text_helper->translate('Continue', array()); ?>" />
 

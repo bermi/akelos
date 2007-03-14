@@ -1,0 +1,20 @@
+        <div id="header">
+          <h1>Welcome aboard</h1>
+          <h2>You&rsquo;re using The Akelos Framework!</h2>
+        </div>
+
+        <div id="main-content">
+          <h1>Getting started</h1>
+          <ol>
+            <li>
+              <h2>Configure your environment</h2>
+              <p><a href="/framework_tests/test/fixtures/public/page/select_database/">Run a step by step wizard for creating a configuration file</a> or read README.txt instead.</p>
+            </li>
+            
+          </ol>
+        </div>
+        <div id="next-step">
+            <p>
+                <a href="/framework_tests/test/fixtures/public/page/select_database/">Start the configuration wizard</a>
+            </p>
+        </div>

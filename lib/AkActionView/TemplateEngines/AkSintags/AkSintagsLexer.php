@@ -102,7 +102,8 @@ class AkSintagsLexer extends AkLexer
 
     function _addHelperTokens()
     {
-        $this->addEntryPattern(AK_SINTAGS_OPEN_HELPER_TAG.'\x3D?[ \n\t]*[A-Za-z0-9_]+[ \n\t]*\x28?[ \n\t]*(?=.*'.AK_SINTAGS_CLOSE_HELPER_TAG.')','Text','Helper');
+        $this->addEntryPattern(AK_SINTAGS_OPEN_HELPER_TAG.'\x3D?[ \n\t]*[A-Za-z0-9_]+[ \n\t]*\x28?[ \n\t]*'.
+        '(?=.*'.AK_SINTAGS_CLOSE_HELPER_TAG.')','Text','Helper');
         $this->addExitPattern('\x29?[ \n\t]*'.AK_SINTAGS_CLOSE_HELPER_TAG, 'Helper');
 
         $this->_addSintagsHelperParametersForScope('Helper');

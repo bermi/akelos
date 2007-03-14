@@ -35,26 +35,37 @@ class Test_of_AkSintags extends  UnitTestCase
             $AkSintags =& new AkSintagsParser();
             $php = $AkSintags->parse($sintags);
             if($php != $expected_php){
-                Ak::trace('GENERATED: '.$php);
-                Ak::trace('EXPECTED: '.$expected_php);
-                Ak::trace('SINTAGS: '.$sintags);
+                Ak::trace("GENERATED: \n".$php);
+                Ak::trace("EXPECTED: \n".$expected_php);
+                Ak::trace("SINTAGS: \n".$sintags);
             }
 
             $this->assertEqual($php, $expected_php);
         }
+
         if($all_in_one_test){
             $AkSintags =& new AkSintagsParser();
             $php = $AkSintags->parse($multiple_sintags);
             if($php != $multiple_expected_php){
-                Ak::trace('GENERATED: '.$php);
-                Ak::trace('EXPECTED: '.$expected_php);
-                Ak::trace('SINTAGS: '.$sintags);
+                Ak::trace("GENERATED: \n".$php);
+                Ak::trace("EXPECTED: \n".$expected_php);
+                Ak::trace("SINTAGS: \n".$sintags);
             }
             $this->assertEqual($php, $multiple_expected_php);
         }
     }
 }
 
+
+class Tests_for_RenderedSintags extends AkWebTestCase 
+{
+    function test_rendered_view()
+    {
+        $this->assertEqual($this->get(AK_TESTING_URL.'/page/setup'), file_get_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'sintags_rendered_view.txt'));
+    }
+}
+
 Ak::test('Test_of_AkSintags');
+Ak::test('Tests_for_RenderedSintags');
 
 ?>

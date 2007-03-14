@@ -5,7 +5,7 @@
         <p><?php echo $text_helper->translate('The Akelos Framework makes an extensive use of the file system for handling locales, cache, compiled templates...', array()); ?></p>
         <p><?php echo $text_helper->translate('The installer could not create a test file at <b>config/test_file.txt</b>, so you should check if the user that is running the web server has enough privileges to write files inside the installation directory.', array()); ?></p>
         
-        <p><?=$text_helper->translate('If you have made changes to the filesystem or web server, <a href="%ftp_url">click here to continue</a> or 
+        <p><?php echo $text_helper->translate('If you have made changes to the filesystem or web server, <a href="%ftp_url">click here to continue</a> or 
 <a href="%url_skip">here to skip the filesystem setting</a></p>',
 array(
 	'%ftp_url'=>$url_helper->url_for(array('controller'=>'framework_setup','action'=>'configure_ftp_details','check'=>true)),
@@ -14,7 +14,7 @@ array(
 
 
 
-        <? if($FrameworkSetup->canUseFtpFileHandling()) : ?>
+        <?php if($FrameworkSetup->canUseFtpFileHandling()) : ?>
         
         <p><?php echo $text_helper->translate('If you can\'t change the web server or file system permissions the Akelos Framework has an alternate way to access the file system by using an FTP account that points to your application path.', array()); ?></p>
         
@@ -23,7 +23,7 @@ array(
         <div id="main-content">
           <h1><?php echo $text_helper->translate('Please set your ftp connection details', array()); ?></h1>
         
-          <?= $form_tag_helper->start_form_tag(array('controller'=>'framework_setup','action'=>'configure_ftp_details')) ?>
+          <?php echo  $form_tag_helper->start_form_tag(array('controller'=>'framework_setup','action'=>'configure_ftp_details')) ?>
    
           <label for='ftp_host'><?php echo $text_helper->translate('FTP Host', array()); ?></label>
                     <input type='text' name='ftp_host' id='ftp_host' value='<?php 
@@ -55,7 +55,7 @@ array(
             
         </div>
         
-        <? else : ?>
+        <?php else : ?>
         
         <div class="important">
             <p><?php echo $text_helper->translate('You don\'t have enabled FTP support into your PHP settings. When enabled 
@@ -65,4 +65,4 @@ array(
             </p>
         </div>
         
-        <? endif; ?>
+        <?php endif; ?>

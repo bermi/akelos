@@ -22,6 +22,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'TemplateEngines'.DS.'AkSintags'.DS
 require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'TemplateEngines'.DS.'AkSintags'.DS.'AkSintagsParser.php');
 
 ak_define('SINTAGS_REMOVE_PHP_SILENTLY', false);
+ak_define('SINTAGS_REPLACE_SHORTHAND_PHP_TAGS', true);
 ak_define('SINTAGS_HIDDEN_COMMENTS_TAG', 'hidden');
 
 ak_define('SINTAGS_OPEN_HELPER_TAG', '<%');

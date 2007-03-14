@@ -202,12 +202,14 @@ class AkActionController extends AkObject
             $helpers[$current_controller_helper_file_name] = $current_controller_helper;
         }
 
+        $available_helpers = array();
         foreach ($helpers as $file=>$helper){
             $helper_class_name = $helper.'Helper';
             $full_path = preg_match('/[\\\\\/]+/',$file);
             $full_path ? include_once($file) : include_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.$file);
             if(class_exists($helper_class_name)){
                 $attribute_name = $full_path ? AkInflector::underscore($helper_class_name) : substr($file,0,-4);
+                $available_helpers[] = $attribute_name;
                 $this->$attribute_name =& new $helper_class_name(&$this);
                 if(method_exists($this->$attribute_name,'setController')){
                     $this->$attribute_name->setController(&$this);
@@ -217,6 +219,8 @@ class AkActionController extends AkObject
                 }
             }
         }
+        
+        ak_define('ACTION_CONTROLLER_AVAILABLE_HELPERS', join(',',$available_helpers));
     }
 
     function getDefaultHelpers()

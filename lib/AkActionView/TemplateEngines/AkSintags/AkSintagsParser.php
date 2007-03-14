@@ -65,7 +65,28 @@ class AkSintagsParser
 
     function PhpCode($match, $state)
     {
-        $this->output .= $match;
+        if(!AK_SINTAGS_REPLACE_SHORTHAND_PHP_TAGS){
+            $this->output .= $match;
+            return true;   
+        }
+        switch ($state){
+            case AK_LEXER_ENTER:
+            $this->output .= '<?php';
+            break;
+            case AK_LEXER_UNMATCHED:
+            $match = ltrim($match);
+            if(!empty($match)){
+                if(substr($match,0,3) == 'php'){
+                    $match = substr($match,3);
+                }elseif($match[0] == '='){
+                    $match = ' echo'.substr($match,1);
+                }
+                $this->output.=  $match;
+            }
+            break;
+            case AK_LEXER_EXIT:
+            $this->output .= '?>';
+        }
         return true;
     }
 
@@ -254,10 +275,10 @@ class AkSintagsParser
     {
         switch ($state){
             case AK_LEXER_ENTER:
-            $this->_has_last_argument_params = false;
             $method_name = trim($match,' =('.AK_SINTAGS_OPEN_HELPER_TAG);
             if($helper = $this->_getHelperNameForMethod($method_name)){
                 $this->avoid_php_tags = !$is_inline_function && !strstr($match,'=');
+                $this->_current_function_opening = strlen($this->output);
                 if(!$this->avoid_php_tags){
                     $this->output .= $is_inline_function ? '' : '<?php echo ';
                 }
@@ -274,20 +295,26 @@ class AkSintagsParser
             if($match == ','){
                 $this->output .= $match.' ';
             }elseif ($match == '=>'){
-                if(!$this->_has_last_argument_params){
-                    $function_opening = strrpos($this->output,'(')+1;
-                    $last_comma = strrpos($this->output,',')+1;
+                if(empty($this->_inside_array) && empty($this->_has_last_argument_params)){
+                    $current_function = substr($this->output,$this->_current_function_opening);
+
+                    $function_opening = strrpos($current_function,'(')+1;
+                    $last_comma = strrpos($current_function,',')+1;
                     $insert_point = $function_opening > $last_comma && $last_comma === 1 ? $function_opening : $last_comma;
-                    $this->output = substr($this->output,0,$insert_point).' array('.ltrim(substr($this->output,$insert_point));
+
+                    $this->output = substr($this->output,0,$this->_current_function_opening+$insert_point).' array('.ltrim(substr($this->output,$this->_current_function_opening+$insert_point));
                     $this->_has_last_argument_params = true;
                 }
+
                 $this->output .= ' => ';
             }
             break;
 
             case AK_LEXER_EXIT:
-            $this->output .= ($this->_has_last_argument_params ? ')':'').')'.
+            $this->output .= (!empty($this->_has_last_argument_params) ? ')':'').')'.
             ($this->avoid_php_tags ? '' : ($is_inline_function?'':'; ?>'));
+            $this->_has_last_argument_params = false;
+            break;
         }
 
         return true;
@@ -408,6 +435,7 @@ class AkSintagsParser
     {
         switch ($state){
             case AK_LEXER_ENTER:
+            $this->_inside_array = true;
             $this->output .= 'array(';
             break;
             case AK_LEXER_UNMATCHED:
@@ -419,6 +447,7 @@ class AkSintagsParser
             }
             break;
             case AK_LEXER_EXIT:
+            $this->_inside_array = false;
             $this->output .= ')';
             break;
         }
@@ -446,23 +475,23 @@ class AkSintagsParser
 
     function _getAvailableHelpers()
     {
+        $helpers = array();
         if(empty($this->available_helpers)){
             if(defined('AK_SINTAGS_AVALABLE_HELPERS')){
                 $helpers = unserialize(AK_SINTAGS_AVALABLE_HELPERS);
             }elseif (defined('AK_ACTION_CONTROLLER_AVAILABLE_HELPERS')){
-                $underscored_helper_names = Ak::toStruct(AK_ACTION_CONTROLLER_AVAILABLE_HELPERS);
-                $helpers = array();
+                $underscored_helper_names = Ak::toArray(AK_ACTION_CONTROLLER_AVAILABLE_HELPERS);
                 foreach ($underscored_helper_names as $underscored_helper_name){
                     $helper_class_name = AkInflector::camelize($underscored_helper_name);
                     if(class_exists($helper_class_name)){
                         foreach (get_class_methods($helper_class_name) as $method_name){
-                            if($method[0] != '_'){
+                            if($method_name[0] != '_'){
                                 $helpers[$method_name] = $underscored_helper_name;
                             }
                         }
                     }
                 }
-
+                $helpers['render'] = 'controller';
             }
             $this->available_helpers = $helpers;
         }
