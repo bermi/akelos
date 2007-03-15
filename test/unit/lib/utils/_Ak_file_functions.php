@@ -79,6 +79,12 @@ class test_of_Ak_file_functions extends  UnitTestCase
         $this->assertFalse(Ak::directory_delete('./'));
     }
     
+    function test_mime_type_detection()
+    {
+        $this->assertEqual(Ak::mime_content_type(AK_PUBLIC_DIR.DS.'images'.DS.'akelos_framework_logo.png'),'image/png');
+        $this->assertEqual(Ak::mime_content_type('C:\Folder\image.png'),'image/png');
+    }
+    
 }
 
 Ak::test('test_of_Ak_file_functions');

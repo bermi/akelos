@@ -223,3 +223,14 @@
 
 <?php echo "Hola" ?>
 
+
+===================================
+
+<%= url_for true, false %>
+
+-----------------------------------
+
+
+<?php echo $url_helper->url_for(true, false); ?>
+
+
