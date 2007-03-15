@@ -238,7 +238,7 @@ class AkSintagsParser
     function Loop($match, $state)
     {
         if(AK_LEXER_SPECIAL === $state){
-            $sintags_var = substr($match, 6,-1);
+            $sintags_var = rtrim(substr($match, 6,-1),'?');
             $php_variable = $this->_convertSintagsVarToPhp($sintags_var);
             if($php_variable){
                 $php_variable = $php_variable;

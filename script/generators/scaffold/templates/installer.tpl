@@ -17,7 +17,11 @@ class <?=$model_name?>Installer extends AkInstaller
     function up_1()
     {
         $this->createTable('<?=$plural_name?>', "
-          id integer not null auto increment pk
+          id,
+          name,
+          description,
+          created_at,
+          updated_at
         ");  
     }
     

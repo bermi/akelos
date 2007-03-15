@@ -14,15 +14,15 @@
 
   <tr>
     <?='<? '?>$content_columns = array_keys($<?=$model_name?>->getContentColumns()); ?>
-    {loop content_columns?}
+    {loop content_columns}
         <th scope="col"><?='<?= '?>$pagination_helper->sortable_link($content_column) ?></th>
     {end}
     <th colspan="3" scope="col"><span class="auraltext">_{Item actions}</span></th>
   </tr>
 
-  {loop <?=$plural_name?>?}
+  {loop <?=$plural_name?>}
     <tr {?<?=$singular_name?>_odd_position}class="odd"{end}>
-    {loop content_columns?}
+    {loop content_columns}
       <td class="field"><?='<?= '?>$<?=$singular_name?>->get($content_column) ?></td>
     {end}
       <td class="operation"><?='<?= '.$helper_var_name?>->link_to_show($<?=$singular_name?>)?></td>

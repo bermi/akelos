@@ -97,7 +97,7 @@ class AkSintagsLexer extends AkLexer
 
     function _addLoopTokens()
     {
-        $this->addSpecialPattern('{loop [A-Za-z][\.A-Za-z0-9_-]+}','Text','Loop');
+        $this->addSpecialPattern('{loop [A-Za-z][\.A-Za-z0-9_-]+\??}','Text','Loop');
     }
 
     function _addHelperTokens()
