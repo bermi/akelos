@@ -35,7 +35,7 @@
 
 -----------------------------------
 
-<?php echo $text_helper->translate('I\'m anxious', 'I\'m Testing'); ?>
+<?php  echo $text_helper->translate('I\'m anxious', 'I\'m Testing'); ?>
 
 
 
@@ -221,7 +221,7 @@
 -----------------------------------
 
 
-<?php echo "Hola" ?>
+<?php  echo "Hola" ?>
 
 
 ===================================
@@ -232,5 +232,17 @@
 
 
 <?php echo $url_helper->url_for(true, false); ?>
+
+===================================
+
+<? if (true): ?>
+ <td></td>
+<? endif; ?>
+
+-----------------------------------
+
+<?php if (true): ?>
+ <td></td>
+<?php endif; ?>
 
 

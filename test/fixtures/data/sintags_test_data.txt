@@ -5,7 +5,7 @@ echo "{@url_for controller:page}";
 
 -----------------------------------
 
-<?php 
+<?php  
 echo "{@url_for controller:page}";
 ?>
 
@@ -301,4 +301,19 @@ _{I need to print \{something_inside_curly_brackets\}. _\{Maybe a multilingual t
 <?php } ?>
 
 
+===================================
 
+{?company}{loop people}{end}{end}
+
+-----------------------------------
+
+<?php if(!empty($company)) { ?><?php 
+ empty($people) ? null : $person_loop_counter = 0;
+ empty($people) ? null : $people_available = count($people);
+ if(!empty($people))
+     foreach ($people as $person_loop_key=>$person){
+         $person_loop_counter++;
+         $person_is_first = $person_loop_counter === 1;
+         $person_is_last = $person_loop_counter === $people_available;
+         $person_odd_position = $person_loop_counter%2;
+?><?php } ?><?php } ?>

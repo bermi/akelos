@@ -71,7 +71,7 @@ class AkSintagsParser
         }
         switch ($state){
             case AK_LEXER_ENTER:
-            $this->output .= '<?php';
+            $this->output .= '<?php ';
             break;
             case AK_LEXER_UNMATCHED:
             $match = ltrim($match);
