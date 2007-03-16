@@ -25,6 +25,7 @@ class AkSintagsLexer extends AkLexer
     'Comment',
     'Helper',
     'Translation',
+    'VariableTranslation',
     'EndTag',
     'ElseTag',
     'ConditionStart',
@@ -68,6 +69,11 @@ class AkSintagsLexer extends AkLexer
     {
         $this->addEntryPattern('_{','Text','Translation');
         $this->addExitPattern('}','Translation');
+    }
+
+    function _addVariableTranslationTokens()
+    {
+        $this->addSpecialPattern('{_[A-Za-z][\.A-Za-z0-9_-]+}','Text','VariableTranslation');
     }
 
     function _addVariableTokens()
@@ -139,7 +145,7 @@ class AkSintagsLexer extends AkLexer
         $this->addExitPattern("'", 'SingleQuote');
 
         $this->addSpecialPattern('[0-9]+[\.0-9]*', $scope, 'Numbers');
-        
+
         $this->addSpecialPattern('true|false', $scope, 'Text');
 
         $this->addSpecialPattern('\x3A[A-Za-z0-9_]+',$scope,'Symbol');

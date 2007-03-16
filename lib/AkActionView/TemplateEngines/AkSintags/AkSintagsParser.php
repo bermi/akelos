@@ -137,6 +137,22 @@ class AkSintagsParser
 
 
     //------------------------------------
+    //  VARIABLE TRANSLATIONS
+    //------------------------------------
+
+    function VariableTranslation($match, $state)
+    {
+        $php_variable = $this->_convertSintagsVarToPhp(trim($match,'{_}?'));
+        if($php_variable){
+            $this->output .= '<?php echo empty('.$php_variable.') || !is_array('.$php_variable.') ? \'\' : $text_helper->translate('.$php_variable.'); ?>';
+        }else{
+            $this->output .= $match;
+        }
+        return true;
+    }
+
+
+    //------------------------------------
     //  SINTAGS CONDITIONAL VARIABLES
     //------------------------------------
 
