@@ -1069,7 +1069,7 @@ Options are:
         static $instances;
         if(!isset($instances[$class_name])) {
             if(is_object($arguments)){
-                $instances[$class_name] =& new $class_name(&$arguments);
+                $instances[$class_name] =& new $class_name($arguments);
             }else{
                 if(Ak::size($arguments) > 0){
                     eval("\$instances[\$class_name] =& new \$class_name(".var_export($arguments, true)."); ");

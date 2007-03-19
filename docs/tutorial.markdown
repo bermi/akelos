@@ -43,7 +43,7 @@ you're on the right track and can continue creating an Akelos application; other
 
     which php
 
-And change the `#!/usr/bin/env php` at the beginning of these files  `script/console`, `script/generate`, `script/migrate`, `script/setup` and `script/test` to you php binary path.
+And change the `#!/usr/bin/env php` at the beginning of these files  `script/console`, `script/generate`, `script/migrate`, `script/setup` and `script/test` to your php binary path.
 
 **Note for Windows users:** You will need to call the scripts from your application directory using the full path to your php.exe file like:
 
@@ -57,9 +57,9 @@ You have downloaded Akelos and made sure you'll be able to run PHP scripts from 
 Now you can follow two paths:
 
  1. Create an Akelos application in a different folder and link it to the Framework libraries.
- 2. Start coding our application from this folder with the security implications that has making available to the visitors of your site all your Application models, views, 3rd party libraries and so on.
+ 2. Start coding your application from this folder with the security implications that has making available to the visitors of your site all your Application models, views, 3rd party libraries and so on.
  
-As you might have guessed we go with the first option and will create a linked Akelos application which will only expose the public folder to the world. Changing the Framework paths is really simple in Akelos, all you have to do is define in your configuration file where each component is located, but we will leave this for a future tutorial about designing an application for distributing it.
+As you might have guessed you should go with the first option and create a linked Akelos application which will only expose the public folder to the world. Changing the Framework paths is really simple in Akelos, all you have to do is define in your configuration file where each component is located, but we will leave this for a future tutorial about designing an application for distributing it.
 
 Assuming you've downloaded the framework to `HOME_DIR/akelos` and that you are  inside the `akelos` directory you will check available options for setting up your new application by running
 
@@ -106,9 +106,9 @@ and then restart your web server.
 
 ### Creating a database for your application ###
 
-Next thing you'll need is to create a database your your application. If you intend to use SQLite on PHP5 skip this step. 
+Next thing you'll need is to create a database for your application. If you intend to use SQLite on PHP5 skip this step. 
 
-Creating a MySQL database is out of the scope of this tutorial so you might need to google how to do this on your system or just try this common scenario where we will create database for 3 different environments (production, development and testing).
+Creating a MySQL database is out of the scope of this tutorial so you might need to google how to do this on your system or just try this common scenario where you can create 3 different databases one for each different environment (production, development and testing).
 
     mysql -u root -p
     
@@ -123,7 +123,7 @@ Creating a MySQL database is out of the scope of this tutorial so you might need
     mysql> FLUSH PRIVILEGES;
     mysql> exit
 
-If you are on a shared hosted server you might need to create it from your hosting company control panel.
+If you are on a shared hosted server you might need to create it from your hosting provider control panel.
 
 ### Generating the configuration file ###
 
@@ -182,7 +182,7 @@ Now you will create a file named `app/installers/booklink_installer.php` with th
      
      ?>
 
-That's enough for Akelos to create our database schema. If you just specify the column name, Akelos will default to the best data type based on database normalization conventions. If you want to have full control over your table settings, you can use [php Adodb Datadict syntax](http://phplens.com/lens/adodb/docs-datadict.htm)
+That's enough for Akelos to create your database schema. If you just specify the column name, Akelos will default to the best data type based on database normalization conventions. If you want to have full control over your table settings, you can use [php Adodb Datadict syntax](http://phplens.com/lens/adodb/docs-datadict.htm)
 
 Now we need to execute the installer with the command
 
