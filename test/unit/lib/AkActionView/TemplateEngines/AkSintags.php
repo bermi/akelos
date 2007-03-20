@@ -11,14 +11,14 @@ class Test_of_AkSintags extends  UnitTestCase
 
     function test_sintags()
     {
-        $this->_run_helpers_from_file('sintags_test_data.txt');
+        $this->_run_from_file('sintags_test_data.txt', false);
     }
     function test_sintags_helpers()
     {
-        $this->_run_helpers_from_file('sintags_helpers_data.txt');
+        $this->_run_from_file('sintags_helpers_data.txt');
     }
 
-    function _run_helpers_from_file($file_name, $all_in_one_test = true)
+    function _run_from_file($file_name, $all_in_one_test = true)
     {
         $multiple_expected_php = $multiple_sintags = '';
         $tests = explode('===================================',file_get_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.$file_name));

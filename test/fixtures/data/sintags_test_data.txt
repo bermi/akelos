@@ -317,3 +317,23 @@ _{I need to print \{something_inside_curly_brackets\}. _\{Maybe a multilingual t
          $person_is_last = $person_loop_counter === $people_available;
          $person_odd_position = $person_loop_counter%2;
 ?><?php } ?><?php } ?>
+
+
+===================================
+
+<h1>_{You can use %variables using the %sintags.variable-naming-way}</h1>
+
+-----------------------------------
+
+<h1><?php echo $text_helper->translate('You can use %variables using the %sintags.variable-naming-way', array('%variables' => @$variables, '%sintags.variable-naming-way' => @$sintags->variable['naming']['way'])); ?></h1>
+
+
+===================================
+
+<h1>_{Mixing %variables and \%escaped_variables}</h1>
+
+-----------------------------------
+
+<h1><?php echo $text_helper->translate('Mixing %variables and %escaped_variables', array('%variables' => @$variables)); ?></h1>
+
+

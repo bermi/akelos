@@ -67,7 +67,7 @@ class AkSintagsParser
     {
         if(!AK_SINTAGS_REPLACE_SHORTHAND_PHP_TAGS){
             $this->output .= $match;
-            return true;   
+            return true;
         }
         switch ($state){
             case AK_LEXER_ENTER:
@@ -123,13 +123,29 @@ class AkSintagsParser
     {
         switch ($state){
             case AK_LEXER_ENTER:
+            $this->_translation_tokens = array();
             $this->output .= '<?php echo $text_helper->translate(\'';
             break;
             case AK_LEXER_UNMATCHED:
             $this->output.= $this->_unescapeChars(str_replace("'","\'",$match), true);
             break;
             case AK_LEXER_EXIT:
-            $this->output .= '\', array()); ?>';
+            $this->output .= '\', array('.(empty($this->_translation_tokens)?'':join(', ',$this->_translation_tokens)).')); ?>';
+        }
+        return true;
+    }
+
+
+    //------------------------------------
+    //  TRANSLATIONS TOKEN
+    //------------------------------------
+
+    function TranslationToken($match)
+    {
+        $this->output.= ltrim($match,'\\');
+        $php_variable = $this->_convertSintagsVarToPhp(trim($match,'%'));
+        if($match[0] != '\\' && $php_variable){
+            $this->_translation_tokens[] = '\''.$match.'\' => @'.$php_variable;
         }
         return true;
     }
