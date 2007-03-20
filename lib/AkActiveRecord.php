@@ -2379,7 +2379,7 @@ Examples for find all:
 
             $column_objects = $this->_databaseTableInternals($this->getTableName());
 
-            if(!isset($this->_avoidTableNameValidation) && !is_array($column_objects)){
+            if(!isset($this->_avoidTableNameValidation) && !is_array($column_objects) && !$this->_runCurrentModelInstallerIfExists($column_objects)){
                 trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())), E_USER_ERROR);
                 return false;
             }elseif(is_array($column_objects)){
@@ -2433,8 +2433,8 @@ Examples for find all:
 
 
     /**#@+
-     * Active Record localization support methods
-     */
+    * Active Record localization support methods
+    */
     function _isInternationalizeCandidate($column_name)
     {
         $pos = strpos($column_name,'_');
@@ -2514,7 +2514,7 @@ Examples for find all:
         }
         return $attribute_locales;
     }
-    
+
     function setAttributeByLocale($attribute, $value, $locale)
     {
         $internationalizable_columns = $this->getInternationalizedColumns();
@@ -4553,6 +4553,29 @@ Examples for find all:
         }else{
             return 'unknown';
         }
+    }
+
+    function _runCurrentModelInstallerIfExists(&$column_objects)
+    {
+        static $installed_models = array();
+        if(!defined('AK_AVOID_AUTOMATIC_ACTIVE_RECORD_INSTALLERS') && !in_array($this->getModelName(), $installed_models)){
+            $installed_models[] = $this->getModelName();
+            require_once(AK_LIB_DIR.DS.'AkInstaller.php');
+            $installer_name = $this->getModelName().'Installer';
+            $installer_file = AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'.php';
+            if(file_exists($installer_file)){
+                require_once($installer_file);
+                if(class_exists($installer_name)){
+                    $Installer = new $installer_name();
+                    if(method_exists($Installer,'install')){
+                        $Installer->install();
+                        $column_objects = $this->_databaseTableInternals($this->getTableName());
+                        return !empty($column_objects);
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 }
