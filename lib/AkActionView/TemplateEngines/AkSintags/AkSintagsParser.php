@@ -79,7 +79,7 @@ class AkSintagsParser
                 if(substr($match,0,3) == 'php'){
                     $match = substr($match,3);
                 }elseif($match[0] == '='){
-                    $match = ' echo'.substr($match,1);
+                    $match = 'echo '.substr($match,1);
                 }
                 $this->output.=  $match;
             }

@@ -11,7 +11,7 @@ class Test_of_AkSintags extends  UnitTestCase
 
     function test_sintags()
     {
-        $this->_run_from_file('sintags_test_data.txt', false);
+        $this->_run_from_file('sintags_test_data.txt');
     }
     function test_sintags_helpers()
     {
