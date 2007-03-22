@@ -134,6 +134,9 @@ class AkSintagsLexer extends AkLexer
         $this->addEntryPattern('[A-Za-z][A-Za-z0-9_]+[ \n\t]*\x28(?=.*\x29)',$scope,'HelperFunction');
         $this->addExitPattern('\x29', 'HelperFunction');
 
+        $this->addEntryPattern('_[ \n\t]*\x28(?=.*\x29)',$scope,'HelperFunction');
+        $this->addExitPattern('\x29', 'HelperFunction');
+
         $this->addEntryPattern("\x7B", $scope, 'Hash');
         $this->addExitPattern("\x7D", 'Hash');
 

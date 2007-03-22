@@ -531,8 +531,11 @@ class AkSintagsParser
 
     }
 
-    function _getHelperNameForMethod($method_name)
+    function _getHelperNameForMethod(&$method_name)
     {
+        if($method_name == '_'){
+            $method_name = 'translate';   
+        }
         $this->_getAvailableHelpers();
         return empty($this->available_helpers[$method_name]) ? false : $this->available_helpers[$method_name];
     }

@@ -246,3 +246,24 @@
 <?php endif; ?>
 
 
+===================================
+
+
+<%= _('Write me home') %>
+
+-----------------------------------
+
+<?php echo $text_helper->translate('Write me home'); ?>
+
+
+===================================
+
+
+<%= _'Write me home' %>
+
+-----------------------------------
+
+<?php echo $text_helper->translate('Write me home'); ?>
+
+
+
