@@ -267,3 +267,15 @@
 
 
 
+
+===================================
+
+
+<%= link_to _('Back to overview'), :action => 'listing' %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to($text_helper->translate('Back to overview'), array('action' => 'listing')); ?>
+
+
+

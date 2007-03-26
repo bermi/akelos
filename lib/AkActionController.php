@@ -650,8 +650,13 @@ class AkActionController extends AkObject
         'Template','db','helpers','models','layout','Response','Request',
         'params','passed_args');
     }
+    
 
-
+    /**
+     * Use this to translate strings in the scope of your controller
+     * 
+     * @see Ak::t
+     */
     function t($string, $array = null)
     {
         return Ak::t($string, $array, AkInflector::underscore($this->getControllerName()));

@@ -89,7 +89,7 @@ class CaptureHelper
 
     function _addVarToView($var_name, $content)
     {
-        $this->_controller->_viewVars[$var_name] = $content;
+        AkActionView::_addGlobalVar($var_name, $content);
     }
 
     /**

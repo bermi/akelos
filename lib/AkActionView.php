@@ -192,8 +192,8 @@ class AkActionView
     */
     function renderTemplate($____template_extension, $____template, $____file_path = null, $____local_assigns = array(), $____save_content_in_attribute_as = 'layout')
     {
-        $____local_assigns = array_merge((array)@$this->assigns,array_merge((array)@$this->_local_assigns,
-        array_merge((array)$____local_assigns,array('controller_name' => $this->controller,'controller' => &$this->_controllerInstance))));
+        $____local_assigns = array_merge(array_merge($this->_getGlobals(),(array)@$this->assigns,array_merge((array)@$this->_local_assigns,
+        array_merge((array)$____local_assigns,array('controller_name' => $this->controller,'controller' => &$this->_controllerInstance)))));
 
         if(!empty($this->_template_handlers[$____template_extension])){
             $____handler =& $this->_template_handlers[$____template_extension];
@@ -435,7 +435,31 @@ class AkActionView
 
     }
 
-
+    /**
+     * Variables assigned using this method will act on any controller or action. Use this in conjunction
+     * with your application helpers in order to allow variable passing from inside your views.
+     * This is used for example on the capture helper.
+     * 
+     * @static 
+     */
+    function _addGlobalVar($var_name, $value, $_retrieve = false)
+    {
+        static $_global_vars = array();
+        if($_retrieve){
+            return $_global_vars;
+        }
+        if($var_name[0] != '_'){
+            $_global_vars[$var_name] =& $value;
+        }
+    }
+     /**
+     * @static 
+     */
+    function _getGlobals()
+    {
+        return AkActionView::_addGlobalVar(null,null,true);
+    }
+    
 }
 
 ?>
