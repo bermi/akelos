@@ -242,10 +242,12 @@ class Ak
         $locale = empty($locale) ? (defined('AK_LOCALE') ? AK_LOCALE : (Ak::t('Akelos') && Ak::locale($locale_setting))) : $locale;
 
         if (empty($settings[$locale])) {
-            if(func_num_args() != 3){
-                $settings[$locale] = array();
-                $settings[$locale]['charset'] = AK_CHARSET;
-                //trigger_error(Ak::t('You must set the settings for current locale first by calling Ak::locale(null, $locale, $settings)'),E_USER_ERROR);
+            if(func_num_args() != 3){ // First time we ask for something using this locale so we will load locale details
+                $requested_locale = $locale;
+                @require(AK_CONFIG_DIR.DS.'locales'.DS.Ak::sanitize_include($requested_locale).'.php');
+                $locale = !empty($locale) && is_array($locale) ? $locale : array();
+                Ak::locale(null, $requested_locale, $locale);
+                return Ak::locale($locale_setting, $requested_locale);
             }else{
                 $settings[$locale] = func_get_arg(2);
                 if(isset($settings[$locale]['charset'])){
