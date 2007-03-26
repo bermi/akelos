@@ -419,7 +419,6 @@ class AkRouter extends AkObject
             $params = array();
 
             if(preg_match($route['regex'], $url)){
-
                 foreach ($route['regex_array'] as $single_regex_arr){
 
                     $k = key($single_regex_arr);
@@ -537,7 +536,7 @@ class AkRouter extends AkObject
             //COMPULSORY
 
             if($is_constant){
-                $regex_arr[] = array('_constant_'.$piece => '('.$piece.'){1}');
+                $regex_arr[] = array('_constant_'.$piece => '('.$piece.'(?=(\/|$))){1}');
             }elseif(isset($requirements[$piece])){
                 if (isset($options[$piece]) && $options[$piece] !== COMPULSORY){
                     $regex_arr[] = array($piece=> '(('.trim($requirements[$piece],'/').'){1})?');
@@ -582,11 +581,6 @@ class AkRouter extends AkObject
                 break;
             }
         }
-        /*
-        $allow_optional_values = !empty($allow_optional_values) || @$options[$k] === COMPULSORY || @$requirements[$k] === COMPULSORY;
-        if($allow_optional_values)
-        Ak::trace("$k");
-        */
 
         $regex = '/^((\/)?';
         $pieces_count = count($regex_arr);

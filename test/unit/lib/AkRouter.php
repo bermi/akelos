@@ -258,6 +258,19 @@ class Tests_for_url_constants_named_as_url_variables extends  UnitTestCase
         $this->Router->connect('/foo/bar/*bar', array('controller'=>'some', 'bar'=>1));
         $this->assertEqual($this->Router->toParams('/foo/bar/foobar'), array('controller'=>'some', 'bar'=>array(0=>'foobar')));
     }
+
+    function test_same_pieces_6()
+    {
+        $this->Router->connect('/foo/:bar',	array('variable'=>'ok'));
+        $this->Router->connect('/baz/:bar',	array('variable2'=>'ok', 'bar'=>COMPULSORY));
+        $this->Router->connect('/:controller');
+
+        $this->assertEqual($this->Router->toParams('/foo/baz'), array('variable'=>'ok','bar'=>'baz'));
+        $this->assertEqual($this->Router->toParams('/abc'), array('controller'=>'abc'));
+        $this->assertEqual($this->Router->toParams('/fooabc'), array('controller'=>'fooabc'));
+        $this->assertEqual($this->Router->toParams('/baz/bar'), array('variable2'=>'ok','bar'=>'bar'));
+        $this->assertEqual($this->Router->toParams('/bazabc'), array('controller'=>'bazabc'));
+    }
 }
 
 
@@ -272,17 +285,17 @@ class Test_for_middle_optional_values_when_generating_urls extends  UnitTestCase
         $this->Router->_loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
     }
-    
+
     function test_middle_values()
     {
         $this->Router->connect('/news/feed/:type/:category',
-        array('controller'=>'news','action'=>'feed','type'=>'atom','category'=>'all')); 
-        
-        
+        array('controller'=>'news','action'=>'feed','type'=>'atom','category'=>'all'));
+
+
         $input_value = array('controller'=>'news','action'=>'feed','type'=>'atom','category'=>'foobar');
         $expected = $this->url_prefix.'/news/feed/atom/foobar/';
         $this->assertEqual($this->Router->toUrl($input_value),$expected);
-        
+
         $input_value = array('controller'=>'news','action'=>'feed');
         $expected = $this->url_prefix.'/news/feed/';
         $this->assertEqual($this->Router->toUrl($input_value),$expected);
