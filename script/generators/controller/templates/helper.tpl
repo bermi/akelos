@@ -1,7 +1,7 @@
-<?='<?php'?>
+<?php  echo '<?php'?>
 
 
-class <?=$class_name?>Helper
+class <?php  echo $class_name?>Helper
 {
 }
 

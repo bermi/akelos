@@ -1,15 +1,15 @@
-<?='<?='?>$active_record_helper->error_messages_for('<?=$singular_name?>');?>
+<?php  echo '<?php  echo '?>$active_record_helper->error_messages_for('<?php  echo $singular_name?>');?>
 
-<? if(empty($content_columns)) : ?>
-<?='<?='?>$active_record_helper->all_input_tags($<?=$model_name?>, '<?=$singular_name?>', array()) ?>
-<? else : 
+<?php  if(empty($content_columns)) : ?>
+<?php  echo '<?php  echo '?>$active_record_helper->all_input_tags($<?php  echo $model_name?>, '<?php  echo $singular_name?>', array()) ?>
+<?php  else : 
         foreach ($content_columns as $column=>$details){
             echo "
     <p>
         <label for=\"{$singular_name}_{$column}\">_{".
             AkInflector::humanize($details['name']).
             "}</label><br />
-        <?=\$active_record_helper->input('$singular_name', '$column')?>
+        <?php  echo \$active_record_helper->input('$singular_name', '$column')?>
     </p>
 ";
         }

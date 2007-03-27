@@ -23,9 +23,9 @@
 *
 * == Capturing a block into an instance variable
 *
-*   <? $capture_helper->begin (); ?>
+*   <?php $capture_helper->begin (); ?>
 *     [some html...]
-*   <? $script = $capture_helper->end (); ?>
+*   <?php $script = $capture_helper->end (); ?>
 *  
 *
 * == Add javascript to header using content_for
@@ -51,9 +51,9 @@
 *   
 *   This page shows an alert box!
 *
-*   <? $capture_helper->begin ('script'); ?>
+*   <?php $capture_helper->begin ('script'); ?>
 *     alert('hello world');
-*   <? $capture_helper->end (); ?>
+*   <?php $capture_helper->end (); ?>
 *
 *   Normal view text
 */
@@ -67,7 +67,7 @@ class CaptureHelper
      * 
      * Example:
      * 
-     *   <? $capture_helper->begin(); ?>
+     *   <?php $capture_helper->begin(); ?>
      *     Welcome To my shiny new web page!
      *   <% $greeting = $capture_helper->end(); ?>      
      */
@@ -103,9 +103,9 @@ class CaptureHelper
     * 
     * Example:
     * 
-    *   <? $capture_helper->content_for('header'); ?>
+    *   <?php $capture_helper->content_for('header'); ?>
     *     alert('hello world');
-    *   <? $capture_helper->end(); ?>
+    *   <?php $capture_helper->end(); ?>
     *
     * You can use $content_for_header anywhere in your templates.
     *

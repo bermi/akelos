@@ -2,12 +2,12 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
  <head>
-  <title><?='<?='?>$text_helper->translate('<?= $controller_human_name ?>',array(),'layout');?>: <?='<?='?> $text_helper->translate($controller->getActionName(),array(),'layout');?></title>
+  <title><?php  echo '<?php  echo '?>$text_helper->translate('<?php  echo  $controller_human_name ?>',array(),'layout');?>: <?php  echo '<?php  echo '?> $text_helper->translate($controller->getActionName(),array(),'layout');?></title>
   <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-  <?='<?='?> $asset_tag_helper->stylesheet_link_tag('scaffold') ?>
+  <?php  echo '<?php  echo '?> $asset_tag_helper->stylesheet_link_tag('scaffold') ?>
  </head>
  <body>
  {?flash-notice}<div class="flash_notice">{flash-notice}</div>{end}
-  <?='<?='?> $content_for_layout ?>
+  <?php  echo '<?php  echo '?> $content_for_layout ?>
  </body>
 </html>

@@ -440,10 +440,10 @@ class AkActionController extends AkObject
     * PHP is used for rendering and the current layout is not used.
     * 
     * * Renders "hello, hello, hello, again"
-    *   $this->render(array('inline' => "<?=str_repeat('hello, ', 3).'again'?>" ));
+    *   $this->render(array('inline' => "<?php echo str_repeat('hello, ', 3).'again'?>" ));
     * 
     * * Renders "hello david"
-    *   $this->render(array('inline' => "<?= 'hello ' . $name ?>", 'locals' => array('name' => 'david')));
+    *   $this->render(array('inline' => "<?php echo  'hello ' . $name ?>", 'locals' => array('name' => 'david')));
     * 
     * 
     * === Rendering nothing
@@ -1031,9 +1031,9 @@ class AkActionController extends AkObject
     * Layouts reverse the common pattern of including shared headers and footers in many templates 
     * to isolate changes in repeated setups. The inclusion pattern has pages that look like this:
     *
-    *   <?= $controller->render('shared/header') ?>
+    *   <?php echo  $controller->render('shared/header') ?>
     *   Hello World
-    *   <?= $controller->render('shared/footer') ?>
+    *   <?php echo  $controller->render('shared/footer') ?>
     *
     * This approach is a decent way of keeping common structures isolated from the 
     * changing content, but it's verbose and if( you ever want to change the structure 
@@ -1044,7 +1044,7 @@ class AkActionController extends AkObject
     * mentioned in one place, like this:
     *
     *   <!-- The header part of this layout -->
-    *   <?= $content_for_layout ?>
+    *   <?php echo  $content_for_layout ?>
     *   <!-- The footer part of this layout -->
     *
     * And then you have content pages that look like this:
@@ -1065,12 +1065,12 @@ class AkActionController extends AkObject
     * This allows you to have layouts with references that won't materialize before 
     * rendering time:
     *
-    *   <h1><?= $page_title ?></h1>
-    *   <?= $content_for_layout ?>
+    *   <h1><?php echo  $page_title ?></h1>
+    *   <?php echo  $content_for_layout ?>
     *
     * ...and content pages that fulfill these references _at_ rendering time:
     *
-    *    <? $page_title = 'Welcome'; ?>
+    *    <?php $page_title = 'Welcome'; ?>
     *    Off-world colonies offers you a chance to start a new life
     *
     * The result after rendering is:
@@ -1200,7 +1200,7 @@ class AkActionController extends AkObject
     /**
     * If a layout is specified, all actions rendered through render and render_action will have their result assigned 
     * to <tt>$this->content_for_layout</tt>, which can then be used by the layout to insert their contents with
-    * <tt><?= $$this->content_for_layout ?></tt>. This layout can itself depend on instance variables assigned during action
+    * <tt><?php echo  $$this->content_for_layout ?></tt>. This layout can itself depend on instance variables assigned during action
     * performance and have access to them as any normal template would.
     */
     function setLayout($template_name, $conditions = array())
@@ -1881,7 +1881,7 @@ class AkActionController extends AkObject
     *   }
     *
     *   display.tpl
-    *     <? if($flash['notice']) : ?><div class='notice'><?=$flash['notice'] ?></div><? endif; ?>
+    *     <?php if($flash['notice']) : ?><div class='notice'><?php echo $flash['notice'] ?></div><?php endif; ?>
     *
     * This example just places a string in the flash, but you can put any object in there. And of course, you can put as many
     * as you like at a time too. Just remember: They'll be gone by the time the next action has been performed.

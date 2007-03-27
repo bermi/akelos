@@ -25,9 +25,9 @@
 * following loop for names:
 *
 *   <b>Names of all the people</b>
-*   <? foreach($people as $person) : ?>
+*   <?php foreach($people as $person) : ?>
 *   Name: <?=$person->name ?><br/>
-*   <? endforeach ?>
+*   <?php endforeach ?>
 *
 * == Using sub templates
 *
@@ -44,7 +44,7 @@
 * But you don't have to restrict yourself to static includes. Templates can share variables amongst themselves by using instance
 * variables defined using the regular embedding tags. Like this:
 *
-*   <? $shared->page_title = "A Wonderful Hello" ?>
+*   <?php $shared->page_title = "A Wonderful Hello" ?>
 *   <?= $controller->render("shared/header") ?>
 *
 * Now the header can pick up on the $page_title variable and use it for outputting a title tag:
@@ -313,9 +313,9 @@ class AkActionView
     * 
     *    <?= $controller->render(array('partial' =>'account','locals'=>array('account'=>$buyer)));  ?>
     * 
-    *    <? foreach($advertisements as $ad) : ?>
+    *    <?php foreach($advertisements as $ad) : ?>
     *      <?= $controller->render(array('partial'=>'ad','locals'=>array('ad'=>$ad))); ?>
-    *    <? endforeach; ?>
+    *    <?php endforeach; ?>
     * 
     *  This would first render "advertiser/_account.tpl" with $buyer passed in as the local variable $account, then render 
     *  "advertiser/_ad.tpl" and pass the local variable $ad to the template for display.

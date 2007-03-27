@@ -92,7 +92,7 @@ class FormHelper extends AkActionViewHelper
       * Creates a form and a scope around a specific model object, which is then used as a base for questioning about
       * values for the fields. Examples:
       *
-      *   <? $f = $form_helper->form_for('person', $Person, array('url' => array('action' => 'update'))); ?>
+      *   <?php $f = $form_helper->form_for('person', $Person, array('url' => array('action' => 'update'))); ?>
       *     First name: <?= $f->text_field('first_name'); ?>
       *     Last name : <?= $f->text_field('last_name'); ?>
       *     Biography : <?= $f->text_area('biography'); ?>
@@ -111,7 +111,7 @@ class FormHelper extends AkActionViewHelper
       * Also note that form_for doesn't create an exclusive scope. It's still possible to use both the stand-alone FormHelper methods
       * and methods from FormTagHelper. Example:
       *
-      *   <? $f = $form_helper->form_for('person', $Person, array('url' => array('action' => 'update'))); ?>
+      *   <?php $f = $form_helper->form_for('person', $Person, array('url' => array('action' => 'update'))); ?>
       *     First name: <?= $f->text_field('first_name'); ?>
       *     Last name : <?= $f->text_field('last_name'); ?>
       *     Biography : <?= $f->text_area('person', $Biography); ?>
@@ -132,11 +132,11 @@ class FormHelper extends AkActionViewHelper
       * Creates a scope around a specific model object like form_for, but doesn't create the form tags themselves. This makes
       * fields_for suitable for specifying additional model objects in the same form. Example:
       *
-      *   <? $person_form = $this->form_for('person', $Person, array('url' => array('action'=>'update'))); ?>
+      *   <?php $person_form = $this->form_for('person', $Person, array('url' => array('action'=>'update'))); ?>
       *     First name: <?= $person_form->text_field('first_name'); ?>
       *     Last name : <?= person_form->text_field('last_name'); ?>
       *     
-      *     <? $permission_fields = $form_helper->fields_for('permission', $Person->permission); ?>
+      *     <?php $permission_fields = $form_helper->fields_for('permission', $Person->permission); ?>
       *       Admin?  : <?= $permission_fields->check_box('admin'); ?>
       *   <?= $person_form->end_form_tag(); ?>
       *

@@ -1,7 +1,7 @@
-<?='<?php'?>
+<?php  echo '<?php'?>
 
 
-class <?=$class_name?> extends ActiveRecord
+class <?php  echo $class_name?> extends ActiveRecord
 {
 
 }

@@ -1,18 +1,18 @@
-<?='<?php'?>
+<?php  echo '<?php'?>
 
 require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
-require_once(AK_CONTROLLERS_DIR.DS.'<?=AkInflector::underscore($class_name)?>_controller.php');
+require_once(AK_CONTROLLERS_DIR.DS.'<?php  echo AkInflector::underscore($class_name)?>_controller.php');
 
 
-class <?=$class_name?>ControllerTest extends  UnitTestCase
+class <?php  echo $class_name?>ControllerTest extends  UnitTestCase
 {
-    function test_<?=$class_name?>()
+    function test_<?php  echo $class_name?>()
     {
-        $this->assertTrue(false, '<?=$class_name?>Controller has not being tested');
+        $this->assertTrue(false, '<?php  echo $class_name?>Controller has not being tested');
     }
 }
 
 
-Ak::test('<?=$class_name?>ControllerTest',true);
+Ak::test('<?php  echo $class_name?>ControllerTest',true);
 
 ?>
