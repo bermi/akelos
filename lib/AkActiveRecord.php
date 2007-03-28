@@ -3846,7 +3846,7 @@ Examples for find all:
 
         $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
         foreach ($attribute_names as $attribute_name){
-            if($allow_null ? (isset($this->$attribute_name) ? (!in_array(@$this->$attribute_name,$array_of_posibilities)) : false ) : (isset($this->$attribute_name) ? !in_array(@$this->$attribute_name,$array_of_posibilities) : true )){
+            if($allow_null ? (!empty($this->$attribute_name) ? (!in_array(@$this->$attribute_name,$array_of_posibilities)) : false ) : (isset($this->$attribute_name) ? !in_array(@$this->$attribute_name,$array_of_posibilities) : true )){
                 $this->addError($attribute_name, $message);
             }
         }
@@ -3876,7 +3876,7 @@ Examples for find all:
         $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
         foreach ($attribute_names as $attribute_name){
 
-            if($allow_null ? (isset($this->$attribute_name) ? (in_array(@$this->$attribute_name,$array_of_posibilities)) : false ) : (isset($this->$attribute_name) ? in_array(@$this->$attribute_name,$array_of_posibilities) : true )){
+            if($allow_null ? (!empty($this->$attribute_name) ? (in_array(@$this->$attribute_name,$array_of_posibilities)) : false ) : (isset($this->$attribute_name) ? in_array(@$this->$attribute_name,$array_of_posibilities) : true )){
                 $this->addError($attribute_name, $message);
             }
         }
