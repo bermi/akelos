@@ -58,7 +58,10 @@ class TagHelper
     function _tag_options($options)
     {
         $formated_options = array();
-        foreach (array_diff($options,array('')) as $key=>$value){
+        foreach ($options as $key=>$value){
+            if(empty($value) && !is_string($value)){
+                continue;
+            }
             if(!is_numeric($key) && !is_array($value) && !is_object($value)){
                 $formated_options[$key] =  $key.'="'.htmlentities($value, ENT_COMPAT, Ak::locale('charset')).'"';
             }

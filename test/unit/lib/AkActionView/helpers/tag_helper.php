@@ -11,7 +11,7 @@ class TagHelperTests extends HelpersUnitTester
         $this->assertEqual(TagHelper::tag('br'),'<br />');
         $this->assertEqual(TagHelper::tag('input',array('type'=>'text','value'=>'Insert your text >> "HERE"')),
         '<input type="text" value="Insert your text &gt;&gt; &quot;HERE&quot;" />');
-        $this->assertEqual(TagHelper::tag('hr',array('style'=>'',1234=>'This is not possible')),'<hr />');
+        $this->assertEqual(TagHelper::tag('hr',array('style'=>null,1234=>'This is not possible')),'<hr />');
 
         $this->assertEqual(TagHelper::content_tag('p','Have a look "HERE"'),
         '<p>Have a look "HERE"</p>');
