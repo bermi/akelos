@@ -3550,6 +3550,54 @@ Examples for find all:
         }
     }
 
+    /**
+    * Validates whether the associated object or objects are all valid themselves. Works with any kind of association.
+    *
+    *   class Book extends ActiveRecord
+        {
+    *       var $has_many = 'pages';
+    *       var $belongs_to = 'library';
+    * 
+    *       function validate(){
+    *           $this->validatesAssociated(array('pages', 'library'));
+    *       }
+    *   }
+    * 
+    *
+    * Warning: If, after the above definition, you then wrote:
+    *
+    *   class Page extends ActiveRecord
+    *   {
+    *       var $belongs_to = 'book';
+    *       function validate(){
+    *           $this->validatesAssociated('book');
+    *       }
+    *   }
+    *
+    * ...this would specify a circular dependency and cause infinite recursion.
+    *
+    * NOTE: This validation will not fail if the association hasn't been assigned. If you want to ensure that the association
+    * is both present and guaranteed to be valid, you also need to use validatesPresenceOf.
+    */
+    function validatesAssociated($attribute_names, $message = 'invalid')
+    {
+        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $messa;
+        $attribute_names = Ak::toArray($attribute_names);
+        foreach ($attribute_names as $attribute_name){
+            if(!empty($this->$attribute_name)){
+                if(is_array($this->$attribute_name)){
+                    foreach(array_keys($this->$attribute_name) as $k){
+                        if(method_exists($this->{$attribute_name}[$k],'isValid') && !$this->{$attribute_name}[$k]->isValid()){
+                            $this->addError($attribute_name, $message);
+                        }
+                    }
+                }elseif (method_exists($this->$attribute_name,'isValid') && !$this->$attribute_name->isValid()){
+                    $this->addError($attribute_name, $message);
+                }
+            }
+        }
+    }
+
     function isBlank($value = null)
     {
         return trim((string)$value) == '';

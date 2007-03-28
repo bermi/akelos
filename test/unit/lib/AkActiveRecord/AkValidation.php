@@ -7,7 +7,7 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
 
 
-class test_AkActiveRecord_validators extends  UnitTestCase
+class test_AkActiveRecord_validators extends  AkUnitTest
 {
     var $_testing_models_to_delete = array();
     var $_testing_model_databases_to_delete = array();
@@ -17,6 +17,8 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         parent::UnitTestCase();
         $this->_createNewTestingModelDatabase('AkTestPerson');
         $this->_createNewTestingModel('AkTestPerson');
+
+        $this->installAndIncludeModels(array('Picture', 'Landlord'));
     }
 
     function setUp()
@@ -382,7 +384,7 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person->user_name_confirmation = 'bermi';
         $Person->validatesConfirmationOf('user_name');
         $this->assertEqual($Person->getErrorsOn('user_name'),$Person->_defaultErrorMessages['confirmation']);
-        
+
         $Person = new AkTestPerson();
         $Person->setAttributes(array('password'=>'abc','password_confirmation'=>'ake'));
         $Person->validatesConfirmationOf('password');
@@ -425,7 +427,7 @@ class test_AkActiveRecord_validators extends  UnitTestCase
     {
         $Person = new AkTestPerson();
 
-        $Person->city = 'Vilanova i la Geltr�';
+        $Person->city = 'Vilanova i la Geltrí';
         $Person->validatesLengthOf("city", array("maximum"=>5,'message'=>"less than %d if you don't mind"));
         $this->assertEqual($Person->getErrorsOn('city'),"less than 5 if you don't mind");
 
@@ -433,84 +435,84 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person->city = 'Carlet';
         $Person->validatesLengthOf("city", array("maximum"=>10));
         $this->assertFalse($Person->getErrorsOn('city'));
-        
+
         $Person->clearErrors();
         $Person->city = '';
         $Person->validatesLengthOf("city", array("maximum"=>10, 'allow_null'=>true, 'message'=> "less than %d if you don't mind"));
         $this->assertFalse($Person->getErrorsOn('city'));
-        
+
         $Person->clearErrors();
         $Person->score = 101;
         $Person->validatesLengthOf("score", array("within"=>array(1, 100)));
         $this->assertEqual($Person->getErrorsOn('score'),sprintf($Person->_defaultErrorMessages['too_long'],100));
-        
+
         $Person->clearErrors();
         $Person->score = -5;
         $Person->validatesLengthOf("score", array("within"=>array(1, 100)));
         $this->assertEqual($Person->getErrorsOn('score'),sprintf($Person->_defaultErrorMessages['too_short'],1));
-        
+
         $Person->clearErrors();
         $Person->score = 25;
         $Person->validatesLengthOf("score", array("within"=>array(1, 100)));
         $this->assertFalse($Person->getErrorsOn('score'));
-        
+
         $Person->clearErrors();
         $Person->state = 'CA';
         $Person->validatesLengthOf("state", array("in"=>array(5, 20), "too_long" => "pick a shorter name", "too_short" => "pick a longer name"));
         $this->assertEqual($Person->getErrorsOn('state'),"pick a longer name");
-        
+
         $Person->clearErrors();
         $Person->state = 'Barcelona';
         $Person->validatesLengthOf("state", array("in"=>array(2, 5), "too_long" => "pick a shorter name", "too_short" => "pick a longer name"));
         $this->assertEqual($Person->getErrorsOn('state'),"pick a shorter name");
 
         $Person->clearErrors();
-        $Person->state = 'Valencia';        
+        $Person->state = 'Valencia';
         $Person->validatesLengthOf("state", array("in"=>array(5, 20), "too_long" => "pick a shorter name", "too_short" => "pick a longer name"));
         $this->assertFalse($Person->getErrorsOn('state'));
 
-        
+
         $Person->clearErrors();
         $Person->subscriptions = array();
         $Person->validatesLengthOf("subscriptions", array("minimum"=>4, "too_short"=>"you need to select at least 4 subscriptions"));
         $this->assertEqual($Person->getErrorsOn('subscriptions'),"you need to select at least 4 subscriptions");
-        
+
         $Person->clearErrors();
         $Person->subscriptions = array('php architect');
         $Person->validatesLengthOf("subscriptions", array("minimum"=>4, "too_short"=>"you need to select at least 4 subscriptions"));
         $this->assertEqual($Person->getErrorsOn('subscriptions'),"you need to select at least 4 subscriptions");
-        
+
         $Person->clearErrors();
         $Person->subscriptions = array('php architect','computer world', 'wired','slashdot');
         $Person->validatesLengthOf("subscriptions", array("minimum"=>4, "too_short"=>"you need to select at least 4 subscriptions"));
         $this->assertFalse($Person->getErrorsOn('subscriptions'));
-        
+
         $Person->clearErrors();
         $Person->validatesLengthOf("country", array("is"=>2, "message"=>"must be %d characters long as specified on ISO 3166"));
         $this->assertEqual($Person->getErrorsOn('country'),"must be 2 characters long as specified on ISO 3166");
-        
+
         $Person->clearErrors();
         $Person->country = '';
         $Person->validatesLengthOf("country", array("is"=>2, "message"=>"must be %d characters long as specified on ISO 3166"));
         $this->assertEqual($Person->getErrorsOn('country'),"must be 2 characters long as specified on ISO 3166");
-        
+
         $Person->clearErrors();
         $Person->country = 2;
         $Person->validatesLengthOf("country", array("is"=>2, "message"=>"must be %d characters long as specified on ISO 3166"));
         $this->assertFalse($Person->getErrorsOn('country'));
-        
+
         $Person->clearErrors();
         $Person->country = 'ES';
         $Person->validatesLengthOf("country", array("is"=>2, "message"=>"must be %d characters long as specified on ISO 3166"));
         $this->assertFalse($Person->getErrorsOn('country'));
-        
+
     }
 
     function Test_of_validatesSizeOf()
     {
         //alias for validatesLengthOf
     }
-    
+
     function Test_of_validatesUniquenessOf()
     {
         $Person = new AkTestPerson('user_name->','bermi','first_name->','Bermi','last_name->','Ferrer','country->','ES','tos->',1);
@@ -519,79 +521,64 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person = new AkTestPerson('user_name->','bermi','first_name->','Bermi','last_name->','Ferrer');
         $Person->validatesUniquenessOf("user_name");
         $this->assertTrue($Person->hasErrors());
-        
+
         $Person = $Person->findFirst(array('username = ?','bermi'));
         $Person->validatesUniquenessOf("user_name");
         $this->assertFalse($Person->hasErrors());
-        
-        
+
+
         $Person = $Person->findFirst(array('username = ?','bermi'));
-        $Person->validatesUniquenessOf("user_name",array('scope'=>'country'));        
+        $Person->validatesUniquenessOf("user_name",array('scope'=>'country'));
         $this->assertFalse($Person->hasErrors());
-        
+
         $Person = new AkTestPerson('user_name->','bermi','first_name->','Bermi','last_name->','Ferrer','country->','US');
-        $Person->validatesUniquenessOf("user_name",array('scope'=>'country'));        
+        $Person->validatesUniquenessOf("user_name",array('scope'=>'country'));
         $this->assertFalse($Person->hasErrors());
-        
+
         $Person = new AkTestPerson('user_name->','bermi','first_name->','Bermi','last_name->','Ferrer','country->','ES');
         $Person->validatesUniquenessOf("user_name",array('scope'=>'country'));
         $this->assertTrue($Person->hasErrors());
-        
+
     }
-    
+
     function Test_of_validatesUniquenessOfUsingMultipleScopes()
     {
         $Person = new AkTestPerson('user_name->','admin','first_name->','Sam','last_name->','','country->','ES','tos->',1);
         $this->assertTrue($Person->save());
-        
+
         $Person = new AkTestPerson('user_name->','admin','first_name->','Sam','last_name->','','country->','FR','tos->',1);
-        $Person->validatesUniquenessOf("user_name",array('scope'=>'first_name'));        
+        $Person->validatesUniquenessOf("user_name",array('scope'=>'first_name'));
         $this->assertTrue($Person->hasErrors());
-        
+
         $Person = new AkTestPerson('user_name->','admin','first_name->','Sam','last_name->','','country->','FR','tos->',1);
-        $Person->validatesUniquenessOf("user_name",array('scope'=>array('first_name','country')));        
+        $Person->validatesUniquenessOf("user_name",array('scope'=>array('first_name','country')));
         $this->assertFalse($Person->hasErrors());
-        
+
     }
-        
+
     function Test_of_validatesUniquenessOfConditionally()
     {
         $Person = new AkTestPerson('user_name->','james','first_name->','James','last_name->','','country->','ES','tos->',1);
         $this->assertTrue($Person->save());
-        
+
         $Person = new AkTestPerson('user_name->','james','first_name->','James','last_name->','','country->','ES','tos->',1);
-        $Person->validatesUniquenessOf("user_name");        
+        $Person->validatesUniquenessOf("user_name");
         $this->assertTrue($Person->hasErrors());
-        
+
         $Person = new AkTestPerson('user_name->','james','first_name->','James','last_name->','','country->','ES','tos->',1);
         $Person->force_validation = false;
-        $Person->validatesUniquenessOf("user_name", array('if'=>'$this->force_validation'));        
+        $Person->validatesUniquenessOf("user_name", array('if'=>'$this->force_validation'));
         $this->assertFalse($Person->hasErrors());
-        
+
     }
-    
-    
-    
+
+
+
     function Test_of_validatesFormatOf()
     {
         $Person = new AkTestPerson();
         $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
         $this->assertEqual($Person->getErrorsOn('email'),$Person->_defaultErrorMessages['invalid']);
-        
-        $Person->clearErrors();
-        $Person->email = 'bermi [at] example.com';
-        $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
-        $this->assertEqual($Person->getErrorsOn('email'),$Person->_defaultErrorMessages['invalid']);
-
-        $Person->clearErrors();
-        $Person->email = 'bermi@example.com';
-        $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
-        $Person->email = 'bermi@example.co.uk';
-        $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
-        $Person->email = 'bermi_ferrer@exam-ple.co.uk';
-        $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
-        $this->assertFalse($Person->hasErrors());
-        
 
         $Person->clearErrors();
         $Person->email = 'bermi [at] example.com';
@@ -606,7 +593,22 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person->email = 'bermi_ferrer@exam-ple.co.uk';
         $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
         $this->assertFalse($Person->hasErrors());
-        
+
+
+        $Person->clearErrors();
+        $Person->email = 'bermi [at] example.com';
+        $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
+        $this->assertEqual($Person->getErrorsOn('email'),$Person->_defaultErrorMessages['invalid']);
+
+        $Person->clearErrors();
+        $Person->email = 'bermi@example.com';
+        $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
+        $Person->email = 'bermi@example.co.uk';
+        $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
+        $Person->email = 'bermi_ferrer@exam-ple.co.uk';
+        $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
+        $this->assertFalse($Person->hasErrors());
+
 
         $Person->clearErrors();
         $Person->first_name = '';
@@ -618,7 +620,7 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person->validatesFormatOf('first_name', AK_NOT_EMPTY_REGULAR_EXPRESSION,"can not be empty");
         $this->assertFalse($Person->hasErrors());
 
-        
+
         $Person->clearErrors();
         $Person->number = 12.56;
         $Person->validatesFormatOf('number', AK_NUMBER_REGULAR_EXPRESSION);
@@ -639,7 +641,7 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person->validatesFormatOf('phone', AK_PHONE_REGULAR_EXPRESSION);
         $this->assertFalse($Person->hasErrors());
 
-        
+
         $Person->clearErrors();
         $Person->date = 'Monday';
         $Person->validatesFormatOf('date', AK_DATE_REGULAR_EXPRESSION);
@@ -666,7 +668,7 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person->post_code = 'a';
         $Person->validatesFormatOf('post_code', AK_POST_CODE_REGULAR_EXPRESSION);
         $this->assertEqual($Person->getErrorsOn('post_code'),$Person->_defaultErrorMessages['invalid']);
-        
+
         $Person->clearErrors();
         $Person->post_code = 'san francisco';
         $Person->validatesFormatOf('post_code', AK_POST_CODE_REGULAR_EXPRESSION);
@@ -676,22 +678,22 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person->post_code = 'NSW 8376';
         $Person->validatesFormatOf('post_code', AK_POST_CODE_REGULAR_EXPRESSION);
         $this->assertFalse($Person->hasErrors());
-        
+
         $Person->clearErrors();
         $Person->post_code = 'NSW 1008';
         $Person->validatesFormatOf('post_code', AK_POST_CODE_REGULAR_EXPRESSION);
         $Person->post_code = 46240;
         $Person->validatesFormatOf('post_code', AK_POST_CODE_REGULAR_EXPRESSION);
         $this->assertFalse($Person->hasErrors());
-        
+
     }
-    
+
     function Test_of_validatesInclusionOf()
     {
         $Person = new AkTestPerson();
         $Person->validatesInclusionOf('gender', array('male', 'female'), "woah! what are you then!??!!");
         $this->assertEqual($Person->getErrorsOn('gender'),"woah! what are you then!??!!");
-        
+
         $Person->clearErrors();
         $Person->gender = 'm';
         $Person->validatesInclusionOf('gender', array('male', 'female'), "woah! what are you then!??!!");
@@ -701,7 +703,7 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person->gender = 'male';
         $Person->validatesInclusionOf('gender', array('male', 'female'));
         $this->assertFalse($Person->hasErrors());
-        
+
         $Person->clearErrors();
         unset($Person->gender);
         $Person->validatesInclusionOf('gender', array('male', 'female'),'I need to know your gender',true);
@@ -711,7 +713,7 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person->age = 17;
         $Person->validatesInclusionOf('age', range(18, 120));
         $this->assertEqual($Person->getErrorsOn('age'),$Person->_defaultErrorMessages['inclusion']);
-                
+
         $Person->clearErrors();
         $Person->age = 121;
         $Person->validatesInclusionOf('age', range(18, 120));
@@ -722,14 +724,14 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person->validatesInclusionOf('age', range(18, 120));
         $this->assertFalse($Person->hasErrors());
     }
-    
+
 
     function Test_of_validatesExclusionOf()
     {
         $Person = new AkTestPerson();
         $Person->validatesExclusionOf('gender', array('too much'), "don't lie");
         $this->assertEqual($Person->getErrorsOn('gender'),"don't lie");
-        
+
         $Person->clearErrors();
         $Person->gender = 'too much';
         $Person->validatesExclusionOf('gender', array('too much'), "don't lie");
@@ -739,7 +741,7 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person->gender = 'male';
         $Person->validatesExclusionOf('gender', array('too much'), "don't lie");
         $this->assertFalse($Person->hasErrors());
-        
+
         $Person->clearErrors();
         unset($Person->gender);
         $Person->validatesExclusionOf('gender', array('too much'), "don't lie", true);
@@ -749,59 +751,59 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person->age = 17;
         $Person->validatesExclusionOf('age', range(18, 120));
         $this->assertFalse($Person->hasErrors());
-                
+
         $Person->clearErrors();
         $Person->age = 121;
         $Person->validatesExclusionOf('age', range(18, 120));
         $this->assertFalse($Person->hasErrors());
-        
+
         $Person->clearErrors();
         $Person->age = 18;
         $Person->validatesExclusionOf('age', range(18, 120));
         $this->assertEqual($Person->getErrorsOn('age'),$Person->_defaultErrorMessages['exclusion']);
     }
-    
+
     function Test_of_validatesNumericalityOf()
     {
         $Person = new AkTestPerson();
 
         $Person->validatesNumericalityOf('age');
         $this->assertEqual($Person->getErrorsOn('age'),$Person->_defaultErrorMessages['not_a_number']);
-        
+
         $Person->clearErrors();
         $Person->age = 'text';
-        $Person->validatesNumericalityOf('age');        
+        $Person->validatesNumericalityOf('age');
         $this->assertEqual($Person->getErrorsOn('age'),$Person->_defaultErrorMessages['not_a_number']);
-        
+
         $Person->clearErrors();
         $Person->age = 15.98;
         $Person->validatesNumericalityOf('age');
         $this->assertFalse($Person->hasErrors());
-        
+
         $Person->clearErrors();
         $Person->age = 15.98;
         $Person->validatesNumericalityOf('age','not_valid', true);
         $this->assertEqual($Person->getErrorsOn('age'),'not_valid');
-        
+
         $Person->clearErrors();
         $Person->age = 18;
-        $Person->validatesNumericalityOf('age');        
+        $Person->validatesNumericalityOf('age');
         $this->assertFalse($Person->hasErrors());
-        
+
         $Person->clearErrors();
         unset($Person->age);
         $Person->validatesNumericalityOf('age', 'not_valid',false, true);
         $this->assertFalse($Person->hasErrors());
 
     }
-    
+
     function Test_of_validateOnCreate()
     {
-        $Person = new AkTestPerson('user_name->','hilario','first_name->','Hilario','last_name->','Herv�s','country->','ES','tos->',1);
+        $Person = new AkTestPerson('user_name->','hilario','first_name->','Hilario','last_name->','Hervás','country->','ES','tos->',1);
         $Person->validateOnCreate();
         $this->assertFalse($Person->hasErrors());
-        
-        $Person = new AkTestPerson('user_name->','hilario','first_name->','Hilario','last_name->','Herv�s','country->','ES');
+
+        $Person = new AkTestPerson('user_name->','hilario','first_name->','Hilario','last_name->','Hervás','country->','ES');
         $Person->validateOnCreate();
         $this->assertEqual($Person->getErrorsOn('tos'),$Person->_defaultErrorMessages['accepted']);
         $this->assertFalse($Person->save());
@@ -812,8 +814,8 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person = new AkTestPerson('email->','email@example.com');
         $Person->validateOnUpdate();
         $this->assertFalse($Person->hasErrors());
-        
-        $Person = new AkTestPerson('user_name->','hilario','first_name->','Hilario','last_name->','Herv�s','country->','ES');
+
+        $Person = new AkTestPerson('user_name->','hilario','first_name->','Hilario','last_name->','Hervás','country->','ES');
         $Person->validateOnUpdate();
         $this->assertEqual($Person->getErrorsOn('email'),$Person->_defaultErrorMessages['blank']);
     }
@@ -824,30 +826,40 @@ class test_AkActiveRecord_validators extends  UnitTestCase
         $Person = new AkTestPerson('first_name->','Alicia');
         $Person->validate();
         $this->assertFalse($Person->hasErrors());
-        
-        $Person = new AkTestPerson('last_name->','Sadurn�','country->','ES');
+
+        $Person = new AkTestPerson('last_name->','Sadurní','country->','ES');
         $Person->validate();
         $this->assertEqual($Person->getErrorsOn('first_name'),$Person->_defaultErrorMessages['blank']);
     }
-    
+
     function Test_of_isValid()
     {
         $Person = new AkTestPerson('country->','ES');
         $this->assertFalse($Person->isValid());
         $this->assertEqual($Person->getErrors(), array('first_name' => array("can't be blank"),'tos' =>array("must be accepted")));
-        
+
         $Person->clearErrors();
         $Person = $Person->findFirst(array('username = ?','bermi'));
         $Person->set('tos',0);
         $this->assertFalse($Person->isValid());
         $this->assertEqual($Person->getErrors(), array('email' => array("can't be blank")));
     }
-    
-    
-    //function Test_of_validatesAssociated(){}
-    //function Test_of_yieldEachError(){}
-    //function Test_of_yieldError(){}
-    //function Test_of_yieldEachFullError(){}
+
+
+    function Test_of_validatesAssociated()
+    {
+        $Picture =& new Picture('title->','Carlet');
+        
+        $Landlord =& new Landlord();
+        $Landlord->test_validators = array('validatesPresenceOf'=>array('name'));
+        $Picture->landlord->assign($Landlord);
+
+        $Picture->validatesAssociated('landlord');
+        
+        $this->assertEqual($Picture->getErrorsOn('landlord'),$Picture->_defaultErrorMessages['invalid']);
+    }
+
+
 
 }
 
