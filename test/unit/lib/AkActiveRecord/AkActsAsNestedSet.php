@@ -11,8 +11,9 @@ if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
 }
 
 
-class test_AkActiveRecord_actsAsNestedSet extends  UnitTestCase
+class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
 {
+    /**/
     var $_testing_models_to_delete = array();
     var $_testing_model_databases_to_delete = array();
 
@@ -20,11 +21,7 @@ class test_AkActiveRecord_actsAsNestedSet extends  UnitTestCase
     {
         parent::UnitTestCase();
         $this->_createNewTestingModelDatabase('AkTestNestedCategory');
-        $this->_createNewTestingModel('AkTestNestedCategory');        
-    }
-
-    function setUp()
-    {
+        $this->_createNewTestingModel('AkTestNestedCategory');
     }
 
     function tearDown()
@@ -167,7 +164,7 @@ class test_AkActiveRecord_actsAsNestedSet extends  UnitTestCase
         $this->assertTrue(empty($Categories->nested_set->custom_attribute));
     }
 
-    
+
     function Test_of__ensureIsActiveRecordInstance()
     {
         $Categories =& new AkTestNestedCategory();
@@ -205,7 +202,7 @@ class test_AkActiveRecord_actsAsNestedSet extends  UnitTestCase
     }
 
     function Test_of_isRoot()
-    {        
+    {
         $Categories =& new AkTestNestedCategory();
         $this->assertFalse($Categories->nested_set->isRoot());
 
@@ -250,7 +247,7 @@ class test_AkActiveRecord_actsAsNestedSet extends  UnitTestCase
     }
 
     function Test_of_isChild()
-    {        
+    {
         $Categories =& new AkTestNestedCategory();
         $this->assertFalse($Categories->nested_set->isChild());
 
@@ -261,7 +258,7 @@ class test_AkActiveRecord_actsAsNestedSet extends  UnitTestCase
         $Category_1 =& new AkTestNestedCategory(2);
 
         $this->assertTrue($Category_1->nested_set->isChild());
-        
+
         $Categories =& new AkTestNestedCategory(3);
 
         $this->assertFalse($Categories->nested_set->isChild());
@@ -288,12 +285,12 @@ class test_AkActiveRecord_actsAsNestedSet extends  UnitTestCase
     }
 
     function Test_of_addChild()
-    {        
+    {
         $Categories =& new AkTestNestedCategory();
-        
+
         $Categories->destroy(3);
         $RootNode =& new AkTestNestedCategory(1);
-        
+
 
         $Category_2 = $RootNode->nested_set->addChild($Categories->create(array('description'=>'Category 2')));
         $Category_3 = $RootNode->nested_set->addChild($Categories->create(array('description'=>'Category 3')));
@@ -302,18 +299,18 @@ class test_AkActiveRecord_actsAsNestedSet extends  UnitTestCase
         $this->assertFalse($Category_2->nested_set->isUnknown());
         $this->assertFalse($Category_3->nested_set->isUnknown());
         $this->assertFalse($Category_4->nested_set->isUnknown());
-        
+
         $this->assertTrue($Category_2->lft == 5 && $Category_2->rgt == 6 && $Category_2->parent_id == 1);
         $this->assertTrue($Category_3->lft == 7 && $Category_3->rgt == 8 && $Category_2->parent_id == 1);
         $this->assertTrue($Category_4->lft == 9 && $Category_4->rgt == 10 && $Category_2->parent_id == 1);
-    
+
         $this->assertErrorPattern('/supported/', $Category_3->nested_set->addChild($Category_2));
     }
 
     function Test_of_childrenCount()
-    {        
+    {
         $Categories =& new AkTestNestedCategory();
-        
+
         $Category_1 =& new AkTestNestedCategory(2);
 
         for ($i=1; $i <= 10; $i++){
@@ -325,13 +322,13 @@ class test_AkActiveRecord_actsAsNestedSet extends  UnitTestCase
 
 
         $RootNode =& new AkTestNestedCategory(1);
-        
+
         $this->assertEqual($Category_1->nested_set->childrenCount(), 10);
         $this->assertEqual($RootNode->nested_set->childrenCount(), 14);
         $this->assertEqual($Category_1_1->nested_set->childrenCount(), 0);
         $this->assertEqual($Category_1_5->nested_set->childrenCount(), 0);
         $this->assertEqual($Category_1_10->nested_set->childrenCount(), 0);
-        
+
     }
 
     function Test_of_fullSet()
@@ -342,12 +339,12 @@ class test_AkActiveRecord_actsAsNestedSet extends  UnitTestCase
         $Categories = $Categories->find('first',array('conditions'=>array('description = ?','Category 1.5')));
 
         $ChildNodes = $Categories->nested_set->fullSet();
-        
+
         $this->assertEqual(Ak::size($ChildNodes)-1,  $Categories->nested_set->childrenCount());
 
         $Categories =& new AkTestNestedCategory(1);
         $ChildNodes = $Categories->nested_set->fullSet();
-        
+
         $this->assertEqual(Ak::size($ChildNodes)-1,  $Categories->nested_set->childrenCount());
 
         $Categories->nested_set->setScopeCondition(" department = 'sales' ");
@@ -381,7 +378,7 @@ class test_AkActiveRecord_actsAsNestedSet extends  UnitTestCase
         $ChildNodes = $Categories->nested_set->directChildren();
         $this->assertEqual(Ak::size($ChildNodes),  $Categories->nested_set->childrenCount());
 
-        $Categories =& new AkTestNestedCategory(1); 
+        $Categories =& new AkTestNestedCategory(1);
         $ChildNodes = $Categories->nested_set->directChildren();
         $this->assertEqual(Ak::size($ChildNodes),  5);
 
@@ -424,42 +421,86 @@ class test_AkActiveRecord_actsAsNestedSet extends  UnitTestCase
         $Categories =& new AkTestNestedCategory(2);
         $Root = $Categories->nested_set->getParents();
         $this->assertTrue($Root[0]->nested_set->isRoot());
-        
+
         $Categories = $Categories->find('first',array('conditions'=>array('description = ?','Category 1.5')));
         $Root = $Categories->nested_set->getParents();
 
         $this->assertTrue(($Root[1]->nested_set->isRoot() && $Root[0]->nested_set->isChild()) || ($Root[0]->nested_set->isRoot() && $Root[1]->nested_set->isChild()));
-        
+
     }
 
     function Test_of_beforeDestroy()
     {
-        
+
         $Categories =& new AkTestNestedCategory(1);
         $this->assertEqual($Categories->NestedSet->childrenCount(), 14);
 
         $Categories->destroy(15);
         $Categories->reload();
         $this->assertEqual($Categories->NestedSet->childrenCount(), 13);
-        
+
         $Categories->destroy(2);
         $Categories->reload();
         $this->assertEqual($Categories->NestedSet->childrenCount(), 3);
-        
+
         $Categories->destroy(1);
-        
+
         if($Categories->reload()){
             $this->assertEqual($Categories->NestedSet->childrenCount(), 0);
         }
 
     }
-  /**/  
+
+    
+    
+    /**/
+    
+    function test_include_locations()
+    {
+        $this->installAndIncludeModels(array('Location'));
+                $this->Location =& new Location();
+    }
+
+
+    function test_getRoot()
+    {
+        $Europe =& $this->Location->create('name->','Europe');
+        $Root = $Europe->nested_set->getRoot();
+        $this->assertEqual($Europe->name,$Root->name);
+        
+        $Spain =& $this->Location->create('name->','Spain');
+        $Europe->nested_set->addChild($Spain);
+        
+        $Root = $Spain->nested_set->getRoot();
+        $this->assertEqual($Europe->name,$Root->name);
+    }
+
+
+    function _test_getRoot()
+    {
+        $Europe =& $this->Location->create('name->','Europe');
+        $Root = $Europe->nested_set->getRoot();
+        $this->assertEqual($Europe->name,$Root->name);
+        
+        $Spain =& $this->Location->create('name->','Spain');
+        $Europe->nested_set->addChild($Spain);
+        
+        $Root = $Spain->nested_set->getRoot();
+        $this->assertEqual($Europe->name,$Root->name);
+    }
+
+
+    
+    
+    
+
+    /**/
     function _resetTable()
     {
         $this->_deleteTestingModelDatabases();
         $this->_createNewTestingModelDatabase('AkTestNestedCategory');
     }
-    
+
     function _getNestedSetList($Categories = null, $breadcrumb = false)
     {
         if(!isset($Categories)){
@@ -478,10 +519,11 @@ class test_AkActiveRecord_actsAsNestedSet extends  UnitTestCase
                 $list[] = $bread_crumb."(".$Category->id.")".$Category->description;//
             }else{
                 $list[$Category->parent_id][$Category->id] = $Category->lft.' &lt;- '.$Category->description.' -&gt;'.$Category->rgt;// getAttributes();
-            }   
+            }
         }
         return $list;
     }
+    /**/
 }
 
 

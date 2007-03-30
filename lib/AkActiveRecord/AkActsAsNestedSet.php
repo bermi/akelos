@@ -384,8 +384,8 @@ class AkActsAsNestedSet extends AkObserver
      function beforeCreate()
      {
          
-        $left = $this->_ActiveRecordInstance->get($this->getLeftColumnName());
-        $right = $this->_ActiveRecordInstance->get($this->getRightColumnName());
+        $left = $this->getLeftColumnName();
+        $right = $this->getRightColumnName();
 
         $maxright = $this->_ActiveRecordInstance->maximum($right, array('conditions'=>$this->getScopeCondition()));
         $maxright = empty($maxright) ? 0 : $maxright;
