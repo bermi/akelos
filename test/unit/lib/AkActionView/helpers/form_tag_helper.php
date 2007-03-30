@@ -27,7 +27,7 @@ class FormTagHelperTests extends HelpersUnitTester
         $this->assertEqual($form_tag->text_field_tag('person', 'Bermi',array('id'=>'bermi')),'<input id="bermi" name="person" type="text" value="Bermi" />');
         $this->assertEqual($form_tag->hidden_field_tag('person', 'Bermi',array('id'=>'bermi')),'<input id="bermi" name="person" type="hidden" value="Bermi" />');
         $this->assertEqual($form_tag->file_field_tag('photo', array('id'=>'pick_photo')),'<input id="pick_photo" name="photo" type="file" />');
-        $this->assertEqual($form_tag->password_field_tag('password', '',array('id'=>'pass')),'<input id="pass" name="password" type="password" />');
+        $this->assertEqual($form_tag->password_field_tag('password', '',array('id'=>'pass')),'<input id="pass" name="password" type="password" value="" />');
         $this->assertEqual($form_tag->text_area_tag('address', 'My address',array('id'=>'address_box')),'<textarea id="address_box" name="address">My address</textarea>');
         $this->assertEqual($form_tag->check_box_tag('subscribe', 'subscribed',true),'<input checked="checked" id="subscribe" name="subscribe" type="checkbox" value="subscribed" />');
 
