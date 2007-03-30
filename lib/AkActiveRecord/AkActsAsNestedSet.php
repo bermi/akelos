@@ -18,7 +18,7 @@
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
 
-class AkActsAsNestedSet extends AkObserver 
+class AkActsAsNestedSet extends AkObserver
 {
 
     /**
@@ -98,7 +98,7 @@ class AkActsAsNestedSet extends AkObserver
     *   to give it an entire string that is interpolated if you need a tighter scope than just a foreign key.
     *   Example: <tt>actsAsList(array('scope' => array('todo_list_id = ? AND completed = 0',$todo_list_id)));</tt>
     */
-    
+
     var $_scope_condition;
     var $_left_column_name = 'lft';
     var $_right_column_name = 'rgt';
@@ -110,7 +110,7 @@ class AkActsAsNestedSet extends AkObserver
     {
         $this->_ActiveRecordInstance =& $ActiveRecordInstance;
     }
-    
+
     function init($options = array())
     {
         empty($options['parent_column']) ? null : ($this->_parent_column_name = $options['parent_column']);
@@ -119,8 +119,8 @@ class AkActsAsNestedSet extends AkObserver
         empty($options['scope']) ? null : $this->setScopeCondition($options['scope']);
         return $this->_ensureIsActiveRecordInstance($this->_ActiveRecordInstance);
     }
-    
-    
+
+
     function _ensureIsActiveRecordInstance(&$ActiveRecordInstance)
     {
         if(is_object($ActiveRecordInstance) && method_exists($ActiveRecordInstance,'actsLike')){
@@ -140,7 +140,7 @@ class AkActsAsNestedSet extends AkObserver
         }
         return true;
     }
-    
+
     function reloadActiveRecordInstance(&$nodeInstance)
     {
         AK_PHP5 ? null : $nodeInstance->nested_set->_ensureIsActiveRecordInstance($nodeInstance);
@@ -213,18 +213,21 @@ class AkActsAsNestedSet extends AkObserver
     */
     function isRoot()
     {
-        return !empty($this->_ActiveRecordInstance->{$this->getParentColumnName()}) && ($this->_ActiveRecordInstance->{$this->getParentColumnName()} == $this->_ActiveRecordInstance->getId());
+        $parent_id = $this->_ActiveRecordInstance->get($this->getParentColumnName());
+        $left_id = $this->_ActiveRecordInstance->get($this->getLeftColumnName());
+        $right_id = $this->_ActiveRecordInstance->get($this->getRightColumnName());
+        return (empty($parent_id) && $left_id == 1 && ($right_id > $left_id)) || (!empty($parent_id) && $parent_id == $this->_ActiveRecordInstance->getId());
     }
-
+     
     /**
     * Returns true is this is a child node
     */
     function isChild()
     {
         $parent_id = $this->_ActiveRecordInstance->{$this->getParentColumnName()};
-        return !empty($parent_id) && 
-        !$this->isRoot() && 
-        ($this->_ActiveRecordInstance->{$this->getLeftColumnName()} > $parent_id) && 
+        return !empty($parent_id) &&
+        !$this->isRoot() &&
+        ($this->_ActiveRecordInstance->{$this->getLeftColumnName()} > $parent_id) &&
         ($this->_ActiveRecordInstance->{$this->getRightColumnName()} > $this->_ActiveRecordInstance->{$this->getLeftColumnName()});
     }
 
@@ -249,23 +252,21 @@ class AkActsAsNestedSet extends AkObserver
 
         if ($child->nested_set->isRoot()){
             trigger_error(Ak::t("Adding sub-tree isn't currently supported"),E_USER_ERROR);
-            return false;
         }elseif ($child->nested_set->isChild()){
             trigger_error(Ak::t("Moving nodes isn't currently supported"),E_USER_ERROR);
-            return false;
         }else{
             if ( empty($this->_ActiveRecordInstance->{$this->getLeftColumnName()}) || empty($this->_ActiveRecordInstance->{$this->getRightColumnName()}) ){
                 $this->_ActiveRecordInstance->transactionStart();
-                
+
                 if(!$child->save()){
                     $this->_ActiveRecordInstance->transactionFail();
                     $this->_ActiveRecordInstance->transactionComplete();
                     return false;
                 }
                 $node_id = $child->getId();
-                $child->{$this->getParentColumnName()} = $child->getId();
-                $child->{$this->getLeftColumnName()} = $child->getId()+1;
-                $child->{$this->getRightColumnName()} = $child->getId()+2;
+                $child->{$this->getParentColumnName()} = $node_id;
+                $child->{$this->getLeftColumnName()} = $node_id+1;
+                $child->{$this->getRightColumnName()} = $node_id+2;
                 $root_node = $child->save();
                 $this->reloadActiveRecordInstance($root_node);
                 $this->_ActiveRecordInstance->transactionComplete();
@@ -278,7 +279,7 @@ class AkActsAsNestedSet extends AkObserver
                 $child->{$this->getRightColumnName()} = $right_bound + 1;
                 $this->_ActiveRecordInstance->{$this->getRightColumnName()} += 2;
                 $this->_ActiveRecordInstance->transactionStart();
-                
+
                 $this->_ActiveRecordInstance->updateAll($this->getLeftColumnName()." = (".$this->getLeftColumnName()." + 2)",  $this->getScopeCondition()." AND ".$this->getLeftColumnName()." >= $right_bound" );
                 $this->_ActiveRecordInstance->updateAll($this->getRightColumnName()." = (".$this->getRightColumnName()." + 2)",  $this->getScopeCondition()." AND ".$this->getRightColumnName()." >= $right_bound");
                 $this->_ActiveRecordInstance->save();
@@ -288,10 +289,9 @@ class AkActsAsNestedSet extends AkObserver
                 return $child;
             }
         }
-        return false;
     }
 
-    
+
 
     /**
     * Returns the number of all nested children of this object.
@@ -324,7 +324,7 @@ class AkActsAsNestedSet extends AkObserver
     {
         return $this->isUnknown() ? false : $this->_ActiveRecordInstance->find('all', array('conditions' => " ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." = ".$this->_ActiveRecordInstance->getId()));
     }
-    
+
     /**
     * Returns the parent Object
     */
@@ -334,7 +334,7 @@ class AkActsAsNestedSet extends AkObserver
         'first', array('conditions' => " ".$this->getScopeCondition()." AND ".$this->_ActiveRecordInstance->getPrimaryKey()." = ".$this->_ActiveRecordInstance->{$this->getParentColumnName()})
         );
     }
-    
+
     /**
     * Returns an array of parent Objects this is usefull to make breadcrum like stuctures
     */
@@ -345,9 +345,7 @@ class AkActsAsNestedSet extends AkObserver
         " AND ".$this->getLeftColumnName()." < ".$this->_ActiveRecordInstance->{$this->getLeftColumnName()}.
         " AND ".$this->getRightColumnName()." > ".$this->_ActiveRecordInstance->{$this->getRightColumnName()}, 'order'=>$this->getParentColumnName().' ASC'));
     }
-    
 
-    
 
     /**
     * Prunes a branch off of the tree, shifting all of the elements on the right
@@ -359,11 +357,11 @@ class AkActsAsNestedSet extends AkObserver
             return true;
         }
         $dif = $object->{$this->getRightColumnName()} - $object->{$this->getLeftColumnName()} + 1;
-        
+
         $object->transactionStart();
         $object->deleteAll($this->getScopeCondition().
-            " AND ".$this->getLeftColumnName()." > ".$object->{$this->getLeftColumnName()}.
-            " AND ".$this->getRightColumnName()." < ".$object->{$this->getRightColumnName()});
+        " AND ".$this->getLeftColumnName()." > ".$object->{$this->getLeftColumnName()}.
+        " AND ".$this->getRightColumnName()." < ".$object->{$this->getRightColumnName()});
 
         $object->updateAll($this->getLeftColumnName()." = (".$this->getLeftColumnName()." - $dif)",
         $this->getScopeCondition()." AND ".$this->getLeftColumnName()." >= ".$object->{$this->getRightColumnName()} );
@@ -376,7 +374,300 @@ class AkActsAsNestedSet extends AkObserver
             return false;
         }
         $object->transactionComplete();
+
+        return true;
+    }
+
+    /**
+     * on creation, set automatically lft and rgt to the end of the tree
+     */
+     function beforeCreate()
+     {
+         
+        $left = $this->_ActiveRecordInstance->get($this->getLeftColumnName());
+        $right = $this->_ActiveRecordInstance->get($this->getRightColumnName());
+
+        $maxright = $this->_ActiveRecordInstance->maximum($right, array('conditions'=>$this->getScopeCondition()));
+        $maxright = empty($maxright) ? 0 : $maxright;
         
+        $this->_ActiveRecordInstance->set($left, $maxright+1);
+        $this->_ActiveRecordInstance->set($right, $maxright+2);
+        
+        return true;
+     }
+     
+    /**
+     * Returns the single root
+     */
+    function getRoot()
+    {
+        return $this->_ActiveRecordInstance->find('first', array('conditions' => " ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." IS NULL "));
+    }
+
+    /**
+     * Returns roots when multiple roots (or virtual root, which is the same)
+     */
+    function getRoots()
+    {
+        return $this->_ActiveRecordInstance->find('all', array('conditions' => " ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." IS NULL ",'order' => $this->getLeftColumnName()));
+    }
+
+
+    /**
+     * Returns an array of all parents 
+     */
+    function getAncestors()
+    {
+        return $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
+        $this->getLeftColumnName().' < '.$this->_ActiveRecordInstance->get($this->getLeftColumnName()).' AND '.
+        $this->getRightColumnName().' > '.$this->_ActiveRecordInstance->get($this->getRightColumnName())
+        ,'order' => $this->getLeftColumnName()));
+    }
+
+    /**
+     * Returns the array of all parents and self
+     */
+    function getSelfAndAncestors()
+    {
+        if($result = $this->getAncestors()){
+            array_push($result, $this->_ActiveRecordInstance);
+        }else{
+            $result = array($this->_ActiveRecordInstance);
+        }
+        return $result;
+    }
+
+
+    /**
+     * Returns the array of all children of the parent, except self
+     */
+    function getSiblings()
+    {
+        return $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
+        $this->getParentColumnName().' = '.$this->_ActiveRecordInstance->get($this->getParentColumnName()).' AND '.
+        $this->_ActiveRecordInstance->getPrimaryKey().' <> '.$this->_ActiveRecordInstance->getId()
+        ,'order' => $this->getLeftColumnName()));
+    }
+
+    /**
+     * Returns the array of all children of the parent, included self
+     */
+    function getSelfAndSiblings()
+    {
+        $parent_id = $this->_ActiveRecordInstance->get($this->getParentColumnName());
+        if(!empty($parent_id) && $result = $this->getSiblings()){
+            array_push($result, $this->_ActiveRecordInstance);
+        }else{
+            $result = array($this->_ActiveRecordInstance);
+        }
+        return $result;
+    }
+
+
+    /**
+     * Returns the level of this object in the tree 
+     * root level is 0
+     */
+    function getLevel()
+    {
+        $parent_id = $this->_ActiveRecordInstance->get($this->getParentColumnName());
+        if(empty($parent_id)){
+            return 0;
+        }
+        return $this->_ActiveRecordInstance->count(' '.$this->getScopeCondition().' AND '.
+        $this->getLeftColumnName().' < '.$this->_ActiveRecordInstance->get($this->getLeftColumnName()).' AND '.
+        $this->getRightColumnName().' > '.$this->_ActiveRecordInstance->get($this->getRightColumnName()));
+    }
+
+
+    /**
+    * Returns the number of all nested children of this object.
+    */
+    function getChildrenCount()
+    {
+        return ($this->_ActiveRecordInstance->{$this->getRightColumnName()} - $this->_ActiveRecordInstance->{$this->getLeftColumnName()} - 1)/2;
+    }
+
+
+    /**
+     * Returns a set of only this entry's immediate children
+     */
+    function getChildren()
+    {
+        return $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
+        $this->getParentColumnName().' = '.$this->_ActiveRecordInstance->getId()
+        ,'order' => $this->getLeftColumnName()));
+    }
+
+    /**
+     * Returns a set of all of its children and nested children
+     */
+    function getAllChildren($exclude = null)
+    {
+        $excluded_ids = array();
+        if(!empty($exclude)){
+            $exclude = is_string($exclude) ? Ak::toArray($exclude) : (is_array($exclude) ? $exclude : array($exclude));
+            $parent_class_name = get_class($this->_ActiveRecordInstance);
+            foreach (array_keys($exclude) as $k){
+                $Item =& $exclude[$k];
+                if(is_a($Item,$parent_class_name)){
+                    $ItemToExclude =& $Item;
+                }else{
+                    $ItemToExclude =& $this->_ActiveRecordInstance->find($Item);
+                }
+                if($ItemSet =& $ItemToExclude->nested_set->getFullSet()){
+                    foreach (array_keys($ItemSet) as $l){
+                        $excluded_ids[] = $ItemSet[$l]->getId();
+                    }
+                }
+            }
+            $excluded_ids = array_unique(array_diff($excluded_ids,array('')));
+        }
+        return $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
+        (empty($excluded_ids) ? '' : ' id NOT IN ('.join(',',$excluded_ids).') AND ').
+        $this->getLeftColumnName().' > '.$this->_ActiveRecordInstance->get($this->getLeftColumnName()).' AND '.
+        $this->getRightColumnName().' < '.$this->_ActiveRecordInstance->get($this->getRightColumnName())
+        ,'order' => $this->getLeftColumnName()));
+    }
+
+    /**
+     * Returns a set of itself and all of its nested children
+     */
+    function getFullSet($exclude = null)
+    {
+        if($this->_ActiveRecordInstance->isNewRecord() || $this->_ActiveRecordInstance->get($this->getRightColumnName()) - $this->_ActiveRecordInstance->get($this->getLeftColumnName()) == 1 ){
+            $result = array($this->_ActiveRecordInstance);
+        }else{
+        (array)$result = $this->getAllChildren($exclude);
+        array_unshift($result, $this->_ActiveRecordInstance);
+        }
+        return $result;
+    }
+
+
+    /**
+     * Move the node to the left of another node
+     */
+    function moveToLeftOf($node)
+    {
+        $this->moveTo($node, 'left');
+    }
+
+    /**
+     * Move the node to the left of another node
+     */
+    function moveToRightOf($node)
+    {
+        $this->moveTo($node, 'right');
+    }
+
+    /**
+     * Move the node to the child of another node
+     */
+    function moveToChildOf($node)
+    {
+        $this->moveTo($node, 'child');
+    }
+
+    function moveTo(&$target, $position)
+    {
+        if($this->_ActiveRecordInstance->isNewRecord()){
+            trigger_error(Ak::t('You cannot move a new node'), E_USER_ERROR);
+        }
+        $current_left = $this->_ActiveRecordInstance->get($this->getLeftColumnName());
+        $current_right = $this->_ActiveRecordInstance->get($this->getRightColumnName());
+        // $extent is the width of the tree self and children
+        $extent = $current_right - $current_left + 1;
+
+        // load object if node is not an object
+        if (is_int($target)){
+            $target =& $this->_ActiveRecordInstance->find($target);
+        }
+        if(!$target || !is_a($target, get_class($this->_ActiveRecordInstance))){
+            trigger_error(Ak::t('Invalid target'), E_USER_NOTICE);
+            return false;
+        }
+
+        $target_left = $target->get($this->getLeftColumnName());
+        $target_right = $target->get($this->getRightColumnName());
+
+
+        // detect impossible move
+        if ((($current_left <= $target_left) && ($target_left <= $current_right)) || (($current_left <= $target_right) && ($target_right <= $current_right))){
+            trigger_error(Ak::t('Impossible move, target node cannot be inside moved tree.'), E_USER_ERROR);
+        }
+
+        // compute new left/right for self
+        if ($position == 'child'){
+            if ($target_left < $current_left){
+                $new_left  = $target_left + 1;
+                $new_right = $target_left + $extent;
+            }else{
+                $new_left  = $target_left - $extent + 1;
+                $new_right = $target_left;
+            }
+        }elseif($position == 'left'){
+            if ($target_left < $current_left){
+                $new_left  = $target_left;
+                $new_right = $target_left + $extent - 1;
+            }else{
+                $new_left  = $target_left - $extent;
+                $new_right = $target_left - 1;
+            }
+        }elseif($position == 'right'){
+            if ($target_right < $current_right){
+                $new_left  = $target_right + 1;
+                $new_right = $target_right + $extent;
+            }else{
+                $new_left  = $target_right - $extent + 1;
+                $new_right = $target_right;
+            }
+        }else{
+            trigger_error(Ak::t("Position should be either left or right ('%position' received).",array('%position'=>$position)), E_USER_ERROR);
+        }
+
+        // boundaries of update action
+        $left_boundary = min($current_left, $new_left);
+        $right_boundary = max($current_right, $new_right);
+
+        // Shift value to move self to new $position
+        $shift = $new_left - $current_left;
+
+        // Shift value to move nodes inside boundaries but not under self_and_children
+        $updown = ($shift > 0) ? -$extent : $extent;
+
+        // change null to NULL for new parent
+        if($position == 'child'){
+            $new_parent = $target->getId();
+        }else{
+            $target_parent = $target->get($this->getParentColumnName());
+            $new_parent = empty($target_parent) ? 'NULL' : $target_parent;
+        }
+
+        $this->_ActiveRecordInstance->updateAll(
+
+        $this->getLeftColumnName().' = CASE '.
+        'WHEN '.$this->getLeftColumnName().' BETWEEN '.$current_left.' AND '.$current_right.' '.
+        'THEN '.$this->getLeftColumnName().' + '.$shift.' '.
+        'WHEN '.$this->getLeftColumnName().' BETWEEN '.$left_boundary.' AND '.$right_boundary.' '.
+        'THEN '.$this->getLeftColumnName().' + '.$updown.' '.
+        'ELSE '.$this->getLeftColumnName().' END, '.
+
+        $this->getRightColumnName().' = CASE '.
+        'WHEN '.$this->getRightColumnName().' BETWEEN '.$current_left.' AND '.$current_right.' '.
+        'THEN '.$this->getRightColumnName().' + '.$shift.' '.
+        'WHEN '.$this->getRightColumnName().' BETWEEN '.$left_boundary.' AND '.$right_boundary.' '.
+        'THEN '.$this->getRightColumnName().' + '.$updown.' '.
+        'ELSE '.$this->getRightColumnName().' END, '.
+
+        $this->getParentColumnName().' = CASE '.
+        'WHEN '.$this->_ActiveRecordInstance->getPrimaryKey().' = '.$this->_ActiveRecordInstance->getId().' '.
+        'THEN '.$new_parent.' '.
+        'ELSE '.$this->getParentColumnName().' END',
+
+        $this->getScopeCondition() );
+        $this->_ActiveRecordInstance->reload();
+
         return true;
     }
 
