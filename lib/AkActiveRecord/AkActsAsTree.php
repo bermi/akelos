@@ -38,12 +38,12 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
  * 
  * $Category = new Category;
  * 
- * $CategoryA = $Category.create()
- * $CategoryAa = $Category.create()
- * $CategoryAa1 = $Category.create()
- * $CategoryAa2 = $Category.create()
- * $CategoryAb = $Category.create()
- * $CategoryB = $Category.create()
+ * $CategoryA = $Category->create();
+ * $CategoryAa = $Category->create();
+ * $CategoryAa1 = $Category->create();
+ * $CategoryAa2 = $Category->create();
+ * $CategoryAb = $Category->create();
+ * $CategoryB = $Category->create();
  * 
  * $CategoryA->tree->addChild($CategoryAa)
  * $CategoryA->tree->addChild($CategoryAb)
@@ -254,12 +254,13 @@ class AkActsAsTree extends AkObserver
 
     function childrenCount()
     {
-        return $this->_ActiveRecordInstance->count(" ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." = ".$this->_ActiveRecordInstance->getId());
+        
+        return $this->_ActiveRecordInstance->isNewRecord() ? 0 : $this->_ActiveRecordInstance->count(" ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." = ".$this->_ActiveRecordInstance->getId());
     }
 
     function getChildren()
     {
-        return $this->_ActiveRecordInstance->findAll(" ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." = ".$this->_ActiveRecordInstance->getId());
+        return $this->_ActiveRecordInstance->isNewRecord() ? false : $this->_ActiveRecordInstance->findAll(" ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." = ".$this->_ActiveRecordInstance->getId());
     }
 
     function getParent()

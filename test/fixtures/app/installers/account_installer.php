@@ -10,6 +10,8 @@ class AccountInstaller extends AkInstaller
         username,
         password,
         is_enabled,
+        credit_limit int,
+        firm_id,
         reset_key,
         created_at'
         );

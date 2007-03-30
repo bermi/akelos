@@ -41,6 +41,10 @@ class AkUnitTest extends UnitTestCase
 
     function installAndIncludeModels($models = array())
     {
+        $args = func_get_args();
+        $models = !empty($args) ? (is_array($args[0]) ? $args[0] : (count($args) > 1 ? $args : Ak::toArray($args))) : array();
+        $options = is_array($models[count($models)-1]) ? array_pop($models) : array();
+
         foreach ($models as $model){
             require_once(AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($model).'_installer.php');
             require_once(AK_MODELS_DIR.DS.AkInflector::underscore($model).'.php');
@@ -48,20 +52,57 @@ class AkUnitTest extends UnitTestCase
             $installer = new $installer_name();
             $installer->uninstall();
             $installer->install();
+            if(!empty($options['populate'])){
+                $this->populateTables(AkInflector::tableize($model));
+            }
+            if(!empty($options['instantiate'])){
+                $this->instantiateModel($model);
+            }
         }
         if(isset($_SESSION['__activeRecordColumnsSettingsCache'])){
             unset($_SESSION['__activeRecordColumnsSettingsCache']);
         }
     }
+
+    function populateTables()
+    {
+        $args = func_get_args();
+        $tables = !empty($args) ? (is_array($args[0]) ? $args[0] : (count($args) > 1 ? $args : Ak::toArray($args))) : array();
+        foreach ($tables as $table){
+            $file = AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.Ak::sanitize_include($table).'.yaml';
+            if(!file_exists($file)){
+                continue;
+            }
+            $class_name = AkInflector::modulize($table);
+            if($this->instantiateModel($class_name)){
+                $items = Ak::convert('yaml','array',file_get_contents($file));
+                foreach ($items as $item){
+                    $this->{$class_name}->create($item);
+                }
+            }
+
+        }
+    }
+
+    function instantiateModel($model_name)
+    {
+        if(empty($htis->$model_name)){
+            Ak::import($model_name);
+            if(class_exists($model_name)){
+                $this->$model_name =& new $model_name();
+            }
+        }
+        return !empty($this->$model_name) && is_object($this->$model_name) && strtolower(get_class($this->$model_name)) == strtolower($model_name);
+    }
 }
 
-class AkWebTestCase extends WebTestCase 
+class AkWebTestCase extends WebTestCase
 {
     function assertWantedText($text, $message = '%s')
     {
         $this->assertWantedPattern('/'.preg_quote($text).'/', $message);
     }
-    
+
     /**
      * Asserts only if the whole response matches $text
      */
