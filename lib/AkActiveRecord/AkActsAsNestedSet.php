@@ -330,7 +330,7 @@ class AkActsAsNestedSet extends AkObserver
         }
         $dif = $object->{$this->getRightColumnName()} - $object->{$this->getLeftColumnName()} + 1;
 
-        $ObjectsToDelete =& $object->nested_set->getAllChildren();
+        $ObjectsToDelete = $object->nested_set->getAllChildren();
 
         $object->transactionStart();
 
@@ -515,7 +515,7 @@ class AkActsAsNestedSet extends AkObserver
                     }else{
                         $ItemToExclude =& $this->_ActiveRecordInstance->find($Item);
                     }
-                    if($ItemSet =& $ItemToExclude->nested_set->getFullSet()){
+                    if($ItemSet = $ItemToExclude->nested_set->getFullSet()){
                         foreach (array_keys($ItemSet) as $l){
                             $excluded_ids[] = $ItemSet[$l]->getId();
                         }
