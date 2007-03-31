@@ -201,298 +201,277 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
         $this->assertEqual($Categories->nested_set->getParentColumnName(), 'column_name');
     }
 
-    function Test_of_isRoot()
-    {
-        $Categories =& new AkTestNestedCategory();
-        $this->assertFalse($Categories->nested_set->isRoot());
 
-        $Categories->description = "Root node";
-        $Categories->save();
-
-        $Categories->nested_set->addChild($Categories);
-
-        $this->assertTrue($Categories->nested_set->isRoot());
-
-        $this->assertEqual($Categories->lft, 2);
-        $this->assertEqual($Categories->rgt, 3);
-        $this->assertEqual($Categories->parent_id, 1);
-
-        $Category_1 = $Categories->create(array('description'=>'Category 1'));
-
-        $Categories->nested_set->addChild($Category_1);
-
-        $this->assertFalse($Category_1->nested_set->isRoot());
-
-        $Categories =& new AkTestNestedCategory();
-        $Categories->nested_set->setScopeCondition(" department = 'sales' ");
-
-        $Categories->department = 'sales';
-        $Categories->description = 'Sales root node';
-
-        $Categories->save();
-
-        $Categories->nested_set->addChild($Categories);
-
-        $this->assertTrue($Categories->nested_set->isRoot());
-
-        $this->assertEqual($Categories->lft, $Categories->getId()+1);
-        $this->assertEqual($Categories->rgt, $Categories->getId()+2);
-        $this->assertEqual($Categories->parent_id, $Categories->getId());
-
-        $SalesCategory_1_1 = $Categories->create(array('description'=>'Sales Category 1', 'department' => 'sales'));
-
-        $Categories->nested_set->addChild($SalesCategory_1_1);
-
-        $this->assertFalse($SalesCategory_1_1->nested_set->isRoot());
-    }
-
-    function Test_of_isChild()
-    {
-        $Categories =& new AkTestNestedCategory();
-        $this->assertFalse($Categories->nested_set->isChild());
-
-        $Categories =& new AkTestNestedCategory(1);
-
-        $this->assertFalse($Categories->nested_set->isChild());
-
-        $Category_1 =& new AkTestNestedCategory(2);
-
-        $this->assertTrue($Category_1->nested_set->isChild());
-
-        $Categories =& new AkTestNestedCategory(3);
-
-        $this->assertFalse($Categories->nested_set->isChild());
-
-        $SalesCategory_1_1 =& new AkTestNestedCategory(4);
-
-        $this->assertTrue($SalesCategory_1_1->nested_set->isChild());
-
-    }
-
-    function Test_of_isUnknown()
-    {
-        $Categories =& new AkTestNestedCategory();
-        $this->assertTrue($Categories->nested_set->isUnknown());
-
-        $Categories =& new AkTestNestedCategory(1);
-
-        $this->assertFalse($Categories->nested_set->isUnknown());
-
-        $Category_1 =& new AkTestNestedCategory(2);
-
-        $this->assertFalse($Category_1->nested_set->isUnknown());
-
-    }
-
-    function Test_of_addChild()
-    {
-        $Categories =& new AkTestNestedCategory();
-
-        $Categories->destroy(3);
-        $RootNode =& new AkTestNestedCategory(1);
-
-
-        $Category_2 = $RootNode->nested_set->addChild($Categories->create(array('description'=>'Category 2')));
-        $Category_3 = $RootNode->nested_set->addChild($Categories->create(array('description'=>'Category 3')));
-        $Category_4 = $RootNode->nested_set->addChild($Categories->create(array('description'=>'Category 4')));
-
-        $this->assertFalse($Category_2->nested_set->isUnknown());
-        $this->assertFalse($Category_3->nested_set->isUnknown());
-        $this->assertFalse($Category_4->nested_set->isUnknown());
-
-        $this->assertTrue($Category_2->lft == 5 && $Category_2->rgt == 6 && $Category_2->parent_id == 1);
-        $this->assertTrue($Category_3->lft == 7 && $Category_3->rgt == 8 && $Category_2->parent_id == 1);
-        $this->assertTrue($Category_4->lft == 9 && $Category_4->rgt == 10 && $Category_2->parent_id == 1);
-
-        $this->assertErrorPattern('/supported/', $Category_3->nested_set->addChild($Category_2));
-    }
-
-    function Test_of_childrenCount()
-    {
-        $Categories =& new AkTestNestedCategory();
-
-        $Category_1 =& new AkTestNestedCategory(2);
-
-        for ($i=1; $i <= 10; $i++){
-            $var_name = 'Category_1_'.$i;
-            $$var_name = $Categories->create(array('description'=>'Category 1.'.$i));
-            $Category_1->nested_set->addChild($$var_name);
-            $$var_name->reload();
-        }
-
-
-        $RootNode =& new AkTestNestedCategory(1);
-
-        $this->assertEqual($Category_1->nested_set->childrenCount(), 10);
-        $this->assertEqual($RootNode->nested_set->childrenCount(), 14);
-        $this->assertEqual($Category_1_1->nested_set->childrenCount(), 0);
-        $this->assertEqual($Category_1_5->nested_set->childrenCount(), 0);
-        $this->assertEqual($Category_1_10->nested_set->childrenCount(), 0);
-
-    }
-
-    function Test_of_fullSet()
-    {
-        $Categories =& new AkTestNestedCategory();
-        $this->assertFalse($Categories->nested_set->fullSet());
-
-        $Categories = $Categories->find('first',array('conditions'=>array('description = ?','Category 1.5')));
-
-        $ChildNodes = $Categories->nested_set->fullSet();
-
-        $this->assertEqual(Ak::size($ChildNodes)-1,  $Categories->nested_set->childrenCount());
-
-        $Categories =& new AkTestNestedCategory(1);
-        $ChildNodes = $Categories->nested_set->fullSet();
-
-        $this->assertEqual(Ak::size($ChildNodes)-1,  $Categories->nested_set->childrenCount());
-
-        $Categories->nested_set->setScopeCondition(" department = 'sales' ");
-        $this->assertFalse($Categories->nested_set->fullSet());
-
-    }
-
-    function Test_of_allChildren()
-    {
-        $Categories =& new AkTestNestedCategory();
-        $this->assertFalse($Categories->nested_set->allChildren());
-
-        $Categories = $Categories->find('first',array('conditions'=>array('description = ?','Category 1.5')));
-        $ChildNodes = $Categories->nested_set->allChildren();
-        $this->assertEqual(Ak::size($ChildNodes),  $Categories->nested_set->childrenCount());
-
-        $Categories =& new AkTestNestedCategory(1);
-        $ChildNodes = $Categories->nested_set->allChildren();
-        $this->assertEqual(Ak::size($ChildNodes),  $Categories->nested_set->childrenCount());
-
-        $Categories->nested_set->setScopeCondition(" department = 'sales' ");
-        $this->assertFalse($Categories->nested_set->allChildren());
-    }
-
-    function Test_of_directChildren()
-    {
-        $Categories =& new AkTestNestedCategory();
-        $this->assertFalse($Categories->nested_set->directChildren());
-
-        $Categories = $Categories->find('first',array('conditions'=>array('description = ?','Category 1.5')));
-        $ChildNodes = $Categories->nested_set->directChildren();
-        $this->assertEqual(Ak::size($ChildNodes),  $Categories->nested_set->childrenCount());
-
-        $Categories =& new AkTestNestedCategory(1);
-        $ChildNodes = $Categories->nested_set->directChildren();
-        $this->assertEqual(Ak::size($ChildNodes),  5);
-
-        $Categories = $Categories->find('first',array('conditions'=>array('description = ?','Category 1')));
-        $ChildNodes = $Categories->nested_set->directChildren();
-        $this->assertEqual(Ak::size($ChildNodes),  10);
-
-        $Categories->nested_set->setScopeCondition(" department = 'sales' ");
-        $this->assertFalse($Categories->nested_set->allChildren());
-
-    }
-
-    function Test_of_getParent()
-    {
-        $Categories =& new AkTestNestedCategory();
-        $this->assertFalse($Categories->nested_set->getParent());
-
-        $Categories =& new AkTestNestedCategory(1);
-        $this->assertFalse($Categories->nested_set->getParent());
-
-        $Categories = $Categories->find('first',array('conditions'=>array('description = ?','Category 1')));
-        $Root = $Categories->nested_set->getParent();
-        $this->assertTrue($Root->nested_set->isRoot());
-
-        $Categories = $Categories->find('first',array('conditions'=>array('description = ?','Category 1.5')));
-        $Child = $Categories->nested_set->getParent();
-        $this->assertTrue($Child->nested_set->isChild());
-
-        $this->assertEqual($Child->id, 2);
-    }
-
-    function Test_of_getParents()
-    {
-        $Categories =& new AkTestNestedCategory();
-        $this->assertFalse($Categories->nested_set->getParents());
-
-        $Categories =& new AkTestNestedCategory(1);
-        $this->assertFalse($Categories->nested_set->getParents());
-
-        $Categories =& new AkTestNestedCategory(2);
-        $Root = $Categories->nested_set->getParents();
-        $this->assertTrue($Root[0]->nested_set->isRoot());
-
-        $Categories = $Categories->find('first',array('conditions'=>array('description = ?','Category 1.5')));
-        $Root = $Categories->nested_set->getParents();
-
-        $this->assertTrue(($Root[1]->nested_set->isRoot() && $Root[0]->nested_set->isChild()) || ($Root[0]->nested_set->isRoot() && $Root[1]->nested_set->isChild()));
-
-    }
-
-    function Test_of_beforeDestroy()
-    {
-
-        $Categories =& new AkTestNestedCategory(1);
-        $this->assertEqual($Categories->NestedSet->childrenCount(), 14);
-
-        $Categories->destroy(15);
-        $Categories->reload();
-        $this->assertEqual($Categories->NestedSet->childrenCount(), 13);
-
-        $Categories->destroy(2);
-        $Categories->reload();
-        $this->assertEqual($Categories->NestedSet->childrenCount(), 3);
-
-        $Categories->destroy(1);
-
-        if($Categories->reload()){
-            $this->assertEqual($Categories->NestedSet->childrenCount(), 0);
-        }
-
-    }
-
-    
-    
     /**/
-    
+
+    // New tests for Better Nested Set implementation
+
+    function getLocation($Location)
+    {
+        if(is_array($Location)){
+            return array_values($this->Location->collect($Location,'id','name'));
+        }else{
+            return $Location->get('name');
+        }
+    }
+
     function test_include_locations()
     {
         $this->installAndIncludeModels(array('Location'));
-                $this->Location =& new Location();
+        $this->Location =& new Location();
     }
 
 
     function test_getRoot()
     {
-        $Europe =& $this->Location->create('name->','Europe');
-        $Root = $Europe->nested_set->getRoot();
-        $this->assertEqual($Europe->name,$Root->name);
-        
-        $Spain =& $this->Location->create('name->','Spain');
-        $Europe->nested_set->addChild($Spain);
-        
-        $Root = $Spain->nested_set->getRoot();
-        $this->assertEqual($Europe->name,$Root->name);
+        $this->Europe =& $this->Location->create('name->','Europe');
+
+        $this->assertEqual('Europe',$this->getLocation($this->Location->nested_set->getRoot()));
+        $this->assertTrue($this->Europe->nested_set->isRoot());
+
+
+        $this->Spain =& $this->Location->create('name->','Spain');
+
+        $this->Europe->nested_set->addChild($this->Spain);
+
+        $this->assertFalse($this->Spain->nested_set->isRoot());
+
+        $this->assertEqual('Europe',$this->getLocation($this->Spain->nested_set->getRoot()));
     }
 
-
-    function _test_getRoot()
+    function test_getRoots()
     {
-        $Europe =& $this->Location->create('name->','Europe');
-        $Root = $Europe->nested_set->getRoot();
-        $this->assertEqual($Europe->name,$Root->name);
-        
-        $Spain =& $this->Location->create('name->','Spain');
-        $Europe->nested_set->addChild($Spain);
-        
-        $Root = $Spain->nested_set->getRoot();
-        $this->assertEqual($Europe->name,$Root->name);
+        $this->Oceania =& $this->Location->create('name->','Oceania');
+        $Roots = $this->Oceania->nested_set->getRoots();
+
+        $this->assertEqual('Europe',$Roots[0]->name);
+        $this->assertEqual('Oceania',$Roots[1]->name);
+
+        $this->Australia =& $this->Location->create('name->','Australia');
+        $this->Oceania->nested_set->addChild($this->Australia);
+
+        $Roots = $this->Oceania->nested_set->getRoots();
+
+        $this->assertEqual('Europe',$Roots[0]->name);
+        $this->assertEqual('Oceania',$Roots[1]->name);
     }
 
 
-    
-    
-    
+    function test_getAncestors()
+    {
+        $this->Valencia =& $this->Location->create('name->','Valencia');
+        $this->Spain->nested_set->addChild($this->Valencia);
+
+        $this->Carlet =& $this->Location->create('name->','Carlet');
+        $this->Valencia->nested_set->addChild($this->Carlet);
+
+
+        $this->assertEqual(array('Europe','Spain','Valencia'), $this->getLocation($this->Carlet->nested_set->getAncestors()));
+        $this->assertEqual(array('Europe'), $this->getLocation($this->Spain->nested_set->getAncestors()));
+    }
+
+
+    function test_getSelfAndAncestors()
+    {
+        $this->assertEqual(array('Europe','Spain','Valencia','Carlet'), array_values($this->Location->collect($this->Carlet->nested_set->getSelfAndAncestors(),'id','name')));
+
+        $this->assertEqual(array('Europe','Spain'), array_values($this->Location->collect($this->Spain->nested_set->getSelfAndAncestors(),'id','name')));
+    }
+
+
+    function test_getSiblings()
+    {
+        $this->Gandia =& $this->Location->create('name->','Gandia');
+        $this->Alcudia =& $this->Location->create('name->','Alcudia');
+        $this->Daimus =& $this->Location->create('name->','Daimus');
+
+        $this->Valencia->nested_set->addChild($this->Gandia);
+        $this->Valencia->nested_set->addChild($this->Alcudia);
+        $this->Valencia->nested_set->addChild($this->Daimus);
+
+        $this->assertEqual(array('Gandia','Alcudia','Daimus'), array_values($this->Location->collect($this->Carlet->nested_set->getSiblings(),'id','name')));
+
+        $this->Barcelona =& $this->Location->create('name->','Barcelona');
+        $this->Spain->nested_set->addChild($this->Barcelona);
+
+        $this->assertEqual(array('Valencia'), array_values($this->Location->collect($this->Barcelona->nested_set->getSiblings(),'id','name')));
+
+    }
+
+
+    function test_getSelfAndSiblings()
+    {
+        $this->assertEqual(array('Carlet','Gandia','Alcudia','Daimus'), $this->getLocation($this->Carlet->nested_set->getSelfAndSiblings()));
+
+        $this->assertEqual(array('Carlet','Gandia','Alcudia','Daimus'), $this->getLocation($this->Alcudia->nested_set->getSelfAndSiblings()));
+
+        $this->assertEqual(array('Valencia','Barcelona'),$this->getLocation($this->Barcelona->nested_set->getSelfAndSiblings()));
+
+
+    }
+
+    function test_getLevel()
+    {
+        $this->assertIdentical(0,$this->Europe->nested_set->getLevel());
+        $this->assertIdentical(0,$this->Oceania->nested_set->getLevel());
+        $this->assertIdentical(1,$this->Spain->nested_set->getLevel());
+        $this->assertIdentical(2,$this->Barcelona->nested_set->getLevel());
+        $this->assertIdentical(3,$this->Carlet->nested_set->getLevel());
+    }
+
+    function test_countChildren()
+    {
+        $this->Europe->reload();
+        $this->Oceania->reload();
+        $this->Spain->reload();
+        $this->Barcelona->reload();
+        $this->Valencia->reload();
+
+        $this->assertIdentical(7,$this->Europe->nested_set->countChildren());
+        $this->assertIdentical(1,$this->Oceania->nested_set->countChildren());
+        $this->assertIdentical(6,$this->Spain->nested_set->countChildren());
+        $this->assertIdentical(0,$this->Barcelona->nested_set->countChildren());
+        $this->assertIdentical(4,$this->Valencia->nested_set->countChildren());
+    }
+
+    function test_getAllChildren()
+    {
+        $this->assertEqual(array('Carlet','Gandia','Alcudia','Daimus'), $this->getLocation($this->Valencia->nested_set->getAllChildren()));
+        $this->assertEqual(array('Valencia','Carlet','Gandia','Alcudia','Daimus','Barcelona'), $this->getLocation($this->Spain->nested_set->getAllChildren()));
+        $this->assertEqual(array('Spain','Valencia','Carlet','Gandia','Alcudia','Daimus','Barcelona'), $this->getLocation($this->Europe->nested_set->getAllChildren()));
+
+    }
+
+    function test_getAllChildren_excuding_some()
+    {
+        $this->assertEqual(array('Spain','Barcelona'), $this->getLocation($this->Europe->nested_set->getAllChildren($this->Valencia)));
+        $this->assertEqual(array('Spain','Barcelona'), $this->getLocation($this->Europe->nested_set->getAllChildren($this->Valencia->id)));
+        $this->assertEqual(array('Spain','Barcelona'), $this->getLocation($this->Europe->nested_set->getAllChildren(array($this->Valencia))));
+        $this->assertEqual(array('Spain','Barcelona'), $this->getLocation($this->Europe->nested_set->getAllChildren(array($this->Valencia->id))));
+        $this->assertEqual(array('Alcudia','Daimus'), $this->getLocation($this->Valencia->nested_set->getAllChildren($this->Carlet,$this->Gandia)));
+        $this->assertEqual(array('Alcudia','Daimus'), $this->getLocation($this->Valencia->nested_set->getAllChildren($this->Carlet->id,$this->Gandia->id)));
+        $this->assertEqual(array('Alcudia','Daimus'), $this->getLocation($this->Valencia->nested_set->getAllChildren(array($this->Carlet,$this->Gandia))));
+        $this->assertEqual(array('Alcudia','Daimus'), $this->getLocation($this->Valencia->nested_set->getAllChildren(array($this->Carlet->id,$this->Gandia->id))));
+        $this->assertEqual(array('Alcudia','Daimus'), $this->getLocation($this->Valencia->nested_set->getAllChildren(array($this->Carlet->id,$this->Gandia))));
+    }
+
+
+    function test_getFullSet()
+    {
+        $this->assertEqual(array('Europe','Spain','Barcelona'), $this->getLocation($this->Europe->nested_set->getFullSet($this->Valencia)));
+        $this->assertEqual(array('Valencia','Carlet','Gandia','Alcudia','Daimus'), $this->getLocation($this->Valencia->nested_set->getFullSet()));
+    }
+
+    function test_moveToLeftOf()
+    {
+        $this->Alcudia->nested_set->moveToLeftOf($this->Gandia);
+        $this->assertEqual(array('Carlet','Alcudia','Gandia','Daimus'), $this->getLocation($this->Valencia->nested_set->getAllChildren()));
+
+        $this->Carlet->reload();
+        $this->Spain->reload();
+        $this->Valencia->reload();
+
+        $this->Carlet->nested_set->moveToLeftOf($this->Spain->id);
+        $this->assertEqual(array('Alcudia','Gandia','Daimus'), $this->getLocation($this->Valencia->nested_set->getAllChildren()));
+        $this->assertEqual(array('Carlet'), $this->getLocation($this->Spain->nested_set->getSiblings()));
+    }
+
+
+    function test_moveToRightOf()
+    {
+        $this->Alcudia->reload();
+        $this->Gandia->reload();
+        $this->Valencia->reload();
+
+        $this->Alcudia->nested_set->moveToRightOf($this->Gandia);
+        $this->assertEqual(array('Gandia','Alcudia','Daimus'), $this->getLocation($this->Valencia->nested_set->getAllChildren()));
+
+        $this->Carlet->reload();
+        $this->Alcudia->reload();
+
+        $this->Carlet->nested_set->moveToRightOf($this->Alcudia->id);
+
+        $this->Valencia->reload();
+        $this->Spain->reload();
+
+        $this->assertEqual(array('Gandia','Alcudia','Carlet','Daimus'), $this->getLocation($this->Valencia->nested_set->getAllChildren()));
+        $this->assertEqual(array('Spain'), $this->getLocation($this->Spain->nested_set->getSelfAndSiblings()));
+    }
+
+
+    function test_moveToChildOf()
+    {
+        $this->Oceania->reload();
+        $this->Spain->nested_set->moveToChildOf($this->Oceania);
+        $this->Spain->reload();
+        $this->assertEqual(array('Australia'), $this->getLocation($this->Spain->nested_set->getSiblings()));
+
+        $this->Europe->reload();
+        $this->Spain->nested_set->moveToChildOf($this->Europe);
+        $this->Spain->reload();
+        $this->assertEqual(array('Spain'), $this->getLocation($this->Spain->nested_set->getSelfAndSiblings()));
+
+        $this->Europe->reload();
+        $this->Oceania->reload();
+        $this->World =& $this->Location->create('name->','World');
+        $this->Oceania->nested_set->moveToChildOf($this->World);
+        $this->World->reload();
+        $this->Europe->nested_set->moveToChildOf($this->World);
+        $this->Europe->reload();
+        $this->Oceania->reload();
+        $this->assertEqual('World',$this->getLocation($this->Europe->nested_set->getRoot()));
+        $this->assertEqual('World',$this->getLocation($this->Oceania->nested_set->getRoot()));
+        $this->assertEqual(array('Europe','Oceania'), $this->getLocation($this->Europe->nested_set->getSelfAndSiblings()));
+
+    }
+
+    function test_of_countChildren()
+    {
+        $this->Spain->reload();
+        $this->Oceania->reload();
+        $this->World->reload();
+        $this->assertEqual(6, $this->Spain->nested_set->countChildren());
+        $this->assertEqual(1, $this->Oceania->nested_set->countChildren());
+        $this->assertEqual(10, $this->World->nested_set->countChildren());
+    }
+
+
+    function test_of_getParent()
+    {
+        $this->assertEqual('World',$this->getLocation($this->Europe->nested_set->getParent()));
+        $this->assertEqual('Europe',$this->getLocation($this->Spain->nested_set->getParent()));
+        $this->assertEqual(false,$this->World->nested_set->getParent());
+    }
+
+
+
+    function test_of_getParents()
+    {
+        $this->Valencia->reload();
+        $this->assertEqual(array('World','Europe','Spain'),$this->getLocation($this->Valencia->nested_set->getParents()));
+        $this->assertEqual(false,$this->World->nested_set->getParents());
+    }
+
+
+    function Test_of_isChild()
+    {
+        $this->assertTrue($this->Carlet->nested_set->isChild());
+        $this->assertFalse($this->World->nested_set->isChild());
+        $this->assertTrue($this->Valencia->nested_set->isChild());
+    }
+
+
+    function test_deletions()
+    {
+        $this->assertEqual(6, $this->Spain->nested_set->countChildren());
+        $this->Valencia->destroy();
+        $this->Spain->reload();
+        $this->assertEqual(1, $this->Spain->nested_set->countChildren());
+    }
+
+
+
+
 
     /**/
     function _resetTable()
