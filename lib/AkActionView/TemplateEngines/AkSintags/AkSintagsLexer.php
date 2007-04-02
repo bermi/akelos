@@ -90,7 +90,7 @@ class AkSintagsLexer extends AkLexer
 
     function _addConditionStartTokens()
     {
-        $this->addSpecialPattern('{\?[A-Za-z][\.A-Za-z0-9_-]+}','Text','ConditionStart');
+        $this->addSpecialPattern('{[\?!][A-Za-z][\.A-Za-z0-9_-]+}','Text','ConditionStart');
     }
 
     function _addEndTagTokens()

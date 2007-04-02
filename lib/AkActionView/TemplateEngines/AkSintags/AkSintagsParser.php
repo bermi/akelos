@@ -228,9 +228,11 @@ class AkSintagsParser
     function ConditionStart($match, $state)
     {
         if(AK_LEXER_SPECIAL === $state){
-            $php_variable = $this->_convertSintagsVarToPhp(trim($match,'{}?'));
+            $match = trim($match,'{}');
+            $assert_simbol = substr($match,0,1) == '?' ? '!' : '';
+            $php_variable = $this->_convertSintagsVarToPhp(trim($match,'?!'));
             if($php_variable){
-                $this->output .= '<?php if(!empty('.$php_variable.')) { ?>';
+                $this->output .= '<?php if('.$assert_simbol.'empty('.$php_variable.')) { ?>';
             }else{
                 $this->output .= $match;
             }
