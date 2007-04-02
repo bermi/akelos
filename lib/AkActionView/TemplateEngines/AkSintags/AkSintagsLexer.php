@@ -156,6 +156,8 @@ class AkSintagsLexer extends AkLexer
         $this->addSpecialPattern('\x3A[A-Za-z0-9_]+',$scope,'Symbol');
 
         $this->addSpecialPattern('@?[A-Za-z][\.A-Za-z0-9_-]+',$scope,'HelperVariable');
+        
+        
 
         $this->addSpecialPattern('\x5B',$scope,'Struct');
         $this->addSpecialPattern('\x5D',$scope,'Struct');

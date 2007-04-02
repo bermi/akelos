@@ -278,4 +278,23 @@
 <?php echo $url_helper->link_to($text_helper->translate('Back to overview'), array('action' => 'listing')); ?>
 
 
+===================================
+
+
+<%= link_to 'Empty string test', '' %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to('Empty string test', ''); ?>
+
+
+===================================
+
+
+<%= link_to 'Empty string test', "" %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to('Empty string test', ""); ?>
+
 

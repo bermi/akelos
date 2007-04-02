@@ -411,10 +411,7 @@ class AkSintagsParser
     //-----------------------------------------
     function SingleQuote($match, $state)
     {
-        if(AK_LEXER_UNMATCHED === $state){
-            $this->output .= "'".$match."'";
-        }
-        return true;
+        return $this->_handleQuotedParam($match, $state, "'");
     }
 
     //-----------------------------------------
@@ -422,12 +419,23 @@ class AkSintagsParser
     //-----------------------------------------
     function DoubleQuote($match, $state)
     {
+        return $this->_handleQuotedParam($match, $state, '"');
+    }
+
+    function _handleQuotedParam($match, $state, $quote_using)
+    {
+        if(AK_LEXER_ENTER === $state){
+            $this->quoted_content = '';
+        }
         if(AK_LEXER_UNMATCHED === $state){
-            $this->output .= '"'.$match.'"';
+            $this->quoted_content = $match;
+        }
+        if(AK_LEXER_EXIT === $state){
+            $this->output .= $quote_using.$this->quoted_content.$quote_using;
         }
         return true;
     }
-
+    
     //-----------------------------------------
     //  SINTAGS HELPER NUMBER PARAMETER
     //-----------------------------------------
@@ -536,7 +544,7 @@ class AkSintagsParser
     function _getHelperNameForMethod(&$method_name)
     {
         if($method_name == '_'){
-            $method_name = 'translate';   
+            $method_name = 'translate';
         }
         $this->_getAvailableHelpers();
         return empty($this->available_helpers[$method_name]) ? false : $this->available_helpers[$method_name];
