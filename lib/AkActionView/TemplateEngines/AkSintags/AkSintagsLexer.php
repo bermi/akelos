@@ -21,6 +21,7 @@ class AkSintagsLexer extends AkLexer
     var $_SINTAGS_REMOVE_PHP_SILENTLY = AK_SINTAGS_REMOVE_PHP_SILENTLY;
     var $_SINTAGS_HIDDEN_COMMENTS_TAG = AK_SINTAGS_HIDDEN_COMMENTS_TAG;
     var $_modes = array(
+    'Xml',
     'Php',
     'Comment',
     'Helper',
@@ -33,6 +34,7 @@ class AkSintagsLexer extends AkLexer
     'Variable',
     'Loop',
     'Helper',
+    'InlineHelper',
     );
 
     function AkSintagsLexer(&$parser)
@@ -44,6 +46,11 @@ class AkSintagsLexer extends AkLexer
         }
     }
 
+    function _addXmlTokens()
+    {
+        $this->addSpecialPattern('<\?xml','Text','XmlOpening');
+    }
+    
     function _addPhpTokens()
     {
         if(!$this->_SINTAGS_REMOVE_PHP_SILENTLY){
@@ -69,7 +76,7 @@ class AkSintagsLexer extends AkLexer
     {
         $this->addEntryPattern('_{','Text','Translation');
         $this->addExitPattern('}','Translation');
-        
+
         $this->addSpecialPattern('\x5C?\x25[A-Za-z][\.A-Za-z0-9_-]+','Translation','TranslationToken');
     }
 
@@ -114,19 +121,25 @@ class AkSintagsLexer extends AkLexer
         '(?=.*'.AK_SINTAGS_CLOSE_HELPER_TAG.')','Text','Helper');
         $this->addExitPattern('\x29?[ \n\t]*'.AK_SINTAGS_CLOSE_HELPER_TAG, 'Helper');
 
+        $this->addSpecialPattern('#{[A-Za-z][\.A-Za-z0-9_-]+}','DoubleQuote','InlineVariable');
+
+        $this->addEntryPattern('#{[ \n\t]*[A-Za-z0-9_]+[ \n\t]*\x28?[ \n\t]*(?=.*})','DoubleQuote','InlineHelper');
+        $this->addExitPattern('[ \n\t]*}', 'InlineHelper');
+        $this->_addSintagsHelperParametersForScope('InlineHelper');
+
         $this->_addSintagsHelperParametersForScope('Helper');
         $this->_addSintagsHelperParametersForScope('Hash');
         $this->_addSintagsHelperParametersForScope('HelperFunction');
         $this->_addSintagsHelperParametersForScope('Struct');
+    }
 
-        return ;
-        /**
-         * @todo Implement inline helpers
-         */
+    function _addInlineHelperTokens()
+    {
+        $this->addSpecialPattern('#{[A-Za-z][\.A-Za-z0-9_-]+}','DoubleQuote','InlineVariable');
+
+        $this->addEntryPattern('#{[ \n\t]*[A-Za-z0-9_]+[ \n\t]*\x28?[ \n\t]*(?=.*})','DoubleQuote','InlineHelper');
+        $this->addExitPattern('[ \n\t]*}', 'InlineHelper');
         $this->_addSintagsHelperParametersForScope('InlineHelper');
-        $this->addEntryPattern('\x7B\x25[ \n\t]*[A-Za-z0-9_]+[ \n\t]*\x28?[ \n\t]*(?=.*\x7D)','DoubleQuote','InlineHelper');
-        $this->addExitPattern('[ \n\t]*\x25\x7D', 'InlineHelper');
-        $this->addSpecialPattern('\x7B@?[A-Za-z][\.A-Za-z0-9_-]+\x7D','DoubleQuote','InlineVariable');
     }
 
     function _addSintagsHelperParametersForScope($scope = 'Helper')
@@ -151,13 +164,13 @@ class AkSintagsLexer extends AkLexer
 
         $this->addSpecialPattern('[0-9]+[\.0-9]*', $scope, 'Numbers');
 
-        $this->addSpecialPattern('true|false', $scope, 'Text');
+        $this->addSpecialPattern('true|false|null', $scope, 'Text');
 
         $this->addSpecialPattern('\x3A[A-Za-z0-9_]+',$scope,'Symbol');
 
         $this->addSpecialPattern('@?[A-Za-z][\.A-Za-z0-9_-]+',$scope,'HelperVariable');
-        
-        
+
+
 
         $this->addSpecialPattern('\x5B',$scope,'Struct');
         $this->addSpecialPattern('\x5D',$scope,'Struct');

@@ -30,7 +30,7 @@ class AkSintagsParser
     '\{' => '____AKST_OT____',
     '\}' => '____AKST_CT____',
     '\"' => '____AKST_DQ____',
-    "\'" => '____AKST_SQ____',
+    "\'" => '____AKST_SQ____'
     );
 
     function AkSintagsParser($mode = 'Text')
@@ -63,6 +63,9 @@ class AkSintagsParser
         return true;
     }
 
+    //------------------------------------
+    //  PHP CODE
+    //------------------------------------
     function PhpCode($match, $state)
     {
         if(!AK_SINTAGS_REPLACE_SHORTHAND_PHP_TAGS){
@@ -86,6 +89,17 @@ class AkSintagsParser
             break;
             case AK_LEXER_EXIT:
             $this->output .= '?>';
+        }
+        return true;
+    }
+
+    //----------------------------------------------------
+    //  XML OPENING COMPATIBILITY WHITH SHORTAGS SETTINGS
+    //----------------------------------------------------
+    function XmlOpening($match, $state)
+    {
+        if(AK_LEXER_SPECIAL === $state){
+            $this->output .= '<?php echo \'<?xml\'; ?>';
         }
         return true;
     }
@@ -370,16 +384,17 @@ class AkSintagsParser
 
     function InlineHelper($match, $state, $position = null)
     {
+        $success = true;
         if(AK_LEXER_ENTER === $state){
-            $this->output .= '.';
+            $this->output .= '".';
+            $success = $this->Helper(ltrim($match,'{#'), $state, $position, true);
+        }elseif(AK_LEXER_EXIT === $state){
+            $success = $this->Helper($match, $state, $position, true);
+            $this->output .= '."';
+        }else{
+            $success = $this->Helper($match, $state, $position, true);
         }
-        if(!$this->Helper($match, $state, $position, true)){
-            return false;
-        }
-        if(AK_LEXER_EXIT === $state){
-            $this->output .= '.';
-        }
-        return true;
+        return $success;
     }
 
     //------------------------------------
@@ -388,7 +403,11 @@ class AkSintagsParser
 
     function InlineVariable($match, $state, $position = null)
     {
-        return $this->HelperVariable($match, $state, $position, true);
+        $php_variable = $this->_convertSintagsVarToPhp(trim($match,'#{}'));
+        if($php_variable){
+            $this->output .= '".'.$php_variable.'."';
+        }
+        return true;
     }
 
     //------------------------------------
@@ -425,17 +444,17 @@ class AkSintagsParser
     function _handleQuotedParam($match, $state, $quote_using)
     {
         if(AK_LEXER_ENTER === $state){
-            $this->quoted_content = '';
+            $this->output .= $quote_using;
         }
         if(AK_LEXER_UNMATCHED === $state){
-            $this->quoted_content = $match;
+            $this->output .= $match;
         }
         if(AK_LEXER_EXIT === $state){
-            $this->output .= $quote_using.$this->quoted_content.$quote_using;
+            $this->output .= $quote_using;
         }
         return true;
     }
-    
+
     //-----------------------------------------
     //  SINTAGS HELPER NUMBER PARAMETER
     //-----------------------------------------
