@@ -279,7 +279,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $sql = array_merge(array($sql),$options['bind']);
         }
 
-        $result =& $this->_findBySqlWithAssociations($sql, $limit, $offset, $options['include']);
+        $result =& $this->_findBySqlWithAssociations($sql, $limit, $offset, $options['include'], empty($options['virtual_limit']) ? false : $options['virtual_limit']);
 
         return $result;
     }
@@ -335,7 +335,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
     /**
      * @todo Refactor in order to increase performance of associated inclussions
      */
-    function &_findBySqlWithAssociations($sql, $limit = null, $offset = null, $included_associations = array())
+    function &_findBySqlWithAssociations($sql, $limit = null, $offset = null, $included_associations = array(), $virtual_limit = false)
     {
         if(is_array($sql)){
             $sql_query = array_shift($sql);
@@ -344,6 +344,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
         }
         $this->setConnection();
         $objects = array();
+        $_included_results = array(); // Used only in conjuntion with virtual limits for doing find('first',...include'=>...
         if(is_integer($limit)){
             if(is_integer($offset)){
                 $results = !empty($bindings) ?
@@ -385,6 +386,14 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 // We need to keep a pointer to unique parent elements in order to add associates to the first loaded item
                 $e = null;
                 $object_id = $this_item_attributes[$this->getPrimaryKey()];
+                
+                if(!empty($virtual_limit)){
+                    $_included_results[$object_id] = $object_id;
+                    if(count($_included_results) > $virtual_limit){
+                        continue;
+                    }
+                }
+                
                 if(!isset($ids[$object_id])){
                     $ids[$object_id] = $i;
                     $attributes_for_instantation = $this->getOnlyAvailableAtrributes($this_item_attributes);
@@ -394,7 +403,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                     $e = $i;
                     $i = $ids[$object_id];
                 }
-
+                
                 foreach ($associated_items as $association_id=>$attributes){
                     if(count(array_diff($attributes, array(''))) > 0){
                         if(!method_exists($objects[$i]->$association_id, 'build')){

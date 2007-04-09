@@ -257,7 +257,7 @@ and
 
     ./script/generate scaffold Author
 
-This will generate a brunch of files and folder with code that really works!. Don't trust me? Try it yourself. Point your browser to [http://localhost/booklink/author](http://localhost/booklink/author) and [http://localhost/booklink/books](http://localhost/booklink/books) to start adding authors and books. Create some records and come back for an explanation of what is going under the hood.
+This will generate a bunch of files and folders with code that really works!. Don't trust me? Try it yourself. Point your browser to [http://localhost/booklink/author](http://localhost/booklink/author) and [http://localhost/booklink/books](http://localhost/booklink/books) to start adding authors and books. Create some records and come back for an explanation of what is going under the hood.
 
 
 The Akelos Workflow
@@ -315,7 +315,7 @@ So you will need to tell your models how they relate to each other like
 
 Now that you made the models aware of each other you will need to modify the book controller so it loads the `author` and the `book` model instances
 
-*/app/models/author.php*
+*/app/controllers/book_controller.php*
 
     <?php
     
@@ -324,6 +324,18 @@ Now that you made the models aware of each other you will need to modify the boo
         var $models = 'book, author'; // <- make this models available
         
         // ... more BookController code
+        
+         // ... more BookController code
+ 
+        function show()
+        {
+            // Replace "$this->book = $this->Book->find(@$this->params['id']);"
+            // with this in order to find related authors.
+            $this->book = $this->Book->find(@$this->params['id'], array('include' => 'author'));
+        }
+        
+        // ... more BookController code
+    }
 
 Next step is to show available authors when creating or editing a book. This can be achieved using the `$form_options_helper` by inserting the following code
 right after `<?=$active_record_helper->error_messages_for('book');?>` on the  */app/views/book/_form.tpl*  file

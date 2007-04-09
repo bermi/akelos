@@ -860,7 +860,10 @@ Examples for find all:
 
         switch ($args[0]) {
             case 'first':
-            $result =& $this->find('all', array_merge($options, array('limit'=>1)));
+
+            $options = array_merge($options, array((!empty($options['include']) && $this->hasAssociations() ?'virtual_limit':'limit')=>1));
+            $result =& $this->find('all', $options);
+
             if(!empty($result) && is_array($result)){
                 $_result =& $result[0];
             }else{
@@ -925,20 +928,19 @@ Examples for find all:
                 break;
 
                 case 1 :
-
-                if(empty($options['include'])){
-                    $result =& $this->find('first', array_merge($options, array('conditions' => $this->getTableName().'.'.$this->getPrimaryKey().' = '.$ids[0].$conditions)));
-                    if(is_array($args[0]) && $result !== false){
-                        //This is a dirty hack for avoiding PHP4 pass by reference error
-                        $result_for_ref = array(&$result);
-                        $_result =& $result_for_ref;
-                    }else{
-                        $_result =& $result;
-                    }
-                    return  $_result;
-
-                    break;
+                $table_name = !empty($options['include']) && $this->hasAssociations() ? '__owner' : $this->getTableName();
+                $result =& $this->find('first', array_merge($options, array('conditions' => $table_name.'.'.$this->getPrimaryKey().' = '.$ids[0].$conditions)));
+                if(is_array($args[0]) && $result !== false){
+                    //This is a dirty hack for avoiding PHP4 pass by reference error
+                    $result_for_ref = array(&$result);
+                    $_result =& $result_for_ref;
+                }else{
+                    $_result =& $result;
                 }
+                return  $_result;
+
+                break;
+
                 default:
 
                 $ids_condition = $this->getPrimaryKey().' IN ('.join(', ',$ids).')';

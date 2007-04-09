@@ -22,6 +22,7 @@ $partial_tests = array(
 'AkActiveRecord_multiple_inclussion',
 'AkActiveRecord_accessible_attributes',
 'AkActiveRecord_calculations',
+'AkActiveRecord_associated_inclusion',
 );
 
 foreach ($partial_tests as $partial_test){
