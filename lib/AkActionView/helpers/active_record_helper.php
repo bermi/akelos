@@ -156,7 +156,7 @@ class ActiveRecordHelper extends AkActionViewHelper
         $result = '';
         foreach (array_keys($record->getContentColumns()) as $column){
             ob_start();
-            eval("?>$input_block<?");
+            eval("?>$input_block<?php ");
             $result .= ob_get_clean()."\n";
         }
         return $result;

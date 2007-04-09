@@ -129,7 +129,7 @@ class {$this->options['dynamic_server_class_name']} extends AkIxrInstrospectionS
     function serve()
     {
         $this->_generateServerClassCode();
-        eval('?>'.$this->_serverClassCode.'<?');
+        eval('?>'.$this->_serverClassCode.'<?php ');
         $Server =& new $this->options['dynamic_server_class_name'];
         $this->_linkWebServicesToServer($Server);
         $Server->init();
