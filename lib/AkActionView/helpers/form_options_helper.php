@@ -152,7 +152,9 @@ class FormOptionsHelper extends AkActionViewHelper
         if (empty($container)) {
             return '';
         }
-        $text_is_value = count(array_diff(array_keys($container),range(0,count($container)))) == 0;
+        $container = array_map('strval',$container);
+
+        $text_is_value = count(array_diff(range(0,count($container)-1),array_keys($container))) == 0;
 
         $selected = (array)$selected;
         $options_for_select = '';

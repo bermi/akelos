@@ -4,8 +4,8 @@ require_once('_HelpersUnitTester.php');
 require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_options_helper.php');
 
 
-class FormOptionsHelperTests extends HelpersUnitTester 
-{    
+class FormOptionsHelperTests extends HelpersUnitTester
+{
     function test_for_formOptionsHelper()
     {
         $FormOptionsHelper = & new FormOptionsHelper();
@@ -32,7 +32,7 @@ class FormOptionsHelperTests extends HelpersUnitTester
         $Person->setReturnValue('get', '3', array('role'));
         $Person->setReturnValue('get', '3', array('id'));
         $Controller =& new MockAkActionController($this);
-        
+
 
         $AkFormHelperOptionsInstanceTag =& new AkFormHelperOptionsInstanceTag('person','role',&$FormOptionsHelper,null,&$Person);
 
@@ -272,7 +272,29 @@ class FormOptionsHelperTests extends HelpersUnitTester
          * @todo add tests for AkFormOptionsHelperBuilder
          */
     }
-    
+
+    function test_numerical_indexes_for_select()
+    {
+        $Person =& new MockAkActiveRecord($this);
+        $Person->setReturnValue('get', '2', array('role'));
+        $FormOptionsHelper = & new FormOptionsHelper();
+        $FormOptionsHelper->addObject('person',$Person);
+
+        $this->assertEqual(trim(str_replace("\n",'',
+        $FormOptionsHelper->select('person',  'role', array('Admin'=>1,'Moderator'=>2,'Visitor'=>3)))),
+        '<select id="person_role" name="person[role]"><option value="1">Admin</option>'.
+        '<option selected="selected" value="2">Moderator</option>'.
+        '<option value="3">Visitor</option>'.
+        '</select>');
+        
+        $this->assertEqual(trim(str_replace("\n",'',
+        $FormOptionsHelper->select('person',  'role', array('Admin'=>0,'Moderator'=>1,'Visitor'=>2)))),
+        '<select id="person_role" name="person[role]"><option value="0">Admin</option>'.
+        '<option value="1">Moderator</option>'.
+        '<option selected="selected" value="2">Visitor</option>'.
+        '</select>');
+    }
+
 }
 
 Ak::test('FormOptionsHelperTests', true);
