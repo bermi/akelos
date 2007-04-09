@@ -30,6 +30,9 @@
      function AkImage($image_path = null, $tranform_using = AK_IMAGE_DRIVER)
      {
          $this->Transform =& Image_Transform::factory($tranform_using);
+         if (PEAR::isError($this->Transform)){
+             trigger_error($this->Transform->getMessage(), E_USER_ERROR);
+         }
          if(!empty($image_path)){
              $this->load($image_path);
          }
@@ -48,7 +51,7 @@
          }
          
          $path = empty($path) ? $this->image_path : $path;
-         $this->Transform->save($tmp_image_name, array_pop(pathinfo($path)), $quality);         
+         $this->Transform->save($tmp_image_name, $this->getExtension($path), $quality);         
          Ak::file_put_contents($path, file_get_contents($tmp_image_name), $options);
          @unlink($tmp_image_name);
      }
@@ -70,9 +73,9 @@
          return $this->Transform->getImageHeight();
      }
 
-     function getExtension()
+     function getExtension($path = null)
      {
-         return array_pop(pathinfo($this->image_path));
+         return substr(strrchr(empty($path) ? $this->image_path : $path, '.'), 1);
      }
 
      function addFilter($filter_name, $options = array())
