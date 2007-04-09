@@ -85,6 +85,8 @@ ak_define('PUBLIC_DIR', AK_BASE_DIR.DS.'public');
 ak_define('TEST_DIR', AK_BASE_DIR.DS.'test');
 ak_define('SCRIPT_DIR',AK_BASE_DIR.DS.'script');
 
+ak_define('DEFAULT_LAYOUT', 'application');
+
 // Paths below this point refer to the Akelos Framework components.
 ak_define('FRAMEWORK_DIR', AK_BASE_DIR);
 ak_define('CONTRIB_DIR',AK_FRAMEWORK_DIR.DS.'vendor');

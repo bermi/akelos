@@ -1293,9 +1293,10 @@ class AkActionController extends AkObject
         if(!empty($layout)){
             $layout = strstr($layout,'/') || strstr($layout,DS) ? $layout : 'layouts'.DS.$layout;
             $layout = substr($layout,0,7) === 'layouts' ? AK_VIEWS_DIR.DS.$layout.'.tpl' : $layout.'.tpl';
-            return file_exists($layout) ? $layout : false;
+        }elseif($layout !== false){
+            $layout = AK_VIEWS_DIR.DS.'layouts'.DS.AK_DEFAULT_LAYOUT.'.tpl';
         }
-        return false;
+        return file_exists($layout) ? $layout : false;
     }
 
     function _doesActionHasLayout()

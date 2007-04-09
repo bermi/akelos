@@ -38,6 +38,9 @@ Stephen Reay
 
  - AkXhtmlValidator.php patch. 2007-02-23
 
+Jerome Loyet
+
+ - Multiple patches and contributions
 
 Special thanks to David Heinemeier Hansson and the Rails community for creating 
 the great Ruby on Rails framework.
