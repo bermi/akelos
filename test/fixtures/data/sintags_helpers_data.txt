@@ -1,5 +1,4 @@
 
-
 <%= render :partial => "account", :locals => { :account => @buyer } %>
 
 -----------------------------------
@@ -226,12 +225,12 @@
 
 ===================================
 
-<%= url_for true, false %>
+<%= url_for true, false, null %>
 
 -----------------------------------
 
 
-<?php echo $url_helper->url_for(true, false); ?>
+<?php echo $url_helper->url_for(true, false, null); ?>
 
 ===================================
 
@@ -297,4 +296,27 @@
 
 <?php echo $url_helper->link_to('Empty string test', ""); ?>
 
+===================================
 
+<%= link_to "Posted by #{Post.author}" %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to("Posted by ".$Post->author.""); ?>
+
+===================================
+
+<%= link_to "Status: #{translate 'active',{'key'=> Value.text}, :foo => _('Bar')}" %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to("Status: ".$text_helper->translate('active', array('key' => $Value->text), array('foo' => $text_helper->translate('Bar'))).""); ?>
+
+
+===================================
+
+<%= link_to "Status: #{translate 'active'}" %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to("Status: ".$text_helper->translate('active').""); ?>
