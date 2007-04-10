@@ -325,8 +325,6 @@ Now that you made the models aware of each other you will need to modify the boo
         
         // ... more BookController code
         
-         // ... more BookController code
- 
         function show()
         {
             // Replace "$this->book = $this->Book->find(@$this->params['id']);"
