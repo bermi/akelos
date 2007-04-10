@@ -117,6 +117,11 @@ class AkResponse extends AkObject
         
         $terminate_if_redirected ? (!empty($_redirected) ? exit() : null) : null;
     }
+    
+    function deleteHeader($header)
+    {
+        unset($this->_headers[$header]);
+    }
 
     /**
     * Redirects to given $url, after turning off $this->autoRender.
