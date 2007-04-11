@@ -180,7 +180,7 @@ class AkPhpTemplateHandler
         if(!file_exists($this->_getCompiledTemplatePath())){
             return true;
         }
-        $tpl_time = filemtime($this->_getTemplatePath());
+        $tpl_time = @filemtime($this->_getTemplatePath());
         $compiled_tpl_time = filemtime($this->_getCompiledTemplatePath());
         if($tpl_time > $compiled_tpl_time){
             return true;
@@ -194,14 +194,19 @@ class AkPhpTemplateHandler
         return true;
     }
 
-
-
     function _getTemplateBasePath()
     {
         if(empty($this->_options['template_base_path'])){
-            $this->_options['template_base_path'] = rtrim(str_replace($this->_getTemplateFilename(),'',$this->_options['file_path']),'\/');
+            $template_file_name = $this->_getTemplateFilename();
+            if(!empty($template_file_name)){
+                $this->_options['template_base_path'] = rtrim(str_replace($template_file_name,'',$this->_options['file_path']),'\/');
+                if(defined('AK_COMPILED_VIEWS_DIR') && !strstr($this->_options['template_base_path'], AK_TMP_DIR)){
+                    $this->_options['template_base_path'] = str_replace(AK_BASE_DIR, AK_COMPILED_VIEWS_DIR, $this->_options['template_base_path']);
+                }
+            }else{
+                $this->_options['template_base_path'] = AK_BASE_DIR.DS.'tmp';
+            }
         }
-
         return $this->_options['template_base_path'];
     }
 
