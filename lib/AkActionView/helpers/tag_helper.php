@@ -18,41 +18,80 @@
 
 
 /**
-* This class is for the rare cases where you need to programmatically make tags.
+* Use these methods to generate HTML tags programmatically when you can't use a Builder. 
+* By default, they output XHTML compliant tags.
 */
 class TagHelper
 {
     /**
-       * Examples:
-       * <tt>$tag_helper->tag('br'); => <br /></tt>
-       * <tt>$tag_helper->tag('input', array('type' => 'text')); => <input type="text" /></tt>
-       */
+    * Returns an empty HTML tag of type *name* which by default is XHTML 
+    * compliant. Setting *open* to true will create an open tag compatible 
+    * with HTML 4.0 and below. Add HTML attributes by passing an attributes 
+    * array to *options*. For attributes with no value like (disabled and 
+    * readonly), give it a value of true in the *options* array.
+    *
+    * Examples:
+    * 
+    *   <%= tag 'br' %>
+    *    # => <br />
+    *   <%= tag 'br', null, true %>
+    *    # => <br>
+    *   <%= tag 'input', { :type => 'text', :disabled => true } %>
+    *    # => <input type="text" disabled="disabled" />
+    */
     function tag($name, $options = null, $open = false)
     {
         return '<'.$name.(!empty($options) ? TagHelper::_tag_options($options) : '').($open ? '>' : ' />');
     }
 
     /**
-       * Examples:
-       * <tt>$tag_helper->content_tag("p", "Hello world!") => <p>Hello world!</p></tt>
-       * <tt>$tag_helper->content_tag("div", content_tag("p", "Hello world!"), "class" => "strong") => </tt>
-       *<tt><div class="strong"><p>Hello world!</p></div></tt>
-       * */
+    *  Returns an HTML block tag of type *name* surrounding the *content*. Add
+    * HTML attributes by passing an attributes array to *options*. For attributes 
+    * with no value like (disabled and readonly), give it a value of true in 
+    * the *options* array. You can use symbols or strings for the attribute names.
+    *
+    *   <%= content_tag 'p', 'Hello world!' %>
+    *    # => <p>Hello world!</p>
+    *   <%= content_tag('div', content_tag('p', "Hello world!"), :class => "strong") %>
+    *    # => <div class="strong"><p>Hello world!</p></div>
+    *   <%= content_tag("select", options, :multiple => true) %>
+    *    # => <select multiple="multiple">...options...</select>
+    */
     function content_tag($name, $content, $options = null)
     {
         return '<'.$name.(!empty($options) ? TagHelper::_tag_options($options) : '').'>'.$content.'</'.$name.'>';
     }
 
     /**
-      * Returns a CDATA section for the given +content+.  CDATA sections
-      * are used to escape blocks of text containing characters which would
-      * otherwise be recognized as markup. CDATA sections begin with the string
-      * <tt>&lt;![CDATA[</tt> and } with (and may not contain) the string 
-      * <tt>]]></tt>. 
-      */
+    * Returns a CDATA section for the given +content+.  CDATA sections
+    * are used to escape blocks of text containing characters which would
+    * otherwise be recognized as markup. CDATA sections begin with the string
+    * <tt>&lt;![CDATA[</tt> and } with (and may not contain) the string 
+    * <tt>]]></tt>. 
+    */
     function cdata_section($content)
     {
         return '<![CDATA['.$content.']]>';
+    }
+
+
+    /**
+    * Returns the escaped +html+ without affecting existing escaped entities.
+    *
+    *  <%= escape_once "1 > 2 &amp; 3" %>
+    *    # => "1 &gt; 2 &amp; 3"
+    */
+    function escape_once($html)
+    {
+        return TagHelper::_fix_double_escape(htmlentities($html, ENT_COMPAT, Ak::locale('charset')));
+    }
+
+    /**
+    * Fix double-escaped entities, such as &amp;amp;, &amp;#123;, etc.
+    */
+    function _fix_double_escape($escaped)
+    {
+        return preg_replace('/&amp;([a-z]+|(#\d+));/i', '&$1;', $escaped);
     }
 
     function _tag_options($options)
@@ -63,7 +102,7 @@ class TagHelper
                 continue;
             }
             if(!is_numeric($key) && !is_array($value) && !is_object($value)){
-                $formated_options[$key] =  $key.'="'.htmlentities($value, ENT_COMPAT, Ak::locale('charset')).'"';
+                $formated_options[$key] =  $key.'="'.TagHelper::escape_once($value).'"';
             }
         }
         ksort($formated_options);

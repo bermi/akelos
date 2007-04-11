@@ -4,7 +4,7 @@ require_once('_HelpersUnitTester.php');
 require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'tag_helper.php');
 
 
-class TagHelperTests extends HelpersUnitTester 
+class TagHelperTests extends HelpersUnitTester
 {
     function test_TagHelper()
     {
@@ -22,7 +22,12 @@ class TagHelperTests extends HelpersUnitTester
         $this->assertEqual(TagHelper::cdata_section('Have a look "HERE"'),
         '<![CDATA[Have a look "HERE"]]>');
     }
-    
+
+    function test_for_not_double_escaping_entities()
+    {
+        $this->assertEqual(TagHelper::escape_once("1 > 2 &amp; 3"), "1 &gt; 2 &amp; 3");
+    }
+
 }
 
 
