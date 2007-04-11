@@ -129,7 +129,7 @@ Si estás en un servidor de hosting compartido, seguramente deberás crearlas de
 
 Ahora ya puedes acceder al asistente de configuracion de tu aplicacion en http://localhost/booklink    
 
-Sigue los pasos del asistente para configurar el acceso a tu base de datos, configuraciones regionales y permisos de archivo, para así generar un archivo de configración. Yo mientras tanto iré por un café mientras vas creando la aplicación **booklink** tranquilamente.
+Sigue los pasos del asistente para configurar el acceso a tu base de datos, configuraciones regionales y permisos de archivo, para así generar un archivo de configuración. Yo mientras tanto iré por un café mientras vas creando la aplicación **booklink** tranquilamente.
 
 #### Configuración manual de la aplicación ####
 
@@ -148,7 +148,7 @@ Ahora necesitas definir las tablas y columnas donde la aplicación almacenará l
 
 Cuando se trabaja con otros desarrolladores, los cambios en las bases de datos pueden ser difíciles de distribuir entre todos ellos. Akelos brinda una solución a este problema llamada *instalador* o *migración*.
 
-Así que crearás la estructura de la base de datos usando un installer con la finalidad de distribuir los cambios que realices de vez en cuando en la estructura de la base de datos de booklink.
+Así que crearás la estructura de la base de datos usando un installer con la finalidad de distribuir los cambios que realices en la estructura de la base de datos de booklink.
 El uso de *instaladores* te permitirá también definir las tablas y columnas de tu base de datos de manera independiente al tipo de base de datos que utilices.
 
 Ahora crearás un archivo llamado `app/installers/booklink_installer.php` con el siguiente código correspondiente al Instalador de Booklink:
@@ -254,7 +254,7 @@ y
 
     ./script/generate scaffold Author
 
-Esto generará un montón de archivos y carpetas que ¡funcionan de verdad!. ¿No me crees? Pruebalo tu mismo. Dirige tu navegador a  [http://localhost/booklink/author](http://localhost/booklink/author) y [http://localhost/booklink/books](http://localhost/booklink/books) para empezar a agregar autores y libros. Crea algunos registros y vuelve aquí para saber que es lo que ocurre internamente.
+Esto generará un montón de archivos y carpetas que ¡funcionan de verdad!. ¿No me crees? Pruébalo tu mismo. Dirige tu navegador a  [http://localhost/booklink/author](http://localhost/booklink/author) y [http://localhost/booklink/books](http://localhost/booklink/books) para empezar a agregar autores y libros. Crea algunos registros y vuelve aquí para saber que es lo que ocurre internamente.
 
 
 El flujo de trabajo de Akelos
@@ -276,7 +276,7 @@ Esta es una pequeña explicación del flujo de trabajo subyacente para una llama
 
  5. Una vez que la acción `show` ha sido ejecutada, el controlador buscará el archivo de la vista en `/app/views/book/show.tpl` y renderizará el resultado en la variable `$content_for_layout`.
 
- 6. Ahora Akelos buscará un layout con el mismo conmbre que el controlador en `/app/views/layouts/book.tpl`. Si lo encuentra rederizará el mismo, insertando el contenido de `$content_for_layout` y enviando la salida al navegador.
+ 6. Ahora Akelos buscará un layout con el mismo nombre que el controlador en `/app/views/layouts/book.tpl`. Si lo encuentra renderizará el mismo, insertando el contenido de `$content_for_layout` y enviando la salida al navegador.
 
 Esto podría ayudarte a comprender la forma en la que Akelos maneja tus peticiones, así que estamos listos para modificar la aplicación base.
 
@@ -340,9 +340,9 @@ justo después de `<?=$active_record_helper->error_messages_for('book');?>` en e
         <?=$form_options_helper->select('book', 'author_id', $Author->collect($Author->find(), 'name', 'id'));?>
     </p>
 
-Si aún no has creado ningún autor necesitarás crealos ahora mismo para ver de lo que hablamos. Luego visita http://locahost/boolink/book/add para comprobar que nos una lista para seleccionar autores. Adelante, crea un libro seleccionando un autor de la lista.
+Si aún no has creado ningún autor necesitarás crear algunos ahora mismo para ver de lo que hablamos. Luego visita http://locahost/boolink/book/add para comprobar que nos muestra una lista para seleccionar autores. Adelante, crea un libro seleccionando un autor de la lista.
 
-Parece ser que el autor ha sido guardado, pero no está incluído en la vista `app/views/book/show.tpl`. deberás añadir este código después de `<? $content_columns = array_keys($Book->getContentColumns()); ?>`
+Parece ser que el autor se ha guardado, pero no se muestra en la vista `app/views/book/show.tpl`. deberás añadir este código después de `<? $content_columns = array_keys($Book->getContentColumns()); ?>`
 
     <label>_{Author}:</label> <span class="static">{book.author.name?}</span><br />
 
@@ -351,10 +351,10 @@ Ahora seguramente estarás poniendo el grito en el cielo sobre la extraña sinta
 Comentarios Finales
 --------------------
 
-Esto es todo por ahora, iré mejorando este tutorial de vez en cuando, para agregaralgunas funcionalidades que faltan, como:
+Esto es todo por ahora, iré mejorando este tutorial de vez en cuando, para agregar algunas funcionalidades que faltan, como:
                                 
  * validaciones
- * enrutamientos (routes)
+ * rutas (routes)
  * filtros
  * callbacks
  * transacciones
@@ -365,3 +365,8 @@ Esto es todo por ahora, iré mejorando este tutorial de vez en cuando, para agre
  * pruebas unitarias (testing)
  * distribución
  * y mucho más...
+
+
+------------
+
+Traducción realizada por: Matias Quaglia
