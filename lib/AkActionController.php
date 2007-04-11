@@ -1298,7 +1298,7 @@ class AkActionController extends AkObject
             }
             $layout = null;
         }
-        if(empty($layout) && $layout !== false){
+        if(empty($layout) && $layout !== false && defined('AK_DEFAULT_LAYOUT')){
             $layout = AK_VIEWS_DIR.DS.'layouts'.DS.AK_DEFAULT_LAYOUT.'.tpl';
         }
         return file_exists($layout) ? $layout : false;
