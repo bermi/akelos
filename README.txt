@@ -1,9 +1,6 @@
 Introduction.
 ---------------------------------------
 
-Please note that this has been until now a ONE MAN PROJECT, so if you find the 
-framework useful and can contribute with patches we will get a better environment.
-
 The Akelos Framework is an open-source port of Ruby on Rails to the 
 PHP programming language.
 
@@ -14,6 +11,12 @@ conventions over configuration.
 
 You can find more information at the Akelos Framework website at
 http://akelos.org 
+
+
+The tutorial
+---------------------------------------
+Perhaps the easiest way to lear about Akelos is to get your hands on the tutorials 
+you can find on the docs folder.
 
 
 Setting up the framework.

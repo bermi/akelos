@@ -217,7 +217,7 @@ Models, Views and Controllers
 
 Akelos follows the [MVC design pattern](http://en.wikipedia.org/wiki/Model-view-controller) for organizing your application.
 
-Akelos MVC diagram.
+![Akelos MVC diagram.](http://akelosframework.googlecode.com/svn/trunk/docs/images/akelos_mvc.png)
 
 ### Your application files and the Akelos Naming conventions ###
 
@@ -249,7 +249,7 @@ Akelos comes with code generators that can cut your development time by creating
 
 ### Meet the Scaffold generator ###
 
-You will create a base skeleton for interacting with the **booklink** database created before. In order to get this skeleton quickly you can use the *scaffold generator* like this
+You will generate a base skeleton for interacting with the **booklink** database created before. In order to get this skeleton quickly you can use the *scaffold generator* like this
 
     ./script/generate scaffold Book
 

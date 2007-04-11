@@ -1,11 +1,11 @@
-Thanks to all the people who has tried the Akelos Framework in it's chilhood.
+Thanks to all the people who has tried the Akelos Framework in it's childhood.
 You are all helping Akelos to become the best framework for the PHP community.
 
 Here is a list of the people who is being helping to create a better Akelos. 
-Some in form of patch, new feature or doccumentation, they are all listed 
+Some in form of patch, new feature or documentation, they are all listed 
 here (if you contributed and are not listed, let me know it). 
 If you need to contact them, drop me a line and I'll give you their contact
-email I don't whant them to be spammed for being in this list.
+email I don't want them to be spammed for being in this list.
 
 
 Core contributors (new features)
@@ -19,7 +19,7 @@ Niels Ganser
 
  - AkActsAsTree.php unit tested new feature 2006-09-20
 
- Kaste
+Kaste
 
   - AkInstaller patch and new unit test. 2007-02-25
   - AkActiveRecord::accessibleAttributes patch and new unit test. 2007-02-26
@@ -40,9 +40,15 @@ Stephen Reay
 
 Jerome Loyet
 
- - Multiple patches and contributions
+ - Multiple patches and contributions. 2007-04-01 till present :D
+ 
+Matias Quaglia
+
+ - Spanish translation of the tutorial . 2007-04-11
+ - Spanish Mini HOW-TO set php on Windows path . 2007-04-11
+ 
 
 Special thanks to David Heinemeier Hansson and the Rails community for creating 
 the great Ruby on Rails framework.
 
-Many thanks to all the Anonymous people wich has helped us in many different forms :D
+Many thanks to all the Anonymous people which has helped us in many different forms :D
