@@ -5,12 +5,14 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'prototype_helper.php'
 require_once(AK_LIB_DIR.DS.'AkActionController.php');
 require_once(AK_LIB_DIR.DS.'AkRequest.php');
 
+Mock::generate('AkRequest');
+
 class PrototypeHelperTests extends HelpersUnitTester
 {
     function test_setup()
     {
         $Controller = &new AkActionController();
-        $Controller->Request =& new AkRequest();
+        $Controller->Request =& new MockAkRequest($this);
         $Controller->controller_name = 'test';
         $Controller->instantiateHelpers();
         
