@@ -325,7 +325,7 @@ class PrototypeHelper extends AkActionViewHelper
         }
 
         $javascript_function .= ";\n";
-        return $options['binding'] ? $this->_controller->text_helper->concat($javascript_function, $options['binding']) : $javascript_function;
+        return !empty($options['binding']) ? $this->_controller->text_helper->concat($javascript_function, $options['binding']) : $javascript_function;
     }
 
     /**
