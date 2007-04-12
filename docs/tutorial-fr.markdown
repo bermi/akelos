@@ -385,3 +385,7 @@ Petite conclusion
 
 C'est tout pour le moment. Ce tutoriel continuera bien sûr d'évoluer, et il y en aura d'autres, car ce ne sont pas là les seules fonctionnalités d'Akelos !
 Si vous voyez une faute de frappe ou de français, n'hésitez pas à me le faire savoir !
+
+---------------------
+
+Traduit par: Naixn
