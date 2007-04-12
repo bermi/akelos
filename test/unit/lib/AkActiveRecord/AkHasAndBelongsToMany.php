@@ -227,7 +227,7 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
 
     }
 
-    
+
     function test_find_on_unsaved_models_including_associations()
     {
         $Property =& new Property('description->','Chalet by the sea');
@@ -251,7 +251,7 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
         }
     }
 
-    
+
     function test_clean_up_dependencies()
     {
         $Property =& new Property('description->','Luxury Estate');
@@ -275,7 +275,7 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
 
     }
 
-    
+
     function test_double_assignation()
     {
         $AkelosOffice =& new Property(array('description'=>'Akelos new Office'));
@@ -310,7 +310,7 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
 
         $PisoBermi->property_type->add($Atico);
         $PisoBermi->property_type->add($Apartamento);
-        
+
 
         $this->assertTrue($PisoJose =& $PisoJose->findFirstBy('description','Piso Jose'));
         $this->assertTrue($Atico =& $Atico->findFirstBy('description','Ático'));
@@ -320,22 +320,20 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
         $PisoJose->property_type->delete($Atico);
 
         $this->assertTrue($PisoBermi =& $PisoBermi->findFirstBy('description','Piso Bermi'));
-        
+
         $this->assertTrue($PisoJose =& $PisoJose->findFirstBy('description','Piso Jose'));
         $PisoJose->property_type->load();
-        
+
         $this->assertTrue($Atico =& $Atico->findFirstBy('description','Ático'));
         $this->assertTrue($Apartamento =& $Apartamento->findFirstBy('description','Apartamento'));
-        
+
         $this->assertEqual($PisoJose->property_types[0]->getId(), $Apartamento->getId());
         $this->assertEqual($PisoBermi->property_type->count(), 2);
-        
-        
+
+
     }
 
-    /**
-     * @todo Implement support for unique elements
-     */
+
     function test_associated_uniqueness()
     {
 
@@ -352,10 +350,14 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
 
         $this->assertTrue($RanchoMaria =& $Property->findFirstBy('description','Rancho Maria'));
         $this->assertTrue($Rancho =&  $PropertyType->findFirstBy('description','Rancho', array('include'=>'properties')));
-        
+
         $Rancho->property->add($RanchoMaria);
         $this->assertEqual($Rancho->property->count(), 1);
 
+        $Rancho->set('description', 'Rancho Type');
+        $this->assertTrue($Rancho->save());
+        $this->assertTrue($Rancho =&  $PropertyType->findFirstBy('description','Rancho Type', array('include'=>'properties')));
+        $this->assertEqual($Rancho->property->count(), 1);
     }
 
 }

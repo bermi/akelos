@@ -482,7 +482,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                 }else{
                     $record_id = $records[$k];
                 }
-                
+
                 foreach (array_keys($this->Owner->{$this->association_id}) as $kk){
                     if(
                     (
@@ -863,6 +863,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
             $class_name = strtolower($CollectionHandler->getOption($association_id, 'class_name'));
             if(!empty($object->$association_id) && is_array($object->$association_id)){
+                $this->_removeDuplicates($object, $association_id);
                 foreach (array_keys($object->$association_id) as $k){
                     if(!empty($object->{$association_id}[$k]) && strtolower(get_class($object->{$association_id}[$k])) == $class_name){
                         $AssociatedItem =& $object->{$association_id}[$k];
@@ -886,6 +887,37 @@ class AkHasAndBelongsToMany extends AkAssociation
             return $success;
         }
 
+    }
+
+    function _removeDuplicates(&$object, $association_id)
+    {
+        if(!empty($object->{$association_id})){
+            $CollectionHandler =& $object->hasAndBelongsToMany->models[$association_id];
+            $options = $CollectionHandler->getOptions($association_id);
+            if(empty($options['unique'])){
+                return ;
+            }
+            if($object->isNewRecord()){
+                $ids = array();
+            }else{
+                if($existing = $CollectionHandler->find()){
+                    $ids = $existing[0]->collect($existing,'id','id');
+                }else{
+                    $ids = array();
+                }
+            }
+            $class_name = strtolower($CollectionHandler->getOption($association_id, 'class_name'));
+            foreach (array_keys($object->$association_id) as $k){
+                if(!empty($object->{$association_id}[$k]) && strtolower(get_class($object->{$association_id}[$k])) == $class_name && !$object->{$association_id}[$k]->isNewRecord()){
+                    $AssociatedItem =& $object->{$association_id}[$k];
+                    if(isset($ids[$AssociatedItem->getId()])){
+                        unset($object->{$association_id}[$k]);
+                        continue;
+                    }
+                    $ids[$AssociatedItem->getId()] = true;
+                }
+            }
+        }
     }
 }
 
