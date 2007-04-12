@@ -4,9 +4,9 @@ Creando una aplicación simple usando el Akelos Framework
 Introducción
 --------------------------
 
-Este tutorial te mostrará cómo crear una aplicación con el Akelos Framework. 
+Este tutorial te muestra cómo crear una aplicación con el Akelos Framework. 
 
-Esta aplicación servirá para manejar libros y sus autores y la llamaremos **booklink**
+Esta aplicación sirve para manejar libros y sus autores y la llamaremos **booklink**
 
 Requisitos para este tutorial
 ---------------------------
@@ -16,12 +16,12 @@ Requisitos para este tutorial
  - Acceso Shell a tu servidor
  - PHP4 ó PHP5
 
-Esta configuración se puede encontrar en la mayoría de los servidores y proveedores de hosting Linux. Akelos funciona bajo múltiples configuraciones, pero a para este tutorial nos centraremos en ésta concretamente.
+Esta configuración se puede encontrar en la mayoría de los servidores y proveedores de hosting Linux. Akelos funciona bajo múltiples configuraciones, pero para este tutorial nos centraremos en los requisitos anteriores.
 
 Descarga e Instalación
 ---------------------------
-Hasta que no esté disponible la versión 1.0, te recomendamos que te descargues la última versión trunk (troncal). Para ello necesitarás tener instalado [subversion](http://subversion.tigris.org/).
-Podrás retirar una "copia de trabajo" del código fuente de Akelos con el comando:
+Hasta que no esté disponible la versión 1.0, te recomendamos que te descargues la última versión trunk (troncal). Para ello necesitas tener instalado [subversion](http://subversion.tigris.org/).
+Puedes retirar una "copia de trabajo" del código fuente de Akelos con el comando:
 
     svn co http://akelosframework.googlecode.com/svn/trunk/ akelos
 
@@ -54,14 +54,14 @@ o alternativamente configurando el path para evitar escribir la ruta completa al
 Instalando una nueva aplicación con Akelos
 ---------------------------------------------
 
-Ya has descargado Akelos y te has asegurado que puedes de ejecutar scripts PHP desde tu linea de comandos (no es necesario para ejecutar aplicaciones realizadas con Akelos, pero sí que es necesario para seguir este tutorial)
+Ya te has descargado Akelos y te has asegurado de que puedes ejecutar scripts PHP desde tu linea de comandos (no es necesario para ejecutar aplicaciones realizadas con Akelos, pero sí que es necesario para seguir este tutorial)
 
 Ahora se pueden seguir dos vías:
 
  1. Crear una aplicación con Akelos y enlazarla a las librerías del Framework.
- 2. Comenzar a codificar tu aplicación desde esta carpeta, con el de seguridad que implica que los _visitantes_ de tu sitio pueadan dirigirse con su navegador directamente a cualquier fichero del Framework o de tu aplicación sin pasar por en controlador principal.	
+ 2. Comenzar a escribir el código de tu aplicación desde esta carpeta, con el riesgo que conlleva que los _visitantes_ de tu sitio puedan dirigirse con su navegador directamente a cualquier fichero del Framework o de tu aplicación sin pasar por el controlador principal.	
  
-Asumiendo que has descargado Akelos en `HOME_DIR/akelos` y que estás dentro del directorio `akelos`, puedes comprobar las opciones disponibles para instalar tu nueva aplicación con el comando:
+Si ya te has descargado Akelos en `HOME_DIR/akelos` y estás dentro del directorio `akelos`, puedes comprobar las opciones disponibles para instalar tu nueva aplicación con el comando:
 
    ./script/setup -h
    
@@ -71,11 +71,11 @@ lo que nos muestra las opciones disponibles para el instalador
 
     -deps --dependencies      Incluye una copia del framework dentro del directorio de la aplicación. (true)
     -d --directory=<value>    Directorio de destino para instalar la aplicación.
-    -f --force                Sobreescribe archivos que ya existan. (false)
-    -h --help                 Muestra esta ayuda.
-    -p --public_html=<value>  Ubicación donde la aplicación será accedida por el servidor web. ()
+    -f --force                Sobrescribe archivos que ya existen. (false)
+    -h --help                 Muestra la ayuda que ahora mismo estás leyendo.
+    -p --public_html=<value>  Ubicación que el servidor web utilizará para iniciar la aplicación. ()
     -q --quiet                Suprime la salida por pantalla normal. (false)
-    -s --skip                 Ignora archivos que ya existan en el directorio. (false)
+    -s --skip                 Ignora archivos que ya existen en el directorio. (false)
 	
 Así que ejecutando el siguiente comando: (reemplazar `/www/htdocs` con tu  ruta al directorio público del servidor web. En algunos Hosting Compartidos es `/home/USUARIO/public_html`)
 
@@ -86,7 +86,7 @@ Esto creará la siguiente estructura para la aplicación **booklink**:
     booklink/
         app/ << La aplicación, incluyendo controladores, vistas, modelos e instaladores
         config/ << Los aburridos archivos de configuración (haremos la configuración vía web)
-        public/ << Esta es la única carpeta publica dentro del enlace simbólico /www/htdocs/booklink 
+        public/ << Ésta es la única carpeta pública dentro del enlace simbólico /www/htdocs/booklink 
         script/ << Utilidades para generación de código y ejecución de pruebas unitarias (tests)
 
 **Nota para los usuarios de Windows:** Un enlace simbólico al directorio booklink/public se crea solamente en sistemas *NIX, así que necesitarás indicarle a tu servidor web cómo encontrar la ruta pública para la aplicación **booklink** en tu archivo `httpd.conf` agregando algo así como:
@@ -106,7 +106,7 @@ una vez agregado esto, reinicia el servidor.
 
 El siguiente paso es crear una base de datos para la aplicación. Si tienes planeado usar SQLite sobre PHP5 puedes saltarte este paso.
 
-Cómo crear una base de datos MySQL está fuera del alcance de este tutorial, así que deberás googlear cómo hacer esto en tu sistema, o intentar tomar como ejemplo este caso común para la creación de las mismas, donde creamos tres bases de datos diferentes. Una para cada entorno (producción, desarrollo y testing).
+ En este tutorial no podemos  explicar cómo crear una base de datos MySQL pero quizá te sirva de ayuda tomar como ejemplo este caso común donde creamos tres bases de datos diferentes, una para cada entorno (producción, desarrollo y testing).
 
     mysql -u root -p
     
@@ -127,15 +127,15 @@ Si estás en un servidor de hosting compartido, seguramente deberás crearlas de
 
 #### Usando el instalador web ####
 
-Ahora ya puedes acceder al asistente de configuracion de tu aplicacion en http://localhost/booklink    
+Ahora ya puedes acceder al asistente de configuración de tu aplicacion en http://localhost/booklink    
 
-Sigue los pasos del asistente para configurar el acceso a tu base de datos, configuraciones regionales y permisos de archivo, para así generar un archivo de configuración. Yo mientras tanto iré por un café mientras vas creando la aplicación **booklink** tranquilamente.
+Sigue los pasos del asistente para configurar el acceso a tu base de datos, configuraciones regionales y permisos de archivo, para así generar un archivo de configuración. Yo mientras vas creando la aplicación **booklink** tranquilamente, iré a buscar un café.
 
 #### Configuración manual de la aplicación ####
 
 Guarda los archivos `config/DEFAULT-config.php` y `config/DEFAULT-routes.php` como `config/config.php` y `config/routes.php` y modifica lo que consideres necesario siguiendo las indicaciones del fichero.
 
-Puede que también necesites ajustar manualmente la ruta base de reescritura de URLs, si deseas poder usar URLs bonitas,  editando el archivo `public/.htaccess` y colocando el RewriteBase como:
+Si deseas usar URLs bonitas necesitas definir la ruta base para la reescritura de URLs, editando el archivo `public/.htaccess` y definiendo RewriteBase como:
 
     RewriteBase /booklink
 
@@ -146,10 +146,10 @@ La estructura de la base de datos de booklink
 
 Ahora necesitas definir las tablas y columnas donde la aplicación almacenará la información de los libros y los autores. 
 
-Cuando se trabaja con otros desarrolladores, los cambios en las bases de datos pueden ser difíciles de distribuir entre todos ellos. Akelos brinda una solución a este problema llamada *instalador* o *migración*.
+Cuando se trabaja con otros desarrolladores, los cambios en las bases de datos pueden ser difíciles de distribuir entre todos ellos. Akelos ofrece una solución a este problema llamada *instalador* o *migración*.
 
-Así que crearás la estructura de la base de datos usando un installer con la finalidad de distribuir los cambios que realices en la estructura de la base de datos de booklink.
-El uso de *instaladores* te permitirá también definir las tablas y columnas de tu base de datos de manera independiente al tipo de base de datos que utilices.
+Para crear la estructura de la base de datos utilizarás un installer para distribuir las modificaciones que realices en ella.
+El uso de *instaladores* te permitirá definir las tablas y columnas de tu base de datos independientemente de si usas MySQL, SQLite u otro.
 
 Ahora crearás un archivo llamado `app/installers/booklink_installer.php` con el siguiente código correspondiente al Instalador de Booklink:
 
@@ -180,13 +180,13 @@ Ahora crearás un archivo llamado `app/installers/booklink_installer.php` con el
      
      ?>
 
-Eso es suficiente para que Akelos cree la estructura de tu base de datos. Si solo especificas el nombre de la columna, Akelos asumirá el mejor tipo de dato basándose en convenciones de normalización de base de datos. Si deseas tener total control de la configuración de tus tablas, puedes usar [sintaxis php para Adodb Datadict](http://phplens.com/lens/adodb/docs-datadict.htm)
+Eso es suficiente para que Akelos cree la estructura de tu base de datos. Si sólo especificas el nombre de la columna, Akelos determinará el tipo de datos basándose en convenciones de normalización de base de datos. Si deseas tener total control de la configuración de tus tablas, puedes usar [sintaxis Datadict de php Adodb](http://phplens.com/lens/adodb/docs-datadict.htm)
 
-Ahora debemos ejecutar el instalador, con el comando:
+Ahora ejecuta el instalador, con el comando:
 
     ./script/migrate Booklink install
 
-y eso creará las tablas definidas por el instalador. Si estas usando una base de datos MySQL, creará las siguientes estructuras:
+y eso creará las tablas definidas en el instalador. Si estás usando una base de datos MySQL, creará las siguientes estructuras:
 
 **TABLA BOOKS**
 
@@ -218,7 +218,7 @@ Akelos sigue el [patrón de diseño MVC](http://en.wikipedia.org/wiki/Model-view
 
 ### Los archivos de tu aplicación y las convenciones de nomenclatura de Akelos ###
 
-Estas son las convenciones que permiten mantener la filosofía de convención sobre configuración de Akelos.
+Éstas son las convenciones que permiten mantener la filosofía de convención sobre configuración de Akelos.
 
 #### Modelos ####
 
@@ -274,7 +274,7 @@ Esta es una pequeña explicación del flujo de trabajo subyacente para una llama
 
  4. Ahora llamará a la acción `show` de la clase `BookController` si estuviese disponible.
 
- 5. Una vez que la acción `show` ha sido ejecutada, el controlador buscará el archivo de la vista en `/app/views/book/show.tpl` y renderizará el resultado en la variable `$content_for_layout`.
+ 5. Una vez que la acción `show` se ejecuta, el controlador buscará el archivo de la vista en `/app/views/book/show.tpl` y renderizará el resultado en la variable `$content_for_layout`.
 
  6. Ahora Akelos buscará un layout con el mismo nombre que el controlador en `/app/views/layouts/book.tpl`. Si lo encuentra renderizará el mismo, insertando el contenido de `$content_for_layout` y enviando la salida al navegador.
 
@@ -310,7 +310,7 @@ Ahora necesitarás indicarle a tus modelos cómo se relacionan unos con otros de
     
     ?>
 
-Ahora que los modelos son concientes el uno del otro  necesitas modificar el controlador book, para que incluya las instancias de los modelos `author` y `book`
+Ahora que los modelos son concientes el uno del otro necesitas modificar el controlador book, para que incluya las instancias de los modelos `author` y `book`
 
 */app/controllers/book_controller.php*
 
