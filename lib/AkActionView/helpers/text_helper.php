@@ -478,6 +478,14 @@ class  TextHelper
         AkInflector::underscore($this->_controller->getControllerName()) : $locale_namespace);
     }
 
+    /**
+    * Alias for translate
+    */
+    function t($string, $args = null, $locale_namespace = null)
+    {
+        return TextHelper::translate($string, $args, $locale_namespace);
+    }
+
 
     function humanize($text)
     {
