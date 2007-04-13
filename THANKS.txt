@@ -25,6 +25,10 @@ Kaste
   - AkActiveRecord::accessibleAttributes patch and new unit test. 2007-02-26
   - AkActiveRecord refactoring and improvement. 2007-03-03
 
+Jerome Loyet
+
+ - Multiple patches and contributions. 2007-04-01 till present :D
+
 
 Contributions submitted as patches
 ---------------------------------------
@@ -37,10 +41,6 @@ Naixn
 Stephen Reay
 
  - AkXhtmlValidator.php patch. 2007-02-23
-
-Jerome Loyet
-
- - Multiple patches and contributions. 2007-04-01 till present :D
  
 Matias Quaglia
 

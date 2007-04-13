@@ -193,6 +193,7 @@ class PrototypeHelper extends AkActionViewHelper
     *
     * Example:
     *   $prototype->form_remote_tag('html' => array('action' => $this->_controller->url_helper->url_for(array('controller' => 'some', 'action' => 'place')));
+    *   $prototype->form_remote_tag('url' => array('controller' => 'foo', 'action' => 'bar'), 'update' => 'div_to_update', html => array('id' => 'form_id'));
     *
     * The Hash passed to the 'html' key is equivalent to the options (2nd) 
     * argument in the FormTagHelper.form_tag method.
@@ -202,15 +203,14 @@ class PrototypeHelper extends AkActionViewHelper
     */
     function form_remote_tag($options = array())
     {
+        
+        $options['url'] = empty($options['url']) ? array() : $options['url'];
+        
         $options['form'] = true;
-
-        if (empty($options['html'])) {
-            $options['html'] = array();
-        }else{
-            $options['html']['onsubmit'] = $this->remote_function($options).'; return false;';
-            $options['html']['action'] = !empty($options['html']['action']) ? $options['html']['action'] : $this->_controller->url_helper->url_for($options['url']);
-            $options['html']['method'] = !empty($options['html']['method']) ? $options['html']['method'] : 'post';
-        }
+        $options['html'] = empty($options['html']) ? array() : $options['html'];
+        $options['html']['onsubmit'] = $this->remote_function($options).'; return false;';
+        $options['html']['action'] = !empty($options['html']['action']) ? $options['html']['action'] : (is_array($options['url']) ? $this->_controller->url_helper->url_for($options['url']) : $options['url']);
+        $options['html']['method'] = !empty($options['html']['method']) ? $options['html']['method'] : 'post';
 
         return $this->_controller->tag_helper->tag('form', $options['html'], true);
 
@@ -436,10 +436,10 @@ class PrototypeHelper extends AkActionViewHelper
     */
     function observe_form($form_id, $options = array())
     {
-        if (!empty($options['frequency'])){
+        if (!empty($options['frequency']) && $options['frequency']>0) {
             return $this->_buildObserver('Form.Observer', $form_id, $options);
         }else{
-            return $this->buildObserver('Form.EventObserver', $form_id, $options);
+            return $this->_buildObserver('Form.EventObserver', $form_id, $options);
         }
     }
 

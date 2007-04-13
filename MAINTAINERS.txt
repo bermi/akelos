@@ -1,5 +1,7 @@
 Bermi Ferrer Martinez <bermi-a.t-akelos-d.ot-co.m> Lead developer
 
+Jerome Loyet,  <jerome-a-t-nospam-loyet net> Core Contributor
+
 Jose Salavert <salavert-a-t-akelos-d.ot-co.m> Core Contributor
 
 Niels Ganser <niels.ganser.nospam-gmail-d.ot-co.m> Core Contributor
