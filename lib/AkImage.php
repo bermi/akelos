@@ -28,11 +28,7 @@
      var $filters = array();
 
      function AkImage($image_path = null, $tranform_using = AK_IMAGE_DRIVER)
-     {
-         if(!function_exists('getimagesize')){
-             trigger_error(Ak::t('GD library is not available.'), E_USER_ERROR);
-         }
-         
+     {         
          $this->Transform =& Image_Transform::factory($tranform_using);
          
          if(PEAR::isError($this->Transform)){
