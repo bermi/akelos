@@ -12,6 +12,7 @@
  * @package AkelosFramework
  * @subpackage Helpers
  * @author Bermi Ferrer <bermi a.t akelos c.om>
+ * @author Jerome Loyet
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
@@ -67,28 +68,27 @@ class JavascriptMacrosHelper extends AkActionViewHelper
         $function .= "'".UrlHelper::url_for($options['url'])."'";
 
         $js_options = array();
-        if ($options['cancel_text']){
+        if (!empty($options['cancel_text'])){
             $js_options['cancelText'] = AK::t("{$options['cancel_text']}");
         }
-        if ($options['save_text']){
+        if (!empty($options['save_text'])){
             $js_options['okText'] = AK::t("{$options['save_text']}");
         }        
-        if ($options['rows']){
+        if (!empty($options['rows'])){
             $js_options['rows'] = $options['rows'];
         }
-        if ($options['external_control']){
+        if (!empty($options['external_control'])){
             $js_options['externalControl'] = $options['external_control'] ;    
         }
-        if ($options['options']){
+        if (!empty($options['options'])){
             $js_options['ajaxOptions'] = $options['options'];    
         }
-        if ($options['with']){
+        if (!empty($options['with'])){
             $js_options['callback'] = "function(form) { return {$options['with']} }" ;
         }
         if (!empty($js_options)) {
             $function .= (', ' . JavaScriptHelper::_options_for_javascript($js_options));
         }
-        
         $function .= ')';
 
         return JavaScriptHelper::javascript_tag($function);
@@ -193,7 +193,7 @@ class JavascriptMacrosHelper extends AkActionViewHelper
         );
         
         foreach ($default_options as $key=>$default_option) {
-            if (!empty($options[$k])) {
+            if (!empty($options[$key])) {
                 $js_options[$default_option] = $options[$key];
             }
         }
@@ -215,7 +215,7 @@ class JavascriptMacrosHelper extends AkActionViewHelper
       * The auto_complete_result can of course also be called from a view belonging to the 
       * auto_complete action if you need to decorate it further.
       */
-      function auto_complete_result($entries, $field, $phrase = nil)
+      function auto_complete_result($entries, $field, $phrase = null)
       {
           /**
            * @todo: check the function h() used on ruby version instead of @$entry[$field]
@@ -224,9 +224,9 @@ class JavascriptMacrosHelper extends AkActionViewHelper
           	return '';
           }
           foreach ($entries as $entry) {
-          	$items[] = array_map(TagHelper::content_tag('li',!empty($phrase) ? TextHelper::highlight($entry[$field], $phrase) : @$entry[$field]));
+          	$items[] = TagHelper::content_tag('li',!empty($phrase) ? TextHelper::highlight($entry[$field], $phrase) : @$entry[$field]);
           }
-          return TagHelper::content_tag('ul', array_unique($items));
+          return TagHelper::content_tag('ul', join('', array_unique($items)));
       }
       
       
@@ -240,10 +240,14 @@ class JavascriptMacrosHelper extends AkActionViewHelper
       */
       function text_field_with_auto_complete($object, $method, $tag_options = array(), $completion_options = array())
       {
-        return (!empty($completion_options['skip_style']) ? "" : $this->_auto_complete_stylesheet()) .
-        $this->text_field($object, $method, $tag_options) .
-        TagHelper::content_tag('div', '', array('id' => "{$object}_{$method}_auto_complete", 'class' => 'auto_complete') .
-        $this->auto_complete_field("{$object}_{$method}", array_merge(array('url' => array('action' => "auto_complete_for_{$object}_{$method}" )), $completion_options)));
+        if (!isset($tag_options['autocomplete'])) $tag_options['autocomplete'] = "off";
+
+        return (
+            !empty($completion_options['skip_style']) ? "" : $this->_auto_complete_stylesheet()) .
+            $this->_controller->form_helper->text_field($object, $method, $tag_options) .
+            TagHelper::content_tag('div', '', array('id' => "{$object}_{$method}_auto_complete", 'class' => 'auto_complete')) .
+            $this->auto_complete_field("{$object}_{$method}", array_merge(array('url' => array('action' => "auto_complete_for_{$object}_{$method}" )), $completion_options)
+        );
       }
       
       

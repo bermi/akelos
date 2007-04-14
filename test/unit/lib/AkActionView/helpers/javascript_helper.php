@@ -31,6 +31,24 @@ class JavaScriptHelperTests extends HelpersUnitTester
         $this->assertEqual($javascript->escape_javascript($input), $expected);
     }
     
+    function test_javascript_tag()
+    {
+        $javascript = new JavaScriptHelper();
+
+        //static call
+        $this->AssertEqual(
+            JavascriptHelper::javascript_tag("alert('test akelos');"),
+            "<script type=\"text/javascript\">\n//<![CDATA[\nalert('test akelos');\n//]]>\n</script>"
+        );
+
+        //object call
+        $this->AssertEqual(
+            $javascript->javascript_tag("alert('test akelos');"),
+            "<script type=\"text/javascript\">\n//<![CDATA[\nalert('test akelos');\n//]]>\n</script>"
+        );
+    }
+
+    
 }
 
 

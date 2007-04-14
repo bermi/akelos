@@ -113,7 +113,7 @@ class JavascriptHelper extends AkActionViewHelper
     */
     function javascript_tag($content)
     {
-        return TagHelper::content_tag("script", $this->javascript_cdata_section($content), array('type' => 'text/javascript'));
+        return TagHelper::content_tag("script", JavascriptHelper::javascript_cdata_section($content), array('type' => 'text/javascript'));
     }
 
     function javascript_cdata_section($content)
