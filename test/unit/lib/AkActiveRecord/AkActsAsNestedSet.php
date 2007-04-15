@@ -461,12 +461,20 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
     }
 
 
-    function test_deletions()
+    function test_deletions_with_children()
     {
         $this->assertEqual(6, $this->Spain->nested_set->countChildren());
         $this->Valencia->destroy();
         $this->Spain->reload();
         $this->assertEqual(1, $this->Spain->nested_set->countChildren());
+    }
+
+    function test_deletions_without_children()
+    {
+        $this->Barcelona->reload();
+        $this->Barcelona->destroy();
+        $this->Spain->reload();
+        $this->assertEqual(0, $this->Spain->nested_set->countChildren());
     }
 
 

@@ -334,15 +334,17 @@ class AkActsAsNestedSet extends AkObserver
 
         $object->transactionStart();
 
-        foreach (array_keys($ObjectsToDelete) as $k){
-            $Child =& $ObjectsToDelete[$k];
-            $Child->__avoid_nested_set_before_destroy_recursion = true;
-            if($Child->beforeDestroy()){
-                if($Child->notifyObservers('beforeDestroy') === false){
+        if(!empty($ObjectsToDelete)){
+            foreach (array_keys($ObjectsToDelete) as $k){
+                $Child =& $ObjectsToDelete[$k];
+                $Child->__avoid_nested_set_before_destroy_recursion = true;
+                if($Child->beforeDestroy()){
+                    if($Child->notifyObservers('beforeDestroy') === false){
+                        $Child->transactionFail();
+                    }
+                }else{
                     $Child->transactionFail();
                 }
-            }else{
-                $Child->transactionFail();
             }
         }
 
@@ -357,11 +359,13 @@ class AkActsAsNestedSet extends AkObserver
         $this->getScopeCondition()." AND ".$this->getRightColumnName()." >= ".$object->{$this->getRightColumnName()});
 
 
-        foreach (array_keys($ObjectsToDelete) as $k){
-            $Child =& $ObjectsToDelete[$k];
-            $Child->__avoid_nested_set_before_destroy_recursion = true;
-            if(!$Child->afterDestroy() || $Child->notifyObservers('afterDestroy') === false){
-                $Child->transactionFail();
+        if(!empty($ObjectsToDelete)){
+            foreach (array_keys($ObjectsToDelete) as $k){
+                $Child =& $ObjectsToDelete[$k];
+                $Child->__avoid_nested_set_before_destroy_recursion = true;
+                if(!$Child->afterDestroy() || $Child->notifyObservers('afterDestroy') === false){
+                    $Child->transactionFail();
+                }
             }
         }
 
