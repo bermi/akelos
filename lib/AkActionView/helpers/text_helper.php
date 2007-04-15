@@ -20,7 +20,26 @@
 require_once(AK_VENDOR_DIR.DS.'phputf8'.DS.'utf8.php');
 
 defined('AK_VALID_URL_CHARS_REGEX') ? null : define('AK_VALID_URL_CHARS_REGEX','A-Z-a-z0-9:=?&\/\.\-\\%~#_;,+');
-defined('AK_AUTO_LINK_REGEX') ? null : define('AK_AUTO_LINK_REGEX', '/((?:http[s]?|:\/\/)|(?:ftp[s]?|:\/\/)|(?:www\.))(['.AK_VALID_URL_CHARS_REGEX.']+)/x');
+define('AK_AUTO_LINK_REGEX','/
+        (                          # leading text
+          <\w+.*?>|                # leading HTML tag, or
+          [^=!:\'"\/]|               # leading punctuation, or 
+          ^                        # beginning of line
+        )
+        (
+          (?:https?:\/\/)|           # protocol spec, or
+          (?:www\.)                # www.*
+        )
+        (
+          [-\w]+                   # subdomain or domain
+          (?:\.[-\w]+)*            # remaining subdomains or domain
+          (?::\d+)?                # port
+          (?:\/(?:(?:[~\w\+%-]|(?:[,.;:][^\s$]))+)?)* # path
+          (?:\?[\w\+%&=.;-]+)?     # query string
+          (?:\#[\w\-]*)?           # trailing anchor
+        )
+        ([[:punct:]]|\s|<|$)       # trailing text
+        /x');
 
 /**
 * Provides a set of methods for working with text strings that can help unburden 
@@ -49,18 +68,24 @@ class  TextHelper
     /**
     * Truncates "$text" to the length of "length" and replaces the last three 
     * characters with the "$truncate_string" if the "$text" is longer than 
-    * "$length".
+    * "$length" and the last characters will be replaced with the +truncate_string+.
+    * If +break+ is specified and if it's present in +text+ and if its position is 
+    * lesser than +length+, then the truncated +text+ will be limited to +break+.
+    * 
     */
-    function truncate($text, $length = 30, $truncate_string = '...', $break = ' ')
+    function truncate($text, $length = 30, $truncate_string = '...', $break = false)
     {
         if(utf8_strlen($text) <= $length){
             return $text;
         }
 
-        if(false !== ($breakpoint = empty($break) ? $length : utf8_strpos($text, $break, $length))) {
-            if($breakpoint < utf8_strlen($text) - 1) {
-                $text = utf8_substr($text, 0, $breakpoint) . $truncate_string;
+        if (false !== ($breakpoint = (empty($break) ? $length : utf8_strpos($text, $break))) && ($breakpoint >= utf8_strlen($truncate_string)))
+        {
+            if ($breakpoint > $length)
+            {
+                $breakpoint = $length;
             }
+            return utf8_substr($text, 0, $breakpoint - utf8_strlen($truncate_string)) . $truncate_string;
         }
         return $text;
     }
@@ -144,7 +169,7 @@ class  TextHelper
         // No need to use an UTF-8 wordwrap function as we are using the default cut character.
         return trim(wordwrap($text, $line_width, $break));
     }
-    
+
     /**
      * Like word wrap but allows defining text indenting  and boby indenting
      */
@@ -179,8 +204,8 @@ class  TextHelper
         }
         return $formated_text;
     }
-    
-    
+
+
     /**
      * Returns the "$text" with all the Textile codes turned into HTML-tags.
      */
@@ -335,16 +360,22 @@ class  TextHelper
     function auto_link_urls($text, $href_options = array())
     {
         $extra_options = TagHelper::_tag_options($href_options);
-        $links = TextHelper::get_urls_from_text($text);
-        $linked_urls = TextHelper::get_linked_urls_from_text($text);
-        $urls_to_replace = array_diff(array_keys($links),$linked_urls);
-        $find = array();
-        $replace = array();
-        foreach ($urls_to_replace as $url_to_replace){
-            $find[] = '@'.preg_quote($url_to_replace).'@';
-            $replace[] = '<a href="'.$links[$url_to_replace].'"'.$extra_options.'>'.$url_to_replace.'</a>';
+        $extra_options_array = var_export($extra_options,true);
+        return preg_replace_callback(AK_AUTO_LINK_REGEX, create_function(
+        '$matched',
+        'return TextHelper::_replace_url_with_link_callback($matched,'.$extra_options_array.');'
+        ), $text);
+    }
+
+    function _replace_url_with_link_callback($matched, $extra_options)
+    {
+        list($all, $a, $b, $c, $d) = $matched;
+        if (preg_match('/<a\s/i',$a)){ // don't replace URL's that are already linked
+            return $all;
+        }else{
+            $text = $b.$c;
+            return $a.'<a href="'.($b=="www."?"http://www.":$b).$c.'"'.$extra_options.'>'.$text.'</a>'.$d;
         }
-        return preg_replace($find, $replace, $text);
     }
 
     /**
