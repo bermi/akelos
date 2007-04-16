@@ -51,7 +51,7 @@ class DateHelper extends AkActionViewHelper
         $to_time = is_numeric($to_time) ? $to_time : Ak::getTimestamp($to_time);
         $distance_in_minutes = round((abs($to_time - $from_time))/60);
         $distance_in_seconds = round(abs($to_time - $from_time));
-        
+
         if($distance_in_minutes <= 1){
             if($include_seconds){
                 if($distance_in_seconds < 5){
@@ -130,7 +130,7 @@ class DateHelper extends AkActionViewHelper
         }elseif(!empty($this->_object[$object_name])){
             $date = $this->_object[$object_name]->get($column_name);
         }
-        
+
         $date = !empty($options['include_blank']) ? (!empty($date) ? $date : 0) : (!empty($date) ? $date : Ak::getDate());
 
         $options['order'] = empty($options['order']) ? explode(',',Ak::t('year,month,day',array(),'localize/date')) : $options['order'];
@@ -170,10 +170,12 @@ class DateHelper extends AkActionViewHelper
             $date = $this->_controller->$object_name->$column_name();
         }elseif(!empty($this->_controller->$object_name)) {
             $date = $this->_controller->$object_name->get($column_name);
+        }elseif(!empty($this->_object[$object_name])) {
+            $date = $this->_object[$object_name]->get($column_name);
         }
-        
+
         $date = !empty($options['include_blank']) ? (!empty($date) ? $date : 0) : (!empty($date) ? $date : Ak::getDate());
-        
+
         $discard = array(
         'year'=>!empty($options['discard_year']),
         'month'=>!empty($options['discard_month']),
@@ -294,7 +296,7 @@ class DateHelper extends AkActionViewHelper
         }else{
             $month_details = Ak::t('January,February,March,April,May,June,July,August,September,October,November,December',array(),'localize/date');
         }
-        
+
         return DateHelper::_select_for('month', explode(',',$month_details),'n',(empty($date) ? Ak::getDate() : $date), $options,'_add_one');
     }
 
@@ -331,7 +333,7 @@ class DateHelper extends AkActionViewHelper
         foreach ($range as $k=>$time_unit){
             if(is_string($time_unit)){
                 $k = !empty($unit_format_callback) ? DateHelper::$unit_format_callback($k) : $k;
-                $options_array[] = '<option value="'.$k.'"'.($k == $datetime_unit ? ' selected="selected"' : '').">$time_unit</option>";                
+                $options_array[] = '<option value="'.$k.'"'.($k == $datetime_unit ? ' selected="selected"' : '').">$time_unit</option>";
             }else{
                 $time_unit = !empty($unit_format_callback) ? DateHelper::$unit_format_callback($time_unit) : $time_unit;
                 $options_array[] = '<option value="'.$time_unit.'"'.($time_unit == $datetime_unit ? ' selected="selected"' : '').">$time_unit</option>";
@@ -359,8 +361,8 @@ class DateHelper extends AkActionViewHelper
     {
         return $number+1;
     }
-    
-    
+
+
     /**
      * Converts an ISO date to current locale format
      *
@@ -371,7 +373,7 @@ class DateHelper extends AkActionViewHelper
         $format = Ak::locale('date_time_format');
         return Ak::getDate($timestamp, $format);
     }
-    
+
     /**
      * Converts an ISO date to current locale format
      *
