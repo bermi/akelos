@@ -1363,7 +1363,7 @@ Options are:
         $number_of_arguments = func_num_args();
         if($number_of_arguments > 1){
             $options = array();
-            if(is_array($args[$number_of_arguments-1])){
+            if($number_of_arguments > 3 && is_array($args[$number_of_arguments-1])){
                 $options = array_pop($args);
             }
             $options['from'] = $args[0];
