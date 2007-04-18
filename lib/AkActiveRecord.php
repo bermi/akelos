@@ -4110,9 +4110,10 @@ Examples for find all:
             $this->setObservableState($method);
         }
 
-        for ($i=0;$i<$observer_count;$i++) {
-            if(in_array($this->getModelName(),$observers[$i]->_observing)){
-                if(method_exists($observers[$i],$method)){
+        $model_name = $this->getModelName();
+        for ($i=0; $i<$observer_count; $i++) {
+            if(in_array($model_name, $observers[$i]->_observing)){
+                if(method_exists($observers[$i], $method)){
                     $observers[$i]->$method($this);
                 }else{
                     $observers[$i]->update($this->getObservableState(), &$this);

@@ -108,7 +108,6 @@ class AkObserver extends AkObject
         }
     }
     
-
     /**
     * Constructs the Observer
     * @param $subject the name or names of the Models to observe
@@ -117,9 +116,10 @@ class AkObserver extends AkObject
     {
         static $memo;
         $model_name = $target->getModelName();
-        if(!isset($memo[get_class($this)][$model_name])){
-            $memo[get_class($this)][$model_name] = $model_name;
-            $this->_observing[$model_name] = $model_name;
+        $class_name = get_class($this);
+        if(empty($memo[$class_name]) || !in_array($model_name, $memo[$class_name])){
+            $memo[$class_name][] = $model_name;
+            $this->_observing[] = $model_name;
             $target->addObserver(&$this);
         }
     }
