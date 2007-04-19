@@ -25,7 +25,7 @@ class MenuHelperTests extends HelpersUnitTester
             $this->menu_helper->menu_for_controllers(),
             file_get_contents(AK_TEST_HELPERS_DIR.DS.'menu_helper_all.txt')
         );
-/*
+
         $this->assertEqual(
             $this->menu_helper->menu_for_controllers(array('advertiser' => array('buy', 'partial_in_template'), 'locale_detection' => 'session', 'page' => 'setup')),
             file_get_contents(AK_TEST_HELPERS_DIR.DS.'menu_helper_limit.txt')
@@ -67,7 +67,7 @@ class MenuHelperTests extends HelpersUnitTester
             $this->menu_helper->menu_for_controllers(array('advertiser' => array('buy', 'partial_in_template'), 'locale_detection' => 'session', 'page' => 'setup'), 'menu', 'selected', ''),
             file_get_contents(AK_TEST_HELPERS_DIR.DS.'menu_helper_limit_current_not_default_no_title.txt')
         );
-        */
+        
     } 
     
 }
