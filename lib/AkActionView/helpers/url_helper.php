@@ -150,7 +150,7 @@ class UrlHelper
 
         $url = is_string($options) ? $options : $this->url_for($options);
 
-        $name = !empty($name) ? $name : (is_string($options) ?  $options : htmlentities($this->url_for($options)));
+        $name = !empty($name) ? $name : (is_string($options) ?  $options : TagHelper::escape_once($this->url_for($options)));
 
         $html_options = array_merge($html_options,array('type'=>'submit','value'=>$name));
         return '<form method="post" action="'.$url.'" class="button-to"><div>'.

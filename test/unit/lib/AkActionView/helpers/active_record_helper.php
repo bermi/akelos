@@ -23,7 +23,7 @@ class ActiveRecordHelperTests extends HelpersUnitTester
         $this->controller->instantiateHelpers();
 
         $this->active_record_helper =& $this->controller->active_record_helper;
-        $this->installAndIncludeModels(array('ProtectedPerson'));
+        $this->installAndIncludeModels(array('ProtectedPerson','Property'));
 
         $this->controller->ProtectedPerson =& new ProtectedPerson();
         $this->LuckyLuke =& $this->controller->ProtectedPerson;
@@ -33,7 +33,12 @@ class ActiveRecordHelperTests extends HelpersUnitTester
         $this->controller->ProtectedPerson->save();
         $this->controller->ProtectedPerson->created_at = Ak::getDate(mktime(8,42,36,3,27,1982));
         $this->controller->ProtectedPerson->updated_at = Ak::getDate(mktime(8,42,36,3,27,1982));
+        
+        $this->controller->Property =& new Property('description->','阿尔罕布拉宫','details->','阿尔罕布拉宫 <> & (阿拉伯语: الحمراء‎‎ = Al Ħamrā\'; 即"红色城堡")');
+        $this->alhambra =& $this->controller->Property;
+        $this->alhambra->save();
     }
+    
 
     function tests_input()
     {
@@ -91,6 +96,14 @@ class ActiveRecordHelperTests extends HelpersUnitTester
         $this->assertEqual(
             $this->active_record_helper->error_messages_for('ProtectedPerson', array('header_tag'=>'h3','id'=>'LuckyLukeErrors','class'=>'errors')),
             file_get_contents(AK_TEST_HELPERS_DIR.DS.'active_record_errors_2.txt')
+        );
+    }
+    
+    function test_textarea_should_escape_characters_correctly()
+    {
+        $this->assertEqual(
+            $this->active_record_helper->form('Property'),
+            file_get_contents(AK_TEST_HELPERS_DIR.DS.'active_record_textarea_should_escape_characters_correctly.txt')
         );
     }
 }

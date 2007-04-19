@@ -362,7 +362,7 @@ class AkFormHelperInstanceTag extends TagHelper
     {
         $options = array_merge($this->default_text_area_options,$options);
         $this->add_default_name_and_id($options);
-        return TagHelper::content_tag('textarea', htmlentities($this->value_before_type_cast()), $options);
+        return TagHelper::content_tag('textarea', TagHelper::escape_once($this->value_before_type_cast()), $options);
     }
 
     function to_check_box_tag($options = array(), $checked_value = '1', $unchecked_value = '0')
