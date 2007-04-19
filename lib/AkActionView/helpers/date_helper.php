@@ -211,8 +211,7 @@ class DateHelper extends AkActionViewHelper
     function select_datetime($datetime = null, $options = array())
     {
         $datetime = empty($datetime) ? Ak::getDate() : $datetime;
-        return DateHelper::select_year($datetime, $options) . DateHelper::select_month($datetime, $options) . DateHelper::select_day($datetime, $options) .
-        DateHelper::select_hour($datetime, $options) . DateHelper::select_minute($datetime, $options);
+        return DateHelper::select_date($datetime, $options) . DateHelper::select_time($datetime, $options);
     }
 
     /**

@@ -399,8 +399,8 @@ class AkFormHelperInstanceTag extends TagHelper
         DateHelper::select_year($date, array_merge($defaults,array('prefix'=>"{$this->object_name}[{$this->_column_name}(1)]")));
     }
     
-      function to_date_select_tag($options = array())
-      {
+    function to_date_select_tag($options = array())
+    {
         require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'date_helper.php');
         $DateHelper =& new DateHelper();
         $object_name = empty($this->_object_name) ? $this->object_name : $this->_object_name;
@@ -408,10 +408,10 @@ class AkFormHelperInstanceTag extends TagHelper
             $DateHelper->_object[$object_name] =& $this->object;
         }
         return $DateHelper->date_select($object_name, $this->_column_name, $options);          
-      }
-
-      function to_datetime_select_tag($options = array())
-      {
+    }
+    
+    function to_datetime_select_tag($options = array())
+    {
         require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'date_helper.php');
         $DateHelper =& new DateHelper();
         $object_name = empty($this->_object_name) ? $this->object_name : $this->_object_name;
@@ -419,8 +419,7 @@ class AkFormHelperInstanceTag extends TagHelper
             $DateHelper->_object[$object_name] =& $this->object;
         }        
         return $DateHelper->datetime_select($object_name, $this->_column_name, $options);
-      }
-
+    }
 
     function to_boolean_select_tag($options = array())
     {

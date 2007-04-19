@@ -48,7 +48,7 @@ class ActiveRecordHelperTests extends HelpersUnitTester
 
         $this->assertEqual(
             $this->active_record_helper->input('ProtectedPerson', 'birthday'),
-            file_get_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'helpers'.DS.'active_record_input_date.txt')
+            file_get_contents(AK_TEST_HELPERS_DIR.DS.'active_record_input_date.txt')
         );
 
 
@@ -62,7 +62,7 @@ class ActiveRecordHelperTests extends HelpersUnitTester
     {
         $this->assertEqual(
             $this->active_record_helper->form('ProtectedPerson'),
-            file_get_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'helpers'.DS.'active_record_form.txt')
+            file_get_contents(AK_TEST_HELPERS_DIR.DS.'active_record_form.txt')
         );
     }
 
@@ -85,12 +85,12 @@ class ActiveRecordHelperTests extends HelpersUnitTester
         $this->LuckyLuke->addError('birthday');
         $this->assertEqual(
             $this->active_record_helper->error_messages_for('ProtectedPerson'),
-            file_get_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'helpers'.DS.'active_record_errors.txt')
+            file_get_contents(AK_TEST_HELPERS_DIR.DS.'active_record_errors.txt')
         );
 
         $this->assertEqual(
             $this->active_record_helper->error_messages_for('ProtectedPerson', array('header_tag'=>'h3','id'=>'LuckyLukeErrors','class'=>'errors')),
-            file_get_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'helpers'.DS.'active_record_errors_2.txt')
+            file_get_contents(AK_TEST_HELPERS_DIR.DS.'active_record_errors_2.txt')
         );
     }
 }

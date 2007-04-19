@@ -6,200 +6,249 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php');
 
 class FormHelperTests extends HelpersUnitTester 
 {    
-    function test_for_form_helpers()
+    function setUp()
     {
-        $Controller = &new MockAkActionController($this);
-        $Controller->setReturnValue('urlFor','/url/for/test');
-        $ActiveRecord = &new MockAkActiveRecord($this);
-        $ActiveRecord->setReturnValue('get', 'Bermi');
+        $this->test_value = "Akelos";
+        $this->controller = &new MockAkActionController($this);
+        $this->controller->setReturnValue('urlFor', '/url/for/test');
+        $this->active_record = &new MockAkActiveRecord($this);
+        $this->active_record->setReturnValue('get', $this->test_value);
         
-        $Mock = new stdClass();
-        $Mock->_controller->person =& $ActiveRecord;
-        $AkFormHelperInstanceTag =& new AkFormHelperInstanceTag('person','name',$Mock);
+        $this->mock = new stdClass();
+        $this->mock->_controller->person =& $this->active_record;
+        $this->ak_form_helper_instance_tag =& new AkFormHelperInstanceTag('person', 'name', $this->mock);
+    }
 
+    function test_add_default_name_and_id()
+    {
         $options = array();
-        $AkFormHelperInstanceTag->add_default_name_and_id($options);
+        $this->ak_form_helper_instance_tag->add_default_name_and_id($options);
         $this->assertEqual($options,array('name'=>'person[name]','id'=>'person_name'));
 
         $options = array('index'=>3);
-        $AkFormHelperInstanceTag->add_default_name_and_id($options);
+        $this->ak_form_helper_instance_tag->add_default_name_and_id($options);
         $this->assertEqual($options,array('name'=>'person[3][name]','id'=>'person_3_name'));
+    }
 
-        $this->assertReference($AkFormHelperInstanceTag->getObject(),$ActiveRecord);
-        $this->assertEqual($AkFormHelperInstanceTag->getValue(),'Bermi');
+    function test_get_object()
+    {
+        $this->assertReference($this->ak_form_helper_instance_tag->getObject(), $this->active_record);
+    }
 
-        $this->assertEqual($AkFormHelperInstanceTag->value_before_type_cast(),'Bermi');
+    function test_get_value()
+    {
+        $this->assertEqual($this->ak_form_helper_instance_tag->getValue(), $this->test_value);
+    }
 
-        $ActiveRecord->name_before_type_cast = 'bermi';
-        $this->assertEqual($AkFormHelperInstanceTag->value_before_type_cast(),'bermi');
+    function test_value_before_type_cast()
+    {
+        $this->assertEqual($this->ak_form_helper_instance_tag->value_before_type_cast(), $this->test_value);
+        $this->active_record->name_before_type_cast = 'test_akelos';
+        $this->assertEqual($this->ak_form_helper_instance_tag->value_before_type_cast(), 'test_akelos');
+    }
 
-        $this->assertEqual($AkFormHelperInstanceTag->to_input_field_tag('text'),'<input id="person_name" name="person[name]" size="30" type="text" value="bermi" />');
-        $this->assertEqual($AkFormHelperInstanceTag->to_input_field_tag('hidden'),'<input id="person_name" name="person[name]" type="hidden" value="bermi" />');
-        $this->assertEqual($AkFormHelperInstanceTag->to_input_field_tag('file'),'<input id="person_name" name="person[name]" size="30" type="file" />');
+    function test_to_input_field_tag()
+    {
+        $this->assertEqual($this->ak_form_helper_instance_tag->to_input_field_tag('text'), '<input id="person_name" name="person[name]" size="30" type="text" value="'.$this->test_value.'" />');
+        $this->assertEqual($this->ak_form_helper_instance_tag->to_input_field_tag('hidden'), '<input id="person_name" name="person[name]" type="hidden" value="'.$this->test_value.'" />');
+        $this->assertEqual($this->ak_form_helper_instance_tag->to_input_field_tag('file'), '<input id="person_name" name="person[name]" size="30" type="file" />');
+    }
 
-        $this->assertEqual($AkFormHelperInstanceTag->to_radio_button_tag('Bermi'),'<input checked="checked" id="person_name_bermi" name="person[name]" type="radio" value="Bermi" />');
-        $this->assertEqual($AkFormHelperInstanceTag->to_radio_button_tag('Hilario'),'<input id="person_name_hilario" name="person[name]" type="radio" value="Hilario" />');
+    function test_to_radio_button_tag()
+    {
+        $this->assertEqual($this->ak_form_helper_instance_tag->to_radio_button_tag('Bermi'), '<input id="person_name_bermi" name="person[name]" type="radio" value="Bermi" />');
+        $this->assertEqual($this->ak_form_helper_instance_tag->to_radio_button_tag('Hilario'), '<input id="person_name_hilario" name="person[name]" type="radio" value="Hilario" />');
+    }
 
-        $ActiveRecord->name_before_type_cast = 'Something "NEW"';
+    function test_to_text_area_tag()
+    {
+        $this->active_record->name_before_type_cast = 'Something "NEW"';
 
-        $this->assertEqual($AkFormHelperInstanceTag->to_text_area_tag(array('class'=>'wysiwyg')),
-        '<textarea class="wysiwyg" cols="40" id="person_name" name="person[name]" rows="20">Something &quot;NEW&quot;</textarea>'
+        $this->assertEqual(
+            $this->ak_form_helper_instance_tag->to_text_area_tag(array('class'=>'wysiwyg')),
+            '<textarea class="wysiwyg" cols="40" id="person_name" name="person[name]" rows="20">Something &quot;NEW&quot;</textarea>'
         );
+    }
 
-        $this->assertEqual($AkFormHelperInstanceTag->to_check_box_tag(array(),'Bermi'),'<input name="person[name]" type="hidden" value="0" /><input checked="checked" id="person_name" name="person[name]" type="checkbox" value="Bermi" />');
-        $this->assertEqual($AkFormHelperInstanceTag->to_check_box_tag(array(),'si','no'),'<input name="person[name]" type="hidden" value="no" /><input id="person_name" name="person[name]" type="checkbox" value="si" />');
+    function test_to_check_box_tag()
+    {
+        $this->assertEqual($this->ak_form_helper_instance_tag->to_check_box_tag(array(),'Bermi'),'<input name="person[name]" type="hidden" value="0" /><input id="person_name" name="person[name]" type="checkbox" value="Bermi" />');
+        $this->assertEqual($this->ak_form_helper_instance_tag->to_check_box_tag(array(),'si','no'),'<input name="person[name]" type="hidden" value="no" /><input id="person_name" name="person[name]" type="checkbox" value="si" />');
+    }
 
-        $this->assertEqual($AkFormHelperInstanceTag->to_boolean_select_tag(),'<select id="person_name" name="person[name]"><option value="false">False</option><option value="true" selected>True</option></select>');
-        $this->assertEqual($AkFormHelperInstanceTag->to_boolean_select_tag(),'<select id="person_name" name="person[name]"><option value="false">False</option><option value="true" selected>True</option></select>');
+    function test_to_boolean_select_tag()
+    {
+        $this->assertEqual($this->ak_form_helper_instance_tag->to_boolean_select_tag(),'<select id="person_name" name="person[name]"><option value="false">False</option><option value="true" selected>True</option></select>');
+        $this->assertEqual($this->ak_form_helper_instance_tag->to_boolean_select_tag(),'<select id="person_name" name="person[name]"><option value="false">False</option><option value="true" selected>True</option></select>');
+    }
 
-        $this->assertEqual($AkFormHelperInstanceTag->to_content_tag('h1'),'<h1>Bermi</h1>');
+    function test_to_content_tag()
+    {
+        $this->assertEqual($this->ak_form_helper_instance_tag->to_content_tag('h1'),'<h1>'.$this->test_value.'</h1>');
+    }
 
-        $ActiveRecord = &new MockAkActiveRecord($this);
-        $ActiveRecord->setReturnValue('get', '1978-06-16');
-        $AkFormHelperInstanceTag =& new AkFormHelperInstanceTag('person','join_date',$ActiveRecord,null,$ActiveRecord);
+    function test_to_date_tag()
+    {
+        $active_record = &new MockAkActiveRecord($this);
+        $active_record->setReturnValue('get', '1978-06-16');
+        $ak_form_helper_instance_tag =& new AkFormHelperInstanceTag('person', 'join_date', $active_record, null, $active_record);
+        $this->assertEqual($ak_form_helper_instance_tag->to_date_tag(), file_get_contents(AK_TEST_HELPERS_DIR.DS.'form_helper_to_date_tag.txt'));
+    }
 
-        $this->assertEqual(trim(str_replace("\n",'',$AkFormHelperInstanceTag->to_date_tag())),trim(str_replace("\n",'','
-<select name="person[join_date(3)]">
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
+    function test_to_date_select_tag()
+    {
+        $active_record = &new MockAkActiveRecord($this);
+        $active_record->setReturnValue('get', '1978-06-16');
+        $ak_form_helper_instance_tag =& new AkFormHelperInstanceTag('person', 'join_date', $active_record, null, $active_record);
+        $this->assertEqual($ak_form_helper_instance_tag->to_date_select_tag(), file_get_contents(AK_TEST_HELPERS_DIR.DS.'form_helper_to_date_select_tag.txt'));
+    }
 
-<option value="4">4</option>
-<option value="5">5</option>
-<option value="6">6</option>
-<option value="7">7</option>
-<option value="8">8</option>
-<option value="9">9</option>
-<option value="10">10</option>
-<option value="11">11</option>
-<option value="12">12</option>
+    function test_to_datetime_select_tag()
+    {
+        $active_record = &new MockAkActiveRecord($this);
+        $active_record->setReturnValue('get', '1978-06-16');
+        $ak_form_helper_instance_tag =& new AkFormHelperInstanceTag('person', 'join_date', $active_record, null, $active_record);
+        $this->assertEqual($ak_form_helper_instance_tag->to_datetime_select_tag(), file_get_contents(AK_TEST_HELPERS_DIR.DS.'form_helper_to_datetime_select_tag.txt'));
+    }
 
-<option value="13">13</option>
-<option value="14">14</option>
-<option value="15">15</option>
-<option value="16" selected="selected">16</option>
-<option value="17">17</option>
-<option value="18">18</option>
-<option value="19">19</option>
-<option value="20">20</option>
-<option value="21">21</option>
+    function test_tag_name()
+    {
+        $this->assertEqual($this->ak_form_helper_instance_tag->tag_name(),'person[name]');
+    }
 
-<option value="22">22</option>
-<option value="23">23</option>
-<option value="24">24</option>
-<option value="25">25</option>
-<option value="26">26</option>
-<option value="27">27</option>
-<option value="28">28</option>
-<option value="29">29</option>
-<option value="30">30</option>
+    function test_tag_name_with_index()
+    {
+        $this->assertEqual($this->ak_form_helper_instance_tag->tag_name_with_index(42),'person[42][name]');
+    }
 
-<option value="31">31</option>
-</select>
-<select name="person[join_date(2)]">
-<option value="1">January</option>
-<option value="2">February</option>
-<option value="3">March</option>
-<option value="4">April</option>
-<option value="5">May</option>
-<option value="6" selected="selected">June</option>
-<option value="7">July</option>
+    function test_tag_id()
+    {
+        $this->assertEqual($this->ak_form_helper_instance_tag->tag_id(),'person_name');
+    }
 
-<option value="8">August</option>
-<option value="9">September</option>
-<option value="10">October</option>
-<option value="11">November</option>
-<option value="12">December</option>
-</select>
-<select name="person[join_date(1)]">
-<option value="1973">1973</option>
-<option value="1974">1974</option>
-<option value="1975">1975</option>
+    function test_tag_id_with_index()
+    {
+        $this->assertEqual($this->ak_form_helper_instance_tag->tag_id_with_index(42),'person_42_name');
+    }
 
-<option value="1976">1976</option>
-<option value="1977">1977</option>
-<option value="1978" selected="selected">1978</option>
-<option value="1979">1979</option>
-<option value="1980">1980</option>
-<option value="1981">1981</option>
-<option value="1982">1982</option>
-<option value="1983">1983</option>
-</select>
-')));
+    function test_for_form_helpers()
+    {
 
-        $Controller = &new MockAkActionController($this);
-        $Controller->setReturnValue('urlFor','/url/for/test');
-        $Controller->form_tag_helper = new FormTagHelper();
-        $Controller->form_tag_helper->setController($Controller);
+        $controller = &new MockAkActionController($this);
+        $controller->setReturnValue('urlFor', '/url/for/test');
+        $controller->form_tag_helper = new FormTagHelper();
+        $controller->form_tag_helper->setController($controller);
 
-        $Person = &new MockAkActiveRecord($this);
-        $Person->setReturnValue('get', 'Bermi', array('name'));
+        $person = &new MockAkActiveRecord($this);
+        $person->setReturnValue('get', 'Bermi', array('name'));
 
-        $Task = &new MockAkActiveRecord($this);
-        $Task->setReturnValue('get', 'Do the testing');
+        $task = &new MockAkActiveRecord($this);
+        $task->setReturnValue('get', 'Do the testing');
         
-        $FormHelper = new FormHelper(array('person'=>&$Person));
-        $FormHelper->setController($Controller);
+        $form_helper = new FormHelper(array('person' => &$person));
+        $form_helper->setController($controller);
 
-        $this->assertReference($FormHelper->getObject('person'),$Person);
+        $this->assertReference($form_helper->getObject('person'), $person);
 
         ob_start();
-        $f = $FormHelper->form_for('person',$Person,array('url' => array('action' => 'update')));
+        $f = $form_helper->form_for('person', $person, array('url' => array('action' => 'update')));
         $this->assertEqual(ob_get_clean(),'<form action="/url/for/test" method="post">');
 
-        $this->assertEqual($FormHelper->text_field('task','description'),
-        '<input id="task_description" name="task[description]" size="30" type="text" />');
-
-        $this->assertEqual($FormHelper->text_field('task','description',array('object'=>&$Task)),
-        '<input id="task_description" name="task[description]" size="30" type="text" value="Do the testing" />');
-
-        $this->assertEqual($f->text_field('person','name'),
-        '<input id="person_name" name="person[name]" size="30" type="text" value="Bermi" />');
-
-        $Person->setReturnValue('get', 'Alicia', array('first_name'));
-        $this->assertEqual($f->text_field('person','first_name',array('size'=>80)),
-        '<input id="person_first_name" name="person[first_name]" size="80" type="text" value="Alicia" />');
+        $this->assertEqual(
+            $form_helper->text_field('task', 'description'),
+            '<input id="task_description" name="task[description]" size="30" type="text" />'
+        );
 
         $this->assertEqual(
-        $FormHelper->password_field('person','password').
-        $FormHelper->file_field('person','photo').
-        $FormHelper->hidden_field('person','referer').
-        $FormHelper->text_area('person','notes').
-        $FormHelper->text_field('person','name'),
-        '<input id="person_password" name="person[password]" size="30" type="password" />'.
-        '<input id="person_photo" name="person[photo]" size="30" type="file" />'.
-        '<input id="person_referer" name="person[referer]" type="hidden" />'.
-        '<textarea cols="40" id="person_notes" name="person[notes]" rows="20"></textarea>'.
-        '<input id="person_name" name="person[name]" size="30" type="text" />');
-
-
-        $Person->setReturnValue('get', '1234', array('password'));
-        $Person->setReturnValue('get', 'no_value_on_file_types', array('photo'));
-        $Person->setReturnValue('get', 'http://www.example.com', array('referer'));
-        $Person->setReturnValue('get', 'Check this "NOTES"', array('notes'));
+            $form_helper->text_field('task', 'description', array('object' => &$task)),
+            '<input id="task_description" name="task[description]" size="30" type="text" value="Do the testing" />'
+        );
 
         $this->assertEqual(
-        $f->password_field('person','password').
-        $f->file_field('person','photo').
-        $f->hidden_field('person','referer').
-        $f->text_area('person','notes').
-        $f->text_field('person','name'),
-        '<input id="person_password" name="person[password]" size="30" type="password" value="1234" />'.
-        '<input id="person_photo" name="person[photo]" size="30" type="file" />'.
-        '<input id="person_referer" name="person[referer]" type="hidden" value="http://www.example.com" />'.
-        '<textarea cols="40" id="person_notes" name="person[notes]" rows="20">Check this &quot;NOTES&quot;</textarea>'.
-        '<input id="person_name" name="person[name]" size="30" type="text" value="Bermi" />');
+            $f->text_field('person', 'name'),
+            '<input id="person_name" name="person[name]" size="30" type="text" value="Bermi" />'
+        );
 
-        $Person->setReturnValue('get', 1, array('validate'));
-        $this->assertEqual($f->check_box("post", "validate"),
-        '<input name="post[validate]" type="hidden" value="0" />'.
-        '<input checked="checked" id="post_validate" name="post[validate]" type="checkbox" value="1" />');
+        $person->setReturnValue('get', 'Alicia', array('first_name'));
 
-        $this->assertEqual($f->radio_button('post', 'validate','si'),
-        '<input id="post_validate_si" name="post[validate]" type="radio" value="si" />');
+        $this->assertEqual(
+            $f->text_field('person', 'first_name', array('size'=>80)),
+            '<input id="person_first_name" name="person[first_name]" size="80" type="text" value="Alicia" />'
+        );
 
-        $this->assertEqual($f->radio_button('post', 'validate','1'),
-        '<input checked="checked" id="post_validate_1" name="post[validate]" type="radio" value="1" />');
+        $this->assertEqual(
+            $form_helper->password_field('person','password'),
+            '<input id="person_password" name="person[password]" size="30" type="password" />'
+        );
+
+        $this->assertEqual(
+            $form_helper->file_field('person','photo'),
+            '<input id="person_photo" name="person[photo]" size="30" type="file" />'
+        );
+
+        $this->assertEqual(
+            $form_helper->hidden_field('person','referer'),
+            '<input id="person_referer" name="person[referer]" type="hidden" />'
+        );
+
+        $this->assertEqual(
+            $form_helper->text_area('person','notes'),
+            '<textarea cols="40" id="person_notes" name="person[notes]" rows="20"></textarea>'
+        );
+
+        $this->assertEqual(
+            $form_helper->text_field('person','name'),
+            '<input id="person_name" name="person[name]" size="30" type="text" />'
+        );
+
+
+        $person->setReturnValue('get', '1234', array('password'));
+        $person->setReturnValue('get', 'no_value_on_file_types', array('photo'));
+        $person->setReturnValue('get', 'http://www.example.com', array('referer'));
+        $person->setReturnValue('get', 'Check this "NOTES"', array('notes'));
+
+        $this->assertEqual(
+            $f->password_field('person','password'),
+            '<input id="person_password" name="person[password]" size="30" type="password" value="1234" />'
+        );
+
+        $this->assertEqual(
+            $f->file_field('person','photo'),
+            '<input id="person_photo" name="person[photo]" size="30" type="file" />'
+        );
+
+        $this->assertEqual(
+            $f->hidden_field('person','referer'),
+            '<input id="person_referer" name="person[referer]" type="hidden" value="http://www.example.com" />'
+        );
+
+        $this->assertEqual(
+            $f->text_area('person','notes'),
+            '<textarea cols="40" id="person_notes" name="person[notes]" rows="20">Check this &quot;NOTES&quot;</textarea>'
+        );
+
+        $this->assertEqual(
+            $f->text_field('person','name'),
+            '<input id="person_name" name="person[name]" size="30" type="text" value="Bermi" />'
+        );
+
+        $person->setReturnValue('get', 1, array('validate'));
+
+        $this->assertEqual(
+            $f->check_box("post", "validate"),
+            '<input name="post[validate]" type="hidden" value="0" />'.
+            '<input checked="checked" id="post_validate" name="post[validate]" type="checkbox" value="1" />'
+        );
+
+        $this->assertEqual(
+            $f->radio_button('post', 'validate','si'),
+            '<input id="post_validate_si" name="post[validate]" type="radio" value="si" />'
+        );
+
+        $this->assertEqual(
+            $f->radio_button('post', 'validate','1'),
+            '<input checked="checked" id="post_validate_1" name="post[validate]" type="radio" value="1" />'
+        );
     }
 }
 

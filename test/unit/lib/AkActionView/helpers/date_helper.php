@@ -3,14 +3,24 @@
 require_once('_HelpersUnitTester.php');
 require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'date_helper.php');
 
-
 class DateHelperTests extends HelpersUnitTester 
 {    
-    function test_DateHelper()
+    function setUp()
     {
-     
-        $this->assertEqual(DateHelper::distance_of_time_in_words('1978-06-16','2006-01-18'),'10078 days');
-        $this->assertEqual(DateHelper::distance_of_time_in_words('1779-12-01','1780-01-01'),'31 days');
+        $this->Person = &new MockAkActiveRecord($this);
+        $this->Person->setReturnValue('get', '1978-06-16 04:37:00', array('date'));
+        $this->date_helper = new DateHelper(array('person'=>&$this->Person));
+        $this->date = '1978-06-16 12:20:30';
+    }
+
+    function test_distance_of_time_in_words()
+    {
+        $this->assertEqual(DateHelper::distance_of_time_in_words('1978-06-16','2006-01-18'), '10078 days');
+        $this->assertEqual(DateHelper::distance_of_time_in_words('1779-12-01','1780-01-01'), '31 days');
+        $this->assertEqual(DateHelper::distance_of_time_in_words('1779-12-01','1780-01-01 17:18:53', true), '32 days');
+        $this->assertEqual(DateHelper::distance_of_time_in_words('1780-01-01 17:18:14', '1780-01-01 17:18:53' , true), 'half a minute');
+        $this->assertEqual(DateHelper::distance_of_time_in_words('1780-01-01 17:18:42', '1780-01-01 17:18:53' , true), 'less than 20 seconds');
+        $this->assertEqual(DateHelper::distance_of_time_in_words('1780-01-01 17:18:14', '1780-01-01 17:18:53'), '1 minute');
 
         /**
          * According to the Gregorian calendar, which is the civil calendar in use today, 
@@ -18,874 +28,93 @@ class DateHelperTests extends HelpersUnitTester
          * that are not evenly divisible by 400. Therefore, the years 1700, 1800, 1900 and 2100 
          * are not leap years, but 1600, 2000, and 2400 are leap years.
         */
-        $this->assertEqual(DateHelper::distance_of_time_in_words('2100-02-01','2100-03-01'),'28 days');
-        $this->assertEqual(DateHelper::distance_of_time_in_words('2096-02-01','2096-03-01'),'29 days');
-        $this->assertEqual(DateHelper::distance_of_time_in_words('2000-02-01','2000-03-01'),'29 days');
-
-        $this->assertEqual(DateHelper::distance_of_time_in_words('2100-02-01 01:00:00','2100-02-01 02:50:00'),'about 2 hours');
-
-        $this->assertEqual(DateHelper::distance_of_time_in_words('2100-02-01 01:00:00','2100-02-01 02:50:00'),'about 2 hours');
-
-        $Person = &new MockAkActiveRecord($this);
-
-        $Person->setReturnValue('get', '1978-06-16 04:37:00', array('date'));
-
-        $DateHelper = new DateHelper(array('person'=>&$Person));
-
-        $this->assertEqual(join(array_diff(explode("\n",
-        $DateHelper->date_select('person','date')),array(''))),
-        join(array_diff(explode("\n",'<select name="person[date(1i)]">
-<option value="1973">1973</option>
-<option value="1974">1974</option>
-<option value="1975">1975</option>
-<option value="1976">1976</option>
-<option value="1977">1977</option>
-<option value="1978" selected="selected">1978</option>
-<option value="1979">1979</option>
-<option value="1980">1980</option>
-<option value="1981">1981</option>
-<option value="1982">1982</option>
-<option value="1983">1983</option>
-</select>
-<select name="person[date(2i)]">
-<option value="1">January</option>
-<option value="2">February</option>
-<option value="3">March</option>
-<option value="4">April</option>
-<option value="5">May</option>
-<option value="6" selected="selected">June</option>
-<option value="7">July</option>
-<option value="8">August</option>
-
-<option value="9">September</option>
-<option value="10">October</option>
-<option value="11">November</option>
-<option value="12">December</option>
-</select>
-
-<select name="person[date(3i)]">
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-
-<option value="4">4</option>
-<option value="5">5</option>
-<option value="6">6</option>
-<option value="7">7</option>
-<option value="8">8</option>
-<option value="9">9</option>
-<option value="10">10</option>
-<option value="11">11</option>
-<option value="12">12</option>
-
-<option value="13">13</option>
-<option value="14">14</option>
-<option value="15">15</option>
-<option value="16" selected="selected">16</option>
-<option value="17">17</option>
-<option value="18">18</option>
-<option value="19">19</option>
-<option value="20">20</option>
-<option value="21">21</option>
-
-<option value="22">22</option>
-<option value="23">23</option>
-<option value="24">24</option>
-<option value="25">25</option>
-<option value="26">26</option>
-<option value="27">27</option>
-<option value="28">28</option>
-<option value="29">29</option>
-<option value="30">30</option>
-
-<option value="31">31</option>
-</select>
-
-'),array(''))));
-
-
-        $this->assertEqual(join(array_diff(explode("\n",$DateHelper->date_select('person','date',array('include_blank'=>true,'discard_day'=>true,'order'=>array('month','year')))),array(''))),join(array_diff(explode("\n",'<select name="person[date(2i)]">
-<option value=""></option>
-<option value="1">January</option>
-<option value="2">February</option>
-
-<option value="3">March</option>
-<option value="4">April</option>
-<option value="5">May</option>
-<option value="6" selected="selected">June</option>
-<option value="7">July</option>
-<option value="8">August</option>
-<option value="9">September</option>
-<option value="10">October</option>
-<option value="11">November</option>
-
-<option value="12">December</option>
-</select>
-
-<select name="person[date(1i)]">
-<option value=""></option>
-<option value="1973">1973</option>
-<option value="1974">1974</option>
-<option value="1975">1975</option>
-<option value="1976">1976</option>
-<option value="1977">1977</option>
-<option value="1978" selected="selected">1978</option>
-
-<option value="1979">1979</option>
-<option value="1980">1980</option>
-<option value="1981">1981</option>
-<option value="1982">1982</option>
-<option value="1983">1983</option>
-</select>'),array(''))));
-
-
-        $this->assertEqual(join(array_diff(explode("\n",$DateHelper->datetime_select('person','date')),array(''))),join(array_diff(explode("\n",'<select name="person[date(1i)]">
-<option value="1973">1973</option>
-<option value="1974">1974</option>
-<option value="1975">1975</option>
-
-<option value="1976">1976</option>
-<option value="1977">1977</option>
-<option value="1978" selected="selected">1978</option>
-<option value="1979">1979</option>
-<option value="1980">1980</option>
-<option value="1981">1981</option>
-<option value="1982">1982</option>
-<option value="1983">1983</option>
-</select>
-
-<select name="person[date(2i)]">
-<option value="1">January</option>
-<option value="2">February</option>
-<option value="3">March</option>
-<option value="4">April</option>
-<option value="5">May</option>
-<option value="6" selected="selected">June</option>
-<option value="7">July</option>
-<option value="8">August</option>
-
-<option value="9">September</option>
-<option value="10">October</option>
-<option value="11">November</option>
-<option value="12">December</option>
-</select>
-
-<select name="person[date(3i)]">
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-
-<option value="4">4</option>
-<option value="5">5</option>
-<option value="6">6</option>
-<option value="7">7</option>
-<option value="8">8</option>
-<option value="9">9</option>
-<option value="10">10</option>
-<option value="11">11</option>
-<option value="12">12</option>
-
-<option value="13">13</option>
-<option value="14">14</option>
-<option value="15">15</option>
-<option value="16" selected="selected">16</option>
-<option value="17">17</option>
-<option value="18">18</option>
-<option value="19">19</option>
-<option value="20">20</option>
-<option value="21">21</option>
-
-<option value="22">22</option>
-<option value="23">23</option>
-<option value="24">24</option>
-<option value="25">25</option>
-<option value="26">26</option>
-<option value="27">27</option>
-<option value="28">28</option>
-<option value="29">29</option>
-<option value="30">30</option>
-
-<option value="31">31</option>
-</select>
-
- &mdash; <select name="person[date(4i)]">
-<option value="00">00</option>
-<option value="01">01</option>
-<option value="02">02</option>
-<option value="03">03</option>
-<option value="04" selected="selected">04</option>
-
-<option value="05">05</option>
-<option value="06">06</option>
-<option value="07">07</option>
-<option value="08">08</option>
-<option value="09">09</option>
-<option value="10">10</option>
-<option value="11">11</option>
-<option value="12">12</option>
-<option value="13">13</option>
-
-<option value="14">14</option>
-<option value="15">15</option>
-<option value="16">16</option>
-<option value="17">17</option>
-<option value="18">18</option>
-<option value="19">19</option>
-<option value="20">20</option>
-<option value="21">21</option>
-<option value="22">22</option>
-
-<option value="23">23</option>
-</select>
-
- : <select name="person[date(5i)]">
-<option value="00">00</option>
-<option value="01">01</option>
-<option value="02">02</option>
-<option value="03">03</option>
-<option value="04">04</option>
-
-<option value="05">05</option>
-<option value="06">06</option>
-<option value="07">07</option>
-<option value="08">08</option>
-<option value="09">09</option>
-<option value="10">10</option>
-<option value="11">11</option>
-<option value="12">12</option>
-<option value="13">13</option>
-
-<option value="14">14</option>
-<option value="15">15</option>
-<option value="16">16</option>
-<option value="17">17</option>
-<option value="18">18</option>
-<option value="19">19</option>
-<option value="20">20</option>
-<option value="21">21</option>
-<option value="22">22</option>
-
-<option value="23">23</option>
-<option value="24">24</option>
-<option value="25">25</option>
-<option value="26">26</option>
-<option value="27">27</option>
-<option value="28">28</option>
-<option value="29">29</option>
-<option value="30">30</option>
-<option value="31">31</option>
-
-<option value="32">32</option>
-<option value="33">33</option>
-<option value="34">34</option>
-<option value="35">35</option>
-<option value="36">36</option>
-<option value="37" selected="selected">37</option>
-<option value="38">38</option>
-<option value="39">39</option>
-<option value="40">40</option>
-
-<option value="41">41</option>
-<option value="42">42</option>
-<option value="43">43</option>
-<option value="44">44</option>
-<option value="45">45</option>
-<option value="46">46</option>
-<option value="47">47</option>
-<option value="48">48</option>
-<option value="49">49</option>
-
-<option value="50">50</option>
-<option value="51">51</option>
-<option value="52">52</option>
-<option value="53">53</option>
-<option value="54">54</option>
-<option value="55">55</option>
-<option value="56">56</option>
-<option value="57">57</option>
-<option value="58">58</option>
-
-<option value="59">59</option>
-</select>'),array(''))));
-
-        //$ActiveRecord->tally();
-
-        $date = '1978-06-16 12:20:30';
-
-        $this->assertEqual(join(array_diff(explode("\n",
-        DateHelper::select_datetime($date).
-        DateHelper::select_date($date).
-        DateHelper::select_time($date).
-        DateHelper::select_second($date).
-        DateHelper::select_minute($date).
-        DateHelper::select_hour($date).
-        DateHelper::select_day($date).
-        DateHelper::select_month($date).
-        DateHelper::select_year($date)
-        ),array(''))),join(array_diff(explode("\n",'<select name="dateyear">
-<option value="1973">1973</option>
-<option value="1974">1974</option>
-<option value="1975">1975</option>
-
-<option value="1976">1976</option>
-<option value="1977">1977</option>
-<option value="1978" selected="selected">1978</option>
-<option value="1979">1979</option>
-<option value="1980">1980</option>
-<option value="1981">1981</option>
-<option value="1982">1982</option>
-<option value="1983">1983</option>
-</select>
-
-<select name="datemonth">
-<option value="1">January</option>
-<option value="2">February</option>
-<option value="3">March</option>
-<option value="4">April</option>
-<option value="5">May</option>
-<option value="6" selected="selected">June</option>
-<option value="7">July</option>
-<option value="8">August</option>
-
-<option value="9">September</option>
-<option value="10">October</option>
-<option value="11">November</option>
-<option value="12">December</option>
-</select>
-<select name="dateday">
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-<option value="4">4</option>
-
-<option value="5">5</option>
-<option value="6">6</option>
-<option value="7">7</option>
-<option value="8">8</option>
-<option value="9">9</option>
-<option value="10">10</option>
-<option value="11">11</option>
-<option value="12">12</option>
-<option value="13">13</option>
-
-<option value="14">14</option>
-<option value="15">15</option>
-<option value="16" selected="selected">16</option>
-<option value="17">17</option>
-<option value="18">18</option>
-<option value="19">19</option>
-<option value="20">20</option>
-<option value="21">21</option>
-<option value="22">22</option>
-
-<option value="23">23</option>
-<option value="24">24</option>
-<option value="25">25</option>
-<option value="26">26</option>
-<option value="27">27</option>
-<option value="28">28</option>
-<option value="29">29</option>
-<option value="30">30</option>
-<option value="31">31</option>
-
-</select>
-<select name="datehour">
-<option value="00">00</option>
-<option value="01">01</option>
-<option value="02">02</option>
-<option value="03">03</option>
-<option value="04">04</option>
-<option value="05">05</option>
-<option value="06">06</option>
-<option value="07">07</option>
-
-<option value="08">08</option>
-<option value="09">09</option>
-<option value="10">10</option>
-<option value="11">11</option>
-<option value="12" selected="selected">12</option>
-<option value="13">13</option>
-<option value="14">14</option>
-<option value="15">15</option>
-<option value="16">16</option>
-
-<option value="17">17</option>
-<option value="18">18</option>
-<option value="19">19</option>
-<option value="20">20</option>
-<option value="21">21</option>
-<option value="22">22</option>
-<option value="23">23</option>
-</select>
-<select name="dateminute">
-<option value="00">00</option>
-
-<option value="01">01</option>
-<option value="02">02</option>
-<option value="03">03</option>
-<option value="04">04</option>
-<option value="05">05</option>
-<option value="06">06</option>
-<option value="07">07</option>
-<option value="08">08</option>
-<option value="09">09</option>
-
-<option value="10">10</option>
-<option value="11">11</option>
-<option value="12">12</option>
-<option value="13">13</option>
-<option value="14">14</option>
-<option value="15">15</option>
-<option value="16">16</option>
-<option value="17">17</option>
-<option value="18">18</option>
-
-<option value="19">19</option>
-<option value="20" selected="selected">20</option>
-<option value="21">21</option>
-<option value="22">22</option>
-<option value="23">23</option>
-<option value="24">24</option>
-<option value="25">25</option>
-<option value="26">26</option>
-<option value="27">27</option>
-
-<option value="28">28</option>
-<option value="29">29</option>
-<option value="30">30</option>
-<option value="31">31</option>
-<option value="32">32</option>
-<option value="33">33</option>
-<option value="34">34</option>
-<option value="35">35</option>
-<option value="36">36</option>
-
-<option value="37">37</option>
-<option value="38">38</option>
-<option value="39">39</option>
-<option value="40">40</option>
-<option value="41">41</option>
-<option value="42">42</option>
-<option value="43">43</option>
-<option value="44">44</option>
-<option value="45">45</option>
-
-<option value="46">46</option>
-<option value="47">47</option>
-<option value="48">48</option>
-<option value="49">49</option>
-<option value="50">50</option>
-<option value="51">51</option>
-<option value="52">52</option>
-<option value="53">53</option>
-<option value="54">54</option>
-
-<option value="55">55</option>
-<option value="56">56</option>
-<option value="57">57</option>
-<option value="58">58</option>
-<option value="59">59</option>
-</select>
-<select name="dateyear">
-<option value="1973">1973</option>
-<option value="1974">1974</option>
-<option value="1975">1975</option>
-
-<option value="1976">1976</option>
-<option value="1977">1977</option>
-<option value="1978" selected="selected">1978</option>
-<option value="1979">1979</option>
-<option value="1980">1980</option>
-<option value="1981">1981</option>
-<option value="1982">1982</option>
-<option value="1983">1983</option>
-</select>
-
-<select name="datemonth">
-<option value="1">January</option>
-<option value="2">February</option>
-<option value="3">March</option>
-<option value="4">April</option>
-<option value="5">May</option>
-<option value="6" selected="selected">June</option>
-<option value="7">July</option>
-<option value="8">August</option>
-
-<option value="9">September</option>
-<option value="10">October</option>
-<option value="11">November</option>
-<option value="12">December</option>
-</select>
-<select name="dateday">
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-<option value="4">4</option>
-
-<option value="5">5</option>
-<option value="6">6</option>
-<option value="7">7</option>
-<option value="8">8</option>
-<option value="9">9</option>
-<option value="10">10</option>
-<option value="11">11</option>
-<option value="12">12</option>
-<option value="13">13</option>
-
-<option value="14">14</option>
-<option value="15">15</option>
-<option value="16" selected="selected">16</option>
-<option value="17">17</option>
-<option value="18">18</option>
-<option value="19">19</option>
-<option value="20">20</option>
-<option value="21">21</option>
-<option value="22">22</option>
-
-<option value="23">23</option>
-<option value="24">24</option>
-<option value="25">25</option>
-<option value="26">26</option>
-<option value="27">27</option>
-<option value="28">28</option>
-<option value="29">29</option>
-<option value="30">30</option>
-<option value="31">31</option>
-
-</select>
-<select name="datehour">
-<option value="00">00</option>
-<option value="01">01</option>
-<option value="02">02</option>
-<option value="03">03</option>
-<option value="04">04</option>
-<option value="05">05</option>
-<option value="06">06</option>
-<option value="07">07</option>
-
-<option value="08">08</option>
-<option value="09">09</option>
-<option value="10">10</option>
-<option value="11">11</option>
-<option value="12" selected="selected">12</option>
-<option value="13">13</option>
-<option value="14">14</option>
-<option value="15">15</option>
-<option value="16">16</option>
-
-<option value="17">17</option>
-<option value="18">18</option>
-<option value="19">19</option>
-<option value="20">20</option>
-<option value="21">21</option>
-<option value="22">22</option>
-<option value="23">23</option>
-</select>
-<select name="dateminute">
-<option value="00">00</option>
-
-<option value="01">01</option>
-<option value="02">02</option>
-<option value="03">03</option>
-<option value="04">04</option>
-<option value="05">05</option>
-<option value="06">06</option>
-<option value="07">07</option>
-<option value="08">08</option>
-<option value="09">09</option>
-
-<option value="10">10</option>
-<option value="11">11</option>
-<option value="12">12</option>
-<option value="13">13</option>
-<option value="14">14</option>
-<option value="15">15</option>
-<option value="16">16</option>
-<option value="17">17</option>
-<option value="18">18</option>
-
-<option value="19">19</option>
-<option value="20" selected="selected">20</option>
-<option value="21">21</option>
-<option value="22">22</option>
-<option value="23">23</option>
-<option value="24">24</option>
-<option value="25">25</option>
-<option value="26">26</option>
-<option value="27">27</option>
-
-<option value="28">28</option>
-<option value="29">29</option>
-<option value="30">30</option>
-<option value="31">31</option>
-<option value="32">32</option>
-<option value="33">33</option>
-<option value="34">34</option>
-<option value="35">35</option>
-<option value="36">36</option>
-
-<option value="37">37</option>
-<option value="38">38</option>
-<option value="39">39</option>
-<option value="40">40</option>
-<option value="41">41</option>
-<option value="42">42</option>
-<option value="43">43</option>
-<option value="44">44</option>
-<option value="45">45</option>
-
-<option value="46">46</option>
-<option value="47">47</option>
-<option value="48">48</option>
-<option value="49">49</option>
-<option value="50">50</option>
-<option value="51">51</option>
-<option value="52">52</option>
-<option value="53">53</option>
-<option value="54">54</option>
-
-<option value="55">55</option>
-<option value="56">56</option>
-<option value="57">57</option>
-<option value="58">58</option>
-<option value="59">59</option>
-</select>
-<select name="datesecond">
-<option value="00">00</option>
-<option value="01">01</option>
-<option value="02">02</option>
-
-<option value="03">03</option>
-<option value="04">04</option>
-<option value="05">05</option>
-<option value="06">06</option>
-<option value="07">07</option>
-<option value="08">08</option>
-<option value="09">09</option>
-<option value="10">10</option>
-<option value="11">11</option>
-
-<option value="12">12</option>
-<option value="13">13</option>
-<option value="14">14</option>
-<option value="15">15</option>
-<option value="16">16</option>
-<option value="17">17</option>
-<option value="18">18</option>
-<option value="19">19</option>
-<option value="20">20</option>
-
-<option value="21">21</option>
-<option value="22">22</option>
-<option value="23">23</option>
-<option value="24">24</option>
-<option value="25">25</option>
-<option value="26">26</option>
-<option value="27">27</option>
-<option value="28">28</option>
-<option value="29">29</option>
-
-<option value="30" selected="selected">30</option>
-<option value="31">31</option>
-<option value="32">32</option>
-<option value="33">33</option>
-<option value="34">34</option>
-<option value="35">35</option>
-<option value="36">36</option>
-<option value="37">37</option>
-<option value="38">38</option>
-
-<option value="39">39</option>
-<option value="40">40</option>
-<option value="41">41</option>
-<option value="42">42</option>
-<option value="43">43</option>
-<option value="44">44</option>
-<option value="45">45</option>
-<option value="46">46</option>
-<option value="47">47</option>
-
-<option value="48">48</option>
-<option value="49">49</option>
-<option value="50">50</option>
-<option value="51">51</option>
-<option value="52">52</option>
-<option value="53">53</option>
-<option value="54">54</option>
-<option value="55">55</option>
-<option value="56">56</option>
-
-<option value="57">57</option>
-<option value="58">58</option>
-<option value="59">59</option>
-</select>
-<select name="dateminute">
-<option value="00">00</option>
-<option value="01">01</option>
-<option value="02">02</option>
-<option value="03">03</option>
-<option value="04">04</option>
-
-<option value="05">05</option>
-<option value="06">06</option>
-<option value="07">07</option>
-<option value="08">08</option>
-<option value="09">09</option>
-<option value="10">10</option>
-<option value="11">11</option>
-<option value="12">12</option>
-<option value="13">13</option>
-
-<option value="14">14</option>
-<option value="15">15</option>
-<option value="16">16</option>
-<option value="17">17</option>
-<option value="18">18</option>
-<option value="19">19</option>
-<option value="20" selected="selected">20</option>
-<option value="21">21</option>
-<option value="22">22</option>
-
-<option value="23">23</option>
-<option value="24">24</option>
-<option value="25">25</option>
-<option value="26">26</option>
-<option value="27">27</option>
-<option value="28">28</option>
-<option value="29">29</option>
-<option value="30">30</option>
-<option value="31">31</option>
-
-<option value="32">32</option>
-<option value="33">33</option>
-<option value="34">34</option>
-<option value="35">35</option>
-<option value="36">36</option>
-<option value="37">37</option>
-<option value="38">38</option>
-<option value="39">39</option>
-<option value="40">40</option>
-
-<option value="41">41</option>
-<option value="42">42</option>
-<option value="43">43</option>
-<option value="44">44</option>
-<option value="45">45</option>
-<option value="46">46</option>
-<option value="47">47</option>
-<option value="48">48</option>
-<option value="49">49</option>
-
-<option value="50">50</option>
-<option value="51">51</option>
-<option value="52">52</option>
-<option value="53">53</option>
-<option value="54">54</option>
-<option value="55">55</option>
-<option value="56">56</option>
-<option value="57">57</option>
-<option value="58">58</option>
-
-<option value="59">59</option>
-</select>
-<select name="datehour">
-<option value="00">00</option>
-<option value="01">01</option>
-<option value="02">02</option>
-<option value="03">03</option>
-<option value="04">04</option>
-<option value="05">05</option>
-<option value="06">06</option>
-
-<option value="07">07</option>
-<option value="08">08</option>
-<option value="09">09</option>
-<option value="10">10</option>
-<option value="11">11</option>
-<option value="12" selected="selected">12</option>
-<option value="13">13</option>
-<option value="14">14</option>
-<option value="15">15</option>
-
-<option value="16">16</option>
-<option value="17">17</option>
-<option value="18">18</option>
-<option value="19">19</option>
-<option value="20">20</option>
-<option value="21">21</option>
-<option value="22">22</option>
-<option value="23">23</option>
-</select>
-
-<select name="dateday">
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-<option value="4">4</option>
-<option value="5">5</option>
-<option value="6">6</option>
-<option value="7">7</option>
-<option value="8">8</option>
-
-<option value="9">9</option>
-<option value="10">10</option>
-<option value="11">11</option>
-<option value="12">12</option>
-<option value="13">13</option>
-<option value="14">14</option>
-<option value="15">15</option>
-<option value="16" selected="selected">16</option>
-<option value="17">17</option>
-
-<option value="18">18</option>
-<option value="19">19</option>
-<option value="20">20</option>
-<option value="21">21</option>
-<option value="22">22</option>
-<option value="23">23</option>
-<option value="24">24</option>
-<option value="25">25</option>
-<option value="26">26</option>
-
-<option value="27">27</option>
-<option value="28">28</option>
-<option value="29">29</option>
-<option value="30">30</option>
-<option value="31">31</option>
-</select>
-<select name="datemonth">
-<option value="1">January</option>
-<option value="2">February</option>
-<option value="3">March</option>
-
-<option value="4">April</option>
-<option value="5">May</option>
-<option value="6" selected="selected">June</option>
-<option value="7">July</option>
-<option value="8">August</option>
-<option value="9">September</option>
-<option value="10">October</option>
-<option value="11">November</option>
-<option value="12">December</option>
-
-</select>
-<select name="dateyear">
-<option value="1973">1973</option>
-<option value="1974">1974</option>
-<option value="1975">1975</option>
-<option value="1976">1976</option>
-<option value="1977">1977</option>
-<option value="1978" selected="selected">1978</option>
-<option value="1979">1979</option>
-<option value="1980">1980</option>
-
-<option value="1981">1981</option>
-<option value="1982">1982</option>
-<option value="1983">1983</option>
-</select>'),array(''))));
-
-        //echo DateHelper::distance_of_time_in_words('1779-12-01','1780-01-01');
-
+        $this->assertEqual(DateHelper::distance_of_time_in_words('2100-02-01', '2100-03-01'), '28 days');
+        $this->assertEqual(DateHelper::distance_of_time_in_words('2096-02-01', '2096-03-01'), '29 days');
+        $this->assertEqual(DateHelper::distance_of_time_in_words('2000-02-01', '2000-03-01'), '29 days');
+
+        $this->assertEqual(DateHelper::distance_of_time_in_words('2100-02-01 01:00:00', '2100-02-01 02:50:00'), 'about 2 hours');
+        $this->assertEqual(DateHelper::distance_of_time_in_words('2100-02-01 01:00:00', '2100-02-01 02:50:00'), 'about 2 hours');
+    }
+
+    function test_time_ago_in_words()
+    {
+        $this->assertEqual(DateHelper::time_ago_in_words('2000-02-01 01:00:00'), DateHelper::distance_of_time_in_words('2000-02-01 01:00:00', Ak::time()));
+    }
+
+    function test_distance_of_time_in_words_to_now()
+    {
+        $this->assertEqual(DateHelper::distance_of_time_in_words_to_now('2000-02-01 01:00:00'), DateHelper::distance_of_time_in_words('2000-02-01 01:00:00', Ak::time()));
+    }
+
+    function test_date_select()
+    {
+        $this->assertEqual($this->date_helper->date_select('person', 'date'), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_date_select_1.txt'));
+        $this->assertEqual($this->date_helper->date_select('person','date',array('include_blank'=>true,'discard_day'=>true,'order'=>array('month','year'))), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_date_select_2.txt'));
+    }
+
+    function test_datetime_select()
+    {
+        $this->assertEqual($this->date_helper->datetime_select('person', 'date'), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_date_select_3.txt'));
+    }
+
+    function test_select_date()
+    {
+        $this->assertEqual(DateHelper::select_date($this->date), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_date.txt'));
+    }
+
+    function test_select_datetime()
+    {
+        $this->assertEqual(DateHelper::select_datetime($this->date), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_datetime.txt'));
+        $this->assertEqual(DateHelper::select_datetime($this->date, array('include_seconds' => true)), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_datetime_seconds.txt'));
+    }
+
+    function test_select_time()
+    {
+        $this->assertEqual(DateHelper::select_time($this->date), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_time.txt'));
+        $this->assertEqual(DateHelper::select_time($this->date, array('include_seconds' => true)), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_time_seconds.txt'));
+    }
+
+    function test_select_second()
+    {
+        $this->assertEqual(DateHelper::select_second($this->date), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_second.txt'));
+    }
+
+    function test_select_minute()
+    {
+        $this->assertEqual(DateHelper::select_minute($this->date), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_minute.txt'));
+    }
+
+    function test_select_hour()
+    {
+        $this->assertEqual(DateHelper::select_hour($this->date), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_hour.txt'));
+    }
+
+    function test_select_day()
+    {
+        $this->assertEqual(DateHelper::select_day($this->date), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_day.txt'));
+    }
+
+    function test_select_month()
+    {
+        $this->assertEqual(DateHelper::select_month($this->date), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_month.txt'));
+        $this->assertEqual(DateHelper::select_month($this->date, array('use_month_numbers' => true)), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_month_numbers.txt'));
+        $this->assertEqual(DateHelper::select_month($this->date, array('add_month_numbers' => true)), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_month_add_numbers.txt'));
+        $this->assertEqual(DateHelper::select_month($this->date, array('add_month_numbers' => true, 'use_short_month' => true)), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_month_add_numbers_short_month.txt'));
+        $this->assertEqual(DateHelper::select_month($this->date, array('use_short_month' => true)), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_month_short_month.txt'));
+    }
+
+    function test_select_year()
+    {
+        $this->assertEqual(DateHelper::select_year($this->date), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_year.txt'));
+        $this->assertEqual(DateHelper::select_year($this->date, array('start_year' => 1950, 'end_year' => 2010)), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_year_options.txt'));
+        $this->assertEqual(DateHelper::select_year($this->date, array('start_year' => 2010, 'end_year' => 1950)), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_year_options_reverse.txt'));
+        $this->assertEqual(DateHelper::select_year($this->date, array('start_year' => 1980, 'end_year' => 1990)), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_year_options_out_of_range.txt'));
+    }
+
+    function test_locale_date_time()
+    {
+        $this->assertEqual(DateHelper::locale_date_time($this->date), '1978-06-16 12:20:30');
+        $this->assertEqual(DateHelper::locale_date($this->date), '1978-06-16');
     }
 }
 

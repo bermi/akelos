@@ -58,36 +58,8 @@ class JavaScriptMacrosHelperTests extends HelpersUnitTester
     
     function test_text_field_with_auto_complete()
     {
-
-
-        $style = "<style>          div.auto_complete {
-              width: 350px;
-              background: #fff;
-            }
-            div.auto_complete ul {
-              border:1px solid #888;
-              margin:0;
-              padding:0;
-              width:100%;
-              list-style-type:none;
-            }
-            div.auto_complete ul li {
-              margin:0;
-              padding:3px;
-            }
-            div.auto_complete ul li.selected { 
-              background-color: #ffb; 
-            }
-            div.auto_complete ul strong.highlight { 
-              color: #800; 
-              margin:0;
-              padding:0;
-            }</style>";
-        $code = "<input autocomplete=\"off\" id=\"user_login\" name=\"user[login]\" size=\"30\" type=\"text\" /><div class=\"auto_complete\" id=\"user_login_auto_complete\"></div><script type=\"text/javascript\">
-//<![CDATA[
-var user_login_auto_completer = new Ajax.Autocompleter('user_login', 'user_login_auto_complete', '/foo/bar/', {})
-//]]>
-</script>";
+        $style = file_get_contents(AK_TEST_HELPERS_DIR.DS.'javascript_macros_helper_style.txt');
+        $code = file_get_contents(AK_TEST_HELPERS_DIR.DS.'javascript_macros_helper_code.txt');
 
         $this->assertEqual(
             $this->javascript_macros_helper->text_field_with_auto_complete('user', 'login', array(), array('url' => array('controller' => 'foo', 'action' => 'bar'))),
