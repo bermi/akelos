@@ -92,7 +92,8 @@ class MenuHelper extends AkActionViewHelper
     {
         $controller_file_names = array_map('array_pop', (array)Ak::dir(AK_CONTROLLERS_DIR, array('files'=>false)));
 
-        krsort($controller_file_names);
+        sort($controller_file_names);
+        
         $menu_options = array();
         foreach ($controller_file_names as $controller_file_name){
             $controller_name = str_replace('.php','',$controller_file_name);

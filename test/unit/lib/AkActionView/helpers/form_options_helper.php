@@ -70,13 +70,21 @@ class FormOptionsHelperTests extends HelpersUnitTester
 
         $Person =& new MockAkActiveRecord($this);
         $AkFormHelperOptionsInstanceTag =& new AkFormHelperOptionsInstanceTag('person','role',&$FormOptionsHelper,null,&$Person);
-        $this->assertEqual(trim(str_replace("\n",'',
-        $AkFormHelperOptionsInstanceTag->to_select_tag(array('a','b'),array(),array('prompt'=>true)))),
-        '<select id="person_role" name="person[role]">'.
-        '<option value="">Please select</option>'.
-        '<option value="a">a</option>'.
-        '<option value="b">b</option>'.
-        '</select>');
+
+        $this->assertEqual(
+            $AkFormHelperOptionsInstanceTag->to_select_tag(array('a','b'),array(), array('prompt' => true)),
+            file_get_contents(AK_TEST_HELPERS_DIR.DS.'form_options_helper_to_select_prompt.txt')
+        );
+
+        $this->assertEqual(
+            $AkFormHelperOptionsInstanceTag->to_select_tag(array('a','b'), array(), array('include_blank' => true)),
+            file_get_contents(AK_TEST_HELPERS_DIR.DS.'form_options_helper_to_select_include_blank.txt')
+        );
+
+        $this->assertEqual(
+            $AkFormHelperOptionsInstanceTag->to_select_tag(array('a','b'), array(), array('include_blank' => true, 'prompt' => true)),
+            file_get_contents(AK_TEST_HELPERS_DIR.DS.'form_options_helper_to_select_include_blank_prompt.txt')
+        );
 
         $Person =& new MockAkActiveRecord($this);
         $Person->setReturnValue('get', 'USA', array('country'));
