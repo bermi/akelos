@@ -345,9 +345,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Set the connection for the class.
     */
-    function setConnection($dns = null)
+    function setConnection($dns = null, $connection_id = null)
     {
-        $this->_db =& Ak::db($dns);
+        $this->_db =& Ak::db($dns, $connection_id);
     }
 
     /**
