@@ -250,6 +250,9 @@ define('DS', DIRECTORY_SEPARATOR);
 define('AK_OS', (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'WINDOWS' : 'UNIX'));
 define('AK_PHP5', version_compare(PHP_VERSION, '5', '>=') == 1 ? true : false);
 
+define('AK_BASE_DIR', str_replace(DS.'script'.DS.'setup','',__FILE__));
+@ini_set("include_path",(AK_BASE_DIR.DS.'vendor'.DS.'pear'.PATH_SEPARATOR.ini_get("include_path")));
+
 
 if(!empty($_SERVER['argv'][1]) && $_SERVER['argv'][1][0] != '-'){
     $_SERVER['argv'][0] = '-d';
