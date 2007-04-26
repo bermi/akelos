@@ -321,7 +321,7 @@ Now that you made the models aware of each other you will need to modify the boo
     
     class BookController extends ApplicationController
     {
-        var $models = 'book, author'; // <- make this models available
+        var $models = 'book, author'; // <- make these models available
         
         // ... more BookController code
         

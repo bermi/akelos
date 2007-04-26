@@ -12,6 +12,8 @@ class FrameworkSetup extends AkObject
     var $available_locales = array('en', 'es');
     var $locales = array('en');
 
+    var $stylesheets = array('scaffold','forms');
+
     function __construct()
     {
         if(file_exists(AK_CONFIG_DIR.DS.'config.php')){
@@ -405,7 +407,7 @@ CONFIG;
         $file_2 = AK_PUBLIC_DIR.DS.'.htaccess';
         $file_1_content = @Ak::file_get_contents($file_1);
         $file_2_content = @Ak::file_get_contents($file_2);
-        
+
         empty($file_1_content) ? null : @Ak::file_put_contents($file_1, str_replace('# RewriteBase /framework',' RewriteBase '.$this->getUrlSuffix(), $file_1_content));
         empty($file_2_content) ? null : @Ak::file_put_contents($file_2, str_replace('# RewriteBase /framework',' RewriteBase '.$this->getUrlSuffix(), $file_2_content));
     }
@@ -688,6 +690,29 @@ CONFIG;
     function suggestDatabaseHost()
     {
         return 'localhost';
+    }
+
+    function relativizeStylesheetPaths()
+    {
+        if($this->hasUrlSuffix()){
+            $url_suffix = trim($this->getUrlSuffix(),'/');
+            foreach ($this->stylesheets as $stylesheet) {
+                $filename = AK_PUBLIC_DIR.DS.'stylesheets'.DS.$stylesheet.'.css';
+                $relativized_css = preg_replace("/url\((\'|\")?\/images/","url($1/$url_suffix/images", @Ak::file_get_contents($filename));
+                empty($relativized_css) ? null : @Ak::file_put_contents($filename, $relativized_css);
+            }
+        }
+
+    }
+
+    function removeSetupFiles()
+    {
+        @array_map(array('Ak','file_delete'),  array(
+        AK_APP_DIR.DS.'installers'.DS.'framework_installer.php',
+        AK_APP_DIR.DS.'models'.DS.'framework_setup.php',
+        AK_APP_DIR.DS.'controllers'.DS.'framework_setup_controller.php',
+        AK_APP_DIR.DS.'views'.DS.'framework_setup'
+        ));
     }
 
 }

@@ -184,7 +184,10 @@ class FrameworkSetupController extends AkActionController
                 if($this->FrameworkSetup->hasUrlSuffix()){
                     $this->FrameworkSetup->modifyHtaccessFiles();
                 }
-
+                
+                $this->FrameworkSetup->relativizeStylesheetPaths();
+                $this->FrameworkSetup->removeSetupFiles();
+                
                 $this->redirectTo(array('controller'=>'page'));
             }
 
