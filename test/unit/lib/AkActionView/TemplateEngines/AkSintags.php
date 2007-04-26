@@ -57,6 +57,6 @@ class Test_of_AkSintags extends  UnitTestCase
 }
 
 
-Ak::test('Test_of_AkSintags');
+ak_test('Test_of_AkSintags');
 
 ?>

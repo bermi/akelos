@@ -6,7 +6,7 @@ require_once(AK_LIB_DIR.DS.'AkActionController.php');
 require_once(AK_LIB_DIR.DS.'AkRequest.php');
 require_once(AK_CONTROLLERS_DIR.DS.'..'.DS.'application_controller.php');
 
-Mock::generate('AkRequest');
+ak_generate_mock('AkRequest');
 
 class MenuHelperTests extends HelpersUnitTester 
 {
@@ -72,6 +72,6 @@ class MenuHelperTests extends HelpersUnitTester
     
 }
 
-Ak::test('MenuHelperTests');
+ak_test('MenuHelperTests');
 
 ?>

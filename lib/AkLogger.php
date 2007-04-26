@@ -34,7 +34,7 @@ defined('AK_LOGER_DEFAULT_LOG_FILE')            ? null : define('AK_LOGER_DEFAUL
 // Loggin events for log types
 defined('AK_LOGGER_DEBUG')      ? null : define('AK_LOGGER_DEBUG',      AK_MODE_FILE    | AK_MODE_DISPLAY);
 defined('AK_LOGGER_INFO')       ? null : define('AK_LOGGER_INFO',       AK_MODE_DISPLAY);
-defined('AK_LOGGER_MESSAGE')    ? null : define('AK_LOGGER_MESSAGE',    AK_MODE_DISPLAY | AK_MODE_FILE);
+defined('AK_LOGGER_MESSAGE')    ? null : define('AK_LOGGER_MESSAGE',    AK_MODE_FILE);
 defined('AK_LOGGER_NOTICE')     ? null : define('AK_LOGGER_NOTICE',     AK_MODE_DISPLAY | AK_MODE_FILE | AK_MODE_DIE);
 defined('AK_LOGGER_WARNING')    ? null : define('AK_LOGGER_WARNING',    AK_MODE_DISPLAY | AK_MODE_FILE | AK_MODE_DIE);
 defined('AK_LOGGER_ERROR')      ? null : define('AK_LOGGER_ERROR',      AK_MODE_DISPLAY | AK_MODE_FILE | AK_MODE_DIE);
@@ -52,7 +52,7 @@ class AkLogger
 {
     var $_log_params                = array();
     var $print_display_message      = true;
-    var $extended_details           = true;
+    var $extended_details           = false;
     var $default_mail_destination   = AK_LOGER_DEFAULT_MAIL_DESTINATION;
     var $default_mail_sender        = AK_LOGER_DEFAULT_MAIL_SENDER;
     var $default_mail_subject       = AK_LOGER_DEFAULT_MAIL_SUBJECT;
@@ -68,9 +68,7 @@ class AkLogger
     {
         $type = strtoupper($type);
         $event_code = empty ($event_code) ? (defined('AK_LOGGER_'.$type) ? 'AK_LOGGER_'.$type : AK_LOGGER_INFO) : $event_code;
-
-
-        $this->_log($message, $error_message, $filename, $line_number, $vars);
+        $this->_log($type, $message, $vars, $event_code);
     }
 
     function debug($message, $vars = array(), $event_code = null)
@@ -108,59 +106,63 @@ class AkLogger
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    function _log($error_number, $error_message, $filename, $line_number, $vars=array())
+    function _log($error_mode, $error_message, $vars=array(), $event_code = null)
     {
         $this->setLogParams($vars);
-        $this->mode = defined('AK_LOG_'.$error_number) ? constant('AK_LOG_'.$error_number) : $this->default_log_settings;
+        $this->mode = defined('AK_LOG_'.$error_mode) ? constant('AK_LOG_'.$error_mode) : $this->default_log_settings;
         $type = $this->log_type;
-        $this->mode & AK_MODE_DISPLAY ? $this->_displayLog($type, $error_number, $error_message, $filename, $line_number) : null;
-        $this->mode & AK_MODE_MAIL ? $this->_mailLog($type, $error_number, $error_message, $filename, $line_number) : null;
-        $this->mode & AK_MODE_FILE ? $this->_appendLogToFile($type, $error_number, $error_message, $filename, $line_number) : null;
-        $this->mode & AK_MODE_DATABASE ? $this->_saveLogInDatabase($type, $error_number, $error_message, $filename, $line_number) : null;
+        $this->mode & AK_MODE_DISPLAY ? $this->_displayLog($type, $error_mode, $error_message) : null;
+        $this->mode & AK_MODE_FILE ? $this->_appendLogToFile($type, $error_mode, $error_message) : null;
+        $this->mode & AK_MODE_DATABASE ? $this->_saveLogInDatabase($type, $error_mode, $error_message) : null;
+        $this->mode & AK_MODE_MAIL ? $this->_mailLog($type, $error_mode, $error_message) : null;
         $this->mode & AK_MODE_DIE ? exit : null;
     }
 
-    function _displayLog($type, $error_number, $error_message, $filename, $line_number)
+    function _displayLog($type, $error_mode, $error_message)
     {
-        $message = $this->_getLogFormatedAsHtml($type, $error_number, $error_message, $filename, $line_number);
+        $message = $this->_getLogFormatedAsHtml($type, $error_mode, $error_message);
         if($this->print_display_message){
-            echo  $result;
+            Ak::trace($message);
         }
         return $message;
     }
-    function _mailLog($type, $error_number, $error_message, $filename, $line_number)
+    function _mailLog($type, $error_mode, $error_message)
     {
         if(!empty($this->default_mail_destination)){
-            $message = $this->_getLogFormatedAsString($type, $error_number, $error_message, $filename, $line_number);
+            $message = $this->_getLogFormatedAsString($type, $error_mode, $error_message);
             $message = strip_tags(str_replace('<li>',' - ',$message));
             Ak::mail($this->default_mail_sender, $this->default_mail_destination, $this->default_mail_subject, $message);
         }
     }
-    function _appendLogToFile($type, $error_number, $error_message, $filename, $line_number)
+    function _appendLogToFile($type, $error_mode, $error_message)
     {
         $filename = $this->error_file;
+        if(!is_writable($filename)){
+            clearstatcache();
+            Ak::file_put_contents($filename,'');
+            if(!is_writable($filename)){
+                trigger_error($this->internalError($this->t('Error writing file: %filename Description:',array('%filename'=>$filename)).$error_message,__FILE__,__LINE__), E_USER_NOTICE);
+                return ;
+            }
+        }
 
-        if (is_writable($filename) || (Ak::file_put_contents(AK_MODE_DIR.DS.$filename.'.log','') && (clearstatcache() && is_writable($filename)))){
-            $message = $this->_getLogFormatedAsString($type, $error_number, $error_message, $filename, $line_number);
-            if(!$fp = fopen($filename, 'a')) {
-                die($this->internalError($this->t('Cannot open file (%file)', array('%file'=>$filename)),__FILE__,__LINE__));
-            }
-            @flock($fp, LOCK_EX);
-            if (@fwrite($fp, "\r\n".$message) === FALSE) {
-                @flock ($fp, LOCK_UN);
-                die($this->internalError($this->t('Error writing file: %filename Description:',array('%filename'=>$filename)).$error_message,__FILE__,__LINE__));
-            }
+        $message = $this->_getLogFormatedAsString($type, $error_mode, $error_message);
+        if(!$fp = fopen($filename, 'a')) {
+            die($this->internalError($this->t('Cannot open file (%file)', array('%file'=>$filename)),__FILE__,__LINE__));
+        }
+        @flock($fp, LOCK_EX);
+        if (@fwrite($fp, $message) === FALSE) {
             @flock ($fp, LOCK_UN);
-            @fclose($fp);
-        } else {
             die($this->internalError($this->t('Error writing file: %filename Description:',array('%filename'=>$filename)).$error_message,__FILE__,__LINE__));
         }
+        @flock ($fp, LOCK_UN);
+        @fclose($fp);
     }
 
-    function _saveLogInDatabase($type, $error_number, $error_message, $filename, $line_number)
+    function _saveLogInDatabase($type, $error_mode, $error_message)
     {
         $db =& Ak::db();
-        $message = $this->_getLogFormatedAsRawText($type, $error_number, $error_message, $filename, $line_number);
+        $message = $this->_getLogFormatedAsRawText($type, $error_mode, $error_message);
         $sql = 'INSERT INTO log (user_id, type, message, severity, location, hostname, created) '.
         " VALUES (0, ".$db->qstr($type).", ".$db->qstr($message).', '.($this->mode & AK_MODE_DIE ? 100 : 0).', '.
         $db->qstr(AK_CURRENT_URL).', '.$db->qstr($_SERVER['REMOTE_ADDR']).', '.$db->qstr(Ak::getTimestamp()).');';
@@ -169,11 +171,11 @@ class AkLogger
         }
     }
 
-    function _getLogFormatedAsHtml($type, $error_number, $error_message, $filename, $line_number)
+    function _getLogFormatedAsHtml($type, $error_mode, $error_message)
     {
-        $error_type = $error_number ? 'error' : 'info';
-        $message = "\n<div id='logger_$error_type'>\n<p>".$this->t(ucfirst($error_type)).": [$error_number] - $error_message</p>\n";
-        $params = array_merge($this->_log_params, ($this->extended_details ? array('file'=>$filename, 'line_number'=>$line_number, 'remote_address'=>$_SERVER['REMOTE_ADDR'], 'browser'=>$_SERVER['HTTP_USER_AGENT']) : array() ));
+        $error_type = $error_mode ? 'error' : 'info';
+        $message = "\n<div id='logger_$error_type'>\n<p>".$this->t(ucfirst($error_type)).": [$error_mode] - $error_message</p>\n";
+        $params = array_merge($this->_log_params, ($this->extended_details ? array('remote_address'=>$_SERVER['REMOTE_ADDR'], 'browser'=>$_SERVER['HTTP_USER_AGENT']) : array() ));
         $details = '';
         foreach ($params as $k=>$v){
             $details .= "<li><span>".AkInflector::humanize($k).":</span> $v</li>\n";
@@ -181,10 +183,10 @@ class AkLogger
         return empty($details) ? $message.'</div>' : $message."<ul>\n$details\n</ul>\n</div>";
     }
 
-    function _getLogFormatedAsString($type, $error_number, $error_message, $filename, $line_number, $serialized = false)
+    function _getLogFormatedAsString($type, $error_mode, $error_message, $serialized = false)
     {
-        $message = Ak::getTimestamp()."\t[$error_number]\t$error_message";
-        $params = array_merge($this->_log_params, ($this->extended_details ? array('file'=>$filename, 'line_number'=>$line_number, 'remote_address'=>$_SERVER['REMOTE_ADDR'], 'browser'=>$_SERVER['HTTP_USER_AGENT']) : array() ));
+        $message = date('r')."\t[$error_mode]\t$error_message";
+        $params = array_merge($this->_log_params, ($this->extended_details ? array('remote_address'=>$_SERVER['REMOTE_ADDR'], 'browser'=>$_SERVER['HTTP_USER_AGENT']) : array() ));
 
         if($serialized){
             $message .= (count($params) ? "\t".serialize($params) : '');
@@ -198,9 +200,9 @@ class AkLogger
         return $message;
     }
 
-    function _getLogFormatedAsRawText($type, $error_number, $error_message, $filename, $line_number)
+    function _getLogFormatedAsRawText($type, $error_mode, $error_message)
     {
-        return $this->_getLogFormatedAsString($type, $error_number, $error_message, $filename, $line_number, true);
+        return $this->_getLogFormatedAsString($type, $error_mode, $error_message, $filename, $line_number, true);
     }
 
 

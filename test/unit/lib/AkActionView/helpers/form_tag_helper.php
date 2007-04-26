@@ -42,6 +42,6 @@ class FormTagHelperTests extends HelpersUnitTester
     }
 }
 
-Ak::test('FormTagHelperTests');
+ak_test('FormTagHelperTests');
 
 ?>

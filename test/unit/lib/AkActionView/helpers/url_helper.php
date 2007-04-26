@@ -56,6 +56,6 @@ class UrlHelperTests extends HelpersUnitTester
     }
 }
 
-Ak::test('UrlHelperTests');
+ak_test('UrlHelperTests');
 
 ?>

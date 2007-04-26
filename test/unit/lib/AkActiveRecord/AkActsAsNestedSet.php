@@ -514,6 +514,6 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
 }
 
 
-Ak::test('test_AkActiveRecord_actsAsNestedSet',true);
+ak_test('test_AkActiveRecord_actsAsNestedSet',true);
 
 ?>

@@ -333,7 +333,7 @@ class Test_of_AkActionControllerFilters extends  UnitTestCase
 
 if(!defined('ALL_TESTS_CALL')){
     ob_start();
-    Ak::test('Test_of_AkActionControllerFilters');
+    ak_test('Test_of_AkActionControllerFilters');
     ob_end_flush();
 }
 

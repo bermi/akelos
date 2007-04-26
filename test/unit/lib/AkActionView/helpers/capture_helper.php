@@ -6,7 +6,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView.php');
 require_once(AK_LIB_DIR.DS.'AkActionController.php');
 require_once(AK_LIB_DIR.DS.'AkRequest.php');
 
-Mock::generate('AkRequest');
+ak_generate_mock('AkRequest');
 
 
 class CaptureHelperTests extends HelpersUnitTester 
@@ -53,6 +53,6 @@ class CaptureHelperTests extends HelpersUnitTester
 }
 
 
-Ak::test('CaptureHelperTests');
+ak_test('CaptureHelperTests');
 
 ?>

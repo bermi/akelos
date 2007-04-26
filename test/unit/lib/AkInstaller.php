@@ -224,6 +224,6 @@ class Test_of_AkInstaller extends  UnitTestCase
 
 }
 
-Ak::test('Test_of_AkInstaller', true);
+ak_test('Test_of_AkInstaller', true);
 
 ?>

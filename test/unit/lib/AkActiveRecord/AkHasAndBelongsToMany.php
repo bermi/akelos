@@ -362,6 +362,6 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
 
 }
 
-Ak::test('test_AkActiveRecord_hasAndBelongsToMany_Associations', true);
+ak_test('test_AkActiveRecord_hasAndBelongsToMany_Associations', true);
 
 ?>

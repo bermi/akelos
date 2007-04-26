@@ -5,7 +5,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_macros_hel
 require_once(AK_LIB_DIR.DS.'AkActionController.php');
 require_once(AK_LIB_DIR.DS.'AkRequest.php');
 
-Mock::generate('AkRequest');
+ak_generate_mock('AkRequest');
 
 
 class JavaScriptMacrosHelperTests extends HelpersUnitTester 
@@ -73,6 +73,6 @@ class JavaScriptMacrosHelperTests extends HelpersUnitTester
 }
 
 
-Ak::test('JavaScriptMacrosHelperTests');
+ak_test('JavaScriptMacrosHelperTests');
 
 ?>

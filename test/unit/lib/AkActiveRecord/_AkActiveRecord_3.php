@@ -622,7 +622,7 @@ class test_AkActiveRecord_3 extends  UnitTestCase
 
 }
 
-Ak::test('test_AkActiveRecord_locking',true);
+ak_test('test_AkActiveRecord_locking',true);
 
 
 ?>

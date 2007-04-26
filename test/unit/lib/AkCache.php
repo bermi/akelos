@@ -150,6 +150,6 @@ class Test_of_AkCache_Class extends  UnitTestCase
 
 }
 
-Ak::test('Test_of_AkCache_Class', true);
+ak_test('Test_of_AkCache_Class', true);
 
 ?>

@@ -13,6 +13,6 @@ class <?php  echo $class_name?>ControllerTest extends  UnitTestCase
 }
 
 
-Ak::test('<?php  echo $class_name?>ControllerTest',true);
+ak_test('<?php  echo $class_name?>ControllerTest',true);
 
 ?>

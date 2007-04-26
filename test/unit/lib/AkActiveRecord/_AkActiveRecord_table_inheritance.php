@@ -36,6 +36,6 @@ class test_AkActiveRecord_table_inheritance extends  AkUnitTest
     }
 }
 
-Ak::test('test_AkActiveRecord_table_inheritance',true);
+ak_test('test_AkActiveRecord_table_inheritance',true);
 
 ?>

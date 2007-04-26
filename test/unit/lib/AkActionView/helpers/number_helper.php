@@ -54,6 +54,6 @@ class NumberHelperTests extends HelpersUnitTester
 }
 
 
-Ak::test('NumberHelperTests');
+ak_test('NumberHelperTests');
 
 ?>

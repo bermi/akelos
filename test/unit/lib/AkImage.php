@@ -89,6 +89,6 @@ class Test_of_AkImage extends  AkUnitTest
     }
 }
 
-Ak::test('Test_of_AkImage');
+ak_test('Test_of_AkImage');
 
 ?>

@@ -313,7 +313,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
 }
 
 
-Ak::test('test_AkActiveRecord_belongsTo_Associations', true);
+ak_test('test_AkActiveRecord_belongsTo_Associations', true);
 
 
 ?>

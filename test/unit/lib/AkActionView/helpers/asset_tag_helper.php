@@ -4,7 +4,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'asset_tag_helper.php'
 require_once(AK_LIB_DIR.DS.'AkActionController.php');
 require_once(AK_LIB_DIR.DS.'AkRequest.php');
 
-Mock::generate('AkRequest');
+ak_generate_mock('AkRequest');
 
 class AssetTagHelperTests extends HelpersUnitTester
 {
@@ -182,6 +182,6 @@ class AssetTagHelperTests extends HelpersUnitTester
     }
 }
 
-Ak::test('AssetTagHelperTests');
+ak_test('AssetTagHelperTests');
 
 ?>

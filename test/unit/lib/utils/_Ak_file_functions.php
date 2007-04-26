@@ -87,6 +87,6 @@ class test_of_Ak_file_functions extends  UnitTestCase
     
 }
 
-Ak::test('test_of_Ak_file_functions');
+ak_test('test_of_Ak_file_functions');
 
 ?>

@@ -8,7 +8,7 @@
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
-Ak::compat('http_build_query');
+ak_compat('http_build_query');
 
 /**
  * Native PHP URL rewriting for the Akelos Framework.

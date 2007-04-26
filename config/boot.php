@@ -195,6 +195,7 @@ ak_define('MODE_FILE', 4);
 ak_define('MODE_DATABASE', 8);
 ak_define('MODE_DIE', 16);
 
+ak_define('LOG_EVENTS', false);
 
 ak_define('ROUTES_MAPPING_FILE', AK_CONFIG_DIR.DS.'routes.php');
 ak_define('OS', (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'WINDOWS' : 'UNIX'));

@@ -371,6 +371,6 @@ class test_AkActiveRecord_observer extends  UnitTestCase
     
 }
 
-Ak::test('test_AkActiveRecord_observer', true);
+ak_test('test_AkActiveRecord_observer', true);
 
 ?>

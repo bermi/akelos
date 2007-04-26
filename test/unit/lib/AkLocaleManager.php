@@ -255,7 +255,7 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
 
 }
 
-Ak::test('Test_of_AkLocaleManager_Class');
+ak_test('Test_of_AkLocaleManager_Class');
 
 
 ?>

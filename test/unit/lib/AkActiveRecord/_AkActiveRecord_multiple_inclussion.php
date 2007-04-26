@@ -115,6 +115,6 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
     }
 }
 
-Ak::test('test_AkActiveRecord_multiple_inclussion',true);
+ak_test('test_AkActiveRecord_multiple_inclussion',true);
 
 ?>

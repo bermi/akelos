@@ -23,6 +23,6 @@ class <?php  echo $model_name?>Test extends  AkUnitTest
 }
 
 
-Ak::test('<?php  echo $model_name?>Test',true);
+ak_test('<?php  echo $model_name?>Test',true);
 
 ?>

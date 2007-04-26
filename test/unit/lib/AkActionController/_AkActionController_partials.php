@@ -61,7 +61,7 @@ class Test_of_AkActionController_partials extends  AkWebTestCase
     }
 }
 
-Ak::test('Test_of_AkActionController_partials');
+ak_test('Test_of_AkActionController_partials');
 
 
 ?>

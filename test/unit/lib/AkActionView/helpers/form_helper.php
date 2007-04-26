@@ -252,6 +252,6 @@ class FormHelperTests extends HelpersUnitTester
     }
 }
 
-Ak::test('FormHelperTests', true);
+ak_test('FormHelperTests', true);
 
 ?>

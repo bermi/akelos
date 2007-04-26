@@ -187,6 +187,6 @@ class test_AkActiveRecord_accessible_attributes extends  AkUnitTest
     }
 }
 
-Ak::test('test_AkActiveRecord_accessible_attributes',true);
+ak_test('test_AkActiveRecord_accessible_attributes',true);
 
 ?>

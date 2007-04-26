@@ -295,6 +295,6 @@ class Test_of_AkInflector extends  UnitTestCase
 
 }
 
-Ak::test('Test_of_AkInflector');
+ak_test('Test_of_AkInflector');
 
 ?>

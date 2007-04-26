@@ -65,6 +65,6 @@ class Test_of_AkDbSession_Class extends  WebTestCase
     }
 }
 
-Ak::test('Test_of_AkDbSession_Class', true);
+ak_test('Test_of_AkDbSession_Class', true);
 
 ?>

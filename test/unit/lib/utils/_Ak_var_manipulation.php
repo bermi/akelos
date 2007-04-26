@@ -19,6 +19,6 @@ class test_Ak_var_manipulation extends  UnitTestCase
 }
 
 
-Ak::test('test_Ak_var_manipulation');
+ak_test('test_Ak_var_manipulation');
 
 ?>

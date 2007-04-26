@@ -16,6 +16,8 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
+ak_define('LOG_EVENTS', false);
+
 require_once(AK_LIB_DIR.DS.'Ak.php');
 require_once(AK_LIB_DIR.DS.'AkInflector.php');
 require_once(AK_LIB_DIR.DS.'AkObject.php');
@@ -142,6 +144,33 @@ class AkBaseModel extends AkObject
             }
         }
         return $models;
+    }
+    
+    function _executeSql($sql, $trigger_error = true)
+    {
+        AK_LOG_EVENTS ? ($this->Logger->message($this->getModelName().' executing SQL: '.$sql)) : null;
+        if(!$result = $this->_db->Execute($sql) && AK_DEBUG){
+            AK_LOG_EVENTS ? ($this->Logger->error($this->getModelName().': '.$this->_db->ErrorMsg())) : null;
+            $trigger_error ? trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE) : false;
+        }
+        return $result;
+    }
+    
+    function _startSqlBlockLog()
+    {
+        $this->__original_dbug = $this->_db->debug;
+        $this->_db->debug = true;
+        ob_start();
+    }
+    
+    function _endSqlBlockLog()
+    {
+        $sql_debug = ob_get_clean();
+        $this->Logger->message($this->getModelName().' executing SQL: '.preg_replace('/^\([a-z]+\): /','',trim(Ak::html_entity_decode(strip_tags($sql_debug)),"\n- ")));
+        if($this->__original_dbug){
+            echo $sql_debug;
+        }
+        $this->_db->debug = $this->__original_dbug;
     }
 }
 

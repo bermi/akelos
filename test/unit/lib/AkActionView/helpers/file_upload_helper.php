@@ -17,6 +17,6 @@ class FileUploadHelperTests extends HelpersUnitTester
 }
 
 
-Ak::test('FileUploadHelperTests');
+ak_test('FileUploadHelperTests');
 
 ?>

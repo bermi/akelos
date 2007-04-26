@@ -343,6 +343,9 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $sql = $sql_query;
         }
         $this->setConnection();
+
+        AK_LOG_EVENTS ? $this->_startSqlBlockLog() : null;
+        
         $objects = array();
         $_included_results = array(); // Used only in conjuntion with virtual limits for doing find('first',...include'=>...
         if(is_integer($limit)){
@@ -361,6 +364,8 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $this->_db->Execute($sql);
         }
 
+        AK_LOG_EVENTS ? $this->_endSqlBlockLog() : null;
+        
         if(!$results && AK_DEBUG){
             trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE);
         }else{

@@ -86,6 +86,6 @@ class _AkActionController_locale_detection extends AkWebTestCase
     }    
 }
 
-Ak::test('_AkActionController_locale_detection');
+ak_test('_AkActionController_locale_detection');
 
 ?>

@@ -94,6 +94,6 @@ class test_AkActiveRecord_i18n extends  AkUnitTest
     }
 }
 
-Ak::test('test_AkActiveRecord_i18n',true);
+ak_test('test_AkActiveRecord_i18n',true);
 
 ?>

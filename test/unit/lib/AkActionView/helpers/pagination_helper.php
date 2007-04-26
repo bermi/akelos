@@ -17,6 +17,6 @@ class PaginationHelperTests extends HelpersUnitTester
 }
 
 
-Ak::test('PaginationHelperTests');
+ak_test('PaginationHelperTests');
 
 ?>

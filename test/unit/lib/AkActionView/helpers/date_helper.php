@@ -118,6 +118,6 @@ class DateHelperTests extends HelpersUnitTester
     }
 }
 
-Ak::test('DateHelperTests');
+ak_test('DateHelperTests');
 
 ?>

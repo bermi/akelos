@@ -863,7 +863,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
 }
 
-Ak::test('test_AkActiveRecord_validators',true);
+ak_test('test_AkActiveRecord_validators',true);
 
 
 ?>

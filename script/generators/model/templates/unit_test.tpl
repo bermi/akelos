@@ -23,6 +23,6 @@ class <?php  echo $class_name?>Test extends  UnitTestCase
 }
 
 
-Ak::test('<?php  echo $class_name?>Test',true);
+ak_test('<?php  echo $class_name?>Test',true);
 
 ?>

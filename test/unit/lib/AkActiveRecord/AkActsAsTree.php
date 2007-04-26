@@ -332,6 +332,6 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
 }
 
 
-Ak::test('test_AkActiveRecord_actAsTree',true);
+ak_test('test_AkActiveRecord_actAsTree',true);
 
 ?>

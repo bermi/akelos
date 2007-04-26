@@ -31,6 +31,6 @@ class TagHelperTests extends HelpersUnitTester
 }
 
 
-Ak::test('TagHelperTests');
+ak_test('TagHelperTests');
 
 ?>

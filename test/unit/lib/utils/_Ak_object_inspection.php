@@ -178,6 +178,6 @@ class test_of_Ak_object_inspection extends  UnitTestCase
 }
 
 
-Ak::test('test_of_Ak_object_inspection',true);
+ak_test('test_of_Ak_object_inspection',true);
 
 ?>

@@ -52,6 +52,6 @@ class JavaScriptHelperTests extends HelpersUnitTester
 }
 
 
-Ak::test('JavaScriptHelperTests');
+ak_test('JavaScriptHelperTests');
 
 ?>

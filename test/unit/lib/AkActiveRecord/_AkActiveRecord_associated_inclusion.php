@@ -37,6 +37,6 @@ class test_AkActiveRecord_associated_inclusion extends  AkUnitTest
     }
 }
 
-Ak::test('test_AkActiveRecord_associated_inclusion',true);
+ak_test('test_AkActiveRecord_associated_inclusion',true);
 
 ?>

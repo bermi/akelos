@@ -271,7 +271,7 @@ class Test_of_Ak_static_file_functions_using_ftp extends  UnitTestCase
 }
 
 
-Ak::test('test_AkFileFunctionsUsingFtp');
+ak_test('test_AkFileFunctionsUsingFtp');
 
 
 ?>

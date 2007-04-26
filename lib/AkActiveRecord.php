@@ -30,7 +30,7 @@ ak_define('DATE_REGULAR_EXPRESSION',"/^(([0-9]{1,2}(\-|\/|\.| )[0-9]{1,2}(\-|\/|
 ak_define('IP4_REGULAR_EXPRESSION',"/^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/");
 ak_define('POST_CODE_REGULAR_EXPRESSION',"/^[0-9A-Za-z  -]{2,9}$/");
 
-Ak::compat('array_combine');
+ak_compat('array_combine');
 
 /**
 * Active Record objects doesn't specify their attributes directly, but rather infer them from the table definition with
@@ -227,6 +227,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     function init($attributes = array())
     {
+        AK_LOG_EVENTS ? ($this->Logger =& Ak::getLogger()) : null;
+        
         $this->_internationalize = is_null($this->_internationalize) ? count($this->getAvaliableLocales()) > 1 : $this->_internationalize;
 
         @$this->_instatiateDefaultObserver();
@@ -407,6 +409,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if(!$this->isConnected()){
             $this->setConnection();
         }
+        
+        AK_LOG_EVENTS ? ($this->Logger->message($this->getModelName().' executing SQL: '.$sql)) : null;
         $rs = $this->_db->Execute($sql);
 
         return @(integer)$rs->fields[0];
@@ -509,9 +513,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         */
         $sql = 'UPDATE '.$this->getTableName().' SET '.$updates;
         $sql  .= isset($conditions) ? ' WHERE '.$conditions : '';
-        if(!$this->_db->Execute($sql) && AK_DEBUG){
-            trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE);
-        }
+        $this->_executeSql($sql);
         return $this->_db->Affected_Rows();
     }
 
@@ -576,9 +578,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $sql = 'DELETE FROM '.$this->getTableName();
 
         $sql  .= isset($conditions) ? ' WHERE '.$conditions : ($this->_getDatabaseType() == 'sqlite' ? ' WHERE 1' : ''); // (HACK) If where clause is not included sqlite_changes will not get the right result
-        if(!$this->_db->Execute($sql) && AK_DEBUG){
-            trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE);
-        }
+        $this->_executeSql($sql);
         return $this->_db->Affected_Rows() > 0;
     }
 
@@ -620,10 +620,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     $this->notifyObservers('beforeDestroy');
 
                     $sql = 'DELETE FROM '.$this->getTableName().' WHERE '.$this->getPrimaryKey().' = '.$this->_db->qstr($this->getId());
-
-                    if(!$this->_db->Execute($sql) && AK_DEBUG){
-                        trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE);
-                    }
+                    $this->_executeSql($sql);
                     $had_success = ($this->_db->Affected_Rows() > 0);
                     if(!$had_success || ($had_success && !$this->afterDestroy())){
                         $this->transactionFail();
@@ -1074,6 +1071,9 @@ Examples for find all:
             $sql = $sql_query;
         }
         $this->setConnection();
+        
+        AK_LOG_EVENTS ? $this->_startSqlBlockLog() : null;
+                
         $objects = array();
         if(is_integer($limit)){
             if(is_integer($offset)){
@@ -1084,6 +1084,8 @@ Examples for find all:
         }else{
             $results = !empty($bindings) ? $this->_db->Execute($sql, $bindings) : $this->_db->Execute($sql);
         }
+        
+        AK_LOG_EVENTS ? $this->_endSqlBlockLog() : null;
 
         if(!$results){
             AK_DEBUG ? trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE) : null;
@@ -3081,7 +3083,7 @@ Examples for find all:
                 'WHERE '.$this->getPrimaryKey().'='.$this->quotedId().$lock_check;
             }
 
-            if(!$this->_db->Execute($sql)){
+            if(!$this->_executeSql($sql, false)){
                 $this->transactionFail();
                 AK_DEBUG ? trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE) : null;
             }
@@ -3208,7 +3210,7 @@ Examples for find all:
             '('.join(', ',array_keys($attributes)).') '.
             'VALUES ('.join(',',array_values($attributes)).')';
 
-            if(!$this->_db->Execute($sql)){
+            if(!$this->_executeSql($sql, false)){
                 AK_DEBUG ? trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE) : null;
             }
 
@@ -4934,6 +4936,7 @@ Examples for find all:
             return empty($column) ? $value : AkActiveRecord::castAttributeFromDatabase($column, $value);
         }
     }
+    
 }
 
 

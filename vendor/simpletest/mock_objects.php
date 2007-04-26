@@ -928,7 +928,7 @@
          *    @access public
          */
         function Mock() {
-            trigger_error('Mock factory methods are class only.');
+            //trigger_error('Mock factory methods are class only.');
         }
 
         /**

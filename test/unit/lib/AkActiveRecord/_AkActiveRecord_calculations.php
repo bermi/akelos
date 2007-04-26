@@ -121,6 +121,6 @@ class test_AkActiveRecord_calculations extends  AkUnitTest
 
 }
 
-Ak::test('test_AkActiveRecord_calculations',true);
+ak_test('test_AkActiveRecord_calculations',true);
 
 ?>

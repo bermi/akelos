@@ -17,6 +17,6 @@ class ScriptaculousHelperTests extends HelpersUnitTester
 }
 
 
-Ak::test('ScriptaculousHelperTests');
+ak_test('ScriptaculousHelperTests');
 
 ?>

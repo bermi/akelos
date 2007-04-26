@@ -161,6 +161,6 @@ class TextHelperTests extends HelpersUnitTester
 }
 
 
-Ak::test('TextHelperTests');
+ak_test('TextHelperTests');
 
 ?>

@@ -498,7 +498,7 @@ Options are:
      */
     function url_get_contents($url, $options = array())
     {
-        Ak::compat('http_build_query');
+        ak_compat('http_build_query');
 
         $default_options = array(
         'referer' => $url,
@@ -732,46 +732,15 @@ Options are:
 
 
 
-
-    /**
-    * Log a system message into the database.
-    *
-    * @param $type The category to which this message belongs. Usually a model or a controller.
-    * @param $message The message to store in the log.
-    * @param $severity The severity of the message. One of the following values:
-    * - AK_LOG_NOTICE
-    * - AK_LOG_WARNING
-    * - AK_LOG_ERROR
-    * @param $link A link to associate with the message.
-    */
-    function log($type, $message, $severity = AK_LOG_NOTICE, $link = NULL)
+    function &getLogger()
     {
-        $DB =& Ak::db();
-        $DB->debug=true;
-
-        /**
-        * @todo use a function like Ak::get_user_id() to fetch user id and insert it into the log.
-        * meanwhile we will use user 0;
-        */
-        $user_id = 0;
-
-        $sql = "INSERT INTO log ( user_id, type, message, severity, link, location, hostname, created )
-                VALUES (".
-        $user_id.', '.
-        $DB->qstr($type).', '.
-        $DB->qstr($message).', '.
-        $severity.', '.
-        $DB->qstr($link).', '.
-        $DB->qstr(AK_REQUEST_URI).', '.
-        $DB->qstr($_SERVER['REMOTE_ADDR']).', '.
-        $DB->DBTimeStamp(Ak::time()).
-        ');';
-        if ($DB->Execute($sql) === false) {
-            trigger_error('Error inserting: '.$DB->ErrorMsg(),E_USER_WARNING);
+        static $Logger;
+        if(empty($Logger)){
+            require_once(AK_LIB_DIR.DS.'AkLogger.php');
+            $Logger =& new AkLogger();
         }
+        return $Logger;
     }
-
-
 
 
     function get_constants()
@@ -1098,13 +1067,13 @@ Options are:
             $level = $xml_elem['level'] - 1;
             switch ($xml_elem['type']) {
                 case 'open':
-                $tag_or_id = (array_key_exists ('attributes', $xml_elem)) ? @$xml_elem['attributes']['ID'] : $xml_elem['tag'];
-                $ptrs[$level][$tag_or_id][] = array ();
-                $ptrs[$level+1] = & $ptrs[$level][$tag_or_id][count($ptrs[$level][$tag_or_id])-1];
-                break;
+                    $tag_or_id = (array_key_exists ('attributes', $xml_elem)) ? @$xml_elem['attributes']['ID'] : $xml_elem['tag'];
+                    $ptrs[$level][$tag_or_id][] = array ();
+                    $ptrs[$level+1] = & $ptrs[$level][$tag_or_id][count($ptrs[$level][$tag_or_id])-1];
+                    break;
                 case 'complete':
-                $ptrs[$level][$xml_elem['tag']] = (isset ($xml_elem['value'])) ? $xml_elem['value'] : '';
-                break;
+                    $ptrs[$level][$xml_elem['tag']] = (isset ($xml_elem['value'])) ? $xml_elem['value'] : '';
+                    break;
             }
         }
         return ($params);
@@ -1331,9 +1300,7 @@ Options are:
      */
     function compat($function_name)
     {
-        if(!function_exists($function_name)){
-            require_once(AK_VENDOR_DIR.DS.'pear'.DS.'PHP'.DS.'Compat'.DS.'Function'.DS.$function_name.'.php');
-        }
+        ak_compat($function_name);
     }
 
 
@@ -1607,7 +1574,7 @@ Options are:
     function mime_content_type($file)
     {
         static $mime_types;
-        Ak::compat('mime_content_type');
+        ak_compat('mime_content_type');
 
         $mime = mime_content_type($file);
 
@@ -1713,15 +1680,7 @@ Options are:
 
     function test($test_case_name, $use_sessions = false)
     {
-        if(!defined('ALL_TESTS_CALL')){
-            $use_sessions ? @session_start() : null;
-            $test = &new $test_case_name();
-            if (defined('AK_CLI') && AK_CLI || TextReporter::inCli() || (defined('AK_CONSOLE_MODE') && AK_CONSOLE_MODE) || (defined('AK_WEB_REQUEST') && !AK_WEB_REQUEST)) {
-                $test->run(new TextReporter());
-            }else{
-                $test->run(new HtmlReporter());
-            }
-        }
+        ak_test($test_case_name, $use_sessions);
     }
 
     /**
@@ -1781,6 +1740,36 @@ Options are:
 function translate($string, $args = null, $controller = null)
 {
     return Ak::t($string, $args, $controller);
+}
+
+
+function ak_test($test_case_name, $use_sessions = false)
+{
+    if(!defined('ALL_TESTS_CALL')){
+        $use_sessions ? @session_start() : null;
+        $test = &new $test_case_name();
+        if (defined('AK_CLI') && AK_CLI || TextReporter::inCli() || (defined('AK_CONSOLE_MODE') && AK_CONSOLE_MODE) || (defined('AK_WEB_REQUEST') && !AK_WEB_REQUEST)) {
+            $test->run(new TextReporter());
+        }else{
+            $test->run(new HtmlReporter());
+        }
+    }
+}
+
+function ak_compat($function_name)
+{
+	if(!function_exists($function_name)){
+        require_once(AK_VENDOR_DIR.DS.'pear'.DS.'PHP'.DS.'Compat'.DS.'Function'.DS.$function_name.'.php');
+    }
+}
+
+function ak_generate_mock($name)
+{
+	static $Mock;
+	if(empty($Mock)){
+		$Mock = new Mock();
+	}
+	$Mock->generate($name);
 }
 
 

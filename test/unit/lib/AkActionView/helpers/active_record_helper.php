@@ -10,7 +10,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'active_record_helper.
 require_once(AK_LIB_DIR.DS.'AkActionController.php');
 require_once(AK_LIB_DIR.DS.'AkRequest.php');
 
-Mock::generate('AkRequest');
+ak_generate_mock('AkRequest');
 
 
 class ActiveRecordHelperTests extends HelpersUnitTester
@@ -109,6 +109,6 @@ class ActiveRecordHelperTests extends HelpersUnitTester
 }
 
 
-Ak::test('ActiveRecordHelperTests');
+ak_test('ActiveRecordHelperTests');
 
 ?>

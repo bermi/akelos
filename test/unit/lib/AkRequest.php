@@ -179,6 +179,6 @@ class Test_of_AkRequest_Class extends  UnitTestCase
 
 }
 
-Ak::test('Test_of_AkRequest_Class');
+ak_test('Test_of_AkRequest_Class');
 
 ?>

@@ -9,6 +9,6 @@ class test_AkActionViewHelper extends  UnitTestCase
 }
 
 
-Ak::test('test_AkActionViewHelper',true);
+ak_test('test_AkActionViewHelper',true);
 
 ?>

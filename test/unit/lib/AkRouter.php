@@ -303,9 +303,9 @@ class Test_for_middle_optional_values_when_generating_urls extends  UnitTestCase
 }
 
 
-Ak::test('Test_of_AkRouter_Class');
-Ak::test('Test_for_default_routes');
-Ak::test('Tests_for_url_constants_named_as_url_variables');
-Ak::test('Test_for_middle_optional_values_when_generating_urls');
+ak_test('Test_of_AkRouter_Class');
+ak_test('Test_for_default_routes');
+ak_test('Tests_for_url_constants_named_as_url_variables');
+ak_test('Test_for_middle_optional_values_when_generating_urls');
 
 ?>

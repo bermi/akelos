@@ -949,6 +949,6 @@ class test_AkActiveRecord extends  UnitTestCase
 
 }
 
-Ak::test('test_AkActiveRecord',true);
+ak_test('test_AkActiveRecord',true);
 
 ?>

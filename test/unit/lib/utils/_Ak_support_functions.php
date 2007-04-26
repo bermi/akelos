@@ -26,6 +26,6 @@ class test_Ak_support_functions extends  AkUnitTest
 }
 
 
-Ak::test('test_Ak_support_functions');
+ak_test('test_Ak_support_functions');
 
 ?>

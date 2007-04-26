@@ -112,6 +112,6 @@ EOF;
     }
 }
 
-Ak::test('test_Ak_convert',true);
+ak_test('test_Ak_convert',true);
 
 ?>

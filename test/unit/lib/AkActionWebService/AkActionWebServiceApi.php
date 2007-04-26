@@ -85,6 +85,6 @@ class AkActionWebServiceApiTests extends  UnitTestCase
 }
 
 
-Ak::test('AkActionWebServiceApiTests',true);
+ak_test('AkActionWebServiceApiTests',true);
 
 ?>

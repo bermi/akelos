@@ -709,6 +709,6 @@ class test_AkActiveRecord_actsAsList extends  UnitTestCase
 }
 
 
-Ak::test('test_AkActiveRecord_actsAsList',true);
+ak_test('test_AkActiveRecord_actsAsList',true);
 
 ?>
