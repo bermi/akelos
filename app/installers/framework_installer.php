@@ -16,18 +16,12 @@ class FrameworkInstaller extends AkInstaller
         expire datetime,
         value text'
         );
-        
-        $this->createTable('var', '
-        id string(50) not null primary key,
-        val text'
-        );
     }
 
     function down_1()
     {
         $this->dropTable('cache');
         $this->dropTable('sessions');
-        $this->dropTable('var');
     }
 }
 
