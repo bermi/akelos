@@ -310,9 +310,10 @@ class AkActsAsNestedSet extends AkObserver
     /**
     * Returns an array of parent Objects this is usefull to make breadcrum like stuctures
     */
-    function getParents()
+    function &getParents()
     {
-        return $this->getAncestors();
+        $Ancestors =& $this->getAncestors();
+        return $Ancestors;
     }
 
 
@@ -419,23 +420,24 @@ class AkActsAsNestedSet extends AkObserver
     /**
      * Returns an array of all parents 
      */
-    function getAncestors()
+    function &getAncestors()
     {
-        return $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
+        $Ancestors =& $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
         $this->getLeftColumnName().' < '.$this->_ActiveRecordInstance->get($this->getLeftColumnName()).' AND '.
         $this->getRightColumnName().' > '.$this->_ActiveRecordInstance->get($this->getRightColumnName())
         ,'order' => $this->getLeftColumnName()));
+        return $Ancestors;
     }
 
     /**
      * Returns the array of all parents and self
      */
-    function getSelfAndAncestors()
+    function &getSelfAndAncestors()
     {
-        if($result = $this->getAncestors()){
+        if($result =& $this->getAncestors()){
             array_push($result, $this->_ActiveRecordInstance);
         }else{
-            $result = array($this->_ActiveRecordInstance);
+            $result = array(&$this->_ActiveRecordInstance);
         }
         return $result;
     }
