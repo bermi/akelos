@@ -166,7 +166,8 @@ class AkBaseModel extends AkObject
     function _endSqlBlockLog()
     {
         $sql_debug = ob_get_clean();
-        $this->Logger->message($this->getModelName().' executing SQL: '.preg_replace('/^\([a-z]+\): /','',trim(Ak::html_entity_decode(strip_tags($sql_debug)),"\n- ")));
+        $this->Logger->message($this->Logger->formatText($this->getModelName(),'bold').' executing SQL: '.
+        $this->Logger->formatText(preg_replace('/^\([a-z]+\): /','',trim(Ak::html_entity_decode(strip_tags($sql_debug)),"\n- ")),'blue'));
         if($this->__original_dbug){
             echo $sql_debug;
         }

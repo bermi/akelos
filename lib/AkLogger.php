@@ -19,7 +19,6 @@
  */
 
 require_once(AK_LIB_DIR.DS.'Ak.php');
-require_once(AK_LIB_DIR.DS.'AkInflector.php');
 
 defined('AK_LOG_DIR') ? null : define('AK_LOG_DIR', AK_BASE_DIR.DS.'log');
 
@@ -47,6 +46,7 @@ defined('AK_LOG_'.E_USER_NOTICE)    ? null : define('AK_LOG_'.E_USER_NOTICE, AK_
 defined('AK_LOG_'.E_WARNING)        ? null : define('AK_LOG_'.E_WARNING, AK_MODE_FILE);
 defined('AK_LOG_'.E_NOTICE)         ? null : define('AK_LOG_'.E_NOTICE, AK_MODE_FILE);
 
+ak_define('LOG_ENABLE_COLORING', true);
 
 class AkLogger
 {
@@ -178,7 +178,7 @@ class AkLogger
         $params = array_merge($this->_log_params, ($this->extended_details ? array('remote_address'=>$_SERVER['REMOTE_ADDR'], 'browser'=>$_SERVER['HTTP_USER_AGENT']) : array() ));
         $details = '';
         foreach ($params as $k=>$v){
-            $details .= "<li><span>".AkInflector::humanize($k).":</span> $v</li>\n";
+            $details .= "<li><span>".$k.":</span> $v</li>\n";
         }
         return empty($details) ? $message.'</div>' : $message."<ul>\n$details\n</ul>\n</div>";
     }
@@ -193,7 +193,7 @@ class AkLogger
         }else{
             $details = '';
             foreach ($params as $k=>$v){
-                $details .= "\n\t\t- ".AkInflector::humanize($k).": $v";
+                $details .= "\n\t\t- ".$k.": $v";
             }
             $message .= empty($details) ? "\n" : "\n\t".'PARAMS{'.$details."\t\n}\n";
         }
@@ -227,6 +227,34 @@ class AkLogger
         return Ak::t($string, $array, 'error');
     }
 
+    function formatText($text, $color = 'normal')
+    {
+        if(!AK_LOG_ENABLE_COLORING){
+            return $text;
+        }
+        
+        $colors = array(
+        'light_red '      => '[1;31m',
+        'light_green'      => '[1;32m',
+        'yellow'      => '[1;33m',
+        'light_blue'      => '[1;34m',
+        'magenta'      => '[1;35m',
+        'light_cyan'      => '[1;36m',
+        'white'      => '[1;37m',
+        'normal'      => '[0m',
+        'black'      => '[0;30m',
+        'red'      => '[0;31m',
+        'green'      => '[0;32m',
+        'brown'      => '[0;33m',
+        'blue'      => '[0;34m',
+        'cyan'      => '[0;36m',
+        'bold'      => '[1m',
+        'underscore'      => '[4m',
+        'reverse'      => '[7m'
+        );
+
+        return "\033".(isset($colors[$color]) ? $colors[$color] : '[0m').$text."\033[0m";
+    }
 }
 
 ?>
