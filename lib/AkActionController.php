@@ -192,7 +192,7 @@ class AkActionController extends AkObject
     {
         $helpers = $this->getDefaultHelpers();
 
-        $helpers = array_merge($this->getApplicationHelpers(), $helpers);
+        $helpers = array_merge($helpers, $this->getApplicationHelpers());
 
         require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
 
@@ -207,6 +207,7 @@ class AkActionController extends AkObject
             $helper_class_name = $helper.'Helper';
             $full_path = preg_match('/[\\\\\/]+/',$file);
             $full_path ? include_once($file) : include_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.$file);
+
             if(class_exists($helper_class_name)){
                 $attribute_name = $full_path ? AkInflector::underscore($helper_class_name) : substr($file,0,-4);
                 $available_helpers[] = $attribute_name;
@@ -242,14 +243,14 @@ class AkActionController extends AkObject
     {
         $helper_names = array();
 
-        if ( $this->app_helpers == 'all' ){
+        if ($this->app_helpers == 'all' ){
             $available_helpers = Ak::dir(AK_HELPERS_DIR,array('dirs'=>false));
             $helper_names = array();
             foreach ($available_helpers as $available_helper){
-                $helper_names[$available_helper] = AkInflector::classify(substr($available_helper,0,-10));
+                $helper_names[AK_HELPERS_DIR.DS.$available_helper] = AkInflector::classify(substr($available_helper,0,-10));
             }
 
-        } elseif (is_string($this->app_helpers)){
+        } elseif (!empty($this->app_helpers)){
             foreach (Ak::toArray($this->app_helpers) as $helper_name){
                 $helper_names[AK_HELPERS_DIR.DS.AkInflector::underscore($helper_name).'_helper.php'] = AkInflector::classify($helper_name);
             }

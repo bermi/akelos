@@ -489,7 +489,8 @@ class AkActsAsNestedSet extends AkObserver
     */
     function countChildren()
     {
-        return ($this->_ActiveRecordInstance->get($this->getRightColumnName()) - $this->_ActiveRecordInstance->get($this->getLeftColumnName()) - 1)/2;
+        $children_count = ($this->_ActiveRecordInstance->get($this->getRightColumnName()) - $this->_ActiveRecordInstance->get($this->getLeftColumnName()) - 1)/2;
+        return $children_count > 0 ? $children_count : 0;
     }
 
 
