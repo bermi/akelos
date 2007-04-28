@@ -157,8 +157,8 @@ class AkRequest extends AkObject
         }
 
         $this->env =& $_SERVER;
-        
-        if(AK_LOG_EVENTS){
+
+        if(defined('AK_LOG_EVENTS') && AK_LOG_EVENTS){
             $Logger =& Ak::getLogger();
             $Logger->message($Logger->formatText('Request','green').' from '.$this->getRemoteIp(), $this->getParams());
         }

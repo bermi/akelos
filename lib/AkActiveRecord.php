@@ -2149,7 +2149,7 @@ Examples for find all:
     }
 
     /**
-    * Every Active Record class must use "id" as their primary ID. This getter overwrites the native id method, which isn?t being used in this context.
+    * Every Active Record class must use "id" as their primary ID. This getter overwrites the native id method, which isn't being used in this context.
     */
     function getId()
     {
