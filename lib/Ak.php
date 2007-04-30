@@ -1347,13 +1347,13 @@ Options are:
         if(!class_exists($converter_class_name)){
             $file_name = $options['path'].DS.$converter_class_name.'.php';
             if(!file_exists($file_name)){
-                trigger_error(Ak::t('Could not locate %from to %to converter on %file_name',array('%from'=>$options['from'],'%to'=>$options['to'],'%file_name'=>$file_name)),E_USER_ERROR);
+                trigger_error(Ak::t('Could not locate %from to %to converter on %file_name',array('%from'=>$options['from'],'%to'=>$options['to'],'%file_name'=>$file_name)),E_USER_NOTICE);
                 return false;
             }
             require_once($file_name);
         }
         if(!class_exists($converter_class_name)){
-            trigger_error(Ak::t('Could not load %converter_class_name converter class',array('%converter_class_name'=>$converter_class_name)),E_USER_ERROR);
+            trigger_error(Ak::t('Could not load %converter_class_name converter class',array('%converter_class_name'=>$converter_class_name)),E_USER_NOTICE);
             return false;
         }
 
