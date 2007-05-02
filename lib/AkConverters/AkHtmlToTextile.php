@@ -20,6 +20,7 @@ class AkHtmlToTextile
 {
     function convert()
     {
+        ak_compat('str_ireplace');
         $this->source = trim(preg_replace("/(>[ \n\t]+<)/",'> <', $this->source));
         return trim($this->detextilize($this->source));
     }
@@ -27,21 +28,22 @@ class AkHtmlToTextile
     function detextilize($html)
     {
         $replacements =
-        array("  "=>' ' , "<br />" => "\n", "<br>" => "\n",
+        array("\r"=>"\n","\t"=>" ","  "=>' ' , "<br />" => "\n", "<br>" => "\n",
         "<table>" => "", "</table>" => "", "<tr>" => "", "</tr>" => "|\n", "<td>" => "|",
-        "</td>" => "", "<th>" => "|_.", "</th>" => "","\n "=>"\n");
+        "</td>" => "", "<th>" => "|_.", "</th>" => '');
 
         $html = str_ireplace(array_keys($replacements), array_values($replacements), $html);
         $html = preg_replace('/<img(?!.*\/>)([^>]*)>/Us','<img$1 />',$html);
+        $html = preg_replace('/<img\s*([^>]*)/>/Usi','<img $1>image hack</img>',$html);
 
         $valid_tags = array('p','ol','ul','li','i','b','em','strong','span','a','h[1-6]',
-        'u','del','sup','sub','blockquote');
-
+        'u','del','sup','sub','blockquote','img');
+                
         foreach($valid_tags as $tag){
-            $html = preg_replace_callback("/\t*<(".$tag.")\s*([^>]*)>(.*)<\/\\1>/Usi",
+            $html = preg_replace_callback("/\s*<(".$tag.")\s*([^>]*)>(.*)<\/\\1>/Usi",
             array(&$this, 'replaceTag'), $html);
         }
-
+        
         $html = $this->convertList($html);
 
         return Ak::html_entity_decode($html);
@@ -82,9 +84,10 @@ class AkHtmlToTextile
     function replaceTag($html_tag_matches)
     {
         list($all, $tag, $attributes, $content) = $html_tag_matches;
+        
         $attributes = $this->getAttributesAsArray($attributes);
 
-        $non_block_tags = array(
+        $delimiters = array(
         'em'=>'_',
         'i'=>'__',
         'b'=>'**',
@@ -99,119 +102,51 @@ class AkHtmlToTextile
 
         $block_tags = array('p','h1','h2','h3','h4','h5','h6');
 
-        if(isset($non_block_tags[$tag])) {
-            return $non_block_tags[$tag].$this->addAttributes($attributes).$content.$non_block_tags[$tag];
+        if(isset($delimiters[$tag])) {
+            return $delimiters[$tag].$this->addAttributes($attributes).$content.$delimiters[$tag];
         } elseif($tag == 'blockquote') {
             return 'bq.'.$this->addAttributes($attributes).' '.$content;
         } elseif(in_array($tag,$block_tags)) {
             return $tag.$this->addAttributes($attributes).'. '.$content."\n\n";
-        } elseif ($tag == 'a') {
-            $attribute = $this->getFilteredAttributes($attributes, array('href', 'title'));
-            $result = '"'.$content;
-            $result.= (isset($attribute['title'])) ? ' ('.$attribute['title'].')' : '';
-            $result.= '":'.$attribute['href'];
-            return $result;
+        } elseif ($tag == 'a' && isset($attributes['href'])) {
+            return '"'.$content.((isset($attributes['title'])) ? ' ('.$attributes['title'].')' : '').'":'.$attributes['href'];
+        } elseif ($tag == 'img' && isset($attributes['src'])) {
+            return '!'.$attributes['src'].(isset($attributes['alt'])?'('.$attributes['alt'].')':'').'!';
         } else {
             return $all;
         }
     }
 
 
-    function getFilteredAttributes($attributes, $ok)
-    {
-        $result = '';
-        foreach($attributes as $attribute) {
-            if(in_array($attribute['name'], $ok)) {
-                if(!empty($attribute['attribute'])) {
-                    $result[$attribute['name']] = $attribute['attribute'];
-                }
-            }
-        }
-        return $result;
-    }
-
     function addAttributes($attributes)
     {
         $result = '';
-        foreach($attributes as $attribute){
-            $result.= ($attribute['name']=='class') ? '('.$attribute['attribute'].')' : '';
-            $result.= ($attribute['name']=='id') ? '['.$attribute['attribute'].']' : '';
-            $result.= ($attribute['name']=='style') ? '{'.$attribute['attribute'].'}' : '';
-            $result.= ($attribute['name']=='cite') ? ':'.$attribute['attribute'] : '';
+        $delimiters = array('class'=>array('(',')'),'lang'=>array('[',']'),'id'=>array('[',']'),'style'=>array('{','}',';'),'cite'=>array(':',''));
+        foreach($attributes as $name=>$value){
+            $value = isset($delimiters[$name][2]) ? trim($value, $delimiters[$name][2]) : $value;
+            $result .= isset($delimiters[$name]) ? $delimiters[$name][0].$value.$delimiters[$name][1] : '';
         }
         return $result;
     }
 
 
-    function getAttributesAsArray($attributes)
+    function getAttributesAsArray($attributes_string)
     {
-        $result = array();
-        $attribute_name = '';
-        $mode = 0;
-
-        while (strlen($attributes) != 0){
-            $ok = 0;
-            switch ($mode) {
-                case 0: // name
-                if (preg_match('/^([a-z]+)/i', $attributes, $match)) {
-                    $attribute_name = $match[1];
-                    $ok = $mode = 1;
-                    $attributes = preg_replace('/^[a-z]+/i', '', $attributes);
-                }
-                break;
-
-                case 1: // =
-                if (preg_match('/^\s*=\s*/', $attributes)) {
-                    $ok = 1;
-                    $mode = 2;
-                    $attributes = preg_replace('/^\s*=\s*/', '', $attributes);
-                    break;
-                }
-                if (preg_match('/^\s+/', $attributes)) {
-                    $ok = 1;
-                    $mode = 0;
-                    $result[] = array('name'=>$attribute_name,'whole'=>$attribute_name,'attribute'=>$attribute_name);
-                    $attributes = preg_replace('/^\s+/', '', $attributes);
-                }
-                break;
-
-                case 2: // value
-                if (preg_match('/^("[^"]*")(\s+|$)/', $attributes, $match)) {
-                    $result[]=array('name' =>$attribute_name,'whole'=>$attribute_name.'='.$match[1],
-                    'attribute'=>str_replace('"','',$match[1]));
-                    $ok = 1;
-                    $mode = 0;
-                    $attributes = preg_replace('/^"[^"]*"(\s+|$)/', '', $attributes);
-                    break;
-                }
-                if (preg_match("/^('[^']*')(\s+|$)/", $attributes, $match)) {
-                    $result[]=array('name' =>$attribute_name,'whole'=>$attribute_name.'='.$match[1],
-                    'attribute'=>str_replace("'",'',$match[1]));
-                    $ok = 1;
-                    $mode = 0;
-                    $attributes = preg_replace("/^'[^']*'(\s+|$)/", '', $attributes);
-                    break;
-                }
-                if (preg_match("/^(\w+)(\s+|$)/", $attributes, $match)) {
-                    $result[]=
-                    array('name'=>$attribute_name,'whole'=>$attribute_name.'="'.$match[1].'"',
-                    'attribute'=>$match[1]);
-                    $ok = 1;
-                    $mode = 0;
-                    $attributes = preg_replace("/^\w+(\s+|$)/", '', $attributes);
-                }
-                break;
-            }
-            if ($ok == 0){
-                $attributes = preg_replace('/^\S*\s*/', '', $attributes);
-                $mode = 0;
+        $attributes = array();
+        if(preg_match_all('/(\w+)[\s]*\=[\s]*
+        (
+            (?=")"([^"]+)"  # double quoted attributes
+        |
+            (?=\')\'([^\']+)\' # single quoted attributes  
+        |
+            (?=[^\'"])([^ \>]+) # unquoted attributes  
+    )/xs',
+        $attributes_string, $matches)){
+            foreach ($matches[1] as $k=>$attribute){
+                $attributes[$attribute] = empty($matches[3][$k]) ? (empty($matches[4][$k]) ? (empty($matches[5][$k]) ? '' : $matches[5][$k]) : $matches[4][$k]) : $matches[3][$k];
             }
         }
-        if ($mode == 1) {
-            $result[] = array ('name'=>$attribute_name,'whole'=>$attribute_name.'="'.$attribute_name.'"','attribute'=>$attribute_name);
-        }
-
-        return $result;
+        return $attributes;
     }
 }
 
