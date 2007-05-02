@@ -1060,7 +1060,7 @@ Examples for find all:
     * $Post->findBySql("SELECT p.*, c.author FROM posts p, comments c WHERE p.id = c.post_id");
     * $Post->findBySql(array("SELECT * FROM posts WHERE author = ? AND created_on > ?", $author_id, $start_date));
     */
-    function &findBySql($sql, $limit = null, $offset = null)
+    function &findBySql($sql, $limit = null, $offset = null, $bindings = null)
     {
         if(!isset($this->_activeRecordHasBeenInstantiated)){
             return Ak::handleStaticCall();
