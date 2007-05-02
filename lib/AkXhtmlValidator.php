@@ -1367,7 +1367,7 @@ class AkXhtmlValidator
             $inverse_rules[$tag] = array();
             $rules = $this->getRules();
             foreach($rules as $container_tag => $rule) {
-                if (in_array($rule, $rule)) {
+                if (in_array($tag, $rule)) {
                     $inverse_rules[$tag][] = $container_tag;
                 }
             }
