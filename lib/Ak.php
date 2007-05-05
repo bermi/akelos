@@ -1029,6 +1029,7 @@ Options are:
     {
         $resulting_array = (array)$source_array;
         $args = array_slice(func_get_args(),1);
+        $args = count($args) == 1 ? Ak::toArray($args[0]) : $args;
         foreach ($args as $arg){
             unset($resulting_array[$arg]);
         }

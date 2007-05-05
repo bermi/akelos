@@ -348,7 +348,7 @@ class AkFormHelperOptionsInstanceTag extends AkFormHelperInstanceTag
         $selected_value = !empty($options['selected']) ? $options['selected'] : $this->getValue();
 
         return TagHelper::content_tag('select', $this->_addOptions($this->_template_object->options_for_select($choices, $selected_value, $options),
-        $html_options, $this->getValue()), array_diff($html_options,array('prompt'=>true)));
+        $html_options, $this->getValue()), Ak::delete($html_options,'prompt','include_blank'));
     }
 
     function to_collection_select_tag($collection, $value_column_name, $text_column_name = null, $options = array(), $html_options = array())
