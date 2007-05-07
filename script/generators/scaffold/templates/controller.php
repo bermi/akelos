@@ -49,7 +49,7 @@ class <?php echo $controller_class_name?> extends ApplicationController
         if(!empty($this->params['<?php echo $singular_name?>']) && !empty($this->params['id'])){
             <?php 
             if($model_name != $controller_name){ // if equal will be handled by the Akelos directly
-                ?>if(empty($this-><?php echo $singular_name?>->id) || $this-><?php echo $singular_name?>->id != $this->params['id'])){
+                ?>if(empty($this-><?php echo $singular_name?>->id) || $this-><?php echo $singular_name?>->id != $this->params['id']){
                     $this-><?php echo $singular_name?> =& $this-><?php echo $model_name?>->find($this->params['id']);
                 }<?php
             }
