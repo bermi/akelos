@@ -365,3 +365,24 @@ _{I need to print \{something_inside_curly_brackets\}. _\{Maybe a multilingual t
 <?php echo '<?xml'; ?> version="1.0" encoding="UTF-8" ?>
 
 
+===================================
+
+{loop items-directories}
+
+{end}
+
+-----------------------------------
+
+<?php 
+ empty($items['directories']) ? null : $directory_loop_counter = 0;
+ empty($items['directories']) ? null : $directories_available = count($items['directories']);
+ if(!empty($items['directories']))
+     foreach ($items['directories'] as $directory_loop_key=>$directory){
+         $directory_loop_counter++;
+         $directory_is_first = $directory_loop_counter === 1;
+         $directory_is_last = $directory_loop_counter === $directories_available;
+         $directory_odd_position = $directory_loop_counter%2;
+?>
+
+<?php } ?>
+

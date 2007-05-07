@@ -294,16 +294,19 @@ class AkSintagsParser
             $php_variable = $this->_convertSintagsVarToPhp($sintags_var);
             if($php_variable){
                 $php_variable = $php_variable;
-                $singular_variable = '$'.$this->_getSingularVariableTerminationName($sintags_var);
+                $termination = $this->_getTerminationName($sintags_var);
+                $singular_variable = '$'.AkInflector::singularize($termination);
+                $plural_variable = '$'.$termination;
+                
                 $this->output .=
                 "<?php ".
                 "\n empty({$php_variable}) ? null : {$singular_variable}_loop_counter = 0;".
-                "\n empty({$php_variable}) ? null : {$php_variable}_available = count({$php_variable});".
+                "\n empty({$php_variable}) ? null : {$plural_variable}_available = count({$php_variable});".
                 "\n if(!empty({$php_variable}))".
                 "\n     foreach ({$php_variable} as {$singular_variable}_loop_key=>{$singular_variable}){".
                 "\n         {$singular_variable}_loop_counter++;".
                 "\n         {$singular_variable}_is_first = {$singular_variable}_loop_counter === 1;".
-                "\n         {$singular_variable}_is_last = {$singular_variable}_loop_counter === {$php_variable}_available;".
+                "\n         {$singular_variable}_is_last = {$singular_variable}_loop_counter === {$plural_variable}_available;".
                 "\n         {$singular_variable}_odd_position = {$singular_variable}_loop_counter%2;".
                 "\n?>";
             }else{
@@ -313,9 +316,9 @@ class AkSintagsParser
         return true;
     }
 
-    function _getSingularVariableTerminationName($plural)
+    function _getTerminationName($plural)
     {
-        return AkInflector::singularize(substr($plural,max(strpos($plural,'.'),strpos($plural,'-'),-1)+1));
+        return substr($plural,max(strpos($plural,'.'),strpos($plural,'-'),-1)+1);
     }
 
 
