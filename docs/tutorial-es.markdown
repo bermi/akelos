@@ -281,12 +281,12 @@ Esta es una pequeña explicación del flujo de trabajo subyacente para una llama
 Esto podría ayudarte a comprender la forma en la que Akelos maneja tus peticiones, así que estamos listos para modificar la aplicación base.
 
 
-Relacionando Libros y Autores
+Relacionando libros y autores
 ----------------------------
 
-Ahora vamos a enlazar autores y libros (asociaciones más complejas serán tratadas en próximos tutoriales). Para conseguir esto, usarás la columna `author_id` que definistes en la base de datos.
+Ahora vamos a enlazar autores y libros (trataremos asociaciones más complejas en futuros tutoriales). Para conseguir esto, usarás la columna `author_id` que definiste en la base de datos.
 
-Ahora necesitarás indicarle a tus modelos cómo se relacionan unos con otros de esta forma 
+Ahora necesitarás indicar a tus modelos cómo se relacionan unos con otros, de esta forma 
 
 */app/models/book.php*
 
@@ -310,7 +310,7 @@ Ahora necesitarás indicarle a tus modelos cómo se relacionan unos con otros de
     
     ?>
 
-Ahora que los modelos son concientes el uno del otro necesitas modificar el controlador book, para que incluya las instancias de los modelos `author` y `book`
+Ahora que los modelos son conscientes de la existencia del otro necesitas modificar el controlador book, para que incluya las instancias de los modelos `author` y `book`
 
 */app/controllers/book_controller.php*
 
