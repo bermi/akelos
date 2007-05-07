@@ -21,6 +21,7 @@ class AkSintagsParser
 
     var $_SINTAGS_OPEN_HELPER_TAG = AK_SINTAGS_OPEN_HELPER_TAG;
     var $_SINTAGS_CLOSE_HELPER_TAG = AK_SINTAGS_CLOSE_HELPER_TAG;
+    var $_SINTAGS_HASH_KEY_VALUE_DELIMITER = AK_SINTAGS_HASH_KEY_VALUE_DELIMITER;
     
     var $_Lexer;
     var $_lexer_name = 'AkSintagsLexer';
@@ -345,7 +346,7 @@ class AkSintagsParser
             $match = trim($match);
             if($match == ','){
                 $this->output .= $match.' ';
-            }elseif ($match == '=>'){
+            }elseif ($match == $this->_SINTAGS_HASH_KEY_VALUE_DELIMITER){
                 if(empty($this->_inside_array) && empty($this->_has_last_argument_params)){
                     $current_function = substr($this->output,$this->_current_function_opening);
 
@@ -504,7 +505,7 @@ class AkSintagsParser
             break;
             case AK_LEXER_UNMATCHED:
             $match = trim($match);
-            if($match == '=>'){
+            if($match == $this->_SINTAGS_HASH_KEY_VALUE_DELIMITER){
                 $this->output .= ' => ';
             }elseif($match == ','){
                 $this->output .= ', ';

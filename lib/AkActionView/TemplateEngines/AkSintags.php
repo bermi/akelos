@@ -27,6 +27,7 @@ ak_define('SINTAGS_HIDDEN_COMMENTS_TAG', 'hidden');
 
 ak_define('SINTAGS_OPEN_HELPER_TAG', '<%');
 ak_define('SINTAGS_CLOSE_HELPER_TAG', '%>');
+ak_define('SINTAGS_HASH_KEY_VALUE_DELIMITER', '=>');
 
 /**
  * Sintags, The Akelos Framework special syntax for view Templates
