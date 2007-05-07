@@ -19,6 +19,9 @@
 class AkSintagsParser
 {
 
+    var $_SINTAGS_OPEN_HELPER_TAG = AK_SINTAGS_OPEN_HELPER_TAG;
+    var $_SINTAGS_CLOSE_HELPER_TAG = AK_SINTAGS_CLOSE_HELPER_TAG;
+    
     var $_Lexer;
     var $_lexer_name = 'AkSintagsLexer';
     var $_mode;
@@ -323,7 +326,7 @@ class AkSintagsParser
     {
         switch ($state){
             case AK_LEXER_ENTER:
-            $method_name = trim($match,' =('.AK_SINTAGS_OPEN_HELPER_TAG);
+            $method_name = trim($match,' =('.$this->_SINTAGS_OPEN_HELPER_TAG);
             if($helper = $this->_getHelperNameForMethod($method_name)){
                 $this->avoid_php_tags = !$is_inline_function && !strstr($match,'=');
                 $this->_current_function_opening = strlen($this->output);

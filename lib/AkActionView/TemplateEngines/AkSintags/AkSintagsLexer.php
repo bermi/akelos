@@ -20,6 +20,10 @@ class AkSintagsLexer extends AkLexer
 {
     var $_SINTAGS_REMOVE_PHP_SILENTLY = AK_SINTAGS_REMOVE_PHP_SILENTLY;
     var $_SINTAGS_HIDDEN_COMMENTS_TAG = AK_SINTAGS_HIDDEN_COMMENTS_TAG;
+    
+    var $_SINTAGS_OPEN_HELPER_TAG = AK_SINTAGS_OPEN_HELPER_TAG;
+    var $_SINTAGS_CLOSE_HELPER_TAG = AK_SINTAGS_CLOSE_HELPER_TAG;
+    
     var $_modes = array(
     'Xml',
     'Php',
@@ -117,9 +121,9 @@ class AkSintagsLexer extends AkLexer
 
     function _addHelperTokens()
     {
-        $this->addEntryPattern(AK_SINTAGS_OPEN_HELPER_TAG.'\x3D?[ \n\t]*[A-Za-z0-9_]+[ \n\t]*\x28?[ \n\t]*'.
-        '(?=.*'.AK_SINTAGS_CLOSE_HELPER_TAG.')','Text','Helper');
-        $this->addExitPattern('\x29?[ \n\t]*'.AK_SINTAGS_CLOSE_HELPER_TAG, 'Helper');
+        $this->addEntryPattern($this->_SINTAGS_OPEN_HELPER_TAG.'\x3D?[ \n\t]*[A-Za-z0-9_]+[ \n\t]*\x28?[ \n\t]*'.
+        '(?=.*'.$this->_SINTAGS_CLOSE_HELPER_TAG.')','Text','Helper');
+        $this->addExitPattern('\x29?[ \n\t]*'.$this->_SINTAGS_CLOSE_HELPER_TAG, 'Helper');
 
         $this->addSpecialPattern('#{[A-Za-z][\.A-Za-z0-9_-]+}','DoubleQuote','InlineVariable');
 
