@@ -109,7 +109,7 @@ class AkBaseModel extends AkObject
         if(!empty($model_name)){
             $this->_parentModelName = $model_name;
         }else{
-            $class_name = AkInflector::modulize(get_parent_class($this));
+            $class_name = AkInflector::camelize(get_parent_class($this));
             if(!AK_PHP5){
                 $included_models = $this->_getIncludedModelNames();
                 if(!in_array($class_name, $included_models)){
@@ -140,7 +140,7 @@ class AkBaseModel extends AkObject
         $models = array();
         foreach ($included_files as $file_name){
             if(strstr($file_name,AK_MODELS_DIR)){
-                $models[] = AkInflector::modulize(str_replace(array(AK_MODELS_DIR.DS,'.php'),'',$file_name));
+                $models[] = AkInflector::camelize(str_replace(array(AK_MODELS_DIR.DS,'.php'),'',$file_name));
             }
         }
         return $models;

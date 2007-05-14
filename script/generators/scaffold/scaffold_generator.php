@@ -23,7 +23,7 @@ class ScaffoldGenerator extends  AkelosGenerator
 
     function cast()
     {
-        $this->model_name = AkInflector::modulize($this->model_name);
+        $this->model_name = AkInflector::camelize($this->model_name);
         $this->model_file_path = AkInflector::toModelFilename($this->model_name);
         $this->controller_name = empty($this->controller_name) ? $this->model_name : (AkInflector::camelize($this->controller_name));
         $this->controller_file_path = AkInflector::toControllerFilename($this->controller_name);

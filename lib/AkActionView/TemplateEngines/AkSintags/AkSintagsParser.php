@@ -340,7 +340,7 @@ class AkSintagsParser
                 $this->output .= "\${$helper}->$method_name(";
                 return true;
             }else{
-                trigger_error(Ak::t('Could not find a helper to handle the method "%method" you called using Sintags in your view', array('%method'=>$method_name)), E_USER_NOTICE);
+                trigger_error(Ak::t('Could not find a helper to handle the method "%method" you called in your view', array('%method'=>$method_name)), E_USER_NOTICE);
             }
             return false;
             break;

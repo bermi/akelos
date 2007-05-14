@@ -1260,7 +1260,7 @@ Options are:
         $args = is_array($args[0]) ? $args[0] : (func_num_args() > 1 ? $args : Ak::stringToArray($args[0]));
         $models = array();
         foreach ($args as $arg){
-            $model_name = AkInflector::modulize($arg);
+            $model_name = AkInflector::camelize($arg);
             $model = AkInflector::toModelFilename($model_name);
             if(file_exists($model)){
                 $models[] = $model_name;

@@ -1284,7 +1284,7 @@ Examples for find all:
         $inheritance_column = $this->getInheritanceColumn();
         if(!empty($record[$inheritance_column])){
             $inheritance_column = $record[$inheritance_column];
-            $inheritance_model_name = AkInflector::modulize($inheritance_column);
+            $inheritance_model_name = AkInflector::camelize($inheritance_column);
             @require_once(AkInflector::toModelFilename($inheritance_model_name));
             if(!class_exists($inheritance_model_name)){
                 trigger_error($this->t("The single-table inheritance mechanism failed to locate the subclass: '%class_name'. ".
