@@ -244,6 +244,8 @@ Modèles, Vues, et Controlleurs
 
 Pour faire fonctionner vos applications, Akelos utilise le [motif de conception appelé MVC](http://fr.wikipedia.org/wiki/Motif_de_conception).
 
+![Diagrame de fonction du modèle MVC avec Akelos.](http://akelosframework.googlecode.com/svn/trunk/docs/images/akelos_mvc-fr.png)
+
 ### Les conventions de nommage dans Akelos ###
 
 Le nommage de chaque objet dans Akelos est très important, puisqu'il permet l'automatisation de son fonctionnement.
