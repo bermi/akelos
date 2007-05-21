@@ -252,7 +252,7 @@ class AkActionController extends AkObject
 
         } elseif (!empty($this->app_helpers)){
             foreach (Ak::toArray($this->app_helpers) as $helper_name){
-                $helper_names[AK_HELPERS_DIR.DS.AkInflector::underscore($helper_name).'_helper.php'] = AkInflector::classify($helper_name);
+                $helper_names[AK_HELPERS_DIR.DS.AkInflector::underscore($helper_name).'_helper.php'] = AkInflector::camelize($helper_name);
             }
         }
         return $helper_names;
@@ -550,7 +550,8 @@ class AkActionController extends AkObject
     function renderTemplate($template, $status = null, $type = 'tpl', $local_assigns = array())
     {
         $this->_addVariablesToAssigns();
-        $this->renderText($this->Template->renderTemplate($type, $template, null, $local_assigns), $status);
+        $local_assigns = array_merge($local_assigns,$this->_assigns);
+        return $this->renderText($this->Template->renderTemplate($type, $template, null, $local_assigns), $status);
     }
 
     function renderText($text = null, $status = null)
