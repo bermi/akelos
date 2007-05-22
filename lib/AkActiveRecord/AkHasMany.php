@@ -622,7 +622,7 @@ class AkHasMany extends AkAssociation
 
     function &find()
     {
-        $result =& $GLOBALS['false'];
+        $result = false;
         if(!$this->Owner->isNewRecord()){
             $this->constructSql();
             $has_many_options = $this->getOptions($this->association_id);

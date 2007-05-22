@@ -105,7 +105,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
     function &assign(&$Associated)
     {
-        $result = $GLOBALS['false'];
+        $result = false;
         if(is_object($this->_AssociationHandler)){
             $result =& $this->_AssociationHandler->assign($this->getAssociationId(), $Associated);
         }
@@ -118,7 +118,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
      */
     function &build($attributes = array(), $replace_existing = true)
     {
-        $result = $GLOBALS['false'];
+        $result = false;
         if(!empty($this->_AssociationHandler)){
             $result =& $this->_AssociationHandler->build($this->getAssociationId(), $attributes, $replace_existing);
         }
@@ -128,7 +128,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
     function &create($attributes = array(), $replace_existing = true)
     {
-        $result = $GLOBALS['false'];
+        $result = false;
         if(!empty($this->_AssociationHandler)){
             $result =& $this->_AssociationHandler->create($this->getAssociationId(), $attributes, $replace_existing);
         }
@@ -137,7 +137,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
     function &replace(&$NewAssociated, $dont_save = false)
     {
-        $result = $GLOBALS['false'];
+        $result = false;
         if(!empty($this->_AssociationHandler)){
             $result =& $this->_AssociationHandler->replace($this->getAssociationId(), $NewAssociated, $dont_save = false);
         }
@@ -146,7 +146,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
     function &find()
     {
-        $result = $GLOBALS['false'];
+        $result = false;
         if(!empty($this->_AssociationHandler)){
             $result =& $this->_AssociationHandler->findAssociated($this->getAssociationId());
         }
@@ -155,7 +155,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
     function &load()
     {
-        $result = $GLOBALS['false'];
+        $result = false;
         if(!empty($this->_AssociationHandler)){
             $result =& $this->_AssociationHandler->loadAssociated($this->getAssociationId());
         }
@@ -230,7 +230,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
     function &findWithAssociations($options, $limit = null, $offset = null)
     {
-        $result = $GLOBALS['false'];
+        $result = false;
 
         $options['include'] = is_array($options['include']) ? $options['include'] : array($options['include']);
         $options['order'] = empty($options['order']) ? '' : $options['order'];
@@ -424,7 +424,8 @@ class AkAssociatedActiveRecord extends AkBaseModel
                      *       this makes table joins behave the same way as they do on MySql
                      */
                     }elseif (in_array($association_id, $included_associations) && $this->_getDatabaseType() == 'sqlite'){
-                        return $GLOBALS['false'];
+                        $false = false; 
+                        return $false;
                     }
                 }
 
@@ -435,7 +436,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
         if(!empty($objects)){
             $result =& $objects;
         }else{
-            $result =& $GLOBALS['false'];
+            $result = false;
         }
 
         return $result;

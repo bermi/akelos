@@ -10,6 +10,9 @@
 
 require_once(AK_VENDOR_DIR.DS.'pear'.DS.'PHP'.DS.'Compat'.DS.'Constant'.DS.'T.php');
 
+/**
+* @todo Avoid the ussage of globals in the PHP parser
+*/
 
 /**
  * This is a modified version of the pear/PHP_Shell package by Jan Kneschke

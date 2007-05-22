@@ -161,7 +161,8 @@ class AkActionWebserviceApi extends AkObject
     function &getDefaultApiMethodInstance()
     {
         if(empty($this->default_api_method)){
-            return $GLOBALS['false'];
+            $false = false;
+            return $false;
         }
 
         $name = $this->default_api_method;

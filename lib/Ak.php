@@ -28,9 +28,6 @@ defined('AK_FRAMEWORK_LANGUAGE') ? null : define('AK_FRAMEWORK_LANGUAGE', 'en');
 defined('AK_DEV_MODE') ? null : define('AK_DEV_MODE', false);
 defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION') ? null : define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
 
-// We set a global true/false/array to workaround pass-by-reference notice on PHP4 for references
-$GLOBALS['false'] = false;
-$GLOBALS['true'] = true;
 
 /**
 * Akelos Framework static functions
@@ -1772,6 +1769,28 @@ function ak_generate_mock($name)
 	}
 	$Mock->generate($name);
 }
+
+
+/**
+ * PHP4 triggers "Only variable references should be returned by reference" error when 
+ * a method that should return an object reference returns a boolean/array
+ * 
+ * The old method was to use a global variables, but it can lead into hard to debug bugs.
+ * 
+ * Now you'll need to use the following technique if you whant to build functions that
+ * can return Object references or TRUE/FALSE.
+ * 
+ *  $result = false;
+ *  return $result;
+ */
+
+/**
+ * Globals are deprecated. Used ak_false, ak_true and ak_array instead
+ *
+ * @deprecated
+ */
+$GLOBALS['false'] = false;
+$GLOBALS['true'] = true;
 
 
 AK_PHP5 ? null : eval('function clone($object){return $object;}');

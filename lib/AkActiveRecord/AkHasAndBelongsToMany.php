@@ -769,7 +769,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
     function find()
     {
-        $result =& $GLOBALS['false'];
+        $result = false;
         if(!$this->Owner->isNewRecord()){
             $this->constructSql();
             $has_and_belongs_to_many_options = $this->getOptions($this->association_id);

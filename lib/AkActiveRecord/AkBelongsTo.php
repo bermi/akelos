@@ -106,7 +106,7 @@ class AkBelongsTo extends AkAssociation
 
     function &findAssociated($association_id)
     {
-        $result =& $GLOBALS['false'];
+        $result = false;
         $primary_key_name = $this->Owner->$association_id->getAssociationOption('primary_key_name');
         $primary_key_name_value = $this->Owner->get($primary_key_name);
         if(!$primary_key_name_value){

@@ -767,29 +767,29 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * 'include' => Names associations that should be loaded alongside using LEFT OUTER JOINs. The symbols 
     * named refer to already defined associations. See eager loading under Associations.
     * 
-Examples for find by id:
-
-  $Person->find(1);       // returns the object for ID = 1
-  $Person->find(1, 2, 6); // returns an array for objects with IDs in (1, 2, 6), Returns false if any of those IDs is not available
-  $Person->find(array(7, 17)); // returns an array for objects with IDs in (7, 17)
-  $Person->find(array(1));     // returns an array for objects the object with ID = 1
-  $Person->find(1, array('conditions' => "administrator = 1", 'order' => "created_on DESC"));
-
-Examples for find first:
-
-  $Person->find('first'); // returns the first object fetched by SELECT * FROM people
-  $Person->find('first', array('conditions' => array("user_name = ':user_name'", ':user_name' => $user_name)));
-  $Person->find('first', array('order' => "created_on DESC", 'offset' => 5));
-
-Examples for find all:
-
-  $Person->find('all'); // returns an array of objects for all the rows fetched by SELECT * FROM people
-  $Person->find(); // Same as $Person->find('all');
-  $Person->find('all', array('conditions => array("category IN (categories)", 'categories' => join(','$categories)), 'limit' => 50));
-  $Person->find('all', array('offset' => 10, 'limit' => 10));
-  $Person->find('all', array('include' => array('account', 'friends'));
-
-*/
+    * Examples for find by id:
+    * 
+    *   $Person->find(1);       // returns the object for ID = 1
+    *   $Person->find(1, 2, 6); // returns an array for objects with IDs in (1, 2, 6), Returns false if any of those IDs is not available
+    *   $Person->find(array(7, 17)); // returns an array for objects with IDs in (7, 17)
+    *   $Person->find(array(1));     // returns an array for objects the object with ID = 1
+    *   $Person->find(1, array('conditions' => "administrator = 1", 'order' => "created_on DESC"));
+    * 
+    * Examples for find first:
+    * 
+    *   $Person->find('first'); // returns the first object fetched by SELECT * FROM people
+    *   $Person->find('first', array('conditions' => array("user_name = ':user_name'", ':user_name' => $user_name)));
+    *   $Person->find('first', array('order' => "created_on DESC", 'offset' => 5));
+    * 
+    * Examples for find all:
+    * 
+    *   $Person->find('all'); // returns an array of objects for all the rows fetched by SELECT * FROM people
+    *   $Person->find(); // Same as $Person->find('all');
+    *   $Person->find('all', array('conditions => array("category IN (categories)", 'categories' => join(','$categories)), 'limit' => 50));
+    *   $Person->find('all', array('offset' => 10, 'limit' => 10));
+    *   $Person->find('all', array('include' => array('account', 'friends'));
+    * 
+    */
     function &find()
     {
         if(!isset($this->_activeRecordHasBeenInstantiated)){
@@ -864,7 +864,7 @@ Examples for find all:
             if(!empty($result) && is_array($result)){
                 $_result =& $result[0];
             }else{
-                $_result =& $GLOBALS['false'];
+                $_result = false;
             }
             return  $_result;
             break;
@@ -891,7 +891,7 @@ Examples for find all:
             if(!empty($result) && is_array($result)){
                 $_result =& $result;
             }else{
-                $_result =& $GLOBALS['false'];
+                $_result = false;
             }
             return  $_result;
             break;
@@ -954,20 +954,20 @@ Examples for find all:
                 $result =& $this->find('all', $options);
                 if(is_array($result) && (count($result) == $num_ids || empty($without_conditions))){
                     if($result === false){
-                        $_result =& $GLOBALS['false'];
+                        $_result = false;
                     }else{
                         $_result =& $result;
                     }
                     return $_result;
                 }else{
-                    $result =& $GLOBALS['false'];
+                    $result = false;
                     return $result;
                 }
                 break;
             }
             break;
         }
-        $result =& $GLOBALS['false'];
+        $result = false;
         return $result;
     }
 
@@ -977,7 +977,8 @@ Examples for find all:
             return Ak::handleStaticCall();
         }
         $args = func_get_args();
-        return Ak::call_user_func_array(array(&$this,'find'), array_merge(array('first'),$args));
+        $result =& Ak::call_user_func_array(array(&$this,'find'), array_merge(array('first'),$args));
+        return $result;
     }
 
     function &findAll()
@@ -1131,7 +1132,8 @@ Examples for find all:
         }
         $options['order'] = $this->getPrimaryKey().' DESC';
         array_push($args, $options);
-        return Ak::call_user_func_array(array(&$this,'findFirstBy'), $args);
+        $result =& Ak::call_user_func_array(array(&$this,'findFirstBy'), $args);
+        return $result;
     }
 
     function &findAllBy()
@@ -1238,7 +1240,8 @@ Examples for find all:
 
         if($query_arguments_count != count($requested_args)){
             trigger_error(Ak::t('Argument list did not match expected set. Requested arguments are:').join(', ',$requested_args),E_USER_ERROR);
-            return $GLOBALS['false'];
+            $false = false;
+            return $false;
         }
 
         $true_bool_values = array(true,1,'true','True','TRUE','1','y','Y','yes','Yes','YES','s','Si','SI','V','v','T','t');
@@ -4428,7 +4431,8 @@ Examples for find all:
         }
         if(!class_exists($class_name)){
             trigger_error(Ak::t('The class %class used for handling an "act_as %class" does not exist',array('%class'=>$class_name)), E_USER_ERROR);
-            return $GLOBALS['false'];
+            $false = false; 
+            return $false;
         }else{
             $ActAsInstance =& new $class_name($this, $options);
             return $ActAsInstance;

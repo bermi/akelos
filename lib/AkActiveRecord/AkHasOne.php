@@ -242,7 +242,7 @@ class AkHasOne extends AkAssociation
 
     function &findAssociated($association_id)
     {
-        $result =& $GLOBALS['false'];
+        $result = false;
         if(!$this->Owner->getId()){
             return $result;
         }
