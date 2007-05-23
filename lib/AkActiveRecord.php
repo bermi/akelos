@@ -722,6 +722,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     /**
     * Just freeze the attributes hash, such that associations are still accessible even on destroyed records.
+    * 
+    * @todo implement freeze correctly for its intended use
     */
     function freeze()
     {

@@ -100,7 +100,7 @@ class Ak
         static $cache;
         if(!isset($cache)){
             require_once(AK_LIB_DIR.DS.'AkCache.php');
-            $cache =& new AkCache();
+            $cache = new AkCache();
         }
         return $cache;
     }

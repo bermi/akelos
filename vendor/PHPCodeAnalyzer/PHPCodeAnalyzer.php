@@ -146,6 +146,7 @@ class PHPCodeAnalyzer
         T_FILE => 'handleString',
         T_LINE => 'handleString',
         T_DOUBLE_ARROW => 'handleString',
+        T_CONCAT_EQUAL => 'handleString',
 
         T_DOUBLE_COLON => 'handleDoubleColon',
         T_NEW => 'handleNew',
@@ -227,54 +228,54 @@ class PHPCodeAnalyzer
         switch($token)
         {
             case "(":
-            // method is called
-            if ($this->staticClass !== false)
-            {
-                if (!isset($this->calledStaticMethods[$this->staticClass][$this->currentString]))
+                // method is called
+                if ($this->staticClass !== false)
                 {
-                    $this->calledStaticMethods[$this->staticClass][$this->currentString]
-                    = array();
+                    if (!isset($this->calledStaticMethods[$this->staticClass][$this->currentString]))
+                    {
+                        $this->calledStaticMethods[$this->staticClass][$this->currentString]
+                        = array();
+                    }
+                    $this->calledStaticMethods[$this->staticClass][$this->currentString][]
+                    = $this->lineNumber;
+                    $this->staticClass = false;
                 }
-                $this->calledStaticMethods[$this->staticClass][$this->currentString][]
-                = $this->lineNumber;
-                $this->staticClass = false;
-            }
-            else if ($this->currentVar !== false)
-            {
-                if (!isset($this->calledMethods[$this->currentVar][$this->currentString]))
+                else if ($this->currentVar !== false)
                 {
-                    $this->calledMethods[$this->currentVar][$this->currentString] = array();
+                    if (!isset($this->calledMethods[$this->currentVar][$this->currentString]))
+                    {
+                        $this->calledMethods[$this->currentVar][$this->currentString] = array();
+                    }
+                    $this->calledMethods[$this->currentVar][$this->currentString][] = $this->lineNumber;
+                    $this->currentVar = false;
                 }
-                $this->calledMethods[$this->currentVar][$this->currentString][] = $this->lineNumber;
-                $this->currentVar = false;
-            }
-            else if ($this->inNew !== false)
-            {
-                $this->classInstantiated();
-            }
-            else if ($this->currentString !== null)
-            {
-                $this->functionCalled();
-            }
-            //$this->currentString = null;
-            break;
+                else if ($this->inNew !== false)
+                {
+                    $this->classInstantiated();
+                }
+                else if ($this->currentString !== null)
+                {
+                    $this->functionCalled();
+                }
+                //$this->currentString = null;
+                break;
             case "=":
             case ";":
-            if ($this->inNew !== false)
-            {
-                $this->classInstantiated();
-            }
-            else if ($this->inInclude !== false)
-            {
-                $this->fileIncluded();
-            }
-            else if ($this->currentVar !== false)
-            {
-                $this->useMemberVar();
-            }
-            $this->currentString = null;
-            $this->currentStrings = null;
-            break;
+                if ($this->inNew !== false)
+                {
+                    $this->classInstantiated();
+                }
+                else if ($this->inInclude !== false)
+                {
+                    $this->fileIncluded();
+                }
+                else if ($this->currentVar !== false)
+                {
+                    $this->useMemberVar();
+                }
+                $this->currentString = null;
+                $this->currentStrings = null;
+                break;
         }
     }
 
@@ -432,16 +433,21 @@ class PHPCodeAnalyzer
 	*/
     function functionCalled($id = false)
     {
-        /**
-         * @todo IMPORTANT disable $function_calls() like this
-         */
-        if($this->currentString[0] != "'" && $this->currentString[0] != '$'){ 
-            if (!isset($this->calledFunctions[$this->currentString]))
-            {
-                $this->calledFunctions[$this->currentString] = array();
+        $function_name = trim(rtrim($this->currentStrings,'('));
+        if(empty($this->currentStrings) || substr($function_name,-1) != ']'){
+            $function_name = $this->currentString;
+            if(strstr('"\'',substr($function_name,-1))){
+                $this->currentString = null;
+                return ;
             }
-            $this->calledFunctions[$this->currentString][] = $this->lineNumber;
         }
+
+        if (!isset($this->calledFunctions[$function_name]))
+        {
+            $this->calledFunctions[$function_name] = array();
+        }
+        
+        $this->calledFunctions[$function_name][] = $this->lineNumber;
         $this->currentString = null;
     }
 
@@ -473,5 +479,4 @@ class PHPCodeAnalyzer
         $this->usedVariables[$this->currentString][] = $this->lineNumber;
     }
 }
-
 ?>
