@@ -146,7 +146,9 @@ class PHPCodeAnalyzer
         T_FILE => 'handleString',
         T_LINE => 'handleString',
         T_DOUBLE_ARROW => 'handleString',
-        T_CONCAT_EQUAL => 'handleString',
+        
+        T_ARRAY => 'handleClearStrings',
+        T_CONCAT_EQUAL => 'handleClearStrings',
 
         T_DOUBLE_COLON => 'handleDoubleColon',
         T_NEW => 'handleNew',
@@ -207,10 +209,10 @@ class PHPCodeAnalyzer
                     $call = $handleMap[$id];
                     $this->$call($id,$text);
                 }
-                /*else
+                /*else * /
                 {
                 echo token_name($id).": $text<br>\n";
-                }*/
+                } /* */
             }
         }
     }
@@ -297,6 +299,15 @@ class PHPCodeAnalyzer
     {
         $this->currentString = $text;
         $this->currentStrings .= $text;
+    }
+    
+    /**
+	* handle String tokens
+	* @access private
+	*/
+    function handleClearStrings($id,$text)
+    {
+        $this->currentString = '';
     }
 
     /**
