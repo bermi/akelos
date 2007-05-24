@@ -195,7 +195,7 @@ class AkPhpCodeSanitizer
     {
         $result = array();
         foreach ((array)$functions_array as $function){
-            if($function[0] == '$'){
+            if(isset($function[0]) && $function[0] == '$'){
                 $result[] = $function;
             }
         }
