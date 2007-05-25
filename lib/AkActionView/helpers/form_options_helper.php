@@ -62,7 +62,7 @@ class FormOptionsHelper extends AkActionViewHelper
      * See options_for_select for the required format of the choices parameter.
      *
      * Example with $Post->person_id => 1:
-     *   $form_options_helper->select('post', 'person_id', $Person->collect($Person->find(), 'name', 'id'), array('include_blank'=>true));
+     *   $form_options_helper->select('post', 'person_id', $Person->collect($Person->find(), 'name', 'id'), array(), array('include_blank'=>true));
      *
      * could become:
      *
