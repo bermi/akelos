@@ -26,23 +26,28 @@ class PaginationHelper extends AkActionViewHelper
         $default_url_options = array(
         'sort'=>$column,
         'direction' => empty($this->_controller->params['sort']) ? 'desc' : ($this->_controller->params['sort'] == $column ? (empty($this->_controller->params['direction']) ? 'desc' : ($this->_controller->params['direction'] == 'desc' ? 'asc' : 'desc')) : 'desc'),);
-        
+
         $page_var_on_url = empty($url_options['page_var_on_url']) ? 'page' : $url_options['page_var_on_url'];
         unset($url_options['page_var_on_url']);
-        
+
         $url_options = array_merge($default_url_options, $url_options);
 
         $link_options['href'] = html_entity_decode($this->_controller->url_helper->modify_current_url($url_options,array($page_var_on_url)));
-        
+
         if(empty($link_options['title'])){
             $link_options['title'] = $this->_controller->t("Sort by $column ({$url_options['direction']})");
         }
-
-        return TagHelper::content_tag('a',$this->_controller->t(AkInflector::humanize($column)),$link_options);
+        if(!empty($link_options['link_text'])){
+            $link_text = $link_options['link_text'];
+            unset($link_options['link_text']);
+        }else{
+            $link_text =  $this->_controller->t(AkInflector::humanize($column));
+        }
+        return TagHelper::content_tag('a',$link_text,$link_options);
     }
-    
-    
-    
+
+
+
     function getFindOptions(&$object)
     {
         $paginator_name = AkInflector::underscore($object->getModelName()).'_pages';
@@ -50,18 +55,18 @@ class PaginationHelper extends AkActionViewHelper
         $limit_and_offset = isset($this->$paginator_name) ? array('limit' =>  $this->$paginator_name->getItemsPerPage(),
         'offset' =>  $this->$paginator_name->getOffset()) : array();
 
-        $find_options = array_merge($limit_and_offset,(!empty($this->_controller->params['sort']) && 
+        $find_options = array_merge($limit_and_offset,(!empty($this->_controller->params['sort']) &&
         $object->hasColumn($this->_controller->params['sort']) ? array('order'=>$this->_getOrderColumnFromCurrentModel($object, $paginator_name).$this->getSortDirection()) : array()));
 
         empty($find_options['sort']) ? ($this->_getOrderFromCustomDictionary($paginator_name, $find_options) ? null : $this->_getOrderFromAssociations($object, $paginator_name, $find_options)) : null;
-        
+
         if(!empty($this->$paginator_name->_ak_options['include'])){
             $find_options['include'] = Ak::toArray($this->$paginator_name->_ak_options['include']);
         }
 
         return $find_options;
     }
-    
+
     function _getOrderColumnFromCurrentModel(&$object, $paginator_name)
     {
         return empty($this->$paginator_name->_ak_options['include']) ? $this->_controller->params['sort'] :  'parent_'.$object->getModelName().'.'.$this->_controller->params['sort'];
@@ -75,7 +80,7 @@ class PaginationHelper extends AkActionViewHelper
         }
         return false;
     }
-    
+
     function _getOrderFromAssociations(&$object, $paginator_name, &$find_options)
     {
         if(!empty($this->_controller->params['sort']) && !empty($this->$paginator_name->_ak_options['include']) && $object->hasAssociations()){
@@ -91,13 +96,13 @@ class PaginationHelper extends AkActionViewHelper
         }
         return false;
     }
-    
+
     function getSortDirection()
     {
         return (empty($this->_controller->params['direction']) || $this->_controller->params['direction'] == 'asc' ? ' ASC' : ' DESC');
     }
-    
-    
+
+
     /**
      * Returns a paginator object
      *
@@ -121,13 +126,13 @@ class PaginationHelper extends AkActionViewHelper
         );
         $options = array_merge($default_options, $options);
         $paginator_name = AkInflector::underscore($object->getModelName()).'_pages';
-        $this->$paginator_name = new AkPaginator($this->_controller, 
-        $object->{$options['count_method']}($options['count_conditions'], $options['count_joins']), 
+        $this->$paginator_name = new AkPaginator($this->_controller,
+        $object->{$options['count_method']}($options['count_conditions'], $options['count_joins']),
         $options['items_per_page'], @$this->_controller->params[$options['page_var_on_url']]);
         $this->$paginator_name->_ak_options =& $options;
         return $this->$paginator_name;
     }
 }
 
-  
+
 ?>

@@ -37,7 +37,6 @@ class UrlHelper
         'only_path' => true
         );
         $options = array_merge($default_options, $options);
-
         return $this->_controller->urlFor($options, $parameters_for_method_reference);
     }
 
@@ -46,11 +45,9 @@ class UrlHelper
     {
         $options_to_exclude = $remove_unnecesary_options ? array_merge(array('ak','lang',AK_SESSION_NAME,'AK_SESSID','PHPSESSID'), $options_to_exclude) : $options_to_exclude;
         $options_to_add = array_merge(array_merge(array('action'=>$this->_controller->Request->getAction(), 'controller' => $this->_controller->Request->getController()),$this->_controller->Request->getUrlParams()),$options_to_add);
-
         foreach ($options_to_exclude as $option_to_exclude){
             unset($options_to_add[$option_to_exclude]);
         }
-
         return $this->url_for($options_to_add);
     }
 
