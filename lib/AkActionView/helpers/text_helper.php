@@ -501,6 +501,14 @@ class  TextHelper
 
 
     /**
+    * Gets a localized setting (date format,...).
+    */
+    function locale($locale_setting, $locale = null)
+    {
+        return Ak::locale($locale_setting, $locale);
+    }
+    
+    /**
     * Translate strings to the current locale.
     */
     function translate($string, $args = null, $locale_namespace = null)
