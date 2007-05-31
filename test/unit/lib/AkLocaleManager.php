@@ -69,34 +69,24 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
 
 
 
-    function Test_of__getBrowserLanguage()
+    function Test_of_getBrowserLanguages()
     {
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = $this->LocaleManager->_browser_language = 'en-us,en,es-es;q=0.5;';
         
-        unset($_SERVER['HTTP_USER_AGENT']);
         $this->LocaleManager->available_locales = array('en_us'=>'en_us','en'=>'en','es_es'=>'es_es');
         $expected = array_keys($this->LocaleManager->available_locales);
-        $result = $this->LocaleManager->_getBrowserLanguage();
+        $result = $this->LocaleManager->getBrowserLanguages();
         $this->assertEqual($expected, $result);
 
         unset($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-        unset($_SERVER['HTTP_USER_AGENT']);
         $this->LocaleManager->available_locales = array('en'=>'en');
         $expected = array_keys($this->LocaleManager->available_locales);
-        $result = $this->LocaleManager->_getBrowserLanguage();
+        $result = $this->LocaleManager->getBrowserLanguages();
         $this->assertEqual($expected, $result);
 
         $this->LocaleManager->available_locales = array('en_us'=>'en_us');
         $expected = array_keys($this->LocaleManager->available_locales);
-        $result = $this->LocaleManager->_getBrowserLanguage();
-        $this->assertEqual($expected, $result);
-
-        unset($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-        $_SERVER['HTTP_USER_AGENT'] = $this->LocaleManager->_browser_language = 
-        'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.10) Gecko/20050716 Firefox/1.0.6';
-        $this->LocaleManager->available_locales = array('es'=>'es','en'=>'en','en_us'=>'en_us');
-        $expected = array('en_us');
-        $result = $this->LocaleManager->_getBrowserLanguage();
+        $result = $this->LocaleManager->getBrowserLanguages();
         $this->assertEqual($expected, $result);
 
     }
@@ -105,30 +95,22 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
     function Test_of_getDefaultLanguageForUser()
     {
         unset($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-        unset($_SERVER['HTTP_USER_AGENT']);
         $this->LocaleManager->available_locales = array('en_us'=>array('en_us'),'en'=>array('en'),'es_es'=>array('es_es'));
-        $this->LocaleManager->browser_lang = $this->LocaleManager->_getBrowserLanguage();
-        $result = $this->LocaleManager->getDefaultLanguageForUser();
-        $expected = 'en_us';
-        $this->assertEqual($expected, $result);
-
-        $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.10) Gecko/20050716 Firefox/1.0.6';
-        $this->LocaleManager->available_locales = array('en'=>array('en'),'en_us'=>array('en_us'),'es_es'=>array('es_es'));
-        $this->LocaleManager->browser_lang = $this->LocaleManager->_getBrowserLanguage();
+        $this->LocaleManager->browser_lang = $this->LocaleManager->getBrowserLanguages();
         $result = $this->LocaleManager->getDefaultLanguageForUser();
         $expected = 'en_us';
         $this->assertEqual($expected, $result);
 
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'es-es,en-us,en;q=0.5;';
         $this->LocaleManager->available_locales = array('en'=>array('en'),'en_us'=>array('en_us'),'es_es'=>array('es_es'));
-        $this->LocaleManager->browser_lang = $this->LocaleManager->_getBrowserLanguage();
+        $this->LocaleManager->browser_lang = $this->LocaleManager->getBrowserLanguages();
         $result = $this->LocaleManager->getDefaultLanguageForUser();
         $expected = 'es_es';
         $this->assertEqual($expected, $result);
 
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en-us,en;q=0.5;';
         $this->LocaleManager->available_locales = array('es_es'=>array('es_es'));
-        $this->LocaleManager->browser_lang = $this->LocaleManager->_getBrowserLanguage();
+        $this->LocaleManager->browser_lang = $this->LocaleManager->getBrowserLanguages();
         $result = $this->LocaleManager->getDefaultLanguageForUser();
         $expected = 'es_es';
         $this->assertEqual($expected, $result);

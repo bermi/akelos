@@ -96,7 +96,8 @@ class AkFtp
                     $ftp_conn = isset($f['port']) ?  ftp_ssl_connect($f['host'], $f['port']) : ftp_ssl_connect($f['host']);
                 }
 
-                $login_result = ftp_login($ftp_conn, @$f['user'], @$f['pass']);
+                $f['user'] = str_replace('+','@', @$f['user']);
+                $login_result = ftp_login($ftp_conn, $f['user'], @$f['pass']);
 
                 if(!$ftp_conn || !$login_result){
                     AK_FTP_SHOW_ERRORS ? trigger_error(Ak::t('Could not connect to the FTP server'), E_USER_NOTICE) : null;

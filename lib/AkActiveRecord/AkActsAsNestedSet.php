@@ -300,11 +300,16 @@ class AkActsAsNestedSet extends AkObserver
     /**
     * Returns the parent Object
     */
-    function getParent()
+    function &getParent()
     {
-        return !$this->isChild() ? false : $this->_ActiveRecordInstance->find(
-        'first', array('conditions' => " ".$this->getScopeCondition()." AND ".$this->_ActiveRecordInstance->getPrimaryKey()." = ".$this->_ActiveRecordInstance->{$this->getParentColumnName()})
-        );
+        if(!$this->isChild()){
+            $result = false;
+        }else{
+            $result =& $this->_ActiveRecordInstance->find(
+            'first', array('conditions' => " ".$this->getScopeCondition()." AND ".$this->_ActiveRecordInstance->getPrimaryKey()." = ".$this->_ActiveRecordInstance->{$this->getParentColumnName()})
+            );
+        }
+        return $result;
     }
 
     /**

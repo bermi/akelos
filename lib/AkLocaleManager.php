@@ -87,46 +87,39 @@ class AkLocaleManager extends AkObject
         return $locales;
     }
 
-
-    function _getBrowserLanguage()
+    function getBrowserLanguages()
     {
-        Ak::profile(__CLASS__.'::'.__FUNCTION__);
-        $user_locales = array();
-        $regex_arr = array();
-
-        foreach ($this->available_locales as $lang=>$alias){
-            $regex_arr[] = '('.str_replace('_','-',$lang).')(,|;){1}';
+        $browser_accepted_languages = str_replace('-','_', strtolower(preg_replace('/q=[0-9\.]+,*/','',@$_SERVER['HTTP_ACCEPT_LANGUAGE'])));
+        $browser_languages = (array_diff(split(';|,',$browser_accepted_languages.','), array('')));
+        if(empty($browser_languages)){
+            return array($this->_getDefaultLocale());
         }
-
-        $regex = '/'.join('|',$regex_arr).'/';
-
-        $search_path = trim(strtolower((string)@$_SERVER['HTTP_ACCEPT_LANGUAGE'].';'.(string)@$_SERVER['HTTP_USER_AGENT']),';').';';
-
-        if (preg_match_all($regex, $search_path, $match)){
-            $nav_locales = $match[0];
-            foreach ($nav_locales as $locale){
-                $user_locales[] = str_replace(array('-',';',','),array('_','',''),$locale);
-            }
-        }
-
-        $user_locales = array_unique($user_locales);
-
-        return count($user_locales) ? $user_locales : array($this->_getDefaultLocale());
-
+        return array_unique($browser_languages);
     }
+
 
     function getDefaultLanguageForUser()
     {
-        Ak::profile(__CLASS__.'::'.__FUNCTION__);
-        foreach ($this->browser_lang as $k=>$browser_lang){
-            if(isset($this->available_locales[$browser_lang]) && is_array($this->available_locales[$browser_lang])){
-                return $browser_lang;
+        $browser_languages = $this->getBrowserLanguages();
+
+        // First run for full locale (en_us, en_uk)
+        foreach ($browser_languages as $browser_language){
+            if(isset($this->available_locales[$browser_language])){
+                return $browser_language;
             }
         }
 
+        // Second run for only language code (en, es)
+        foreach ($browser_languages as $browser_language){
+            if($pos = strpos($browser_language,'_')){
+                $browser_language = substr($browser_language,0, $pos);
+                if(isset($this->available_locales[$browser_language])){
+                    return $browser_language;
+                }
+            }
+        }
         return $this->_getDefaultLocale();
     }
-
 
     function _getDefaultLocale()
     {
@@ -260,13 +253,13 @@ class AkLocaleManager extends AkObject
         }
     }
 
-    
-    
+
+
     /**
      * The following functions are for handling i18n when using url based interfaces
      */
-    
-    
+
+
     function initApplicationInternationalization(&$Request)
     {
         if(!defined('AK_APP_LOCALES')){
@@ -372,7 +365,7 @@ class AkLocaleManager extends AkObject
     function getNavigationLanguage()
     {
         if(!isset($_SESSION['lang'])){
-            $this->browser_lang = $this->_getBrowserLanguage();
+            $this->browser_lang = $this->getDefaultLanguageForUser();
             return $this->getDefaultLanguageForUser();
         }else{
             return $_SESSION['lang'];

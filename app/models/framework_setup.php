@@ -682,7 +682,7 @@ CONFIG;
         if(AK_OS === 'WINDOWS'){
             $langs[] = @$_ENV['LANG'];
         }
-        $langs = array_merge($langs, $LocaleManager->_getBrowserLanguage());
+        $langs = array_merge($langs, $LocaleManager->getBrowserLanguages());
 
         return array_unique(array_map('strtolower',array_diff($langs,array(''))));
     }
