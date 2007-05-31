@@ -110,7 +110,7 @@ if(AK_ENVIRONMENT != 'setup'){
     }
 }
 
-@ini_set("arg_separator.output","&amp;");
+@ini_set("arg_separator.output","&");
 
 @ini_set("session.name","AK_SESSID");
 @ini_set("include_path",(AK_LIB_DIR.PATH_SEPARATOR.AK_MODELS_DIR.PATH_SEPARATOR.AK_CONTRIB_DIR.DS.'pear'.PATH_SEPARATOR.ini_get("include_path")));
