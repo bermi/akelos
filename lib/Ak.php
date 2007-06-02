@@ -1558,7 +1558,7 @@ Options are:
 
         natcasesort($array_copy);
         if(strtolower($direction) == 'desc'){
-            $array_copy = array_reverse(&$array_copy, true);
+            $array_copy = array_reverse($array_copy, true);
         }
 
         foreach (array_keys($array_copy) as $k){
