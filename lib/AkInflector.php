@@ -70,7 +70,7 @@ class AkInflector
         '/(ax|test)is$/i'=> '\1es',
         '/s$/i'=> 's',
         '/$/'=> 's');
-        
+
         $uncountable = array('equipment', 'information', 'rice', 'money', 'species', 'series', 'fish', 'sheep');
 
         $irregular = array(
@@ -142,7 +142,7 @@ class AkInflector
         '/(n)ews$/i' => '\\1ews',
         '/s$/i' => '',
         );
-       
+
 
         $uncountable = array('equipment', 'information', 'rice', 'money', 'species', 'series', 'fish', 'sheep','sms');
 
@@ -178,7 +178,7 @@ class AkInflector
 
     // }}}
     // {{{ conditionalPlural()
-    
+
     /**
      * Get the plural form of a word if first parameter is greater than 1
      *
@@ -190,7 +190,7 @@ class AkInflector
     {
         return $numer_of_records > 1 ? AkInflector::pluralize($word) : $word;
     }
-    
+
     // }}}
     // {{{ titleize()
 
@@ -263,11 +263,11 @@ class AkInflector
     */
     function underscore($word)
     {
-        return  strtolower(preg_replace('/[^A-Z^a-z^0-9^\/]+/','_',
-        preg_replace('/([a-z\d])([A-Z])/','\1_\2',
-        preg_replace('/([A-Z]+)([A-Z][a-z])/','\1_\2',
-        preg_replace('/::/', '/',$word)))));
+        return  strtolower(preg_replace(
+        array('/[^A-Z^a-z^0-9^\/]+/','/([a-z\d])([A-Z])/','/([A-Z]+)([A-Z][a-z])/'),
+        array('_','\1_\2','\1_\2'), $word));
     }
+
 
     // }}}
     // {{{ humanize()
@@ -377,16 +377,16 @@ class AkInflector
         }else{
             switch (($number % 10)) {
                 case 1:
-                return $number.'st';
-                break;
+                    return $number.'st';
+                    break;
                 case 2:
-                return $number.'nd';
-                break;
+                    return $number.'nd';
+                    break;
                 case 3:
-                return $number.'rd';
+                    return $number.'rd';
                 default:
-                return $number.'th';
-                break;
+                    return $number.'th';
+                    break;
             }
         }
     }
@@ -413,23 +413,23 @@ class AkInflector
     function unaccent($text)
     {
         $map = array(
-            'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 
-            'È'=>'E', 'É'=>'E', 'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 
-            'Ð'=>'D', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 
-            'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'T', 'ß'=>'s', 'à'=>'a', 
-            'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e', 
-            'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'e', 
-            'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 
-            'ú'=>'u', 'û'=>'u', 'ü'=>'u', 'ý'=>'y', 'þ'=>'t', 'ÿ'=>'y');
+        'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C',
+        'È'=>'E', 'É'=>'E', 'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I',
+        'Ð'=>'D', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O',
+        'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'T', 'ß'=>'s', 'à'=>'a',
+        'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e',
+        'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'e',
+        'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u',
+        'ú'=>'u', 'û'=>'u', 'ü'=>'u', 'ý'=>'y', 'þ'=>'t', 'ÿ'=>'y');
         return str_replace(array_keys($map), array_values($map), $text);
     }
-    
-    
+
+
     function urlize($text)
     {
-    	return trim(AkInflector::underscore(AkInflector::unaccent($text)),'_');
+        return trim(AkInflector::underscore(AkInflector::unaccent($text)),'_');
     }
-    
+
     /**
     * Returns $class_name in underscored form, with "_id" tacked on at the end. 
     * This is for use in dealing with the database.
@@ -473,7 +473,7 @@ class AkInflector
             return ucfirst($name.$correct);
         }
     }
-    
+
 
 }
 

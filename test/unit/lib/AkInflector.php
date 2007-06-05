@@ -120,20 +120,12 @@ class Test_of_AkInflector extends  UnitTestCase
     "HTML"                  => "html",
     );
 
-    var $CamelWithModuleToUnderscoreWithSlash = array(
-    "Admin::Product" => "admin/product",
-    "Users::Commission::Department" => "users/commission/department",
-    "UsersSection::CommissionDepartment" => "users_section/commission_department",
-    );
-
     var $ClassNameToForeignKeyWithUnderscore = array(
     "Person" => "person_id",
-    "MyApplication::Billing::Account" => "account_id"
     );
 
     var $ClassNameToForeignKeyWithoutUnderscore = array(
     "Person" => "personid",
-    "MyApplication::Billing::Account" => "accountid"
     );
 
     var $ClassNameToTableName = array(
@@ -222,10 +214,6 @@ class Test_of_AkInflector extends  UnitTestCase
         foreach ($this->CamelToUnderscore as $camel=>$underscore){
             $this->assertEqual($camel, AkInflector::camelize($underscore));
         }
-
-        foreach ($this->CamelWithModuleToUnderscoreWithSlash as $camel=>$underscore){
-            $this->assertEqual($camel, AkInflector::camelize($underscore));
-        }
     }
 
     function Test_of_underscore()
@@ -237,17 +225,8 @@ class Test_of_AkInflector extends  UnitTestCase
         foreach ($this->CamelToUnderscoreWithoutReverse as $camel=>$underscore){
             $this->assertEqual($underscore, AkInflector::underscore($camel));
         }
-
-        foreach ($this->CamelWithModuleToUnderscoreWithSlash as $camel=>$underscore){
-            $this->assertEqual($underscore, AkInflector::underscore($camel));
-        }
     }
-
-    function Test_of_demodulize()
-    {
-        $this->assertEqual('Account', AkInflector::demodulize('MyApplication::Billing::Account'));
-    }
-
+    
     function Test_of_foreignKey()
     {
         foreach ($this->ClassNameToForeignKeyWithUnderscore as $class=>$foreign_key){
