@@ -628,18 +628,8 @@ class AkActionController extends AkObject
         $_protected_variables_cache = array_merge($_protected_variables_cache, $this->_getProtectedInstanceVariables());
 
         foreach (array_diff(array_keys(get_object_vars($this)), $_protected_variables_cache) as $attribute){
-            $this->_addInstanceVariableToAssigns($attribute, $this->$attribute);
-        }
-    }
-
-    function _addInstanceVariableToAssigns($var_name, &$value)
-    {
-        static $_protected_variables_cache = array();
-        $_protected_variables_cache = array_merge($_protected_variables_cache, $this->_getProtectedInstanceVariables());
-
-        foreach (array_diff(array_keys(get_object_vars($this)), $_protected_variables_cache) as $attribute){
-            if($var_name[0] != '_'){
-                $this->_assigns[$var_name] =& $value;
+            if($attribute[0] != '_'){
+                $this->_assigns[$attribute] =& $this->$attribute;
             }
         }
     }
