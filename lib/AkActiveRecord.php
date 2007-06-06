@@ -19,8 +19,9 @@
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php');
 
+ak_define('ACTIVE_RECORD_ENABLE_PERSISTENCE', AK_ENVIRONMENT != 'testing');
+ak_define('ACTIVE_RECORD_CACHE_DATABASE_SCHEMA', AK_ACTIVE_RECORD_ENABLE_PERSISTENCE && AK_ENVIRONMENT != 'development');
 ak_define('ACTIVE_RECORD_VALIDATE_TABLE_NAMES', true);
-ak_define('ACTIVE_RECORD_ENABLE_PERSISTENCE', true);
 ak_define('ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS', false);
 ak_define('NOT_EMPTY_REGULAR_EXPRESSION','/.+/');
 ak_define('EMAIL_REGULAR_EXPRESSION',"/^([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)$/i");
@@ -2219,14 +2220,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Initializes the attributes array with keys matching the columns from the linked table and
     * the values matching the corresponding default value of that column, so
-    * that a new instance, or one populated from a passed-in Hash, still has all the attributes
+    * that a new instance, or one populated from a passed-in array, still has all the attributes
     * that instances loaded from the database would.
     */
     function attributesFromColumnDefinition()
     {
         $attributes = array();
-        $availableColumns = $this->getColumns();
-        foreach ($availableColumns as $column_name=>$column_settings){
+
+        foreach ((array)$this->getColumns() as $column_name=>$column_settings){
             if (!isset($column_settings['primaryKey']) && isset($column_settings['hasDefault'])) {
                 $attributes[$column_name] = $column_settings['defaultValue'];
             } else {
@@ -2260,16 +2261,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    /**
-    * Resets all the cached information about columns, which will cause they to be reloaded on the next request.
-    */
-    function resetColumnInformation()
-    {
-        if(isset($_SESSION['__activeRecordColumnsSettingsCache'][$this->getModelName()])){
-            unset($_SESSION['__activeRecordColumnsSettingsCache'][$this->getModelName()]);
-        }
-        $this->_columnNames = $this->_columns = $this->_columnsSettings = $this->_contentColumns = array();
-    }
 
 
     /**
@@ -2330,17 +2321,122 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $this->t(AkInflector::humanize($attribute));
     }
 
+
+    /**#@+
+    * Database reflection methods
+    */
+
+    function getTableName($modify_for_associations = true)
+    {
+        if(!isset($this->_tableName)){
+            // We check if we are on a inheritance Table Model
+            $this->getClassForDatabaseTableMapping();
+            if(!isset($this->_tableName)){
+                $this->setTableName();
+            }
+        }
+
+        if($modify_for_associations && isset($this->_associationTablePrefixes[$this->_tableName])){
+            return $this->_associationTablePrefixes[$this->_tableName];
+        }
+
+        return $this->_tableName;
+    }
+
+    function setTableName($table_name = null, $check_for_existence = AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES, $check_mode = false)
+    {
+        static $available_tables;
+        if(empty($table_name)){
+            $table_name = AkInflector::tableize($this->getModelName());
+        }
+        if($check_for_existence){
+            if(!isset($available_tables) || $check_mode){
+                if(!isset($this->_db)){
+                    $this->setConnection();
+                }
+                if(empty($_SESSION['__activeRecordColumnsSettingsCache']['available_tables']) || 
+                !AK_ACTIVE_RECORD_ENABLE_PERSISTENCE){
+                    $_SESSION['__activeRecordColumnsSettingsCache']['available_tables'] = $this->_db->MetaTables();
+                }
+                $available_tables = $_SESSION['__activeRecordColumnsSettingsCache']['available_tables'];
+            }
+            if(!in_array($table_name,(array)$available_tables)){
+                if(!$check_mode){
+                    trigger_error(Ak::t('Unable to set "%table_name" table for the model "%model".'.
+                    '  There is no "%table_name" available into current database layout.'.
+                    ' Set AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES constant to false in order to'.
+                    ' avoid table name validation',array('%table_name'=>$table_name,'%model'=>$this->getModelName())),E_USER_WARNING);
+                }
+                return false;
+            }
+        }
+        $this->_tableName = $table_name;
+        return true;
+    }
+
+    /**
+     * Gets information from the database engine about a single table
+     */
+    function _databaseTableInternals($table)
+    {
+        if(empty($_SESSION['__activeRecordColumnsSettingsCache']['database_table_'.$table.'_internals']) || !AK_ACTIVE_RECORD_ENABLE_PERSISTENCE){
+            $_SESSION['__activeRecordColumnsSettingsCache']['database_table_'.$table.'_internals'] = $this->_db->MetaColumns($table);
+        }
+        $cache[$table] = $_SESSION['__activeRecordColumnsSettingsCache']['database_table_'.$table.'_internals'];
+
+        return $cache[$table];
+    }
+
+
+    function _getDatabaseType()
+    {
+        if(strstr($this->_db->databaseType,'mysql')){
+            return 'mysql';
+        }elseif(strstr($this->_db->databaseType,'sqlite')){
+            return 'sqlite';
+        }elseif(strstr($this->_db->databaseType,'post')){
+            return 'postgre';
+        }else{
+            return 'unknown';
+        }
+    }
+
+    /**
+    * If is the first time we use a model this function will run the installer for the model if it exists
+    */
+    function _runCurrentModelInstallerIfExists(&$column_objects)
+    {
+        static $installed_models = array();
+        if(!defined('AK_AVOID_AUTOMATIC_ACTIVE_RECORD_INSTALLERS') && !in_array($this->getModelName(), $installed_models)){
+            $installed_models[] = $this->getModelName();
+            require_once(AK_LIB_DIR.DS.'AkInstaller.php');
+            $installer_name = $this->getModelName().'Installer';
+            $installer_file = AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'.php';
+            if(file_exists($installer_file)){
+                require_once($installer_file);
+                if(class_exists($installer_name)){
+                    $Installer = new $installer_name();
+                    if(method_exists($Installer,'install')){
+                        $Installer->install();
+                        $column_objects = $this->_databaseTableInternals($this->getTableName());
+                        return !empty($column_objects);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    
     /**
     * Returns an array of column objects for the table associated with this class.
     */
     function getColumns()
     {
         if(empty($this->_columns)){
-            $column_settings = $this->getColumnSettings();
-            foreach ($column_settings as $column=>$settings){
-                $this->_columns[$column] = $settings;
-            }
+            $this->_columns = $this->getColumnSettings();
         }
+
         return $this->_columns;
     }
 
@@ -2355,34 +2451,32 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     function loadColumnsSettings()
     {
-        $model_name = $this->getModelName();
-
         if(is_null($this->_db)){
             $this->setConnection();
         }
-
-        if((empty($this->_columnsSettings) && empty($_SESSION['__activeRecordColumnsSettingsCache'][$model_name.'_column_settings'])) || (AK_ENVIRONMENT != 'development' && !defined('AK_AVOID_ACTIVE_RECORD_DB_SCHEMA_CACHE'))){
+        $this->_columnsSettings = $this->_getPersistedTableColumnSettings();
+        
+        if(empty($this->_columnsSettings) || !AK_ACTIVE_RECORD_ENABLE_PERSISTENCE){
             if(empty($this->_dataDictionary)){
                 $this->_dataDictionary =& NewDataDictionary($this->_db);
             }
 
             $column_objects = $this->_databaseTableInternals($this->getTableName());
 
-            if(!isset($this->_avoidTableNameValidation) && !is_array($column_objects) && !$this->_runCurrentModelInstallerIfExists($column_objects)){
+            if( !isset($this->_avoidTableNameValidation) &&
+            !is_array($column_objects) &&
+            !$this->_runCurrentModelInstallerIfExists($column_objects)){
                 trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())), E_USER_ERROR);
                 return false;
             }elseif(is_array($column_objects)){
-                foreach ($column_objects as $column_object){
-                    $this->setColumnSettings($column_object->name, $column_object);
+                foreach (array_keys($column_objects) as $k){
+                    $this->setColumnSettings($column_objects[$k]->name, $column_objects[$k]);
                 }
             }
             if(!empty($this->_columnsSettings)){
-                $_SESSION['__activeRecordColumnsSettingsCache'][$model_name.'_column_settings'] = $this->_columnsSettings;
+                $this->_persistTableColumnSettings();
             }
-        }else{
-            $this->_columnsSettings = $_SESSION['__activeRecordColumnsSettingsCache'][$model_name.'_column_settings'];
         }
-
         return isset($this->_columnsSettings) ? $this->_columnsSettings : array();
     }
 
@@ -2419,6 +2513,81 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
+
+    
+
+    /**
+    * Resets all the cached information about columns, which will cause they to be reloaded on the next request.
+    */
+    function resetColumnInformation()
+    {
+        if(isset($_SESSION['__activeRecordColumnsSettingsCache'][$this->getModelName()])){
+            unset($_SESSION['__activeRecordColumnsSettingsCache'][$this->getModelName()]);
+        }
+        $this->_clearPersitedColumnSettings();
+        $this->_columnNames = $this->_columns = $this->_columnsSettings = $this->_contentColumns = array();
+    }
+
+    function _getColumnsSettings()
+    {
+        return $_SESSION['__activeRecordColumnsSettingsCache'];
+    }
+
+    function _getModelColumnSettings()
+    {
+        return $_SESSION['__activeRecordColumnsSettingsCache'][$this->getModelName()];
+    }
+
+
+    function _persistTableColumnSettings()
+    {
+        $_SESSION['__activeRecordColumnsSettingsCache'][$this->getModelName().'_column_settings'] = $this->_columnsSettings;
+    }
+
+    function _getPersistedTableColumnSettings()
+    {
+        $model_name = $this->getModelName();
+        if(AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA && !isset($_SESSION['__activeRecordColumnsSettingsCache']) && AK_CACHE_HANDLER > 0){
+            $this->_loadPersistedColumnSetings();
+        }
+        return isset($_SESSION['__activeRecordColumnsSettingsCache'][$model_name.'_column_settings']) ?
+        $_SESSION['__activeRecordColumnsSettingsCache'][$model_name.'_column_settings'] : false;
+    }
+
+    function _clearPersitedColumnSettings()
+    {
+        if(AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA && AK_CACHE_HANDLER > 0){
+            $Cache =& Ak::cache();
+            $Cache->init(300);
+            $Cache->clean('AkActiveRecord');
+        }
+    }
+
+    function _savePersitedColumnSettings()
+    {
+        if(isset($_SESSION['__activeRecordColumnsSettingsCache'])){
+            $Cache =& Ak::cache();
+            $Cache->init(300);
+            $Cache->save(serialize($_SESSION['__activeRecordColumnsSettingsCache']), 'active_record_db_cache', 'AkActiveRecord');
+        }
+    }
+
+    function _loadPersistedColumnSetings()
+    {
+        if(!isset($_SESSION['__activeRecordColumnsSettingsCache'])){
+            $Cache =& Ak::cache();
+            $Cache->init(300);
+            if($serialized_column_settings = $Cache->get('active_record_db_cache', 'AkActiveRecord') && !empty($serialized_column_settings)){
+                $_SESSION['__activeRecordColumnsSettingsCache'] = @unserialize($serialized_column_settings);
+
+            }elseif(AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA){
+                register_shutdown_function(array($this,'_savePersitedColumnSettings'));
+            }
+        }else{
+            $_SESSION['__activeRecordColumnsSettingsCache'] = array();
+        }
+    }
+    /**#@-*/
 
 
     /**#@+
@@ -2557,13 +2726,15 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function initiateAttributeToNull($attribute)
     {
         if(!isset($this->$attribute)){
-            $this->setAttribute($attribute, null, false);
+            $this->$attribute = null;
         }
     }
 
     function initiateColumnsToNull()
     {
-        array_map(array(&$this,'initiateAttributeToNull'),array_keys(isset($this->_columnsSettings) ? $this->_columnsSettings : array()));
+        if(isset($this->_columnsSettings) && is_array($this->_columnsSettings)){
+            array_map(array(&$this,'initiateAttributeToNull'),array_keys($this->_columnsSettings));
+        }
     }
 
 
@@ -2696,56 +2867,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         return $class_name;
     }
-
-
-    function getTableName($modify_for_associations = true)
-    {
-        if(!isset($this->_tableName)){
-            // We check if we are on a inheritance Table Model
-            $this->getClassForDatabaseTableMapping();
-            if(!isset($this->_tableName)){
-                $this->setTableName();
-            }
-        }
-
-        if($modify_for_associations && isset($this->_associationTablePrefixes[$this->_tableName])){
-            return $this->_associationTablePrefixes[$this->_tableName];
-        }
-
-        return $this->_tableName;
-    }
-
-    function setTableName($table_name = null, $check_for_existence = AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES, $check_mode = false)
-    {
-        static $available_tables;
-        if(empty($table_name)){
-            $table_name = AkInflector::tableize($this->getModelName());
-        }
-        if($check_for_existence){
-            if(!isset($available_tables) || $check_mode){
-                if(!isset($this->_db)){
-                    $this->setConnection();
-                }
-                if(empty($_SESSION['__activeRecordColumnsSettingsCache']['available_tables']) || (AK_ENVIRONMENT != 'development' && !defined('AK_AVOID_ACTIVE_RECORD_DB_SCHEMA_CACHE'))){
-                    $_SESSION['__activeRecordColumnsSettingsCache']['available_tables'] = $this->_db->MetaTables();
-                }
-                $available_tables = $_SESSION['__activeRecordColumnsSettingsCache']['available_tables'];
-            }
-            if(!in_array($table_name,(array)$available_tables)){
-                if(!$check_mode){
-                    trigger_error(Ak::t('Unable to set "%table_name" table for the model "%model".'.
-                    '  There is no "%table_name" available into current database layout.'.
-                    ' Set AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES constant to false in order to'.
-                    ' avoid table name validation',array('%table_name'=>$table_name,'%model'=>$this->getModelName())),E_USER_WARNING);
-                }
-                return false;
-            }
-        }
-        $this->_tableName = $table_name;
-        return true;
-    }
-
-
 
     function getDisplayField()
     {
@@ -4562,65 +4683,11 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $resulting_array;
     }
 
-    /**
-     * Gets information from the database engine about a single table
-     */
-    function _databaseTableInternals($table)
-    {
-        if(empty($_SESSION['__activeRecordColumnsSettingsCache']['database_table_'.$table.'_internals']) || (AK_ENVIRONMENT != 'development' && !defined('AK_AVOID_ACTIVE_RECORD_DB_SCHEMA_CACHE'))){
-            $_SESSION['__activeRecordColumnsSettingsCache']['database_table_'.$table.'_internals'] = $this->_db->MetaColumns($table);
-        }
-        $cache[$table] = $_SESSION['__activeRecordColumnsSettingsCache']['database_table_'.$table.'_internals'];
-
-        return $cache[$table];
-    }
-
 
     function hasBeenModified()
     {
         return Ak::objectHasBeenModified($this);
     }
-
-    function _getDatabaseType()
-    {
-        if(strstr($this->_db->databaseType,'mysql')){
-            return 'mysql';
-        }elseif(strstr($this->_db->databaseType,'sqlite')){
-            return 'sqlite';
-        }elseif(strstr($this->_db->databaseType,'post')){
-            return 'postgre';
-        }else{
-            return 'unknown';
-        }
-    }
-
-    function _runCurrentModelInstallerIfExists(&$column_objects)
-    {
-        static $installed_models = array();
-        if(!defined('AK_AVOID_AUTOMATIC_ACTIVE_RECORD_INSTALLERS') && !in_array($this->getModelName(), $installed_models)){
-            $installed_models[] = $this->getModelName();
-            require_once(AK_LIB_DIR.DS.'AkInstaller.php');
-            $installer_name = $this->getModelName().'Installer';
-            $installer_file = AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'.php';
-            if(file_exists($installer_file)){
-                require_once($installer_file);
-                if(class_exists($installer_name)){
-                    $Installer = new $installer_name();
-                    if(method_exists($Installer,'install')){
-                        $Installer->install();
-                        $column_objects = $this->_databaseTableInternals($this->getTableName());
-                        return !empty($column_objects);
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-
-
-
-
 
     /**
      * Database statements. Database statements is the first step of the Rails connectors port to PHP
