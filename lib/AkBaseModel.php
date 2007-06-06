@@ -149,7 +149,8 @@ class AkBaseModel extends AkObject
     function _executeSql($sql, $trigger_error = true)
     {
         AK_LOG_EVENTS ? ($this->Logger->message($this->getModelName().' executing SQL: '.$sql)) : null;
-        if(!$result = $this->_db->Execute($sql) && AK_DEBUG){
+        $result = $this->_db->Execute($sql);
+        if(!$result && AK_DEBUG){
             AK_LOG_EVENTS ? ($this->Logger->error($this->getModelName().': '.$this->_db->ErrorMsg())) : null;
             $trigger_error ? trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE) : false;
         }

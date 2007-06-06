@@ -460,7 +460,7 @@ class AkActionController extends AkObject
     * * Renders an empty Response with status code 401 (access denied)
     *   $this->render(array('nothing' => true, 'status' => 401));
     */
-    function render($options = null, $status = '200')
+    function render($options = null, $status = 200)
     {
         Ak::profile('Entering into '.__CLASS__.'::'.__FUNCTION__.' '.__FILE__.' on line '.__LINE__);
 

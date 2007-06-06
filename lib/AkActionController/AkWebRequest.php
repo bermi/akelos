@@ -109,7 +109,7 @@ class AkWebRequest extends AkActionController
         empty($Controller->model) ? ($Controller->model = $Controller->params['controller']) : null;
         empty($Controller->models) ? ($Controller->models = array()) : null;
         empty($Controller->_assigns) ? ($Controller->_assigns = array()) : null;
-        empty($Controller->_default_render_status_code) ? ($Controller->_default_render_status_code = '200 OK') : null;
+        empty($Controller->_default_render_status_code) ? ($Controller->_default_render_status_code = 200) : null;
         $Controller->_enableLayoutOnRender = 
             !isset($Controller->_enableLayoutOnRender) ? true : $Controller->_enableLayoutOnRender;
 
