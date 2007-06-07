@@ -272,6 +272,18 @@ class Test_of_AkInflector extends  UnitTestCase
         AkInflector::unaccent('ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ'));
     }
 
+    function Test_for_setting_custom_plurals()
+    {
+        AkInflector::pluralize('camión', 'camiones');
+        $this->assertEqual(AkInflector::pluralize('camión'), 'camiones');
+    }
+    
+    function Test_for_setting_custom_singulars()
+    {
+        AkInflector::singularize('camiones', 'camión');
+        $this->assertEqual(AkInflector::singularize('camiones'), 'camión');
+    }
+
 }
 
 ak_test('Test_of_AkInflector');
