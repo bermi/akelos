@@ -247,19 +247,19 @@ class test_AkActiveRecord extends  UnitTestCase
         $this->assertEqual($User->getArrayFromAkString(' name AND last_name ; options | date '),$expected);
         $this->assertEqual($User->getArrayFromAkString(' name and last_name + options , date '),$expected);
     }
-
+    /**/
     function Test_of_parseAkelosArgs()
     {
         $User = new AkTestUser();
         
-        $expected = array('name'=>'Bermi', 'last_name'=>'Ferrer','date'=>'1978-06-16');
+        $expected = array('name'=>'Bermi', 'last_name'=>'Ferrer','options'=>array('admin'=>true,'expire'=>'never'),'date'=>'1978-06-16');
         $akelos_args = array('name->','Bermi', 'last_name->','Ferrer','options'=>array('admin'=>true,'expire'=>'never'),'date->','1978-06-16');
         $User->parseAkelosArgs($akelos_args);
         $this->assertEqual($akelos_args,$expected);
         $User->parseAkelosArgs($expected);
         $this->assertEqual($akelos_args,$expected);
     }
-    
+    /**/
     function Test_of_isConnected()
     {
         $User = new AkTestUser();
@@ -945,6 +945,7 @@ class test_AkActiveRecord extends  UnitTestCase
         $AkTestField->incrementAttribute($AkTestField->getPrimaryKey());
         $this->assertEqual($AkTestField->getId(), 124);
     }
+    /**/
 
 
 }

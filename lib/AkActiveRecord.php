@@ -1463,16 +1463,25 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function parseAkelosArgs(&$args)
     {
-        $params = array();
-        foreach ($args as $k=>$v){
-            if($k % 2 == 0 && is_string($v) && (substr($v,-2) == '->' || substr($v,-2) == '=>')){
-                $key = trim($v, '=-> ');
-            }elseif(isset($key)) {
-                $params[$key] = $v;
-                unset($key);
+        $k = array_keys($args);
+        if(isset($k[1]) && substr($args[$k[0]],-1) == '>'){
+            $size = sizeOf($k);
+            $params = array();
+            for($i = 0; $i < $size; $i++ ) {
+                $v = $args[$k[$i]];
+                if(!isset($key) && is_string($args[$k[$i]]) && substr($v,-1) == '>'){
+                    $key = rtrim($v, '=-> ');
+                }elseif(isset($key)) {
+                    $params[$key] = $v;
+                    unset($key);
+                }else{
+                    $params[$k[$i]] = $v;
+                }
+            }
+            if(!empty($params)){
+                $args = $params;
             }
         }
-        $args = count($params) > 0 ? $params : $args;
         $this->_castDateParametersFromDateHelper_($args);
     }
 
