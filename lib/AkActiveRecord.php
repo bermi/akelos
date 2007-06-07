@@ -19,8 +19,12 @@
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php');
 
+// Use setColumnName if available when using set('column_name', $value);
+ak_define('ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS', true); 
+ak_define('ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS', true); 
 ak_define('ACTIVE_RECORD_ENABLE_PERSISTENCE', AK_ENVIRONMENT != 'testing');
 ak_define('ACTIVE_RECORD_CACHE_DATABASE_SCHEMA', AK_ACTIVE_RECORD_ENABLE_PERSISTENCE && AK_ENVIRONMENT != 'development');
+ak_define('ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE', 300);
 ak_define('ACTIVE_RECORD_VALIDATE_TABLE_NAMES', true);
 ak_define('ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS', false);
 ak_define('NOT_EMPTY_REGULAR_EXPRESSION','/.+/');
@@ -1559,8 +1563,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function setAttribute($attribute, $value, $inspect_for_callback_child_method = true, $compose_after_set = true)
-    {
+    function setAttribute($attribute, $value, $inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS, $compose_after_set = true){
         static $watchdog;
 
         if($attribute[0] == '_'){
@@ -1572,6 +1575,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
 
         if($inspect_for_callback_child_method === true && method_exists($this,'set'.AkInflector::camelize($attribute))){
+            static $watchdog;
             $watchdog[$attribute] = @$watchdog[$attribute]+1;
             if($watchdog[$attribute] == 5000){
                 if((!defined('AK_ACTIVE_RECORD_PROTECT_SET_RECURSION')) || defined('AK_ACTIVE_RECORD_PROTECT_SET_RECURSION') && AK_ACTIVE_RECORD_PROTECT_SET_RECURSION){
@@ -1585,7 +1589,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if($this->hasAttribute($attribute)){
             $this->{$attribute.'_before_type_cast'} = $value;
             $this->$attribute = $value;
-            if($compose_after_set && !$this->requiredForCombination($attribute)){
+            if($compose_after_set && !empty($this->_combinedAttributes) && !$this->requiredForCombination($attribute)){
                 $combined_attributes = $this->_getCombinedAttributesWhereThisAttributeIsUsed($attribute);
                 foreach ($combined_attributes as $combined_attribute){
                     $this->composeCombinedAttribute($combined_attribute);
@@ -1621,15 +1625,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $this->setAttribute($attribute, $value, $inspect_for_callback_child_method, $compose_after_set);
     }
 
-    function getAttribute($attribute, $inspect_for_callback_child_method = true)
+    function getAttribute($attribute, $inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS)
     {
-        static $watchdog;
-
         if($attribute[0] == '_'){
             return false;
         }
 
         if($inspect_for_callback_child_method === true && method_exists($this,'get'.AkInflector::camelize($attribute))){
+            static $watchdog;
             $watchdog[@$attribute] = @$watchdog[$attribute]+1;
             if($watchdog[$attribute] == 66){
                 if((!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')) || defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') && AK_ACTIVE_RECORD_PROTECT_GET_RECURSION){
@@ -1642,7 +1645,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         if(isset($this->$attribute) || (!isset($this->$attribute) && $this->isCombinedAttribute($attribute))){
             if($this->hasAttribute($attribute)){
-                if ($this->isCombinedAttribute($attribute)){
+                if (!empty($this->_combinedAttributes) && $this->isCombinedAttribute($attribute)){
                     $this->composeCombinedAttribute($attribute);
                 }
                 return isset($this->$attribute) ? $this->$attribute : null;
@@ -1849,20 +1852,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             }
         }
     }
-    /*
-    if(!empty($this->_combinedAttributes)){
-    foreach ($this->_combinedAttributes as $attribute=>$rule){
-    $pattern = $rule[0];
-    $ary = array();
-    $ary = array();
-    for ($x=1;$x<count($rule);$x++){
-    $subattribute = $rule[$x];
-    $ary[$subattribute] = $this->getAttribute($subattribute);
-    }
-    $this->$attribute = method_exists(&$this, $pattern.'Compose') ? $this->{$pattern.'Compose'}($ary) : vsprintf($pattern, $ary);
-    }
-    }
-    */
+    
     function composeCombinedAttribute($combined_attribute)
     {
         if($this->isCombinedAttribute($combined_attribute)){
@@ -2558,7 +2548,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         if(AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA && AK_CACHE_HANDLER > 0){
             $Cache =& Ak::cache();
-            $Cache->init(300);
+            $Cache->init(AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE);
             $Cache->clean('AkActiveRecord');
         }
     }
@@ -2567,7 +2557,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         if(isset($_SESSION['__activeRecordColumnsSettingsCache'])){
             $Cache =& Ak::cache();
-            $Cache->init(300);
+            $Cache->init(AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE);
             $Cache->save(serialize($_SESSION['__activeRecordColumnsSettingsCache']), 'active_record_db_cache', 'AkActiveRecord');
         }
     }
@@ -2576,7 +2566,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         if(!isset($_SESSION['__activeRecordColumnsSettingsCache'])){
             $Cache =& Ak::cache();
-            $Cache->init(300);
+            $Cache->init(AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE);
             if($serialized_column_settings = $Cache->get('active_record_db_cache', 'AkActiveRecord') && !empty($serialized_column_settings)){
                 $_SESSION['__activeRecordColumnsSettingsCache'] = @unserialize($serialized_column_settings);
 
