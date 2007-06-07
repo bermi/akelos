@@ -1994,6 +1994,8 @@ class AkActionController extends AkObject
         if(is_file(AK_ROUTES_MAPPING_FILE)){
             $Map =& AkRouter();
             include(AK_ROUTES_MAPPING_FILE);
+            // Set this routes for being used via Ak::toUrl
+            Ak::toUrl($Map,true);
             $this->Request->checkForRoutedRequests($Map);
         }
     }
