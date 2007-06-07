@@ -20,20 +20,21 @@
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php');
 
 // Use setColumnName if available when using set('column_name', $value);
-ak_define('ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS', true); 
-ak_define('ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS', true); 
-ak_define('ACTIVE_RECORD_ENABLE_PERSISTENCE', AK_ENVIRONMENT != 'testing');
-ak_define('ACTIVE_RECORD_CACHE_DATABASE_SCHEMA', AK_ACTIVE_RECORD_ENABLE_PERSISTENCE && AK_ENVIRONMENT != 'development');
-ak_define('ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE', 300);
-ak_define('ACTIVE_RECORD_VALIDATE_TABLE_NAMES', true);
-ak_define('ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS', false);
-ak_define('NOT_EMPTY_REGULAR_EXPRESSION','/.+/');
-ak_define('EMAIL_REGULAR_EXPRESSION',"/^([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)$/i");
-ak_define('NUMBER_REGULAR_EXPRESSION',"/^[0-9]+$/");
-ak_define('PHONE_REGULAR_EXPRESSION',"/^([\+]?[(]?[\+]?[ ]?[0-9]{2,3}[)]?[ ]?)?[0-9 ()\-]{4,25}$/");
-ak_define('DATE_REGULAR_EXPRESSION',"/^(([0-9]{1,2}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{2,4})|([0-9]{2,4}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{1,2})){1}$/");
-ak_define('IP4_REGULAR_EXPRESSION',"/^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/");
-ak_define('POST_CODE_REGULAR_EXPRESSION',"/^[0-9A-Za-z  -]{2,9}$/");
+defined('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT') ? null : define('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT', true); 
+defined('AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS') ? null : define('AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS', true); 
+defined('AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS') ? null : define('AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS', true); 
+defined('AK_ACTIVE_RECORD_ENABLE_PERSISTENCE') ? null : define('AK_ACTIVE_RECORD_ENABLE_PERSISTENCE', AK_ENVIRONMENT != 'testing');
+defined('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA') ? null : define('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA', AK_ACTIVE_RECORD_ENABLE_PERSISTENCE && AK_ENVIRONMENT != 'development');
+defined('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE') ? null : define('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE', 300);
+defined('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES') ? null : define('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES', true);
+defined('AK_ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS') ? null : define('AK_ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS', false);
+defined('AK_NOT_EMPTY_REGULAR_EXPRESSION') ? null : define('AK_NOT_EMPTY_REGULAR_EXPRESSION','/.+/');
+defined('AK_EMAIL_REGULAR_EXPRESSION') ? null : define('AK_EMAIL_REGULAR_EXPRESSION',"/^([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)$/i");
+defined('AK_NUMBER_REGULAR_EXPRESSION') ? null : define('AK_NUMBER_REGULAR_EXPRESSION',"/^[0-9]+$/");
+defined('AK_PHONE_REGULAR_EXPRESSION') ? null : define('AK_PHONE_REGULAR_EXPRESSION',"/^([\+]?[(]?[\+]?[ ]?[0-9]{2,3}[)]?[ ]?)?[0-9 ()\-]{4,25}$/");
+defined('AK_DATE_REGULAR_EXPRESSION') ? null : define('AK_DATE_REGULAR_EXPRESSION',"/^(([0-9]{1,2}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{2,4})|([0-9]{2,4}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{1,2})){1}$/");
+defined('AK_IP4_REGULAR_EXPRESSION') ? null : define('AK_IP4_REGULAR_EXPRESSION',"/^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/");
+defined('AK_POST_CODE_REGULAR_EXPRESSION') ? null : define('AK_POST_CODE_REGULAR_EXPRESSION',"/^[0-9A-Za-z  -]{2,9}$/");
 
 ak_compat('array_combine');
 
@@ -234,7 +235,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         AK_LOG_EVENTS ? ($this->Logger =& Ak::getLogger()) : null;
         
-        $this->_internationalize = is_null($this->_internationalize) ? count($this->getAvaliableLocales()) > 1 : $this->_internationalize;
+        $this->_internationalize = is_null($this->_internationalize) && AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT ? count($this->getAvaliableLocales()) > 1 : $this->_internationalize;
 
         @$this->_instatiateDefaultObserver();
 
@@ -1573,7 +1574,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
 
     function setAttribute($attribute, $value, $inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS, $compose_after_set = true){
-        static $watchdog;
 
         if($attribute[0] == '_'){
             return false;
@@ -2890,8 +2890,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function hasAttribute ($attribute)
     {
-        $cols = $this->getColumns();
-        return isset($cols[$attribute]) || $this->isCombinedAttribute($attribute);
+        empty($this->_columns) ? $this->getColumns() : $this->_columns;
+        return isset($this->_columns[$attribute]) || (!empty($this->_combinedAttributes) && $this->isCombinedAttribute($attribute));
     }
 
     /**
@@ -2902,7 +2902,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function isCombinedAttribute ($attribute)
     {
-        return !empty($this->_combinedAttributes) && array_key_exists($attribute, $this->_combinedAttributes);
+        return !empty($this->_combinedAttributes) && isset($this->_combinedAttributes[$attribute]);
     }
 
     /**
@@ -2913,7 +2913,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function hasColumn($column)
     {
-        return array_key_exists($column, $this->getColumns());
+        empty($this->_columns) ? $this->getColumns() : $this->_columns;
+        return isset($this->_columns[$column]);
     }
 
     function debug ($data = 'active_record_class', $_functions=0)
@@ -2990,10 +2991,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $ret_attributes = array();
         if(!empty($attributes) && is_array($attributes)){
             $available_attributes = $this->getAvailableAttributes();
-            foreach ($attributes as $k=>$v){
-                $k = str_replace($table_name.'.','',$k);
+            
+            $keys = array_keys($attributes);
+            $size = sizeOf($keys);
+            for ($i=0; $i < $size; $i++){
+                $k = str_replace($table_name.'.','',$keys[$i]);
                 if(isset($available_attributes[$k]['name'][$k])){
-                    $ret_attributes[$k] = $v;
+                    $ret_attributes[$k] =& $attributes[$keys[$i]];
                 }
             }
         }
@@ -3097,33 +3101,17 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function castAttributeFromDatabase($column_name, $value)
     {
         if($this->hasColumn($column_name)){
-            switch ($this->getColumnType($column_name)) {
-                case 'date':
-                if(!empty($value) && strstr(trim($value),' ')){
+            $column_type = $this->getColumnType($column_name);
+            if($column_type){
+                if(!empty($value) && 'date' == $column_type && strstr(trim($value),' ')){
                     return substr($value,0,10) == '0000-00-00' ? null : str_replace(substr($value,strpos($value,' ')), '', $value);
-                }
-                break;
-
-                case 'datetime':
-                if(!empty($value) && substr($value,0,10) == '0000-00-00'){
+                }elseif (!empty($value) && 'datetime' == $column_type && substr($value,0,10) == '0000-00-00'){
                     return null;
-                }
-                break;
-
-                case 'binary':
-                if($this->_getDatabaseType() == 'postgre'){
+                }elseif ('binary' == $column_type && $this->_getDatabaseType() == 'postgre'){
                     return $this->_db->BlobDecode($value);
-                }else{
-                    return $value;
+                }elseif('boolean' == $column_type){
+                    return (integer)$value === 1 ? true : false;
                 }
-
-                case 'boolean':
-                return (integer)$value === 1 ? true : false;
-                break;
-
-                default:
-                return $value;
-                break;
             }
         }
         return $value;

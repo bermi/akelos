@@ -83,7 +83,11 @@ class TagHelper
     */
     function escape_once($html)
     {
-        return TagHelper::_fix_double_escape(htmlentities($html, ENT_COMPAT, Ak::locale('charset')));
+        static $charset;
+        if(empty($charset)){
+            $charset = Ak::locale('charset');
+        }
+        return TagHelper::_fix_double_escape(htmlentities($html, ENT_COMPAT, $charset));
     }
 
     /**

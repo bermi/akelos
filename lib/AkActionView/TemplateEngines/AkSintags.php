@@ -21,13 +21,13 @@ require_once(AK_LIB_DIR.DS.'AkLexer.php');
 require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'TemplateEngines'.DS.'AkSintags'.DS.'AkSintagsLexer.php');
 require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'TemplateEngines'.DS.'AkSintags'.DS.'AkSintagsParser.php');
 
-ak_define('SINTAGS_REMOVE_PHP_SILENTLY', false);
-ak_define('SINTAGS_REPLACE_SHORTHAND_PHP_TAGS', true);
-ak_define('SINTAGS_HIDDEN_COMMENTS_TAG', 'hidden');
+defined('AK_SINTAGS_REMOVE_PHP_SILENTLY') ? null : define('AK_SINTAGS_REMOVE_PHP_SILENTLY', false);
+defined('AK_SINTAGS_REPLACE_SHORTHAND_PHP_TAGS') ? null : define('AK_SINTAGS_REPLACE_SHORTHAND_PHP_TAGS', true);
+defined('AK_SINTAGS_HIDDEN_COMMENTS_TAG') ? null : define('AK_SINTAGS_HIDDEN_COMMENTS_TAG', 'hidden');
 
-ak_define('SINTAGS_OPEN_HELPER_TAG', '<%');
-ak_define('SINTAGS_CLOSE_HELPER_TAG', '%>');
-ak_define('SINTAGS_HASH_KEY_VALUE_DELIMITER', '=>');
+defined('AK_SINTAGS_OPEN_HELPER_TAG') ? null : define('AK_SINTAGS_OPEN_HELPER_TAG', '<%');
+defined('AK_SINTAGS_CLOSE_HELPER_TAG') ? null : define('AK_SINTAGS_CLOSE_HELPER_TAG', '%>');
+defined('AK_SINTAGS_HASH_KEY_VALUE_DELIMITER') ? null : define('AK_SINTAGS_HASH_KEY_VALUE_DELIMITER', '=>');
 
 /**
  * Sintags, The Akelos Framework special syntax for view Templates

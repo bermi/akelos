@@ -260,13 +260,17 @@ class AkInflector
     */
     function camelize($word)
     {
-        if(preg_match_all('/\/(.?)/',$word,$got)){
-            foreach ($got[1] as $k=>$v){
-                $got[1][$k] = '::'.strtoupper($v);
+        static $_cached;
+        if(!isset($_cached[$word])){
+            if(preg_match_all('/\/(.?)/',$word,$got)){
+                foreach ($got[1] as $k=>$v){
+                    $got[1][$k] = '::'.strtoupper($v);
+                }
+                $word = str_replace($got[0],$got[1],$word);
             }
-            $word = str_replace($got[0],$got[1],$word);
+            $_cached[$word] = str_replace(' ','',ucwords(preg_replace('/[^A-Z^a-z^0-9^:]+/',' ',$word)));
         }
-        return str_replace(' ','',ucwords(preg_replace('/[^A-Z^a-z^0-9^:]+/',' ',$word)));
+        return $_cached[$word];
     }
 
     // }}}
@@ -287,9 +291,13 @@ class AkInflector
     */
     function underscore($word)
     {
-        return  strtolower(preg_replace(
-        array('/[^A-Z^a-z^0-9^\/]+/','/([a-z\d])([A-Z])/','/([A-Z]+)([A-Z][a-z])/'),
-        array('_','\1_\2','\1_\2'), $word));
+        static $_cached;
+        if(!isset($_cached[$word])){
+            $_cached[$word] = strtolower(preg_replace(
+            array('/[^A-Z^a-z^0-9^\/]+/','/([a-z\d])([A-Z])/','/([A-Z]+)([A-Z][a-z])/'),
+            array('_','\1_\2','\1_\2'), $word));
+        }
+        return $_cached[$word];
     }
 
 

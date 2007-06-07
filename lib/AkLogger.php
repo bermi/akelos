@@ -46,7 +46,7 @@ defined('AK_LOG_'.E_USER_NOTICE)    ? null : define('AK_LOG_'.E_USER_NOTICE, AK_
 defined('AK_LOG_'.E_WARNING)        ? null : define('AK_LOG_'.E_WARNING, AK_MODE_FILE);
 defined('AK_LOG_'.E_NOTICE)         ? null : define('AK_LOG_'.E_NOTICE, AK_MODE_FILE);
 
-ak_define('LOG_ENABLE_COLORING', true);
+defined('AK_LOG_ENABLE_COLORING') ? null : define('AK_LOG_ENABLE_COLORING', true);
 
 class AkLogger
 {

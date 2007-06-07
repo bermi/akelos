@@ -177,172 +177,178 @@ class AkRouter extends AkObject
     */
     function toUrl($params=array())
     {
-        $parsed = '';
-
-        if(isset($params[AK_SESSION_NAME]) && isset($_COOKIE)){
-            unset($params[AK_SESSION_NAME]);
-        }
-
-
-        foreach ($this->_loaded_routes as $route){
-            $params_copy = $params;
+        static $_cache;
+        $_cache_key = md5(serialize($params));
+        if(!isset($_cache[$_cache_key])){
             $parsed = '';
-            $_controller = '';
-            foreach ($params_copy as $k=>$v){
-                if(isset($$k)){
-                    unset($$k);
-                }
-            }
-            extract($params);
 
-            if(isset($route['options'])){
-                foreach ($route['options'] as $option=>$value){
-                    if(
-                        !empty($route['url_pieces']) && 
-                        isset($route['options'][$option]) && 
-                        array_search(':'.$option, $route['url_pieces']) === false && 
-                        array_search('*'.$option, $route['url_pieces']) === false && 
+            if(isset($params[AK_SESSION_NAME]) && isset($_COOKIE)){
+                unset($params[AK_SESSION_NAME]);
+            }
+
+
+            foreach ($this->_loaded_routes as $route){
+                $params_copy = $params;
+                $parsed = '';
+                $_controller = '';
+                foreach ($params_copy as $k=>$v){
+                    if(isset($$k)){
+                        unset($$k);
+                    }
+                }
+                extract($params);
+
+                if(isset($route['options'])){
+                    foreach ($route['options'] as $option=>$value){
+                        if(
+                        !empty($route['url_pieces']) &&
+                        isset($route['options'][$option]) &&
+                        array_search(':'.$option, $route['url_pieces']) === false &&
+                        array_search('*'.$option, $route['url_pieces']) === false &&
                         (
-                            is_string($value) ||
-                            is_integer($value)) && 
-                            (
-                                !isset($params_copy[$option]
-                            ) ||
-                            $params_copy[$option] != $value
+                        is_string($value) ||
+                        is_integer($value)) &&
+                        (
+                        !isset($params_copy[$option]
+                        ) ||
+                        $params_copy[$option] != $value
                         )
-                    )
-                    {
-                        continue 2;
-                    }
-                    if(isset($params_copy[$option]) && 
-                    $value == $params_copy[$option] && 
-                    $value !== OPTIONAL && 
-                    $value !== COMPULSORY)
-                    {
-                        if($option == 'controller'){
-                            $_controller = $value;
+                        )
+                        {
+                            continue 2;
                         }
-                        unset($params_copy[$option]);
-                        unset($$option);
-                    }
-                }
-            }
-
-
-            foreach ($route['arr_params'] as $arr_route){
-                if(isset($$arr_route) && is_array($$arr_route)){
-                    $$arr_route = join('/',$$arr_route);
-                }
-            }
-
-            $_url_pieces = array();
-            foreach (array_reverse($route['url_pieces']) as $v){
-                if(strstr($v,':') || strstr($v,'*')){
-                    $v = substr($v,1);
-                    if(isset($params[$v])){
-                        if (count($_url_pieces) || isset($route['options'][$v]) && $params[$v] != $route['options'][$v] || !isset($route['options'][$v]) || isset($route['options'][$v]) && $route['options'][$v] === COMPULSORY){
-                            $_url_pieces[] = is_array($params[$v]) ? join('/',$params[$v]) : $params[$v];
+                        if(isset($params_copy[$option]) &&
+                        $value == $params_copy[$option] &&
+                        $value !== OPTIONAL &&
+                        $value !== COMPULSORY)
+                        {
+                            if($option == 'controller'){
+                                $_controller = $value;
+                            }
+                            unset($params_copy[$option]);
+                            unset($$option);
                         }
                     }
-                }else{
-                    $_url_pieces[] = is_array($v) ? join('/',$v) : $v;
+                }
+
+
+                foreach ($route['arr_params'] as $arr_route){
+                    if(isset($$arr_route) && is_array($$arr_route)){
+                        $$arr_route = join('/',$$arr_route);
+                    }
+                }
+
+                $_url_pieces = array();
+                foreach (array_reverse($route['url_pieces']) as $v){
+                    if(strstr($v,':') || strstr($v,'*')){
+                        $v = substr($v,1);
+                        if(isset($params[$v])){
+                            if (count($_url_pieces) || isset($route['options'][$v]) && $params[$v] != $route['options'][$v] || !isset($route['options'][$v]) || isset($route['options'][$v]) && $route['options'][$v] === COMPULSORY){
+                                $_url_pieces[] = is_array($params[$v]) ? join('/',$params[$v]) : $params[$v];
+                            }
+                        }
+                    }else{
+                        $_url_pieces[] = is_array($v) ? join('/',$v) : $v;
+                    }
+                }
+
+
+                $parsed = str_replace('//','/','/'.join('/',array_reverse($_url_pieces)).'/');
+
+                // This might be faster but using eval here might cause security issues
+                //@eval('$parsed = "/".trim(str_replace("//","/","'.str_replace(array('/:','/*'),'/$','/'.join('/',$route['url_pieces']).'/').'"),"/")."/";');
+
+                if($parsed == '//'){
+                    $parsed = '/';
+                }
+
+                if(is_string($parsed)){
+                    if($parsed_arr = $this->toParams($parsed)){
+                        if($parsed == '/' && count(array_diff($params,$parsed_arr)) == 0){
+                            $_cache[$_cache_key] = '/';
+                            return $_cache[$_cache_key];
+                        }
+
+                        if( isset($parsed_arr['controller']) &&
+                        ((isset($controller) && $parsed_arr['controller'] == $controller) ||
+                        (isset($_controller) && $parsed_arr['controller'] == $_controller))){
+
+
+                            if( isset($route['options']['controller']) &&
+                            $route['options']['controller'] !== OPTIONAL &&
+                            $route['options']['controller'] !== COMPULSORY &&
+                            $parsed_arr['controller'] != $route['options']['controller'] &&
+                            count(array_diff(array_keys($route['options']),array_keys($parsed_arr))) > 0){
+                                continue;
+                            }
+
+                            $url_params = array_merge($parsed_arr,$params_copy);
+
+                            if($parsed != '/'){
+                                foreach ($parsed_arr as $k=>$v){
+                                    if(isset($url_params[$k]) && $url_params[$k] == $v){
+                                        unset($url_params[$k]);
+                                    }
+                                }
+                            }
+
+                            foreach (array_reverse($route['url_pieces'], true) as $position => $piece){
+                                $piece = str_replace(array(':','*'),'', $piece);
+                                if(isset($$piece)){
+                                    if(strstr($parsed,'/'.$$piece.'/')){
+                                        unset($url_params[$piece]);
+                                    }
+                                }
+                            }
+
+                            foreach ($url_params as $k=>$v){
+                                if($v == null){
+                                    unset($url_params[$k]);
+                                }
+                            }
+
+                            if($parsed == '/' && !empty($url_params['controller'])){
+                                $parsed = '/'.join('/',array_diff(array($url_params['controller'],@$url_params['action'],@$url_params['id']),array('')));
+                                unset($url_params['controller'],$url_params['action'],$url_params['id']);
+                            }
+
+                            if(defined('AK_URL_REWRITE_ENABLED') && AK_URL_REWRITE_ENABLED === true){
+                                if(isset($url_params['ak'])){
+                                    unset($url_params['ak']);
+                                }
+                                if(isset($url_params['lang'])){
+                                    $parsed = '/'.$url_params['lang'].$parsed;
+                                    unset($url_params['lang']);
+                                }
+                                $parsed .= count($url_params) ? '?'.http_build_query($url_params) : '';
+                            }else{
+                                $parsed = count($url_params) ? '/?ak='.$parsed.'&'.http_build_query($url_params) : '/?ak='.$parsed;
+                            }
+                            $_cache[$_cache_key] = $parsed;
+                            return $parsed;
+                        }
+                    }
                 }
             }
-            
 
-            $parsed = str_replace('//','/','/'.join('/',array_reverse($_url_pieces)).'/');
+            (array)$extra_parameters = @array_diff($params_copy,$parsed_arr);
 
-            // This might be faster but using eval here might cause security issues
-            //@eval('$parsed = "/".trim(str_replace("//","/","'.str_replace(array('/:','/*'),'/$','/'.join('/',$route['url_pieces']).'/').'"),"/")."/";');
 
+            if($parsed == '' && is_array($params)){
+                $parsed = '?'.http_build_query(array_merge($params,(array)$extra_parameters));
+            }
             if($parsed == '//'){
                 $parsed = '/';
             }
 
-            if(is_string($parsed)){
-                if($parsed_arr = $this->toParams($parsed)){
-                    if($parsed == '/' && count(array_diff($params,$parsed_arr)) == 0){
-                        return '/';
-                    }
-                    
-                    if( isset($parsed_arr['controller']) &&
-                    ((isset($controller) && $parsed_arr['controller'] == $controller) ||
-                    (isset($_controller) && $parsed_arr['controller'] == $_controller))){
-
-
-                        if( isset($route['options']['controller']) &&
-                        $route['options']['controller'] !== OPTIONAL &&
-                        $route['options']['controller'] !== COMPULSORY &&
-                        $parsed_arr['controller'] != $route['options']['controller'] &&
-                        count(array_diff(array_keys($route['options']),array_keys($parsed_arr))) > 0){
-                            continue;
-                        }
-
-                        $url_params = array_merge($parsed_arr,$params_copy);
-                        
-                        if($parsed != '/'){
-                            foreach ($parsed_arr as $k=>$v){
-                                if(isset($url_params[$k]) && $url_params[$k] == $v){
-                                    unset($url_params[$k]);
-                                }
-                            }
-                        }
-                        
-                        foreach (array_reverse($route['url_pieces'], true) as $position => $piece){
-                            $piece = str_replace(array(':','*'),'', $piece);
-                            if(isset($$piece)){
-                                if(strstr($parsed,'/'.$$piece.'/')){
-                                    unset($url_params[$piece]);
-                                }
-                            }
-                        }
-
-                        foreach ($url_params as $k=>$v){
-                            if($v == null){
-                                unset($url_params[$k]);
-                            }
-                        }
-
-                        if($parsed == '/' && !empty($url_params['controller'])){
-                            $parsed = '/'.join('/',array_diff(array($url_params['controller'],@$url_params['action'],@$url_params['id']),array('')));
-                            unset($url_params['controller'],$url_params['action'],$url_params['id']);
-                        }
-
-                        if(defined('AK_URL_REWRITE_ENABLED') && AK_URL_REWRITE_ENABLED === true){
-                            if(isset($url_params['ak'])){
-                                unset($url_params['ak']);
-                            }
-                            if(isset($url_params['lang'])){
-                                $parsed = '/'.$url_params['lang'].$parsed;
-                                unset($url_params['lang']);
-                            }
-                            $parsed .= count($url_params) ? '?'.http_build_query($url_params) : '';
-                        }else{
-                            $parsed = count($url_params) ? '/?ak='.$parsed.'&'.http_build_query($url_params) : '/?ak='.$parsed;
-                        }
-                        return $parsed;
-                    }
-                }
+            if(defined('AK_URL_REWRITE_ENABLED') && AK_URL_REWRITE_ENABLED === false && $parsed{0} != '?'){
+                $parsed = '?ak='.trim($parsed,'/');
             }
+
+            $_cache[$_cache_key] = empty($extra_parameters) ? '' : (strstr($parsed,'?') ? '&' : '?').http_build_query($extra_parameters);
+
         }
-
-        (array)$extra_parameters = @array_diff($params_copy,$parsed_arr);
-
-
-        if($parsed == '' && is_array($params)){
-            $parsed = '?'.http_build_query(array_merge($params,(array)$extra_parameters));
-        }
-        if($parsed == '//'){
-            $parsed = '/';
-        }
-
-        if(defined('AK_URL_REWRITE_ENABLED') && AK_URL_REWRITE_ENABLED === false && $parsed{0} != '?'){
-            $parsed = '?ak='.trim($parsed,'/');
-        }
-
-        $parsed .= empty($extra_parameters) ? '' : (strstr($parsed,'?') ? '&' : '?').http_build_query($extra_parameters);
-
-        return $parsed;
+        return $_cache[$_cache_key];
     }
 
     // }}}

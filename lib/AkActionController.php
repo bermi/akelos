@@ -20,7 +20,6 @@ require_once(AK_LIB_DIR.DS.'Ak.php');
 require_once(AK_LIB_DIR.DS.'AkInflector.php');
 require_once(AK_LIB_DIR.DS.'AkObject.php');
 
-
 class AkActionController extends AkObject
 {
     var $__database_connection_available = false;
@@ -206,7 +205,8 @@ class AkActionController extends AkObject
         foreach ($helpers as $file=>$helper){
             $helper_class_name = $helper.'Helper';
             $full_path = preg_match('/[\\\\\/]+/',$file);
-            $full_path ? include_once($file) : include_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.$file);
+            $file_path = $full_path ? $file : AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.$file;
+            include_once($file_path);
 
             if(class_exists($helper_class_name)){
                 $attribute_name = $full_path ? AkInflector::underscore($helper_class_name) : substr($file,0,-4);
@@ -220,8 +220,7 @@ class AkActionController extends AkObject
                 }
             }
         }
-        
-        ak_define('ACTION_CONTROLLER_AVAILABLE_HELPERS', join(',',$available_helpers));
+        defined('AK_ACTION_CONTROLLER_AVAILABLE_HELPERS') ? null : define('AK_ACTION_CONTROLLER_AVAILABLE_HELPERS', join(',',$available_helpers));
     }
 
     function getDefaultHelpers()
@@ -642,7 +641,7 @@ class AkActionController extends AkObject
         'Template','db','helpers','models','layout','Response','Request',
         'params','passed_args');
     }
-    
+
 
     /**
      * Use this to translate strings in the scope of your controller
@@ -974,9 +973,9 @@ class AkActionController extends AkObject
             if(empty($options['lang'])){
                 $rewritten_url .= (empty($locale) ? '' : '/').$locale;
             }
-            
+
         }
-        
+
         $rewritten_url .= (substr($rewritten_url,-1) == '/' ? '' : (AK_URL_REWRITE_ENABLED ? '' : '/'));
         $rewritten_url .= $path;
         $rewritten_url .= empty($options['trailing_slash']) ? '' : '/';
@@ -2510,7 +2509,7 @@ class AkActionController extends AkObject
                 $Server->addService($web_service);
             }
             $Server->init();
-            $Server->serve(); 
+            $Server->serve();
             exit;
         }else{
             die(Ak::t('There is not any webservice configured at this endpoint'));

@@ -16,7 +16,7 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-ak_define('LOG_EVENTS', false);
+defined('AK_LOG_EVENTS') ? null : define('AK_LOG_EVENTS', false);
 
 require_once(AK_LIB_DIR.DS.'Ak.php');
 require_once(AK_LIB_DIR.DS.'AkInflector.php');
