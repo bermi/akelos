@@ -115,13 +115,12 @@ class Ak
                 return;
             }else{
                 require_once(AK_LIB_DIR.DS.'AkRouter.php');
-                $Map =& new AkRouter();
+                $Map = new AkRouter();
                 if(is_file(AK_ROUTES_MAPPING_FILE)){
                     include(AK_ROUTES_MAPPING_FILE);
                 }
             }
         }
-        $Map->debug = true;
         return $Map->toUrl($options);
     }
 
