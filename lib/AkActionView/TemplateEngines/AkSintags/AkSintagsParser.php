@@ -337,6 +337,9 @@ class AkSintagsParser
                 if(!$this->avoid_php_tags){
                     $this->output .= $is_inline_function ? '' : '<?php echo ';
                 }
+                if(!strpos($helper, 'helper')){
+                    $method_name = AkInflector::variablize($method_name);
+                }
                 $this->output .= "\${$helper}->$method_name(";
                 return true;
             }else{
@@ -565,6 +568,7 @@ class AkSintagsParser
                     }
                 }
                 $helpers['render'] = 'controller';
+                $helpers['render_partial'] = 'controller';
             }
             $this->available_helpers = $helpers;
         }

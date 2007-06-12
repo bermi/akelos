@@ -345,8 +345,8 @@ class AkRouter extends AkObject
                 $parsed = '?ak='.trim($parsed,'/');
             }
 
-            $_cache[$_cache_key] = empty($extra_parameters) ? '' : (strstr($parsed,'?') ? '&' : '?').http_build_query($extra_parameters);
-
+            $parsed .= empty($extra_parameters) ? '' : (strstr($parsed,'?') ? '&' : '?').http_build_query($extra_parameters);
+            $_cache[$_cache_key] = $parsed;
         }
         return $_cache[$_cache_key];
     }

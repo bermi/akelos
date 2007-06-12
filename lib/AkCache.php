@@ -173,7 +173,7 @@ class AkCache extends AkObject
     */
     function init($options = null, $cache_type = AK_CACHE_HANDLER)
     {
-        $options = is_int($options) ? array('lifeTime'=>$options) : array();
+        $options = is_int($options) ? array('lifeTime'=>$options) : (is_array($options) ? $options : array());
 
         switch ($cache_type) {
             case 1:
