@@ -566,7 +566,7 @@ class AkRequest extends AkObject
         $session_params = isset($_SESSION['request']) ? $_SESSION['request'] : null;
         $command_line_params = !empty($_REQUEST)  ? $_REQUEST : null;
 
-        $requests = array($command_line_params, $_GET, $_POST, $this->_getNormalizedFilesArray(), $_COOKIE, $session_params);
+        $requests = array($command_line_params, $_GET, array_merge_recursive($_POST, $this->_getNormalizedFilesArray()), $_COOKIE, $session_params);
 
         foreach ($requests as $request){
             $this->_request = (!is_null($request) && is_array($request)) ?

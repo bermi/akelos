@@ -85,7 +85,7 @@ class FormTagHelper  extends AkActionViewHelper
       */
     function select_tag($name, $option_tags = null, $options = array())
     {
-        return TagHelper::content_tag('select', $option_tags, array_merge(array('name'=> $name, 'id' => $name), $options));
+        return TagHelper::content_tag('select', $option_tags, array_merge(array('name'=> $name, 'id' => trim(AkInflector::underscore($name),'_')), $options));
     }
 
     /**
@@ -100,7 +100,7 @@ class FormTagHelper  extends AkActionViewHelper
       */
     function text_field_tag($name, $value = null, $options = array())
     {
-        return TagHelper::tag('input', array_merge(array('type'=>'text','name'=>$name,'id'=>$name,'value'=>$value), $options));
+        return TagHelper::tag('input', array_merge(array('type'=>'text','name'=>$name,'id'=>trim(AkInflector::underscore($name),'_'),'value'=>$value), $options));
     }
 
     /**
