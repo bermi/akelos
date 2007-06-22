@@ -336,7 +336,6 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
 
     function test_associated_uniqueness()
     {
-
         $Property =& new Property();
         $PropertyType =& new PropertyType();
 
@@ -358,6 +357,18 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
         $this->assertTrue($Rancho->save());
         $this->assertTrue($Rancho =&  $PropertyType->findFirstBy('description','Rancho Type', array('include'=>'properties')));
         $this->assertEqual($Rancho->property->count(), 1);
+    }
+    
+    function test_should_include_associates_using_simple_finder()
+    {
+        $Property =& new Property();
+        $PropertyType =& new PropertyType();
+        $this->assertTrue($Rancho =&  $PropertyType->findFirstBy('description','Rancho Type', array('include'=>'properties')));
+                
+        $this->assertTrue($RanchoMaria =& $Property->find($Rancho->properties[0]->getId(), array('include'=>'property_types')));
+        
+        $this->assertEqual($RanchoMaria->property_types[0]->getId(), $Rancho->getId());
+        $this->assertEqual($RanchoMaria->getId(), $Rancho->properties[0]->getId());
     }
 
 }
