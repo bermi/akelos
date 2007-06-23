@@ -352,7 +352,7 @@ class AkInstaller
 
     function _getColumnsAsAdodbDataDictionaryString($columns)
     {
-        $columns = str_replace("\t",' ', $this->_setColumnDefaults($columns));
+        $columns = $this->_setColumnDefaults($columns);
         $equivalences = array(
         '/ ((limit|max|length) ?= ?)([0-9]+)([ \n\r,]+)/'=> ' (\3) ',
         '/([ \n\r,]+)default([ =]+)([^\'^,^\n]+)/i'=> ' DEFAULT \'\3\'',
@@ -382,6 +382,7 @@ class AkInstaller
 
     function _setColumnDefaults($columns)
     {
+	    $columns = str_replace("\t",' ', $columns);
         if(is_string($columns)){
             if(strstr($columns,"\n")){
                 $columns = explode("\n",$columns);
