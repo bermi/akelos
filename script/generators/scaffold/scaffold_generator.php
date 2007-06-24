@@ -135,7 +135,10 @@ class ScaffoldGenerator extends  AkelosGenerator
             $this->save($file_path, $this->render('view', !empty($this->sintags)));
         }
 
-
+        $unit_test_runner = AK_TEST_DIR.DS.'unit.php';
+        if(!file_exists($unit_test_runner)){
+            Ak::file_put_contents($unit_test_runner, file_get_contents(AK_FRAMEWORK_DIR.DS.'test'.DS.'app.php'));
+        }
 
     }
 }
