@@ -82,7 +82,7 @@ class ScaffoldGenerator extends  AkelosGenerator
         $this->_template_vars = (array)$this;
         foreach ($model_files as $template=>$file_path){
             if(!file_exists($file_path)){
-                $this->save($file_path, $this->render($template));
+                $this->save($file_path, $this->render($template, !empty($this->sintags)));
             }
         }
 
@@ -128,11 +128,11 @@ class ScaffoldGenerator extends  AkelosGenerator
 
         $this->_template_vars = (array)$this;
         foreach ($this->files as $template=>$file_path){
-            $this->save($file_path, $this->render($template));
+            $this->save($file_path, $this->render($template, !empty($this->sintags)));
         }
         foreach ($this->user_actions as $action=>$file_path){
             $this->assignVarToTemplate('action',$action);
-            $this->save($file_path, $this->render('view'));
+            $this->save($file_path, $this->render('view', !empty($this->sintags)));
         }
 
 

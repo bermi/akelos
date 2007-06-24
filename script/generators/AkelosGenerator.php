@@ -77,29 +77,44 @@ class AkelosGenerator
     function _identifyUnnamedCommands(&$commands)
     {
         $i = 0;
+        $extra_commands = array();
+        $unnamed_commands = array();
         foreach ($commands as $param=>$value){
+            if($value[0] == '-'){
+                $next_is_value_for = trim($value,'- ');
+                $extra_commands[$next_is_value_for] = true;
+                continue;
+            }
+            
+            if(isset($next_is_value_for)){
+                $extra_commands[$next_is_value_for] = trim($value,'- ');
+                unset($next_is_value_for);
+                continue;
+            }
+            
             if(is_numeric($param)){
                 if(!empty($this->command_values[$i])){
                     $index =$this->command_values[$i];
                     if(substr($this->command_values[$i],0,7) == '(array)'){
                         $index =substr($this->command_values[$i],7);
-                        $commands[$index][] = $value;
+                        $unnamed_commands[$index][] = $value;
                         $i--;
                     }else{
-                        $commands[$index] = $value;
+                        $unnamed_commands[$index] = $value;
                     }
                 }
                 $i++;
             }
         }
+        $commands = array_merge($extra_commands, $unnamed_commands);        
     }
 
-    function render($template)
+    function render($template, $sintags_version = false)
     {
         extract($this->_template_vars);
 
         ob_start();
-        include(AK_SCRIPT_DIR.DS.'generators'.DS.$this->type.DS.'templates'.DS.(strstr($template,'.') ? $template : $template.'.tpl'));
+        include(AK_SCRIPT_DIR.DS.'generators'.DS.$this->type.DS.($sintags_version?'sintags_':'').'templates'.DS.(strstr($template,'.') ? $template : $template.'.tpl'));
         $result = ob_get_contents();
         ob_end_clean();
 
