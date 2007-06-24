@@ -1,8 +1,8 @@
 <div id="sidebar">
   <h1>_{Tasks}:</h1>
   <ul>
-    <li><?php  echo '<%='?> link_to _'Back to overview', :action => 'listing' %></li>
-    <li><?php  echo '<%='?> link_to _'Show this <?php  echo AkInflector::humanize($singular_name)?>', :action => 'show', :id => <?php  echo $singular_name?>.id %></li>
+    <li><?php  echo '<%='?> link_to _('Back to overview'), :action => 'listing' %></li>
+    <li><?php  echo '<%='?> link_to _('Show this <?php  echo AkInflector::humanize($singular_name)?>'), :action => 'show', :id => <?php  echo $singular_name?>.id %></li>
   </ul> 
 </div>
 

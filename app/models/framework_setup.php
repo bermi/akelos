@@ -322,9 +322,9 @@ defined('AK_ENVIRONMENT') ? null : define('AK_ENVIRONMENT', 'development');
 define('AK_AVAILABLE_LOCALES', '%locales');
 
 // Use this in order to allow only these locales on web requests
-define('AK_ACTIVE_RECORD_DEFAULT_LOCALES','%locales');
-define('AK_APP_LOCALES','%locales');
-define('AK_PUBLIC_LOCALES','%locales');
+define('AK_ACTIVE_RECORD_DEFAULT_LOCALES', AK_AVAILABLE_LOCALES);
+define('AK_APP_LOCALES', AK_AVAILABLE_LOCALES);
+define('AK_PUBLIC_LOCALES', AK_AVAILABLE_LOCALES);
 
 %AK_FRAMEWORK_DIR
 
@@ -714,7 +714,8 @@ CONFIG;
         AK_APP_DIR.DS.'installers'.DS.'framework_version.txt',
         AK_APP_DIR.DS.'models'.DS.'framework_setup.php',
         AK_APP_DIR.DS.'controllers'.DS.'framework_setup_controller.php',
-        AK_APP_DIR.DS.'views'.DS.'framework_setup'
+        AK_APP_DIR.DS.'views'.DS.'framework_setup',
+        AK_APP_DIR.DS.'locales'.DS.'framework_setup'
         ));
     }
 

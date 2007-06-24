@@ -1,7 +1,7 @@
 <div id="sidebar">
   <h1>_{Tasks}:</h1>
   <ul>
-    <li><?php  echo '<%='?> link_to _'Create new <?php  echo AkInflector::humanize($singular_name)?>', :action => 'add' %></li>
+    <li><?php  echo '<%='?> link_to _('Create new <?php  echo AkInflector::humanize($singular_name)?>'), :action => 'add' %></li>
   </ul> 
 </div>
 
