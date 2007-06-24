@@ -708,7 +708,10 @@ CONFIG;
     function removeSetupFiles()
     {
         @array_map(array('Ak','file_delete'),  array(
+        AK_APP_DIR.DS.'installers'.DS.'database_installer.php',
         AK_APP_DIR.DS.'installers'.DS.'framework_installer.php',
+        AK_APP_DIR.DS.'installers'.DS.'database_version.txt',
+        AK_APP_DIR.DS.'installers'.DS.'framework_version.txt',
         AK_APP_DIR.DS.'models'.DS.'framework_setup.php',
         AK_APP_DIR.DS.'controllers'.DS.'framework_setup_controller.php',
         AK_APP_DIR.DS.'views'.DS.'framework_setup'

@@ -36,6 +36,11 @@ defined('AK_DATE_REGULAR_EXPRESSION') ? null : define('AK_DATE_REGULAR_EXPRESSIO
 defined('AK_IP4_REGULAR_EXPRESSION') ? null : define('AK_IP4_REGULAR_EXPRESSION',"/^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/");
 defined('AK_POST_CODE_REGULAR_EXPRESSION') ? null : define('AK_POST_CODE_REGULAR_EXPRESSION',"/^[0-9A-Za-z  -]{2,9}$/");
 
+// Forces loading database schema on every call
+if(AK_DEV_MODE && isset($_SESSION['__activeRecordColumnsSettingsCache'])){
+    unset($_SESSION['__activeRecordColumnsSettingsCache']);
+}
+
 ak_compat('array_combine');
 
 /**
