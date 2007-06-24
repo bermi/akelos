@@ -5,7 +5,7 @@ class <?php echo $controller_class_name?> extends ApplicationController
 {
 <?php 
     if($model_name != $controller_name){ // if equal will be handled by the Akelos directly
-        echo "    var \$models = '$singular_name';";
+        echo "    var \$models = '$singular_name';\n\n";
     }
 ?>
     function index()
@@ -40,20 +40,19 @@ class <?php echo $controller_class_name?> extends ApplicationController
             }
         }
     }
+    <?php  if($model_name != $controller_name){ ?>
 
     function edit()
     {
-        if (empty($this->params['id'])){
-         $this->redirectToAction('listing');
-        }
-        if(!empty($this->params['<?php echo $singular_name?>']) && !empty($this->params['id'])){
-            <?php 
-            if($model_name != $controller_name){ // if equal will be handled by the Akelos directly
-                ?>if(empty($this-><?php echo $singular_name?>->id) || $this-><?php echo $singular_name?>->id != $this->params['id']){
-                    $this-><?php echo $singular_name?> =& $this-><?php echo $model_name?>->find($this->params['id']);
-                }<?php
+        if(!empty($this->params['id'])){
+            if(empty($this-><?php echo $singular_name?>->id) || $this-><?php echo $singular_name?>->id != $this->params['id']){
+                $this-><?php echo $singular_name?> =& $this-><?php echo $model_name?>->find($this->params['id']);
             }
-            ?>
+        }else{
+            $this->redirectToAction('listing');
+        }
+
+        if(!empty($this->params['<?php echo $singular_name?>'])){
             $this-><?php echo $singular_name?>->setAttributes($this->params['<?php echo $singular_name?>']);
             if($this->Request->isPost() && $this-><?php echo $singular_name?>->save()){
                 $this->flash['notice'] = $this->t('<?php echo $model_name?> was successfully updated.');
@@ -61,7 +60,23 @@ class <?php echo $controller_class_name?> extends ApplicationController
             }
         }
     }
+    <?php } else { ?>
 
+    function edit()
+    {
+        if (empty($this->params['id'])){
+         $this->redirectToAction('listing');
+        }
+        if(!empty($this->params['<?php echo $singular_name?>']) && !empty($this->params['id'])){
+            $this-><?php echo $singular_name?>->setAttributes($this->params['<?php echo $singular_name?>']);
+            if($this->Request->isPost() && $this-><?php echo $singular_name?>->save()){
+                $this->flash['notice'] = $this->t('<?php echo $model_name?> was successfully updated.');
+                $this->redirectTo(array('action' => 'show', 'id' => $this-><?php echo $singular_name?>->getId()));
+            }
+        }
+    }
+    <?php } ?>
+    
     function destroy()
     {
         if(!empty($this->params['id'])){
