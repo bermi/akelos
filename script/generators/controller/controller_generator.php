@@ -65,6 +65,8 @@ class ControllerGenerator extends  AkelosGenerator
         $this->save(AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.$this->controller_path, $this->render('fixture'));
         $this->save(AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'helpers'.DS.$this->underscored_controller_name."_helper.php", $this->render('helper_fixture'));
         
+        @Ak::make_dir(AK_VIEWS_DIR.DS.AkInflector::underscore($this->class_name));
+        
         foreach ((array)@$this->actions as $action){
             //$this->action = $action;
             $this->assignVarToTemplate('action',$action);

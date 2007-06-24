@@ -67,6 +67,12 @@ class ModelGenerator extends  AkelosGenerator
         foreach ($files as $template=>$file_path){
             $this->save($file_path, $this->render($template));
         }
+        
+        $installer_path = AK_APP_DIR.DS.'installers'.DS.$this->underscored_model_name.'_installer.php';
+        if(!file_exists($installer_path)){
+            $this->save($installer_path, $this->render('installer'));
+        }
+        
     }
     
     function cast()
