@@ -573,7 +573,7 @@ class AkActionController extends AkObject
         $this->performed_render = false;
         $this->_addVariablesToAssigns();
         $this->Template->controller =& $this;
-        $this->$partial_path = $this->renderText($this->Template->renderPartial($partial_path, $object, $local_assigns), $status);
+        $this->$partial_path = $this->renderText($this->Template->renderPartial($partial_path, $object, array_merge($this->_assigns, (array)$local_assigns)), $status);
         return $this->$partial_path;
     }
 

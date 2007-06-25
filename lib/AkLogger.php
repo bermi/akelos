@@ -28,7 +28,7 @@ defined('AK_LOGER_DEFAULT_MAIL_SENDER')         ? null : define('AK_LOGER_DEFAUL
 defined('AK_LOGER_DEFAULT_MAIL_SUBJECT')        ? null : define('AK_LOGER_DEFAULT_MAIL_SUBJECT', 'Log message');
 
 // Default file logger settings
-defined('AK_LOGER_DEFAULT_LOG_FILE')            ? null : define('AK_LOGER_DEFAULT_LOG_FILE', AK_LOG_DIR.DS.AK_HOST.'.log');
+defined('AK_LOGER_DEFAULT_LOG_FILE')            ? null : define('AK_LOGER_DEFAULT_LOG_FILE', AK_LOG_DIR.DS.AK_ENVIRONMENT.'.log');
 
 // Loggin events for log types
 defined('AK_LOGGER_DEBUG')      ? null : define('AK_LOGGER_DEBUG',      AK_MODE_FILE    | AK_MODE_DISPLAY);

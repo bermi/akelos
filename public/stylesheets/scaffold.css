@@ -192,11 +192,6 @@ a:visited.paginationLink {
   clear: both;
 }
 
-hr {
-  margin: 50px 0 0 0;
-  border: 1px solid #eee;
-}
-
 .fieldWithErrors {
   padding: 2px;
   background-color: red;
@@ -246,4 +241,8 @@ hr {
 
 .show label {
   font-weight: bold;
+}
+
+.fieldError {
+  background-color:#fdd;
 }

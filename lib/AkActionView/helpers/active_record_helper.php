@@ -180,6 +180,8 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
     
     function to_tag($options = array())
     {
+        $options = array_merge($this->object->getErrorsOn($this->method_name)==false?array():array("class"=>"fieldError"), $options);
+        
         switch ($this->get_column_type()) {
 
             case 'string':
