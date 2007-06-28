@@ -31,7 +31,9 @@ class AkFtp
 
         if($ftp = AkFtp::connect()){
 
+            $file = AkFtp::unrelativizePath($file);
             $file = str_replace('\\','/',$file);
+
             $path = dirname($file);
 
             if(!AkFtp::is_dir($path)){
@@ -59,6 +61,7 @@ class AkFtp
     {
         if($ftp = AkFtp::connect()){
 
+            $file = AkFtp::unrelativizePath($file);
             $file = str_replace('\\','/',$file);
 
             $tmpfname = tempnam('/tmp', 'tmp');
@@ -153,6 +156,7 @@ class AkFtp
     function make_dir($path)
     {
         if($ftp_conn = AkFtp::connect()){
+            $path = AkFtp::unrelativizePath($path);
             $path = str_replace('\\','/',$path);
             if(!strstr($path,'/')){
                 $dir = array(trim($path,'.'));
@@ -187,6 +191,7 @@ class AkFtp
     {
         $result = false;
         if($ftp_conn = AkFtp::connect()){
+            $path = AkFtp::unrelativizePath($path);
             $path = str_replace('\\','/',$path);
             $path = str_replace(array('..','./'),array('',''),$path);
             $keep_parent_dir = substr($path,-2) != '/*';
@@ -240,6 +245,7 @@ class AkFtp
     function is_dir($path)
     {
         if($ftp_conn = AkFtp::connect()){
+            $path = AkFtp::unrelativizePath($path);
             $path = str_replace('\\','/',$path);
             $result = @ftp_chdir ($ftp_conn, $path);
             AkFtp::connect();
@@ -248,8 +254,30 @@ class AkFtp
         return false;
     }
 
-    
-
+    function unrelativizePath($path)
+    {
+        
+        if(!strstr($path,'..')){
+            return $path;
+        }
+        
+        $path_parts = explode(DS, $path);
+        if(!empty($path_parts)){
+            $new_parts = array();
+            for ($i = 0, $count = sizeof($path_parts); $i < $count; $i++) {
+                if ($path_parts[$i] === '' || $path_parts[$i] == '.'){
+                    continue;
+                }
+                if ($path_parts[$i] == '..') {
+                    array_pop($new_parts);
+                    continue;
+                }
+                array_push($new_parts, $path_parts[$i]);
+            }
+            return implode(DS, $new_parts);
+        }
+        return false;
+    }
 }
 
 

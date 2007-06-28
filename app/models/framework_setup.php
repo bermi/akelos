@@ -322,9 +322,9 @@ defined('AK_ENVIRONMENT') ? null : define('AK_ENVIRONMENT', 'development');
 define('AK_AVAILABLE_LOCALES', '%locales');
 
 // Use this in order to allow only these locales on web requests
-define('AK_ACTIVE_RECORD_DEFAULT_LOCALES', AK_AVAILABLE_LOCALES);
-define('AK_APP_LOCALES', AK_AVAILABLE_LOCALES);
-define('AK_PUBLIC_LOCALES', AK_AVAILABLE_LOCALES);
+define('AK_ACTIVE_RECORD_DEFAULT_LOCALES', '%locales');
+define('AK_APP_LOCALES', '%locales');
+define('AK_PUBLIC_LOCALES', '%locales');
 
 %AK_FRAMEWORK_DIR
 
@@ -434,6 +434,7 @@ CONFIG;
     function guessApplicationName()
     {
         $application_name = array_pop(explode('/',AK_SITE_URL_SUFFIX));
+        $application_name = empty($application_name) ? substr(AK_BASE_DIR, strrpos(AK_BASE_DIR, DS)+1) : $application_name; 
         return empty($application_name) ? 'my_app' : $application_name;
     }
 
@@ -547,7 +548,7 @@ CONFIG;
         'admin_database_user' => $this->getDatabaseAdminUser(),
         'admin_database_password' => $this->getDatabaseAdminPassword(),
 
-        'url_suffix'=> AK_SITE_URL_SUFFIX,
+        'url_suffix'=> trim(AK_SITE_URL_SUFFIX, '/'),
         'locales'=> join(',',$this->suggestLocales()),
         'ftp_user' => $this->getFtpUser(),
         'ftp_host' => $this->getFtpHost(),
@@ -619,7 +620,7 @@ CONFIG;
 
     function hasUrlSuffix()
     {
-        return !empty($this->url_suffix);
+        return !empty($this->url_suffix) && trim($this->url_suffix,'/') != '';
     }
 
     function suggestUserName()
