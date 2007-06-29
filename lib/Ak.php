@@ -1792,7 +1792,7 @@ $GLOBALS['false'] = false;
 $GLOBALS['true'] = true;
 
 
-AK_PHP5 ? null : eval('function clone($object){return $object;}');
+AK_PHP5 || function_exists('clone') ? null : eval('function clone($object){return $object;}');
 
 Ak::profile('Ak.php class included'.__FILE__);
 
