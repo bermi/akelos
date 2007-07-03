@@ -599,14 +599,14 @@ class  TextHelper
         if(empty($message)){
             $message = '';
             foreach ($this->_controller->flash as $k=>$v){
-                if(is_string($v)){
+                if(is_string($v) && !empty($v)){
                     $message .= TagHelper::content_tag('div', $v, array('id'=>'flash_'.$k));
                 }
             }
         }elseif (is_array($message)){
             $message = '';
             foreach ($this->_controller->flash as $k=>$v){
-                if(is_string($v)){
+                if(is_string($v) && !empty($v)){
                     $message .= TagHelper::content_tag('div', $v, array('id'=>'flash_'.$k));
                 }
             }
