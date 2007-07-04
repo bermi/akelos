@@ -386,3 +386,10 @@ _{I need to print \{something_inside_curly_brackets\}. _\{Maybe a multilingual t
 
 <?php } ?>
 
+===================================
+
+{conflict_key}\_{conflicted_file_loop_key}
+
+-----------------------------------
+
+<?php echo $conflict_key; ?>_<?php echo $conflicted_file_loop_key; ?>

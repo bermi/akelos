@@ -134,6 +134,16 @@ class AkSintagsParser
     }
 
     //------------------------------------
+    //  ESCAPED TEXT
+    //------------------------------------
+
+    function EscapedText($match, $state)
+    {
+        $this->output .= ltrim($match,'\\');
+        return true;
+    }
+
+    //------------------------------------
     //  TRANSLATIONS
     //------------------------------------
 

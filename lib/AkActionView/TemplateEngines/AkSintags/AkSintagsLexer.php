@@ -29,6 +29,7 @@ class AkSintagsLexer extends AkLexer
     'Php',
     'Comment',
     'Helper',
+    'EscapedText',
     'Translation',
     'VariableTranslation',
     'EndTag',
@@ -76,6 +77,11 @@ class AkSintagsLexer extends AkLexer
         }
     }
 
+    function _addEscapedTextTokens()
+    {
+        $this->addSpecialPattern('\x5C_(?={)','Text','EscapedText');
+    }
+    
     function _addTranslationTokens()
     {
         $this->addEntryPattern('_{','Text','Translation');
