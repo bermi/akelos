@@ -1470,12 +1470,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function parseAkelosArgs(&$args)
     {
         $k = array_keys($args);
-        if(isset($k[1]) && substr($args[$k[0]],-1) == '>'){
+        if(isset($k[1]) && substr($args[$k[0]],-1) == '>' && preg_match('/$[a-zA-Z0-9_]+>^/', $k[0])){
             $size = sizeOf($k);
             $params = array();
             for($i = 0; $i < $size; $i++ ) {
                 $v = $args[$k[$i]];
-                if(!isset($key) && is_string($args[$k[$i]]) && substr($v,-1) == '>'){
+                if(!isset($key) && is_string($args[$k[$i]]) && substr($v,-1) == '>' && preg_match('/$[a-zA-Z0-9_]+>^/', $v)){
                     $key = rtrim($v, '=-> ');
                 }elseif(isset($key)) {
                     $params[$key] = $v;
@@ -1578,8 +1578,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function setAttribute($attribute, $value, $inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS, $compose_after_set = true){
-
+    function setAttribute($attribute, $value, $inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS, $compose_after_set = true)
+    {
         if($attribute[0] == '_'){
             return false;
         }
@@ -1587,7 +1587,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if($this->isFrozen()){
             return false;
         }
-
         if($inspect_for_callback_child_method === true && method_exists($this,'set'.AkInflector::camelize($attribute))){
             static $watchdog;
             $watchdog[$attribute] = @$watchdog[$attribute]+1;
