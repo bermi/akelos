@@ -429,14 +429,14 @@ class Ak
         $options = array_merge($default_options, $options);
 
         $sucess = true;
-        $dir_name = str_replace('..','', rtrim($dir_name,'\\/. '));
-        if($dir_name == ''){
+        $dir_name = Ak::_getRestrictedPath($dir_name, $options);
+
+        if(empty($dir_name)){
             return false;
         }
-        $dir_name = trim(str_replace($options['base_path'], '',$dir_name),DS);
+
         if($options['ftp']){
             require_once(AK_LIB_DIR.DS.'AkFtp.php');
-            $dir_name = trim(str_replace(array(DS,'//'),array('/','/'),$dir_name),'/');
             return AkFtp::delete($dir_name);
         }else{
             if($fs_items = glob($options['base_path'].DS.$dir_name."/*")){
@@ -479,13 +479,85 @@ class Ak
         return false;
     }
 
+    /**
+    * This static method will copy recursively all the files or directories from one
+    * path within an Akelos application to another.
+    * 
+    * It uses current installation settings, so it can perform copies via the filesystem or via FTP
+    */
+    function copy($origin, $target, $options = array())
+    {
+        $default_options = array(
+        'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
+        'base_path' => AK_BASE_DIR,
+        );
+        $options = array_merge($default_options, $options);
+
+        $sucess = true;
+
+        $origin = Ak::_getRestrictedPath($origin, $options);
+        $target = Ak::_getRestrictedPath($target, $options);
+        
+        if(empty($origin) || empty($target)){
+            return false;
+        }
+
+        if($options['ftp']){
+            require_once(AK_LIB_DIR.DS.'AkFtp.php');
+        }
+        $destination = str_replace($origin, $target, $origin);
+        if(is_file($options['base_path'].DS.$origin)){
+            return Ak::file_put_contents($options['base_path'].DS.$destination, Ak::file_get_contents($options['base_path'].DS.$origin, $options), $options);
+        }
+        Ak::make_dir($options['base_path'].DS.$destination);
+        if($fs_items = glob($options['base_path'].DS.$origin."/*")){
+            $items_to_copy = array('directories'=>array(), 'files'=>array());
+            foreach($fs_items as $fs_item) {
+                $items_to_copy[ (is_dir($fs_item) ? 'directories' : 'files') ][] = $fs_item;
+            }
+            foreach ($items_to_copy['files'] as $file){
+                $destination = str_replace($origin, $target, $file);
+                $sucess = $sucess ? Ak::file_put_contents($destination, Ak::file_get_contents($file, $options), $options) : $sucess;
+            }
+            foreach ($items_to_copy['directories'] as $directory){
+                $destination = str_replace($origin, $target, $directory);
+                $sucess = $sucess ? Ak::copy($directory, $destination, $options) : $sucess;
+            }
+        }
+        return $sucess;
+    }
+
+    /**
+     * Returns a path restricting it to a base location
+     * 
+     * This is used by Akelos to prevent functions namespaced under Ak
+     * from writing out of the Akelos base directory for security reasons.
+     */
+    function _getRestrictedPath($path, $options = array())
+    {
+        $default_options = array(
+        'ftp' => false,
+        'base_path' => AK_BASE_DIR,
+        );
+        $options = array_merge($default_options, $options);
+
+        $path = str_replace('..','', rtrim($path,'\\/. '));
+        $path = trim(str_replace($options['base_path'], '',$path),DS);
+
+        if($options['ftp']){
+            $path = trim(str_replace(array(DS,'//'),array('/','/'), $path),'/');
+        }
+        
+        return $path;
+    }
+
 
     /**
      * Perform a web request using curl
      * 
      * @param string $url URL we are going to request.
      * @param array $options Options for current request.
-Options are:
+     *  Options are:
      * * referer: URL that will be set as referer url. Default is current url
      * * params: Parameter for the request. Can be an array of key=>values or a url params string like key=value&key2=value2
      * * method: In case params are given the will be requested using post method by default. Specify get if post is not what you need.
