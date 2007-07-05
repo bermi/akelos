@@ -21,6 +21,7 @@ ob_start('ob_logstdout', 2);
 
 define('AK_CONSOLE_MODE', true);
 defined('AK_ENVIRONMENT') ? null : define('AK_ENVIRONMENT', 'development');
+define('AK_ENABLE_AKELOS_ARGS', true); 
 include(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
 
 error_reporting(defined('AK_ERROR_REPORTING_ON_SCRIPTS') ? AK_ERROR_REPORTING_ON_SCRIPTS : 0);

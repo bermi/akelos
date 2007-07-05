@@ -19,6 +19,9 @@
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php');
 
+// Akelos args is a short way to call functions that is only intended for fast prototyping
+defined('AK_ENABLE_AKELOS_ARGS') ? null : define('AK_ENABLE_AKELOS_ARGS', false); 
+
 // Use setColumnName if available when using set('column_name', $value);
 defined('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT') ? null : define('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT', true); 
 defined('AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS') ? null : define('AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS', true); 
@@ -1466,16 +1469,24 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * create(array('first_name'=>'Bermi', 'last_name'=> 'Ferrer'));
     *
     * Use this syntax only for quick testings, not for production environments. If the number of arguments varies, the result might be unpredictable.
+    *
+    * This function syntax is disabled by default. You need to define('AK_ENABLE_AKELOS_ARGS', true)
+    * if you need this functionality.
+    *
+    * @deprecated
     */
     function parseAkelosArgs(&$args)
     {
+        if(!AK_ENABLE_AKELOS_ARGS){
+            return ;
+        }
         $k = array_keys($args);
-        if(isset($k[1]) && substr($args[$k[0]],-1) == '>' && preg_match('/$[a-zA-Z0-9_]+>^/', $k[0])){
+        if(isset($k[1]) && substr($args[$k[0]],-1) == '>'){
             $size = sizeOf($k);
             $params = array();
             for($i = 0; $i < $size; $i++ ) {
                 $v = $args[$k[$i]];
-                if(!isset($key) && is_string($args[$k[$i]]) && substr($v,-1) == '>' && preg_match('/$[a-zA-Z0-9_]+>^/', $v)){
+                if(!isset($key) && is_string($args[$k[$i]]) && substr($v,-1) == '>'){
                     $key = rtrim($v, '=-> ');
                 }elseif(isset($key)) {
                     $params[$key] = $v;

@@ -19,7 +19,7 @@ define('AK_TEST_HELPERS_DIR', AK_TEST_DIR.DIRECTORY_SEPARATOR.'fixtures'.DIRECTO
 define('AK_SITE_URL_SUFFIX', str_replace(array(join(DIRECTORY_SEPARATOR,array_diff((array)@explode(DIRECTORY_SEPARATOR,AK_TEST_DIR),
 (array)@explode('/',@$_SERVER['REQUEST_URI']))),DIRECTORY_SEPARATOR),array('','/'),AK_TEST_DIR));
 
-
+defined('AK_ENABLE_AKELOS_ARGS') ? null : define('AK_ENABLE_AKELOS_ARGS', true); 
 //define('AK_SKIP_DB_CONNECTION',isset($db) && $db === false);
 
 include_once(substr(AK_TEST_DIR,0,-5).DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
