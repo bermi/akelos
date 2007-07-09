@@ -553,14 +553,14 @@ class AkRouter extends AkObject
                 }
             }elseif(isset($options[$piece])){
                 if($options[$piece] === OPTIONAL){
-                    $regex_arr[] = array($piece=>'([^\/]+)?');
+                    $regex_arr[] = array($piece=>'[^\/]*');
                 }elseif ($options[$piece] === COMPULSORY){
                     $regex_arr[] = array($piece=> COMPULSORY_REGEX);
                 }elseif(is_string($options[$piece]) && $options[$piece][0] == '/' &&
                 ($_tmp_close_char = strlen($options[$piece])-1 || $options[$piece][$_tmp_close_char] == '/')){
                     $regex_arr[] = array($piece=> substr($options[$piece],1,$_tmp_close_char*-1));
                 }elseif ($options[$piece] != ''){
-                    $regex_arr[] = array($piece=>'([^\/]+)?');
+                    $regex_arr[] = array($piece=>'[^\/]*');
                     $optional_pieces[$piece] = $piece;
                 }
             }else{
@@ -599,9 +599,9 @@ class AkRouter extends AkObject
 
             if(isset($optional_pieces[$k])){
                 $terminal = (is_numeric($options[$k]) && $options[$k] > 0 && in_array($k,$arr_params)) ? '{'.$options[$k].'}' : ($pieces_count == $pos+1 ? '?' : '{1}');
-                $regex .= $is_arr ? '('.$single_regex.'(\/)'.$slash_delimiter.')+' : '('.$single_regex.'(\/)'.$slash_delimiter.')'.$terminal;
+                $regex .= $is_arr ? '('.$single_regex.'\/'.$slash_delimiter.')+' : '('.$single_regex.'\/'.$slash_delimiter.')'.$terminal;
             }else{
-                $regex .= $is_arr ? $single_regex.'(\/)+' : $single_regex.'(\/)'.($pieces_count == $pos+1 ? '?' : $slash_delimiter);
+                $regex .= $is_arr ? $single_regex.'\/+' : $single_regex.'\/'.($pieces_count == $pos+1 ? '?' : $slash_delimiter);
             }
         }
         $regex = rtrim($regex ,'/').'){1}$/';
