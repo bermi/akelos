@@ -10,7 +10,7 @@ Model-View-Control pattern. It lets you write less code by favoring
 conventions over configuration.
 
 You can find more information at the Akelos Framework website at
-http://akelos.org 
+http://www.akelos.org 
 
 
 The tutorial

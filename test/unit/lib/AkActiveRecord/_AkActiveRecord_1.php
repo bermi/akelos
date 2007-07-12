@@ -282,20 +282,6 @@ class test_AkActiveRecord extends  UnitTestCase
         //$this->assertErrorPattern('/Ooops! Could not fetch details for the table ak_test_unavailable_database./',$AkTestUnavailableDatabase->getTableName());
     }
 
-    function Test_of_attributesFromColumnDefinition()
-    {
-        $User = new AkTestUser();
-        $input = array('first_name'=>'Bermi','last_name'=>'Ferrer Martinez','not_valid'=>'Invalid value','id'=>123);
-        $expected = array('first_name'=>'Bermi','last_name'=>'Ferrer Martinez','id'=>123);
-        $got = $User->filterForeignAndProtectedAttributes($input);
-        $this->assertEqual($got,$expected);
-
-        $User->setProtectedAttributes('last_name');
-        $expected = array('first_name'=>'Bermi','id'=>123);
-        $got = $User->filterForeignAndProtectedAttributes($input);
-        $this->assertEqual($got,$expected);
-
-    }
 
     // Test_of_setConnection(){} //This will not be tested due its simplicity
 

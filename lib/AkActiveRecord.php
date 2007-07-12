@@ -11,6 +11,7 @@
 /**
  * @package AkelosFramework
  * @subpackage AkActiveRecord
+ * @component Active Record
  * @author Bermi Ferrer <bermi a.t akelos c.om> 2004 - 2007
  * @author Kaste 2007
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
@@ -117,7 +118,7 @@ ak_compat('array_combine');
 * 
 * == Saving arrays, hashes, and other non-mappable objects in text columns ==
 * 
-* Active Record can serialize any object in text columns. To do so, you must specify this with by setting the attribute serialize whith 
+* Active Record can serialize any object in text columns. To do so, you must specify this with by setting the attribute serialize with 
 * a comma separated list of columns or an array. 
 * This makes it possible to store arrays, hashes, and other non-mappeable objects without doing any additional work. Example:
 * 
@@ -294,97 +295,77 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     }
 
-
-
     /**
-    * If this macro is used, only those attributed named in it will be accessible 
-    * for mass-assignment, such as new ModelName($attributes) and $this->attributes($attributes). 
-    * This is the more conservative choice for mass-assignment protection. 
-    * If you'd rather start from an all-open default and restrict attributes as needed, 
-    * have a look at AkActiveRecord::setProtectedAttributes().
+    * New objects can be instantiated as either empty (pass no construction parameter) or pre-set with attributes but not yet saved
+    * (pass an array with key names matching the associated table column names). 
+    * In both instances, valid attribute keys are determined by the column names of the associated table; hence you can't 
+    * have attributes that aren't part of the table columns.
     */
-    function setAccessibleAttributes()
+    function newRecord($attributes)
     {
-        $args = func_get_args();
-        $this->_accessibleAttributes = array_unique(array_merge((array)$this->_accessibleAttributes, $args));
-    }
+        $this->_newRecord = true;
 
-    /**
-     * Attributes named in this macro are protected from mass-assignment, such as 
-     * new ModelName($attributes) and $this->attributes(attributes). Their assignment 
-     * will simply be ignored. Instead, you can use the direct writer methods to do assignment. 
-     * This is meant to protect sensitive attributes to be overwritten by URL/form hackers. 
-     * 
-     * Example:
-     * <code>
-     *   class Customer extends AkActiveRecord
-     *    {
-     *      function Customer()
-     *      {
-     *          $this->setProtectedAttributes('credit_rating');
-     *      }
-     *    }
-     *  
-     *    $Customer = new Customer('name' => 'David', 'credit_rating' => 'Excellent');
-     *    $Customer->credit_rating // => null
-     *    $Customer->attributes(array('description' => 'Jolly fellow', 'credit_rating' => 'Superb'));
-     *    $Customer->credit_rating // => null
-     *  
-     *    $Customer->credit_rating = 'Average'
-     *    $Customer->credit_rating // => 'Average'
-     *  </code>
-     */    
-    function setProtectedAttributes()
-    {
-        $args = func_get_args();
-        $this->_protectedAttributes = array_unique(array_merge((array)$this->_protectedAttributes, $args));
-    }
-
-
-    /**
-    * Returns true if a connection that?s accessible to this class have already been opened.
-    */ 
-    function isConnected()
-    {
-        return isset($this->_db);
-    }
-
-    /**
-    * Returns the connection currently associated with the class. This can also be used to 
-    * "borrow" the connection to do database work unrelated to any of the specific Active Records.
-    */
-    function &getConnection()
-    {
-        return $this->_db;
-    }
-
-    /**
-    * Set the connection for the class.
-    */
-    function setConnection($dns = null, $connection_id = null)
-    {
-        $this->_db =& Ak::db($dns, $connection_id);
-    }
-
-    /**
-    * Returns an array of columns objects where the primary id, all columns ending in "_id" or "_count", 
-    * and columns used for single table inheritance has been removed.
-    */
-    function getContentColumns()
-    {
-        $inheritance_column = $this->getInheritanceColumn();
-        $columns = $this->getColumns();
-        foreach ($columns as $name=>$details){
-            if((substr($name,-3) == '_id' || substr($name,-6) == '_count') ||
-            !empty($details['primaryKey']) || ($inheritance_column !== false && $inheritance_column == $name)){
-                unset($columns[$name]);
-            }
+        if(AK_ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS && empty($attributes)){
+            return;
         }
-        return $columns;
+
+        if(isset($attributes) && !is_array($attributes)){
+            $attributes = func_get_args();
+        }
+        $this->setAttributes($this->attributesFromColumnDefinition(),true);
+        $this->setAttributes($attributes);
+    }
+
+
+    /**
+    * Returns a clone of the record that hasn't been assigned an id yet and is treated as a new record.
+    */
+    function cloneRecord()
+    {
+        $model_name = $this->getModelName();
+        $attributes = $this->getAttributesBeforeTypeCast();
+        if(isset($attributes[$this->getPrimaryKey()])){
+            unset($attributes[$this->getPrimaryKey()]);
+        }
+        return new $model_name($attributes);
+    }
+
+
+    /**
+    * Returns true if this object hasn't been saved yet that is, a record for the object doesn't exist yet.
+    */
+    function isNewRecord()
+    {
+        if(!isset($this->_newRecord) && !isset($this->{$this->getPrimaryKey()})){
+            $this->_newRecord = true;
+        }
+        return $this->_newRecord;
     }
 
 
 
+    /**
+    * Reloads the attributes of this object from the database.
+    */   
+    function reload()
+    {
+        /**
+        * @todo clear cache
+        */        
+        if($object = $this->find($this->getId())){
+            $this->setAttributes($object->getAttributes(), true);
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+
+
+    /** 
+                         Creating records
+    ====================================================================
+    */
     /**
     * Creates an object, instantly saves it as a record (if the validation permits it), and returns it. 
     * If the save fail under validations, the unsaved object is still returned.
@@ -406,7 +387,153 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $object;
     }
 
+    function createOrUpdate($validate = true)
+    {
+        if($validate && !$this->isValid() || !($this->isNewRecord() ? $this->afterValidationOnCreate() : $this->afterValidationOnUpdate())){
+            $this->transactionFail();
+            return false;
+        }
+        return $this->isNewRecord() ? $this->_create() : $this->_update();
+    }
+    
 
+    /**
+    * Creates a new record with values matching those of the instance attributes.
+    * Must be called as a result of a call to createOrUpdate.
+    */
+    function _create()
+    {
+        if($this->isFrozen()){
+            $this->transactionFail();
+            return false;
+        }
+
+        if($this->beforeCreate()){
+
+            $this->notifyObservers('beforeCreate');
+
+            if($this->_recordTimestamps){
+                if ($this->hasColumn('created_at')){
+                    $this->setAttribute('created_at', Ak::getDate());
+                }
+                if ($this->hasColumn('created_on')){
+                    $this->setAttribute('created_on', Ak::getDate(null, 'Y-m-d'));
+                }
+
+                if(isset($this->expires_on)){
+                    if(isset($this->expires_at) && $this->hasColumn('expires_at')){
+                        $this->setAttribute('expires_at',Ak::getDate(strtotime($this->expires_at) + (defined('AK_TIME_DIFFERENCE') ? AK_TIME_DIFFERENCE*60 : 0)));
+                    }elseif(isset($this->expires_on) && $this->hasColumn('expires_on')){
+                        $this->setAttribute('expires_on',Ak::getDate(strtotime($this->expires_on) + (defined('AK_TIME_DIFFERENCE') ? AK_TIME_DIFFERENCE*60 : 0), 'Y-m-d'));
+                    }
+                }
+            }
+
+            $attributes = $this->getColumnsForAtrributes($this->getAttributes());
+
+            if($this->isLockingEnabled()){
+                $attributes['lock_version'] = 1;
+                $this->setAttribute('lock_version',1);
+            }
+
+            $pk = $this->getPrimaryKey();
+            $table = $this->getTableName();
+
+            foreach ($attributes as $column=>$value){
+                $attributes[$column] = $this->castAttributeForDatabase($column,$value);
+            }
+
+            /**
+            * @todo sanitize attributes
+            * 'beforeValidationOnCreate', 'afterValidationOnCreate'
+            */
+            if(!isset($this->_generateSequence) || (isset($this->_generateSequence) && $this->_generateSequence !== false)){
+                if((empty($attributes[$pk]) || (!empty($attributes[$pk]) && (integer)$attributes[$pk] > 0 ))){
+                    if($this->_getDatabaseType() != 'mysql'){
+                        $table_details = $this->_databaseTableInternals('seq_'.$table);
+                        if(!isset($table_details['ID'])){
+                            $this->_db->CreateSequence('seq_'.$table);
+                        }
+                        $attributes[$pk] = $this->_db->GenID('seq_'.$table);
+                    }
+                }
+            }
+
+            $__attributes = $attributes;
+            $attributes = array_diff($attributes, array('',"''"));
+
+            $sql = 'INSERT INTO '.$table.' '.
+            '('.join(', ',array_keys($attributes)).') '.
+            'VALUES ('.join(',',array_values($attributes)).')';
+
+            if(!$this->_executeSql($sql, false)){
+                AK_DEBUG ? trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE) : null;
+            }
+
+            $id = !empty($attributes[$pk]) ? $attributes[$pk] : $this->_db->Insert_ID($table, $pk);
+            $this->setId($id);
+
+            if(!$this->transactionHasFailed()){
+                $this->_newRecord = false;
+                if(!$this->afterCreate()){
+                    $this->transactionFail();
+                }else{
+                    $this->notifyObservers('afterCreate');
+                }
+            }
+        }else{
+            $this->transactionFail();
+        }
+        return $this;
+    }
+
+    /*/Creating records*/
+
+
+    /** 
+                         Saving records
+    ====================================================================
+    */
+    /**
+    * - No record exists: Creates a new record with values matching those of the object attributes.
+    * - A record does exist: Updates the record with values matching those of the object attributes.
+    */
+    function save($validate = true)
+    {
+        if($this->isFrozen()){
+            return false;
+        }
+        $result = false;
+        $this->transactionStart();
+        if($this->beforeSave() && $this->notifyObservers('beforeSave')){
+            $result = $this->createOrUpdate($validate);
+            if(!$this->transactionHasFailed()){
+                if(!$this->afterSave()){
+                    $this->transactionFail();
+                }else{
+                    if(!$this->notifyObservers('afterSave')){
+                        $this->transactionFail();
+                    }
+                }
+            }
+        }else{
+            $this->transactionFail();
+        }
+
+        $result = $this->transactionHasFailed() ? false : $result;
+        $this->transactionComplete();
+
+        return $result;
+    }
+    
+    /*/Saving records*/
+    
+    /** 
+                            Counting Records
+    ====================================================================
+    See also: Counting Attributes.
+    */
+    
     /**
       * Returns the result of an SQL statement that should only include a COUNT(*) in the SELECT part.
       * 
@@ -429,38 +556,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         return @(integer)$rs->fields[0];
     }
-
-    /**
-    * Increments the specified counter by one. So $DiscussionBoard->incrementCounter("post_count", 
-    * $discussion_board_id); would increment the "post_count" counter on the board responding to 
-    * $discussion_board_id. This is used for caching aggregate values, so that they doesn't need to 
-    * be computed every time. Especially important for looping over a collection where each element 
-    * require a number of aggregate values. Like the $DiscussionBoard that needs to list both the number of posts and comments.
+    /*/Counting Records*/
+    
+    /** 
+                          Updating records
+    ====================================================================
+    See also: Callbacks.
     */
-    function incrementCounter($counter_name, $id, $difference = 1)
-    {
-        $new_value = $this->getAttribute($counter_name) + $difference;
-        if($this->updateAll($counter_name.' = '.$new_value, $this->getPrimaryKey().' = '.$this->castAttributeForDatabase($this->getPrimaryKey(), $id)) === 0){
-            return false;
-        }
-        return $new_value;
-    }
-
-    /**
-    * Works like AkActiveRecord::incrementCounter, but decrements instead.
-    */
-    function decrementCounter($counter_name, $id, $difference = 1)
-    {
-        $new_value = $this->getAttribute($counter_name) - $difference;
-
-        if(!$this->updateAll($counter_name.' = '.$new_value, $this->getPrimaryKey().' = '.$this->castAttributeForDatabase($this->getPrimaryKey(), $id)) === 0){
-            return false;
-        }
-        return $new_value;
-    }
-
-
-
+    
     /**
     * Finds the record from the passed id, instantly saves it with the passed attributes (if the validation permits it), 
     * and returns it. If the save fail under validations, the unsaved object is still returned.
@@ -506,15 +609,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return isset($object) ? $object->save() : $this->save();
     }
 
-
-
-
     /**
     * Updates all records with the SET-part of an SQL update statement in updates and returns an 
     * integer with the number of rows updates. A subset of the records can be selected by specifying conditions. Example:
     * <code>$Billing->updateAll("category = 'authorized', approved = 1", "author = 'David'");</code>
     * 
-    * Important note: Condifitons are not sanitized yet so beware of accepting 
+    * Important note: Conditions are not sanitized yet so beware of accepting 
     * variable conditions when using this function
     */
     function updateAll($updates, $conditions = null)
@@ -533,6 +633,82 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
 
     /**
+    * Updates the associated record with values matching those of the instance attributes.
+    * Must be called as a result of a call to createOrUpdate.
+    */
+    function _update()
+    {
+        if($this->isFrozen()){
+            $this->transactionFail();
+            return false;
+        }
+        if($this->beforeUpdate()){
+            $this->notifyObservers('beforeUpdate');
+
+            if($this->_recordTimestamps){
+                if ($this->hasColumn('updated_at')){
+                    $this->setAttribute('updated_at', Ak::getDate());
+                }
+                if ($this->hasColumn('updated_on')){
+                    $this->setAttribute('updated_on', Ak::getDate(null, 'Y-m-d'));
+                }
+            }
+
+
+            $lock_check = '';
+            if ($this->isLockingEnabled()){
+                $previous_value = $this->lock_version;
+                $this->setAttribute('lock_version', $previous_value + 1);
+                $lock_check = ' AND lock_version = '.$previous_value;
+            }
+
+            $quoted_attributes = $this->getAvailableAttributesQuoted();
+
+            if(!empty($quoted_attributes)){
+                $sql = 'UPDATE '.$this->getTableName().' '.
+                'SET '.join(', ', $quoted_attributes) .' '.
+                'WHERE '.$this->getPrimaryKey().'='.$this->quotedId().$lock_check;
+            }
+
+            if(!$this->_executeSql($sql, false)){
+                $this->transactionFail();
+                AK_DEBUG ? trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE) : null;
+            }
+
+            if ($this->isLockingEnabled()){
+                if($this->_db->Affected_Rows() != 1){
+                    $this->setAttribute('lock_version', $previous_value);
+                    $this->transactionFail();
+                    trigger_error(Ak::t('Attempted to update a stale object'), E_USER_NOTICE);
+                    return false;
+                }
+            }
+
+            if(!$this->transactionHasFailed()){
+                if($this->afterUpdate()){
+                    $this->notifyObservers('afterUpdate');
+                }else {
+                    $this->transactionFail();
+                }
+            }
+
+        }else{
+            $this->transactionFail();
+        }
+        return $this;
+    }
+    
+    /*/Updating records*/
+    
+    
+    
+    /** 
+                          Deleting records
+    ====================================================================
+    See also: Callbacks.
+    */
+    
+    /**
     * Deletes the record with the given id without instantiating an object first. If an array of 
     * ids is provided, all of them are deleted.
     */
@@ -547,38 +723,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
 
     /**
-    * Returns an array of names for the attributes available on this object sorted alphabetically.
-    */
-    function getAttributeNames()
-    {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
-        $attributes = array_keys($this->getAvailableAttributes());
-        $names = array_combine($attributes,array_map(array(&$this,'getAttributeCaption'), $attributes));
-        natsort($names);
-        return $names;
-    }
-
-
-    /**
-    * Returns true if the specified attribute has been set by the user or by a database load and is neither null nor empty?
-    */
-    function isAttributePresent($attribute)
-    {
-        $value = $this->getAttribute($attribute);
-        return !empty($value);
-    }
-
-
-
-    /**
     * Deletes all the records that matches the condition without instantiating the objects first 
     * (and hence not calling the destroy method). Example:
     * 
     * <code>$Post->destroyAll("person_id = 5 AND (category = 'Something' OR category = 'Else')");</code>
     * 
-    * Important note: Condifitons are not sanitized yet so beware of accepting 
+    * Important note: Conditions are not sanitized yet so beware of accepting 
     * variable conditions when using this function
     */
     function deleteAll($conditions = null)
@@ -665,7 +815,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-
     /**
     * Destroys the objects for all the records that matches the condition by instantiating 
     * each object and calling the destroy method. 
@@ -689,66 +838,16 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             return false;
         }
     }
+    
+    /*/Deleting records*/
 
 
 
-
-
-    /**
-    * Establishes the connection to the database. Accepts an array as input where the 'adapter' 
-    * key must be specified with the name of a database adapter (in lower-case) example for regular 
-    * databases (MySQL, Postgresql, etc):
-    * 
-    *   $AkActiveRecord->establishConnection(
-    *       array(
-    *       'adapter'  => "mysql",
-    *       'host'     => "localhost",
-    *       'username' => "myuser",
-    *       'password' => "mypass",
-    *       'database' => "somedatabase"
-    *       ));
-    *
-    *    Example for SQLite database:
-    *
-    *     $AkActiveRecord->establishConnection(
-    *       array(
-    *       'adapter' => "sqlite",
-    *       'dbfile'  => "path/to/dbfile"
-    *       )
-    *     )
+    
+    /** 
+                          Finding records
+    ====================================================================
     */
-    function &establishConnection($spec = null)
-    {
-        if(isset($spec)){
-            $dns = is_string($spec) ? $spec : '';
-            if(!empty($spec['adapter'])){
-                $dsn = $spec['adapter'] == 'sqlite' ?
-                'sqlite://'.urlencode($spec['dbfile']).'/' :
-                $spec['adapter'].'://'.@$spec['username'].':'.@$spec['password'].'@'.@$spec['host'].'/'.@$spec['database'];
-            }
-            $dsn .= isset($spec['persist']) && $spec['persist'] === false ? '' : '?persist';
-            return $this->setConnection($dns);
-        }else{
-            return false;
-        }
-    }
-
-
-    /**
-    * Just freeze the attributes hash, such that associations are still accessible even on destroyed records.
-    * 
-    * @todo implement freeze correctly for its intended use
-    */
-    function freeze()
-    {
-        $this->_freeze = true;
-    }
-
-    function isFrozen()
-    {
-        return !empty($this->_freeze);
-    }
-
 
     /**
     * Returns true if the given id represents the primary key of a record in the database, false otherwise. Example:
@@ -759,9 +858,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         return $this->find('first',array('conditions' => array($this->getPrimaryKey().' = '.$id))) !== false;
     }
-
-
-
 
     /**
      * Find operates with three different retrieval approaches:
@@ -1008,70 +1104,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function &objectCache()
-    {
-        static $cache;
-        $args =& func_get_args();
-        if(count($args) == 2){
-            if(!isset($cache[$args[0]])){
-                $cache[$args[0]] =& $args[1];
-            }
-        }elseif(!isset($cache[$args[0]])){
-            return false;
-        }
-        return $cache[$args[0]];
-    }
-
-    /**
-    * Gets an array from a string.
-    *
-    * Acts like Php explode() function but uses any of this as valid separators ' AND ',' and ',' + ',' ',',',';'
-    */
-    function getArrayFromAkString($string)
-    {
-        if(is_array($string)){
-            return $string;
-        }
-        $string = str_replace(array(' AND ',' and ',' + ',' ',',',';'),array('|','|','|','','|','|'),trim($string));
-        return strstr($string,'|') ? explode('|', $string) : array($string);
-    }
-
-    // Gets the column name for use with single table inheritance ? can be overridden in subclasses.
-    function getInheritanceColumn()
-    {
-        return empty($this->_inheritanceColumn) ? ($this->hasColumn('type') ? 'type' : false ) : $this->_inheritanceColumn;
-    }
-
-    // Defines the column name for use with single table inheritance ? can be overridden in subclasses.
-    function setInheritanceColumn($column_name)
-    {
-        if(!$this->hasColumn($column_name)){
-            trigger_error(Ak::t('Could not set "%column_name" as the inheritance column as this column is not available on the database.',array('%column_name'=>$column_name)), E_USER_NOTICE);
-            return false;
-        }elseif($this->getColumnType($column_name) != 'string'){
-            trigger_error(Ak::t('Could not set %column_name as the inheritance column as this column type is "%column_type" instead of "string".',array('%column_name'=>$column_name,'%column_type'=>$this->getColumnType($column_name))), E_USER_NOTICE);
-            return false;
-        }else{
-            $this->_inheritanceColumn = $column_name;
-            return true;
-        }
-    }
-
-    function getColumnsWithRegexBoundaries()
-    {
-        $columns = array_keys($this->getColumns());
-        foreach ($columns as $k=>$column){
-            $columns[$k] = '/([^\.])\b('.$column.')\b/';
-        }
-        return $columns;
-    }
-
-
-
-    //SELECT t.code as codigo , c.description  as descripcion FROM technical_listings as t LEFT OUTER JOIN categories as c ON c.id = t.category_id
-
-
-
     /**
     * Works like find_all, but requires a complete SQL string. Examples:
     * $Post->findBySql("SELECT p.*, c.author FROM posts p, comments c WHERE p.id = c.post_id");
@@ -1116,10 +1148,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $objects;
     }
 
-
-
     /**
-    * This function pretends to emulate ror finders until AkActiveRecord::addMethod becomes stable on future PHP versions.
+    * This function pretends to emulate RoR finders until AkActiveRecord::addMethod becomes stable on future PHP versions.
     * @todo use PHP5 __call method for handling the magic finder methods like findFirstByUnsenameAndPassword('bermi','pass')
     */
     function &findFirstBy()
@@ -1165,6 +1195,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $result;
     }
 
+    /**
+    * This method allows you to use finders in a more flexible way like:
+    * 
+    *   findBy('username AND password', $username, $password);
+    *   findBy('age > ? AND name:contains', 18, 'Joe');
+    *   findBy('is_active = true AND session_id', session_id());
+    *   
+    */
     function &findBy()
     {
         if(!isset($this->_activeRecordHasBeenInstantiated)){
@@ -1293,39 +1331,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
 
 
-    /**
-    * Finder methods must instantiate through this method to work with the single-table inheritance model and
-    * eager loading associations.
-    * that makes it possible to create objects of different types from the same table.
-    */
-    function &instantiate($record, $set_as_new = true)
-    {
-        $inheritance_column = $this->getInheritanceColumn();
-        if(!empty($record[$inheritance_column])){
-            $inheritance_column = $record[$inheritance_column];
-            $inheritance_model_name = AkInflector::camelize($inheritance_column);
-            @require_once(AkInflector::toModelFilename($inheritance_model_name));
-            if(!class_exists($inheritance_model_name)){
-                trigger_error($this->t("The single-table inheritance mechanism failed to locate the subclass: '%class_name'. ".
-                "This error is raised because the column '%column' is reserved for storing the class in case of inheritance. ".
-                "Please rename this column if you didn't intend it to be used for storing the inheritance class ".
-                "or overwrite #{self.to_s}.inheritance_column to use another column for that information.",
-                array('%class_name'=>$inheritance_model_name, '%column'=>$this->getInheritanceColumn())),E_USER_ERROR);
-            }
-        }
-
-        $model_name = isset($inheritance_model_name) ? $inheritance_model_name : $this->getModelName();
-        $object =& new $model_name('attributes', $record);
-
-        $object->_newRecord = $set_as_new;
-
-        (AK_CLI && AK_ENVIRONMENT == 'development') ? $object ->toString() : null;
-
-        return $object;
-    }
-
-
-
     function constructFinderSql($options, $select_from_prefix = 'default')
     {
         $sql = isset($options['select_prefix']) ? $options['select_prefix'] : ($select_from_prefix == 'default' ? 'SELECT * FROM '.$this->getTableName() : $select_from_prefix);
@@ -1408,121 +1413,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $new_conditions;
     }
 
-
-    function descendsFromActiveRecord(&$object)
-    {
-        if(substr(strtolower(get_parent_class($object)),-12) == 'activerecord'){
-            return true;
-        }
-        if(!method_exists($object, 'getInheritanceColumn')){
-            return false;
-        }
-        $inheritance_column = $object->getInheritanceColumn();
-        return !empty($inheritance_column);
-    }
-
-
-    function typeCondition()
-    {
-        $inheritance_column = $this->getInheritanceColumn();
-        $type_condition = array();
-        $table_name = $this->getTableName();
-        $available_types = array_merge(array($this->getModelName()),$this->getSubclasses());
-        foreach ($available_types as $subclass){
-            $type_condition[] = ' '.$table_name.'.'.$inheritance_column.' = \''.AkInflector::demodulize($subclass).'\' ';
-        }
-        return empty($type_condition) ? '' : '('.join('OR',$type_condition).') ';
-    }
-
-    function getSubclasses()
-    {
-        $current_class = get_class($this);
-        $subclasses = array();
-        $classes = get_declared_classes();
-
-        while ($class = array_shift($classes)) {
-            $parent_class = get_parent_class($class);
-            if($parent_class == $current_class || in_array($parent_class,$subclasses)){
-                $subclasses[] = $class;
-            }elseif(!empty($parent_class)){
-                $classes[] = $parent_class;
-            }
-        }
-        $subclasses = array_unique(array_map(array(&$this,'_getModelName'),$subclasses));
-        return $subclasses;
-    }
-
     function _quoteColumnName($column_name)
     {
         return $this->_db->nameQuote.$column_name.$this->_db->nameQuote;
     }
 
 
-    /**
-    * Parses an special formated array as a list of keys and values
-    * 
-    * This function generates an array with values and keys from an array with numeric keys.
-    * 
-    * This allows to parse an array to a function in the following manner.
-    * create('first_name->', 'Bermi', 'last_name->', 'Ferrer');
-    * //Previous code will be the same that
-    * create(array('first_name'=>'Bermi', 'last_name'=> 'Ferrer'));
-    *
-    * Use this syntax only for quick testings, not for production environments. If the number of arguments varies, the result might be unpredictable.
-    *
-    * This function syntax is disabled by default. You need to define('AK_ENABLE_AKELOS_ARGS', true)
-    * if you need this functionality.
-    *
-    * @deprecated
-    */
-    function parseAkelosArgs(&$args)
-    {
-        if(!AK_ENABLE_AKELOS_ARGS){
-            return ;
-        }
-        $k = array_keys($args);
-        if(isset($k[1]) && substr($args[$k[0]],-1) == '>'){
-            $size = sizeOf($k);
-            $params = array();
-            for($i = 0; $i < $size; $i++ ) {
-                $v = $args[$k[$i]];
-                if(!isset($key) && is_string($args[$k[$i]]) && substr($v,-1) == '>'){
-                    $key = rtrim($v, '=-> ');
-                }elseif(isset($key)) {
-                    $params[$key] = $v;
-                    unset($key);
-                }else{
-                    $params[$k[$i]] = $v;
-                }
-            }
-            if(!empty($params)){
-                $args = $params;
-            }
-        }
-        $this->_castDateParametersFromDateHelper_($args);
-    }
-
-    /**
-    * Joins date arguments into a single attribute. Like the array generated by the date_helper, so
-    * array('published_on(1i)' => 2002, 'published_on(2i)' => 'January', 'published_on(3i)' => 24)
-    * Will be converted to array('published_on'=>'2002-01-24')
-    */
-    function _castDateParametersFromDateHelper_(&$params)
-    {
-        if(empty($params)){
-            return;
-        }
-        $date_attributes = array();
-        foreach ($params as $k=>$v) {
-            if(preg_match('/^([A-Za-z0-9_]+)\(([1-5]{1})i\)$/',$k,$match)){
-                $date_attributes[$match[1]][$match[2]] = $v;
-                unset($params[$k]);
-            }
-        }
-        foreach ($date_attributes as $attribute=>$date){
-            $params[$attribute] = Ak::getDate(Ak::getTimestamp(trim(@$date[1].'-'.@$date[2].'-'.@$date[3].' '.@$date[4].':'.@$date[5],' :-')));
-        }
-    }
 
 
     // EXPERIMENTAL: Will allow to create finders when PHP includes aggregate_methods as a stable feature on PHP4, for PHP5 we might use __call
@@ -1566,29 +1462,123 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-
     /**
-    * New objects can be instantiated as either empty (pass no construction parameter) or pre-set with attributes but not yet saved
-    * (pass an array with key names matching the associated table column names). 
-    * In both instances, valid attribute keys are determined by the column names of the associated table ? hence you can't 
-    * have attributes that aren't part of the table columns.
+    * Finder methods must instantiate through this method to work with the single-table inheritance model and
+    * eager loading associations.
+    * that makes it possible to create objects of different types from the same table.
     */
-    function newRecord($attributes)
+    function &instantiate($record, $set_as_new = true)
     {
-        $this->_newRecord = true;
-
-        if(AK_ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS && empty($attributes)){
-            return;
+        $inheritance_column = $this->getInheritanceColumn();
+        if(!empty($record[$inheritance_column])){
+            $inheritance_column = $record[$inheritance_column];
+            $inheritance_model_name = AkInflector::camelize($inheritance_column);
+            @require_once(AkInflector::toModelFilename($inheritance_model_name));
+            if(!class_exists($inheritance_model_name)){
+                trigger_error($this->t("The single-table inheritance mechanism failed to locate the subclass: '%class_name'. ".
+                "This error is raised because the column '%column' is reserved for storing the class in case of inheritance. ".
+                "Please rename this column if you didn't intend it to be used for storing the inheritance class ".
+                "or overwrite #{self.to_s}.inheritance_column to use another column for that information.",
+                array('%class_name'=>$inheritance_model_name, '%column'=>$this->getInheritanceColumn())),E_USER_ERROR);
+            }
         }
 
-        if(isset($attributes) && !is_array($attributes)){
-            $attributes = func_get_args();
-        }
-        $this->setAttributes($this->attributesFromColumnDefinition(),true);
-        $this->setAttributes($attributes);
+        $model_name = isset($inheritance_model_name) ? $inheritance_model_name : $this->getModelName();
+        $object =& new $model_name('attributes', $record);
+
+        $object->_newRecord = $set_as_new;
+
+        (AK_CLI && AK_ENVIRONMENT == 'development') ? $object ->toString() : null;
+
+        return $object;
     }
+    
+    /*/Finding records*/
+    
 
 
+     /** 
+                           Table inheritance
+     ====================================================================
+     */
+     function descendsFromActiveRecord(&$object)
+     {
+         if(substr(strtolower(get_parent_class($object)),-12) == 'activerecord'){
+             return true;
+         }
+         if(!method_exists($object, 'getInheritanceColumn')){
+             return false;
+         }
+         $inheritance_column = $object->getInheritanceColumn();
+         return !empty($inheritance_column);
+     }
+
+     /**
+     * Gets the column name for use with single table inheritance. Can be overridden in subclasses.
+    */
+     function getInheritanceColumn()
+     {
+         return empty($this->_inheritanceColumn) ? ($this->hasColumn('type') ? 'type' : false ) : $this->_inheritanceColumn;
+     }
+
+     /**
+     * Defines the column name for use with single table inheritance. Can be overridden in subclasses.
+     */
+     function setInheritanceColumn($column_name)
+     {
+         if(!$this->hasColumn($column_name)){
+             trigger_error(Ak::t('Could not set "%column_name" as the inheritance column as this column is not available on the database.',array('%column_name'=>$column_name)), E_USER_NOTICE);
+             return false;
+         }elseif($this->getColumnType($column_name) != 'string'){
+             trigger_error(Ak::t('Could not set %column_name as the inheritance column as this column type is "%column_type" instead of "string".',array('%column_name'=>$column_name,'%column_type'=>$this->getColumnType($column_name))), E_USER_NOTICE);
+             return false;
+         }else{
+             $this->_inheritanceColumn = $column_name;
+             return true;
+         }
+     }
+
+
+     function getSubclasses()
+     {
+         $current_class = get_class($this);
+         $subclasses = array();
+         $classes = get_declared_classes();
+
+         while ($class = array_shift($classes)) {
+             $parent_class = get_parent_class($class);
+             if($parent_class == $current_class || in_array($parent_class,$subclasses)){
+                 $subclasses[] = $class;
+             }elseif(!empty($parent_class)){
+                 $classes[] = $parent_class;
+             }
+         }
+         $subclasses = array_unique(array_map(array(&$this,'_getModelName'),$subclasses));
+         return $subclasses;
+     }
+
+
+     function typeCondition()
+     {
+         $inheritance_column = $this->getInheritanceColumn();
+         $type_condition = array();
+         $table_name = $this->getTableName();
+         $available_types = array_merge(array($this->getModelName()),$this->getSubclasses());
+         foreach ($available_types as $subclass){
+             $type_condition[] = ' '.$table_name.'.'.$inheritance_column.' = \''.AkInflector::demodulize($subclass).'\' ';
+         }
+         return empty($type_condition) ? '' : '('.join('OR',$type_condition).') ';
+     }
+
+     /*/Table inheritance*/
+
+
+
+    /** 
+                         Setting Attributes
+    ====================================================================
+    See also: Getting Attributes, Model Attributes, Toggling Attributes, Counting Attributes.
+    */
     function setAttribute($attribute, $value, $inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS, $compose_after_set = true)
     {
         if($attribute[0] == '_'){
@@ -1603,7 +1593,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $watchdog[$attribute] = @$watchdog[$attribute]+1;
             if($watchdog[$attribute] == 5000){
                 if((!defined('AK_ACTIVE_RECORD_PROTECT_SET_RECURSION')) || defined('AK_ACTIVE_RECORD_PROTECT_SET_RECURSION') && AK_ACTIVE_RECORD_PROTECT_SET_RECURSION){
-                    trigger_error(Ak::t('You are calling recursivelly AkActiveRecord::setAttribute by placing parent::setAttribute() or  parent::set() on your model "%method" method. In order to avoid this, set the 3rd paramenter of parent::setAttribute to FALSE. If this was the behaviour you expected, please define the constant AK_ACTIVE_RECORD_PROTECT_SET_RECURSION and set it to false',array('%method'=>'set'.AkInflector::camelize($attribute))),E_USER_ERROR);
+                    trigger_error(Ak::t('You are calling recursively AkActiveRecord::setAttribute by placing parent::setAttribute() or  parent::set() on your model "%method" method. In order to avoid this, set the 3rd paramenter of parent::setAttribute to FALSE. If this was the behaviour you expected, please define the constant AK_ACTIVE_RECORD_PROTECT_SET_RECURSION and set it to false',array('%method'=>'set'.AkInflector::camelize($attribute))),E_USER_ERROR);
                     return false;
                 }
             }
@@ -1638,9 +1628,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return true;
     }
 
-
-
-
     function set($attribute, $value = null, $inspect_for_callback_child_method = true, $compose_after_set = true)
     {
         if(is_array($attribute)){
@@ -1649,6 +1636,47 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $this->setAttribute($attribute, $value, $inspect_for_callback_child_method, $compose_after_set);
     }
 
+    /**
+    * Allows you to set all the attributes at once by passing in an array with 
+    * keys matching the attribute names (which again matches the column names). 
+    * Sensitive attributes can be protected from this form of mass-assignment by 
+    * using the $this->setProtectedAttributes method. Or you can alternatively 
+    * specify which attributes can be accessed in with the $this->setAccessibleAttributes method. 
+    * Then all the attributes not included in that won?t be allowed to be mass-assigned.
+    */
+    function setAttributes($attributes, $override_attribute_protection = false)
+    {
+        $this->parseAkelosArgs($attributes);
+        if(!$override_attribute_protection){
+            $attributes = $this->removeAttributesProtectedFromMassAssignment($attributes);
+        }
+        if(!empty($attributes) && is_array($attributes)){
+            foreach ($attributes as $k=>$v){
+                $this->setAttribute($k, $v);
+            }
+        }
+    }
+
+    
+    function setId($value)
+    {
+        if($this->isFrozen()){
+            return false;
+        }
+        $pk = $this->getPrimaryKey();
+        $this->$pk = $value;
+        return true;
+    }
+    
+    
+    /*/Setting Attributes*/
+
+    /** 
+                         Getting Attributes
+    ====================================================================
+    See also: Setting Attributes, Model Attributes, Toggling Attributes, Counting Attributes.
+    */
+    
     function getAttribute($attribute, $inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS)
     {
         if($attribute[0] == '_'){
@@ -1719,30 +1747,193 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         return $attributes;
     }
+    
 
+    /**
+    * Every Active Record class must use "id" as their primary ID. This getter overwrites the native id method, which isn't being used in this context.
+    */
+    function getId()
+    {
+        return $this->{$this->getPrimaryKey()};
+    }
+
+    /*/Getting Attributes*/
+
+
+
+    /** 
+                         Toggling Attributes
+    ====================================================================
+    See also: Setting Attributes, Getting Attributes.
+    */
+    /**
+    * Turns an attribute that?s currently true into false and vice versa. Returns attribute value.
+    */
+    function toggleAttribute($attribute)
+    {
+        $value = $this->getAttribute($attribute);
+        $new_value = $value ? false : true;
+        $this->setAttribute($attribute, $new_value);
+        return $new_value;
+    }
 
 
     /**
-    * Allows you to set all the attributes at once by passing in an array with 
-    * keys matching the attribute names (which again matches the column names). 
-    * Sensitive attributes can be protected from this form of mass-assignment by 
-    * using the $this->setProtectedAttributes method. Or you can alternatively 
-    * specify which attributes can be accessed in with the $this->setAccessibleAttributes method. 
-    * Then all the attributes not included in that won?t be allowed to be mass-assigned.
+    * Toggles the attribute and saves the record.
     */
-    function setAttributes($attributes, $override_attribute_protection = false)
+    function toggleAttributeAndSave($attribute)
     {
-        $this->parseAkelosArgs($attributes);
-        if(!$override_attribute_protection){
-            $attributes = $this->removeAttributesProtectedFromMassAssignment($attributes);
+        $value = $this->toggleAttribute($attribute);
+        if($this->updateAttribute($attribute, $value)){
+            return $value;
         }
-        if(!empty($attributes) && is_array($attributes)){
-            foreach ($attributes as $k=>$v){
-                $this->setAttribute($k, $v);
-            }
+        return null;
+    }
+
+    /*/Toggling Attributes*/
+    
+    
+    /** 
+                         Counting Attributes
+    ====================================================================
+    See also: Counting Records, Setting Attributes, Getting Attributes.
+    */
+
+    /**
+    * Increments the specified counter by one. So $DiscussionBoard->incrementCounter("post_count", 
+    * $discussion_board_id); would increment the "post_count" counter on the board responding to 
+    * $discussion_board_id. This is used for caching aggregate values, so that they doesn't need to 
+    * be computed every time. Especially important for looping over a collection where each element 
+    * require a number of aggregate values. Like the $DiscussionBoard that needs to list both the number of posts and comments.
+    */
+    function incrementCounter($counter_name, $id, $difference = 1)
+    {
+        $new_value = $this->getAttribute($counter_name) + $difference;
+        if($this->updateAll($counter_name.' = '.$new_value, $this->getPrimaryKey().' = '.$this->castAttributeForDatabase($this->getPrimaryKey(), $id)) === 0){
+            return false;
+        }
+        return $new_value;
+    }
+
+    /**
+    * Works like AkActiveRecord::incrementCounter, but decrements instead.
+    */
+    function decrementCounter($counter_name, $id, $difference = 1)
+    {
+        $new_value = $this->getAttribute($counter_name) - $difference;
+
+        if(!$this->updateAll($counter_name.' = '.$new_value, $this->getPrimaryKey().' = '.$this->castAttributeForDatabase($this->getPrimaryKey(), $id)) === 0){
+            return false;
+        }
+        return $new_value;
+    }
+    
+    /**
+    * Initializes the attribute to zero if null and subtracts one. Only makes sense for number-based attributes. Returns attribute value.
+    */
+    function decrementAttribute($attribute)
+    {
+        if(!isset($this->$attribute)){
+            $this->setAttribute($attribute, 0);
+            return 0;
+        }else {
+            $value = $this->getAttribute($attribute) -1;
+            $this->setAttribute($attribute, $value);
+            return $value;
         }
     }
 
+    /**
+    * Decrements the attribute and saves the record.
+    */
+    function decrementAndSaveAttribute($attribute)
+    {
+        $value = $this->decrementAttribute($attribute);
+        if($this->updateAttribute($attribute, $value)){
+            return $value;
+        }
+        return false;
+    }
+
+
+    /**
+    * Initializes the attribute to zero if null and adds one. Only makes sense for number-based attributes. Returns attribute value.
+    */
+    function incrementAttribute($attribute)
+    {
+        if(!isset($this->$attribute)){
+            $this->setAttribute($attribute, 0);
+            return 0;
+        }else {
+            $value = $this->getAttribute($attribute) +1;
+            $this->setAttribute($attribute, $value);
+            return $value;
+        }
+    }
+
+    /**
+    * Increments the attribute and saves the record.
+    */
+    function incrementAndSaveAttribute($attribute)
+    {
+        $value = $this->incrementAttribute($attribute);
+        if($this->updateAttribute($attribute, $value)){
+            return $value;
+        }
+        return false;
+    }
+    
+    /*/Counting Attributes*/
+
+    /** 
+                         Protecting attributes
+    ====================================================================
+    */
+    
+    /**
+    * If this macro is used, only those attributed named in it will be accessible 
+    * for mass-assignment, such as new ModelName($attributes) and $this->attributes($attributes). 
+    * This is the more conservative choice for mass-assignment protection. 
+    * If you'd rather start from an all-open default and restrict attributes as needed, 
+    * have a look at AkActiveRecord::setProtectedAttributes().
+    */
+    function setAccessibleAttributes()
+    {
+        $args = func_get_args();
+        $this->_accessibleAttributes = array_unique(array_merge((array)$this->_accessibleAttributes, $args));
+    }
+
+    /**
+     * Attributes named in this macro are protected from mass-assignment, such as 
+     * new ModelName($attributes) and $this->attributes(attributes). Their assignment 
+     * will simply be ignored. Instead, you can use the direct writer methods to do assignment. 
+     * This is meant to protect sensitive attributes to be overwritten by URL/form hackers. 
+     * 
+     * Example:
+     * <code>
+     *   class Customer extends AkActiveRecord
+     *    {
+     *      function Customer()
+     *      {
+     *          $this->setProtectedAttributes('credit_rating');
+     *      }
+     *    }
+     *  
+     *    $Customer = new Customer('name' => 'David', 'credit_rating' => 'Excellent');
+     *    $Customer->credit_rating // => null
+     *    $Customer->attributes(array('description' => 'Jolly fellow', 'credit_rating' => 'Superb'));
+     *    $Customer->credit_rating // => null
+     *  
+     *    $Customer->credit_rating = 'Average'
+     *    $Customer->credit_rating // => 'Average'
+     *  </code>
+     */    
+    function setProtectedAttributes()
+    {
+        $args = func_get_args();
+        $this->_protectedAttributes = array_unique(array_merge((array)$this->_protectedAttributes, $args));
+    }
+    
     function removeAttributesProtectedFromMassAssignment($attributes)
     {
         if(!empty($this->_accessibleAttributes) && is_array($this->_accessibleAttributes) &&  is_array($attributes)){
@@ -1760,10 +1951,126 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         return $attributes;
     }
+    
+    /*/Protecting attributes*/
 
+
+     /** 
+                          Model Attributes
+     ====================================================================
+     See also: Getting Attributes, Setting Attributes.
+     */
+    /**
+    * Returns an array of all the attributes that have been specified for serialization as keys and the objects as values.
+    */
+    function getSerializedAttributes()
+    {
+        return isset($this->_serializedAttributes) ? $this->_serializedAttributes : array();
+    }
+
+    function getAvailableAttributes()
+    {
+        return array_merge($this->getColumns(), $this->getAvailableCombinedAttributes());
+    }
+    
+    function getAttributeCaption($attribute)
+    {
+        return $this->t(AkInflector::humanize($attribute));
+    }
+    
+    /**
+     * This function is useful in case you need to know if attributes have been assigned to an object.
+     */
+    function hasAttributesDefined()
+    {
+        $attributes = join('',$this->getAttributes());
+        return empty($attributes);
+    }
+    
+
+    /**
+    * Returns the primary key field.
+    */
+    function getPrimaryKey()
+    {
+        if(!isset($this->_primaryKey)){
+            $this->setPrimaryKey();
+        }
+        return $this->_primaryKey;
+    }
+
+    function getColumnNames()
+    {
+        if(empty($this->_columnNames)){
+            $columns = $this->getColumns();
+            foreach ($columns as $column_name=>$details){
+                $this->_columnNames[$column_name] = isset($details->columnName) ? $this->t($details->columnName) : $this->getAttributeCaption($column_name);
+            }
+        }
+        return $this->_columnNames;
+    }
 
 
     /**
+    * Returns an array of columns objects where the primary id, all columns ending in "_id" or "_count", 
+    * and columns used for single table inheritance has been removed.
+    */
+    function getContentColumns()
+    {
+        $inheritance_column = $this->getInheritanceColumn();
+        $columns = $this->getColumns();
+        foreach ($columns as $name=>$details){
+            if((substr($name,-3) == '_id' || substr($name,-6) == '_count') ||
+            !empty($details['primaryKey']) || ($inheritance_column !== false && $inheritance_column == $name)){
+                unset($columns[$name]);
+            }
+        }
+        return $columns;
+    }
+
+    /**
+    * Returns an array of names for the attributes available on this object sorted alphabetically.
+    */
+    function getAttributeNames()
+    {
+        if(!isset($this->_activeRecordHasBeenInstantiated)){
+            return Ak::handleStaticCall();
+        }
+        $attributes = array_keys($this->getAvailableAttributes());
+        $names = array_combine($attributes,array_map(array(&$this,'getAttributeCaption'), $attributes));
+        natsort($names);
+        return $names;
+    }
+
+
+    /**
+    * Returns true if the specified attribute has been set by the user or by a database load and is neither null nor empty?
+    */
+    function isAttributePresent($attribute)
+    {
+        $value = $this->getAttribute($attribute);
+        return !empty($value);
+    }
+    
+    /**
+    * Returns true if given attribute exists for this Model.
+    *
+    * @param string $attribute
+    * @return boolean
+    */
+    function hasAttribute ($attribute)
+    {
+        empty($this->_columns) ? $this->getColumns() : $this->_columns;
+        return isset($this->_columns[$attribute]) || (!empty($this->_combinedAttributes) && $this->isCombinedAttribute($attribute));
+    }
+    
+    /*/Model Attributes*/
+
+
+    /** 
+                          Combined attributes
+    ====================================================================
+    *
     * The Akelos Framework has a handy way to represent combined fields.
     * You can add a new attribute to your models using a printf patter to glue
     * multiple parameters in a single one.
@@ -1837,12 +2144,20 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *       // ....
     *    } 
     *   ?>
-    *   
-    *    This way you can get rid calling the parent constructor
-    *    
-    * @param $attribute
-    * @param $mapping
+    *
     */
+
+    /**
+    * Returns true if given attribute is a combined attribute for this Model.
+    *
+    * @param string $attribute
+    * @return boolean
+    */
+    function isCombinedAttribute ($attribute)
+    {
+        return !empty($this->_combinedAttributes) && isset($this->_combinedAttributes[$attribute]);
+    }
+
     function addCombinedAttributeConfiguration($attribute)
     {
         $args = is_array($attribute) ? $attribute : func_get_args();
@@ -1863,9 +2178,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-    /**
-    * Use a printf pattern to glue sub-attributes into an attribute. Sub-attribute getters will are fired (if they exist).
-    */
     function composeCombinedAttributes()
     {
 
@@ -1940,11 +2252,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $result;
     }
 
-
-
-    /**
-    * Use a scanf pattern match to break an attribute down into it's sub-attributes.
-    */
     function decomposeCombinedAttributes()
     {
         if(!empty($this->_combinedAttributes)){
@@ -1993,275 +2300,110 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
+    function getAvailableCombinedAttributes()
+    {
+        $combined_attributes = array();
+        foreach ($this->_combinedAttributes as $attribute=>$details){
+            $combined_attributes[$attribute] = array('name'=>$attribute, 'type'=>'string', 'path' => array_shift($details), 'uses'=>$details);
+        }
+        return !empty($this->_combinedAttributes) && is_array($this->_combinedAttributes) ? $combined_attributes : array();
+    }
+    
+    /*/Combined attributes*/
 
 
-    /**
-    * Returns a clone of the record that hasn't been assigned an id yet and is treated as a new record.
+
+
+    /** 
+                         Database connection
+    ====================================================================
     */
-    function cloneRecord()
-    {
-        $model_name = $this->getModelName();
-        $attributes = $this->getAttributesBeforeTypeCast();
-        if(isset($attributes[$this->getPrimaryKey()])){
-            unset($attributes[$this->getPrimaryKey()]);
-        }
-        return new $model_name($attributes);
-    }
-
-
     /**
-    * Initializes the attribute to zero if null and subtracts one. Only makes sense for number-based attributes. Returns attribute value.
+    * Establishes the connection to the database. Accepts an array as input where the 'adapter' 
+    * key must be specified with the name of a database adapter (in lower-case) example for regular 
+    * databases (MySQL, Postgresql, etc):
+    * 
+    *   $AkActiveRecord->establishConnection(
+    *       array(
+    *       'adapter'  => "mysql",
+    *       'host'     => "localhost",
+    *       'username' => "myuser",
+    *       'password' => "mypass",
+    *       'database' => "somedatabase"
+    *       ));
+    *
+    *    Example for SQLite database:
+    *
+    *     $AkActiveRecord->establishConnection(
+    *       array(
+    *       'adapter' => "sqlite",
+    *       'dbfile'  => "path/to/dbfile"
+    *       )
+    *     )
     */
-    function decrementAttribute($attribute)
+    function &establishConnection($spec = null)
     {
-        if(!isset($this->$attribute)){
-            $this->setAttribute($attribute, 0);
-            return 0;
-        }else {
-            $value = $this->getAttribute($attribute) -1;
-            $this->setAttribute($attribute, $value);
-            return $value;
-        }
-    }
-
-    /**
-    * Decrements the attribute and saves the record.
-    */
-    function decrementAndSaveAttribute($attribute)
-    {
-        $value = $this->decrementAttribute($attribute);
-        if($this->updateAttribute($attribute, $value)){
-            return $value;
-        }
-        return false;
-    }
-
-
-    /**
-    * Initializes the attribute to zero if null and adds one. Only makes sense for number-based attributes. Returns attribute value.
-    */
-    function incrementAttribute($attribute)
-    {
-        if(!isset($this->$attribute)){
-            $this->setAttribute($attribute, 0);
-            return 0;
-        }else {
-            $value = $this->getAttribute($attribute) +1;
-            $this->setAttribute($attribute, $value);
-            return $value;
-        }
-    }
-
-    /**
-    * Increments the attribute and saves the record.
-    */
-    function incrementAndSaveAttribute($attribute)
-    {
-        $value = $this->incrementAttribute($attribute);
-        if($this->updateAttribute($attribute, $value)){
-            return $value;
-        }
-        return false;
-    }
-
-
-    /**
-    * Returns true if this object hasn't been saved yet that is, a record for the object doesn't exist yet.
-    */
-    function isNewRecord()
-    {
-        if(!isset($this->_newRecord) && !isset($this->{$this->getPrimaryKey()})){
-            $this->_newRecord = true;
-        }
-        return $this->_newRecord;
-    }
-
-    /**
-     * This function is usefull in case you need to know if attribtes have been assigned to an object.
-     */
-    function hasAttributesDefined()
-    {
-        $attributes = join('',$this->getAttributes());
-        return empty($attributes);
-    }
-
-    /**
-    * Reloads the attributes of this object from the database.
-    */   
-    function reload()
-    {
-        /**
-        * @todo clear cache
-        */        
-        if($object = $this->find($this->getId())){
-            $this->setAttributes($object->getAttributes(), true);
-            return true;
-        }else {
-            return false;
-        }
-    }
-
-
-    /**
-    * - No record exists: Creates a new record with values matching those of the object attributes.
-    * - A record does exist: Updates the record with values matching those of the object attributes.
-    */
-    function save($validate = true)
-    {
-        if($this->isFrozen()){
-            return false;
-        }
-        $result = false;
-        $this->transactionStart();
-        if($this->beforeSave() && $this->notifyObservers('beforeSave')){
-            $result = $this->createOrUpdate($validate);
-            if(!$this->transactionHasFailed()){
-                if(!$this->afterSave()){
-                    $this->transactionFail();
-                }else{
-                    if(!$this->notifyObservers('afterSave')){
-                        $this->transactionFail();
-                    }
-                }
+        if(isset($spec)){
+            $dns = is_string($spec) ? $spec : '';
+            if(!empty($spec['adapter'])){
+                $dsn = $spec['adapter'] == 'sqlite' ?
+                'sqlite://'.urlencode($spec['dbfile']).'/' :
+                $spec['adapter'].'://'.@$spec['username'].':'.@$spec['password'].'@'.@$spec['host'].'/'.@$spec['database'];
             }
+            $dsn .= isset($spec['persist']) && $spec['persist'] === false ? '' : '?persist';
+            return $this->setConnection($dns);
         }else{
-            $this->transactionFail();
-        }
-
-        $result = $this->transactionHasFailed() ? false : $result;
-        $this->transactionComplete();
-
-        return $result;
-    }
-
-    function createOrUpdate($validate = true)
-    {
-        if($validate && !$this->isValid() || !($this->isNewRecord() ? $this->afterValidationOnCreate() : $this->afterValidationOnUpdate())){
-            $this->transactionFail();
             return false;
         }
-        return $this->isNewRecord() ? $this->_create() : $this->_update();
     }
 
 
     /**
-    * Turns an attribute that?s currently true into false and vice versa. Returns attribute value.
-    */
-    function toggleAttribute($attribute)
+    * Returns true if a connection that?s accessible to this class have already been opened.
+    */ 
+    function isConnected()
     {
-        $value = $this->getAttribute($attribute);
-        $new_value = $value ? false : true;
-        $this->setAttribute($attribute, $new_value);
-        return $new_value;
-    }
-
-
-    /**
-    * Toggles the attribute and saves the record.
-    */
-    function toggleAttributeAndSave($attribute)
-    {
-        $value = $this->toggleAttribute($attribute);
-        if($this->updateAttribute($attribute, $value)){
-            return $value;
-        }
-        return null;
+        return isset($this->_db);
     }
 
     /**
-    * Every Active Record class must use "id" as their primary ID. This getter overwrites the native id method, which isn't being used in this context.
+    * Returns the connection currently associated with the class. This can also be used to 
+    * "borrow" the connection to do database work unrelated to any of the specific Active Records.
     */
-    function getId()
+    function &getConnection()
     {
-        return $this->{$this->getPrimaryKey()};
-    }
-
-    function quotedId()
-    {
-        return $this->castAttributeForDatabase($this->getPrimaryKey(), $this->getId());
-    }
-
-    function setId($value)
-    {
-        if($this->isFrozen()){
-            return false;
-        }
-        $pk = $this->getPrimaryKey();
-        $this->$pk = $value;
-        return true;
-    }
-
-
-
-    function getAttributesBeforeTypeCast()
-    {
-        $attributes_array = array();
-        $available_attributes = $this->getAvailableAttributes();
-        foreach ($available_attributes as $attribute){
-            $attribute_value = $this->getAttributeBeforeTypeCast($attribute['name']);
-            if(!empty($attribute_value)){
-                $attributes_array[$attribute['name']] = $attribute_value;
-            }
-        }
-        return $attributes_array;
-    }
-
-
-    function getAttributeBeforeTypeCast($attribute)
-    {
-        if(isset($this->{$attribute.'_before_type_cast'})){
-            return $this->{$attribute.'_before_type_cast'};
-        }
-        return null;
+        return $this->_db;
     }
 
     /**
-    * unused function; misleading named attributesFromColumnDefinition
+    * Set the connection for the class.
     */
-    function filterForeignAndProtectedAttributes($attributes)
+    function setConnection($dns = null, $connection_id = null)
     {
-        $filtered_attributes = array();
-        if(is_array($attributes)){
-            foreach ($attributes as $k=>$v){
-                if($this->hasAttribute($k) &&  !in_array($k, $this->_protectedAttributes)){
-                    $filtered_attributes[$k] = $v;
-                }
-            }
-        }
-        return $filtered_attributes;
+        $this->_db =& Ak::db($dns, $connection_id);
     }
-
-    /**
-    * Initializes the attributes array with keys matching the columns from the linked table and
-    * the values matching the corresponding default value of that column, so
-    * that a new instance, or one populated from a passed-in array, still has all the attributes
-    * that instances loaded from the database would.
+    
+    function _getDatabaseType()
+    {
+        if(strstr($this->_db->databaseType,'mysql')){
+            return 'mysql';
+        }elseif(strstr($this->_db->databaseType,'sqlite')){
+            return 'sqlite';
+        }elseif(strstr($this->_db->databaseType,'post')){
+            return 'postgre';
+        }else{
+            return 'unknown';
+        }
+    }
+    /*/Database connection*/
+    
+    
+    /** 
+                           Table Settings
+    ====================================================================
+    See also: Database Reflection.
     */
-    function attributesFromColumnDefinition()
-    {
-        $attributes = array();
-
-        foreach ((array)$this->getColumns() as $column_name=>$column_settings){
-            if (!isset($column_settings['primaryKey']) && isset($column_settings['hasDefault'])) {
-                $attributes[$column_name] = $column_settings['defaultValue'];
-            } else {
-                $attributes[$column_name] = null;
-            }
-        }
-        return $attributes;
-    }
-
-    /**
-    * Returns the primary key field.
-    */
-    function getPrimaryKey()
-    {
-        if(!isset($this->_primaryKey)){
-            $this->setPrimaryKey();
-        }
-        return $this->_primaryKey;
-    }
-
+    
     /**
     * Defines the primary key field ? can be overridden in subclasses.
     */
@@ -2274,71 +2416,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-
-
-
-    /**
-    * Specifies that the attribute by the name of attr_name should be serialized before saving to the database and unserialized after loading from the database. If class_name is specified, the serialized object must be of that class on retrieval, as a new instance of the object will be loaded with serialized values.
-    */
-
-    function setSerializeAttribute($attr_name, $class_name = null)
-    {
-        if($this->hasColumn($attr_name)){
-            $this->_serializedAttributes[$attr_name] = $class_name;
-        }
-    }
-
-
-    /**
-    * Returns an array of all the attributes that have been specified for serialization as keys and the objects as values.
-    */
-    function getSerializedAttributes()
-    {
-        return isset($this->_serializedAttributes) ? $this->_serializedAttributes : array();
-    }
-
-
-
-    function t($string, $array = null)
-    {
-        return Ak::t($string, $array, AkInflector::underscore($this->getModelName()));
-    }
-
-    function getAvailableCombinedAttributes()
-    {
-        $combined_attributes = array();
-        foreach ($this->_combinedAttributes as $attribute=>$details){
-            $combined_attributes[$attribute] = array('name'=>$attribute, 'type'=>'string', 'path' => array_shift($details), 'uses'=>$details);
-        }
-        return !empty($this->_combinedAttributes) && is_array($this->_combinedAttributes) ? $combined_attributes : array();
-    }
-
-    function getAvailableAttributes()
-    {
-        return array_merge($this->getColumns(), $this->getAvailableCombinedAttributes());
-    }
-
-    function getColumnNames()
-    {
-        if(empty($this->_columnNames)){
-            $columns = $this->getColumns();
-            foreach ($columns as $column_name=>$details){
-                $this->_columnNames[$column_name] = isset($details->columnName) ? $this->t($details->columnName) : $this->getAttributeCaption($column_name);
-            }
-        }
-        return $this->_columnNames;
-    }
-
-
-    function getAttributeCaption($attribute)
-    {
-        return $this->t(AkInflector::humanize($attribute));
-    }
-
-
-    /**#@+
-    * Database reflection methods
-    */
 
     function getTableName($modify_for_associations = true)
     {
@@ -2388,6 +2465,84 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return true;
     }
 
+    
+    function getOnlyAvailableAtrributes($attributes)
+    {
+        $table_name = $this->getTableName();
+        $ret_attributes = array();
+        if(!empty($attributes) && is_array($attributes)){
+            $available_attributes = $this->getAvailableAttributes();
+            
+            $keys = array_keys($attributes);
+            $size = sizeOf($keys);
+            for ($i=0; $i < $size; $i++){
+                $k = str_replace($table_name.'.','',$keys[$i]);
+                if(isset($available_attributes[$k]['name'][$k])){
+                    $ret_attributes[$k] =& $attributes[$keys[$i]];
+                }
+            }
+        }
+        return $ret_attributes;
+    }
+
+    function getColumnsForAtrributes($attributes)
+    {
+        $ret_attributes = array();
+        $table_name = $this->getTableName();
+        if(!empty($attributes) && is_array($attributes)){
+            $columns = $this->getColumns();
+            foreach ($attributes as $k=>$v){
+                $k = str_replace($table_name.'.','',$k);
+                if(isset($columns[$k]['name'][$k])){
+                    $ret_attributes[$k] = $v;
+                }
+            }
+        }
+        return $ret_attributes;
+    }
+    
+    /**
+    * Returns true if given attribute exists for this Model.
+    *
+    * @param string $name Name of table to look in
+    * @return boolean
+    */
+    function hasColumn($column)
+    {
+        empty($this->_columns) ? $this->getColumns() : $this->_columns;
+        return isset($this->_columns[$column]);
+    }
+
+
+    /*/Table Settings*/
+    
+    /** 
+                           Database Reflection
+    ====================================================================
+    See also: Table Settings, Type Casting.
+    */
+    
+
+    /**
+    * Initializes the attributes array with keys matching the columns from the linked table and
+    * the values matching the corresponding default value of that column, so
+    * that a new instance, or one populated from a passed-in array, still has all the attributes
+    * that instances loaded from the database would.
+    */
+    function attributesFromColumnDefinition()
+    {
+        $attributes = array();
+
+        foreach ((array)$this->getColumns() as $column_name=>$column_settings){
+            if (!isset($column_settings['primaryKey']) && isset($column_settings['hasDefault'])) {
+                $attributes[$column_name] = $column_settings['defaultValue'];
+            } else {
+                $attributes[$column_name] = null;
+            }
+        }
+        return $attributes;
+    }
+
     /**
      * Gets information from the database engine about a single table
      */
@@ -2401,19 +2556,15 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $cache[$table];
     }
 
-
-    function _getDatabaseType()
+    function getColumnsWithRegexBoundaries()
     {
-        if(strstr($this->_db->databaseType,'mysql')){
-            return 'mysql';
-        }elseif(strstr($this->_db->databaseType,'sqlite')){
-            return 'sqlite';
-        }elseif(strstr($this->_db->databaseType,'post')){
-            return 'postgre';
-        }else{
-            return 'unknown';
+        $columns = array_keys($this->getColumns());
+        foreach ($columns as $k=>$column){
+            $columns[$k] = '/([^\.])\b('.$column.')\b/';
         }
+        return $columns;
     }
+    
 
     /**
     * If is the first time we use a model this function will run the installer for the model if it exists
@@ -2528,8 +2679,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    
-
     /**
     * Resets all the cached information about columns, which will cause they to be reloaded on the next request.
     */
@@ -2601,141 +2750,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $_SESSION['__activeRecordColumnsSettingsCache'] = array();
         }
     }
-    /**#@-*/
-
-
-    /**#@+
-    * Active Record localization support methods
-    */
-    function _isInternationalizeCandidate($column_name)
-    {
-        $pos = strpos($column_name,'_');
-        return $pos === 2 && in_array(substr($column_name,0,$pos),$this->getAvaliableLocales());
-    }
-
-    function _addInternationalizedColumn($column_name)
-    {
-        $this->_columnsSettings[$column_name]['i18n'] = true;
-    }
-
-    function getInternationalizedColumns()
-    {
-        static $cache;
-        $model = $this->getModelName();
-        $available_locales = $this->getAvaliableLocales();
-        if(empty($cache[$model])){
-            $cache[$model] = array();
-            foreach ($this->getColumnSettings() as $column_name=>$details){
-                if(!empty($details['i18n'])){
-                    $_tmp_pos = strpos($column_name,'_');
-                    $column = substr($column_name,$_tmp_pos+1);
-                    $lang = substr($column_name,0,$_tmp_pos);
-                    if(in_array($lang, $available_locales)){
-                        $cache[$model][$column] = empty($cache[$model][$column]) ? array($lang) :
-                        array_merge($cache[$model][$column] ,array($lang));
-                    }
-                }
-            }
-        }
-
-        return $cache[$model];
-    }
-
-    function getAvaliableLocales()
-    {
-        static $available_locales;
-        if(empty($available_locales)){
-            if(defined('AK_ACTIVE_RECORD_DEFAULT_LOCALES')){
-                $available_locales = Ak::stringToArray(AK_ACTIVE_RECORD_DEFAULT_LOCALES);
-            }else{
-                $available_locales =  Ak::langs();
-            }
-        }
-        return $available_locales;
-    }
-
-    function getCurrentLocale()
-    {
-        static $current_locale;
-        if(empty($current_locale)){
-            $current_locale = Ak::lang();
-            $available_locales = $this->getAvaliableLocales();
-            if(!in_array($current_locale, $available_locales)){
-                $current_locale = array_shift($available_locales);
-            }
-        }
-        return $current_locale;
-    }
-
-
-    function getAttributeByLocale($attribute, $locale)
-    {
-        $internationalizable_columns = $this->getInternationalizedColumns();
-        if(!empty($internationalizable_columns[$attribute]) && is_array($internationalizable_columns[$attribute]) && in_array($locale, $internationalizable_columns[$attribute])){
-            return $this->getAttribute($locale.'_'.$attribute);
-        }
-    }
-
-    function getAttributeLocales($attribute)
-    {
-        $attribute_locales = array();
-        foreach ($this->getAvaliableLocales() as $locale){
-            if($this->hasColumn($locale.'_'.$attribute)){
-                $attribute_locales[$locale] = $this->getAttributeByLocale($attribute, $locale);
-            }
-        }
-        return $attribute_locales;
-    }
-
-    function setAttributeByLocale($attribute, $value, $locale)
-    {
-        $internationalizable_columns = $this->getInternationalizedColumns();
-
-        if($this->_isInternationalizeCandidate($locale.'_'.$attribute) && !empty($internationalizable_columns[$attribute]) && is_array($internationalizable_columns[$attribute]) && in_array($locale, $internationalizable_columns[$attribute])){
-            $this->setAttribute($locale.'_'.$attribute, $value);
-        }
-
-    }
-
-    function setAttributeLocales($attribute, $values = array())
-    {
-        foreach ($values as $locale=>$value){
-            $this->setAttributeByLocale($attribute, $value, $locale);
-        }
-    }
-
-
-    function _delocalizeAttribute($attribute)
-    {
-        return $this->_isInternationalizeCandidate($attribute) ? substr($attribute,3) : $attribute;
-    }
-    /**#@-*/
-
-
-    /**
-     * Adds an internationalized attribute to an array containing other locales for the same column name
-     * 
-     * Example:
-     *  es_title and en_title will be available unser title = array('es'=>'...', 'en' => '...')
-     */
-    function _groupInternationalizedAttribute($attribute, $value)
-    {
-        if($this->_internationalize && $this->_isInternationalizeCandidate($attribute)){
-            if(!empty($this->$attribute)){
-                $_tmp_pos = strpos($attribute,'_');
-                $column = substr($attribute,$_tmp_pos+1);
-                $lang = substr($attribute,0,$_tmp_pos);
-                $this->$column = empty($this->$column) ? array() : $this->$column;
-                if(empty($this->$column) || (!empty($this->$column) && is_array($this->$column))){
-                    $this->$column = empty($this->$column) ? array($lang=>$value) : array_merge($this->$column,array($lang=>$value));
-                }
-            }
-        }
-    }
-
-
-
-
+    
 
     function initiateAttributeToNull($attribute)
     {
@@ -2855,8 +2870,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-
-
     /**
      * This method retrieves current class name that will be used to map 
      * your database to this object.
@@ -2897,144 +2910,193 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-    /**
-    * Returns true if given attribute exists for this Model.
-    *
-    * @param string $attribute
-    * @return boolean
+
+
+    
+    /*/Database Reflection*/
+
+    /** 
+                               Localization
+    ====================================================================
     */
-    function hasAttribute ($attribute)
+    
+    function t($string, $array = null)
     {
-        empty($this->_columns) ? $this->getColumns() : $this->_columns;
-        return isset($this->_columns[$attribute]) || (!empty($this->_combinedAttributes) && $this->isCombinedAttribute($attribute));
+        return Ak::t($string, $array, AkInflector::underscore($this->getModelName()));
     }
-
-    /**
-    * Returns true if given attribute is a combined attribute for this Model.
-    *
-    * @param string $attribute
-    * @return boolean
-    */
-    function isCombinedAttribute ($attribute)
+    
+    function getInternationalizedColumns()
     {
-        return !empty($this->_combinedAttributes) && isset($this->_combinedAttributes[$attribute]);
-    }
-
-    /**
-    * Returns true if given attribute exists for this Model.
-    *
-    * @param string $name Name of table to look in
-    * @return boolean
-    */
-    function hasColumn($column)
-    {
-        empty($this->_columns) ? $this->getColumns() : $this->_columns;
-        return isset($this->_columns[$column]);
-    }
-
-    function debug ($data = 'active_record_class', $_functions=0)
-    {
-        if(!AK_DEBUG && !AK_DEV_MODE){
-            return;
-        }
-
-        $data = $data == 'active_record_class' ?  (AK_PHP5 ? clone($this) : $this) : $data;
-
-        if($_functions!=0) {
-            $sf=1;
-        } else {
-            $sf=0 ;
-        }
-
-        if (isset ($data)) {
-            if (is_array($data) || is_object($data)) {
-
-                if (count ($data)) {
-                    echo AK_CLI ? "/--\n" : "<ol>\n";
-                    while (list ($key,$value) = each ($data)) {
-                        if($key{0} == '_'){
-                            continue;
-                        }
-                        $type=gettype($value);
-                        if ($type=="array") {
-                            AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key) :
-                            printf ("<li>(%s) <b>%s</b>:\n",$type, $key);
-                            ob_start();
-                            Ak::debug ($value,$sf);
-                            $lines = explode("\n",ob_get_clean()."\n");
-                            foreach ($lines as $line){
-                                echo "\t".$line."\n";
-                            }
-                        }elseif($type == "object"){
-                            if(method_exists($value,'hasColumn') && $value->hasColumn($key)){
-                                $value->toString(true);
-                                AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key) :
-                                printf ("<li>(%s) <b>%s</b>:\n",$type, $key);
-                                ob_start();
-                                Ak::debug ($value,$sf);
-                                $lines = explode("\n",ob_get_clean()."\n");
-                                foreach ($lines as $line){
-                                    echo "\t".$line."\n";
-                                }
-                            }
-                        }elseif (eregi ("function", $type)) {
-                            if ($sf) {
-                                AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key, $value) :
-                                printf ("<li>(%s) <b>%s</b> </li>\n",$type, $key, $value);
-                            }
-                        } else {
-                            if (!$value) {
-                                $value="(none)";
-                            }
-                            AK_CLI ? printf ("\t* (%s) %s = %s\n",$type, $key, $value) :
-                            printf ("<li>(%s) <b>%s</b> = %s</li>\n",$type, $key, $value);
-                        }
+        static $cache;
+        $model = $this->getModelName();
+        $available_locales = $this->getAvaliableLocales();
+        if(empty($cache[$model])){
+            $cache[$model] = array();
+            foreach ($this->getColumnSettings() as $column_name=>$details){
+                if(!empty($details['i18n'])){
+                    $_tmp_pos = strpos($column_name,'_');
+                    $column = substr($column_name,$_tmp_pos+1);
+                    $lang = substr($column_name,0,$_tmp_pos);
+                    if(in_array($lang, $available_locales)){
+                        $cache[$model][$column] = empty($cache[$model][$column]) ? array($lang) :
+                        array_merge($cache[$model][$column] ,array($lang));
                     }
-                    echo AK_CLI ? "\n--/\n" : "</ol>fin.\n";
-                } else {
-                    echo "(empty)";
                 }
             }
         }
+
+        return $cache[$model];
     }
 
-
-
-    function getOnlyAvailableAtrributes($attributes)
+    function getAvaliableLocales()
     {
-        $table_name = $this->getTableName();
-        $ret_attributes = array();
-        if(!empty($attributes) && is_array($attributes)){
-            $available_attributes = $this->getAvailableAttributes();
-            
-            $keys = array_keys($attributes);
-            $size = sizeOf($keys);
-            for ($i=0; $i < $size; $i++){
-                $k = str_replace($table_name.'.','',$keys[$i]);
-                if(isset($available_attributes[$k]['name'][$k])){
-                    $ret_attributes[$k] =& $attributes[$keys[$i]];
-                }
+        static $available_locales;
+        if(empty($available_locales)){
+            if(defined('AK_ACTIVE_RECORD_DEFAULT_LOCALES')){
+                $available_locales = Ak::stringToArray(AK_ACTIVE_RECORD_DEFAULT_LOCALES);
+            }else{
+                $available_locales =  Ak::langs();
             }
         }
-        return $ret_attributes;
+        return $available_locales;
     }
 
-    function getColumnsForAtrributes($attributes)
+    function getCurrentLocale()
     {
-        $ret_attributes = array();
-        $table_name = $this->getTableName();
-        if(!empty($attributes) && is_array($attributes)){
-            $columns = $this->getColumns();
-            foreach ($attributes as $k=>$v){
-                $k = str_replace($table_name.'.','',$k);
-                if(isset($columns[$k]['name'][$k])){
-                    $ret_attributes[$k] = $v;
+        static $current_locale;
+        if(empty($current_locale)){
+            $current_locale = Ak::lang();
+            $available_locales = $this->getAvaliableLocales();
+            if(!in_array($current_locale, $available_locales)){
+                $current_locale = array_shift($available_locales);
+            }
+        }
+        return $current_locale;
+    }
+
+
+    function getAttributeByLocale($attribute, $locale)
+    {
+        $internationalizable_columns = $this->getInternationalizedColumns();
+        if(!empty($internationalizable_columns[$attribute]) && is_array($internationalizable_columns[$attribute]) && in_array($locale, $internationalizable_columns[$attribute])){
+            return $this->getAttribute($locale.'_'.$attribute);
+        }
+    }
+
+    function getAttributeLocales($attribute)
+    {
+        $attribute_locales = array();
+        foreach ($this->getAvaliableLocales() as $locale){
+            if($this->hasColumn($locale.'_'.$attribute)){
+                $attribute_locales[$locale] = $this->getAttributeByLocale($attribute, $locale);
+            }
+        }
+        return $attribute_locales;
+    }
+
+    function setAttributeByLocale($attribute, $value, $locale)
+    {
+        $internationalizable_columns = $this->getInternationalizedColumns();
+
+        if($this->_isInternationalizeCandidate($locale.'_'.$attribute) && !empty($internationalizable_columns[$attribute]) && is_array($internationalizable_columns[$attribute]) && in_array($locale, $internationalizable_columns[$attribute])){
+            $this->setAttribute($locale.'_'.$attribute, $value);
+        }
+
+    }
+
+    function setAttributeLocales($attribute, $values = array())
+    {
+        foreach ($values as $locale=>$value){
+            $this->setAttributeByLocale($attribute, $value, $locale);
+        }
+    }
+
+
+    function _delocalizeAttribute($attribute)
+    {
+        return $this->_isInternationalizeCandidate($attribute) ? substr($attribute,3) : $attribute;
+    }
+    
+    function _isInternationalizeCandidate($column_name)
+    {
+        $pos = strpos($column_name,'_');
+        return $pos === 2 && in_array(substr($column_name,0,$pos),$this->getAvaliableLocales());
+    }
+
+    function _addInternationalizedColumn($column_name)
+    {
+        $this->_columnsSettings[$column_name]['i18n'] = true;
+    }
+
+    
+    /**
+     * Adds an internationalized attribute to an array containing other locales for the same column name
+     * 
+     * Example:
+     *  es_title and en_title will be available user title = array('es'=>'...', 'en' => '...')
+     */
+    function _groupInternationalizedAttribute($attribute, $value)
+    {
+        if($this->_internationalize && $this->_isInternationalizeCandidate($attribute)){
+            if(!empty($this->$attribute)){
+                $_tmp_pos = strpos($attribute,'_');
+                $column = substr($attribute,$_tmp_pos+1);
+                $lang = substr($attribute,0,$_tmp_pos);
+                $this->$column = empty($this->$column) ? array() : $this->$column;
+                if(empty($this->$column) || (!empty($this->$column) && is_array($this->$column))){
+                    $this->$column = empty($this->$column) ? array($lang=>$value) : array_merge($this->$column,array($lang=>$value));
                 }
             }
         }
-        return $ret_attributes;
+    }
+    
+    /*/Localization*/
+    
+
+
+
+    /** 
+                             Type Casting
+    ====================================================================
+    See also: Database Reflection.
+    */
+
+    function getAttributesBeforeTypeCast()
+    {
+        $attributes_array = array();
+        $available_attributes = $this->getAvailableAttributes();
+        foreach ($available_attributes as $attribute){
+            $attribute_value = $this->getAttributeBeforeTypeCast($attribute['name']);
+            if(!empty($attribute_value)){
+                $attributes_array[$attribute['name']] = $attribute_value;
+            }
+        }
+        return $attributes_array;
     }
 
+
+    function getAttributeBeforeTypeCast($attribute)
+    {
+        if(isset($this->{$attribute.'_before_type_cast'})){
+            return $this->{$attribute.'_before_type_cast'};
+        }
+        return null;
+    }
+    
+    function quotedId()
+    {
+        return $this->castAttributeForDatabase($this->getPrimaryKey(), $this->getId());
+    }
+
+    /**
+    * Specifies that the attribute by the name of attr_name should be serialized before saving to the database and unserialized after loading from the database. If class_name is specified, the serialized object must be of that class on retrieval, as a new instance of the object will be loaded with serialized values.
+    */
+    function setSerializeAttribute($attr_name, $class_name = null)
+    {
+        if($this->hasColumn($attr_name)){
+            $this->_serializedAttributes[$attr_name] = $class_name;
+        }
+    }
 
     function getAvailableAttributesQuoted()
     {
@@ -3052,8 +3114,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         return $set;
     }
-
-
 
     function getColumnType($column_name)
     {
@@ -3132,6 +3192,32 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $value;
     }
 
+
+    /**
+    * Joins date arguments into a single attribute. Like the array generated by the date_helper, so
+    * array('published_on(1i)' => 2002, 'published_on(2i)' => 'January', 'published_on(3i)' => 24)
+    * Will be converted to array('published_on'=>'2002-01-24')
+    */
+    function _castDateParametersFromDateHelper_(&$params)
+    {
+        if(empty($params)){
+            return;
+        }
+        $date_attributes = array();
+        foreach ($params as $k=>$v) {
+            if(preg_match('/^([A-Za-z0-9_]+)\(([1-5]{1})i\)$/',$k,$match)){
+                $date_attributes[$match[1]][$match[2]] = $v;
+                unset($params[$k]);
+            }
+        }
+        foreach ($date_attributes as $attribute=>$date){
+            $params[$attribute] = Ak::getDate(Ak::getTimestamp(trim(@$date[1].'-'.@$date[2].'-'.@$date[3].' '.@$date[4].':'.@$date[5],' :-')));
+        }
+    }
+    
+    
+    
+    
     function _addBlobQueryStack($column_name, $blob_value)
     {
         $this->_BlobQueryStack[$column_name] = $blob_value;
@@ -3147,16 +3233,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-    function getAttributeCondition($argument)
-    {
-        if(is_array($argument)){
-            return 'IN (?)';
-        }elseif (is_null($argument)){
-            return 'IS ?';
-        }else{
-            return '= ?';
-        }
-    }
+
 
     function getValueForDateColumn($column_name, $value)
     {
@@ -3172,77 +3249,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         return Ak::getTimestamp($value);
     }
-
-    /**
-    * Updates the associated record with values matching those of the instance attributes.
-    * Must be called as a result of a call to createOrUpdate.
-    */
-    function _update()
-    {
-        if($this->isFrozen()){
-            $this->transactionFail();
-            return false;
-        }
-        if($this->beforeUpdate()){
-            $this->notifyObservers('beforeUpdate');
-
-            if($this->_recordTimestamps){
-                if ($this->hasColumn('updated_at')){
-                    $this->setAttribute('updated_at', Ak::getDate());
-                }
-                if ($this->hasColumn('updated_on')){
-                    $this->setAttribute('updated_on', Ak::getDate(null, 'Y-m-d'));
-                }
-            }
-
-
-            $lock_check = '';
-            if ($this->isLockingEnabled()){
-                $previous_value = $this->lock_version;
-                $this->setAttribute('lock_version', $previous_value + 1);
-                $lock_check = ' AND lock_version = '.$previous_value;
-            }
-
-            $quoted_attributes = $this->getAvailableAttributesQuoted();
-
-            if(!empty($quoted_attributes)){
-                $sql = 'UPDATE '.$this->getTableName().' '.
-                'SET '.join(', ', $quoted_attributes) .' '.
-                'WHERE '.$this->getPrimaryKey().'='.$this->quotedId().$lock_check;
-            }
-
-            if(!$this->_executeSql($sql, false)){
-                $this->transactionFail();
-                AK_DEBUG ? trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE) : null;
-            }
-
-            if ($this->isLockingEnabled()){
-                if($this->_db->Affected_Rows() != 1){
-                    $this->setAttribute('lock_version', $previous_value);
-                    $this->transactionFail();
-                    trigger_error(Ak::t('Attempted to update a stale object'), E_USER_NOTICE);
-                    return false;
-                }
-            }
-
-            if(!$this->transactionHasFailed()){
-                if($this->afterUpdate()){
-                    $this->notifyObservers('afterUpdate');
-                }else {
-                    $this->transactionFail();
-                }
-            }
-
-        }else{
-            $this->transactionFail();
-        }
-        return $this;
-    }
-
-
-    /////////////////// OPTIMISTIC LOCKING //////////////////////////////
-
-    /**
+    
+    /*/Type Casting*/
+    
+    /** 
+                             Optimistic Locking
+    ====================================================================
+    *
     * Active Records support optimistic locking if the field <tt>lock_version</tt> is present.  Each update to the
     * record increments the lock_version column and the locking facilities ensure that records instantiated twice
     * will let the last one saved return false on save() if the first was also updated. Example:
@@ -3267,105 +3280,15 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         return ((isset($this->lock_optimistically) && $this->lock_optimistically !== false) || !isset($this->lock_optimistically)) && $this->hasColumn('lock_version');
     }
+    /*/Optimistic Locking*/
 
 
-    /**
-    * Creates a new record with values matching those of the instance attributes.
-    * Must be called as a result of a call to createOrUpdate.
-    */
-    function _create()
-    {
-        if($this->isFrozen()){
-            $this->transactionFail();
-            return false;
-        }
-
-        if($this->beforeCreate()){
-
-            $this->notifyObservers('beforeCreate');
-
-            if($this->_recordTimestamps){
-                if ($this->hasColumn('created_at')){
-                    $this->setAttribute('created_at', Ak::getDate());
-                }
-                if ($this->hasColumn('created_on')){
-                    $this->setAttribute('created_on', Ak::getDate(null, 'Y-m-d'));
-                }
-
-                if(isset($this->expires_on)){
-                    if(isset($this->expires_at) && $this->hasColumn('expires_at')){
-                        $this->setAttribute('expires_at',Ak::getDate(strtotime($this->expires_at) + (defined('AK_TIME_DIFFERENCE') ? AK_TIME_DIFFERENCE*60 : 0)));
-                    }elseif(isset($this->expires_on) && $this->hasColumn('expires_on')){
-                        $this->setAttribute('expires_on',Ak::getDate(strtotime($this->expires_on) + (defined('AK_TIME_DIFFERENCE') ? AK_TIME_DIFFERENCE*60 : 0), 'Y-m-d'));
-                    }
-                }
-            }
-
-            $attributes = $this->getColumnsForAtrributes($this->getAttributes());
-
-            if($this->isLockingEnabled()){
-                $attributes['lock_version'] = 1;
-                $this->setAttribute('lock_version',1);
-            }
-
-            $pk = $this->getPrimaryKey();
-            $table = $this->getTableName();
-
-            foreach ($attributes as $column=>$value){
-                $attributes[$column] = $this->castAttributeForDatabase($column,$value);
-            }
-
-            /**
-            * @todo sanitize attributes
-            * 'beforeValidationOnCreate', 'afterValidationOnCreate'
-            */
-            if(!isset($this->_generateSequence) || (isset($this->_generateSequence) && $this->_generateSequence !== false)){
-                if((empty($attributes[$pk]) || (!empty($attributes[$pk]) && (integer)$attributes[$pk] > 0 ))){
-                    if($this->_getDatabaseType() != 'mysql'){
-                        $table_details = $this->_databaseTableInternals('seq_'.$table);
-                        if(!isset($table_details['ID'])){
-                            $this->_db->CreateSequence('seq_'.$table);
-                        }
-                        $attributes[$pk] = $this->_db->GenID('seq_'.$table);
-                    }
-                }
-            }
-
-            $__attributes = $attributes;
-            $attributes = array_diff($attributes, array('',"''"));
-
-            $sql = 'INSERT INTO '.$table.' '.
-            '('.join(', ',array_keys($attributes)).') '.
-            'VALUES ('.join(',',array_values($attributes)).')';
-
-            if(!$this->_executeSql($sql, false)){
-                AK_DEBUG ? trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE) : null;
-            }
-
-            $id = !empty($attributes[$pk]) ? $attributes[$pk] : $this->_db->Insert_ID($table, $pk);
-            $this->setId($id);
-
-            if(!$this->transactionHasFailed()){
-                $this->_newRecord = false;
-                if(!$this->afterCreate()){
-                    $this->transactionFail();
-                }else{
-                    $this->notifyObservers('afterCreate');
-                }
-            }
-        }else{
-            $this->transactionFail();
-        }
-        return $this;
-    }
-
-
-
-    /**#@+
+    /** 
+                                    Callbacks
+    ====================================================================
+    See also: Observers.
     *
-    * @todo Investigate a way for setting up callbacks using attributes without causing to much overhead.
-    *
-    * Callbacks are hooks into the lifecycle of an Active Record object that allows you to trigger logic
+    * Callbacks are hooks into the life-cycle of an Active Record object that allows you to trigger logic
     * before or after an alteration of the object state. This can be used to make sure that associated and
     * dependent objects are deleted when destroy is called (by overwriting beforeDestroy) or to massage attributes
     * before they're validated (by overwriting beforeValidation). As an example of the callbacks initiated, consider
@@ -3435,7 +3358,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *   }
     *
     *
-    * == Cancelling callbacks ==
+    * == Canceling callbacks ==
     *
     * If a before* callback returns false, all the later callbacks and the associated action are cancelled. If an after* callback returns
     * false, all the later callbacks are cancelled. Callbacks are generally run in the order they are defined, with the exception of callbacks
@@ -3445,6 +3368,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * @access public
     */
+    
     function beforeCreate(){return true;}
     function beforeValidation(){return true;}
     function beforeValidationOnCreate(){return true;}
@@ -3459,53 +3383,18 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function afterDestroy(){return true;}
     function beforeDestroy(){return true;}
     function afterSave(){return true;}
-    /**#@-*/
+    
+    /*/Callbacks*/
 
-
-    function toString($print = false)
-    {
-        $result = '';
-        if(!AK_CLI || (AK_ENVIRONMENT == 'testing' && !AK_CLI)){
-            $result = "<h2>Details for ".AkInflector::humanize(AkInflector::underscore($this->getModelName()))." with ".$this->getPrimaryKey()." ".$this->getId()."</h2>\n<dl>\n";
-            foreach ($this->getColumnNames() as $column=>$caption){
-                $result .= "<dt>$caption</dt>\n<dd>".$this->getAttribute($column)."</dd>\n";
-            }
-            $result .= "</dl>\n<hr />";
-            if($print){
-                echo $result;
-            }
-        }elseif(AK_ENVIRONMENT == 'development'){
-            $result =   "\n".
-            str_replace("\n"," ",var_export($this->getAttributes(),true));
-            $result .= "\n";
-            echo $result;
-            return '';
-        }elseif (AK_CLI){
-            $result = "\n-------\n Details for ".AkInflector::humanize(AkInflector::underscore($this->getModelName()))." with ".$this->getPrimaryKey()." ".$this->getId()." ==\n\n/==\n";
-            foreach ($this->getColumnNames() as $column=>$caption){
-                $result .= "\t * $caption: ".$this->getAttribute($column)."\n";
-            }
-            $result .= "\n\n-------\n";
-            if($print){
-                echo $result;
-            }
-        }
-        return $result;
-    }
-
-
-
-    function toJson()
-    {
-        return Ak::toJson($this->getAttributes());
-    }
-
-
-    /**#@+
+    
+    /** 
+                                    Transactions
+    ====================================================================
+    *
     * Transaction support for database operations
     *
     * Transactions are enabled automatically for Active record objects, But you can nest transactions within models.
-    * This transactions are nested, and only the othermost will be executed
+    * This transactions are nested, and only the outermost will be executed
     *
     *   $User->transactionStart();
     *   $User->create('username'=>'Bermi');
@@ -3517,6 +3406,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     *   $User->transactionComplete();
     */
+    
     function transactionStart()
     {
         if(!$this->isConnected()){
@@ -3540,17 +3430,16 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $this->_db->HasFailedTrans();
     }
 
-    /**#@-*/
+    /*/Transactions*/
 
 
 
 
-    ////////////////////////////////////////////////////////////////////
-    //////////          VALIDATION      ////////////////////////////////
-    ////////////////////////////////////////////////////////////////////
-
-
-    /**
+    /** 
+                                    Validators
+    ====================================================================
+    See also: Error Handling.
+    *
     * Active Records implement validation by overwriting AkActiveRecord::validate (or the variations, validateOnCreate and
     * validateOnUpdate). Each of these methods can inspect the state of the object, which usually means ensuring
     * that a number of attributes have a certain value (such as not empty, within a given range, matching a certain regular expression).
@@ -3666,7 +3555,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Validates whether the associated object or objects are all valid themselves. Works with any kind of association.
     *
     *   class Book extends ActiveRecord
-        {
+    *   {
     *       var $has_many = 'pages';
     *       var $belongs_to = 'library';
     * 
@@ -3744,7 +3633,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       *     }
       * }
       *  
-      * NOTE: Be aware that $this->validatesLengthOf('field', array('is'=>5)); Will match a string containing 5 characters (Ie. "Spain"), an integer 5, and an array with 5 elements. You must supply additional checking to check for appropiate types.
+      * NOTE: Be aware that $this->validatesLengthOf('field', array('is'=>5)); Will match a string containing 5 characters (Ie. "Spain"), an integer 5, and an array with 5 elements. You must supply additional checking to check for appropriate types.
       *
       * Configuration options:
       * <tt>minimum</tt> - The minimum size of the attribute
@@ -3992,11 +3881,11 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *   }
     *
     * Parameters:
-    * <tt>$array_of_posibilities</tt> - An array of available items
+    * <tt>$array_of_ possibilities</tt> - An array of available items
     * <tt>$message</tt> - Specifies a customer error message (default is: "is not included in the list")
     * <tt>$allow_null</tt> - If set to true, skips this validation if the attribute is null (default is: false)
     */
-    function validatesInclusionOf($attribute_names, $array_of_posibilities, $message = 'inclusion', $allow_null = false)
+    function validatesInclusionOf($attribute_names, $array_of_possibilities, $message = 'inclusion', $allow_null = false)
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
@@ -4006,7 +3895,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
         foreach ($attribute_names as $attribute_name){
-            if($allow_null ? (!empty($this->$attribute_name) ? (!in_array(@$this->$attribute_name,$array_of_posibilities)) : false ) : (isset($this->$attribute_name) ? !in_array(@$this->$attribute_name,$array_of_posibilities) : true )){
+            if($allow_null ? (!empty($this->$attribute_name) ? (!in_array(@$this->$attribute_name,$array_of_possibilities)) : false ) : (isset($this->$attribute_name) ? !in_array(@$this->$attribute_name,$array_of_possibilities) : true )){
                 $this->addError($attribute_name, $message);
             }
         }
@@ -4025,18 +3914,18 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *   }
     * 
     * Parameters:
-    * <tt>$array_of_posibilities</tt> - An array of items that the value shouldn't be part of
+    * <tt>$array_of_possibilities</tt> - An array of items that the value shouldn't be part of
     * <tt>$message</tt> - Specifies a customer error message (default is: "is reserved")
     * <tt>$allow_null</tt> - If set to true, skips this validation if the attribute is null (default is: false)
     */
-    function validatesExclusionOf($attribute_names, $array_of_posibilities, $message = 'exclusion', $allow_null = false)
+    function validatesExclusionOf($attribute_names, $array_of_possibilities, $message = 'exclusion', $allow_null = false)
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
         $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
         foreach ($attribute_names as $attribute_name){
 
-            if($allow_null ? (!empty($this->$attribute_name) ? (in_array(@$this->$attribute_name,$array_of_posibilities)) : false ) : (isset($this->$attribute_name) ? in_array(@$this->$attribute_name,$array_of_posibilities) : true )){
+            if($allow_null ? (!empty($this->$attribute_name) ? (in_array(@$this->$attribute_name,$array_of_possibilities)) : false ) : (isset($this->$attribute_name) ? in_array(@$this->$attribute_name,$array_of_possibilities) : true )){
                 $this->addError($attribute_name, $message);
             }
         }
@@ -4173,15 +4062,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-
-    /**
-    * Returns the Errors array that holds all information about attribute error messages.
-    */
-    function getErrors()
-    {
-        return $this->_errors;
-    }
-
     /**
     * Overwrite this method for validation checks on all saves and use addError($field, $message); for invalid attributes.
     */
@@ -4203,15 +4083,16 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
     }
 
+    /*/Validators*/
 
 
-
-    /////////////////////////////////////////////////////////////////////////////
-    ////////////////////// OBSERVERS ////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////
-
+    /** 
+                                  Observers
+    ====================================================================
+    See also: Callbacks.
+    */
+    
     /**
-    * Private
     * $state store the state of this observable object
     */
     var $_observable_state;
@@ -4292,16 +4173,26 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $observers =& $this->addObserver(&$this, false);
         return $observers;
     }
+    
+    /*/Observers*/
 
 
 
 
+    /** 
+                                    Error Handling
+    ====================================================================
+    See also: Validators.
+    */
+    
 
-
-    /////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////// ERROR HANDLING ///////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////
-
+    /**
+    * Returns the Errors array that holds all information about attribute error messages.
+    */
+    function getErrors()
+    {
+        return $this->_errors;
+    }
 
     /**
     * Adds an error to the base object instead of any particular attribute. This is used
@@ -4513,15 +4404,16 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         return $result;
     }
+    
+    /*/Error Handling*/
+    
 
 
-    function getType()
-    {
-        //return isset($this->_inheritanceClassName) ? $this->getModelName() : 'active record';
-        return $this->getModelName();
-    }
-
-
+    /** 
+                            Act as Behaviours
+    ====================================================================
+    See also: Acts as List, Acts as Tree, Acts as Nested Set.
+    */
 
     /**
      * actAs provides a method for extending Active Record models.
@@ -4595,8 +4487,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $result;
     }
 
+    /*/Act as Behaviours*/
 
-
+    /** 
+                            Debugging
+    ====================================================================
+    */
+    
     function dbug()
     {
         if(!$this->isConnected()){
@@ -4604,6 +4501,37 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         $this->_db->debug = $this->_db->debug ? false : true;
         $this->db_debug =& $this->_db->debug;
+    }
+    
+    function toString($print = false)
+    {
+        $result = '';
+        if(!AK_CLI || (AK_ENVIRONMENT == 'testing' && !AK_CLI)){
+            $result = "<h2>Details for ".AkInflector::humanize(AkInflector::underscore($this->getModelName()))." with ".$this->getPrimaryKey()." ".$this->getId()."</h2>\n<dl>\n";
+            foreach ($this->getColumnNames() as $column=>$caption){
+                $result .= "<dt>$caption</dt>\n<dd>".$this->getAttribute($column)."</dd>\n";
+            }
+            $result .= "</dl>\n<hr />";
+            if($print){
+                echo $result;
+            }
+        }elseif(AK_ENVIRONMENT == 'development'){
+            $result =   "\n".
+            str_replace("\n"," ",var_export($this->getAttributes(),true));
+            $result .= "\n";
+            echo $result;
+            return '';
+        }elseif (AK_CLI){
+            $result = "\n-------\n Details for ".AkInflector::humanize(AkInflector::underscore($this->getModelName()))." with ".$this->getPrimaryKey()." ".$this->getId()." ==\n\n/==\n";
+            foreach ($this->getColumnNames() as $column=>$caption){
+                $result .= "\t * $caption: ".$this->getAttribute($column)."\n";
+            }
+            $result .= "\n\n-------\n";
+            if($print){
+                echo $result;
+            }
+        }
+        return $result;
     }
 
     function dbugging($trace_this_on_debug_mode = null)
@@ -4614,21 +4542,83 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         return !empty($this->_db->debug);
     }
+    
+    
 
-
-    function extractOptionsFromArgs(&$args)
+    function debug ($data = 'active_record_class', $_functions=0)
     {
-        $_tmp_options = !empty($args) && is_array($args) && is_array($args[count($args)]) ? array_pop($args) : array();
-        $options = array();
-        foreach (array('conditions', 'include', 'joins', 'limit', 'offset', 'order', 'bind', 'select', 'readonly') as $k){
-            if(isset($_tmp_options[$k])){
-                $options[$k] = $_tmp_options[$k];
+        if(!AK_DEBUG && !AK_DEV_MODE){
+            return;
+        }
+
+        $data = $data == 'active_record_class' ?  (AK_PHP5 ? clone($this) : $this) : $data;
+
+        if($_functions!=0) {
+            $sf=1;
+        } else {
+            $sf=0 ;
+        }
+
+        if (isset ($data)) {
+            if (is_array($data) || is_object($data)) {
+
+                if (count ($data)) {
+                    echo AK_CLI ? "/--\n" : "<ol>\n";
+                    while (list ($key,$value) = each ($data)) {
+                        if($key{0} == '_'){
+                            continue;
+                        }
+                        $type=gettype($value);
+                        if ($type=="array") {
+                            AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key) :
+                            printf ("<li>(%s) <b>%s</b>:\n",$type, $key);
+                            ob_start();
+                            Ak::debug ($value,$sf);
+                            $lines = explode("\n",ob_get_clean()."\n");
+                            foreach ($lines as $line){
+                                echo "\t".$line."\n";
+                            }
+                        }elseif($type == "object"){
+                            if(method_exists($value,'hasColumn') && $value->hasColumn($key)){
+                                $value->toString(true);
+                                AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key) :
+                                printf ("<li>(%s) <b>%s</b>:\n",$type, $key);
+                                ob_start();
+                                Ak::debug ($value,$sf);
+                                $lines = explode("\n",ob_get_clean()."\n");
+                                foreach ($lines as $line){
+                                    echo "\t".$line."\n";
+                                }
+                            }
+                        }elseif (eregi ("function", $type)) {
+                            if ($sf) {
+                                AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key, $value) :
+                                printf ("<li>(%s) <b>%s</b> </li>\n",$type, $key, $value);
+                            }
+                        } else {
+                            if (!$value) {
+                                $value="(none)";
+                            }
+                            AK_CLI ? printf ("\t* (%s) %s = %s\n",$type, $key, $value) :
+                            printf ("<li>(%s) <b>%s</b> = %s</li>\n",$type, $key, $value);
+                        }
+                    }
+                    echo AK_CLI ? "\n--/\n" : "</ol>fin.\n";
+                } else {
+                    echo "(empty)";
+                }
             }
         }
-        return $options;
     }
+    
+    /*/Debugging*/
 
 
+
+    /** 
+                        Utilities
+    ====================================================================
+    */
     /**
      * Selects and filters a search result to include only specified columns
      * 
@@ -4685,15 +4675,75 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $resulting_array;
     }
 
-
-    function hasBeenModified()
+    function toJson()
     {
-        return Ak::objectHasBeenModified($this);
+        return Ak::toJson($this->getAttributes());
     }
+    
 
     /**
-     * Database statements. Database statements is the first step of the Rails connectors port to PHP
-     */
+    * Parses an special formated array as a list of keys and values
+    * 
+    * This function generates an array with values and keys from an array with numeric keys.
+    * 
+    * This allows to parse an array to a function in the following manner.
+    * create('first_name->', 'Bermi', 'last_name->', 'Ferrer');
+    * //Previous code will be the same that
+    * create(array('first_name'=>'Bermi', 'last_name'=> 'Ferrer'));
+    *
+    * Use this syntax only for quick testings, not for production environments. If the number of arguments varies, the result might be unpredictable.
+    *
+    * This function syntax is disabled by default. You need to define('AK_ENABLE_AKELOS_ARGS', true)
+    * if you need this functionality.
+    *
+    * @deprecated
+    */
+    function parseAkelosArgs(&$args)
+    {
+        if(!AK_ENABLE_AKELOS_ARGS){
+            return ;
+        }
+        $k = array_keys($args);
+        if(isset($k[1]) && substr($args[$k[0]],-1) == '>'){
+            $size = sizeOf($k);
+            $params = array();
+            for($i = 0; $i < $size; $i++ ) {
+                $v = $args[$k[$i]];
+                if(!isset($key) && is_string($args[$k[$i]]) && substr($v,-1) == '>'){
+                    $key = rtrim($v, '=-> ');
+                }elseif(isset($key)) {
+                    $params[$key] = $v;
+                    unset($key);
+                }else{
+                    $params[$k[$i]] = $v;
+                }
+            }
+            if(!empty($params)){
+                $args = $params;
+            }
+        }
+        $this->_castDateParametersFromDateHelper_($args);
+    }
+    /**
+    * Gets an array from a string.
+    *
+    * Acts like Php explode() function but uses any of this as valid separators ' AND ',' and ',' + ',' ',',',';'
+    */
+    function getArrayFromAkString($string)
+    {
+        if(is_array($string)){
+            return $string;
+        }
+        $string = str_replace(array(' AND ',' and ',' + ',' ',',',';'),array('|','|','|','','|','|'),trim($string));
+        return strstr($string,'|') ? explode('|', $string) : array($string);
+    }
+    /*/Utilities*/
+    
+    
+    /** 
+                        Database statements
+    ====================================================================
+    */
 
     /**
      * Returns a record array with the column names as keys and column values
@@ -4753,12 +4803,25 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $GLOBALS['ADODB_FETCH_MODE'] = $previous_fetch_mode;
         return empty($results) ? null : $results;
     }
+    
+
+    function getAttributeCondition($argument)
+    {
+        if(is_array($argument)){
+            return 'IN (?)';
+        }elseif (is_null($argument)){
+            return 'IS ?';
+        }else{
+            return '= ?';
+        }
+    }
+    /*/Database statements*/
 
 
-    /**
-     * Active record Calculations
-     */
-
+ /** 
+                     Calculations
+ ====================================================================
+ */
 
     var $_calculation_options = array('conditions', 'joins', 'order', 'select', 'group', 'having', 'distinct', 'limit', 'offset');
 
@@ -4974,8 +5037,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             trigger_error(Ak::t('%options are not valid calculation options.', array('%options'=>join(', ',$invalid_options))), E_USER_ERROR);
         }
     }
-
-
+    
     /**
     * Converts a given key to the value that the database adapter returns as
     * as a usable column name.
@@ -5012,6 +5074,64 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
     
+    /*/Calculations*/
+
+    function extractOptionsFromArgs(&$args)
+    {
+        $_tmp_options = !empty($args) && is_array($args) && is_array($args[count($args)]) ? array_pop($args) : array();
+        $options = array();
+        foreach (array('conditions', 'include', 'joins', 'limit', 'offset', 'order', 'bind', 'select', 'readonly') as $k){
+            if(isset($_tmp_options[$k])){
+                $options[$k] = $_tmp_options[$k];
+            }
+        }
+        return $options;
+    }
+    
+    
+    function hasBeenModified()
+    {
+        return Ak::objectHasBeenModified($this);
+    }
+    
+    /**
+    * Just freeze the attributes hash, such that associations are still accessible even on destroyed records.
+    * 
+    * @todo implement freeze correctly for its intended use
+    */
+    function freeze()
+    {
+        $this->_freeze = true;
+    }
+
+    function isFrozen()
+    {
+        return !empty($this->_freeze);
+    }
+    
+    /**
+    * Alias for getModelName()
+    */
+    function getType()
+    {
+        return $this->getModelName();
+    }
+    
+    function &objectCache()
+    {
+        static $cache;
+        $args =& func_get_args();
+        if(count($args) == 2){
+            if(!isset($cache[$args[0]])){
+                $cache[$args[0]] =& $args[1];
+            }
+        }elseif(!isset($cache[$args[0]])){
+            return false;
+        }
+        return $cache[$args[0]];
+    }
+    
+
 }
 
 
