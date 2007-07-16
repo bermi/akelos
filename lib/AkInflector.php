@@ -140,7 +140,7 @@ class AkInflector
             '/(matr)ices$/i' => '\\1ix',
             '/(vert|ind)ices$/i' => '\\1ex',
             '/^(ox)en/i' => '\\1',
-            '/(alias|status)es$/i' => '\\1',
+            '/(alias|status|wax)es$/i' => '\\1',
             '/([octop|vir])i$/i' => '\\1us',
             '/(cris|ax|test)es$/i' => '\\1is',
             '/(shoe)s$/i' => '\\1',

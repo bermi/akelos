@@ -82,6 +82,7 @@ class Test_of_AkInflector extends  UnitTestCase
     "equipment" => "equipment",
     "bus" => "buses",
     "status" => "statuses",
+    "wax" => "waxes",
     "mouse" => "mice",
 
     "louse" => "lice",
