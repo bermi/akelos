@@ -127,11 +127,15 @@ if(!AK_CLI && AK_WEB_REQUEST){
     defined('AK_PROTOCOL') ? null : define('AK_PROTOCOL',isset($_SERVER['HTTPS']) ? 'https://' : 'http://');
     defined('AK_HOST') ? null : define('AK_HOST', $_SERVER['SERVER_NAME'] == 'localhost' ? $_SERVER['SERVER_ADDR'] : $_SERVER['SERVER_NAME']);
     defined('AK_REMOTE_IP') ? null : define('AK_REMOTE_IP',(isset($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']);
-    $port = ($_SERVER['SERVER_PORT'] != 80 && AK_PROTOCOL == 'http://') ||
-    ($_SERVER['SERVER_PORT'] != 443 && AK_PROTOCOL == 'https://')
+
+    defined('AK_SERVER_STANDARD_PORT') ? null : define('AK_SERVER_STANDARD_PORT', AK_PROTOCOL == 'https://' ? '443' : '80');
+
+    $port = ($_SERVER['SERVER_PORT'] != AK_SERVER_STANDARD_PORT)
     ? (empty($_SERVER['SERVER_PORT']) ? '' : ':'.$_SERVER['SERVER_PORT']) : '';
 
-
+    if(isset($_SERVER['HTTP_HOST']) && strstr($_SERVER['HTTP_HOST'],':')){
+        list(,$port) = explode(':', $_SERVER['HTTP_HOST']);
+    }
     $suffix = '';
     if(defined('AK_SITE_HTPSS_URL_SUFFIX') && isset($_SERVER['HTTPS'])){
         $suffix = AK_SITE_HTPSS_URL_SUFFIX;
@@ -152,6 +156,9 @@ if(!AK_CLI && AK_WEB_REQUEST){
     }
     defined('AK_CURRENT_URL') ? null : define('AK_CURRENT_URL', substr(AK_SITE_URL,0,strlen($suffix)*-1).AK_REQUEST_URI);
 
+
+    defined('AK_SERVER_PORT') ? null : define('AK_SERVER_PORT', empty($port) ? AK_SERVER_STANDARD_PORT : trim($port,':'));
+    
     unset($suffix, $port);
     defined('AK_COOKIE_DOMAIN') ? null : define('AK_COOKIE_DOMAIN', AK_HOST);
     // ini_set('session.cookie_domain', AK_COOKIE_DOMAIN);

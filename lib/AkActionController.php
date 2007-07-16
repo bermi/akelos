@@ -958,12 +958,18 @@ class AkActionController extends AkObject
         $this->Request->getPath().$this->parameters['controller'].$this->parameters['action'].$this->parameters['inspect'];
     }
 
+    /**
+     * Given a path and options, returns a rewritten URL string
+     */
     function _rewriteUrl($path, $options)
     {
         $rewritten_url = '';
         if(empty($options['only_path'])){
             $rewritten_url .= !empty($options['protocol']) ? $options['protocol'] : $this->Request->getProtocol();
+            $rewritten_url .= strstr($rewritten_url,'://') ? '' : '://';
+            $rewritten_url .= $this->_rewriteAuthentication($options);
             $rewritten_url .= !empty($options['host']) ? $options['host'] : $this->Request->getHostWithPort();
+            $options = Ak::delete($options, array('user','password','host','protocol'));
         }
 
         $rewritten_url .= empty($options['skip_relative_url_root']) ? $this->Request->getRelativeUrlRoot() : '';
@@ -980,7 +986,17 @@ class AkActionController extends AkObject
         $rewritten_url .= $path;
         $rewritten_url .= empty($options['trailing_slash']) ? '' : '/';
         $rewritten_url .= empty($options['anchor']) ? '' : '#'.$options['anchor'];
+
         return $rewritten_url;
+    }
+
+    function _rewriteAuthentication($options)
+    {
+        if(!isset($options['user']) && isset($options['password'])){
+            return urlencode($options['user']).':'.urlencode($options['password']).'@';
+        }else{
+            return '';
+        }
     }
 
     function _rewritePath($options)
@@ -1001,7 +1017,6 @@ class AkActionController extends AkObject
             unset($options[$k]);
         }
         $path = Ak::toUrl($options);
-
         return $path;
     }
 

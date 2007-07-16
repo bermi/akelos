@@ -435,7 +435,7 @@ class AkRequest extends AkObject
     */
     function getPort()
     {
-        $this->port_as_int = AK_WEB_REQUEST ? (isset($this->port_as_int) ? $this->port_as_int : $this->env['SERVER_PORT']) : 80;
+        $this->port_as_int = AK_WEB_REQUEST ? AK_SERVER_PORT : 80;
         return $this->port_as_int;
     }
 
@@ -453,7 +453,8 @@ class AkRequest extends AkObject
     */
     function getPortString()
     {
-        return $this->getPort() == $this->getStandardPort() ? '' : ($this->getPort() ? ':'.$this->getPort() : '');
+        $port = $this->getPort();
+        return $port == $this->getStandardPort() ? '' : ($port ? ':'.$this->getPort() : '');
     }
 
     /**
