@@ -966,7 +966,7 @@ class AkActionController extends AkObject
         $rewritten_url = '';
         if(empty($options['only_path'])){
             $rewritten_url .= !empty($options['protocol']) ? $options['protocol'] : $this->Request->getProtocol();
-            $rewritten_url .= strstr($rewritten_url,'://') ? '' : '://';
+            $rewritten_url .= empty($rewritten_url) || strpos($rewritten_url,'://') ? '' : '://';
             $rewritten_url .= $this->_rewriteAuthentication($options);
             $rewritten_url .= !empty($options['host']) ? $options['host'] : $this->Request->getHostWithPort();
             $options = Ak::delete($options, array('user','password','host','protocol'));
