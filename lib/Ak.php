@@ -9,8 +9,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
- * @subpackage Ak
+ * @package ActiveSupport
+ * @subpackage Base
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
@@ -37,8 +37,6 @@ defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION') ? null : define('AK_AUTOMATIC_CON
 * when PHP gets new functions into its core. And also to provide 
 * additional functionality to existing PHP functions mantaining the same interface  
 *
-* @package AkelosFramework
-* @subpackage Ak::static_functions
 * @author Bermi Ferrer <bermi at akelos com>
 * @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>

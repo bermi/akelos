@@ -9,8 +9,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
- * @subpackage AkImage
+ * @package ActiveSupport
+ * @subpackage ImageManipulation
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
@@ -22,10 +22,10 @@
  * Options are:
  * 'width
  * 'height'
- * 'mode' This seting will define how the image will be resized. Options are:
+ * 'mode' This setting will define how the image will be resized. Options are:
  *  - "normal" (default) will shrink to the largest side but will not grow the image if it is smaller
  *  - "expand" grows the image to the largest side
- *  - "force" forces the image to an specific size without mantaining the aspect ratio
+ *  - "force" forces the image to an specific size without maintaining the aspect ratio
  */
 class AkImageResizeFilter extends AkImageFilter
 {

@@ -13,8 +13,8 @@ ak_compat('http_build_query');
 /**
  * Native PHP URL rewriting for the Akelos Framework.
  * 
- * @package AkelosFramework
- * @subpackage Reporting
+ * @package ActionController
+ * @subpackage Request
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
@@ -48,8 +48,6 @@ if(!defined('COMPULSORY_REGEX')){
 *
 * - A rewriting implementation in the Akelos Framework can also be used to generate custom URLs by linking it to the standard URL helpers such as url_for, link_to, and redirect_to.
 *
-* @package AkelosFramework
-* @subpackage AkActionController
 * @author Bermi Ferrer <bermi a.t akelos d.t c.om>
 * @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>

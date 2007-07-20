@@ -9,8 +9,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
- * @subpackage AkImage
+ * @package ActiveSupport
+ * @subpackage ImageManipulation
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
@@ -38,7 +38,7 @@ class AkImageFilter
     }
     
     /**
-     * Options for pear ImageTransform are normally in lower cameCase so we need to remap the option keys
+     * Options for pear ImageTransform are normally in lower camelCase so we need to remap the option keys
      * to adhere to the framework convention of underscored options
      */
     function _variablizeOptions_(&$options)

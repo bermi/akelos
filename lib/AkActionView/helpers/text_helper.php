@@ -9,7 +9,7 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
+ * @package ActionView
  * @subpackage Helpers
  * @author Jose Salavert <salavert a.t akelos c.om>
  * @author Bermi Ferrer <bermi a.t akelos c.om>

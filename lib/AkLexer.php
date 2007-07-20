@@ -14,8 +14,8 @@
 * For an intro to the Lexer see:
 * http://www.phppatterns.com/index.php/article/articleview/106/1/2/
 * @author Marcus Baker
-* @package AkelosFramework
-* @subpackage AkParser
+* @package ActiveSupport
+* @subpackage GenericParser
 */
 
 /**#@+
@@ -32,8 +32,6 @@ define("AK_LEXER_SPECIAL", 5);
  *    Compounded regular expression. Any of
  *    the contained patterns could match and
  *    when one does it's label is returned.
- *    @package AkelosFramework
- *    @subpackage AkParser
  */
 class AkLexerParallelRegex {
     var $_patterns;
@@ -213,8 +211,6 @@ class AkLexerParallelRegex {
 
 /**
  *    States for a stack machine.
- *    @package AkelosFramework
- *    @subpackage AkParser
  */
 class AkLexerStateStack {
     var $_stack;
@@ -269,8 +265,6 @@ class AkLexerStateStack {
  *    content is only scanned by the PHP regex
  *    parser once. Lexer modes must not start
  *    with leading underscores.
- *    @package AkelosFramework
- *    @subpackage AkParser
  */
 class AkLexer {
     var $_regexes;

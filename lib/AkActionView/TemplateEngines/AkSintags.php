@@ -9,8 +9,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
- * @subpackage AkActionView
+ * @package ActionView
+ * @subpackage Sintags
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
@@ -36,14 +36,14 @@ defined('AK_SINTAGS_HASH_KEY_VALUE_DELIMITER') ? null : define('AK_SINTAGS_HASH_
  * 
  * The Akelos Framework doesn't want you force you to learn another useless template language. You have the power of PHP on your templates. But in some cases there's need for a graphic designer to create templates for views, so we have added a very limited syntax that allows you to create simple but powerful templates on WYSIWYG HTML editors.
  * 
- * This special syntax is known as Sintags (where "Sin" comes from the Spanish word for without) wich is a set of rules on your view using only "?", "_", "{", "}", "end", "." and "-" characters. Parsed Sintag is converted to PHP code and cached as a .php file for better performance.
+ * This special syntax is known as Sintags (where "Sin" comes from the Spanish word for without) which is a set of rules on your view using only "?", "_", "{", "}", "end", "." and "-" characters. Parsed Sintag is converted to PHP code and cached as a .php file for better performance.
  * 
  * Sintags elements
  * 
  *     * { Starts a Sintag block
  *     * } Ends a Sintag block
  *     * {var_name?} Asserts if given element has been set by the controller and prints the value of "var_name"
- *     * {?var_name} Asserts if element is not empty and starts a php condition block like "if(!empty($var_name)) {". IMPORTANT NOTE, You need to close this blocks using "{end}" or <?php } ?>
+ *     * {?var_name} Asserts if element is not empty and starts a PHP condition block like "if(!empty($var_name)) {". IMPORTANT NOTE, You need to close this blocks using "{end}" or <?php } ?>
  *     * {end} Closes a block generating <?php } ?>
  *     * {object.attribute} "." is used for accessing object attributes. This is the same as <?php echo $object->attribute; ?>
  *     * {array-key} "-" is used for accessing array on a specific key. This is the same as <?php echo $array['key']; ?>

@@ -16,9 +16,10 @@ require_once(AK_VENDOR_DIR.DS.'pear'.DS.'PHP'.DS.'Compat'.DS.'Constant'.DS.'T.ph
 
 /**
  * This is a modified version of the pear/PHP_Shell package by Jan Kneschke
- * This is used for the interactive PHP shell
+ * and is used for validating PHP in the interactive shell
+ * before terminating execution with fatal errors.
  * 
- * @package AkelosFramework
+ * @package ActiveSupport
  * @subpackage Console
  * @author Jan Kneschke <jan@kneschke.de>
  * @author Bermi Ferrer <bermi a.t akelos c.om>

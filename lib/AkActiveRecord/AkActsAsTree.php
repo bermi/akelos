@@ -17,8 +17,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
- * @subpackage AkActiveRecord
+ * @package ActiveRecord
+ * @subpackage Behaviours
  * @author Niels Ganser <ng a.t depoll d.e>
  * @copyright Copyright (c) 2006, Raw Ideas Pty Ltd
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>

@@ -9,8 +9,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
- * @subpackage AkActionView
+ * @package ActionView
+ * @subpackage Base
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
@@ -63,7 +63,9 @@
 *   First name: <?= $person->first_name ?>
 *
 * 
-* == JavaScriptGenerator
+* == JavaScriptGenerator ==
+*
+* @todo Fully implement Javascript Generators
 *
 * JavaScriptGenerator templates end in +.js.tpl+. Unlike conventional templates which are used to 
 * render the results of an action, these templates generate instructions on how to modify an already rendered page. This makes it easy to 
@@ -79,9 +81,9 @@
 *
 * The subsequently rendered +delete.js.tpl+ might look like:
 *
-*   page.replace_html  'sidebar', :partial => 'sidebar'
-*   page.remove        "person-$person->id"
-*   page.visual_effect :highlight, 'user-list' 
+*   <% replace_html  'sidebar', :partial => 'sidebar' %>
+*   <% remove "person-#{person.id}" %>
+*   <% visual_effect :highlight, 'user-list' %>
 *
 * This refreshes the sidebar, removes a person element and highlights the user list.
 * 

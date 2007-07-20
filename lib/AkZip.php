@@ -8,7 +8,7 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
+ * @package ActiveSupport
  * @subpackage Utils
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @author Vincent Blavet <vincent@blavet.net>
@@ -78,8 +78,6 @@ define('AK_ZIP_PARAM_POST_ADD', 'callback_post_add');
  *
  * @author   Vincent Blavet <vincent@blavet.net>
  * @version  $Revision: 1.6 $
- * @package AkelosFramework
- * @subpackage Utils
  * @category Archive
  */
 

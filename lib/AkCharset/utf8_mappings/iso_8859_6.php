@@ -30,8 +30,6 @@
 * Charset::iso_8859_6 provides functionality to convert
 * ISO-8859-6 strings, to UTF-8 multibyte format and vice versa.
 *
-* @package AKELOS
-* @subpackage Localize
 * @author Bermi Ferrer Martinez <bermi@akelos.org>
 * @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>

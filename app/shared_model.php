@@ -8,8 +8,10 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 * 
 * Add your application-wide methods in the class below, your models
 * will inherit them.
+*
+* @package ActiveRecord
+* @subpackage Base
 */
-
 class ActiveRecord extends AkActiveRecord 
 {
 }

@@ -9,8 +9,8 @@ require_once(AK_LIB_DIR.DS.'AkActionController.php');
 * Add your application-wide methods in the class below, your controllers 
 * will inherit them.
 * 
-* @package AKELOS
-* @subpackage AKELOS.app
+* @package ActionController
+* @subpackage Base
 */
 
 class ApplicationController extends AkActionController 

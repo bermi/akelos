@@ -9,8 +9,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
- * @subpackage Utils
+ * @package ActiveSupport
+ * @subpackage Compatibility
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
@@ -27,7 +27,6 @@ if(!defined('AK_OBJECT_CLASS_INCLUDED')){ define('AK_OBJECT_CLASS_INCLUDED',true
 * top-layer __construct() which (if present) should call
 * parent::__construct()
 *
-* @package AkelosFramework
 * @author Bermi Ferrer <bermi a.t akelos c.om>
 * @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>

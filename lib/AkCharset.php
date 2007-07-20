@@ -9,7 +9,7 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
+ * @package ActiveSupport
  * @subpackage I18n-L10n
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
@@ -38,8 +38,6 @@
 * More information about charsets at
 * http://en.wikipedia.org/wiki/Character_encoding
 *
-* @package AkelosFramework
-* @subpackage I18n-L10n
 * @author Bermi Ferrer <bermi@akelos.org>
 * @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>

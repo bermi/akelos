@@ -9,8 +9,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
- * @subpackage AkActionController
+ * @package ActionController
+ * @subpackage Request
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
@@ -37,8 +37,6 @@ if(!defined('AK_DEFAULT_ACTION')){
 * ApplicationController class, who takes control of the data
 * flow.
 * 
-* @package AkelosFramework
-* @subpackage AkActionController
 * @author Bermi Ferrer <bermi@akelos.com>
 * @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
@@ -97,7 +95,7 @@ class AkRequest extends AkObject
     * This method requires for a previous execution of the _mergeRequest() method, 
     * in order to merge all the request all i one array.
     *
-    * This method expands dinamically the class Request, adding a public propierty for
+    * This method expands dynamically the class Request, adding a public property for
     * every parameter sent in the request.
     *
     * 

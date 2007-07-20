@@ -9,12 +9,12 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
- * @subpackage AkActiveRecord
- * @author Bermi Ferrer <bermi a.t akelos c.om>
- * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
- */
+* @package ActiveRecord
+* @subpackage Behaviours
+* @author Bermi Ferrer <bermi a.t akelos c.om>
+* @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
+* @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
+*/
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
 
@@ -24,7 +24,7 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
 * the mapped database table.
 * 
 * Todo list example:
-* 
+* <code>
 *   class TodoList extends AkActiveRecord
 *   {
 *       var $has_many = array('todo_items', array('order' => "position"));
@@ -38,11 +38,9 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
 *     
 *   $TodoList =& new TodoList();
 *
-*   $TodoList->list->.moveToBottom
-*   todo_list.last.moveHigher
+*   $TodoList->list->moveToBottom();
+* </code>
 */
-
-
 class AkActsAsList extends AkObserver
 {
     var $column = 'position';

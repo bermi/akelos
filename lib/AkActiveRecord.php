@@ -9,8 +9,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
- * @subpackage AkActiveRecord
+ * @package ActiveRecord
+ * @subpackage Base
  * @component Active Record
  * @author Bermi Ferrer <bermi a.t akelos c.om> 2004 - 2007
  * @author Kaste 2007
@@ -20,9 +20,11 @@
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php');
 
+/**#@+
+ * Constants
+ */
 // Akelos args is a short way to call functions that is only intended for fast prototyping
 defined('AK_ENABLE_AKELOS_ARGS') ? null : define('AK_ENABLE_AKELOS_ARGS', false); 
-
 // Use setColumnName if available when using set('column_name', $value);
 defined('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT') ? null : define('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT', true); 
 defined('AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS') ? null : define('AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS', true); 
@@ -39,6 +41,7 @@ defined('AK_PHONE_REGULAR_EXPRESSION') ? null : define('AK_PHONE_REGULAR_EXPRESS
 defined('AK_DATE_REGULAR_EXPRESSION') ? null : define('AK_DATE_REGULAR_EXPRESSION',"/^(([0-9]{1,2}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{2,4})|([0-9]{2,4}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{1,2})){1}$/");
 defined('AK_IP4_REGULAR_EXPRESSION') ? null : define('AK_IP4_REGULAR_EXPRESSION',"/^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/");
 defined('AK_POST_CODE_REGULAR_EXPRESSION') ? null : define('AK_POST_CODE_REGULAR_EXPRESSION',"/^[0-9A-Za-z  -]{2,9}$/");
+/**#@-*/
 
 // Forces loading database schema on every call
 if(AK_DEV_MODE && isset($_SESSION['__activeRecordColumnsSettingsCache'])){
@@ -60,26 +63,31 @@ ak_compat('array_combine');
 * Active Records accepts constructor parameters either in an array or as a list of parameters in a specific format. The array method is especially useful when
 * you're receiving the data from somewhere else, like a HTTP request. It works like this:
 * 
+* <code>
 *   $user = new User(array('name' => 'David', 'occupation' => 'Code Artist'));
 *   echo $user->name; // Will print "David"
-* 
+* </code>
+*
 * You can also use a parameter list initialization.:
 * 
 *   $user = new User('name->', 'David', 'occupation->', 'Code Artist');
 * 
 * And of course you can just create a bare object and specify the attributes after the fact:
 * 
+* <code>
 *   $user = new User();
 *   $user->name = 'David';
 *   $user->occupation = 'Code Artist';
-* 
+* </code>
+*
 * == Conditions ==
 * 
 * Conditions can either be specified as a string or an array representing the WHERE-part of an SQL statement.
 * The array form is to be used when the condition input is tainted and requires sanitization. The string form can
 * be used for statements that doesn't involve tainted data. Examples:
 * 
-*   class User extends AkActiveRecord
+* <code>
+*   class User extends ActiveRecord
 *   {
 *     function authenticateUnsafely($user_name, $password)
 *     {
@@ -91,7 +99,8 @@ ak_compat('array_combine');
 *          return findFirst("user_name = ? AND password = ?", $user_name, $password);
 *     }
 *    }
-* 
+* </code>
+*
 * The <tt>authenticateUnsafely</tt> method inserts the parameters directly into the query and is thus susceptible to SQL-injection
 * attacks if the <tt>$user_name</tt> and <tt>$password</tt> parameters come directly from a HTTP request. The <tt>authenticateSafely</tt> method, 
 * on the other hand, will sanitize the <tt>$user_name</tt> and <tt>$password</tt> before inserting them in the query, which will ensure that
@@ -101,11 +110,13 @@ ak_compat('array_combine');
 * question mark is supposed to represent. In those cases, you can resort to named bind variables instead. That's done by replacing 
 * the question marks with symbols and supplying a hash with values for the matching symbol keys:
 * 
+* <code>
 *   $Company->findFirst(
 *              "id = :id AND name = :name AND division = :division AND created_at > :accounting_date", 
 *               array(':id' => 3, ':name' => "37signals", ':division' => "First", ':accounting_date' => '2005-01-01')
 *             );
-* 
+* </code>
+*
 * == Accessing attributes before they have been type casted ==
 * 
 * Some times you want to be able to read the raw attribute data without having the column-determined type cast run its course first.
@@ -121,26 +132,30 @@ ak_compat('array_combine');
 * Active Record can serialize any object in text columns. To do so, you must specify this with by setting the attribute serialize with 
 * a comma separated list of columns or an array. 
 * This makes it possible to store arrays, hashes, and other non-mappeable objects without doing any additional work. Example:
-* 
-*   class User extends AkActiveRecord
+*
+* <code> 
+*   class User extends ActiveRecord
 *   {
 *      var $serialize = 'preferences';
 *   }
-* 
+*
 *   $User = new User(array('preferences'=>array("background" => "black", "display" => 'large')));
 *   $User->find($user_id);
 *   $User->preferences // array("background" => "black", "display" => 'large')
+* </code>
 * 
 * == Single table inheritance ==
 * 
 * Active Record allows inheritance by storing the name of the class in a column that by default is called "type" (can be changed 
 * by overwriting <tt>AkActiveRecord->_inheritanceColumn</tt>). This means that an inheritance looking like this:
 * 
-*   class Company extends AkActiveRecord{}
+* <code>
+*   class Company extends ActiveRecord{}
 *   class Firm extends Company{}
 *   class Client extends Company{}
 *   class PriorityClient extends Client{}
-* 
+* </code>
+*
 * When you do $Firm->create('name =>', "akelos"), this record will be saved in the companies table with type = "Firm". You can then
 * fetch this row again using $Company->find('first', "name = '37signals'") and it will return a Firm object.
 * 
@@ -166,6 +181,9 @@ ak_compat('array_combine');
 */
 class AkActiveRecord extends AkAssociatedActiveRecord
 {
+    /**#@+
+    * @access private
+    */
     //var $disableAutomatedAssociationLoading = true;
     var $_tableName;
     var $_db;
@@ -232,8 +250,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     );
 
     var $__activeRecordObject = true;
-
-
+    
+    /**#@-*/
+    
     function __construct()
     {
         $attributes = (array)func_get_args();
@@ -400,6 +419,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Creates a new record with values matching those of the instance attributes.
     * Must be called as a result of a call to createOrUpdate.
+    *
+    * @access private
     */
     function _create()
     {
@@ -635,6 +656,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Updates the associated record with values matching those of the instance attributes.
     * Must be called as a result of a call to createOrUpdate.
+    *
+    * @access private
     */
     function _update()
     {
@@ -880,27 +903,29 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * named refer to already defined associations. See eager loading under Associations.
     * 
     * Examples for find by id:
-    * 
+    * <code>
     *   $Person->find(1);       // returns the object for ID = 1
     *   $Person->find(1, 2, 6); // returns an array for objects with IDs in (1, 2, 6), Returns false if any of those IDs is not available
     *   $Person->find(array(7, 17)); // returns an array for objects with IDs in (7, 17)
     *   $Person->find(array(1));     // returns an array for objects the object with ID = 1
     *   $Person->find(1, array('conditions' => "administrator = 1", 'order' => "created_on DESC"));
-    * 
+    * </code>
+    *
     * Examples for find first:
-    * 
+    * <code> 
     *   $Person->find('first'); // returns the first object fetched by SELECT * FROM people
     *   $Person->find('first', array('conditions' => array("user_name = ':user_name'", ':user_name' => $user_name)));
     *   $Person->find('first', array('order' => "created_on DESC", 'offset' => 5));
+    * </code>
     * 
     * Examples for find all:
-    * 
+    * <code> 
     *   $Person->find('all'); // returns an array of objects for all the rows fetched by SELECT * FROM people
     *   $Person->find(); // Same as $Person->find('all');
     *   $Person->find('all', array('conditions => array("category IN (categories)", 'categories' => join(','$categories)), 'limit' => 50));
     *   $Person->find('all', array('offset' => 10, 'limit' => 10));
     *   $Person->find('all', array('include' => array('account', 'friends'));
-    * 
+    * </code>
     */
     function &find()
     {
@@ -1413,6 +1438,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $new_conditions;
     }
 
+    /**
+    *
+    * @access private
+    */
     function _quoteColumnName($column_name)
     {
         return $this->_db->nameQuote.$column_name.$this->_db->nameQuote;
@@ -1421,7 +1450,11 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
 
 
-    // EXPERIMENTAL: Will allow to create finders when PHP includes aggregate_methods as a stable feature on PHP4, for PHP5 we might use __call
+    /**
+    * EXPERIMENTAL: Will allow to create finders when PHP includes aggregate_methods as a stable feature on PHP4, for PHP5 we might use __call
+    *
+    * @access private
+    */
     function _buildFinders($finderFunctions = array('find','findFirst'))
     {
         if(!$this->_dynamicMethods){
@@ -1911,7 +1944,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      * 
      * Example:
      * <code>
-     *   class Customer extends AkActiveRecord
+     *   class Customer extends ActiveRecord
      *    {
      *      function Customer()
      *      {
@@ -2101,7 +2134,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * for composing and another for decomposing by passing their names as an array like on the patterns.
     *
     *    <?php 
-    *    class User extends AkActiveRecord 
+    *    class User extends ActiveRecord 
     *    { 
     *        function User()
     *        {
@@ -2209,7 +2242,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-
+    /**
+    * @access private
+    */
     function _getCombinedAttributesWhereThisAttributeIsUsed($attribute)
     {
         $result = array();
@@ -2383,6 +2418,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $this->_db =& Ak::db($dns, $connection_id);
     }
     
+    /**
+    * @access private
+    */
     function _getDatabaseType()
     {
         if(strstr($this->_db->databaseType,'mysql')){
@@ -2545,6 +2583,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     /**
      * Gets information from the database engine about a single table
+     *
+     * @access private
      */
     function _databaseTableInternals($table)
     {
@@ -2568,6 +2608,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     /**
     * If is the first time we use a model this function will run the installer for the model if it exists
+    *
+    * @access private
     */
     function _runCurrentModelInstallerIfExists(&$column_objects)
     {
@@ -2691,22 +2733,33 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $this->_columnNames = $this->_columns = $this->_columnsSettings = $this->_contentColumns = array();
     }
 
+    /**
+    * @access private
+    */
     function _getColumnsSettings()
     {
         return $_SESSION['__activeRecordColumnsSettingsCache'];
     }
 
+    /**
+    * @access private
+    */
     function _getModelColumnSettings()
     {
         return $_SESSION['__activeRecordColumnsSettingsCache'][$this->getModelName()];
     }
 
-
+    /**
+    * @access private
+    */
     function _persistTableColumnSettings()
     {
         $_SESSION['__activeRecordColumnsSettingsCache'][$this->getModelName().'_column_settings'] = $this->_columnsSettings;
     }
 
+    /**
+    * @access private
+    */
     function _getPersistedTableColumnSettings()
     {
         $model_name = $this->getModelName();
@@ -2717,6 +2770,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $_SESSION['__activeRecordColumnsSettingsCache'][$model_name.'_column_settings'] : false;
     }
 
+    /**
+    * @access private
+    */
     function _clearPersitedColumnSettings()
     {
         if(AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA && AK_CACHE_HANDLER > 0){
@@ -2726,6 +2782,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
+    /**
+    * @access private
+    */
     function _savePersitedColumnSettings()
     {
         if(isset($_SESSION['__activeRecordColumnsSettingsCache'])){
@@ -2735,6 +2794,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
+    /**
+    * @access private
+    */
     function _loadPersistedColumnSetings()
     {
         if(!isset($_SESSION['__activeRecordColumnsSettingsCache'])){
@@ -3011,18 +3073,26 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-
+    /**
+    * @access private
+    */
     function _delocalizeAttribute($attribute)
     {
         return $this->_isInternationalizeCandidate($attribute) ? substr($attribute,3) : $attribute;
     }
     
+    /**
+    * @access private
+    */
     function _isInternationalizeCandidate($column_name)
     {
         $pos = strpos($column_name,'_');
         return $pos === 2 && in_array(substr($column_name,0,$pos),$this->getAvaliableLocales());
     }
-
+    
+    /**
+    * @access private
+    */
     function _addInternationalizedColumn($column_name)
     {
         $this->_columnsSettings[$column_name]['i18n'] = true;
@@ -3034,6 +3104,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      * 
      * Example:
      *  es_title and en_title will be available user title = array('es'=>'...', 'en' => '...')
+     *
+     * @access private
      */
     function _groupInternationalizedAttribute($attribute, $value)
     {
@@ -3197,6 +3269,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Joins date arguments into a single attribute. Like the array generated by the date_helper, so
     * array('published_on(1i)' => 2002, 'published_on(2i)' => 'January', 'published_on(3i)' => 24)
     * Will be converted to array('published_on'=>'2002-01-24')
+    *
+    * @access private
     */
     function _castDateParametersFromDateHelper_(&$params)
     {
@@ -3217,12 +3291,17 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     
     
     
-    
+    /**
+    * @access private
+    */
     function _addBlobQueryStack($column_name, $blob_value)
     {
         $this->_BlobQueryStack[$column_name] = $blob_value;
     }
 
+    /**
+    * @access private
+    */
     function _updateBlobFields($condition)
     {
         if(!empty($this->_BlobQueryStack) && is_array($this->_BlobQueryStack)){
@@ -3315,7 +3394,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Active Record lifecycle.
     *
     * Examples:
-    *   class CreditCard extends AkActiveRecord
+    *   class CreditCard extends ActiveRecord
     *   {
     *       // Strip everything but digits, so the user can specify "555 234 34" or
     *       // "5552-3434" or both will mean "55523434"
@@ -3327,7 +3406,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *       }
     *   }
     *
-    *   class Subscription extends AkActiveRecord
+    *   class Subscription extends ActiveRecord
     *   {
     *       // Note: This is not implemented yet
     *       var $beforeCreate  = 'recordSignup';
@@ -3338,7 +3417,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *       }
     *   }
     *
-    *   class Firm extends AkActiveRecord
+    *   class Firm extends ActiveRecord
     *   {
     *       //Destroys the associated clients and people when the firm is destroyed
     *       // Note: This is not implemented yet
@@ -3446,7 +3525,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * 
     * Example:
     * 
-    *   class Person extends AkActiveRecord
+    *   class Person extends ActiveRecord
     *   {
     *       function validate()
     *       {
@@ -3490,7 +3569,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       * Encapsulates the pattern of wanting to validate a password or email address field with a confirmation. Example:
       * 
       *  Model:
-      *     class Person extends AkActiveRecord
+      *     class Person extends ActiveRecord
       *     {
       *         function validate()
       *         {
@@ -3523,7 +3602,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
       * Encapsulates the pattern of wanting to validate the acceptance of a terms of service check box (or similar agreement). Example:
       * 
-      * class Person extends AkActiveRecord
+      * class Person extends ActiveRecord
       * {
       *     function validateOnCreate()
       *     {
@@ -3620,7 +3699,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
       * Validates that the specified attribute matches the length restrictions supplied. Only one option can be used at a time:
       * 
-      * class Person extends AkActiveRecord
+      * class Person extends ActiveRecord
       * {
       *     function validate()
       *     {
@@ -3739,7 +3818,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Validates whether the value of the specified attributes are unique across the system. Useful for making sure that only one user
     * can be named "davidhh".
     *
-    *  class Person extends AkActiveRecord
+    *  class Person extends ActiveRecord
     *   {
     *       function validate()
     *       {
@@ -3751,7 +3830,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * It can also validate whether the value of the specified attributes are unique based on multiple scope parameters.  For example,
     * making sure that a teacher can only be on the schedule once per semester for a particular class. 
     *
-    *   class TeacherSchedule extends AkActiveRecord
+    *   class TeacherSchedule extends ActiveRecord
     *   {
     *       function validate()
     *       {
@@ -3829,13 +3908,15 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Validates whether the value of the specified attribute is of the correct form by matching it against the regular expression
     * provided.
     *
-    *   class Person extends AkActiveRecord
+    * <code>
+    *   class Person extends ActiveRecord
     *   {
     *       function validate()
     *       {
     *           $this->validatesFormatOf('email', "/^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/");
     *       }
     *   }
+    * </code>
     *
     * A regular expression must be provided or else an exception will be raised.
     *
@@ -3872,7 +3953,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Validates whether the value of the specified attribute is available in a particular array of elements.
     *
-    * class Person extends AkActiveRecord
+    * class Person extends ActiveRecord
     * {
     *   function validate()
     *   {
@@ -3904,7 +3985,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Validates that the value of the specified attribute is not in a particular array of elements.
     *
-    *   class Person extends AkActiveRecord
+    *   class Person extends ActiveRecord
     *   {
     *       function validate()
     *       {
@@ -3937,7 +4018,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Validates whether the value of the specified attribute is numeric.
     * 
-    *   class Person extends AkActiveRecord
+    *   class Person extends ActiveRecord
     *   {
     *       function validate()
     *       {
@@ -4025,6 +4106,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Specific validators are (for now):
     * $this->_automated_max_length_validator = true; // true by default, but you can set it to false on your model
     * $this->_automated_not_null_validator = false; // disabled by default
+    *
+    * @access private
     */
     function _runAutomatedValidators()
     {
@@ -4044,6 +4127,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     /**
     * $this->_set_default_attribute_values_automatically = true; // This enables automated attribute setting from database definition
+    *
+    * @access private
     */
     function _setDefaultAttributeValuesAutomatically()
     {
@@ -4094,10 +4179,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     
     /**
     * $state store the state of this observable object
+    *
+    * @access private
     */
     var $_observable_state;
 
-
+    /**
+    * @access private
+    */
     function _instatiateDefaultObserver()
     {
         $default_observer_name = ucfirst($this->getModelName().'Observer');
@@ -4435,12 +4524,18 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
+    /**
+    * @access private
+    */
     function _getActAsClassName($behaviour)
     {
         return (in_array(strtolower($behaviour), $this->__coreActsLikeAttributes) ?
         'AkActsAs' : 'ActAs').AkInflector::camelize($behaviour);
     }
 
+    /**
+    * @access private
+    */
     function &_getActAsInstance($class_name, $options)
     {
         if(substr($class_name,0,2) == 'Ak'){
@@ -4456,6 +4551,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
+    /**
+    * @access private
+    */
     function _loadActAsBehaviours()
     {
         $this->act_as = !empty($this->acts_as) ? $this->acts_as : (empty($this->act_as) ? false : $this->act_as);
@@ -4823,6 +4921,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
  ====================================================================
  */
 
+    /**
+    * @access private
+    */
     var $_calculation_options = array('conditions', 'joins', 'order', 'select', 'group', 'having', 'distinct', 'limit', 'offset');
 
     /**
@@ -4945,6 +5046,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return 0;
     }
 
+    /**
+    * @access private
+    */
     function _constructCountOptionsFromLegacyArgs($args)
     {
         $options = array();
@@ -4976,6 +5080,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
+    /**
+    * @access private
+    */
     function _constructCalculationSql($operation, $column_name, $options)
     {
         $operation = strtolower($operation);
@@ -5006,12 +5113,18 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
+    /**
+    * @access private
+    */
     function _executeSimpleCalculation($operation, $column_name, $column, $options)
     {
         $value = $this->sqlSelectValue($this->_constructCalculationSql($operation, $column_name, $options), empty($options['limit']) ? false : $options['limit'], !isset($options['offset']) ? false : $options['offset']);
         return $this->_typeCastCalculatedValue($value, $column, $operation);
     }
 
+    /**
+    * @access private
+    */
     function _executeGroupedCalculation($operation, $column_name, $column, $options)
     {
         $group_attr  = $options['group'];
@@ -5030,6 +5143,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $all;
     }
 
+    /**
+    * @access private
+    */
     function _validateCalculationOptions($options = array())
     {
         $invalid_options = array_diff(array_keys($options),$this->_calculation_options);
@@ -5045,6 +5161,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *   sum(id) #=> sum_id
     *   count(distinct users.id) #=> count_distinct_users_id
     *   count(*) #=> count_all
+    *
+    * @access private
     */
     function _getColumnAliasFor()
     {
@@ -5053,6 +5171,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return preg_replace(array('/\*/','/\W+/','/^ +/','/ +$/','/ +/'),array('all',' ','','','_'), $keys);
     }
 
+    /**
+    * @access private
+    */
     function _getColumnFor($field)
     {
         $field_name = ltrim(substr($field,strpos($field,'.')),'.');
@@ -5062,6 +5183,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $field;
     }
 
+    /**
+    * @access private
+    */
     function _typeCastCalculatedValue($value, $column, $operation = null)
     {
         $operation = strtolower($operation);

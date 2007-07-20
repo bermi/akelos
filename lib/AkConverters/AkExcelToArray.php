@@ -9,7 +9,7 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
+ * @package ActiveSupport
  * @subpackage Converters
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org

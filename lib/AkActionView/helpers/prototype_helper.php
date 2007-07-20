@@ -9,7 +9,7 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
+ * @package ActionView
  * @subpackage Helpers
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @author Jerome Loyet

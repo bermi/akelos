@@ -9,8 +9,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
- * @subpackage AkActiveRecord
+* @package ActiveRecord
+* @subpackage Behaviours
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @author Jean-Christophe Michel, Symétrie
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
