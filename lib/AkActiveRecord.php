@@ -415,6 +415,24 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $this->isNewRecord() ? $this->_create() : $this->_update();
     }
     
+    function &findOrCreateBy()
+    {
+        $args = func_get_args();
+        $Item =& Ak::call_user_func_array(array(&$this,'findFirstBy'), $args);
+        if(!$Item){
+            $attributes = array();
+            
+            list($sql, $columns) = $this->_getFindBySqlAndColumns(array_shift($args), $args);
+            
+            if(!empty($columns)){
+                foreach ($columns as $column){
+                    $attributes[$column] = array_shift($args);
+                }
+            }
+            $Item =& $this->create($attributes);
+        }
+        return $Item;
+    }
 
     /**
     * Creates a new record with values matching those of the instance attributes.
@@ -1234,31 +1252,73 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             return Ak::handleStaticCall();
         }
         $args = func_get_args();
-        $sql = array_shift($args);
-        if($sql == 'all' || $sql == 'first'){
-            $fetch = $sql;
-            $sql = array_shift($args);
+        $find_by_sql = array_shift($args);
+        if($find_by_sql == 'all' || $find_by_sql == 'first'){
+            $fetch = $find_by_sql;
+            $find_by_sql = array_shift($args);
         }else{
             $fetch = 'all';
         }
-
+    
         $options = array_pop($args);
-
+    
         if(!is_array($options)){
             array_push($args, $options);
             $options = array();
         }
-
+    
         $query_values = $args;
         $query_arguments_count = count($query_values);
-
-        $sql = str_replace(array('(',')','||','|','&&','&','  '),array(' ( ',' ) ',' OR ',' OR ',' AND ',' AND ',' '),$sql);
+    
+        list($sql, $requested_args) = $this->_getFindBySqlAndColumns($find_by_sql, $query_values);
+    
+        if($query_arguments_count != count($requested_args)){
+            trigger_error(Ak::t('Argument list did not match expected set. Requested arguments are:').join(', ',$requested_args),E_USER_ERROR);
+            $false = false;
+            return $false;
+        }
+    
+        $true_bool_values = array(true,1,'true','True','TRUE','1','y','Y','yes','Yes','YES','s','Si','SI','V','v','T','t');
+    
+        foreach ($requested_args as $k=>$v){
+            switch ($this->getColumnType($v)) {
+                case 'boolean':
+                    $query_values[$k] = in_array($query_values[$k],$true_bool_values) ? 1 : 0;
+                    break;
+    
+                case 'date':
+                case 'datetime':
+                    $query_values[$k] = str_replace('/','-', $this->castAttributeForDatabase($k,$query_values[$k],false));
+                    break;
+    
+                default:
+                    break;
+            }
+        }
+    
+        $_find_arguments = array();
+        $_find_arguments[] = $fetch;
+        $_find_arguments[] = $sql;
+        foreach ($query_values as $value){
+            $_find_arguments[] = $value;
+        }
+        $_find_arguments[] = $options;
+    
+        $_result =& $this->find('set arguments', $_find_arguments);
+        $result =& $_result; // Pass by reference hack
+        return $result;
+    }
+    
+    
+    function _getFindBySqlAndColumns($find_by_sql, &$query_values)
+    {
+        $sql = str_replace(array('(',')','||','|','&&','&','  '),array(' ( ',' ) ',' OR ',' OR ',' AND ',' AND ',' '), $find_by_sql);
         $operators = array('AND','and','(',')','&','&&','NOT','<>','OR','|','||');
         $pieces = explode(' ',$sql);
         $pieces = array_diff($pieces,array(' ',''));
         $params = array_diff($pieces,$operators);
         $operators = array_diff($pieces,$params);
-
+    
         $new_sql = '';
         $parameter_count = 0;
         $requested_args = array();
@@ -1268,7 +1328,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 $requested_args[$parameter_count] = $piece;
                 $parameter_count++;
             }elseif (!in_array($piece,$operators)){
-
+    
                 if(strstr($piece,':')){
                     $_tmp_parts = explode(':',$piece);
                     if($this->hasColumn($_tmp_parts[0])){
@@ -1278,31 +1338,31 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                             case 'is':
                             case 'has':
                             case 'contains':
-                            $query_values[$parameter_count] = '%'.$query_values[$parameter_count].'%';
-                            $new_sql .= $_tmp_parts[0]." LIKE ? ";
-                            break;
+                                $query_values[$parameter_count] = '%'.$query_values[$parameter_count].'%';
+                                $new_sql .= $_tmp_parts[0]." LIKE ? ";
+                                break;
                             case 'like_left':
                             case 'like%':
                             case 'begins':
                             case 'begins_with':
                             case 'starts':
                             case 'starts_with':
-                            $query_values[$parameter_count] = $query_values[$parameter_count].'%';
-                            $new_sql .= $_tmp_parts[0]." LIKE ? ";
-                            break;
+                                $query_values[$parameter_count] = $query_values[$parameter_count].'%';
+                                $new_sql .= $_tmp_parts[0]." LIKE ? ";
+                                break;
                             case 'like_right':
                             case '%like':
                             case 'ends':
                             case 'ends_with':
                             case 'finishes':
                             case 'finishes_with':
-                            $query_values[$parameter_count] = '%'.$query_values[$parameter_count];
-                            $new_sql .= $_tmp_parts[0]." LIKE ? ";
-                            break;
+                                $query_values[$parameter_count] = '%'.$query_values[$parameter_count];
+                                $new_sql .= $_tmp_parts[0]." LIKE ? ";
+                                break;
                             default:
-                            $query_values[$parameter_count] = $query_values[$parameter_count];
-                            $new_sql .= $_tmp_parts[0].' '.$_tmp_parts[1].' ? ';
-                            break;
+                                $query_values[$parameter_count] = $query_values[$parameter_count];
+                                $new_sql .= $_tmp_parts[0].' '.$_tmp_parts[1].' ? ';
+                                break;
                         }
                         $requested_args[$parameter_count] = $_tmp_parts[0];
                         $parameter_count++;
@@ -1316,45 +1376,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 $new_sql .= $piece.' ';
             }
         }
-
-        if($query_arguments_count != count($requested_args)){
-            trigger_error(Ak::t('Argument list did not match expected set. Requested arguments are:').join(', ',$requested_args),E_USER_ERROR);
-            $false = false;
-            return $false;
-        }
-
-        $true_bool_values = array(true,1,'true','True','TRUE','1','y','Y','yes','Yes','YES','s','Si','SI','V','v','T','t');
-
-        foreach ($requested_args as $k=>$v){
-            switch ($this->getColumnType($v)) {
-                case 'boolean':
-                $query_values[$k] = in_array($query_values[$k],$true_bool_values) ? 1 : 0;
-                break;
-
-                case 'date':
-                case 'datetime':
-                $query_values[$k] = str_replace('/','-', $this->castAttributeForDatabase($k,$query_values[$k],false));
-                break;
-
-                default:
-                break;
-            }
-        }
-
-        $_find_arguments = array();
-        $_find_arguments[] = $fetch;
-        $_find_arguments[] = $new_sql;
-        foreach ($query_values as $value){
-            $_find_arguments[] = $value;
-        }
-        $_find_arguments[] = $options;
-
-        $_result =& $this->find('set arguments', $_find_arguments);
-        $result =& $_result; // Pass by reference hack
-        return $result;
+        
+        return array($new_sql, $requested_args);
     }
-
-
+   
 
     function constructFinderSql($options, $select_from_prefix = 'default')
     {
