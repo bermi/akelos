@@ -353,6 +353,7 @@ class AkInstaller
     function _getColumnsAsAdodbDataDictionaryString($columns)
     {
         $columns = $this->_setColumnDefaults($columns);
+        $this->_ensureColumnNameCompatibility($columns);
         $equivalences = array(
         '/ ((limit|max|length) ?= ?)([0-9]+)([ \n\r,]+)/'=> ' (\3) ',
         '/([ \n\r,]+)default([ =]+)([^\'^,^\n]+)/i'=> ' DEFAULT \'\3\'',
@@ -382,7 +383,7 @@ class AkInstaller
 
     function _setColumnDefaults($columns)
     {
-	    $columns = str_replace("\t",' ', $columns);
+        $columns = str_replace("\t",' ', $columns);
         if(is_string($columns)){
             if(strstr($columns,"\n")){
                 $columns = explode("\n",$columns);
@@ -539,6 +540,62 @@ class AkInstaller
     {
         $path = AK_APP_DIR.DS.'installers'.DS.$this->getInstallerName().'.xml';
         return file_exists($path) ? $path : false;
+    }
+    
+    function _ensureColumnNameCompatibility($columns)
+    {
+        $columns = explode(',',$columns.',');
+        foreach ($columns as $column){
+            $column = trim($column);
+            $column = substr($column, 0, strpos($column.' ',' '));
+            $this->_canUseColumn($column);
+        }
+    }
+
+    function _canUseColumn($column_name)
+    {
+        static $invalid_columns;
+
+        if(empty($invalid_columns)){
+            $invalid_columns = $this->_getInvalidColumnNames();
+        }
+        if(in_array($column_name, $invalid_columns)){
+            $method_name_part = AkInflector::camelize($column_name);
+            $method_name = (method_exists(new AkActiveRecord(), 'set'.$method_name_part)?'set':'get').$method_name_part;
+
+            trigger_error(Ak::t('A method named %method_name exists in the AkActiveRecord class'.
+            ' wich will cause a recusion problem if you use the column %column_name in your database. '.
+            'You can disable automatic %type by setting the constant %constant to false '.
+            'in your configuration file.', array(
+            '%method_name'=> $method_name,
+            '%column_name' => $column_name,
+            '%type' => Ak::t($method_name[0] == 's' ? 'setters' : 'getters'),
+            '%constant' => Ak::t($method_name[0] == 's' ? 'AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS' : 'AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS'),
+            ''
+            )), E_USER_ERROR);
+        }
+    }
+
+    function _getInvalidColumnNames()
+    {
+        $methods = Ak::get_this_object_methods(new AkActiveRecord());
+
+        $conditions = AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS ? 'set' : '';
+        $conditions .= AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS ? (!empty($conditions)?'|':'').'get' : '';
+
+        $invalid_column_names = array();
+
+        if(!empty($conditions)){
+            foreach ($methods as $method){
+                if(preg_match('/^('.$conditions.')/',$method)){
+                    $column = AkInflector::underscore(substr($method,3));
+                    if(!empty($column) && $column != 'id'){
+                        $invalid_column_names[] = $column;
+                    }
+                }
+            }
+        }
+        return $invalid_column_names;
     }
 
     function execute($sql)
