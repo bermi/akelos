@@ -430,7 +430,11 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 }
             }
             $Item =& $this->create($attributes);
+            $Item->has_been_created = true;
+        }else{
+            $Item->has_been_created = false;
         }
+        $Item->has_been_found = !$Item->has_been_created;
         return $Item;
     }
 
