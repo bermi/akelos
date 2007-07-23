@@ -554,13 +554,11 @@ class AkInstaller
 
     function _canUseColumn($column_name)
     {
-        static $invalid_columns;
-
-        if(empty($invalid_columns)){
-            $invalid_columns = $this->_getInvalidColumnNames();
-        }
+        $invalid_columns = $this->_getInvalidColumnNames();
         if(in_array($column_name, $invalid_columns)){
+            
             $method_name_part = AkInflector::camelize($column_name);
+            require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
             $method_name = (method_exists(new AkActiveRecord(), 'set'.$method_name_part)?'set':'get').$method_name_part;
 
             trigger_error(Ak::t('A method named %method_name exists in the AkActiveRecord class'.
@@ -578,24 +576,19 @@ class AkInstaller
 
     function _getInvalidColumnNames()
     {
-        $methods = Ak::get_this_object_methods(new AkActiveRecord());
-
-        $conditions = AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS ? 'set' : '';
-        $conditions .= AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS ? (!empty($conditions)?'|':'').'get' : '';
-
-        $invalid_column_names = array();
-
-        if(!empty($conditions)){
-            foreach ($methods as $method){
-                if(preg_match('/^('.$conditions.')/',$method)){
-                    $column = AkInflector::underscore(substr($method,3));
-                    if(!empty($column) && $column != 'id'){
-                        $invalid_column_names[] = $column;
-                    }
-                }
-            }
-        }
-        return $invalid_column_names;
+        return defined('AK_INVALID_ACTIVE_RECORD_COLUMNS') ? explode(',',AK_INVALID_ACTIVE_RECORD_COLUMNS) : array('sanitized_conditions_array','conditions','inheritance_column','inheritance_column',
+        'subclasses','attribute','attributes','attribute','attributes','accessible_attributes','protected_attributes',
+        'serialized_attributes','available_attributes','attribute_caption','primary_key','column_names','content_columns',
+        'attribute_names','combined_subattributes','available_combined_attributes','connection','connection','primary_key',
+        'table_name','table_name','only_available_atrributes','columns_for_atrributes','columns_with_regex_boundaries','columns',
+        'column_settings','column_settings','akelos_data_type','class_for_database_table_mapping','display_field','display_field',
+        'internationalized_columns','avaliable_locales','current_locale','attribute_by_locale','attribute_locales',
+        'attribute_by_locale','attribute_locales','attributes_before_type_cast','attribute_before_type_cast','serialize_attribute',
+        'available_attributes_quoted','attributes_quoted','column_type','value_for_date_column','observable_state',
+        'observable_state','observers','errors','base_errors','errors_on','full_error_messages','array_from_ak_string',
+        'attribute_condition','association_handler','associated','associated_finder_sql_options','association_option',
+        'association_option','association_id','associated_ids','associated_handler_name','associated_type','association_type',
+        'collection_handler_name','model_name','model_name','parent_model_name','parent_model_name');
     }
 
     function execute($sql)

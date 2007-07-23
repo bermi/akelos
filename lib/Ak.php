@@ -78,8 +78,13 @@ class Ak
             }
 
             if (!$db[$connection_id] = (AK_DEBUG ? NewADOConnection($dsn) : @NewADOConnection($dsn))){
-                trigger_error(Ak::t('Connection to the database failed'), E_USER_ERROR);
-                exit;
+                error_reporting(E_ALL);
+                if(defined('AK_DATABASE_CONNECTION_FAILURE_CALLBACK') && function_exists(AK_DATABASE_CONNECTION_FAILURE_CALLBACK)){
+                    $fn = AK_DATABASE_CONNECTION_FAILURE_CALLBACK;
+                    $fn();
+                }
+                die(Ak::t('Connection to the database failed.').' '.
+                (AK_DEBUG?preg_replace('/\/\/(\w+):(.*)@/i','//$1:******@', $dsn)."\n":''));
             }
             $db[$connection_id]->debug = AK_DEBUG == 2;
             defined('AK_DATABASE_CONNECTION_AVAILABLE') ? null : define('AK_DATABASE_CONNECTION_AVAILABLE', true);
