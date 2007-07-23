@@ -277,7 +277,7 @@ class FrameworkSetup extends AkObject
         'database_name' => '%production_database_name',
         'user' => '%production_database_user',
         'password' => '%production_database_password',
-        'options' => 'persistent' // persistent, debug, fetchmode, new
+        'options' => '' // persistent, debug, fetchmode, new
     ),
     
     'development' => array(
@@ -288,7 +288,7 @@ class FrameworkSetup extends AkObject
         'database_name' => '%development_database_name',
         'user' => '%development_database_user',
         'password' => '%development_database_password',
-        'options' => 'persistent'
+        'options' => ''
     ),
     
     // Warning: The database defined as 'testing' will be erased and
@@ -302,7 +302,7 @@ class FrameworkSetup extends AkObject
         'database_name' => '%testing_database_name',
         'user' => '%testing_database_user',
         'password' => '%testing_database_password',
-        'options' => 'persistent'
+        'options' => ''
     )
 );
 

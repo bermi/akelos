@@ -36,7 +36,7 @@ if(AK_ENVIRONMENT != 'setup'){
     '/'.$akdb['database_name'].
     (!empty($akdb['options'])?'?'.$akdb['options']:'');
 
-    require_once(AK_CONFIG_DIR.DS.AK_ENVIRONMENT.'.php');
+    require_once(AK_CONFIG_DIR.DS.'environments'.DS.AK_ENVIRONMENT.'.php');
 }
 
 unset($environment, $database_settings, $akdb);

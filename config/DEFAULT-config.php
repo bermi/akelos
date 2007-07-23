@@ -9,7 +9,7 @@ $database_settings = array(
         'database_name' => '',
         'user' => '',
         'password' => '',
-        'options' => 'persistent' // persistent, debug, fetchmode, new
+        'options' => '' // persistent, debug, fetchmode, new
     ),
     
     'development' => array(
@@ -20,7 +20,7 @@ $database_settings = array(
         'database_name' => '',
         'user' => '',
         'password' => '',
-        'options' => 'persistent'
+        'options' => ''
     ),
     
     // Warning: The database defined as 'testing' will be erased and
@@ -34,7 +34,7 @@ $database_settings = array(
         'database_name' => '',
         'user' => '',
         'password' => '',
-        'options' => 'persistent'
+        'options' => ''
     )
 );
 
