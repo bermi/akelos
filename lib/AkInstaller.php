@@ -20,6 +20,9 @@ require_once(AK_LIB_DIR.DS.'Ak.php');
 require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 file_exists(AK_APP_DIR.DS.'shared_model.php') ? require_once(AK_APP_DIR.DS.'shared_model.php') : null;
 
+// Install scripts might use more RAM than normal requests.
+@ini_set('memory_limit', -1);
+
 class AkInstaller
 {
     var $db;
