@@ -462,7 +462,7 @@ class Ak
     function make_dir($path, $options = array())
     {
         $default_options = array(
-        'ftp' => defined('AK_READ_FILES_USING_FTP') && AK_READ_FILES_USING_FTP,
+        'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
         'base_path' => AK_BASE_DIR
         );
         $options = array_merge($default_options, $options);
