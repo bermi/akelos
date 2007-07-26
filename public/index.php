@@ -14,18 +14,21 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-// defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '/path/to/the/framework');
+defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '/Volumes/Files/Projects/akelos_framework/trunk');
 
 /**
  * Public PHP file. This file will launch the framework
  */
 if(!defined('AK_CONFIG_INCLUDED')){
-    if(!file_exists('..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php')){
+    if(!file_exists(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php')){
         define('AK_ENVIRONMENT', 'setup');
-        require('..'.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'framework_setup_controller.php');
+        error_reporting(E_ALL);
+        @ini_set('display_errors', 1);
+        require(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.
+        'app'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'framework_setup_controller.php');
         exit;
     }else{
-        include_once('..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
+        include_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
     }
 }
 

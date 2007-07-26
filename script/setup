@@ -93,6 +93,10 @@ class AkelosInstaller
                 }
             }
             $this->yield("\n    Could not create a symbolic link of ".$this->options['directory'].DS.'public'.' at '.$this->options['public_html']);
+
+        }else{
+            $this->_addRootLevelDispatcher();
+            $this->_addHtaccessDirectoryProtection();
         }
         return false;
     }
@@ -110,6 +114,24 @@ class AkelosInstaller
                 file_put_contents($this->options['directory'].DS.$file, $file_contents);
             }
         }
+    }
+
+    function _addRootLevelDispatcher()
+    {
+        $this->_copyFile($this->options['source'].DS.'index.php');
+        $this->_copyFile($this->options['source'].DS.'.htaccess');
+    }
+
+    function _addHtaccessDirectoryProtection()
+    {
+        foreach($this->source_tree as $k=>$node){
+            $folder = array_shift(array_keys($node));
+            $path = $this->options['directory'].DS.$folder;
+            if(is_dir($path) && !file_exists($path.DS.'.htaccess') && $folder != 'public'){
+                file_put_contents($path.DS.'.htaccess', "order allow,deny\ndeny from all");
+            }
+        }
+
     }
 
     function _copyFrameworkFiles($directory_structure, $base_path = '.')

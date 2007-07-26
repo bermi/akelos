@@ -14,12 +14,6 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-if(!@include('.'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php')){
-    define('AK_ENVIRONMENT', 'setup');
-	require('app'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'framework_setup_controller.php');
-	exit;
-}
-
-include(AK_PUBLIC_DIR.DS.'index.php');
+include('public'.DIRECTORY_SEPARATOR.'index.php');
 
 ?>

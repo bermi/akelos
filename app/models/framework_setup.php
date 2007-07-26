@@ -328,6 +328,8 @@ define('AK_PUBLIC_LOCALES', '%locales');
 
 %AK_FRAMEWORK_DIR
 
+%AK_ASSET_URL_PREFIX
+
 include_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'boot.php');
 
 
@@ -359,6 +361,15 @@ CONFIG;
             $settings['%locales'] = $this->getLocales();
             $settings['%AK_FRAMEWORK_DIR'] = defined('AK_FRAMEWORK_DIR') ?
             "defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '".AK_FRAMEWORK_DIR."');" : '';
+
+
+            $asset_path = $this->_getAssetBasePath();
+            if(!empty($asset_path)){
+                $settings['%AK_ASSET_URL_PREFIX'] = "define('AK_ASSET_URL_PREFIX','/".trim($this->getUrlSuffix(),'/').'/'.$asset_path."');";
+            }else{
+                $settings['%AK_ASSET_URL_PREFIX'] = '';
+            }
+
         }
 
         return str_replace(array_keys($settings), array_values($settings), $configuration_template);
@@ -408,8 +419,12 @@ CONFIG;
         $file_1_content = @Ak::file_get_contents($file_1);
         $file_2_content = @Ak::file_get_contents($file_2);
 
-        empty($file_1_content) ? null : @Ak::file_put_contents($file_1, str_replace('# RewriteBase /framework',' RewriteBase '.$this->getUrlSuffix(), $file_1_content));
-        empty($file_2_content) ? null : @Ak::file_put_contents($file_2, str_replace('# RewriteBase /framework',' RewriteBase '.$this->getUrlSuffix(), $file_2_content));
+        $url_suffix = $this->getUrlSuffix();
+
+        $url_suffix = $url_suffix[0] != '/' ? '/'.$url_suffix : $url_suffix;
+
+        empty($file_1_content) ? null : @Ak::file_put_contents($file_1, str_replace('# RewriteBase /framework',' RewriteBase '.$url_suffix, $file_1_content));
+        empty($file_2_content) ? null : @Ak::file_put_contents($file_2, str_replace('# RewriteBase /framework',' RewriteBase '.$url_suffix, $file_2_content));
     }
 
     function isUrlRewriteEnabled()
@@ -434,7 +449,7 @@ CONFIG;
     function guessApplicationName()
     {
         $application_name = array_pop(explode('/',AK_SITE_URL_SUFFIX));
-        $application_name = empty($application_name) ? substr(AK_BASE_DIR, strrpos(AK_BASE_DIR, DS)+1) : $application_name; 
+        $application_name = empty($application_name) ? substr(AK_BASE_DIR, strrpos(AK_BASE_DIR, DS)+1) : $application_name;
         return empty($application_name) ? 'my_app' : $application_name;
     }
 
@@ -697,6 +712,10 @@ CONFIG;
     {
         if($this->hasUrlSuffix()){
             $url_suffix = trim($this->getUrlSuffix(),'/');
+            $asset_path = $this->_getAssetBasePath();
+            if(!empty($asset_path)){
+                $url_suffix = $asset_path.'/'.$url_suffix;
+            }
             foreach ($this->stylesheets as $stylesheet) {
                 $filename = AK_PUBLIC_DIR.DS.'stylesheets'.DS.$stylesheet.'.css';
                 $relativized_css = preg_replace("/url\((\'|\")?\/images/","url($1/$url_suffix/images", @Ak::file_get_contents($filename));
@@ -704,6 +723,11 @@ CONFIG;
             }
         }
 
+    }
+
+    function _getAssetBasePath()
+    {
+        return file_exists(AK_BASE_DIR.DS.'index.php') ? 'public' : '';
     }
 
     function removeSetupFiles()

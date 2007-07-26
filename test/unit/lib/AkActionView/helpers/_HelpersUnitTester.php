@@ -27,8 +27,7 @@ class HelpersUnitTester extends AkUnitTest
     
     function HelpersUnitTester()
     {
-        $base_url = parse_url(dirname(@$_SERVER['SCRIPT_NAME']));
-        $this->testing_url_path = '/'.ltrim($base_url['path'], '/');
+        $this->testing_url_path = AK_ASSET_URL_PREFIX;
     }
 }
 
