@@ -14,7 +14,7 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '/Volumes/Files/Projects/akelos_framework/trunk');
+// defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '/path/to/the/framework');
 
 /**
  * Public PHP file. This file will launch the framework
