@@ -6,6 +6,7 @@ class TagInstaller extends AkInstaller
     {
         $this->createTable('tags', '
         id integer max=10 auto increment primary,
+        score int default 100,
         name string 50'
         );
     }

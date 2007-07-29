@@ -3261,8 +3261,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
             case 'serial':
             case 'integer':
+                $value = is_null($value) ? null : (integer)$value;
             case 'float':
-            $result = (empty($value) && @$value !== 0) ? 'null' : (is_numeric($value) ? $value : $this->_db->qstr($value));
+            $result = (empty($value) && $value !== 0) ? 'null' : (is_numeric($value) ? $value : $this->_db->qstr($value));
             $result = !empty($this->_columns[$column_name]['notNull']) && $result == 'null' && $this->_getDatabaseType() == 'sqlite' ? '0' : $result;
             break;
 
@@ -3279,14 +3280,16 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if($this->hasColumn($column_name)){
             $column_type = $this->getColumnType($column_name);
             if($column_type){
-                if(!empty($value) && 'date' == $column_type && strstr(trim($value),' ')){
+                if('integer' == $column_type){
+                    return is_null($value) ? null : (integer)$value;
+                }elseif('boolean' == $column_type){
+                    return (integer)$value === 1 ? true : false;
+                }elseif(!empty($value) && 'date' == $column_type && strstr(trim($value),' ')){
                     return substr($value,0,10) == '0000-00-00' ? null : str_replace(substr($value,strpos($value,' ')), '', $value);
                 }elseif (!empty($value) && 'datetime' == $column_type && substr($value,0,10) == '0000-00-00'){
                     return null;
                 }elseif ('binary' == $column_type && $this->_getDatabaseType() == 'postgre'){
                     return $this->_db->BlobDecode($value);
-                }elseif('boolean' == $column_type){
-                    return (integer)$value === 1 ? true : false;
                 }
             }
         }

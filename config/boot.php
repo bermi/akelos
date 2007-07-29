@@ -125,7 +125,10 @@ if(!AK_CLI && AK_WEB_REQUEST){
     defined('AK_AUTOMATIC_SSL_DETECTION') ? null : define('AK_AUTOMATIC_SSL_DETECTION', 1);
 
     defined('AK_PROTOCOL') ? null : define('AK_PROTOCOL',isset($_SERVER['HTTPS']) ? 'https://' : 'http://');
-    defined('AK_HOST') ? null : define('AK_HOST', $_SERVER['SERVER_NAME'] == 'localhost' ? $_SERVER['SERVER_ADDR'] : $_SERVER['SERVER_NAME']);
+    defined('AK_HOST') ? null : define('AK_HOST', $_SERVER['SERVER_NAME'] == 'localhost' ? 
+    // Will force to IP4 for localhost until IP6 is supported by helpers
+    ($_SERVER['SERVER_ADDR'] == '::1' ? '127.0.0.1' : $_SERVER['SERVER_ADDR']) : 
+    $_SERVER['SERVER_NAME']);
     defined('AK_REMOTE_IP') ? null : define('AK_REMOTE_IP',(isset($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']);
 
     defined('AK_SERVER_STANDARD_PORT') ? null : define('AK_SERVER_STANDARD_PORT', AK_PROTOCOL == 'https://' ? '443' : '80');

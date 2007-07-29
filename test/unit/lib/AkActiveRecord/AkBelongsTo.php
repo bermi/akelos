@@ -76,7 +76,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
         $this->assertFalse($Picture->isNewRecord());
         $this->assertFalse($Picture->main_thumbnail->isNewRecord());
 
-        $CeBitPic = $Picture->findFirstBy('title:has','CeBIT', array('include'=>'main_thumbnail'));
+        $CeBitPic =& $Picture->findFirstBy('title:has','CeBIT', array('include'=>'main_thumbnail'));
 
         $this->assertEqual($CeBitPic->title, 'The Akelos Media Team at CeBIT');
         $this->assertEqual($CeBitPic->main_thumbnail->caption, 'CeBIT 2005');
@@ -161,12 +161,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
 
         $this->assertEqual($Thumbnail->picture->getType(), 'belongsTo');
 
-        $Thumbnail = $Thumbnail->findFirstBy('caption:has','Lucky');
-
-        // Its necesary to call loadAssociations after a finder in order to keep reference integrity
-        $Thumbnail->loadAssociations();
-
-        $this->assertReference($Thumbnail->belongsTo->load('picture'), $Thumbnail->picture);
+        $Thumbnail =& $Thumbnail->findFirstBy('caption:has','Lucky', array('include'=>'picture'));
 
         $this->assertEqual($Thumbnail->picture->getType(), 'Picture');
         $this->assertEqual($Thumbnail->picture->title, 'The Akelos Media Team at Carlet');
