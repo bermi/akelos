@@ -37,7 +37,21 @@ $command = count($options) > 0 ? array_shift($options) : 'usage';
 $file = AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'.php';
 
 if($installer_name == 'Installer'){
-    echo "\n  You must supply a valid installer name  \n";
+    $files = Ak::dir(AK_APP_DIR.DS.'installers');
+    if(empty($files)){
+        echo Ak::t("\n  Could not find installers at %dir  \n", array('%dir'=>AK_APP_DIR.DS.'installers'));
+
+    }else{
+        echo Ak::t("\n  You must supply a valid installer name like : \n");
+        echo Ak::t("\n  > ./script/migrate my_installer_name install\n\n");
+        echo Ak::t("  Available installers are:  \n\n");
+        foreach($files as $file){
+            if(preg_match('/(.*)_installer\.php$/', $file, $match)){
+                echo ' * '.$match[1]."\n";
+            }        
+        }
+        echo "\n";
+    }
 }elseif(!file_exists($file)){
     echo Ak::t("\n\n  Could not locate the installer file %file\n\n",array('%file'=>$file));
 }else{

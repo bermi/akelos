@@ -161,6 +161,13 @@ if(!AK_CLI && AK_WEB_REQUEST){
     defined('AK_COOKIE_DOMAIN') ? null : define('AK_COOKIE_DOMAIN', AK_HOST);
     // ini_set('session.cookie_domain', AK_COOKIE_DOMAIN);
 
+    defined('AK_INSECURE_APP_DIRECTORY_LAYOUT') ? null : define('AK_INSECURE_APP_DIRECTORY_LAYOUT', false);
+
+    if(!defined('AK_ASSET_URL_PREFIX')){
+        defined('AK_ASSET_URL_PREFIX') ? null : define('AK_ASSET_URL_PREFIX', AK_INSECURE_APP_DIRECTORY_LAYOUT ? AK_SITE_URL_SUFFIX.str_replace(array(AK_BASE_DIR,'\\','//'),array('','/','/'), AK_PUBLIC_DIR) : AK_SITE_URL_SUFFIX);
+    }
+
+
 }else{
     defined('AK_PROTOCOL') ? null : define('AK_PROTOCOL','http://');
     defined('AK_HOST') ? null : define('AK_HOST', 'localhost');
@@ -169,6 +176,8 @@ if(!AK_CLI && AK_WEB_REQUEST){
     defined('AK_URL') ? null : define('AK_URL', 'http://localhost/');
     defined('AK_CURRENT_URL') ? null : define('AK_CURRENT_URL', 'http://localhost/');
     defined('AK_COOKIE_DOMAIN') ? null : define('AK_COOKIE_DOMAIN', AK_HOST);
+    
+    defined('AK_ASSET_URL_PREFIX') ? null : define('AK_ASSET_URL_PREFIX', '');
 }
 
 defined('AK_SESSION_HANDLER') ? null : define('AK_SESSION_HANDLER', 0);
@@ -178,12 +187,6 @@ defined('AK_SESSION_NAME') ? null : define('AK_SESSION_NAME', 'AK_SESSID');
 defined('AK_DESKTOP') ? null : define('AK_DESKTOP', AK_SITE_URL == 'http://akelos');
 
 defined('AK_ASSET_HOST') ? null : define('AK_ASSET_HOST','');
-
-defined('AK_INSECURE_APP_DIRECTORY_LAYOUT') ? null : define('AK_INSECURE_APP_DIRECTORY_LAYOUT', false);
-
-if(!defined('AK_ASSET_URL_PREFIX')){
-    defined('AK_ASSET_URL_PREFIX') ? null : define('AK_ASSET_URL_PREFIX', AK_INSECURE_APP_DIRECTORY_LAYOUT ? AK_SITE_URL_SUFFIX.str_replace(array(AK_BASE_DIR,'\\','//'),array('','/','/'), AK_PUBLIC_DIR) : AK_SITE_URL_SUFFIX);
-}
 
 defined('AK_DEV_MODE') ? null : define('AK_DEV_MODE', AK_ENVIRONMENT == 'development');
 defined('AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES') ? null : define('AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES', AK_DEV_MODE);

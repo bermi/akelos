@@ -51,8 +51,18 @@ class AkInstaller
         return $this->_upgradeOrDowngrade('up', $version, $options);
     }
 
+    function up($version = null, $options = array())
+    {
+        return $this->_upgradeOrDowngrade('up', $version, $options);
+    }
+
 
     function uninstall($version = null, $options = array())
+    {
+        return $this->_upgradeOrDowngrade('down', $version, $options);
+    }
+
+    function down($version = null, $options = array())
     {
         return $this->_upgradeOrDowngrade('down', $version, $options);
     }
@@ -73,19 +83,26 @@ class AkInstaller
 
         if($action == 'up'){
             $newest_version = max($available_versions);
-            $version = is_numeric($version) ? $version : $newest_version;
-
-            if($version <= $newest_version && $version > $current_version){
-                $versions = array_slice($available_versions, array_shift(array_keys($available_versions,$current_version))+($current_version ? 1 : 0));
-            }
-
-        }else{
-            $version = is_numeric($version) ? $version : 1;
-            $installed_versions = array_slice(array_reverse($available_versions), array_shift(array_keys(array_reverse($available_versions),$current_version)));
-            $versions = array_slice($installed_versions, array_shift(array_keys($installed_versions,$current_version)));
-            if(!in_array($version, $versions)){
+            $version = isset($version[0]) && is_numeric($version[0]) ? $version[0] : $newest_version;
+            $versions = range($current_version+1,$version);
+            
+            if($current_version > $version){
+                echo Ak::t("You can't upgrade to version %version, when you are currently on version %current_version", array('%version'=>$version,'%current_version'=>$current_version));
                 return false;
             }
+        }else{
+            $version = !empty($version[0]) && is_numeric($version[0]) ? $version[0] : 0;
+            $versions = range($current_version, empty($version) ? 1 : $version+1);
+
+            if($current_version < $version){
+                echo Ak::t("You can't downgrade to version %version, when you just have installed version %current_version", array('%version'=>$version,'%current_version'=>$current_version));
+                return false;
+            }
+        }
+
+        if($current_version == $version){
+            echo Ak::t("Can't go $action to version %version, you're already on version %version", array('%version'=>$version));
+            return false;
         }
 
         if(AK_CLI && !empty($this->vervose) && AK_ENVIRONMENT == 'development'){
@@ -544,7 +561,7 @@ class AkInstaller
         $path = AK_APP_DIR.DS.'installers'.DS.$this->getInstallerName().'.xml';
         return file_exists($path) ? $path : false;
     }
-    
+
     function _ensureColumnNameCompatibility($columns)
     {
         $columns = explode(',',$columns.',');
@@ -559,7 +576,7 @@ class AkInstaller
     {
         $invalid_columns = $this->_getInvalidColumnNames();
         if(in_array($column_name, $invalid_columns)){
-            
+
             $method_name_part = AkInflector::camelize($column_name);
             require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
             $method_name = (method_exists(new AkActiveRecord(), 'set'.$method_name_part)?'set':'get').$method_name_part;
@@ -602,7 +619,7 @@ class AkInstaller
 
     function usage()
     {
-        return Ak::t("Description:
+        echo Ak::t("Description:
     Database migrations is a sort of SCM like subversion, but for database settings.
 
     The migration command takes the name of an installer located on your 
