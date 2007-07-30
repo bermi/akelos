@@ -47,7 +47,7 @@
 
      function save($path = null, $quality = 90, $options = array())
      {
-         if(!$tmp_image_name = tempnam(AK_CACHE_DIR,'ak_image_')){
+         if(!$tmp_image_name = tempnam(AK_TMP_DIR,'ak_image_')){
              trigger_error(Ak::t('Could not create the temporary file %tmp_image_name for apliying changes and saving', array('%tmp_image_name'=>$tmp_image_name)), E_USER_ERROR);
          }
          

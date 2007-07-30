@@ -1252,8 +1252,8 @@ class Ak
     function compress($data, $format = 'gzip')
     {
         $key = Ak::randomString(15);
-        $compressed_file = AK_CACHE_DIR.DS.'tmp'.DS.'d'.$key;
-        $uncompressed_file = AK_CACHE_DIR.DS.'tmp'.DS.'s'.$key;
+        $compressed_file = AK_TMP_DIR.DS.'d'.$key;
+        $uncompressed_file = AK_TMP_DIR.DS.'s'.$key;
 
         if(@Ak::file_put_contents($uncompressed_file, $data)){
             $compressed = gzopen($compressed_file,'w9');
@@ -1265,7 +1265,7 @@ class Ak
             fclose($uncompressed);
             gzclose($compressed);
         }else{
-            trigger_error(Ak::t('Could not write to temporary directory for generating compressed file using Ak::compress(). Please provide write access to %dirname', array('%dirname'=>AK_CACHE_DIR)), E_USER_ERROR);
+            trigger_error(Ak::t('Could not write to temporary directory for generating compressed file using Ak::compress(). Please provide write access to %dirname', array('%dirname'=>AK_TMP_DIR)), E_USER_ERROR);
         }
         $result = Ak::file_get_contents($compressed_file);
         return $result;
@@ -1274,8 +1274,8 @@ class Ak
     function uncompress($compressed_data, $format = 'gzip')
     {
         $key = Ak::randomString(15);
-        $compressed_file = AK_CACHE_DIR.DS.'tmp'.DS.'s'.$key;
-        $uncompressed_file = AK_CACHE_DIR.DS.'tmp'.DS.'d'.$key;
+        $compressed_file = AK_TMP_DIR.DS.'s'.$key;
+        $uncompressed_file = AK_TMP_DIR.DS.'d'.$key;
 
         if(@Ak::file_put_contents($compressed_file, $compressed_data)){
             $compressed = gzopen($compressed_file, "r");
@@ -1287,7 +1287,7 @@ class Ak
             gzclose($compressed);
             fclose($uncompressed);
         }else{
-            trigger_error(Ak::t('Could not write to temporary directory for generating uncompressing file using Ak::uncompress(). Please provide write access to %dirname', array('%dirname'=>AK_CACHE_DIR)), E_USER_ERROR);
+            trigger_error(Ak::t('Could not write to temporary directory for generating uncompressing file using Ak::uncompress(). Please provide write access to %dirname', array('%dirname'=>AK_TMP_DIR)), E_USER_ERROR);
         }
         $result = Ak::file_get_contents($uncompressed_file);
         return $result;
@@ -1844,6 +1844,21 @@ function ak_generate_mock($name)
 	$Mock->generate($name);
 }
 
+/**
+ * This function sets a constant and returns it's value. If constant has been already defined it
+ * will reutrn its original value. 
+ * 
+ * Returns null in case the constant does not exist
+ *
+ * @param string $name
+ * @param mixed $value
+ */
+function ak_define($name, $value = null)
+{
+    $name = strtoupper($name);
+    $name = substr($name,0,3) == 'AK_' ? $name : 'AK_'.$name;
+    return  defined($name) ? constant($name) : (is_null($value) ? null : (define($name, $value) ? $value : null));
+}
 
 /**
  * PHP4 triggers "Only variable references should be returned by reference" error when 

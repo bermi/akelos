@@ -42,7 +42,7 @@ class AkMsWordToMany
         $this->ext = empty($this->ext) ? 'doc' : strtolower(trim($this->ext,'.'));
         $this->tmp_name = Ak::randomString();
         if(empty($this->source_file)){
-            $this->source_file = AK_CACHE_DIR.DS.$this->tmp_name.'.'.$this->ext;
+            $this->source_file = AK_TMP_DIR.DS.$this->tmp_name.'.'.$this->ext;
             Ak::file_put_contents($this->source_file,$this->source);
             $this->delete_source_file = true;
             $this->keep_destination_file = empty($this->keep_destination_file) ? (empty($this->destination_file) ? false : true) : $this->keep_destination_file;
@@ -53,7 +53,7 @@ class AkMsWordToMany
 
         $this->convert_to = !empty($this->convert_to) && empty($this->_file_type_codes[$this->convert_to]) ? 'unicode' : (empty($this->convert_to) ? 'unicode' : $this->convert_to);
         $this->destination_file_name = empty($this->destination_file_name) ? $this->tmp_name.'.'.$this->convert_to : $this->destination_file_name.(strstr($this->destination_file_name,'.') ? '' : '.'.$this->convert_to);
-        $this->destination_file = empty($this->destination_file) ? AK_CACHE_DIR.DS.$this->destination_file_name : $this->destination_file;
+        $this->destination_file = empty($this->destination_file) ? AK_TMP_DIR.DS.$this->destination_file_name : $this->destination_file;
     }
 }
 

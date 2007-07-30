@@ -50,7 +50,7 @@ class FileUploadHelper extends AkActionViewHelper
      * 
      * @param bool $send_json_response
      */
-    function handle_partial_upload($temporary_directory = AK_CACHE_DIR, $send_json_response = true)
+    function handle_partial_upload($temporary_directory = AK_TMP_DIR, $send_json_response = true)
     {
         $this->_instantiateCacheHandler();
         

@@ -50,7 +50,7 @@ class AkExcelToArray
         
         $this->tmp_name = Ak::randomString();
         if(empty($this->source_file)){
-            $this->source_file = AK_CACHE_DIR.DS.$this->tmp_name.'.xls';
+            $this->source_file = AK_TMP_DIR.DS.$this->tmp_name.'.xls';
             Ak::file_put_contents($this->source_file,$this->source);
             $this->delete_source_file = true;
             $this->keep_destination_file = empty($this->keep_destination_file) ? (empty($this->destination_file) ? false : true) : $this->keep_destination_file;

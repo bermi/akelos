@@ -2472,7 +2472,7 @@ class AkActionController extends AkObject
      */
     function sendDataAsStream($data, $options)
     {
-        $temp_file_name = tempnam(AK_CACHE_DIR, Ak::randomString());
+        $temp_file_name = tempnam(AK_TMP_DIR, Ak::randomString());
         $fp = fopen($temp_file_name, 'w');
         fwrite($fp, $data);
         fclose($fp);

@@ -31,7 +31,7 @@ class AkImageColorScheme extends AkObject
     {
         $this->Image =& new AkImage($image_path);
         $this->Image->transform('resize',array('size'=>'24x24'));
-        $this->_tmp_file = AK_CACHE_DIR.DS.'__AkImageColorScheme_'.Ak::randomString(32).'.jpg';
+        $this->_tmp_file = AK_TMP_DIR.DS.'__AkImageColorScheme_'.Ak::randomString(32).'.jpg';
         $this->Image->save($this->_tmp_file);
     }
 

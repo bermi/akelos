@@ -9,7 +9,7 @@ class test_of_Ak_file_functions extends  UnitTestCase
 {
     function Test_file_put_contents()
     {
-        $file_name = AK_CACHE_DIR.DS.'test_file_1.txt';
+        $file_name = AK_TMP_DIR.DS.'test_file_1.txt';
         $content = 'This is the content of file 1';
         $this->assertFalse(!Ak::file_put_contents($file_name, $content));
         
@@ -17,7 +17,7 @@ class test_of_Ak_file_functions extends  UnitTestCase
         $content = 'This is the NEW content for file 1';
         $this->assertFalse(!Ak::file_put_contents($file_name, $content));
         
-        $file_name = AK_CACHE_DIR.DS.'test_file_2.txt';
+        $file_name = AK_TMP_DIR.DS.'test_file_2.txt';
         $content = "\n\rThis is the content of file 2\n";
         $this->assertFalse(!Ak::file_put_contents($file_name, $content));
         
@@ -41,11 +41,11 @@ class test_of_Ak_file_functions extends  UnitTestCase
 
    function Test_file_get_contents()
    {
-       $file_name = AK_CACHE_DIR.DS.'test_file_1.txt';
+       $file_name = AK_TMP_DIR.DS.'test_file_1.txt';
        $content = 'This is the NEW content for file 1';
        $this->assertFalse(!Ak::file_get_contents($file_name) === $content);
        
-       $file_name = AK_CACHE_DIR.DS.'test_file_2.txt';
+       $file_name = AK_TMP_DIR.DS.'test_file_2.txt';
        $content = "\n\rThis is the content of file 2\n";
        $this->assertFalse(!Ak::file_get_contents($file_name) === $content);
        
@@ -61,7 +61,7 @@ class test_of_Ak_file_functions extends  UnitTestCase
 
    function Test_copy_files()
     {
-        $original_path = AK_CACHE_DIR.DS.'test_file_1.txt';
+        $original_path = AK_TMP_DIR.DS.'test_file_1.txt';
         $copy_path = $original_path.'.copy';
         $this->assertTrue(Ak::copy($original_path, $copy_path));
         $this->assertEqual(Ak::file_get_contents($original_path), Ak::file_get_contents($copy_path));
@@ -81,10 +81,10 @@ class test_of_Ak_file_functions extends  UnitTestCase
 
     function Test_file_delete()
     {
-        $this->assertFalse(!Ak::file_delete(AK_CACHE_DIR.DS.'test_file_1.txt'));
-        $this->assertFalse(!Ak::file_delete(AK_CACHE_DIR.DS.'test_file_2.txt'));
-        $this->assertFalse(!Ak::file_delete(AK_CACHE_DIR.DS.'test_file_3.txt'));
-        $this->assertFalse(!Ak::file_delete(AK_CACHE_DIR.'/test_file_4.txt'));
+        $this->assertFalse(!Ak::file_delete(AK_TMP_DIR.DS.'test_file_1.txt'));
+        $this->assertFalse(!Ak::file_delete(AK_TMP_DIR.DS.'test_file_2.txt'));
+        $this->assertFalse(!Ak::file_delete('cache/test_file_3.txt'));
+        $this->assertFalse(!Ak::file_delete('cache/test_file_4.txt'));
         $this->assertFalse(!Ak::file_delete('ak_test_folder/new_folder/test_file.txt'));
 
     }

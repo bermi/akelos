@@ -119,7 +119,7 @@ while(true){
             strip_tags(array_shift(explode(': eval()',$result))) :
             $result;
 
-            Ak::file_add_contents(AK_CACHE_DIR.DS.'command_line.log',$promt_line.$command."\n".$result."\n");
+            Ak::file_add_contents(AK_LOG_DIR.DS.'command_line.log',$promt_line.$command."\n".$result."\n");
             echo empty($result) ? $promt_line : "\n".$result."\n\n$promt_line";
         }
         break;

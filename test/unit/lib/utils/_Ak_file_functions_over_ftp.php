@@ -14,7 +14,7 @@ class test_AkFileFunctionsUsingFtp extends  UnitTestCase
 {
     function Test_file_put_contents()
     {
-        $file_name = AK_CACHE_DIR.DS.'test_file_1.txt';
+        $file_name = AK_TMP_DIR.DS.'test_file_1.txt';
         $content = 'This is the content of file 1';
         $this->assertTrue(Ak::file_put_contents($file_name, $content));
         
@@ -22,7 +22,7 @@ class test_AkFileFunctionsUsingFtp extends  UnitTestCase
         $content = 'This is the NEW content for file 1';
         $this->assertTrue(Ak::file_put_contents($file_name, $content));
         
-        $file_name = AK_CACHE_DIR.DS.'test_file_2.txt';
+        $file_name = AK_TMP_DIR.DS.'test_file_2.txt';
         $content = "\n\rThis is the content of file 2\n";
         $this->assertTrue(Ak::file_put_contents($file_name, $content));
         
@@ -51,11 +51,11 @@ class test_AkFileFunctionsUsingFtp extends  UnitTestCase
 
     function Test_file_get_contents()
     {
-        $file_name = AK_CACHE_DIR.DS.'test_file_1.txt';
+        $file_name = AK_TMP_DIR.DS.'test_file_1.txt';
         $content = 'This is the NEW content for file 1';
         $this->assertTrue(Ak::file_get_contents($file_name) === $content);
         
-        $file_name = AK_CACHE_DIR.DS.'test_file_2.txt';
+        $file_name = AK_TMP_DIR.DS.'test_file_2.txt';
         $content = "\n\rThis is the content of file 2\n";
         $this->assertTrue(Ak::file_get_contents($file_name) === $content);
         
@@ -75,10 +75,10 @@ class test_AkFileFunctionsUsingFtp extends  UnitTestCase
     
     function Test_file_delete()
     {
-        $this->assertTrue(Ak::file_delete(AK_CACHE_DIR.DS.'test_file_1.txt'));
-        $this->assertTrue(Ak::file_delete(AK_CACHE_DIR.DS.'test_file_2.txt'));
-        $this->assertTrue(Ak::file_delete(AK_CACHE_DIR.DS.'test_file_3.txt'));
-        $this->assertTrue(Ak::file_delete(AK_CACHE_DIR.'\test_file_4.txt'));
+        $this->assertTrue(Ak::file_delete(AK_TMP_DIR.DS.'test_file_1.txt'));
+        $this->assertTrue(Ak::file_delete(AK_TMP_DIR.DS.'test_file_2.txt'));
+        $this->assertTrue(Ak::file_delete(AK_TMP_DIR.DS.'test_file_3.txt'));
+        $this->assertTrue(Ak::file_delete(AK_TMP_DIR.'\test_file_4.txt'));
         $this->assertTrue(Ak::file_delete('ak_test_folder/new_folder/test_file.txt'));
         $this->assertTrue(Ak::file_delete('ak_test_folder/folder with space/test file.txt'));
 
@@ -114,7 +114,7 @@ class Test_of_Ak_static_file_functions_using_ftp extends  UnitTestCase
 
     function Test_file_put_contents()
     {
-        $file_name = AK_CACHE_DIR.DS.'test_file_1.txt';
+        $file_name = AK_TMP_DIR.DS.'test_file_1.txt';
         $content = 'This is the content of file 1';
         $this->assertTrue(Ak::file_put_contents($file_name, $content));
         
@@ -122,7 +122,7 @@ class Test_of_Ak_static_file_functions_using_ftp extends  UnitTestCase
         $content = 'This is the NEW content for file 1';
         $this->assertTrue(Ak::file_put_contents($file_name, $content));
         
-        $file_name = AK_CACHE_DIR.DS.'test_file_2.txt';
+        $file_name = AK_TMP_DIR.DS.'test_file_2.txt';
         $content = "\n\rThis is the content of file 2\n";
         $this->assertTrue(Ak::file_put_contents($file_name, $content));
         
@@ -145,11 +145,11 @@ class Test_of_Ak_static_file_functions_using_ftp extends  UnitTestCase
 
     function Test_file_get_contents()
     {
-        $file_name = AK_CACHE_DIR.DS.'test_file_1.txt';
+        $file_name = AK_TMP_DIR.DS.'test_file_1.txt';
         $content = 'This is the NEW content for file 1';
         $this->assertTrue(Ak::file_get_contents($file_name) === $content);
         
-        $file_name = AK_CACHE_DIR.DS.'test_file_2.txt';
+        $file_name = AK_TMP_DIR.DS.'test_file_2.txt';
         $content = "\n\rThis is the content of file 2\n";
         $this->assertTrue(Ak::file_get_contents($file_name) === $content);
         
@@ -165,10 +165,10 @@ class Test_of_Ak_static_file_functions_using_ftp extends  UnitTestCase
     
     function Test_file_delete()
     {
-        $this->assertTrue(Ak::file_delete(AK_CACHE_DIR.DS.'test_file_1.txt'));
-        $this->assertTrue(Ak::file_delete(AK_CACHE_DIR.DS.'test_file_2.txt'));
-        $this->assertTrue(Ak::file_delete(AK_CACHE_DIR.DS.'test_file_3.txt'));
-        $this->assertTrue(Ak::file_delete(AK_CACHE_DIR.'\test_file_4.txt'));
+        $this->assertTrue(Ak::file_delete(AK_TMP_DIR.DS.'test_file_1.txt'));
+        $this->assertTrue(Ak::file_delete(AK_TMP_DIR.DS.'test_file_2.txt'));
+        $this->assertTrue(Ak::file_delete(AK_TMP_DIR.DS.'test_file_3.txt'));
+        $this->assertTrue(Ak::file_delete(AK_TMP_DIR.'\test_file_4.txt'));
         $this->assertTrue(Ak::file_delete('ak_test_folder/new_folder/test_file.txt'));
 
     }

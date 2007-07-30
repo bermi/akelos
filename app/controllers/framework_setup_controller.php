@@ -187,7 +187,7 @@ class FrameworkSetupController extends AkActionController
                 
                 $this->FrameworkSetup->relativizeStylesheetPaths();
                 $this->FrameworkSetup->removeSetupFiles();
-                
+                unset($_SESSION);
                 $this->redirectTo(array('controller'=>'page'));
             }
 
