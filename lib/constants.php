@@ -62,7 +62,7 @@ defined('AK_DEBUG') ? null : define('AK_DEBUG', AK_ENVIRONMENT == 'production' ?
 
 @error_reporting(AK_DEBUG ? E_ALL : 0);
 
-defined('AK_CACHE_HANDLER') ? null : define('AK_CACHE_HANDLER', 2);
+defined('AK_CACHE_HANDLER') ? null : define('AK_CACHE_HANDLER', 1);
 
 defined('AK_APP_DIR') ? null : define('AK_APP_DIR', AK_BASE_DIR.DS.'app');
 defined('AK_APIS_DIR') ? null : define('AK_APIS_DIR', AK_APP_DIR.DS.'apis');
