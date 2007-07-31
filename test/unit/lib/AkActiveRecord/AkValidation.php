@@ -706,7 +706,22 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
         $Person->clearErrors();
         unset($Person->gender);
-        $Person->validatesInclusionOf('gender', array('male', 'female'),'I need to know your gender',true);
+        $Person->validatesInclusionOf('gender', array('male', 'female'),'I need to know your gender', true);
+        $this->assertFalse($Person->hasErrors());
+
+        $Person = new AkTestPerson();
+        $Person->gender = '0';
+        $Person->validatesInclusionOf('gender', array('male', 'female'),'I need to know your gender', true);
+        $this->assertTrue($Person->hasErrors());
+
+        $Person = new AkTestPerson();
+        $Person->gender = 0;
+        $Person->validatesInclusionOf('gender', array('male', 'female'),'I need to know your gender', true);
+        $this->assertTrue($Person->hasErrors());
+
+        $Person = new AkTestPerson();
+        $Person->gender = null;
+        $Person->validatesInclusionOf('gender', array('male', 'female'),'I need to know your gender', true);
         $this->assertFalse($Person->hasErrors());
 
         $Person->clearErrors();

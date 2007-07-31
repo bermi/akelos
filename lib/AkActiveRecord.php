@@ -4002,13 +4002,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
-        /**
-         * @todo get values from lists, collections and nested sets
-         */
-
         $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
         foreach ($attribute_names as $attribute_name){
-            if($allow_null ? (!empty($this->$attribute_name) ? (!in_array(@$this->$attribute_name,$array_of_possibilities)) : false ) : (isset($this->$attribute_name) ? !in_array(@$this->$attribute_name,$array_of_possibilities) : true )){
+            if($allow_null ? (@$this->$attribute_name != '' ? (!in_array($this->$attribute_name,$array_of_possibilities)) : @$this->$attribute_name === 0 ) : (isset($this->$attribute_name) ? !in_array(@$this->$attribute_name,$array_of_possibilities) : true )){
                 $this->addError($attribute_name, $message);
             }
         }
