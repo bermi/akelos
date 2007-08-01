@@ -1,8 +1,0 @@
-
-<IfModule sapi_apache2.c>
-   php_value memory_limit        "600M"
-</IfModule>
-
-<IfModule mod_php4.c>
-   php_value memory_limit        "600M"
-</IfModule>
