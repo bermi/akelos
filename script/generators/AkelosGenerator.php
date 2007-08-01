@@ -31,7 +31,7 @@ class AkelosGenerator
         if(empty($generator_name)){
             echo "\n   ".Ak::t("You must supply a valid generator as the first command.\n\n   Available generator are:");
             echo "\n\n   ".join("\n   ", $this->_getAvailableGenerators())."\n\n";
-            AK_CONSOLE_MODE ? null : exit;
+            defined('AK_CONSOLE_MODE') && AK_CONSOLE_MODE ? null : exit; 
             return ;
         }
         
