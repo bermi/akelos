@@ -283,7 +283,7 @@ class test_AkActiveRecord_3 extends  UnitTestCase
 
     function Test_of_binary_data_on_database()
     {
-        $long_string = Ak::file_get_contents(AK_LIB_DIR.DS.'AkActiveRecord.php');
+        $long_string = file_get_contents(AK_LIB_DIR.DS.'AkActiveRecord.php');
 
         $_tmp_file = fopen(AK_LIB_DIR.DS.'AkActiveRecord.php', "rb");
         $binary_data = fread($_tmp_file, fileSize(AK_LIB_DIR.DS.'AkActiveRecord.php'));

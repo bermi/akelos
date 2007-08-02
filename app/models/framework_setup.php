@@ -243,10 +243,10 @@ class FrameworkSetup extends AkObject
         require_once(AK_LIB_DIR.DS.'AkInstaller.php');
         require_once(AK_APP_DIR.DS.'installers'.DS.'framework_installer.php');
 
-        foreach (array('development', 'production', 'testing') as $mode){
+        foreach (array('production', 'development') as $mode){
             $db_conn = Ak::db($this->_getDsn($mode));
             $installer = new FrameworkInstaller($db_conn);
-            $installer->install();
+            $installer->install(null, array('mode' => $mode));
         }
 
         return true;
@@ -328,8 +328,6 @@ define('AK_PUBLIC_LOCALES', '%locales');
 
 %AK_FRAMEWORK_DIR
 
-%AK_ASSET_URL_PREFIX
-
 include_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'boot.php');
 
 
@@ -361,15 +359,6 @@ CONFIG;
             $settings['%locales'] = $this->getLocales();
             $settings['%AK_FRAMEWORK_DIR'] = defined('AK_FRAMEWORK_DIR') ?
             "defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '".AK_FRAMEWORK_DIR."');" : '';
-
-
-            $asset_path = $this->_getAssetBasePath();
-            if(!empty($asset_path)){
-                $settings['%AK_ASSET_URL_PREFIX'] = "define('AK_ASSET_URL_PREFIX','/".trim($this->getUrlSuffix(),'/').'/'.$asset_path."');";
-            }else{
-                $settings['%AK_ASSET_URL_PREFIX'] = '';
-            }
-
         }
 
         return str_replace(array_keys($settings), array_values($settings), $configuration_template);

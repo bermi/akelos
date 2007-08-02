@@ -125,13 +125,14 @@ class AkelosInstaller
     function _addHtaccessDirectoryProtection()
     {
         foreach($this->source_tree as $k=>$node){
-            $folder = array_shift(array_keys($node));
-            $path = $this->options['directory'].DS.$folder;
-            if(is_dir($path) && !file_exists($path.DS.'.htaccess') && $folder != 'public'){
-                file_put_contents($path.DS.'.htaccess', "order allow,deny\ndeny from all");
+            if (is_array($node)){
+                $folder = array_shift(array_keys($node));
+                $path = $this->options['directory'].DS.$folder;
+                if(is_dir($path) && !file_exists($path.DS.'.htaccess') && $folder != 'public'){
+                    file_put_contents($path.DS.'.htaccess', "order allow,deny\ndeny from all");
+                }
             }
         }
-
     }
 
     function _copyFrameworkFiles($directory_structure, $base_path = '.')

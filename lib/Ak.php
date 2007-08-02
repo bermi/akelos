@@ -63,13 +63,14 @@ class Ak
     */
     function &db($dsn = null, $connection_id = null)
     {
-        static $db;
+        static $db, $default_connection_id;
 
         // In order to retrieve a database connection we just need to provide its identifier
-        $connection_id = empty($connection_id) ?
-        (empty($dsn) || strstr($dsn,':') ? 'default' : $dsn) :
-        $connection_id;
-
+        if(empty($default_connection_id)){
+            $default_connection_id = md5($dsn);
+        }
+        $connection_id = empty($connection_id) ? $default_connection_id : $connection_id;
+        
         if(empty($db[$connection_id])){
             require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb.inc.php');
 
@@ -1648,12 +1649,11 @@ class Ak
         static $mime_types;
         ak_compat('mime_content_type');
 
-        $mime = mime_content_type($file);
+        $mime = @mime_content_type($file);
 
         if(empty($mime)){
             empty($mime_types) ? require(AK_LIB_DIR.DS.'utils'.DS.'mime_types.php') : null;
-            $file_name = substr($file,strrpos($file,'/')+1);
-            $file_extension = substr($file_name,strrpos($file_name,'.')+1);
+            $file_extension = substr($file,strrpos($file,'.')+1);
             $mime = !empty($mime_types[$file_extension]) ? $mime_types[$file_extension] : false;
         }
 

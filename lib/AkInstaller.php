@@ -48,7 +48,8 @@ class AkInstaller
 
     function install($version = null, $options = array())
     {
-        return $this->_upgradeOrDowngrade('up', $version, $options);
+        $version = (is_null($version)) ? max($this->getAvailableVersions()) : $version;
+        return $this->_upgradeOrDowngrade('up',  $version , $options);
     }
 
     function up($version = null, $options = array())
@@ -59,6 +60,7 @@ class AkInstaller
 
     function uninstall($version = null, $options = array())
     {
+        $version = (is_null($version)) ? 0 : $version;
         return $this->_upgradeOrDowngrade('down', $version, $options);
     }
 
@@ -76,7 +78,7 @@ class AkInstaller
             $this->db->debug = true;
         }
 
-        $current_version = $this->getInstalledVersion();
+        $current_version = $this->getInstalledVersion($options);
         $available_versions = $this->getAvailableVersions();
 
         $action = stristr($action,'down') ? 'down' : 'up';
@@ -85,7 +87,7 @@ class AkInstaller
             $newest_version = max($available_versions);
             $version = isset($version[0]) && is_numeric($version[0]) ? $version[0] : $newest_version;
             $versions = range($current_version+1,$version);
-            
+
             if($current_version > $version){
                 echo Ak::t("You can't upgrade to version %version, when you are currently on version %current_version", array('%version'=>$version,'%current_version'=>$current_version));
                 return false;
@@ -94,7 +96,9 @@ class AkInstaller
             $version = !empty($version[0]) && is_numeric($version[0]) ? $version[0] : 0;
             $versions = range($current_version, empty($version) ? 1 : $version+1);
 
-            if($current_version < $version){
+            if($current_version == 0){
+            	return true;
+            }elseif($current_version < $version){
                 echo Ak::t("You can't downgrade to version %version, when you just have installed version %current_version", array('%version'=>$version,'%current_version'=>$current_version));
                 return false;
             }
@@ -152,7 +156,7 @@ class AkInstaller
         $success = !$this->transactionHasFailed();
         $this->transactionComplete();
         if($success){
-            $this->setInstalledVersion($version_number);
+            $this->setInstalledVersion($version_number, $options);
         }
         return $success;
     }
@@ -163,25 +167,27 @@ class AkInstaller
     }
 
 
-    function _versionPath()
+    function _versionPath($options = array())
     {
-        return AK_APP_DIR.DS.'installers'.DS.$this->getInstallerName().'_version.txt';
+        $mode = empty($options['mode']) ? AK_ENVIRONMENT : $options['mode'];
+        return AK_APP_DIR.DS.'installers'.DS.'versions'.DS.$mode.'_'.$this->getInstallerName().'_version.txt';
     }
 
 
-    function getInstalledVersion()
+    function getInstalledVersion($options = array())
     {
-        $version_file = $this->_versionPath();
+        $version_file = $this->_versionPath($options);
+        
         if(!is_file($version_file)){
-            $this->setInstalledVersion(0);
+            $this->setInstalledVersion(0, $options);
         }
-        return Ak::file_get_contents($this->_versionPath());
+        return Ak::file_get_contents($this->_versionPath($options));
     }
 
 
-    function setInstalledVersion($version)
+    function setInstalledVersion($version, $options = array())
     {
-        return Ak::file_put_contents($this->_versionPath(), $version);
+        return Ak::file_put_contents($this->_versionPath($options), $version);
     }
 
 
@@ -316,7 +322,7 @@ class AkInstaller
     {
         $index_name = ($index_name == '') ? 'idx_'.$table_name.'_'.$columns : $index_name;
         $index_options = array();
-        if (preg_match('/(UNIQUE|FULLTEXT|HASH)/',$columns,$match)) {
+        if(preg_match('/(UNIQUE|FULLTEXT|HASH)/',$columns,$match)){
             $columns = trim(str_replace($match[1],'',$columns),' ');
             $index_options[] = $match[1];
         }
@@ -325,10 +331,10 @@ class AkInstaller
 
     function removeIndex($table_name, $columns_or_index_name)
     {
-        if (!$this->tableExists($table_name)) return false;
+        if(!$this->tableExists($table_name)) return false;
         $available_indexes =& $this->db->MetaIndexes($table_name);
         $index_name = isset($available_indexes[$columns_or_index_name]) ? $columns_or_index_name : 'idx_'.$table_name.'_'.$columns_or_index_name;
-        if (!isset($available_indexes[$index_name])) {
+        if(!isset($available_indexes[$index_name])){
             trigger_error(Ak::t('Index %index_name does not exist.', array('%index_name'=>$index_name)), E_USER_NOTICE);
             return false;
         }
@@ -407,7 +413,7 @@ class AkInstaller
         if(is_string($columns)){
             if(strstr($columns,"\n")){
                 $columns = explode("\n",$columns);
-            }elseif (strstr($columns,',')){
+            }elseif(strstr($columns,',')){
                 $columns = explode(',',$columns);
             }
         }
@@ -436,7 +442,7 @@ class AkInstaller
         foreach ($rules as $regex=>$replacement){
             if(is_string($replacement)){
                 $column = preg_replace($regex,$replacement,$column);
-            }elseif (preg_match($regex,$column,$match)){
+            }elseif(preg_match($regex,$column,$match)){
                 $column = call_user_func_array($replacement,$match);
             }
         }
