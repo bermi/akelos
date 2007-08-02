@@ -244,8 +244,8 @@ class FrameworkSetup extends AkObject
         require_once(AK_APP_DIR.DS.'installers'.DS.'framework_installer.php');
 
         foreach (array('production', 'development') as $mode){
-            $db_conn = Ak::db($this->_getDsn($mode));
-            $installer = new FrameworkInstaller($db_conn);
+            $db_conn =& Ak::db($this->_getDsn($mode), $mode);
+            $installer =& new FrameworkInstaller($db_conn);
             $installer->install(null, array('mode' => $mode));
         }
 
