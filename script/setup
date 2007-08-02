@@ -356,7 +356,7 @@ if (PEAR::isError($args)) {
     if ($args->getCode() === CONSOLE_GETARGS_ERROR_USER) {
         echo Console_Getargs::getHelp($config, null, $args->getMessage())."\n";
     } else if ($args->getCode() === CONSOLE_GETARGS_HELP) {
-        echo Console_Getargs::getHelp($config)."\n";
+        echo @Console_Getargs::getHelp($config)."\n";
     }
     exit;
 }
