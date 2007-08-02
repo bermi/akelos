@@ -34,6 +34,7 @@ class ControllerGenerator extends  AkelosGenerator
     {
         $this->collisions = array();
         $this->_preloadPaths();
+        $this->actions = empty($this->actions) ? array() : (array)$this->actions;
         
         $files = array(
         AK_APP_DIR.DS.$this->controller_path,
@@ -43,7 +44,7 @@ class ControllerGenerator extends  AkelosGenerator
         AK_HELPERS_DIR.DS.$this->underscored_controller_name."_helper.php"
         );
         
-        foreach ((array)@$this->actions as $action){
+        foreach ($this->actions as $action){
             $files[] = AK_VIEWS_DIR.DS.AkInflector::underscore($this->class_name).DS.$action.'.tpl';
         }
         
@@ -67,7 +68,7 @@ class ControllerGenerator extends  AkelosGenerator
         
         @Ak::make_dir(AK_VIEWS_DIR.DS.AkInflector::underscore($this->class_name));
         
-        foreach ((array)@$this->actions as $action){
+        foreach ($this->actions as $action){
             //$this->action = $action;
             $this->assignVarToTemplate('action',$action);
             $this->assignVarToTemplate('path','AK_VIEWS_DIR.DS.\''.AkInflector::underscore($this->class_name).'/'.$action.'.tpl\'');
