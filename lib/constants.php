@@ -60,7 +60,9 @@ $_SERVER['PHP_SELF'] .'?'.(isset($_SERVER['argv']) ? $_SERVER['argv'][0] : $_SER
 
 defined('AK_DEBUG') ? null : define('AK_DEBUG', AK_ENVIRONMENT == 'production' ? 0 : 1);
 
-@error_reporting(AK_DEBUG ? E_ALL : 0);
+defined('AK_ERROR_REPORTING') ? null : define('AK_ERROR_REPORTING', AK_DEBUG ? E_ALL : 0);
+
+@error_reporting(AK_ERROR_REPORTING);
 
 defined('AK_CACHE_HANDLER') ? null : define('AK_CACHE_HANDLER', 1);
 
