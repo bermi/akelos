@@ -22,12 +22,12 @@ class <?php echo $controller_class_name?> extends ApplicationController
     function listing()
     {
         $this-><?php echo $singular_name?>_pages = $this->pagination_helper->getPaginator($this-><?php echo $model_name?>, array('items_per_page' => 10));        
-        $this-><?php echo $plural_name?> = $this-><?php echo $model_name?>->find('all', $this->pagination_helper->getFindOptions($this-><?php echo $model_name?>));
+        $this-><?php echo $plural_name?> =& $this-><?php echo $model_name?>->find('all', $this->pagination_helper->getFindOptions($this-><?php echo $model_name?>));
     }
 
     function show()
     {
-        $this-><?php echo $singular_name?> = $this-><?php echo $model_name?>->find(@$this->params['id']);
+        $this-><?php echo $singular_name?> =& $this-><?php echo $model_name?>->find(@$this->params['id']);
     }
 
     function add()
@@ -80,7 +80,7 @@ class <?php echo $controller_class_name?> extends ApplicationController
     function destroy()
     {
         if(!empty($this->params['id'])){
-            $this-><?php echo $singular_name?> = $this-><?php echo $model_name?>->find($this->params['id']);
+            $this-><?php echo $singular_name?> =& $this-><?php echo $model_name?>->find($this->params['id']);
             if($this->Request->isPost()){
                 $this-><?php echo $singular_name?>->destroy();
                 $this->redirectTo(array('action' => 'listing'));
