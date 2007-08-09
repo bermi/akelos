@@ -23,6 +23,25 @@ class test_Ak_support_functions extends  AkUnitTest
         $this->assertTrue(class_exists('ImportTestModelC'));
     }
 
+    function Test_for_element_size()
+    {
+        $element = 'check_this_size';
+        $expected_value = 15;
+        $this->assertEqual(Ak::size($element), $expected_value);
+        
+        $element = '123';
+        $expected_value = 3;
+        $this->assertEqual(Ak::size($element), $expected_value);
+        
+        $element = 123;
+        $expected_value = 123;
+        $this->assertEqual(Ak::size($element), $expected_value);
+        
+        $element = array(0=>'A', 1=>'B', 2=>'C', 3=>'D', 4=>array('E', 'F'));
+        $expected_value = 5;
+        $this->assertEqual(Ak::size($element), $expected_value);
+    }
+
 }
 
 
