@@ -23,7 +23,7 @@ Download and installation
 We highly recommend you to get the trunk version of Akelos until we hit version 1.0. You need to have installed [subversion](http://subversion.tigris.org/).
 You can checkout a working copy of the Akelos source code with the command:
 
-    svn co http://akelosframework.googlecode.com/svn/trunk/ akelos
+    svn co http://svn.akelos.org/trunk/ akelos
 
 If you can't or don't want to checkout the code from subversion, you can get the [latest stable version](http://www.akelos.org/akelos_framework-dev_preview.tar.gz) generated automatically by the Continuous Integration system, and untar it by typing:
 
@@ -217,7 +217,7 @@ Models, Views and Controllers
 
 Akelos follows the [MVC design pattern](http://en.wikipedia.org/wiki/Model-view-controller) for organizing your application.
 
-![Akelos MVC diagram.](http://akelosframework.googlecode.com/svn/trunk/docs/images/akelos_mvc.png)
+![Akelos MVC diagram.](http://svn.akelos.org/trunk/docs/images/akelos_mvc.png)
 
 ### Your application files and the Akelos Naming conventions ###
 

@@ -26,7 +26,7 @@ Pour cela, il vous faudra posséder un client [subversion](http://subversion.tig
 
 Pour récupérer la dernière révision d'Akelos, tapez la commande :
 
-    svn co http://akelosframework.googlecode.com/svn/trunk/ akelos
+    svn co http://svn.akelos.org/trunk/ akelos
 
 Si jamais vous ne pouvez ou ne voulez pas utiliser subversion, vous pouvez toujours télécharger la [dernière version stable](http://www.akelos.org/akelos_framework-dev_preview.tar.gz).
 Vous pouvez ensuite l'extraire en tapant :
@@ -244,7 +244,7 @@ Modèles, Vues, et Controlleurs
 
 Pour faire fonctionner vos applications, Akelos utilise le [motif de conception appelé MVC](http://fr.wikipedia.org/wiki/Motif_de_conception).
 
-![Diagrame de fonction du modèle MVC avec Akelos.](http://akelosframework.googlecode.com/svn/trunk/docs/images/akelos_mvc-fr.png)
+![Diagrame de fonction du modèle MVC avec Akelos.](http://svn.akelos.org/trunk/docs/images/akelos_mvc-fr.png)
 
 ### Les conventions de nommage dans Akelos ###
 

@@ -23,7 +23,7 @@ Descarga e Instalación
 Hasta que no esté disponible la versión 1.0, te recomendamos que te descargues la última versión trunk (troncal). Para ello necesitas tener instalado [subversion](http://subversion.tigris.org/).
 Puedes retirar una "copia de trabajo" del código fuente de Akelos con el comando:
 
-    svn co http://akelosframework.googlecode.com/svn/trunk/ akelos
+    svn co http://svn.akelos.org/trunk/ akelos
 
 Si no puedes o no quieres descargar el código desde subversion, puedes obtener la [última versión estable](http://www.akelos.org/akelos_framework-dev_preview.tar.gz) generada de forma automática por el sistema de Integración Contínua, y descomprimirlo con el comando:
 
@@ -49,7 +49,7 @@ Y cambiar el `#!/usr/bin/env php` al inicio de estos archivos  `script/console`,
 
     C:\Archivos de Programa\xampp\php\php.exe ./script/generate scaffold
 
-o alternativamente configurando el path para evitar escribir la ruta completa al binario de PHP siguiendo los pasos dell Mini HOW-TO [Añadiendo PHP al path de Windows](http://akelosframework.googlecode.com/svn/trunk/docs/windows_set_php_path-es.markdown).
+o alternativamente configurando el path para evitar escribir la ruta completa al binario de PHP siguiendo los pasos dell Mini HOW-TO [Añadiendo PHP al path de Windows](http://svn.akelos.org/trunk/docs/windows_set_php_path-es.markdown).
 
 Instalando una nueva aplicación con Akelos
 ---------------------------------------------
@@ -214,7 +214,7 @@ Modelos, Vistas y Controladores
 
 Akelos sigue el [patrón de diseño MVC](http://en.wikipedia.org/wiki/Model-view-controller) para organizar tu aplicación.
 
-![Diagrama MVC de Akelos.](http://akelosframework.googlecode.com/svn/trunk/docs/images/akelos_mvc-es.png)
+![Diagrama MVC de Akelos.](http://svn.akelos.org/trunk/docs/images/akelos_mvc-es.png)
 
 ### Los archivos de tu aplicación y las convenciones de nomenclatura de Akelos ###
 
