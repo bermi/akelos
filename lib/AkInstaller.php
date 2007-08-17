@@ -240,10 +240,16 @@ class AkInstaller
 
     function createTable($table_name, $column_options = null, $table_options = array())
     {
+        static $created_tables = array();
+        
+        if(in_array($table_name, $created_tables)){
+            return false;
+        }
         if($this->tableExists($table_name)){
             trigger_error(Ak::t('Table %table_name already exists on the database', array('%table_name'=>$table_name)), E_USER_NOTICE);
             return false;
         }
+        $created_tables[] = $table_name;
         return $this->_createOrModifyTable($table_name, $column_options, $table_options);
     }
 
