@@ -4827,6 +4827,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function parseAkelosArgs(&$args)
     {
         if(!AK_ENABLE_AKELOS_ARGS){
+            $this->_castDateParametersFromDateHelper_($args);
             return ;
         }
         $k = array_keys($args);

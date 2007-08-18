@@ -1025,10 +1025,10 @@ class Ak
     {
         if(is_array($element)){
             return count($element);
+        }elseif (is_numeric($element) && !is_string($element)){
+            return $element;
         }elseif (is_string($element)){
             return strlen($element);
-        }elseif (is_numeric($element)){
-            return $element;
         }elseif (is_object($element) && method_exists($element,'size')){
             return $element->size();
         }else{

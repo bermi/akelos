@@ -243,7 +243,7 @@ class AkInstaller
         static $created_tables = array();
         
         if(in_array($table_name, $created_tables)){
-            return false;
+            //return false;
         }
         if($this->tableExists($table_name)){
             trigger_error(Ak::t('Table %table_name already exists on the database', array('%table_name'=>$table_name)), E_USER_NOTICE);
