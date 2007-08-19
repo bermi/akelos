@@ -28,6 +28,12 @@ to your webserver with a command like:
 
 Then just point your browser to that url and follow the steps.
 
+You will also need to make sure that mod_rewrite is loaded into Apache,
+and that it can be controlled from .htaccess files, to do this make sure that
+the Apache configuration directive AllowOverride is set to 'All' (you may allow only the specific directives for mod_rewrite),
+for the directory your project will be accessed from.
+
+
 If you have problems with the web setup you can copy and edit 
 config/DEFAULT-config.php and config/DEFAULT-routes.php. You might also need
 to edit the  .htaccess files in ./ and ./public/  and un-comment/edit the 
