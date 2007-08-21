@@ -2673,7 +2673,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $this->_columns = $this->getColumnSettings();
         }
 
-        return $this->_columns;
+        return (array)$this->_columns;
     }
 
     function getColumnSettings()
@@ -2704,7 +2704,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             !$this->_runCurrentModelInstallerIfExists($column_objects)){
                 trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())), E_USER_ERROR);
                 return false;
-            }elseif(is_array($column_objects)){
+            }elseif (empty($column_objects)){
+                $this->_runCurrentModelInstallerIfExists($column_objects);
+            }
+            if(is_array($column_objects)){
                 foreach (array_keys($column_objects) as $k){
                     $this->setColumnSettings($column_objects[$k]->name, $column_objects[$k]);
                 }

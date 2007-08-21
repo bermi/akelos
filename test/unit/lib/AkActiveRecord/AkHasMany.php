@@ -8,7 +8,7 @@ defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 
-class test_AkActiveRecord_hasMany_Associations extends  UnitTestCase
+class test_AkActiveRecord_hasMany_Associations extends  AkUnitTest 
 {
 
     function test_start()
@@ -56,7 +56,6 @@ class test_AkActiveRecord_hasMany_Associations extends  UnitTestCase
 
         $this->assertNull($Property->pictures[0]->get('property_id'));
 
-        //$Property->dbug();
         $MountainViews =& new Picture(array('title'=>'Mountain views'));
         $this->assertTrue($MountainViews->isNewRecord());
         $Property->picture->add($MountainViews);
@@ -132,8 +131,9 @@ class test_AkActiveRecord_hasMany_Associations extends  UnitTestCase
         $Property =& $Property->find('first');
         $this->assertIdentical($Property->picture->count(), 0);
 
-        $this->assertFalse($Property->find('first', array('include'=>'pictures')));
-
+        //$this->assertTrue($Property =& $Property->find('first', array('include'=>'pictures')));
+        //$this->assertIdentical($Property->picture->count(), 0);
+        
         $Picture =& new Picture();
         $Alicia =& $Picture->create(array('title'=>'Alicia'));
         $Bermi =& $Picture->create(array('title'=>'Bermi'));
@@ -212,29 +212,67 @@ class test_AkActiveRecord_hasMany_Associations extends  UnitTestCase
 
         $this->assertEqual($VillaAltea->pictures[0]->get('title'), 'Garden');
     }
-    
+
     /**/
 
     function test_clean_up_dependencies()
     {
         $Property =& new Property(array('description'=>'Ruins in Matamon'));
         $this->assertTrue($Property->save());
-        
+
         $South =& $Property->picture->create(array('title'=>'South views'));
         $this->assertReference($South, $Property->pictures[0]);
         $this->assertFalse($South->isNewRecord());
-        
+
         $pic_id = $South->getId();
 
         $Property =& new Property($Property->getId());
         $this->assertTrue($Property->destroy());
-        
+
         $Picture =& new Picture();
 
         $this->assertFalse($Picture->find($pic_id));
-        
+
     }
 
+    function _test_should_not_die_on_unincluded_model()
+    {
+        $this->installAndIncludeModels(array('Post'));
+        $Post =& new Post();
+        $Post->dbug();
+        $Post->find('all', array('include' => array('comments')));
+    }
+
+    function test_should_find_owner_even_if_it_has_no_relations()
+    {
+        $this->installAndIncludeModels(array('Post', 'Comment'));
+        
+        $Post =& new Post(array('title' => 'Post for unit testing', 'body' => 'This is a post for testing the model'));
+
+        $Post->save();
+        $Post->reload();
+        
+        $expected_id = $Post->getId();
+
+        $this->assertTrue($Result =& $Post->find($expected_id, array('include' => array('comments'))));
+        $this->assertEqual($Result->getId(), $expected_id);
+    }
+
+    function test_should_find_owner_using_related_conditions()
+    {
+        $this->installAndIncludeModels(array('Post', 'Comment'));
+        
+        $Post =& new Post(array('title' => 'Post for unit testing', 'body' => 'This is a post for testing the model'));
+        $Post->comment->create(array('body' => 'hello', 'name' => 'Aditya'));
+        $Post->save();
+        $Post->reload();
+
+        $expected_id = $Post->getId();
+
+        $this->assertTrue($Result =& $Post->find($expected_id, array('include' => array('comments'), 'conditions' => "name = 'Aditya'")));
+
+        $this->assertEqual($Result->comments[0]->get('name'), 'Aditya');
+    }
 }
 
 ak_test('test_AkActiveRecord_hasMany_Associations', true);

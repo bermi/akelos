@@ -418,14 +418,6 @@ class AkAssociatedActiveRecord extends AkBaseModel
                             $objects[$i]->$association_id->build($attributes, false);
                             $objects[$i]->$association_id->_newRecord = false;
                         }
-
-                        /**
-                     * @todo FIXME This is a dirty hack for sqlite table joins which are not exclusive as they are on MySql
-                     *       this makes table joins behave the same way as they do on MySql
-                     */
-                    }elseif (in_array($association_id, $included_associations) && $this->_getDatabaseType() == 'sqlite'){
-                        $false = false; 
-                        return $false;
                     }
                 }
 

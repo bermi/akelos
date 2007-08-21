@@ -565,22 +565,10 @@ class AkHasMany extends AkAssociation
 
         $finder_options['selection'] = trim($finder_options['selection'], ', ');
 
-        /**
-         * @todo Refactorize me. This is too confusing
-         */
-        $finder_options['conditions'] =
-        // If owner is not available we build the searcher without an specific id
-        (empty($owner_id) ? '' :
+        $finder_options['conditions'] = empty($options['conditions']) ? '' : 
 
-        // We have an Id so we add it to the conditions
-        ' '.$Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['foreign_key']).' = '.$owner_id.' '.
-        // After adding the Id we need to add AND in case we have a previous contidion available
-        (!empty($options['conditions']) ? ' AND ' : ' ')).
-
-        // We add previous conditions
-        (!empty($options['conditions']) ?
-        $Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ' : '');
-
+        $Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ';
+        
         return $finder_options;
     }
 
@@ -614,6 +602,7 @@ class AkHasMany extends AkAssociation
         static $ModelInstance;
         if(empty($ModelInstance)){
             $class_name = $this->getOption($this->association_id, 'class_name');
+            Ak::import($class_name);
             $ModelInstance =& new $class_name();
         }
         return $ModelInstance;
