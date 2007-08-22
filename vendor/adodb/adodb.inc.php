@@ -3722,7 +3722,7 @@
 		if ($obj) {
 			if ($errorfn)  $obj->raiseErrorFn = $errorfn;
 			if (isset($dsna)) {
-				if (isset($dsn['port'])) $obj->port = $dsn['port'];
+				if (isset($dsna['port'])) $obj->port = $dsna['port'];
 				foreach($opt as $k => $v) {
 					switch(strtolower($k)) {
 					case 'persist':
