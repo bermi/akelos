@@ -281,7 +281,7 @@ class AkRequest extends AkObject
      */
     function getRelativeUrlRoot()
     {
-        return str_replace('/index.php','', @$this->env['SCRIPT_NAME']);
+        return str_replace('/index.php','', @$this->env['PHP_SELF']);
     }
 
     /**
@@ -676,8 +676,8 @@ class AkRequest extends AkObject
                 array_walk($_GET, array('AkRequest', '_fixGpc'));
                 array_walk($_POST, array('AkRequest', '_fixGpc'));
                 array_walk($_COOKIE, array('AkRequest', '_fixGpc'));
-                array_walk($_REQUEST, array('AkRequest', '_fixGpc'));
-                !empty($_FILES) ? array_walk($_FILES, array('AkRequest', '_fixGpc')) : null;
+                //array_walk($_REQUEST, array('AkRequest', '_fixGpc'));
+                //!empty($_FILES) ? array_walk($_FILES, array('AkRequest', '_fixGpc')) : null;
             }
             define('AK_GPC_MAGIC_FIXED',true);
         }
