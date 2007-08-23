@@ -506,6 +506,15 @@ class AkInflector
         }
     }
 
+    function is_singular($singular)
+    {
+        return AkInflector::singularize(AkInflector::pluralize($singular)) == $singular;
+    }
+    
+    function is_plural($plural)
+    {
+        return AkInflector::pluralize(AkInflector::singularize($plural)) == $plural;
+    }
 
 }
 

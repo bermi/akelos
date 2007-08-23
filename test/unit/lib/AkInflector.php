@@ -284,6 +284,20 @@ class Test_of_AkInflector extends  UnitTestCase
         AkInflector::singularize('camiones', 'camión');
         $this->assertEqual(AkInflector::singularize('camiones'), 'camión');
     }
+    
+    function test_should_detect_singulars()
+    {
+        foreach (array_keys($this->SingularToPlural) as $singular){
+            $this->assertTrue(AkInflector::is_singular($singular), $singular.' is not detected as singular');
+        }
+    }
+    
+    function test_should_detect_plurals()
+    {
+        foreach (array_values($this->SingularToPlural) as $plural){
+            $this->assertTrue(AkInflector::is_plural($plural), $plural.' is not detected as plural');
+        }
+    }
 
 }
 

@@ -29,12 +29,16 @@ class ModelGenerator extends  AkelosGenerator
         $this->model_path = 'app'.DS.'models'.DS.$this->underscored_model_name.'.php';
         $this->installer_path = 'app'.DS.'installers'.DS.$this->underscored_model_name.'_installer.php';
     }
-    
+
     function hasCollisions()
     {
         $this->_preloadPaths();
-        
+
         $this->collisions = array();
+
+        if(AkInflector::is_plural($this->class_name)){
+            $this->collisions[] = Ak::t('%class_name should be a singular noun',array('%class_name'=>$this->class_name));
+        }
 
         $files = array(
         AkInflector::toModelFilename($this->class_name),
@@ -54,7 +58,7 @@ class ModelGenerator extends  AkelosGenerator
     function generate()
     {
         $this->_preloadPaths();
-        
+
         $this->class_name = AkInflector::camelize($this->class_name);
 
         $files = array(
@@ -67,19 +71,19 @@ class ModelGenerator extends  AkelosGenerator
         foreach ($files as $template=>$file_path){
             $this->save($file_path, $this->render($template));
         }
-        
+
         $installer_path = AK_APP_DIR.DS.'installers'.DS.$this->underscored_model_name.'_installer.php';
         if(!file_exists($installer_path)){
             $this->save($installer_path, $this->render('installer'));
         }
-        
+
         $unit_test_runner = AK_TEST_DIR.DS.'unit.php';
         if(!file_exists($unit_test_runner)){
             Ak::file_put_contents($unit_test_runner, file_get_contents(AK_FRAMEWORK_DIR.DS.'test'.DS.'app.php'));
         }
-        
+
     }
-    
+
     function cast()
     {
         $this->_template_vars['class_name'] = AkInflector::camelize($this->class_name);
