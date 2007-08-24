@@ -440,13 +440,19 @@ class AkHasAndBelongsToMany extends AkAssociation
             $owner_type = $this->_findOwnerTypeForAssociation($AssociatedModel, $this->Owner);
 
             $this->JoinObject->setPrimaryKey($options['join_class_primary_key']);
+
             foreach (array_keys($Associated) as $k){
                 $id = $Associated[$k]->getId();
-                $JoinObjectToDelete =& $this->JoinObject->findFirstBy($options['association_foreign_key'],$id);
-                if($JoinObjectToDelete->destroy()){
-                    $items_to_remove_from_collection[] = $id;
-                }else{
-                    $success = false;
+
+                if(!in_array($id, $ids_to_skip)){
+                    $JoinObjectToDelete =& $this->JoinObject->findFirstBy(
+                        $options['foreign_key'].' AND '.$options['association_foreign_key'], 
+                        $this->Owner->getId(), $id);
+                    if($JoinObjectToDelete->destroy()){
+                        $items_to_remove_from_collection[] = $id;
+                    }else{
+                        $success = false;
+                    }
                 }
             }
 

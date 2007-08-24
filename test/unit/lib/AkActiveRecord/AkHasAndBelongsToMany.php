@@ -10,7 +10,6 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
 {
-
     function test_start()
     {
         require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
@@ -90,8 +89,6 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
         $this->assertEqual($Property->property_type->count(), 2);
 
         $this->assertEqual($Property->property_types[1]->getType(), 'PropertyType');
-
-
 
         $Property->property_type->delete($Property->property_types[1]);
 
@@ -374,9 +371,14 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
 
     function test_should_remove_associated_using_the_right_key()
     {
+        $Installer =& new AkInstaller();
+        @$Installer->dropTable('groups_users');
+        @Ak::file_delete(AK_MODELS_DIR.DS.'group_user.php');
+
         $this->installAndIncludeModels('User', 'Group', array('instantiate' => true));
 
         $Admin =& $this->Group->create(array('name' => 'Admin'));
+
         $Moderator =& $this->Group->create(array('name' => 'Moderator'));
 
         $this->assertFalse($Admin->hasErrors());
@@ -384,19 +386,22 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
 
         $Salavert =& $this->User->create(array('name' => 'Jose'));
         $this->assertFalse($Salavert->hasErrors());
+
         $Salavert->group->setByIds($Admin->getId(), $Moderator->getId());
-        $Salavert->reload();
+
+        $Salavert =& $this->User->find($Salavert->getId());
         $this->assertEqual(2, $Salavert->group->count());
-        
+
         $Jyrki =& $this->User->create(array('name' => 'Jyrki'));
         $this->assertFalse($Jyrki->hasErrors());
         $Jyrki->group->setByIds($Admin->getId(), $Moderator->getId());
-        $Jyrki->reload();
+        $Jyrki =& $this->User->find($Jyrki->getId());
         $this->assertEqual(2, $Jyrki->group->count());
-        
+
         $Jyrki->destroy();
-        $Salavert->reload();
+        $Salavert =& $this->User->find($Salavert->getId());
         $this->assertEqual(2, $Salavert->group->count());
+
     }
 }
 
