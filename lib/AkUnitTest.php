@@ -86,7 +86,7 @@ class AkUnitTest extends UnitTestCase
 
     function instantiateModel($model_name)
     {
-        if(empty($htis->$model_name)){
+        if(empty($this->$model_name)){
             Ak::import($model_name);
             if(class_exists($model_name)){
                 $this->$model_name =& new $model_name();

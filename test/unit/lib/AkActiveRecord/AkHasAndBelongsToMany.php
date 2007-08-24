@@ -371,6 +371,33 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
         $this->assertEqual($RanchoMaria->getId(), $Rancho->properties[0]->getId());
     }
 
+
+    function test_should_remove_associated_using_the_right_key()
+    {
+        $this->installAndIncludeModels('User', 'Group', array('instantiate' => true));
+
+        $Admin =& $this->Group->create(array('name' => 'Admin'));
+        $Moderator =& $this->Group->create(array('name' => 'Moderator'));
+
+        $this->assertFalse($Admin->hasErrors());
+        $this->assertFalse($Moderator->hasErrors());
+
+        $Salavert =& $this->User->create(array('name' => 'Jose'));
+        $this->assertFalse($Salavert->hasErrors());
+        $Salavert->group->setByIds($Admin->getId(), $Moderator->getId());
+        $Salavert->reload();
+        $this->assertEqual(2, $Salavert->group->count());
+        
+        $Jyrki =& $this->User->create(array('name' => 'Jyrki'));
+        $this->assertFalse($Jyrki->hasErrors());
+        $Jyrki->group->setByIds($Admin->getId(), $Moderator->getId());
+        $Jyrki->reload();
+        $this->assertEqual(2, $Jyrki->group->count());
+        
+        $Jyrki->destroy();
+        $Salavert->reload();
+        $this->assertEqual(2, $Salavert->group->count());
+    }
 }
 
 ak_test('test_AkActiveRecord_hasAndBelongsToMany_Associations', true);
