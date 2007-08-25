@@ -261,7 +261,7 @@ Le nommage de chaque objet dans Akelos est très important, puisqu'il permet l'a
 
  * **Dossier :** */app/controllers/*
  * **Nom des classes :** Au singulier ou au pluriel, au format CamelCase, fini par `Controller` *(AccountController, UserController)*
- * **Nom des fichiers :** Au singulier ou au pluriel, séparé par des underscore, fini par `_controller` *(account_controller.php, user_controller.php)*
+ * **Nom des fichiers :** Au singulier ou au pluriel, séparé par des underscore, fini par `_controller` *(`account_controller.php`, `user_controller.php`)*
 
 #### Vues ####
 
@@ -292,9 +292,8 @@ Le fonctionnement d'Akelos
 Voici une description rapide de comment Akelos réagi lorsqu'il répond à l'adresse : `http://localhost/booklink/book/show/2`
   
  1. Akelos va récupérer trois paramètres, en fonction de ce que vous avez défini dans le fichier `/config/routes.php` (tutoriel est à venir) :
-
-  * contrôleur : *book*
-  * action : *show*
+  * contrôleur : book
+  * action : show
   * id : 2
 
  2. Il va ensuite chercher le fichier `/app/controllers/book_controller.php`. S'il existe, il instanciera la classe `BookController`.

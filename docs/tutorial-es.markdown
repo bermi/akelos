@@ -231,7 +231,7 @@ Akelos sigue el [patrón de diseño MVC](http://en.wikipedia.org/wiki/Model-view
 
  * **Ruta:** */app/controllers/*
  * **Nombre dela clase:** singular o plural, separando palabras sin espacios y con mayúsculas (CamelCase), termina en `Controller` *(AccountController, PersonController)*
- * **Nombre del fichero:** singular o pural, separando palabras con guiones bajos, termina en `_controller` *(account_controller.php, person_controller.php)*
+ * **Nombre del fichero:** singular o pural, separando palabras con guiones bajos, termina en `_controller` *(`account_controller.php`, `person_controller.php`)*
 
 #### Vistas ####
 
@@ -263,9 +263,8 @@ El flujo de trabajo de Akelos
 Esta es una pequeña explicación del flujo de trabajo subyacente para una llamada a la siguiente URL  `http://localhost/booklink/book/show/2`
 
  1. Akelos dividirá la petición en tres parámetros  de acuerdo a tu archivo `/config/routes.php` (más sobre este tema en un instante)
-
-  * controlador: *book*
-  * acción: *show*
+  * controlador: book
+  * acción: show
   * id: 2
 
  2. Una vez que Akelos conoce las partes de la petición buscará el archivo `/app/controllers/book_controller.php` y si lo encuentra instanciará la clase `BookController`
@@ -352,7 +351,7 @@ Comentarios Finales
 --------------------
 
 Esto es todo por ahora, iré mejorando este tutorial de vez en cuando, para agregar algunas funcionalidades que faltan, como:
-                                
+
  * validaciones
  * rutas (routes)
  * filtros

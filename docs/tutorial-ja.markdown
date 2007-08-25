@@ -236,7 +236,7 @@ Akelosに「設定よりも規約」という哲学を付与する規約があ�
 
  * **パス:** */app/controllers/*
  * **クラス名:** 単数形 または 複数形, キャメルケース, `Controller`で終わる *(AccountController, PersonController)*
- * **ファイル名:** 単数形 または 複数, アンダースコア, `_controller`で終わる *(account_controller.php, person_controller.php)*
+ * **ファイル名:** 単数形 または 複数, アンダースコア, `_controller`で終わる *(`account_controller.php`, `person_controller.php`)*
 
 #### ビュー ####
 
@@ -267,9 +267,8 @@ Akelos ワークフロー
 これは、`http://localhost/booklink/book/show/2`というURLをコールしたときのワークフローの簡単な説明です。
 
  1. Akelos はリクエストを３つのパラメータに分解します。これは`/config/routes.php`ファイル（この後に詳しく説明します）の内容に従います。
-
-  * controller: *book*
-  * action: *show*
+  * controller: book
+  * action: show
   * id: 2
 
  2. 一度Akelosがこのリクエストを処理すると、`/app/controllers/book_controller.php`ファイルを検索します。もし見つかれば、`BookController`クラスをインスタンス化します。

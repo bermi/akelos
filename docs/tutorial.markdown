@@ -234,7 +234,7 @@ These are the conventions that empower the Akelos convention over configuration 
 
  * **Path:** */app/controllers/*
  * **Class Name:** singular or pural, camel cased, ends in `Controller` *(AccountController, PersonController)*
- * **File Name:** singular or pural, underscored, ends in `_controller` *(account_controller.php, person_controller.php)*
+ * **File Name:** singular or pural, underscored, ends in `_controller` *(`account_controller.php`, `person_controller.php`)*
 
 #### Views ####
 
@@ -266,9 +266,8 @@ The Akelos Workflow
 This is a small description of the workflow for a call to the following URL `http://localhost/booklink/book/show/2`
   
  1. Akelos will break up your request into three parameters according to your `/config/routes.php` file (more on this later)
-
-  * controller: *book*
-  * action: *show*
+  * controller: book
+  * action: show
   * id: 2
 
  2. Once Akelos knows about this request it will look for the file `/app/controllers/book_controller.php` and if found it will instantiate the class `BookController`
