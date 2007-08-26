@@ -157,7 +157,7 @@ a different OID if a database must be reloaded. */
 		if (!is_resource($this->_resultid) || get_resource_type($this->_resultid) !== 'pgsql result') return false;
 		$oid = pg_getlastoid($this->_resultid);
 		// to really return the id, we need the table and column-name, else we can only return the oid != id
-		return empty($table) || empty($column) ? $oid : $this->GetOne("SELECT $column FROM $table WHERE oid=".(int)$oid);
+		return empty($table) || empty($column) ? $oid : $this->GetOne("SELECT $column FROM $table ORDER BY $column DESC LIMIT 1");
 	}
 
 // I get this error with PHP before 4.0.6 - jlim

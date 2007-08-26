@@ -39,16 +39,15 @@ class test_AkActiveRecord_2 extends  UnitTestCase
         $this->assertTrue($User->isNewRecord());
         
         $User->newRecord('last_name->','Gimeno');
-        
-        $this->assertTrue($User->save() !== false);
 
+        $this->assertTrue($User->save() !== false);
         $this->assertFalse($User->isNewRecord());
         $User->destroy();
         
         $User->newRecord('last_name->','Ferrer','date->','1978-06-16','expires_on->','2120-06-16');
         $this->assertTrue($User->isNewRecord());
     }
-    
+
     function Test_of__getCombinedAttributesWhereThisAttributeIsUsed()
     {
         $User = new AkTestUser();
@@ -450,7 +449,7 @@ class test_AkActiveRecord_2 extends  UnitTestCase
         $this->assertEqual(count($FoundUsers), 3);
 
     }
-    
+
 }
 
 ak_test('test_AkActiveRecord_2',true);

@@ -8,7 +8,7 @@ defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 
-class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
+class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest 
 {
     /**/
     function test_start()
@@ -23,14 +23,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  UnitTestCase
         $installer->uninstall();
         $installer->install();
         $models = array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'Person', 'Account');
-        foreach ($models as $model){
-            require_once(AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($model).'_installer.php');
-            require_once(AK_MODELS_DIR.DS.AkInflector::underscore($model).'.php');
-            $installer_name = $model.'Installer';
-            $installer = new $installer_name();
-            $installer->uninstall();
-            $installer->install();
-        }
+        $this->installAndIncludeModels(array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'Person', 'Account'));
         unset($_SESSION['__activeRecordColumnsSettingsCache']);
     }
 

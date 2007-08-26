@@ -46,14 +46,14 @@ class test_AkActiveRecord_calculations extends  AkUnitTest
     function test_should_order_by_grouped_field()
     {
         $credit = $this->Account->sum('credit_limit',array('group'=>'firm_id','order'=>'firm_id DESC'));
-        $this->assertEqual(array_diff(array_keys($credit),array('')), array(9,6,2,1));
+        $this->assertEqual(join(array_diff(array_keys($credit),array(''))), join(array(9,6,2,1)));
     }
 
     function test_should_order_by_calculation()
     {
         $credit = $this->Account->sum('credit_limit',array('group'=>'firm_id','order'=>'sum_credit_limit desc, firm_id'));
         $this->assertEqual(array_values($credit), array(105, 60, 53, 50, 50));
-        $this->assertEqual(array_keys($credit), array(6,2,9,null,1));
+        $this->assertEqual(join(array_keys($credit)), join(array(6,2,9,null,1)));
     }
 
     function test_should_limit_calculation()

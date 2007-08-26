@@ -139,7 +139,6 @@ class test_AkActiveRecord_hasMany_Associations extends  AkUnitTest
         $Bermi =& $Picture->create(array('title'=>'Bermi'));
         $Hilario =& $Picture->create(array('title'=>'Hilario'));
 
-
         $Property->picture->setByIds(array($Alicia->getId(),$Bermi->getId(),$Hilario->getId()));
 
         $Property->set('description', 'Cool house');
@@ -152,9 +151,9 @@ class test_AkActiveRecord_hasMany_Associations extends  AkUnitTest
 
         $this->assertEqual($Property->picture->count(), 3);
 
-        $FoundAlicia = $Property->picture->find('first', array('title'=>'Alicia'));
+        $FoundAlicia = $Property->picture->find('first', array('conditions' => array('title = ?',"Alicia")));
         $this->assertEqual($Alicia->get('title').$Alicia->getId(), $FoundAlicia->get('title').$FoundAlicia->getId());
-
+        
         $FoundPals = $Property->picture->find();
 
         $this->assertEqual(count($FoundPals), $Property->picture->count());
@@ -273,6 +272,7 @@ class test_AkActiveRecord_hasMany_Associations extends  AkUnitTest
 
         $this->assertEqual($Result->comments[0]->get('name'), 'Aditya');
     }
+    /**/
 }
 
 ak_test('test_AkActiveRecord_hasMany_Associations', true);

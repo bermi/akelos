@@ -216,7 +216,7 @@ class test_AkActiveRecord extends  UnitTestCase
             $dict->ExecuteSQLArray($sqlarray);
         }
         
-        $db->CreateSequence('seq_'.$table['table_name']);
+        strstr($db->databaseType,'sqlite') ? $db->CreateSequence('seq_'.$table['table_name']) : null;
 
         $this->_testing_model_databases_to_delete[] = $table_name;
         if(!isset($shutdown_called)){
@@ -232,7 +232,7 @@ class test_AkActiveRecord extends  UnitTestCase
         $db =& AK::db();
         foreach ($this->_testing_model_databases_to_delete as $table_name){
             $db->Execute('DROP TABLE '.$table_name);
-            $db->DropSequence('seq_'.$table_name);
+            strstr($db->databaseType,'sqlite') ? $db->DropSequence('seq_'.$table_name) : null;
         }
     }
 

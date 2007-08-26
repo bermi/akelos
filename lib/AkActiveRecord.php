@@ -492,7 +492,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             */
             if(!isset($this->_generateSequence) || (isset($this->_generateSequence) && $this->_generateSequence !== false)){
                 if((empty($attributes[$pk]) || (!empty($attributes[$pk]) && (integer)$attributes[$pk] > 0 ))){
-                    if($this->_getDatabaseType() != 'mysql'){
+                    if($this->_getDatabaseType() == 'sqlite'){
                         $table_details = $this->_databaseTableInternals('seq_'.$table);
                         if(!isset($table_details['ID'])){
                             $this->_db->CreateSequence('seq_'.$table);
@@ -565,7 +565,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         $result = $this->transactionHasFailed() ? false : $result;
         $this->transactionComplete();
-
+        
         return $result;
     }
     
@@ -2602,7 +2602,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         foreach ((array)$this->getColumns() as $column_name=>$column_settings){
             if (!isset($column_settings['primaryKey']) && isset($column_settings['hasDefault'])) {
-                $attributes[$column_name] = $column_settings['defaultValue'];
+                $attributes[$column_name] = $this->_extractValueFromDefault($column_settings['defaultValue']);
             } else {
                 $attributes[$column_name] = null;
             }
@@ -5285,6 +5285,24 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             return false;
         }
         return $cache[$args[0]];
+    }
+    
+    
+    /** 
+                        Connection adapters
+    ====================================================================
+    Right now Akelos uses phpAdodb for bd abstraction. This are functionalities not
+    provided in phpAdodb and that will move to a separated driver for each db 
+    engine in a future
+    */
+    function _extractValueFromDefault($default)
+    {
+        if($this->_getDatabaseType() == 'postgre'){
+            if(preg_match("/^'(.*)'::/", $default, $match)){
+                return $match[1];
+            }
+        }
+        return $default;
     }
     
 

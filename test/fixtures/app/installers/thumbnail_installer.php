@@ -7,7 +7,7 @@ class ThumbnailInstaller extends AkInstaller
         $this->createTable('thumbnails', '
         id integer(11) auto increment primary key,
         photo_id integer(10),
-        owner string (40) default=Picture,
+        owner string (40) default \'Picture\',
         caption string (200)
         '
         );

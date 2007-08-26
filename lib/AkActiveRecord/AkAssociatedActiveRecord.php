@@ -231,9 +231,8 @@ class AkAssociatedActiveRecord extends AkBaseModel
     function &findWithAssociations($options, $limit = null, $offset = null)
     {
         $result = false;
-
         $options['include'] = is_array($options['include']) ? $options['include'] : array($options['include']);
-        $options['order'] = empty($options['order']) ? '' : $options['order'];
+        $options['order'] = empty($options['order']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options['order']);
         $options['conditions'] = empty($options['conditions']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options['conditions']);
 
         $included_associations = array();
@@ -278,7 +277,6 @@ class AkAssociatedActiveRecord extends AkBaseModel
         if(!empty($options['bind']) && is_array($options['bind']) && strstr($sql,'?')){
             $sql = array_merge(array($sql),$options['bind']);
         }
-
         $result =& $this->_findBySqlWithAssociations($sql, $limit, $offset, $options['include'], empty($options['virtual_limit']) ? false : $options['virtual_limit']);
 
         return $result;
