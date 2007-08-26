@@ -84,8 +84,11 @@ class Ak
                     $fn = AK_DATABASE_CONNECTION_FAILURE_CALLBACK;
                     $fn();
                 }
+                if(!AK_PHP5 && substr($dsn,0,6) == 'sqlite'){
+                    echo "\nWarning, sqlite support is not available by default on PHP4.\n Check your PHP version by running \"env php -v\", and change the first line in your scripts/ so they point to a php5 binary\n\n";
+                }
                 die(Ak::t('Connection to the database failed.').' '.
-                (AK_DEBUG?preg_replace('/\/\/(\w+):(.*)@/i','//$1:******@', $dsn)."\n":''));
+                (AK_DEBUG?preg_replace('/\/\/(\w+):(.*)@/i','//$1:******@', urldecode($dsn))."\n":''));
             }
             $db[$connection_id]->debug = AK_DEBUG == 2;
             defined('AK_DATABASE_CONNECTION_AVAILABLE') ? null : define('AK_DATABASE_CONNECTION_AVAILABLE', true);

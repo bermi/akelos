@@ -982,7 +982,7 @@ class AkActionController extends AkObject
 
         }
 
-        $rewritten_url .= (substr($rewritten_url,-1) == '/' ? '' : (AK_URL_REWRITE_ENABLED ? '' : '/'));
+        $rewritten_url .= (substr($rewritten_url,-1) == '/' ? '' : (AK_URL_REWRITE_ENABLED ? '' : (!empty($path[0]) && $path[0] != '/' ? '/' : '')));
         $rewritten_url .= $path;
         $rewritten_url .= empty($options['trailing_slash']) ? '' : '/';
         $rewritten_url .= empty($options['anchor']) ? '' : '#'.$options['anchor'];

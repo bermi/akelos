@@ -3596,7 +3596,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *   $Person->setAttributes(array("last_name" => "Heinemeier", "phone_number" => "555-555"));
     *   $Person->save(); // => true (and person is now saved in the database)
     * 
-    * An "Errors" object is automatically created for every Active Record.
+    * An "_errors" array is available for every Active Record.
     * 
     */
 

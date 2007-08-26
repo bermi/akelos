@@ -27,58 +27,28 @@
               
               <?php if($FrameworkSetup->database_type != 'sqlite') : ?>
        
-              <label for='<?php 
- echo $mode;
-?>_database_host'><?php echo $text_helper->translate('Database Host', array()); ?></label>
-                        <input type='text' name='<?php 
- echo $mode;
-?>_database_host' id='<?php 
- echo $mode;
-?>_database_host' 
+              <label for='<?php echo $mode; ?>_database_host'><?php echo $text_helper->translate('Database Host', array()); ?></label>
+                        <input type='text' name='<?php echo $mode; ?>_database_host' id='<?php echo $mode; ?>_database_host' 
                         value='<?php echo $FrameworkSetup->getDatabaseHost($mode)?>' />
                         
-                    <label for='<?php 
- echo $mode;
-?>_database_name'><?php echo $text_helper->translate('Database name', array()); ?></label>
-                        <input type='text' name='<?php 
- echo $mode;
-?>_database_name' id='<?php 
- echo $mode;
-?>_database_name' 
+                    <label for='<?php echo $mode; ?>_database_name'><?php echo $text_helper->translate('Database name', array()); ?></label>
+                        <input type='text' name='<?php echo $mode; ?>_database_name' id='<?php echo $mode; ?>_database_name' 
                         value='<?php echo $FrameworkSetup->getDatabaseName($mode)?>' />
                         
-                    <label for='<?php 
- echo $mode;
-?>_database_user'><?php echo $text_helper->translate('User', array()); ?></label>
-                        <input type='text' name='<?php 
- echo $mode;
-?>_database_user' id='<?php 
- echo $mode;
-?>_database_user' 
+                    <label for='<?php echo $mode; ?>_database_user'><?php echo $text_helper->translate('User', array()); ?></label>
+                        <input type='text' name='<?php echo $mode; ?>_database_user' id='<?php echo $mode; ?>_database_user' 
                         value='<?php echo $FrameworkSetup->getDatabaseUser($mode)?>' />
                         
-                    <label for='<?php 
- echo $mode;
-?>_database_password'><?php echo $text_helper->translate('Password', array()); ?></label>
-                        <input type='password' name='<?php 
- echo $mode;
-?>_database_password' id='<?php 
- echo $mode;
-?>_database_password' 
+                    <label for='<?php echo $mode; ?>_database_password'><?php echo $text_helper->translate('Password', array()); ?></label>
+                        <input type='password' name='<?php echo $mode; ?>_database_password' id='<?php echo $mode; ?>_database_password' 
                         value='<?php echo $FrameworkSetup->getDatabasePassword($mode)?>' />
                         
             <?php else : ?>
            
-              <label for='<?php 
- echo $mode;
-?>_database_name'><?php echo $text_helper->translate('Database name', array()); ?></label>
-              <b>config/.ht-</b><input class="sqlite_database_name" type='text' 
-                        name='<?php 
- echo $mode;
-?>_database_name' id='<?php 
- echo $mode;
-?>_database_name' 
-                        value='<?php echo $FrameworkSetup->getDatabaseName($mode)?>' /><b>.sqlite</b>
+              <label for='<?php echo $mode; ?>_database_name'><?php echo $text_helper->translate('Database name', array()); ?></label>
+              <b>config/</b><input class="sqlite_database_name" type='text' 
+                        name='<?php echo $mode; ?>_database_name' id='<?php echo $mode; ?>_database_name' 
+                        value='<?php echo $FrameworkSetup->getDatabaseName($mode)?>' /><b>-<?php echo $FrameworkSetup->random?>.sqlite</b>
             
             <?php endif; ?>
                 
@@ -89,7 +59,7 @@
         <?php endforeach; ?>
         
         
-        <?php
+        <?php 
         /**
          * @todo Database creation form. Requires extensive testing before 
          * making it into the setup process

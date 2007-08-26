@@ -46,9 +46,9 @@
             <? else : ?>
            
               <label for='{mode}_database_name'>_{Database name}</label>
-              <b>config/.ht-</b><input class="sqlite_database_name" type='text' 
+              <b>config/</b><input class="sqlite_database_name" type='text' 
                         name='{mode}_database_name' id='{mode}_database_name' 
-                        value='<?=$FrameworkSetup->getDatabaseName($mode)?>' /><b>.sqlite</b>
+                        value='<?=$FrameworkSetup->getDatabaseName($mode)?>' /><b>-<?=$FrameworkSetup->random?>.sqlite</b>
             
             <? endif; ?>
                 

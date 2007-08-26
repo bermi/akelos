@@ -369,5 +369,4 @@ This is all for now, I'll be improving this tutorial from time to time to add so
  * distributing
  * and many more...
  
-My apologies for any typo or grammatical error you might find. English is not my mother tongue and I would really like you to help me fixing errors in this document.
-
+My apologies for any typo or grammatical error you might find. English is not my mother tongue and I would really like you to help me [improving and fixing errors in this document](http://trac.akelos.org/newticket?keywords=booklink%20english&component=Documentation&priority=minor&type=documentation&summary=Booklin%20Tutorial%20improvements).

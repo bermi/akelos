@@ -45,7 +45,7 @@ defined('AK_AVAILABLE_LOCALES') ? null : define('AK_AVAILABLE_LOCALES', 'auto');
 // defined('AK_APP_LOCALES') ? null : define('AK_APP_LOCALES','en,es');
 // defined('AK_PUBLIC_LOCALES') ? null : define('AK_PUBLIC_LOCALES','en,es');
 
-defined('AK_URL_REWRITE_ENABLED') ? null : define('AK_URL_REWRITE_ENABLED', true);
+// defined('AK_URL_REWRITE_ENABLED') ? null : define('AK_URL_REWRITE_ENABLED', true);
 
 defined('AK_TIME_DIFFERENCE') ? null : define('AK_TIME_DIFFERENCE', 0); // Time difference from the webserver
 

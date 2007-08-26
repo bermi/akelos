@@ -25,12 +25,6 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 * an option, it is guessed using the lexical order of the class names. So a join between Developer and Project
 * will give the default join table name of "developers_projects" because "D" outranks "P".
 *
-* Any additional fields added to the join table will be placed as attributes when pulling records out through
-* hasAndBelongsToMany associations. This is helpful when have information about the association itself
-* that you want available on retrieval. Note that any fields in the join table will override matching field names
-* in the two joined tables. As a consequence, having an "id" field in the join table usually has the undesirable
-* result of clobbering the "id" fields in either of the other two tables.
-*
 * Adds the following methods for retrieval and query.
 * 'collection' is replaced with the associton identification passed as the first argument, so 
 * <tt>var $has_and_belongs_to_many = 'categories'</tt> would make available on the its parent an array of

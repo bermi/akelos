@@ -48,5 +48,4 @@ DirectoryIndex index.php
   RewriteRule ^(.*)$ index.php?ak=$1 [L,QSA]
 </IfModule>
 
-ErrorDocument 400 /public/400.html
-ErrorDocument 500 /public/500.html
+ErrorDocument 500 "<h2>Apache server error</h2>Akelos application failed to start properly"

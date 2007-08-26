@@ -203,7 +203,7 @@ class FrameworkSetup extends AkObject
             $this->getDatabaseAdminPassword().'@'.$this->getDatabaseHost('production').($db_type == 'mysql' ? '/mysql' : '');
         }else{
             return $this->getDatabaseType() == 'sqlite' ?
-            "sqlite://".urlencode(AK_CONFIG_DIR.DS.'.ht-'.$this->getDatabaseName($mode).'.sqlite') :
+            "sqlite://".urlencode(AK_CONFIG_DIR.DS.$this->getDatabaseName($mode).'-'.$this->random.'.sqlite') :
             $this->getDatabaseType($mode)."://".$this->getDatabaseUser($mode).":".$this->getDatabasePassword($mode).
             "@".$this->getDatabaseHost($mode)."/".$this->getDatabaseName($mode);
         }
@@ -326,6 +326,8 @@ define('AK_ACTIVE_RECORD_DEFAULT_LOCALES', '%locales');
 define('AK_APP_LOCALES', '%locales');
 define('AK_PUBLIC_LOCALES', '%locales');
 
+%AK_URL_REWRITINGdefined('AK_URL_REWRITE_ENABLED') ? null : define('AK_URL_REWRITE_ENABLED', true);
+
 %AK_FRAMEWORK_DIR
 
 include_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'boot.php');
@@ -339,7 +341,7 @@ CONFIG;
                 $settings['%'.$mode.'_database_type'] = $this->getDatabaseType($mode);
                 if($settings['%'.$mode.'_database_type'] == 'sqlite'){
 
-                    $settings['%'.$mode.'_database_file'] = AK_CONFIG_DIR.DS.'.ht-'.$this->getDatabaseName($mode).'.sqlite';
+                    $settings['%'.$mode.'_database_file'] = AK_CONFIG_DIR.DS.$this->getDatabaseName($mode).'-'.$this->random.'.sqlite';
                     $settings['%'.$mode.'_database_user'] =
                     $settings['%'.$mode.'_database_password'] =
                     $settings['%'.$mode.'_database_host'] =
@@ -357,6 +359,8 @@ CONFIG;
 
 
             $settings['%locales'] = $this->getLocales();
+            
+            $settings['%AK_URL_REWRITING'] = $this->isUrlRewriteEnabled() ? '' : "// The web configuration wizard could not detect if you have mod_rewrite enabled. \n// If that is the case, you should uncomment the next line line for better performance. \n// ";
             $settings['%AK_FRAMEWORK_DIR'] = defined('AK_FRAMEWORK_DIR') ?
             "defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '".AK_FRAMEWORK_DIR."');" : '';
         }
@@ -556,7 +560,9 @@ CONFIG;
         'locales'=> join(',',$this->suggestLocales()),
         'ftp_user' => $this->getFtpUser(),
         'ftp_host' => $this->getFtpHost(),
-        'ftp_path' => $this->getFtpPath()
+        'ftp_path' => $this->getFtpPath(),
+        
+        'random' => Ak::randomString(),
         );
     }
 
