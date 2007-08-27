@@ -5,7 +5,7 @@ set_time_limit(0);
 define('ALL_TESTS_CALL',true);
 define('ALL_TESTS_RUNNER',true);
 
-define('AK_TEST_DATABASE_ON', true);
+defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
 
 require_once(AK_LIB_DIR.DS.'AkInstaller.php');
