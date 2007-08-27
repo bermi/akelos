@@ -27,6 +27,8 @@ if(!defined('AK_DEFAULT_ACTION')){
     define('AK_DEFAULT_ACTION', 'index');
 }
 
+// IIS does not provide a valid REQUEST_URI so we need to guess it from the script name + query string
+$_SERVER['REQUEST_URI'] = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_NAME'].(( isset($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '')));
 
 
 /**
@@ -409,7 +411,7 @@ class AkRequest extends AkObject
     */
     function getProtocol()
     {
-        return isset($this->env['HTTPS']) ? 'https://' : 'http://';
+        return $this->isSsl() ? 'https://' : 'http://';
     }
 
     /**
@@ -417,7 +419,7 @@ class AkRequest extends AkObject
     */
     function isSsl()
     {
-        return isset($this->env['HTTPS']);
+        return isset($this->env['HTTPS']) && ($this->env['HTTPS'] === true || $this->env['HTTPS'] == 'on');
     }
 
     /**
