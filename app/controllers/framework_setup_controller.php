@@ -10,8 +10,8 @@ define('AK_WEB_REQUEST_CONNECT_TO_DATABASE_ON_INSTANTIATE', false);
 
 define('AK_URL_REWRITE_ENABLED', false);
 
-define('AK_AVAILABLE_LOCALES','en,es');
-define('AK_APP_LOCALES','en,es');
+define('AK_AVAILABLE_LOCALES','en,ja,es');
+define('AK_APP_LOCALES','en,ja,es');
 
 defined('DS') ? null : define('DS', DIRECTORY_SEPARATOR);
 defined('AK_BASE_DIR') ? null : define('AK_BASE_DIR', str_replace(DS.'app'.DS.'controllers'.DS.'framework_setup_controller.php','',__FILE__));

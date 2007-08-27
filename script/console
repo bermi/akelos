@@ -32,6 +32,7 @@ require_once(AK_LIB_DIR.DS.'AkInflector.php');
 require_once(AK_LIB_DIR.DS.'AkPhpParser.php');
 
 defined('AK_SKIP_DB_CONNECTION') && AK_SKIP_DB_CONNECTION ? ($dsn='') : Ak::db(&$dsn);
+defined('AK_RECODE_UTF8_ON_CONSOLE_TO') ? null : define('AK_RECODE_UTF8_ON_CONSOLE_TO', false);
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 require_once(AK_APP_DIR.DS.'shared_model.php');
@@ -120,7 +121,9 @@ while(true){
             $result;
 
             Ak::file_add_contents(AK_LOG_DIR.DS.'command_line.log',$promt_line.$command."\n".$result."\n");
-            echo empty($result) ? $promt_line : "\n".$result."\n\n$promt_line";
+            echo empty($result) ? $promt_line : "\n".
+            (AK_RECODE_UTF8_ON_CONSOLE_TO ? Ak::recode($result, AK_RECODE_UTF8_ON_CONSOLE_TO) : $result).
+            "\n\n$promt_line";
         }
         break;
     }
