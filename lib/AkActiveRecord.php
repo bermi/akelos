@@ -963,6 +963,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         $args = $num_args > 0 ? (!isset($args) ? func_get_args() : $args) : array('all');
 
+        // Handle find('first', 23)
+        if($num_args >= 2 && is_numeric($args[1]) && $args[0] == 'first'){
+            array_shift($args);
+            $args[0] = (integer)$args[0];
+            $num_args--;
+        }
+        
         if($num_args === 1 && is_numeric($args[0]) && $args[0] > 0){
             $args[0] = (integer)$args[0]; //Cast query by Id
         }

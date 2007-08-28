@@ -16,6 +16,7 @@ $partial_tests = array(
 'AkActiveRecord_1',
 'AkActiveRecord_2',
 'AkActiveRecord_3',
+'AkActiveRecord_finders',
 'AkActiveRecord_locking',
 'AkActiveRecord_table_inheritance',
 'AkActiveRecord_i18n',

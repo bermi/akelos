@@ -297,6 +297,22 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
 
     }
     
+    function test_should_load_resquested_list()
+    {
+        $this->installAndIncludeModels(array('TodoList', 'TodoTask'));
+
+        $ListA =& new TodoList(array('name' => 'A'));
+        $this->assertTrue($ListA->save());
+        
+        $ListB =& new TodoList(array('name' => 'B'));
+        $this->assertTrue($ListB->save());
+        
+        $Task1 =& $ListB->task->create(array('details' => 1));
+        
+        $Task1->todo_list->load(true);
+        
+        $this->assertEqual($Task1->todo_list->getId(), $ListB->getId());
+    }
         /**/
 }
 

@@ -116,7 +116,7 @@ class AkBelongsTo extends AkAssociation
             $this->build($association_id, array(), false);
         }
 
-        $result =& $this->Owner->$association_id->find('first', $primary_key_name_value);
+        $result =& $this->Owner->$association_id->find($primary_key_name_value);
         
         return $result;
     }

@@ -1,18 +1,8 @@
 <?php
 
-if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
-    define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION',false);
-}
-
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
-
-
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-
-
-class test_AkActiveRecord_actsAsList extends  UnitTestCase
+class AkActiveRecord_actsAsListTestCase extends  AkUnitTest
 {
+    /**/
     var $_testing_models_to_delete = array();
     var $_testing_model_databases_to_delete = array();
 
@@ -21,10 +11,6 @@ class test_AkActiveRecord_actsAsList extends  UnitTestCase
         parent::UnitTestCase();
         $this->_createNewTestingModelDatabase('AkTestTodoItem');
         $this->_createNewTestingModel('AkTestTodoItem');
-    }
-
-    function setUp()
-    {
     }
 
     function tearDown()
@@ -39,18 +25,18 @@ class test_AkActiveRecord_actsAsList extends  UnitTestCase
         switch ($test_model_name) {
 
             case 'AkTestTodoItem':
-            $model_source =
-            '<?php
-    class AkTestTodoItem extends AkActiveRecord 
+                $model_source =
+                '<?php
+    class AkTestTodoItem extends AkActiveRecord
     {
-        var $act_as = "list";
-    } 
-?>';
-            break;
+    var $act_as = "list";
+    }
+    ?>';
+                break;
 
             default:
-            $model_source = '<?php class '.$test_model_name.' extends AkActiveRecord { } ?>';
-            break;
+                $model_source = '<?php class '.$test_model_name.' extends AkActiveRecord { } ?>';
+                break;
         }
 
         $file_name = AkInflector::toModelFilename($test_model_name);
@@ -93,24 +79,24 @@ class test_AkActiveRecord_actsAsList extends  UnitTestCase
         }
         switch ($table_name) {
             case 'ak_test_todo_items':
-            $table =
-            array(
-            'table_name' => 'ak_test_todo_items',
-            'fields' => 'id I AUTO KEY,
-            position I(20),
-            task X,
-            due_time T, 
-            created_at T, 
-            expires T, 
-            updated_at T,
-            new_position I(10)',
-            'index_fileds' => 'id',
-            'table_options' => array('mysql' => 'TYPE=InnoDB', 'REPLACE')
-            );
-            break;
+                $table =
+                array(
+                'table_name' => 'ak_test_todo_items',
+                'fields' => 'id I AUTO KEY,
+                            position I(20),
+                            task X,
+                            due_time T,
+                            created_at T,
+                            expires T,
+                            updated_at T,
+                            new_position I(10)',
+                            'index_fileds' => 'id',
+                            'table_options' => array('mysql' => 'TYPE=InnoDB', 'REPLACE')
+                            );
+                            break;
             default:
-            return false;
-            break;
+                return false;
+                break;
         }
 
         $dict = NewDataDictionary($db);
@@ -228,7 +214,7 @@ class test_AkActiveRecord_actsAsList extends  UnitTestCase
 
         $this->assertTrue($getBottomItem = $TodoItems->List->getBottomItem());
         $this->assertEqual($getBottomItem->toString(), $TodoItems->toString());
-        
+
         $TodoItems =& new AkTestTodoItem('task->','Book COMDEX trip','due_time->',Ak::getDate(Ak::time()+(60*60*24*3)));
         $this->assertTrue($TodoItems->isNewRecord());
         $this->assertTrue($TodoItems->save());
@@ -290,7 +276,7 @@ class test_AkActiveRecord_actsAsList extends  UnitTestCase
         $todo_list = $this->_getTodoList();
         $this->assertEqual($todo_list[10] , 'Task number 10');
         $TodoItems =& new AkTestTodoItem(10);
-        
+
         $this->assertTrue($TodoItems->list->decrementPositionsOnLowerItems());
         $todo_list = $this->_getTodoList();
 
@@ -307,7 +293,7 @@ class test_AkActiveRecord_actsAsList extends  UnitTestCase
     function Test_of_removeFromList()
     {
         $TodoItems =& new AkTestTodoItem(10);
-        
+
         $TodoItems->transactionStart();
         $this->assertTrue($TodoItems->list->removeFromList());
         $this->assertFalse($TodoItems->list->isInList());
@@ -321,7 +307,7 @@ class test_AkActiveRecord_actsAsList extends  UnitTestCase
     function Test_of_afterDestroy_and_beforeDestroy()
     {
         $TodoItems =& new AkTestTodoItem(10);
-        
+
         $TodoItems->transactionStart();
 
         $TodoItems->destroy();
@@ -351,7 +337,7 @@ class test_AkActiveRecord_actsAsList extends  UnitTestCase
         $TodoItems =& new AkTestTodoItem();
         $this->assertFalse($TodoItems->list->getLowerItem());
         $TodoItem = $TodoItems->find(10);
-        
+
         $LowerItem = $TodoItem->list->getLowerItem();
         $this->assertEqual($LowerItem->task, 'Task number 11');
 
@@ -689,7 +675,6 @@ class test_AkActiveRecord_actsAsList extends  UnitTestCase
         $TodoItems->transactionFail();
         $TodoItems->transactionComplete();
     }
-    /**/
 
     function _getTodoList($use_id_as_index = false)
     {
@@ -706,9 +691,38 @@ class test_AkActiveRecord_actsAsList extends  UnitTestCase
         return $list;
     }
 
+
+    function test_should_move_up_the_item_with_the_same_position_as_the_inserted()
+    {
+        $this->installAndIncludeModels(array('TodoList', 'TodoTask'));
+
+        $ListA =& new TodoList(array('name' => 'A'));
+        $this->assertTrue($ListA->save());
+        $ListA->task->create(array('details' => 1));
+
+        $ListB =& new TodoList(array('name' => 'B'));
+        $this->assertTrue($ListB->save());
+        $ListB->task->create(array('details' => 2));
+        $TodoTask =& $ListB->task->create(array('details' => 3));
+
+        $Task1 =& $TodoTask->findFirstBy('details', 1);
+
+        $Task1->list->removeFromList();
+        $this->assertTrue($Task1->save());
+        $Task1->todo_list->assign($ListB);
+        $this->assertTrue($Task1->save());
+        //$Task1->reload();
+        $Task1->list->insertAt(2);
+
+        $ListB =& $ListB->findFirstBy('name', 'B', array('include'=>'tasks'));
+
+        foreach (array_keys($ListB->tasks) as $k){
+            $this->assertEqual($ListB->tasks[$k]->get('position'), $k+1);
+        }
+    }
+    /**//**//**/
+
 }
 
-
-ak_test('test_AkActiveRecord_actsAsList',true);
 
 ?>
