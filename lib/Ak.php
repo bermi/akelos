@@ -1654,7 +1654,7 @@ class Ak
 
         $mime = @mime_content_type($file);
 
-        if (AK_OS == 'WIN' && $mime == 'application/octet-stream' && is_file($file)){
+        if (AK_OS == 'WINDOWS' && $mime == 'application/octet-stream' && is_file($file)){
             $mime = false;
         }
         
