@@ -1,15 +1,15 @@
 <?php
 
-if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
-    define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION',false);
-}
-
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
-
-
-class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
+class HasAndBelongsToManyTestCase extends  AkUnitTest
 {
+    function setup()
+    {
+        $this->installAndIncludeModels(array('Post', 'Tag'));
+        $Installer = new AkInstaller();
+        @$Installer->dropTable('posts_tags');
+        @Ak::file_delete(AK_MODELS_DIR.DS.'post_tag.php');
+    }
+    /**/
     function test_start()
     {
         require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
@@ -21,6 +21,8 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
         $installer = new FrameworkInstaller();
         $installer->uninstall();
         $installer->install();
+        
+        
         $models = array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType');
         foreach ($models as $model){
             require_once(AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($model).'_installer.php');
@@ -97,28 +99,29 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
         $Property->property_type->load(true);
         $this->assertEqual($Property->property_type->count(), 1);
 
-        $Property = $Property->findFirstBy('description','Gandia Palace');
+        
+        $Property =& $Property->findFirstBy('description','Gandia Palace');
+        $PropertyType =& new PropertyType();
 
-        $PropertyType = new PropertyType();
-
-        $PropertyTypes = $PropertyType->find();
+        $PropertyTypes =& $PropertyType->find();
 
         $Property->property_type->set($PropertyTypes);
 
         $this->assertEqual($Property->property_type->count(), count($PropertyTypes));
 
-        $Property = $Property->findFirstBy('description','Gandia Palace');
+        $Property =& $Property->findFirstBy('description','Gandia Palace');
 
         $Property->property_type->load();
         $this->assertEqual($Property->property_type->count(), count($PropertyTypes));
 
-        $Property = $Property->findFirstBy('description','Gandia Palace');
+        $Property =& $Property->findFirstBy('description','Gandia Palace');
 
         $PropertyType->set('description', 'Palace');
+
         $Property->property_type->set($PropertyType);
 
         $this->assertEqual($Property->property_type->count(), 1);
-
+        
         $this->assertTrue(in_array('property_types', $Property->getAssociatedIds()));
 
         $Property = $Property->findFirstBy('description','Gandia Palace',array('include'=>'property_types'));
@@ -223,8 +226,7 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
         $this->assertEqual($RecordSet->RecordCount(), 0);
 
     }
-
-
+    
     function test_find_on_unsaved_models_including_associations()
     {
         $Property =& new Property('description->','Chalet by the sea');
@@ -403,8 +405,42 @@ class test_AkActiveRecord_hasAndBelongsToMany_Associations extends  AkUnitTest
         $this->assertEqual(2, $Salavert->group->count());
 
     }
+
+
+    function test_remove_existing_associates_before_setting_by_id()
+    {
+
+        foreach (range(1,10) as $i){
+            $Post =& new Post(array('title' => 'Post '.$i));
+            $Post->tag->create(array('name' => 'Tag '.$i));
+            $Post->save();
+            $this->assertEqual($Post->tag->count(), 1);
+        }
+
+        $Post11 =& new Post(array('name' => 'Post 11'));
+        $this->assertTrue($Post11->save());
+
+        $Post->tag->setByIds(1,2,3,4,5);
+        
+        $this->assertTrue($Post =& $Post->find(10, array('include' => 'tags')));
+
+        foreach (array_keys($Post->tags) as $k){
+            $this->assertEqual($Post->tags[$k]->getId(), $k+1);
+        }
+        
+        // Tag 10 should exist but unrelated to a post
+        $this->assertTrue($Tag =& $Post->tags[$k]->find(10));
+        $this->assertEqual($Tag->post->count(), 0);
+
+        $Post11->tag->setByIds(array(10,1));
+
+        $this->assertTrue($Tag =& $Tag->find(10, array('include'=>'posts')));
+        $this->assertEqual($Tag->posts[0]->getId(), 11);
+
+
+    }
+    /**//** //**/
 }
 
-ak_test('test_AkActiveRecord_hasAndBelongsToMany_Associations', true);
 
 ?>

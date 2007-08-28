@@ -21,6 +21,8 @@
 error_reporting(E_ALL);
 
 defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
+defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
+
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
 
 $argv = array_map('trim',$argv);
@@ -41,7 +43,6 @@ foreach ($argv as $_test_file){
                 if(preg_match('/(.+)TestCase$/i', $____class, $match)){
                     if(!preg_match('/^('.join('|',$____skip_tests).')$/i',$match[1])){
                         $____skip_tests[] = $match[1];
-                        Ak::trace(join(',',$____skip_tests));
                         ak_test($match[1].'TestCase', true);
                     }
                 }

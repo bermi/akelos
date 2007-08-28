@@ -13,7 +13,7 @@ class CommentInstaller extends AkInstaller
 
     function down_1()
     {
-        $this->dropTable('comments');
+        $this->dropTable('comments', array('sequence'=>true));
     }
     
     function down_2()

@@ -251,6 +251,7 @@ class AkHasMany extends AkAssociation
     {
         $ids = func_get_args();
         $ids = is_array($ids[0]) ? $ids[0] : $ids;
+        
         $AssociatedModel =& $this->getAssociatedModelInstance();
         if(!empty($ids)){
             $NewAssociates =& $AssociatedModel->find($ids);
@@ -313,13 +314,17 @@ class AkHasMany extends AkAssociation
                         }
                         break;
                         case 'nullify':
-                        $ids_to_nullify[] = $Associated[$k]->quotedId();
+                            $id_to_nullify = $Associated[$k]->quotedId();
+                            if(!empty($id_to_nullify)){
+                                $ids_to_nullify[] = $id_to_nullify;
+                            }
                         default:
                         break;
                     }
                 }
             }
 
+            $ids_to_nullify = empty($ids_to_nullify) ? false : array_diff($ids_to_nullify,array(''));
             if(!empty($ids_to_nullify)){
                 $success = $AssociatedModel->updateAll(
                 ' '.$options['foreign_key'].' = NULL ',
@@ -398,7 +403,7 @@ class AkHasMany extends AkAssociation
         if(empty($Member->__hasManyMemberId)) {
             $Member->__hasManyMemberId = Ak::randomString();
         }
-        $object_id = $Member->getId();
+        $object_id = method_exists($Member,'getId') ? $Member->getId() : null;
         if(!empty($object_id)){
             $this->asssociated_ids[$object_id] = $Member->__hasManyMemberId;
         }
@@ -428,12 +433,14 @@ class AkHasMany extends AkAssociation
     function _relateAssociatedWithOwner(&$Associated)
     {
         if(!$this->Owner->isNewRecord()){
-            $foreign_key = $this->getOption($this->association_id, 'foreign_key');
-            if($this->getOption($this->association_id, 'class_name') != $Associated->getModelName() || $foreign_key == $Associated->get($foreign_key)){
-                return false;
+            if(method_exists($Associated, 'getModelName')){
+                $foreign_key = $this->getOption($this->association_id, 'foreign_key');
+                if($this->getOption($this->association_id, 'class_name') != $Associated->getModelName() || $foreign_key == $Associated->get($foreign_key)){
+                    return false;
+                }
+                $Associated->set($foreign_key, $this->Owner->getId());
+                return true;
             }
-            $Associated->set($foreign_key, $this->Owner->getId());
-            return true;
         }
         return false;
     }
@@ -709,18 +716,22 @@ class AkHasMany extends AkAssociation
                         break;
 
                         case 'nullify':
-                        $ids_to_nullify[] = $object->{$k}[$key]->quotedId();
+                        $id_to_nullify = $object->{$k}[$key]->quotedId();
+                        if(!empty($id_to_nullify)){
+                            $ids_to_nullify[] = $id_to_nullify;
+                        }
                         break;
 
                         default:
                         break;
                     }
                 }
-
+                
+                $ids_to_nullify = empty($ids_to_nullify) ? false : array_diff($ids_to_nullify,array(''));
                 if(!empty($ids_to_nullify)){
                     $success = $object->{$k}[$key]->updateAll(
                     ' '.$object->$v->options[$k]['foreign_key'].' = NULL ',
-                    ' '.$object->$v->options[$k]['foreign_key'].' = '.$object->quotedId().' AND '.$object->{$k}[$key]->getPrimaryKey().' IN ('.join(', ',$ids_to_nullify).')'
+                    ' '.$object->$v->options[$k]['foreign_key'].' = '.$object->quotedId().' AND '.$object->{$k}[$key]->getPrimaryKey().' IN ('.join(', ', $ids_to_nullify).')'
                     ) ? $success : false;
                 }elseif(!empty($ids_to_delete)){
                     $success = $object->{$k}[$key]->delete($ids_to_delete) ? $success : false;

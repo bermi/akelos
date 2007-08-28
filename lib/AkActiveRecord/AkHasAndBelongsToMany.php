@@ -439,13 +439,15 @@ class AkHasAndBelongsToMany extends AkAssociation
                 $id = $Associated[$k]->getId();
 
                 if(!in_array($id, $ids_to_skip)){
-                    $JoinObjectToDelete =& $this->JoinObject->findFirstBy(
-                        $options['foreign_key'].' AND '.$options['association_foreign_key'], 
-                        $this->Owner->getId(), $id);
-                    if($JoinObjectToDelete->destroy()){
-                        $items_to_remove_from_collection[] = $id;
-                    }else{
-                        $success = false;
+                
+                    if($JoinObjectsToDelete =& $this->JoinObject->findAllBy($options['foreign_key'].' AND '.$options['association_foreign_key'], $this->Owner->getId(), $id)){
+                        foreach (array_keys($JoinObjectsToDelete) as $k) {
+                            if($JoinObjectsToDelete[$k]->destroy()){
+                                $items_to_remove_from_collection[] = $id;
+                            }else{
+                                $success = false;
+                            }
+                        }
                     }
                 }
             }

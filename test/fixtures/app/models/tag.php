@@ -6,7 +6,8 @@ class Tag extends AkActiveRecord
         'files' => array(
             'join_table' => 'taggings',
             'join_class_name' => 'Tagging'
-        )
+        ),
+        'posts'
     );
     
     var $has_many = 'taggings';

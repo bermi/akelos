@@ -9,7 +9,7 @@ class PostInstaller extends AkInstaller
 
     function uninstall()
     {
-        $this->dropTable('posts');
+        $this->dropTable('posts', array('sequence'=>true));
     }
 }
 

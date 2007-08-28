@@ -1,16 +1,8 @@
 <?php
 
-if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
-    define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION',false);
-}
-
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
-
-
-class test_AkActiveRecord_hasMany_Associations extends  AkUnitTest 
+class HasManyTestCase extends AkUnitTest 
 {
-
+    /**/
     function test_start()
     {
         require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
@@ -34,7 +26,6 @@ class test_AkActiveRecord_hasMany_Associations extends  AkUnitTest
         unset($_SESSION['__activeRecordColumnsSettingsCache']);
     }
 
-    /**/
     function test_for_has_many()
     {
         $Property =& new Property();
@@ -212,8 +203,6 @@ class test_AkActiveRecord_hasMany_Associations extends  AkUnitTest
         $this->assertEqual($VillaAltea->pictures[0]->get('title'), 'Garden');
     }
 
-    /**/
-
     function test_clean_up_dependencies()
     {
         $Property =& new Property(array('description'=>'Ruins in Matamon'));
@@ -272,10 +261,41 @@ class test_AkActiveRecord_hasMany_Associations extends  AkUnitTest
 
         $this->assertEqual($Result->comments[0]->get('name'), 'Aditya');
     }
-    /**/
-}
+    
+    
+    function test_remove_existing_associates_before_setting_by_id()
+    {
+        $this->installAndIncludeModels(array('Post', 'Comment'));
+        
+        foreach (range(1,10) as $i){
+            $Post =& new Post(array('title' => 'Post '.$i));
+            $Post->comment->create(array('name' => 'Comment '.$i));
+            $Post->save();
+        }
+                    
+        $Post11 =& new Post(array('name' => 'Post 11'));
+        $this->assertTrue($Post11->save());
 
-ak_test('test_AkActiveRecord_hasMany_Associations', true);
+        $Post->comment->setByIds(1,2,3,4,5);
+       
+        $this->assertTrue($Post =& $Post->find(10, array('include' => 'comments')));
+        
+        
+        foreach (array_keys($Post->comments) as $k){
+            $this->assertEqual($Post->comments[$k]->getId(), $k+1);
+        }
+        
+        // Comment 10 should exist but unrelated to a post
+        $this->assertTrue($Comment =& $Post->comments[$k]->find(10));
+        $this->assertNull($Comment->get('post_id'));
+                
+        $Post11->comment->setByIds(array(10,1));
+        
+        $this->assertTrue($Comment =& $Comment->find(10));
+        $this->assertEqual($Comment->get('post_id'), 11);
+    }
+    /**//**//**/
+}
 
 
 ?>
