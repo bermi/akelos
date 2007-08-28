@@ -1654,6 +1654,10 @@ class Ak
 
         $mime = @mime_content_type($file);
 
+        if (AK_OS == 'WIN' && $mime == 'application/octet-stream' && is_file($file)){
+            $mime = false;
+        }
+        
         if(empty($mime)){
             empty($mime_types) ? require(AK_LIB_DIR.DS.'utils'.DS.'mime_types.php') : null;
             $file_extension = substr($file,strrpos($file,'.')+1);
