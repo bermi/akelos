@@ -343,7 +343,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
         $this->setConnection();
 
         AK_LOG_EVENTS ? $this->_startSqlBlockLog() : null;
-        
+
         $objects = array();
         $_included_results = array(); // Used only in conjuntion with virtual limits for doing find('first',...include'=>...
         if(is_integer($limit)){
@@ -363,13 +363,16 @@ class AkAssociatedActiveRecord extends AkBaseModel
         }
 
         AK_LOG_EVENTS ? $this->_endSqlBlockLog() : null;
-        
+
         if(!$results && AK_DEBUG){
             trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE);
         }else{
             $objects = array();
             $i = 0;
             $associated_ids = $this->getAssociatedIds();
+            $number_of_associates = count($associated_ids);
+            $object_associates_details = array();
+
             $ids = array();
             while ($record = $results->FetchRow()) {
                 $this_item_attributes = array();
@@ -389,14 +392,14 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 // We need to keep a pointer to unique parent elements in order to add associates to the first loaded item
                 $e = null;
                 $object_id = $this_item_attributes[$this->getPrimaryKey()];
-                
+
                 if(!empty($virtual_limit)){
                     $_included_results[$object_id] = $object_id;
-                    if(count($_included_results) > $virtual_limit){
+                    if(count($_included_results) > $virtual_limit * $number_of_associates){
                         continue;
                     }
                 }
-                
+
                 if(!isset($ids[$object_id])){
                     $ids[$object_id] = $i;
                     $attributes_for_instantation = $this->getOnlyAvailableAtrributes($this_item_attributes);
@@ -406,20 +409,32 @@ class AkAssociatedActiveRecord extends AkBaseModel
                     $e = $i;
                     $i = $ids[$object_id];
                 }
-                
+
                 foreach ($associated_items as $association_id=>$attributes){
                     if(count(array_diff($attributes, array(''))) > 0){
-                        if(!method_exists($objects[$i]->$association_id, 'build')){
-                            $handler_name = $this->getAssociatedHandlerName($association_id);
-                            $objects[$i]->$handler_name->build($attributes, false);
-                        }else{
-                            $objects[$i]->$association_id->build($attributes, false);
-                            $objects[$i]->$association_id->_newRecord = false;
-                        }
+                        $object_associates_details[$i][$association_id][md5(serialize($attributes))] = $attributes;
                     }
                 }
 
                 $i = !is_null($e) ? $e : $i+1;
+            }
+        }
+
+        if(!empty($object_associates_details)){
+            foreach ($object_associates_details as $i=>$object_associate_details){
+                foreach ($object_associate_details as $association_id => $associated_attributes){
+                    foreach ($associated_attributes as $attributes){
+                        if(count(array_diff($attributes, array(''))) > 0){
+                            if(!method_exists($objects[$i]->$association_id, 'build')){
+                                $handler_name = $this->getAssociatedHandlerName($association_id);
+                                $objects[$i]->$handler_name->build($attributes, false);
+                            }else{
+                                $objects[$i]->$association_id->build($attributes, false);
+                                $objects[$i]->$association_id->_newRecord = false;
+                            }
+                        }
+                    }
+                }
             }
         }
 

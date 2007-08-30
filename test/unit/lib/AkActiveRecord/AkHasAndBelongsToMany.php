@@ -135,8 +135,8 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $Property = $Property->findFirstBy('description','Gandia Palace');
         $this->assertIdentical($Property->property_type->count(), 0);
 
-        $this->assertFalse($Property->findFirstBy('description','Gandia Palace',array('include'=>'property_types')));
-
+        // It should return existing Property even if it doesnt have property_types
+        $this->assertTrue($Property->findFirstBy('description','Gandia Palace',array('include'=>'property_types')));
 
         $Property =& new Property(array('description'=> 'Luxury Downtown House'));
         $Apartment =& $PropertyType->create(array('description'=>'Apartment'));
