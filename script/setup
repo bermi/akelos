@@ -61,7 +61,10 @@ class AkelosInstaller
     {
         if(empty($this->destination_tree) || !empty($this->options['force'])){
             if(!is_dir($this->options['directory'])){
-                $this->_makeDir($this->options['directory']);
+                if(!$this->_makeDir($this->options['directory'])){
+                	$this->addError("Can't create directory: " . $this->options['directory']);
+                	return false;
+                }
             }
 
             $this->_copyFrameworkFiles($this->source_tree, $this->options['source']);
@@ -190,9 +193,11 @@ class AkelosInstaller
         if($this->_canUsePath($dir)){
             if(!is_dir($dir)){
                 $this->yield("    Creating directory: ".$dir);
-                @mkdir($dir);
+                if(!@mkdir($dir))
+                	return false;
             }
         }
+        return true;
     }
 
     function _copyFile($path)
