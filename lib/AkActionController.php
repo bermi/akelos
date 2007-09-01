@@ -2285,7 +2285,7 @@ class AkActionController extends AkObject
     *
     * include_once('AkAccountLocation.php');
     * 
-    * class ApplicationController extends AkActiveRecord
+    * class ApplicationController extends AkActionController
     * {
     *   var $before_filter = '_findAccount';
     *   

@@ -16,7 +16,8 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-defined('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES') ? null : define('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES' ,true);
+ defined('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES') ? null : define('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES' ,true);
+ defined('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS') ? null : define('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS' , 'ActiveRecord');
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 
@@ -124,7 +125,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         'association_foreign_key' => false,
         'conditions' => false,
         'order' => false,
-        'join_class_extends' => 'AkActiveRecord',
+        'join_class_extends' => AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS,
         'join_class_primary_key' => 'id', // Used for removing items from the collection
         'finder_sql' => false,
         'delete_sql' => false,
