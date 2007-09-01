@@ -153,7 +153,10 @@ class AkPluginLoader
         $plugin_dirs = Ak::dir(AK_PLUGINS_DIR, array('dirs' => true, 'files' => false));
         $this->_available_plugins = array();
         foreach ($plugin_dirs as $plugin_dir){
-            $this->_available_plugins[] = array_pop($plugin_dir);
+            $plugin_dir = array_pop($plugin_dir);
+            if($plugin_dir[0] != '.'){
+                $this->_available_plugins[] = $plugin_dir;
+            }
         }
     }
 
