@@ -109,7 +109,6 @@ if(AK_ENVIRONMENT != 'setup'){
 
 @ini_set("arg_separator.output","&");
 
-@ini_set("session.name","AK_SESSID");
 @ini_set("include_path",(AK_LIB_DIR.PATH_SEPARATOR.AK_MODELS_DIR.PATH_SEPARATOR.AK_CONTRIB_DIR.DS.'pear'.PATH_SEPARATOR.ini_get("include_path")));
 defined('AK_PHP5') ? null : define('AK_PHP5', version_compare(PHP_VERSION, '5', '>=') == 1 ? true : false);
 
@@ -184,7 +183,8 @@ if(!AK_CLI && AK_WEB_REQUEST){
 
 defined('AK_SESSION_HANDLER') ? null : define('AK_SESSION_HANDLER', 0);
 defined('AK_SESSION_EXPIRE') ? null : define('AK_SESSION_EXPIRE', 600);
-defined('AK_SESSION_NAME') ? null : define('AK_SESSION_NAME', 'AK_SESSID');
+defined('AK_SESSION_NAME') ? null : define('AK_SESSION_NAME', 'AK_'.substr(md5(AK_HOST.AK_APP_DIR),0,6));
+@ini_set("session.name", AK_SESSION_NAME);
 
 defined('AK_DESKTOP') ? null : define('AK_DESKTOP', AK_SITE_URL == 'http://akelos');
 

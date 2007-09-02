@@ -27,7 +27,7 @@ defined('AK_SKIP_DB_CONNECTION') && AK_SKIP_DB_CONNECTION ? ($dsn='') : Ak::db(&
 array_shift($argv);
 $command = join(' ',$argv);
 
-require_once(AK_SCRIPT_DIR.DS.'generators'.DS.'AkelosGenerator.php');
+require_once(AK_LIB_DIR.DS.'utils'.DS.'generators'.DS.'AkelosGenerator.php');
 
 $Generator = new AkelosGenerator();
 $Generator->runCommand($command);

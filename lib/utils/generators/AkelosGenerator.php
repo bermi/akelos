@@ -16,6 +16,8 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
+defined('AK_GENERATORS_DIR') ? null : define('AK_GENERATORS_DIR', AK_LIB_DIR.DS.'utils'.DS.'generators');
+
 class AkelosGenerator
 {
     var $log = array();
@@ -31,18 +33,18 @@ class AkelosGenerator
         if(empty($generator_name)){
             echo "\n   ".Ak::t("You must supply a valid generator as the first command.\n\n   Available generator are:");
             echo "\n\n   ".join("\n   ", $this->_getAvailableGenerators())."\n\n";
-            defined('AK_CONSOLE_MODE') && AK_CONSOLE_MODE ? null : exit; 
+            defined('AK_CONSOLE_MODE') && AK_CONSOLE_MODE ? null : exit;
             return ;
         }
-        
+
         if(count(array_diff($commands,array('help','-help','usage','-usage','h','-h','USAGE','-USAGE'))) != count($commands) || count($commands) == 0){
-            $usage = method_exists($this,'banner') ? $this->banner() : @Ak::file_get_contents(AK_SCRIPT_DIR.DS.'generators'.DS.$generator_name.DS.'USAGE');
+            $usage = method_exists($this,'banner') ? $this->banner() : @Ak::file_get_contents(AK_GENERATORS_DIR.DS.$generator_name.DS.'USAGE');
             echo empty($usage) ? "\n".Ak::t('Could not locate usage file for this generator') : "\n".$usage."\n";
             return;
         }
 
-        if(file_exists(AK_SCRIPT_DIR.DS.'generators'.DS.$generator_name.DS.$generator_name.'_generator.php')){
-            include_once(AK_SCRIPT_DIR.DS.'generators'.DS.$generator_name.DS.$generator_name.'_generator.php');
+        if(file_exists(AK_GENERATORS_DIR.DS.$generator_name.DS.$generator_name.'_generator.php')){
+            include_once(AK_GENERATORS_DIR.DS.$generator_name.DS.$generator_name.'_generator.php');
 
             $generator_class_name = AkInflector::camelize($generator_name.'_generator');
             $generator = new $generator_class_name();
@@ -85,13 +87,13 @@ class AkelosGenerator
                 $extra_commands[$next_is_value_for] = true;
                 continue;
             }
-            
+
             if(isset($next_is_value_for)){
                 $extra_commands[$next_is_value_for] = trim($value,'- ');
                 unset($next_is_value_for);
                 continue;
             }
-            
+
             if(is_numeric($param)){
                 if(!empty($this->command_values[$i])){
                     $index =$this->command_values[$i];
@@ -106,7 +108,7 @@ class AkelosGenerator
                 $i++;
             }
         }
-        $commands = array_merge($extra_commands, $unnamed_commands);        
+        $commands = array_merge($extra_commands, $unnamed_commands);
     }
 
     function render($template, $sintags_version = false)
@@ -114,7 +116,7 @@ class AkelosGenerator
         extract($this->_template_vars);
 
         ob_start();
-        include(AK_SCRIPT_DIR.DS.'generators'.DS.$this->type.DS.($sintags_version?'sintags_':'').'templates'.DS.(strstr($template,'.') ? $template : $template.'.tpl'));
+        include(AK_GENERATORS_DIR.DS.$this->type.DS.($sintags_version?'sintags_':'').'templates'.DS.(strstr($template,'.') ? $template : $template.'.tpl'));
         $result = ob_get_contents();
         ob_end_clean();
 
@@ -142,7 +144,7 @@ class AkelosGenerator
         }else{
             echo "\n".Ak::t('There where collisions when attempting to generate the %type.',array('%type'=>$this->type))."\n";
             echo Ak::t('Please add force=true to the argument list in order to overwrite existing files.')."\n\n";
-            
+
             echo join("\n",$this->collisions)."\n";
         }
     }
@@ -210,7 +212,7 @@ class AkelosGenerator
     function _getAvailableGenerators()
     {
         $generators = array();
-        foreach (Ak::dir(AK_SCRIPT_DIR.DS.'generators',array('files'=>false,'dirs'=>true)) as $folder){
+        foreach (Ak::dir(AK_GENERATORS_DIR,array('files'=>false,'dirs'=>true)) as $folder){
             $generator = array_shift(array_keys($folder));
             if(strstr($generator,'.php')){
                 continue;

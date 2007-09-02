@@ -709,7 +709,7 @@ CONFIG;
             $url_suffix = trim($this->getUrlSuffix(),'/');
             $asset_path = $this->_getAssetBasePath();
             if(!empty($asset_path)){
-                $url_suffix = $asset_path.'/'.$url_suffix;
+                $url_suffix = $url_suffix.'/'.$asset_path;
             }
             foreach ($this->stylesheets as $stylesheet) {
                 $filename = AK_PUBLIC_DIR.DS.'stylesheets'.DS.$stylesheet.'.css';
@@ -722,7 +722,7 @@ CONFIG;
 
     function _getAssetBasePath()
     {
-        return file_exists(AK_BASE_DIR.DS.'index.php') ? 'public' : '';
+        return defined('AK_INSECURE_APP_DIRECTORY_LAYOUT') && AK_INSECURE_APP_DIRECTORY_LAYOUT ? 'public' : '';
     }
 
     function removeSetupFiles()
