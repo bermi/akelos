@@ -25,12 +25,12 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
 * 
 * Todo list example:
 * <code>
-*   class TodoList extends AkActiveRecord
+*   class TodoList extends ActiveRecord
 *   {
 *       var $has_many = array('todo_items', array('order' => "position"));
 *   }
 * 
-*   class TodoItem extends AkActiveRecord
+*   class TodoItem extends ActiveRecord
 *   {
 *       var $belongs_to = 'todo_list';
 *       var $acts_as = array('list' => array('scope' => 'todo_list')); 

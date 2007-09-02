@@ -393,3 +393,45 @@ _{I need to print \{something_inside_curly_brackets\}. _\{Maybe a multilingual t
 -----------------------------------
 
 <?php echo $conflict_key; ?>_<?php echo $conflicted_file_loop_key; ?>
+
+===================================
+
+{loop Post.author.friends}
+
+{end}
+
+-----------------------------------
+
+<?php 
+ empty($Post->author->friends) ? null : $friend_loop_counter = 0;
+ empty($Post->author->friends) ? null : $friends_available = count($Post->author->friends);
+ if(!empty($Post->author->friends))
+     foreach ($Post->author->friends as $friend_loop_key=>$friend){
+         $friend_loop_counter++;
+         $friend_is_first = $friend_loop_counter === 1;
+         $friend_is_last = $friend_loop_counter === $friends_available;
+         $friend_odd_position = $friend_loop_counter%2;
+?>
+
+<?php } ?>
+
+===================================
+
+{loop Post.versions as Post}
+
+{end}
+
+-----------------------------------
+
+<?php 
+ empty($Post->versions) ? null : $Post_loop_counter = 0;
+ empty($Post->versions) ? null : $Posts_available = count($Post->versions);
+ if(!empty($Post->versions))
+     foreach ($Post->versions as $Post_loop_key=>$Post){
+         $Post_loop_counter++;
+         $Post_is_first = $Post_loop_counter === 1;
+         $Post_is_last = $Post_loop_counter === $Posts_available;
+         $Post_odd_position = $Post_loop_counter%2;
+?>
+
+<?php } ?>

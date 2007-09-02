@@ -38,6 +38,7 @@ class AkSintagsLexer extends AkLexer
     'ConditionalVariable',
     'Variable',
     'Loop',
+    'LoopAs',
     'Helper',
     'InlineHelper',
     );
@@ -119,12 +120,17 @@ class AkSintagsLexer extends AkLexer
     {
         $this->addSpecialPattern('{else}','Text','ElseTag');
     }
-
+    
     function _addLoopTokens()
     {
-        $this->addSpecialPattern('{loop [A-Za-z][\.A-Za-z0-9_-]+\??}','Text','Loop');
+        $this->addSpecialPattern('{loop[ \n\t]+[A-Za-z][\.A-Za-z0-9_-]+\??}','Text','Loop');
     }
-
+    
+    function _addLoopAsTokens()
+    {
+        $this->addSpecialPattern('{loop[ \n\t]+[A-Za-z][\.A-Za-z0-9_-]+[ \n\t]+as[ \n\t]+[A-Za-z][\.A-Za-z0-9_-]+\??}','Text','Loop');
+    }
+    
     function _addHelperTokens()
     {
         $this->addEntryPattern($this->_SINTAGS_OPEN_HELPER_TAG.'\x3D?[ \n\t]*[A-Za-z0-9_]+[ \n\t]*\x28?[ \n\t]*'.

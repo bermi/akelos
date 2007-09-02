@@ -22,7 +22,7 @@ class AkSintagsParser
     var $_SINTAGS_OPEN_HELPER_TAG = AK_SINTAGS_OPEN_HELPER_TAG;
     var $_SINTAGS_CLOSE_HELPER_TAG = AK_SINTAGS_CLOSE_HELPER_TAG;
     var $_SINTAGS_HASH_KEY_VALUE_DELIMITER = AK_SINTAGS_HASH_KEY_VALUE_DELIMITER;
-    
+
     var $_Lexer;
     var $_lexer_name = 'AkSintagsLexer';
     var $_mode;
@@ -78,21 +78,21 @@ class AkSintagsParser
         }
         switch ($state){
             case AK_LEXER_ENTER:
-            $this->output .= '<?php ';
-            break;
+                $this->output .= '<?php ';
+                break;
             case AK_LEXER_UNMATCHED:
-            $match = ltrim($match);
-            if(!empty($match)){
-                if(substr($match,0,3) == 'php'){
-                    $match = substr($match,3);
-                }elseif($match[0] == '='){
-                    $match = 'echo '.substr($match,1);
+                $match = ltrim($match);
+                if(!empty($match)){
+                    if(substr($match,0,3) == 'php'){
+                        $match = substr($match,3);
+                    }elseif($match[0] == '='){
+                        $match = 'echo '.substr($match,1);
+                    }
+                    $this->output.=  $match;
                 }
-                $this->output.=  $match;
-            }
-            break;
+                break;
             case AK_LEXER_EXIT:
-            $this->output .= '?>';
+                $this->output .= '?>';
         }
         return true;
     }
@@ -151,14 +151,14 @@ class AkSintagsParser
     {
         switch ($state){
             case AK_LEXER_ENTER:
-            $this->_translation_tokens = array();
-            $this->output .= '<?php echo $text_helper->translate(\'';
-            break;
+                $this->_translation_tokens = array();
+                $this->output .= '<?php echo $text_helper->translate(\'';
+                break;
             case AK_LEXER_UNMATCHED:
-            $this->output.= $this->_unescapeChars(str_replace("'","\'",$match), true);
-            break;
+                $this->output.= $this->_unescapeChars(str_replace("'","\'",$match), true);
+                break;
             case AK_LEXER_EXIT:
-            $this->output .= '\', array('.(empty($this->_translation_tokens)?'':join(', ',$this->_translation_tokens)).')); ?>';
+                $this->output .= '\', array('.(empty($this->_translation_tokens)?'':join(', ',$this->_translation_tokens)).')); ?>';
         }
         return true;
     }
@@ -300,14 +300,19 @@ class AkSintagsParser
     function Loop($match, $state)
     {
         if(AK_LEXER_SPECIAL === $state){
-            $sintags_var = rtrim(substr($match, 6,-1),'?');
+            $sintags_var = trim(preg_replace('/[\s|?]+/',' ', substr($match, 6,-1)));
+            if(strstr($sintags_var,' as ')){
+                $new_sintags_var = substr($sintags_var,0, strpos($sintags_var,' '));
+                $termination = $this->_getTerminationName(AkInflector::pluralize(str_replace($new_sintags_var.' as ','', $sintags_var)));
+                $sintags_var = $new_sintags_var;
+            }
             $php_variable = $this->_convertSintagsVarToPhp($sintags_var);
             if($php_variable){
                 $php_variable = $php_variable;
-                $termination = $this->_getTerminationName($sintags_var);
+                $termination = empty($termination) ? $this->_getTerminationName($sintags_var) : $termination;
                 $singular_variable = '$'.AkInflector::singularize($termination);
                 $plural_variable = '$'.$termination;
-                
+
                 $this->output .=
                 "<?php ".
                 "\n empty({$php_variable}) ? null : {$singular_variable}_loop_counter = 0;".
@@ -328,7 +333,9 @@ class AkSintagsParser
 
     function _getTerminationName($plural)
     {
-        return substr($plural,max(strpos($plural,'.'),strpos($plural,'-'),-1)+1);
+        $plural = str_replace('-','.', $plural);
+        $pos = strrpos($plural, '.');
+        return substr($plural, $pos > 0 ? $pos+1 : 0);
     }
 
 
@@ -340,49 +347,49 @@ class AkSintagsParser
     {
         switch ($state){
             case AK_LEXER_ENTER:
-            $method_name = trim($match,' =('.$this->_SINTAGS_OPEN_HELPER_TAG);
-            if($helper = $this->_getHelperNameForMethod($method_name)){
-                $this->avoid_php_tags = !$is_inline_function && !strstr($match,'=');
-                $this->_current_function_opening = strlen($this->output);
-                if(!$this->avoid_php_tags){
-                    $this->output .= $is_inline_function ? '' : '<?php echo ';
+                $method_name = trim($match,' =('.$this->_SINTAGS_OPEN_HELPER_TAG);
+                if($helper = $this->_getHelperNameForMethod($method_name)){
+                    $this->avoid_php_tags = !$is_inline_function && !strstr($match,'=');
+                    $this->_current_function_opening = strlen($this->output);
+                    if(!$this->avoid_php_tags){
+                        $this->output .= $is_inline_function ? '' : '<?php echo ';
+                    }
+                    if(!strpos($helper, 'helper')){
+                        $method_name = AkInflector::variablize($method_name);
+                    }
+                    $this->output .= "\${$helper}->$method_name(";
+                    return true;
+                }else{
+                    $this->raiseError(Ak::t('Could not find a helper to handle the method "%method" you called in your view', array('%method'=>$method_name)), E_USER_NOTICE);
                 }
-                if(!strpos($helper, 'helper')){
-                    $method_name = AkInflector::variablize($method_name);
-                }
-                $this->output .= "\${$helper}->$method_name(";
-                return true;
-            }else{
-                $this->raiseError(Ak::t('Could not find a helper to handle the method "%method" you called in your view', array('%method'=>$method_name)), E_USER_NOTICE);
-            }
-            return false;
-            break;
+                return false;
+                break;
 
             case AK_LEXER_UNMATCHED:
-            $match = trim($match);
-            if($match == ','){
-                $this->output .= $match.' ';
-            }elseif ($match == $this->_SINTAGS_HASH_KEY_VALUE_DELIMITER){
-                if(empty($this->_inside_array) && empty($this->_has_last_argument_params)){
-                    $current_function = substr($this->output,$this->_current_function_opening);
+                $match = trim($match);
+                if($match == ','){
+                    $this->output .= $match.' ';
+                }elseif ($match == $this->_SINTAGS_HASH_KEY_VALUE_DELIMITER){
+                    if(empty($this->_inside_array) && empty($this->_has_last_argument_params)){
+                        $current_function = substr($this->output,$this->_current_function_opening);
 
-                    $function_opening = strrpos($current_function,'(')+1;
-                    $last_comma = strrpos($current_function,',')+1;
-                    $insert_point = $function_opening > $last_comma && $last_comma === 1 ? $function_opening : $last_comma;
+                        $function_opening = strrpos($current_function,'(')+1;
+                        $last_comma = strrpos($current_function,',')+1;
+                        $insert_point = $function_opening > $last_comma && $last_comma === 1 ? $function_opening : $last_comma;
 
-                    $this->output = substr($this->output,0,$this->_current_function_opening+$insert_point).' array('.ltrim(substr($this->output,$this->_current_function_opening+$insert_point));
-                    $this->_has_last_argument_params = true;
+                        $this->output = substr($this->output,0,$this->_current_function_opening+$insert_point).' array('.ltrim(substr($this->output,$this->_current_function_opening+$insert_point));
+                        $this->_has_last_argument_params = true;
+                    }
+
+                    $this->output .= ' => ';
                 }
-
-                $this->output .= ' => ';
-            }
-            break;
+                break;
 
             case AK_LEXER_EXIT:
-            $this->output .= (!empty($this->_has_last_argument_params) ? ')':'').')'.
-            ($this->avoid_php_tags ? '' : ($is_inline_function?'':'; ?>'));
-            $this->_has_last_argument_params = false;
-            break;
+                $this->output .= (!empty($this->_has_last_argument_params) ? ')':'').')'.
+                ($this->avoid_php_tags ? '' : ($is_inline_function?'':'; ?>'));
+                $this->_has_last_argument_params = false;
+                break;
         }
 
         return true;
@@ -516,21 +523,21 @@ class AkSintagsParser
     {
         switch ($state){
             case AK_LEXER_ENTER:
-            $this->_inside_array = true;
-            $this->output .= 'array(';
-            break;
+                $this->_inside_array = true;
+                $this->output .= 'array(';
+                break;
             case AK_LEXER_UNMATCHED:
-            $match = trim($match);
-            if($match == $this->_SINTAGS_HASH_KEY_VALUE_DELIMITER){
-                $this->output .= ' => ';
-            }elseif($match == ','){
-                $this->output .= ', ';
-            }
-            break;
+                $match = trim($match);
+                if($match == $this->_SINTAGS_HASH_KEY_VALUE_DELIMITER){
+                    $this->output .= ' => ';
+                }elseif($match == ','){
+                    $this->output .= ', ';
+                }
+                break;
             case AK_LEXER_EXIT:
-            $this->_inside_array = false;
-            $this->output .= ')';
-            break;
+                $this->_inside_array = false;
+                $this->output .= ')';
+                break;
         }
         return true;
     }
@@ -539,7 +546,7 @@ class AkSintagsParser
     {
         trigger_error($error, $type);
     }
-    
+
     function _tokenizeHelperStructures($raw_structures)
     {
         $i = 1;
