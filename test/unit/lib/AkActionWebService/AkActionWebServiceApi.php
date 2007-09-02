@@ -67,7 +67,7 @@ class AkActionWebServiceApiTests extends  UnitTestCase
     {
         $TodoApi =& new TodoApi();
         ob_start();
-        require_once(AK_SCRIPT_DIR.DS.'generators'.DS.'AkelosGenerator.php');
+        require_once(AK_LIB_DIR.DS.'utils'.DS.'generators'.DS.'AkelosGenerator.php');
         $Generator = new AkelosGenerator();
         $Generator->runCommand('service Todo');
         ob_end_clean();
