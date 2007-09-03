@@ -28,7 +28,7 @@ array_shift($argv);
 $options = $argv;
 
 require_once(AK_LIB_DIR.DS.'AkInstaller.php');
-require_once(AK_SCRIPT_DIR.DS.'generators'.DS.'AkelosGenerator.php');
+require_once(AK_LIB_DIR.DS.'utils'.DS.'generators'.DS.'AkelosGenerator.php');
 
 $installer_name = AkInflector::camelize(array_shift($options)).'Installer';
 $command = count($options) > 0 ? array_shift($options) : 'usage';

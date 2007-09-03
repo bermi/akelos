@@ -38,7 +38,7 @@ class AkelosGenerator
         }
 
         if(count(array_diff($commands,array('help','-help','usage','-usage','h','-h','USAGE','-USAGE'))) != count($commands) || count($commands) == 0){
-            $usage = method_exists($this,'banner') ? $this->banner() : @Ak::file_get_contents(AK_GENERATORS_DIR.DS.$generator_name.DS.'USAGE');
+            $usage = method_exists($this,'banner') ? $this->banner() : @file_get_contents(AK_GENERATORS_DIR.DS.$generator_name.DS.'USAGE');
             echo empty($usage) ? "\n".Ak::t('Could not locate usage file for this generator') : "\n".$usage."\n";
             return;
         }
