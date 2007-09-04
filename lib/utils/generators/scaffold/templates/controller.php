@@ -26,8 +26,10 @@ class <?php echo $controller_class_name?> extends ApplicationController
     }
 
     function show()
-    {
-        $this-><?php echo $singular_name?> =& $this-><?php echo $model_name?>->find(@$this->params['id']);
+    {<?php if($model_name != $controller_name){ ?>
+
+        $this-><?php echo $singular_name?> =& $this-><?php echo $model_name?>->find(@$this->params['id']);<?php } ?>
+
     }
 
     function add()

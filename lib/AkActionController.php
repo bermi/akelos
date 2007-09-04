@@ -300,7 +300,7 @@ class AkActionController extends AkObject
         }
     }
 
-    function instantiateModelClass($model_class_name)
+    function instantiateModelClass($model_class_name, $finder_options = array())
     {
         $underscored_model_class_name = AkInflector::underscore($model_class_name);
 
@@ -313,9 +313,13 @@ class AkActionController extends AkObject
             $underscored_model_class_name = AkInflector::underscore($model_class_name);
 
             if(!isset($this->$model_class_name) || !isset($this->$underscored_model_class_name)){
-                if(is_numeric($id)){
+                if($finder_options !== false && is_numeric($id)){
                     $model =& new $model_class_name();
-                    $model =& $model->find($id);
+                    if(empty($finder_options)){
+                        $model =& $model->find($id);
+                    }else{
+                        $model =& $model->find($id, $finder_options);
+                    }
                 }else{
                     $model =& new $model_class_name();
                 }
