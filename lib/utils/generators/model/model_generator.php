@@ -68,6 +68,8 @@ class ModelGenerator extends  AkelosGenerator
         'installer_fixture.tpl'=>AK_TEST_DIR.DS.'fixtures'.DS.$this->installer_path
         );
 
+        $this->_template_vars = (array)$this;
+
         foreach ($files as $template=>$file_path){
             $this->save($file_path, $this->render($template));
         }
