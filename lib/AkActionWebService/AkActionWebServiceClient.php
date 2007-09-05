@@ -43,7 +43,18 @@ class AkActionWebServiceClient extends AkObject
             call_user_func_array(array($this->_Client, 'init'), $args);
         }
     }
+    
+    function hasErrors()
+    {
+        return $this->_Client->hasErrors();
+    }
 
+    function getErrors()
+    {
+        return $this->_Client->getErrors();
+    }
+
+    
 }
 
 ?>

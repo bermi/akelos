@@ -18,6 +18,7 @@
 
 require_once(AK_VENDOR_DIR.DS.'incutio'.DS.'IXR_Library.inc.php');
 
+defined('AK_ACTION_WEBSERVICE_CACHE_REMOTE_METHODS') ? null : define('AK_ACTION_WEBSERVICE_CACHE_REMOTE_METHODS', AK_ENVIRONMENT == 'production');
 
 class AkXmlRpcClient extends IXR_Client
 {
@@ -26,6 +27,7 @@ class AkXmlRpcClient extends IXR_Client
     var $errors = array();
     var $_IxrParameters = array();
     var $WebServiceClient;
+    var $error_handler;
 
 
     function AkXmlRpcClient(&$WebServiceClient)
@@ -44,13 +46,13 @@ class AkXmlRpcClient extends IXR_Client
 
         $default_options = array(
         'user_agent' => 'Akelos XML-RPC Client',
-        'build' => false,
+        'build' => true,
         'remote_object_prefix' => 'AkRemote_',
         'debug' => false,
         /**
          * @todo add a better cache system for remote methods
          */
-         'cache_remote_methods' => isset($_SESSION)
+         'cache_remote_methods' => isset($_SESSION) && AK_ACTION_WEBSERVICE_CACHE_REMOTE_METHODS
          );
 
          $this->options = array_merge($default_options, $this->options);
@@ -110,7 +112,7 @@ class AkXmlRpcClient extends IXR_Client
     function _buildClass($class_name, $methods)
     {
         $reserved_words = array('and', 'as', 'break', 'case', 'cfunction', 'class', 'continue', 'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif', 'empty', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endswitch', 'endwhile', 'eval', 'exit', 'extends', 'false', 'for', 'foreach', 'function', 'global', 'if', 'include', 'include_once', 'list', 'new', 'not', 'null', 'old_function', 'or', 'parent', 'print', 'require', 'require_once', 'return', 'static', 'stdclass', 'switch', 'true', 'var', 'virtual', 'while', 'xor');
-        
+
         $class_methods = '';
         foreach ($methods as $method){
             $function_name = in_array(strtolower($method),$reserved_words) ? 'get'.ucfirst($method) : $method;
@@ -165,16 +167,19 @@ class AkXmlRpcClient extends IXR_Client
         }
 
         $_remote_methods = $this->getResponse();
+
         $remote_methods = array();
-        foreach ($_remote_methods as $method){
-            $parts = explode('.', $method);
-            $remote_methods[array_shift($parts)][] = array_shift($parts);
-        }
+        if(is_array($_remote_methods)){
+            foreach ($_remote_methods as $method){
+                $parts = explode('.', $method);
+                $remote_methods[array_shift($parts)][] = array_shift($parts);
+            }
 
-        if($this->options['cache_remote_methods']){
-            $_SESSION['__XML-RPC_methods_for_'.$this->options['class_name']] = $remote_methods;
+            if($this->options['cache_remote_methods']){
+                $_SESSION['__XML-RPC_methods_for_'.$this->options['class_name']] = $remote_methods;
+            }
         }
-
+        
         return $remote_methods;
     }
 
@@ -208,7 +213,6 @@ class AkXmlRpcClient extends IXR_Client
     {
         return md5($this->server.$this->port.$this->path);
     }
-
 }
 
 ?>
