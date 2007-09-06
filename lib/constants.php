@@ -72,11 +72,12 @@ defined('AK_MODELS_DIR') ? null : define('AK_MODELS_DIR', AK_APP_DIR.DS.'models'
 defined('AK_CONTROLLERS_DIR') ? null : define('AK_CONTROLLERS_DIR', AK_APP_DIR.DS.'controllers');
 defined('AK_VIEWS_DIR') ? null : define('AK_VIEWS_DIR', AK_APP_DIR.DS.'views');
 defined('AK_HELPERS_DIR') ? null : define('AK_HELPERS_DIR', AK_APP_DIR.DS.'helpers');
-defined('AK_ELEMENTS_DIR') ? null : define('AK_ELEMENTS_DIR', AK_VIEWS_DIR.DS.'elements');
-defined('AK_COMPONENTS_DIR') ? null : define('AK_COMPONENTS_DIR',AK_BASE_DIR.DS.'components');
 defined('AK_PUBLIC_DIR') ? null : define('AK_PUBLIC_DIR', AK_BASE_DIR.DS.'public');
 defined('AK_TEST_DIR') ? null : define('AK_TEST_DIR', AK_BASE_DIR.DS.'test');
 defined('AK_SCRIPT_DIR') ? null : define('AK_SCRIPT_DIR',AK_BASE_DIR.DS.'script');
+defined('AK_APP_VENDOR_DIR') ? null : define('AK_APP_VENDOR_DIR',AK_APP_DIR.DS.'vendor');
+defined('AK_APP_PLUGINS_DIR') ? null : define('AK_APP_PLUGINS_DIR',AK_APP_VENDOR_DIR.DS.'plugins');
+defined('AK_APP_BEHAVIOURS_DIR') ? null : define('AK_APP_BEHAVIOURS_DIR',AK_APP_VENDOR_DIR.DS.'behaviours');
 
 
 defined('AK_TMP_DIR') ? null : define('AK_TMP_DIR', AK_BASE_DIR.DS.'tmp');

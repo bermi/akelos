@@ -230,7 +230,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     var $_activeRecordHasBeenInstantiated = true;
 
     var $__ActsLikeAttributes = array();
-    var $__coreActsLikeAttributes = array('nested_set', 'list', 'tree');
 
     /**
     * Holds a hash with all the default error messages, such that they can be replaced by your own copy or localizations.
@@ -4568,8 +4567,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function _getActAsClassName($behaviour)
     {
-        return (in_array(strtolower($behaviour), $this->__coreActsLikeAttributes) ?
-        'AkActsAs' : 'ActAs').AkInflector::camelize($behaviour);
+        $class_name = AkInflector::camelize($behaviour);
+        return file_exists(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActsAs'.$class_name.'.php') ? 
+        'AkActsAs'.$class_name : 'ActsAs'.$class_name;
     }
 
     /**
@@ -4579,6 +4579,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         if(substr($class_name,0,2) == 'Ak'){
             include_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.$class_name.'.php');
+        }else{
+            include_once(AK_APP_BEHAVIOURS_DIR.DS.$class_name.'.php');
         }
         if(!class_exists($class_name)){
             trigger_error(Ak::t('The class %class used for handling an "act_as %class" does not exist',array('%class'=>$class_name)), E_USER_ERROR);

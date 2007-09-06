@@ -42,8 +42,11 @@ class AkUnitTest extends UnitTestCase
     function installAndIncludeModels($models = array())
     {
         $args = func_get_args();
-        $models = !empty($args) ? (is_array($args[0]) ? $args[0] : (count($args) > 1 ? $args : Ak::toArray($args))) : array();
+        $models = !empty($args) ? (is_array($args[0]) ? $args[0] : (count($args) > 1 ? $args : Ak::toArray($args[0]))) : array();
+
+        $default_options = array('instantiate' => true);
         $options = is_array($models[count($models)-1]) ? array_pop($models) : array();
+        $options = array_merge($default_options, $options);
 
         foreach ($models as $model){
             require_once(AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($model).'_installer.php');

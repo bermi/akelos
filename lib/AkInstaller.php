@@ -594,7 +594,7 @@ class AkInstaller
             $method_name = (method_exists(new AkActiveRecord(), 'set'.$method_name_part)?'set':'get').$method_name_part;
 
             trigger_error(Ak::t('A method named %method_name exists in the AkActiveRecord class'.
-            ' wich will cause a recusion problem if you use the column %column_name in your database. '.
+            ' which will cause a recusion problem if you use the column %column_name in your database. '.
             'You can disable automatic %type by setting the constant %constant to false '.
             'in your configuration file.', array(
             '%method_name'=> $method_name,
