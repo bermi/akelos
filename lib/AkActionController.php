@@ -2404,7 +2404,7 @@ class AkActionController extends AkObject
     *   sendFile('/path/to.zip');
     * 
     * Show a JPEG in browser:
-    *   sendFile('/path/to.jpeg', 'type' => 'image/jpeg', 'disposition' => 'inline');
+    *   sendFile('/path/to.jpeg', array('type' => 'image/jpeg', 'disposition' => 'inline'));
     * 
     * Read about the other Content-* HTTP headers if you'd like to
     * provide the user with more information (such as Content-Description).

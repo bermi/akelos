@@ -43,7 +43,6 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_helper.php
 * See JavaScriptGenerator for information on updating multiple elements
 * on the page in an Ajax response. 
 */
-
 class PrototypeHelper extends AkActionViewHelper
 {
     function getCallbacks()

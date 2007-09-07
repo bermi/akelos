@@ -2674,30 +2674,30 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns an array of column objects for the table associated with this class.
     */
-    function getColumns()
+    function getColumns($force_reload = false)
     {
-        if(empty($this->_columns)){
-            $this->_columns = $this->getColumnSettings();
+        if(empty($this->_columns) || $force_reload){
+            $this->_columns = $this->getColumnSettings($force_reload);
         }
 
         return (array)$this->_columns;
     }
 
-    function getColumnSettings()
+    function getColumnSettings($force_reload = false)
     {
-        if(empty($this->_columnsSettings)){
-            $this->loadColumnsSettings();
+        if(empty($this->_columnsSettings) || $force_reload){
+            $this->loadColumnsSettings($force_reload);
             $this->initiateColumnsToNull();
         }
         return isset($this->_columnsSettings) ? $this->_columnsSettings : array();
     }
 
-    function loadColumnsSettings()
+    function loadColumnsSettings($force_reload = false)
     {
         if(is_null($this->_db)){
             $this->setConnection();
         }
-        $this->_columnsSettings = $this->_getPersistedTableColumnSettings();
+        $this->_columnsSettings = $force_reload ? null : $this->_getPersistedTableColumnSettings();
         
         if(empty($this->_columnsSettings) || !AK_ACTIVE_RECORD_ENABLE_PERSISTENCE){
             if(empty($this->_dataDictionary)){
@@ -4568,7 +4568,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function _getActAsClassName($behaviour)
     {
         $class_name = AkInflector::camelize($behaviour);
-        return file_exists(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActsAs'.$class_name.'.php') ? 
+        return !file_exists(AK_APP_BEHAVIOURS_DIR.DS.'ActsAs'.$class_name.'.php') ? 
         'AkActsAs'.$class_name : 'ActsAs'.$class_name;
     }
 
