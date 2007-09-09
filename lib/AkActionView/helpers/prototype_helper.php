@@ -84,15 +84,15 @@ class PrototypeHelper extends AkActionViewHelper
     * either render_partial or render_partial_collection. 
     *
     * Examples:
-    *   $prototype->link_to_remote('Delete this post', array('update' => 'posts'), array('url' => array('action' => 'destroy', 'id' => $_POST['id']));
-    *   $prototype->link_to_remote(Asset$this->_controller->tag_helper->image_tag('refresh'), array('update => 'emails'), array('url' => array('action' => 'list_emails'));
+    *   $prototype_helper->link_to_remote('Delete this post', array('url' => array('action' => 'destroy', 'id' => $_POST['id']), array('update' => 'posts'));
+    *   $prototype_helper->link_to_remote(Asset$this->_controller->tag_helper->image_tag('refresh'), array('url' => array('action' => 'list_emails'), array('update => 'emails'));
     *
     * You can also specify a hash for <tt>options['update']</tt> to allow for
     * easy redirection of output to an other DOM element if a server-side 
     * error occurs:
     *
     * Example:
-    *   $prototype->link_to_remote('Delete this post', array('url' => array('action' => 'destroy', 'id' => $_POST['id']), array('update' => array('success' => 'posts', 'failure' => 'error');
+    *   $prototype_helper->link_to_remote('Delete this post', array('url' => array('action' => 'destroy', 'id' => $_POST['id']), array('update' => array('success' => 'posts', 'failure' => 'error');
     *
     * Optionally, you can use the <tt>options['position']</tt> parameter to 
     * influence how the target DOM element is updated. It must be one of 
@@ -108,7 +108,7 @@ class PrototypeHelper extends AkActionViewHelper
     *
     * Example:
     * 
-    *   $prototype->link_to_remote($word,array('url' => array('action' => 'undo', 'n' => $word_counter) , 'complete' => 'undoRequestCompleted(request)');
+    *   $prototype_helper->link_to_remote($word, array('url' => array('action' => 'undo', 'n' => $word_counter) , 'complete' => 'undoRequestCompleted(request)');
     *
     * The callbacks that may be specified are (in order):
     *
@@ -192,8 +192,8 @@ class PrototypeHelper extends AkActionViewHelper
     * specified with the 'action'/'method' options on 'html'.
     *
     * Example:
-    *   $prototype->form_remote_tag('html' => array('action' => $this->_controller->url_helper->url_for(array('controller' => 'some', 'action' => 'place')));
-    *   $prototype->form_remote_tag('url' => array('controller' => 'foo', 'action' => 'bar'), 'update' => 'div_to_update', html => array('id' => 'form_id'));
+    *   $prototype_helper->form_remote_tag('html' => array('action' => $this->_controller->url_helper->url_for(array('controller' => 'some', 'action' => 'place')));
+    *   $prototype_helper->form_remote_tag('url' => array('controller' => 'foo', 'action' => 'bar'), 'update' => 'div_to_update', html => array('id' => 'form_id'));
     *
     * The Hash passed to the 'html' key is equivalent to the options (2nd) 
     * argument in the FormTagHelper.form_tag method.
@@ -282,7 +282,7 @@ class PrototypeHelper extends AkActionViewHelper
     *   }
     *
     *   * Returning view
-    *   <?= $prototype->update_element_function('cart', array('action' => 'update', 'position' => 'bottom', 'content' => "<p>New Product: {$product.name}</p>")) ?>
+    *   <?= $prototype_helper->update_element_function('cart', array('action' => 'update', 'position' => 'bottom', 'content' => "<p>New Product: {$product.name}</p>")) ?>
     * 
     *   <% update_element_function("status", :binding => binding) do %>
     *     You've bought a new product!
@@ -343,7 +343,7 @@ class PrototypeHelper extends AkActionViewHelper
     * Takes the same arguments as link_to_remote.
     * 
     * Example:
-    *   <select id="options" onchange="<?= $prototype->remote_function(array('update' => 'options',  'url' => array('action' => 'update_options' )) ?>">
+    *   <select id="options" onchange="<?= $prototype_helper->remote_function(array('update' => 'options',  'url' => array('action' => 'update_options' )) ?>">
     *     <option value="0">Hello</option>
     *     <option value="1">World</option>
     *   </select>
