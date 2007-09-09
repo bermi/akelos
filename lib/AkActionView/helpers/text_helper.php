@@ -208,12 +208,18 @@ class  TextHelper
     /**
      * Returns the "$text" with all the Textile codes turned into HTML-tags.
      */
-    function textilize($text)
+    function textilize($text, $options = array())
     {
+        $default_options = array(
+        'extended_mode' => true,
+        'allow_images' => true,
+        'rel' => '',
+        );
+        $options = array_merge($default_options, $options);
         require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'Textile.php');
         if (!empty($text)) {
             $Textile = new Textile();
-            $text = trim($Textile->TextileThis($text));
+            $text = trim($Textile->TextileThis($text, !$options['extended_mode'], '', !$options['allow_images'], true, $options['rel']));
         }
         return $text;
     }
@@ -222,9 +228,9 @@ class  TextHelper
      * Returns the "$text" with all the Textile codes turned into HTML-tags, but 
      * without the regular bounding <p> tag.
      */
-    function textilize_without_paragraph($text)
+    function textilize_without_paragraph($text, $options = array())
     {
-        return preg_replace('/^<p([A-Za-z0-9& ;\-=",\/:\.\']+)?>(.+)<\/p>$/u','\2', TextHelper::textilize($text));
+        return preg_replace('/^<p([A-Za-z0-9& ;\-=",\/:\.\']+)?>(.+)<\/p>$/u','\2', TextHelper::textilize($text, $options));
     }
 
     /**
@@ -674,6 +680,19 @@ class  TextHelper
         return $html;
     }
 
+    function html_escape($html)
+    {
+        static $charset;
+        if(empty($charset)){
+            $charset = Ak::locale('charset');
+        }
+        return htmlentities($html, ENT_COMPAT, $charset);
+    }
+    
+    function h($html)
+    {
+        return TextHelper::html_escape($html);
+    }
 }
 
 ?>

@@ -320,3 +320,11 @@
 -----------------------------------
 
 <?php echo $url_helper->link_to("Status: ".$text_helper->translate('active').""); ?>
+
+===================================
+
+<%= translate h('<b>foo</b>') %>
+
+-----------------------------------
+
+<?php echo $text_helper->translate($text_helper->h('<b>foo</b>')); ?>

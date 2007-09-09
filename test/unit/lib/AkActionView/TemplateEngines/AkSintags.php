@@ -4,7 +4,7 @@ require_once(dirname(__FILE__).'/../../../../fixtures/config/config.php');
 
 require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'TemplateEngines'.DS.'AkSintags.php');
 
-define('AK_SINTAGS_AVALABLE_HELPERS', 'a:8:{s:7:"url_for";s:10:"url_helper";s:7:"link_to";s:10:"url_helper";s:7:"mail_to";s:10:"url_helper";s:10:"email_link";s:10:"url_helper";s:9:"translate";s:11:"text_helper";s:20:"number_to_human_size";s:13:"number_helper";s:6:"render";s:10:"controller";s:25:"distance_of_time_in_words";s:11:"date_helper";}');
+define('AK_SINTAGS_AVALABLE_HELPERS', 'a:9:{s:7:"url_for";s:10:"url_helper";s:7:"link_to";s:10:"url_helper";s:7:"mail_to";s:10:"url_helper";s:10:"email_link";s:10:"url_helper";s:9:"translate";s:11:"text_helper";s:20:"number_to_human_size";s:13:"number_helper";s:6:"render";s:10:"controller";s:25:"distance_of_time_in_words";s:11:"date_helper";s:1:"h";s:11:"text_helper";}');
 
 class Test_of_AkSintags extends  UnitTestCase
 {

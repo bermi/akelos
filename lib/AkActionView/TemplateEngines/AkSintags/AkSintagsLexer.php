@@ -88,27 +88,27 @@ class AkSintagsLexer extends AkLexer
         $this->addEntryPattern('_{','Text','Translation');
         $this->addExitPattern('}','Translation');
 
-        $this->addSpecialPattern('\x5C?\x25[A-Za-z][\.A-Za-z0-9_-]+','Translation','TranslationToken');
+        $this->addSpecialPattern('\x5C?\x25[A-Za-z][\.A-Za-z0-9_-]*','Translation','TranslationToken');
     }
 
     function _addVariableTranslationTokens()
     {
-        $this->addSpecialPattern('{_[A-Za-z][\.A-Za-z0-9_-]+}','Text','VariableTranslation');
+        $this->addSpecialPattern('{_[A-Za-z][\.A-Za-z0-9_-]*}','Text','VariableTranslation');
     }
 
     function _addVariableTokens()
     {
-        $this->addSpecialPattern('{[A-Za-z][\.A-Za-z0-9_-]+}','Text','Variable');
+        $this->addSpecialPattern('{[A-Za-z][\.A-Za-z0-9_-]*}','Text','Variable');
     }
 
     function _addConditionalVariableTokens()
     {
-        $this->addSpecialPattern('{[A-Za-z][\.A-Za-z0-9_-]+\?}','Text','ConditionalVariable');
+        $this->addSpecialPattern('{[A-Za-z][\.A-Za-z0-9_-]*\?}','Text','ConditionalVariable');
     }
 
     function _addConditionStartTokens()
     {
-        $this->addSpecialPattern('{[\?!][A-Za-z][\.A-Za-z0-9_-]+}','Text','ConditionStart');
+        $this->addSpecialPattern('{[\?!][A-Za-z][\.A-Za-z0-9_-]*}','Text','ConditionStart');
     }
 
     function _addEndTagTokens()
@@ -123,12 +123,12 @@ class AkSintagsLexer extends AkLexer
     
     function _addLoopTokens()
     {
-        $this->addSpecialPattern('{loop[ \n\t]+[A-Za-z][\.A-Za-z0-9_-]+\??}','Text','Loop');
+        $this->addSpecialPattern('{loop[ \n\t]+[A-Za-z][\.A-Za-z0-9_-]*\??}','Text','Loop');
     }
     
     function _addLoopAsTokens()
     {
-        $this->addSpecialPattern('{loop[ \n\t]+[A-Za-z][\.A-Za-z0-9_-]+[ \n\t]+as[ \n\t]+[A-Za-z][\.A-Za-z0-9_-]+\??}','Text','Loop');
+        $this->addSpecialPattern('{loop[ \n\t]+[A-Za-z][\.A-Za-z0-9_-]+[ \n\t]+as[ \n\t]+[A-Za-z][\.A-Za-z0-9_-]*\??}','Text','Loop');
     }
     
     function _addHelperTokens()
@@ -137,7 +137,7 @@ class AkSintagsLexer extends AkLexer
         '(?=.*'.$this->_SINTAGS_CLOSE_HELPER_TAG.')','Text','Helper');
         $this->addExitPattern('\x29?[ \n\t]*'.$this->_SINTAGS_CLOSE_HELPER_TAG, 'Helper');
 
-        $this->addSpecialPattern('#{[A-Za-z][\.A-Za-z0-9_-]+}','DoubleQuote','InlineVariable');
+        $this->addSpecialPattern('#{[A-Za-z][\.A-Za-z0-9_-]*}','DoubleQuote','InlineVariable');
 
         $this->addEntryPattern('#{[ \n\t]*[A-Za-z0-9_]+[ \n\t]*\x28?[ \n\t]*(?=.*})','DoubleQuote','InlineHelper');
         $this->addExitPattern('[ \n\t]*}', 'InlineHelper');
@@ -151,7 +151,7 @@ class AkSintagsLexer extends AkLexer
 
     function _addInlineHelperTokens()
     {
-        $this->addSpecialPattern('#{[A-Za-z][\.A-Za-z0-9_-]+}','DoubleQuote','InlineVariable');
+        $this->addSpecialPattern('#{[A-Za-z][\.A-Za-z0-9_-]*}','DoubleQuote','InlineVariable');
 
         $this->addEntryPattern('#{[ \n\t]*[A-Za-z0-9_]+[ \n\t]*\x28?[ \n\t]*(?=.*})','DoubleQuote','InlineHelper');
         $this->addExitPattern('[ \n\t]*}', 'InlineHelper');
@@ -160,7 +160,7 @@ class AkSintagsLexer extends AkLexer
 
     function _addSintagsHelperParametersForScope($scope = 'Helper')
     {
-        $this->addEntryPattern('[A-Za-z][A-Za-z0-9_]+[ \n\t]*\x28(?=.*\x29)',$scope,'HelperFunction');
+        $this->addEntryPattern('[A-Za-z][A-Za-z0-9_]*[ \n\t]*\x28(?=.*\x29)',$scope,'HelperFunction');
         $this->addExitPattern('\x29', 'HelperFunction');
 
         $this->addEntryPattern('_[ \n\t]*\x28(?=.*\x29)',$scope,'HelperFunction');
@@ -184,7 +184,7 @@ class AkSintagsLexer extends AkLexer
 
         $this->addSpecialPattern('\x3A[A-Za-z0-9_]+',$scope,'Symbol');
 
-        $this->addSpecialPattern('@?[A-Za-z][\.A-Za-z0-9_-]+',$scope,'HelperVariable');
+        $this->addSpecialPattern('@?[A-Za-z][\.A-Za-z0-9_-]*',$scope,'HelperVariable');
 
 
 
