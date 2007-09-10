@@ -1811,6 +1811,17 @@ class Ak
         }
         return strtr($html, $translation_table_or_quote_style);
     }
+    
+    /**
+    * Loads the plugins found at app/vendor/plugins
+    */
+    function &loadPlugins()
+    {
+        require_once(AK_LIB_DIR.DS.'AkPlugin.php');
+        $PluginManager =& new AkPluginLoader();
+        $PluginManager->loadPlugins();
+        return $PluginManager;
+    }
 }
 
 

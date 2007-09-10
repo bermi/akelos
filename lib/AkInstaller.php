@@ -19,6 +19,7 @@
 require_once(AK_LIB_DIR.DS.'Ak.php');
 require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 file_exists(AK_APP_DIR.DS.'shared_model.php') ? require_once(AK_APP_DIR.DS.'shared_model.php') : null;
+defined('AK_APP_INSTALLERS_DIR') ? null : define('AK_APP_INSTALLERS_DIR', AK_APP_DIR.DS.'installers');
 
 // Install scripts might use more RAM than normal requests.
 @ini_set('memory_limit', -1);
@@ -170,7 +171,7 @@ class AkInstaller
     function _versionPath($options = array())
     {
         $mode = empty($options['mode']) ? AK_ENVIRONMENT : $options['mode'];
-        return AK_APP_DIR.DS.'installers'.DS.'versions'.DS.$mode.'_'.$this->getInstallerName().'_version.txt';
+        return AK_APP_INSTALLERS_DIR.DS.'versions'.DS.$mode.'_'.$this->getInstallerName().'_version.txt';
     }
 
 
@@ -570,7 +571,7 @@ class AkInstaller
 
     function _getDbDesignerFilePath()
     {
-        $path = AK_APP_DIR.DS.'installers'.DS.$this->getInstallerName().'.xml';
+        $path = AK_APP_INSTALLERS_DIR.DS.$this->getInstallerName().'.xml';
         return file_exists($path) ? $path : false;
     }
 

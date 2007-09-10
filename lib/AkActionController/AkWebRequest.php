@@ -119,7 +119,7 @@ class AkWebRequest extends AkActionController
             require_once(AK_LIB_DIR.DS.'AkResponse.php');
             $Controller->Response =& AkResponse();
         }
-
+                
         if(empty($Controller->Template)){
             require_once(AK_LIB_DIR.DS.'AkActionView.php');
             require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkPhpTemplateHandler.php');
@@ -132,8 +132,9 @@ class AkWebRequest extends AkActionController
 
         $Controller->passed_args = !isset($Controller->Request->pass)? array() : $Controller->Request->pass;
 
+        Ak::loadPlugins();
+        
         $Controller->instantiateIncludedModelClasses();
-
         
         if(isset($Controller->api)){
             require_once(AK_LIB_DIR.DS.'AkActionWebService.php');
