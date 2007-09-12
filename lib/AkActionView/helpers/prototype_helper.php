@@ -482,7 +482,7 @@ class PrototypeHelper extends AkActionViewHelper
         empty($options['type']) ? null : ($js_options['asynchronous'] = $options['type'] != 'synchronous' ? 'asynchronous' : 'synchronous');
         empty($options['method']) ? null : $js_options['method'] = $this->_methodOptionToString($options['method']);
         empty($options['position']) ? null : $js_options['insertion'] = "Insertion.".AkInflector::camelize($options['position']);
-        isset($options['script']) ? $js_options['evalScripts'] = $js_options['evalScripts'] : null;
+        isset($options['script']) ? $js_options['evalScripts'] = 'true' : null;
 
         if(!empty($options['form'])){
             $js_options['parameters'] = 'Form.serialize(this)';
