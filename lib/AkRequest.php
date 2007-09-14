@@ -727,7 +727,7 @@ class AkRequest extends AkObject
         $this->_enableInternationalizationSupport();
         $this->_mapRoutes($Map);
         
-        $params =& $this->getParams();
+        $params = $this->getParams();
         $controller_file_name = AkInflector::underscore($params['controller']).'_controller.php';
         $controller_class_name = AkInflector::camelize($params['controller']).'Controller';
         $controller_path = AK_CONTROLLERS_DIR.DS.$controller_file_name;
