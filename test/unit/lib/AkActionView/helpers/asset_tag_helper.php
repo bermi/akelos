@@ -12,6 +12,7 @@ class AssetTagHelperTests extends HelpersUnitTester
     {
         $this->testing_url_path = $this->testing_url_path == '/' ? '' : $this->testing_url_path;
         $this->controller = &new MockAkActionController($this);
+        $this->controller->asset_host = AK_ASSET_HOST;
         $this->controller->setReturnValue('urlFor','/url/for/test');
         $this->asset_tag_helper = new AssetTagHelper();
         $this->asset_tag_helper->setController($this->controller);
@@ -133,6 +134,7 @@ class AssetTagHelperTests extends HelpersUnitTester
     function test_stylesheet_for_current_controller()
     {
         $controller =& new MockAkActionController($this);
+        $controller->asset_host = AK_ASSET_HOST;
         $controller->setReturnValue('urlFor','/url/for/test');
         $controller->setReturnValue('getControllerName','valid_controller');
         $controller->setReturnValue('urlFor','/url/for/test');
@@ -147,6 +149,7 @@ class AssetTagHelperTests extends HelpersUnitTester
 
 
         $controller = &new MockAkActionController($this);
+        $controller->asset_host = AK_ASSET_HOST;
         $controller->setReturnValue('urlFor','/url/for/test');
         $asset_tag_helper = new AssetTagHelper();
         $asset_tag_helper->setController($controller);
@@ -159,6 +162,7 @@ class AssetTagHelperTests extends HelpersUnitTester
     function test_javascript_for_current_controller()
     {
         $controller = &new MockAkActionController($this);
+        $controller->asset_host = AK_ASSET_HOST;
         $controller->setReturnValue('urlFor','/url/for/test');
         $asset_tag_helper = new AssetTagHelper();
         $asset_tag_helper->setController($controller);
@@ -172,6 +176,7 @@ class AssetTagHelperTests extends HelpersUnitTester
 
 
         $controller = &new MockAkActionController($this);
+        $controller->asset_host = AK_ASSET_HOST;
         $controller->setReturnValue('urlFor','/url/for/test');
         $asset_tag_helper = new AssetTagHelper();
         $asset_tag_helper->setController($controller);

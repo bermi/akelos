@@ -8,6 +8,12 @@
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
+if(!class_exists('AkActionController')){
+
+require_once(AK_LIB_DIR.DS.'AkObject.php');
+
+defined('AK_HIGH_LOAD_MODE') ? null : define('AK_HIGH_LOAD_MODE', false);
+
 /**
  * @package ActionController
  * @subpackage Base
@@ -15,18 +21,14 @@
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
-
-require_once(AK_LIB_DIR.DS.'Ak.php');
-require_once(AK_LIB_DIR.DS.'AkInflector.php');
-require_once(AK_LIB_DIR.DS.'AkObject.php');
-
+    
 class AkActionController extends AkObject
 {
-    var $__database_connection_available = false;
-    var $__session_handler = AK_SESSION_HANDLER;
-    var $__session_available = false;
-    var $__internationalization_support_enabled = false;
-
+    var $_high_load_mode = AK_HIGH_LOAD_MODE;
+    var $_enable_plugins = true;
+    var $_auto_instantiate_models = true;
+    var $validate_output = false;
+    
     var $_ssl_requirement = false;
 
     /**
@@ -38,7 +40,7 @@ class AkActionController extends AkObject
     /**
     * Protected instance variable cache
     */
-    var $_protected_variables_cache;
+    var $_protected_variables_cache = array();
 
     /**
     * Prepends all the URL-generating helpers from AssetHelper. 
@@ -47,39 +49,10 @@ class AkActionController extends AkObject
     * Example: 
     *  $this->_asset_host = 'http://assets.example.com';
     */
-    var $_asset_host = '';
+    var $asset_host = AK_ASSET_HOST;
 
-    /**
-    * All Requests are considered local by default, so everyone will be exposed 
-    * to detailed debugging screens on errors.
-    * When the application is ready to go public, this should be set to false, 
-    * and the protected method <tt>isLocalRequest()</tt>
-    * should instead be implemented in the controller to determine when debugging 
-    * screens should be shown.
-    */
-    var $_consider_all_requests_local = true;
 
-    /**
-    * Enable or disable the collection of failure information for RoutingErrors.
-    * This information can be extremely useful when tweaking custom routes, but is
-    * pointless once routes have been tested and verified.
-    */
-    var $_debug_routes = true;
-
-    /**
-    * Template root determines the base from which template references will be made. 
-    * So a call to $this->render("test/template");
-    * will be converted to "$this->_template_root/test/template.tpl.php".
-    */
-    var $_template_root;
-
-    /**
-    * The logger is used for generating information on the action run-time 
-    * (including benchmarking) if available.
-    * Can be set to null for no logging. Compatible with Log4r loggers.
-    * @todo add Log calls
-    */
-    var $Logger;
+    var $_Logger;
 
     /**
     * Determines which template class should be used by AkActionController.
@@ -140,8 +113,6 @@ class AkActionController extends AkObject
 
     var $cookies;
 
-    var $_autoIncludePaginator = true;
-
     var $helpers = 'default';
 
     var $app_helpers;
@@ -152,31 +123,104 @@ class AkActionController extends AkObject
     var $web_service_api;
     var $web_service_apis = array();
 
-    function handleRequest($options = array())
+    /**
+     * Old fashioned way of dispatching requests. Please use AkDispatcher or roll your own.
+     * 
+     * @deprecated 
+     */
+    function handleRequest()
     {
-        $default_options = array(
-        'request_type'=>AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE,
-        'controller'=>false,
-        'action'=>AK_ACTION_CONTROLLER_DEFAULT_ACTION
-        );
-
-        $options = array_merge($default_options, $options);
-
-        if ($options['controller'] === false) {
-            $request_type = 'Ak'.AkInflector::camelize($options['request_type']);
-            if(file_exists(AK_LIB_DIR.DS.'AkActionController'.DS.$request_type.'.php')){
-                require_once(AK_LIB_DIR.DS.'AkActionController'.DS.$request_type.'.php');
-                if(class_exists($request_type)){
-                    $$request_type =& new $request_type();
-                    $$request_type->init($this);
-                    $$request_type->handle();
-                    return ;
-                }
-            }
-            trigger_error(Ak::t('There is no support for %request_type requests',array('%request_type'=>$request_type)));
-        }
+        AK_LOG_EVENTS && empty($this->_Logger) ? ($this->_Logger =& Ak::getLogger()) : null;
+        AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->warning('Using deprecated request dispatcher AkActionController::handleRequest. Use  to AkDispatcher + AkDispatcher::dispatch instead.') : null;
+        require_once(AK_LIB_DIR.DS.'AkDispatcher.php');
+        $Dispatcher =& new AkDispatcher();
+        $Dispatcher->dispatch();
     }
 
+    function process(&$Request, &$Response)
+    {
+        AK_LOG_EVENTS && empty($this->_Logger) ? ($this->_Logger =& Ak::getLogger()) : null;
+        
+        $this->Request =& $Request;
+        $this->Response =& $Response;
+        $this->params =& $this->Request->getParams();
+        $this->_action_name = $this->Request->getAction();
+        
+        if(!method_exists($this, $this->_action_name)){
+            trigger_error(Ak::t('Controller <i>%controller_name</i> can\'t handle action %action_name',
+            array(
+            '%controller_name' => $this->getControllerName(),
+            '%action_name' => $this->_action_name,
+            )), E_USER_ERROR);
+        }
+        
+        Ak::t('Akelos'); // We need to get locales ready
+        
+        if($this->_high_load_mode !== true){
+        
+            // Before filters
+            if(!empty($this->helpers)){
+                $this->beforeFilter('instantiateHelpers');
+            }
+            if(!empty($this->_enable_plugins)){
+                $this->beforeFilter('loadPlugins');
+            }
+            if(!empty($this->_auto_instantiate_models)){
+                $this->beforeFilter('instantiateIncludedModelClasses');
+            }
+        }else{
+            $this->_enableLayoutOnRender = false;
+        }
+       
+        $this->beforeFilter('_ensureProperProtocol');
+        
+        // After filters
+        $this->afterFilter('_handleFlashAttribute');
+        
+        if(!empty($this->validate_output)){
+            $this->beforeFilter('_validateGeneratedXhtml');
+        
+        }
+        
+        $this->_loadActionView();
+        
+        if(isset($this->api)){
+            require_once(AK_LIB_DIR.DS.'AkActionWebService.php');
+            $this->aroundFilter(new AkActionWebService($this));
+        }
+        
+        $this->performActionWithFilters($this->_action_name);
+        
+        if (!$this->_hasPerformed()){
+            $this->_enableLayoutOnRender ? $this->renderWithLayout() : $this->renderWithoutLayout();
+        }
+
+        $this->Response->outputResults();
+    }
+    
+    function _loadActionView()
+    {
+        empty($this->_assigns) ? ($this->_assigns = array()) : null;
+        empty($this->_default_render_status_code) ? ($this->_default_render_status_code = 200) : null;
+        $this->_enableLayoutOnRender = !isset($this->_enableLayoutOnRender) ? true : $this->_enableLayoutOnRender;
+        $this->passed_args = !isset($this->Request->pass)? array() : $this->Request->pass;
+        empty($this->cookies) && isset($_COOKIE) ? ($this->cookies =& $_COOKIE) : null;
+        
+        if(empty($this->Template)){
+            require_once(AK_LIB_DIR.DS.'AkActionView.php');
+            require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkPhpTemplateHandler.php');
+            $this->Template =& new AkActionView(AK_APP_DIR.DS.'views'.DS.$this->Request->getController(),
+            $this->Request->getParameters(),$this->Request->getController());
+        
+            $this->Template->_controllerInstance =& $this;
+            $this->Template->_registerTemplateHandler('tpl','AkPhpTemplateHandler');
+        }
+    }
+    
+    function loadPlugins()
+    {
+        Ak::loadPlugins();
+    }
 
     /**
      * Creates an instance of each available helper and links it into into current controller.
@@ -286,14 +330,17 @@ class AkActionController extends AkObject
         $this->instantiateIncludedModelClasses($models);
     }
 
-    function instantiateIncludedModelClasses($models = null)
+    function instantiateIncludedModelClasses()
     {
         require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
         require_once(AK_APP_DIR.DS.'shared_model.php');
 
-        $models = empty($models) ? array_unique(array_merge(
+        empty($this->model) ? ($this->model = $this->params['controller']) : null;
+        empty($this->models) ? ($this->models = array()) : null;
+        
+        $models =array_unique(array_merge(
         Ak::import($this->model),
-        Ak::import($this->models))) : $models;
+        Ak::import($this->models)));
 
         foreach ($models as $model){
             $this->instantiateModelClass($model);
@@ -465,8 +512,6 @@ class AkActionController extends AkObject
     */
     function render($options = null, $status = 200)
     {
-        Ak::profile('Entering into '.__CLASS__.'::'.__FUNCTION__.' '.__FILE__.' on line '.__LINE__);
-
         if(empty($options['partial']) && $this->_hasPerformed()){
             $this->_doubleRenderError(Ak::t("Can only render or redirect once per action"));
             return false;
@@ -476,7 +521,6 @@ class AkActionController extends AkObject
 
         // Ror Backwards compatibility
         if(!is_array($options)){
-            Ak::profile('Enterind on render file '.__CLASS__.'::'.__FUNCTION__.' '.__FILE__.' on line '.__LINE__);
             return $this->renderFile(empty($options) ? $this->getDefaultTemplateName() : $options, $status, true);
         }
 
@@ -543,10 +587,9 @@ class AkActionController extends AkObject
         if($use_full_path){
             $this->_assertExistanceOfTemplateFile($template_path);
         }
-        if (!empty($this->Logger)) {
-            $this->Logger->info("Rendering $template_path" . (!empty($status) ? " ($status)" : ''));
-        }
-
+        
+        AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message("Rendering $this->full_template_path" . (!empty($status) ? " ($status)":'')) : null;
+        
         return $this->renderText($this->Template->renderFile($template_path, $use_full_path, $locals), $status);
     }
 
@@ -601,7 +644,7 @@ class AkActionController extends AkObject
         return $this->renderWithALayout($template_name, $status, $layout);
     }
 
-    function renderWithoutLayout($template_name, $status = null)
+    function renderWithoutLayout($template_name = null, $status = null)
     {
         $template_name = empty($template_name) ? $this->getDefaultTemplateName() : $template_name;
         return $this->render($template_name, $status);
@@ -627,10 +670,9 @@ class AkActionController extends AkObject
 
     function _addInstanceVariablesToAssigns()
     {
-        static $_protected_variables_cache = array();
-        $_protected_variables_cache = array_merge($_protected_variables_cache, $this->_getProtectedInstanceVariables());
+        $this->_protected_variables_cache = array_merge($this->_protected_variables_cache, $this->_getProtectedInstanceVariables());
 
-        foreach (array_diff(array_keys(get_object_vars($this)), $_protected_variables_cache) as $attribute){
+        foreach (array_diff(array_keys(get_object_vars($this)), $this->_protected_variables_cache) as $attribute){
             if($attribute[0] != '_'){
                 $this->_assigns[$attribute] =& $this->$attribute;
             }
@@ -685,9 +727,7 @@ class AkActionController extends AkObject
                 if($this->_hasPerformed()){
                     $this->_doubleRenderError();
                 }
-                if(!empty($this->Logger)){
-                    $this->Logger->info('Redirected to '.$options);
-                }
+                AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message('Redirected to '.$options) : null;
                 $this->_handleFlashAttribute();
                 $this->Response->redirect($options);
                 $this->Response->redirected_to = $options;
@@ -1831,6 +1871,7 @@ class AkActionController extends AkObject
         return $this->_callFilters(&$this->_afterFilters, $method);
     }
 
+    
     function _callFilters(&$filters, $method = '')
     {
         $filter_result = null;
@@ -1844,7 +1885,7 @@ class AkActionController extends AkObject
                 }elseif(is_object($filter) && method_exists($filter, 'filter')){
                     $filter_result = $filter->filter($this);
                 }else{
-                    trigger_error(Ak::t('Filters need to be a method name, or class implementing a static filter method'), E_USER_WARNING);
+                    trigger_error(Ak::t('Invalid filter %filter. Filters need to be a method name or a class implementing a static filter method', array('%filter'=>$filter)), E_USER_WARNING);
                 }
 
             }
@@ -1954,69 +1995,6 @@ class AkActionController extends AkObject
         $this->flash_now = array_merge($this->flash_now,$this->flash);
     }
 
-
-
-    /**
-     * This methods are used before triggering an Application Controller
-     */
-    function __connectToDatabase()
-    {
-        global $dsn;
-        if(!empty($dsn)){
-            Ak::db($dsn);
-            $this->__database_connection_available = AK_DATABASE_CONNECTION_AVAILABLE;
-        }
-    }
-
-    function __startSession()
-    {
-        if($this->__session_available === false){
-            if($this->__session_handler == 1 && $this->__database_connection_available){
-                require_once(AK_LIB_DIR.DS.'AkDbSession.php');
-
-                $AkDbSession = new AkDbSession();
-                $AkDbSession->session_life = AK_SESSION_EXPIRE;
-                session_set_save_handler (
-                array(&$AkDbSession, '_open'),
-                array(&$AkDbSession, '_close'),
-                array(&$AkDbSession, '_read'),
-                array(&$AkDbSession, '_write'),
-                array(&$AkDbSession, '_destroy'),
-                array(&$AkDbSession, '_gc')
-                );
-            }
-            @session_start();
-        }
-        $this->__session_available = isset($_SESSION);
-
-        if($this->__session_available){
-            $this->session =& $_SESSION;
-        }
-    }
-
-    function __enableInternationalizationSupport()
-    {
-        require_once(AK_LIB_DIR.DS.'AkLocaleManager.php');
-
-        $LocaleManager = new AkLocaleManager();
-
-        $LocaleManager->init();
-        $LocaleManager->initApplicationInternationalization($this->Request);
-
-        $this->__internationalization_support_enabled = true;
-    }
-
-    function __mapRoutes()
-    {
-        require_once(AK_LIB_DIR.DS.'AkRouter.php');
-        if(is_file(AK_ROUTES_MAPPING_FILE)){
-            $Map =& AkRouter();
-            include(AK_ROUTES_MAPPING_FILE);
-            // Set this routes for being used via Ak::toUrl
-            Ak::toUrl($Map,true);
-            $this->Request->checkForRoutedRequests($Map);
-        }
-    }
 
 
 
@@ -2504,7 +2482,7 @@ class AkActionController extends AkObject
 
     function redirectToLocale($locale)
     {
-        if($this->__internationalization_support_enabled){
+        if($this->Request->__internationalization_support_enabled){
             $lang = isset($this->params['lang']) ? $this->params['lang'] : $locale;
 
             if($locale != $lang){
@@ -2547,6 +2525,8 @@ function &AkActionController()
     $params = func_num_args() == 0 ? null : func_get_args();
     $AkActionController =& Ak::singleton('AkActionController', $params);
     return $AkActionController;
+}
+
 }
 
 ?>

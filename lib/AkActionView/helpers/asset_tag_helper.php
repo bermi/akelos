@@ -222,7 +222,7 @@ class AssetTagHelper extends AkActionViewHelper
         $source = $source[0] != '/' && !strstr($source,':') ? "/$dir/$source" : $source;
         $source = !strstr($source,'.') ? "$source.$ext" : $source;
         $source = !preg_match('/^[-a-z]+:\/\//',$source) ? AK_ASSET_URL_PREFIX.$source : $source;
-        $source = strstr($source,':') ? $source : AK_ASSET_HOST.$source;
+        $source = strstr($source,':') ? $source : $this->_controller->asset_host.$source;
         $source = substr($source,0,2) == '//' ? substr($source,1) : $source;
         
         return $source;

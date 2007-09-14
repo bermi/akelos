@@ -14,7 +14,7 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-// defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '/path/to/the/framework');
+defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '/Volumes/Files/Projects/akelos_framework/trunk');
 
 /**
  * Public PHP file. This file will launch the framework
@@ -32,7 +32,8 @@ if(!defined('AK_CONFIG_INCLUDED')){
     }
 }
 
-$ActionController = new AkActionController();
-$ActionController->handleRequest();
+require_once(AK_LIB_DIR.DS.'AkDispatcher.php');
+$Dispatcher =& new AkDispatcher();
+$Dispatcher->dispatch();
 
 ?>

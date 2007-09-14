@@ -16,7 +16,7 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-if(!defined('AK_OBJECT_CLASS_INCLUDED')){ define('AK_OBJECT_CLASS_INCLUDED',true); // Class overriding trick
+if(!class_exists('AkObject')){ 
 
 /**
 * Allows for __construct and __destruct to be used in PHP4.
@@ -147,8 +147,6 @@ class AkObject
 
 }
 
-}// End of if(!defined('AK_OBJECT_CLASS_INCLUDED')){
-
 
 function ____ak_shutdown_function($details = false)
 {
@@ -166,5 +164,6 @@ function ____ak_shutdown_function($details = false)
     }
 }
 
+}
 
 ?>

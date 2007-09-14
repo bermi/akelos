@@ -42,7 +42,6 @@ class AkLocaleManager extends AkObject
     function _getAvailableLocales()
     {
         static $available_locales;
-        Ak::profile(__CLASS__.'::'.__FUNCTION__);
 
         if(empty($available_locales)){
             $available_locales = array();
@@ -61,7 +60,6 @@ class AkLocaleManager extends AkObject
 
     function _parseLocaleConfigString($locale_settings)
     {
-        Ak::profile(__CLASS__.'::'.__FUNCTION__);
         $locale_settings = trim(str_replace(' ','',$locale_settings));
         $locale_settings = str_replace(array(';','(',')'), array(',','~','',''),$locale_settings);
         $available_locales = strstr($locale_settings,',') ? explode(',',$locale_settings) : array($locale_settings);

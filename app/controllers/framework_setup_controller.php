@@ -23,6 +23,10 @@ define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
 define('AK_FTP_SHOW_ERRORS', false);
 
 include_once(AK_CONFIG_DIR.DS.'boot.php');
+require_once(AK_LIB_DIR.DS.'AkObject.php');
+require_once(AK_LIB_DIR.DS.'AkInflector.php');
+require_once(AK_LIB_DIR.DS.'Ak.php');
+require_once(AK_LIB_DIR.DS.'AkActionController.php');
 
 $_GET['controller'] = 'framework_setup';
 

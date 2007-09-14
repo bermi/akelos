@@ -21,7 +21,5 @@ defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', AK_BASE_DIR);
 defined('AK_LIB_DIR') ? null : define('AK_LIB_DIR',AK_FRAMEWORK_DIR.DS.'lib');
 
 require_once(AK_LIB_DIR.DS.'constants.php');
-require_once(AK_LIB_DIR.DS.'Ak.php');
-require_once(AK_LIB_DIR.DS.'AkActionController.php');
 
 ?>

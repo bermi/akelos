@@ -4568,7 +4568,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function _getActAsClassName($behaviour)
     {
         $class_name = AkInflector::camelize($behaviour);
-        return !file_exists(AK_APP_BEHAVIOURS_DIR.DS.'ActsAs'.$class_name.'.php') && !class_exists('ActsAs'.$class_name) ? 
+        return file_exists(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActsAs'.$class_name.'.php') && !class_exists('ActsAs'.$class_name) ? 
         'AkActsAs'.$class_name : 'ActsAs'.$class_name;
     }
 
@@ -4581,7 +4581,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             if(substr($class_name,0,2) == 'Ak'){
                 include_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.$class_name.'.php');
             }else{
-                include_once(AK_APP_BEHAVIOURS_DIR.DS.$class_name.'.php');
+                include_once(AK_APP_PLUGINS_DIR.DS.AkInflector::underscore($class_name).DS.'lib'.DS.$class_name.'.php');
             }
         }
         if(!class_exists($class_name)){

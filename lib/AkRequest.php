@@ -8,6 +8,8 @@
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
+if(!class_exists('AkResponse')){
+
 /**
  * @package ActionController
  * @subpackage Request
@@ -16,16 +18,16 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-if(!defined('AK_REQUEST_CLASS_INCLUDED')){ define('AK_REQUEST_CLASS_INCLUDED',true); // Class overriding trick
-
-require_once(AK_LIB_DIR.DS.'AkObject.php');
-
 if(!defined('AK_DEFAULT_CONTROLLER')){
     define('AK_DEFAULT_CONTROLLER', 'page');
 }
 if(!defined('AK_DEFAULT_ACTION')){
     define('AK_DEFAULT_ACTION', 'index');
 }
+
+defined('AK_HIGH_LOAD_MODE') ? null : define('AK_HIGH_LOAD_MODE', false);
+defined('AK_AUTOMATIC_DB_CONNECTION') ? null : define('AK_AUTOMATIC_DB_CONNECTION', !AK_HIGH_LOAD_MODE);
+defined('AK_AUTOMATIC_SESSION_START') ? null : define('AK_AUTOMATIC_SESSION_START', !AK_HIGH_LOAD_MODE);
 
 // IIS does not provide a valid REQUEST_URI so we need to guess it from the script name + query string
 $_SERVER['REQUEST_URI'] = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_NAME'].(( isset($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '')));
@@ -63,16 +65,17 @@ class AkRequest extends AkObject
     var $_request = array();
 
     var $_init_check = false;
+    var $__internationalization_support_enabled = false;
 
     var $action = AK_DEFAULT_ACTION;
     var $controller = AK_DEFAULT_CONTROLLER;
     var $view;
-
+    
     /**
-     * Holds information about current environment. Initially a reference to $_SERVER
-     *
-     * @var array
-     */
+    * Holds information about current environment. Initially a reference to $_SERVER
+    *
+    * @var array
+    */
     var $env = array();
     // }}}
 
@@ -137,7 +140,6 @@ class AkRequest extends AkObject
     * @uses parseRequest
     * @return void 
     */
-
     function init()
     {
         if(!$this->_init_check){
@@ -585,14 +587,14 @@ class AkRequest extends AkObject
         $params = array_diff($params,array(''));
         if(!empty($params) && is_array($params)){
             foreach ($params as $name=>$details){
-                
+
                 if(is_array($details) && !empty($details['name']) &&  !empty($details['tmp_name']) &&  !empty($details['size'])){
-                    
-                    if( is_array($details['tmp_name']) && 
-                        (
-                            count($details['tmp_name']) == 1 && 
-                            !is_array(array_shift(array_values($details['tmp_name']))))
-                        ){
+
+                    if( is_array($details['tmp_name']) &&
+                    (
+                    count($details['tmp_name']) == 1 &&
+                    !is_array(array_shift(array_values($details['tmp_name']))))
+                    ){
 
                         foreach (array_keys($details['tmp_name']) as $k){
                             if(UPLOAD_ERR_NO_FILE != $details['error'][$k]){
@@ -633,7 +635,7 @@ class AkRequest extends AkObject
                 }
             }
         }
-        
+
         return $result;
     }
 
@@ -678,8 +680,6 @@ class AkRequest extends AkObject
                 array_walk($_GET, array('AkRequest', '_fixGpc'));
                 array_walk($_POST, array('AkRequest', '_fixGpc'));
                 array_walk($_COOKIE, array('AkRequest', '_fixGpc'));
-                //array_walk($_REQUEST, array('AkRequest', '_fixGpc'));
-                //!empty($_FILES) ? array_walk($_FILES, array('AkRequest', '_fixGpc')) : null;
             }
             define('AK_GPC_MAGIC_FIXED',true);
         }
@@ -712,6 +712,104 @@ class AkRequest extends AkObject
         }
     }
 
+
+    // {{{ recognize()
+
+    /**
+    * Recognizes a Request and returns the responsible controller instance
+    * 
+    * @return AkActionController
+    */
+    function &recognize($Map = null)
+    {
+        $this->_connectToDatabase();
+        $this->_startSession();
+        $this->_enableInternationalizationSupport();
+        $this->_mapRoutes($Map);
+        
+        $params =& $this->getParams();
+        $controller_file_name = AkInflector::underscore($params['controller']).'_controller.php';
+        $controller_class_name = AkInflector::camelize($params['controller']).'Controller';
+        $controller_path = AK_CONTROLLERS_DIR.DS.$controller_file_name;
+        include_once(AK_APP_DIR.DS.'application_controller.php');
+        if(@!include_once($controller_path)){
+            trigger_error(Ak::t('Could not find the file /app/controllers/<i>%controller_file_name</i> for '.
+            'the controller %controller_class_name',
+            array('%controller_file_name'=> $controller_file_name,
+            '%controller_class_name' => $controller_class_name)), E_USER_ERROR);
+        }
+        if(!class_exists($controller_class_name)){
+            trigger_error(Ak::t('Controller <i>%controller_name</i> does not exist',
+            array('%controller_name' => $controller_class_name)), E_USER_ERROR);
+        }
+        $Controller =& new $controller_class_name(array('controller'=>true));
+        isset($_SESSION) ? $Controller->session = $_SESSION : null;
+        return $Controller;
+
+    }
+
+    // }}}
+
+    function _enableInternationalizationSupport()
+    {
+        if(AK_AVAILABLE_LOCALES != 'en'){
+            require_once(AK_LIB_DIR.DS.'AkLocaleManager.php');
+
+            $LocaleManager = new AkLocaleManager();
+            $LocaleManager->init();
+            $LocaleManager->initApplicationInternationalization($this);
+            $this->__internationalization_support_enabled = true;
+        }
+    }
+
+    function _mapRoutes($Map = null)
+    {
+        require_once(AK_LIB_DIR.DS.'AkRouter.php');
+        if(is_file(AK_ROUTES_MAPPING_FILE)){
+            if(empty($Map)){
+                $Map =& AkRouter();
+            }
+            include(AK_ROUTES_MAPPING_FILE);
+            // Set this routes for being used via Ak::toUrl
+            Ak::toUrl($Map,true);
+            $this->checkForRoutedRequests($Map);
+        }
+    }
+    
+
+    function _connectToDatabase()
+    {
+        global $dsn;
+        if(AK_AUTOMATIC_DB_CONNECTION){
+            if(!empty($dsn)){
+                Ak::db($dsn);
+            }
+        }
+    }
+    
+    function _startSession()
+    {
+        if(AK_AUTOMATIC_SESSION_START){
+            if(!isset($_SESSION)){
+                if(AK_SESSION_HANDLER == 1 && defined('AK_DATABASE_CONNECTION_AVAILABLE') && AK_DATABASE_CONNECTION_AVAILABLE){
+                    require_once(AK_LIB_DIR.DS.'AkDbSession.php');
+                
+                    $AkDbSession = new AkDbSession();
+                    $AkDbSession->session_life = AK_SESSION_EXPIRE;
+                    session_set_save_handler (
+                    array(&$AkDbSession, '_open'),
+                    array(&$AkDbSession, '_close'),
+                    array(&$AkDbSession, '_read'),
+                    array(&$AkDbSession, '_write'),
+                    array(&$AkDbSession, '_destroy'),
+                    array(&$AkDbSession, '_gc')
+                    );
+                }
+                @session_start();
+            }
+        }
+    }
+
 }
 
 function &AkRequest()
@@ -721,7 +819,7 @@ function &AkRequest()
     return $AkRequest;
 }
 
-}// End of if(!defined('AK_REQUEST_CLASS_INCLUDED')){
 
+}
 
 ?>

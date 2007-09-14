@@ -77,7 +77,6 @@ defined('AK_TEST_DIR') ? null : define('AK_TEST_DIR', AK_BASE_DIR.DS.'test');
 defined('AK_SCRIPT_DIR') ? null : define('AK_SCRIPT_DIR',AK_BASE_DIR.DS.'script');
 defined('AK_APP_VENDOR_DIR') ? null : define('AK_APP_VENDOR_DIR',AK_APP_DIR.DS.'vendor');
 defined('AK_APP_PLUGINS_DIR') ? null : define('AK_APP_PLUGINS_DIR',AK_APP_VENDOR_DIR.DS.'plugins');
-defined('AK_APP_BEHAVIOURS_DIR') ? null : define('AK_APP_BEHAVIOURS_DIR',AK_APP_VENDOR_DIR.DS.'behaviours');
 
 
 defined('AK_TMP_DIR') ? null : define('AK_TMP_DIR', AK_BASE_DIR.DS.'tmp');

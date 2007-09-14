@@ -18,7 +18,8 @@
 
 
 require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
-
+require_once(AK_LIB_DIR.DS.'AkActionController'.DS.'AkPaginator.php');
+            
 class PaginationHelper extends AkActionViewHelper
 {
     function sortable_link($column, $url_options = array(), $link_options = array())

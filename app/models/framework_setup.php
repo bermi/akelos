@@ -240,13 +240,18 @@ class FrameworkSetup extends AkObject
 
     function runFrameworkInstaller()
     {
+        static $unique_dsn = array();
         require_once(AK_LIB_DIR.DS.'AkInstaller.php');
         require_once(AK_APP_DIR.DS.'installers'.DS.'framework_installer.php');
 
         foreach (array('production', 'development') as $mode){
-            $db_conn =& Ak::db($this->_getDsn($mode), $mode);
-            $installer =& new FrameworkInstaller($db_conn);
-            $installer->install(null, array('mode' => $mode));
+            $dsn = $this->_getDsn($mode);
+            if(!isset($unique_dsn[$dsn])){
+                $db_conn =& Ak::db($dsn, $mode);
+                $installer =& new FrameworkInstaller($db_conn);
+                $installer->install(null, array('mode' => $mode));
+                $unique_dsn[$dsn] = true;
+            }
         }
 
         return true;
@@ -359,7 +364,7 @@ CONFIG;
 
 
             $settings['%locales'] = $this->getLocales();
-            
+
             $settings['%AK_URL_REWRITING'] = $this->isUrlRewriteEnabled() ? '' : "// The web configuration wizard could not detect if you have mod_rewrite enabled. \n// If that is the case, you should uncomment the next line line for better performance. \n// ";
             $settings['%AK_FRAMEWORK_DIR'] = defined('AK_FRAMEWORK_DIR') ?
             "defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '".AK_FRAMEWORK_DIR."');" : '';
@@ -561,7 +566,7 @@ CONFIG;
         'ftp_user' => $this->getFtpUser(),
         'ftp_host' => $this->getFtpHost(),
         'ftp_path' => $this->getFtpPath(),
-        
+
         'random' => Ak::randomString(),
         );
     }

@@ -8,7 +8,7 @@
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
-require_once(AK_LIB_DIR.DS.'AkObject.php');
+if(!class_exists('AkResponse')){
 
 /**
  * @package ActionController
@@ -23,7 +23,8 @@ class AkResponse extends AkObject
     var $_headers = array();
     var $_headers_sent = array();
     var $body = '';
-
+    var $__Logger;
+    
     function set($data, $id = null)
     {
         if(isset($id)){
@@ -60,11 +61,12 @@ class AkResponse extends AkObject
 
     function outputResults()
     {
-         Ak::profile('Started sending response'.__CLASS__.'::'.__FUNCTION__.' '.__FILE__.' on line '.__LINE__);
         $this->sendHeaders();
         if(is_object($this->body) && method_exists($this->body,'stream')){
+            AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message("Sending response as stream") : null;
             $this->body->stream();
         }else{
+            AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message("Sending response") : null;
             echo $this->body;
         }
     }
@@ -89,6 +91,7 @@ class AkResponse extends AkObject
         }
         
         if(!empty($this->_headers) && is_array($this->_headers)){
+            $this->addHeader('Connection: close');
             foreach ($this->_headers as $k=>$v){
                 $header = trim((!is_numeric($k) ? $k.': ' : '').$v);
                 $this->_headers_sent[] = $header;
@@ -102,6 +105,7 @@ class AkResponse extends AkObject
                 if(strtolower(substr($header,0,13)) == 'content-type:'){
                     $_has_content_type = true;
                 }
+                AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message("Sending header:  $header") : null;
                 header($header);
             }
         }
@@ -191,7 +195,10 @@ function &AkResponse()
 {
     $null = null;
     $AkResponse =& Ak::singleton('AkResponse', $null);
+    AK_LOG_EVENTS && empty($AkResponse->_Logger) ? ($AkResponse->_Logger =& Ak::getLogger()) : null;
     return $AkResponse;
+}
+
 }
 
 ?>
