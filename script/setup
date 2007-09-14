@@ -135,7 +135,7 @@ class AkelosInstaller
         $this->yield("\n    Linking the application with the framework at ".$this->options['source'])."\n";
         foreach (array(
         'config'.DS.'DEFAULT-config.php',
-        'public'.DS.'index.php') as $file){
+        'app'.DS.'controllers'.DS.'framework_setup_controller.php') as $file){
             if(file_exists($this->options['directory'].DS.$file)){
                 $file_contents = str_replace("// defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '/path/to/the/framework');",
                 "defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '".addcslashes($this->options['source'],'\\')."');",

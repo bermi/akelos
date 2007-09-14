@@ -16,7 +16,8 @@ define('AK_APP_LOCALES','en,ja,es');
 defined('DS') ? null : define('DS', DIRECTORY_SEPARATOR);
 defined('AK_BASE_DIR') ? null : define('AK_BASE_DIR', str_replace(DS.'app'.DS.'controllers'.DS.'framework_setup_controller.php','',__FILE__));
 defined('AK_CONFIG_DIR') ? null : define('AK_CONFIG_DIR', AK_BASE_DIR.DS.'config');
-
+// defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '/path/to/the/framework'); 
+	
 define('AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES', true);
 define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
 
@@ -208,7 +209,8 @@ class FrameworkSetupController extends AkActionController
 
 }
 
-$ActionController = new AkActionController();
-$ActionController->handleRequest();
+require_once(AK_LIB_DIR.DS.'AkDispatcher.php');
+$Dispatcher =& new AkDispatcher();
+$Dispatcher->dispatch();
 
 ?>

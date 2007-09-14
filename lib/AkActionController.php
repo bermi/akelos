@@ -143,7 +143,7 @@ class AkActionController extends AkObject
         
         $this->Request =& $Request;
         $this->Response =& $Response;
-        $this->params =& $this->Request->getParams();
+        $this->params = $this->Request->getParams();
         $this->_action_name = $this->Request->getAction();
         
         if(!method_exists($this, $this->_action_name)){
@@ -157,22 +157,20 @@ class AkActionController extends AkObject
         Ak::t('Akelos'); // We need to get locales ready
         
         if($this->_high_load_mode !== true){
-        
-            // Before filters
+            if(!empty($this->_auto_instantiate_models)){
+                $this->instantiateIncludedModelClasses();
+            }
             if(!empty($this->helpers)){
-                $this->beforeFilter('instantiateHelpers');
+                $this->instantiateHelpers();
             }
             if(!empty($this->_enable_plugins)){
-                $this->beforeFilter('loadPlugins');
-            }
-            if(!empty($this->_auto_instantiate_models)){
-                $this->beforeFilter('instantiateIncludedModelClasses');
+                $this->loadPlugins();
             }
         }else{
             $this->_enableLayoutOnRender = false;
         }
        
-        $this->beforeFilter('_ensureProperProtocol');
+        $this->_ensureProperProtocol();
         
         // After filters
         $this->afterFilter('_handleFlashAttribute');
