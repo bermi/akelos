@@ -129,8 +129,9 @@ class AkSintagsParser
     }
     function _unescapeChars($string, $strip_slashes_from_tokens = false)
     {
-        $replacements = $strip_slashes_from_tokens ? array_map('stripcslashes',array_keys($this->escape_chars)) : array_keys($this->escape_chars);
-        return str_replace(array_values($this->escape_chars),$replacements,$string);
+        $escape_chars = array_merge(array('{' => '____AKST_OT____','}' => '____AKST_CT____'), $this->escape_chars);
+        $replacements = $strip_slashes_from_tokens ? array_map('stripcslashes',array_keys($escape_chars)) : array_keys($escape_chars);
+        return str_replace(array_values($escape_chars),$replacements,$string);
     }
 
     //------------------------------------
