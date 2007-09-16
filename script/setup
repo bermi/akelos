@@ -62,8 +62,8 @@ class AkelosInstaller
         if(empty($this->destination_tree) || !empty($this->options['force'])){
             if(!is_dir($this->options['directory'])){
                 if(!$this->_makeDir($this->options['directory'])){
-                	$this->addError("Can't create directory: " . $this->options['directory']);
-                	return false;
+                    $this->addError("Can't create directory: " . $this->options['directory']);
+                    return false;
                 }
             }
 
@@ -73,6 +73,8 @@ class AkelosInstaller
                 $this->_setupApplicationTestingEnvironment();
                 $this->_linkDependencies();
             }
+
+            $this->runEvironmentSpecificTasks();
 
             $this->_linkPublicHtmlFolder();
 
@@ -88,16 +90,16 @@ class AkelosInstaller
     {
         $source_test_dir = $this->options['source'].DS.'test';
         $test_dir = $this->options['directory'].DS.'test';
-        
+
         $this->_makeDir($test_dir);
         $this->_copyFile($source_test_dir.DS.'app.php');
-        
+
         $this->_makeDir($test_dir.DS.'fixtures');
         $this->_makeDir($test_dir.DS.'fixtures'.DS.'app');
-        
+
         $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'app'.DS.'application_controller.php');
         $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'app'.DS.'shared_model.php');
-        
+
         $this->_makeDir($test_dir.DS.'fixtures'.DS.'config');
         $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'config'.DS.'config.php');
 
@@ -194,7 +196,7 @@ class AkelosInstaller
             if(!is_dir($dir)){
                 $this->yield("    Creating directory: ".$dir);
                 if(!@mkdir($dir))
-                	return false;
+                return false;
             }
         }
         return true;
@@ -297,6 +299,70 @@ class AkelosInstaller
     }
 
 
+    function runEvironmentSpecificTasks()
+    {
+        if($evironment = $this->guessEnvironment()){
+            $method_name = 'run'.$evironment.'Tasks';
+            if(method_exists($this, $method_name)){
+                $this->$method_name();
+            }
+        }
+    }
+
+    // Environment specific tasks
+
+    function guessEnvironment()
+    {
+        if(AK_WINDOWS){
+            if(file_exists('C:/xampp/apache/conf/httpd.conf')){
+                return 'DefaultXamppOnWindows';
+            }
+        }
+        return false;
+    }
+
+    function runDefaultXamppOnWindowsTasks()
+    {
+        // XAMPP has mod_rewrite disabled by default so we will try to enable it.
+        $http_conf = file_get_contents('C:/xampp/apache/conf/httpd.conf');
+        if(strstr($http_conf, '#LoadModule rewrite_module')){
+            $this->yield('Enabling mod_rewrite');
+            file_put_contents('C:/xampp/apache/conf/httpd.conf.akelos', $http_conf);
+            file_put_contents('C:/xampp/apache/conf/httpd.conf',
+            str_replace(
+            '#LoadModule rewrite_module',
+            'LoadModule rewrite_module',
+            $http_conf
+            ));
+
+            $this->yield('Restarting Apache');
+            // Stop apache
+            exec('C:\xampp\apache\bin\pv -f -k apache.exe -q');
+            exec('rm C:\xampp\apache\logs\httpd.pid');
+
+            // Start Apache in the background
+            $shell = new COM('WScript.Shell');
+            $shell->Run('C:\xampp\apache\bin\apache.exe', 0, false);
+        }
+
+        $my_cnf = @file_get_contents('C:/xampp/mysql/bin/my.cnf');
+        // InnoDB engine is not enabled by default on XAMPP we need it enabled in order to use transactions
+        if(strstr($my_cnf, '#innodb_')){
+            $this->yield('Enabling InnoDB MySQL engine.');
+            file_put_contents('C:/xampp/mysql/bin/my.cnf.akelos', $my_cnf);
+            file_put_contents('C:/xampp/mysql/bin/my.cnf',
+            str_replace(
+            array('skip-innodb', '#innodb_', '#set-variable = innodb'),
+            array('#skip-innodb', 'innodb_', 'set-variable = innodb')
+            ,$my_cnf));
+
+            $this->yield('Restarting MySQL server.');
+            $shell = new COM('WScript.Shell');
+            $shell->Run('C:\xampp\mysql\bin\mysqladmin --user=pma --password= shutdown', 0, false);
+            $shell = new COM('WScript.Shell');
+            $shell->Run('C:\xampp\mysql\bin\mysqld --defaults-file=C:\xampp\mysql\bin\my.cnf --standalone --console', 0, false);
+        }
+    }
 }
 
 
