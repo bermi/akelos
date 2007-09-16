@@ -457,9 +457,8 @@ class Ak
                 foreach ($items_to_delete['directories'] as $directory){
                     $sucess = $sucess ? Ak::directory_delete($directory, $options) : $sucess;
                 }
-                return $sucess;
             }
-            return rmdir($options['base_path'].DS.$dir_name);
+            return $sucess ? rmdir($options['base_path'].DS.$dir_name) : $sucess;
         }
     }
 

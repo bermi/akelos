@@ -98,6 +98,10 @@ class test_of_Ak_file_functions extends  UnitTestCase
         $this->assertFalse(Ak::directory_delete(' '));
         $this->assertFalse(Ak::directory_delete('/'));
         $this->assertFalse(Ak::directory_delete('./'));
+        
+        clearstatcache();
+        $this->assertFalse(is_dir(AK_BASE_DIR.DS.'ak_test_folder'), 'Did not remove empty dir ./ak_test_folder');
+        $this->assertFalse(is_dir(AK_BASE_DIR.DS.'ak_test_folder_copy'), 'Did not remove nested dir ./ak_test_folder_copy');
     }
     
     function test_mime_type_detection()
