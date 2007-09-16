@@ -743,7 +743,7 @@ class AkRequest extends AkObject
             array('%controller_name' => $controller_class_name)), E_USER_ERROR);
         }
         $Controller =& new $controller_class_name(array('controller'=>true));
-        isset($_SESSION) ? $Controller->session = $_SESSION : null;
+        isset($_SESSION) ? $Controller->session =& $_SESSION : null;
         return $Controller;
 
     }
