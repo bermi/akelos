@@ -24,11 +24,11 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php');
 
 /**
 * Provides a set of helpers for creating JavaScript macros that rely on and often bundle methods from JavaScriptHelper into
-* larger units. These macros also rely on counterparts in the controller that provide them with their backing. The in-place
-* editing relies on ActionController::Base.in_place_edit_for and the autocompletion relies on 
-* ActionController::Base.auto_complete_for.
+* larger units. These macros are deprecated and will be removed on Akelos 0.9
+* 
+* @deprecated 
 */
-class JavascriptMacrosHelper extends AkActionViewHelper 
+class JavascriptMacrosHelper extends AkActionViewHelper
 {
 
     /**
@@ -60,9 +60,10 @@ class JavascriptMacrosHelper extends AkActionViewHelper
     * <tt>options</tt>::           Pass through options to the AJAX call (see prototype's Ajax.Updater)
     * <tt>with</tt>::              JavaScript snippet that should return what is to be sent
     *                               in the AJAX call, +form+ is an implicit parameter
+    * @deprecated 
     */
-      function in_place_editor($field_id, $options = array())
-      {
+    function in_place_editor($field_id, $options = array())
+    {
         $function =  "new Ajax.InPlaceEditor(";
         $function .= "'{$field_id}', ";
         $function .= "'".UrlHelper::url_for($options['url'])."'";
@@ -73,15 +74,15 @@ class JavascriptMacrosHelper extends AkActionViewHelper
         }
         if (!empty($options['save_text'])){
             $js_options['okText'] = AK::t("{$options['save_text']}");
-        }        
+        }
         if (!empty($options['rows'])){
             $js_options['rows'] = $options['rows'];
         }
         if (!empty($options['external_control'])){
-            $js_options['externalControl'] = $options['external_control'] ;    
+            $js_options['externalControl'] = $options['external_control'] ;
         }
         if (!empty($options['options'])){
-            $js_options['ajaxOptions'] = $options['options'];    
+            $js_options['ajaxOptions'] = $options['options'];
         }
         if (!empty($options['with'])){
             $js_options['callback'] = "function(form) { return {$options['with']} }" ;
@@ -92,31 +93,10 @@ class JavascriptMacrosHelper extends AkActionViewHelper
         $function .= ')';
 
         return JavaScriptHelper::javascript_tag($function);
-      }
-      
-      /**
-      * Renders the value of the specified object and method with in-place editing capabilities.
-      *
-      * See the RDoc on ActionController::InPlaceEditing to learn more about this.
-      */
-      function in_place_editor_field($object, $method, $tag_options = array(), $in_place_editor_options = array())
-      {
-          
-        $tag = new AkFormHelperInstanceTag($object_name, $column_name, $this, null, $object);
-        
-        /**
-         * @todo: http://cpan.uwinnipeg.ca/htdocs/HTML-Prototype/HTML/Prototype.pm.html (Catalyst)
-         * 
-         * tag = ::ActionView::Helpers::InstanceTag.new(object, method, self)
-         * tag_options = {:tag => "span", :id => "#{object}_#{method}_#{tag.object.id}_in_place_editor", :class => "in_place_editor_field"}.merge!(tag_options)
-         * in_place_editor_options[:url] = in_place_editor_options[:url] || url_for({ :action => "set_#{object}_#{method}", :id => tag.object.id })
-         * tag.to_content_tag(tag_options.delete(:tag), tag_options) +
-         * in_place_editor(tag_options[:id], in_place_editor_options)
-         */
-      }
-      
-      
-      /**
+    }
+
+
+    /**
       * Adds AJAX autocomplete functionality to the text input field with the 
       * DOM ID specified by +field_id+.
       *
@@ -164,34 +144,35 @@ class JavascriptMacrosHelper extends AkActionViewHelper
       * <tt>select</tt>::    Pick the class of the element from which the value for 
       *                       insertion should be extracted. If this is not specified,
       *                       the entire element is used.
+      * @deprecated 
       */
-      function auto_complete_field($field_id, $options = array())
-      {
+    function auto_complete_field($field_id, $options = array())
+    {
         $function =  "var {$field_id}_auto_completer = new Ajax.Autocompleter(";
         $function .= "'{$field_id}', ";
         $function .= !empty($options['update']) ? "'{$options['update']}', " : "'{$field_id}_auto_complete', ";
         $function .= "'".UrlHelper::url_for($options['url'])."'";
-        
+
         $js_options = array();
         if (!empty($options['tokens'])){
             $js_options['tokens'] = JavaScriptHelper::_array_or_string_for_javascript($options['tokens']) ;
         }
         if (!empty($options['with'])) {
-            $js_options['callback'] = "function(element, value) { return {$options['with']} }";	
+            $js_options['callback'] = "function(element, value) { return {$options['with']} }";
         }
         if (!empty($options['indicator'])) {
-            $js_options['indicator'] = "'{$options['indicator']}'";	
+            $js_options['indicator'] = "'{$options['indicator']}'";
         }
         if (!empty($options['select'])) {
-            $js_options['select'] = "'{$options['select']}'";	
+            $js_options['select'] = "'{$options['select']}'";
         }
-        
+
         $default_options = array(
-            'on_show' => 'onShow', 
-            'on_hide' => 'onHide', 
-            'min_chars' => 'min_chars'
+        'on_show' => 'onShow',
+        'on_hide' => 'onHide',
+        'min_chars' => 'min_chars'
         );
-        
+
         foreach ($default_options as $key=>$default_option) {
             if (!empty($options[$key])) {
                 $js_options[$default_option] = $options[$key];
@@ -199,9 +180,9 @@ class JavascriptMacrosHelper extends AkActionViewHelper
         }
         $function .= ', '.JavaScriptHelper::_options_for_javascript($js_options).')';
         return JavaScriptHelper::javascript_tag($function);
-      }
-      
-      /**
+    }
+
+    /**
       * Use this method in your view to generate a return for the AJAX autocomplete requests.
       *
       * Example action:
@@ -214,47 +195,49 @@ class JavascriptMacrosHelper extends AkActionViewHelper
       *
       * The auto_complete_result can of course also be called from a view belonging to the 
       * auto_complete action if you need to decorate it further.
+      *
+      * @deprecated 
       */
-      function auto_complete_result($entries, $field, $phrase = null)
-      {
-          /**
-           * @todo: check the function h() used on ruby version instead of @$entry[$field]
-           */
-          if (empty($entries)) {
-          	return '';
-          }
-          foreach ($entries as $entry) {
-          	$items[] = TagHelper::content_tag('li',!empty($phrase) ? TextHelper::highlight($entry[$field], $phrase) : @$entry[$field]);
-          }
-          return TagHelper::content_tag('ul', join('', array_unique($items)));
-      }
-      
-      
-      /**
+    function auto_complete_result($entries, $field, $phrase = null)
+    {
+        if (empty($entries)) {
+            return '';
+        }
+        foreach ($entries as $entry) {
+            $items[] = TagHelper::content_tag('li',!empty($phrase) ? TextHelper::highlight(TextHelper::h($entry[$field]), $phrase) : TextHelper::h(@$entry[$field]));
+        }
+        return TagHelper::content_tag('ul', join('', array_unique($items)));
+    }
+
+
+    /**
       * Wrapper for text_field with added AJAX autocompletion functionality.
       *
       * In your controller, you'll need to define an action called
       * auto_complete_for_object_method to respond the AJAX calls,
       * 
-      * See the RDoc on ActionController::AutoComplete to learn more about this.
+      * @deprecated 
       */
-      function text_field_with_auto_complete($object, $method, $tag_options = array(), $completion_options = array())
-      {
+    function text_field_with_auto_complete($object, $method, $tag_options = array(), $completion_options = array())
+    {
         if (!isset($tag_options['autocomplete'])) $tag_options['autocomplete'] = "off";
 
         return (
-            !empty($completion_options['skip_style']) ? "" : $this->_auto_complete_stylesheet()) .
-            $this->_controller->form_helper->text_field($object, $method, $tag_options) .
-            TagHelper::content_tag('div', '', array('id' => "{$object}_{$method}_auto_complete", 'class' => 'auto_complete')) .
-            $this->auto_complete_field("{$object}_{$method}", array_merge(array('url' => array('action' => "auto_complete_for_{$object}_{$method}" )), $completion_options)
+        !empty($completion_options['skip_style']) ? "" : $this->_auto_complete_stylesheet()) .
+        $this->_controller->form_helper->text_field($object, $method, $tag_options) .
+        TagHelper::content_tag('div', '', array('id' => "{$object}_{$method}_auto_complete", 'class' => 'auto_complete')) .
+        $this->auto_complete_field("{$object}_{$method}", array_merge(array('url' => array('action' => "auto_complete_for_{$object}_{$method}" )), $completion_options)
         );
-      }
-      
-      
-      function _auto_complete_stylesheet()
-      {
-          return TagHelper::content_tag('style', 
-          <<<EOT
+    }
+
+
+    /**
+       * @deprecated 
+       */
+    function _auto_complete_stylesheet()
+    {
+        return TagHelper::content_tag('style',
+        <<<EOT
           div.auto_complete {
               width: 350px;
               background: #fff;
@@ -279,8 +262,8 @@ class JavascriptMacrosHelper extends AkActionViewHelper
               padding:0;
             }
 EOT
-        );
-      }
-                
+);
+    }
+
 }
 ?>
