@@ -710,11 +710,11 @@ CONFIG;
 
     function relativizeStylesheetPaths()
     {
-        if($this->hasUrlSuffix()){
+        $asset_path = $this->_getAssetBasePath();
+        if($this->hasUrlSuffix() || !empty($asset_path)){
             $url_suffix = trim($this->getUrlSuffix(),'/');
-            $asset_path = $this->_getAssetBasePath();
             if(!empty($asset_path)){
-                $url_suffix = $url_suffix.'/'.$asset_path;
+                $url_suffix = trim($url_suffix.'/'.$asset_path,'/');
             }
             foreach ($this->stylesheets as $stylesheet) {
                 $filename = AK_PUBLIC_DIR.DS.'stylesheets'.DS.$stylesheet.'.css';
