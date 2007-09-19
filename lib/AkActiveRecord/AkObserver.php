@@ -21,73 +21,68 @@ require_once(AK_LIB_DIR.DS.'AkInflector.php');
 require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 
 /**
-* Observer classes respond to lifecycle callbacks to implement trigger-like
-* behavior outside the original class. This is a great way to reduce the
-* clutter that normally comes when the model class is burdened with
-* functionality that doesn't pertain to the core responsibility of the
-* class. Example:
+* Observer classes respond to life-cycle callbacks to implement trigger-like 
+* behavior outside the original class. This is a great way to reduce the clutter
+* that normally comes when the model class is burdened with functionality that
+* doesn't pertain to the core responsibility of the class. 
 * 
-*   class CommentObserver extends AkObserver
-*   {
-*       function afterSave($comment)
-*       {
-*           Ak::mail("admin@example.com", "New comment was posted", $comment->toString());
-*       }
-*   }
+* Example:
+* 
+*     class CommentObserver extends AkObserver
+*     {
+*         function afterSave($comment)
+*         {
+*             Ak::mail("admin@example.com", "New comment was posted",
+*                     $comment->toString());
+*         }
+*     }
 * 
 * This Observer sends an email when a Comment::save is finished.
 * 
-* == Observing a class that can't be inferred
+* ## Observing a class that can't be inferred
 * 
-* Observers will by default be mapped to the class with which they share a name. So CommentObserver will
-* be tied to observing Comment, ProductManagerObserver to ProductManager, and so on. If you want to name your observer
-* differently than the class you're interested in observing, you can use the AkActiveRecord->observe() class method:
+* Observers will by default be mapped to the class with which they share a name.
+* So CommentObserver will be tied to observing Comment, ProductManagerObserver
+* to ProductManager, and so on. If you want to name your observer differently
+* than the class you're interested in observing, you can use the
+* AkActiveRecord->observe() class method:
 * 
-*   class AuditObserver extends AkObserver
-*   {
-*       function __construct()
-*       {
-*           $this->observe('Account');
-*       }
+*     function afterUpdate(&$account)
+*     {
+*         $AuditTrail =& new AuditTrail($account, "UPDATED");
+*         $AuditTrail->save();
+*     }
 * 
-*       function afterUpdate(&$account)
-*       {
-*           $AuditTrail =& new AuditTrail($account, "UPDATED");
-*           $AuditTrail->save();
-*       }
-*   }
+* If the audit observer needs to watch more than one kind of object, this can be
+* specified with multiple arguments:
 * 
-* If the audit observer needs to watch more than one kind of object, this can be specified with multiple arguments:
+*     function afterUpdate(&$record)
+*     {
+*         $ObservedRecord =& new AuditTrail($record, "UPDATED");
+*         $ObservedRecord->save();
+*     }
 * 
-*   class AuditObserver extends AkObserver
-*   {
-*       function __construct()
-*       {
-*           $this->observe('Account', 'Balance');
-*       }
+* The AuditObserver will now act on both updates to Account and Balance by
+* treating them both as records.
 * 
-*       function afterUpdate(&$record)
-*       {
-*           $ObservedRecord =& new AuditTrail($record, "UPDATED");
-*           $ObservedRecord->save();
-*       }
-*   }
+* ## Available callback methods
 * 
-* The AuditObserver will now act on both updates to Account and Balance by treating them both as records.
+* The observer can implement callback methods for each of these methods:
+* beforeCreate, beforeValidation, beforeValidationOnCreate, beforeSave,
+* afterValidation, afterValidationOnCreate, afterCreate and afterSave
 * 
-* == Available callback methods
+* ## Triggering Observers
 * 
-* The observer can implement callback methods for each of these methods: beforeCreate, beforeValidation, beforeValidationOnCreate, beforeSave, afterValidation, afterValidationOnCreate, afterCreate and afterSave
+* In order to activate an observer, you need to call create an Observer instance
+* and attach it to a model. 
 * 
-* == Triggering Observers
+* In the Akelos Framework, this can be done in controllers using the short-hand
+* of for example: 
 * 
-* In order to activate an observer, you need to call create an Observer instance and attach it to a model. 
-*   In the Akelos Framework, this can be done in controllers
-*   using the short-hand of for example 
-*   $ComentObserverInstance =& new CommentObserver();
-*   $Model->addObserver(&$ComentObserverInstance);
+*     $ComentObserverInstance =& new CommentObserver();
+*     $Model->addObserver(&$ComentObserverInstance);
+*
 */
-
 class AkObserver extends AkObject
 {
     /**

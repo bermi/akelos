@@ -114,7 +114,7 @@ defined('AK_PHP5') ? null : define('AK_PHP5', version_compare(PHP_VERSION, '5', 
 
 if(!AK_CLI && AK_WEB_REQUEST){
 
-    defined('AK_SITE_URL_SUFFIX') ? null : define('AK_SITE_URL_SUFFIX', str_replace(array(join(DS,array_diff((array)@explode(DS,AK_BASE_DIR), (array)@explode('/',AK_REQUEST_URI))), DS), array('','/'), AK_BASE_DIR));
+    defined('AK_SITE_URL_SUFFIX') ? null : define('AK_SITE_URL_SUFFIX', str_replace(array(join(DS,array_diff((array)@explode(DS,AK_BASE_DIR), (array)@explode('/',AK_REQUEST_URI))), DS,'//'), array('','/','/'), AK_BASE_DIR));
 
     defined('AK_AUTOMATIC_SSL_DETECTION') ? null : define('AK_AUTOMATIC_SSL_DETECTION', 1);
 

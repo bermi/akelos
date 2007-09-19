@@ -722,7 +722,6 @@ CONFIG;
                 empty($relativized_css) ? null : @Ak::file_put_contents($filename, $relativized_css);
             }
         }
-
     }
 
     function _getAssetBasePath()

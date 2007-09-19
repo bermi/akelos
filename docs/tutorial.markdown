@@ -257,7 +257,7 @@ and
 
     ./script/generate scaffold Author
 
-This will generate a bunch of files and folders with code that really works!. Don't trust me? Try it yourself. Point your browser to [http://localhost/booklink/author](http://localhost/booklink/author) and [http://localhost/booklink/books](http://localhost/booklink/books) to start adding authors and books. Create some records and come back for an explanation of what is going under the hood.
+This will generate a bunch of files and folders with code that really works!. Don't trust me? Try it yourself. Point your browser to [http://localhost/booklink/author](http://localhost/booklink/author) and [http://localhost/booklink/books](http://localhost/booklink/books) or to  [http://localhost/booklink/?ak=author](http://localhost/booklink/?ak=author) and [http://localhost/booklink/?ak=books](http://localhost/booklink/?ak=books) in case mod_rewrite is disabled to start adding authors and books. Create some records and come back for an explanation of what is going under the hood.
 
 
 The Akelos Workflow
