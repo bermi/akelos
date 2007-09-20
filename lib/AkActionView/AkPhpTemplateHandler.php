@@ -119,7 +119,7 @@ class AkPhpTemplateHandler
                     $this->_options['template_base_path'] = str_replace(AK_BASE_DIR, AK_COMPILED_VIEWS_DIR, $this->_options['template_base_path']);
                 }
             }else{
-                $this->_options['template_base_path'] = AK_BASE_DIR.DS.'tmp';
+                $this->_options['template_base_path'] = AK_COMPILED_VIEWS_DIR;
             }
         }
         return $this->_options['template_base_path'];
