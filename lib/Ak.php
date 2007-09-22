@@ -1422,6 +1422,13 @@ class Ak
         if(!class_exists($converter_class_name)){
             $file_name = $options['path'].DS.$converter_class_name.'.php';
             if(!file_exists($file_name)){
+                if(defined('AK_REMOTE_CONVERTER_URI')){
+                    require_once(AK_LIB_DIR.DS.'AkConverters'.DS.'AkRemoteConverter.php');
+                    $result = AkRemoteConverter::convert($options['from'], $options['to'], $options['source']);
+                    if($result !== false){
+                        return $result;
+                    }
+                }
                 trigger_error(Ak::t('Could not locate %from to %to converter on %file_name',array('%from'=>$options['from'],'%to'=>$options['to'],'%file_name'=>$file_name)),E_USER_NOTICE);
                 return false;
             }
