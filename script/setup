@@ -313,7 +313,7 @@ class AkelosInstaller
 
     function guessEnvironment()
     {
-        if(AK_WINDOWS){
+        if(AK_OS == 'WINDOWS'){
             if(file_exists('C:/xampp/apache/conf/httpd.conf')){
                 return 'DefaultXamppOnWindows';
             }
