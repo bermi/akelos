@@ -34,7 +34,7 @@ class AkelosInstaller
         );
         $this->options = array_merge($default_options, $options);
 
-        $this->options['directory'] = $this->_absolutePath($this->options['directory']);
+        $this->options['directory'] = $this->_absolutePath(@$this->options['directory']);
 
         if(empty($this->options['directory'])){
             trigger_error('You must supply a valid destination path', E_USER_ERROR);
@@ -422,7 +422,6 @@ $config =  array(
 'short'   => 'p',
 'max'     => 1,
 'min'     => 1,
-'default' => false,
 'desc'    => 'Location where the application will be accesed by the webserver.'),
 
 
