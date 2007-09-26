@@ -2,7 +2,7 @@
 
 class Location extends ActiveRecord
 {
-    var $act_as = 'nested_set';
+    var $acts_as = array('nested_set' => array('scope'=>'owner_id = ?'));
 }
 
 ?>

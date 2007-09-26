@@ -105,10 +105,9 @@ class AkActsAsTree extends AkObserver
     *   Example: <tt>actsAsTree(array('scope' => array('todo_list_id = ? AND completed = 0',$todo_list_id)));</tt>
     */
 
-    var $scope = '';
     var $parent_column = 'parent_id';
-    
-    var $_scope_condition;
+    var $scope;
+    var $scope_condition;
     var $_parent_column_name = 'parent_id';
     var $_dependent = false;
 
@@ -124,7 +123,6 @@ class AkActsAsTree extends AkObserver
         empty($options['parent_column']) ? null : ($this->_parent_column_name = $options['parent_column']);
         empty($options['dependent']) ? null : ($this->_dependent = $options['dependent']);
         empty($options['scope']) ? null : $this->setScopeCondition($options['scope']);
-        $this->scope = !empty($options['scope']) ? $options['scope'] : $this->scope;
         $this->parent_column = !empty($options['parent_column']) ? $options['parent_column'] : $this->parent_column;
         return $this->_ensureIsActiveRecordInstance($this->_ActiveRecordInstance);
     }
@@ -162,8 +160,11 @@ class AkActsAsTree extends AkObserver
     
     function getScopeCondition()
     {
-        // An allways true condition in case no scope has been specified
-        if(empty($this->scope_condition) && empty($this->scope)){
+        if (!empty($this->variable_scope_condition)){
+            return $this->_ActiveRecordInstance->_getVariableSqlCondition($this->variable_scope_condition);
+            
+        // True condition in case we don't have a scope
+        }elseif(empty($this->scope_condition) && empty($this->scope)){
             $this->scope_condition = (substr($this->_ActiveRecordInstance->_db->databaseType,0,4) == 'post') ? 'true' : '1';
         }elseif (!empty($this->scope)){
             $this->setScopeCondition(join(' AND ',array_diff(array_map(array(&$this,'getScopedColumn'),(array)$this->scope),array(''))));
@@ -174,7 +175,11 @@ class AkActsAsTree extends AkObserver
 
     function setScopeCondition($scope_condition)
     {
-        $this->scope_condition  = $scope_condition;
+        if(!is_array($scope_condition) && strstr($scope_condition, '?')){
+            $this->variable_scope_condition = $scope_condition;
+        }else{
+            $this->scope_condition  = $scope_condition;
+        }
     }
 
     function getScopedColumn($column)

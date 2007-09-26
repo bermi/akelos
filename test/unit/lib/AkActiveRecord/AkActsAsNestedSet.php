@@ -228,8 +228,7 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
 
         $this->assertEqual('Europe',$this->getLocation($this->Location->nested_set->getRoot()));
         $this->assertTrue($this->Europe->nested_set->isRoot());
-
-
+        
         $this->Spain =& $this->Location->create('name->','Spain');
 
         $this->Europe->nested_set->addChild($this->Spain);

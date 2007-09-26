@@ -20,7 +20,7 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
         parent::UnitTestCase();
         $this->_createNewTestingModelDatabase('AkTestCategory');
         $this->_createNewTestingModel('AkTestCategory');
-        $this->_createNewTestingModel('AkDependentTestCategory');         
+        $this->_createNewTestingModel('AkDependentTestCategory');
     }
 
     function setUp()
@@ -40,29 +40,29 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
         switch ($test_model_name) {
 
             case 'AkTestCategory':
-            $model_source =
-            '<?php
+                $model_source =
+                '<?php
     class AkTestCategory extends AkActiveRecord 
     {
         var $act_as = "tree";
     } 
 ?>';
-            break;
-            
-                        case 'AkDependentTestCategory':
-            $model_source =
-            '<?php
+                break;
+
+            case 'AkDependentTestCategory':
+                $model_source =
+                '<?php
     class AkDependentTestCategory extends AkActiveRecord 
     {
         var $act_as = array("tree" => array("dependent" => true));
         var $table_name = "ak_test_categories";
     } 
 ?>';
-            break;
+                break;
 
             default:
-            $model_source = '<?php class '.$test_model_name.' extends AkActiveRecord { } ?>';
-            break;
+                $model_source = '<?php class '.$test_model_name.' extends AkActiveRecord { } ?>';
+                break;
         }
 
         $file_name = AkInflector::toModelFilename($test_model_name);
@@ -105,11 +105,11 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
         }
         switch ($table_name) {
             case 'ak_test_categories':
-            $table =
-            array(
-            'table_name' => 'ak_test_categories',
-            'fields' =>
-            'id I AUTO KEY,
+                $table =
+                array(
+                'table_name' => 'ak_test_categories',
+                'fields' =>
+                'id I AUTO KEY,
             parent_id I(11),
             description C(250),
             department C(25)',
@@ -119,8 +119,8 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
 
             break;
             default:
-            return false;
-            break;
+                return false;
+                break;
         }
 
         $dict = NewDataDictionary($db);
@@ -169,13 +169,13 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
     function Test_of_Test_of_init()
     {
         $Categories =& new AkTestCategory();
-        $Categories->tree->init(array('scope'=>array('category_id = ? AND completed = 0',$Categories->getId()),'custom_attribute'=>'This is not allowed here'));
+        $Categories->tree->init(array('scope'=> 'category_id = ? AND completed = 0','custom_attribute'=>'This is not allowed here'));
 
-        $this->assertEqual($Categories->tree->getScopeCondition(), 'category_id = ? AND completed = 0');
+        $this->assertEqual($Categories->tree->getScopeCondition(), 'category_id = null AND completed = 0');
         $this->assertTrue(empty($Categories->tree->custom_attribute));
     }
 
-    
+
     function Test_of__ensureIsActiveRecordInstance()
     {
         $Categories =& new AkTestCategory();
@@ -204,7 +204,7 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
 
         $Categories->tree->setParentColumnName('column_name');
         $this->assertEqual($Categories->tree->getParentColumnName(), 'column_name');
-        
+
         $Categories->tree->setDependent(true);
         $this->assertTrue($Categories->tree->getDependent());
         $Categories->tree->setDependent(false);
@@ -212,20 +212,20 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
     }
 
     function Test_of_hasChildren_and_hasParent()
-    {        
+    {
         $CategoryA =& new AkTestCategory();
         $CategoryA->description = "Cat A";
-        
+
         $CategoryAa =& new AkTestCategory();
         $CategoryAa->description = "Cat Aa";
-        
+
         $this->assertFalse($CategoryA->tree->hasChildren());
         $this->assertFalse($CategoryA->tree->hasParent());
         $this->assertFalse($CategoryAa->tree->hasChildren());
         $this->assertFalse($CategoryAa->tree->hasParent());
-        
+
         $CategoryA->tree->addChild($CategoryAa);
-        
+
         $this->assertTrue($CategoryA->tree->hasChildren());
         $this->assertFalse($CategoryA->tree->hasParent());
         $this->assertFalse($CategoryAa->tree->hasChildren());
@@ -234,23 +234,23 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
 
 
     function Test_of_addChild_and_children()
-    {        
+    {
         $CategoryA =& new AkTestCategory();
         $CategoryA->description = "Cat A";
-        
+
         $CategoryAa =& new AkTestCategory();
         $CategoryAa->description = "Cat Aa";
-        
+
         $CategoryAb =& new AkTestCategory();
         $CategoryAb->description = "Cat Ab";
-        
+
         $CategoryA->tree->addChild($CategoryAa);
         $CategoryA->tree->addChild($CategoryAb);
-        
+
         $children = $CategoryA->tree->getChildren();
         $this->assertEqual($CategoryAa->getId(), $children[0]->getId());
         $this->assertEqual($CategoryAb->getId(), $children[1]->getId());
-        
+
         $this->assertErrorPattern('/Cannot add myself as a child to myself/', $CategoryA->tree->addChild($CategoryA));
     }
 
@@ -258,39 +258,39 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
     {
         $CategoryA =& new AkTestCategory();
         $CategoryA->description = "Cat A";
-        
+
         $CategoryB =& new AkTestCategory();
         $CategoryB->description = "Cat B";
-        
+
         $CategoryAa =& new AkTestCategory();
         $CategoryAa->description = "Cat Aa";
-        
+
         $CategoryAb =& new AkTestCategory();
         $CategoryAb->description = "Cat Ab";
 
         $CategoryA->tree->addChild($CategoryAa);
         $CategoryA->tree->addChild($CategoryAb);
-        
+
         $this->assertEqual(2, $CategoryA->tree->childrenCount());
         $this->assertEqual(0, $CategoryB->tree->childrenCount());
         $this->assertEqual(0, $CategoryAa->tree->childrenCount());
-        $this->assertEqual(0, $CategoryAb->tree->childrenCount());        
+        $this->assertEqual(0, $CategoryAb->tree->childrenCount());
     }
-    
+
     function Test_of_parent()
     {
         $CategoryA =& new AkTestCategory();
         $CategoryA->description = "Cat A";
-        
+
         $CategoryAa =& new AkTestCategory();
         $CategoryAa->description = "Cat Aa";
-        
+
         $CategoryAb =& new AkTestCategory();
         $CategoryAb->description = "Cat Ab";
 
         $CategoryA->tree->addChild($CategoryAa);
         $CategoryA->tree->addChild($CategoryAb);
-        
+
         $catAaParent = $CategoryAa->tree->getParent();
         $catAbParent = $CategoryAb->tree->getParent();
         $this->assertEqual($CategoryA->getId(), $catAaParent->getId());
@@ -301,22 +301,22 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
     {
         $CategoryA =& new AkDependentTestCategory();
         $CategoryA->description = "Cat A";
-        
+
         $CategoryB =& new AkTestCategory();
         $CategoryB->description = "Cat B";
-        
+
         $CategoryAa =& new AkDependentTestCategory();
         $CategoryAa->description = "Cat Aa";
-        
+
         $CategoryBa =& new AkTestCategory();
         $CategoryBa->description = "Cat Ba";
 
         $CategoryA->tree->addChild($CategoryAa);
         $CategoryB->tree->addChild($CategoryBa);
-        
+
         $CategoryA->destroy();
         $this->assertFalse($CategoryAa->reload());
-        
+
         $CategoryB->destroy();
         $this->assertTrue($CategoryBa->reload());
         $this->assertFalse($CategoryBa->tree->hasParent());
@@ -328,7 +328,7 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
         $this->_deleteTestingModelDatabases();
         $this->_createNewTestingModelDatabase('AkTestCategory');
     }
-    
+
 }
 
 

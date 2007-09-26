@@ -50,9 +50,7 @@ class AkActsAsList extends AkObserver
 * Configuration options are:
 * 
 * * +column+ - specifies the column name to use for keeping the position integer (default: position)
-* * +scope+ - restricts what is to be considered a list. Given a symbol, it'll attach "_id" 
-*   (if that hasn't been already) and use that as the foreign key restriction. It's also possible 
-*   to give it an entire string that is interpolated if you need a tighter scope than just a foreign key.
+* * +scope+ - restricts what is to be considered a list. 
 *   Example: 
 * 
 * class TodoTask extends ActiveRecord
@@ -332,8 +330,11 @@ class AkActsAsList extends AkObserver
 
     function getScopeCondition()
     {
-        // An allways true condition in case no scope has been specified
-        if(empty($this->scope_condition) && empty($this->scope)){
+        if (!empty($this->variable_scope_condition)){
+            return $this->_ActiveRecordInstance->_getVariableSqlCondition($this->variable_scope_condition);
+            
+        // True condition in case we don't have a scope
+        }elseif(empty($this->scope_condition) && empty($this->scope)){
             $this->scope_condition = (substr($this->_ActiveRecordInstance->_db->databaseType,0,4) == 'post') ? 'true' : '1';
         }elseif (!empty($this->scope)){
             $this->setScopeCondition(join(' AND ',array_map(array(&$this,'getScopedColumn'),(array)$this->scope)));
@@ -344,7 +345,11 @@ class AkActsAsList extends AkObserver
 
     function setScopeCondition($scope_condition)
     {
-        $this->scope_condition  = $scope_condition;
+        if(!is_array($scope_condition) && strstr($scope_condition, '?')){
+            $this->variable_scope_condition = $scope_condition;
+        }else{
+            $this->scope_condition  = $scope_condition;
+        }
     }
 
     function getScopedColumn($column)

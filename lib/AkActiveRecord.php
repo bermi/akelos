@@ -1343,6 +1343,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 if(strstr($piece,':')){
                     $_tmp_parts = explode(':',$piece);
                     if($this->hasColumn($_tmp_parts[0])){
+                        $query_values[$parameter_count] = isset($query_values[$parameter_count]) ? $query_values[$parameter_count] : $this->get($_tmp_parts[0]);
                         switch (strtolower($_tmp_parts[1])) {
                             case 'like':
                             case '%like%':
@@ -1389,6 +1390,25 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         
         return array($new_sql, $requested_args);
+    }
+    
+    
+    /**
+     *  Given a condition that uses bindings like "user = ?  AND created_at > ?" will return a
+     * string replacing the "?" bindings with the column values for current Active Record
+     * 
+     * @return string
+     */
+    function _getVariableSqlCondition($variable_condition)
+    {
+        $query_values = array();
+        list($sql, $requested_columns) = $this->_getFindBySqlAndColumns($variable_condition, $query_values);
+        $replacements = array();
+        $sql = preg_replace('/((('.join($requested_columns,'|').') = \?) = \?)/','$2', $sql);
+        foreach ($requested_columns as $attribute){
+            $replacements[$attribute] = $this->castAttributeForDatabase($attribute, $this->get($attribute));
+        }
+        return trim(preg_replace('/('.join('|',array_keys($replacements)).')\s+([^\?]+)\s+\?/e', "isset(\$replacements['\\1']) ? '\\1 \\2 '.\$replacements['\\1']:'\\1 \\2 null'", $sql));
     }
    
 
