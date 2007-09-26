@@ -152,9 +152,9 @@ class ActiveRecordHelper extends AkActionViewHelper
     function all_input_tags(&$record, $record_name, $options = array())
     {
         $input_block = !empty($options['input_block']) ? $options['input_block'] : $this->default_input_block();
-
+        $columns = empty($options['columns']) ? array_keys($record->getContentColumns()) : $options['columns'];
         $result = '';
-        foreach (array_keys($record->getContentColumns()) as $column){
+        foreach ($columns as $column){
             ob_start();
             eval("?>$input_block<?php ");
             $result .= ob_get_clean()."\n";

@@ -70,6 +70,14 @@ class ActiveRecordHelperTests extends HelpersUnitTester
             file_get_contents(AK_TEST_HELPERS_DIR.DS.'active_record_form.txt')
         );
     }
+    
+    function test_should_render_limited_form_fields()
+    {
+        $this->assertEqual(
+            $this->active_record_helper->form('ProtectedPerson', array('columns'=>array('id','name'))),
+            file_get_contents(AK_TEST_HELPERS_DIR.DS.'active_record_limited_form.txt')
+        );
+    }
 
     function test_error_message_on()
     {
