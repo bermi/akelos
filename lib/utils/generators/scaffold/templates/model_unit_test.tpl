@@ -1,6 +1,6 @@
 <?php  echo '<?php'?>
 
-// To run this test calling ./script/test unit/app/models/<?php  echo AkInflector::underscore($class_name); ?>
+// To run this test calling ./script/test unit/app/models/<?php  echo AkInflector::underscore($model_name); ?>
 // More about testing at http://wiki.akelos.org/testing-guide
 
 class <?php  echo $model_name?>TestCase extends AkUnitTest
