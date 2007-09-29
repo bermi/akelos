@@ -100,15 +100,15 @@ class FormOptionsHelperTests extends HelpersUnitTester
 
 
         $Person =& new MockAkActiveRecord($this);
-        $Person->setReturnValue('get', array('Madrid','London'), array('timezone'));
+        $Person->setReturnValue('get', array('(GMT+01:00) Madrid'=>3600, '(GMT) London'=>0), array('timezone'));
         $AkFormHelperOptionsInstanceTag =& new AkFormHelperOptionsInstanceTag('person','timezone',&$FormOptionsHelper,null,&$Person);
 
-        $timezone_select_html = $AkFormHelperOptionsInstanceTag->to_time_zone_select_tag(array('(GMT +1:00) España'=>'Madrid'),array(),array('multiple'=>'multiple'));
-
+        $timezone_select_html = $AkFormHelperOptionsInstanceTag->to_time_zone_select_tag(array('(GMT+01:00) Madrid'=>3600),array(),array('multiple'=>'multiple'));
         $this->assertTrue(strstr($timezone_select_html,'<select id="person_timezone" multiple="multiple" name="person[timezone][]">'));
-        $this->assertTrue(strstr($timezone_select_html,'<option selected="selected" value="Madrid">(GMT +1:00) España</option>'));
+        $this->assertTrue(strstr($timezone_select_html,'<option selected="selected" value="3600">(GMT+01:00) Madrid</option>'));
         $this->assertTrue(strstr($timezone_select_html,'<option value="">-------------</option>'));
-        $this->assertTrue(strstr($timezone_select_html,'<option selected="selected" value="London">(GMT) London</option>'));
+        $this->assertTrue(strstr($timezone_select_html,'<option selected="selected" value="0">(GMT) London</option>'));
+        $this->assertFalse(strstr($timezone_select_html,'<option selected="selected" value="0">(GMT) Dublin</option>'));
         unset($timezone_select_html);
 
 
@@ -177,24 +177,24 @@ class FormOptionsHelperTests extends HelpersUnitTester
         $FormOptionsHelper->time_zone_select(
         'person',
         'timezone',
-        array('(GMT +01:00) Madrid'=>'Madrid'),
+        array('(GMT+01:00) Madrid'=>3600),
         array('prompt'=>true),
         array('style'=>'border:5px solid red;')))),
         '<select id="person_timezone" name="person[timezone]" style="border:5px solid red;">'.
         '<option value="">Please select</option>'.
-        '<option value="Madrid">(GMT +01:00) Madrid</option>'.
+        '<option value="3600">(GMT+01:00) Madrid</option>'.
         '<option value="">-------------</option>'
         ));
 
-        $Person->setReturnValue('get', 'Budapest', array('timezone'));
+        $Person->setReturnValue('get', array('(GMT+01:00) Budapest'=>3600), array('timezone'));
         $this->assertTrue(strstr(trim(str_replace("\n",'',
         $FormOptionsHelper->time_zone_select(
         'person',
         'timezone',
-        array('(GMT +01:00) Madrid'=>'Madrid'),
+        array('(GMT+01:00) Madrid'=>3600),
         array('prompt'=>true),
         array('style'=>'border:5px solid red;')))),
-        '<option selected="selected" value="Budapest">(GMT+01:00) Budapest</option>'
+        '<option selected="selected" value="3600">(GMT+01:00) Budapest</option>'
         ));
 
 

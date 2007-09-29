@@ -158,9 +158,14 @@ class FormOptionsHelper extends AkActionViewHelper
 
         $selected = (array)$selected;
         $options_for_select = '';
+        
+        $compare_captions = !empty($selected) ? is_string(key(array_slice($selected,0,1))) : false;
+       
         foreach ($container as $text=>$value){
             $options_for_select .= TagHelper::content_tag('option',$text_is_value ? $value : $text,
-            array_merge($options,in_array($value,$selected) ? array('value'=>$value,'selected'=>'selected') : array('value'=>$value))
+            array_merge($options, ($compare_captions ? 
+            (isset($selected[$text]) && $selected[$text] == $value) : 
+            in_array($value, $selected)) ? array('value'=>$value,'selected'=>'selected') : array('value'=>$value))
             )."\n";
         }
         return $options_for_select;
@@ -298,10 +303,9 @@ class FormOptionsHelper extends AkActionViewHelper
        * The +selected+ parameter must be either +null+, or a string that names
        * a TimeZone.
        *
-       * By default, +model+ is the AkTimeZone constant (which can be obtained
-       * in ActiveRecord as a value object). The only requirement is that the
+       * By default, +model+ is an AkTimeZone instance. The only requirement is that the
        * +model+ parameter be an object that responds to #all, and returns
-       * an array with the Time zone description as key and the GTM time difference as values.
+       * an object with a toString() method and an utc_offset attribute.
        *
        * NOTE: Only the option tags are returned, you have to wrap this call in
        * a regular HTML select tag.
@@ -311,24 +315,22 @@ class FormOptionsHelper extends AkActionViewHelper
         $zone_options = '';
         if($model == 'AkTimeZone'){
             require_once(AK_LIB_DIR.DS.'AkLocalize'.DS.'AkTimeZone.php');
-            $zones_form_method = AkTimeZone::all();
+            $Zones = AkTimeZone::all();
         }else{
-            $zones_form_method = $model->all();
+            $Zones = $model->all();
         }
 
-        $zones = array();
-        foreach ($zones_form_method as $description=>$gmt){
-            $k = Ak::t('(%gmt) %description',array('%gmt'=>$gmt,'%description'=>$description),'localize/timezones');
-            //$timezone = ltrim(str_replace(array('GMT',':00',':30',' ','+0','-0','+'),array('','','.5','','','-',''),$gmt),'()');
-            $zones[$k] = $description;
+        $zones_for_options = array();
+        foreach (array_keys($Zones) as $k){
+            $zones_for_options[$Zones[$k]->toString()] = $Zones[$k]->utc_offset;
         }
 
         if (!empty($priority_zones)){
             $zone_options .= $this->options_for_select($priority_zones, $selected);
             $zone_options .= '<option value="">-------------</option>'."\n";
         }
-
-        $zone_options .= $this->options_for_select(array_diff($zones,$priority_zones), $selected);
+        
+        $zone_options .= $this->options_for_select(array_diff_assoc($zones_for_options,$priority_zones), $selected);
         return $zone_options;
 
     }

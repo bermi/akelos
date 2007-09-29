@@ -366,7 +366,7 @@ class DateHelper extends AkActionViewHelper
      * Converts an ISO date to current locale format
      *
      */
-    function locale_date_time($iso_date_time)
+    function locale_date_time($iso_date_time = null)
     {
         $timestamp = Ak::getTimestamp($iso_date_time);
         $format = Ak::locale('date_time_format');
@@ -377,7 +377,7 @@ class DateHelper extends AkActionViewHelper
      * Converts an ISO date to current locale format
      *
      */
-    function locale_date($iso_date)
+    function locale_date($iso_date = null)
     {
         $timestamp = Ak::getTimestamp($iso_date);
         $format = Ak::locale('date_format');
