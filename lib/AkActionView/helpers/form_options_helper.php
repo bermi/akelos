@@ -294,22 +294,25 @@ class FormOptionsHelper extends AkActionViewHelper
     }
 
     /**
-       * Returns a string of option tags for pretty much any time zone in the
-       * world. Supply a TimeZone name as +selected+ to have it marked as the
-       * selected option tag. You can also supply an array of TimeZones
-       * as +$priority_zones+, so that they will be listed above the rest of the
-       * (long) list. 
-       * 
-       * The +selected+ parameter must be either +null+, or a string that names
-       * a TimeZone.
-       *
-       * By default, +model+ is an AkTimeZone instance. The only requirement is that the
-       * +model+ parameter be an object that responds to #all, and returns
-       * an object with a toString() method and an utc_offset attribute.
-       *
-       * NOTE: Only the option tags are returned, you have to wrap this call in
-       * a regular HTML select tag.
-       */
+    * Returns a string of option tags for pretty much any time zone in the
+    * world. Supply a TimeZone name as +selected+ to have it marked as the
+    * selected option tag. You can also supply an array of TimeZones
+    * as +$priority_zones+, so that they will be listed above the rest of the
+    * (long) list. 
+    * 
+    * The +selected+ parameter must be either +null+, or a string that names
+    * a TimeZone.
+    *
+    * By default, +model+ is an AkTimeZone instance. The only requirement is that the
+    * +model+ parameter be an object that responds to #all, and returns
+    * an object with a toString() method and the TimeZone name provided by a 'name'
+    * attribute
+    * 
+    * For a list of supported timezones see: http://www.php.net/manual/en/timezones.php
+    *
+    * NOTE: Only the option tags are returned, you have to wrap this call in
+    * a regular HTML select tag.
+    */
     function time_zone_options_for_select($selected = null, $priority_zones = array(), $model = 'AkTimeZone')
     {
         $zone_options = '';
@@ -322,7 +325,7 @@ class FormOptionsHelper extends AkActionViewHelper
 
         $zones_for_options = array();
         foreach (array_keys($Zones) as $k){
-            $zones_for_options[$Zones[$k]->toString()] = $Zones[$k]->utc_offset;
+            $zones_for_options[$Zones[$k]->toString()] = $Zones[$k]->name;
         }
 
         if (!empty($priority_zones)){
