@@ -147,4 +147,12 @@ $dictionary['Ooops! Could not fetch details for the table %table_name.'] = 'Ooop
 $dictionary['Upgrading'] = 'Upgrading';
 $dictionary['Could not find the file /app/controllers/<i>%controller_file_name</i> for the controller %controller_class_name'] = 'Could not find the file /app/controllers/<i>%controller_file_name</i> for the controller %controller_class_name';
 
+$dictionary['No controller was specified.'] = 'No controller was specified.';
+
+// 2007-10-05 23:28:22
+
+
+$dictionary['Please add force=true to the argument list in order to overwrite existing files.'] = 'Please add force=true to the argument list in order to overwrite existing files.';
+
+
 ?>

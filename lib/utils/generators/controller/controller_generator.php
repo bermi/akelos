@@ -24,18 +24,39 @@ class ControllerGenerator extends  AkelosGenerator
 
     function _preloadPaths()
     {
-        $this->class_name = AkInflector::camelize(preg_replace('/_?controller$/i','',$this->class_name));
+        if(!empty($this->class_name_arg)){
+            $this->class_name = $this->class_name_arg;
+        }
+        
+        $this->class_name = $this->controller_name = $this->class_name_arg = str_replace('::', '/', AkInflector::camelize(preg_replace('/_?controller$/i','',$this->class_name)));
+        
+        $this->module_path = '';
+
+        // Controller inside module
+        if(strstr($this->class_name_arg,'/')){
+            $module_parts = substr($this->class_name, 0, strrpos($this->class_name_arg, '/'));
+            $this->module_path = join(DS, array_map(array('AkInflector','underscore'), strstr($module_parts, '/') ? explode('/', $module_parts) : array($module_parts))).DS;
+
+            $this->controller_name = substr($this->class_name_arg, strrpos($this->class_name_arg, '/') + 1);
+            $this->underscored_controller_name = $this->module_path.AkInflector::underscore($this->controller_name);
+            $this->controller_path = 'controllers'.DS.$this->underscored_controller_name.'_controller.php';
+
+            $this->class_name = str_replace('/', '_', $this->class_name_arg);
+        }else{
+            $this->underscored_controller_name = AkInflector::underscore($this->class_name);
+            $this->controller_path = 'controllers'.DS.$this->underscored_controller_name.'_controller.php';
+        }
+
         $this->assignVarToTemplate('class_name', $this->class_name);
-        $this->underscored_controller_name = AkInflector::underscore($this->class_name);
-        $this->controller_path = 'controllers'.DS.$this->underscored_controller_name.'_controller.php';
+
     }
-    
+
     function hasCollisions()
     {
         $this->collisions = array();
         $this->_preloadPaths();
         $this->actions = empty($this->actions) ? array() : (array)$this->actions;
-        
+
         $files = array(
         AK_APP_DIR.DS.$this->controller_path,
         AK_TEST_DIR.DS.'functional'.DS.'app'.DS.$this->controller_path,
@@ -45,9 +66,9 @@ class ControllerGenerator extends  AkelosGenerator
         );
         
         foreach ($this->actions as $action){
-            $files[] = AK_VIEWS_DIR.DS.AkInflector::underscore($this->class_name).DS.$action.'.tpl';
+            $files[] = AK_VIEWS_DIR.DS.$this->module_path.AkInflector::underscore($this->controller_name).DS.$action.'.tpl';
         }
-        
+
         foreach ($files as $file_name){
             if(file_exists($file_name)){
                 $this->collisions[] = Ak::t('%file_name file already exists',array('%file_name'=>$file_name));
@@ -59,20 +80,20 @@ class ControllerGenerator extends  AkelosGenerator
     function generate()
     {
         $this->_preloadPaths();
-        
+
         $this->save(AK_APP_DIR.DS.$this->controller_path, $this->render('controller'));
         $this->save(AK_HELPERS_DIR.DS.$this->underscored_controller_name."_helper.php", $this->render('helper'));
         $this->save(AK_TEST_DIR.DS.'functional'.DS.$this->controller_path, $this->render('functional_test'));
         $this->save(AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.$this->controller_path, $this->render('fixture'));
         $this->save(AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'helpers'.DS.$this->underscored_controller_name."_helper.php", $this->render('helper_fixture'));
-        
-        @Ak::make_dir(AK_VIEWS_DIR.DS.AkInflector::underscore($this->class_name));
-        
+
+        @Ak::make_dir(AK_VIEWS_DIR.DS.$this->module_path.AkInflector::underscore($this->controller_name));
+
         foreach ($this->actions as $action){
             //$this->action = $action;
             $this->assignVarToTemplate('action',$action);
-            $this->assignVarToTemplate('path','AK_VIEWS_DIR.DS.\''.AkInflector::underscore($this->class_name).'/'.$action.'.tpl\'');
-            $this->save(AK_VIEWS_DIR.DS.AkInflector::underscore($this->class_name).DS.$action.'.tpl', $this->render('view'));
+            $this->assignVarToTemplate('path','AK_VIEWS_DIR.DS.\''.$this->module_path.AkInflector::underscore($this->controller_name).'/'.$action.'.tpl\'');
+            $this->save(AK_VIEWS_DIR.DS.$this->module_path.AkInflector::underscore($this->controller_name).DS.$action.'.tpl', $this->render('view'));
         }
     }
 }

@@ -1776,6 +1776,7 @@ class Ak
     {
         $rules = array(
         'paranoid' => '/([^A-Z^a-z^0-9^_^-^ ]+)/',
+        'high' => '/([^A-Z^a-z^0-9^_^-^ ^\/^\\\^:]+)/',
         'normal' => '/([^A-Z^a-z^0-9^_^-^ ^\.^\/^\\\]+)/'
         );
         $mode = array_key_exists($mode,$rules) ? $mode : 'normal';

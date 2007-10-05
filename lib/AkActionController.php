@@ -122,6 +122,8 @@ class AkActionController extends AkObject
 
     var $web_service_api;
     var $web_service_apis = array();
+    
+    var $module_name;
 
     /**
      * Old fashioned way of dispatching requests. Please use AkDispatcher or roll your own.
@@ -207,7 +209,7 @@ class AkActionController extends AkObject
         if(empty($this->Template)){
             require_once(AK_LIB_DIR.DS.'AkActionView.php');
             require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkPhpTemplateHandler.php');
-            $this->Template =& new AkActionView(AK_APP_DIR.DS.'views'.DS.$this->Request->getController(),
+            $this->Template =& new AkActionView($this->_getTemplateBasePath(),
             $this->Request->getParameters(),$this->Request->getController());
         
             $this->Template->_controllerInstance =& $this;
@@ -759,29 +761,59 @@ class AkActionController extends AkObject
     function rewriteOptions($options)
     {
         $defaults = $this->defaultUrlOptions($options);
+        if(!empty($this->module_name)){
+            $defaults['module'] = $this->getModuleName();
+        }
+        if(!empty($options['controller']) && strstr($options['controller'], '/')){
+            $defaults['module'] = substr($options['controller'], 0, strrpos($options['controller'], '/'));
+            $options['controller'] = substr($options['controller'], strrpos($options['controller'], '/') + 1);
+        }
         $options = !empty($defaults) ? array_merge($defaults, $options) : $options;
         $options['controller'] = empty($options['controller']) ? AkInflector::underscore($this->getControllerName()) : $options['controller'];
         return $options;
     }
 
-    function &getControllerName()
+    function getControllerName()
     {
 
         if(!isset($this->controller_name)){
             $current_class_name = get_class($this);
+
             $included_controllers = $this->_getIncludedControllerNames();
             $lowercase_included_controllers = array_filter($included_controllers, 'strtolower');
-            $key = array_search(strtolower($current_class_name),$lowercase_included_controllers,true);
-            $found_controller = substr($included_controllers[$key],0,-10);
+            $key = array_search(strtolower($current_class_name), $lowercase_included_controllers, true);
+            $found_controller = substr($included_controllers[$key], 0, -10);
             $this->controller_name = $found_controller;
+            $this->_removeModuleNameFromControllerName();
         }
 
         return $this->controller_name;
     }
+    
+    function getModuleName()
+    {
+        return $this->module_name;
+    }
 
     /**
-     * @todo Refactorize transversing dir instead of looking for loaded files (if faster)
+     * Removes the modules name from the controller if exists.
+     * 
+     * Additionally it sets the default url_options for this controller and the module name scope.
      */
+    function _removeModuleNameFromControllerName()
+    {
+        if(strstr($this->controller_name, '::')){
+            $module_parts = substr($this->controller_name, 0, strrpos($this->controller_name, '::'));
+            $this->module_name = join('/', array_map(array('AkInflector','underscore'), strstr($module_parts, '::') ? explode('::', $module_parts) : array($module_parts)));
+            $this->controller_name = substr($this->controller_name, strrpos($this->controller_name, '::')+2);
+        }
+    }
+    
+    function _getTemplateBasePath()
+    {
+        return AK_APP_DIR.DS.'views'.DS.(empty($this->_module_path)?'':$this->_module_path).$this->Request->getController();
+    }
+    
     function _getIncludedControllerNames()
     {
         $controllers = array();
