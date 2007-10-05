@@ -4841,6 +4841,11 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return Ak::toJson($this->getAttributes());
     }
     
+    function toYaml()
+    {
+        return Ak::convert('active_record', 'yaml', $this);
+    }
+    
 
     /**
     * Parses an special formated array as a list of keys and values
