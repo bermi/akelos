@@ -244,8 +244,8 @@ class UrlHelper
         $html_options = Ak::delete($html_options, 'cc','bcc','subject','body','encode');
 
         if ($encode == 'javascript'){
-            $tmp  = "document.write('".TagHelper::content_tag('a', $name, array_merge($html_options,array('href' => 'mailto:'.$email_address.$extras )))."');";
-            for ($i=0;$i<strlen($tmp);$i++){
+            $tmp  = "document.write('".TagHelper::content_tag('a', htmlentities($name, null, Ak::locale('charset')), array_merge($html_options,array('href' => 'mailto:'.$email_address.$extras )))."');";
+            for ($i=0; $i < strlen($tmp); $i++){
                 $string.='%'.dechex(ord($tmp[$i]));
             }
             return "<script type=\"text/javascript\">eval(unescape('$string'))</script>";
