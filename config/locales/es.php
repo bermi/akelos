@@ -148,5 +148,10 @@ $dictionary['No controller was specified.'] = 'No se ha especificado ningún con
 
 $dictionary['Please add force=true to the argument list in order to overwrite existing files.'] = 'Please add force=true to the argument list in order to overwrite existing files.';
 
+// 2007-10-06 3:15:57
+
+
+$dictionary['Could not find a helper to handle the method "%method" you called in your view'] = 'Could not find a helper to handle the method "%method" you called in your view';
+
 
 ?>

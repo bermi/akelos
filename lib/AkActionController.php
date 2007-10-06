@@ -124,7 +124,8 @@ class AkActionController extends AkObject
     var $web_service_apis = array();
     
     var $module_name;
-
+    var $_module_path;
+    
     /**
      * Old fashioned way of dispatching requests. Please use AkDispatcher or roll your own.
      * 
@@ -234,13 +235,13 @@ class AkActionController extends AkObject
     function instantiateHelpers()
     {
         $helpers = $this->getDefaultHelpers();
-
         $helpers = array_merge($helpers, $this->getApplicationHelpers());
-
+        
         require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
 
         $current_controller_helper = $this->getControllerName();
-        $current_controller_helper_file_name = AK_HELPERS_DIR.DS.AkInflector::underscore($current_controller_helper).'_helper.php';
+        $current_controller_helper_file_name = AK_HELPERS_DIR.DS.$this->_module_path.AkInflector::underscore($current_controller_helper).'_helper.php';
+        
         if(file_exists($current_controller_helper_file_name)){
             $helpers[$current_controller_helper_file_name] = $current_controller_helper;
         }
@@ -285,7 +286,6 @@ class AkActionController extends AkObject
     function getApplicationHelpers()
     {
         $helper_names = array();
-
         if ($this->app_helpers == 'all' ){
             $available_helpers = Ak::dir(AK_HELPERS_DIR,array('dirs'=>false));
             $helper_names = array();
@@ -519,7 +519,6 @@ class AkActionController extends AkObject
 
         $this->_flash_handled ? null : $this->_handleFlashAttribute();
 
-        // Ror Backwards compatibility
         if(!is_array($options)){
             return $this->renderFile(empty($options) ? $this->getDefaultTemplateName() : $options, $status, true);
         }
@@ -777,10 +776,10 @@ class AkActionController extends AkObject
     {
 
         if(!isset($this->controller_name)){
-            $current_class_name = get_class($this);
+            $current_class_name = str_replace('_', '::', get_class($this));
 
             $included_controllers = $this->_getIncludedControllerNames();
-            $lowercase_included_controllers = array_filter($included_controllers, 'strtolower');
+            $lowercase_included_controllers = array_map('strtolower', $included_controllers);
             $key = array_search(strtolower($current_class_name), $lowercase_included_controllers, true);
             $found_controller = substr($included_controllers[$key], 0, -10);
             $this->controller_name = $found_controller;
@@ -806,6 +805,7 @@ class AkActionController extends AkObject
             $module_parts = substr($this->controller_name, 0, strrpos($this->controller_name, '::'));
             $this->module_name = join('/', array_map(array('AkInflector','underscore'), strstr($module_parts, '::') ? explode('::', $module_parts) : array($module_parts)));
             $this->controller_name = substr($this->controller_name, strrpos($this->controller_name, '::')+2);
+
         }
     }
     
@@ -1371,7 +1371,9 @@ class AkActionController extends AkObject
         }
         if(!empty($layout)){
             $layout = strstr($layout,'/') || strstr($layout,DS) ? $layout : 'layouts'.DS.$layout;
-            $layout = substr($layout,0,7) === 'layouts' ? AK_VIEWS_DIR.DS.$layout.'.tpl' : $layout.'.tpl';
+            $layout = substr($layout,0,7) === 'layouts' ? 
+            (empty($this->_module_path) ? AK_VIEWS_DIR.DS.$layout.'.tpl' : AK_VIEWS_DIR.DS.'layouts'.DS.trim($this->_module_path, DS).'.tpl') : 
+            $layout.'.tpl';
             if (file_exists($layout)) {
                 return $layout;
             }

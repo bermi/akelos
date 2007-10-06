@@ -745,6 +745,7 @@ class AkRequest extends AkObject
         $module_path = $module_class_peffix = '';
         if(!empty($params['module'])){
             $module_path = trim(str_replace(array('/','\\'), DS, Ak::sanitize_include($params['module'], 'high')), DS).DS;
+            $module_shared_model = AK_CONTROLLERS_DIR.DS.trim($module_path,DS).'_controller.php';
             $module_class_peffix = str_replace(' ','_',AkInflector::titleize(str_replace(DS,' ', trim($module_path, DS)))).'_';
         }
         
@@ -752,6 +753,11 @@ class AkRequest extends AkObject
         $controller_class_name = $module_class_peffix.AkInflector::camelize($params['controller']).'Controller';
         $controller_path = AK_CONTROLLERS_DIR.DS.$module_path.$controller_file_name;
         include_once(AK_APP_DIR.DS.'application_controller.php');
+        
+        if(!empty($module_path) && file_exists($module_shared_model)){
+            include_once($module_shared_model);
+        }
+        
         if(@!include_once($controller_path)){
             trigger_error(Ak::t('Could not find the file /app/controllers/<i>%controller_file_name</i> for '.
             'the controller %controller_class_name',
