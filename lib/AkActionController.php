@@ -30,6 +30,8 @@ class AkActionController extends AkObject
     var $validate_output = false;
     
     var $_ssl_requirement = false;
+    var $_ssl_allowed_actions = array();
+    var $ssl_for_all_actions = true;
 
     /**
     * Determines whether the view has access to controller internals $this->Request, $this->Response, $this->session, and $this->Template.
@@ -2266,8 +2268,9 @@ class AkActionController extends AkObject
 
     function _isSslAllowed()
     {
-        return !empty($this->_ssl_allowed_actions) && is_array($this->_ssl_allowed_actions) && isset($this->_action_name) ?
-        in_array($this->_action_name, $this->_ssl_allowed_actions) : false;
+        return (!empty($this->ssl_for_all_actions) && empty($this->_ssl_allowed_actions)) || 
+        (!empty($this->_ssl_allowed_actions) && is_array($this->_ssl_allowed_actions) && isset($this->_action_name) ?
+        in_array($this->_action_name, $this->_ssl_allowed_actions) : false);
     }
 
     function _ensureProperProtocol()
