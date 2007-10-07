@@ -3,8 +3,6 @@
 defined('AK_PLUGINS_DIR') ? null : define('AK_PLUGINS_DIR', AK_APP_DIR.DS.'vendor'.DS.'plugins');
 defined('AK_PLUGINS') ? null : define('AK_PLUGINS', 'auto');
 
-
-
 class AkPlugin
 {
     var $priority = 100;

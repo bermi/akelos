@@ -31,6 +31,7 @@ class AkInstaller
     var $debug = false;
     var $available_tables = array();
     var $vervose = true;
+    var $module;
 
     function AkInstaller($db_connection = null)
     {
@@ -171,7 +172,7 @@ class AkInstaller
     function _versionPath($options = array())
     {
         $mode = empty($options['mode']) ? AK_ENVIRONMENT : $options['mode'];
-        return AK_APP_INSTALLERS_DIR.DS.'versions'.DS.$mode.'_'.$this->getInstallerName().'_version.txt';
+        return AK_APP_INSTALLERS_DIR.DS.(empty($this->module)?'':$this->module.DS).'versions'.DS.$mode.'_'.$this->getInstallerName().'_version.txt';
     }
 
 

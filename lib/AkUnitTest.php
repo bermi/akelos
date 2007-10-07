@@ -28,6 +28,10 @@ require_once(AK_APP_DIR.DS.'shared_model.php');
 
 class AkUnitTest extends UnitTestCase
 {
+    var $module = '';
+    var $insert_models_data = false;
+    var $instantiate_models = false;
+    
     function resetFrameworkDatabaseTables()
     {
         require_once(AK_APP_DIR.DS.'installers'.DS.'framework_installer.php');
@@ -49,16 +53,16 @@ class AkUnitTest extends UnitTestCase
         $options = array_merge($default_options, $options);
 
         foreach ($models as $model){
-            require_once(AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($model).'_installer.php');
+            require_once(AK_APP_DIR.DS.'installers'.DS.(empty($this->module)?'':$this->module.DS).AkInflector::underscore($model).'_installer.php');
             require_once(AK_MODELS_DIR.DS.AkInflector::underscore($model).'.php');
             $installer_name = $model.'Installer';
             $installer = new $installer_name();
             $installer->uninstall();
             $installer->install();
-            if(!empty($options['populate'])){
+            if($this->insert_models_data || !empty($options['populate'])){
                 $this->populateTables(AkInflector::tableize($model));
             }
-            if(!empty($options['instantiate'])){
+            if($this->instantiate_models || !empty($options['instantiate'])){
                 $this->instantiateModel($model);
             }
         }
@@ -72,7 +76,7 @@ class AkUnitTest extends UnitTestCase
         $args = func_get_args();
         $tables = !empty($args) ? (is_array($args[0]) ? $args[0] : (count($args) > 1 ? $args : Ak::toArray($args))) : array();
         foreach ($tables as $table){
-            $file = AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.Ak::sanitize_include($table).'.yaml';
+            $file = AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.(empty($this->module)?'':$this->module.DS).Ak::sanitize_include($table).'.yaml';
             if(!file_exists($file)){
                 continue;
             }
