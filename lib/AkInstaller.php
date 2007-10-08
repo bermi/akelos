@@ -32,6 +32,7 @@ class AkInstaller
     var $available_tables = array();
     var $vervose = true;
     var $module;
+    var $warn_if_same_version = true;
 
     function AkInstaller($db_connection = null)
     {
@@ -106,7 +107,7 @@ class AkInstaller
             }
         }
 
-        if($current_version == $version){
+        if($this->warn_if_same_version && $current_version == $version){
             echo Ak::t("Can't go $action to version %version, you're already on version %version", array('%version'=>$version));
             return false;
         }

@@ -57,7 +57,6 @@ class AkPluginManagerTestCase extends AkUnitTest
         $this->assertTrue(in_array('acts_as_versioned', $this->PluginManager->getInstalledPlugins()));
     }
 
-
     function test_should_update_plugin()
     {
         Ak::directory_delete(AK_PLUGINS_DIR.DS.'acts_as_versioned'.DS.'lib');
@@ -70,6 +69,12 @@ class AkPluginManagerTestCase extends AkUnitTest
     {
         $this->PluginManager->uninstallPlugin('acts_as_versioned');
         $this->assertFalse(is_dir(AK_PLUGINS_DIR.DS.'acts_as_versioned'));
+    }
+
+    function test_should_get_remote_repositories_listing()
+    {
+        $repositories = $this->PluginManager->_getRepositoriesFromRemotePage();
+        $this->assertEqual($repositories[0], $this->PluginManager->main_repository);
     }
 }
 
