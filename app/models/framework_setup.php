@@ -737,7 +737,9 @@ CONFIG;
         AK_APP_DIR.DS.'installers'.DS.'database_version.txt',
         AK_APP_DIR.DS.'installers'.DS.'framework_version.txt',
         AK_APP_DIR.DS.'models'.DS.'framework_setup.php',
-        AK_APP_DIR.DS.'controllers'.DS.'framework_setup_controller.php',
+        AK_APP_DIR.DS.'controllers'.DS.'framework_setup_controller.php'
+        ));
+        @array_map(array('Ak','directory_delete'),  array(
         AK_APP_DIR.DS.'views'.DS.'framework_setup',
         AK_APP_DIR.DS.'locales'.DS.'framework_setup'
         ));

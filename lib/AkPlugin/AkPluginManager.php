@@ -69,6 +69,10 @@ class AkPluginManager extends AkObject
      */
     function getAvailableRepositories($force_reload = false)
     {
+        if(!empty($this->tmp_repositories)){
+            return $this->tmp_repositories;
+        }
+
         if($force_reload || empty($this->repositories)){
             $this->repositories = array($this->main_repository);
             if(file_exists($this->_getRepositoriesConfigPath())){
@@ -96,7 +100,9 @@ class AkPluginManager extends AkObject
      */
     function addRepository($repository_path)
     {
-        Ak::file_add_contents($this->_getRepositoriesConfigPath(), $repository_path."\n");
+        if(!in_array(trim($repository_path), $this->getAvailableRepositories(true))){
+            Ak::file_add_contents($this->_getRepositoriesConfigPath(), $repository_path."\n");
+        }
     }
 
 
@@ -134,13 +140,13 @@ class AkPluginManager extends AkObject
      */
     function getPlugins($force_update = false)
     {
-        if(!$force_update || !is_file($this->_getRepositoriesCahePath()) || filemtime($this->_getRepositoriesCahePath()) > 3600){
+        if($force_update || !is_file($this->_getRepositoriesCahePath()) || filemtime($this->_getRepositoriesCahePath()) > 3600){
             if(!$this->_updateRemotePluginsList()){
                 return array();
             }
         }
 
-        return Ak::convert('yaml', 'array', Ak::file_get_contents($this->_getRepositoriesCahePath()));
+        return array_map('trim', Ak::convert('yaml', 'array', Ak::file_get_contents($this->_getRepositoriesCahePath())));
     }
 
 
@@ -170,41 +176,83 @@ class AkPluginManager extends AkObject
      * 
      * @param  string  $plugin_name Plugin name
      * @param  unknown $repository   An Apache mod_svn interface to subversion. If not provided it will use a trusted repository.
+     * @param  array $options  
+     * - externals: Use svn:externals to grab the plugin. Enables plugin updates and plugin versioning.
+     * - checkout:  Use svn checkout to grab the plugin. Enables updating but does not add a svn:externals entry.
+     * - revision:  Checks out the given revision from subversion. Ignored if subversion is not used.
+     * - force:     Overwrite existing files.
      * @return mixed Returns false if the plugin can't be found.
      * @access public 
      */
-    function installPlugin($plugin_name, $repository = null)
+    function installPlugin($plugin_name, $repository = null, $options = array())
     {
+        $default_options = array(
+        'externals' => false,
+        'checkout' => false,
+        'force' => false,
+        'revision' => null,
+        );
+
+        $options = array_merge($default_options, $options);
+
         $plugin_name = Ak::sanitize_include($plugin_name, 'high');
-        $repository = $this->_getRepositoryForPlugin($plugin_name, $repository);
-        $this->_copyRemoteDir(rtrim($repository, '/').'/'.$plugin_name.'/', AK_PLUGINS_DIR);
-        $this->_runInstaller($plugin_name, 'install');
+        $repository = $this->getRepositoryForPlugin($plugin_name, $repository);
+
+        if(!$options['force'] && is_dir(AK_PLUGINS_DIR.DS.$plugin_name)){
+            trigger_error(Ak::t('Destination directory is not empty. Use force option to overwrite exiting files.'), E_USER_NOTICE);
+        }else{
+            $method = '_installUsing'.ucfirst($this->guessBestInstallMethod($options));
+            $this->$method($plugin_name, rtrim($repository, '/'), $options['revision'], $options['force']);
+            $this->_runInstaller($plugin_name, 'install');
+        }
+    }
+
+
+    function guessBestInstallMethod($options = array())
+    {
+        if($this->canUseSvn()){
+            if($options['externals'] && $this->_shouldUseSvnExternals()){
+                return 'externals';
+            }elseif($options['checkout'] && $this->_shouldUseSvnCheckout()){
+                return 'checkout';
+            }
+            return 'export';
+        }else{
+            return 'http';
+        }
+    }
+
+    function canUseSvn()
+    {
+        return strstr(`svn --version`, 'CollabNet');
     }
 
 
     /**
-     * Updates a plugin if there changes.
+     * Updates a plugin if there are changes.
      * 
-     * This method is the same as install, but can you can avoid an updates if 
-     * you keep a CHANGELOG file for your plugin it will only perform the update
-     * if the CHANGELOG has hanged from last version
+     * Uses subversion update if available. If http update is used, it will 
+     * download the whole plugin unless there is a CHANGELOG file, in which case
+     * it will only perform the update if there are changes.
      * 
      * @param  string  $plugin_name Plugin name
      * @param  string $repository   An Apache mod_svn interface to subversion. If not provided it will use a trusted repository.
-     * @return mixed Returns false if the plugin can't be found, true if is already updated and null when there is an update
+     * @return null
      * @access public 
      */
     function updatePlugin($plugin_name, $repository = null)
     {
+        $options = array(
+        'externals' => true,
+        'checkout' => true
+        );
+
         $plugin_name = Ak::sanitize_include($plugin_name, 'high');
-        $repository = $this->_getRepositoryForPlugin($plugin_name, $repository);
 
-        if(is_file(AK_PLUGINS_DIR.DS.$plugin_name.DS.'CHANGELOG') &&
-        md5(Ak::url_get_contents(rtrim($repository, '/').'/'.$plugin_name.'/CHANGELOG')) == md5_file(AK_PLUGINS_DIR.DS.$plugin_name.DS.'CHANGELOG')){
-            return false;
-        }
+        $method = '_updateUsing'.ucfirst($this->guessBestInstallMethod($options));
+        $this->$method($plugin_name, rtrim($this->getRepositoryForPlugin($plugin_name, $repository), '/'));
 
-        return $this->installPlugin($plugin_name, $repository);
+        $this->_runInstaller($plugin_name, 'install');
     }
 
 
@@ -224,6 +272,10 @@ class AkPluginManager extends AkObject
         $plugin_name = Ak::sanitize_include($plugin_name, 'high');
         $this->_runInstaller($plugin_name, 'uninstall');
         Ak::directory_delete(AK_PLUGINS_DIR.DS.$plugin_name);
+
+        if($this->_shouldUseSvnExternals()){
+            $this->_uninstallExternals($plugin_name);
+        }
     }
 
 
@@ -245,9 +297,9 @@ class AkPluginManager extends AkObject
      * @param  string  $plugin_name     The name of the plugin
      * @param  string  $repository  If a repository name is provided it will check for the plugin name existance.
      * @return mixed Repository URL or false if plugin can't be found   
-     * @access private
+     * @access public
      */
-    function _getRepositoryForPlugin($plugin_name, $repository = null)
+    function getRepositoryForPlugin($plugin_name, $repository = null)
     {
         if(empty($repository)){
             $available_plugins = $this->getPlugins();
@@ -281,10 +333,12 @@ class AkPluginManager extends AkObject
     {
         $plugin_dir = AK_PLUGINS_DIR.DS.$plugin_name;
         if(file_exists($plugin_dir.DS.'installer'.DS.$plugin_name.'_installer.php')){
+            require_once(AK_LIB_DIR.DS.'AkInstaller.php');
             require_once($plugin_dir.DS.'installer'.DS.$plugin_name.'_installer.php');
             $class_name = AkInflector::camelize($plugin_name.'_installer');
             if(class_exists($class_name)){
                 $Installer =& new $class_name();
+                $Installer->db->debug = false;
                 $Installer->warn_if_same_version = false;
                 $Installer->$install_or_uninstall();
             }
@@ -436,7 +490,11 @@ class AkPluginManager extends AkObject
      */
     function _getRepositoriesConfigPath()
     {
-        return AK_CONFIG_DIR.DS.'plugin_repositories.txt';
+        if(empty($this->tmp_repositories)){
+            return AK_CONFIG_DIR.DS.'plugin_repositories.txt';
+        }else{
+            return AK_TMP_DIR.DS.'plugin_repositories.'.md5(serialize($this->tmp_repositories));
+        }
     }
 
 
@@ -451,6 +509,113 @@ class AkPluginManager extends AkObject
     {
         return AK_TMP_DIR.DS.'plugin_repositories.yaml';
     }
+
+
+    
+    function _shouldUseSvnExternals()
+    {
+        return is_dir(AK_PLUGINS_DIR.DS.'.svn');
+    }
+
+    function _shouldUseSvnCheckout()
+    {
+        return is_dir(AK_PLUGINS_DIR.DS.'.svn');
+    }
+
+    function _installUsingCheckout($name, $uri, $rev = null, $force = false)
+    {
+        $rev = empty($rev) ? '' : " -r $rev ";
+        $force = $force ? ' --force ' : '';
+        $plugin_dir = AK_PLUGINS_DIR.DS.$name;
+        `svn co $force $rev $uri/$name $plugin_dir`;
+    }
+
+    function _updateUsingCheckout($name)
+    {
+        $plugin_dir = AK_PLUGINS_DIR.DS.$name;
+        `svn update $plugin_dir`;
+    }
+
+    function _installUsingExport($name, $uri, $rev = null, $force = false)
+    {
+        $rev = empty($rev) ? '' : " -r $rev ";
+        $force = $force ? ' --force ' : '';
+        $plugin_dir = AK_PLUGINS_DIR.DS.$name;
+        `svn export $force $rev $uri/$name $plugin_dir`;
+    }
+    
+    function _updateUsingExport($name, $uri)
+    {
+        $plugin_dir = AK_PLUGINS_DIR.DS.$name;
+        `svn export --force $uri/$name $plugin_dir`;
+    }
+
+    function _installUsingExternals($name, $uri, $rev = null, $force = false)
+    {
+        $extras = empty($rev) ? '' : " -r $rev ";
+        $extras .= ($force ? ' --force ' : '');
+        $externals = $this->_getExternals();
+        $externals[$name] = $uri;
+        $this->_setExternals($externals, $extras);
+        $this->_installUsingCheckout($name, $uri, $rev, $force);
+    }
+    
+    function _updateUsingExternals($name)
+    {
+        $this->_updateUsingCheckout($name);
+    }
+    
+    function _updateUsingHttp($name, $uri)
+    {
+        if(is_file(AK_PLUGINS_DIR.DS.$name.DS.'CHANGELOG') &&
+        md5(Ak::url_get_contents(rtrim($uri, '/').'/'.$name.'/CHANGELOG')) == md5_file(AK_PLUGINS_DIR.DS.$name.DS.'CHANGELOG')){
+            return false;
+        }
+        $this->_copyRemoteDir(rtrim($uri, '/').'/'.$name.'/', AK_PLUGINS_DIR);
+    }
+    
+    
+    function _setExternals($items, $extras = '')
+    {
+        $externals = array();
+        foreach ($items as $name => $uri){
+            $externals[] = "$name ".rtrim($uri, '/');
+        }
+        $tmp_file = AK_TMP_DIR.DS.Ak::uuid();
+        $plugins_dir = AK_PLUGINS_DIR;
+        Ak::file_put_contents($tmp_file, join("\n", $externals));
+        `svn propset $extras -q svn:externals -F "$tmp_file" "$plugins_dir"`;
+        Ak::file_delete($tmp_file);
+    }
+
+    function _uninstallExternals($name)
+    {
+        $externals = $this->_getExternals();
+        unset($externals[$name]);
+        $this->_setExternals($externals);
+    }
+
+    function _getExternals()
+    {
+        if($this->_shouldUseSvnExternals()){
+            $plugins_dir = AK_PLUGINS_DIR;
+            $svn_externals = array_diff(array_map('trim',(array)explode("\n", `svn propget svn:externals "$plugins_dir"`)), array(''));
+            $externals = array();
+            foreach ($svn_externals as $svn_external){
+                list($name, $uri) = explode(' ', trim($svn_external));
+                $externals[$name] = $uri;
+            }
+            return $externals;
+        }else{
+            return array();
+        }
+    }
+
+    function _installUsingHttp($name, $uri)
+    {
+        $this->_copyRemoteDir(rtrim($uri, '/').'/'.$name.'/', AK_PLUGINS_DIR);
+    }
+    
 }
 
 ?>

@@ -125,6 +125,17 @@ class test_of_Ak_file_functions extends  UnitTestCase
             }
         }
     }
+    
+    function test_should_delete_nested_directories_when_include_hidden_files()
+    {
+        $dir_name = AK_TMP_DIR.Ak::randomString();
+        Ak::make_dir($dir_name);
+        Ak::make_dir($dir_name.DS.'.hidden');
+        $this->assertTrue(is_dir($dir_name), 'Could not create test directory '.$dir_name);
+        $this->assertTrue(Ak::directory_delete($dir_name));
+        clearstatcache();
+        $this->assertFalse(is_dir($dir_name));
+    }
 }
 
 ak_test('test_of_Ak_file_functions');

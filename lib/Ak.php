@@ -447,10 +447,15 @@ class Ak
             require_once(AK_LIB_DIR.DS.'AkFtp.php');
             return AkFtp::delete($dir_name);
         }else{
-            if($fs_items = glob($options['base_path'].DS.$dir_name."/*")){
+            $items = glob($options['base_path'].DS.$dir_name."/*");
+            $hidden_items = glob($options['base_path'].DS.$dir_name."/.*");
+            $fs_items = $items || $hidden_items ? array_merge((array)$items, (array)$hidden_items) : false;
+            if($fs_items){
                 $items_to_delete = array('directories'=>array(), 'files'=>array());
                 foreach($fs_items as $fs_item) {
-                    $items_to_delete[ (is_dir($fs_item) ? 'directories' : 'files') ][] = $fs_item;
+                    if($fs_item[strlen($fs_item)-1] != '.'){
+                        $items_to_delete[ (is_dir($fs_item) ? 'directories' : 'files') ][] = $fs_item;
+                    }
                 }
                 foreach ($items_to_delete['files'] as $file){
                     Ak::file_delete($file, $options);
@@ -578,6 +583,7 @@ class Ak
         $default_options = array(
         'referer' => $url,
         'method' => 'post',
+        'timeout' => 100,
         'params' => '',
         'browser_name' => 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)',
         );
@@ -589,9 +595,10 @@ class Ak
 
         $ch = curl_init();
 
-        curl_setopt ($ch, CURLOPT_URL, $options['referer']);
-        curl_setopt ($ch, CURLOPT_USERAGENT, $options['browser_name']);
-        curl_setopt ($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_USERAGENT, $options['browser_name']);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
 
         if(!empty($options['params']) && $options['method'] == 'post'){
             curl_setopt($ch, CURLOPT_POST, 1);
@@ -600,10 +607,10 @@ class Ak
             $url = trim($url,'?').'?'.trim($options['params'], '?');
         }
 
-        curl_setopt ($ch, CURLOPT_REFERER, $url);
+        curl_setopt ($ch, CURLOPT_REFERER, $options['referer']);
 
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 100);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $options['timeout']);
 
         $result = curl_exec ($ch);
         curl_close ($ch);
