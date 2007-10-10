@@ -29,6 +29,7 @@ class AkSintagsParser
     var $_last_match;
     var $_matches;
     var $_current_match;
+    var $_block_vars = array();
     var $output;
     var $escape_chars = array(
     '\{' => '____AKST_OT____',
@@ -348,6 +349,11 @@ class AkSintagsParser
     {
         switch ($state){
             case AK_LEXER_ENTER:
+                if(preg_match('/=+$/', trim($match))){
+                    $this->avoid_php_tags = $this->_current_function_opening = false;
+                    $this->output .= '<?php '.$this->_convertSintagsVarToPhp(trim($match,' =('.$this->_SINTAGS_OPEN_HELPER_TAG)).' = (';
+                    return true;
+                }
                 $method_name = trim($match,' =('.$this->_SINTAGS_OPEN_HELPER_TAG);
                 if($helper = $this->_getHelperNameForMethod($method_name)){
                     $this->avoid_php_tags = !$is_inline_function && !strstr($match,'=');
@@ -542,6 +548,92 @@ class AkSintagsParser
         }
         return true;
     }
+
+
+    //-----------------------------------------
+    //  SINTAGS BLOCKS
+    //-----------------------------------------
+    function Block($match, $state)
+    {
+        switch ($state){
+            case AK_LEXER_ENTER:
+                $this->_block = '';
+                $this->_block_params = array();
+                $this->_block_data = array();
+                if(strstr($match, '=')){
+                    list($parameters, $match) = explode('=', $match);
+                    $parameters = array_diff(array_map('trim', Ak::toArray(trim($parameters,' (){|'.$this->_SINTAGS_OPEN_HELPER_TAG))), array(''));
+                    foreach ($parameters as $parameter){
+                        if($parameter = $this->_convertSintagsVarToPhp($parameter)){
+                            $this->_block_params[] = $parameter;
+                        }else{
+                            return false;
+                        }
+                    }
+                }
+                $method_or_var_names = array_diff(array_map('trim', Ak::toArray(trim($match,' (){|'.$this->_SINTAGS_OPEN_HELPER_TAG))), array(''));
+                foreach ($method_or_var_names as $method_or_var_name){
+                    if($helper = $this->_getHelperNameForMethod($method_or_var_name)){
+                        if(!strpos($helper, 'helper')){
+                            $method_or_var_name = AkInflector::variablize($method_or_var_name);
+                        }
+                        $this->_block_data[] = "\${$helper}->$method_or_var_name()";
+                        return true;
+                    }elseif(!strstr($match,'(') && $php_variable = $this->_convertSintagsVarToPhp($method_or_var_name)){
+                        $this->_block_data[] = $php_variable;
+                    }else{
+                        $this->raiseError(Ak::t('Could not find a helper to handle the method "%method" you called in your view', array('%method'=>$method_or_var_name)), E_USER_NOTICE);
+                    }
+                }
+
+                break;
+            case AK_LEXER_MATCHED:
+                $this->_block_keys = array();
+                $parameters = Ak::toArray($match);
+                foreach ($parameters as $parameter){
+                    if($parameter = $this->_convertSintagsVarToPhp($parameter)){
+                        $this->_block_keys[] = $parameter;
+                    }else{
+                        return false;
+                    }
+                }
+                break;
+            case AK_LEXER_UNMATCHED:
+                $this->_block .= $match;
+                break;
+            case AK_LEXER_EXIT:
+
+                $this->output .= "<?php \n";
+                foreach ($this->_block_data as $k=>$block_data){
+                    if(strstr($block_data,'->')){
+                        /**
+                         * @todo Implement helper calls on blocks
+                         */
+                    }else{
+                        $this->output .= "if(!empty($block_data)){\n";
+                        if(!empty($this->_block_params[$k])){
+                            $this->output .= "    {$this->_block_params[$k]} = array();\n";
+                        }
+                        $this->output .= "    foreach (array_keys((array)$block_data) as \$ak_sintags_key){\n";
+                        if(count($this->_block_keys) == 1){
+                            $this->output .= "        {$this->_block_keys[0]} =& {$block_data}[\$ak_sintags_key];\n";
+                        }
+                        $this->output .= "       $this->_block;\n";
+                        if(!empty($this->_block_params[$k])){
+                            $this->output .= "        {$this->_block_params[$k]}[\$ak_sintags_key] = {$block_data}[\$ak_sintags_key];\n";
+                        }
+                        $this->output .= "    }\n";
+                        $this->output .= "}";
+                    }
+                }
+                $this->output .= "?>";
+
+                return true;
+        }
+
+        return true;
+    }
+
 
     function raiseError($error, $type = E_USER_NOTICE)
     {

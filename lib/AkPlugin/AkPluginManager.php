@@ -211,9 +211,9 @@ class AkPluginManager extends AkObject
     function guessBestInstallMethod($options = array())
     {
         if($this->canUseSvn()){
-            if($options['externals'] && $this->_shouldUseSvnExternals()){
+            if(!empty($options['externals']) && $this->_shouldUseSvnExternals()){
                 return 'externals';
-            }elseif($options['checkout'] && $this->_shouldUseSvnCheckout()){
+            }elseif(!empty($options['checkout']) && $this->_shouldUseSvnCheckout()){
                 return 'checkout';
             }
             return 'export';
