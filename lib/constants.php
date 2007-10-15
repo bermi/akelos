@@ -134,36 +134,36 @@ if(!AK_CLI && AK_WEB_REQUEST){
 
     defined('AK_SERVER_STANDARD_PORT') ? null : define('AK_SERVER_STANDARD_PORT', AK_PROTOCOL == 'https://' ? '443' : '80');
 
-    $port = ($_SERVER['SERVER_PORT'] != AK_SERVER_STANDARD_PORT)
+    $_ak_port = ($_SERVER['SERVER_PORT'] != AK_SERVER_STANDARD_PORT)
     ? (empty($_SERVER['SERVER_PORT']) ? '' : ':'.$_SERVER['SERVER_PORT']) : '';
 
     if(isset($_SERVER['HTTP_HOST']) && strstr($_SERVER['HTTP_HOST'],':')){
-        list(,$port) = explode(':', $_SERVER['HTTP_HOST']);
+        $_ak_port = substr($_SERVER['HTTP_HOST'], strpos($_SERVER['HTTP_HOST'],':'));
     }
-    $suffix = '';
+    $_ak_suffix = '';
     if(defined('AK_SITE_HTPSS_URL_SUFFIX') && isset($_SERVER['HTTPS'])){
-        $suffix = AK_SITE_HTPSS_URL_SUFFIX;
-        $port = strstr(AK_SITE_HTPSS_URL_SUFFIX,':') ? '' : $port;
+        $_ak_suffix = AK_SITE_HTPSS_URL_SUFFIX;
+        $_ak_port = strstr(AK_SITE_HTPSS_URL_SUFFIX,':') ? '' : $_ak_port;
     }elseif(defined('AK_SITE_URL_SUFFIX') && AK_SITE_URL_SUFFIX != ''){
-        $suffix = AK_SITE_URL_SUFFIX;
-        $port = strstr(AK_SITE_URL_SUFFIX,':') ? '' : $port;
+        $_ak_suffix = AK_SITE_URL_SUFFIX;
+        $_ak_port = strstr(AK_SITE_URL_SUFFIX,':') ? '' : $_ak_port;
     }
     if(!defined('AK_SITE_URL')){
-        defined('AK_SITE_URL') ? null : define('AK_SITE_URL', trim(AK_PROTOCOL.AK_HOST, '/').$port.$suffix);
+        defined('AK_SITE_URL') ? null : define('AK_SITE_URL', trim(AK_PROTOCOL.AK_HOST, '/').$_ak_port.$_ak_suffix);
         defined('AK_URL') ? null : define('AK_URL', AK_SITE_URL);
     }else{
         if(AK_AUTOMATIC_SSL_DETECTION){
-            defined('AK_URL') ? null : define('AK_URL', str_replace(array('https://','http://'),AK_PROTOCOL, AK_SITE_URL).$port.$suffix);
+            defined('AK_URL') ? null : define('AK_URL', str_replace(array('https://','http://'),AK_PROTOCOL, AK_SITE_URL).$_ak_port.$_ak_suffix);
         }else{
-            defined('AK_URL') ? null : define('AK_URL', AK_SITE_URL.$port.$suffix);
+            defined('AK_URL') ? null : define('AK_URL', AK_SITE_URL.$_ak_port.$_ak_suffix);
         }
     }
-    defined('AK_CURRENT_URL') ? null : define('AK_CURRENT_URL', substr(AK_SITE_URL,0,strlen($suffix)*-1).AK_REQUEST_URI);
 
+    defined('AK_CURRENT_URL') ? null : define('AK_CURRENT_URL', substr(AK_SITE_URL,0,strlen($_ak_suffix)*-1).AK_REQUEST_URI);
 
-    defined('AK_SERVER_PORT') ? null : define('AK_SERVER_PORT', empty($port) ? AK_SERVER_STANDARD_PORT : trim($port,':'));
+    defined('AK_SERVER_PORT') ? null : define('AK_SERVER_PORT', empty($_ak_port) ? AK_SERVER_STANDARD_PORT : trim($_ak_port,':'));
 
-    unset($suffix, $port);
+    unset($_ak_suffix, $_ak_port);
     defined('AK_COOKIE_DOMAIN') ? null : define('AK_COOKIE_DOMAIN', AK_HOST);
     // ini_set('session.cookie_domain', AK_COOKIE_DOMAIN);
 
