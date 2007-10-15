@@ -19,15 +19,16 @@ defined('AK_CONFIG_DIR') ? null : define('AK_CONFIG_DIR', AK_BASE_DIR.DS.'config
 
 // If you need to customize the framework default settings or specify internationalization options,
 // edit the files config/testing.php, config/development.php, config/production.php
-if(AK_ENVIRONMENT != 'setup'){
+if(AK_ENVIRONMENT != 'setup'){        
     $akdb = $database_settings[strtolower(AK_ENVIRONMENT)];
+    $akdb['options'] = empty($akdb['options']) && !empty($akdb['socket']) ? 'socket='.urlencode($akdb['socket']) : $akdb['options'];
     $dsn = $akdb['type'] == 'sqlite' ?
     'sqlite://'.urlencode($akdb['database_file']).'/?persist' :
     $akdb['type'].'://'.$akdb['user'].':'.$akdb['password'].'@'.$akdb['host'].
     (empty($akdb['port'])?'':':'.$akdb['port']).
     '/'.$akdb['database_name'].
     (!empty($akdb['options'])?'?'.$akdb['options']:'');
-
+    
     require_once(AK_CONFIG_DIR.DS.'environments'.DS.AK_ENVIRONMENT.'.php');
 }
 
