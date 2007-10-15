@@ -123,7 +123,7 @@ class test_of_Ak_object_inspection extends  UnitTestCase
         $this->assertEqual('2005-12-25 00:00:00', Ak::getDate(Ak::getTimestamp('2005-12-25')));
         $this->assertEqual('1592-10-09 00:00:00', Ak::getDate(Ak::getTimestamp('1592-10-09')));
         $this->assertEqual('2192-10-09 00:00:00', Ak::getDate(Ak::getTimestamp('2192-10-09')));
-        $this->assertEqual('2192-10-09 01:02:03', Ak::getDate(Ak::getTimestamp('2192-10-9 1:2:3')));
+        $this->assertEqual('2192-10-09 01:02:03', Ak::getDate(Ak::getTimestamp('2192-10-9 01:02:03')));
     }
 
     function Test_for_getDate()

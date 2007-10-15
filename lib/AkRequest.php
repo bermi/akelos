@@ -599,34 +599,28 @@ class AkRequest extends AkObject
             foreach ($params as $name=>$details){
 
                 if(is_array($details) && !empty($details['name']) &&  !empty($details['tmp_name']) &&  !empty($details['size'])){
-
-                    if( is_array($details['tmp_name']) &&
-                    (
-                    count($details['tmp_name']) == 1 &&
-                    !is_array(array_shift(array_values($details['tmp_name']))))
-                    ){
-
-                        foreach (array_keys($details['tmp_name']) as $k){
-                            if(UPLOAD_ERR_NO_FILE != $details['error'][$k]){
-                                $result[$name][$k] = array(
-                                'name'=>$details['name'][$k],
-                                'tmp_name'=>$details['tmp_name'][$k],
-                                'size'=>$details['size'][$k],
-                                'type'=>$details['type'][$k],
-                                'error'=>$details['error'][$k],
-                                );
-                            }
-                        }
-                    }elseif(is_array($details['tmp_name'])){
+                    if(is_array($details['tmp_name'])){
                         foreach ($details['tmp_name'] as $item=>$item_details){
-                            foreach (array_keys($item_details) as $k){
-                                if(UPLOAD_ERR_NO_FILE != $details['error'][$item][$k]){
-                                    $result[$name][$item][$k] = array(
-                                    'name'=>$details['name'][$item][$k],
-                                    'tmp_name'=>$details['tmp_name'][$item][$k],
-                                    'size'=>$details['size'][$item][$k],
-                                    'type'=>$details['type'][$item][$k],
-                                    'error'=>$details['error'][$item][$k],
+                            if(is_array($item_details)){
+                                foreach (array_keys($item_details) as $k){
+                                    if(UPLOAD_ERR_NO_FILE != $details['error'][$item][$k]){
+                                        $result[$name][$item][$k] = array(
+                                        'name'=>$details['name'][$item][$k],
+                                        'tmp_name'=>$details['tmp_name'][$item][$k],
+                                        'size'=>$details['size'][$item][$k],
+                                        'type'=>$details['type'][$item][$k],
+                                        'error'=>$details['error'][$item][$k],
+                                        );
+                                    }
+                                }
+                            }else{
+                                if(UPLOAD_ERR_NO_FILE != $details['error'][$item]){
+                                    $result[$name][$item] = array(
+                                    'name'=>$details['name'][$item],
+                                    'tmp_name'=>$details['tmp_name'][$item],
+                                    'size'=>$details['size'][$item],
+                                    'type'=>$details['type'][$item],
+                                    'error'=>$details['error'][$item],
                                     );
                                 }
                             }
@@ -648,8 +642,7 @@ class AkRequest extends AkObject
 
         return $result;
     }
-
-
+    
     // {{{ _addParams()
 
     /**
