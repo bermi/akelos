@@ -8,6 +8,8 @@ $locale['date_format'] = 'Y-m-d';
 $locale['long_date_format'] = 'Y-m-d';
 $locale['time_format'] = 'H:i';
 $locale['long_time_format'] = 'H:i:s';
+$locale['first_day_of_week'] = 0; // 0 sunday, 1 monday
+$locale['weekday_abbreviation'] = 1;
 
 $locale['currency'] = array(
 'precision'=>2,
@@ -149,15 +151,14 @@ $dictionary['Could not find the file /app/controllers/<i>%controller_file_name</
 
 $dictionary['No controller was specified.'] = 'No controller was specified.';
 
-// 2007-10-05 23:28:22
-
-
 $dictionary['Please add force=true to the argument list in order to overwrite existing files.'] = 'Please add force=true to the argument list in order to overwrite existing files.';
-
-// 2007-10-06 3:15:57
-
-
 $dictionary['Could not find a helper to handle the method "%method" you called in your view'] = 'Could not find a helper to handle the method "%method" you called in your view';
+$dictionary['Could not locate usage file for this generator'] = 'Could not locate usage file for this generator';
+$dictionary['You must supply a valid generator as the first command.
+
+   Available generator are:'] = 'You must supply a valid generator as the first command.
+
+   Available generator are:';
 
 
 ?>

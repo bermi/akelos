@@ -8,6 +8,8 @@ $locale['date_format'] = 'd/m/Y';
 $locale['long_date_format'] = 'd/m/Y';
 $locale['time_format'] = 'H:i';
 $locale['long_time_format'] = 'H:i:s';
+$locale['first_day_of_week'] = 1; // 0 sunday, 1 monday ....  
+$locale['weekday_abbreviation'] = 1;
 
 $locale['currency'] = array(
 'precision'=>2,
@@ -143,15 +145,14 @@ $dictionary['Could not find the file /app/controllers/<i>%controller_file_name</
 
 $dictionary['No controller was specified.'] = 'No se ha especificado ningún controlador.';
 
-// 2007-10-05 23:28:22
+$dictionary['Please add force=true to the argument list in order to overwrite existing files.'] = 'Añada --force a la lista de argumentos para sobreescribir los archivos existentes.';
+$dictionary['Could not find a helper to handle the method "%method" you called in your view'] = 'No se ha encontrado el "helper" "%method" que ha sido invocado desde la vista';
+$dictionary['Could not locate usage file for this generator'] = 'No se ha encontrado un fichero de ayuda para este generator';
+$dictionary['You must supply a valid generator as the first command.
 
+   Available generator are:'] = 'Debes proporcionar un nombre de generador válido.
 
-$dictionary['Please add force=true to the argument list in order to overwrite existing files.'] = 'Please add force=true to the argument list in order to overwrite existing files.';
-
-// 2007-10-06 3:15:57
-
-
-$dictionary['Could not find a helper to handle the method "%method" you called in your view'] = 'Could not find a helper to handle the method "%method" you called in your view';
+   Los generadores disponibles son:';
 
 
 ?>

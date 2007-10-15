@@ -8,6 +8,8 @@ $locale['date_format'] = 'Y-m-d';
 $locale['long_date_format'] = 'Y-m-d';
 $locale['time_format'] = 'H:i';
 $locale['long_time_format'] = 'H:i:s';
+$locale['first_day_of_week'] = 0; // 0 sunday, 1 monday
+$locale['weekday_abbreviation'] = false;
 
 $locale['currency'] = array(
 'precision'=>2,
@@ -146,5 +148,14 @@ $dictionary['Ooops! Could not fetch details for the table %table_name.'] = 'テ�
 
 $dictionary['Upgrading'] = '更新中';
 $dictionary['Could not find the file /app/controllers/<i>%controller_file_name</i> for the controller %controller_class_name'] = 'コントローラ %controller_class_name のファイル /app/controllers/<i>%controller_file_name</i> が見つかりませんでした';
+
+$dictionary['Please add force=true to the argument list in order to overwrite existing files.'] = 'Please add force=true to the argument list in order to overwrite existing files.';
+$dictionary['Could not find a helper to handle the method "%method" you called in your view'] = 'Could not find a helper to handle the method "%method" you called in your view';
+$dictionary['Could not locate usage file for this generator'] = 'Could not locate usage file for this generator';
+$dictionary['You must supply a valid generator as the first command.
+
+   Available generator are:'] = 'You must supply a valid generator as the first command.
+
+   Available generator are:';
 
 ?>
