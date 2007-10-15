@@ -118,6 +118,7 @@ class AkActionController extends AkObject
     var $helpers = 'default';
 
     var $app_helpers;
+    var $plugin_helpers = 'all';
 
     var $web_service;
     var $web_services = array();
@@ -165,11 +166,11 @@ class AkActionController extends AkObject
             if(!empty($this->_auto_instantiate_models)){
                 $this->instantiateIncludedModelClasses();
             }
-            if(!empty($this->helpers)){
-                $this->instantiateHelpers();
-            }
             if(!empty($this->_enable_plugins)){
                 $this->loadPlugins();
+            }
+            if(!empty($this->helpers)){
+                $this->instantiateHelpers();
             }
         }else{
             $this->_enableLayoutOnRender = false;
@@ -238,7 +239,8 @@ class AkActionController extends AkObject
     {
         $helpers = $this->getDefaultHelpers();
         $helpers = array_merge($helpers, $this->getApplicationHelpers());
-        
+        $helpers = array_merge($helpers, $this->getPluginHelpers());
+
         require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
 
         $current_controller_helper = $this->getControllerName();
@@ -250,11 +252,10 @@ class AkActionController extends AkObject
 
         $available_helpers = array();
         foreach ($helpers as $file=>$helper){
-            $helper_class_name = $helper.'Helper';
+            $helper_class_name = strstr($helper, 'Helper') ? $helper : $helper.'Helper';
             $full_path = preg_match('/[\\\\\/]+/',$file);
             $file_path = $full_path ? $file : AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.$file;
             include_once($file_path);
-
             if(class_exists($helper_class_name)){
                 $attribute_name = $full_path ? AkInflector::underscore($helper_class_name) : substr($file,0,-4);
                 $available_helpers[] = $attribute_name;
@@ -288,7 +289,7 @@ class AkActionController extends AkObject
     function getApplicationHelpers()
     {
         $helper_names = array();
-        if ($this->app_helpers == 'all' ){
+        if ($this->app_helpers == 'all'){
             $available_helpers = Ak::dir(AK_HELPERS_DIR,array('dirs'=>false));
             $helper_names = array();
             foreach ($available_helpers as $available_helper){
@@ -303,6 +304,44 @@ class AkActionController extends AkObject
         return $helper_names;
     }
 
+    function getPluginHelpers()
+    {
+        $helper_names = AkActionController::addPluginHelper(false); // Trick for getting helper names set by AkPlugin::addHelper
+        if(empty($helper_names)){
+            return array();
+        }elseif ($this->plugin_helpers == 'all'){
+            return $helper_names;
+        }else {
+            $selected_helper_names = array();
+            foreach (Ak::toArray($this->plugin_helpers) as $helper_name){
+                $helper_name = AkInflector::camelize($helper_name);
+                if($path = array_shift(array_keys($helper_names, AkInflector::camelize($helper_name)))){
+                    $selected_helper_names[$path] = $helper_names[$path];
+                }
+            }
+            return $selected_helper_names;
+        }
+    }
+    
+     /**
+     * Used for adding helpers to the base class like those added by the plugins engine.
+     *
+     * @param string $helper_name Helper class name like CalendarHelper
+     * @param array $options - path: Path to the helper class, defaults to AK_PLUGINS_DIR/helper_name/lib/helper_name.php
+     */
+    function addPluginHelper($helper_name, $options = array())
+    {
+        static $helpers = array();
+        if($helper_name === false){
+            return $helpers;
+        }
+        $underscored_helper_name = AkInflector::underscore($helper_name);
+        $default_options = array(
+        'path' => AK_PLUGINS_DIR.DS.$underscored_helper_name.DS.'lib'.DS.$underscored_helper_name.'.php'
+        );
+        $options = array_merge($default_options, $options);
+        $helpers[$options['path']] = $helper_name;
+    }
 
     function _validateGeneratedXhtml()
     {

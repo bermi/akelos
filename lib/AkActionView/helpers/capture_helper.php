@@ -77,11 +77,11 @@ class CaptureHelper
         $this->_stack[] = $var_name;
     }
 
-    function end()
+    function end($add_to_view = true)
     {
         $var_name = array_pop($this->_stack);
         $result = ob_get_clean();
-        if(!empty($var_name)){
+        if($add_to_view && !empty($var_name)){
             $this->_addVarToView('content_for_'.$var_name, $result);
         }
         return $result;

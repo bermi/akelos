@@ -82,6 +82,13 @@ class AkPlugin
     {
 
     }
+    
+    function addHelper($helper_name, $helper_path = null)
+    {
+        $helper_name = AkInflector::camelize($helper_name);
+        $helper_path = empty($helper_path) ? $this->getPath().DS.'lib'.DS.AkInflector::underscore($helper_name).'.php' : $helper_path;
+        AkActionController::addPluginHelper($helper_name, array('path' => $helper_path));
+    }
 
     /**
      * Gets the base path for a given plugin

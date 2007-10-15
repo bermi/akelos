@@ -28,26 +28,33 @@ class AkelosGenerator
     function runCommand($command)
     {
         $commands = $this->getOptionsFromCommand($command);
-        $generator_name = isset($commands['generator']) ? $commands['generator'] : array_shift($commands);
+        $generator_name = AkInflector::underscore(isset($commands['generator']) ? $commands['generator'] : array_shift($commands));
 
-        if(empty($generator_name)){
+        $available_generators = $this->_getAvailableGenerators();
+        $generator_file_name = array_shift(array_keys($available_generators, $generator_name));
+
+        if(empty($generator_file_name)){
             echo "\n   ".Ak::t("You must supply a valid generator as the first command.\n\n   Available generator are:");
-            echo "\n\n   ".join("\n   ", $this->_getAvailableGenerators())."\n\n";
+            echo "\n\n   ".join("\n   ", $available_generators)."\n\n";
             defined('AK_CONSOLE_MODE') && AK_CONSOLE_MODE ? null : exit;
             return ;
         }
 
-        if(count(array_diff($commands,array('help','-help','usage','-usage','h','-h','USAGE','-USAGE'))) != count($commands) || count($commands) == 0){
-            $usage = method_exists($this,'banner') ? $this->banner() : @file_get_contents(AK_GENERATORS_DIR.DS.$generator_name.DS.'USAGE');
-            echo empty($usage) ? "\n".Ak::t('Could not locate usage file for this generator') : "\n".$usage."\n";
-            return;
-        }
-
-        if(file_exists(AK_GENERATORS_DIR.DS.$generator_name.DS.$generator_name.'_generator.php')){
-            include_once(AK_GENERATORS_DIR.DS.$generator_name.DS.$generator_name.'_generator.php');
+        if(include_once($generator_file_name)){
 
             $generator_class_name = AkInflector::camelize($generator_name.'_generator');
             $generator = new $generator_class_name();
+            $generator->_generator_base_path = dirname($generator_file_name);
+
+            if(count(array_diff($commands,array('help','-help','usage','-usage','h','-h','USAGE','-USAGE'))) != count($commands) || count($commands) == 0){
+                if(empty($generator->command_values) && empty($commands)){
+                    // generator without commands
+                }else{
+                    $generator->banner();
+                    return;
+                }
+            }
+
             $generator->type = $generator_name;
             $generator->_identifyUnnamedCommands($commands);
             $generator->_assignVars($commands);
@@ -131,8 +138,10 @@ class AkelosGenerator
 
     function printLog()
     {
-        echo "\n".Ak::t('The following files have been created:')."\n";
-        echo join("\n",$this->log)."\n";
+        if(!empty($this->log)){
+            echo "\n".Ak::t('The following files have been created:')."\n";
+            echo join("\n",$this->log)."\n";
+        }
         $this->log = array();
     }
 
@@ -204,24 +213,52 @@ class AkelosGenerator
         return str_replace('___AMP___','&',$str);
     }
 
-    function manifest()
+    function manifest($call_generate = true)
     {
-        return $this->generate();
+        return $call_generate ? $this->generate() : null;
+    }
+    
+    function generate()
+    {
+        return $this->manifest(false);
+    }
+
+    function banner()
+    {
+        $usage = @file_get_contents(@$this->_generator_base_path.DS.'USAGE');
+        echo empty($usage) ? "\n".Ak::t('Could not locate usage file for this generator') : "\n".$usage."\n";
     }
 
     function _getAvailableGenerators()
     {
+        return array_merge($this->_getGeneratorsInsidePath(AK_GENERATORS_DIR), $this->_getPluginGenerators());
+    }
+
+    function _getPluginGenerators()
+    {
         $generators = array();
-        foreach (Ak::dir(AK_GENERATORS_DIR,array('files'=>false,'dirs'=>true)) as $folder){
-            $generator = array_shift(array_keys($folder));
-            if(strstr($generator,'.php')){
-                continue;
-            }
-            $generators[] = $generator;
+        defined('AK_PLUGINS_DIR') ? null : define('AK_PLUGINS_DIR', AK_APP_DIR.DS.'vendor'.DS.'plugins');
+        foreach (Ak::dir(AK_PLUGINS_DIR,array('files'=>false,'dirs'=>true)) as $folder){
+            $plugin_name = array_shift(array_keys($folder));
+            $generators = array_merge($generators, $this->_getGeneratorsInsidePath(AK_PLUGINS_DIR.DS.$plugin_name.DS.'generators'));
         }
         return $generators;
     }
 
+    function _getGeneratorsInsidePath($path)
+    {
+        $generators = array();
+        if(is_dir($path)){
+            foreach (Ak::dir($path,array('files'=>false,'dirs'=>true)) as $folder){
+                $generator = array_shift(array_keys($folder));
+                if(strstr($generator,'.php')){
+                    continue;
+                }
+                $generators[$path.DS.$generator.DS.$generator.'_generator.php'] = $generator;
+            }
+        }
+        return $generators;
+    }
 }
 
 ?>
