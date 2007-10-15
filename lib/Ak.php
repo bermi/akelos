@@ -860,16 +860,24 @@ class Ak
         if(empty($iso_date_or_hour)){
             return Ak::time();
         }
-        if (!preg_match("|^([0-9]{4})[-/\.]?([0-9]{1,2})[-/\.]?([0-9]{1,2})[ -]?(([0-9]{1,2}):?([0-9]{1,2}):?([0-9\.]{1,4}))?|", ($iso_date_or_hour), $rr)){
+        if (!preg_match("/^
+            ([0-9]{4})[-\/\.]? # year
+            ([0-9]{1,2})[-\/\.]? # month
+            ([0-9]{1,2})[ -]? # day
+            (
+                ([0-9]{1,2}):? # hour
+                ([0-9]{2}):? # minute
+                ([0-9\.]{0,4}) # seconds
+            )?/x", ($iso_date_or_hour), $rr)){
             if (preg_match("|^(([0-9]{1,2}):?([0-9]{1,2}):?([0-9\.]{1,4}))?|", ($iso_date_or_hour), $rr)){
                 return empty($rr[0]) ? Ak::time() : mktime($rr[2],$rr[3],$rr[4]);
             }
         }else{
             if($rr[1]>=2038 || $rr[1]<=1970){
                 require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb-time.inc.php');
-                return isset($rr[5]) ? adodb_mktime($rr[5],$rr[6],$rr[7],$rr[2],$rr[3],$rr[1]) : adodb_mktime(0,0,0,$rr[2],$rr[3],$rr[1]);
+                return isset($rr[5]) ? adodb_mktime($rr[5],$rr[6],(int)$rr[7],$rr[2],$rr[3],$rr[1]) : adodb_mktime(0,0,0,$rr[2],$rr[3],$rr[1]);
             }else{
-                return isset($rr[5]) ? mktime($rr[5],$rr[6],$rr[7],$rr[2],$rr[3],$rr[1]) : mktime(0,0,0,$rr[2],$rr[3],$rr[1]);
+                return isset($rr[5]) ? mktime($rr[5],$rr[6],(int)$rr[7],$rr[2],$rr[3],$rr[1]) : mktime(0,0,0,$rr[2],$rr[3],$rr[1]);
             }
         }
         trigger_error(Ak::t('Invalid ISO date. You must supply date in one of the following formats: "year-month-day hour:min:sec", "year-month-day", "hour:min:sec"'));

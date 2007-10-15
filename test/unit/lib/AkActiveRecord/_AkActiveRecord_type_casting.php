@@ -43,6 +43,26 @@ class test_AkActiveRecord_type_casting extends  AkUnitTest
         $this->assertEqual($Post->get('posted_on'), '2005-06-16');
 
     }
+
+    // Ticket #76
+    function test_should_update_datetime_correctly()
+    {
+        $params = array(
+        'title' => 'Expiring salutation',
+        'body' => 'Expiring Hello world!',
+        'expires_at(1i)' => '2007', 
+        'expires_at(2i)' => '10', 
+        'expires_at(3i)' => '15', 
+        'expires_at(4i)' => '17', 
+        'expires_at(5i)' => '30'
+        );
+        $Post =& new Post();
+        $Post->setAttributes($params);
+        $this->assertTrue($Post->save());
+        $Post->reload();
+        $this->assertEqual($Post->get('expires_at'), '2007-10-15 17:30:00');
+
+    }
 }
 
 ak_test('test_AkActiveRecord_type_casting',true);

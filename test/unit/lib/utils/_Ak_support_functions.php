@@ -41,7 +41,13 @@ class test_Ak_support_functions extends  AkUnitTest
         $expected_value = 5;
         $this->assertEqual(Ak::size($element), $expected_value);
     }
-
+    
+    function test_should_convert_between_timestamp_and_date()
+    {
+        $iso_date = '2007-10-15 16:30:00';
+        $this->assertEqual(Ak::getDate(Ak::getTimestamp($iso_date)), $iso_date);
+        $this->assertEqual(Ak::getDate(Ak::getTimestamp('2007-10-15 16:30')), $iso_date);
+    }
 }
 
 

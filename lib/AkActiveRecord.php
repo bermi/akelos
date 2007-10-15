@@ -3347,7 +3347,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             }
         }
         foreach ($date_attributes as $attribute=>$date){
-            $params[$attribute] = Ak::getDate(Ak::getTimestamp(trim(@$date[1].'-'.@$date[2].'-'.@$date[3].' '.@$date[4].':'.@$date[5],' :-')));
+            $params[$attribute] = Ak::getDate(Ak::getTimestamp(trim(@$date[1].'-'.@$date[2].'-'.@$date[3].' '.@$date[4].':'.@$date[5].':'.@$date[6],' :-')));
         }
     }
     
