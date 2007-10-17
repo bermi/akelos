@@ -246,7 +246,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
             }
         }
 
-        $avaliable_associated_options = array('order'=>array(), 'conditions'=>array(), 'joins'=>array(), 'selection'=>array());
+        $available_associated_options = array('order'=>array(), 'conditions'=>array(), 'joins'=>array(), 'selection'=>array());
 
         foreach ($included_associations as $association_id){
             $association_options = empty($included_association_options[$association_id]) ? array() : $included_association_options[$association_id];
@@ -254,14 +254,14 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $handler_name = $this->getCollectionHandlerName($association_id);
             $handler_name = empty($handler_name) ? $association_id : (in_array($handler_name, $included_associations) ? $association_id : $handler_name);
             $associated_options = $this->$handler_name->getAssociatedFinderSqlOptions($association_options);
-            foreach (array_keys($avaliable_associated_options) as $associated_option){
+            foreach (array_keys($available_associated_options) as $associated_option){
                 if(!empty($associated_options[$associated_option])){
-                    $avaliable_associated_options[$associated_option][] = $associated_options[$associated_option];
+                    $available_associated_options[$associated_option][] = $associated_options[$associated_option];
                 }
             }
         }
 
-        foreach ($avaliable_associated_options as $option=>$values){
+        foreach ($available_associated_options as $option=>$values){
             if(!empty($values)){
                 $separator = $option == 'joins' ? ' ' : (in_array($option, array('selection','order')) ? ', ': ' AND ');
                 $values = array_map('trim', $values);

@@ -263,7 +263,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         AK_LOG_EVENTS ? ($this->Logger =& Ak::getLogger()) : null;
         
-        $this->_internationalize = is_null($this->_internationalize) && AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT ? count($this->getAvaliableLocales()) > 1 : $this->_internationalize;
+        $this->_internationalize = is_null($this->_internationalize) && AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT ? count($this->getAvailableLocales()) > 1 : $this->_internationalize;
 
         @$this->_instatiateDefaultObserver();
 
@@ -3050,7 +3050,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         static $cache;
         $model = $this->getModelName();
-        $available_locales = $this->getAvaliableLocales();
+        $available_locales = $this->getAvailableLocales();
         if(empty($cache[$model])){
             $cache[$model] = array();
             foreach ($this->getColumnSettings() as $column_name=>$details){
@@ -3069,7 +3069,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $cache[$model];
     }
 
-    function getAvaliableLocales()
+    function getAvailableLocales()
     {
         static $available_locales;
         if(empty($available_locales)){
@@ -3087,7 +3087,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         static $current_locale;
         if(empty($current_locale)){
             $current_locale = Ak::lang();
-            $available_locales = $this->getAvaliableLocales();
+            $available_locales = $this->getAvailableLocales();
             if(!in_array($current_locale, $available_locales)){
                 $current_locale = array_shift($available_locales);
             }
@@ -3107,7 +3107,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function getAttributeLocales($attribute)
     {
         $attribute_locales = array();
-        foreach ($this->getAvaliableLocales() as $locale){
+        foreach ($this->getAvailableLocales() as $locale){
             if($this->hasColumn($locale.'_'.$attribute)){
                 $attribute_locales[$locale] = $this->getAttributeByLocale($attribute, $locale);
             }
@@ -3146,7 +3146,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function _isInternationalizeCandidate($column_name)
     {
         $pos = strpos($column_name,'_');
-        return $pos === 2 && in_array(substr($column_name,0,$pos),$this->getAvaliableLocales());
+        return $pos === 2 && in_array(substr($column_name,0,$pos),$this->getAvailableLocales());
     }
     
     /**

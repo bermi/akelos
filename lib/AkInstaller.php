@@ -617,7 +617,7 @@ class AkInstaller
         'attribute_names','combined_subattributes','available_combined_attributes','connection','connection','primary_key',
         'table_name','table_name','only_available_atrributes','columns_for_atrributes','columns_with_regex_boundaries','columns',
         'column_settings','column_settings','akelos_data_type','class_for_database_table_mapping','display_field','display_field',
-        'internationalized_columns','avaliable_locales','current_locale','attribute_by_locale','attribute_locales',
+        'internationalized_columns','available_locales','current_locale','attribute_by_locale','attribute_locales',
         'attribute_by_locale','attribute_locales','attributes_before_type_cast','attribute_before_type_cast','serialize_attribute',
         'available_attributes_quoted','attributes_quoted','column_type','value_for_date_column','observable_state',
         'observable_state','observers','errors','base_errors','errors_on','full_error_messages','array_from_ak_string',
