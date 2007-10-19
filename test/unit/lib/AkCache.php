@@ -9,7 +9,7 @@ require_once(AK_LIB_DIR.DS.'AkCache.php');
 //$db =& Ak::db();
 //$db->debug = true;
 
-class Test_of_AkCache_Class extends  UnitTestCase
+class AkCaheTestCase extends AkUnitTest 
 {
     
     var $_driverInstance = NULL;
@@ -28,6 +28,14 @@ class Test_of_AkCache_Class extends  UnitTestCase
         unset($this->Cache);
     }
     
+    function test_setup()
+    {
+        require_once(AK_LIB_DIR.DS.'AkInstaller.php');
+        require_once(AK_APP_DIR.DS.'installers'.DS.'framework_installer.php');
+        $installer = new FrameworkInstaller();
+        $installer->uninstall();
+        $installer->install();
+    }
         
     function Testinit()
     {
@@ -150,6 +158,5 @@ class Test_of_AkCache_Class extends  UnitTestCase
 
 }
 
-ak_test('Test_of_AkCache_Class', true);
 
 ?>
