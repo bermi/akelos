@@ -752,14 +752,27 @@ class AkRequest extends AkObject
         }
         
         if(@!include_once($controller_path)){
-            trigger_error(Ak::t('Could not find the file /app/controllers/<i>%controller_file_name</i> for '.
-            'the controller %controller_class_name',
-            array('%controller_file_name'=> $controller_file_name,
-            '%controller_class_name' => $controller_class_name)), E_USER_ERROR);
+            if(AK_ENVIRONMENT == 'development'){
+                trigger_error(Ak::t('Could not find the file /app/controllers/<i>%controller_file_name</i> for '.
+                'the controller %controller_class_name',
+                array('%controller_file_name'=> $controller_file_name,
+                '%controller_class_name' => $controller_class_name)), E_USER_ERROR);
+            }elseif(@include(AK_PUBLIC_DIR.DS.'404.php')){
+                exit;
+            }else{
+                die('404 Page not found');
+            }
         }
         if(!class_exists($controller_class_name)){
-            trigger_error(Ak::t('Controller <i>%controller_name</i> does not exist',
-            array('%controller_name' => $controller_class_name)), E_USER_ERROR);
+
+            if(AK_ENVIRONMENT == 'development'){
+                trigger_error(Ak::t('Controller <i>%controller_name</i> does not exist',
+                array('%controller_name' => $controller_class_name)), E_USER_ERROR);
+            }elseif(@include(AK_PUBLIC_DIR.DS.'404.php')){
+                exit;
+            }else{
+                die('404 Page not found');
+            }
         }
         $Controller =& new $controller_class_name(array('controller'=>true));
         $Controller->_module_path = $module_path;

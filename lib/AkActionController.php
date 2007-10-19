@@ -13,6 +13,7 @@ if(!class_exists('AkActionController')){
 require_once(AK_LIB_DIR.DS.'AkObject.php');
 
 defined('AK_HIGH_LOAD_MODE') ? null : define('AK_HIGH_LOAD_MODE', false);
+defined('AK_APP_NAME') ? null : define('AK_APP_NAME', 'Application');
 
 /**
  * @package ActionController
@@ -424,6 +425,11 @@ class AkActionController extends AkObject
 
 
     /**
+                            Rendering content
+    ====================================================================
+    */
+    
+    /**
     * Renders the content that will be returned to the browser as the Response body.
     * 
     * === Rendering an action
@@ -740,6 +746,11 @@ class AkActionController extends AkObject
     }
 
 
+    
+    /**
+                            Redirects
+    ====================================================================
+    */
 
     /**
     * Redirects the browser to the target specified in +options+. This parameter can take one of three forms:
@@ -868,6 +879,11 @@ class AkActionController extends AkObject
 
 
 
+
+    /**
+                            URL generation/rewriting 
+    ====================================================================
+    */
 
 
     /**
@@ -1147,7 +1163,12 @@ class AkActionController extends AkObject
     }
 
 
+
+
     /**
+                            Layouts
+    ====================================================================
+    *
     * Layouts reverse the common pattern of including shared headers and footers in many templates 
     * to isolate changes in repeated setups. The inclusion pattern has pages that look like this:
     *
@@ -1448,8 +1469,10 @@ class AkActionController extends AkObject
 
 
 
-
     /**
+                        Filters
+    ====================================================================
+    *
     * Filters enable controllers to run shared pre and post processing code for its actions. These filters can be used to do 
     * authentication, caching, or auditing before the intended action is performed. Or to do localization or output 
     * compression after the action has been performed.
@@ -1986,9 +2009,10 @@ class AkActionController extends AkObject
 
 
 
-
-
     /**
+                    Flash communication between actions
+    ====================================================================
+    *
     * The flash provides a way to pass temporary objects between actions. Anything you place in the flash will be exposed
     * to the very next action and then cleared out. This is a great way of doing notices and alerts, such as a create action
     * that sets <tt>flash['notice] = 'Successfully created'</tt> before redirecting to a display action that can then expose 
@@ -2069,10 +2093,9 @@ class AkActionController extends AkObject
     }
 
 
-
-
     /**
-    * === Pagination for Active Record collections
+                    Pagination for Active Record collections
+    ====================================================================
     *
     * The Pagination module aids in the process of paging large collections of
     * Active Record objects. It offers macro-style automatic fetching of your
@@ -2219,8 +2242,6 @@ class AkActionController extends AkObject
     }
 
 
-
-
     function _paginationCreateAndRetrieveCollections()
     {
         foreach($this->_pagination_options[$this->class]  as $collection_id=>$options){
@@ -2278,7 +2299,11 @@ class AkActionController extends AkObject
         return array(&$paginator, &$collection);
     }
 
-
+    /**
+                        Protocol conformance
+    ====================================================================
+    */
+    
     /**
      * Specifies that the named actions requires an SSL connection to be performed (which is enforced by ensure_proper_protocol).
      */
@@ -2326,10 +2351,9 @@ class AkActionController extends AkObject
         }
     }
 
-
     /**
-    * Account Location
-    * ================
+                            Account Location
+    ====================================================================
     * 
     * Account location is a set of methods that supports the account-key-as-subdomain 
     * way of identifying the current scope. These methods allow you to easily produce URLs that
@@ -2358,7 +2382,7 @@ class AkActionController extends AkObject
     *           $this->redirectTo(array('host' => $this->accountHost($this->new_account->username), 'controller' => 'weblog'));
     *       }
     *
-    *       function _authenticate()
+    *       function authenticate()
     *       {
     *           $this->session[$this->account_domain] = 'authenticated';
     *           $this->redirectTo(array('controller => 'weblog'));
@@ -2417,8 +2441,11 @@ class AkActionController extends AkObject
 
 
     /**
-    * Methods for sending files and streams to the browser instead of rendering.
+                            Data streaming
+    ====================================================================
+    Methods for sending files and streams to the browser instead of rendering.
     */
+    
     var $default_send_file_options = array(
     'type' => 'application/octet-stream',
     'disposition' => 'attachment',
@@ -2586,13 +2613,179 @@ class AkActionController extends AkObject
             die(Ak::t('There is not any webservice configured at this endpoint'));
         }
     }
+    
+    
+
+    /**
+                            HTTP Authentication
+    ====================================================================
+    * 
+    * Simple Basic example:
+    * 
+    *   class PostsController extends ApplicationController
+    *   {
+    *       var $_authorized_users = array('bermi' => 'secret');
+    *       
+    *       function __construct(){
+    *           $this->beforeFilter(array('authenticate' => array('except' => array('index'))));
+    *       }
+    * 
+    *       function index() {
+    *           $this->renderText("Everyone can see me!");
+    *       }
+    *   
+    *       function edit(){
+    *           $this->renderText("I'm only accessible if you know the password");
+    *       }
+    *   
+    *       function authenticate(){
+    *           return $this->_authenticateOrRequestWithHttpBasic('App name', $this->_authorized_users);
+    *       }
+    *   }
+    * 
+    * Here is a more advanced Basic example where only Atom feeds and the XML API is protected by HTTP authentication, 
+    * the regular HTML interface is protected by a session approach:
+    * 
+    *   class ApplicationController extends AkActionController
+    *   {
+    *       var $models = 'account';
+    *       
+    *       function __construct() {
+    *         $this->beforeFilter(array('_setAccount', 'authenticate'));
+    *       }
+    *       
+    *       function _setAccount() {
+    *         $this->Account = $this->account->findFirstBy('url_name', array_pop($this->Request->getSubdomains()));
+    *       }
+    *   
+    *       function authenticate() {
+    *           if($this->Request->isFormat('XML', 'ATOM')){
+    *               if($User = $this->_authenticateWithHttpBasic($Account)){
+    *                   $this->CurrentUser = $User;
+    *               }else{
+    *                   $this->_requestHttpBasicAuthentication();
+    *               }
+    *           }else{
+    *               if($this->isSessionAuthenticated()){
+    *                   $this->CurrentUser = $Account->user->find($_SESSION['authenticated']['user_id']);
+    *               }else{
+    *                   $this->redirectTo(array('controller'=>'login'));
+    *                   return false;
+    *               }
+    *           }
+    *       }
+    *   }
+    *
+    * On shared hosts, Apache sometimes doesn't pass authentication headers to
+    * FCGI instances. If your environment matches this description and you cannot
+    * authenticate, try this rule in public/.htaccess (replace the plain one):
+    * 
+    *   RewriteRule ^(.*)$ index.php [E=X-HTTP_AUTHORIZATION:%{HTTP:Authorization},QSA,L]
+    */
+
+    function _authenticateOrRequestWithHttpBasic($realm = AK_APP_NAME, $login_procedure)
+    {
+        return $this->_authenticateWithHttpBasic($login_procedure) || $this->_requestHttpBasicAuthentication($realm);
+    }
+
+    function _authenticateWithHttpBasic($login_procedure)
+    {
+        return $this->_authenticate($login_procedure);
+    }
+
+    function _requestHttpBasicAuthentication($realm = AK_APP_NAME)
+    {
+        return $this->_authenticationRequest($realm);
+    }
+
+    /**
+     * This is method takes a $login_procedure for performing access authentication.
+     * 
+     * If an array is given, it will check the key for a user and the value will be verified to match given password.
+     * 
+     * You can pass and array like array('handler' => $Account, 'method' => 'verifyCredentials'), which will call 
+     * 
+     *      $Account->verifyCredentials($user_name, $password, $Controller)
+     * 
+     * You can also pass an object which implements an "authenticate" method. when calling
+     * 
+     *     $this->_authenticate(new User());
+     * 
+     * It will call the $User->authenticate($user_name, $password, $Controller)
+     * 
+     * In both cases the authentication method should return true for valid credentials or false is invalid.
+     * 
+     * @return bool
+     */
+    function _authenticate($login_procedure)
+    {
+        if(!$this->_authorization()){
+            return false;
+        }else{
+            list($user_name, $password) = $this->_getUserNameAndPassword();
+            if(is_array($login_procedure)){
+                if(!isset($login_procedure['handler'])){
+                    return isset($login_procedure[$user_name]) && $login_procedure[$user_name] == $password;
+                }elseif(is_a($login_procedure['handler']) && method_exists($login_procedure['handler'], $login_procedure['method'])){
+                    return $login_procedure['handler']->$login_procedure['method']($user_name, $password, $this);
+                }
+            }elseif(method_exists($login_procedure, 'authenticate')){
+                return $login_procedure->authenticate($user_name, $password, $this);
+            }
+        }
+        return false;
+    }
+
+    function _getUserNameAndPassword()
+    {
+        $credentials = $this->_decodeCredentials();
+        return !is_array($credentials) ? split('/:/', $credentials , 2) : $credentials;
+    }
+
+    function _authorization()
+    {
+        return
+        empty($this->Request->env['PHP_AUTH_USER']) ? (
+        empty($this->Request->env['HTTP_AUTHORIZATION']) ? (
+        empty($this->Request->env['X-HTTP_AUTHORIZATION']) ? (
+        empty($this->Request->env['X_HTTP_AUTHORIZATION']) ? (
+        isset($this->Request->env['REDIRECT_X_HTTP_AUTHORIZATION']) ?
+        $this->Request->env['REDIRECT_X_HTTP_AUTHORIZATION'] : null
+        ) : $this->Request->env['X_HTTP_AUTHORIZATION']
+        ) : $this->Request->env['X-HTTP_AUTHORIZATION']
+        ) : $this->Request->env['HTTP_AUTHORIZATION']
+        ) : array($this->Request->env['PHP_AUTH_USER'], $this->Request->env['PHP_AUTH_PW']);
+    }
+
+    function _decodeCredentials()
+    {
+        $authorization = $this->_authorization();
+        if(is_array($authorization)){
+            return $authorization;
+        }
+        $credentials = (array)split(' ', $authorization);
+        return base64_decode(array_pop($credentials));
+    }
+
+    function _encodeCredentials($user_name, $password)
+    {
+        return 'Basic '.base64_encode("$user_name:$password");
+    }
+
+    function _authenticationRequest($realm)
+    {
+        header('WWW-Authenticate: Basic realm="' . str_replace('"','',$realm) . '"');
+        header('HTTP/1.0 401 Unauthorized');
+        echo "HTTP Basic: Access denied.\n";
+        exit;
+    }
 }
 
 
 /**
  * Function for getting the singleton controller;
  *
- * @return unknown
+ * @return AkActionController instance
  */
 function &AkActionController()
 {

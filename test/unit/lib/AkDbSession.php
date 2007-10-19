@@ -29,7 +29,6 @@ class Test_of_AkDbSession_Class extends  WebTestCase
         $expected_session_id = $browser->getContentAsText();
         $this->get("$this->_test_script?open_check=1");
         //$browser->getContentAsText();
-
         $this->assertWantedText($expected_session_id,'Sessions are not working correctly');
     }
         

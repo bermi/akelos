@@ -14,9 +14,10 @@ if(!defined('ALL_TESTS_RUNNER') && empty($test)){
 @session_start();
 
 $partial_tests = array(
-'AkActionController_filters',
-'AkActionController_locale_detection',
-'AkActionController_partials',
+'filters',
+'locale_detection',
+'partials',
+'http_authentication'
 );
 
 foreach ($partial_tests as $partial_test){
