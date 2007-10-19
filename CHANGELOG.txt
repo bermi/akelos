@@ -1,0 +1,45 @@
+SVN
+----------------------
+
+* Added support for HTTP Authentication [412]. Example:
+
+    <?php
+    
+    class PostController extends ApplicationController
+    {
+        var $_authorized_users = array('bermi' => 'secret');
+        
+        function __construct()
+        {
+            $this->beforeFilter(array('authenticate' => array('except' => array('index'))));
+        }
+    
+        function index() 
+        {
+            $this->renderText("Everyone can see me!");
+        }
+    
+        function edit()
+        {
+            $this->renderText("I'm only accessible if you know the password");
+        }
+    
+        function authenticate()
+        {
+            /**
+            * You can either use an array like $this->_authorized_users or
+            * an Model instance that implements an authenticate method like Model::authenticate($user,$pass, $controller);
+            */
+            return $this->_authenticateOrRequestWithHttpBasic('My Blog', $this->_authorized_users);
+        }
+    }
+    
+    ?>
+
+* Added public/500.php and public/404.php for handling errors on production mode.
+
+
+0.8
+----------------------
+
+ * First public release
