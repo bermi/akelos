@@ -1,57 +1,13 @@
 #!/usr/bin/env php
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage Scripts
- * @author Bermi Ferrer <bermi a.t akelos c.om>
- * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
- */
-
 
 error_reporting(E_ALL);
-
 defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
-
 $argv = array_map('trim',$argv);
 array_shift($argv);
-
 $tests_dir = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'test');
-$____skip_tests = array('Simple','Unit','Web','AkWeb');
-
-foreach ($argv as $_test_file){
-    $_test_file = strstr($_test_file,'.php') ? trim($_test_file, '/') : $_test_file.'.php';
-    $_test_file = substr($_test_file,0,5) == 'test/' ? substr($_test_file,5) : $_test_file;
-    $_test_file = $tests_dir.DIRECTORY_SEPARATOR.$_test_file;
-    if(!file_exists($_test_file)){
-        echo "\nCould not load $_test_file test file\n";
-    }else{
-        require($_test_file);
-            foreach(get_declared_classes() as $____class){
-                if(preg_match('/(.+)TestCase$/i', $____class, $match)){
-                    if(!preg_match('/^('.join('|',$____skip_tests).')$/i',$match[1])){
-                        $____skip_tests[] = $match[1];
-                        ak_test($match[1].'TestCase', true);
-                    }
-                }
-            }
-        echo $_test_file."\n";
-    }
-}
-
-
-
+require_once(AK_LIB_DIR.DS.'utils'.DS.'scripts'.DS.'test.php');
 
 ?>

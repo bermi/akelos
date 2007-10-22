@@ -1,5 +1,6 @@
 SVN
 ----------------------
+* Removed AkInflector::modulize as it had a misleading name, use AkInflector::classify instead [420]
 
 * Added support for HTTP Authentication [412]. Example:
 

@@ -27,7 +27,8 @@ class ScaffoldGenerator extends  AkelosGenerator
         $this->model_file_path = AkInflector::toModelFilename($this->model_name);
         $this->controller_name = empty($this->controller_name) ? $this->model_name : (AkInflector::camelize($this->controller_name));
         $this->controller_file_path = AkInflector::toControllerFilename($this->controller_name);
-        $this->controller_class_name = $this->controller_name.'Controller';
+        $this->controller_class_name = str_replace(array('/','::'),'_', $this->controller_name.'Controller');
+        $this->controller_name = AkInflector::demodulize($this->controller_name);
         $this->controller_human_name = AkInflector::humanize($this->controller_name);
         $this->helper_var_name = '$'.AkInflector::underscore($this->controller_name).'_helper';
 
@@ -35,26 +36,31 @@ class ScaffoldGenerator extends  AkelosGenerator
         $this->plural_name = AkInflector::pluralize($this->singular_name);
         $this->singular_controller_name = AkInflector::underscore($this->controller_name);
 
+        $this->module_preffix = AkInflector::underscore(substr($this->controller_class_name, 0, strrpos($this->controller_class_name, '_')));
+        $this->module_preffix = empty($this->module_preffix) ? '' : DS.$this->module_preffix;    
+                
+        
         $this->files = array(
         'controller.php' => $this->controller_file_path,
         /**
          * @todo Implement generic functional tests
          */
         // 'functional_test.php' => AK_TEST_DIR.DS.'functional'.DS.'test_'.$this->controller_class_name.'.php',
-        'helper.php' => AK_HELPERS_DIR.DS.trim($this->helper_var_name,'$').'.php',
+        'helper.php' => AK_HELPERS_DIR.$this->module_preffix.DS.trim($this->helper_var_name,'$').'.php',
         'layout' => AK_VIEWS_DIR.DS.'layouts'.DS.$this->singular_controller_name.'.tpl',
-        'view_add' => AK_VIEWS_DIR.DS.$this->singular_controller_name.DS.'add.tpl',
-        'view_destroy' => AK_VIEWS_DIR.DS.$this->singular_controller_name.DS.'destroy.tpl',
-        'view_edit' => AK_VIEWS_DIR.DS.$this->singular_controller_name.DS.'edit.tpl',
-        'view_listing' => AK_VIEWS_DIR.DS.$this->singular_controller_name.DS.'listing.tpl',
-        'view_show' => AK_VIEWS_DIR.DS.$this->singular_controller_name.DS.'show.tpl',
-        'form' => AK_VIEWS_DIR.DS.$this->singular_controller_name.DS.'_form.tpl',
+        'view_add' => AK_VIEWS_DIR.$this->module_preffix.DS.$this->singular_controller_name.DS.'add.tpl',
+        'view_destroy' => AK_VIEWS_DIR.$this->module_preffix.DS.$this->singular_controller_name.DS.'destroy.tpl',
+        'view_edit' => AK_VIEWS_DIR.$this->module_preffix.DS.$this->singular_controller_name.DS.'edit.tpl',
+        'view_listing' => AK_VIEWS_DIR.$this->module_preffix.DS.$this->singular_controller_name.DS.'listing.tpl',
+        'view_show' => AK_VIEWS_DIR.$this->module_preffix.DS.$this->singular_controller_name.DS.'show.tpl',
+        'form' => AK_VIEWS_DIR.$this->module_preffix.DS.$this->singular_controller_name.DS.'_form.tpl',
         );
-
+        
         $this->user_actions = array();
         foreach ((array)@$this->actions as $action){
-            $this->user_actions[$action] = AK_VIEWS_DIR.DS.$this->singular_controller_name.DS.$action.'.tpl';
+            $this->user_actions[$action] = AK_VIEWS_DIR.$this->module_preffix.DS.$this->singular_controller_name.DS.$action.'.tpl';
         }
+        
     }
 
     function hasCollisions()
@@ -73,12 +79,12 @@ class ScaffoldGenerator extends  AkelosGenerator
         //Generate models if they don't exist
         $model_files = array(
         'model'=>$this->model_file_path,
-        'installer'=>AK_APP_DIR.DS.'installers'.DS.$this->singular_name.'_installer.php',
+        'installer'=>AK_APP_DIR.DS.'installers'.$this->module_preffix.DS.$this->singular_name.'_installer.php',
         'model_unit_test'=>AK_TEST_DIR.DS.'unit'.DS.'app'.DS.'models'.DS.$this->singular_name.'.php',
         'model_fixture'=>    AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'models'.DS.$this->singular_name.'.php',
-        'installer_fixture'=>AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'installers'.DS.$this->singular_name.'_installer.php'
+        'installer_fixture'=>AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'installers'.$this->module_preffix.DS.$this->singular_name.'_installer.php'
         );
-
+        
         $this->_template_vars = (array)$this;
         foreach ($model_files as $template=>$file_path){
             if(!file_exists($file_path)){

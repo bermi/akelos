@@ -434,7 +434,8 @@ class AkInflector
     */
     function demodulize($module_name)
     {
-        return (strstr($module_name, '/') || strstr($module_name, '::') ? preg_replace('/^.*(::|\/)/', '', $module_name) : substr($module_name, 1+strrpos($module_name,'_')));
+        $module_name = str_replace('::', '/', $module_name);
+        return (strstr($module_name, '/') ? preg_replace('/^.*\//', '', $module_name) : (strstr($module_name, '_') ? substr($module_name, 1+strrpos($module_name,'_')) : $module_name));
     }
     
     /**
@@ -475,7 +476,8 @@ class AkInflector
 
     function toControllerFilename($name)
     {
-        return AK_CONTROLLERS_DIR.DS.AkInflector::underscore($name).'_controller.php';
+        $name = str_replace('::', '/', $name);
+        return AK_CONTROLLERS_DIR.DS.join(DS, array_map(array('AkInflector','underscore'), strstr($name, '/') ? explode('/', $name) : array($name))).'_controller.php';
     }
 
     function toModelFilename($name)

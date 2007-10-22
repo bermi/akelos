@@ -304,8 +304,15 @@ class Test_of_AkInflector extends  UnitTestCase
         $this->assertEqual(AkInflector::demodulize('admin/dashboard_controller'), 'dashboard_controller');
         $this->assertEqual(AkInflector::demodulize('Admin_DashboardController'), 'DashboardController');
         $this->assertEqual(AkInflector::demodulize('Admin::Dashboard'), 'Dashboard');
+        $this->assertEqual(AkInflector::demodulize('User'), 'User');
     }
 
+    function test_should_get_controller_file_name()
+    {
+        $this->assertEqual(AkInflector::toControllerFilename('admin'), AK_CONTROLLERS_DIR.DS.'admin_controller.php');
+        $this->assertEqual(AkInflector::toControllerFilename('user_authentication'), AK_CONTROLLERS_DIR.DS.'user_authentication_controller.php');
+        $this->assertEqual(AkInflector::toControllerFilename('admin/users'), AK_CONTROLLERS_DIR.DS.'admin'.DS.'users_controller.php');
+    }
 }
 
 ak_test('Test_of_AkInflector');
