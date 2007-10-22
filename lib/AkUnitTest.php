@@ -80,7 +80,7 @@ class AkUnitTest extends UnitTestCase
             if(!file_exists($file)){
                 continue;
             }
-            $class_name = AkInflector::modulize($table);
+            $class_name = AkInflector::classify($table);
             if($this->instantiateModel($class_name)){
                 $items = Ak::convert('yaml','array',file_get_contents($file));
                 foreach ($items as $item){

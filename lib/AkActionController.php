@@ -871,7 +871,7 @@ class AkActionController extends AkObject
         $controllers = array();
         foreach (get_included_files() as $file_name){
             if(strstr($file_name,AK_CONTROLLERS_DIR)){
-                $controllers[] = AkInflector::modulize(str_replace(array(AK_CONTROLLERS_DIR.DS,'.php'),'',$file_name));
+                $controllers[] = AkInflector::classify(str_replace(array(AK_CONTROLLERS_DIR.DS,'.php', DS, '//'),array('','','/', '/'),$file_name));
             }
         }
         return $controllers;

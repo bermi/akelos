@@ -373,7 +373,7 @@ class AkInflector
     // {{{ classify()
 
     /**
-    * Converts a table name to its class name according to rails
+    * Converts a table name to its class name according to Akelos
     * naming conventions.
     * 
     * Converts "people" to "Person"
@@ -425,19 +425,18 @@ class AkInflector
 
     // }}}
 
-
+    /**
+    * Removes the module name from a module/path, Module::name or Module_ControllerClassName.
+    *
+    *   Example:    AkInflector::demodulize('admin/dashboard_controller');  //=> dashboard_controller
+    *               AkInflector::demodulize('Admin_DashboardController');  //=> DashboardController
+    *               AkInflector::demodulize('Admin::Dashboard');  //=> Dashboard
+    */
     function demodulize($module_name)
     {
-        $module_name = preg_replace('/^.*::/','',$module_name);
-        return AkInflector::humanize(AkInflector::underscore($module_name));
+        return (strstr($module_name, '/') || strstr($module_name, '::') ? preg_replace('/^.*(::|\/)/', '', $module_name) : substr($module_name, 1+strrpos($module_name,'_')));
     }
-
-    function modulize($module_description)
-    {
-        return AkInflector::camelize(AkInflector::singularize($module_description));
-    }
-
-
+    
     /**
      * Transforms a string to its unaccented version. 
      * This might be useful for generating "friendly" URLs
@@ -471,7 +470,7 @@ class AkInflector
     */
     function foreignKey($class_name, $separate_class_name_and_id_with_underscore = true)
     {
-        return AkInflector::underscore(AkInflector::demodulize($class_name)).($separate_class_name_and_id_with_underscore ? "_id" : "id");
+        return AkInflector::underscore(AkInflector::humanize(AkInflector::underscore($class_name))).($separate_class_name_and_id_with_underscore ? "_id" : "id");
     }
 
     function toControllerFilename($name)

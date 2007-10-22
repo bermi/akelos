@@ -298,6 +298,13 @@ class Test_of_AkInflector extends  UnitTestCase
             $this->assertTrue(AkInflector::is_plural($plural), $plural.' is not detected as plural');
         }
     }
+    
+    function test_should_demodulize()
+    {
+        $this->assertEqual(AkInflector::demodulize('admin/dashboard_controller'), 'dashboard_controller');
+        $this->assertEqual(AkInflector::demodulize('Admin_DashboardController'), 'DashboardController');
+        $this->assertEqual(AkInflector::demodulize('Admin::Dashboard'), 'Dashboard');
+    }
 
 }
 

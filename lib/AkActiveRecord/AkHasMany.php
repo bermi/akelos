@@ -86,7 +86,7 @@ class AkHasMany extends AkAssociation
     {
 
         $default_options = array(
-        'class_name' => empty($options['class_name']) ? AkInflector::modulize($association_id) : $options['class_name'],
+        'class_name' => empty($options['class_name']) ? AkInflector::classify($association_id) : $options['class_name'],
         'conditions' => false,
         'order' => false,
         'include_conditions_when_included' => true,

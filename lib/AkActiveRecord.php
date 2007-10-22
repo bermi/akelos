@@ -1654,7 +1654,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
          $table_name = $this->getTableName();
          $available_types = array_merge(array($this->getModelName()),$this->getSubclasses());
          foreach ($available_types as $subclass){
-             $type_condition[] = ' '.$table_name.'.'.$inheritance_column.' = \''.AkInflector::demodulize($subclass).'\' ';
+             $type_condition[] = ' '.$table_name.'.'.$inheritance_column.' = \''.AkInflector::humanize(AkInflector::underscore($subclass)).'\' ';
          }
          return empty($type_condition) ? '' : '('.join('OR',$type_condition).') ';
      }
@@ -1782,7 +1782,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 }
             }
             $value = $this->{'get'.AkInflector::camelize($attribute)}();
-            return $this->getInheritanceColumn() === $attribute ? AkInflector::demodulize($value) : $value;
+            return $this->getInheritanceColumn() === $attribute ? AkInflector::humanize(AkInflector::underscore($value)) : $value;
         }
         if(isset($this->$attribute) || (!isset($this->$attribute) && $this->isCombinedAttribute($attribute))){
             if($this->hasAttribute($attribute)){

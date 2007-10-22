@@ -30,13 +30,14 @@ $options = $argv;
 require_once(AK_LIB_DIR.DS.'AkInstaller.php');
 require_once(AK_LIB_DIR.DS.'utils'.DS.'generators'.DS.'AkelosGenerator.php');
 
-$installer_name = AkInflector::camelize(array_shift($options)).'Installer';
+$installer = array_shift($options);
+$installer_class_name = AkInflector::camelize(AkInflector::demodulize($installer)).'Installer';
 $command = count($options) > 0 ? array_shift($options) : 'usage';
 
 
-$file = AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'.php';
+$file = AK_APP_DIR.DS.'installers'.DS.rtrim(join('/',array_map(array('AkInflector','underscore'), explode('/',$installer.'/'))),'/').'_installer.php';
 
-if($installer_name == 'Installer'){
+if($installer_class_name == 'Installer'){
     $files = Ak::dir(AK_APP_DIR.DS.'installers');
     if(empty($files)){
         echo Ak::t("\n  Could not find installers at %dir  \n", array('%dir'=>AK_APP_DIR.DS.'installers'));
@@ -56,13 +57,13 @@ if($installer_name == 'Installer'){
     echo Ak::t("\n\n  Could not locate the installer file %file\n\n",array('%file'=>$file));
 }else{
     require_once($file);
-    if(!class_exists($installer_name)){
+    if(!class_exists($installer_class_name)){
         echo Ak::t("\n\n  Could not find load the installer. Class doesn't exists\n\n");
     }else{
-        $installer = new $installer_name();
+        $installer = new $installer_class_name();
         if(!method_exists($installer,$command)){
             echo Ak::t("\n\n  Could not find the method %method for the installer %installer\n\n",
-            array('%method'=>$command,'%installer'=>$installer_name));
+            array('%method'=>$command,'%installer'=>$installer_class_name));
         }else{
             $installer->$command($options);
         }
