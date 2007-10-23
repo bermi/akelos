@@ -1,5 +1,7 @@
 SVN
 ----------------------
+* Rearranged scripts to include as little code as possible in the application space. This should make updates easier.
+
 * Removed AkInflector::modulize as it had a misleading name, use AkInflector::classify instead [420]
 
 * Added support for HTTP Authentication [412]. Example:
