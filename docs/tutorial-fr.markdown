@@ -227,16 +227,20 @@ Et pouf ! Les tables sont installées automagiquement ! Avec MySQL, vous devriez
     | description  | longtext     | YES  |     |                |
     | author_id    | int(11)      | YES  | MUL |                |
     | published_on | date         | YES  |     |                |
-    +--------------+--------------+------+-----+----------------+ 
+    | updated_at   | datetime     | YES  |     |                |
+    | created_at   | datetime     | YES  |     |                |
+    +--------------+--------------+------+-----+----------------+
 
 **TABLE "AUTHORS"**
-                       
-    +-------+--------------+------+-----+----------------+
-    | Field | Type         | Null | Key | Extra          |
-    +-------+--------------+------+-----+----------------+
-    | id    | int(11)      | NO   | PRI | auto_increment |
-    | name  | varchar(255) | YES  |     |                |
-    +-------+--------------+------+-----+----------------+
+
+    +--------------+--------------+------+-----+----------------+
+    | Field        | Type         | Null | Key | Extra          |
+    +--------------+--------------+------+-----+----------------+
+    | id           | int(11)      | NO   | PRI | auto_increment |
+    | name         | varchar(255) | YES  |     |                |
+    | updated_at   | datetime     | YES  |     |                |
+    | created_at   | datetime     | YES  |     |                |
+    +--------------+--------------+------+-----+----------------+
 
 
 Modèles, Vues, et Controlleurs

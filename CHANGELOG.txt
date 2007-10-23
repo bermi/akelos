@@ -1,5 +1,33 @@
 SVN
 ----------------------
+* AkInstaller::createTable() will now add created_at and updated_at columns automatically unless you have one of 
+  them in your table declaration or set the option 'timestamp' => false
+    
+    function up_1(){
+        $this->createTable('user', 'id, first_name, last_name, email'); // will add created_at, and updated_at
+    }
+
+  to avoid it
+
+    function up_1(){
+          $this->createTable('user', 'id, first_name, last_name, email', array('timestamp'=>false)); // nothing extra
+    }   
+  
+  or
+  
+    function up_1(){
+          $this->createTable('user', 'id, first_name, last_name, email, updated_at'); // nothing extra
+    }   
+      
+* Simplifying unit test calls for models and core tests. Updated generators to reflect this new way of calling tests.
+  If you stick with the convention of prefixing your test cases with TestCase you will no longer need to call ak__test('testcaseclass')
+  
+  Running models test can now be done with simply
+    ./script/test model User
+    
+  Core tests can be called without the full path like
+    ./script/test AkActiveRecord
+
 * Rearranged scripts to include as little code as possible in the application space. This should make updates easier.
 
 * Removed AkInflector::modulize as it had a misleading name, use AkInflector::classify instead [420]

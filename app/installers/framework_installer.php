@@ -9,13 +9,13 @@ class FrameworkInstaller extends AkInstaller
         cache_group string(50) index,
         cache_data binary,
         expire datetime'
-        );
+        , array('timestamp'=>false));
                 
         $this->createTable('sessions', '
         id string(32) not null primary key,
         expire datetime,
         value text'
-        );
+        , array('timestamp'=>false));
     }
 
     function down_1()

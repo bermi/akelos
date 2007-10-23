@@ -11,8 +11,8 @@ class PropertyInstaller extends AkInstaller
         details text,
         landlord_id integer,
         price integer,
-        location string limit=200'
-        );
+        location string limit=200',
+        array('timestamp'=>false));
     }
 
     function uninstall()

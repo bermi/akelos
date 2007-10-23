@@ -18,10 +18,7 @@ class <?php  echo $model_name?>Installer extends AkInstaller
     {
         $this->createTable('<?php  echo $plural_name?>', "
           id,
-          name,
-          description,
-          created_at,
-          updated_at
+          name
         ");  
     }
     

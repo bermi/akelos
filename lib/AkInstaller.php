@@ -243,16 +243,12 @@ class AkInstaller
 
     function createTable($table_name, $column_options = null, $table_options = array())
     {
-        static $created_tables = array();
-        
-        if(in_array($table_name, $created_tables)){
-            //return false;
-        }
         if($this->tableExists($table_name)){
             trigger_error(Ak::t('Table %table_name already exists on the database', array('%table_name'=>$table_name)), E_USER_NOTICE);
             return false;
         }
-        $created_tables[] = $table_name;
+        $this->timestamps = (!isset($table_options['timestamp']) || (isset($table_options['timestamp']) && $table_options['timestamp'])) && 
+                            (!strstr($column_options, 'created') && !strstr($column_options, 'updated'));
         return $this->_createOrModifyTable($table_name, $column_options, $table_options);
     }
 
@@ -389,6 +385,7 @@ class AkInstaller
     {
         $columns = $this->_setColumnDefaults($columns);
         $this->_ensureColumnNameCompatibility($columns);
+
         $equivalences = array(
         '/ ((limit|max|length) ?= ?)([0-9]+)([ \n\r,]+)/'=> ' (\3) ',
         '/([ \n\r,]+)default([ =]+)([^\'^,^\n]+)/i'=> ' DEFAULT \'\3\'',
@@ -418,19 +415,16 @@ class AkInstaller
 
     function _setColumnDefaults($columns)
     {
-        $columns = str_replace("\t",' ', $columns);
-        if(is_string($columns)){
-            if(strstr($columns,"\n")){
-                $columns = explode("\n",$columns);
-            }elseif(strstr($columns,',')){
-                $columns = explode(',',$columns);
-            }
-        }
+        $columns = Ak::toArray($columns);
         foreach ((array)$columns as $column){
-            $column = trim($column, "\n\r, ");
+            $column = trim($column, "\n\t\r, ");
             if(!empty($column)){
                 $single_columns[$column] = $this->_setColumnDefault($column);
             }
+        }
+        if(!empty($this->timestamps) && !isset($single_columns['created_at']) &&  !isset($single_columns['updated_at'])){
+            $single_columns['updated_at'] = $this->_setColumnDefault('updated_at');
+            $single_columns['created_at'] = $this->_setColumnDefault('created_at');
         }
         return join(",\n", $single_columns);
     }

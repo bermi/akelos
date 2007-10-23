@@ -191,23 +191,27 @@ y eso creará las tablas definidas en el instalador. Si estás usando una base d
 **TABLA BOOKS**
 
     +--------------+--------------+------+-----+----------------+
-    | Campo        | Tipo         | Null | Key | Extra          |
+    | Field        | Type         | Null | Key | Extra          |
     +--------------+--------------+------+-----+----------------+
     | id           | int(11)      | NO   | PRI | auto_increment |
     | title        | varchar(255) | YES  |     |                |
     | description  | longtext     | YES  |     |                |
     | author_id    | int(11)      | YES  | MUL |                |
     | published_on | date         | YES  |     |                |
+    | updated_at   | datetime     | YES  |     |                |
+    | created_at   | datetime     | YES  |     |                |
     +--------------+--------------+------+-----+----------------+ 
 
 **TABLA AUTHORS**
-                                         
-    +-------+--------------+------+-----+----------------+
-    | Campo | Tipo         | Null | Key | Extra          |
-    +-------+--------------+------+-----+----------------+
-    | id    | int(11)      | NO   | PRI | auto_increment |
-    | name  | varchar(255) | YES  |     |                |
-    +-------+--------------+------+-----+----------------+
+                       
+    +--------------+--------------+------+-----+----------------+
+    | Field        | Type         | Null | Key | Extra          |
+    +--------------+--------------+------+-----+----------------+
+    | id           | int(11)      | NO   | PRI | auto_increment |
+    | name         | varchar(255) | YES  |     |                |
+    | updated_at   | datetime     | YES  |     |                |
+    | created_at   | datetime     | YES  |     |                |
+    +--------------+--------------+------+-----+----------------+
 
 Modelos, Vistas y Controladores
 ------------------------------------------------------

@@ -135,20 +135,20 @@ class Test_of_AkInstaller extends  AkUnitTest
             name string(255),
             description text,
             parent_id integer(11) not null default '0'
-        ");
+        ", array('timestamp'=>false));
 
 
         $this->Installer->createTable('test_categories_pages', "
             category_id integer(11) not null,
             page_id integer(11) not null
-        ");
+        ", array('timestamp'=>false));
 
         $this->Installer->createTable('test_nice_urls', "
             id integer not null auto_increment primary_key,
             url string(255),
             context_id integer(11) not null,
             context string(255) not null default 'page'
-        ");
+        ", array('timestamp'=>false));
 
 
         $this->Installer->dropTables('test_pages','test_categories');

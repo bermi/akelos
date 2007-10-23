@@ -282,7 +282,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         $options = $this->getOptions($this->association_id);
         require_once(AK_LIB_DIR.DS.'AkDbManager.php');
 
-        AkDbManager::createTable($options['join_table'], "id I AUTO KEY,{$options['foreign_key']} I, {$options['association_foreign_key']} I",array('mysql' => 'TYPE=InnoDB'),false,
+        AkDbManager::createTable($options['join_table'], "id I AUTO KEY,{$options['foreign_key']} I, {$options['association_foreign_key']} I",array('mysql' => 'TYPE=InnoDB','timestamp'=>false),false,
         "{$options['foreign_key']},{$options['association_foreign_key']}");
         return $this->_hasJoinTable();
     }

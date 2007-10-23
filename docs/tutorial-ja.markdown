@@ -202,16 +202,20 @@ booklink データベースの構造
     | description  | longtext     | YES  |     |                |
     | author_id    | int(11)      | YES  | MUL |                |
     | published_on | date         | YES  |     |                |
+    | updated_at   | datetime     | YES  |     |                |
+    | created_at   | datetime     | YES  |     |                |
     +--------------+--------------+------+-----+----------------+ 
 
 **AUTHORS テーブル**
                        
-    +-------+--------------+------+-----+----------------+
-    | Field | Type         | Null | Key | Extra          |
-    +-------+--------------+------+-----+----------------+
-    | id    | int(11)      | NO   | PRI | auto_increment |
-    | name  | varchar(255) | YES  |     |                |
-    +-------+--------------+------+-----+----------------+
+    +--------------+--------------+------+-----+----------------+
+    | Field        | Type         | Null | Key | Extra          |
+    +--------------+--------------+------+-----+----------------+
+    | id           | int(11)      | NO   | PRI | auto_increment |
+    | name         | varchar(255) | YES  |     |                |
+    | updated_at   | datetime     | YES  |     |                |
+    | created_at   | datetime     | YES  |     |                |
+    +--------------+--------------+------+-----+----------------+
 
 
 モデル,ビュー,コントローラ

@@ -1,4 +1,3 @@
-
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
@@ -17,6 +16,16 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
+if(preg_match('/^model/i', $argv[0])){
+    array_shift($argv);
+    foreach ($argv as $k=>$v){
+        $argv[$k] = 'unit/app/models/'.AkInflector::underscore($v);
+    }
+}elseif(preg_match('/^Ak[a-zA-Z]+/', $argv[0]) && is_dir(AK_BASE_DIR.DS.'test'.DS.'unit'.DS.'lib')){
+    foreach ($argv as $k=>$v){
+        $argv[$k] = 'unit/lib/'.$v;
+    }
+}
 
 $____skip_tests = array('Simple','Unit','Web','AkWeb');
 
