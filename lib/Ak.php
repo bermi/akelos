@@ -964,7 +964,6 @@ class Ak
     *   @return boolean whether message has been sent or not.
     *
     */
-
     function mail ($from, $to, $subject, $body, $additional_headers = array())
     {
         require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Mail.php');
@@ -1011,9 +1010,7 @@ class Ak
 
         $headers = array_merge($headers, $additional_headers);
 
-        $error_code = $mail_connector->send($recipients, $headers, $body);
-
-        return $error_code;
+        return $mail_connector->send($recipients, $headers, $body) == true;
     }
 
 
