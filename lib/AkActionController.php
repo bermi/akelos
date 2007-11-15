@@ -182,11 +182,6 @@ class AkActionController extends AkObject
         // After filters
         $this->afterFilter('_handleFlashAttribute');
         
-        if(!empty($this->validate_output)){
-            $this->beforeFilter('_validateGeneratedXhtml');
-        
-        }
-        
         $this->_loadActionView();
         
         if(isset($this->api)){
@@ -200,6 +195,10 @@ class AkActionController extends AkObject
             $this->_enableLayoutOnRender ? $this->renderWithLayout() : $this->renderWithoutLayout();
         }
 
+        if(!empty($this->validate_output)){
+            $this->_validateGeneratedXhtml();
+        }
+        
         $this->Response->outputResults();
     }
     
