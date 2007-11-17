@@ -384,7 +384,7 @@ class AkActionController extends AkObject
         Ak::import($this->models)));
 
         foreach ($models as $model){
-            $this->instantiateModelClass($model);
+            $this->instantiateModelClass($model, (empty($this->finder_options[$model])?array():$this->finder_options[$model]));
         }
     }
 

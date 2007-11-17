@@ -17,7 +17,8 @@ $partial_tests = array(
 'filters',
 'locale_detection',
 'partials',
-'http_authentication'
+'http_authentication',
+'model_instantiation',
 );
 
 foreach ($partial_tests as $partial_test){
