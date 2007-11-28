@@ -44,7 +44,12 @@ class UrlHelper
     function modify_current_url($options_to_add = array(), $options_to_exclude = array(), $remove_unnecesary_options = true)
     {
         $options_to_exclude = $remove_unnecesary_options ? array_merge(array('ak','lang',AK_SESSION_NAME,'AK_SESSID','PHPSESSID'), $options_to_exclude) : $options_to_exclude;
-        $options_to_add = array_merge(array_merge(array('action'=>$this->_controller->Request->getAction(), 'controller' => $this->_controller->Request->getController()),$this->_controller->Request->getUrlParams()),$options_to_add);
+        $url_params = $this->_controller->Request->getUrlParams();
+        if(!empty($options_to_add['ak'])){
+            $Router =& AkRouter();
+            $url_params = array_merge($url_params, $Router->toParams($options_to_add['ak']));
+        }
+        $options_to_add = array_merge(array_merge(array('action'=>$this->_controller->Request->getAction(), 'controller' => $this->_controller->Request->getController()),$url_params),$options_to_add);
         foreach ($options_to_exclude as $option_to_exclude){
             unset($options_to_add[$option_to_exclude]);
         }
