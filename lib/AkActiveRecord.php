@@ -3302,7 +3302,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             break;
         }
 
-        return empty($this->_columns[$column_name]['notNull']) ? ($result === '' ? "''" : $result) : ($result == 'null' ? '' : $result);
+        return empty($this->_columns[$column_name]['notNull']) ? ($result === '' ? "''" : $result) : ($result === 'null' ? '' : $result);        
     }
 
     function castAttributeFromDatabase($column_name, $value)
