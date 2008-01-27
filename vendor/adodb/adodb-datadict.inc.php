@@ -571,7 +571,8 @@ class ADODB_DataDict {
                                 }
                         } else if ($fdefault !== false && !$fnoquote)
                                 if ($ty == 'C' or $ty == 'X' or 
-                                        ( substr($fdefault,0,1) != "'" && !is_numeric($fdefault)))
+                                        // HACK we need this for postgre/ so the default for boolean-columns can be numeric '0' or '1' 
+                                        ( substr($fdefault,0,1) != "'" /*&& !is_numeric($fdefault)*/))  
                                         if (strlen($fdefault) != 1 && substr($fdefault,0,1) == ' ' && substr($fdefault,strlen($fdefault)-1) == ' ') 
                                                 $fdefault = trim($fdefault);
                                         else if (strtolower($fdefault) != 'null')

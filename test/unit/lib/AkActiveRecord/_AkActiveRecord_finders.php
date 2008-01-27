@@ -1,5 +1,10 @@
 <?php
 
+defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
+defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
+
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
+
 class AkActiveRecord_finders_TestCase extends  AkUnitTest
 {
 
@@ -11,14 +16,16 @@ class AkActiveRecord_finders_TestCase extends  AkUnitTest
         @Ak::file_delete(AK_MODELS_DIR.DS.'post_tag.php');
     }
     
-    function test_should_find_using_first_id_and_options()
+    function test_should_find_using_id_and_options()
     {
         $Tag =& new Tag();
 
         $One =& $Tag->create(array('name' => 'One'));
         $Two =& $Tag->create(array('name' => 'Two'));
 
-        $Found =& $Tag->find('first', $Two->getId(), array('order'=>'name'));
+        //find by id is always 'first'; API-change
+        //$Found =& $Tag->find('first', $Two->getId(), array('order'=>'name'));
+        $Found =& $Tag->find($Two->getId(), array('order'=>'name'));
 
         $this->assertEqual($Found->getId(), $Two->getId());
 
@@ -34,7 +41,14 @@ class AkActiveRecord_finders_TestCase extends  AkUnitTest
 
         $this->assertTrue($Post->save());
 
+        // on PostgreSQL we get an unordered comments-list
         $this->assertTrue($Post =& $Post->find($Post->getId(), array('include'=>array('comments', 'tags'))));
+        $exptected = array('Comment 1','Comment 2');
+        $this->assertTrue(in_array($Post->comments[0]->get('name'),$exptected));
+        $this->assertTrue(in_array($Post->comments[1]->get('name'),$exptected));
+        
+        // so we could do this 
+        $this->assertTrue($Post =& $Post->find($Post->getId(), array('include'=>array('comments', 'tags'),'order'=>'_comments.id ASC, _tags.id ASC')));
         $this->assertEqual(count($Post->comments), 2);
         $this->assertEqual($Post->comments[0]->get('name'), 'Comment 1');
         $this->assertEqual($Post->comments[1]->get('name'), 'Comment 2');
@@ -47,5 +61,7 @@ class AkActiveRecord_finders_TestCase extends  AkUnitTest
 
 
 }
+
+ak_test('AkActiveRecord_finders_TestCase',true);
 
 ?>

@@ -1,153 +1,32 @@
 <?php
 
-
 defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
-
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 
 if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
     define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
 }
 
-
 class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
 {
-    /**/
-    var $_testing_models_to_delete = array();
-    var $_testing_model_databases_to_delete = array();
 
-    function test_AkActiveRecord_actsAsNestedSet()
+    function test_start()
     {
-        parent::UnitTestCase();
-        $this->_createNewTestingModelDatabase('AkTestNestedCategory');
-        $this->_createNewTestingModel('AkTestNestedCategory');
-    }
-
-    function tearDown()
-    {
-        unset($_SESSION['__activeRecordColumnsSettingsCache']);
-    }
-
-    function _createNewTestingModel($test_model_name)
-    {
-
-        static $shutdown_called;
-        switch ($test_model_name) {
-
-            case 'AkTestNestedCategory':
-            $model_source =
-            '<?php
-    class AkTestNestedCategory extends AkActiveRecord 
-    {
-        var $act_as = "nested_set";
-    } 
-?>';
-            break;
-
-            default:
-            $model_source = '<?php class '.$test_model_name.' extends AkActiveRecord { } ?>';
-            break;
-        }
-
-        $file_name = AkInflector::toModelFilename($test_model_name);
-
-        if(!Ak::file_put_contents($file_name,$model_source)){
-            die('Ooops!, in order to perform this test, you must set your app/model permissions so this can script can create and delete files into/from it');
-        }
-        if(!in_array($file_name, get_included_files()) && !class_exists($test_model_name)){
-            include($file_name);
-        }else {
-            return false;
-        }
-        $this->_testing_models_to_delete[] = $file_name;
-        if(!isset($shutdown_called)){
-            $shutdown_called = true;
-            register_shutdown_function(array(&$this,'_deleteTestingModels'));
-        }
-        return true;
-    }
-
-    function _deleteTestingModels()
-    {
-        foreach ($this->_testing_models_to_delete as $file){
-            Ak::file_delete($file);
-        }
-    }
-
-
-
-
-    function _createNewTestingModelDatabase($test_model_name)
-    {
-        static $shutdown_called;
-        // Create a data dictionary object, using this connection
-        $db =& AK::db();
-        //$db->debug = true;
-        $table_name = AkInflector::tableize($test_model_name);
-        if(in_array($table_name, (array)$db->MetaTables())){
-            return false;
-        }
-        switch ($table_name) {
-            case 'ak_test_nested_categories':
-            $table =
-            array(
-            'table_name' => 'ak_test_nested_categories',
-            'fields' =>
-            'id I AUTO KEY,
-            lft I(11),
-            rgt I(11),
-            parent_id I(11),
-            description C(250),
-            department C(25)',
-            'index_fileds' => 'id',
-            'table_options' => array('mysql' => 'TYPE=InnoDB', 'REPLACE')
-            );
-
-            break;
-            default:
-            return false;
-            break;
-        }
-
-        $dict = NewDataDictionary($db);
-        $sqlarray = $dict->CreateTableSQL($table['table_name'], $table['fields'], $table['table_options']);
-        $dict->ExecuteSQLArray($sqlarray);
-        if(isset($table['index_fileds'])){
-            $sqlarray = $dict->CreateIndexSQL('idx_'.$table['table_name'], $table['table_name'], $table['index_fileds']);
-            $dict->ExecuteSQLArray($sqlarray);
-        }
-
-        $db->CreateSequence('seq_'.$table['table_name']);
-
-        $this->_testing_model_databases_to_delete[] = $table_name;
-        if(!isset($shutdown_called)){
-            $shutdown_called = true;
-            register_shutdown_function(array(&$this,'_deleteTestingModelDatabases'));
-        }
-        //$db->debug = false;
-        return true;
-    }
-
-    function _deleteTestingModelDatabases()
-    {
-        $db =& AK::db();
-        foreach ($this->_testing_model_databases_to_delete as $table_name){
-            $db->Execute('DROP TABLE '.$table_name);
-            $db->DropSequence('seq_'.$table_name);
-        }
+        $this->installAndIncludeModels(array(
+            'NestedCategory'=>'id,lft int,rgt int,parent_id,description,department string(25)'
+            ));
     }
 
     function Test_of_actsAsNestedSet_instatiation()
     {
-        $Categories =& new AkTestNestedCategory();
+        $Categories =& new NestedCategory();
         $this->assertEqual($Categories->actsLike(), 'active record,nested set');
 
         $this->assertEqual($Categories->nested_set->_parent_column_name,'parent_id');
         $this->assertEqual($Categories->nested_set->_left_column_name,'lft');
         $this->assertEqual($Categories->nested_set->_right_column_name,'rgt');
 
-        $Categories =& new AkTestNestedCategory();
+        $Categories =& new NestedCategory();
 
         $this->assertErrorPattern('/columns are required/',$Categories->actsAs('nested_set', array('parent_column'=>'not_available')));
 
@@ -157,7 +36,7 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
 
     function Test_of_Test_of_init()
     {
-        $Categories =& new AkTestNestedCategory();
+        $Categories =& new NestedCategory();
         $Categories->nested_set->init(array('scope'=>array('category_id = ? AND completed = 0',$Categories->getId()),'custom_attribute'=>'This is not allowed here'));
 
         $this->assertEqual($Categories->nested_set->getScopeCondition(), array ( 0 => 'category_id = ? AND completed = 0', 1 => null));
@@ -167,29 +46,29 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
 
     function Test_of__ensureIsActiveRecordInstance()
     {
-        $Categories =& new AkTestNestedCategory();
+        $Categories =& new NestedCategory();
         $Object =& new AkObject();
         $this->assertErrorPattern('/is not an active record/',$Categories->nested_set->_ensureIsActiveRecordInstance(&$Object));
     }
 
     function Test_of_getType()
     {
-        $Categories =& new AkTestNestedCategory();
+        $Categories =& new NestedCategory();
         $this->assertEqual($Categories->nested_set->getType(), 'nested set');
     }
 
 
     function Test_of_getScopeCondition_and_setScopeCondition()
     {
-        $Categories =& new AkTestNestedCategory();
-        $this->assertEqual($Categories->nested_set->getScopeCondition(), (substr($Categories->_db->databaseType,0,4) == 'post') ? 'true' : '1');
+        $Categories =& new NestedCategory();
+        $this->assertEqual($Categories->nested_set->getScopeCondition(), ($Categories->_db->type() == 'postgre') ? 'true' : '1');
         $Categories->nested_set->setScopeCondition('true');
         $this->assertEqual($Categories->nested_set->getScopeCondition(), 'true');
     }
 
     function Test_of_getters_and_setters()
     {
-        $Categories =& new AkTestNestedCategory();
+        $Categories =& new NestedCategory();
 
         $Categories->nested_set->setLeftColumnName('column_name');
         $this->assertEqual($Categories->nested_set->getLeftColumnName(), 'column_name');
@@ -484,13 +363,13 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
     function _resetTable()
     {
         $this->_deleteTestingModelDatabases();
-        $this->_createNewTestingModelDatabase('AkTestNestedCategory');
+        $this->_createNewTestingModelDatabase('NestedCategory');
     }
 
     function _getNestedSetList($Categories = null, $breadcrumb = false)
     {
         if(!isset($Categories)){
-            $Categories = new AkTestNestedCategory();
+            $Categories = new NestedCategory();
             $Categories = $Categories->find('all',array('conditions'=>$Categories->nested_set->getScopeCondition(),'order'=>' lft ASC '));
         }
         $list = array();

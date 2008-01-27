@@ -7,24 +7,12 @@ if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
 defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-
 class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest 
 {
     /**/
     function test_start()
     {
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-        require_once(AK_LIB_DIR.DS.'AkInstaller.php');
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkHasOne.php');
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkBelongsTo.php');
-        require_once(AK_APP_DIR.DS.'shared_model.php');
-        require_once(AK_APP_DIR.DS.'installers'.DS.'framework_installer.php');
-        $installer = new FrameworkInstaller();
-        $installer->uninstall();
-        $installer->install();
-        $models = array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'Person', 'Account');
         $this->installAndIncludeModels(array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'Person', 'Account'));
-        unset($_SESSION['__activeRecordColumnsSettingsCache']);
     }
 
     /**/

@@ -164,9 +164,9 @@ class AkLogger
         $db =& Ak::db();
         $message = $this->_getLogFormatedAsRawText($type, $error_mode, $error_message);
         $sql = 'INSERT INTO log (user_id, type, message, severity, location, hostname, created) '.
-        " VALUES (0, ".$db->qstr($type).", ".$db->qstr($message).', '.($this->mode & AK_MODE_DIE ? 100 : 0).', '.
-        $db->qstr(AK_CURRENT_URL).', '.$db->qstr($_SERVER['REMOTE_ADDR']).', '.$db->qstr(Ak::getTimestamp()).');';
-        if ($db->Execute($sql) === false) {
+        " VALUES (0, ".$db->quote_string($type).", ".$db->quote_string($message).', '.($this->mode & AK_MODE_DIE ? 100 : 0).', '.
+        $db->quote_string(AK_CURRENT_URL).', '.$db->quote_string($_SERVER['REMOTE_ADDR']).', '.$db->quote_string(Ak::getTimestamp()).');';
+        if ($db->execute($sql) === false) {
             die($this->internalError($this->t('Error inserting: ').$db->ErrorMsg(),__FILE__,__LINE__));
         }
     }

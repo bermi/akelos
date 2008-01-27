@@ -18,7 +18,7 @@ define('AK_SITE_URL_SUFFIX',str_replace(array(join(DIRECTORY_SEPARATOR,array_dif
 include('..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
 
 require_once(AK_LIB_DIR.DS.'Ak.php');
-Ak::db(&$dsn);
+Ak::db();
 
 require_once(AK_LIB_DIR.DS.'AkDbSession.php');
 

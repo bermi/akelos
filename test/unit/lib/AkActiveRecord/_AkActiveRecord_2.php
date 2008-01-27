@@ -3,17 +3,23 @@
 defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-
-class test_AkActiveRecord_2 extends  UnitTestCase
+class test_AkActiveRecord_2 extends  AkUnitTest 
 {
-
-
-    function tearDown()
+    function _test_AkActiveRecord()
     {
-        unset($_SESSION['__activeRecordColumnsSettingsCache']);
+        $this->installAndIncludeModels(array(
+            'AkTestUser'=>'id I AUTO KEY, user_name C(32), first_name C(200), last_name C(200), email C(150), country I, password C(32), created_at T, updated_at T, expires_on T',
+            'AkTestMember'=>'ak_test_user_id I, role C(25)',
+            'AkTestComment'=>'id I AUTO KEY, ak_test_user_id I, private_comment L(1), birth_date T',
+            'AkTestField'=>'id I AUTO KEY,varchar_field C(255),longtext_field XL,text_field X,logblob_field B,date_field D, 
+                    datetime_field T,tinyint_field L(2),integer_field I,smallint_field I2,bigint_field I8,double_field F,
+                    numeric_field N,bytea_field B,timestamp_field T,
+                    boolean_field L(1),int2_field I2,int4_field I4,int8_field I8,foat_field F,varchar4000_field X, 
+                    clob_field XL,nvarchar2000_field X2,blob_field B,nvarchar_field C2(255),
+                    decimal1_field L(2),decimal3_field I1,decimal5_field I2,decimal10_field I4,decimal20_field I8,decimal_field N,
+                    created_at T,updated_at T,expires_on T'));
     }
-
+    
     function Test_of_newRecord()
     {
         $User = new AkTestUser();
@@ -30,8 +36,6 @@ class test_AkActiveRecord_2 extends  UnitTestCase
         $this->assertFalse(empty($User->_newRecord));
 
     }
-    
-
 
     function Test_of_isNewRecord()
     {
@@ -241,7 +245,7 @@ class test_AkActiveRecord_2 extends  UnitTestCase
         
         $User->save();
 
-        $User = $Users->find("first_name = 'John' AND last_name = 'Smith'");
+        $User = $Users->find('first', "first_name = 'John' AND last_name = 'Smith'");
         $this->assertEqual($User->first_name,'John');
         $this->assertEqual($User->last_name,'Smith');
     }
@@ -280,7 +284,7 @@ class test_AkActiveRecord_2 extends  UnitTestCase
         $Got = $Users->findFirst("last_name = 'Ferrer Martínez'");
         $this->assertEqual($Got->first_name, 'Bermi');
         
-        $Got = $Users->findFirst();
+        $Got = $Users->findFirst(array('order'=>'id ASC'));
         
         $this->assertEqual($Got->first_name, 'Bermi');
         
@@ -444,15 +448,21 @@ class test_AkActiveRecord_2 extends  UnitTestCase
         
         $FoundUsers = $Users->findBySql("SELECT * FROM ak_test_users",6);
         $this->assertEqual(count($FoundUsers), 6);
+        $this->assertErrorPattern("/DEPRECATED WARNING.*findBySql.*/");
         
         $FoundUsers = $Users->findBySql("SELECT * FROM ak_test_users",6,6);
         $this->assertEqual(count($FoundUsers), 3);
+        $this->assertErrorPattern("/DEPRECATED WARNING.*findBySql.*/");
 
+        $FoundUsers = $Users->findBySql("SELECT * FROM ak_test_users WHERE iad=123");
+        $this->assertEqual(count($FoundUsers), 0);
+        $this->assertError();
+        
     }
 
 }
 
+require_once('_AkActiveRecord_1.php');
 ak_test('test_AkActiveRecord_2',true);
-
 
 ?>

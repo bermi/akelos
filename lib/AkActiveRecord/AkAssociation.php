@@ -127,7 +127,7 @@ class AkAssociation extends AkObserver
     function setAssociatedId($association_id, $associated_id)
     {
         $this->Owner->_associationIds[$association_id]  = $associated_id;
-        $this->asssociated_ids[$association_id] = $associated_id;
+        $this->associated_ids[$association_id] = $associated_id;
     }
 
     function &loadAssociated($association_id)

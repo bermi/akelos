@@ -243,8 +243,8 @@ class AkPluginManager extends AkObject
     function updatePlugin($plugin_name, $repository = null)
     {
         $options = array(
-        'externals' => true,
-        'checkout' => true
+        'externals' => false,
+        'checkout' => false
         );
 
         $plugin_name = Ak::sanitize_include($plugin_name, 'high');

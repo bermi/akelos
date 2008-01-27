@@ -54,7 +54,7 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 */
 class AkHasOne extends AkAssociation
 {
-    var $asssociated_ids = array();
+    var $associated_ids = array();
 
     function &addAssociated($association_id, $options = array())
     {
@@ -111,7 +111,7 @@ class AkHasOne extends AkAssociation
 
     function getAssociatedId($association_id)
     {
-        return isset($this->asssociated_ids[$association_id]) ? $this->asssociated_ids[$association_id] : false;
+        return isset($this->associated_ids[$association_id]) ? $this->associated_ids[$association_id] : false;
     }
 
 
@@ -242,11 +242,9 @@ class AkHasOne extends AkAssociation
 
     function &findAssociated($association_id)
     {
-        $result = false;
         if(!$this->Owner->getId()){
-            return $result;
+            return false;
         }
-
         if(empty($this->Owner->$association_id->__activeRecordObject)){
             $this->build($association_id, array(), false);
         }
@@ -260,7 +258,11 @@ class AkHasOne extends AkAssociation
         'order' => trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($table_name, $this->Owner->$association_id->getAssociationOption('order')))
         );
         
-        if($results =& $this->Owner->$association_id->findBySql($this->Owner->constructFinderSqlWithAssociations($finder_options, false),1)){
+        /**
+        * todo we will use a select statement later
+        */
+        $sql = $this->Owner->constructFinderSqlWithAssociations($finder_options, false);//.' LIMIT 1';
+        if($results =& $this->Owner->$association_id->findBySql($sql)){
             $result =& $results[0];
         }
 

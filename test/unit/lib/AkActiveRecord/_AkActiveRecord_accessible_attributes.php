@@ -85,7 +85,7 @@ class test_AkActiveRecord_accessible_attributes extends  AkUnitTest
         $this->assertNull($ProtectedPerson->birthday);
         $this->assertNull($ProtectedPerson->created_at);
         $this->assertTrue($ProtectedPerson->is_active);
-        $this->assertEqual($ProtectedPerson->is_active,1);
+        $this->assertEqual($ProtectedPerson->is_active,true);
         $this->assertEqual($ProtectedPerson->credit_points,1000);
         
         

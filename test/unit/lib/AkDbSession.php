@@ -16,6 +16,15 @@ class Test_of_AkDbSession_Class extends  WebTestCase
 {
     var $sessionLife = NULL;
    
+    function test_install_db_tables()
+    {
+        require_once(dirname(__FILE__).'/../../fixtures/app/installers/framework_installer.php');
+        $installer =& new FrameworkInstaller();
+        $installer->uninstall();
+        $installer->install();
+        
+    }
+
     function setUp()
     {   
         $this->_test_script = str_replace('/fixtures/public','',trim(AK_TESTING_URL,'/')).

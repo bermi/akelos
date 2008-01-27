@@ -17,9 +17,6 @@
  */
 
 
-if(!defined('AK_ADODBCACHE_CLASS_INCLUDED')){ define('AK_ADODBCACHE_CLASS_INCLUDED',true); // Class overriding trick
-
-// ---- Required Files ---- //
 require_once(AK_LIB_DIR.'/Ak.php');
 
 
@@ -32,11 +29,6 @@ require_once(AK_LIB_DIR.'/Ak.php');
 */
 class AkAdodbCache
 {
-    // {{{ properties
-
-
-    // --- Private properties --- //
-
 
     /**
     * Handles an instance of current database conection using
@@ -97,19 +89,6 @@ class AkAdodbCache
     */
     var $_automaticSerialization = false;
 
-    // }}}
-
-
-
-    // ------ CLASS METHODS ------ //
-
-
-
-    // ---- Setters ---- //
-
-
-    // {{{ setDb()
-
     /**
     * $this->_db setter
     *
@@ -127,9 +106,6 @@ class AkAdodbCache
 
     }
 
-    // }}}
-    // {{{ setRefreshTime()
-
     /**
     * $this->_refreshTime setter
     *
@@ -146,9 +122,6 @@ class AkAdodbCache
 
     }
 
-    // }}}
-    // {{{ setLifeTime()
-
     /**
     * $this->_lifeTime setter
     *
@@ -164,9 +137,6 @@ class AkAdodbCache
         $this->_lifeTime = $life_time;
         $this->setRefreshTime(time() - $this->_lifeTime);
     }
-
-    // }}}
-    // {{{ setMemoryCaching()
 
     /**
     * $this->_memoryCaching setter
@@ -186,9 +156,6 @@ class AkAdodbCache
 
     }
 
-    // }}}
-    // {{{ setAutomaticSerialization()
-
     /**
     * $this->_automaticSerialization setter
     *
@@ -204,14 +171,6 @@ class AkAdodbCache
         $this->_automaticSerialization = (bool)$automatic_serialization;
 
     }
-
-    // }}}
-
-
-    // ---- Public methods ---- //
-
-
-    // {{{ init()
 
     /**
     * Class constructor (ALA Akelos Framework)
@@ -242,9 +201,6 @@ class AkAdodbCache
         $this->_refreshTime = time() - $this->_lifeTime;
     }
 
-    // }}}
-    // {{{ get()
-
     /**
     * Test if a cache is available and (if yes) return it
     *
@@ -263,19 +219,16 @@ class AkAdodbCache
             return $this->_memoryCachingArray[$cache_hash];
         }
 
-        $query_result = $this->_db->Execute('
+        $query_result = $this->_db->selectValue('
             SELECT cache_data 
             FROM cache 
-            WHERE id = '.$this->_db->qstr($cache_hash).' 
-            AND cache_group = '.$this->_db->qstr($this->_group).' 
-            AND expire > '.$this->_db->DBTimeStamp($this->_refreshTime)
-        );
-        
-        if(!$query_result && AK_DEBUG){
-            trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE);
-        }else{
+            WHERE id = '.$this->_db->quote_string($cache_hash).' 
+            AND cache_group = '.$this->_db->quote_string($this->_group).' 
+            AND expire > '.$this->_db->quote_datetime($this->_refreshTime)
+            );
+            if (!$query_result) return false;
 
-            $data = $this->_db->BlobDecode($query_result->fields[0]);
+            $data = $this->_db->unescape_blob($query_result);
 
             if($this->_automaticSerialization == true){
                 $data = unserialize($data);
@@ -286,14 +239,7 @@ class AkAdodbCache
             }
 
             return $data;
-        }
-
-        return false;
     }
-
-
-    // }}}
-    // {{{ save()
 
     /**
     * Save some data in the cache
@@ -317,12 +263,13 @@ class AkAdodbCache
             $data = serialize($data);
         }
 
-        $ret = $this->_db->Replace(
+        // TODO replace with AkDbAdapter statement
+        $ret = $this->_db->connection->Replace(
         'cache', array(
-        'id'=>$this->_db->qstr($cache_hash),
-        'cache_data'=>$this->_db->qstr($this->_db->BlobEncode($data)),
-        'cache_group'=>$this->_db->qstr($this->_group),
-        'expire'=>$this->_db->DBTimeStamp(time() + $this->_lifeTime)),
+        'id'=>$this->_db->quote_string($cache_hash),
+        'cache_data'=>$this->_db->quote_string($this->_db->escape_blob($data)),
+        'cache_group'=>$this->_db->quote_string($this->_group),
+        'expire'=>$this->_db->quote_datetime(time() + $this->_lifeTime)),
         'id');
 
         if($ret == 0){
@@ -334,9 +281,6 @@ class AkAdodbCache
             return true;
         }
     }
-
-    // }}}
-    // {{{ remove()
 
     /**
     * Remove a cache item from the database
@@ -353,14 +297,8 @@ class AkAdodbCache
         if (isset($this->_memoryCachingArray[$cache_hash])) {
             unset($this->_memoryCachingArray[$cache_hash]);
         }
-        if(!$this->_db->Execute('DELETE FROM cache WHERE id = '.$this->_db->qstr($cache_hash)) && AK_DEBUG){
-            trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE);
-        }
-        return (bool)$this->_db->Affected_Rows();
+        return (bool)$this->_db->delete('DELETE FROM cache WHERE id = '.$this->_db->quote_string($cache_hash));
     }
-
-    // }}}
-    // {{{ clean()
 
     /**
     * Clean the cache
@@ -384,31 +322,17 @@ class AkAdodbCache
     {
         switch ($mode) {
             case 'ingroup':
-            if(!$this->_db->Execute('DELETE FROM cache WHERE cache_group = '.$this->_db->qstr($group)) && AK_DEBUG){
-                trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE);
-            }
-            return (bool)$this->_db->Affected_Rows();
+                return (bool)$this->_db->delete('DELETE FROM cache WHERE cache_group = '.$this->_db->quote_string($group));
             case 'notingroup':
-
-            if(!$this->_db->Execute('DELETE FROM cache WHERE cache_group NOT LIKE '.$this->_db->qstr($group)) && AK_DEBUG){
-                trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE);
-            }
-            return (bool)$this->_db->Affected_Rows();
+                return (bool)$this->_db->delete('DELETE FROM cache WHERE cache_group NOT LIKE '.$this->_db->quote_string($group));
             case 'old':
-
-            if(!$this->_db->Execute('DELETE FROM cache WHERE expire < '.$this->_db->DBTimeStamp(time())) && AK_DEBUG){
-                trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE);
-            }
-            return (bool)$this->_db->Affected_Rows();
+                return (bool)$this->_db->delete('DELETE FROM cache WHERE expire < '.$this->_db->quote_datetime(time()));
             default:
-            return true;
+                return true;
         }
     }
 
-    // }}}
-
 }
 
-}// End of if(!defined('AK_ADODBCACHE_CLASS_INCLUDED')){
 
 ?>

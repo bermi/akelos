@@ -55,12 +55,6 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 */
 class AkDbSession extends AkObject
 {
-    // {{{ properties
-
-
-    // --- Public properties --- //
-
-
     /**
     * Secconds for the session to expire.
     *
@@ -69,10 +63,6 @@ class AkDbSession extends AkObject
     * @var integer $sessionLife
     */
     var $sessionLife = AK_SESSION_EXPIRE;
-
-
-    // --- Protected properties --- //
-
 
     /**
     * Database instance handler
@@ -84,9 +74,6 @@ class AkDbSession extends AkObject
     */
     var $_db;
 
-    // }}}
-
-
     /**
     * Original session value for avoiding hitting the database in case nothing has changed
     *
@@ -94,18 +81,6 @@ class AkDbSession extends AkObject
     * @var string $_db
     */
     var $_original_sess_value = '';
-
-    // }}}
-
-
-    // ------ CLASS METHODS ------ //
-
-
-
-    // ---- Setters ---- //
-
-
-    // {{{ setSessionLife()
 
     /**
     * $this->sessionLife setter
@@ -124,13 +99,7 @@ class AkDbSession extends AkObject
 
     }
 
-    // }}}
-
-
     // ---- Protected methods ---- //
-
-
-    // {{{ _open()
 
     /**
     * Session open handler
@@ -143,9 +112,6 @@ class AkDbSession extends AkObject
         $this->_db =& Ak::db();
         return true;
     }
-
-    // }}}
-    // {{{ _close()
 
     /**
     * Session close handler
@@ -163,9 +129,6 @@ class AkDbSession extends AkObject
         return true;
     }
 
-    // }}}
-    // {{{ _read()
-
     /**
     * Session read handler
     *
@@ -175,18 +138,9 @@ class AkDbSession extends AkObject
     */
     function _read($id)
     {
-        $query_result = $this->_db->Execute("SELECT value FROM sessions WHERE id = ".$this->_db->qstr($id));
-        if(!$query_result && AK_DEBUG){
-            trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE);
-        }else{
-            $this->_original_sess_value = (string)$query_result->fields[0];
-            return $this->_original_sess_value;
-        }
-        return '';
+        $result = $this->_db->selectValue("SELECT value FROM sessions WHERE id = ".$this->_db->quote_string($id));
+        return is_null($result) ? '' : (string)$result;
     }
-
-    // }}}
-    // {{{ _write()
 
     /**
     * Session write handler
@@ -200,7 +154,10 @@ class AkDbSession extends AkObject
     {
         // We don't want to hit the db if nothing has changed
         if($this->_original_sess_value != $data){
-            $ret = $this->_db->Replace('sessions', array('id'=>$this->_db->qstr($id),'expire'=>$this->_db->DBTimeStamp(time()),'value'=>$this->_db->qstr($data)), 'id');
+            /**
+            * @todo replace with dbAdapter-method
+            */
+            $ret = $this->_db->connection->Replace('sessions', array('id'=>$this->_db->quote_string($id),'expire'=>$this->_db->quote_datetime(time()),'value'=>$this->_db->quote_string($data)), 'id');
             if($ret == 0){
                 return false;
             }else{
@@ -211,9 +168,6 @@ class AkDbSession extends AkObject
         }
     }
 
-    // }}}
-    // {{{ _destroy()
-
     /**
     * Session destroy handler
     *
@@ -223,14 +177,8 @@ class AkDbSession extends AkObject
     */
     function _destroy($id)
     {
-        if(!$this->_db->Execute('DELETE FROM sessions WHERE id = '.$this->_db->qstr($id)) && AK_DEBUG){
-            trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE);
+        return (bool)$this->_db->delete('DELETE FROM sessions WHERE id = '.$this->_db->quote_string($id));
         }
-        return (bool)@$this->_db->Affected_Rows();
-    }
-
-    // }}}
-    // {{{ _gc()
 
     /**
     * Session garbage collection handler
@@ -240,13 +188,8 @@ class AkDbSession extends AkObject
     */
     function _gc()
     {
-        if(!$this->_db->Execute('DELETE FROM sessions WHERE expire < '.$this->_db->DBTimeStamp(time()-$this->sessionLife)) && AK_DEBUG){
-            trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE);
+        return (bool)$this->_db->delete('DELETE FROM sessions WHERE expire < '.$this->_db->quote_datetime(time()-$this->sessionLife));
         }
-        return (bool)$this->_db->Affected_Rows();
-    }
-
-    // }}}
 
 
 }

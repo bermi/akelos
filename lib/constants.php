@@ -20,20 +20,12 @@ defined('AK_CONFIG_DIR') ? null : define('AK_CONFIG_DIR', AK_BASE_DIR.DS.'config
 // If you need to customize the framework default settings or specify internationalization options,
 // edit the files config/testing.php, config/development.php, config/production.php
 if(AK_ENVIRONMENT != 'setup'){        
-    $akdb = $database_settings[strtolower(AK_ENVIRONMENT)];
-    $akdb['options'] = empty($akdb['options']) && !empty($akdb['socket']) ? 'socket='.urlencode($akdb['socket']) : $akdb['options'];
-    $dsn = $akdb['type'] == 'sqlite' ?
-    'sqlite://'.urlencode($akdb['database_file']).'/?persist' :
-    $akdb['type'].'://'.$akdb['user'].':'.$akdb['password'].'@'.$akdb['host'].
-    (empty($akdb['port'])?'':':'.$akdb['port']).
-    '/'.$akdb['database_name'].
-    (!empty($akdb['options'])?'?'.$akdb['options']:'');
-    
     require_once(AK_CONFIG_DIR.DS.'environments'.DS.AK_ENVIRONMENT.'.php');
 }
 
-unset($environment, $database_settings, $akdb);
-
+if (!defined('AK_TEST_DATABASE_ON')) {
+    defined('AK_DEFAULT_DATABASE_PROFILE') ? null : define('AK_DEFAULT_DATABASE_PROFILE',AK_ENVIRONMENT);
+}
 
 // Locale settings ( you must create a file at /config/locales/ using en.php as departure point)
 // Please be aware that your charset needs to be UTF-8 in order to edit the locales files
@@ -222,5 +214,6 @@ defined('AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE') ? null : define('AK_ACTION_
 defined('AK_ACTION_CONTROLLER_DEFAULT_ACTION') ? null : define('AK_ACTION_CONTROLLER_DEFAULT_ACTION', 'index');
 
 defined('AK_ERROR_REPORTING_ON_SCRIPTS') ? null : define('AK_ERROR_REPORTING_ON_SCRIPTS', E_ALL);
+defined('AK_BEEP_ON_ERRORS_WHEN_TESTING') ? null : define('AK_BEEP_ON_ERRORS_WHEN_TESTING', false);
 
 ?>

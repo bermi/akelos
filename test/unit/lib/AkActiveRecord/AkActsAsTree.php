@@ -3,162 +3,29 @@
 defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-
 if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
     define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
 }
 
-
-class test_AkActiveRecord_actAsTree extends  UnitTestCase
+class test_AkActiveRecord_actAsTree extends  AkUnitTest 
 {
-    var $_testing_models_to_delete = array();
-    var $_testing_model_databases_to_delete = array();
 
-    function test_AkActiveRecord_actAsTree()
+    function test_start()
     {
-        parent::UnitTestCase();
-        $this->_createNewTestingModelDatabase('AkTestCategory');
-        $this->_createNewTestingModel('AkTestCategory');
-        $this->_createNewTestingModel('AkDependentTestCategory');
-    }
-
-    function setUp()
-    {
-        $this->_resetTable();
-    }
-
-    function tearDown()
-    {
-        unset($_SESSION['__activeRecordColumnsSettingsCache']);
-    }
-
-    function _createNewTestingModel($test_model_name)
-    {
-
-        static $shutdown_called;
-        switch ($test_model_name) {
-
-            case 'AkTestCategory':
-                $model_source =
-                '<?php
-    class AkTestCategory extends AkActiveRecord 
-    {
-        var $act_as = "tree";
-    } 
-?>';
-                break;
-
-            case 'AkDependentTestCategory':
-                $model_source =
-                '<?php
-    class AkDependentTestCategory extends AkActiveRecord 
-    {
-        var $act_as = array("tree" => array("dependent" => true));
-        var $table_name = "ak_test_categories";
-    } 
-?>';
-                break;
-
-            default:
-                $model_source = '<?php class '.$test_model_name.' extends AkActiveRecord { } ?>';
-                break;
-        }
-
-        $file_name = AkInflector::toModelFilename($test_model_name);
-
-        if(!Ak::file_put_contents($file_name,$model_source)){
-            die('Ooops!, in order to perform this test, you must set your app/model permissions so this can script can create and delete files into/from it');
-        }
-        if(!in_array($file_name, get_included_files()) && !class_exists($test_model_name)){
-            include($file_name);
-        }else {
-            return false;
-        }
-        $this->_testing_models_to_delete[] = $file_name;
-        if(!isset($shutdown_called)){
-            $shutdown_called = true;
-            register_shutdown_function(array(&$this,'_deleteTestingModels'));
-        }
-        return true;
-    }
-
-    function _deleteTestingModels()
-    {
-        foreach ($this->_testing_models_to_delete as $file){
-            Ak::file_delete($file);
-        }
-    }
-
-
-
-
-    function _createNewTestingModelDatabase($test_model_name)
-    {
-        static $shutdown_called;
-        // Create a data dictionary object, using this connection
-        $db =& AK::db();
-        //$db->debug = true;
-        $table_name = AkInflector::tableize($test_model_name);
-        if(in_array($table_name, (array)$db->MetaTables())){
-            return false;
-        }
-        switch ($table_name) {
-            case 'ak_test_categories':
-                $table =
-                array(
-                'table_name' => 'ak_test_categories',
-                'fields' =>
-                'id I AUTO KEY,
-            parent_id I(11),
-            description C(250),
-            department C(25)',
-            'index_fileds' => 'id',
-            'table_options' => array('mysql' => 'TYPE=InnoDB', 'REPLACE')
-            );
-
-            break;
-            default:
-                return false;
-                break;
-        }
-
-        $dict = NewDataDictionary($db);
-        $sqlarray = $dict->CreateTableSQL($table['table_name'], $table['fields'], $table['table_options']);
-        $dict->ExecuteSQLArray($sqlarray);
-        if(isset($table['index_fileds'])){
-            $sqlarray = $dict->CreateIndexSQL('idx_'.$table['table_name'], $table['table_name'], $table['index_fileds']);
-            $dict->ExecuteSQLArray($sqlarray);
-        }
-
-        $db->CreateSequence('seq_'.$table['table_name']);
-
-        $this->_testing_model_databases_to_delete[] = $table_name;
-        if(!isset($shutdown_called)){
-            $shutdown_called = true;
-            register_shutdown_function(array(&$this,'_deleteTestingModelDatabases'));
-        }
-        //$db->debug = false;
-        return true;
-    }
-
-    function _deleteTestingModelDatabases()
-    {
-        $db =& AK::db();
-        foreach ($this->_testing_model_databases_to_delete as $table_name){
-            $db->Execute('DROP TABLE '.$table_name);
-            $db->DropSequence('seq_'.$table_name);
-        }
+        $this->installAndIncludeModels(array(
+            'Category'=>'id, parent_id, description, department string(25)'
+            ));
+        Ak::import('DependentCategory');        
     }
 
     function Test_of_actsAsTree_instatiation()
     {
-        $Categories =& new AkTestCategory();
+        $Categories =& new Category();
         $this->assertEqual($Categories->actsLike(), 'active record,tree');
 
         $this->assertEqual($Categories->tree->_parent_column_name,'parent_id');
 
-        $Categories =& new AkTestCategory();
+        $Categories =& new Category();
 
         $this->assertErrorPattern('/columns are required/',$Categories->actsAs('tree', array('parent_column'=>'not_available')));
 
@@ -168,7 +35,7 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
 
     function Test_of_Test_of_init()
     {
-        $Categories =& new AkTestCategory();
+        $Categories =& new Category();
         $Categories->tree->init(array('scope'=> 'category_id = ? AND completed = 0','custom_attribute'=>'This is not allowed here'));
 
         $this->assertEqual($Categories->tree->getScopeCondition(), 'category_id = null AND completed = 0');
@@ -178,29 +45,29 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
 
     function Test_of__ensureIsActiveRecordInstance()
     {
-        $Categories =& new AkTestCategory();
+        $Categories =& new Category();
         $Object =& new AkObject();
         $this->assertErrorPattern('/is not an active record/',$Categories->tree->_ensureIsActiveRecordInstance(&$Object));
     }
 
     function Test_of_getType()
     {
-        $Categories =& new AkTestCategory();
+        $Categories =& new Category();
         $this->assertEqual($Categories->tree->getType(), 'tree');
     }
 
 
     function Test_of_getScopeCondition_and_setScopeCondition()
     {
-        $Categories =& new AkTestCategory();
-        $this->assertEqual($Categories->tree->getScopeCondition(), (substr($Categories->_db->databaseType,0,4) == 'post') ? 'true' : '1');
+        $Categories =& new Category();
+        $this->assertEqual($Categories->tree->getScopeCondition(), ($Categories->_db->type() == 'postgre') ? 'true' : '1');
         $Categories->tree->setScopeCondition('true');
         $this->assertEqual($Categories->tree->getScopeCondition(), 'true');
     }
 
     function Test_of_getters_and_setters()
     {
-        $Categories =& new AkTestCategory();
+        $Categories =& new Category();
 
         $Categories->tree->setParentColumnName('column_name');
         $this->assertEqual($Categories->tree->getParentColumnName(), 'column_name');
@@ -213,10 +80,10 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
 
     function Test_of_hasChildren_and_hasParent()
     {
-        $CategoryA =& new AkTestCategory();
+        $CategoryA =& new Category();
         $CategoryA->description = "Cat A";
 
-        $CategoryAa =& new AkTestCategory();
+        $CategoryAa =& new Category();
         $CategoryAa->description = "Cat Aa";
 
         $this->assertFalse($CategoryA->tree->hasChildren());
@@ -235,13 +102,13 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
 
     function Test_of_addChild_and_children()
     {
-        $CategoryA =& new AkTestCategory();
+        $CategoryA =& new Category();
         $CategoryA->description = "Cat A";
 
-        $CategoryAa =& new AkTestCategory();
+        $CategoryAa =& new Category();
         $CategoryAa->description = "Cat Aa";
 
-        $CategoryAb =& new AkTestCategory();
+        $CategoryAb =& new Category();
         $CategoryAb->description = "Cat Ab";
 
         $CategoryA->tree->addChild($CategoryAa);
@@ -256,16 +123,16 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
 
     function Test_of_childrenCount()
     {
-        $CategoryA =& new AkTestCategory();
+        $CategoryA =& new Category();
         $CategoryA->description = "Cat A";
 
-        $CategoryB =& new AkTestCategory();
+        $CategoryB =& new Category();
         $CategoryB->description = "Cat B";
 
-        $CategoryAa =& new AkTestCategory();
+        $CategoryAa =& new Category();
         $CategoryAa->description = "Cat Aa";
 
-        $CategoryAb =& new AkTestCategory();
+        $CategoryAb =& new Category();
         $CategoryAb->description = "Cat Ab";
 
         $CategoryA->tree->addChild($CategoryAa);
@@ -279,13 +146,13 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
 
     function Test_of_parent()
     {
-        $CategoryA =& new AkTestCategory();
+        $CategoryA =& new Category();
         $CategoryA->description = "Cat A";
 
-        $CategoryAa =& new AkTestCategory();
+        $CategoryAa =& new Category();
         $CategoryAa->description = "Cat Aa";
 
-        $CategoryAb =& new AkTestCategory();
+        $CategoryAb =& new Category();
         $CategoryAb->description = "Cat Ab";
 
         $CategoryA->tree->addChild($CategoryAa);
@@ -299,16 +166,16 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
 
     function Test_of_beforeDestroy()
     {
-        $CategoryA =& new AkDependentTestCategory();
+        $CategoryA =& new DependentCategory();
         $CategoryA->description = "Cat A";
 
-        $CategoryB =& new AkTestCategory();
+        $CategoryB =& new Category();
         $CategoryB->description = "Cat B";
 
-        $CategoryAa =& new AkDependentTestCategory();
+        $CategoryAa =& new DependentCategory();
         $CategoryAa->description = "Cat Aa";
 
-        $CategoryBa =& new AkTestCategory();
+        $CategoryBa =& new Category();
         $CategoryBa->description = "Cat Ba";
 
         $CategoryA->tree->addChild($CategoryAa);
@@ -322,15 +189,7 @@ class test_AkActiveRecord_actAsTree extends  UnitTestCase
         $this->assertFalse($CategoryBa->tree->hasParent());
     }
 
-
-    function _resetTable()
-    {
-        $this->_deleteTestingModelDatabases();
-        $this->_createNewTestingModelDatabase('AkTestCategory');
-    }
-
 }
-
 
 ak_test('test_AkActiveRecord_actAsTree',true);
 

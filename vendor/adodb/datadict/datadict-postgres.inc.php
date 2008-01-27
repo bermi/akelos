@@ -51,10 +51,6 @@ class ADODB2_postgres extends ADODB_DataDict {
 			case 'BYTEA':
 				return 'B';
 			
-		    case 'NUMERIC' :
-		      //if((int)$len === 1) return 'L';
-		      return 'L';
-
 			case 'BOOL':
 			case 'BOOLEAN':
 				return 'L';
@@ -105,8 +101,8 @@ class ADODB2_postgres extends ADODB_DataDict {
 		case 'D': return 'DATE';
 		case 'T': return 'TIMESTAMP';
 		
-		case 'L': return 'NUMERIC';
-		case 'I': return 'NUMERIC';
+		case 'L': return 'BOOLEAN';
+		case 'I': return 'INTEGER';
 		case 'I1': return 'SMALLINT';
 		case 'I2': return 'INT2';
 		case 'I4': return 'INT4';

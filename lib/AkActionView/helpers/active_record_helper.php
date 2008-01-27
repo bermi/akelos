@@ -105,7 +105,8 @@ class ActiveRecordHelper extends AkActionViewHelper
     function error_message_on($object_name, $method, $prepend_text = '', $append_text = '', $css_class = 'formError')
     {
         if($errors = $this->_controller->$object_name->getErrorsOn($method)){
-            return TagHelper::content_tag('div', $prepend_text.(is_array($errors) ? array_shift($errors) : $errors).$append_text, array('class'=>$css_class));
+            $text = $prepend_text.(is_array($errors) ? array_shift($errors) : $errors).$append_text;
+            return TagHelper::content_tag('div', Ak::t($text,array(),'helpers/active_record'), array('class'=>$css_class));
         }
         return '';
     }
@@ -129,7 +130,7 @@ class ActiveRecordHelper extends AkActionViewHelper
             $error_list = '<ul>';
             foreach ($object->getFullErrorMessages() as $field=>$errors){
                 foreach ($errors as $error){
-                    $error_list .= TagHelper::content_tag('li',$error);
+                    $error_list .= TagHelper::content_tag('li',Ak::t($error,array(),'helpers/active_record'));
                 }
             }
             $error_list .= '</ul>';

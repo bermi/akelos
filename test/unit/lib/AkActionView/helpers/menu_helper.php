@@ -19,12 +19,27 @@ class MenuHelperTests extends HelpersUnitTester
         
         $this->menu_helper =& $this->controller->menu_helper;
     }
+    
+    function test_should_get_controller_methods()
+    {
+        $controller_file_name = 'authentication_controller.php';
+        require_once(AK_CONTROLLERS_DIR.DS.$controller_file_name);
+        $this->assertTrue(in_array('authenticate',$this->menu_helper->_get_this_class_methods('AuthenticationController')));
+    }
+
+    function test_should_get_all_controllers_with_their_actions()
+    {
+        $available_controllers = array_map('array_pop', (array)Ak::dir(AK_CONTROLLERS_DIR, array('files'=>false)));
+        $got = $this->menu_helper->_get_default_full_menu();
+        foreach ($available_controllers as $controller_filename){
+            $controller_name = str_replace('_controller.php','',$controller_filename);
+            $this->assertTrue(isset($got[$controller_name]));
+        }
+        $this->assertTrue(in_array('authenticate',$got['authentication']));
+    }
+    
     function tests_menu_for_controllers()
     {
-        $this->assertEqual(
-            $this->menu_helper->menu_for_controllers(),
-            file_get_contents(AK_TEST_HELPERS_DIR.DS.'menu_helper_all.txt')
-        );
 
         $this->assertEqual(
             $this->menu_helper->menu_for_controllers(array('advertiser' => array('buy', 'partial_in_template'), 'locale_detection' => 'session', 'page' => 'setup')),

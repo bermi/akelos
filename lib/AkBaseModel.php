@@ -144,35 +144,6 @@ class AkBaseModel extends AkObject
         }
         return $models;
     }
-    
-    function _executeSql($sql, $trigger_error = true)
-    {
-        AK_LOG_EVENTS ? ($this->Logger->message($this->getModelName().' executing SQL: '.$sql)) : null;
-        $result = $this->_db->Execute($sql);
-        if(!$result && AK_DEBUG){
-            AK_LOG_EVENTS ? ($this->Logger->error($this->getModelName().': '.$this->_db->ErrorMsg())) : null;
-            $trigger_error ? trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE) : false;
-        }
-        return $result;
-    }
-    
-    function _startSqlBlockLog()
-    {
-        $this->__original_dbug = $this->_db->debug;
-        $this->_db->debug = true;
-        ob_start();
-    }
-    
-    function _endSqlBlockLog()
-    {
-        $sql_debug = ob_get_clean();
-        $this->Logger->message($this->Logger->formatText($this->getModelName(),'bold').' executing SQL: '.
-        $this->Logger->formatText(preg_replace('/^\([a-z]+\): /','',trim(Ak::html_entity_decode(strip_tags($sql_debug)),"\n- ")),'blue'));
-        if($this->__original_dbug){
-            echo $sql_debug;
-        }
-        $this->_db->debug = $this->__original_dbug;
-    }
 }
 
 

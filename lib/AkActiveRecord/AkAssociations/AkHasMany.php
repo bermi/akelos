@@ -79,7 +79,7 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
  */
 class AkHasMany extends AkAssociation
 {
-    var $asssociated_ids = array();
+    var $associated_ids = array();
     var $association_id;
 
     function &addAssociated($association_id, $options = array())
@@ -405,21 +405,21 @@ class AkHasMany extends AkAssociation
         }
         $object_id = method_exists($Member,'getId') ? $Member->getId() : null;
         if(!empty($object_id)){
-            $this->asssociated_ids[$object_id] = $Member->__hasManyMemberId;
+            $this->associated_ids[$object_id] = $Member->__hasManyMemberId;
         }
     }
 
     function _unsetAssociatedMemberId(&$Member)
     {
         $id = $this->_getAssociatedMemberId($Member);
-        unset($this->asssociated_ids[$id]);
+        unset($this->associated_ids[$id]);
         unset($Member->__hasManyMemberId);
     }
 
     function _getAssociatedMemberId(&$Member)
     {
         if(!empty($Member->__hasManyMemberId)) {
-            return array_search($Member->__hasManyMemberId, $this->asssociated_ids);
+            return array_search($Member->__hasManyMemberId, $this->associated_ids);
         }
         return false;
     }
@@ -606,13 +606,13 @@ class AkHasMany extends AkAssociation
 
     function &getAssociatedModelInstance()
     {
-        static $ModelInstance;
-        if(empty($ModelInstance)){
+        static $ModelInstances;
             $class_name = $this->getOption($this->association_id, 'class_name');
+        if(empty($ModelInstances[$class_name])){  
             Ak::import($class_name);
-            $ModelInstance =& new $class_name();
+            $ModelInstances[$class_name] =& new $class_name();
         }
-        return $ModelInstance;
+        return $ModelInstances[$class_name];
     }
 
 

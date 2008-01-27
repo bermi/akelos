@@ -56,7 +56,7 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 */
 class AkBelongsTo extends AkAssociation
 {
-    var $asssociated_ids = array();
+    var $associated_ids = array();
 
     function &addAssociated($association_id, $options = array())
     {

@@ -1,5 +1,101 @@
 SVN
 ----------------------
+
+* Relocated Active Record database adapters, behaviors and associations into lib/AkActiveRecord/AkDbAdapters, AkActsAsBehaviours and AkAssociations respectively.
+
+----------
+
+## Merging Kaste's branch with the trunk.
+
+    WARNING: IMPORTANT CHANGES AHEAD!
+
+* [387] Refactored AkActiveRecord::find(). 
+* [387] API-change: removed find('first', $id, $options) cause finding one id is always "first". Use find($id, $options); instead.
+* [395] Deprecated AkActiveRecord::find($sql) which silently expanded to AkActiveRecord::find('first', $sql).
+This was ambiguous because find($sql, $bind_variables*) expanded to find('all',*)
+Use AkActiveRecord::find('first', $sql) instead.
+* [396] Added AkDbAdapter between ADODb and the Active Record.
+* [396] Expanded AkUnitTest so its easy to generate Models on the fly like: 
+
+    $AkUnitTest->installAndIncludeModels(array('Article'=>'id,name,description'));
+
+Creates the table 'articles' with specified columns and builds the ActiveRecord Model (class) 'Article'.
+* [396] AkActiveRecord::toYaml now handles ActiveRecord collections.
+
+    User::toYaml($found_users);
+
+* [407] Fixed typos on the Active Record like $asssociated_ids....
+* [407] Improved and refactored Active Record unit tests.
+* [405] Fixed AkHasAndBelongsToMany/AkHasMany::getAssociatedModelInstance which Singleton was badly implemented.
+* [416] Avoided unsetting database profiles.
+* [416] Added support for extra database profiles you can quickly test with different db-adapters like:
+
+    ActiveRecord::establishConnection('super_user');
+    ./test _some_test_case.php sqlite_test_profile 
+
+* [417] Changed NewDataDictionary(db->connection) to db->getDictionary();
+* [418] AkHasAndBelongsToMany now uses AkInstaller to create the join table. Because of that it creates the sequence_table for sqlite straight away.
+* [419] Fixed singleton implementation of Ak::getLogger() 
+* [425] AkInstaller: Added magic 'lock_version' column.
+
+    'lock_version' => 'lock_version int default=1'
+
+* [427] Refactored the Active Record "callback"-chain. Fixes #95 and #94.
+* [427] Added create, update and execute methods to AkDbAdapter.
+* [428] Adding support for late bindings on AkDbAdapter::execute()
+This allows you to safely sanitize parameters before adding them to your custom SQL queries.
+
+    AkDbAdapter::execute(array('select * from articles where id=?', 1));
+
+* [429] Added addLimitAndOffset method to AkDbAdapter for delegating limits and offsets.
+* [431] Implemented renameColumn in AkDbAdapter. Closes #47 and #96.
+* [436] Removed AkActiveRecord::sqlSelect* (now in AkDbAdapter)
+* [437] Moved transactions to AkDbAdapter
+* [439] Fixed a serious issue in a TEST that could lead to data loss in the development database. 
+* [441] Replacing MetaTables() and MetaColumns() with  AkDbAdapter::availableTables() and AkDbAdapter::getColumnDetails($table). 
+* [446] Improved the MenuHeper
+* [446] Changed default options for AkPluginManager::updatePlugin(). Disables externals and checkout.
+* [448] AkActiveRecord::findBySql now uses AkDbAdapter::select
+* [450] AkActiveRecord::incrementCounter() and decrementCounter() now are pseudo-static.
+* [450] AkActiveRecord::updateAttribute() now validates when saving by default. Pass 'false' as third argument to bypass validation.
+* [451] AkInstaller automatically sets '*_count'-columns => 'columnname int default 0'
+* [458] Fixed #103, quoting strings on PostgreSQL.
+* [459] Adding decimal-type support on Active Records.
+* [459] Datatypes for PostgreSQL changed. You need to update/change your table schemas! Run migrations!
+Before this, we kinda hacked Mysql-behavior into PostgreSQL. Thus we didnt used features of Postgre on one side. 
+
+In the long run we had to fix - better now than later - since the design problems only "multiply" when time goes by.  
+
+At this point we wanted to implement the decimal/numeric datatype. And so we had to decide whether to hack further or to solve the underlying issue. This means we HAD to correct a wrong implementation.  
+
+    (simplified type>) Akelos      Postgre (<Actual Type) 
+
+Until now we had:
+
+    boolean  => numeric(1) 
+    integer  => numeric(X,0) 
+                       
+From now on we have:
+    boolean  => bool 
+    integer  => integer  (int4) 
+    decimal  => numeric 
+                                   
+To guide you through this we'll have a test at test/unit/lib/AkActiveRecord/_PostgreSQL_datatype_migration.php. 
+
+First make you comfortably with this test and make it pass. This is a test against a dummy-table of course. 
+(When you're on Postgre 7 you have to modify this test. But you'll see that.)  
+
+Next write appropriate migrations/installers for your real tables. (Again: You should always begin with a test.) 
+
+Keep in mind that we typecast TINYINT as boolean on MySQL. So you cannot use tinyint for other things.                                              
+* [459] Boolean columns now actually have three possible states: true, false and null. Before that null=>false!
+* [461] ActiveRecordHelper::error_messages_for and error_message_on now translate the error messages.
+* [467] NULL values can be saved on boolean and decimal columns. Fixes #114 and #113.
+
+#### End of Kaste merge
+
+-----------
+
 * AkInstaller::createTable() will now add created_at and updated_at columns automatically unless you have one of 
   them in your table declaration or set the option 'timestamp' => false
     
@@ -74,3 +170,5 @@ SVN
 ----------------------
 
  * First public release
+
+

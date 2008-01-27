@@ -16,7 +16,6 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-if(!defined('AK_CACHE_CLASS_INCLUDED')){ define('AK_CACHE_CLASS_INCLUDED',true); // Class overriding trick
 
 // ---- Required Files ---- //
 require_once(AK_LIB_DIR.DS.'Ak.php');
@@ -83,11 +82,6 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 */
 class AkCache extends AkObject
 {
-    // {{{ properties
-
-
-    // --- Private properties --- //
-
 
     /**
     * Handles an instance of current Cache driver
@@ -96,7 +90,7 @@ class AkCache extends AkObject
     * @var object $_driverInstance
     */
     var $_driverInstance = NULL;
-    
+
     /**
     * Ecnables / Disables caching
     *
@@ -104,22 +98,7 @@ class AkCache extends AkObject
     * @var boolean true
     */
     var $cache_enabled = true;
-    
-    
 
-    // }}}
-
-
-
-    // ------ CLASS METHODS ------ //
-
-
-
-
-    // ---- Public methods ---- //
-
-
-    // {{{ init()
 
     /**
     * Class constructor (ALA Akelos Framework)
@@ -175,29 +154,27 @@ class AkCache extends AkObject
 
         switch ($cache_type) {
             case 1:
-            $this->cache_enabled = true;
-            if(!class_exists('Cache_Lite')){
-                require_once(AK_CONTRIB_DIR.'/pear/Cache_Lite/Lite.php');
-            }
-            if(!isset($options['cacheDir'])){
-                $options['cacheDir'] = AK_CACHE_DIR.DS;
-            }
-            $this->_driverInstance =& new Cache_Lite($options);
-            break;
+                $this->cache_enabled = true;
+                if(!class_exists('Cache_Lite')){
+                    require_once(AK_CONTRIB_DIR.'/pear/Cache_Lite/Lite.php');
+                }
+                if(!isset($options['cacheDir'])){
+                    $options['cacheDir'] = AK_CACHE_DIR.DS;
+                }
+                $this->_driverInstance =& new Cache_Lite($options);
+                break;
             case 2:
-            $this->cache_enabled = true;
-            require_once(AK_LIB_DIR.'/AkCache/AkAdodbCache.php');
-            $this->_driverInstance =& new AkAdodbCache();
-            $this->_driverInstance->init($options);
-            break;
+                $this->cache_enabled = true;
+                require_once(AK_LIB_DIR.'/AkCache/AkAdodbCache.php');
+                $this->_driverInstance =& new AkAdodbCache();
+                $this->_driverInstance->init($options);
+                break;
             default:
-            $this->cache_enabled = false;
-            break;
+                $this->cache_enabled = false;
+                break;
         }
     }
 
-    // }}}
-    // {{{ get()
 
     /**
     * Test if a cache is available and (if yes) return it
@@ -212,8 +189,6 @@ class AkCache extends AkObject
         return $this->cache_enabled ? $this->_driverInstance->get($id, $group) : false;
     }
 
-    // }}}
-    // {{{ save()
 
     /**
     * Save some data in the cache
@@ -229,8 +204,6 @@ class AkCache extends AkObject
         return $this->cache_enabled ? $this->_driverInstance->save($data, $id, $group) : true;
     }
 
-    // }}}
-    // {{{ remove()
 
     /**
     * Remove a cache item
@@ -245,8 +218,6 @@ class AkCache extends AkObject
         return $this->cache_enabled ? $this->_driverInstance->remove($id, $group) : true;
     }
 
-    // }}}
-    // {{{ clean()
 
     /**
     * Clean the cache
@@ -272,11 +243,7 @@ class AkCache extends AkObject
         return $this->cache_enabled ? $this->_driverInstance->clean($group, $mode) : true;
     }
 
-    // }}}
-
 
 }
-
-}// End of if(!defined('AK_CACHE_CLASS_INCLUDED')){
 
 ?>

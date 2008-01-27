@@ -7,8 +7,8 @@ class LocationInstaller extends AkInstaller
         $this->createTable('locations', '
         id,
         parent_id,
-        lft integer(10) index,
-        rgt integer(10) index,
+        lft integer index,
+        rgt integer index,
         owner_id int default 1,
         name'
         );

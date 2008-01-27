@@ -1,29 +1,14 @@
 <?php
 
+defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
+
 class HasManyTestCase extends AkUnitTest 
 {
-    /**/
+
     function test_start()
     {
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-        require_once(AK_LIB_DIR.DS.'AkInstaller.php');
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkHasOne.php');
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkBelongsTo.php');
-        require_once(AK_APP_DIR.DS.'shared_model.php');
-        require_once(AK_APP_DIR.DS.'installers'.DS.'framework_installer.php');
-        $installer = new FrameworkInstaller();
-        $installer->uninstall();
-        $installer->install();
-        $models = array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType');
-        foreach ($models as $model){
-            require_once(AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($model).'_installer.php');
-            require_once(AK_MODELS_DIR.DS.AkInflector::underscore($model).'.php');
-            $installer_name = $model.'Installer';
-            $installer = new $installer_name();
-            $installer->uninstall();
-            $installer->install();
-        }
-        unset($_SESSION['__activeRecordColumnsSettingsCache']);
+        $this->installAndIncludeModels(array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType'));
     }
 
     function test_for_has_many()
@@ -280,11 +265,14 @@ class HasManyTestCase extends AkUnitTest
        
         $this->assertTrue($Post =& $Post->find(10, array('include' => 'comments')));
         
-        
+        // order cannot be guaranteed! 
+        $expected_ids = array(1,2,3,4,5);              // on my postgreSQL $Post->comment->associated_ids = array(5,4,3,2,1);
         foreach (array_keys($Post->comments) as $k){
-            $this->assertEqual($Post->comments[$k]->getId(), $k+1);
+            $this->assertTrue(in_array($Post->comments[$k]->getId(),$expected_ids));
+            unset($expected_ids[$Post->comments[$k]->getId()-1]);
         }
-        
+        $this->assertTrue(empty($expected_ids));
+
         // Comment 10 should exist but unrelated to a post
         $this->assertTrue($Comment =& $Post->comments[$k]->find(10));
         $this->assertNull($Comment->get('post_id'));
@@ -297,5 +285,6 @@ class HasManyTestCase extends AkUnitTest
     /**//**//**/
 }
 
+ak_test('HasManyTestCase',true);
 
 ?>

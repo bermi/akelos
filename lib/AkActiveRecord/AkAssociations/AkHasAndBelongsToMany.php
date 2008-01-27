@@ -110,7 +110,7 @@ class AkHasAndBelongsToMany extends AkAssociation
      * Join object place holder
      */
     var $JoinObject;
-    var $asssociated_ids = array();
+    var $associated_ids = array();
     var $association_id;
     var $_automatically_create_join_model_files = AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES;
 
@@ -173,7 +173,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         $this->setAssociatedId($association_id, $options['handler_name']);
         $Collection->association_id = $association_id;
 
-        $Collection->_loadJoinObject() ? null : trigger_error(Ak::t('Could find join model %model_name for hasAndBelongsToMany association %id',array('%table_name'=>$options['join_class_name'],'id'=>$this->association_id)),E_USER_ERROR);
+        $Collection->_loadJoinObject();
 
         return $Collection;
     }
@@ -216,22 +216,17 @@ class AkHasAndBelongsToMany extends AkAssociation
         }
         $options = $this->getOptions($this->association_id);
 
-        $join_model_file = AkInflector::toModelFilename($options['join_class_name']);
-        if(file_exists($join_model_file)){
-            require_once($join_model_file);
-            if(class_exists($options['join_class_name'])){
+        if (class_exists($options['join_class_name']) || $this->_loadJoinClass($options['join_class_name']) || $this->_createJoinClass()) {
                 $this->JoinObject =& new $options['join_class_name']();
+            if($this->_tableExists($options['join_table']) || $this->_createJoinTable()){
                 $this->JoinObject->setPrimaryKey($options['foreign_key']);
                 return true;
+                
+            } else {
+                trigger_error(Ak::t('Could not find join table %table_name for hasAndBelongsToMany association %id',array('%table_name'=>$options['join_table'],'id'=>$this->association_id)),E_USER_ERROR);
             }
-        }
-        if($this->_createJoinClass()){
-            $this->JoinObject =& new $options['join_class_name']();
-            if(!$this->_hasJoinTable()){
-                $this->_createJoinTable() ? null : trigger_error(Ak::t('Could not find join table %table_name for hasAndBelongsToMany association %id',array('%table_name'=>$options['join_table'],'id'=>$this->association_id)),E_USER_ERROR);
-            }
-            $this->JoinObject->setPrimaryKey($options['foreign_key']);
-            return true;
+        } else {
+            trigger_error(Ak::t('Could not find join model %model_name for hasAndBelongsToMany association %id',array('%table_name'=>$options['join_class_name'],'id'=>$this->association_id)),E_USER_ERROR); return false;
         }
         return false;
     }
@@ -241,10 +236,17 @@ class AkHasAndBelongsToMany extends AkAssociation
         $options = $this->getOptions($this->association_id);
         return !empty($this->JoinObject) && (strtolower($options['join_class_name']) == strtolower(get_class($this->JoinObject)));
     }
+    
+    function _loadJoinClass($class_name)
+    {
+        $model_file = AkInflector::toModelFilename($class_name);
+        return file_exists($model_file) && require_once($model_file);
+    }
+    
     function _createJoinClass()
     {
         $options = $this->getOptions($this->association_id);
-        if(!class_exists($options['join_class_name'])){
+
             $class_file_code = "<?php \n\n//This code was generated automatically by the active record hasAndBelongsToMany Method\n\n";
             $class_code =
             "class {$options['join_class_name']} extends {$options['join_class_extends']} {
@@ -264,30 +266,22 @@ class AkHasAndBelongsToMany extends AkAssociation
             }else{
                 eval($class_code);
             }
-        }
         return class_exists($options['join_class_name']);
     }
 
-    function _hasJoinTable()
+    function _tableExists($table_name)
     {
-        $options = $this->getOptions($this->association_id);
-        if(isset($this->JoinObject)){
-            return $this->JoinObject->setTableName($options['join_table'], true, true);
-        }
-        return false;
+        return $this->JoinObject->setTableName($table_name, true, true);
     }
 
     function _createJoinTable()
     {
         $options = $this->getOptions($this->association_id);
-        require_once(AK_LIB_DIR.DS.'AkDbManager.php');
-
-        AkDbManager::createTable($options['join_table'], "id I AUTO KEY,{$options['foreign_key']} I, {$options['association_foreign_key']} I",array('mysql' => 'TYPE=InnoDB','timestamp'=>false),false,
-        "{$options['foreign_key']},{$options['association_foreign_key']}");
-        return $this->_hasJoinTable();
+        require_once(AK_LIB_DIR.DS.'AkInstaller.php');
+        $Installer =& new AkInstaller();
+        $Installer->createTable($options['join_table'],"id,{$options['foreign_key']},{$options['association_foreign_key']}",array('timestamp'=>false));
+        return $this->JoinObject->setTableName($options['join_table'],false);
     }
-
-
 
     function &load($force_reload = false)
     {
@@ -500,7 +494,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                         unset($this->Owner->{$this->association_id}[$kk]);
                     }
                 }
-                unset($this->asssociated_ids[$record_id]);
+                unset($this->associated_ids[$record_id]);
                 $this->_unsetAssociatedMemberId($records[$k]);
                 if(!empty($options['after_remove']) && method_exists($this->Owner, $options['after_remove'])){
                     $this->Owner->{$options['after_remove']}($records[$k]);
@@ -520,21 +514,21 @@ class AkHasAndBelongsToMany extends AkAssociation
         }
         $object_id = $Member->getId();
         if(!empty($object_id)){
-            $this->asssociated_ids[$object_id] = $Member->__hasAndBelongsToManyMemberId;
+            $this->associated_ids[$object_id] = $Member->__hasAndBelongsToManyMemberId;
         }
     }
 
     function _unsetAssociatedMemberId(&$Member)
     {
         $id = $this->_getAssociatedMemberId($Member);
-        unset($this->asssociated_ids[$id]);
+        unset($this->associated_ids[$id]);
         unset($Member->__hasAndBelongsToManyMemberId);
     }
 
     function _getAssociatedMemberId(&$Member)
     {
         if(!empty($Member->__hasAndBelongsToManyMemberId)) {
-            return array_search($Member->__hasAndBelongsToManyMemberId, $this->asssociated_ids);
+            return array_search($Member->__hasAndBelongsToManyMemberId, $this->associated_ids);
         }
         return false;
     }
@@ -542,7 +536,7 @@ class AkHasAndBelongsToMany extends AkAssociation
     function _hasAssociatedMember(&$Member)
     {
         $options = $this->getOptions($this->association_id);
-        if($options['unique'] && !$Member->isNewRecord() && isset($this->asssociated_ids[$Member->getId()])){
+        if($options['unique'] && !$Member->isNewRecord() && isset($this->associated_ids[$Member->getId()])){
             return true;
         }
         $id = $this->_getAssociatedMemberId($Member);
@@ -601,11 +595,11 @@ class AkHasAndBelongsToMany extends AkAssociation
     {
         $options = $this->getOptions($this->association_id);
         if(empty($options['finder_sql'])){
-            $sqlite = substr($this->Owner->_db->databaseType,0,6) == 'sqlite';
+            $is_sqlite = $this->Owner->_db->type() == 'sqlite';
             $options['finder_sql'] = "SELECT {$options['table_name']}.* FROM {$options['table_name']} ".
             $this->associationJoin().
             "WHERE ".$this->Owner->getTableName().'.'.$this->Owner->getPrimaryKey()." ".
-            ($sqlite ? ' LIKE ' : ' = ').' '.$this->Owner->quotedId(); // (HACK FOR SQLITE) Otherwise returns wrong data
+                ($is_sqlite ? ' LIKE ' : ' = ').' '.$this->Owner->quotedId(); // (HACK FOR SQLITE) Otherwise returns wrong data
             $options['finder_sql'] .= !empty($options['conditions']) ? ' AND '.$options['conditions'].' ' : '';
             $options['finder_sql'] .= !empty($options['conditions']) ? ' AND '.$options['conditions'].' ' : '';
         }
@@ -752,13 +746,13 @@ class AkHasAndBelongsToMany extends AkAssociation
 
     function &getAssociatedModelInstance()
     {
-        static $ModelInstance;
-        if(empty($ModelInstance)){
+        static $ModelInstances;
             $class_name = $this->getOption($this->association_id, 'class_name');
+        if(empty($ModelInstances[$class_name])){  
             Ak::import($class_name);
-            $ModelInstance =& new $class_name();
+            $ModelInstances[$class_name] =& new $class_name();
         }
-        return $ModelInstance;
+        return $ModelInstances[$class_name];
     }
 
 

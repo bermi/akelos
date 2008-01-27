@@ -165,7 +165,7 @@ class AkActsAsTree extends AkObserver
             
         // True condition in case we don't have a scope
         }elseif(empty($this->scope_condition) && empty($this->scope)){
-            $this->scope_condition = (substr($this->_ActiveRecordInstance->_db->databaseType,0,4) == 'post') ? 'true' : '1';
+            $this->scope_condition = ($this->_ActiveRecordInstance->_db->type() == 'postgre') ? 'true' : '1';
         }elseif (!empty($this->scope)){
             $this->setScopeCondition(join(' AND ',array_diff(array_map(array(&$this,'getScopedColumn'),(array)$this->scope),array(''))));
         }

@@ -58,13 +58,9 @@ class test_of_Ak_object_inspection extends  UnitTestCase
     {
         require_once(AK_CONTRIB_DIR.'/adodb/adodb.inc.php');
 
-        if(substr($GLOBALS['ak_test_db_dns'], 0, 6) == 'mysql:'){
-            $GLOBALS['ak_test_db_dns'] = substr_replace($GLOBALS['ak_test_db_dns'], 'mysqlt:', 0, 6);
-        }
-
-        $db =& Ak::db($GLOBALS['ak_test_db_dns']);
+        $db =& Ak::db();
         $this->assertFalse(!$db,'Connecting to the database. Please check your test_config.php file in order to set up a copy of $dns into $GLOBALS["ak_test_db_dns"]');
-        $this->assertReference($db,Ak::db($GLOBALS['ak_test_db_dns']),'Checking db connection singleton');
+        $this->assertReference($db,Ak::db(),'Checking db connection singleton');
     }
 
     function Test_t()

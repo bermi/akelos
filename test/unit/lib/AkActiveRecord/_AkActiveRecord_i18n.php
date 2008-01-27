@@ -11,7 +11,6 @@ class test_AkActiveRecord_i18n extends  AkUnitTest
         $this->installAndIncludeModels(array('Article'));
     }
 
-
     function test_multilingual_setting()
     {
         $Article = new Article();

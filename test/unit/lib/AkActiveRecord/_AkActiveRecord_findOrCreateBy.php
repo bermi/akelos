@@ -28,8 +28,10 @@ class test_AkActiveRecord_findOrCreateBy extends  AkUnitTest
 
         $SavedBermi =& $Account->findFirstBy('username', 'Bermi');
         $this->assertEqual($SavedBermi->getId(), $Bermi->getId());
+        $SavedBermi =& $Account->findOrCreateBy('username', 'Bermi');
+        $this->assertEqual($SavedBermi->getId(), $Bermi->getId());
 
-        $SavedAlicia =& $Account->findFirstBy('username', 'Alicia');
+        $SavedAlicia =& $Account->findOrCreateBy('username', 'Alicia');
         $this->assertEqual($SavedAlicia->getId(), $Alicia->getId());
     }
 

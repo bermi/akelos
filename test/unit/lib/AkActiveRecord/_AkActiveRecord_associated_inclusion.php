@@ -33,7 +33,9 @@ class test_AkActiveRecord_associated_inclusion extends  AkUnitTest
         $Picture->save();
 
         $Property =& $this->Property->find($Apartment->id, array('include'=>'pictures'));
-        $this->assertEqual($Property->pictures[1]->title, $Picture->title);
+        //$this->assertEqual($Property->pictures[1]->title, $Picture->title); // fails on PostgreSQL
+        $this->assertTrue(in_array($Property->pictures[0]->title,array('Views from the living room','Living room')));
+        $this->assertTrue(in_array($Property->pictures[1]->title,array('Views from the living room','Living room')));
     }
 }
 

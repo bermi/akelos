@@ -50,7 +50,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
     {
         if(empty($this->$association_type) && in_array($association_type, array('hasOne','belongsTo','hasMany','hasAndBelongsToMany'))){
             $association_handler_class_name = 'Ak'.ucfirst($association_type);
-            require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.$association_handler_class_name.'.php');
+            require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociations'.DS.$association_handler_class_name.'.php');
             $this->$association_type =& new $association_handler_class_name($this);
         }
         return !empty($this->$association_type);
@@ -228,7 +228,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
         return !empty($this->_associations) && count($this->_associations) > 0;
     }
 
-    function &findWithAssociations($options, $limit = null, $offset = null)
+    function &findWithAssociations($options)
     {
         $result = false;
         $options['include'] = is_array($options['include']) ? $options['include'] : array($options['include']);
@@ -272,12 +272,11 @@ class AkAssociatedActiveRecord extends AkBaseModel
         }
 
         $sql = trim($this->constructFinderSqlWithAssociations($options));
-        $sql = substr($sql, -5) == 'AND =' ? substr($sql, 0,-5) : $sql;
 
         if(!empty($options['bind']) && is_array($options['bind']) && strstr($sql,'?')){
             $sql = array_merge(array($sql),$options['bind']);
         }
-        $result =& $this->_findBySqlWithAssociations($sql, $limit, $offset, $options['include'], empty($options['virtual_limit']) ? false : $options['virtual_limit']);
+        $result =& $this->_findBySqlWithAssociations($sql, $options['include'], empty($options['virtual_limit']) ? false : $options['virtual_limit']);
 
         return $result;
     }
@@ -304,20 +303,21 @@ class AkAssociatedActiveRecord extends AkBaseModel
      */
     function constructFinderSqlWithAssociations($options, $include_owner_as_selection = true)
     {
+        $sql = 'SELECT ';
         $selection = '';
         if($include_owner_as_selection){
             foreach (array_keys($this->getColumns()) as $column_name){
                 $selection .= '__owner.'.$column_name.' AS __owner_'.$column_name.', ';
             }
-
-            $sql  = 'SELECT '.trim($selection.@$options['selection'], ', ').' '.
-            'FROM '.$this->getTableName().' AS __owner '.
-            (!empty($options['joins']) ? $options['joins'].' ' : '');
+            $selection .= (isset($options['selection']) ? $options['selection'].' ' : '');
+            $selection = trim($selection,', ').' '; // never used by the unit tests
         }else{
-            $sql  = 'SELECT '.$options['selection'].'.* '.
-            'FROM '.$options['selection'].' '.
-            (!empty($options['joins']) ? $options['joins'].' ' : '');
+            // used only by HasOne::findAssociated
+            $selection .= $options['selection'].'.* ';
         }
+        $sql .= $selection;
+        $sql .= 'FROM '.($include_owner_as_selection ? $this->getTableName().' AS __owner ' : $options['selection'].' ');
+        $sql .= (!empty($options['joins']) ? $options['joins'].' ' : '');
 
         empty($options['conditions']) ? null : $this->addConditions($sql, $options['conditions']);
 
@@ -326,6 +326,8 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $options['order'] = $options['sort'];
         }
         $sql  .= !empty($options['order']) ? ' ORDER BY  '.$options['order'] : '';
+
+        $this->_db->addLimitAndOffset($sql,$options);
         return $sql;
     }
 
@@ -333,91 +335,62 @@ class AkAssociatedActiveRecord extends AkBaseModel
     /**
      * @todo Refactor in order to increase performance of associated inclussions
      */
-    function &_findBySqlWithAssociations($sql, $limit = null, $offset = null, $included_associations = array(), $virtual_limit = false)
+    function &_findBySqlWithAssociations($sql, $included_associations = array(), $virtual_limit = false)
     {
-        if(is_array($sql)){
-            $sql_query = array_shift($sql);
-            $bindings = is_array($sql) && count($sql) > 0 ? $sql : array($sql);
-            $sql = $sql_query;
-        }
-        $this->setConnection();
-
-        AK_LOG_EVENTS ? $this->_startSqlBlockLog() : null;
-
         $objects = array();
-        $_included_results = array(); // Used only in conjuntion with virtual limits for doing find('first',...include'=>...
-        if(is_integer($limit)){
-            if(is_integer($offset)){
-                $results = !empty($bindings) ?
-                $this->_db->SelectLimit($sql, $limit, $offset, $bindings) :
-                $this->_db->SelectLimit($sql, $limit, $offset);
-            }else {
-                $results = !empty($bindings) ?
-                $this->_db->SelectLimit($sql, $limit, -1, $bindings) :
-                $this->_db->SelectLimit($sql, $limit);
-            }
-        }else{
-            $results = !empty($bindings) ?
-            $this->_db->Execute($sql, $bindings) :
-            $this->_db->Execute($sql);
+        $results = $this->_db->execute ($sql,'find with associations');
+        if (!$results){
+            return $objects;
         }
-
-        AK_LOG_EVENTS ? $this->_endSqlBlockLog() : null;
-
-        if(!$results && AK_DEBUG){
-            trigger_error($this->_db->ErrorMsg(), E_USER_NOTICE);
-        }else{
-            $objects = array();
-            $i = 0;
-            $associated_ids = $this->getAssociatedIds();
-            $number_of_associates = count($associated_ids);
-            $object_associates_details = array();
-
-            $ids = array();
-            while ($record = $results->FetchRow()) {
-                $this_item_attributes = array();
-                $associated_items = array();
-                foreach ($record as $column=>$value){
-                    if(!is_numeric($column)){
-                        if(substr($column,0,8) == '__owner_'){
-                            $attribute_name = substr($column,8);
-                            $this_item_attributes[$attribute_name] = $value;
-                        }elseif(preg_match('/^_('.join('|',$associated_ids).')_(.+)/',$column, $match)){
-                            $associated_items[$match[1]][$match[2]] = $value;
-                        }
+        
+        $i = 0;
+        $associated_ids = $this->getAssociatedIds();
+        $number_of_associates = count($associated_ids);
+        $_included_results = array(); // Used only in conjuntion with virtual limits for doing find('first',...include'=>...
+        $object_associates_details = array();
+        $ids = array();
+        while ($record = $results->FetchRow()) {
+            $this_item_attributes = array();
+            $associated_items = array();
+            foreach ($record as $column=>$value){
+                if(!is_numeric($column)){
+                    if(substr($column,0,8) == '__owner_'){
+                        $attribute_name = substr($column,8);
+                        $this_item_attributes[$attribute_name] = $value;
+                    }elseif(preg_match('/^_('.join('|',$associated_ids).')_(.+)/',$column, $match)){
+                        $associated_items[$match[1]][$match[2]] = $value;
                     }
                 }
-
-
-                // We need to keep a pointer to unique parent elements in order to add associates to the first loaded item
-                $e = null;
-                $object_id = $this_item_attributes[$this->getPrimaryKey()];
-
-                if(!empty($virtual_limit)){
-                    $_included_results[$object_id] = $object_id;
-                    if(count($_included_results) > $virtual_limit * $number_of_associates){
-                        continue;
-                    }
-                }
-
-                if(!isset($ids[$object_id])){
-                    $ids[$object_id] = $i;
-                    $attributes_for_instantation = $this->getOnlyAvailableAtrributes($this_item_attributes);
-                    $attributes_for_instantation['load_associations'] = true;
-                    $objects[$i] =& $this->instantiate($attributes_for_instantation, false);
-                }else{
-                    $e = $i;
-                    $i = $ids[$object_id];
-                }
-
-                foreach ($associated_items as $association_id=>$attributes){
-                    if(count(array_diff($attributes, array(''))) > 0){
-                        $object_associates_details[$i][$association_id][md5(serialize($attributes))] = $attributes;
-                    }
-                }
-
-                $i = !is_null($e) ? $e : $i+1;
             }
+
+            // We need to keep a pointer to unique parent elements in order to add associates to the first loaded item
+            $e = null;
+            $object_id = $this_item_attributes[$this->getPrimaryKey()];
+
+            if(!empty($virtual_limit)){
+                $_included_results[$object_id] = $object_id;
+                if(count($_included_results) > $virtual_limit * $number_of_associates){
+                    continue;
+                }
+            }
+
+            if(!isset($ids[$object_id])){
+                $ids[$object_id] = $i;
+                $attributes_for_instantation = $this->getOnlyAvailableAttributes($this_item_attributes);
+                $attributes_for_instantation['load_associations'] = true;
+                $objects[$i] =& $this->instantiate($attributes_for_instantation, false);
+            }else{
+                $e = $i;
+                $i = $ids[$object_id];
+            }
+
+            foreach ($associated_items as $association_id=>$attributes){
+                if(count(array_diff($attributes, array(''))) > 0){
+                    $object_associates_details[$i][$association_id][md5(serialize($attributes))] = $attributes;
+                }
+            }
+
+            $i = !is_null($e) ? $e : $i+1;
         }
 
         if(!empty($object_associates_details)){
@@ -438,12 +411,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
             }
         }
 
-        if(!empty($objects)){
-            $result =& $objects;
-        }else{
-            $result = false;
-        }
-
+        $result =& $objects;
         return $result;
     }
 

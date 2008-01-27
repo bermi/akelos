@@ -12,33 +12,26 @@ if(!defined('ALL_TESTS_RUNNER') && empty($test)){
     @session_start();
 }
 
+//these partials are not refactored yet. so they must be run in sequence!
 $partial_tests = array(
-'AkActiveRecord_1',
-'AkActiveRecord_2',
-'AkActiveRecord_3',
-'AkActiveRecord_finders',
-'AkActiveRecord_locking',
-'AkActiveRecord_table_inheritance',
-'AkActiveRecord_i18n',
-'AkActiveRecord_multiple_inclussion',
-'AkActiveRecord_accessible_attributes',
-'AkActiveRecord_calculations',
-'AkActiveRecord_associated_inclusion',
-'AkActiveRecord_findOrCreateBy',
+    '_AkActiveRecord_1.php',
+    '_AkActiveRecord_2.php',
+    '_AkActiveRecord_3.php'
 );
 
 foreach ($partial_tests as $partial_test){
-    $test->addTestFile(AK_LIB_TESTS_DIRECTORY.DS.'AkActiveRecord'.DS.'_'.$partial_test.'.php');
+    $test->addTestFile(AK_LIB_TESTS_DIRECTORY.DS.'AkActiveRecord'.DS.$partial_test);
 }
 
 // Acts as, Validators, Associations and Observer tests
 if(!ALL_TESTS_RUNNER){
     foreach (Ak::dir(AK_LIB_TESTS_DIRECTORY.DS.'AkActiveRecord') as $active_record_test){
-        if($active_record_test[0] != '_'){
+        if(!is_array($active_record_test) && !in_array($active_record_test, $partial_tests)){
             $test->addTestFile(AK_LIB_TESTS_DIRECTORY.DS.'AkActiveRecord'.DS.$active_record_test);
         }
     }
 }
+
 
 if(!ALL_TESTS_RUNNER){
     if (TextReporter::inCli()) {

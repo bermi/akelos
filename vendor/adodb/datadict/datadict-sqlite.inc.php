@@ -34,18 +34,35 @@ class ADODB2_sqlite extends ADODB_DataDict {
 		case 'D': return 'DATE';
 		case 'T': return 'DATE';
 		
-		case 'L': return 'TINYINT';
-		case 'I': return 'DECIMAL(10)';
-		case 'I1': return 'DECIMAL(3)';
-		case 'I2': return 'DECIMAL(5)';
-		case 'I4': return 'DECIMAL(10)';
-		case 'I8': return 'DECIMAL(20)';
+		case 'L': return 'BOOLEAN';
+		case 'I': return 'INTEGER';
+		case 'I1': return 'INTEGER';
+		case 'I2': return 'INTEGER';
+		case 'I4': return 'INTEGER';
+		case 'I8': return 'INTEGER';
 		
-		case 'F': return 'DOUBLE';
+		case 'F': return 'FLOAT';
 		case 'N': return 'DECIMAL';
 		default:
 			return $meta;
 		}
+	}
+
+    function MetaType($t,$len=-1,$fieldobj=false)
+	{
+        if (is_object($t)) {
+            $fieldobj = $t;
+            $t = $fieldobj->type;
+            $len = $fieldobj->max_length;
+        }
+        switch (strtoupper($t)) {
+            case 'TEXT':
+                return 'X';
+            case 'FLOAT':
+            case 'DOUBLE':
+                return 'F';
+        }
+        return parent::MetaType($t,$len,$fieldobj);
 	}
 
 	function AlterColumnSQL($tabname, $flds)
@@ -65,63 +82,4 @@ class ADODB2_sqlite extends ADODB_DataDict {
 	
 }
 
-/*
-//db2
- 	function ActualType($meta)
-	{
-		switch($meta) {
-		case 'C': return 'VARCHAR';
-		case 'X': return 'VARCHAR'; 
-		
-		case 'C2': return 'VARCHAR'; // up to 32K
-		case 'X2': return 'VARCHAR';
-		
-		case 'B': return 'BLOB';
-			
-		case 'D': return 'DATE';
-		case 'T': return 'TIMESTAMP';
-		
-		case 'L': return 'SMALLINT';
-		case 'I': return 'INTEGER';
-		case 'I1': return 'SMALLINT';
-		case 'I2': return 'SMALLINT';
-		case 'I4': return 'INTEGER';
-		case 'I8': return 'BIGINT';
-		
-		case 'F': return 'DOUBLE';
-		case 'N': return 'DECIMAL';
-		default:
-			return $meta;
-		}
-	}
-	
-// ifx
-function ActualType($meta)
-	{
-		switch($meta) {
-		case 'C': return 'VARCHAR';// 255
-		case 'X': return 'TEXT'; 
-		
-		case 'C2': return 'NVARCHAR';
-		case 'X2': return 'TEXT';
-		
-		case 'B': return 'BLOB';
-			
-		case 'D': return 'DATE';
-		case 'T': return 'DATETIME';
-		
-		case 'L': return 'SMALLINT';
-		case 'I': return 'INTEGER';
-		case 'I1': return 'SMALLINT';
-		case 'I2': return 'SMALLINT';
-		case 'I4': return 'INTEGER';
-		case 'I8': return 'DECIMAL(20)';
-		
-		case 'F': return 'FLOAT';
-		case 'N': return 'DECIMAL';
-		default:
-			return $meta;
-		}
-	}
-*/
 ?>

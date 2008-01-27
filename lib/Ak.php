@@ -45,12 +45,12 @@ class Ak
 {
 
     /**
-    * Gets an instance of AdoDb database connection
+    * Gets an instance of AkDbAdapter
     *
     * Whenever a database connection is required you can get a
     * reference to the default database connection by doing:
     *
-    * $db =& Ak:db(); // get an adodb instance
+    * $db =& Ak::db(); // get an adodb instance
     * 
     * AdoDB manual can be found at http://phplens.com/adodb/
     *
@@ -61,43 +61,30 @@ class Ak
     * @static
     * @return resource Php AdoDb instance.
     */
-    function &db($dsn = null, $connection_id = null)
+    function &db($dsn = null)
     {
-        static $db, $default_connection_id;
-
-        // In order to retrieve a database connection we just need to provide its identifier
-        if(empty($default_connection_id)){
-            $default_connection_id = md5($dsn);
+        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbAdapter.php');
+        if (empty($dsn) || !is_array($dsn)){
+            return AkDbAdapter::getInstance();
         }
-        $connection_id = empty($connection_id) ? $default_connection_id : $connection_id;
-        
-        if(empty($db[$connection_id])){
-            require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb.inc.php');
-
-            if(substr($dsn, 0, 6) == 'mysql:'){
-                $dsn = substr_replace($dsn, 'mysqlt:', 0, 6);
-            }
-
-            if (!$db[$connection_id] = (AK_DEBUG ? NewADOConnection($dsn) : @NewADOConnection($dsn))){
-                error_reporting(E_ALL);
-                if(defined('AK_DATABASE_CONNECTION_FAILURE_CALLBACK') && function_exists(AK_DATABASE_CONNECTION_FAILURE_CALLBACK)){
-                    $fn = AK_DATABASE_CONNECTION_FAILURE_CALLBACK;
-                    $fn();
-                }
-                if(!AK_PHP5 && substr($dsn,0,6) == 'sqlite'){
-                    echo "\nWarning, sqlite support is not available by default on PHP4.\n Check your PHP version by running \"env php -v\", and change the first line in your scripts/ so they point to a php5 binary\n\n";
-                }
-                die(Ak::t('Connection to the database failed.').' '.
-                (AK_DEBUG?preg_replace('/\/\/(\w+):(.*)@/i','//$1:******@', urldecode($dsn))."\n":''));
-            }
-            $db[$connection_id]->debug = AK_DEBUG == 2;
-            defined('AK_DATABASE_CONNECTION_AVAILABLE') ? null : define('AK_DATABASE_CONNECTION_AVAILABLE', true);
-            $dsn = '';
-        }
-        return $db[$connection_id];
+        return AkDbAdapter::getInstance($dsn);
     }
 
-
+    /**
+     * @param string $message
+     * @param [OPTIONAL] $fatal triggers even in production-mode
+     */
+    function DeprecateWarning($message, $fatal=false)
+    {
+        if (!$fatal && AK_ENVIRONMENT == 'production'){
+            return;
+        }
+        if (is_array($message)){
+            trigger_error(Ak::t("DEPRECATED WARNING: ".array_shift($message),$message), E_USER_NOTICE);
+        } else {
+            trigger_error(Ak::t("DEPRECATED WARNING: ".$message), E_USER_NOTICE);
+        }
+    }
 
     /**
     * Gets a cache object singleton instance
@@ -509,7 +496,7 @@ class Ak
 
         $origin = Ak::_getRestrictedPath($origin, $options);
         $target = Ak::_getRestrictedPath($target, $options);
-        
+
         if(empty($origin) || empty($target)){
             return false;
         }
@@ -559,7 +546,7 @@ class Ak
         if($options['ftp']){
             $path = trim(str_replace(array(DS,'//'),array('/','/'), $path),'/');
         }
-        
+
         return $path;
     }
 
@@ -819,8 +806,9 @@ class Ak
         static $Logger;
         if(empty($Logger)){
             require_once(AK_LIB_DIR.DS.'AkLogger.php');
-            $Logger =& new AkLogger();
+            $Logger = new AkLogger();
         }
+        $return =& $Logger;
         return $Logger;
     }
 
@@ -869,19 +857,19 @@ class Ak
                 ([0-9]{2}):? # minute
                 ([0-9\.]{0,4}) # seconds
             )?/x", ($iso_date_or_hour), $rr)){
-            if (preg_match("|^(([0-9]{1,2}):?([0-9]{1,2}):?([0-9\.]{1,4}))?|", ($iso_date_or_hour), $rr)){
-                return empty($rr[0]) ? Ak::time() : mktime($rr[2],$rr[3],$rr[4]);
-            }
-        }else{
-            if($rr[1]>=2038 || $rr[1]<=1970){
-                require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb-time.inc.php');
-                return isset($rr[5]) ? adodb_mktime($rr[5],$rr[6],(int)$rr[7],$rr[2],$rr[3],$rr[1]) : adodb_mktime(0,0,0,$rr[2],$rr[3],$rr[1]);
-            }else{
-                return isset($rr[5]) ? mktime($rr[5],$rr[6],(int)$rr[7],$rr[2],$rr[3],$rr[1]) : mktime(0,0,0,$rr[2],$rr[3],$rr[1]);
-            }
+        if (preg_match("|^(([0-9]{1,2}):?([0-9]{1,2}):?([0-9\.]{1,4}))?|", ($iso_date_or_hour), $rr)){
+            return empty($rr[0]) ? Ak::time() : mktime($rr[2],$rr[3],$rr[4]);
         }
-        trigger_error(Ak::t('Invalid ISO date. You must supply date in one of the following formats: "year-month-day hour:min:sec", "year-month-day", "hour:min:sec"'));
-        return false;
+            }else{
+                if($rr[1]>=2038 || $rr[1]<=1970){
+                    require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb-time.inc.php');
+                    return isset($rr[5]) ? adodb_mktime($rr[5],$rr[6],(int)$rr[7],$rr[2],$rr[3],$rr[1]) : adodb_mktime(0,0,0,$rr[2],$rr[3],$rr[1]);
+                }else{
+                    return isset($rr[5]) ? mktime($rr[5],$rr[6],(int)$rr[7],$rr[2],$rr[3],$rr[1]) : mktime(0,0,0,$rr[2],$rr[3],$rr[1]);
+                }
+            }
+            trigger_error(Ak::t('Invalid ISO date. You must supply date in one of the following formats: "year-month-day hour:min:sec", "year-month-day", "hour:min:sec"'));
+            return false;
     }
 
     /**
@@ -1676,7 +1664,7 @@ class Ak
         if (AK_OS == 'WINDOWS' && $mime == 'application/octet-stream' && is_file($file)){
             $mime = false;
         }
-        
+
         if(empty($mime)){
             empty($mime_types) ? require(AK_LIB_DIR.DS.'utils'.DS.'mime_types.php') : null;
             $file_extension = substr($file,strrpos($file,'.')+1);
@@ -1831,7 +1819,7 @@ class Ak
         }
         return strtr($html, $translation_table_or_quote_style);
     }
-    
+
     /**
     * Loads the plugins found at app/vendor/plugins
     */
@@ -1868,18 +1856,18 @@ function ak_test($test_case_name, $use_sessions = false)
 
 function ak_compat($function_name)
 {
-	if(!function_exists($function_name)){
+    if(!function_exists($function_name)){
         require_once(AK_VENDOR_DIR.DS.'pear'.DS.'PHP'.DS.'Compat'.DS.'Function'.DS.$function_name.'.php');
     }
 }
 
 function ak_generate_mock($name)
 {
-	static $Mock;
-	if(empty($Mock)){
-		$Mock = new Mock();
-	}
-	$Mock->generate($name);
+    static $Mock;
+    if(empty($Mock)){
+        $Mock = new Mock();
+    }
+    $Mock->generate($name);
 }
 
 /**

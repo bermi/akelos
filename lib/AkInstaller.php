@@ -24,11 +24,54 @@ defined('AK_APP_INSTALLERS_DIR') ? null : define('AK_APP_INSTALLERS_DIR', AK_APP
 // Install scripts might use more RAM than normal requests.
 @ini_set('memory_limit', -1);
 
+/**
+ * 
+ * == Column Types ==
+ * 
+ * Akelos natively supports the following column data types.
+ * 
+ * integer|int, float, decimal, 
+ * string, text,
+ * datetime|timestamp, date,
+ * binary,
+ * boolean
+ * 
+ * Caution: Because boolean is virtual tinyint on mysql, you can't use tinyint for other things! 
+ * 
+ *  
+ * == Default settings for columns ==
+ * 
+ * AkInstaller suggests some default values for the column-details.
+ * 
+ * So
+ * <code>
+ *     $this->createTable('Post','title,body,created_at,is_draft');
+ * </code>
+ * 
+ * will actually create something like this: 
+ * 
+ *     title => string(255), body => text, created_at => datetime, is_draft => boolean not null default 0 index
+ *   
+ * 
+ * column_name                    | default setting
+ * -------------------------------+--------------------------------------------
+ * id                             | integer not null auto_increment primary_key
+ * *_id,*_by                      | integer index
+ * description,content,body       | text
+ * position                       | integer index
+ * *_count                        | integer default 0
+ * lock_version                   | integer default 1
+ * *_at                           | datetime
+ * *_on                           | date
+ * is_*,has_*,do_*,does_*,are_*   | boolean not null default 0 index
+ * *somename                      | multilingual column => en_somename, es_somename
+ * default                        | string
+ * 
+ */
 class AkInstaller
 {
     var $db;
     var $data_dictionary;
-    var $debug = false;
     var $available_tables = array();
     var $vervose = true;
     var $module;
@@ -37,16 +80,13 @@ class AkInstaller
     function AkInstaller($db_connection = null)
     {
         if(empty($db_connection)){
-            $this->db =& Ak::db();
+            $this->db =& AkDbAdapter::getInstance();
         }else {
             $this->db =& $db_connection;
         }
 
+        $this->data_dictionary =& $this->db->getDictionary();
         $this->available_tables = $this->getAvailableTables();
-
-        $this->db->debug =& $this->debug;
-
-        $this->data_dictionary = NewDataDictionary($this->db);
     }
 
     function install($version = null, $options = array())
@@ -60,7 +100,6 @@ class AkInstaller
         return $this->_upgradeOrDowngrade('up', $version, $options);
     }
 
-
     function uninstall($version = null, $options = array())
     {
         $version = (is_null($version)) ? 0 : $version;
@@ -72,13 +111,12 @@ class AkInstaller
         return $this->_upgradeOrDowngrade('down', $version, $options);
     }
 
-
     function _upgradeOrDowngrade($action, $version = null, $options = array())
     {
         if(in_array('quiet',$options) && AK_ENVIRONMENT == 'development'){
             $this->vervose = false;
         }elseif(!empty($this->vervose) && AK_ENVIRONMENT == 'development'){
-            $this->db->debug = true;
+            $this->debug(true);
         }
 
         $current_version = $this->getInstalledVersion($options);
@@ -100,7 +138,7 @@ class AkInstaller
             $versions = range($current_version, empty($version) ? 1 : $version+1);
 
             if($current_version == 0){
-            	return true;
+                return true;
             }elseif($current_version < $version){
                 echo Ak::t("You can't downgrade to version %version, when you just have installed version %current_version", array('%version'=>$version,'%current_version'=>$current_version));
                 return false;
@@ -128,7 +166,6 @@ class AkInstaller
 
         return true;
     }
-
 
     function installVersion($version, $options = array())
     {
@@ -169,7 +206,6 @@ class AkInstaller
         return str_replace('installer','',strtolower(get_class($this)));
     }
 
-
     function _versionPath($options = array())
     {
         $mode = empty($options['mode']) ? AK_ENVIRONMENT : $options['mode'];
@@ -180,7 +216,7 @@ class AkInstaller
     function getInstalledVersion($options = array())
     {
         $version_file = $this->_versionPath($options);
-        
+
         if(!is_file($version_file)){
             $this->setInstalledVersion(0, $options);
         }
@@ -234,10 +270,7 @@ class AkInstaller
 
     function renameColumn($table_name, $old_column_name, $new_column_name)
     {
-        if(!strstr($this->db->databaseType,'mysql')){
-            trigger_error(Ak::t('Column renaming is only supported when using MySQL databases'), E_USER_ERROR);
-        }
-        return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->RenameColumnSQL($table_name, $old_column_name, $new_column_name));
+        return $this->db->renameColumn($table_name,$old_column_name,$new_column_name);
     }
 
 
@@ -247,8 +280,8 @@ class AkInstaller
             trigger_error(Ak::t('Table %table_name already exists on the database', array('%table_name'=>$table_name)), E_USER_NOTICE);
             return false;
         }
-        $this->timestamps = (!isset($table_options['timestamp']) || (isset($table_options['timestamp']) && $table_options['timestamp'])) && 
-                            (!strstr($column_options, 'created') && !strstr($column_options, 'updated'));
+        $this->timestamps = (!isset($table_options['timestamp']) || (isset($table_options['timestamp']) && $table_options['timestamp'])) &&
+        (!strstr($column_options, 'created') && !strstr($column_options, 'updated'));
         return $this->_createOrModifyTable($table_name, $column_options, $table_options);
     }
 
@@ -262,7 +295,7 @@ class AkInstaller
         }
 
         $column_options = is_string($column_options) ? array('columns'=>$column_options) : $column_options;
-        
+
         $default_column_options = array(
         'sequence_table' => false
         );
@@ -275,11 +308,14 @@ class AkInstaller
         $table_options = array_merge($default_table_options, $table_options);
 
         $column_string = $this->_getColumnsAsAdodbDataDictionaryString($column_options['columns']);
-        
-        $result = $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->ChangeTableSQL($table_name, str_replace(array(' UNIQUE', ' INDEX', ' FULLTEXT', ' HASH'), '', $column_string), $table_options));
+
+        $create_or_alter_table_sql = $this->data_dictionary->ChangeTableSQL($table_name, str_replace(array(' UNIQUE', ' INDEX', ' FULLTEXT', ' HASH'), '', $column_string), $table_options);
+        $result = $this->data_dictionary->ExecuteSQLArray($create_or_alter_table_sql, false);
 
         if($result){
             $this->available_tables[] = $table_name;
+        }else{
+            trigger_error(Ak::t("Could not create or alter table %name using the SQL \n--------\n%sql\n--------\n", array('%name'=>$table_name, '%sql'=>$create_or_alter_table_sql[0])), E_USER_ERROR);
         }
 
         $columns_to_index = $this->_getColumnsToIndex($column_string);
@@ -301,7 +337,7 @@ class AkInstaller
 
     function dropTable($table_name, $options = array())
     {
-        $result = $this->tableExists($table_name) ? $this->db->Execute('DROP TABLE '.$table_name) : true;
+        $result = $this->tableExists($table_name) ? $this->db->execute('DROP TABLE '.$table_name) : true;
         if($result){
             unset($this->available_tables[array_search($table_name, $this->available_tables)]);
             if(!empty($options['sequence'])){
@@ -336,8 +372,10 @@ class AkInstaller
 
     function removeIndex($table_name, $columns_or_index_name)
     {
-        if(!$this->tableExists($table_name)) return false;
-        $available_indexes =& $this->db->MetaIndexes($table_name);
+        if(!$this->tableExists($table_name)){
+            return false;
+        }
+        $available_indexes = $this->db->getIndexes($table_name);
         $index_name = isset($available_indexes[$columns_or_index_name]) ? $columns_or_index_name : 'idx_'.$table_name.'_'.$columns_or_index_name;
         if(!isset($available_indexes[$index_name])){
             trigger_error(Ak::t('Index %index_name does not exist.', array('%index_name'=>$index_name)), E_USER_NOTICE);
@@ -353,14 +391,14 @@ class AkInstaller
 
     function createSequence($table_name)
     {
-        $result = $this->tableExists('seq_'.$table_name) ? false : $this->db->CreateSequence('seq_'.$table_name);
+        $result = $this->tableExists('seq_'.$table_name) ? false : $this->db->connection->CreateSequence('seq_'.$table_name);
         $this->available_tables[] = 'seq_'.$table_name;
         return $result;
     }
 
     function dropSequence($table_name)
     {
-        $result = $this->tableExists('seq_'.$table_name) ? $this->db->DropSequence('seq_'.$table_name) : true;
+        $result = $this->tableExists('seq_'.$table_name) ? $this->db->connection->DropSequence('seq_'.$table_name) : true;
         if($result){
             unset($this->available_tables[array_search('seq_'.$table_name, $this->available_tables)]);
 
@@ -371,7 +409,7 @@ class AkInstaller
     function getAvailableTables()
     {
         if(empty($this->available_tables)){
-            $this->available_tables = array_diff((array)$this->db->MetaTables(), array(''));
+            $this->available_tables = $this->db->availableTables();
         }
         return $this->available_tables;
     }
@@ -389,16 +427,17 @@ class AkInstaller
         $equivalences = array(
         '/ ((limit|max|length) ?= ?)([0-9]+)([ \n\r,]+)/'=> ' (\3) ',
         '/([ \n\r,]+)default([ =]+)([^\'^,^\n]+)/i'=> ' DEFAULT \'\3\'',
-        '/([ \n\r,]+)(integer|int)([( \n\r,]*)/'=> '\1 I \3',
+        '/([ \n\r,]+)(integer|int)([( \n\r,]+)/'=> '\1 I \3',
         '/([ \n\r,]+)float([( \n\r,]+)/'=> '\1 F \2',
-        '/([ \n\r,]+)datetime([( \n\r,]*)/'=> '\1 T \2',
-        '/([ \n\r,]+)date([( \n\r,]*)/'=> '\1 D \2',
-        '/([ \n\r,]+)timestamp([( \n\r,]*)/'=> '\1 T \2',
-        '/([ \n\r,]+)time([( \n\r,]*)/'=> '\1 T \2',
-        '/([ \n\r,]+)text([( \n\r,]*)/'=> '\1 XL \2',
-        '/([ \n\r,]+)string([( \n\r,]*)/'=> '\1 C \2',
-        '/([ \n\r,]+)binary([( \n\r,]*)/'=> '\1 B \2',
-        '/([ \n\r,]+)boolean([( \n\r,]*)/'=> '\1 L(1) \2',
+        '/([ \n\r,]+)decimal([( \n\r,]+)/'=> '\1 N \2',
+        '/([ \n\r,]+)datetime([( \n\r,]+)/'=> '\1 T \2',
+        '/([ \n\r,]+)date([( \n\r,]+)/'=> '\1 D \2',
+        '/([ \n\r,]+)timestamp([( \n\r,]+)/'=> '\1 T \2',
+        '/([ \n\r,]+)time([( \n\r,]+)/'=> '\1 T \2',
+        '/([ \n\r,]+)text([( \n\r,]+)/'=> '\1 XL \2',
+        '/([ \n\r,]+)string([( \n\r,]+)/'=> '\1 C \2',
+        '/([ \n\r,]+)binary([( \n\r,]+)/'=> '\1 B \2',
+        '/([ \n\r,]+)boolean([( \n\r,]+)/'=> '\1 L'.($this->db->type()=='mysql'?'(1)':'').' \2',
         '/ NOT( |_)?NULL/i'=> ' NOTNULL',
         '/ AUTO( |_)?INCREMENT/i'=> ' AUTO ',
         '/ +/'=> ' ',
@@ -461,6 +500,8 @@ class AkInstaller
         return array(
         '/^\*(.*)$/i' => array(&$this,'_castToMultilingualColumn'),
         '/^(description|content|body)$/i' => '\1 text',
+        '/^(lock_version)$/i' => '\1 integer default \'1\'',
+        '/^(.+_count)$/i' => '\1 integer default \'0\'',
         '/^(id)$/i' => 'id integer not null auto_increment primary_key',
         '/^(.+)_(id|by)$/i' => '\1_\2 integer index',
         '/^(position)$/i' => '\1 integer index',
@@ -505,7 +546,7 @@ class AkInstaller
 
     function _requiresSequenceTable($column_string)
     {
-        if(preg_match('/mysql|postgres/', $this->db->databaseType)){
+        if(in_array($this->db->type(),array('mysql','postgre'))){
             return false;
         }
         foreach (explode(',',$column_string.',') as $column){
@@ -537,22 +578,22 @@ class AkInstaller
     */
     function transactionStart()
     {
-        return $this->db->StartTrans();
+        return $this->db->startTransaction();
     }
 
     function transactionComplete()
     {
-        return $this->db->CompleteTrans();
+        return $this->db->stopTransaction();
     }
 
     function transactionFail()
     {
-        return $this->db->FailTrans();
+        return $this->db->failTransaction();
     }
 
     function transactionHasFailed()
     {
-        return $this->db->HasFailedTrans();
+        return $this->db->hasTransactionFailed();
     }
 
 
@@ -622,9 +663,13 @@ class AkInstaller
 
     function execute($sql)
     {
-        return $this->db->Execute($sql);
+        return $this->db->execute($sql);
     }
 
+    function debug($toggle = null)
+    {
+        $this->db->connection->debug = $toggle === null ? !$this->db->connection->debug : $toggle;
+    }
 
     function usage()
     {
