@@ -16,14 +16,17 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
+
 class ModelGenerator extends  AkelosGenerator
 {
-    var $command_values = array('class_name');
+    var $command_values = array('class_name','(array)table_columns');
 
     function _preloadPaths()
     {
         $this->class_name = AkInflector::camelize($this->class_name);
         $this->assignVarToTemplate('class_name', $this->class_name);
+        $this->table_columns = trim(join(' ', (array)$this->table_columns));
+        $this->assignVarToTemplate('table_columns', $this->table_columns);
         $this->table_name = AkInflector::tableize($this->class_name);
         $this->underscored_model_name = AkInflector::underscore($this->class_name);
         $this->model_path = 'app'.DS.'models'.DS.$this->underscored_model_name.'.php';
@@ -68,8 +71,6 @@ class ModelGenerator extends  AkelosGenerator
         'installer_fixture.tpl'=>AK_TEST_DIR.DS.'fixtures'.DS.$this->installer_path
         );
 
-        $this->_template_vars = (array)$this;
-
         foreach ($files as $template=>$file_path){
             $this->save($file_path, $this->render($template));
         }
@@ -83,13 +84,14 @@ class ModelGenerator extends  AkelosGenerator
         if(!file_exists($unit_test_runner)){
             Ak::file_put_contents($unit_test_runner, file_get_contents(AK_FRAMEWORK_DIR.DS.'test'.DS.'app.php'));
         }
-
     }
 
     function cast()
     {
         $this->_template_vars['class_name'] = AkInflector::camelize($this->class_name);
+        $this->_template_vars['table_columns'] = $this->table_columns;
     }
+
 }
 
 ?>

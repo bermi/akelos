@@ -1,6 +1,10 @@
 SVN
 ----------------------
 
+* Model generator now supports customizing first migration version column setting from the command line like:
+
+    ./generate model Video title, length double, author, is_searchable
+
 * Relocated Active Record database adapters, behaviors and associations into lib/AkActiveRecord/AkDbAdapters, AkActsAsBehaviours and AkAssociations respectively.
 
 ----------
