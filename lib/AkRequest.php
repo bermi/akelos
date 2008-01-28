@@ -728,7 +728,7 @@ class AkRequest extends AkObject
     */
     function &recognize($Map = null)
     {
-        $this->_connectToDatabase();
+        AK_ENVIRONMENT != 'setup' ? $this->_connectToDatabase() : null;
         $this->_startSession();
         $this->_enableInternationalizationSupport();
         $this->_mapRoutes($Map);

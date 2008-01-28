@@ -247,8 +247,16 @@ class FrameworkSetup extends AkObject
         foreach (array('production', 'development') as $mode){
             $dsn = $this->_getDsn($mode);
             if(!isset($unique_dsn[$dsn])){
-                $db_conn =& Ak::db($dsn);
-                $installer =& new FrameworkInstaller($db_conn);
+                $DbInstance =& AkDbAdapter::getInstance(array(
+                'type' => $this->getDatabaseType($mode),
+                'file' => AK_CONFIG_DIR.DS.$this->getDatabaseName($mode).'-'.$this->random.'.sqlite',
+                'user' => $this->getDatabaseUser($mode),
+                'password' => $this->getDatabasePassword($mode),
+                'host' => $this->getDatabaseHost($mode),
+                'database_name' => $this->getDatabaseName($mode)
+                ));
+
+                $installer =& new FrameworkInstaller($DbInstance);
                 $installer->install(null, array('mode' => $mode));
                 $unique_dsn[$dsn] = true;
             }

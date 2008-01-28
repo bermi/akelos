@@ -24,7 +24,7 @@ if(AK_ENVIRONMENT != 'setup'){
 }
 
 if (!defined('AK_TEST_DATABASE_ON')) {
-    defined('AK_DEFAULT_DATABASE_PROFILE') ? null : define('AK_DEFAULT_DATABASE_PROFILE',AK_ENVIRONMENT);
+    defined('AK_DEFAULT_DATABASE_PROFILE') ? null : define('AK_DEFAULT_DATABASE_PROFILE', AK_ENVIRONMENT);
 }
 
 // Locale settings ( you must create a file at /config/locales/ using en.php as departure point)
