@@ -1041,7 +1041,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if (isset($options[0])){
             return false;
         }
-        $valid_keys = array('conditions', 'include', 'joins', 'limit', 'offset', 'order', 'bind', 'select','select_prefix', 'readonly');
+        $valid_keys = array('conditions', 'include', 'joins', 'limit', 'offset', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly');
         foreach (array_keys($options) as $key){
             if (!in_array($key,$valid_keys)){
                 return false;
@@ -1200,7 +1200,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
 
         $options = $this->_extractOptionsFromArgs($args);
-
+        
         $query_values = $args;
         $query_arguments_count = count($query_values);
 
