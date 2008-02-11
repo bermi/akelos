@@ -8,7 +8,7 @@ class <?php  echo $class_name?>ControllerTest extends  UnitTestCase
 {
     function test_<?php  echo $class_name?>()
     {
-        $this->assertTrue(false, '<?php  echo $class_name?>Controller has not being tested');
+        $this->assertTrue(false, '<?php  echo $class_name?>Controller has not been tested');
     }
 }
 
