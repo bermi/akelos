@@ -34,21 +34,30 @@ $command = count($options) > 0 ? array_shift($options) : 'usage';
 $installer = str_replace('::','/',$installer);
 $file = AK_APP_DIR.DS.'installers'.DS.rtrim(join('/',array_map(array('AkInflector','underscore'), explode('/',$installer.'/'))),'/').'_installer.php';
 
+
+function ak_print_available_installers($files, $preffix = '')
+{
+    foreach($files as $k => $file){
+        if(is_string($file)){
+            if(preg_match('/(.*)_installer\.php$/', $file, $match)){
+                echo ' * '.$preffix.$match[1]."\n";
+            }
+        }else{
+            ak_print_available_installers($file, $k.'::');
+        }
+    }
+    echo "\n";
+}
+
 if($installer_class_name == 'Installer'){
-    $files = Ak::dir(AK_APP_DIR.DS.'installers');
+    $files = Ak::dir(AK_APP_DIR.DS.'installers', array('recurse' => true));
     if(empty($files)){
         echo Ak::t("\n  Could not find installers at %dir  \n", array('%dir'=>AK_APP_DIR.DS.'installers'));
-
     }else{
         echo Ak::t("\n  You must supply a valid installer name like : \n");
         echo Ak::t("\n  > ./script/migrate my_installer_name install\n\n");
         echo Ak::t("  Available installers are:  \n\n");
-        foreach($files as $file){
-            if(preg_match('/(.*)_installer\.php$/', $file, $match)){
-                echo ' * '.$match[1]."\n";
-            }
-        }
-        echo "\n";
+        ak_print_available_installers($files);
     }
 }elseif(!file_exists($file)){
     echo Ak::t("\n\n  Could not locate the installer file %file\n\n",array('%file'=>$file));
