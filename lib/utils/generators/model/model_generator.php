@@ -25,7 +25,7 @@ class ModelGenerator extends  AkelosGenerator
     {
         $this->class_name = AkInflector::camelize($this->class_name);
         $this->assignVarToTemplate('class_name', $this->class_name);
-        $this->table_columns = trim(join(' ', (array)$this->table_columns));
+        $this->table_columns = trim(join(' ', (array)@$this->table_columns));
         $this->assignVarToTemplate('table_columns', $this->table_columns);
         $this->table_name = AkInflector::tableize($this->class_name);
         $this->underscored_model_name = AkInflector::underscore($this->class_name);
@@ -89,7 +89,7 @@ class ModelGenerator extends  AkelosGenerator
     function cast()
     {
         $this->_template_vars['class_name'] = AkInflector::camelize($this->class_name);
-        $this->_template_vars['table_columns'] = $this->table_columns;
+        $this->_template_vars['table_columns'] = (array)@$this->table_columns;
     }
 
 }

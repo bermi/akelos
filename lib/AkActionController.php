@@ -371,17 +371,15 @@ class AkActionController extends AkObject
         $this->instantiateIncludedModelClasses($models);
     }
 
-    function instantiateIncludedModelClasses()
+    function instantiateIncludedModelClasses($models = array())
     {
         require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
         require_once(AK_APP_DIR.DS.'shared_model.php');
 
         empty($this->model) ? ($this->model = $this->params['controller']) : null;
         empty($this->models) ? ($this->models = array()) : null;
-        
-        $models =array_unique(array_merge(
-        Ak::import($this->model),
-        Ak::import($this->models)));
+
+        $models = array_unique(array_merge(Ak::import($this->model), Ak::import($this->models), Ak::import($models), (empty($this->app_models)?array(): Ak::import($this->app_models))));
 
         foreach ($models as $model){
             $this->instantiateModelClass($model, (empty($this->finder_options[$model])?array():$this->finder_options[$model]));
@@ -2684,7 +2682,10 @@ class AkActionController extends AkObject
 
     function _authenticateOrRequestWithHttpBasic($realm = AK_APP_NAME, $login_procedure)
     {
-        return $this->_authenticateWithHttpBasic($login_procedure) || $this->_requestHttpBasicAuthentication($realm);
+        if($Result = $this->_authenticateWithHttpBasic($login_procedure)){
+            return $Result;
+        }
+        return $this->_requestHttpBasicAuthentication($realm);
     }
 
     function _authenticateWithHttpBasic($login_procedure)
@@ -2774,9 +2775,14 @@ class AkActionController extends AkObject
     function _authenticationRequest($realm)
     {
         header('WWW-Authenticate: Basic realm="' . str_replace('"','',$realm) . '"');
-        header('HTTP/1.0 401 Unauthorized');
-        echo "HTTP Basic: Access denied.\n";
-        exit;
+
+        if(method_exists($this, 'access_denied')){
+            $this->access_denied();
+        }else{
+            header('HTTP/1.0 401 Unauthorized');
+            echo "HTTP Basic: Access denied.\n";
+            exit;
+        }
     }
 }
 
