@@ -87,13 +87,7 @@ class AkUnitTest extends UnitTestCase
 
     function _reinstallModel($model, $table_definition = '')
     {
-        if (file_exists(AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($model).'_installer.php')){
-            require_once(AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($model).'_installer.php');
-            $installer_name = $model.'Installer';
-            $installer = new $installer_name();
-            $installer->uninstall();
-            $installer->install();
-        }else{
+        if (!$this->uninstallAndInstallMigration($model)){
             $table_name = AkInflector::tableize($model);
             if (empty($table_definition)) {
                 trigger_error(Ak::t('Could not install the table %tablename for the model %modelname',array('%tablename'=>$table_name, '%modelname'=>$model)),E_USER_ERROR);
@@ -103,6 +97,19 @@ class AkUnitTest extends UnitTestCase
             $installer->dropTable($table_name,array('sequence'=>true));
             $installer->createTable($table_name,$table_definition,array('timestamp'=>false));
         }
+    }
+
+    function uninstallAndInstallMigration($installer_name)
+    {
+        if (file_exists(AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php')){
+            require_once(AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php');
+            $installer_class_name = $installer_name.'Installer';
+            $Installer =& new $installer_class_name();
+            $Installer->uninstall();
+            $Installer->install();
+            return true;
+        }
+        return false;
     }
 
     function _includeOrGenerateModel($model_name)
@@ -161,6 +168,19 @@ class AkUnitTest extends UnitTestCase
             trigger_error(Ak::t('Could not instantiate %modelname',array('%modelname'=>$model_name)),E_USER_ERROR);
         }
         return !empty($this->$model_name) && is_object($this->$model_name) && strtolower(get_class($this->$model_name)) == strtolower($model_name);
+    }
+
+    /**
+     * Includes and instantiates given models
+     */
+    function includeAndInstatiateModels()
+    {
+        $args = func_get_args();
+        $models = isset($args[1]) ? (array)$args : Ak::toArray($args[0]);
+        foreach ($models as $model){
+            $this->_includeOrGenerateModel($model);
+            $this->instantiateModel($model);
+        }
     }
 }
 

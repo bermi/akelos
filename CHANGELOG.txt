@@ -1,5 +1,6 @@
 SVN
 
+* [476] Adding includeAndInstatiateModels and uninstallAndInstallMigration to AkUnitTest
 
 * Making it possible to include models by default by declaring in your application_controller.php
 
