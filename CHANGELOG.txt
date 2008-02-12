@@ -1,4 +1,16 @@
 SVN
+
+
+* Making it possible to include models by default by declaring in your application_controller.php
+
+{{{
+  var $app_models = 'user,role';
+}}}
+
+this way you can avoid adding controller-wide models into every single controller.
+
+* HTTP authentication now can have its own failure message by implementing a **access_denied** method into the application controller.
+
 ----------------------
 
 * Model generator now supports customizing first migration version column setting from the command line like:

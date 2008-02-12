@@ -195,7 +195,7 @@ class AkActionView
     function renderTemplate($____template_extension, $____template, $____file_path = null, $____local_assigns = array(), $____save_content_in_attribute_as = 'layout')
     {
         $____local_assigns = array_merge(array_merge($this->_getGlobals(),(array)@$this->assigns,array_merge((array)@$this->_local_assigns,
-        array_merge((array)$____local_assigns,array('controller_name' => $this->controller,'controller' => &$this->_controllerInstance)))));
+        array_merge((array)$____local_assigns,array('controller_name' => $this->_controllerInstance->getControllerName(),'controller' => &$this->_controllerInstance)))));
 
         if(!empty($this->_template_handlers[$____template_extension])){
             $____handler =& $this->_template_handlers[$____template_extension];
