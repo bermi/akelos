@@ -1652,26 +1652,14 @@ class Ak
 
         return $sorted_array;
     }
-
-
+  
     function mime_content_type($file)
     {
         static $mime_types;
         ak_compat('mime_content_type');
-
-        $mime = @mime_content_type($file);
-
-        if (AK_OS == 'WINDOWS' && $mime == 'application/octet-stream' && is_file($file)){
-            $mime = false;
-        }
-
-        if(empty($mime)){
-            empty($mime_types) ? require(AK_LIB_DIR.DS.'utils'.DS.'mime_types.php') : null;
-            $file_extension = substr($file,strrpos($file,'.')+1);
-            $mime = !empty($mime_types[$file_extension]) ? $mime_types[$file_extension] : false;
-        }
-
-        return $mime;
+        empty($mime_types) ? require(AK_LIB_DIR.DS.'utils'.DS.'mime_types.php') : null;
+        $file_extension = substr($file,strrpos($file,'.')+1);
+        return !empty($mime_types[$file_extension]) ? $mime_types[$file_extension] : false;
     }
 
     function stream($path, $buffer_size = 4096)

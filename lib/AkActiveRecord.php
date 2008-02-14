@@ -481,10 +481,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         $this->setId($inserted_id);
 
+        $this->_newRecord = false;
+        
         if (!$this->afterCreate() || !$this->notifyObservers('afterCreate')){
             return $this->transactionFail();
         }
-        $this->_newRecord = false;
+        
         return true;
     }
 
