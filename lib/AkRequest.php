@@ -751,7 +751,7 @@ class AkRequest extends AkObject
             include_once($module_shared_model);
         }
         
-        if(@!include_once($controller_path)){
+        if(!include_once($controller_path)){
             if(AK_ENVIRONMENT == 'development'){
                 trigger_error(Ak::t('Could not find the file /app/controllers/<i>%controller_file_name</i> for '.
                 'the controller %controller_class_name',
