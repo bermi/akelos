@@ -16,7 +16,7 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-class AkActionViewHelper
+class AkActionViewHelper extends AkObject 
 {
     var $locales_namespace = 'helpers';
     

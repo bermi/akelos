@@ -1083,7 +1083,8 @@ class AkActionController extends AkObject
     function toString()
     {
         return $this->Request->getProtocol().$this->Request->getHostWithPort().
-        $this->Request->getPath().$this->parameters['controller'].$this->parameters['action'].$this->parameters['inspect'];
+        $this->Request->getPath().@$this->parameters['controller'].
+        @$this->parameters['action'].@$this->parameters['inspect'];
     }
 
     /**

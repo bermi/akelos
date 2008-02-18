@@ -89,7 +89,7 @@
 * 
 * See the AkActionView/Helpers/PrototypeHelper/JavaScriptGenerator documentation for more details.
 */
-class AkActionView
+class AkActionView extends AkObject
 {
     var $first_render, $base_path, $assigns, $template_extension, $controller,
     $logger, $params, $request, $response, $session, $headers, $flash;

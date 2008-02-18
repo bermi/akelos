@@ -87,6 +87,11 @@ class AkObject
     {
         return get_class($this);
     }
+    
+    function __toString()
+    {
+        return $this->toString();
+    }
 
     // }}}
 

@@ -21,7 +21,7 @@
 * Provides methods for converting a number into a formatted string that currently represents
 * one of the following forms: phone number, percentage, money, or precision level.
 */
-class NumberHelper
+class NumberHelper extends AkObject 
 {
     /**
       * Formats a +number+ into a US phone number string. The +options+ can be a array used to customize the 

@@ -18,7 +18,7 @@
 
 require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_helper.php');
 
-class UrlHelper
+class UrlHelper extends AkObject
 {
     function setController(&$controller)
     {

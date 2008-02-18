@@ -29,7 +29,7 @@ class AkPhpCodeSanitizer
     var $secure_active_record_method_calls = false;
     var $_errors = array();
     var $_options = array();
-    var $_protedted_types = array('constructs','variables','functions','classes','methods');
+    var $_protedted_types = array('constructs','variables','member variables','functions','classes','methods');
 
     function clearErrors()
     {
@@ -49,7 +49,6 @@ class AkPhpCodeSanitizer
             $code =& $this->_options['code'];
         }
         $this->AnalyzeCode($code);
-
         $this->secureVariables($code);
         $this->secureFunctions($code);
         $this->secureConstructs($code);
@@ -71,14 +70,19 @@ class AkPhpCodeSanitizer
     {
         $code = empty($code) ? @$this->_options['code'] : $code;
         if(AK_DEBUG){
-            echo
-            '<h1>'.Ak::t('Template %template_file security error', array('%template_file'=>@$this->_options['file_path'])).':</h1>'.
-            "<ul><li>".join("</li>\n<li>",$this->getErrors())."</li></ul><hr />\n".
-            '<h2>'.Ak::t('Showing template source from %file:',array('%file'=>$this->_options['file_path'])).'</h2>'.
-            (isset($this->_options['file_path']) ? '<pre>'.htmlentities(Ak::file_get_contents($this->_options['file_path'])).'</pre><hr />':'').
-            '<h2>'.Ak::t('Showing compiled template source:').'</h2>'.highlight_string($code,true);
+            // We can't halt execution while testing and the error message is too large for trigger_error
+            if(AK_ENVIRONMENT == 'testing'){
+                trigger_error(join("\n", $this->getErrors()), E_USER_WARNING);
+            }else{
+                echo
+                '<h1>'.Ak::t('Template %template_file security error', array('%template_file'=>@$this->_options['file_path'])).':</h1>'.
+                "<ul><li>".join("</li>\n<li>",$this->getErrors())."</li></ul><hr />\n".
+                '<h2>'.Ak::t('Showing template source from %file:',array('%file'=>$this->_options['file_path'])).'</h2>'.
+                (isset($this->_options['file_path']) ? '<pre>'.htmlentities(Ak::file_get_contents($this->_options['file_path'])).'</pre><hr />':'').
+                '<h2>'.Ak::t('Showing compiled template source:').'</h2>'.highlight_string($code,true);
 
-            die();
+                die();
+            }
         }else{
             trigger_error(Ak::t('Template compilation error'),E_USER_ERROR);
         }
@@ -105,6 +109,9 @@ class AkPhpCodeSanitizer
         array_map(array(&$this,'_addDollarSymbol_'), $_forbidden['variables']);
 
         $_used_vars = array_keys((array)$this->Analyzer->usedVariables);
+        
+        $this->lookForPrivateMemberVariables($this->Analyzer->usedMemberVariables);
+        
         $this->_invalid['variables'] = array_diff($_used_vars, array_diff($_used_vars,array_merge($_forbidden['variables'], array_filter($_used_vars, array(&$this, 'isPrivateVar')))));
     }
 
@@ -171,7 +178,39 @@ class AkPhpCodeSanitizer
 
     function isPrivateVar($var)
     {
-        return $var[1]==="_";
+        return preg_match('/^["\'${\.]*_/', $var);
+    }
+    
+    function isPrivateDynamicVar($var)
+    {
+        if(preg_match('/^["\'{\.]*\$/', $var)){
+            $var_name = trim($var, '{"\'.$');
+            if(isset($GLOBALS[$var_name])){
+                return $this->isPrivateVar($GLOBALS[$var_name]);
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    function lookForPrivateMemberVariables($var, $nested = false)
+    {
+        if(is_string($var) && $this->isPrivateVar($var)){
+            $this->_invalid['member variables'][$var] = $var;
+            return true;
+        }elseif (is_array($var)){
+            foreach (array_keys($var) as $k){
+                if($this->isPrivateVar($k) || ($nested && $this->isPrivateDynamicVar($k))){
+                    $this->_invalid['member variables'][$k] = $k;
+                    return true;
+                }elseif($this->lookForPrivateMemberVariables($var[$k], true)){
+                    return true;
+                }
+            }
+        }elseif (is_object($var)){
+            return $this->lookForPrivateMemberVariables((array)$var, true);
+        }
+        return false;
     }
 
     function &getCodeAnalyzerInstance()

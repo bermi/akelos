@@ -21,7 +21,7 @@
 * Use these methods to generate HTML tags programmatically when you can't use a Builder. 
 * By default, they output XHTML compliant tags.
 */
-class TagHelper
+class TagHelper extends AkObject 
 {
     /**
     * Returns an empty HTML tag of type *name* which by default is XHTML 
