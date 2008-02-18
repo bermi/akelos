@@ -263,6 +263,8 @@ class PHPCodeAnalyzer
                 break;
             case "=":
             case ";":
+            case "?":
+            case ":":
                 if ($this->inNew !== false)
                 {
                     $this->classInstantiated();
