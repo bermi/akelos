@@ -23,6 +23,25 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
         $this->assertEqual($Product->price,198);
     }
     
+    function test_integers_can_be_null()
+    {
+        $this->installAndIncludeModels(array('Hybrid'=>'id,title,price integer'));
+        $Dollar =& $this->Hybrid->create(array('title'=>'not euro','price'=>null));
+        $Dollar->reload();
+        
+        $this->assertNull($Dollar->price);
+    }
+    
+    function test_integers_can_be_zero()
+    {
+        $this->installAndIncludeModels(array('Hybrid'=>'id,title,price integer'));
+        $Dollar =& $this->Hybrid->create(array('title'=>'not euro','price'=>0));
+        $Dollar->reload();
+        
+        $this->assertNotNull($Dollar->price);
+        $this->assertEqual(0,$Dollar->price);
+    }
+    
     function test_installer_should_handle_decimals()
     {
         $this->installAndIncludeModels(array('Hybrid'=>'id,title,price decimal(10.2)'));
@@ -46,7 +65,7 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
         $this->assertEqual($Product->price, 12.99);
     }
 
-    function test_should_handle_zero_value()
+    function test_decimals_can_be_zero()
     {
         $Product =& new Hybrid(array('title'=>'chocolada','price'=>0));
         $Product->save();
@@ -55,7 +74,7 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
         $this->assertEqual($Product->price,0);
     }
     
-    function test_should_handle_null_value()
+    function test_deciamls_can_be_null()
     {
         $Product =& new Hybrid(array('title'=>'easter-egg','price'=>null));
         $Product->save();
@@ -89,7 +108,7 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
         $this->assertFalse($Celebrity->celebrity);
     }
     
-    function test_null_should_not_be_casted_as_false()
+    function test_null_should_not_be_casted_as_false_on_booleans()
     {
         $Celebrity =& new Hybrid(array('title'=>'Franko','celebrity'=>null));
         $Celebrity->save();
@@ -133,6 +152,17 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
         $Post = $this->Hybrid->create(array('title'=>null));
         $Post->reload();
         $this->assertNull($Post->title);
+    }
+    
+    function test_date_is_not_datetime()
+    {
+        $this->installAndIncludeModels(array('Hybrid'=>'id,name,born date'));
+        $columns = $this->Hybrid->getColumnSettings();
+        $this->assertEqual('date',$columns['born']['type'],'Known bug #124');
+
+        #this works
+        $columns_raw = $this->Hybrid->_db->getColumnDetails('hybrids');
+        $this->assertEqual('date',$columns_raw['BORN']->type);
     }
     
 }
