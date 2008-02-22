@@ -5,6 +5,10 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class test_AkActiceRecord_datatypes extends  AkUnitTest
 {
+    /**
+     * @var ActiveRecord
+     */
+    var $Hybrid;
     function test_installer_should_handle_integers()
     {
         $this->installAndIncludeModels(array('Hybrid'=>'id,title,price integer'));
@@ -107,8 +111,30 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
         $Celebrity =& $this->Hybrid->findBy('celebrity','true');
         $this->assertTrue($Celebrity[0]->celebrity);
         $this->assertEqual($Celebrity[0]->title,'Kate');
-     
     }
+    
+    function test_strings_can_be_empty()
+    {
+        $this->installAndIncludeModels(array('Hybrid'=>'id,title'));
+        $Post = $this->Hybrid->create(array('title'=>''));
+        $Post->reload();
+        $this->assertEqual('',$Post->title);
+        $this->assertNotNull($Post->title,'Known bug #123');
+        
+        $Post->updateAttribute('title','',true);
+        $Post->reload();
+        $this->assertEqual('',$Post->title);
+        $this->assertNotNull($Post->title);
+    }
+    
+    function test_strings_can_be_null()
+    {
+        $this->installAndIncludeModels(array('Hybrid'=>'id,title'));
+        $Post = $this->Hybrid->create(array('title'=>null));
+        $Post->reload();
+        $this->assertNull($Post->title);
+    }
+    
 }
 
 ak_test('test_AkActiceRecord_datatypes',true);
