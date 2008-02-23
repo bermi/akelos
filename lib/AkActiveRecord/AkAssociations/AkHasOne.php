@@ -169,7 +169,6 @@ class AkHasOne extends AkAssociation
     {
         $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
         $foreign_key = $this->Owner->$association_id->getAssociationOption('foreign_key');
-
         Ak::import($class_name);
         $record =& new $class_name($attributes);
         if ($replace_existing){
@@ -201,7 +200,6 @@ class AkHasOne extends AkAssociation
     function &replace($association_id, &$NewAssociated, $dont_save = false)
     {
         $Associated =& $this->loadAssociated($association_id);
-
         if(!empty($Associated->__activeRecordObject) && !empty($NewAssociated->__activeRecordObject) && $Associated->getId() == $NewAssociated->getId()){
             return $NewAssociated;
         }
@@ -332,6 +330,9 @@ class AkHasOne extends AkAssociation
             if( isset($object->$associated_id->_associatedAs) &&
             $object->$associated_id->_associatedAs == 'hasOne' &&
             $object->$associated_id->getAssociationOption('dependent')){
+                if ($object->$associated_id->getType() == 'hasOne'){
+                    $object->$associated_id->load();
+                }
                 if(method_exists($object->$associated_id, 'destroy')){
                     $success = $object->$associated_id->destroy() ? $success : false;
                 }
