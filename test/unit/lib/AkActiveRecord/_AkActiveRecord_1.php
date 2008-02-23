@@ -14,11 +14,11 @@ class test_AkActiveRecord extends  AkUnitTest
             'AkTestComment'=>'id I AUTO KEY, ak_test_user_id I, private_comment L, birth_date T',
             'AkTestField'=>'id I AUTO KEY,varchar_field C(255),longtext_field XL,text_field X,logblob_field B,date_field D, 
                     datetime_field T,tinyint_field I2,integer_field I,smallint_field I2,bigint_field I8,double_field F,
-                    numeric_field N,bytea_field B,timestamp_field T,
+                    numeric_field N(10.5),bytea_field B,timestamp_field T,
                     boolean_field L,int2_field I2,int4_field I4,int8_field I8,foat_field F,varchar4000_field X, 
                     clob_field XL,nvarchar2000_field X2,blob_field B,nvarchar_field C2(255),
                     decimal1_field L,'.//*decimal3_field I1,
-                    'decimal5_field I2,decimal10_field I4,decimal20_field I8,decimal_field N,
+                    'decimal5_field I2,decimal10_field I4,decimal20_field I8,decimal_field N(10.5),
                     created_at T,updated_at T,expires_on T'));
     }
 
@@ -259,7 +259,7 @@ class test_AkActiveRecord extends  AkUnitTest
         'longtext_field'=>'text',
         'text_field'=>'text',
         'logblob_field'=>'binary',
-        'date_field'=>'datetime',
+        'date_field'=>'date',
         'datetime_field'=>'datetime',
         'tinyint_field'=>'integer',
         'integer_field'=>'integer',
@@ -551,7 +551,7 @@ class test_AkActiveRecord extends  AkUnitTest
         'user_name' => "user_name='a\'\'\'\'\'a'",
         'first_name' => "first_name='Tim'",
         'last_name' => "last_name='O\'Reilly'",
-        'email' => "email=''",
+        'email' => "email=null",
         'country' => "country=null",
         'password' => "password='*********'",
         'created_at' => "created_at=null",
