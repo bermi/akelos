@@ -51,6 +51,16 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
         $this->assertEqual(0,$Dollar->price);
     }
     
+    function test_integers_can_be_passed_literally_as_string()
+    {
+        $this->installAndIncludeModels(array('Hybrid'=>'id,title,price integer'));
+        $Dollar =& $this->Hybrid->create(array('title'=>'not euro','price'=>'0'));
+        $Dollar->reload();
+        
+        $this->assertNotNull($Dollar->price);
+        $this->assertEqual(0,$Dollar->price);
+    }
+    
     function test_installer_should_handle_decimals()
     {
         $this->installAndIncludeModels(array('Hybrid'=>'id,title,price decimal(10.2)'));
@@ -174,6 +184,15 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
     {
         $this->installAndIncludeModels(array('Hybrid'=>'id,name,born date'));
         $Hans =& $this->Hybrid->create(array('name'=>'Hans','born'=>''));
+        $Hans->reload();
+        
+        $this->assertNull($Hans->born);
+    }
+    
+    function test_handle_null_date_as_null()
+    {
+        $this->installAndIncludeModels(array('Hybrid'=>'id,name,born date'));
+        $Hans =& $this->Hybrid->create(array('name'=>'Hans','born'=>null));
         $Hans->reload();
         
         $this->assertNull($Hans->born);

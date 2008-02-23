@@ -71,7 +71,22 @@ class test_AkActiveRecord_type_casting extends  AkUnitTest
         $MyPost =& $this->Post->create($params);
         
         $MyPost->reload();
-        $this->assertNull($MyPost->posted_on,"Issue #128. Should be null, actually is {$MyPost->posted_on}.");
+        $this->assertNull($MyPost->posted_on);
+    }
+    
+    function test_cast_date_parameters()
+    {
+        $params = array('posted_on(1i)'=>'','posted_on(2i)'=>'','posted_on(3i)'=>'');
+        $this->Post->_castDateParametersFromDateHelper_($params);
+        $this->assertEqual('',$params['posted_on']);
+
+        $params = array('posted_on(1i)'=>'2008','posted_on(2i)'=>'10','posted_on(3i)'=>'');
+        $this->Post->_castDateParametersFromDateHelper_($params);
+        $this->assertEqual('2008-10',$params['posted_on']);
+        
+        $this->assertEqual('2008',$this->Post->{"posted_on(1i)"});
+        $this->assertEqual('10',$this->Post->{"posted_on(2i)"});
+        $this->assertEqual('',$this->Post->{"posted_on(3i)"});
     }
 }
 

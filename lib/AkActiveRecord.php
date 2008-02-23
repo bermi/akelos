@@ -3189,7 +3189,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
             case 'serial':
             case 'integer':
-                $result = is_null($value) ? 'null' : (integer)$value;
+                $result = (is_null($value) || $value==='') ? 'null' : (integer)$value;
                 break;
 
             case 'float':
@@ -3250,11 +3250,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         foreach ($params as $k=>$v) {
             if(preg_match('/^([A-Za-z0-9_]+)\(([1-5]{1})i\)$/',$k,$match)){
                 $date_attributes[$match[1]][$match[2]] = $v;
+                $this->$k = $v;
                 unset($params[$k]);
             }
         }
         foreach ($date_attributes as $attribute=>$date){
-            $params[$attribute] = Ak::getDate(Ak::getTimestamp(trim(@$date[1].'-'.@$date[2].'-'.@$date[3].' '.@$date[4].':'.@$date[5].':'.@$date[6],' :-')));
+            $params[$attribute] = trim(@$date[1].'-'.@$date[2].'-'.@$date[3].' '.@$date[4].':'.@$date[5].':'.@$date[6],' :-');
         }
     }
 
