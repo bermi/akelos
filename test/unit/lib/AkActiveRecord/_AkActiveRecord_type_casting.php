@@ -61,7 +61,17 @@ class test_AkActiveRecord_type_casting extends  AkUnitTest
         $this->assertTrue($Post->save());
         $Post->reload();
         $this->assertEqual($Post->get('expires_at'), '2007-10-15 17:30:00');
+    }
+    
+    function test_should_handle_empty_date_as_null()
+    {
+        $this->installAndIncludeModels(array('Post'));
 
+        $params = array('title'=>'An empty date is a null date','posted_on(1i)'=>'','posted_on(2i)'=>'','posted_on(3i)'=>'');
+        $MyPost =& $this->Post->create($params);
+        
+        $MyPost->reload();
+        $this->assertNull($MyPost->posted_on,"Issue #128. Should be null, actually is {$MyPost->posted_on}.");
     }
 }
 
