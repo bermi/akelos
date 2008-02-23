@@ -32,6 +32,15 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
         $this->assertNull($Dollar->price);
     }
     
+    function test_handle_empty_string_as_null_on_integers()
+    {
+        $this->installAndIncludeModels(array('Hybrid'=>'id,title,price integer'));
+        $Dollar =& $this->Hybrid->create(array('title'=>'not euro','price'=>''));
+        $Dollar->reload();
+        
+        $this->assertNull($Dollar->price,'Issue #129');
+    }
+    
     function test_integers_can_be_zero()
     {
         $this->installAndIncludeModels(array('Hybrid'=>'id,title,price integer'));
@@ -138,7 +147,7 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
         $Post = $this->Hybrid->create(array('title'=>''));
         $Post->reload();
         $this->assertEqual('',$Post->title);
-        $this->assertNotNull($Post->title,'Known bug #123');
+        $this->assertNotNull($Post->title);
         
         $Post->updateAttribute('title','',true);
         $Post->reload();
@@ -158,11 +167,16 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
     {
         $this->installAndIncludeModels(array('Hybrid'=>'id,name,born date'));
         $columns = $this->Hybrid->getColumnSettings();
-        $this->assertEqual('date',$columns['born']['type'],'Known bug #124');
-
-        #this works
-        $columns_raw = $this->Hybrid->_db->getColumnDetails('hybrids');
-        $this->assertEqual('date',$columns_raw['BORN']->type);
+        $this->assertEqual('date',$columns['born']['type']);
+    }
+    
+    function test_handle_empty_date_string_as_null()
+    {
+        $this->installAndIncludeModels(array('Hybrid'=>'id,name,born date'));
+        $Hans =& $this->Hybrid->create(array('name'=>'Hans','born'=>''));
+        $Hans->reload();
+        
+        $this->assertNull($Hans->born);
     }
     
 }
