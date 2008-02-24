@@ -93,7 +93,7 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
         $this->assertEqual($Product->price,0);
     }
     
-    function test_deciamls_can_be_null()
+    function test_decimals_can_be_null()
     {
         $Product =& new Hybrid(array('title'=>'easter-egg','price'=>null));
         $Product->save();
