@@ -10,4 +10,4 @@ Kaste <thdz DOT x gmx net> Core Contributor
 
 See THANKS.txt for the complete list of people who has made Akelos possible
 
-...your name here? Send your patches to http://www.akelos.org
+...your name here? Send your patches to http://trac.akelos.org
