@@ -299,19 +299,16 @@ class AkHasMany extends AkAssociation
             $AssociatedModel =& $this->getAssociatedModelInstance();
 
             $owner_type = $this->_findOwnerTypeForAssociation($AssociatedModel, $this->Owner);
-            $allow_dependency = isset($AssociatedModel->$owner_type->_associatedAs) && $AssociatedModel->$owner_type->_associatedAs == 'belongsTo' && $AssociatedModel->$owner_type->getAssociationOption('dependent') ;
 
             foreach (array_keys($Associated) as $k){
                 $items_to_remove_from_collection[] = $Associated[$k]->getId();
                 if(!in_array($Associated[$k]->getId() , $ids_to_skip)){
                     switch ($options['dependent']) {
                         case 'destroy':
-                        $success = $allow_dependency && $Associated[$k]->destroy() ? $success : false;
+                            $success = $Associated[$k]->destroy() ? $success : false;
                         break;
                         case 'delete_all':
-                        if($allow_dependency){
                             $ids_to_delete[] = $Associated[$k]->getId();
-                        }
                         break;
                         case 'nullify':
                             $id_to_nullify = $Associated[$k]->quotedId();
@@ -334,10 +331,7 @@ class AkHasMany extends AkAssociation
                 $success = $AssociatedModel->delete($ids_to_delete) ? $success : false;
             }
 
-            //$items_to_remove_from_collection
-
             $this->removeFromCollection($items_to_remove_from_collection);
-            //$this->removeFromCollection($Associated);
         }
 
         return $success;
