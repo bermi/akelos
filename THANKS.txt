@@ -11,6 +11,13 @@ email I don't want them to be spammed for being in this list.
 Core contributors (new features)
 ---------------------------------------
 
+Kaste
+
+  - AkInstaller patch and new unit test. 2007-02-25
+  - AkActiveRecord::accessibleAttributes patch and new unit test. 2007-02-26
+  - AkActiveRecord refactoring and improvement. 2007-03-03
+  - Akelos most active contributor up-to-date.
+
 Jose Salavert
 
  - Multiple Action View helpers and many core contributions since 2005
@@ -18,12 +25,6 @@ Jose Salavert
 Niels Ganser
 
  - AkActsAsTree.php unit tested new feature 2006-09-20
-
-Kaste
-
-  - AkInstaller patch and new unit test. 2007-02-25
-  - AkActiveRecord::accessibleAttributes patch and new unit test. 2007-02-26
-  - AkActiveRecord refactoring and improvement. 2007-03-03
 
 Jerome Loyet
 
@@ -46,7 +47,8 @@ Matias Quaglia
 
  - Spanish translation of the tutorial . 2007-04-11
  - Spanish Mini HOW-TO set php on Windows path . 2007-04-11
- 
+
+Alan Lake and thijs for their hard work on improving Akelos user documentation.
 
 Special thanks to David Heinemeier Hansson and the Rails community for creating 
 the great Ruby on Rails framework.
