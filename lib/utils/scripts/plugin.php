@@ -30,7 +30,7 @@ $command = strtolower(array_shift($argv));
 array_unshift($argv, $script_name);
 $_SERVER['argv'] = $argv;
 
-$available_commands = array('list', 'sources', 'source', 'unsource', 'discover', 'install', 'remove', 'info');
+$available_commands = array('list', 'sources', 'source', 'unsource', 'discover', 'install', 'update', 'remove', 'info');
 
 if(!in_array($command, $available_commands)){
     echo <<<BANNER
@@ -140,10 +140,11 @@ if($command == 'list') {
     }
     $installed_plugins = $PluginManager->getInstalledPlugins();
     if(isset($options['local'])){
+        $plugins_dir = $ak_app_dir.DS.'vendor'.DS.'plugins';
         if(empty($installed_plugins)){
-            die("There are not plugins intalled at {$ak_app_dir}/vendor/plugins\n");
+            die("There are not plugins intalled at $plugins_dir\n");
         }else{
-            echo "Plugins installed at  {$ak_app_dir}/vendor/plugins:\n\n";
+            echo "Plugins installed at  $plugins_dir:\n\n";
             foreach ($installed_plugins as $plugin){
                 echo " * ".$plugin." (".rtrim($PluginManager->getRepositoryForPlugin($plugin),'/')."/$plugin)\n";
             }
@@ -294,7 +295,7 @@ if($command == 'discover') {
 
 
 /**
- * Discover repositories referenced on a page.
+ * Install plugins.
  */
 if($command == 'install') {
 
@@ -327,6 +328,11 @@ if($command == 'install') {
         if($plugin_name != $plugin){
             $repository = preg_replace('/\/?'.$plugin_name.'$/', '', trim($plugin));
         }
+        if (!@$PluginManager->getRepositoryForPlugin($plugin_name, $repository)){
+            is_null($repository) ? $repository = AK_PLUGINS_MAIN_REPOSITORY : null;
+            echo "\nPlugin $plugin_name not found @ ".$repository.".\n";
+            continue;
+        }
         echo "\nInstalling $plugin\n";
         $PluginManager->installPlugin($plugin_name, $repository, $options);
     }
@@ -335,7 +341,32 @@ if($command == 'install') {
     die();
 }
 
+/**
+ * Update plugins.
+ */
+if($command == 'update') {
+    $options = get_console_options_for('Update installed plugins.', array(
+    'externals'     => array('short' => 'x', 'desc' =>  "Use svn:externals to grab the plugin. Enables plugin updates and plugin versioning.", 'max' => 0),
+    'checkout'     => array('short' => 'o', 'desc' =>  "Use svn checkout to grab the plugin. Enables updating but does not add a svn:externals entry.", 'max' => 0),
+    ));
 
+    $best = $PluginManager->guessBestInstallMethod($options);
+    if($best == 'http' && (!empty($options['externals']) ||  !empty($options['checkout']))){
+        die("Cannot install using subversion because `svn' cannot be found in your PATH\n");
+    }elseif ($best == 'export' && !empty($options['externals'])){
+        die("Cannot install using externals because this project is not under subversion.");
+    }elseif ($best == 'export' && !empty($options['checkout'])){
+        die("Cannot install using checkout because this project is not under subversion.");
+    }
+    $installed_plugins = $PluginManager->getInstalledPlugins();
+    foreach ($installed_plugins as $plugin){
+        $repository_for_plugin = $PluginManager->getRepositoryForPlugin($plugin);
+        echo "Updating $plugin from $repository_for_plugin.\n";
+        $PluginManager->updatePlugin($plugin,$repository_for_plugin,$options);
+    }
+    echo "Done.\n";
+    die();
+}
 
 
 /**
@@ -347,7 +378,10 @@ if($command == 'remove') {
     CONSOLE_GETARGS_PARAMS => array('short' => 'p', 'desc' =>  "You can specify plugin names as given in 'plugin list' output or absolute URLs to a plugin repository.", 'max' => -1, 'min' => 1)));
 
     if(empty($options['parameters'])){
-        die("You must supply at least one plugin name or plugin URL to uninstall.\n");
+        echo "You must supply at least one plugin name or plugin URL to uninstall.\n";
+        echo "\nInstalled Plugins: ";
+        echo join(', ',$PluginManager->getInstalledPlugins()).'.';
+        die();
     }
 
     $plugins = Ak::toArray($options['parameters']);
