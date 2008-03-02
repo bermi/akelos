@@ -77,12 +77,13 @@ class AkDbAdapter extends AkObject
     {
         return !empty($this->connection);
     }
+    
 
     /**
      * @param array $database_settings
      */
     /* static */
-    function &getInstance($database_specifications = AK_DEFAULT_DATABASE_PROFILE,$auto_connect = true)
+    function &getInstance($database_specifications = AK_DEFAULT_DATABASE_PROFILE, $auto_connect = true)
     {
         static $connections;
 
@@ -93,6 +94,9 @@ class AkDbAdapter extends AkObject
                 global $database_settings;
                 if (!empty($database_settings[$database_specifications])){
                     $database_specifications = $database_settings[$database_specifications];
+                } elseif(strstr($database_specifications, '://')) {
+                    $database_specifications = AkDbAdapter::_getDbSettingsFromDsn($database_specifications);
+                    $settings_hash = AK_ENVIRONMENT;
                 } else {
                     trigger_error(Ak::t("Could not find the database profile '%profile_name' in config/config.php.",array('%profile_name'=>$database_specifications)),E_USER_ERROR);
                     $return = false;
@@ -142,6 +146,9 @@ class AkDbAdapter extends AkObject
      */
     function _constructDsn($database_settings)
     {
+        if(is_string($database_settings)){
+            return $database_settings;
+        }
         $dsn  = $database_settings['type'].'://';
         $dsn .= $database_settings['user'].':'.$database_settings['password'];
         $dsn .= !empty($database_settings['host']) ? '@'.$database_settings['host'] : '@localhost';
@@ -151,7 +158,16 @@ class AkDbAdapter extends AkObject
         return $dsn;
 
     }
-
+    
+    function _getDbSettingsFromDsn($dsn)
+    {
+        $settings = $result = parse_url($dsn);
+        $result['type'] = $settings['scheme'];
+        $result['password'] = $settings['pass'];
+        $result['database_name'] = trim($settings['path'],'/');
+        return $result;
+    }
+    
     function type()
     {
         return $this->settings['type'];
