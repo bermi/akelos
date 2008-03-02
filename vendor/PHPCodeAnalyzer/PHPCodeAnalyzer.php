@@ -124,6 +124,7 @@ class PHPCodeAnalyzer
     var $inNew = false;
     var $inInclude = false;
     var $lineNumber = 1;
+    var $_previousToken = null;
     /**#@-*/
 
     /**
@@ -146,7 +147,7 @@ class PHPCodeAnalyzer
         T_FILE => 'handleString',
         T_LINE => 'handleString',
         T_DOUBLE_ARROW => 'handleString',
-        
+
         T_ARRAY => 'handleClearStrings',
         T_CONCAT_EQUAL => 'handleClearStrings',
 
@@ -280,11 +281,18 @@ class PHPCodeAnalyzer
                 $this->currentString = null;
                 $this->currentStrings = null;
                 break;
-                
+
             case ']':
-            $this->useMemberVar(false);
-            break;
+                $this->useMemberVar(false);
+                break;
+            case '{':
+                if($this->_previousToken == ')'){
+                    $this->currentVar = false;
+                    $this->currentString = null;
+                }
+                break;
         }
+        $this->_previousToken = $token;
     }
 
     /**
@@ -306,7 +314,7 @@ class PHPCodeAnalyzer
         $this->currentString = $text;
         $this->currentStrings .= $text;
     }
-    
+
     /**
 	* handle String tokens
 	* @access private
@@ -463,7 +471,7 @@ class PHPCodeAnalyzer
         {
             $this->calledFunctions[$function_name] = array();
         }
-        
+
         $this->calledFunctions[$function_name][] = $this->lineNumber;
         $this->currentString = null;
     }

@@ -33,6 +33,11 @@ class AkPhpCodeSanitizer_TestCase extends  AkUnitTest
         $this->assertValidCode('<?php empty($Post->comments) ? null : $comment_loop_counter = 0; ?>');
     }
 
+    function test_should_allow_conditional_assingments()
+    {
+        $this->assertValidCode('<?php if (isset($Preference->value)){ $value = $Preference->value; } ?>');
+    }
+
 
     /**/
     function assertValidCode($code)
