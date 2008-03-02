@@ -90,8 +90,8 @@ class AkDbAdapter extends AkObject
         $settings_hash = is_string($database_specifications) ? $database_specifications : AkDbAdapter::_hash($database_specifications);
 
         if (empty($connections[$settings_hash])){
+            global $database_settings;
             if (is_string($database_specifications)){
-                global $database_settings;
                 if (!empty($database_settings[$database_specifications])){
                     $database_specifications = $database_settings[$database_specifications];
                 } elseif(strstr($database_specifications, '://')) {
@@ -102,6 +102,8 @@ class AkDbAdapter extends AkObject
                     $return = false;
                     return $return;
                 }
+            }elseif (!empty($database_settings[$settings_hash])){
+                $database_specifications = $database_settings[$settings_hash];
             }
 
             $available_adapters = Ak::toArray(AK_AVAILABLE_DATABASES);
@@ -122,6 +124,9 @@ class AkDbAdapter extends AkObject
      */
     function _hash($settings)
     {
+        if(!is_array($settings)){
+            return AK_ENVIRONMENT;
+        }
         if (isset($settings['password'])){
             unset($settings['password']);
         }
