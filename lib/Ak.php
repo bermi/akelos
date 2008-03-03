@@ -1324,7 +1324,7 @@ class Ak
      * Gets an array or a comma separated list of models. Then it includes its 
      * respective files and returns an array of available models.
      *
-     * @return unknown
+     * @return array available models
      */
     function import()
     {
@@ -1333,13 +1333,17 @@ class Ak
         $models = array();
         foreach ($args as $arg){
             $model_name = AkInflector::camelize($arg);
+            if (class_exists($model_name)){
+                $models[] = $model_name;
+                continue;
+            }
             $model = AkInflector::toModelFilename($model_name);
-            if(file_exists($model)){
+            if (file_exists($model)){
                 $models[] = $model_name;
                 include_once($model);
-            }elseif (class_exists($model_name)){
-                $models[] = $model_name;
+                continue;
             }
+            // Shouldn't we trigger an user-error?: Unknown Model or could not find the Model
         }
 
         return $models;

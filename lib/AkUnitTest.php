@@ -87,16 +87,18 @@ class AkUnitTest extends UnitTestCase
 
     function _reinstallModel($model, $table_definition = '')
     {
-        if (!$this->uninstallAndInstallMigration($model)){
+        if (!empty($table_definition)){
             $table_name = AkInflector::tableize($model);
-            if (empty($table_definition)) {
-                trigger_error(Ak::t('Could not install the table %tablename for the model %modelname',array('%tablename'=>$table_name, '%modelname'=>$model)),E_USER_ERROR);
-                return false;
-            }
             $installer =& new AkInstaller();
             $installer->dropTable($table_name,array('sequence'=>true));
             $installer->createTable($table_name,$table_definition,array('timestamp'=>false));
+            return true;
         }
+        if ($this->uninstallAndInstallMigration($model)){
+            return true;
+        }
+        trigger_error(Ak::t('Could not install the table %tablename for the model %modelname',array('%tablename'=>$table_name, '%modelname'=>$model)),E_USER_ERROR);
+        return false;
     }
 
     function uninstallAndInstallMigration($installer_name)
@@ -114,12 +116,12 @@ class AkUnitTest extends UnitTestCase
 
     function _includeOrGenerateModel($model_name)
     {
+        if (class_exists($model_name)){
+            return true;
+        }
         if (file_exists(AK_MODELS_DIR.DS.AkInflector::underscore($model_name).'.php')){
             require_once(AK_MODELS_DIR.DS.AkInflector::underscore($model_name).'.php');
         } else {
-            if (class_exists($model_name)){
-                return true;
-            }
             $model_source_code = "class ".$model_name." extends ActiveRecord { ";
             if (!AK_PHP5) $model_source_code .= $this->__fix_for_PHP4($model_name);
             $model_source_code .= "}";
