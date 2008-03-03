@@ -323,7 +323,7 @@ class AkRequest extends AkObject
     */
     function isGet()
     {
-        return $this->getMethod == 'get';
+        return $this->getMethod() == 'get';
     }
 
     /**
