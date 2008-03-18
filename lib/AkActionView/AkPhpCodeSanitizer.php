@@ -49,12 +49,21 @@ class AkPhpCodeSanitizer
             $code =& $this->_options['code'];
         }
         $this->AnalyzeCode($code);
-        $this->secureVariables($code);
-        $this->secureFunctions($code);
-        $this->secureConstructs($code);
-        $this->secureClasses($code);
-
-        $this->secureProtectedTypes($code);
+        if(!defined('AK_PHP_CODE_SANITIZER_SKIP_VARIABLES') || !AK_PHP_CODE_SANITIZER_SKIP_VARIABLES){
+            $this->secureVariables($code);
+        }
+        if(!defined('AK_PHP_CODE_SANITIZER_SKIP_FUNCTIONS') || !AK_PHP_CODE_SANITIZER_SKIP_FUNCTIONS){
+            $this->secureFunctions($code);
+        }
+        if(!defined('AK_PHP_CODE_SANITIZER_SKIP_CONSTRUCTS') || !AK_PHP_CODE_SANITIZER_SKIP_CONSTRUCTS){
+            $this->secureConstructs($code);
+        }
+        if(!defined('AK_PHP_CODE_SANITIZER_SKIP_CLASSES') || !AK_PHP_CODE_SANITIZER_SKIP_CLASSES){
+            $this->secureClasses($code);
+        }
+        if(!defined('AK_PHP_CODE_SANITIZER_SKIP_PROTECTED_TYPES') || !AK_PHP_CODE_SANITIZER_SKIP_PROTECTED_TYPES){
+            $this->secureProtectedTypes($code);
+        }
 
         if(!empty($this->_errors)){
             if($raise_if_insecure){
@@ -109,9 +118,11 @@ class AkPhpCodeSanitizer
         array_map(array(&$this,'_addDollarSymbol_'), $_forbidden['variables']);
 
         $_used_vars = array_keys((array)$this->Analyzer->usedVariables);
-        
-        $this->lookForPrivateMemberVariables($this->Analyzer->usedMemberVariables);
-        
+
+        if(!defined('AK_PHP_CODE_SANITIZER_SKIP_MEMBER_VARIABLES') || !AK_PHP_CODE_SANITIZER_SKIP_MEMBER_VARIABLES){
+            $this->lookForPrivateMemberVariables($this->Analyzer->usedMemberVariables);
+        }
+
         $this->_invalid['variables'] = array_diff($_used_vars, array_diff($_used_vars,array_merge($_forbidden['variables'], array_filter($_used_vars, array(&$this, 'isPrivateVar')))));
     }
 
@@ -180,7 +191,7 @@ class AkPhpCodeSanitizer
     {
         return preg_match('/^["\'${\.]*_/', $var);
     }
-    
+
     function isPrivateDynamicVar($var)
     {
         if(preg_match('/^["\'{\.]*\$/', $var)){
@@ -192,7 +203,7 @@ class AkPhpCodeSanitizer
         }
         return false;
     }
-    
+
     function lookForPrivateMemberVariables($var, $nested = false)
     {
         if(is_string($var) && $this->isPrivateVar($var)){
