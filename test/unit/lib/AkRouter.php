@@ -182,11 +182,11 @@ class Test_of_AkRouter_Class extends  UnitTestCase
 
     function test_url_with_optional_variables()
     {
-        $input_value = array('controller'=>'topic','action'=>'view','id'=>4);
+        $input_value = array('controller'=>'topic','action'=>'view', 'id'=>4);
         $expected = $this->url_prefix.'/topic/4/';
         $this->assertEqual($this->Router->toUrl($input_value),$expected);
 
-        $input_value = array('controller'=>'topic','action'=>'unread','id'=>4);
+        $input_value = array('controller'=>'topic','action'=>'unread', 'id'=>4);
         $expected = $this->url_prefix.'/topic/4/unread/';
         $this->assertEqual($this->Router->toUrl($input_value),$expected);
 
@@ -303,9 +303,40 @@ class Test_for_middle_optional_values_when_generating_urls extends  UnitTestCase
 }
 
 
+
+class Test_router_conflicts extends  UnitTestCase
+{
+
+    var $Router;
+    var $url_prefix = '';
+
+    function Test_for_default_routes()
+    {
+        $this->Router =& new AkRouter();
+        $this->Router->_loadUrlRewriteSettings();
+        $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
+        $this->Router->connect('/:controller/:action/:value');
+    }
+
+    function test_should_allow_variables_with_slashes()
+    {
+        $params = array('controller'=>'page','action'=>'redirect', 'value'=>'http://akelos.org/download/');
+        $url = '/page/redirect/http%3A%2F%2Fakelos.org%2Fdownload%2F/';
+        $this->assertEqual($this->Router->toUrl($params), $url);
+        $this->assertEqual($this->Router->toParams($this->url_prefix.$url), $params);
+    }
+
+    function test_should_trigger_error_on_forbidden_router_variable()
+    {
+        $this->Router->connect('/:this');
+        $this->assertErrorPattern('/reserved word this/');
+    }
+}
+
 ak_test('Test_of_AkRouter_Class');
 ak_test('Test_for_default_routes');
 ak_test('Tests_for_url_constants_named_as_url_variables');
 ak_test('Test_for_middle_optional_values_when_generating_urls');
+ak_test('Test_router_conflicts');
 
 ?>
