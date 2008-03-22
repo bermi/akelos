@@ -1370,6 +1370,33 @@ class Ak
         $args = func_get_args();
         return is_array($args[0]) ? $args[0] : (func_num_args() === 1 ? Ak::stringToArray($args[0]) : $args);
     }
+    
+    /**
+     * Returns an array including only the elements with provided keys.
+     * 
+     * This is useful to limit the parameters of an array used by a method.
+     *
+     * This utility can be used for modifying arrays which is useful for securing record creation/updating.
+     *
+     * If you have this code on a controller
+     * 
+     *     $this->user->setAttributes($this->params['user']);
+     * 
+     * and your users table has a column named is_admin. All it would take to a malicious user is to modify the page html to add the need field and gain admin privileges.
+     * 
+     * You could avoid by using the new Ak::pick method which will return and array with desired keys.
+     * 
+     *     $this->user->setAttributes(Ak::pick('name,email', $this->params['user']));
+     * 
+     */
+    function pick($keys, $source_array)
+    {
+        $result = array();
+        foreach (Ak::toArray($keys) as $k){
+            $result[$k] = isset($source_array[$k]) ? $source_array[$k] : null;
+        }
+        return $result;
+    }
 
 
     /**

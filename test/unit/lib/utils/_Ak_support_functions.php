@@ -48,6 +48,12 @@ class test_Ak_support_functions extends  AkUnitTest
         $this->assertEqual(Ak::getDate(Ak::getTimestamp($iso_date)), $iso_date);
         $this->assertEqual(Ak::getDate(Ak::getTimestamp('2007-10-15 16:30')), $iso_date);
     }
+    
+    function test_should_pick_parameters()
+    {
+        $params = array('id'=>3, 'is_enabled'=>1, 'name'=>'Alicia');
+        $this->assertEqual(Ak::pick('id,name',$params), array('id'=>3, 'name'=>'Alicia'));
+    }
 }
 
 

@@ -1,5 +1,20 @@
 SVN
 
+* [510] Added a handy utility for modifying arrays which is useful for securing record creation/updating.
+
+If you have this code on a controller
+{{{
+  $this->user->setAttributes($this->params['user']);
+}}}
+
+and your users table has a column named is_admin. All it would take to a malicious user is to modify the page html to add the need field and gain admin privileges.
+
+You could avoid by using the new Ak::pick method which will return and array with desired keys.
+
+{{{
+  $this->user->setAttributes(Ak::pick('name,email', $this->params['user']));
+}}}
+
 * [509] Parameters given to url_for do not need to be urlencoded anymore. This allows using variables with slashes.
 
 * [476] Adding includeAndInstatiateModels and uninstallAndInstallMigration to AkUnitTest
