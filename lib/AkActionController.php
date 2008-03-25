@@ -8,8 +8,6 @@
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
-if(!class_exists('AkActionController')){
-
 require_once(AK_LIB_DIR.DS.'AkObject.php');
 
 defined('AK_HIGH_LOAD_MODE') ? null : define('AK_HIGH_LOAD_MODE', false);
@@ -22,14 +20,14 @@ defined('AK_APP_NAME') ? null : define('AK_APP_NAME', 'Application');
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
-    
+
 class AkActionController extends AkObject
 {
     var $_high_load_mode = AK_HIGH_LOAD_MODE;
     var $_enable_plugins = true;
     var $_auto_instantiate_models = true;
     var $validate_output = false;
-    
+
     var $_ssl_requirement = false;
     var $_ssl_allowed_actions = array();
     var $ssl_for_all_actions = true;
@@ -126,10 +124,10 @@ class AkActionController extends AkObject
 
     var $web_service_api;
     var $web_service_apis = array();
-    
+
     var $module_name;
     var $_module_path;
-    
+
     /**
      * Old fashioned way of dispatching requests. Please use AkDispatcher or roll your own.
      * 
@@ -147,12 +145,12 @@ class AkActionController extends AkObject
     function process(&$Request, &$Response)
     {
         AK_LOG_EVENTS && empty($this->_Logger) ? ($this->_Logger =& Ak::getLogger()) : null;
-        
+
         $this->Request =& $Request;
         $this->Response =& $Response;
         $this->params = $this->Request->getParams();
         $this->_action_name = $this->Request->getAction();
-        
+
         if(!method_exists($this, $this->_action_name)){
             trigger_error(Ak::t('Controller <i>%controller_name</i> can\'t handle action %action_name',
             array(
@@ -160,9 +158,9 @@ class AkActionController extends AkObject
             '%action_name' => $this->_action_name,
             )), E_USER_ERROR);
         }
-        
+
         Ak::t('Akelos'); // We need to get locales ready
-        
+
         if($this->_high_load_mode !== true){
             if(!empty($this->_auto_instantiate_models)){
                 $this->instantiateIncludedModelClasses();
@@ -176,21 +174,21 @@ class AkActionController extends AkObject
         }else{
             $this->_enableLayoutOnRender = false;
         }
-       
+
         $this->_ensureProperProtocol();
-        
+
         // After filters
         $this->afterFilter('_handleFlashAttribute');
-        
+
         $this->_loadActionView();
-        
+
         if(isset($this->api)){
             require_once(AK_LIB_DIR.DS.'AkActionWebService.php');
             $this->aroundFilter(new AkActionWebService($this));
         }
-        
+
         $this->performActionWithFilters($this->_action_name);
-        
+
         if (!$this->_hasPerformed()){
             $this->_enableLayoutOnRender ? $this->renderWithLayout() : $this->renderWithoutLayout();
         }
@@ -198,10 +196,10 @@ class AkActionController extends AkObject
         if(!empty($this->validate_output)){
             $this->_validateGeneratedXhtml();
         }
-        
+
         $this->Response->outputResults();
     }
-    
+
     function _loadActionView()
     {
         empty($this->_assigns) ? ($this->_assigns = array()) : null;
@@ -209,18 +207,18 @@ class AkActionController extends AkObject
         $this->_enableLayoutOnRender = !isset($this->_enableLayoutOnRender) ? true : $this->_enableLayoutOnRender;
         $this->passed_args = !isset($this->Request->pass)? array() : $this->Request->pass;
         empty($this->cookies) && isset($_COOKIE) ? ($this->cookies =& $_COOKIE) : null;
-        
+
         if(empty($this->Template)){
             require_once(AK_LIB_DIR.DS.'AkActionView.php');
             require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkPhpTemplateHandler.php');
             $this->Template =& new AkActionView($this->_getTemplateBasePath(),
             $this->Request->getParameters(),$this->Request->getController());
-        
+
             $this->Template->_controllerInstance =& $this;
             $this->Template->_registerTemplateHandler('tpl','AkPhpTemplateHandler');
         }
     }
-    
+
     function loadPlugins()
     {
         Ak::loadPlugins();
@@ -240,15 +238,10 @@ class AkActionController extends AkObject
         $helpers = $this->getDefaultHelpers();
         $helpers = array_merge($helpers, $this->getApplicationHelpers());
         $helpers = array_merge($helpers, $this->getPluginHelpers());
+        $helpers = array_merge($helpers, $this->getModuleHelper());
+        $helpers = array_merge($helpers, $this->getCurrentControllerHelper());
 
         require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
-
-        $current_controller_helper = $this->getControllerName();
-        $current_controller_helper_file_name = AK_HELPERS_DIR.DS.$this->_module_path.AkInflector::underscore($current_controller_helper).'_helper.php';
-        
-        if(file_exists($current_controller_helper_file_name)){
-            $helpers[$current_controller_helper_file_name] = $current_controller_helper;
-        }
 
         $available_helpers = array();
         foreach ($helpers as $file=>$helper){
@@ -269,6 +262,30 @@ class AkActionController extends AkObject
             }
         }
         defined('AK_ACTION_CONTROLLER_AVAILABLE_HELPERS') ? null : define('AK_ACTION_CONTROLLER_AVAILABLE_HELPERS', join(',',$available_helpers));
+    }
+
+    function getCurrentControllerHelper()
+    {
+        $helper = $this->getControllerName();
+        $helper = AkInflector::is_plural($helper)?AkInflector::singularize($helper):$helper;
+        $helper_file_name = AK_HELPERS_DIR.DS.$this->_module_path.AkInflector::underscore($helper).'_helper.php';
+
+        if(file_exists($helper_file_name)){
+            return array($helper_file_name => $helper);
+        }
+        return array();
+    }
+
+    function getModuleHelper()
+    {
+        $this->getControllerName(); // module name is set when we first retrieve the controller name
+        if(!empty($this->module_name)){
+            $helper_file_name = AK_HELPERS_DIR.DS.AkInflector::underscore($this->module_name).'_helper.php';
+            if(file_exists($helper_file_name)){
+                return array($helper_file_name => $this->module_name);
+            }
+        }
+        return array();
     }
 
     function getDefaultHelpers()
@@ -322,8 +339,8 @@ class AkActionController extends AkObject
             return $selected_helper_names;
         }
     }
-    
-     /**
+
+    /**
      * Used for adding helpers to the base class like those added by the plugins engine.
      *
      * @param string $helper_name Helper class name like CalendarHelper
@@ -389,10 +406,10 @@ class AkActionController extends AkObject
     function instantiateModelClass($model_class_name, $finder_options = array())
     {
         $underscored_model_class_name = AkInflector::underscore($model_class_name);
-
+        $controller_name = $this->getControllerName();
         $id = empty($this->params[$underscored_model_class_name]['id']) ?
         (empty($this->params['id']) ? false :
-        ($model_class_name == $this->getControllerName() ? $this->params['id'] : false)) :
+        (($model_class_name == $controller_name || $model_class_name == AkInflector::singularize($controller_name)) ? $this->params['id'] : false)) :
         $this->params[$underscored_model_class_name]['id'];
 
         if(class_exists($model_class_name)){
@@ -425,7 +442,7 @@ class AkActionController extends AkObject
                             Rendering content
     ====================================================================
     */
-    
+
     /**
     * Renders the content that will be returned to the browser as the Response body.
     * 
@@ -630,9 +647,9 @@ class AkActionController extends AkObject
         if($use_full_path){
             $this->_assertExistanceOfTemplateFile($template_path);
         }
-        
+
         AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message("Rendering $this->full_template_path" . (!empty($status) ? " ($status)":'')) : null;
-        
+
         return $this->renderText($this->Template->renderFile($template_path, $use_full_path, $locals), $status);
     }
 
@@ -743,7 +760,7 @@ class AkActionController extends AkObject
     }
 
 
-    
+
     /**
                             Redirects
     ====================================================================
@@ -837,7 +854,7 @@ class AkActionController extends AkObject
 
         return $this->controller_name;
     }
-    
+
     function getModuleName()
     {
         return $this->module_name;
@@ -857,12 +874,12 @@ class AkActionController extends AkObject
 
         }
     }
-    
+
     function _getTemplateBasePath()
     {
         return AK_APP_DIR.DS.'views'.DS.(empty($this->_module_path)?'':$this->_module_path).$this->Request->getController();
     }
-    
+
     function _getIncludedControllerNames()
     {
         $controllers = array();
@@ -1431,8 +1448,8 @@ class AkActionController extends AkObject
         }
         if(!empty($layout)){
             $layout = strstr($layout,'/') || strstr($layout,DS) ? $layout : 'layouts'.DS.$layout;
-            $layout = substr($layout,0,7) === 'layouts' ? 
-            (empty($this->_module_path) ? AK_VIEWS_DIR.DS.$layout.'.tpl' : AK_VIEWS_DIR.DS.'layouts'.DS.trim($this->_module_path, DS).'.tpl') : 
+            $layout = substr($layout,0,7) === 'layouts' ?
+            (empty($this->_module_path) ? AK_VIEWS_DIR.DS.$layout.'.tpl' : AK_VIEWS_DIR.DS.'layouts'.DS.trim($this->_module_path, DS).'.tpl') :
             $layout.'.tpl';
             if (file_exists($layout)) {
                 return $layout;
@@ -1965,7 +1982,7 @@ class AkActionController extends AkObject
         return $this->_callFilters(&$this->_afterFilters, $method);
     }
 
-    
+
     function _callFilters(&$filters, $method = '')
     {
         $filter_result = null;
@@ -2301,7 +2318,7 @@ class AkActionController extends AkObject
                         Protocol conformance
     ====================================================================
     */
-    
+
     /**
      * Specifies that the named actions requires an SSL connection to be performed (which is enforced by ensure_proper_protocol).
      */
@@ -2330,7 +2347,7 @@ class AkActionController extends AkObject
 
     function _isSslAllowed()
     {
-        return (!empty($this->ssl_for_all_actions) && empty($this->_ssl_allowed_actions)) || 
+        return (!empty($this->ssl_for_all_actions) && empty($this->_ssl_allowed_actions)) ||
         (!empty($this->_ssl_allowed_actions) && is_array($this->_ssl_allowed_actions) && isset($this->_action_name) ?
         in_array($this->_action_name, $this->_ssl_allowed_actions) : false);
     }
@@ -2443,7 +2460,7 @@ class AkActionController extends AkObject
     ====================================================================
     Methods for sending files and streams to the browser instead of rendering.
     */
-    
+
     var $default_send_file_options = array(
     'type' => 'application/octet-stream',
     'disposition' => 'attachment',
@@ -2611,8 +2628,8 @@ class AkActionController extends AkObject
             die(Ak::t('There is not any webservice configured at this endpoint'));
         }
     }
-    
-    
+
+
 
     /**
                             HTTP Authentication
@@ -2800,6 +2817,5 @@ function &AkActionController()
     return $AkActionController;
 }
 
-}
 
 ?>

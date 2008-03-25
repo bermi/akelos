@@ -1,5 +1,7 @@
 SVN
 
+* [511] Action Controllers now will automatically load singular named helpers and models if the controller has the plural form.
+
 * [510] Added a handy utility for modifying arrays which is useful for securing record creation/updating.
 
 If you have this code on a controller
