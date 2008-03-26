@@ -60,7 +60,7 @@ class Test_of_AkInstaller extends  AkUnitTest
                 'TITLE' => array('max_length'=>255,'not_null'=>null),
                 'BODY' => array('max_length'=>-1,'not_null'=>null,'type'=>'TEXT'),
                 'PARENT_ID' => array('has_default'=>1,'default_value'=>0,'not_null'=>1),
-                'CREATED_AT' => array('type'=>'DATE'),
+                'CREATED_AT' => array('type'=>'DATETIME'),
                 );
                 $this->expected_for_default_types = array(
                 'ID' => array('type'=>'INTEGER', 'max_length'=>-1,'not_null'=>1,'auto_increment'=>1,'primary_key'=>1),
@@ -70,7 +70,7 @@ class Test_of_AkInstaller extends  AkUnitTest
                 'EN_URL' => array('max_length'=>255,'not_null'=>null),
                 'ES_URL' => array('max_length'=>255,'not_null'=>null),
                 'OWNER_ID' => array('type'=>'INTEGER', 'max_length'=>-1),
-                'MODIFIED_AT' => array('type'=>'DATE'),
+                'MODIFIED_AT' => array('type'=>'DATETIME'),
                 'CREATED_ON' => array('type'=>'DATE'),
                 'IS_FEATURED' => array('max_length'=>-1,'type'=>'BOOLEAN'),
                 'POSITION' => array('max_length'=>-1),
