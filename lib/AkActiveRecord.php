@@ -3610,7 +3610,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function validatesAssociated($attribute_names, $message = 'invalid')
     {
-        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $messa;
+        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
             if(!empty($this->$attribute_name)){

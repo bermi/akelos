@@ -6,6 +6,7 @@ class AkPluginManagerTestCase extends AkUnitTest
 {
     function test_remove_repositories_config()
     {
+        Ak::directory_delete(AK_PLUGINS_DIR.DS.'acts_as_versioned');
         @Ak::file_delete(AK_CONFIG_DIR.DS.'plugin_repositories.txt');
     }
 
