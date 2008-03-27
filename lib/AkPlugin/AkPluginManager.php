@@ -203,7 +203,7 @@ class AkPluginManager extends AkObject
         }else{
             $method = '_installUsing'.ucfirst($this->guessBestInstallMethod($options));
             $this->$method($plugin_name, rtrim($repository, '/'), $options['revision'], $options['force']);
-            $this->_runInstaller($plugin_name, 'install');
+            $this->_runInstaller($plugin_name, 'install', $options);
         }
     }
 
@@ -329,7 +329,7 @@ class AkPluginManager extends AkObject
      * @return void   
      * @access private
      */
-    function _runInstaller($plugin_name, $install_or_uninstall = 'install')
+    function _runInstaller($plugin_name, $install_or_uninstall = 'install', $options = array())
     {
         $plugin_dir = AK_PLUGINS_DIR.DS.$plugin_name;
         if(file_exists($plugin_dir.DS.'installer'.DS.$plugin_name.'_installer.php')){
@@ -338,6 +338,7 @@ class AkPluginManager extends AkObject
             $class_name = AkInflector::camelize($plugin_name.'_installer');
             if(class_exists($class_name)){
                 $Installer =& new $class_name();
+                $Installer->options = $options;
                 $Installer->db->debug = false;
                 $Installer->warn_if_same_version = false;
                 $Installer->$install_or_uninstall();
