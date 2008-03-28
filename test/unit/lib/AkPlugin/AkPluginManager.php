@@ -68,6 +68,7 @@ class AkPluginManagerTestCase extends AkUnitTest
 
     function test_should_uninstall_plugin()
     {
+        clearstatcache();
         $this->PluginManager->uninstallPlugin('acts_as_versioned');
         $this->assertFalse(is_dir(AK_PLUGINS_DIR.DS.'acts_as_versioned'));
     }

@@ -37,9 +37,9 @@ class ScaffoldGenerator extends  AkelosGenerator
         $this->singular_controller_name = AkInflector::underscore($this->controller_name);
 
         $this->module_preffix = AkInflector::underscore(substr($this->controller_class_name, 0, strrpos($this->controller_class_name, '_')));
-        $this->module_preffix = empty($this->module_preffix) ? '' : DS.$this->module_preffix;    
-                
-        
+        $this->module_preffix = empty($this->module_preffix) ? '' : DS.$this->module_preffix;
+
+
         $this->files = array(
         'controller.php' => $this->controller_file_path,
         /**
@@ -55,12 +55,12 @@ class ScaffoldGenerator extends  AkelosGenerator
         'view_show' => AK_VIEWS_DIR.$this->module_preffix.DS.$this->singular_controller_name.DS.'show.tpl',
         'form' => AK_VIEWS_DIR.$this->module_preffix.DS.$this->singular_controller_name.DS.'_form.tpl',
         );
-        
+
         $this->user_actions = array();
         foreach ((array)@$this->actions as $action){
             $this->user_actions[$action] = AK_VIEWS_DIR.$this->module_preffix.DS.$this->singular_controller_name.DS.$action.'.tpl';
         }
-        
+
     }
 
     function hasCollisions()
@@ -79,12 +79,12 @@ class ScaffoldGenerator extends  AkelosGenerator
         //Generate models if they don't exist
         $model_files = array(
         'model'=>$this->model_file_path,
-        'installer'=>AK_APP_DIR.DS.'installers'.$this->module_preffix.DS.$this->singular_name.'_installer.php',
+        'installer'=>AK_APP_DIR.DS.'installers'.DS.$this->singular_name.'_installer.php',
         'model_unit_test'=>AK_TEST_DIR.DS.'unit'.DS.'app'.DS.'models'.DS.$this->singular_name.'.php',
         'model_fixture'=>    AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'models'.DS.$this->singular_name.'.php',
-        'installer_fixture'=>AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'installers'.$this->module_preffix.DS.$this->singular_name.'_installer.php'
+        'installer_fixture'=>AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'installers'.DS.$this->singular_name.'_installer.php'
         );
-        
+
         $this->_template_vars = (array)$this;
         foreach ($model_files as $template=>$file_path){
             if(!file_exists($file_path)){

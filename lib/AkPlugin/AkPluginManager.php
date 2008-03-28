@@ -271,8 +271,9 @@ class AkPluginManager extends AkObject
     {
         $plugin_name = Ak::sanitize_include($plugin_name, 'high');
         $this->_runInstaller($plugin_name, 'uninstall');
-        Ak::directory_delete(AK_PLUGINS_DIR.DS.$plugin_name);
-
+        if(is_dir(AK_PLUGINS_DIR.DS.$plugin_name)){
+            Ak::directory_delete(AK_PLUGINS_DIR.DS.$plugin_name);
+        }
         if($this->_shouldUseSvnExternals()){
             $this->_uninstallExternals($plugin_name);
         }

@@ -24,6 +24,7 @@ class AkelosGenerator
     var $type = '';
     var $_template_vars = array();
     var $collisions = array();
+    var $generators_dir = AK_GENERATORS_DIR;
 
     function runCommand($command)
     {
@@ -120,10 +121,13 @@ class AkelosGenerator
 
     function render($template, $sintags_version = false)
     {
+        $__file_path = $this->generators_dir.DS.$this->type.DS.($sintags_version?'sintags_':'').'templates'.DS.(strstr($template,'.') ? $template : $template.'.tpl');
+        if(!file_exists($__file_path)){
+            trigger_error(Ak::t('Template file %path not found.', array('%path'=>$__file_path)), E_USER_NOTICE);
+        }
         extract($this->_template_vars);
-
         ob_start();
-        include(AK_GENERATORS_DIR.DS.$this->type.DS.($sintags_version?'sintags_':'').'templates'.DS.(strstr($template,'.') ? $template : $template.'.tpl'));
+        include($__file_path);
         $result = ob_get_contents();
         ob_end_clean();
 
@@ -231,7 +235,7 @@ class AkelosGenerator
 
     function _getAvailableGenerators()
     {
-        return array_merge($this->_getGeneratorsInsidePath(AK_GENERATORS_DIR), $this->_getPluginGenerators());
+        return array_merge($this->_getGeneratorsInsidePath($this->generators_dir), $this->_getPluginGenerators());
     }
 
     function _getPluginGenerators()
