@@ -910,22 +910,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $options = $this->_extractOptionsFromArgs($args);
         list($fetch,$options) = $this->_extractConditionsFromArgs($args,$options);
 
-        //$this->santizeSql(conditions);
-        if(!empty($options['conditions']) && is_array($options['conditions'])){
-            if (isset($options['conditions'][0]) && strstr($options['conditions'][0], '?') && count($options['conditions']) > 1){
-                //array('conditions' => array("name=?",$name))
-                $pattern = array_shift($options['conditions']);
-                $options['bind'] = array_values($options['conditions']);
-                $options['conditions'] = $pattern;
-            }elseif (isset($options['conditions'][0])){
-                //array('conditions' => array("user_name = :user_name", ':user_name' => 'hilario')
-                $pattern = array_shift($options['conditions']);
-                $options['conditions'] = str_replace(array_keys($options['conditions']), array_values($this->getSanitizedConditionsArray($options['conditions'])),$pattern);
-            }else{
-                //array('conditions' => array('user_name'=>'Hilario'))
-                $options['conditions'] = join(' AND ',(array)$this->getAttributesQuoted($options['conditions']));
-            }
-        }
+        $this->_sanitizeConditionsVariables($options);
 
         switch ($fetch) {
             case 'first':
@@ -1088,6 +1073,26 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
 
         return array($fetch,$options);
+    }
+
+    function _sanitizeConditionsVariables(&$options)
+    {
+        if(!empty($options['conditions']) && is_array($options['conditions'])){
+            if (isset($options['conditions'][0]) && strstr($options['conditions'][0], '?') && count($options['conditions']) > 1){
+                //array('conditions' => array("name=?",$name))
+                $pattern = array_shift($options['conditions']);
+                $options['bind'] = array_values($options['conditions']);
+                $options['conditions'] = $pattern;
+            }elseif (isset($options['conditions'][0])){
+                //array('conditions' => array("user_name = :user_name", ':user_name' => 'hilario')
+                $pattern = array_shift($options['conditions']);
+                $options['conditions'] = str_replace(array_keys($options['conditions']), array_values($this->getSanitizedConditionsArray($options['conditions'])),$pattern);
+            }else{
+                //array('conditions' => array('user_name'=>'Hilario'))
+                $options['conditions'] = join(' AND ',(array)$this->getAttributesQuoted($options['conditions']));
+            }
+        }
+        
     }
 
     function _validateFindOptions(&$options)
