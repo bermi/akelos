@@ -8,8 +8,6 @@
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
-if(!class_exists('AkResponse')){
-
 /**
  * @package ActionController
  * @subpackage Request
@@ -847,9 +845,6 @@ function &AkRequest()
     $null = null;
     $AkRequest =& Ak::singleton('AkRequest', $null);
     return $AkRequest;
-}
-
-
 }
 
 ?>
