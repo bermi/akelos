@@ -2,7 +2,7 @@
 
 class PostController extends ApplicationController  
 {
-    var $finder_options = array('Post'=>array('include'=>'comments'));
+    var $finder_options = array('Post'=>array('include'=>'comments','order'=>'_comments.id'));
     
     function comments()
     {
