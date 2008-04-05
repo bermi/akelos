@@ -448,7 +448,7 @@ class Ak
                     $sucess = $sucess ? Ak::directory_delete($directory, $options) : $sucess;
                 }
             }
-            return $sucess ? rmdir($options['base_path'].DS.$dir_name) : $sucess;
+            return $sucess ? @rmdir($options['base_path'].DS.$dir_name) : $sucess;
         }
     }
 

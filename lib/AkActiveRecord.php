@@ -296,9 +296,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             }
             // This option is only used internally for loading found objects
         }elseif(isset($attributes[0]) && isset($attributes[1]) && $attributes[0] == 'attributes' && is_array($attributes[1])){
-            foreach($attributes[1] as $k=>$v){
-                $attributes[1][$k] = $this->castAttributeFromDatabase($k, $v);
+            foreach(array_keys($attributes[1]) as $k){
+                $attributes[1][$k] = $this->castAttributeFromDatabase($k, $attributes[1][$k]);
             }
+
             $avoid_loading_associations = isset($attributes[1]['load_associations']) ? false : !empty($this->disableAutomatedAssociationLoading);
             $this->setAttributes($attributes[1], true);
         }else{
@@ -3177,7 +3178,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 if($this->_getDatabaseType() == 'postgre'){
                     $result =  " '".$this->_db->escape_blob($value)."'::bytea ";
                 }else{
-                    $result = $add_quotes ? $this->_db->quote_string($value) : $value;
+                    $result = is_null($value) ? 'null' : ($add_quotes ? $this->_db->quote_string($value) : $value);
                 }
                 break;
 
@@ -3206,6 +3207,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 $result = is_null($value) ? 'null' : ($add_quotes ? $this->_db->quote_string($value) : $value);
                 break;
         }
+
         //  !! nullable vs. not nullable !!
         return empty($this->_columns[$column_name]['notNull']) ? ($result === '' ? "''" : $result) : ($result === 'null' ? '' : $result);
     }
@@ -3214,6 +3216,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         if($this->hasColumn($column_name)){
             $column_type = $this->getColumnType($column_name);
+
             if($column_type){
                 if('integer' == $column_type){
                     return is_null($value) ? null : (integer)$value;
