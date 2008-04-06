@@ -29,7 +29,7 @@ class MenuHelperTests extends HelpersUnitTester
 
     function test_should_get_all_controllers_with_their_actions()
     {
-        $available_controllers = array_map('array_pop', (array)Ak::dir(AK_CONTROLLERS_DIR, array('files'=>false)));
+        $available_controllers = (array)Ak::dir(AK_CONTROLLERS_DIR, array('dirs'=>false));
         $got = $this->menu_helper->_get_default_full_menu();
         foreach ($available_controllers as $controller_filename){
             $controller_name = str_replace('_controller.php','',$controller_filename);
