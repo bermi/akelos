@@ -7,7 +7,8 @@ class CI_Tests
 {
     var $options = array(
         'break_on_errors'=>false,
-        'test_mode'      =>false
+        'test_mode'      =>false,
+        'repeat'         =>1
     );
     
     var $settings;
@@ -70,6 +71,10 @@ class CI_Tests
                     case '?':
                         $this->drawHelp();
                         break;
+                    case '-n':
+                        $timesToRepeat = array_shift($args);
+                        $this->options['repeat'] = $timesToRepeat;
+                        break;
                 }
             }
         }
@@ -115,14 +120,17 @@ class CI_Tests
         $this->drawHeader();
         
         $this->beforeRun();
-        foreach ($this->filesToRun() as $file){
-            foreach ($this->executablesToRun() as $php_version){
-                foreach ($this->environmentsToRun() as $environment){
-                    if ($this->isValidCombination($environment,$php_version)){
-                        $return_value = $this->runCommand($php_version,$file,$environment);
-                        if ($return_value !== 0) {
-                            $this->markError();
-                            if ($this->options['break_on_errors']) break 3;
+        for ($i=1; $i <= $this->timesToRun(); $i++){
+            $this->drawRepeatIndicator($i);
+            foreach ($this->filesToRun() as $file){
+                foreach ($this->executablesToRun() as $php_version){
+                    foreach ($this->environmentsToRun() as $environment){
+                        if ($this->isValidCombination($environment,$php_version)){
+                            $return_value = $this->runCommand($php_version,$file,$environment);
+                            if ($return_value !== 0) {
+                                $this->markError();
+                                if ($this->options['break_on_errors']) break 4;
+                            }
                         }
                     }
                 }
@@ -156,6 +164,11 @@ class CI_Tests
     function environmentsToRun()
     {
         return $this->target_environments;
+    }
+    
+    function timesToRun()
+    {
+        return $this->options['repeat'];
     }
     
     function isValidCombination($environment,$php_version)
@@ -223,14 +236,22 @@ class CI_Tests
         if (!$this->hadError()) echo " All fine."; 
     }
     
+    function drawRepeatIndicator($actual)
+    {
+        if ($this->timesToRun() == 1) return;
+        
+        $this->drawNewline(2);
+        echo str_pad('# '.$actual.'. ',80,'#');
+    }
+    
     function drawLine($char='-',$num=80)
     {
         echo str_pad('',$num,$char);
     }
     
-    function drawNewline()
+    function drawNewline($multiplier=1)
     {
-        echo "\n\r";
+        echo str_repeat("\n\r",$multiplier);
     }
     
     function drawHelp()
@@ -241,6 +262,7 @@ Usage:
 ci_tests [php4|php5] [mysql|postgres|sqlite] [-b] [test-files]
    -b   break on first error
    -t   test-mode, don't run the commands actually
+   -n x repeat tests x times
    -?   this help
 
 Examples:
@@ -269,6 +291,7 @@ $test_args = array(
     #"-b",
     #"-?",
     "-t",
+    #"-n","2",
     #'AkHasMany.php',
     #'postgres'
 );
