@@ -3176,7 +3176,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
             case 'binary':
                 if($this->_getDatabaseType() == 'postgre'){
-                    $result =  " '".$this->_db->escape_blob($value)."'::bytea ";
+                    $result =  is_null($value) ? 'null::bytea ' : " '".$this->_db->escape_blob($value)."'::bytea ";
                 }else{
                     $result = is_null($value) ? 'null' : ($add_quotes ? $this->_db->quote_string($value) : $value);
                 }
@@ -3234,7 +3234,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 }elseif (!empty($value) && 'datetime' == $column_type && substr($value,0,10) == '0000-00-00'){
                     return null;
                 }elseif ('binary' == $column_type && $this->_getDatabaseType() == 'postgre'){
-                    return $this->_db->unescape_blob($value);
+                    $value = $this->_db->unescape_blob($value);
+                    $value = empty($value) || trim($value) == 'null' ? null : $value;
                 }
             }
         }
