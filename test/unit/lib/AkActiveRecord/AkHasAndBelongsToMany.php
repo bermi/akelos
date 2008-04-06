@@ -400,7 +400,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
             $Post =& new Post(array('title' => 'Post '.$i));
             $Post->tag->create(array('name' => 'Tag '.$i));
             $this->assertTrue($Post->save());    
-            $this->assertEqual($Post->tag->count(), 1);  // dont know why but this fails sometimes, randomly -kaste
+            $this->assertEqual($Post->tag->count(), 1, 'Failed on #'.$i);  // dont know why but this fails sometimes, randomly -kaste
         }
 
         $Post11 =& new Post(array('name' => 'Post 11'));
