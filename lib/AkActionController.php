@@ -840,39 +840,48 @@ class AkActionController extends AkObject
 
     function getControllerName()
     {
-
         if(!isset($this->controller_name)){
             $current_class_name = str_replace('_', '::', get_class($this));
-
-            $included_controllers = $this->_getIncludedControllerNames();
-            $lowercase_included_controllers = array_map('strtolower', $included_controllers);
-            $key = array_search(strtolower($current_class_name), $lowercase_included_controllers, true);
-            $found_controller = substr($included_controllers[$key], 0, -10);
-            $this->controller_name = $found_controller;
-            $this->_removeModuleNameFromControllerName();
+            if (!AK_PHP5){
+                $current_class_name = $this->__getControllerName_PHP4_fix($current_class_name); 
+            }
+            $controller_name = substr($current_class_name,0,-10);
+            $this->controller_name = $this->_removeModuleNameFromControllerName($controller_name);
         }
-
         return $this->controller_name;
+    }
+    
+    function __getControllerName_PHP4_fix($class_name)
+    {
+        $included_controllers = $this->_getIncludedControllerNames();
+        $lowercase_included_controllers = array_map('strtolower', $included_controllers);
+        $key = array_search(strtolower($class_name), $lowercase_included_controllers, true);
+        return $included_controllers[$key];
     }
 
     function getModuleName()
     {
         return $this->module_name;
     }
+    
+    function setModuleName($module_name)
+    {
+        return $this->module_name = $module_name;
+    }
 
     /**
-     * Removes the modules name from the controller if exists.
-     * 
-     * Additionally it sets the default url_options for this controller and the module name scope.
+     * Removes the modules name from the controller if exists and sets it.
+     *
+     * @return $controller_name 
      */
-    function _removeModuleNameFromControllerName()
+    function _removeModuleNameFromControllerName($controller_name)
     {
-        if(strstr($this->controller_name, '::')){
-            $module_parts = substr($this->controller_name, 0, strrpos($this->controller_name, '::'));
-            $this->module_name = join('/', array_map(array('AkInflector','underscore'), strstr($module_parts, '::') ? explode('::', $module_parts) : array($module_parts)));
-            $this->controller_name = substr($this->controller_name, strrpos($this->controller_name, '::')+2);
-
+        if(strstr($controller_name, '::')){
+            $module_parts = explode ('::',$controller_name);
+            $controller_name = array_pop($module_parts);
+            $this->setModuleName(join('/', array_map(array('AkInflector','underscore'), $module_parts)));
         }
+        return $controller_name;
     }
 
     function _getTemplateBasePath()
