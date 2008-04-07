@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 defined('AK_ENVIRONMENT') ? null : define('AK_ENVIRONMENT', 'testing');
 
 defined('AK_TEST_DIR') ? null : define('AK_TEST_DIR', str_replace(DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php','',__FILE__));
-
+defined('AK_TMP_DIR') ? null : define('AK_TMP_DIR', AK_TEST_DIR.DIRECTORY_SEPARATOR.'tmp');
 
 defined('AK_APP_DIR') ? null :
 define('AK_APP_DIR', AK_TEST_DIR.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'app');
