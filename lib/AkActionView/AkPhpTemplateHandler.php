@@ -115,7 +115,7 @@ class AkPhpTemplateHandler
             $template_file_name = $this->_getTemplateFilename();
             if(!empty($template_file_name)){
                 $this->_options['template_base_path'] = rtrim(str_replace($template_file_name,'',$this->_options['file_path']),'\/');
-                if(defined('AK_COMPILED_VIEWS_DIR') && !strstr($this->_options['template_base_path'], AK_TMP_DIR)){
+                if(AK_COMPILED_VIEWS_DIR && !strstr($this->_options['template_base_path'], AK_TMP_DIR)){
                     $this->_options['template_base_path'] = str_replace(AK_BASE_DIR, AK_COMPILED_VIEWS_DIR, $this->_options['template_base_path']);
                 }
             }else{
@@ -155,11 +155,9 @@ class AkPhpTemplateHandler
         return $this->_options['compiled_file_name'];
     }
 
-
-
     function _saveCompiledTemplate()
     {
-        Ak::file_put_contents($this->_getCompiledTemplatePath(),$this->_options['code']);
+        Ak::file_put_contents($this->_getCompiledTemplatePath(),$this->_options['code'], array('base_path' => (AK_COMPILED_VIEWS_DIR ? AK_TMP_DIR : AK_BASE_DIR)));
     }
 }
 

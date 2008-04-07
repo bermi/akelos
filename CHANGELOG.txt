@@ -1,5 +1,19 @@
 SVN
 
+* [549] AK_COMPILED_VIEWS_DIR is now set to AK_TMP_DIR/views. This means your compiled views will be generated inside the tmp folder unless you set AK_COMPILED_VIEWS_DIR to false to keep them side to side to your views.
+
+* [549] On those cases where your host do not support FTP and Apache runs as nobody, you will need to set the right permissions for ./app/locales if you want new i18n text to be added automagically. Same for ./logs. Compiled views and cache will go into a temporary folder.
+
+* [549] In those cases where ./tmp is not writable, Akelos will set AK_TMP_DIR to a new folder in your Operating System tmp dir. 
+
+This sometimes might lead to problems when Open Base forbids including files from the temporary path. In that case you'll need to chmod the ./tmp dir so Akelos knows where to put tmp files.
+
+In case you want to make a portable app that needs to write/read files, you can set the AK_TMP_DIR as a base for working with those files like:
+
+{{{
+Ak::file_puts_contents($dir, $content, array('base_path'=>AK_TMP_DIR));
+}}}
+
 * [511] Action Controllers now will automatically load singular named helpers and models if the controller has the plural form.
 
 * [510] Added a handy utility for modifying arrays which is useful for securing record creation/updating.
@@ -11,7 +25,7 @@ If you have this code on a controller
 
 and your users table has a column named is_admin. All it would take to a malicious user is to modify the page html to add the need field and gain admin privileges.
 
-You could avoid by using the new Ak::pick method which will return and array with desired keys.
+You could avoid it by using the new Ak::pick method which will return and array with desired keys. For deleting keys instead of selecting them you can use Ak::delete()
 
 {{{
   $this->user->setAttributes(Ak::pick('name,email', $this->params['user']));

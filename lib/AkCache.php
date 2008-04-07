@@ -99,7 +99,7 @@ class AkCache extends AkObject
     */
     var $cache_enabled = true;
 
-
+    
     /**
     * Class constructor (ALA Akelos Framework)
     *
@@ -159,6 +159,9 @@ class AkCache extends AkObject
                     require_once(AK_CONTRIB_DIR.'/pear/Cache_Lite/Lite.php');
                 }
                 if(!isset($options['cacheDir'])){
+                    if(!is_dir(AK_CACHE_DIR)){
+                        Ak::make_dir(AK_CACHE_DIR, array('base_path'=>AK_TMP_DIR));
+                    }
                     $options['cacheDir'] = AK_CACHE_DIR.DS;
                 }
                 $this->_driverInstance =& new Cache_Lite($options);

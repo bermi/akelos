@@ -1250,13 +1250,13 @@ class Ak
         return $randomString;
     }
 
+
     function compress($data, $format = 'gzip')
     {
         $key = Ak::randomString(15);
         $compressed_file = AK_TMP_DIR.DS.'d'.$key;
         $uncompressed_file = AK_TMP_DIR.DS.'s'.$key;
-
-        if(@Ak::file_put_contents($uncompressed_file, $data)){
+        if(Ak::file_put_contents($uncompressed_file, $data, array('base_path'=>AK_TMP_DIR))){
             $compressed = gzopen($compressed_file,'w9');
             $uncompressed = fopen($uncompressed_file, 'rb');
             while(!feof($uncompressed)){
@@ -1268,7 +1268,7 @@ class Ak
         }else{
             trigger_error(Ak::t('Could not write to temporary directory for generating compressed file using Ak::compress(). Please provide write access to %dirname', array('%dirname'=>AK_TMP_DIR)), E_USER_ERROR);
         }
-        $result = Ak::file_get_contents($compressed_file);
+        $result = Ak::file_get_contents($compressed_file, array('base_path'=>AK_TMP_DIR));
         return $result;
     }
 
@@ -1278,7 +1278,7 @@ class Ak
         $compressed_file = AK_TMP_DIR.DS.'s'.$key;
         $uncompressed_file = AK_TMP_DIR.DS.'d'.$key;
 
-        if(@Ak::file_put_contents($compressed_file, $compressed_data)){
+        if(Ak::file_put_contents($compressed_file, $compressed_data, array('base_path'=>AK_TMP_DIR))){
             $compressed = gzopen($compressed_file, "r");
             $uncompressed = fopen($uncompressed_file, "w");
             while(!gzeof($compressed)){
@@ -1290,7 +1290,7 @@ class Ak
         }else{
             trigger_error(Ak::t('Could not write to temporary directory for generating uncompressing file using Ak::uncompress(). Please provide write access to %dirname', array('%dirname'=>AK_TMP_DIR)), E_USER_ERROR);
         }
-        $result = Ak::file_get_contents($uncompressed_file);
+        $result = Ak::file_get_contents($uncompressed_file, array('base_path'=>AK_TMP_DIR));
         return $result;
     }
 

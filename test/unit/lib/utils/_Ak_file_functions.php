@@ -128,13 +128,14 @@ class test_of_Ak_file_functions extends  UnitTestCase
     
     function test_should_delete_nested_directories_when_include_hidden_files()
     {
-        $dir_name = AK_TMP_DIR.Ak::randomString();
-        Ak::make_dir($dir_name);
-        Ak::make_dir($dir_name.DS.'.hidden');
-        $this->assertTrue(is_dir($dir_name), 'Could not create test directory '.$dir_name);
-        $this->assertTrue(Ak::directory_delete($dir_name));
+        $tmp_dir = AK_TMP_DIR.DS.Ak::randomString();
+        $hidden_tmp_dir = $tmp_dir.DS.'.hidden';
+        Ak::make_dir($tmp_dir, array('base_path'=>AK_TMP_DIR));
+        Ak::make_dir($tmp_dir.DS.'.hidden', array('base_path'=>AK_TMP_DIR));
+        $this->assertTrue(is_dir($hidden_tmp_dir), 'Could not create test directory '.$hidden_tmp_dir);
+        $this->assertTrue(Ak::directory_delete($tmp_dir, array('base_path'=>AK_TMP_DIR)));
         clearstatcache();
-        $this->assertFalse(is_dir($dir_name));
+        $this->assertFalse(is_dir($tmp_dir));
     }
 }
 
