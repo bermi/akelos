@@ -147,14 +147,15 @@ class test_of_Ak_object_inspection extends  UnitTestCase
         $original = Ak::file_get_contents(__FILE__);
         $compressed = Ak::compress($original);
 
-        Ak::file_put_contents(AK_TEST_DIR.DS.'tmp'.DS.'gzip_test.gz', $compressed, array('base_path'=>AK_TMP_DIR));
+        Ak::file_put_contents(AK_TMP_DIR.DS.'gzip_test.gz', $compressed, array('base_path'=>AK_TMP_DIR));
         $this->assertTrue(strlen($compressed) < strlen($original));
 
-        $compressed_file = Ak::file_get_contents(AK_TEST_DIR.DS.'tmp'.DS.'gzip_test.gz', array('base_path'=>AK_TMP_DIR));
+        $compressed_file = Ak::file_get_contents(AK_TMP_DIR.DS.'gzip_test.gz', array('base_path'=>AK_TMP_DIR));
         $this->assertEqual($compressed_file, $compressed);
         $uncompressed_from_file = Ak::uncompress($compressed_file);
         $uncompressed_from_string = Ak::uncompress($compressed);
         $this->assertEqual($uncompressed_from_file, $uncompressed_from_string);
+
     }
     /**/
 
