@@ -209,24 +209,43 @@ class AkInstaller
     function _versionPath($options = array())
     {
         $mode = empty($options['mode']) ? AK_ENVIRONMENT : $options['mode'];
+        return AK_TMP_DIR.DS.'installer_versions'.DS.(empty($this->module)?'':$this->module.DS).$mode.'_'.$this->getInstallerName().'_version.txt';
+    }
+    
+    // DEPRECATED
+    function _versionPath_Deprecated($options = array())
+    {
+        $mode = empty($options['mode']) ? AK_ENVIRONMENT : $options['mode'];
         return AK_APP_INSTALLERS_DIR.DS.(empty($this->module)?'':$this->module.DS).'versions'.DS.$mode.'_'.$this->getInstallerName().'_version.txt';
     }
 
+    // DEPRECATED
+    function _moveOldVersionsFileToNewLocation($options)
+    {
+        $old_filename = $this->_versionPath_Deprecated($options); 
+        if (is_file($old_filename)){
+            $this->setInstalledVersion(Ak::file_get_contents($old_filename),$options);  
+            Ak::file_delete($old_filename); 
+            Ak::file_put_contents(AK_APP_INSTALLERS_DIR.DS.'versions'.DS.'NOTE',"Version information is now stored in the temp folder. \n\rYou can savely move this files here over there to tmp/installer_versions/* or delete this directory if empty.");     
+        }
+    }
 
     function getInstalledVersion($options = array())
     {
         $version_file = $this->_versionPath($options);
 
+        $this->_moveOldVersionsFileToNewLocation($options);
+        
         if(!is_file($version_file)){
             $this->setInstalledVersion(0, $options);
         }
-        return Ak::file_get_contents($this->_versionPath($options));
+        return Ak::file_get_contents($this->_versionPath($options),array('base_path'=>AK_TMP_DIR));
     }
 
 
     function setInstalledVersion($version, $options = array())
     {
-        return Ak::file_put_contents($this->_versionPath($options), $version);
+        return Ak::file_put_contents($this->_versionPath($options), $version, array('base_path'=>AK_TMP_DIR));
     }
 
 
