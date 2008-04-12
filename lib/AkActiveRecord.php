@@ -455,7 +455,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         // deprecated section
         if($this->isLockingEnabled() && is_null($this->get('lock_version'))){
-            Ak::DeprecateWarning(array("Column %lock_version_column should have a default setting. Assumed '1'.",'%lock_version_column'=>'lock_version'));
+            Ak::deprecateWarning(array("Column %lock_version_column should have a default setting. Assumed '1'.",'%lock_version_column'=>'lock_version'));
             $this->setAttribute('lock_version',1);
         } // end
 
@@ -1051,7 +1051,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         // deprecated: acts like findFirstBySQL
         if ($num_args === 1 && !is_numeric($args[0]) && is_string($args[0]) && $args[0] != 'all' && $args[0] != 'first'){
             //  $Users->find("last_name = 'Williams'");    => find('first',"last_name = 'Williams'");
-            Ak::DeprecateWarning(array("AR::find('%sql') is ambiguous and therefore deprecated, use AR::find('first',%sql) instead", '%sql'=>$args[0]));
+            Ak::deprecateWarning(array("AR::find('%sql') is ambiguous and therefore deprecated, use AR::find('first',%sql) instead", '%sql'=>$args[0]));
             $options = array('conditions'=> $args[0]);
             return array('first',$options);
         } //end
@@ -1133,7 +1133,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function &findBySql($sql, $limit = null, $offset = null, $bindings = null)
     {
         if ($limit || $offset){
-            Ak::DeprecateWarning("You're calling AR::findBySql with \$limit or \$offset parameters. This has been deprecated.");
+            Ak::deprecateWarning("You're calling AR::findBySql with \$limit or \$offset parameters. This has been deprecated.");
             $this->_db->addLimitAndOffset($sql, array('limit'=>$limit,'offset'=>$offset));
         }
         if(!isset($this->_activeRecordHasBeenInstantiated)){

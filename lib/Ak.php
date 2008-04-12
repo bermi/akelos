@@ -71,7 +71,7 @@ class Ak
      * @param string $message
      * @param [OPTIONAL] $fatal triggers even in production-mode
      */
-    function DeprecateWarning($message, $fatal=false)
+    function deprecateWarning($message, $fatal=false)
     {
         if (!$fatal && AK_ENVIRONMENT == 'production'){
             return;
@@ -549,57 +549,25 @@ class Ak
 
 
     /**
-     * Perform a web request using curl
+     * Perform a web request
      * 
      * @param string $url URL we are going to request.
      * @param array $options Options for current request.
      *  Options are:
      * * referer: URL that will be set as referer url. Default is current url
      * * params: Parameter for the request. Can be an array of key=>values or a url params string like key=value&key2=value2
-     * * method: In case params are given the will be requested using post method by default. Specify get if post is not what you need.
-     * * browser_name: How are we going to be presented to the website. Default is 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)'
+     * * method: In case params are given the will be requested using get method by default. Specify post if get is not what you need.
      * @return string
      */
     function url_get_contents($url, $options = array())
     {
-        ak_compat('http_build_query');
-
-        $default_options = array(
-        'referer' => $url,
-        'method' => 'post',
-        'timeout' => 100,
-        'params' => '',
-        'browser_name' => 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)',
-        );
-
-        $options = array_merge($default_options, $options);
-
-        $options['params'] = !empty($options['params']) ? (is_array($options['params']) ? http_build_query(array_map('urlencode', $options['params'])) : $options['params']) : '';
-        $options['method'] = strtolower($options['method']) == 'post' ? 'post' : 'get';
-
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_USERAGENT, $options['browser_name']);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-
-        if(!empty($options['params']) && $options['method'] == 'post'){
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $options['params']);
-        }elseif(!empty($options['params'])){
-            $url = trim($url,'?').'?'.trim($options['params'], '?');
+        include_once(AK_LIB_DIR.DS.'AkHttpClient.php');
+        $Client =& new AkHttpClient();
+        $method = empty($options['method']) ? 'get' : strtolower($options['method']);
+        if(empty($method) || !in_array($method, array('get','post','put','delete'))){
+            trigger_error(Ak::t('Invalid HTTP method %method', array('%method'=>$options['method'])), E_USER_ERROR);
         }
-
-        curl_setopt ($ch, CURLOPT_REFERER, $options['referer']);
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $options['timeout']);
-
-        $result = curl_exec ($ch);
-        curl_close ($ch);
-
-        return $result;
+        return $Client->$method($url, $options);
     }
 
 

@@ -1,5 +1,24 @@
 SVN
 
+* [556] Adding a new HTTP client for performing REST requests at lib/AkHttpClient. See unit tests for details.
+
+* [556] Adding support for accepting PUT HTTP requests.
+
+* [556] Changing Ak::DeprecateWarning to Ak::deprecateWarning in order to match coding conventions.
+
+* [556] Adding support for reporting unknown actions using a public/405.php file when working on production mode. 404.php remains the file for controller not found errors.
+
+* [556] Logging invalid controller/action requests.
+
+* [556] Modifying Ak::url_get_contents. It does not require curl anymore. 
+
+Now it works like 
+
+{{{
+$Client = new AkHttpClient();
+$Client->get('url', array('params'=>.....));
+}}}
+
 * [549] AK_COMPILED_VIEWS_DIR is now set to AK_TMP_DIR/views. This means your compiled views will be generated inside the tmp folder unless you set AK_COMPILED_VIEWS_DIR to false to keep them side to side to your views.
 
 * [549] On those cases where your host do not support FTP and Apache runs as nobody, you will need to set the right permissions for ./app/locales if you want new i18n text to be added automagically. Same for ./logs. Compiled views and cache will go into a temporary folder.

@@ -1,52 +1,65 @@
 <?php
-// +-----------------------------------------------------------------------+
-// | Copyright (c) 2002-2003, Richard Heyes                                |
-// | All rights reserved.                                                  |
-// |                                                                       |
-// | Redistribution and use in source and binary forms, with or without    |
-// | modification, are permitted provided that the following conditions    |
-// | are met:                                                              |
-// |                                                                       |
-// | o Redistributions of source code must retain the above copyright      |
-// |   notice, this list of conditions and the following disclaimer.       |
-// | o Redistributions in binary form must reproduce the above copyright   |
-// |   notice, this list of conditions and the following disclaimer in the |
-// |   documentation and/or other materials provided with the distribution.|
-// | o The names of the authors may not be used to endorse or promote      |
-// |   products derived from this software without specific prior written  |
-// |   permission.                                                         |
-// |                                                                       |
-// | THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS   |
-// | "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT     |
-// | LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR |
-// | A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT  |
-// | OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, |
-// | SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT      |
-// | LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, |
-// | DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY |
-// | THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT   |
-// | (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE |
-// | OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  |
-// |                                                                       |
-// +-----------------------------------------------------------------------+
-// | Author: Richard Heyes <richard@phpguru.org>                           |
-// +-----------------------------------------------------------------------+
-//
-// $Id: Request.php,v 1.51 2006/10/25 16:23:31 avb Exp $
-//
-// HTTP_Request Class
-//
-// Simple example, (Fetches yahoo.com and displays it):
-//
-// $a = &new HTTP_Request('http://www.yahoo.com/');
-// $a->sendRequest();
-// echo $a->getResponseBody();
-//
+/**
+ * Class for performing HTTP requests
+ *
+ * PHP versions 4 and 5
+ * 
+ * LICENSE:
+ *
+ * Copyright (c) 2002-2007, Richard Heyes
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * o Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ * o Redistributions in binary form must reproduce the above copyright
+ *   notice, this list of conditions and the following disclaimer in the
+ *   documentation and/or other materials provided with the distribution.
+ * o The names of the authors may not be used to endorse or promote
+ *   products derived from this software without specific prior written
+ *   permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category    HTTP
+ * @package     HTTP_Request
+ * @author      Richard Heyes <richard@phpguru.org>
+ * @author      Alexey Borzov <avb@php.net>
+ * @copyright   2002-2007 Richard Heyes
+ * @license     http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version     CVS: $Id: Request.php,v 1.58 2007/10/26 13:45:56 avb Exp $
+ * @link        http://pear.php.net/package/HTTP_Request/ 
+ */
 
+/**
+ * PEAR and PEAR_Error classes (for error handling)
+ */
 require_once 'PEAR.php';
+/**
+ * Socket class
+ */
 require_once 'Net/Socket.php';
+/**
+ * URL handling class
+ */ 
 require_once 'Net/URL.php';
 
+/**#@+
+ * Constants for HTTP request methods
+ */ 
 define('HTTP_REQUEST_METHOD_GET',     'GET',     true);
 define('HTTP_REQUEST_METHOD_HEAD',    'HEAD',    true);
 define('HTTP_REQUEST_METHOD_POST',    'POST',    true);
@@ -54,15 +67,65 @@ define('HTTP_REQUEST_METHOD_PUT',     'PUT',     true);
 define('HTTP_REQUEST_METHOD_DELETE',  'DELETE',  true);
 define('HTTP_REQUEST_METHOD_OPTIONS', 'OPTIONS', true);
 define('HTTP_REQUEST_METHOD_TRACE',   'TRACE',   true);
+/**#@-*/
 
+/**#@+
+ * Constants for HTTP request error codes
+ */ 
+define('HTTP_REQUEST_ERROR_FILE',             1);
+define('HTTP_REQUEST_ERROR_URL',              2);
+define('HTTP_REQUEST_ERROR_PROXY',            4);
+define('HTTP_REQUEST_ERROR_REDIRECTS',        8);
+define('HTTP_REQUEST_ERROR_RESPONSE',        16);  
+define('HTTP_REQUEST_ERROR_GZIP_METHOD',     32);
+define('HTTP_REQUEST_ERROR_GZIP_READ',       64);
+define('HTTP_REQUEST_ERROR_GZIP_DATA',      128);
+define('HTTP_REQUEST_ERROR_GZIP_CRC',       256);
+/**#@-*/
+
+/**#@+
+ * Constants for HTTP protocol versions
+ */
 define('HTTP_REQUEST_HTTP_VER_1_0', '1.0', true);
 define('HTTP_REQUEST_HTTP_VER_1_1', '1.1', true);
+/**#@-*/
 
-class HTTP_Request {
+if (extension_loaded('mbstring') && (2 & ini_get('mbstring.func_overload'))) {
+   /**
+    * Whether string functions are overloaded by their mbstring equivalents 
+    */
+    define('HTTP_REQUEST_MBSTRING', true);
+} else {
+   /**
+    * @ignore
+    */
+    define('HTTP_REQUEST_MBSTRING', false);
+}
 
+/**
+ * Class for performing HTTP requests
+ *
+ * Simple example (fetches yahoo.com and displays it):
+ * <code>
+ * $a = &new HTTP_Request('http://www.yahoo.com/');
+ * $a->sendRequest();
+ * echo $a->getResponseBody();
+ * </code>
+ *
+ * @category    HTTP
+ * @package     HTTP_Request
+ * @author      Richard Heyes <richard@phpguru.org>
+ * @author      Alexey Borzov <avb@php.net>
+ * @version     Release: 1.4.2
+ */
+class HTTP_Request
+{
+   /**#@+
+    * @access private
+    */
     /**
     * Instance of Net_URL
-    * @var object Net_URL
+    * @var Net_URL
     */
     var $_url;
 
@@ -98,7 +161,7 @@ class HTTP_Request {
 
     /**
     * Socket object
-    * @var object Net_Socket
+    * @var Net_Socket
     */
     var $_sock;
     
@@ -158,7 +221,7 @@ class HTTP_Request {
     
     /**
     * HTTP_Response object
-    * @var object HTTP_Response
+    * @var HTTP_Response
     */
     var $_response;
     
@@ -209,6 +272,7 @@ class HTTP_Request {
     * @var array
     */
     var $_socketOptions = null;
+   /**#@-*/
 
     /**
     * Constructor
@@ -283,10 +347,7 @@ class HTTP_Request {
         }
 
         // Use gzip encoding if possible
-        // Avoid gzip encoding if using multibyte functions (see #1781)
-        if (HTTP_REQUEST_HTTP_VER_1_1 == $this->_http && extension_loaded('zlib') &&
-            0 == (2 & ini_get('mbstring.func_overload'))) {
-
+        if (HTTP_REQUEST_HTTP_VER_1_1 == $this->_http && extension_loaded('zlib')) {
             $this->addHeader('Accept-Encoding', 'gzip');
         }
     }
@@ -360,7 +421,7 @@ class HTTP_Request {
     * @return   string  Current request URL
     * @access   public
     */
-    function getUrl($url)
+    function getUrl()
     {
         return empty($this->_url)? '': $this->_url->getUrl();
     }
@@ -525,11 +586,11 @@ class HTTP_Request {
     function addFile($inputName, $fileName, $contentType = 'application/octet-stream')
     {
         if (!is_array($fileName) && !is_readable($fileName)) {
-            return PEAR::raiseError("File '{$fileName}' is not readable");
+            return PEAR::raiseError("File '{$fileName}' is not readable", HTTP_REQUEST_ERROR_FILE);
         } elseif (is_array($fileName)) {
             foreach ($fileName as $name) {
                 if (!is_readable($name)) {
-                    return PEAR::raiseError("File '{$name}' is not readable");
+                    return PEAR::raiseError("File '{$name}' is not readable", HTTP_REQUEST_ERROR_FILE);
                 }
             }
         }
@@ -615,7 +676,7 @@ class HTTP_Request {
     function sendRequest($saveBody = true)
     {
         if (!is_a($this->_url, 'Net_URL')) {
-            return PEAR::raiseError('No URL given.');
+            return PEAR::raiseError('No URL given', HTTP_REQUEST_ERROR_URL);
         }
 
         $host = isset($this->_proxy_host) ? $this->_proxy_host : $this->_url->host;
@@ -625,7 +686,7 @@ class HTTP_Request {
         // we running on at least 4.3.0
         if (strcasecmp($this->_url->protocol, 'https') == 0 AND function_exists('file_get_contents') AND extension_loaded('openssl')) {
             if (isset($this->_proxy_host)) {
-                return PEAR::raiseError('HTTPS proxies are not supported.');
+                return PEAR::raiseError('HTTPS proxies are not supported', HTTP_REQUEST_ERROR_PROXY);
             }
             $host = 'ssl://' . $host;
         }
@@ -745,7 +806,7 @@ class HTTP_Request {
 
         // Too many redirects
         } elseif ($this->_allowRedirects AND $this->_redirects > $this->_maxRedirects) {
-            return PEAR::raiseError('Too many redirects');
+            return PEAR::raiseError('Too many redirects', HTTP_REQUEST_ERROR_REDIRECTS);
         }
 
         return true;
@@ -833,10 +894,14 @@ class HTTP_Request {
         $path = $this->_url->path . $querystring;
         $url  = $host . $port . $path;
 
+        if (!strlen($url)) {
+            $url = '/';
+        }
+
         $request = $this->_method . ' ' . $url . ' HTTP/' . $this->_http . "\r\n";
 
         if (in_array($this->_method, $this->_bodyDisallowed) ||
-            (empty($this->_body) && (HTTP_REQUEST_METHOD_POST != $this->_method ||
+            (0 == strlen($this->_body) && (HTTP_REQUEST_METHOD_POST != $this->_method ||
              (empty($this->_postData) && empty($this->_postFiles)))))
         {
             $this->removeHeader('Content-Type');
@@ -860,7 +925,7 @@ class HTTP_Request {
 
         // No post data or wrong method, so simply add a final CRLF
         if (in_array($this->_method, $this->_bodyDisallowed) || 
-            (HTTP_REQUEST_METHOD_POST != $this->_method && empty($this->_body))) {
+            (HTTP_REQUEST_METHOD_POST != $this->_method && 0 == strlen($this->_body))) {
 
             $request .= "\r\n";
 
@@ -908,14 +973,23 @@ class HTTP_Request {
                 }
                 $postdata .= '--' . $boundary . "--\r\n";
             }
-            $request .= 'Content-Length: ' . strlen($postdata) . "\r\n\r\n";
+            $request .= 'Content-Length: ' .
+                        (HTTP_REQUEST_MBSTRING? mb_strlen($postdata, 'iso-8859-1'): strlen($postdata)) .
+                        "\r\n\r\n";
             $request .= $postdata;
 
         // Explicitly set request body
-        } elseif (!empty($this->_body)) {
+        } elseif (0 < strlen($this->_body)) {
 
-            $request .= 'Content-Length: ' . strlen($this->_body) . "\r\n\r\n";
+            $request .= 'Content-Length: ' .
+                        (HTTP_REQUEST_MBSTRING? mb_strlen($this->_body, 'iso-8859-1'): strlen($this->_body)) .
+                        "\r\n\r\n";
             $request .= $this->_body;
+
+        // Terminate headers with CRLF on POST request with no body, too
+        } else {
+
+            $request .= "\r\n";
         }
         
         return $request;
@@ -928,6 +1002,7 @@ class HTTP_Request {
     * @param    string  name for item
     * @param    mixed   item's values
     * @return   array   array with the following items: array('item name', 'item value');
+    * @access   private
     */
     function _flattenArray($name, $values)
     {
@@ -954,8 +1029,19 @@ class HTTP_Request {
     * Adds a Listener to the list of listeners that are notified of
     * the object's events
     * 
-    * @param    object   HTTP_Request_Listener instance to attach
-    * @return   boolean  whether the listener was successfully attached
+    * Events sent by HTTP_Request object
+    * - 'connect': on connection to server
+    * - 'sentRequest': after the request was sent
+    * - 'disconnect': on disconnection from server
+    *
+    * Events sent by HTTP_Response object
+    * - 'gotHeaders': after receiving response headers (headers are passed in $data)
+    * - 'tick': on receiving a part of response body (the part is passed in $data)
+    * - 'gzTick': on receiving a gzip-encoded part of response body (ditto)
+    * - 'gotBody': after receiving the response body (passes the decoded body in $data if it was gzipped)
+    *
+    * @param    HTTP_Request_Listener   listener to attach
+    * @return   boolean                 whether the listener was successfully attached
     * @access   public
     */
     function attach(&$listener)
@@ -971,8 +1057,8 @@ class HTTP_Request {
    /**
     * Removes a Listener from the list of listeners 
     * 
-    * @param    object   HTTP_Request_Listener instance to detach
-    * @return   boolean  whether the listener was successfully detached
+    * @param    HTTP_Request_Listener   listener to detach
+    * @return   boolean                 whether the listener was successfully detached
     * @access   public
     */
     function detach(&$listener)
@@ -989,20 +1075,10 @@ class HTTP_Request {
    /**
     * Notifies all registered listeners of an event.
     * 
-    * Events sent by HTTP_Request object
-    * - 'connect': on connection to server
-    * - 'sentRequest': after the request was sent
-    * - 'disconnect': on disconnection from server
-    * 
-    * Events sent by HTTP_Response object
-    * - 'gotHeaders': after receiving response headers (headers are passed in $data)
-    * - 'tick': on receiving a part of response body (the part is passed in $data)
-    * - 'gzTick': on receiving a gzip-encoded part of response body (ditto)
-    * - 'gotBody': after receiving the response body (passes the decoded body in $data if it was gzipped)
-    * 
     * @param    string  Event name
     * @param    mixed   Additional data
     * @access   private
+    * @see      HTTP_Request::attach()
     */
     function _notify($event, $data = null)
     {
@@ -1014,13 +1090,19 @@ class HTTP_Request {
 
 
 /**
-* Response class to complement the Request class
-*/
+ * Response class to complement the Request class
+ *
+ * @category    HTTP
+ * @package     HTTP_Request
+ * @author      Richard Heyes <richard@phpguru.org>
+ * @author      Alexey Borzov <avb@php.net>
+ * @version     Release: 1.4.2
+ */
 class HTTP_Response
 {
     /**
     * Socket object
-    * @var object
+    * @var Net_Socket
     */
     var $_sock;
 
@@ -1075,9 +1157,8 @@ class HTTP_Response
     /**
     * Constructor
     *
-    * @param  object Net_Socket     socket to read the response from
-    * @param  array                 listeners attached to request
-    * @return mixed PEAR Error on error, true otherwise
+    * @param  Net_Socket    socket to read the response from
+    * @param  array         listeners attached to request
     */
     function HTTP_Response(&$sock, &$listeners)
     {
@@ -1106,7 +1187,7 @@ class HTTP_Response
         do {
             $line = $this->_sock->readLine();
             if (sscanf($line, 'HTTP/%s %s', $http_version, $returncode) != 2) {
-                return PEAR::raiseError('Malformed response.');
+                return PEAR::raiseError('Malformed response', HTTP_REQUEST_ERROR_RESPONSE);
             } else {
                 $this->_protocol = 'HTTP/' . $http_version;
                 $this->_code     = intval($returncode);
@@ -1146,7 +1227,7 @@ class HTTP_Response
                     $data = $this->_sock->read(4096);
                 } else {
                     $data = $this->_sock->read(min(4096, $this->_toRead));
-                    $this->_toRead -= strlen($data);
+                    $this->_toRead -= HTTP_REQUEST_MBSTRING? mb_strlen($data, 'iso-8859-1'): strlen($data);
                 }
                 if ('' == $data) {
                     break;
@@ -1278,7 +1359,7 @@ class HTTP_Response
             }
         }
         $data = $this->_sock->read($this->_chunkLength);
-        $this->_chunkLength -= strlen($data);
+        $this->_chunkLength -= HTTP_REQUEST_MBSTRING? mb_strlen($data, 'iso-8859-1'): strlen($data);
         if (0 == $this->_chunkLength) {
             $this->_sock->readLine(); // Trailing CRLF
         }
@@ -1315,6 +1396,10 @@ class HTTP_Response
     */
     function _decodeGzip($data)
     {
+        if (HTTP_REQUEST_MBSTRING) {
+            $oldEncoding = mb_internal_encoding();
+            mb_internal_encoding('iso-8859-1');
+        }
         $length = strlen($data);
         // If it doesn't look like gzip-encoded data, don't bother
         if (18 > $length || strcmp(substr($data, 0, 2), "\x1f\x8b")) {
@@ -1322,11 +1407,11 @@ class HTTP_Response
         }
         $method = ord(substr($data, 2, 1));
         if (8 != $method) {
-            return PEAR::raiseError('_decodeGzip(): unknown compression method');
+            return PEAR::raiseError('_decodeGzip(): unknown compression method', HTTP_REQUEST_ERROR_GZIP_METHOD);
         }
         $flags = ord(substr($data, 3, 1));
         if ($flags & 224) {
-            return PEAR::raiseError('_decodeGzip(): reserved bits are set');
+            return PEAR::raiseError('_decodeGzip(): reserved bits are set', HTTP_REQUEST_ERROR_GZIP_DATA);
         }
 
         // header is 10 bytes minimum. may be longer, though.
@@ -1334,45 +1419,45 @@ class HTTP_Response
         // extra fields, need to skip 'em
         if ($flags & 4) {
             if ($length - $headerLength - 2 < 8) {
-                return PEAR::raiseError('_decodeGzip(): data too short');
+                return PEAR::raiseError('_decodeGzip(): data too short', HTTP_REQUEST_ERROR_GZIP_DATA);
             }
             $extraLength = unpack('v', substr($data, 10, 2));
             if ($length - $headerLength - 2 - $extraLength[1] < 8) {
-                return PEAR::raiseError('_decodeGzip(): data too short');
+                return PEAR::raiseError('_decodeGzip(): data too short', HTTP_REQUEST_ERROR_GZIP_DATA);
             }
             $headerLength += $extraLength[1] + 2;
         }
         // file name, need to skip that
         if ($flags & 8) {
             if ($length - $headerLength - 1 < 8) {
-                return PEAR::raiseError('_decodeGzip(): data too short');
+                return PEAR::raiseError('_decodeGzip(): data too short', HTTP_REQUEST_ERROR_GZIP_DATA);
             }
             $filenameLength = strpos(substr($data, $headerLength), chr(0));
             if (false === $filenameLength || $length - $headerLength - $filenameLength - 1 < 8) {
-                return PEAR::raiseError('_decodeGzip(): data too short');
+                return PEAR::raiseError('_decodeGzip(): data too short', HTTP_REQUEST_ERROR_GZIP_DATA);
             }
             $headerLength += $filenameLength + 1;
         }
         // comment, need to skip that also
         if ($flags & 16) {
             if ($length - $headerLength - 1 < 8) {
-                return PEAR::raiseError('_decodeGzip(): data too short');
+                return PEAR::raiseError('_decodeGzip(): data too short', HTTP_REQUEST_ERROR_GZIP_DATA);
             }
             $commentLength = strpos(substr($data, $headerLength), chr(0));
             if (false === $commentLength || $length - $headerLength - $commentLength - 1 < 8) {
-                return PEAR::raiseError('_decodeGzip(): data too short');
+                return PEAR::raiseError('_decodeGzip(): data too short', HTTP_REQUEST_ERROR_GZIP_DATA);
             }
             $headerLength += $commentLength + 1;
         }
         // have a CRC for header. let's check
         if ($flags & 1) {
             if ($length - $headerLength - 2 < 8) {
-                return PEAR::raiseError('_decodeGzip(): data too short');
+                return PEAR::raiseError('_decodeGzip(): data too short', HTTP_REQUEST_ERROR_GZIP_DATA);
             }
             $crcReal   = 0xffff & crc32(substr($data, 0, $headerLength));
             $crcStored = unpack('v', substr($data, $headerLength, 2));
             if ($crcReal != $crcStored[1]) {
-                return PEAR::raiseError('_decodeGzip(): header CRC check failed');
+                return PEAR::raiseError('_decodeGzip(): header CRC check failed', HTTP_REQUEST_ERROR_GZIP_CRC);
             }
             $headerLength += 2;
         }
@@ -1384,11 +1469,14 @@ class HTTP_Response
         // finally, call the gzinflate() function
         $unpacked = @gzinflate(substr($data, $headerLength, -8), $dataSize);
         if (false === $unpacked) {
-            return PEAR::raiseError('_decodeGzip(): gzinflate() call failed');
+            return PEAR::raiseError('_decodeGzip(): gzinflate() call failed', HTTP_REQUEST_ERROR_GZIP_READ);
         } elseif ($dataSize != strlen($unpacked)) {
-            return PEAR::raiseError('_decodeGzip(): data size check failed');
-        } elseif ($dataCrc != crc32($unpacked)) {
-            return PEAR::raiseError('_decodeGzip(): data CRC check failed');
+            return PEAR::raiseError('_decodeGzip(): data size check failed', HTTP_REQUEST_ERROR_GZIP_READ);
+        } elseif ((0xffffffff & $dataCrc) != (0xffffffff & crc32($unpacked))) {
+            return PEAR::raiseError('_decodeGzip(): data CRC check failed', HTTP_REQUEST_ERROR_GZIP_CRC);
+        }
+        if (HTTP_REQUEST_MBSTRING) {
+            mb_internal_encoding($oldEncoding);
         }
         return $unpacked;
     }

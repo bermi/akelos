@@ -151,13 +151,7 @@ class AkActionController extends AkObject
         $this->params = $this->Request->getParams();
         $this->_action_name = $this->Request->getAction();
 
-        if(!method_exists($this, $this->_action_name)){
-            trigger_error(Ak::t('Controller <i>%controller_name</i> can\'t handle action %action_name',
-            array(
-            '%controller_name' => $this->getControllerName(),
-            '%action_name' => $this->_action_name,
-            )), E_USER_ERROR);
-        }
+        $this->_ensureActionExists();
 
         Ak::t('Akelos'); // We need to get locales ready
 
@@ -843,14 +837,14 @@ class AkActionController extends AkObject
         if(!isset($this->controller_name)){
             $current_class_name = str_replace('_', '::', get_class($this));
             if (!AK_PHP5){
-                $current_class_name = $this->__getControllerName_PHP4_fix($current_class_name); 
+                $current_class_name = $this->__getControllerName_PHP4_fix($current_class_name);
             }
             $controller_name = substr($current_class_name,0,-10);
             $this->controller_name = $this->_removeModuleNameFromControllerName($controller_name);
         }
         return $this->controller_name;
     }
-    
+
     function __getControllerName_PHP4_fix($class_name)
     {
         $included_controllers = $this->_getIncludedControllerNames();
@@ -863,7 +857,7 @@ class AkActionController extends AkObject
     {
         return $this->module_name;
     }
-    
+
     function setModuleName($module_name)
     {
         return $this->module_name = $module_name;
@@ -2809,6 +2803,25 @@ class AkActionController extends AkObject
             header('HTTP/1.0 401 Unauthorized');
             echo "HTTP Basic: Access denied.\n";
             exit;
+        }
+    }
+
+    function _ensureActionExists()
+    {
+        if(!method_exists($this, $this->_action_name)){
+            if(AK_ENVIRONMENT == 'development'){
+                AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->error('Action '.$this->_action_name.' not found on '.$this->getControllerName()) : null;
+                trigger_error(Ak::t('Controller <i>%controller_name</i> can\'t handle action %action_name',
+                array(
+                '%controller_name' => $this->getControllerName(),
+                '%action_name' => $this->_action_name,
+                )), E_USER_ERROR);
+            }elseif(@include(AK_PUBLIC_DIR.DS.'405.php')){
+                exit;
+            }else{
+                header("HTTP/1.1 405 Method Not Allowed");
+                die('405 Method Not Allowed');
+            }
         }
     }
 }

@@ -17,13 +17,13 @@
 // |          Chuck Hagenbuch <chuck@horde.org>                           |
 // +----------------------------------------------------------------------+
 //
-// $Id: Socket.php,v 1.24 2005/02/03 20:40:16 chagenbu Exp $
+// $Id: Socket.php,v 1.31 2007/05/04 04:30:29 chagenbu Exp $
 
 require_once 'PEAR.php';
 
 define('NET_SOCKET_READ',  1);
 define('NET_SOCKET_WRITE', 2);
-define('NET_SOCKET_ERROR', 3);
+define('NET_SOCKET_ERROR', 4);
 
 /**
  * Generalized Socket class.
@@ -216,6 +216,27 @@ class Net_Socket extends PEAR {
     }
 
     /**
+     * Sets the file buffering size on the stream.
+     * See php's stream_set_write_buffer for more information.
+     *
+     * @param integer $size     Write buffer size.
+     * @access public
+     * @return mixed on success or an PEAR_Error object otherwise
+     */
+    function setWriteBuffer($size)
+    {
+        if (!is_resource($this->fp)) {
+            return $this->raiseError('not connected');
+        }
+
+        $returned = stream_set_write_buffer($this->fp, $code);
+        if ($returned == 0) {
+            return true;
+        }
+        return $this->raiseError('Cannot set write buffer.');
+    }
+
+    /**
      * Returns information about an existing socket resource.
      * Currently returns four entries in the result array:
      *
@@ -329,12 +350,14 @@ class Net_Socket extends PEAR {
     /**
      * Tests for end-of-file on a socket descriptor.
      *
+     * Also returns true if the socket is disconnected.
+     *
      * @access public
      * @return bool
      */
     function eof()
     {
-        return (is_resource($this->fp) && feof($this->fp));
+        return (!is_resource($this->fp) || feof($this->fp));
     }
 
     /**
@@ -523,6 +546,31 @@ class Net_Socket extends PEAR {
             $result |= NET_SOCKET_ERROR;
         }
         return $result;
+    }
+
+    /**
+     * Turns encryption on/off on a connected socket.
+     *
+     * @param bool    $enabled  Set this parameter to true to enable encryption
+     *                          and false to disable encryption.
+     * @param integer $type     Type of encryption. See
+     *                          http://se.php.net/manual/en/function.stream-socket-enable-crypto.php for values.
+     *
+     * @access public
+     * @return false on error, true on success and 0 if there isn't enough data and the
+     *         user should try again (non-blocking sockets only). A PEAR_Error object
+     *         is returned if the socket is not connected
+     */
+    function enableCrypto($enabled, $type)
+    {
+        if (version_compare(phpversion(), "5.1.0", ">=")) {
+            if (!is_resource($this->fp)) {
+                return $this->raiseError('not connected');
+            }
+            return @stream_socket_enable_crypto($this->fp, $enabled, $type);
+        } else {
+            return $this->raiseError('Net_Socket::enableCrypto() requires php version >= 5.1.0');
+        }
     }
 
 }

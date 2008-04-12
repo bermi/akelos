@@ -45,10 +45,6 @@ $_SERVER['REQUEST_URI'] = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_UR
 */
 class AkRequest extends AkObject
 {
-    // {{{ properties
-
-
-    // --- Private properties --- //
 
     /**
     * Array containing the request parameters.
@@ -68,25 +64,14 @@ class AkRequest extends AkObject
     var $action = AK_DEFAULT_ACTION;
     var $controller = AK_DEFAULT_CONTROLLER;
     var $view;
-    
+
     /**
     * Holds information about current environment. Initially a reference to $_SERVER
     *
     * @var array
     */
     var $env = array();
-    // }}}
 
-
-    // ------ CLASS METHODS ------ //
-
-
-
-
-    // ---- Public methods ---- //
-
-
-    // {{{ _parseAkRequestString()
 
     /**
     * String parse method.
@@ -115,8 +100,6 @@ class AkRequest extends AkObject
         return $result;
     }
 
-    // }}}
-
 
     function __construct ()
     {
@@ -124,10 +107,6 @@ class AkRequest extends AkObject
     }
 
 
-    // ---- Private methods ---- //
-
-
-    // {{{ init()
 
     /**
     * Initialization method.
@@ -141,7 +120,7 @@ class AkRequest extends AkObject
     function init()
     {
         if(!$this->_init_check){
-
+            $this->env =& $_SERVER;
             $this->_fixGpcMagic();
             $this->_urlDecode();
 
@@ -156,15 +135,11 @@ class AkRequest extends AkObject
             $this->_init_check = true;
         }
 
-        $this->env =& $_SERVER;
-
         if(defined('AK_LOG_EVENTS') && AK_LOG_EVENTS){
-            $Logger =& Ak::getLogger();
-            $Logger->message($Logger->formatText('Request','green').' from '.$this->getRemoteIp(), $this->getParams());
+            $this->Logger =& Ak::getLogger();
+            $this->Logger->message($this->Logger->formatText('Request','green').' from '.$this->getRemoteIp(), $this->getParams());
         }
     }
-
-    // }}}
 
     function get($var_name)
     {
@@ -220,12 +195,12 @@ class AkRequest extends AkObject
                     $this->action = $this->_request['action'] = $found['action'];
                 }
             }
-            if(isset($found['module'])){      
+            if(isset($found['module'])){
                 if($this->_addParam('module',$found['module'])){
                     $this->module = $this->_request['module'] = $found['module'];
                 }
             }
-            
+
             foreach ($found as $k=>$v){
                 if($this->_addParam($k,$v)){
                     $this->_request[$k] = $v;
@@ -337,7 +312,7 @@ class AkRequest extends AkObject
     */
     function isPut()
     {
-        return $this->getMethod() == 'put';
+        return isset($this->env['REQUEST_METHOD']) ? $this->getMethod() == 'put' : false;
     }
 
     /**
@@ -577,7 +552,7 @@ class AkRequest extends AkObject
         $session_params = isset($_SESSION['request']) ? $_SESSION['request'] : null;
         $command_line_params = !empty($_REQUEST)  ? $_REQUEST : null;
 
-        $requests = array($command_line_params, $_GET, array_merge_recursive($_POST, $this->_getNormalizedFilesArray()), $_COOKIE, $session_params);
+        $requests = array($command_line_params, $_GET, array_merge_recursive($_POST, $this->getPutParams(), $this->_getNormalizedFilesArray()), $_COOKIE, $session_params);
 
         foreach ($requests as $request){
             $this->_request = (!is_null($request) && is_array($request)) ?
@@ -640,7 +615,7 @@ class AkRequest extends AkObject
 
         return $result;
     }
-    
+
     // {{{ _addParams()
 
     /**
@@ -658,10 +633,10 @@ class AkRequest extends AkObject
     function _addParam($variable, $value)
     {
         if($variable[0] != '_'){
-            if( ( $variable == 'action' && !$this->isValidActionName($value)) || 
-                ( $variable == 'controller' && !$this->isValidControllerName($value)) ||
-                ( $variable == 'module' && !$this->isValidModuleName($value))
-                ){
+            if( ( $variable == 'action' && !$this->isValidActionName($value)) ||
+            ( $variable == 'controller' && !$this->isValidControllerName($value)) ||
+            ( $variable == 'module' && !$this->isValidModuleName($value))
+            ){
                 return false;
             }
             $this->$variable = $value;
@@ -730,7 +705,7 @@ class AkRequest extends AkObject
         $this->_startSession();
         $this->_enableInternationalizationSupport();
         $this->_mapRoutes($Map);
-        
+
         $params = $this->getParams();
 
         $module_path = $module_class_peffix = '';
@@ -739,17 +714,18 @@ class AkRequest extends AkObject
             $module_shared_model = AK_CONTROLLERS_DIR.DS.trim($module_path,DS).'_controller.php';
             $module_class_peffix = str_replace(' ','_',AkInflector::titleize(str_replace(DS,' ', trim($module_path, DS)))).'_';
         }
-        
+
         $controller_file_name = AkInflector::underscore($params['controller']).'_controller.php';
         $controller_class_name = $module_class_peffix.AkInflector::camelize($params['controller']).'Controller';
         $controller_path = AK_CONTROLLERS_DIR.DS.$module_path.$controller_file_name;
         include_once(AK_APP_DIR.DS.'application_controller.php');
-        
+
         if(!empty($module_path) && file_exists($module_shared_model)){
             include_once($module_shared_model);
         }
-        
+
         if(!is_file($controller_path) || !include_once($controller_path)){
+            defined('AK_LOG_EVENTS') && AK_LOG_EVENTS && $this->Logger->error('Controller '.$controller_path.' not found.');
             if(AK_ENVIRONMENT == 'development'){
                 trigger_error(Ak::t('Could not find the file /app/controllers/<i>%controller_file_name</i> for '.
                 'the controller %controller_class_name',
@@ -758,18 +734,20 @@ class AkRequest extends AkObject
             }elseif(@include(AK_PUBLIC_DIR.DS.'404.php')){
                 exit;
             }else{
-                die('404 Page not found');
+                header("HTTP/1.1 404 Not Found");
+                die('404 Not found');
             }
         }
         if(!class_exists($controller_class_name)){
-
+            defined('AK_LOG_EVENTS') && AK_LOG_EVENTS && $this->Logger->error('Controller '.$controller_path.' does not implement '.$controller_class_name.' class.');
             if(AK_ENVIRONMENT == 'development'){
                 trigger_error(Ak::t('Controller <i>%controller_name</i> does not exist',
                 array('%controller_name' => $controller_class_name)), E_USER_ERROR);
-            }elseif(@include(AK_PUBLIC_DIR.DS.'404.php')){
+            }elseif(@include(AK_PUBLIC_DIR.DS.'405.php')){
                 exit;
             }else{
-                die('404 Page not found');
+                header("HTTP/1.1 405 Method Not Allowed");
+                die('405 Method Not Allowed');
             }
         }
         $Controller =& new $controller_class_name(array('controller'=>true));
@@ -806,7 +784,7 @@ class AkRequest extends AkObject
             $this->checkForRoutedRequests($Map);
         }
     }
-    
+
 
     function _connectToDatabase()
     {
@@ -814,14 +792,14 @@ class AkRequest extends AkObject
             Ak::db(AK_DEFAULT_DATABASE_PROFILE);
         }
     }
-    
+
     function _startSession()
     {
         if(AK_AUTOMATIC_SESSION_START){
             if(!isset($_SESSION)){
                 if(AK_SESSION_HANDLER == 1 && defined('AK_DATABASE_CONNECTION_AVAILABLE') && AK_DATABASE_CONNECTION_AVAILABLE){
                     require_once(AK_LIB_DIR.DS.'AkDbSession.php');
-                
+
                     $AkDbSession = new AkDbSession();
                     $AkDbSession->session_life = AK_SESSION_EXPIRE;
                     session_set_save_handler (
@@ -838,6 +816,26 @@ class AkRequest extends AkObject
         }
     }
 
+    function getPutParams()
+    {
+        if(!isset($this->put) && $this->isPut() && $data = $this->getPutRequestData()){
+            $this->put = array();
+            parse_str(urldecode($data), $this->put);
+        }
+        return isset($this->put) ? $this->put : array();
+    }
+
+    function getPutRequestData()
+    {
+        if(!empty($_SERVER['CONTENT_LENGTH'])){
+            $putdata = fopen('php://input', 'r');
+            $result = fread($putdata, $_SERVER['CONTENT_LENGTH']);
+            fclose($putdata);
+            return $result;
+        }else{
+            return false;
+        }
+    }
 }
 
 function &AkRequest()
