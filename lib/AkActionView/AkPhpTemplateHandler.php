@@ -157,7 +157,11 @@ class AkPhpTemplateHandler
 
     function _saveCompiledTemplate()
     {
-        Ak::file_put_contents($this->_getCompiledTemplatePath(),$this->_options['code'], array('base_path' => (AK_COMPILED_VIEWS_DIR ? AK_TMP_DIR : AK_BASE_DIR)));
+        $options = array('base_path' => (AK_COMPILED_VIEWS_DIR ? AK_TMP_DIR : AK_BASE_DIR));
+        if(defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP && !strstr($options['base_path'], AK_BASE_DIR)){
+            $options['ftp'] = false;
+        }
+        Ak::file_put_contents($this->_getCompiledTemplatePath(), $this->_options['code'], $options);
     }
 }
 
