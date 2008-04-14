@@ -239,13 +239,13 @@ class AkInstaller
         if(!is_file($version_file)){
             $this->setInstalledVersion(0, $options);
         }
-        return Ak::file_get_contents($this->_versionPath($options),array('base_path'=>AK_TMP_DIR));
+        return Ak::file_get_contents($this->_versionPath($options));
     }
 
 
     function setInstalledVersion($version, $options = array())
     {
-        return Ak::file_put_contents($this->_versionPath($options), $version, array('base_path'=>AK_TMP_DIR));
+        return Ak::file_put_contents($this->_versionPath($options), $version);
     }
 
 
