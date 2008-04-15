@@ -282,7 +282,25 @@ class HasManyTestCase extends AkUnitTest
         $this->assertTrue($Comment =& $Comment->find(10));
         $this->assertEqual($Comment->get('post_id'), 11);
     }
-    /**//**//**/
+    
+    function test_find_with_include_on_associated_record()
+    {
+        $this->installAndIncludeModels('Property','Picture','Landlord');
+        $Property =& $this->Property->create(array('description'=>'A Property'));
+        $Picture =& $this->Picture->create(array('title'=>'With a picture'));
+        $Landlord =& $this->Landlord->create(array('name'=>'and a landlord'));
+
+        $Picture->landlord->assign($Landlord);
+        $Property->picture->add($Picture);
+        
+        $Property =& $this->Property->find('first',array('description'=>'A Property'));
+        $Loaded =& $Property->picture->find('all');
+        $this->assertEqual('With a picture',$Loaded[0]->title);
+        
+        $Property =& $this->Property->find('first',array('description'=>'A Property'));
+        $Loaded =& $Property->picture->find('all',array('include'=>'landlord'));
+        $this->assertEqual('and a landlord',$Loaded[0]->landlord->name);        
+    }
 }
 
 ak_test('HasManyTestCase',true);

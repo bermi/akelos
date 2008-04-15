@@ -7,6 +7,7 @@ class PictureInstaller extends AkInstaller
         $this->createTable('pictures', '
         id integer max=10 auto increment primary,
         property_id,
+        landlord_id,
         title string limit=200'
         );
     }
