@@ -461,8 +461,7 @@ class AkHasMany extends AkAssociation
         $options = $this->getOptions($this->association_id);
         $Associated =& $this->getAssociatedModelInstance();
         $owner_id = $this->Owner->quotedId();
-
-        $table_name = empty($options['include']) ? $Associated->getTableName() : ($set_owner_table_has_included ? '__owner' : $Associated->getTableName());
+        $table_name = (!empty($options['include']) || $set_owner_table_has_included) ? '__owner' : $Associated->getTableName();
 
         if(empty($options['finder_sql'])){
             $options['finder_sql'] = ' '.$table_name.'.'.$options['foreign_key'].' = '.(empty($owner_id) ? 'null' : $owner_id).' ';
@@ -614,9 +613,6 @@ class AkHasMany extends AkAssociation
     {
         $result = false;
         if(!$this->Owner->isNewRecord()){
-            $this->constructSql();
-            $has_many_options = $this->getOptions($this->association_id);
-            $Associated =& $this->getAssociatedModelInstance();
 
             $args = func_get_args();
             $num_args = func_num_args();
@@ -629,6 +625,9 @@ class AkHasMany extends AkAssociation
                 $options = array();
             }
 
+            $this->constructSql(!empty($options['include']));
+            $has_many_options = $this->getOptions($this->association_id);
+            $Associated =& $this->getAssociatedModelInstance();
             if (empty($options['conditions'])) {
                 $options['conditions'] = @$has_many_options['finder_sql'];
             } elseif(!empty($has_many_options['finder_sql']) && is_array($options['conditions']) && !strstr($options['conditions'][0], $has_many_options['finder_sql'])) {

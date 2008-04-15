@@ -6,12 +6,11 @@ class PropertyInstaller extends AkInstaller
     {
         $this->createTable('properties', 
         '
-        id integer max=10 auto increment primary,
+        id,
         description string(255),
         details text,
-        landlord_id integer,
-        price integer,
-        location string limit=200',
+        price int,
+        location string(200)',
         array('timestamp'=>false));
     }
 

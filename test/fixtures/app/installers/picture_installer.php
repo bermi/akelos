@@ -5,10 +5,10 @@ class PictureInstaller extends AkInstaller
     function install()
     {
         $this->createTable('pictures', '
-        id integer max=10 auto increment primary,
+        id,
         property_id,
         landlord_id,
-        title string limit=200'
+        title string(200)'
         );
     }
 
