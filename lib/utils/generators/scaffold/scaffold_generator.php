@@ -30,7 +30,8 @@ class ScaffoldGenerator extends  AkelosGenerator
         $this->controller_class_name = str_replace(array('/','::'),'_', $this->controller_name.'Controller');
         $this->controller_name = AkInflector::demodulize($this->controller_name);
         $this->controller_human_name = AkInflector::humanize($this->controller_name);
-        $this->helper_var_name = '$'.AkInflector::underscore($this->controller_name).'_helper';
+        $this->helper_name = (AkInflector::is_plural($this->controller_name)?AkInflector::singularize($this->controller_name):$this->controller_name).'Helper';
+        $this->helper_var_name = '$'.AkInflector::underscore($this->helper_name);
 
         $this->singular_name = AkInflector::underscore($this->model_name);
         $this->plural_name = AkInflector::pluralize($this->singular_name);

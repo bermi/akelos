@@ -1,7 +1,7 @@
 <?php  echo '<?php'?>
 
 
-class <?php  echo $controller_name?>Helper extends AkActionViewHelper
+class <?php  echo $helper_name?> extends AkActionViewHelper
 { 
     function cancel($url = array('action' => 'listing'))
     {
