@@ -643,7 +643,6 @@ class AkActionController extends AkObject
         }
 
         AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message("Rendering $this->full_template_path" . (!empty($status) ? " ($status)":'')) : null;
-
         return $this->renderText($this->Template->renderFile($template_path, $use_full_path, $locals), $status);
     }
 
@@ -1951,12 +1950,12 @@ class AkActionController extends AkObject
 
     function performActionWithFilters($method = '')
     {
-        if ($this->beforeAction($method) !== false || empty($this->_performed)){
+        if ($this->beforeAction($method) !== false && !$this->_hasPerformed()){
             $this->performActionWithoutFilters($method);
             $this->afterAction($method);
             return true;
         }
-        return $this->performActionWithoutFilters($method);
+        return false;
     }
 
     function performAction($method = '')
