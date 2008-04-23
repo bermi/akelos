@@ -156,7 +156,7 @@ class AkelosGenerator
             $this->printLog();
         }else{
             echo "\n".Ak::t('There where collisions when attempting to generate the %type.',array('%type'=>$this->type))."\n";
-            echo Ak::t('Please add force=true to the argument list in order to overwrite existing files.')."\n\n";
+            echo Ak::t('Please add --force to the argument list in order to overwrite existing files.')."\n\n";
 
             echo join("\n",$this->collisions)."\n";
         }
