@@ -343,7 +343,7 @@ Pour renseigner chacun des modèles sur la relation entre *books* et *authors*, 
 
 Les modèles savent maintenant comment ils sont liés, mais il faut que le contrôleur `BookController` puisse charger les deux modèles, `author` et `book`.
 
-`/app/models/author.php`
+`/app/controllers/book_controller.php`
 
     <?php
     
