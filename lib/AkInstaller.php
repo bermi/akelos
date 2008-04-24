@@ -618,7 +618,7 @@ class AkInstaller
     /**
      * Promts for a variable on console scripts
      */
-    function promtUserVar($message, $options = array())
+    function promptUserVar($message, $options = array())
     {
         $f = fopen("php://stdin","r");
         $default_options = array(
@@ -635,10 +635,17 @@ class AkInstaller
         if(empty($value) && empty($options['optional'])){
             echo "\n\nThis setting is not optional.";
             fclose($f);
-            return $this->promtUserVar($message, $options);
+            return $this->promptUserVar($message, $options);
         }
         fclose($f);
         return empty($value) ? $options['default'] : $value;
+    }
+    
+    //DEPRECATED
+    function promtUserVar($message, $options = array())
+    {
+        trigger_error(Ak::t('AkInstaller::promtUserVar is deprecated and will be removed on future versions. Please use AkInstaller::promptUserVar instead.'), E_USER_NOTICE);
+        return $this->promptUserVar($message, $options);
     }
 
     function _loadDbDesignerDbSchema()
