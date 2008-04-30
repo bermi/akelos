@@ -2,7 +2,7 @@
 
 class User extends ActiveRecord
 {
-    var $habtm = 'groups';
+    var $habtm = 'groups,posts';
 }
 
 ?>

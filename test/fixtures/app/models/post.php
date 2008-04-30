@@ -3,7 +3,7 @@
 class Post extends ActiveRecord
 {
     var $has_many = 'comments';
-    var $habtm = 'tags';
+    var $habtm = 'tags,users';
     
     function validate()
     {

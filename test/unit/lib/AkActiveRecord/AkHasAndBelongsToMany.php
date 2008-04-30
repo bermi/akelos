@@ -13,9 +13,9 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         @$Installer->dropTable('posts_tags');
         @Ak::file_delete(AK_MODELS_DIR.DS.'post_tag.php');
 
-        $this->installAndIncludeModels(array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType'));
+        $this->installAndIncludeModels(array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'User'));
     }
-    
+
     function test_getAssociatedModelInstance_should_return_a_single_instance()  // bug-fix
     {
         $this->assertReference($this->Post->tag->getAssociatedModelInstance(),$this->Post->tag->getAssociatedModelInstance());
@@ -85,7 +85,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $Property->property_type->load(true);
         $this->assertEqual($Property->property_type->count(), 1);
 
-        
+
         $Property =& $Property->findFirstBy('description','Gandia Palace');
         $PropertyType =& new PropertyType();
 
@@ -107,7 +107,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $Property->property_type->set($PropertyType);
 
         $this->assertEqual($Property->property_type->count(), 1);
-        
+
         $this->assertTrue(in_array('property_types', $Property->getAssociatedIds()));
 
         $Property = $Property->findFirstBy('description','Gandia Palace',array('include'=>'property_types'));
@@ -212,7 +212,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->assertEqual($RecordSet->RecordCount(), 0);
 
     }
-    
+
     function test_find_on_unsaved_models_including_associations()
     {
         $Property =& new Property('description->','Chalet by the sea');
@@ -343,15 +343,15 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->assertTrue($Rancho =&  $PropertyType->findFirstBy('description','Rancho Type', array('include'=>'properties')));
         $this->assertEqual($Rancho->property->count(), 1);
     }
-    
+
     function test_should_include_associates_using_simple_finder()
     {
         $Property =& new Property();
         $PropertyType =& new PropertyType();
         $this->assertTrue($Rancho =&  $PropertyType->findFirstBy('description','Rancho Type', array('include'=>'properties')));
-                
+
         $this->assertTrue($RanchoMaria =& $Property->find($Rancho->properties[0]->getId(), array('include'=>'property_types')));
-        
+
         $this->assertEqual($RanchoMaria->property_types[0]->getId(), $Rancho->getId());
         $this->assertEqual($RanchoMaria->getId(), $Rancho->properties[0]->getId());
     }
@@ -399,7 +399,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         foreach (range(1,10) as $i){
             $Post =& new Post(array('title' => 'Post '.$i));
             $Post->tag->create(array('name' => 'Tag '.$i));
-            $this->assertTrue($Post->save());    
+            $this->assertTrue($Post->save());
             $this->assertEqual($Post->tag->count(), 1, 'Failed on #'.$i);  // dont know why but this fails sometimes, randomly -kaste
         }
 
@@ -407,13 +407,13 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->assertTrue($Post11->save());
 
         $Post->tag->setByIds(1,2,3,4,5);
-        
+
         $this->assertTrue($Post =& $Post->find(10, array('include' => 'tags','order' => '_tags.id ASC')));
 
         foreach (array_keys($Post->tags) as $k){
             $this->assertEqual($Post->tags[$k]->getId(), $k+1);
         }
-        
+
         // Tag 10 should exist but unrelated to a post
         $this->assertTrue($Tag =& $Post->tags[$k]->find(10));
         $this->assertEqual($Tag->post->count(), 0);
@@ -425,9 +425,18 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
 
 
     }
-    /**//** //**/
+
+    function test_should_allow_multiple_habtm_associates_on_fresh_association_owner()
+    {
+        $Bermi =& new User(array('name'=>'Bermi'));
+        $Bermi->post->set(new Post(array('title' => 'Bermi Post')));
+        $Bermi->save();
+        
+        $Bermi =& $this->User->findFirstBy('name', 'Bermi', array('include'=>'posts'));
+        
+        $this->assertEqual($Bermi->posts[0]->title, 'Bermi Post');
+    }
 }
 
-ak_test('HasAndBelongsToManyTestCase',true);
 
 ?>

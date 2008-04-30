@@ -849,14 +849,17 @@ class AkHasAndBelongsToMany extends AkAssociation
         foreach (array_keys($object->hasAndBelongsToMany->models) as $association_id){
             $CollectionHandler =& $object->hasAndBelongsToMany->models[$association_id];
             $options = $CollectionHandler->getOptions($association_id);
-
             $class_name = strtolower($CollectionHandler->getOption($association_id, 'class_name'));
+
             if(!empty($object->$association_id) && is_array($object->$association_id)){
                 $this->_removeDuplicates($object, $association_id);
                 foreach (array_keys($object->$association_id) as $k){
+
                     if(!empty($object->{$association_id}[$k]) && strtolower(get_class($object->{$association_id}[$k])) == $class_name){
                         $AssociatedItem =& $object->{$association_id}[$k];
                         // This helps avoiding double realation on first time savings
+                        
+                                                    
                         if(!in_array($AssociatedItem->__hasAndBelongsToManyMemberId, $joined_items)){
                             $joined_items[] = $AssociatedItem->__hasAndBelongsToManyMemberId;
                             if(empty($AssociatedItem->hasAndBelongsToMany->__joined) && $AssociatedItem->isNewRecord()? $AssociatedItem->save() : true){
@@ -873,9 +876,11 @@ class AkHasAndBelongsToMany extends AkAssociation
                     }
                 }
             }
-            return $success;
+            if(!$success){
+                return $success;
+            }
         }
-
+        return $success;
     }
 
     function _removeDuplicates(&$object, $association_id)
