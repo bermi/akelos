@@ -296,7 +296,9 @@ class DateHelper extends AkActionViewHelper
             $month_details = Ak::t('January,February,March,April,May,June,July,August,September,October,November,December',array(),'localize/date');
         }
 
-        return DateHelper::_select_for('month', explode(',',$month_details),'n',(empty($date) ? Ak::getDate() : $date), $options,'_add_one');
+        $date = !empty($options['include_blank']) ? (!empty($date) ? $date : 0) : (!empty($date) ? $date : Ak::getDate());
+
+        return DateHelper::_select_for('month', explode(',',$month_details),'n', $date, $options,'_add_one');
     }
 
     /**
@@ -326,8 +328,15 @@ class DateHelper extends AkActionViewHelper
     function _select_for($select_type, $range, $date_format, $datetime, $options = array(), $unit_format_callback = '_leading_zero_on_single_digits')
     {
         $options_array = array();
-        $datetime = empty($datetime) ? Ak::getDate() : $datetime;
-        $datetime_unit = Ak::getDate(Ak::getTimestamp($datetime),$date_format);
+        
+        if (!empty($options['include_blank']) && $datetime == 0) {
+            $datetime_unit = "";
+            $date_blank = true;
+        } else {
+            $datetime = empty($datetime) ? Ak::getDate() : $datetime;
+            $datetime_unit = Ak::getDate(Ak::getTimestamp($datetime),$date_format);
+            $date_blank = false;
+        } 
 
         foreach ($range as $k=>$time_unit){
             if(is_string($time_unit)){
@@ -339,15 +348,16 @@ class DateHelper extends AkActionViewHelper
             }
         }
         return DateHelper::_select_html(empty($options['field_name']) ? $select_type : $options['field_name'],
-        $options_array, @$options['prefix'], @$options['include_blank'], @$options['discard_type'], @$options['disabled']);
+        $options_array, @$options['prefix'], @$options['include_blank'], @$options['discard_type'], @$options['disabled'], $date_blank);
     }
 
-    function _select_html($type, $options, $prefix = null, $include_blank = false, $discard_type = false, $disabled = false)
+    function _select_html($type, $options, $prefix = null, $include_blank = false, $discard_type = false, $disabled = false, $date_blank = false)
     {
         return '<select name="'.(empty($prefix) ? AK_DATE_HELPER_DEFAULT_PREFIX : $prefix).
         ($discard_type ? '' : $type).'"'.
         ($disabled ? ' disabled="disabled"' : '').">\n".
-        ($include_blank ? "<option value=\"\"></option>\n" : '').
+        ($include_blank && $date_blank ? "<option value=\"\" selected=\"selected\"></option>\n" : '').
+        ($include_blank && !$date_blank ? "<option value=\"\"></option>\n" : '').
         (!empty($options) ? join("\n",$options) : '')."\n</select>\n";
     }
 

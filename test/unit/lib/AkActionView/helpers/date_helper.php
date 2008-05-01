@@ -3,8 +3,8 @@
 require_once('_HelpersUnitTester.php');
 require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'date_helper.php');
 
-class DateHelperTests extends HelpersUnitTester 
-{    
+class DateHelperTests extends HelpersUnitTester
+{
     function setUp()
     {
         $this->Person = &new MockAkActiveRecord($this);
@@ -115,6 +115,12 @@ class DateHelperTests extends HelpersUnitTester
     {
         $this->assertEqual(DateHelper::locale_date_time($this->date), '1978-06-16 12:20:30');
         $this->assertEqual(DateHelper::locale_date($this->date), '1978-06-16');
+    }
+
+    function test_should_select_blank()
+    {
+        $this->blank_date = "";
+        $this->assertEqual($this->date_helper->date_select('person','blank_date',array('include_blank'=>true, 'start_year'=>1973, 'end_year'=>1983)), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_'.__FUNCTION__.'.txt'));
     }
 }
 
