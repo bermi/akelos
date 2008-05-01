@@ -16,8 +16,8 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
- defined('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES') ? null : define('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES' ,true);
- defined('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS') ? null : define('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS' , 'ActiveRecord');
+defined('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES') ? null : define('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES' ,true);
+defined('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS') ? null : define('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS' , 'ActiveRecord');
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 
@@ -40,7 +40,7 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 *   (collection->concatWithAttributes() is an alias to this method).
 * * <tt>collection->delete($object, ...)</tt> - removes one or more objects from the collection by removing their associations from the join table.  
 *   This does not destroy the objects.
-* * <tt>collection->set($bjects)</tt> - replaces the collections content by deleting and adding objects as appropriate.
+* * <tt>collection->set($objects)</tt> - replaces the collections content by deleting and adding objects as appropriate.
 * * <tt>collection->setByIds($ids)</tt> - replace the collection by the objects identified by the primary keys in $ids
 * * <tt>collection->clear()</tt> - removes every object from the collection. This does not destroy the objects.
 * * <tt>collection->isEmpty()</tt> - returns true if there are no associated objects.
@@ -217,11 +217,11 @@ class AkHasAndBelongsToMany extends AkAssociation
         $options = $this->getOptions($this->association_id);
 
         if (class_exists($options['join_class_name']) || $this->_loadJoinClass($options['join_class_name']) || $this->_createJoinClass()) {
-                $this->JoinObject =& new $options['join_class_name']();
+            $this->JoinObject =& new $options['join_class_name']();
             if($this->_tableExists($options['join_table']) || $this->_createJoinTable()){
                 $this->JoinObject->setPrimaryKey($options['foreign_key']);
                 return true;
-                
+
             } else {
                 trigger_error(Ak::t('Could not find join table %table_name for hasAndBelongsToMany association %id',array('%table_name'=>$options['join_table'],'id'=>$this->association_id)),E_USER_ERROR);
             }
@@ -236,20 +236,20 @@ class AkHasAndBelongsToMany extends AkAssociation
         $options = $this->getOptions($this->association_id);
         return !empty($this->JoinObject) && (strtolower($options['join_class_name']) == strtolower(get_class($this->JoinObject)));
     }
-    
+
     function _loadJoinClass($class_name)
     {
         $model_file = AkInflector::toModelFilename($class_name);
         return file_exists($model_file) && require_once($model_file);
     }
-    
+
     function _createJoinClass()
     {
         $options = $this->getOptions($this->association_id);
 
-            $class_file_code = "<?php \n\n//This code was generated automatically by the active record hasAndBelongsToMany Method\n\n";
-            $class_code =
-            "class {$options['join_class_name']} extends {$options['join_class_extends']} {
+        $class_file_code = "<?php \n\n//This code was generated automatically by the active record hasAndBelongsToMany Method\n\n";
+        $class_code =
+        "class {$options['join_class_name']} extends {$options['join_class_extends']} {
     var \$_avoidTableNameValidation = true;
     function {$options['join_class_name']}()
     {
@@ -259,13 +259,13 @@ class AkHasAndBelongsToMany extends AkAssociation
         \$this->init(\$attributes);
     }
 }";
-            $class_file_code .= $class_code. "\n\n?>";
-            $join_file = AkInflector::toModelFilename($options['join_class_name']);
-            if($this->_automatically_create_join_model_files && !file_exists($join_file) && @Ak::file_put_contents($join_file, $class_file_code)){
-                require_once($join_file);
-            }else{
-                eval($class_code);
-            }
+        $class_file_code .= $class_code. "\n\n?>";
+        $join_file = AkInflector::toModelFilename($options['join_class_name']);
+        if($this->_automatically_create_join_model_files && !file_exists($join_file) && @Ak::file_put_contents($join_file, $class_file_code)){
+            require_once($join_file);
+        }else{
+            eval($class_code);
+        }
         return class_exists($options['join_class_name']);
     }
 
@@ -358,10 +358,10 @@ class AkHasAndBelongsToMany extends AkAssociation
     /**
     * Remove all records from this association
     */
-    function deleteAll($Skip = null)
+    function deleteAll()
     {
         $this->load();
-        return $this->delete($this->Owner->{$this->association_id}, $Skip);
+        return $this->delete($this->Owner->{$this->association_id});
     }
 
     function reset()
@@ -403,23 +403,15 @@ class AkHasAndBelongsToMany extends AkAssociation
     }
 
 
-    function delete(&$Associated, $Skip = null)
+    function delete(&$Associated)
     {
         $success = true;
         if(!is_array($Associated)){
             $associated_elements = array();
             $associated_elements[] =& $Associated;
-            return $this->delete($associated_elements, $Skip);
+            return $this->delete($associated_elements);
         }else{
             $options = $this->getOptions($this->association_id);
-
-            $ids_to_skip = array();
-            $Skip = empty($Skip) ? null : (is_array($Skip) ? $Skip : array($Skip));
-            if(!empty($Skip)){
-                foreach (array_keys($Skip) as $k){
-                    $ids_to_skip[] = $Skip[$k]->getId();
-                }
-            }
 
             $ids_to_nullify = array();
             $ids_to_delete = array();
@@ -432,16 +424,12 @@ class AkHasAndBelongsToMany extends AkAssociation
 
             foreach (array_keys($Associated) as $k){
                 $id = $Associated[$k]->getId();
-
-                if(!in_array($id, $ids_to_skip)){
-                
-                    if($JoinObjectsToDelete =& $this->JoinObject->findAllBy($options['foreign_key'].' AND '.$options['association_foreign_key'], $this->Owner->getId(), $id)){
-                        foreach (array_keys($JoinObjectsToDelete) as $k) {
-                            if($JoinObjectsToDelete[$k]->destroy()){
-                                $items_to_remove_from_collection[] = $id;
-                            }else{
-                                $success = false;
-                            }
+                if($JoinObjectsToDelete =& $this->JoinObject->findAllBy($options['foreign_key'].' AND '.$options['association_foreign_key'], $this->Owner->getId(), $id)){
+                    foreach (array_keys($JoinObjectsToDelete) as $k) {
+                        if($JoinObjectsToDelete[$k]->destroy()){
+                            $items_to_remove_from_collection[] = $id;
+                        }else{
+                            $success = false;
                         }
                     }
                 }
@@ -479,7 +467,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                 }else{
                     $record_id = $records[$k];
                 }
-
+                
                 foreach (array_keys($this->Owner->{$this->association_id}) as $kk){
                     if(
                     (
@@ -599,7 +587,7 @@ class AkHasAndBelongsToMany extends AkAssociation
             $options['finder_sql'] = "SELECT {$options['table_name']}.* FROM {$options['table_name']} ".
             $this->associationJoin().
             "WHERE ".$this->Owner->getTableName().'.'.$this->Owner->getPrimaryKey()." ".
-                ($is_sqlite ? ' LIKE ' : ' = ').' '.$this->Owner->quotedId(); // (HACK FOR SQLITE) Otherwise returns wrong data
+            ($is_sqlite ? ' LIKE ' : ' = ').' '.$this->Owner->quotedId(); // (HACK FOR SQLITE) Otherwise returns wrong data
             $options['finder_sql'] .= !empty($options['conditions']) ? ' AND '.$options['conditions'].' ' : '';
             $options['finder_sql'] .= !empty($options['conditions']) ? ' AND '.$options['conditions'].' ' : '';
         }
@@ -747,8 +735,8 @@ class AkHasAndBelongsToMany extends AkAssociation
     function &getAssociatedModelInstance()
     {
         static $ModelInstances;
-            $class_name = $this->getOption($this->association_id, 'class_name');
-        if(empty($ModelInstances[$class_name])){  
+        $class_name = $this->getOption($this->association_id, 'class_name');
+        if(empty($ModelInstances[$class_name])){
             Ak::import($class_name);
             $ModelInstances[$class_name] =& new $class_name();
         }
@@ -858,11 +846,12 @@ class AkHasAndBelongsToMany extends AkAssociation
                     if(!empty($object->{$association_id}[$k]) && strtolower(get_class($object->{$association_id}[$k])) == $class_name){
                         $AssociatedItem =& $object->{$association_id}[$k];
                         // This helps avoiding double realation on first time savings
-                        
-                                                    
+
+
                         if(!in_array($AssociatedItem->__hasAndBelongsToManyMemberId, $joined_items)){
                             $joined_items[] = $AssociatedItem->__hasAndBelongsToManyMemberId;
-                            if(empty($AssociatedItem->hasAndBelongsToMany->__joined) && $AssociatedItem->isNewRecord()? $AssociatedItem->save() : true){
+                            
+                            if(empty($AssociatedItem->hasAndBelongsToMany->__joined) && ($AssociatedItem->isNewRecord()? $AssociatedItem->save() : true)){
                                 $AssociatedItem->hasAndBelongsToMany->__joined = true;
                                 $CollectionHandler->JoinObject =& $CollectionHandler->JoinObject->create(array($options['foreign_key'] => $object_id ,$options['association_foreign_key'] => $AssociatedItem->getId()));
 

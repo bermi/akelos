@@ -16,6 +16,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->installAndIncludeModels(array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'User'));
     }
 
+    /**/
     function test_getAssociatedModelInstance_should_return_a_single_instance()  // bug-fix
     {
         $this->assertReference($this->Post->tag->getAssociatedModelInstance(),$this->Post->tag->getAssociatedModelInstance());
@@ -426,15 +427,38 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
 
     }
 
+    /**/
+
     function test_should_allow_multiple_habtm_associates_on_fresh_association_owner()
     {
         $Bermi =& new User(array('name'=>'Bermi'));
         $Bermi->post->set(new Post(array('title' => 'Bermi Post')));
         $Bermi->save();
-        
+
         $Bermi =& $this->User->findFirstBy('name', 'Bermi', array('include'=>'posts'));
-        
+
         $this->assertEqual($Bermi->posts[0]->title, 'Bermi Post');
+    }
+
+
+    function test_should_remove_existing_associates_when_setting_new_ones_and_parent_is_saved()
+    {
+        for ($i=0; $i < 3; $i++){
+            $Bermi =& $this->User->findFirstBy('name', 'Bermi');
+            $Post =& $this->Post->findFirstBy('title', 'Bermi Post');
+            $Bermi->post->set($Post);
+            $Bermi->save();
+        }
+
+        $this->assertEqual($Bermi->post->count(true), 1);
+
+        $PostUser =& new PostUser();
+        $PostUsers = $PostUser->findAllBy('user_id', $Bermi->id);
+
+        $this->assertEqual(count($PostUsers), 1);
+        
+        $PostUsers = $PostUser->findAllBy('post_id', $Post->id);
+        $this->assertEqual(count($PostUsers), 1);
     }
 }
 
