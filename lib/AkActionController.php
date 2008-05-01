@@ -1449,10 +1449,14 @@ class AkActionController extends AkObject
             $layout = $this->_doesActionHasLayout() ? $this->getActiveLayout() : false;
         }
         if(!empty($layout)){
+
             $layout = strstr($layout,'/') || strstr($layout,DS) ? $layout : 'layouts'.DS.$layout;
+            $layout = preg_replace('/\.tpl$/', '', $layout);
+
             $layout = substr($layout,0,7) === 'layouts' ?
-            (empty($this->_module_path) ? AK_VIEWS_DIR.DS.$layout.'.tpl' : AK_VIEWS_DIR.DS.'layouts'.DS.trim($this->_module_path, DS).'.tpl') :
+            (empty($this->_module_path) || !empty($this->layout) ? AK_VIEWS_DIR.DS.$layout.'.tpl' : AK_VIEWS_DIR.DS.'layouts'.DS.trim($this->_module_path, DS).'.tpl') :
             $layout.'.tpl';
+
             if (file_exists($layout)) {
                 return $layout;
             }
