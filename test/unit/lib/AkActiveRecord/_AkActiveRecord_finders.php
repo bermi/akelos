@@ -15,7 +15,7 @@ class AkActiveRecord_finders_TestCase extends  AkUnitTest
         @$Installer->dropTable('posts_tags');
         @Ak::file_delete(AK_MODELS_DIR.DS.'post_tag.php');
     }
-    
+
     function test_should_find_using_id_and_options()
     {
         $Tag =& new Tag();
@@ -59,9 +59,28 @@ class AkActiveRecord_finders_TestCase extends  AkUnitTest
 
     }
 
+    function test_should_parse_include_as_array()
+    {
+        $Post =& new Post(array('title' => 'PHP Frameworks'));
+        $Post->comment->create(array('name'=>'Comment 1'));
+        $Post->comment->create(array('name'=>'Comment 2'));
+        $Post->tag->create(array('name'=>'Tag 1'));
+        $Post->tag->create(array('name'=>'Tag 2'));
+
+        $this->assertTrue($Post->save());
+        
+        $this->assertTrue($Post =& $this->Post->find($Post->getId(), array('include'=>'comments,tags')));
+        
+        $this->assertEqual($Post->tags[0]->name, 'Tag 1');
+        $this->assertEqual($Post->tags[1]->name, 'Tag 2');
+
+        $this->assertEqual($Post->comments[0]->name, 'Comment 1');
+        $this->assertEqual($Post->comments[1]->name, 'Comment 2');
+    }
+
 
 }
 
-ak_test('AkActiveRecord_finders_TestCase',true);
+//ak_test('AkActiveRecord_finders_TestCase',true);
 
 ?>

@@ -231,7 +231,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
     function &findWithAssociations($options)
     {
         $result = false;
-        $options['include'] = is_array($options['include']) ? $options['include'] : array($options['include']);
+        $options['include'] = Ak::toArray($options['include']);
         $options['order'] = empty($options['order']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options['order']);
         $options['conditions'] = empty($options['conditions']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options['conditions']);
 
@@ -245,7 +245,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 $included_association_options[$k] = $v;
             }
         }
-
+        
         $available_associated_options = array('order'=>array(), 'conditions'=>array(), 'joins'=>array(), 'selection'=>array());
 
         foreach ($included_associations as $association_id){
