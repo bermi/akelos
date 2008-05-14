@@ -51,5 +51,4 @@ DirectoryIndex index.php
   
 </IfModule>
 
-ErrorDocument 400 /400.html
-ErrorDocument 500 /500.html
+ErrorDocument 500 "<h2>Apache server error</h2>Akelos application failed to start properly"

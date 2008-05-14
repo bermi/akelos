@@ -34,6 +34,13 @@ class AkHttpClient extends AkObject
         $this->getRequestInstance($url, $http_verb, $options, $body);
         return $this->sendRequest();
     }
+    
+    function urlExists($url)
+    {
+        $this->getRequestInstance($url, 'GET');
+        $this->sendRequest(false);
+        return $this->code == 200;
+    }
 
     function getRequestInstance($url, $http_verb = 'GET', $options = array(), $body = '')
     {
@@ -111,7 +118,7 @@ class AkHttpClient extends AkObject
         $this->HttpRequest->setBody(http_build_query((array)$body));
     }
 
-    function sendRequest()
+    function sendRequest($return_body = true)
     {
         $this->Response = $this->HttpRequest->sendRequest();
         $this->code = $this->HttpRequest->getResponseCode();
@@ -119,7 +126,7 @@ class AkHttpClient extends AkObject
             $this->error = $this->Response->getMessage();
             return false;
         } else {
-            return $this->HttpRequest->getResponseBody();
+            return $return_body ? $this->HttpRequest->getResponseBody() : true;
         }
     }
 
@@ -191,4 +198,3 @@ class AkHttpClient extends AkObject
 
 
 ?>
-

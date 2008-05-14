@@ -191,13 +191,19 @@ class AkWebRequest extends AkActionController
     
     function _raiseError($error)
     {
-            if(AK_ENVIRONMENT == 'production'){
-                header('Status: HTTP/1.1 404 Not Found');
-                header('Location: '.AK_URL.'404.html');
-                exit;
-            }else{
-                trigger_error($error, E_USER_ERROR);
-            }
+        if(AK_LOG_EVENTS){
+            empty($this->_Logger) && ($this->_Logger =& Ak::getLogger());
+            $this->_Logger->error($error);
+        }
+        if(AK_ENVIRONMENT == 'development'){
+            header('HTTP/1.1 404 Not Found');
+            trigger_error($error, E_USER_ERROR);
+        }elseif(@include(AK_PUBLIC_DIR.DS.'404.php')){
+            exit;
+        }else{
+            header('HTTP/1.1 404 Not Found');
+            die('404 Not Found');
+        }
     }
 
 }

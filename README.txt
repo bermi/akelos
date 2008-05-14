@@ -39,7 +39,7 @@ config/DEFAULT-config.php and config/DEFAULT-routes.php. You might also need
 to edit the  .htaccess files in ./ and ./public/  and un-comment/edit the 
 "# RewriteBase" directive so it matches to your url path.
 
-All the configuration params are on /config/boot.php If you define any of them
+All the configuration params are on /lib/constants.php If you define any of them
 in your /config/config.php, /config/development.php, /config/production.php 
 or /config/testing.php the default setting will be overwritten.
 

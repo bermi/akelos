@@ -239,10 +239,11 @@ class AkActionController extends AkObject
 
         $available_helpers = array();
         foreach ($helpers as $file=>$helper){
-            $helper_class_name = strstr($helper, 'Helper') ? $helper : $helper.'Helper';
+            $helper_class_name = AkInflector::camelize(AkInflector::demodulize(strstr($helper, 'Helper') ? $helper : $helper.'Helper'));
             $full_path = preg_match('/[\\\\\/]+/',$file);
             $file_path = $full_path ? $file : AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.$file;
             include_once($file_path);
+
             if(class_exists($helper_class_name)){
                 $attribute_name = $full_path ? AkInflector::underscore($helper_class_name) : substr($file,0,-4);
                 $available_helpers[] = $attribute_name;
@@ -291,8 +292,8 @@ class AkActionController extends AkObject
                 $helper_names[$available_helper] = AkInflector::classify(substr($available_helper,0,-10));
             }
             return $helper_names;
-        }elseif (is_string($this->helpers)){
-            return Ak::stringToArray($this->helpers);
+        }else{
+            $this->helpers = Ak::toArray($this->helpers);
         }
         return $this->helpers;
     }
