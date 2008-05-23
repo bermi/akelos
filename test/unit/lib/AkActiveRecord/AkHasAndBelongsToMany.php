@@ -11,7 +11,9 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->installAndIncludeModels(array('Post', 'Tag'));
         $Installer = new AkInstaller();
         @$Installer->dropTable('posts_tags');
+        @$Installer->dropTable('posts_users');
         @Ak::file_delete(AK_MODELS_DIR.DS.'post_tag.php');
+        @Ak::file_delete(AK_MODELS_DIR.DS.'post_user.php');
 
         $this->installAndIncludeModels(array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'User'));
     }
@@ -462,5 +464,6 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
     }
 }
 
+ak_test('HasAndBelongsToManyTestCase');
 
 ?>
