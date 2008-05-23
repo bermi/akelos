@@ -225,7 +225,7 @@ Akelos follows the [MVC design pattern](http://en.wikipedia.org/wiki/Model-view-
 
 ### Your application files and the Akelos Naming conventions ###
 
-These are the conventions that empower the Akelos convention over configuration philosophy.
+These are the conventions that empower the Akelos [convention over configuration](http://en.wikipedia.org/wiki/Convention_over_Configuration) philosophy.
 
 #### Models ####
 
@@ -249,7 +249,7 @@ These are the conventions that empower the Akelos convention over configuration 
 Akelos scaffolding
 ------------------------------------------
 
-Akelos comes with code generators that can cut your development time by creating fully functional scaffold code that you can use as a departure/learning point.
+Akelos comes with code generators that can cut your development time by creating fully functional [scaffold code](http://en.wikipedia.org/wiki/Scaffold_(programming)) that you can use as a departure/learning point.
 
 ### Meet the Scaffold generator ###
 
