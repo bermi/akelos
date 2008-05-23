@@ -261,7 +261,7 @@ and
 
     ./script/generate scaffold Author
 
-This will generate a bunch of files and folders with code that really works!. Don't trust me? Try it yourself. Point your browser to [http://localhost/booklink/author](http://localhost/booklink/author) and [http://localhost/booklink/books](http://localhost/booklink/books) or to  [http://localhost/booklink/?ak=author](http://localhost/booklink/?ak=author) and [http://localhost/booklink/?ak=books](http://localhost/booklink/?ak=books) in case mod_rewrite is disabled to start adding authors and books. Create some records and come back for an explanation of what is going under the hood.
+This will generate a bunch of files and folders with code that really works!. Don't trust me? Try it yourself. Point your browser to [http://localhost/booklink/author](http://localhost/booklink/author) and [http://localhost/booklink/book](http://localhost/booklink/book) or to  [http://localhost/booklink/?ak=author](http://localhost/booklink/?ak=author) and [http://localhost/booklink/?ak=book](http://localhost/booklink/?ak=book) in case mod_rewrite is disabled to start adding authors and books. Create some records and come back for an explanation of what is going under the hood.
 
 
 The Akelos Workflow
@@ -346,7 +346,7 @@ right after `<?=$active_record_helper->error_messages_for('book');?>` on the  */
         <?=$form_options_helper->select('book', 'author_id', $Author->collect($Author->find(), 'name', 'id'));?>
     </p>
 
-If you have not added authors yet, go and created some right now and then visit http://locahost/boolink/book/add to check out the brand new authors select list. Go ahead and create a new book selecting an author from the list.
+If you have not added authors yet, go and create some right now and then visit http://locahost/booklink/book/add to check out the brand new authors select list. Go ahead and create a new book selecting an author from the list.
 
 Seems like the author has been saved but it its not included on the `app/views/book/show.tpl` view. You'll add it this code right after `<? $content_columns = array_keys($Book->getContentColumns()); ?>`
 

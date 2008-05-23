@@ -258,7 +258,7 @@ y
 
     ./script/generate scaffold Author
 
-Esto generará un montón de archivos y carpetas que ¡funcionan de verdad!. ¿No me crees? Pruébalo tu mismo. Dirige tu navegador a  [http://localhost/booklink/author](http://localhost/booklink/author) y [http://localhost/booklink/books](http://localhost/booklink/books) para empezar a agregar autores y libros. Crea algunos registros y vuelve aquí para saber que es lo que ocurre internamente.
+Esto generará un montón de archivos y carpetas que ¡funcionan de verdad!. ¿No me crees? Pruébalo tu mismo. Dirige tu navegador a  [http://localhost/booklink/author](http://localhost/booklink/author) y [http://localhost/booklink/book](http://localhost/booklink/book) para empezar a agregar autores y libros. Crea algunos registros y vuelve aquí para saber que es lo que ocurre internamente.
 
 
 El flujo de trabajo de Akelos
@@ -343,7 +343,7 @@ justo después de `<?=$active_record_helper->error_messages_for('book');?>` en e
         <?=$form_options_helper->select('book', 'author_id', $Author->collect($Author->find(), 'name', 'id'));?>
     </p>
 
-Si aún no has creado ningún autor necesitarás crear algunos ahora mismo para ver de lo que hablamos. Luego visita http://locahost/boolink/book/add para comprobar que nos muestra una lista para seleccionar autores. Adelante, crea un libro seleccionando un autor de la lista.
+Si aún no has creado ningún autor necesitarás crear algunos ahora mismo para ver de lo que hablamos. Luego visita http://locahost/booklink/book/add para comprobar que nos muestra una lista para seleccionar autores. Adelante, crea un libro seleccionando un autor de la lista.
 
 Parece ser que el autor se ha guardado, pero no se muestra en la vista `app/views/book/show.tpl`. deberás añadir este código después de `<? $content_columns = array_keys($Book->getContentColumns()); ?>`
 

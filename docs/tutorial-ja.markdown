@@ -263,7 +263,7 @@ Akelosはコードジェネレータを付属しており、完全に機能的�
 
     ./script/generate scaffold Author
 
-これは実際に動作するコードを含んだファイルやフォルダを生成します。信じられませんか？自分でやってみてください。ブラウザで[http://localhost/booklink/author](http://localhost/booklink/author) や [http://localhost/booklink/books](http://localhost/booklink/books)を開いて、著者や書籍を追加できます。レコードをいくつか作成し、フードの下に何があるかを説明している部分に戻ってください。
+これは実際に動作するコードを含んだファイルやフォルダを生成します。信じられませんか？自分でやってみてください。ブラウザで[http://localhost/booklink/author](http://localhost/booklink/author) や [http://localhost/booklink/book](http://localhost/booklink/book)を開いて、著者や書籍を追加できます。レコードをいくつか作成し、フードの下に何があるかを説明している部分に戻ってください。
 
 Akelos ワークフロー
 ------------------------------------------
@@ -345,7 +345,7 @@ Books と Authors の関連
         <?=$form_options_helper->select('book', 'author_id', $Author->collect($Author->find(), 'name', 'id'));?>
     </p>
 
-まだ著者テーブルを追加指定ない場合は、すぐに作成してhttp://locahost/boolink/book/add を開き、選択リストから新しい著者をチェックしてください。リストから著者を選択して新しい本を追加します。
+まだ著者テーブルを追加指定ない場合は、すぐに作成してhttp://locahost/booklink/book/add を開き、選択リストから新しい著者をチェックしてください。リストから著者を選択して新しい本を追加します。
 
 著者が保存されたように思えますが、`app/views/book/show.tpl`ビューには含まれていません。`<? $content_columns = array_keys($Book->getContentColumns()); ?>`の後の右にこのコードを追加してください。
 

@@ -287,7 +287,7 @@ Tapez ces deux commandes :
     ./script/generate scaffold Author
 
 Cela va créer une multitude de fichiers là où il le faut, et le tout va fonctionner directement ! Sceptique ?
-Allez donc sur [http://localhost/booklink/author](http://localhost/booklink/author) et sur [http://localhost/booklink/books](http://localhost/booklink/books), et vous pourrez d'ores et déjà gérer les livres et les auteurs dans votre base de données.
+Allez donc sur [http://localhost/booklink/author](http://localhost/booklink/author) et sur [http://localhost/booklink/book](http://localhost/booklink/book), et vous pourrez d'ores et déjà gérer les livres et les auteurs dans votre base de données.
 Allez, je vous laisse un peu de temps pour vous amuser, et revenez me voir dès que vous êtes prêts à continuer.
 
 Le fonctionnement d'Akelos
