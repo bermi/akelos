@@ -351,6 +351,16 @@ If you have not added authors yet, go and create some right now and then visit h
 Seems like the author has been saved but it its not included on the `app/views/book/show.tpl` view. You'll add it this code right after `<? $content_columns = array_keys($Book->getContentColumns()); ?>`
 
     <label>_{Author}:</label> <span class="static">{book.author.name?}</span><br />
+    
+The final step - show the author in the listing. In order to do it replace the last string of the listing method in book_controller.php with the following text:
+
+    $find_options = $this->pagination_helper->getFindOptions($this->Book);
+    $find_options['include'] = 'author';
+    $this->books =& $this->Book->find('all', $find_options);
+
+Now we can edit `app/views/book/listing.tpl`:
+* insert new string `<th>_{Author}</th>` right before `<?php  $content_columns = array_keys($Book->getContentColumns()); ?>`
+* Make the template to output author'a name by adding `<td>{post.user.login?}</td>` after `<tr {?post_odd_position}class="odd"{end}>`
 
 You must be screaming now about the rare `_{Author}` and `{book.author.name?}` syntax. Thats actually [Sintags](http://www.bermi.org/projects/sintags) a small set of rules that helps on writing cleaner views and that will be compiled to standard PHP.
 
