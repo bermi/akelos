@@ -487,7 +487,7 @@ class AkInflector
 
     function toHelperFilename($name)
     {
-        return AK_APP_DIR.DS.'helpers'.DS.AkInflector::underscore($name).'.php';
+        return AK_APP_DIR.DS.'helpers'.DS.AkInflector::underscore($name).'_helper.php';
     }
 
     function toFullName($name, $correct)
