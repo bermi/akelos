@@ -69,7 +69,7 @@ class AkActiveRecord_finders_TestCase extends  AkUnitTest
 
         $this->assertTrue($Post->save());
         
-        $this->assertTrue($Post =& $this->Post->find($Post->getId(), array('include'=>'comments,tags')));
+        $this->assertTrue($Post =& $this->Post->find($Post->getId(), array('include'=>'comments,tags','order'=>'_comments.id ASC, _tags.id ASC')));
         
         $this->assertEqual($Post->tags[0]->name, 'Tag 1');
         $this->assertEqual($Post->tags[1]->name, 'Tag 2');
@@ -81,6 +81,6 @@ class AkActiveRecord_finders_TestCase extends  AkUnitTest
 
 }
 
-//ak_test('AkActiveRecord_finders_TestCase',true);
+ak_test('AkActiveRecord_finders_TestCase',true);
 
 ?>
