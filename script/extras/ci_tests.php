@@ -6,48 +6,48 @@ define('AK_CI_CONFIG_FILE',AK_BASE_DIR.DS.'config'.DS.'ci-config.yaml');
 class CI_Tests
 {
     var $options = array(
-        'break_on_errors'=>false,
-        'test_mode'      =>false,
-        'repeat'         =>1
+    'break_on_errors'=>false,
+    'test_mode'      =>false,
+    'repeat'         =>1
     );
-    
+
     var $settings;
-    
+
     var $target_files;
     var $target_executables;
     var $target_environments;
-    
+
     static function main($args=array())
     {
         if (empty($args)){
             global $argv;
             $args = $argv;
         }
-        
+
         $self = new CI_Tests($args);
         $self->run();
         $self->hadError() ? exit(1) : exit(0);
     }
-    
+
     function __construct($args)
     {
         if (!is_file($this->config_file())) die('Not sure where I am and where config/config.php is. Run from inside the test/* folders.');
-        
+
         $this->loadSettings();
         $this->parseArgs($args);
     }
-    
+
     function loadSettings($filename=AK_CI_CONFIG_FILE)
     {
         require AK_BASE_DIR.DS.'vendor'.DS.'TextParsers'.DS.'spyc.php';
-        
+
         if (!is_file($filename)){
             die ('Could not find ci configuration file in '.AK_CI_CONFIG_FILE.'.');
         }
         $yaml = file_get_contents($filename);
         $this->settings = Spyc::YAMLLoad($yaml);
     }
-    
+
     function parseArgs($args)
     {
         array_shift($args);
@@ -78,47 +78,47 @@ class CI_Tests
                 }
             }
         }
-        
+
         $this->setDefaults();
     }
-    
+
     function setDefaults()
     {
         if (!$this->target_executables)  $this->target_executables  = $this->settings['default_executables'];
         if (!$this->target_files)        $this->target_files[]      = AK_BASE_DIR.DS.'test'.DS.'unit.php';
         if (!$this->target_environments) $this->target_environments = array_keys($this->settings['environments']);
     }
-    
+
     function constructTestFilename($filename)
     {
         if (is_file($filename)) return $filename;
-        
+
         $target_file = getcwd().DIRECTORY_SEPARATOR.$filename;
         if (is_file($target_file)) return $target_file;
-        
+
         return false;
     }
-    
-    
+
+
     function config_file()
     {
         return AK_BASE_DIR.DS.'config'.DS.'config.php';
     }
-    
+
     function config_backup_file()
     {
         return AK_BASE_DIR.DS.'config'.DS.'config-backup.php';
     }
-    
+
     function config_file_for($environment)
     {
-        return AK_BASE_DIR.DS.config.DS.$this->settings['environments'][$environment].'.php';
+        return AK_BASE_DIR.DS.'config'.DS.$this->settings['environments'][$environment].'.php';
     }
-    
+
     function run()
     {
         $this->drawHeader();
-        
+
         $this->beforeRun();
         for ($i=1; $i <= $this->timesToRun(); $i++){
             $this->drawRepeatIndicator($i);
@@ -137,50 +137,50 @@ class CI_Tests
             }
         }
         $this->afterRun();
-        
+
         $this->drawFooter();
     }
-    
+
     function markError()
     {
         $this->errors = true;
     }
-    
+
     function hadError()
     {
         return isset($this->errors);
     }
-    
+
     function filesToRun()
     {
         return $this->target_files;
     }
-    
+
     function executablesToRun()
     {
         return $this->target_executables;
     }
-    
+
     function environmentsToRun()
     {
         return $this->target_environments;
     }
-    
+
     function timesToRun()
     {
         return $this->options['repeat'];
     }
-    
+
     function isValidCombination($environment,$php_version)
     {
         return in_array($environment,$this->settings['valid_combinations'][$php_version]);
     }
-    
+
     function beforeRun()
     {
         return copy($this->config_file(),$this->config_backup_file());
     }
-    
+
     function afterRun()
     {
         if (copy($this->config_backup_file(),$this->config_file())){
@@ -188,7 +188,7 @@ class CI_Tests
         }
         return false;
     }
-    
+
     function prepareEnvironment($environment)
     {
         if (!is_file($this->config_file_for($environment))){
@@ -197,11 +197,11 @@ class CI_Tests
         }
         return copy($this->config_file_for($environment),$this->config_file());
     }
-    
+
     function runCommand($php,$filename,$environment)
     {
         $this->drawBox(array($filename,strtoupper($environment),$php));
-        
+
         if ($this->prepareEnvironment($environment)){
             $command = $this->settings['executables'][$php].' '.$filename;
             if ($this->options['test_mode']){
@@ -213,47 +213,50 @@ class CI_Tests
             return $return_value;
         }
     }
-    
+
     function drawBox($message)
     {
         $this->drawNewline();
         $this->drawLine();
+        $this->drawNewline();
         echo " TARGET: ".join(', ',$message)."\n\r";
         $this->drawLine();
         $this->drawNewline();
     }
-    
+
     function drawHeader()
     {
         #$this->drawLine('+');
     }
-    
+
     function drawFooter()
     {
         $this->drawNewline();
         $this->drawLine('+');
+        $this->drawNewline();
         echo "FINISHED. ";
-        if (!$this->hadError()) echo " All fine."; 
+        $this->drawNewline();
+        if (!$this->hadError()) echo " All fine.";
     }
-    
+
     function drawRepeatIndicator($actual)
     {
         if ($this->timesToRun() == 1) return;
-        
+
         $this->drawNewline(2);
         echo str_pad('# '.$actual.'. ',80,'#');
     }
-    
+
     function drawLine($char='-',$num=80)
     {
         echo str_pad('',$num,$char);
     }
-    
+
     function drawNewline($multiplier=1)
     {
         echo str_repeat("\n\r",$multiplier);
     }
-    
+
     function drawHelp()
     {
         echo <<<BANNER
@@ -286,14 +289,14 @@ BANNER;
     }
 }
 $test_args = array(
-    'Myself_will_be_thrown_away',
-    "all",
-    #"-b",
-    #"-?",
-    "-t",
-    #"-n","2",
-    #'AkHasMany.php',
-    #'postgres'
+'Myself_will_be_thrown_away',
+"all",
+#"-b",
+#"-?",
+"-t",
+#"-n","2",
+#'AkHasMany.php',
+#'postgres'
 );
 #CI_Tests::main($test_args);
 CI_Tests::main();
