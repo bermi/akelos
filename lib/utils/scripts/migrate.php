@@ -28,7 +28,12 @@ require_once(AK_LIB_DIR.DS.'AkInstaller.php');
 require_once(AK_LIB_DIR.DS.'utils'.DS.'generators'.DS.'AkelosGenerator.php');
 
 $installer = array_shift($options);
-$installer_class_name = AkInflector::camelize(AkInflector::demodulize($installer)).'Installer';
+if(preg_match('/:{2}|\//', $installer)){
+    $installer_class_name = AkInflector::camelize(AkInflector::demodulize($installer)).'Installer';
+}else{
+    $installer_class_name = AkInflector::camelize($installer).'Installer';
+}
+
 $command = count($options) > 0 ? array_shift($options) : 'usage';
 
 $installer = str_replace('::','/',$installer);
