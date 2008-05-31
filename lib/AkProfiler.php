@@ -24,6 +24,10 @@ if(!function_exists('memory_get_usage')){
             $tmp = explode("\n",$tmp[1]);
             $tmp = explode('"',trim($tmp[0],'"KB '));
             return intval(str_replace(array('.',','),array(''),$tmp[count($tmp)-1]))*1024;
+        }else{
+            $pid = getmypid();
+            exec("ps -o rss -p $pid", $output);
+            return $output[1] *1024;
         }
         return false;
     }

@@ -126,6 +126,7 @@ class AkObject
         unset($this);
     }
 
+
     // }}}
 
 
@@ -148,6 +149,24 @@ class AkObject
 
         $log = Log::singleton('file', AK_LOGS_DIR.DS.$ident.'.log',$ident);
         $log->log($type, $message);
+    }
+    
+    
+    /**
+    * Unsets circular reference children that are not freed from memory
+    * when calling unset() or when the parent object is garbage collected.
+    * 
+    * @see http://paul-m-jones.com/?p=262
+    * @see http://bugs.php.net/bug.php?id=33595
+    */
+    function freeMemory()
+    {
+        // We can't use get_class_vars as it does not include runtime assigned attributes
+        foreach (array_keys((array)$this) as $attribute){
+            if(isset($this->$attribute)){
+                unset($this->$attribute);
+            }
+        }
     }
 
 }
