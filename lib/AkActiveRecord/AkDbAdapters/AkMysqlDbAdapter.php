@@ -77,7 +77,7 @@ class AkMysqlDbAdapter extends AkDbAdapter
     
     function quote_string($value)
     {
-        return "'".mysql_real_escape_string($value,$this->connection->_connectionID)."'";
+        return "'".mysql_real_escape_string($value, $this->connection->_connectionID)."'";
     }
     
 }

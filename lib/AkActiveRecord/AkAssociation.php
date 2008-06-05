@@ -55,7 +55,7 @@ class AkAssociation extends AkObserver
         $association_id = strtolower(AkInflector::underscore($association_id));
         if(isset($this->Owner->$association_id)){
             trigger_error(Ak::t('Could not load %association_id on %model_name because "%model_name->%association_id" attribute '.
-            'is already defided and can\' be used as an association placeholder',
+            'is already defined and can\'t be used as an association placeholder',
             array('%model_name'=>$this->Owner->getModelName(),'%association_id'=>$association_id)),
             E_USER_ERROR);
             return false;

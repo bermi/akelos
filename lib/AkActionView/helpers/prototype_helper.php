@@ -84,10 +84,10 @@ class PrototypeHelper extends AkActionViewHelper
     * either render_partial or render_partial_collection. 
     *
     * Examples:
-    *   $prototype_helper->link_to_remote('Delete this post', array('url' => array('action' => 'destroy', 'id' => $_POST['id']), array('update' => 'posts'));
+    * $prototype_helper->link_to_remote('Delete this post', array('url' => array('action' => 'destroy', 'id' => $_POST['id']), 'update' => 'posts'));
     *   $prototype_helper->link_to_remote(Asset$this->_controller->tag_helper->image_tag('refresh'), array('url' => array('action' => 'list_emails'), array('update => 'emails'));
     *
-    * You can also specify a hash for <tt>options['update']</tt> to allow for
+    * You can also specify an array for <tt>options['update']</tt> to allow for
     * easy redirection of output to an other DOM element if a server-side 
     * error occurs:
     *

@@ -10,7 +10,7 @@ class <?php echo $controller_class_name?> extends ApplicationController
 ?>
     function index()
     {
-        $this->renderAction('listing');
+        $this->performAction('listing');
     }
 
 <?php  foreach((array)@$actions as $action) :?>

@@ -272,12 +272,14 @@ class AkInstaller
      */
     function addColumn($table_name, $column_details)
     {
+        $this->timestamps = false;
         $column_details = $this->_getColumnsAsAdodbDataDictionaryString($column_details);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->AddColumnSQL($table_name, $column_details));
     }
 
     function changeColumn($table_name, $column_details)
     {
+        $this->timestamps = false;
         $column_details = $this->_getColumnsAsAdodbDataDictionaryString($column_details);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->AlterColumnSQL($table_name, $column_details));
     }
@@ -289,7 +291,7 @@ class AkInstaller
 
     function renameColumn($table_name, $old_column_name, $new_column_name)
     {
-        return $this->db->renameColumn($table_name,$old_column_name,$new_column_name);
+        return $this->db->renameColumn($table_name, $old_column_name, $new_column_name);
     }
 
 

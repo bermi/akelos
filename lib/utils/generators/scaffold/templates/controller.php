@@ -10,7 +10,7 @@ class <?php echo $controller_class_name?> extends ApplicationController
 ?>
     function index()
     {
-        $this->renderAction('listing');
+        $this->performAction('listing');
     }
 
 <?php  foreach((array)@$actions as $action) :?>
@@ -21,8 +21,9 @@ class <?php echo $controller_class_name?> extends ApplicationController
 <?php  endforeach; ?>
     function listing()
     {
-        $this-><?php echo $singular_name?>_pages = $this->pagination_helper->getPaginator($this-><?php echo $model_name?>, array('items_per_page' => 10));        
-        $this-><?php echo $plural_name?> =& $this-><?php echo $model_name?>->find('all', $this->pagination_helper->getFindOptions($this-><?php echo $model_name?>));
+        $this-><?php echo $singular_name?>_pages = $this->pagination_helper->getPaginator($this-><?php echo $model_name?>, array('items_per_page' => 10));
+        $options = $this->pagination_helper->getFindOptions($this-><?php echo $model_name?>);
+        $this-><?php echo $plural_name?> =& $this-><?php echo $model_name?>->find('all', $options);
     }
 
     function show()

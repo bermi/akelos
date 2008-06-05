@@ -144,7 +144,7 @@ class AkHasMany extends AkAssociation
 
         if(isset($this->Owner->$handler_name)){
             trigger_error(Ak::t('Could not load %association_id on %model_name because "%model_name->%handler_name" attribute '.
-            'is already defided and can\' be used as an association placeholder',
+            'is already defined and can\'t be used as an association placeholder',
             array('%model_name'=>$this->Owner->getModelName(),'%association_id'=>$association_id, '%handler_name'=>$handler_name)),
             E_USER_ERROR);
             return false;

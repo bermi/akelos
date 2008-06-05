@@ -3727,7 +3727,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     trigger_error(Ak::t('%option must be a Range (array(min, max))',array('%option',$option)), E_USER_ERROR);
                     return false;
                 }
-                $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
+                $attribute_names = Ak::toArray($attribute_names);
+                
                 foreach ($attribute_names as $attribute_name){
                     if((!empty($option['allow_null']) && !isset($this->$attribute_name)) || (Ak::size($this->$attribute_name)) < $option_value[0]){
                         $this->addError($attribute_name, sprintf($options['too_short'], $option_value[0]));
@@ -3752,7 +3753,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
                 $message = sprintf(!empty($options['message']) ? $options['message'] : $options[$message_options[$option]],$option_value);
 
-                $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
+                $attribute_names = Ak::toArray($attribute_names);
                 foreach ($attribute_names as $attribute_name){
                     if((!$options['allow_null'] && !isset($this->$attribute_name)) ||
                     eval("return !(".Ak::size(@$this->$attribute_name)." {$validity_checks[$option]} $option_value);")){
@@ -3900,7 +3901,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
-        $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
+        $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
             if(!isset($this->$attribute_name) || !$regex_function($regular_expression, $this->$attribute_name)){
                 $this->addError($attribute_name, $message);
@@ -3928,7 +3929,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
-        $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
+        $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
             if($allow_null ? (@$this->$attribute_name != '' ? (!in_array($this->$attribute_name,$array_of_possibilities)) : @$this->$attribute_name === 0 ) : (isset($this->$attribute_name) ? !in_array(@$this->$attribute_name,$array_of_possibilities) : true )){
                 $this->addError($attribute_name, $message);
@@ -3957,7 +3958,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
-        $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
+        $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
 
             if($allow_null ? (!empty($this->$attribute_name) ? (in_array(@$this->$attribute_name,$array_of_possibilities)) : false ) : (isset($this->$attribute_name) ? in_array(@$this->$attribute_name,$array_of_possibilities) : true )){
@@ -3989,7 +3990,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
-        $attribute_names = is_array($attribute_names) ? $attribute_names : array($attribute_names);
+        $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
             if(
             $allow_null ?

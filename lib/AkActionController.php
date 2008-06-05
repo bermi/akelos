@@ -625,7 +625,6 @@ class AkActionController extends AkObject
 
     function renderAction($_action_name, $status = null, $with_layout = true)
     {
-        $this->$_action_name();
         $template = $this->getDefaultTemplateName($_action_name);
         if(!empty($with_layout) && !$this->_isTemplateExemptFromLayout($template)){
             return $this->renderWithLayout($template, $status, $with_layout);
