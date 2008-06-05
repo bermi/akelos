@@ -78,6 +78,11 @@ class AkPluginManagerTestCase extends AkUnitTest
         $repositories = $this->PluginManager->_getRepositoriesFromRemotePage();
         $this->assertEqual($repositories[0], $this->PluginManager->main_repository);
     }
+    
+    function test_remove_plugin()
+    {
+        Ak::directory_delete(AK_PLUGINS_DIR.DS.'acts_as_versioned');
+    }
 }
 
 ?>
