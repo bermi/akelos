@@ -104,6 +104,7 @@ class Test_of_AkInflector extends  UnitTestCase
 
     "horse" => "horses",
     "prize" => "prizes",
+    "price" => "prices",
     "edge" => "edges"
     );
 

@@ -89,11 +89,8 @@ class AkInflector
 
             $lowercased_word = strtolower($word);
 
-            foreach ($uncountable as $_uncountable){
-                if(substr($lowercased_word,(-1*strlen($_uncountable))) == $_uncountable){
-                    $_cached[$_original_word] = $word;
-                    return $word;
-                }
+            if (in_array($lowercased_word,$uncountable)){
+                return $word;
             }
 
             foreach ($irregular as $_plural=> $_singular){
@@ -174,11 +171,9 @@ class AkInflector
             'move' => 'moves');
 
             $lowercased_word = strtolower($word);
-            foreach ($uncountable as $_uncountable){
-                if(substr($lowercased_word,(-1*strlen($_uncountable))) == $_uncountable){
-                    $_cached[$_original_word] = $word;
-                    return $word;
-                }
+
+            if (in_array($lowercased_word,$uncountable)){
+                return $word;
             }
 
             foreach ($irregular as $_singular => $_plural){
