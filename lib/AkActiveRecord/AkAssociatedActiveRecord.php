@@ -319,7 +319,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
         $sql .= 'FROM '.($include_owner_as_selection ? $this->getTableName().' AS __owner ' : $options['selection'].' ');
         $sql .= (!empty($options['joins']) ? $options['joins'].' ' : '');
 
-        empty($options['conditions']) ? null : $this->addConditions($sql, $options['conditions']);
+        empty($options['conditions']) ? null : $this->addConditions($sql, $options['conditions'], '__owner');
 
         // Create an alias for order
         if(empty($options['order']) && !empty($options['sort'])){

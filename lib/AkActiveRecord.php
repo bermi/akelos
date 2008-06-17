@@ -1367,7 +1367,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Adds a sanitized version of $conditions to the $sql string. Note that the passed $sql string is changed.
     */
-    function addConditions(&$sql, $conditions = null)
+    function addConditions(&$sql, $conditions = null, $table_alias = null)
     {
         $concat = empty($sql) ? '' : ' WHERE ';
         if (empty($conditions) && $this->_getDatabaseType() == 'sqlite') $conditions = '1';  // sqlite HACK
@@ -1377,7 +1377,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
 
         if($this->getInheritanceColumn() !== false && $this->descendsFromActiveRecord($this)){
-            $type_condition = $this->typeCondition();
+            $type_condition = $this->typeCondition($table_alias);
             $sql .= !empty($type_condition) ? $concat.$type_condition : '';
         }
         return $sql;
@@ -1576,14 +1576,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function typeCondition()
+    function typeCondition($table_alias = null)
     {
         $inheritance_column = $this->getInheritanceColumn();
         $type_condition = array();
         $table_name = $this->getTableName();
         $available_types = array_merge(array($this->getModelName()),$this->getSubclasses());
         foreach ($available_types as $subclass){
-            $type_condition[] = ' '.$table_name.'.'.$inheritance_column.' = \''.AkInflector::humanize(AkInflector::underscore($subclass)).'\' ';
+            $type_condition[] = ' '.($table_alias != null ? $table_alias : $table_name).'.'.$inheritance_column.' = \''.AkInflector::humanize(AkInflector::underscore($subclass)).'\' ';
         }
         return empty($type_condition) ? '' : '('.join('OR',$type_condition).') ';
     }
