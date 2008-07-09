@@ -76,8 +76,17 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
         $Product =& $this->Hybrid->find('first',array('title'=>'apple'));
         $this->assertEqual($Product->price, 10.99);
     }
+    
+    function test_deciamls_should_not_have_thousands_seperators()
+    {
+        $Product =& new Hybrid(array('title'=>'big apple','price'=>14599.99));
+        $Product->save();
 
-    function test_should_round_decimal()
+        $Product =& $this->Hybrid->find('first',array('title'=>'big apple'));
+        $this->assertEqual($Product->price, 14599.99);
+    }
+
+    function test_should_round_decimals()
     {
         $Product =& $this->Hybrid->create(array('title'=>'BigBlueStock','price'=>12.9888));
         $Product =& $this->Hybrid->find('first',array('title'=>'BigBlueStock'));

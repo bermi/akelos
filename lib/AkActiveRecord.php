@@ -3187,7 +3187,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     $result = 'null';
                 }else{
                     if($scale = $this->getColumnScale($column_name)){
-                        $value = number_format($value, $scale);
+                        $value = number_format($value, $scale, '.', '');
                     }
                     $result = $add_quotes ? $this->_db->quote_string($value) : $value;
                 }
