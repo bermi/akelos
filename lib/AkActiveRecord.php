@@ -1346,8 +1346,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     function constructFinderSql($options, $select_from_prefix = 'default')
     {
-        $sql = isset($options['select_prefix']) ? $options['select_prefix'] : ($select_from_prefix == 'default' ? 'SELECT * FROM '.$this->getTableName() : $select_from_prefix);
-        $sql  .= !empty($options['joins']) ? ' '.$options['joins'] : '';
+        $sql = isset($options['select_prefix']) ? $options['select_prefix'] : ($select_from_prefix == 'default' ? 'SELECT '.(!empty($options['joins'])?$this->getTableName().'.':'') .'* FROM '.$this->getTableName() : $select_from_prefix);
+        $sql .= !empty($options['joins']) ? ' '.$options['joins'] : '';
 
         $this->addConditions($sql, isset($options['conditions']) ? $options['conditions'] : array());
 
