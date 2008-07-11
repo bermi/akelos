@@ -328,10 +328,12 @@ if($command == 'install') {
         if($plugin_name != $plugin){
             $repository = preg_replace('/\/?'.$plugin_name.'$/', '', trim($plugin));
         }
-        if (!@$PluginManager->getRepositoryForPlugin($plugin_name, $repository)){
-            is_null($repository) ? $repository = AK_PLUGINS_MAIN_REPOSITORY : null;
-            echo "\nPlugin $plugin_name not found @ ".$repository.".\n";
-            continue;
+        if(!is_dir($plugin)){
+            if (!@$PluginManager->getRepositoryForPlugin($plugin_name, $repository)){
+                is_null($repository) ? $repository = AK_PLUGINS_MAIN_REPOSITORY : null;
+                echo "\nPlugin $plugin_name not found @ ".$repository.".\n";
+                continue;
+            }
         }
         echo "\nInstalling $plugin\n";
         $PluginManager->installPlugin($plugin_name, $repository, $options);

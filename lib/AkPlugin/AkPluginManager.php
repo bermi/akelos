@@ -196,12 +196,16 @@ class AkPluginManager extends AkObject
         $options = array_merge($default_options, $options);
 
         $plugin_name = Ak::sanitize_include($plugin_name, 'high');
-        $repository = $this->getRepositoryForPlugin($plugin_name, $repository);
 
+        $install_method = $this->guessBestInstallMethod($options);
+
+        if($install_method != 'local directory'){
+            $repository = $this->getRepositoryForPlugin($plugin_name, $repository);
+        }
         if(!$options['force'] && is_dir(AK_PLUGINS_DIR.DS.$plugin_name)){
             trigger_error(Ak::t('Destination directory is not empty. Use force option to overwrite exiting files.'), E_USER_NOTICE);
         }else{
-            $method = '_installUsing'.ucfirst($this->guessBestInstallMethod($options));
+            $method = '_installUsing'.AkInflector::camelize($install_method);
             $this->$method($plugin_name, rtrim($repository, '/'), $options['revision'], $options['force']);
             $this->_runInstaller($plugin_name, 'install', $options);
         }
@@ -210,7 +214,9 @@ class AkPluginManager extends AkObject
 
     function guessBestInstallMethod($options = array())
     {
-        if($this->canUseSvn()){
+        if(is_dir($options['parameters'])){
+            return 'local directory';
+        }elseif($this->canUseSvn()){
             if(!empty($options['externals']) && $this->_shouldUseSvnExternals()){
                 return 'externals';
             }elseif(!empty($options['checkout']) && $this->_shouldUseSvnCheckout()){
@@ -249,7 +255,7 @@ class AkPluginManager extends AkObject
 
         $plugin_name = Ak::sanitize_include($plugin_name, 'high');
 
-        $method = '_updateUsing'.ucfirst($this->guessBestInstallMethod($options));
+        $method = '_updateUsing'.AkInflector::camelize($this->guessBestInstallMethod($options));
         $this->$method($plugin_name, rtrim($this->getRepositoryForPlugin($plugin_name, $repository), '/'));
 
         $this->_runInstaller($plugin_name, 'install');
@@ -513,7 +519,7 @@ class AkPluginManager extends AkObject
     }
 
 
-    
+
     function _shouldUseSvnExternals()
     {
         return is_dir(AK_PLUGINS_DIR.DS.'.svn');
@@ -538,6 +544,19 @@ class AkPluginManager extends AkObject
         `svn update $plugin_dir`;
     }
 
+    function _installUsingLocalDirectory($name, $path, $rev = null)
+    {
+        $source = $path.DS.$name;
+        $plugin_dir = AK_PLUGINS_DIR;
+        $command = AK_OS == 'UNIX' ? 'cp -rf ' : 'xcopy /h /r /k /x /y /S /E ';
+        `$command $source $plugin_dir`;
+    }
+
+    function _updateUsingLocalDirectory($name)
+    {
+        trigger_error(Ak::t('Updating from local targets it\'s not supported yet. Please use install --force instead.'));
+    }
+
     function _installUsingExport($name, $uri, $rev = null, $force = false)
     {
         $rev = empty($rev) ? '' : " -r $rev ";
@@ -545,7 +564,7 @@ class AkPluginManager extends AkObject
         $plugin_dir = AK_PLUGINS_DIR.DS.$name;
         `svn export $force $rev $uri/$name $plugin_dir`;
     }
-    
+
     function _updateUsingExport($name, $uri)
     {
         $plugin_dir = AK_PLUGINS_DIR.DS.$name;
@@ -561,12 +580,12 @@ class AkPluginManager extends AkObject
         $this->_setExternals($externals, $extras);
         $this->_installUsingCheckout($name, $uri, $rev, $force);
     }
-    
+
     function _updateUsingExternals($name)
     {
         $this->_updateUsingCheckout($name);
     }
-    
+
     function _updateUsingHttp($name, $uri)
     {
         if(is_file(AK_PLUGINS_DIR.DS.$name.DS.'CHANGELOG') &&
@@ -575,8 +594,8 @@ class AkPluginManager extends AkObject
         }
         $this->_copyRemoteDir(rtrim($uri, '/').'/'.$name.'/', AK_PLUGINS_DIR);
     }
-    
-    
+
+
     function _setExternals($items, $extras = '')
     {
         $externals = array();
@@ -617,7 +636,7 @@ class AkPluginManager extends AkObject
     {
         $this->_copyRemoteDir(rtrim($uri, '/').'/'.$name.'/', AK_PLUGINS_DIR);
     }
-    
+
 }
 
 ?>
