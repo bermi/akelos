@@ -1,4 +1,4 @@
-<?php
+#<?php
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 // +----------------------------------------------------------------------+
@@ -3992,24 +3992,19 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
-            if(
-            $allow_null ?
-            (
-            isset($this->$attribute_name) ?
-            (
-            $only_integer ?
-            !is_integer(@$this->$attribute_name) :
-            !is_numeric(@$this->$attribute_name)
-            ) :
-            false
-            ) :
-            (
-            isset($this->$attribute_name) ?
-            ($only_integer ? !is_integer(@$this->$attribute_name) : !is_numeric(@$this->$attribute_name)) :
-            true
-            )
-            )
-            {
+            if (isset($this->$attribute_name)){
+                $value = $this->$attribute_name;
+                if ($only_integer){
+                    $is_int = is_numeric($value) && (int)$value == $value;
+                    $has_error = !$is_int;
+                }else{
+                    $has_error = !is_numeric($value);
+                }
+            }else{
+                $has_error = $allow_null ? false : true;
+            }
+
+            if ($has_error){
                 $this->addError($attribute_name, $message);
             }
         }
