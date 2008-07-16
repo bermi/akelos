@@ -1126,7 +1126,7 @@ class Ak
         $xml = $header;
         foreach ($array as $key => $value) {
             $key = is_numeric($key) ? $parent : $key;
-            $value = is_array($value) ? "\r\n".xmlFromArray($value, '', $key) : $value;
+            $value = is_array($value) ? "\r\n".Ak::array_to_xml($value, '', $key) : $value;
             $_tags[$key] = $key;
             $xml .= sprintf("<%s>%s</%s>\r\n", $key, $value, $key);
             $parent = $key;
