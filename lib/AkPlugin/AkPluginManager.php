@@ -214,7 +214,7 @@ class AkPluginManager extends AkObject
 
     function guessBestInstallMethod($options = array())
     {
-        if(is_dir($options['parameters'])){
+        if(!empty($options['parameters']) && is_dir($options['parameters'])){
             return 'local directory';
         }elseif($this->canUseSvn()){
             if(!empty($options['externals']) && $this->_shouldUseSvnExternals()){
