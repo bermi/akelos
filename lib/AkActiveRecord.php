@@ -1096,14 +1096,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         
     }
 
-    function _validateFindOptions(&$options)
-    {
-        $valid_keys = array('conditions', 'include', 'joins', 'limit', 'offset', 'order', 'bind', 'select','select_prefix', 'readonly');
-        foreach (array_keys($options) as $key){
-            if (!in_array($key,$valid_keys)) unset($options[$key]);
-        }
-    }
-
     function &findFirst()
     {
         if(!isset($this->_activeRecordHasBeenInstantiated)){
