@@ -1030,7 +1030,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if (isset($options[0])){
             return false;
         }
-        $valid_keys = array('conditions', 'include', 'joins', 'limit', 'offset', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly');
+        $valid_keys = array('conditions', 'include', 'joins', 'limit', 'offset', 'group', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly');
         foreach (array_keys($options) as $key){
             if (!in_array($key,$valid_keys)){
                 return false;
@@ -1356,7 +1356,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $options['order'] = $options['sort'];
         }
 
-        $sql  .= !empty($options['order']) ? ' ORDER BY  '.$options['order'] : '';
+        $sql .= !empty($options['group']) ? ' GROUP BY '.$options['group'] : ''; 
+        $sql .= !empty($options['order']) ? ' ORDER BY '.$options['order'] : '';
 
         $this->_db->addLimitAndOffset($sql,$options);
 
