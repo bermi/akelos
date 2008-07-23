@@ -342,6 +342,21 @@ class AkAssociatedActiveRecord extends AkBaseModel
         if (!$results){
             return $objects;
         }
+        $result =& $this->_generateObjectGraphFromResultSet($results,$included_associations,$virtual_limit);
+        return $result;
+    }
+    
+    /**
+     * Pass hand-made sql directly to _db->execute and generate the OG with this method.
+     *
+     * @param ADOResultSet $results            a result set from Db->execute
+     * @param array $included_associations     just like in ->find(); $options['include']; but in fact unused
+     * @param mixed $virtual_limit             int or false; unsure if this works                     
+     * @return array                           ObjectGraph as an array
+     */
+    function &_generateObjectGraphFromResultSet($results,$included_associations = array(), $virtual_limit = false)
+    {
+        $objects = array();
         
         $i = 0;
         $associated_ids = $this->getAssociatedIds();
