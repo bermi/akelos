@@ -956,17 +956,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     function &_findEvery($options)
     {
-        $limit = isset($options['limit']) ? $options['limit'] : null;
-        $offset = isset($options['offset']) ? $options['offset'] : null;
-
-        $sql = $this->constructFinderSql($options);
-        if(!empty($options['bind']) && is_array($options['bind']) && strstr($sql,'?')){
-            $sql = array_merge(array($sql),$options['bind']);
-        }
-
         if((!empty($options['include']) && $this->hasAssociations())){
             $result =& $this->findWithAssociations($options);
         }else{
+            $sql = $this->constructFinderSql($options);
+            if(!empty($options['bind']) && is_array($options['bind']) && strstr($sql,'?')){
+                $sql = array_merge(array($sql),$options['bind']);
+            }
+            
             $result =& $this->findBySql($sql);
         }
 
