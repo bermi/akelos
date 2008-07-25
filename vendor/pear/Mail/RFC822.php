@@ -52,7 +52,7 @@
  *
  * @author  Richard Heyes <richard@phpguru.org>
  * @author  Chuck Hagenbuch <chuck@horde.org>
- * @version $Revision: 1.21 $
+ * @version $Revision: 1.24 $
  * @license BSD
  * @package Mail
  */
@@ -342,22 +342,39 @@ class Mail_RFC822 {
     }
 
     /**
-     * Checks if a string has an unclosed quotes or not.
+     * Checks if a string has unclosed quotes or not.
      *
      * @access private
-     * @param string $string The string to check.
-     * @return boolean True if there are unclosed quotes inside the string, false otherwise.
+     * @param string $string  The string to check.
+     * @return boolean  True if there are unclosed quotes inside the string,
+     *                  false otherwise.
      */
     function _hasUnclosedQuotes($string)
     {
-        $string     = explode('"', $string);
-        $string_cnt = count($string);
+        $string = trim($string);
+        $iMax = strlen($string);
+        $in_quote = false;
+        $i = $slashes = 0;
 
-        for ($i = 0; $i < (count($string) - 1); $i++)
-            if (substr($string[$i], -1) == '\\')
-                $string_cnt--;
+        for (; $i < $iMax; ++$i) {
+            switch ($string[$i]) {
+            case '\\':
+                ++$slashes;
+                break;
 
-        return ($string_cnt % 2 === 0);
+            case '"':
+                if ($slashes % 2 == 0) {
+                    $in_quote = !$in_quote;
+                }
+                // Fall through to default action below.
+
+            default:
+                $slashes = 0;
+                break;
+            }
+        }
+
+        return $in_quote;
     }
 
     /**
@@ -912,7 +929,7 @@ class Mail_RFC822 {
      */
     function isValidInetAddress($data, $strict = false)
     {
-        $regex = $strict ? '/^([.0-9a-z_-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,4})$/i' : '/^([*+!.&#$|\'\\%\/0-9a-z^_`{}=?~:-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,4})$/i';
+        $regex = $strict ? '/^([.0-9a-z_+-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})$/i' : '/^([*+!.&#$|\'\\%\/0-9a-z^_`{}=?~:-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})$/i';
         if (preg_match($regex, trim($data), $matches)) {
             return array($matches[1], $matches[2]);
         } else {

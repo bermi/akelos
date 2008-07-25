@@ -16,12 +16,12 @@
 // | Author: Chuck Hagenbuch <chuck@horde.org>                            |
 // +----------------------------------------------------------------------+
 //
-// $Id: mail.php,v 1.13 2004/09/09 02:08:55 jon Exp $
+// $Id: mail.php,v 1.20 2007/10/06 17:00:00 chagenbu Exp $
 
 /**
  * internal PHP-mail() implementation of the PEAR Mail:: interface.
  * @package Mail
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.20 $
  */
 class Mail_mail extends Mail {
 
@@ -41,9 +41,9 @@ class Mail_mail extends Mail {
      */
     function Mail_mail($params = null)
     {
-        /* The other mail implementations accept parameters as arrays.
-         * In the interest of being consistent, explode an array into
-         * a string of parameter arguments. */
+        // The other mail implementations accept parameters as arrays.
+        // In the interest of being consistent, explode an array into
+        // a string of parameter arguments.
         if (is_array($params)) {
             $this->_params = join(' ', $params);
         } else {
@@ -54,10 +54,14 @@ class Mail_mail extends Mail {
          * line arguments, we can't guarantee the use of the standard
          * "\r\n" separator.  Instead, we use the system's native line
          * separator. */
-        $this->sep = (strstr(PHP_OS, 'WIN')) ? "\r\n" : "\n";
+        if (defined('PHP_EOL')) {
+            $this->sep = PHP_EOL;
+        } else {
+            $this->sep = (strpos(PHP_OS, 'WIN') === false) ? "\n" : "\r\n";
+        }
     }
 
-	/**
+    /**
      * Implements Mail_mail::send() function using php's built-in mail()
      * command.
      *
@@ -85,6 +89,15 @@ class Mail_mail extends Mail {
      */
     function send($recipients, $headers, $body)
     {
+        if (!is_array($headers)) {
+            return PEAR::raiseError('$headers must be an array');
+        }
+
+        $result = $this->_sanitizeHeaders($headers);
+        if (is_a($result, 'PEAR_Error')) {
+            return $result;
+        }
+
         // If we're passed an array of recipients, implode it.
         if (is_array($recipients)) {
             $recipients = implode(', ', $recipients);
@@ -98,17 +111,19 @@ class Mail_mail extends Mail {
             unset($headers['Subject']);
         }
 
+        // Also remove the To: header.  The mail() function will add its own
+        // To: header based on the contents of $recipients.
+        unset($headers['To']);
+
         // Flatten the headers out.
         $headerElements = $this->prepareHeaders($headers);
-        if (PEAR::isError($headerElements)) {
+        if (is_a($headerElements, 'PEAR_Error')) {
             return $headerElements;
         }
         list(, $text_headers) = $headerElements;
 
-        /*
-         * We only use mail()'s optional fifth parameter if the additional
-         * parameters have been provided and we're not running in safe mode.
-         */
+        // We only use mail()'s optional fifth parameter if the additional
+        // parameters have been provided and we're not running in safe mode.
         if (empty($this->_params) || ini_get('safe_mode')) {
             $result = mail($recipients, $subject, $body, $text_headers);
         } else {
@@ -116,10 +131,8 @@ class Mail_mail extends Mail {
                            $this->_params);
         }
 
-        /*
-         * If the mail() function returned failure, we need to create a
-         * PEAR_Error object and return it instead of the boolean result.
-         */
+        // If the mail() function returned failure, we need to create a
+        // PEAR_Error object and return it instead of the boolean result.
         if ($result === false) {
             $result = PEAR::raiseError('mail() returned failure');
         }

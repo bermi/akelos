@@ -16,7 +16,7 @@
 // | Author: Chuck Hagenbuch <chuck@horde.org>                            |
 // +----------------------------------------------------------------------+
 //
-// $Id: Mail.php,v 1.17 2006/09/15 03:41:18 jon Exp $
+// $Id: Mail.php,v 1.20 2007/10/06 17:00:00 chagenbu Exp $
 
 require_once 'PEAR.php';
 
@@ -26,7 +26,7 @@ require_once 'PEAR.php';
  * useful in multiple mailer backends.
  *
  * @access public
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.20 $
  * @package Mail
  */
 class Mail
@@ -82,12 +82,20 @@ class Mail
      * @return mixed Returns true on success, or a PEAR_Error
      *               containing a descriptive error message on
      *               failure.
+     *
      * @access public
      * @deprecated use Mail_mail::send instead
      */
     function send($recipients, $headers, $body)
     {
-        $this->_sanitizeHeaders($headers);
+        if (!is_array($headers)) {
+            return PEAR::raiseError('$headers must be an array');
+        }
+
+        $result = $this->_sanitizeHeaders($headers);
+        if (is_a($result, 'PEAR_Error')) {
+            return $result;
+        }
 
         // if we're passed an array of recipients, implode it.
         if (is_array($recipients)) {
@@ -103,10 +111,9 @@ class Mail
         }
 
         // flatten the headers out.
-        list(,$text_headers) = Mail::prepareHeaders($headers);
+        list(, $text_headers) = Mail::prepareHeaders($headers);
 
         return mail($recipients, $subject, $body, $text_headers);
-
     }
 
     /**
@@ -151,9 +158,9 @@ class Mail
         foreach ($headers as $key => $value) {
             if (strcasecmp($key, 'From') === 0) {
                 include_once 'Mail/RFC822.php';
-                $parser = &new Mail_RFC822();
+                $parser = new Mail_RFC822();
                 $addresses = $parser->parseAddressList($value, 'localhost', false);
-                if (PEAR::isError($addresses)) {
+                if (is_a($addresses, 'PEAR_Error')) {
                     return $addresses;
                 }
 
@@ -161,7 +168,6 @@ class Mail
 
                 // Reject envelope From: addresses with spaces.
                 if (strstr($from, ' ')) {
-                    die('Aquiii');
                     return false;
                 }
 
@@ -222,7 +228,7 @@ class Mail
         $addresses = Mail_RFC822::parseAddressList($recipients, 'localhost', false);
 
         // If parseAddressList() returned a PEAR_Error object, just return it.
-        if (PEAR::isError($addresses)) {
+        if (is_a($addresses, 'PEAR_Error')) {
             return $addresses;
         }
 

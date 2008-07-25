@@ -196,6 +196,7 @@ class Mail_mimePart {
             $this->_encoding = '7bit';
         }
 
+        
         // Assign stuff to member variables
         $this->_encoded  = array();
         $this->_headers  = $headers;
