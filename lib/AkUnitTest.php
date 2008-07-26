@@ -184,6 +184,20 @@ class AkUnitTest extends UnitTestCase
     }
 }
 
+/**
+* Unit tester for your mailers.
+*
+* This tester will copy your application views from the app/views to test/fixtures/app/views 
+* unless you implicitly set AkMailerTest::avoid_copying_views to true.
+*/
+class AkMailerTest extends AkUnitTest 
+{
+    function __construct()
+    {
+        empty($this->avoid_copying_views) && Ak::copy(AK_BASE_DIR.DS.'app'.DS.'views',AK_VIEWS_DIR);
+    }
+}
+
 class AkWebTestCase extends WebTestCase
 {
     function assertWantedText($text, $message = '%s')

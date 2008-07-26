@@ -1,5 +1,135 @@
 SVN
 
+* [977]  Adding the Action Mailer framework, for sending emails from your Akelos application.
+
+ActionMailer is an Akelos service-layer package for creating email messages.
+
+=== Generate a mailer ===
+
+Creates a stub file using the generator:
+
+{{{
+./script/generate mailer Notifier
+}}}
+
+A file is created in your app/models directory named notifier.php:
+
+{{{
+class Notifier extends AkActionMailer{
+}
+}}}
+
+There are some new conventions for the Action Mailer:
+
+  * Action Mailer implementations have views. The above example will reference files in app/views/notifier
+  * Each email that you want to send should have one associated method within the class.
+  * You don’t call that method. Ever.
+  * Instead, you call some dynamic methods, as we’ll see below.
+
+=== Example: ===
+
+==== The scenario ====
+
+Let’s assume we’re sending an email to a new user to our website to thank them for signing up, and that user is an object coming from an Active Record that has already been created.
+
+=== Notifier ===
+
+Add the following method to your Notifier:
+
+{{{
+function signup_thanks($User){ 
+  //Email header info MUST be added here
+  $this->set(array( 
+    'recipients' => $User->email, 
+    'from' => 'accounts@example.com', 
+    'subject' => 'Thank you for registering with our website', 
+    // Email body parameters (for the view) go here 
+    'body' => array( 'User' => $User ) 
+    )); 
+}
+}}}
+
+=== Controller ===
+
+And the following snippet to the controller in your application that needs to send an email:
+
+{{{
+function show_page_after_account_creation(){ 
+  Ak::import_mailer('notifier'); 
+  $Notifier = new Notifier(); 
+  $Notifier->deliver('signup_thanks', $this->User); 
+} 
+}}}
+
+You could also import the model into you controller as usual, but before you'll need to `require(AK_LIB_'DIR.'/AkActionMailer.php')`.
+
+=== View ===
+
+The body of the email comes from a .tpl file in app/views/notifier – In this example; app/views/notifier/signup_thanks.tpl:
+
+{{{
+Dear {User.first_name} {User.last_name},
+Thanks for signing up with us!
+}}}
+
+==== HTML and Text messages ====
+
+If you want to send two alternative messages (text/plain and text/html), the Akelos convention is to have two views like:
+
+{{{
+app/views/notifier/signup_thanks.text.plain.tpl
+app/views/notifier/signup_thanks.text.html.tpl
+}}}
+
+If you add images to your html message Akelos will embed them automatically into the message body unless you set the attribute `_attach_html_images` to false in you mailer.
+
+---
+
+You can find more documentation on the Action Mailer at the AkActionMailer inline documentation and on the unit tests, document configuration, helpers and receiving emails.
+
+
+
+* [977] Added new system for retrieving configurations from YAML files.
+
+You just need to call Ak::getSettings($namespace), where namespace is "config/$namespace.yml"
+
+* [977] Added new AkMailerTest, for testing ActionMailer models. This tester will copy your application views from the app/views to test/fixtures/app/views unless you implicitly set AkMailerTest::avoid''copying''views to true.
+* [977] Adding Ak::import_mailer() which works like Ak::import(), but imports lib/AkActionMailer.php before doing so. We might deprecate this once we drop support for PHP4.
+* [977] Whenever a charset is not supported by mb_* AkelosAkCharset will now default to the PhpRecoding engine on that specific recoding task.
+* [977] Adding Ak::first() and Ak::last(), which work like PHP functions shift(), and pop() but without modifying source array.
+* [977] Added a new system for unifying in-function static vars used mainly for performance improvements framework-wide.
+
+Before we had
+
+{{{
+class A{
+  function b($var){
+    static $chache;
+    if(!isset($cache[$var])){
+      $cache[$var] = some_heavy_function($var);
+    }
+    return $cache[$var]; 
+  } 
+}
+}}}
+
+Now imagine we want to create an application server which handles multiple requests on a single instantiation, with the showcased implementation this is not possible as we can't reset $cache, unless we hack badly every single method that uses this strategy.
+
+We can refresh this static values the new `Ak::getStaticVar` method. So from previous example we will have to replace
+
+{{{
+static $chache;
+}}}
+
+with
+
+{{{
+$chache =&amp; Ak::getStaticVar(__CLASS__.'::'.__FUNCTION__);
+}}}
+
+You should not use this strategy on those situations where static vars should never be modified from other methods different of the model implementing it.
+
+
 * [556] Adding a new HTTP client for performing REST requests at lib/AkHttpClient. See unit tests for details.
 
 * [556] Adding support for accepting PUT HTTP requests.

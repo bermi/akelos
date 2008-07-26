@@ -1,0 +1,7 @@
+server_settings: 
+  address: smtp.gmail.com
+  port: 587
+  domain: localhost
+  user_name: username@gmail.com
+  password: 1234
+  authentication: login

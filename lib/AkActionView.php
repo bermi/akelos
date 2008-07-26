@@ -183,7 +183,7 @@ class AkActionView extends AkObject
             }elseif (!empty($options['partial'])){
                 return $this->renderPartial($options['partial'], @$options['object'], @$options['locals']);
             }elseif ($options['inline']){
-                return $this->_renderTemplate(empty($options['type']) ? 'tpl.php' : $options['type'], $options['inline'], null, empty($options['locals']) ? array() : $options['locals']);
+                return $this->renderTemplate(empty($options['type']) ? 'tpl' : $options['type'], $options['inline'], null, empty($options['locals']) ? array() : $options['locals']);
             }
         }
     }
@@ -194,8 +194,10 @@ class AkActionView extends AkObject
     */
     function renderTemplate($____template_extension, $____template, $____file_path = null, $____local_assigns = array(), $____save_content_in_attribute_as = 'layout')
     {
+        $____result = '';
+        $____controller_extras = isset($this->_controllerInstance) ? array('controller_name' => $this->_controllerInstance->getControllerName(), 'controller' => &$this->_controllerInstance) : array();
         $____local_assigns = array_merge(array_merge($this->_getGlobals(),(array)@$this->assigns,array_merge((array)@$this->_local_assigns,
-        array_merge((array)$____local_assigns,array('controller_name' => $this->_controllerInstance->getControllerName(),'controller' => &$this->_controllerInstance)))));
+        array_merge((array)$____local_assigns, $____controller_extras))));
 
         if(!empty($this->_template_handlers[$____template_extension])){
             $____handler =& $this->_template_handlers[$____template_extension];

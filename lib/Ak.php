@@ -111,6 +111,9 @@ class Ak
                     include(AK_ROUTES_MAPPING_FILE);
                 }
             }
+        } else if (is_a($options,'akrouter') && $set_routes) {
+            $Map = $options;
+            return;
         }
         return $Map->toUrl($options);
     }
@@ -354,7 +357,7 @@ class Ak
 
             if(!$result = file_put_contents($options['base_path'].DS.$file_name, $content)){
                 if(!empty($content)){
-                    Ak::trace("Please change file/dir permissions or enable FTP file handling by".
+                    Ak::trace("Could not write to file: \"".$options['base_path'].DS."$file_name\". Please change file/dir permissions or enable FTP file handling by".
                     " setting the following on your config/".AK_ENVIRONMENT.".php file \n<pre>define('AK_UPLOAD_FILES_USING_FTP', true);\n".
                     "define('AK_READ_FILES_USING_FTP', false);\n".
                     "define('AK_DELETE_FILES_USING_FTP', true);\n".
@@ -1316,6 +1319,13 @@ class Ak
 
         return $models;
     }
+    
+    function import_mailer()
+    {
+        require_once(AK_LIB_DIR.DS.'AkActionMailer.php');
+        $args = func_get_args();
+        return call_user_func_array(array('Ak','import'),$args);
+    }
 
     function uses()
     {
@@ -1365,7 +1375,24 @@ class Ak
         }
         return $result;
     }
-
+    
+    /**
+     * Gets a copy of the first element of an array. Similar to array_shift but it does not modify the original array 
+     */
+    function first()
+    {
+        $args = func_get_args();
+        return array_shift(array_slice(is_array($args[0]) ? $args[0] : $args , 0));
+    }
+    
+    /**
+     * Gets a copy of the last element of an array. Similar to array_pop but it does not modify the original array 
+     */
+    function last()
+    {
+        $args = func_get_args();
+        return array_shift(array_slice(is_array($args[0]) ? $args[0] : $args , -1));
+    }
 
     /**
      * Includes PHP functions that are not available on current PHP version
@@ -1411,7 +1438,9 @@ class Ak
         }else{
             $options = $args;
         }
-
+        if ($options['from'] == $options['to']) {
+            return $options['source'];
+        }
         $options['class_prefix'] = empty($options['class_prefix']) && empty($options['path']) ? 'Ak' : $options['class_prefix'];
         $options['path'] = rtrim(empty($options['path']) ? AK_LIB_DIR.DS.'AkConverters' : $options['path'], DS."\t ");
 
@@ -1813,6 +1842,159 @@ class Ak
         $PluginManager =& new AkPluginLoader();
         $PluginManager->loadPlugins();
         return $PluginManager;
+    }
+    
+    function setStaticVar($name,&$value)
+    {
+        $refhack =& Ak::_staticVar($name,$value);
+        return $refhack;
+    }
+    
+    /**
+    * Strategy for unifying in-function static vars used mainly for performance improvements framework-wide.
+    *
+    * Before we had
+    *
+    *     class A{
+    *       function b($var){
+    *         static $chache;
+    *         if(!isset($cache[$var])){
+    *           $cache[$var] = some_heavy_function($var);
+    *         }
+    *         return $cache[$var]; 
+    *       } 
+    *     }
+    *
+    * Now imagine we want to create an application server which handles multiple requests on a single instantiation, with the showcased implementation this is not possible as we can't reset $cache, unless we hack badly every single method that uses this strategy.
+    *
+    * We can refresh this static values the new Ak::getStaticVar method. So from previous example we will have to replace 
+    *
+    *     static $chache;
+    */
+    function &getStaticVar($name)
+    {
+        $refhack =& Ak::_staticVar($name,$refhackvar = null);
+        return $refhack;
+    }
+    
+    function &unsetStaticVar($name)
+    {
+        $refhack =& Ak::_staticVar($name,$refhackvar = null,true);
+        return $refhack;
+    }
+    
+    function &_staticVar($name, &$value, $destruct = false)
+    {
+        static $_memory;
+        $null = null;
+        $true = true;
+        $false = false;
+        $return = $null;
+        if ($value === null && $destruct === false) {
+            /**
+             * GET mode
+             */
+            if (isset($_memory[$name])) {
+                $return = &$_memory[$name];
+            }
+        } else if ($value !== null) {
+            /**
+             * SET mode
+             */
+            if (is_string($name)) {
+                $_memory[$name] = &$value;
+                $return = $true;
+            } else {
+                $return = $false;
+            }
+            
+        } else if ($destruct === true) {
+            if ($name !== null) {
+                $value = isset($_memory[$name])?$_memory[$name]:$null;
+                if (is_object($value) && method_exists($value,'__destruct')) {
+                    $value->__destruct();
+                }
+                unset($value);
+                unset($_memory[$name]);
+            } else {
+                foreach ($_memory as $name => $value) {
+                    Ak::unsetStaticVar($name);
+                }
+            }
+        }
+        return $return;
+    }
+    
+    /**
+     *
+     * @param array $options
+     * @param array $default_options
+     * @param array $available_options
+     * @param boolean $walk_keys
+     */
+    function parseOptions(&$options, $default_options = array(), $parameters = array(), $walk_keys=false)
+    {
+        if ($walk_keys) {
+            foreach ($options as $key=>$value) {
+                if (!is_array($value)) {
+                    $options[$value] = $default_options;
+                } else {
+                    Ak::parseOptions($value, $default_options, $parameters);
+                    $options[$key] = $value;
+                }
+            }
+            return;
+        }
+        
+        $options = array_merge($default_options, $options);
+        foreach($options as $key => $value) {
+            if(isset($params['available_options'])) {
+               if (!isset($params['available_options'][$key])) {
+                   continue;
+               }
+            }
+            $options[$key] = $value;
+            
+        }
+    }
+    
+    /**
+     * Returns YAML settings from config/$namespace.yml
+     */
+    function getSettings($namespace, $raise_error_if_config_file_not_found = true)
+    {
+        $staticVarNs = 'Ak::getSettings';
+        $loaded_settings = &Ak::getStaticVar($staticVarNs);
+        
+        if(isset($loaded_settings[$namespace])){
+            return $loaded_settings[$namespace];
+        }
+        
+        $namespace = Ak::sanitize_include($namespace, 'paranoid');
+        $yaml_file_name = AK_CONFIG_DIR.DS.$namespace.'.yml';
+
+        if (!is_file($yaml_file_name)){
+            if($raise_error_if_config_file_not_found){
+                die(Ak::t('Could not find %namespace settings file in %path.', array('%namespace'=>$namespace, '%path'=>$yaml_file_name))."\n");
+            }
+            return false;
+        }
+        require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'spyc.php');
+        $content = file_get_contents($yaml_file_name);
+        $content = Ak::_parseSettingsConstants($content);
+        $return = Spyc::YAMLLoad($content);
+        Ak::setStaticVar($staticVarNs,$return);
+        return $return;
+    }
+    
+    function _parseSettingsConstants($settingsStr)
+    {
+        return preg_replace_callback('/\$\{(AK_.*?)\}/',array('Ak','_getConstant'),$settingsStr);
+    }
+    
+    function _getConstant($name)
+    {
+        return defined($name[1])?constant($name[1]):'';
     }
 }
 

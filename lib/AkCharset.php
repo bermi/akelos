@@ -302,7 +302,7 @@ class AkCharset
         if($this->enableCharsetRecoding == false || $target_charset==$origin_charset){
             return $string;
         }
-        if(isset($engine)|!isset($memory['engine'])){
+        if(isset($engine) || !isset($memory['engine'])){
             $engine = $this->SetRecodingEngine($engine,$engine_extra_params);
 
         }else{
@@ -436,8 +436,13 @@ class AkCharset
                 return $string;
             }
         }
-
-        return mb_convert_encoding($string,$target_charset, empty($origin_charset) ? mb_detect_encoding($string) : $origin_charset);
+        $origin_charset = empty($origin_charset) ? mb_detect_encoding($string) : $origin_charset;
+        if(!@mb_check_encoding('', $origin_charset) || !@mb_check_encoding('', $target_charset)){
+            $result = $this->_PhpStringRecode($string, $target_charset, $origin_charset);
+        }else{
+           $result = mb_convert_encoding($string,$target_charset, $origin_charset); 
+        }
+        return $result;
     }// -- end of &_MbstringStringRecode -- //
 
     /**
@@ -453,11 +458,11 @@ class AkCharset
 	* return the string without modifications.
 	*/
     function _PhpStringRecode($string, $target_charset, $origin_charset)
-    {
-        $target_charset = $this->_GetCharset($target_charset,false);
-        $origin_charset = $this->_GetCharset($origin_charset,false);
+    {   
+        $target_charset = $this->_GetCharset($target_charset, false);
+        $origin_charset = $this->_GetCharset($origin_charset, false);        
 
-        if((!$this->_ConversionIsNeeded($origin_charset, $target_charset)|!$this->usePhpRecoding) && !$this->isUtf8($string)){
+        if((!$target_charset || !$origin_charset) || ((!$this->_ConversionIsNeeded($origin_charset, $target_charset) || !$this->usePhpRecoding) && !$this->isUtf8($string))){
             return $string;
         }
         if($origin_charset=='utf8'){
@@ -474,7 +479,7 @@ class AkCharset
             }else{
                 return $string;
             }
-        }elseif($target_charset=='utf8'){
+        }elseif($target_charset=='utf8'){            
             include_once(AK_LIB_DIR.DS.'AkCharset'.DS.'utf8_mappings'.DS.$origin_charset.'.php');
             if(class_exists($origin_charset)){
                 $mappingObject =& Ak::singleton($origin_charset, $origin_charset);
@@ -491,6 +496,8 @@ class AkCharset
             return $this->_PhpStringRecode($utf8String,$target_charset,'utf8');
         }
     }// -- end of &_PhpStringRecode -- //
+    
+
 
     /**
 	* Checks for possibility or need of charset conversion.
@@ -540,6 +547,7 @@ class AkCharset
         if(isset($memory[$charset])){
             return $memory[$charset];
         }
+        
         $procesed_charset = $charset == null ? $this->defaultCharset : $charset;
         $procesed_charset = str_replace(array('-','_','.',' '),'',strtolower(trim($procesed_charset)));
         $procesed_charset = str_replace(array('windows','ibm'),'cp',strtolower(trim($procesed_charset)));
@@ -589,13 +597,15 @@ class AkCharset
         'macgreek'=>'macgreek','machebrew'=>'machebrew','maciceland'=>'maciceland','macroman'=>'macroman',
         'macromania'=>'macromania','macthai'=>'macthai','macturkish'=>'macturkish','macukraine'=>'macukraine',
         'mulelao1'=>'mulelao_1','nextstep'=>'nextstep','riscoslatin1'=>'riscos_latin1','shiftjis'=>'shift_jis',
-        'shiftjisx0213'=>'shift_jisx0213','tcvn'=>'tcvn','tds565'=>'tds565','tis620'=>'tis_620','viscii'=>'viscii'
+        'shiftjisx0213'=>'shift_jisx0213','tcvn'=>'tcvn','tds565'=>'tds565','tis620'=>'tis_620','viscii'=>'viscii',
+        'iso885911'=>'iso_8859_11', 'jis0228' => 'jis_0228', 'jis0212' => 'jis_0212'
         );
         $procesed_charset = isset($alias_xref[$procesed_charset]) ? $alias_xref[$procesed_charset] : $procesed_charset;
-        $memory[$charset] = isset($alias[$procesed_charset]) ? $alias[$procesed_charset] : FALSE;//$this->defaultCharset;
+        $memory[$charset] = isset($alias[$procesed_charset]) ? $alias[$procesed_charset] : false;
         if($set_charset){
             $this->_currentCharset = $memory[$charset];
         }
+        
         return $memory[$charset];
     }// -- end of &_GetCharset -- //
 
@@ -714,9 +724,16 @@ class AkCharset
     {
         // From http://w3.org/International/questions/qa-forms-utf-8.html
         return preg_match('%^(?:[\x09\x0A\x0D\x20-\x7E]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})*$%xs', $text);
-
     }
 
+    function _charsetMapFileExists($charset)
+    {
+        if(!file_exists(AK_LIB_DIR.DS.'AkCharset'.DS.'utf8_mappings'.DS.$charset.'.php')){
+            trigger_error(Ak::t('Charset %charset is not supported on your current setting. Please download aditional charset maps from http://svn.akelos.org/extras/utf8_mappings/ into lib/AkActionView/utf8_mappings', array('%charset'=>$charset)), E_USER_NOTICE);
+            return false;
+        }
+        return true;
+    }
 }
 
 ?>
