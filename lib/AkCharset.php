@@ -208,6 +208,7 @@ class AkCharset
         if(isset($memory[$engine.$extra_params])){
             return $memory[$engine.$extra_params];
         }
+
         $engines = array('iconv'=>'iconv','mbstring'=>'mb_convert_encoding','recode'=>'recode_string');
         $this->_recodingEngine = false;
         // Fix for systems with constant iconv defined. Php uses libiconv function instead
@@ -216,13 +217,13 @@ class AkCharset
                 return libiconv($input_encoding, $output_encoding, $string);
             }
         }
-        if(!isset($engine)){
-            foreach ($engines as $engine=>$function){
+        if(empty($engine)){
+            foreach ($engines as $_engine=>$function){
                 if(@function_exists($function)){
-                    $this->_recodingEngine = $engine;
+                    $this->_recodingEngine = $_engine;
                     break;
-                }elseif($this->_LoadExtension($engine)&&function_exists($function)){
-                    $this->_recodingEngine = $engine;
+                }elseif($this->_LoadExtension($_engine)&&function_exists($function)){
+                    $this->_recodingEngine = $_engine;
                     break;
                 }
             }
@@ -237,7 +238,7 @@ class AkCharset
         if(isset($extra_params)){
             $this->_recodingEngineExtraParams = $extra_params;
         }
-        $memory[$engine.$extra_params] = true;
+        $memory[$engine.$extra_params] = $this->_recodingEngine;
         return $this->_recodingEngine;
     }// -- end of &SetRecodingEngine -- //
 
@@ -303,8 +304,7 @@ class AkCharset
             return $string;
         }
         if(isset($engine) || !isset($memory['engine'])){
-            $engine = $this->SetRecodingEngine($engine,$engine_extra_params);
-
+            $engine = $memory['engine'] = $this->SetRecodingEngine($engine,$engine_extra_params);
         }else{
             $engine = $memory['engine'];
         }
@@ -312,6 +312,7 @@ class AkCharset
             return $string;
         }
         $method = strlen($engine)>1 ? '_'.ucfirst($engine).'StringRecode' : '_PhpStringRecode';
+
         if(method_exists($this,$method)){
             return $this->$method($string, $target_charset, $origin_charset, $engine_extra_params);
         }else{
@@ -393,18 +394,23 @@ class AkCharset
 	*/
     function _IconvStringRecode($string, $target_charset, $origin_charset, $engine_extra_params=null)
     {
-        /**
-         * @todo Fix iconv bug on PHP
-         */
-        if(AK_PHP5){
-            return $this->_PhpStringRecode($string, $target_charset, $origin_charset);
-        }
         if(!$this->_ConversionIsNeeded($origin_charset, $target_charset) && !$this->isUtf8($string)){
             return $string;
         }
+
+        $skip_combinations = array('ISO-8859-1.UTF-8', 'UTF-8.ISO-8859-1');
+        if(in_array($target_charset.'.'.$origin_charset, $skip_combinations)){
+            return $this->_PhpStringRecode($string, $target_charset, $origin_charset);
+        }
+
         $engine_extra_params = isset($engine_extra_params) ? $engine_extra_params : $this->_recodingEngineExtraParams;
-        return iconv($target_charset, $origin_charset.$engine_extra_params, $string);
+        if(!$result = @iconv($target_charset, $origin_charset.$engine_extra_params, $string)){
+            return $this->_PhpStringRecode($string, $target_charset, $origin_charset);
+        }else{
+            return $result;
+        }
     }// -- end of &_IconvStringRecode -- //
+
 
     /**
 	* AkCharset::RecodeString() recode_string implementation
@@ -440,7 +446,7 @@ class AkCharset
         if(!@mb_check_encoding('', $origin_charset) || !@mb_check_encoding('', $target_charset)){
             $result = $this->_PhpStringRecode($string, $target_charset, $origin_charset);
         }else{
-           $result = mb_convert_encoding($string,$target_charset, $origin_charset); 
+            $result = mb_convert_encoding($string,$target_charset, $origin_charset);
         }
         return $result;
     }// -- end of &_MbstringStringRecode -- //
@@ -458,9 +464,9 @@ class AkCharset
 	* return the string without modifications.
 	*/
     function _PhpStringRecode($string, $target_charset, $origin_charset)
-    {   
+    {
         $target_charset = $this->_GetCharset($target_charset, false);
-        $origin_charset = $this->_GetCharset($origin_charset, false);        
+        $origin_charset = $this->_GetCharset($origin_charset, false);
 
         if((!$target_charset || !$origin_charset) || ((!$this->_ConversionIsNeeded($origin_charset, $target_charset) || !$this->usePhpRecoding) && !$this->isUtf8($string))){
             return $string;
@@ -479,7 +485,7 @@ class AkCharset
             }else{
                 return $string;
             }
-        }elseif($target_charset=='utf8'){            
+        }elseif($target_charset=='utf8'){
             include_once(AK_LIB_DIR.DS.'AkCharset'.DS.'utf8_mappings'.DS.$origin_charset.'.php');
             if(class_exists($origin_charset)){
                 $mappingObject =& Ak::singleton($origin_charset, $origin_charset);
@@ -496,7 +502,7 @@ class AkCharset
             return $this->_PhpStringRecode($utf8String,$target_charset,'utf8');
         }
     }// -- end of &_PhpStringRecode -- //
-    
+
 
 
     /**
@@ -547,7 +553,7 @@ class AkCharset
         if(isset($memory[$charset])){
             return $memory[$charset];
         }
-        
+
         $procesed_charset = $charset == null ? $this->defaultCharset : $charset;
         $procesed_charset = str_replace(array('-','_','.',' '),'',strtolower(trim($procesed_charset)));
         $procesed_charset = str_replace(array('windows','ibm'),'cp',strtolower(trim($procesed_charset)));
@@ -605,7 +611,7 @@ class AkCharset
         if($set_charset){
             $this->_currentCharset = $memory[$charset];
         }
-        
+
         return $memory[$charset];
     }// -- end of &_GetCharset -- //
 

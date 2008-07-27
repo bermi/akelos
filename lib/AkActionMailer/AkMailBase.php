@@ -430,7 +430,7 @@ class AkMailBase extends Mail
 
     function _contentTypeComparison($a, $b)
     {
-        if(!isset($a->content_type) || !isset($a->content_type)){
+        if(!isset($a->content_type) || !isset($b->content_type)){
             return 0;
         }
         $a_ct = strtolower($a->content_type);

@@ -1492,12 +1492,12 @@ class Ak
         return $Charset->RecodeString($text,'UTF-8',$input_string_encoding);
     }
 
-    function recode($text, $output_string_encoding = null, $input_string_encoding = null)
+    function recode($text, $output_string_encoding = null, $input_string_encoding = null, $recoding_engine = null)
     {
         $input_string_encoding = empty($input_string_encoding) ? Ak::encoding() : $input_string_encoding;
         require_once(AK_LIB_DIR.DS.'AkCharset.php');
         $Charset =& Ak::singleton('AkCharset',$text);
-        return $Charset->RecodeString($text,$output_string_encoding,$input_string_encoding);
+        return $Charset->RecodeString($text,$output_string_encoding,$input_string_encoding, $recoding_engine);
     }
 
     function encoding()
