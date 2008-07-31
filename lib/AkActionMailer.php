@@ -572,7 +572,8 @@ class AkActionMailer extends AkBaseModel
     */
     function deliver($method_name, $parameters = null, $Message = null)
     {
-        if(empty($Message) && empty($this->Message)){
+        if(empty($Message) && 
+        (empty($this->Message) || (!empty($this->Message) && get_class($this->Message) != get_class($this)))){
             $this->create($method_name, $parameters);
         }elseif(!empty($Message)){
             $this->Message =& $Message;
