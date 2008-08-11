@@ -167,6 +167,9 @@ class AkHasMany extends AkAssociation
                 if(!empty($options['order'])){
                     $finder_options['order'] = $options['order'];
                 }
+                if(!empty($options['include'])){
+                    $finder_options['include'] = $options['include'];
+                }
                 if($FoundAssociates = $Associated->find('all',$finder_options)){
                     array_map(array(&$this,'_setAssociatedMemberId'),$FoundAssociates);
                     $this->Owner->{$this->association_id} =& $FoundAssociates;
