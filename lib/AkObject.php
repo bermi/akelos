@@ -142,11 +142,11 @@ class AkObject
 
     // }}}
 
-    function log($message)
+    function log($message, $type = 'message')
     {
         if (AK_LOG_EVENTS){
             $Logger =& Ak::getLogger();
-            $Logger->log($message);
+            $Logger->log($message, $type);
         }
     }
     
