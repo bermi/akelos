@@ -142,13 +142,12 @@ class AkObject
 
     // }}}
 
-    function log($message, $type = '', $identifyer = '')
+    function log($message)
     {
-        require_once 'Log.php';
-        $ident = empty($ident) ? 'main' : $ident;
-
-        $log = Log::singleton('file', AK_LOGS_DIR.DS.$ident.'.log',$ident);
-        $log->log($type, $message);
+        if (AK_LOG_EVENTS){
+            $Logger =& Ak::getLogger();
+            $Logger->log($message);
+        }
     }
     
     
