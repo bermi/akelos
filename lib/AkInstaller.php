@@ -254,7 +254,7 @@ class AkInstaller
         $versions = array();
         foreach(get_class_methods($this) as $method_name){
             if(preg_match('/^up_([0-9]*)$/',$method_name, $match)){
-                $versions[] = $match[1];
+                $versions[] = intval($match[1]);
             }
         }
         sort($versions);
