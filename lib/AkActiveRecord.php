@@ -2921,10 +2921,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     ====================================================================
     */
 
-    function t($string, $array = null)
-    {
-        return Ak::t($string, $array, AkInflector::underscore($this->getModelName()));
-    }
 
     function getInternationalizedColumns()
     {

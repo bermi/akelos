@@ -132,6 +132,11 @@ class AkBaseModel extends AkObject
         }
         return true;
     }
+    
+    function t($string, $array = null)
+    {
+        return Ak::t($string, $array, AkInflector::underscore($this->getModelName()));
+    }
 
     function _getIncludedModelNames()
     {
