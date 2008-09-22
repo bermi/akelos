@@ -85,9 +85,10 @@ class AkPlugin
     
     function addHelper($helper_name, $helper_path = null)
     {
+        require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkHelperLoader.php');
         $helper_name = AkInflector::camelize($helper_name);
         $helper_path = empty($helper_path) ? $this->getPath().DS.'lib'.DS.AkInflector::underscore($helper_name).'.php' : $helper_path;
-        AkActionController::addPluginHelper($helper_name, array('path' => $helper_path));
+        AkHelperLoader::addPluginHelper($helper_name, array('path' => $helper_path));
     }
 
     /**

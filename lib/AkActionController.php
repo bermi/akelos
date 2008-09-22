@@ -229,34 +229,10 @@ class AkActionController extends AkObject
      */
     function instantiateHelpers()
     {
-        $helpers = $this->getDefaultHelpers();
-        $helpers = array_merge($helpers, $this->getApplicationHelpers());
-        $helpers = array_merge($helpers, $this->getPluginHelpers());
-        $helpers = array_merge($helpers, $this->getModuleHelper());
-        $helpers = array_merge($helpers, $this->getCurrentControllerHelper());
-
-        require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
-
-        $available_helpers = array();
-        foreach ($helpers as $file=>$helper){
-            $helper_class_name = AkInflector::camelize(AkInflector::demodulize(strstr($helper, 'Helper') ? $helper : $helper.'Helper'));
-            $full_path = preg_match('/[\\\\\/]+/',$file);
-            $file_path = $full_path ? $file : AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.$file;
-            include_once($file_path);
-
-            if(class_exists($helper_class_name)){
-                $attribute_name = $full_path ? AkInflector::underscore($helper_class_name) : substr($file,0,-4);
-                $available_helpers[] = $attribute_name;
-                $this->$attribute_name =& new $helper_class_name(&$this);
-                if(method_exists($this->$attribute_name,'setController')){
-                    $this->$attribute_name->setController(&$this);
-                }
-                if(method_exists($this->$attribute_name,'init')){
-                    $this->$attribute_name->init();
-                }
-            }
-        }
-        defined('AK_ACTION_CONTROLLER_AVAILABLE_HELPERS') ? null : define('AK_ACTION_CONTROLLER_AVAILABLE_HELPERS', join(',',$available_helpers));
+        require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkHelperLoader.php');
+        $HelperLoader = new AkHelperLoader();
+        $HelperLoader->setController(&$this);
+        $HelperLoader->instantiateHelpers();
     }
 
     function getCurrentControllerHelper()
@@ -270,7 +246,7 @@ class AkActionController extends AkObject
         }
         return array();
     }
-
+        
     function getModuleHelper()
     {
         $this->getControllerName(); // module name is set when we first retrieve the controller name
@@ -282,79 +258,8 @@ class AkActionController extends AkObject
         }
         return array();
     }
-
-    function getDefaultHelpers()
-    {
-        if($this->helpers == 'default'){
-            $available_helpers = Ak::dir(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers',array('dirs'=>false));
-            $helper_names = array();
-            foreach ($available_helpers as $available_helper){
-                $helper_names[$available_helper] = AkInflector::classify(substr($available_helper,0,-10));
-            }
-            return $helper_names;
-        }else{
-            $this->helpers = Ak::toArray($this->helpers);
-        }
-        return $this->helpers;
-    }
-
-    function getApplicationHelpers()
-    {
-        $helper_names = array();
-        if ($this->app_helpers == 'all'){
-            $available_helpers = Ak::dir(AK_HELPERS_DIR,array('dirs'=>false));
-            $helper_names = array();
-            foreach ($available_helpers as $available_helper){
-                $helper_names[AK_HELPERS_DIR.DS.$available_helper] = AkInflector::classify(substr($available_helper,0,-10));
-            }
-
-        } elseif (!empty($this->app_helpers)){
-            foreach (Ak::toArray($this->app_helpers) as $helper_name){
-                $helper_names[AK_HELPERS_DIR.DS.AkInflector::underscore($helper_name).'_helper.php'] = AkInflector::camelize($helper_name);
-            }
-        }
-        return $helper_names;
-    }
-
-    function getPluginHelpers()
-    {
-        $helper_names = AkActionController::addPluginHelper(false); // Trick for getting helper names set by AkPlugin::addHelper
-        if(empty($helper_names)){
-            return array();
-        }elseif ($this->plugin_helpers == 'all'){
-            return $helper_names;
-        }else {
-            $selected_helper_names = array();
-            foreach (Ak::toArray($this->plugin_helpers) as $helper_name){
-                $helper_name = AkInflector::camelize($helper_name);
-                if($path = array_shift(array_keys($helper_names, AkInflector::camelize($helper_name)))){
-                    $selected_helper_names[$path] = $helper_names[$path];
-                }
-            }
-            return $selected_helper_names;
-        }
-    }
-
-    /**
-     * Used for adding helpers to the base class like those added by the plugins engine.
-     *
-     * @param string $helper_name Helper class name like CalendarHelper
-     * @param array $options - path: Path to the helper class, defaults to AK_PLUGINS_DIR/helper_name/lib/helper_name.php
-     */
-    function addPluginHelper($helper_name, $options = array())
-    {
-        static $helpers = array();
-        if($helper_name === false){
-            return $helpers;
-        }
-        $underscored_helper_name = AkInflector::underscore($helper_name);
-        $default_options = array(
-        'path' => AK_PLUGINS_DIR.DS.$underscored_helper_name.DS.'lib'.DS.$underscored_helper_name.'.php'
-        );
-        $options = array_merge($default_options, $options);
-        $helpers[$options['path']] = $helper_name;
-    }
-
+    
+    
     function _validateGeneratedXhtml()
     {
         require_once(AK_LIB_DIR.DS.'AkXhtmlValidator.php');
@@ -393,6 +298,8 @@ class AkActionController extends AkObject
 
         $models = array_unique(array_merge(Ak::import($this->model), Ak::import($this->models), Ak::import($models), (empty($this->app_models)?array(): Ak::import($this->app_models))));
 
+        unset($this->model, $this->models);
+                
         foreach ($models as $model){
             $this->instantiateModelClass($model, (empty($this->finder_options[$model])?array():$this->finder_options[$model]));
         }
