@@ -274,7 +274,6 @@ class AkActionMailer extends AkBaseModel
     var $default_content_type = 'text/plain';
     var $default_mime_version = '1.0';
     var $default_implicit_parts_order = array('multipart/alternative', 'text/html', 'text/enriched', 'text/plain');
-    var $helpers = array('mail');
     var $Message;
     var $Composer;
     var $_defaultMailDriverName = 'AkMailMessage';
@@ -514,7 +513,7 @@ class AkActionMailer extends AkBaseModel
      *
      *   class MyMailer extends AkActionMailer{
      *     function receive($Message){
-     *          parent::recieve($Message);
+     *          parent::receive($Message);
      *       ...
      *     }
      *   }
@@ -539,7 +538,7 @@ class AkActionMailer extends AkBaseModel
         $Message =& new $this->_defaultMailDriverName ($Message);
         $Message->send();
     }
-    
+
     function getRawMessage()
     {
         if(empty($this->Message->_has_been_created_by_mailer)){
@@ -572,7 +571,7 @@ class AkActionMailer extends AkBaseModel
     */
     function deliver($method_name, $parameters = null, $Message = null)
     {
-        if(empty($Message) && 
+        if(empty($Message) &&
         (empty($this->Message) || (!empty($this->Message) && get_class($this->Message) != get_class($this)))){
             $this->create($method_name, $parameters);
         }elseif(!empty($Message)){
@@ -698,52 +697,46 @@ class AkActionMailer extends AkBaseModel
 
 
     /**
+     * Workarround for limited support of helpers on ActionMailer Views
+     * 
+     * @todo refactor helpers to be controller agnostic
+     */
+    function getControllerName()
+    {
+        return $this->getModelName();
+    }
+
+    /**
+     * This is the url_for version for helpers and emails.
+     * 
+     * As we do not have the context of a host being requested, we need to know
+     * the base_url like http://example.com in oder to add it to the generated URL
+     */
+    function urlFor()
+    {
+        $args = func_get_args();
+        $base_url = '';
+        if(isset($args[0]['base_url'])){
+            $base_url = preg_replace('/^(?!http[s]?:\/\/)(.+)/','http://$1', (isset($args[0]['base_url'])?rtrim($args[0]['base_url'],'/'):Ak::getSetting('mailer', 'base_url', AK_HOST)));
+            unset($args[0]['base_url']);
+        }
+       
+        unset($args[0]['only_path'], $args[0]['base_url']);
+
+        return $base_url.call_user_func_array(array('Ak','toUrl'), $args);
+    }
+
+    /**
      * Creates an instance of each available helper and links it into into current mailer.
      * 
      * Mailer helpers work as Controller helpers but without the Request context
      */
-    function &getHelpers()
+    function getHelpers()
     {
-        static $helpers = array();
-        require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
-
-        $mailer_helpers = array_merge(Ak::toArray($this->helpers), array(substr($this->getModelName(),-6)));
-        $mailer_helpers = array_unique(array_map(array('AkInflector','underscore'), $mailer_helpers));
-
-        foreach ($mailer_helpers as $file => $mailer_helper){
-            $full_path = preg_match('/[\\\\\/]+/',$file);
-            $helper_class_name = AkInflector::camelize($mailer_helper).'Helper';
-            $attribute_name = (!$full_path ? AkInflector::underscore($helper_class_name) : substr($file,0,-4));
-            if(empty($helpers[$attribute_name])){
-                if($full_path){
-                    include_once($file);
-                }else{
-                    $helper_file_name = $mailer_helper.'_helper.php';
-                    if(file_exists(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.$helper_file_name)){
-                        include_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.$helper_file_name);
-                    }elseif (file_exists(AK_HELPERS_DIR.DS.$helper_file_name)){
-                        include_once(AK_HELPERS_DIR.DS.$helper_file_name);
-                    }
-                }
-
-                if(class_exists($helper_class_name)){
-                    if(empty($helpers[$attribute_name])){
-                        $helpers[$attribute_name] =& new $helper_class_name(&$this);
-                        if(method_exists($helpers[$attribute_name],'setController')){
-                            $helpers[$attribute_name]->setController(&$this);
-                        }
-                        if(method_exists($helpers[$attribute_name],'setMailer')){
-                            $helpers[$attribute_name]->setMailer(&$this);
-                        }
-                        if(method_exists($helpers[$attribute_name],'init')){
-                            $helpers[$attribute_name]->init();
-                        }
-                    }
-                }
-            }
-        }
-
-        return $helpers;
+        require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkHelperLoader.php');
+        $HelperLoader = new AkHelperLoader();
+        $HelperLoader->setHandler(&$this);
+        return $HelperLoader->getHelpersForMailer();
     }
 
     function _deliverUsingMailDeliveryMethod($method, &$Message, $options)

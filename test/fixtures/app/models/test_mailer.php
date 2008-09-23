@@ -330,8 +330,17 @@ class TestMailer extends AkActionMailer
                 
                 ));
         }
-        
     }
+    
+    function message_with_helpers($recipient)
+    {
+        $this->set(array(
+        'recipients' => $recipient,
+        'subject' => "message_with_helpers",
+        'from' => "system@example.com"
+        ));
+    }
+    
 
     function &receive($raw_email)
     {

@@ -665,20 +665,22 @@ class AkSintagsParser
         if(empty($this->available_helpers)){
             if(defined('AK_SINTAGS_AVALABLE_HELPERS')){
                 $helpers = unserialize(AK_SINTAGS_AVALABLE_HELPERS);
-            }elseif (defined('AK_ACTION_CONTROLLER_AVAILABLE_HELPERS')){
-                $underscored_helper_names = Ak::toArray(AK_ACTION_CONTROLLER_AVAILABLE_HELPERS);
-                foreach ($underscored_helper_names as $underscored_helper_name){
-                    $helper_class_name = AkInflector::camelize($underscored_helper_name);
-                    if(class_exists($helper_class_name)){
-                        foreach (get_class_methods($helper_class_name) as $method_name){
-                            if($method_name[0] != '_'){
-                                $helpers[$method_name] = $underscored_helper_name;
+            }else{
+                require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkHelperLoader.php');
+                if($underscored_helper_names = AkHelperLoader::getInstantiatedHelperNames()){
+                    foreach ($underscored_helper_names as $underscored_helper_name){
+                        $helper_class_name = AkInflector::camelize($underscored_helper_name);
+                        if(class_exists($helper_class_name)){
+                            foreach (get_class_methods($helper_class_name) as $method_name){
+                                if($method_name[0] != '_'){
+                                    $helpers[$method_name] = $underscored_helper_name;
+                                }
                             }
                         }
                     }
+                    $helpers['render'] = 'controller';
+                    $helpers['render_partial'] = 'controller';
                 }
-                $helpers['render'] = 'controller';
-                $helpers['render_partial'] = 'controller';
             }
             $this->available_helpers = $helpers;
         }

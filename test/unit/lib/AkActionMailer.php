@@ -786,12 +786,21 @@ EOF;
 
         $this->assertPattern('/==\r\n\r\n--[a-f0-9]{32}\r\nContent-Type: image\/png;/', $rendered_message, 'Two images embeded');
     }
-    
+
     function test_should_deliver_creating_message()
     {
         $TestMailer =& new TestMailer();
         $Message = $TestMailer->deliver('alternative_message_from_templates', $this->recipient);
         $this->assertPattern('/Subject: Alternative message from template/', $TestMailer->deliveries[0]);
+    }
+
+    function test_should_allow_using_text_helper_on_mail_views()
+    {
+        $TestMailer =& new TestMailer();
+        $Message = $TestMailer->create('message_with_helpers', $this->recipient);
+        $rendered_message = $TestMailer->getRawMessage();
+        $this->assertPattern('/<a href="http:\/\/example.com\/offers\/">Our offers<\/a>/', $rendered_message);
+        $this->assertNoPattern('/text_helper/', $rendered_message);
     }
     /**/
 

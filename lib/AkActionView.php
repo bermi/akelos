@@ -117,7 +117,6 @@ class AkActionView extends AkObject
             }
         }
     }
-
     /**
     * Register a class that knows how to handle template files with the given
     * extension. This can be used to implement new template types.
