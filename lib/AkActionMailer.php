@@ -475,13 +475,9 @@ class AkActionMailer extends AkBaseModel
             $this->setTemplate($attributes['template']);
             unset($attributes['template']);
         }
-
-        if((!empty($attributes['attachment']) || !empty($attributes['attachments'])) &&
-        (empty($attributes['parts']) && empty($attributes['part']) && empty($attributes['body']))){
-            // we can render here the body if there are attachments
-        }
-
         $this->Message->set($attributes);
+        
+        $this->_setter_has_been_called = true;
     }
 
 
@@ -577,7 +573,7 @@ class AkActionMailer extends AkBaseModel
         }elseif(!empty($Message)){
             $this->Message =& $Message;
         }
-
+        
         !empty($this->Message) or trigger_error(Ak::t('No mail object available for delivery!'), E_USER_ERROR);
         if(!empty($this->perform_deliveries)){
             $this->{"perform".ucfirst(strtolower($this->delivery_method))."Delivery"}($this->Message);
@@ -595,7 +591,7 @@ class AkActionMailer extends AkBaseModel
         'username'     =>  @$this->server_settings['user_name'],
         'password'     =>  @$this->server_settings['password'],
         'auth'     =>  (!empty($this->server_settings['user_name']) || @$this->server_settings['authentication']),
-        'debug'    =>  true
+        //'debug'    =>  true
         );
         $settings = array_merge($default_settings, $settings);
 

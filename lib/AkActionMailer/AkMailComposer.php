@@ -135,6 +135,20 @@ class AkMailComposer extends AkObject
         }else{
             trigger_error(Ak::t('Could not find the method %method on the model %model', array('%method'=>$method_name, '%model'=>$this->ActionMailer->getModelName())), E_USER_ERROR);
         }
+        $this->_setAttributesIfRequired();
+    }
+    
+    function _setAttributesIfRequired()
+    {
+        if(empty($this->ActionMailer->_setter_has_been_called)){
+            $attributes = array();
+            foreach ((array)$this->ActionMailer as $k=>$v){
+                if(gettype($v) != 'object' && $k[0] != '_'){
+                    $attributes[$k] = $v;
+                }
+            }
+            $this->ActionMailer->set($attributes);
+        }
     }
 
 
@@ -212,7 +226,7 @@ class AkMailComposer extends AkObject
 
 
     function &_getPartsWithRenderedTemplates()
-    {       
+    {
         $templates = $this->_getAvailableTemplates();
         $alternative_multiparts = array();
         $parts = array();
