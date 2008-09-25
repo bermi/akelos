@@ -14,6 +14,7 @@ if(!defined('ALL_TESTS_RUNNER') && empty($test)){
 @session_start();
 
 $partial_tests = array(
+'forbidden_actions',
 'filters',
 'locale_detection',
 'partials',

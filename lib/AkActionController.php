@@ -149,8 +149,7 @@ class AkActionController extends AkObject
         $this->Request =& $Request;
         $this->Response =& $Response;
         $this->params = $this->Request->getParams();
-        $this->_action_name = $this->Request->getAction();
-
+        $this->_action_name = $this->getActionName();
         $this->_ensureActionExists();
 
         Ak::t('Akelos'); // We need to get locales ready
@@ -246,7 +245,7 @@ class AkActionController extends AkObject
         }
         return array();
     }
-        
+
     function getModuleHelper()
     {
         $this->getControllerName(); // module name is set when we first retrieve the controller name
@@ -258,8 +257,8 @@ class AkActionController extends AkObject
         }
         return array();
     }
-    
-    
+
+
     function _validateGeneratedXhtml()
     {
         require_once(AK_LIB_DIR.DS.'AkXhtmlValidator.php');
@@ -299,7 +298,7 @@ class AkActionController extends AkObject
         $models = array_unique(array_merge(Ak::import($this->model), Ak::import($this->models), Ak::import($models), (empty($this->app_models)?array(): Ak::import($this->app_models))));
 
         unset($this->model, $this->models);
-                
+
         foreach ($models as $model){
             $this->instantiateModelClass($model, (empty($this->finder_options[$model])?array():$this->finder_options[$model]));
         }
@@ -2718,13 +2717,14 @@ class AkActionController extends AkObject
 
     function _ensureActionExists()
     {
-        if(!method_exists($this, $this->_action_name)){
+        $action = $this->getActionName();
+        if(!method_exists($this, $action) || $this->_isActionForbidden()){
             if(AK_ENVIRONMENT == 'development'){
-                AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->error('Action '.$this->_action_name.' not found on '.$this->getControllerName()) : null;
+                AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->error('Action '.$action.' not found on '.$this->getControllerName()) : null;
                 trigger_error(Ak::t('Controller <i>%controller_name</i> can\'t handle action %action_name',
                 array(
                 '%controller_name' => $this->getControllerName(),
-                '%action_name' => $this->_action_name,
+                '%action_name' => $action,
                 )), E_USER_ERROR);
             }elseif(@include(AK_PUBLIC_DIR.DS.'405.php')){
                 exit;
@@ -2733,6 +2733,13 @@ class AkActionController extends AkObject
                 die('405 Method Not Allowed');
             }
         }
+    }
+
+    function _isActionForbidden()
+    {
+        $methods = get_class_methods('AkActionController');
+        $action = $this->getActionName();
+        return empty($action) || in_array($action , $methods) || $action != AkInflector::underscore($action) || $action[0] == '_';
     }
 }
 
