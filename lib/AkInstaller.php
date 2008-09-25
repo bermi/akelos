@@ -520,7 +520,7 @@ class AkInstaller
     {
         return array(
         '/^\*(.*)$/i' => array(&$this,'_castToMultilingualColumn'),
-        '/^(description|content|body)$/i' => '\1 text',
+        '/^(description|content|body|details)$/i' => '\1 text',
         '/^(lock_version)$/i' => '\1 integer default \'1\'',
         '/^(.+_count)$/i' => '\1 integer default \'0\'',
         '/^(id)$/i' => 'id integer not null auto_increment primary_key',
