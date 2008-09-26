@@ -214,6 +214,10 @@ class AkPluginManager extends AkObject
 
     function guessBestInstallMethod($options = array())
     {
+        if(defined('AK_BEST_PLUGIN_INSTALL_METHOD') && in_array(AK_BEST_PLUGIN_INSTALL_METHOD,
+        array('local directory', 'checkout', 'export', 'http'))){
+            return AK_BEST_PLUGIN_INSTALL_METHOD;
+        }
         if(!empty($options['parameters']) && is_dir($options['parameters'])){
             return 'local directory';
         }elseif($this->canUseSvn()){
