@@ -31,16 +31,112 @@ class AkUnitTest extends UnitTestCase
     var $module = '';
     var $insert_models_data = false;
     var $instantiate_models = false;
-
+    
+    function AkUnitTest($label = false) {
+        parent::UnitTestCase($label);
+        $this->_configure();
+    }
+    
+    /**
+     *    Gets a list of test names. Normally that will
+     *    be all internal methods that start with the
+     *    name "test". This method should be overridden
+     *    if you want a different rule.
+     *    @return array        List of test names.
+     *    @access public
+     */
+    function getTests() {
+        $methods = array();
+        if (isset($this->skip) && $this->skip == true) {
+            return $methods;
+        }
+        foreach (get_class_methods(get_class($this)) as $method) {
+            if ($this->_isTest($method)) {
+                $methods[] = $method;
+            }
+        }
+        return $methods;
+    }
+    
+    function _configure()
+    {
+        $this->skip = !$this->_checkIfEnabled();
+        $this->_loadFixtures();
+    }
+    
+    function _checkIfEnabled($file = null)
+    {
+        if ($file == null) {
+            $file = isset($this->check_file)?$this->check_file:null;
+        }
+        if ($file!=null && file_exists($file)) {
+            $val = file_get_contents($file);
+            if ($val == '0') {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    
+    function _loadFixtures($loadFixture = null)
+    {
+        if (isset($this->fixtures)) {
+            $this->fixtures = is_array($this->fixtures)?$this->fixtures:Ak::toArray($this->fixtures);
+        } else {
+            $this->fixtures = array();
+        }
+        
+        foreach ($this->fixtures as $fixture) {
+            $file = AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.$fixture.'.yaml';
+            if(!file_exists($file)){
+                continue;
+            }
+            if ($loadFixture!=null && $fixture!=$loadFixture) {
+                continue;
+            }
+            $setAlias=false;
+            if (!isset($this->$fixture)) {
+                $this->$fixture = array();
+                $setAlias=true;
+                $this->{$fixture.'_set'}=true;
+            } else if ($this->{$fixture.'_set'}) {
+                $setAlias = true;
+            }
+            $class_name = AkInflector::classify($fixture);
+            if($this->instantiateModel($class_name)){
+                $contents = &Ak::getStaticVar('yaml_fixture_'.$file);
+                if (!$contents) {
+                    ob_start();
+                    require_once($file);
+                    $contents = ob_get_clean();
+                    Ak::setStaticVar('yaml_fixture_'.$file, $contents);
+                }
+                $items = Ak::convert('yaml','array',$contents);
+                foreach ($items as $alias=>$item){
+                    $obj=&$this->{$class_name}->create($item);
+                    if (isset($item['created_at'])) {
+                        $obj->updateAttribute('created_at',$item['created_at']);
+                    } else if (isset($item['created_on'])) {
+                        $obj->updateAttribute('created_on',$item['created_on']);
+                    }
+                    if ($setAlias) {
+                        $array=&$this->$fixture;
+                        $array[$alias] = &$obj;
+                        $this->$fixture = &$array;
+                    }
+                }
+            }
+        }
+    }
+    
     function resetFrameworkDatabaseTables()
     {
         require_once(AK_APP_DIR.DS.'installers'.DS.'framework_installer.php');
         $installer = new FrameworkInstaller();
         $installer->uninstall();
         $installer->install();
-        if(isset($_SESSION['__activeRecordColumnsSettingsCache'])){
-            unset($_SESSION['__activeRecordColumnsSettingsCache']);
-        }
+        AkDbSchemaCache::clearAll();
     }
 
     /**
@@ -80,9 +176,6 @@ class AkUnitTest extends UnitTestCase
                 $this->instantiateModel($model);
             }
         }
-        if(isset($_SESSION['__activeRecordColumnsSettingsCache'])){
-            unset($_SESSION['__activeRecordColumnsSettingsCache']);
-        }
     }
 
     function _reinstallModel($model, $table_definition = '')
@@ -96,6 +189,12 @@ class AkUnitTest extends UnitTestCase
             $installer =& new AkInstaller();
             $installer->dropTable($table_name,array('sequence'=>true));
             $installer->createTable($table_name,$table_definition,array('timestamp'=>false));
+            
+        } else {
+            $table_name = AkInflector::tableize($model);
+        }
+        if (isset($this->fixtures) && is_array($this->fixtures) && in_array($table_name,$this->fixtures)) {
+            $this->_loadFixtures($table_name);
         }
     }
 
@@ -143,6 +242,7 @@ class AkUnitTest extends UnitTestCase
 
     function populateTables()
     {
+        
         $args = func_get_args();
         $tables = !empty($args) ? (is_array($args[0]) ? $args[0] : (count($args) > 1 ? $args : Ak::toArray($args))) : array();
         foreach ($tables as $table){
@@ -152,9 +252,22 @@ class AkUnitTest extends UnitTestCase
             }
             $class_name = AkInflector::classify($table);
             if($this->instantiateModel($class_name)){
-                $items = Ak::convert('yaml','array',file_get_contents($file));
+                $contents = &Ak::getStaticVar('yaml_fixture_'.$file);
+                if (!$contents) {
+                    ob_start();
+                    require_once($file);
+                    $contents = ob_get_clean();
+                    Ak::setStaticVar('yaml_fixture_'.$file, $contents);
+                }
+                $items = Ak::convert('yaml','array',$contents);
                 foreach ($items as $item){
-                    $this->{$class_name}->create($item);
+                    
+                    $obj=&$this->{$class_name}->create($item);
+                    if (isset($item['created_at'])) {
+                        $obj->updateAttribute('created_at',$item['created_at']);
+                    } else if (isset($item['created_on'])) {
+                        $obj->updateAttribute('created_on',$item['created_on']);
+                    }
                 }
             }
         }

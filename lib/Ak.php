@@ -841,11 +841,11 @@ class Ak
     }
 
     /**
-	* Return formatted date.
-	* 
-	* You can supply a format as defined at http://php.net/date
-	* 
-	* Default date is in ISO format 
+    * Return formatted date.
+    * 
+    * You can supply a format as defined at http://php.net/date
+    * 
+    * Default date is in ISO format 
     */
     function getDate($timestamp = null, $format = null)
     {
@@ -971,8 +971,8 @@ class Ak
 
 
     /**
-	* @todo move this out of here and use Pear Benchmark instead
-	*/
+    * @todo move this out of here and use Pear Benchmark instead
+    */
     function profile($message = '')
     {
         static $profiler;
@@ -1192,7 +1192,8 @@ class Ak
 
     function blowfishEncrypt($data, $key = null)
     {
-        $key = substr((empty($key) ? md5(AK_SESSION_NAME) : $key),0,56);
+        $key = empty($key) ? md5(AK_SESSION_NAME) : $key;
+        $key = substr($key,0,56);
         require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Crypt'.DS.'Blowfish.php');
         $Blowfish =& Ak::singleton('Crypt_Blowfish', $key);
         $Blowfish->setKey($key);
@@ -1201,7 +1202,8 @@ class Ak
 
     function blowfishDecrypt($encrypted_data, $key = null)
     {
-        $key = substr(empty($key) ? md5(AK_SESSION_NAME) : $key,0,56);
+        $key = empty($key) ? md5(AK_SESSION_NAME) : $key;
+        $key = substr($key,0,56);
         require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Crypt'.DS.'Blowfish.php');
         $Blowfish =& Ak::singleton('Crypt_Blowfish', $key);
         $Blowfish->setKey($key);
@@ -1939,6 +1941,7 @@ class Ak
         if ($walk_keys) {
             foreach ($options as $key=>$value) {
                 if (!is_array($value)) {
+                    unset($options[$key]);
                     $options[$value] = $default_options;
                 } else {
                     Ak::parseOptions($value, $default_options, $parameters);
@@ -1950,8 +1953,8 @@ class Ak
         
         $options = array_merge($default_options, $options);
         foreach($options as $key => $value) {
-            if(isset($params['available_options'])) {
-               if (!isset($params['available_options'][$key])) {
+            if(isset($parameters['available_options'])) {
+               if (!isset($parameters['available_options'][$key])) {
                    continue;
                }
             }
@@ -1963,37 +1966,25 @@ class Ak
     /**
      * Returns YAML settings from config/$namespace.yml
      */
-    function getSettings($namespace, $raise_error_if_config_file_not_found = true)
+    function getSettings($namespace, $raise_error_if_config_file_not_found = true, $environment = AK_ENVIRONMENT)
     {
-        $staticVarNs = 'Ak::getSettings';
-        $loaded_settings = &Ak::getStaticVar($staticVarNs);
-        
-        if(isset($loaded_settings[$namespace])){
-            return $loaded_settings[$namespace];
-        }
-        
-        $namespace = Ak::sanitize_include($namespace, 'paranoid');
-        $yaml_file_name = AK_CONFIG_DIR.DS.$namespace.'.yml';
-
-        if (!is_file($yaml_file_name)){
-            if($raise_error_if_config_file_not_found){
-                die(Ak::t('Could not find %namespace settings file in %path.', array('%namespace'=>$namespace, '%path'=>$yaml_file_name))."\n");
-            }
+        static $_config;
+        if (!in_array($environment,Ak::toArray(AK_AVAILABLE_ENVIRONMENTS))) {
+            trigger_error('The environment '.$environment.' is not allowed. Allowed environments: '.AK_AVAILABLE_ENVIRONMENTS);
             return false;
         }
-        require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'spyc.php');
-        $content = file_get_contents($yaml_file_name);
-        $content = Ak::_parseSettingsConstants($content);
-        $return = Spyc::YAMLLoad($content);
-        Ak::setStaticVar($staticVarNs,$return);
-        return $return;
+        if (!isset($_config)) {
+            require_once(AK_LIB_DIR.DS.'AkConfig.php');
+            $_config = new AkConfig();
+        }
+        return $_config->get($namespace,$environment,$raise_error_if_config_file_not_found);
     }
     
     function getSetting($namespace, $variable, $default_value = null)
     {
         if($settings = Ak::getSettings($namespace)){
             return isset($settings[$variable]) ? $settings[$variable] : $default_value;
-        }
+         }
         return $default_value;
     }
     
@@ -2007,84 +1998,6 @@ class Ak
         return defined($name[1])?constant($name[1]):'';
     }
 }
-
-
-// Now some static functions that are needed by the whole framework
-
-function translate($string, $args = null, $controller = null)
-{
-    return Ak::t($string, $args, $controller);
-}
-
-
-function ak_test($test_case_name, $use_sessions = false)
-{
-    if(!defined('ALL_TESTS_CALL')){
-        $use_sessions ? @session_start() : null;
-        $test = &new $test_case_name();
-        if (defined('AK_CLI') && AK_CLI || TextReporter::inCli() || (defined('AK_CONSOLE_MODE') && AK_CONSOLE_MODE) || (defined('AK_WEB_REQUEST') && !AK_WEB_REQUEST)) {
-            $test->run(new TextReporter());
-        }else{
-            $test->run(new HtmlReporter());
-        }
-    }
-}
-
-function ak_compat($function_name)
-{
-    if(!function_exists($function_name)){
-        require_once(AK_VENDOR_DIR.DS.'pear'.DS.'PHP'.DS.'Compat'.DS.'Function'.DS.$function_name.'.php');
-    }
-}
-
-function ak_generate_mock($name)
-{
-    static $Mock;
-    if(empty($Mock)){
-        $Mock = new Mock();
-    }
-    $Mock->generate($name);
-}
-
-/**
- * This function sets a constant and returns it's value. If constant has been already defined it
- * will reutrn its original value. 
- * 
- * Returns null in case the constant does not exist
- *
- * @param string $name
- * @param mixed $value
- */
-function ak_define($name, $value = null)
-{
-    $name = strtoupper($name);
-    $name = substr($name,0,3) == 'AK_' ? $name : 'AK_'.$name;
-    return  defined($name) ? constant($name) : (is_null($value) ? null : (define($name, $value) ? $value : null));
-}
-
-/**
- * PHP4 triggers "Only variable references should be returned by reference" error when 
- * a method that should return an object reference returns a boolean/array
- * 
- * The old method was to use a global variables, but it can lead into hard to debug bugs.
- * 
- * Now you'll need to use the following technique if you whant to build functions that
- * can return Object references or TRUE/FALSE.
- * 
- *  $result = false;
- *  return $result;
- */
-
-/**
- * Globals are deprecated. Used ak_false, ak_true and ak_array instead
- *
- * @deprecated
- */
-$GLOBALS['false'] = false;
-$GLOBALS['true'] = true;
-
-
-AK_PHP5 || function_exists('clone') ? null : eval('function clone($object){return $object;}');
 
 Ak::profile('Ak.php class included'.__FILE__);
 

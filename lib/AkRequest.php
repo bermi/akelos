@@ -30,7 +30,7 @@ defined('AK_AUTOMATIC_SESSION_START') ? null : define('AK_AUTOMATIC_SESSION_STAR
 // IIS does not provide a valid REQUEST_URI so we need to guess it from the script name + query string
 $_SERVER['REQUEST_URI'] = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_NAME'].(( isset($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '')));
 
-
+require_once(AK_LIB_DIR.DS.'AkRequestMimeType.php');
 /**
 * Class that handles incoming request.
 * 
@@ -71,8 +71,26 @@ class AkRequest extends AkObject
     * @var array
     */
     var $env = array();
-
-
+    
+    var $mime_types = array( 
+                'text/html'                => 'html', 
+                'application/xhtml+xml'    => 'html', 
+                'application/xml'          => 'xml', 
+                'text/xml'                 => 'xml', 
+                'text/javascript'          => 'js', 
+                'application/javascript'   => 'js', 
+                'application/x-javascript' => 'js', 
+                'application/json'         => 'json',
+                'text/x-json'              => 'json', 
+                'application/rss+xml'      => 'rss', 
+                'application/atom+xml'     => 'atom', 
+                '*/*'                      => 'html', 
+                //'application/x-www-form-urlencoded' => 'www-form', 
+                //'application/x-www-form-urlencoded' => 'www-form',
+                'default'                  => 'html', 
+            );
+            
+    var $_format;
     /**
     * String parse method.
     * 
@@ -104,9 +122,9 @@ class AkRequest extends AkObject
     function __construct ()
     {
         $this->init();
+        $this->getFormat();
+        
     }
-
-
 
     /**
     * Initialization method.
@@ -288,7 +306,7 @@ class AkRequest extends AkObject
     */
     function getMethod()
     {
-        return strtolower($this->env['REQUEST_METHOD']);
+        return strtolower(isset($this->env['REQUEST_METHOD'])?$this->env['REQUEST_METHOD']:'get');
     }
 
     /**
@@ -690,7 +708,53 @@ class AkRequest extends AkObject
             $item = urldecode($item);
         }
     }
+    function getAccepts()
+    {
+        $accept_header = isset($this->env['HTTP_ACCEPT'])?$this->env['HTTP_ACCEPT']:'';
+        $accepts = array();
+        foreach (explode(',',$accept_header) as $index=>$acceptable){ 
+                 $mime_struct = $this->_parseMimeType($acceptable); 
+                 if (empty($mime_struct['q'])) $mime_struct['q'] = '1.0'; 
+                  
+                 //we need the original index inside this structure  
+                 //because usort happily rearranges the array on equality 
+                 //therefore we first compare the 'q' and then 'i' 
+                 $mime_struct['i'] = $index; 
+                 $accepts[] = $mime_struct; 
+             } 
+             usort($accepts,array(&$this,'_sortAcceptHeader')); 
+              
+             //we throw away the old index 
+             foreach ($accepts as $array){ 
+                 unset($array['i']); 
+             } 
+             return $accepts; 
+    }
+    function setFormat($format)
+    {
+        $this->_format = $format;
+    }
+    
+    function getFormat()
+    {
 
+        
+        if (isset($this->_format)) {
+            return $this->_format;
+        } else if (isset($this->_request['format'])) {
+            $this->_format = $this->_request['format'];
+        } else {
+            list($format, $requestPath) = AkRequestMimeType::getFormat(@$this->_request['ak']);
+            
+            $this->_format = $format;
+            $this->_request['format'] = $format;
+            if ($requestPath!=null) {
+                $this->_request['ak'] = $requestPath;
+            }
+        }
+        return $this->_format;
+    }
+    
 
     // {{{ recognize()
 
@@ -797,20 +861,8 @@ class AkRequest extends AkObject
     {
         if(AK_AUTOMATIC_SESSION_START){
             if(!isset($_SESSION)){
-                if(AK_SESSION_HANDLER == 1 && defined('AK_DATABASE_CONNECTION_AVAILABLE') && AK_DATABASE_CONNECTION_AVAILABLE){
-                    require_once(AK_LIB_DIR.DS.'AkDbSession.php');
-
-                    $AkDbSession = new AkDbSession();
-                    $AkDbSession->session_life = AK_SESSION_EXPIRE;
-                    session_set_save_handler (
-                    array(&$AkDbSession, '_open'),
-                    array(&$AkDbSession, '_close'),
-                    array(&$AkDbSession, '_read'),
-                    array(&$AkDbSession, '_write'),
-                    array(&$AkDbSession, '_destroy'),
-                    array(&$AkDbSession, '_gc')
-                    );
-                }
+                require_once(AK_LIB_DIR.DS.'AkSession.php');
+                $SessionHandler = &AkSession::initHandler();
                 @session_start();
             }
         }

@@ -1,6 +1,6 @@
 <?php
 
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
+require_once(AK_APP_DIR.DS.'base_active_record.php');
 
 /**
 * This file is application-wide model file. You can put all 
@@ -12,7 +12,7 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 * @package ActiveRecord
 * @subpackage Base
 */
-class ActiveRecord extends AkActiveRecord 
+class ActiveRecord extends BaseActiveRecord 
 {
 }
 

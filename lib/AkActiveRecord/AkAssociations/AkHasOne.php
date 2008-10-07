@@ -240,8 +240,9 @@ class AkHasOne extends AkAssociation
 
     function &findAssociated($association_id)
     {
+        $false = false;
         if(!$this->Owner->getId()){
-            return false;
+            return $false;
         }
         if(empty($this->Owner->$association_id->__activeRecordObject)){
             $this->build($association_id, array(), false);

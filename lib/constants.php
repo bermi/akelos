@@ -15,14 +15,23 @@
  * internationalization options, edit the files at config/environments/*
  */
 
+defined('AK_PHP5') ? null : define('AK_PHP5', version_compare(PHP_VERSION, '5', '>=') == 1 ? true : false);
 
 defined('AK_CONFIG_DIR') ? null : define('AK_CONFIG_DIR', AK_BASE_DIR.DS.'config');
+
+
+defined('AK_CACHE_HANDLER_PEAR') ? null: define('AK_CACHE_HANDLER_PEAR',1);
+defined('AK_CACHE_HANDLER_ADODB') ? null: define('AK_CACHE_HANDLER_ADODB',2);
+defined('AK_CACHE_HANDLER_MEMCACHE') ? null: define('AK_CACHE_HANDLER_MEMCACHE',3);
 
 // If you need to customize the framework default settings or specify internationalization options,
 // edit the files config/testing.php, config/development.php, config/production.php
 if(AK_ENVIRONMENT != 'setup'){        
     require_once(AK_CONFIG_DIR.DS.'environments'.DS.AK_ENVIRONMENT.'.php');
 }
+
+defined('AK_CACHE_HANDLER') ? null : define('AK_CACHE_HANDLER', AK_CACHE_HANDLER_PEAR);
+
 
 if (!defined('AK_TEST_DATABASE_ON')) {
     defined('AK_DEFAULT_DATABASE_PROFILE') ? null : define('AK_DEFAULT_DATABASE_PROFILE', AK_ENVIRONMENT);
@@ -33,7 +42,7 @@ if (!defined('AK_TEST_DATABASE_ON')) {
 // auto will enable all the locales at config/locales/ dir
 defined('AK_AVAILABLE_LOCALES') ? null : define('AK_AVAILABLE_LOCALES', 'auto');
 
-
+defined('AK_AVAILABLE_ENVIRONMENTS') ? null : define('AK_AVAILABLE_ENVIRONMENTS',"setup,testing,development,production");
 // Set these constants in order to allow only these locales on web requests
 // defined('AK_ACTIVE_RECORD_DEFAULT_LOCALES') ? null : define('AK_ACTIVE_RECORD_DEFAULT_LOCALES','en,es');
 // defined('AK_APP_LOCALES') ? null : define('AK_APP_LOCALES','en,es');
@@ -58,7 +67,6 @@ defined('AK_ERROR_REPORTING') ? null : define('AK_ERROR_REPORTING', AK_DEBUG ? E
 
 @error_reporting(AK_ERROR_REPORTING);
 
-defined('AK_CACHE_HANDLER') ? null : define('AK_CACHE_HANDLER', 1);
 
 defined('AK_APP_DIR') ? null : define('AK_APP_DIR', AK_BASE_DIR.DS.'app');
 defined('AK_APIS_DIR') ? null : define('AK_APIS_DIR', AK_APP_DIR.DS.'apis');
@@ -71,7 +79,6 @@ defined('AK_TEST_DIR') ? null : define('AK_TEST_DIR', AK_BASE_DIR.DS.'test');
 defined('AK_SCRIPT_DIR') ? null : define('AK_SCRIPT_DIR',AK_BASE_DIR.DS.'script');
 defined('AK_APP_VENDOR_DIR') ? null : define('AK_APP_VENDOR_DIR',AK_APP_DIR.DS.'vendor');
 defined('AK_APP_PLUGINS_DIR') ? null : define('AK_APP_PLUGINS_DIR',AK_APP_VENDOR_DIR.DS.'plugins');
-
 
 
 /**
@@ -102,6 +109,63 @@ function ak_get_tmp_dir_name(){
     }
     return AK_TMP_DIR;
 }
+
+
+
+// Now some static functions that are needed by the whole framework
+
+function translate($string, $args = null, $controller = null)
+{
+    return Ak::t($string, $args, $controller);
+}
+
+
+function ak_test($test_case_name, $use_sessions = false)
+{
+    if(!defined('ALL_TESTS_CALL')){
+        $use_sessions ? @session_start() : null;
+        $test = &new $test_case_name();
+        if (defined('AK_CLI') && AK_CLI || TextReporter::inCli() || (defined('AK_CONSOLE_MODE') && AK_CONSOLE_MODE) || (defined('AK_WEB_REQUEST') && !AK_WEB_REQUEST)) {
+            $test->run(new TextReporter());
+        }else{
+            $test->run(new HtmlReporter());
+        }
+    }
+}
+
+function ak_compat($function_name)
+{
+    if(!function_exists($function_name)){
+        require_once(AK_VENDOR_DIR.DS.'pear'.DS.'PHP'.DS.'Compat'.DS.'Function'.DS.$function_name.'.php');
+    }
+}
+
+function ak_generate_mock($name)
+{
+    static $Mock;
+    if(empty($Mock)){
+        $Mock = new Mock();
+    }
+    $Mock->generate($name);
+}
+
+/**
+ * This function sets a constant and returns it's value. If constant has been already defined it
+ * will reutrn its original value. 
+ * 
+ * Returns null in case the constant does not exist
+ *
+ * @param string $name
+ * @param mixed $value
+ */
+function ak_define($name, $value = null)
+{
+    $name = strtoupper($name);
+    $name = substr($name,0,3) == 'AK_' ? $name : 'AK_'.$name;
+    return  defined($name) ? constant($name) : (is_null($value) ? null : (define($name, $value) ? $value : null));
+}
+
+AK_PHP5 || function_exists('clone') ? null : eval('function clone($object){return $object;}');
 
 defined('AK_TMP_DIR') ? null : define('AK_TMP_DIR', ak_get_tmp_dir_name());
 defined('AK_COMPILED_VIEWS_DIR') ? null : define('AK_COMPILED_VIEWS_DIR', AK_TMP_DIR.DS.'views');
@@ -134,7 +198,6 @@ if(AK_ENVIRONMENT != 'setup'){
 @ini_set("arg_separator.output","&");
 
 @ini_set("include_path",(AK_LIB_DIR.PATH_SEPARATOR.AK_MODELS_DIR.PATH_SEPARATOR.AK_CONTRIB_DIR.DS.'pear'.PATH_SEPARATOR.ini_get("include_path")));
-defined('AK_PHP5') ? null : define('AK_PHP5', version_compare(PHP_VERSION, '5', '>=') == 1 ? true : false);
 
 if(!AK_CLI && AK_WEB_REQUEST){
 

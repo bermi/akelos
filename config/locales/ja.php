@@ -4,6 +4,7 @@ $locale = array();
 $locale['description'] = 'Japanese';
 $locale['charset'] = 'UTF-8';
 $locale['date_time_format'] = 'Y-m-d H:i:s';
+$locale['db_date_time_format'] = 'Y-m-d H:i:s';
 $locale['date_format'] = 'Y-m-d';
 $locale['long_date_format'] = 'Y-m-d';
 $locale['time_format'] = 'H:i';

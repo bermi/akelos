@@ -11,6 +11,11 @@
         <?=$form_tag_helper->text_area_tag('config',$configuration_file,array('size'=>'45x40'))?>
         </form>
     </li>
+    <li>_{Copy the following configuration file contents to <b>config/database.yml</b>.}
+        <?= $form_tag_helper->start_form_tag(array('controller'=>'framework_setup','action'=>'perform_setup')) ?>
+        <?=$form_tag_helper->text_area_tag('db_config',$db_configuration_file,array('size'=>'45x40'))?>
+        </form>
+    </li>
     <li>_{Copy the file <b>config/DEFAULT-routes.php</b> to <b>config/routes.php</b>}</li>
     
     <?php if(strlen($FrameworkSetup->getUrlSuffix()) > 1) : ?>

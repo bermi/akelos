@@ -18,7 +18,7 @@
 
 
 require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
-require_once(AK_LIB_DIR.DS.'AkActionController'.DS.'AkPaginator.php');
+
             
 class PaginationHelper extends AkActionViewHelper
 {
@@ -127,6 +127,7 @@ class PaginationHelper extends AkActionViewHelper
         );
         $options = array_merge($default_options, $options);
         $paginator_name = AkInflector::underscore($object->getModelName()).'_pages';
+        require_once(AK_LIB_DIR.DS.'AkActionController'.DS.'AkPaginator.php');
         $this->$paginator_name = new AkPaginator($this->_controller,
         $object->{$options['count_method']}($options['count_conditions'], $options['count_joins']),
         $options['items_per_page'], @$this->_controller->params[$options['page_var_on_url']]);

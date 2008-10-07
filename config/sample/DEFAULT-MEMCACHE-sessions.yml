@@ -1,0 +1,5 @@
+enabled: true
+handler:
+    type: 3 #1=File based,2=AdoDB,3=Memcache
+    options: 
+           lifeTime: 3600

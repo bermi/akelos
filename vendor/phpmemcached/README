@@ -1,0 +1,58 @@
+MemCached Client
+Version 1.0.0
+Copyright 2004, Steve Blinch
+http://code.blitzaffe.com
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+****************************************************************************
+
+DETAILS
+
+This is a MemCached client library used to connect to MemCache daemons
+(http://www.danga.com/memcached/) to store and retrieved memory-cached data.
+
+
+EXAMPLE
+
+//
+// Simple MemCached client library example
+//
+require_once('class_MemCachedClient.php');
+
+$hosts = array('127.0.0.1:1234','127.0.0.2:1234');
+$mc = &new MemCachedClient($hosts);
+
+// try to get a value
+if (!$mc->get("myvalue")) {
+
+// if an error occurred, exit
+if ($mc->errno==ERR_NO_SOCKET) {
+die("Could not connect to MemCache daemon\n");
+}
+
+// set a value
+$mc->set("myvalue",1);
+}
+
+// increment a counter
+$mc->incr('counter');
+// decrement a counter
+$mc->decr('counter');
+
+// delete a value
+$mc->delete("myvalue");
+
+

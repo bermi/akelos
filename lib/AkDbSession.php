@@ -51,6 +51,7 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 * @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
 * @since 0.1
+* @deprecated use AkSession instead
 * @version $Revision 0.1 $
 */
 class AkDbSession extends AkObject
@@ -138,7 +139,7 @@ class AkDbSession extends AkObject
     */
     function _read($id)
     {
-        $result = $this->_db->selectValue("SELECT value FROM sessions WHERE id = ".$this->_db->quote_string($id));
+        $result = @$this->_db->selectValue("SELECT value FROM sessions WHERE id = ".$this->_db->quote_string($id));
         return is_null($result) ? '' : (string)$result;
     }
 
@@ -157,7 +158,7 @@ class AkDbSession extends AkObject
             /**
             * @todo replace with dbAdapter-method
             */
-            $ret = $this->_db->connection->Replace('sessions', array('id'=>$this->_db->quote_string($id),'expire'=>$this->_db->quote_datetime(time()),'value'=>$this->_db->quote_string($data)), 'id');
+            $ret = @$this->_db->connection->Replace('sessions', array('id'=>$this->_db->quote_string($id),'expire'=>$this->_db->quote_datetime(time()),'value'=>$this->_db->quote_string($data)), 'id');
             if($ret == 0){
                 return false;
             }else{
@@ -177,7 +178,7 @@ class AkDbSession extends AkObject
     */
     function _destroy($id)
     {
-        return (bool)$this->_db->delete('DELETE FROM sessions WHERE id = '.$this->_db->quote_string($id));
+        return (bool)@$this->_db->delete('DELETE FROM sessions WHERE id = '.$this->_db->quote_string($id));
         }
 
     /**
@@ -188,8 +189,9 @@ class AkDbSession extends AkObject
     */
     function _gc()
     {
-        return (bool)$this->_db->delete('DELETE FROM sessions WHERE expire < '.$this->_db->quote_datetime(time()-$this->sessionLife));
-        }
+        return (bool)@$this->_db->delete('DELETE FROM sessions WHERE expire < '.$this->_db->quote_datetime(time()-$this->sessionLife));
+
+    }
 
 
 }

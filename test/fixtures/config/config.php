@@ -2,6 +2,8 @@
 
 error_reporting(E_ALL);
 
+defined('AK_CACHE_HANDLER') ? null: define('AK_CACHE_HANDLER', 1);
+
 defined('AK_ENVIRONMENT') ? null : define('AK_ENVIRONMENT', 'testing');
 
 defined('AK_TEST_DIR') ? null : define('AK_TEST_DIR', str_replace(DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php','',__FILE__));
@@ -30,7 +32,9 @@ defined('AK_PUBLIC_LOCALES') ? null : define('AK_PUBLIC_LOCALES', AK_APP_LOCALES
 defined('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT') ? null : define('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT', true);
 defined('AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS') ? null : define('AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS', true);
 
-defined('AK_TESTING_URL') ? null : define('AK_TESTING_URL', rtrim(AK_URL,'/').'/test/fixtures/public');
+//defined('AK_TESTING_URL') ? null : define('AK_TESTING_URL', rtrim(AK_URL,'/').'/test/fixtures/public');
+
+defined('AK_TESTING_URL') ? null : define('AK_TESTING_URL', 'http://localhost:81/test/fixtures/public');
 defined('AK_TESTING_REWRITE_BASE') ? null : define('AK_TESTING_REWRITE_BASE', false);
 
 defined('AK_LIB_TESTS_DIRECTORY') ? null : define('AK_LIB_TESTS_DIRECTORY', AK_TEST_DIR.DS.'unit'.DS.'lib');
@@ -40,9 +44,9 @@ if(AK_TESTING_REWRITE_BASE){
 }
 
 if(defined('AK_TEST_DATABASE_ON')){
-    $default_profile = !empty($argv) && array_key_exists($argv[count($argv)-1], $database_settings) ? array_pop($argv) : AK_ENVIRONMENT;
+    $default_profile = AK_ENVIRONMENT;
     define('AK_DEFAULT_DATABASE_PROFILE', $default_profile);
-    $GLOBALS['database_settings'] = $database_settings;
+    //$GLOBALS['database_settings'] = $database_settings;
     include_once(AK_LIB_DIR.DS.'Ak.php');
     Ak::db();
     unset($default_profile);

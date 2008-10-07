@@ -20,7 +20,7 @@
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php');
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbAdapter.php');
-
+require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
 /**#@+
 * Constants
 */
@@ -31,6 +31,15 @@ defined('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT') ? null : define('
 defined('AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS') ? null : define('AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS', false);
 defined('AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS') ? null : define('AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS', AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS);
 defined('AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS') ? null : define('AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS', AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS);
+
+// Forces loading database schema on every call
+if(AK_DEV_MODE) {
+    AkDbSchemaCache::doRefresh(true);
+} else if (AK_ENVIRONMENT == 'testing') {
+    AkDbSchemaCache::doRefresh(true);
+    define('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA',true);
+}
+
 defined('AK_ACTIVE_RECORD_ENABLE_PERSISTENCE') ? null : define('AK_ACTIVE_RECORD_ENABLE_PERSISTENCE', AK_ENVIRONMENT != 'testing');
 defined('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA') ? null : define('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA', AK_ACTIVE_RECORD_ENABLE_PERSISTENCE && AK_ENVIRONMENT != 'development');
 defined('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE') ? null : define('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE', 300);
@@ -45,10 +54,7 @@ defined('AK_IP4_REGULAR_EXPRESSION') ? null : define('AK_IP4_REGULAR_EXPRESSION'
 defined('AK_POST_CODE_REGULAR_EXPRESSION') ? null : define('AK_POST_CODE_REGULAR_EXPRESSION',"/^[0-9A-Za-z  -]{2,9}$/");
 /**#@-*/
 
-// Forces loading database schema on every call
-if(AK_DEV_MODE && isset($_SESSION['__activeRecordColumnsSettingsCache'])){
-    unset($_SESSION['__activeRecordColumnsSettingsCache']);
-}
+
 
 ak_compat('array_combine');
 
@@ -272,8 +278,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if(!empty($this->table_name)){
             $this->setTableName($this->table_name);
         }
-
-        $this->_loadActAsBehaviours();
+        $this->act_as = !empty($this->acts_as) ? $this->acts_as : (empty($this->act_as) ? false : $this->act_as);
+        if (!empty($this->act_as)) {
+            $this->_loadActAsBehaviours();
+        }
 
         if(!empty($this->combined_attributes)){
             foreach ($this->combined_attributes as $combined_attribute){
@@ -306,7 +314,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $this->newRecord($attributes);
         }
 
-        $this->_buildFinders();
+        if($this->_dynamicMethods){
+            $this->_buildFinders();
+        }
         empty($avoid_loading_associations) ? $this->loadAssociations() : null;
     }
 
@@ -1495,7 +1505,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $object =& new $model_name('attributes', $record);
 
         $object->_newRecord = $set_as_new;
-
+        
+        $object->afterInstantiate();
+        $object->notifyObservers('afterInstantiate');
+        
         (AK_CLI && AK_ENVIRONMENT == 'development') ? $object ->toString() : null;
 
         return $object;
@@ -2421,11 +2434,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 if(!isset($this->_db)){
                     $this->setConnection();
                 }
-                if(empty($_SESSION['__activeRecordColumnsSettingsCache']['available_tables']) ||
-                !AK_ACTIVE_RECORD_ENABLE_PERSISTENCE){
-                    $_SESSION['__activeRecordColumnsSettingsCache']['available_tables'] = $this->_db->availableTables();
+                if (!AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA || ($available_tables = AkDbSchemaCache::getAvailableTables()) === false) {
+                    $available_tables = $this->_db->availableTables();
+                    if (AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA) {
+                        AkDbSchemaCache::setAvailableTables($available_tables);
+                    }
                 }
-                $available_tables = $_SESSION['__activeRecordColumnsSettingsCache']['available_tables'];
             }
             if(!in_array($table_name,(array)$available_tables)){
                 if(!$check_mode){
@@ -2526,12 +2540,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      */
     function _databaseTableInternals($table)
     {
-        if(empty($_SESSION['__activeRecordColumnsSettingsCache']['database_table_'.$table.'_internals']) || !AK_ACTIVE_RECORD_ENABLE_PERSISTENCE){
-            $_SESSION['__activeRecordColumnsSettingsCache']['database_table_'.$table.'_internals'] = $this->_db->getColumnDetails($table);
+        if (!AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA || ($cache = AkDbSchemaCache::getDbTableInternals($table))===false) {
+            $cache = $this->_db->getColumnDetails($table);
+            if (AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA) {
+                AkDbSchemaCache::setDbTableInternals($table,$cache);
+            }
         }
-        $cache[$table] = $_SESSION['__activeRecordColumnsSettingsCache']['database_table_'.$table.'_internals'];
-
-        return $cache[$table];
+        return $cache;
     }
 
     function getColumnsWithRegexBoundaries()
@@ -2621,7 +2636,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     $this->setColumnSettings($column_objects[$k]->name, $column_objects[$k]);
                 }
             }
-            if(!empty($this->_columnsSettings)){
+            if(!empty($this->_columnsSettings) && AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA){
                 $this->_persistTableColumnSettings();
             }
         }
@@ -2670,9 +2685,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function resetColumnInformation()
     {
-        if(isset($_SESSION['__activeRecordColumnsSettingsCache'][$this->getModelName()])){
-            unset($_SESSION['__activeRecordColumnsSettingsCache'][$this->getModelName()]);
-        }
         $this->_clearPersitedColumnSettings();
         $this->_columnNames = $this->_columns = $this->_columnsSettings = $this->_contentColumns = array();
     }
@@ -2682,7 +2694,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function _getColumnsSettings()
     {
-        return $_SESSION['__activeRecordColumnsSettingsCache'];
+        return AkDbSchemaCache::getColumnsSettings();
     }
 
     /**
@@ -2690,7 +2702,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function _getModelColumnSettings()
     {
-        return $_SESSION['__activeRecordColumnsSettingsCache'][$this->getModelName()];
+        return AkDbSchemaCache::getModelColumnSettings($this->getModelName());
+        
     }
 
     /**
@@ -2698,7 +2711,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function _persistTableColumnSettings()
     {
-        $_SESSION['__activeRecordColumnsSettingsCache'][$this->getModelName().'_column_settings'] = $this->_columnsSettings;
+        AkDbSchemaCache::setModelColumnSettings($this->getModelName(), $this->_columnsSettings);
     }
 
     /**
@@ -2706,12 +2719,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function _getPersistedTableColumnSettings()
     {
-        $model_name = $this->getModelName();
-        if(AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA && !isset($_SESSION['__activeRecordColumnsSettingsCache']) && AK_CACHE_HANDLER > 0){
-            $this->_loadPersistedColumnSetings();
-        }
-        return isset($_SESSION['__activeRecordColumnsSettingsCache'][$model_name.'_column_settings']) ?
-        $_SESSION['__activeRecordColumnsSettingsCache'][$model_name.'_column_settings'] : false;
+        return AkDbSchemaCache::getModelColumnSettings($this->getModelName());
+        
     }
 
     /**
@@ -2719,43 +2728,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function _clearPersitedColumnSettings()
     {
-        if(AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA && AK_CACHE_HANDLER > 0){
-            $Cache =& Ak::cache();
-            $Cache->init(AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE);
-            $Cache->clean('AkActiveRecord');
-        }
+        AkDbSchemaCache::clear($this->getModelName());
     }
 
-    /**
-    * @access private
-    */
-    function _savePersitedColumnSettings()
-    {
-        if(isset($_SESSION['__activeRecordColumnsSettingsCache'])){
-            $Cache =& Ak::cache();
-            $Cache->init(AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE);
-            $Cache->save(serialize($_SESSION['__activeRecordColumnsSettingsCache']), 'active_record_db_cache', 'AkActiveRecord');
-        }
-    }
-
-    /**
-    * @access private
-    */
-    function _loadPersistedColumnSetings()
-    {
-        if(!isset($_SESSION['__activeRecordColumnsSettingsCache'])){
-            $Cache =& Ak::cache();
-            $Cache->init(AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE);
-            if($serialized_column_settings = $Cache->get('active_record_db_cache', 'AkActiveRecord') && !empty($serialized_column_settings)){
-                $_SESSION['__activeRecordColumnsSettingsCache'] = @unserialize($serialized_column_settings);
-
-            }elseif(AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA){
-                register_shutdown_function(array($this,'_savePersitedColumnSettings'));
-            }
-        }else{
-            $_SESSION['__activeRecordColumnsSettingsCache'] = array();
-        }
-    }
 
 
     function initiateAttributeToNull($attribute)
@@ -2921,6 +2896,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     ====================================================================
     */
 
+    function t($string, $array = null)
+    {
+        return Ak::t($string, $array, AkInflector::underscore($this->getModelName()));
+    }
 
     function getInternationalizedColumns()
     {
@@ -3404,6 +3383,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function afterValidation(){return true;}
     function afterValidationOnCreate(){return true;}
     function afterValidationOnUpdate(){return true;}
+    function afterInstantiate(){return true;}
     function afterCreate(){return true;}
     function afterDestroy(){return true;}
     function beforeDestroy(){return true;}
@@ -4176,29 +4156,54 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         return $this->_observable_state;
     }
-
+    
     /**
     * Register the reference to an object object
+    * 
+    * 
+    * @param $observer AkObserver
+    * @param $options array of options for the observer
     * @return void
     */ 
-    function &addObserver(&$observer)
+    function addObserver(&$observer)
     {
-        static $observers, $registered_observers;
+        $staticVarNs='AkActiveRecord::observers::' . $this->_modelName;
         $observer_class_name = get_class($observer);
-        if(!isset($registered_observers[$observer_class_name]) && func_num_args() == 1){
-            $observers[] =& $observer;
-            $registered_observers[$observer_class_name] = count($observers);
+        /**
+         * get the statically stored observers for the namespace
+         */
+        $observers = &Ak::getStaticVar($staticVarNs);
+        if (!is_array($observers)) {
+            $observers = array('classes'=>array(),'objects'=>array());
         }
-        return $observers;
+        /**
+         * if not already registered, the observerclass will 
+         * be registered now
+         */
+        if (!in_array($observer_class_name,$observers['classes'])) {
+            $observers['classes'][] = $observer_class_name;
+            $observers['objects'][] = &$observer;
+            Ak::setStaticVar($staticVarNs, $observers);
+            
+        }
     }
-
     /**
     * Register the reference to an object object
     * @return void
     */ 
     function &getObservers()
     {
-        $observers =& $this->addObserver(&$this, false);
+        $staticVarNs='AkActiveRecord::observers::' . $this->_modelName;
+        $key = 'objects';
+
+        $array = array();
+        $observers_arr =& Ak::getStaticVar($staticVarNs);
+        if (isset($observers_arr[$key])) {
+            $observers = &$observers_arr[$key];
+        } else {
+            $observers = &$array;
+        }
+
         return $observers;
     }
 
@@ -4500,7 +4505,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function _loadActAsBehaviours()
     {
-        $this->act_as = !empty($this->acts_as) ? $this->acts_as : (empty($this->act_as) ? false : $this->act_as);
+        //$this->act_as = !empty($this->acts_as) ? $this->acts_as : (empty($this->act_as) ? false : $this->act_as);
         if(!empty($this->act_as)){
             if(is_string($this->act_as)){
                 $this->act_as = array_unique(array_diff(array_map('trim',explode(',',$this->act_as.',')), array('')));
@@ -4718,11 +4723,349 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $resulting_array;
     }
 
-    function toJson()
+    /**
+     * Generate a json representation of the model record.
+     * 
+     * parameters:
+     *
+     * @param array $options 
+     *  
+     *              option parameters:
+     *             array(
+     *              'collection' => array($Person1,$Person), // array of ActiveRecords
+     *              'include' => array('association1','association2'), // include the associations when exporting
+     *              'exclude' => array('id','name'), // exclude the attribtues
+     *              'only' => array('email','last_name') // only export these attributes
+     *              )
+     * @return string in Json Format
+     */
+    function toJson($options = array())
     {
-        return Ak::toJson($this->getAttributes());
-    }
+        if (is_array($options) && isset($options[0]) && is_a($options[0], 'AkActiveRecord')) {
+            $options = array('collection'=>$options);
+        }
+        if (isset($options['collection']) && is_array($options['collection']) && $options['collection'][0]->_modelName == $this->_modelName) {
+            $json = '';
 
+            $collection = $options['collection'];
+            unset($options['collection']);
+            $jsonVals = array();
+            foreach ($collection as $element) {
+                $jsonVals[]= $element->toJson($options);
+            }
+            $json = '['.implode(',',$jsonVals).']';
+            return $json;
+        }
+        /**
+         * see if we need to include associations
+         */
+        $associatedIds = array();
+        if (isset($options['include']) && !empty($options['include'])) {
+            $options['include'] = is_array($options['include'])?$options['include']:preg_split('/,\s*/',$options['include']);
+            foreach ($this->_associations as $key => $obj) {
+                if (in_array($key,$options['include'])) {
+                    $associatedIds[$obj->getAssociationId() . '_id'] = array('name'=>$key,'type'=>$obj->getType());
+                }
+            }
+        }
+        if (isset($options['only'])) {
+            $options['only'] = is_array($options['only'])?$options['only']:preg_split('/,\s*/',$options['only']);
+        }
+        if (isset($options['except'])) {
+            $options['except'] = is_array($options['except'])?$options['except']:preg_split('/,\s*/',$options['except']);
+        }
+        foreach ($this->_columns as $key => $def) {
+            
+            if (isset($options['except']) && in_array($key, $options['except'])) {
+                continue;
+            } else if (isset($options['only']) && !in_array($key, $options['only'])) {
+                continue;
+            } else {
+                $val = $this->$key;
+                $type = $this->getColumnType($key);
+                if (($type == 'serial' || $type=='integer') && $val!==null) $val = intval($val);
+                if ($type == 'float' && $val!==null) $val = floatval($val);
+                if ($type == 'boolean') $val = $val?1:0;
+                $data[$key] = $val;
+            }
+        }
+        if (isset($options['include'])) {
+            foreach($this->_associationIds as $key=>$val) {
+                if ((in_array($key,$options['include']) || in_array($val,$options['include']))) {
+                    $this->$key->load();
+                    $associationElement = $key;
+                    $associationElement = $this->_convert_column_to_xml_element($associationElement);
+                    if (is_array($this->$key)) {
+                        $data[$associationElement] = array();
+                        foreach ($this->$key as $el) {
+                            if (is_a($el,'AkActiveRecord')) {
+                                $attributes = $el->getAttributes();
+                                foreach($attributes as $ak=>$av) {
+                                    $type = $el->getColumnType($ak);
+                                    if (($type == 'serial' || $type=='integer') && $av!==null) $av = intval($av);
+                                    if ($type == 'float' && $av!==null) $av = floatval($av);
+                                    if ($type == 'boolean') $av = $av?1:0;
+                                    $attributes[$ak]=$av;
+                                }
+                                $data[$associationElement][] = $attributes;
+                            }
+                        }
+                    } else {
+                        $el = &$this->$key->load();
+                        if (is_a($el,'AkActiveRecord')) {
+                            $attributes = $el->getAttributes();
+                            foreach($attributes as $ak=>$av) {
+                                $type = $el->getColumnType($ak);
+                                if (($type == 'serial' || $type=='integer') && $av!==null) $av = intval($av);
+                                if ($type == 'float' && $av!==null) $av = floatval($av);
+                                if ($type == 'boolean') $av = $av?1:0;
+                                $attributes[$ak]=$av;
+                            }
+                            $data[$associationElement] = $attributes;
+                        }
+                    }
+                }
+            }
+        }
+        return Ak::toJson($data);
+    }
+    function _convert_column_to_xml_element($col)
+    {
+        return str_replace('_','-',$col);
+    }
+    function _convert_column_from_xml_element($col)
+    {
+        return str_replace('-','_',$col);
+    }
+    
+    function _parseXmlAttributes($attributes)
+    {
+        $new = array();
+        foreach($attributes as $key=>$value)
+        {
+            $new[$this->_convert_column_from_xml_element($key)] = $value;
+        }
+        return $new;
+    }
+    
+    function &_generateModelFromArray($modelName,$attributes)
+    {
+        if (isset($attributes[0]) && is_array($attributes[0])) {
+            $attributes = $attributes[0];
+        }
+        $record = new $modelName('attributes',$this->_parseXmlAttributes($attributes));
+        $record->_newRecord = !empty($attributes['id']);
+
+        $associatedIds = array();
+        foreach ($record->getAssociatedIds() as $key) {
+            if (isset($attributes[$key]) && is_array($attributes[$key])) {
+                $class = $record->$key->_AssociationHandler->getOption($key,'class_name');
+                $related = $this->_generateModelFromArray($class,$attributes[$key]);
+                $record->$key->build($related->getAttributes(),false);
+                $related = &$record->$key->load();
+                $record->$key = &$related;
+            }
+        }
+        return $record;
+    }
+    
+    function _fromArray($array)
+    {
+        $data  = $array;
+        $modelName = $this->getModelName();
+        $values = array();
+        if (!isset($data[0])) {
+            $data = array($data);
+        }
+        foreach ($data as $key => $value) {
+            if (is_array($value)){
+                $values[] = &$this->_generateModelFromArray($modelName,$value);
+            }
+        }
+        return count($values)==1?$values[0]:$values;
+    }
+    
+    /**
+     * Reads Xml in the following format:
+     * 
+     * 
+     * <?xml version="1.0" encoding="UTF-8"?>
+     * <person>
+     *    <id>1</id>
+     *    <first-name>Hansi</first-name>
+     *    <last-name>Müller</last-name>
+     *    <email>hans@mueller.com</email>
+     *    <created-at type="datetime">2008-01-01 13:01:23</created-at>
+     * </person>
+     * 
+     * and returns an ActiveRecord Object
+     *
+     * @param string $xml
+     * @return AkActiveRecord
+     */
+    function fromXml($xml)
+    {
+        $array = Ak::xml_to_array($xml);
+        $array = $this->_fromXmlCleanup($array);
+         return $this->_fromArray($array);
+    }
+    
+    function _fromXmlCleanup($array)
+    {
+        $result = array();
+        $key = key($array);
+        while(is_string($key) && is_array($array[$key]) && count($array[$key])==1) {
+            $array = $array[$key][0];
+            $key = key($array);
+        }
+        if (is_string($key) && is_array($array[$key])) {
+            $array = $array[$key];
+        }
+        return $array;
+    }
+    /**
+     * Reads Json string in the following format:
+     * 
+     * {"id":1,"first_name":"Hansi","last_name":"M\u00fcller",
+     *  "email":"hans@mueller.com","created_at":"2008-01-01 13:01:23"}
+     * 
+     * and returns an ActiveRecord Object
+     *
+     * @param string $json
+     * @return AkActiveRecord
+     */
+    function fromJson($json)
+    {
+        $json = Ak::fromJson($json);
+        $array = Ak::convert('Object','Array',$json);
+        return $this->_fromArray($array);
+    }
+    
+    /**
+     * Generate a xml representation of the model record.
+     * 
+     * Example result:
+     * 
+     * <?xml version="1.0" encoding="UTF-8"?>
+     * <person>
+     *    <id>1</id>
+     *    <first-name>Hansi</first-name>
+     *    <last-name>Müller</last-name>
+     *    <email>hans@mueller.com</email>
+     *    <created-at type="datetime">2008-01-01 13:01:23</created-at>
+     * </person>
+     * 
+     * parameters:
+     *
+     * @param array $options 
+     *  
+     *              option parameters:
+     *             array(
+     *              'collection' => array($Person1,$Person), // array of ActiveRecords
+     *              'include' => array('association1','association2'), // include the associations when exporting
+     *              'exclude' => array('id','name'), // exclude the attribtues
+     *              'only' => array('email','last_name') // only export these attributes
+     *              )
+     * @return string in Xml Format
+     */
+    function toXml($options = array())
+    {
+        if (is_array($options) && isset($options[0]) && is_a($options[0], 'AkActiveRecord')) {
+            $options = array('collection'=>$options);
+        }
+        if (isset($options['collection']) && is_array($options['collection']) && $options['collection'][0]->_modelName == $this->_modelName) {
+            $root = strtolower(AkInflector::pluralize($this->_modelName));
+            $root = $this->_convert_column_to_xml_element($root);
+            $xml = '';
+            if (!(isset($options['skip_instruct']) && $options['skip_instruct'] == true)) {
+                $xml .= '<?xml version="1.0" encoding="UTF-8"?>';
+            }
+            $xml .= '<' . $root . '>';
+            $collection = $options['collection'];
+            unset($options['collection']);
+            $options['skip_instruct'] = true;
+            foreach ($collection as $element) {
+                $xml .= $element->toXml($options);
+            }
+            $xml .= '</' . $root .'>';
+            return $xml;
+        }
+        /**
+         * see if we need to include associations
+         */
+        $associatedIds = array();
+        if (isset($options['include']) && !empty($options['include'])) {
+            $options['include'] = is_array($options['include'])?$options['include']:preg_split('/,\s*/',$options['include']);
+            foreach ($this->_associations as $key => $obj) {
+                if (in_array($key,$options['include'])) {
+                    if ($obj->getType()!='hasAndBelongsToMany') {
+                        $associatedIds[$obj->getAssociationId() . '_id'] = array('name'=>$key,'type'=>$obj->getType());
+                    } else {
+                        $associatedIds[$key] = array('name'=>$key,'type'=>$obj->getType());
+                    }
+                }
+            }
+        }
+        if (isset($options['only'])) {
+            $options['only'] = is_array($options['only'])?$options['only']:preg_split('/,\s*/',$options['only']);
+        }
+        if (isset($options['except'])) {
+            $options['except'] = is_array($options['except'])?$options['except']:preg_split('/,\s*/',$options['except']);
+        }
+        $xml = '';
+        if (!(isset($options['skip_instruct']) && $options['skip_instruct'] == true)) {
+            $xml .= '<?xml version="1.0" encoding="UTF-8"?>';
+        }
+        $root = $this->_convert_column_to_xml_element(strtolower($this->_modelName));
+        
+        $xml .= '<' . $root . '>';
+        $xml .= "\n";
+        foreach ($this->_columns as $key => $def) {
+            
+            if (isset($options['except']) && in_array($key, $options['except'])) {
+                continue;
+            } else if (isset($options['only']) && !in_array($key, $options['only'])) {
+                continue;
+            } else {
+                $columnType = $def['type'];
+                $elementName = $this->_convert_column_to_xml_element($key);
+                $xml .= '<' . $elementName;
+                $val = $this->$key;
+                if (!in_array($columnType,array('string','text','serial'))) {
+                    $xml .= ' type="' . $columnType . '"';
+                    if ($columnType=='boolean') $val = $val?1:0;
+                }
+                $xml .= '>' . Ak::utf8($val) . '</' . $elementName . '>';
+                $xml .= "\n";
+            }
+        }
+        if (isset($options['include'])) {
+            foreach($this->_associationIds as $key=>$val) {
+                if ((in_array($key,$options['include']) || in_array($val,$options['include']))) {
+                    if (is_array($this->$key)) {
+                        
+                        $associationElement = $key;
+                        $associationElement = AkInflector::pluralize($associationElement);
+                        $associationElement = $this->_convert_column_to_xml_element($associationElement);
+                        $xml .= '<'.$associationElement.'>';
+                        foreach ($this->$key as $el) {
+                            if (is_a($el,'AkActiveRecord')) {
+                                $xml .= $el->toXml(array('skip_instruct'=>true));
+                            }
+                        }
+                        $xml .= '</' . $associationElement .'>';
+                    } else {
+                        $el = &$this->$key->load();
+                        if (is_a($el,'AkActiveRecord')) {
+                            $xml.=$el->toXml(array('skip_instruct'=>true));
+                        }
+                    }
+                }
+            }
+        }
+        $xml .= '</' . $root . '>';
+        return $xml;
+    }
     /**
      * converts to yaml-strings 
      * 
@@ -5126,13 +5469,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function &objectCache()
     {
         static $cache;
+        $false = false;
         $args =& func_get_args();
         if(count($args) == 2){
             if(!isset($cache[$args[0]])){
                 $cache[$args[0]] =& $args[1];
             }
         }elseif(!isset($cache[$args[0]])){
-            return false;
+            return $false;
         }
         return $cache[$args[0]];
     }

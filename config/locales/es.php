@@ -4,6 +4,7 @@ $locale = array();
 $locale['description'] = 'Spanish';
 $locale['charset'] = 'UTF-8';
 $locale['date_time_format'] = 'd/m/Y H:i:s';
+$locale['db_date_time_format'] = 'Y-m-d H:i:s';
 $locale['date_format'] = 'd/m/Y';
 $locale['long_date_format'] = 'd/m/Y';
 $locale['time_format'] = 'H:i';

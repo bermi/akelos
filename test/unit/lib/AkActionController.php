@@ -20,6 +20,10 @@ $partial_tests = array(
 'partials',
 'http_authentication',
 'model_instantiation',
+'page_caching',
+'action_caching',
+'sweeper',
+'respond_to_format'
 );
 
 foreach ($partial_tests as $partial_test){

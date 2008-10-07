@@ -86,6 +86,16 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 class AkObserver extends AkObject
 {
     /**
+     * Models in this array will automatically be observed
+     * 
+     * Example:
+     * 
+     * var $observe = array('Person','Car');
+     * 
+     * @var array
+     */
+    var $observe = array();
+    /**
     * $_observing array of models that we're observing
     */
     var $_observing = array();
@@ -101,6 +111,22 @@ class AkObserver extends AkObject
                 $this->setObservedModels($target);
             }
         }
+        $this->_initModelObserver();
+    }
+    
+    /**
+     * adds itself to the models which are listed
+     * in var $observe = array(...)
+     *
+     */
+    function _initModelObserver()
+    {
+        
+        $this->observe = Ak::toArray($this->observe);
+        if (count($this->observe)>0) {
+            $this->setObservedModels($this->observe);
+        }
+        
     }
     
     /**

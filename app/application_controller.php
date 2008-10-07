@@ -1,6 +1,6 @@
 <?php
 
-require_once(AK_LIB_DIR.DS.'AkActionController.php');
+require_once(AK_APP_DIR.DS.'base_action_controller.php');
 
 /**
 * This file is application-wide controller file. You can put all 
@@ -13,7 +13,7 @@ require_once(AK_LIB_DIR.DS.'AkActionController.php');
 * @subpackage Base
 */
 
-class ApplicationController extends AkActionController 
+class ApplicationController extends BaseActionController 
 {
 
 }

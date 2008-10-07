@@ -98,7 +98,91 @@ class AkCache extends AkObject
     * @var boolean true
     */
     var $cache_enabled = true;
-
+    
+    
+    /**
+     * Instantiates and configures the AkCache store.
+     * 
+     * If $options == NULL the configuration will be taken from the constants:
+     * 
+     * AK_CACHE_HANDLER and AK_CACHE_OPTIONS
+     * 
+     * if $options is of type string/int the $options parameter will be considered
+     * as the AK_CACHE_HANDLER_* Type (AK_CACHE_HANDLER_PEAR,AK_CACHE_HANDLER_ADODB,AK_CACHE_HANDLER_MEMCACHE)
+     * 
+     * if $options is an array of format:
+     * 
+     *   array('file'=>array('cacheDir'=>'/tmp'))
+     *   
+     *   or
+     * 
+     *   array(AK_CACHE_HANDLER_PEAR=>array('cacheDir'=>'/tmp'))
+     * 
+     *  the first key will be used as the AK_CACHE_HANDLER_* Type
+     *  and the array as the config options
+     * 
+     * Default behaviour is calling the method with the $options == null parameter:
+     * 
+     * AkCache::lookupStore()
+     * 
+     * Calling it with:
+     * 
+     * AkCache::lookupStore(true)
+     * 
+     * will return the configured $cache_store
+     *
+     * @param mixed $options
+     * @return mixed   false if no cache could be configured or AkCache instance
+     */
+    function &lookupStore($options = null)
+    {
+        static $cache_store;
+        $false = false;
+        if ($options === true && !empty($cache_store)) {
+            return $cache_store;
+        } else if (is_array($options) && 
+                   isset($options['enabled']) && $options['enabled']==true &&
+                   isset($options['handler']) &&
+                   isset($options['handler']['type'])) {
+            $type = $options['handler']['type'];
+            $options = isset($options['handler']['options'])?$options['handler']['options']:array();
+        } else if (is_string($options) || is_int($options)) {
+            $type = $options;
+            $options = array();
+        } else {
+            return $false;
+        }
+        $cache_store = new AkCache();
+        $cache_store->init($options,$type);
+        if ($cache_store->cache_enabled) {
+            return $cache_store;
+        }
+        return $false;
+    }
+    
+    function expandCacheKey($key, $namespace = null)
+    {
+        $expanded_cache_key = $namespace != null? $namespace : '';
+        if (isset($_ENV['AK_CACHE_ID'])) {
+            $expanded_cache_key .= DS . $_ENV['AK_CACHE_ID'];
+        } else if (isset($_ENV['AK_APP_VERSION'])) {
+            $expanded_cache_key .= DS . $_ENV['AK_APP_VERSION'];
+        }
+        
+        if (is_object($key) && method_exists($key,'cacheKey')) {
+            $expanded_cache_key .= DS . $key->cacheKey();
+        } else if (is_array($key)) {
+            foreach ($key as $idx => $v) {
+                $expanded_cache_key .= DS . $idx.'='.$v;
+            }
+        } else {
+            $expanded_cache_key .= DS . $key;
+        }
+        $regex = '|'.DS.'+|';
+        $expanded_cache_key = preg_replace($regex,DS, $expanded_cache_key);
+        $expanded_cache_key = rtrim($expanded_cache_key,DS);
+        return $expanded_cache_key;
+    }
     
     /**
     * Class constructor (ALA Akelos Framework)
@@ -146,9 +230,10 @@ class AkCache extends AkObject
     * - 0: No cache at all
     * - 1: File based cache using the folder defined at AK_CACHE_DIR or the system /tmp dir
     * - 2: Database based cache. This one has a performance penalty, but works on most servers
+    * - 3: Memcached - The fastest option
     * @return void
     */
-    function init($options = null, $cache_type = AK_CACHE_HANDLER)
+    function init($options = null, $cache_type = null)
     {
         $options = is_int($options) ? array('lifeTime'=>$options) : (is_array($options) ? $options : array());
 
@@ -159,18 +244,26 @@ class AkCache extends AkObject
                     require_once(AK_CONTRIB_DIR.'/pear/Cache_Lite/Lite.php');
                 }
                 if(!isset($options['cacheDir'])){
-                    if(!is_dir(AK_CACHE_DIR)){
-                        Ak::make_dir(AK_CACHE_DIR, array('base_path'=>AK_TMP_DIR));
-                    }
                     $options['cacheDir'] = AK_CACHE_DIR.DS;
+                } else {
+                    $options['cacheDir'].=DS;
+                }
+                 if(!is_dir($options['cacheDir'])){
+                    Ak::make_dir($options['cacheDir'], array('base_path'=>dirname($options['cacheDir'])));
                 }
                 $this->_driverInstance =& new Cache_Lite($options);
                 break;
             case 2:
-                $this->cache_enabled = true;
                 require_once(AK_LIB_DIR.'/AkCache/AkAdodbCache.php');
                 $this->_driverInstance =& new AkAdodbCache();
-                $this->_driverInstance->init($options);
+                $res = $this->_driverInstance->init($options);
+                $this->cache_enabled = $res;
+                break;
+            case 3:
+                require_once(AK_LIB_DIR.'/AkCache/AkMemcache.php');
+                $this->_driverInstance =& new AkMemcache();
+                $res = $this->_driverInstance->init($options);
+                $this->cache_enabled = $res;
                 break;
             default:
                 $this->cache_enabled = false;
@@ -245,7 +338,6 @@ class AkCache extends AkObject
     {
         return $this->cache_enabled ? $this->_driverInstance->clean($group, $mode) : true;
     }
-
 
 }
 

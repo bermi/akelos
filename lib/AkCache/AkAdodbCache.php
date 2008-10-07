@@ -199,6 +199,7 @@ class AkAdodbCache
             }
         }
         $this->_refreshTime = time() - $this->_lifeTime;
+        return $this->_db?true:false;
     }
 
     /**
@@ -262,7 +263,6 @@ class AkAdodbCache
         if($this->_automaticSerialization == true){
             $data = serialize($data);
         }
-
         // TODO replace with AkDbAdapter statement
         $ret = $this->_db->connection->Replace(
         'cache', array(
@@ -272,7 +272,7 @@ class AkAdodbCache
         'expire'=>$this->_db->quote_datetime(time() + $this->_lifeTime)),
         'id');
 
-        if($ret == 0){
+        if(!$ret){
             return false;
         }else{
             if($this->_memoryCaching){

@@ -1,3 +1,73 @@
+WARNING: IMPORTANT CHANGES AHEAD!
+
+Using this version requires you do manually add/change files/folders to existing applications.
+
+
+SVN
+
+[1185] Merging Caching Branch into trunk:
+
+New features:
+
+1. Configuration
+ 1.1. Yaml Configuration (see inline doc at: http://svn.akelos.org/trunk/lib/AkConfig.php)
+
+2. Caching (see inline doc at: http://svn.akelos.org/trunk/lib/AkActionController/AkCacheHandler.php)
+ 2.1 Memcache Cache Handler
+ 2.2 Page Caching
+ 2.3 Action Caching
+ 2.4 Fragment Caching
+ 2.5 Cache Sweepers
+
+3. ActiveRecord
+ 3.1 toXml (RoR style) (see inline doc at: http://svn.akelos.org/trunk/lib/AkActiveRecord.php)
+ 3.2 fromXml 
+ 3.3 toJson (RoR style) (see inline doc at: http://svn.akelos.org/trunk/lib/AkActiveRecord.php)
+ 3.4 fromJson
+ 3.5 AkDbSchemaCache
+
+4. ActionController
+ 4.1 respondToFormat (see inline doc at: http://svn.akelos.org/trunk/lib/AkActionController.php)
+
+5. Functional Testing (AkTestApplication) (see example usage in: http://svn.akelos.org/trunk/test/unit/lib/AkActionController/_page_caching.php)
+
+Refactoring / Improvements:
+
+6. Unit Testing Fixtures 
+
+class AkSomeTest extends AkUnitTest
+{
+/**
+ * grabs AK_BASE_DIR/test/fixtures/data/posts.yaml and inserts the data in the db
+ * example:
+ * 
+ * posts.yaml:
+ * entry1:
+ *    id: 1
+ *    name: test1
+ * entry2:
+ *    id: 2
+ *    name: test2
+ *
+ * model instances are available via $this->posts['entry1] and $this->posts['entry2]
+ */
+ var $fixtures = 'posts';
+    
+  ...
+}
+
+7. AkSession
+   
+  Session handling can now be configured via config/sessions.yml.
+  Besides file storage you can use Memcache or Db Storage for sessions.
+
+8. AkPluginInstaller
+
+
+
+-------
+
+
 SVN
 
 * [977]  Adding the Action Mailer framework, for sending emails from your Akelos application.

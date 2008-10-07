@@ -185,6 +185,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
     function &_setCollectionHandler($association_id, $handler_name)
     {
+        $false = false;
         if(isset($this->Owner->$association_id)){
             if(!is_array($this->Owner->$association_id)){
                 trigger_error(Ak::t('%model_name::%association_id is not a collection array on current %association_id hasAndBelongsToMany association',array('%model_name'=>$this->Owner->getModelName(), '%association_id'=>$association_id)), E_USER_NOTICE);
@@ -200,7 +201,7 @@ class AkHasAndBelongsToMany extends AkAssociation
             'is already defined and can\'t be used as an association placeholder',
             array('%model_name'=>$this->Owner->getModelName(),'%association_id'=>$association_id, '%handler_name'=>$handler_name)),
             E_USER_ERROR);
-            return false;
+            return $false;
         }else{
             $this->Owner->$handler_name =& new AkHasAndBelongsToMany($this->Owner);
         }

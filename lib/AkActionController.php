@@ -127,6 +127,8 @@ class AkActionController extends AkObject
 
     var $module_name;
     var $_module_path;
+    
+    var $_request_id = -1;
 
     /**
      * Old fashioned way of dispatching requests. Please use AkDispatcher or roll your own.
@@ -135,13 +137,16 @@ class AkActionController extends AkObject
      */
     function handleRequest()
     {
+
         AK_LOG_EVENTS && empty($this->_Logger) ? ($this->_Logger =& Ak::getLogger()) : null;
         AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->warning('Using deprecated request dispatcher AkActionController::handleRequest. Use  to AkDispatcher + AkDispatcher::dispatch instead.') : null;
         require_once(AK_LIB_DIR.DS.'AkDispatcher.php');
         $Dispatcher =& new AkDispatcher();
         $Dispatcher->dispatch();
     }
-
+    
+    
+    
     function process(&$Request, &$Response)
     {
         AK_LOG_EVENTS && empty($this->_Logger) ? ($this->_Logger =& Ak::getLogger()) : null;
@@ -149,9 +154,15 @@ class AkActionController extends AkObject
         $this->Request =& $Request;
         $this->Response =& $Response;
         $this->params = $this->Request->getParams();
-        $this->_action_name = $this->getActionName();
-        $this->_ensureActionExists();
+        $this->_action_name = $this->Request->getAction();
 
+        $actionExists = $this->_ensureActionExists();
+        
+        if (!$actionExists) {
+            $this->handleResponse();
+            return false;
+        }
+        
         Ak::t('Akelos'); // We need to get locales ready
 
         if($this->_high_load_mode !== true){
@@ -173,30 +184,131 @@ class AkActionController extends AkObject
         // After filters
         $this->afterFilter('_handleFlashAttribute');
 
+        $this->_initExtensions();
+
         $this->_loadActionView();
 
         if(isset($this->api)){
             require_once(AK_LIB_DIR.DS.'AkActionWebService.php');
             $this->aroundFilter(new AkActionWebService($this));
         }
-
+        
+        $this->_identifyRequest();
+        
+        
         $this->performActionWithFilters($this->_action_name);
 
-        if (!$this->_hasPerformed()){
-            $this->_enableLayoutOnRender ? $this->renderWithLayout() : $this->renderWithoutLayout();
-        }
-
-        if(!empty($this->validate_output)){
-            $this->_validateGeneratedXhtml();
-        }
-
-        $this->Response->outputResults();
+        
+        $this->handleResponse();
     }
-
+    
+    function _sendMimeContentType()
+    {
+        $this->Response->setContentTypeForFormat($this->Request->getFormat());
+    }
+    
+    /**
+     * Used to respond to multiple formats on the same action.
+     * The format gets detected by the requested file extension or the
+     * accept headers.
+     * 
+     * Example 1:
+     * If you need to perform some calculations inste
+     * ----
+     * 
+     * function listing()
+     * {
+     *    $this->listings = $this->listing->find(..);
+     *    if (!$this->respondToFormat()) {
+     *        // default html response here
+     *    }
+     * }
+     * // handles action listing in format xml
+     * function _handleListingAsXml()
+     * {
+     *    $this->renderText($this->listing->toXml($this->listings));
+     * }
+     * 
+     * 
+     * Example 2:
+     * If you just render a standard template by default
+     * 
+     * function listing()
+     * {  
+     *    // if its the standard format it will render the template post.tpl
+     *    $this->respondToFormat();
+     * }
+     * // handles action listing in format xml
+     * function _handleListingAsXml()
+     * {
+     *    $this->renderText($this->listing->toXml($this->listings));
+     * }
+     *
+     * @param array $options
+     * @return boolean true if there is a format action, false if not
+     */
+    function respondToFormat($options = array())
+    {
+        $default_options = array('default'=>'html');
+        
+        $options = array_merge($default_options,$options);
+        
+        $format = $this->Request->getFormat();
+        $action = $this->getActionName();
+        $formatAction = '_handle'.$action.'As'.ucfirst($format);
+        $isDefaultAction = $format == null || $format == $options['default'];
+        $formatActionExists = method_exists($this,$formatAction);
+        if (!$formatActionExists && !$isDefaultAction) {
+            $this->renderText('404 Not found',404);
+            
+        }
+        if (!$isDefaultAction && $formatActionExists) {
+                $this->performActionWithoutFilters($formatAction);
+                return true;
+        }
+        return false;
+    }
+    
+    function _identifyRequest()
+    {
+        if (AK_ENVIRONMENT != 'testing') {
+            /**
+             * for AkTestApplication we need to identify if handleResponse rendered
+             * the output already.
+             * Since AkTestApplication performs multiple requests
+             * on one instance of AkActionController, each Request needs
+             * to be identified separately
+             */
+            $this->_request_id++;
+        } else {
+            $this->_request_id = md5(time().microtime(true).rand(0,10000));
+        }
+    }
+    function handleResponse()
+    {
+        static $handled;
+        if (empty($handled)) {
+            $handled = array();
+        }
+        if (!isset($handled[$this->_request_id])) {
+            if (!$this->_hasPerformed()){
+                $this->_enableLayoutOnRender ? $this->renderWithLayout() : $this->renderWithoutLayout();
+            }
+            $this->_sendMimeContentType();
+            if(!empty($this->validate_output)){
+                $this->_validateGeneratedXhtml();
+            }
+            if (!isset($this->Response->_headers['Status']) && !empty($this->_default_render_status_code)) {
+                $this->Response->_headers['Status'] = $this->_default_render_status_code;
+            }
+            $this->Response->outputResults();
+            $handled[$this->_request_id]=true;
+        }
+    }
+    
     function _loadActionView()
     {
         empty($this->_assigns) ? ($this->_assigns = array()) : null;
-        empty($this->_default_render_status_code) ? ($this->_default_render_status_code = 200) : null;
         $this->_enableLayoutOnRender = !isset($this->_enableLayoutOnRender) ? true : $this->_enableLayoutOnRender;
         $this->passed_args = !isset($this->Request->pass)? array() : $this->Request->pass;
         empty($this->cookies) && isset($_COOKIE) ? ($this->cookies =& $_COOKIE) : null;
@@ -258,7 +370,7 @@ class AkActionController extends AkObject
         return array();
     }
 
-
+    
     function _validateGeneratedXhtml()
     {
         require_once(AK_LIB_DIR.DS.'AkXhtmlValidator.php');
@@ -298,7 +410,7 @@ class AkActionController extends AkObject
         $models = array_unique(array_merge(Ak::import($this->model), Ak::import($this->models), Ak::import($models), (empty($this->app_models)?array(): Ak::import($this->app_models))));
 
         unset($this->model, $this->models);
-
+        
         foreach ($models as $model){
             $this->instantiateModelClass($model, (empty($this->finder_options[$model])?array():$this->finder_options[$model]));
         }
@@ -307,10 +419,10 @@ class AkActionController extends AkObject
     function instantiateModelClass($model_class_name, $finder_options = array())
     {
         $underscored_model_class_name = AkInflector::underscore($model_class_name);
-        $controller_name = $this->getControllerName();
+        $controller_name = isset($this->controller_name)?$this->controller_name:$this->getControllerName();
         $id = empty($this->params[$underscored_model_class_name]['id']) ?
         (empty($this->params['id']) ? false :
-        (($model_class_name == $controller_name || $model_class_name == AkInflector::singularize($controller_name)) ? $this->params['id'] : false)) :
+        (($model_class_name == $controller_name || $model_class_name == $this->singularized_controller_name) ? $this->params['id'] : false)) :
         $this->params[$underscored_model_class_name]['id'];
 
         if(class_exists($model_class_name)){
@@ -478,7 +590,9 @@ class AkActionController extends AkObject
             $this->_doubleRenderError(Ak::t("Can only render or redirect once per action"));
             return false;
         }
-
+        /**
+         * need to check this with the caching!!!
+         */
         $this->_flash_handled ? null : $this->_handleFlashAttribute();
 
         if(!is_array($options)){
@@ -562,7 +676,9 @@ class AkActionController extends AkObject
     function renderText($text = null, $status = null)
     {
         $this->performed_render = true;
-        $this->Response->_headers['Status'] = !empty($status) ? $status : $this->_default_render_status_code;
+        if($status != null) {
+            $this->Response->_headers['Status'] = $status;
+        }
         $this->Response->body = $text;
         return $text;
     }
@@ -746,6 +862,7 @@ class AkActionController extends AkObject
             }
             $controller_name = substr($current_class_name,0,-10);
             $this->controller_name = $this->_removeModuleNameFromControllerName($controller_name);
+            $this->singularized_controller_name = AkInflector::singularize($this->controller_name);
         }
         return $this->controller_name;
     }
@@ -2717,30 +2834,144 @@ class AkActionController extends AkObject
 
     function _ensureActionExists()
     {
-        $action = $this->getActionName();
-        if(!method_exists($this, $action) || $this->_isActionForbidden()){
-            if(AK_ENVIRONMENT == 'development'){
-                AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->error('Action '.$action.' not found on '.$this->getControllerName()) : null;
-                trigger_error(Ak::t('Controller <i>%controller_name</i> can\'t handle action %action_name',
-                array(
-                '%controller_name' => $this->getControllerName(),
-                '%action_name' => $action,
-                )), E_USER_ERROR);
-            }elseif(@include(AK_PUBLIC_DIR.DS.'405.php')){
-                exit;
-            }else{
-                header("HTTP/1.1 405 Method Not Allowed");
-                die('405 Method Not Allowed');
-            }
+        if(!method_exists($this, $this->getActionName()) || $this->_isActionForbidden()){
+            return $this->_renderActionNotExists();
+        }
+        return true;
+    }
+    
+    function _renderActionNotExists()
+    {
+        if(AK_ENVIRONMENT == 'development'){
+            AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->error('Action '.$this->_action_name.' not found on '.$this->getControllerName()) : null;
+            trigger_error(Ak::t('Controller <i>%controller_name</i> can\'t handle action %action_name',
+            array(
+            '%controller_name' => $this->getControllerName(),
+            '%action_name' => $this->_action_name,
+            )), E_USER_ERROR);
+            return true;
+        }elseif(@include(AK_PUBLIC_DIR.DS.'405.php')){
+            return false;
+        }else{
+            $this->Response->addHeader('Status',405);//("HTTP/1.1 405 Method Not Allowed");
+            $this->renderText('405 Method Not Allowed');
+            return false;
         }
     }
-
     function _isActionForbidden()
     {
         $methods = get_class_methods('AkActionController');
         $action = $this->getActionName();
         return empty($action) || in_array($action , $methods) || $action != AkInflector::underscore($action) || $action[0] == '_';
     }
+    /**
+     * ########################################################################
+     * #
+     * #               Modules
+     * #
+     * ########################################################################
+     */
+    
+    function _initExtensions()
+    {
+        
+         $this->_initCacheHandler();
+        
+        //$this->_registerModule('caching','AkActionControllerCaching','AkActionController/Caching.php');
+    }
+    function _initCacheHandler() 
+    { 
+        // TODOARNO
+        $cache_settings = Ak::getSettings('caching', false);
+        if ($cache_settings['enabled']) {
+            $null = null;
+            require_once(AK_LIB_DIR . DS . 'AkActionController' . DS . 'AkCacheHandler.php');
+            $this->_CacheHandler =& Ak::singleton('AkCacheHandler', $null);
+            $this->_CacheHandler->init(&$this);
+        }
+    }
+    function getAppliedCacheType()
+    {
+        if ($this->cacheConfigured()) {
+            return $this->_CacheHandler->getCacheType();
+        }
+        return null;
+    }
+    /**
+     * ########################################################################
+     * #
+     * #               START Module: AkActionControllerCaching
+     * #
+     * ########################################################################
+     */
+    function cacheConfigured()
+    {
+        if (!isset($this->_CacheHandler)) return false;
+        return $this->_CacheHandler->cacheConfigured();
+    }
+    function cachePage($content, $path = null)
+    {
+        if (!isset($this->_CacheHandler)) return false;
+        return $this->_CacheHandler->cachePage($content, $path);
+    }
+    
+    function getCachedPage($path = null, $lang = null)
+    {
+        if (!isset($this->_CacheHandler)) return false;
+        return $this->_CacheHandler->getCachedPage($path, $lang);
+    }
+    
+    function expirePage($options)
+    {
+        if (!isset($this->_CacheHandler)) return false;
+        return $this->_CacheHandler->expirePage($options);
+    }
+    function fragmentCacheKey($key)
+    {
+        if (!isset($this->_CacheHandler)) return false;
+        return $this->_CacheHandler->fragmentCacheKey($key);
+    }
+    function cacheTplFragmentStart($key, $options = array())
+    {
+        if (!isset($this->_CacheHandler)) return false;
+        return $this->_CacheHandler->cacheTplFragmentStart($key, $options);
+    }
+    
+    function cacheTplFragmentEnd($key, $options = array())
+    {
+        if (!isset($this->_CacheHandler)) return false;
+        return $this->_CacheHandler->cacheTplFragmentEnd($key, $options);
+    }
+    
+    function writeFragment($key, $content, $options = array())
+    {
+        if (!isset($this->_CacheHandler)) return false;
+        return $this->_CacheHandler->writeFragment($key,$content, $options);
+    }
+    
+    function readFragment($key, $options = array())
+    {
+        if (!isset($this->_CacheHandler)) return false;
+        return $this->_CacheHandler->readFragment($key,$options);
+    }
+    
+    function expireFragment($key, $options = array())
+    {
+        if (!isset($this->_CacheHandler)) return false;
+        return $this->_CacheHandler->expireFragment($key,$options);
+    }
+    function expireAction($options = array())
+    {
+        if (!isset($this->_CacheHandler)) return false;
+        return $this->_CacheHandler->expireAction($options);
+    }
+    /**
+     * ########################################################################
+     * #
+     * #               END Module: AkActionControllerCaching
+     * #
+     * ########################################################################
+     */
 }
 
 

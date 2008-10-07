@@ -620,7 +620,7 @@ class TextHelper extends AkObject
             return '';
         }
 
-        $flash_message = TagHelper::content_tag('div', $close_button.$message,$html_options);
+        $flash_message = '<!--CACHE-SKIP-START-->'.TagHelper::content_tag('div', $close_button.$message.'-test',$html_options).'<!--CACHE-SKIP-END-->';
 
         if ($options['animate']) {
             $animation_effects = '';

@@ -5,7 +5,6 @@ require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
 require_once(AK_LIB_DIR.DS.'AkInflector.php');
 
-
 class Test_of_AkInflector extends  UnitTestCase
 {
     var $SingularToPlural = array(
@@ -313,6 +312,21 @@ class Test_of_AkInflector extends  UnitTestCase
         $this->assertEqual(AkInflector::toControllerFilename('admin'), AK_CONTROLLERS_DIR.DS.'admin_controller.php');
         $this->assertEqual(AkInflector::toControllerFilename('user_authentication'), AK_CONTROLLERS_DIR.DS.'user_authentication_controller.php');
         $this->assertEqual(AkInflector::toControllerFilename('admin/users'), AK_CONTROLLERS_DIR.DS.'admin'.DS.'users_controller.php');
+    }
+    function test_singularize_singular()
+    {
+        $this->assertEqual('resize',AkInflector::singularize('resize'));
+    }
+    function test_simple_tableize()
+    {
+        $this->assertEqual('Pictures',AkInflector::pluralize('Picture'));
+        $this->assertEqual('pictures',AkInflector::tableize('picture'));
+    }
+    function test_spanish_dictionary()
+    {
+        $this->assertNotEqual('tijeras',AkInflector::singularize('tijeras'));
+        $this->assertEqual('tijeras',AkInflector::singularize('tijeras',null,'es'));
+        $this->assertEqual('ingleses',AkInflector::pluralize('inglés',null,'es'));
     }
 }
 

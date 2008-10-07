@@ -30,7 +30,7 @@ $command = strtolower(array_shift($argv));
 array_unshift($argv, $script_name);
 $_SERVER['argv'] = $argv;
 
-$available_commands = array('list', 'sources', 'source', 'unsource', 'discover', 'install', 'update', 'remove', 'info');
+$available_commands = array('test','list', 'sources', 'source', 'unsource', 'discover', 'install', 'update', 'remove', 'info');
 
 if(!in_array($command, $available_commands)){
     echo <<<BANNER
@@ -48,6 +48,7 @@ COMMANDS
   source     Add a plugin source repository.
   unsource   Remove a plugin repository.
   sources    List currently configured plugin repositories.
+  test       Run the unit tests for the plugin
 
 
 EXAMPLES
@@ -81,6 +82,9 @@ EXAMPLES
 
   Show currently configured repositories:
     {$script_name} sources
+    
+  Test a plugin
+    {$script_name} test acts_as_versioned
 
 BANNER;
     exit;
@@ -427,4 +431,23 @@ if($command == 'info') {
     die("\n");
 }
 
+if($command == 'test') {
+     $options = get_console_options_for('Test plugin', array(CONSOLE_GETARGS_PARAMS=>array('min'=>1,'max'=>1,'short' => 'p', 'desc' =>  "Specify the plugin name you wish to test"),'phpbin'=>array('short'=>'b','max'=>1,'min'=>1,'desc'=>'Path to the php binary','default'=>'/usr/bin/env php')));
+
+    if(empty($options['parameters'])){
+        die("You must supply a plugin name.\n");
+    }
+    $plugin = $options['parameters'];
+    $plugin_name = basename($plugin);
+
+    $test_file = AK_PLUGINS_DIR.DS.$plugin_name.DS.'test'.DS.$plugin_name.'.php';
+    if (file_exists($test_file)) {
+        $exec_command = $options['phpbin'].' '.$test_file;
+        passthru($exec_command);
+    } else {
+        echo "The test file $test_file does not exist.";
+        die("\n");
+    }
+    
+}
 ?>

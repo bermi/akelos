@@ -49,7 +49,7 @@ class AkDbAdapter extends AkObject
     {
     }
 
-    function connect()
+    function connect($die_on_error=true)
     {
         $dsn = $this->_constructDsn($this->settings);
         require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb.inc.php');
@@ -65,7 +65,7 @@ class AkDbAdapter extends AkObject
             }
             trigger_error(Ak::t("Connection to the database failed. %dsn",
             array('%dsn'=> AK_DEBUG ? preg_replace('/\/\/(\w+):(.*)@/i','//$1:******@', urldecode($dsn))."\n" : '')),
-            E_USER_ERROR);
+            ($die_on_error?E_USER_ERROR:E_USER_WARNING));
         } else {
             $this->connection->debug = AK_DEBUG == 2;
             $this->connection->SetFetchMode(ADODB_FETCH_ASSOC);
@@ -91,22 +91,34 @@ class AkDbAdapter extends AkObject
         $settings_hash = is_string($database_specifications) ? $database_specifications : AkDbAdapter::_hash($database_specifications);
 
         if (empty($connections[$settings_hash])){
-            global $database_settings;
-            if (is_string($database_specifications)){
-                if (!empty($database_settings[$database_specifications])){
-                    $database_specifications = $database_settings[$database_specifications];
+            if (empty($database_specifications)) {
+                $settings_hash = AK_ENVIRONMENT;
+                $database_specifications = Ak::getSettings('database',false,$settings_hash);
+            } else if (is_string($database_specifications)){
+                $environment_settings = Ak::getSettings('database',false,$database_specifications);
+                if (!empty($environment_settings)){
+                    $database_specifications = $environment_settings;
                 } elseif(strstr($database_specifications, '://')) {
                     $database_specifications = AkDbAdapter::_getDbSettingsFromDsn($database_specifications);
                     $settings_hash = AK_ENVIRONMENT;
                 } else {
-                    trigger_error(Ak::t("Could not find the database profile '%profile_name' in config/config.php.",array('%profile_name'=>$database_specifications)),E_USER_ERROR);
+                    global $database_settings;
+                    if (isset($database_settings) && !file_exists(AK_CONFIG_DIR.DS.'database.yml')) {
+                        trigger_error(Ak::t("You are still using the old config/config.php database configuration. Please upgrade to use the config/database.yml configuration."), E_USER_NOTICE);
+                    } 
+                    if (!file_exists(AK_CONFIG_DIR.DS.'database.yml')) {
+                        trigger_error(Ak::t("Could not find the database configuration file in %dbconfig.",array('%dbconfig'=>AK_CONFIG_DIR.DS.'database.yml')),E_USER_ERROR);
+                    } else {
+                        trigger_error(Ak::t("Could not find the database profile '%profile_name' in config/database.yml.",array('%profile_name'=>$database_specifications)),E_USER_ERROR);
+                    }
+                    
+                    
                     $return = false;
                     return $return;
                 }
             }elseif (!empty($database_settings[$settings_hash])){
                 $database_specifications = $database_settings[$settings_hash];
             }
-
             $available_adapters = Ak::toArray(AK_AVAILABLE_DATABASES);
             $class_name = 'AkDbAdapter';
             $designated_database = strtolower($database_specifications['type']);
@@ -356,16 +368,32 @@ class AkDbAdapter extends AkObject
 
     /* META */
 
+    /**
+     * caching the meta info
+     *
+     * @return unknown
+     */
     function availableTables()
     {
         return $this->connection->MetaTables();
     }
-
+    /**
+     * caching the meta info
+     *
+     * @param unknown_type $table_name
+     * @return unknown
+     */
     function getColumnDetails($table_name)
     {
         return $this->connection->MetaColumns($table_name);
     }
 
+    /**
+     * caching the meta info
+     *
+     * @param unknown_type $table_name
+     * @return unknown
+     */
     function getIndexes($table_name)
     {
         return $this->connection->MetaIndexes($table_name);

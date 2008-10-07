@@ -164,7 +164,8 @@ class EstraierPure_Document
             $lines = explode("\n", $draft);
             $num = 0;
             $len = count($lines);
-            while ($num < $len) {
+            $line = ' ';
+            while ($num< $len) {
                 $num++;
                 if (strlen($line) == 0) {
                     break;
@@ -183,7 +184,7 @@ class EstraierPure_Document
                 }
                 $line = EstraierPure_Utility::sanitize($lines[$num]);
                 if (strpos($line, '=')) {
-                    list($key, $value) = explode(' ', $line);
+                    @list($key, $value) = explode(' ', $line);
                     $this->attrs[$key] = $value;
                 }
             }
@@ -457,6 +458,9 @@ class EstraierPure_Condition
      */
     var $order;
 
+    
+    var $skip;
+    
     /**
      * The maximum number of retrieval
      *
@@ -506,6 +510,14 @@ class EstraierPure_Condition
             array($phrase, 'string')
         );
         $this->phrase = EstraierPure_Utility::sanitize($phrase);
+        $phrase = $this->phrase;
+        $parts = split(' ',$phrase);
+        foreach($parts as $idx=>$part) {
+            $part = preg_replace('/^(.*?)\*$/','[BW] \\1',$part);
+            $part = preg_replace('/^\*(.*?)$/','[EW] \\1',$part);
+            $parts[$idx]=$part;
+        }
+        $this->phrase=implode(' ',$parts);
     }
 
     /**
@@ -520,7 +532,7 @@ class EstraierPure_Condition
         ESTRAIERPURE_DEBUG && EstraierPure_Utility::check_types(
             array($expr, 'string')
         );
-        $this->attr[] = EstraierPure_Utility::sanitize($expr);
+        $this->attrs[] = EstraierPure_Utility::sanitize($expr);
     }
 
     /**
@@ -538,7 +550,13 @@ class EstraierPure_Condition
         );
         $this->order = EstraierPure_Utility::sanitize($order);
     }
-
+    function set_skip($skip)
+    {
+        ESTRAIERPURE_DEBUG && EstraierPure_Utility::check_types(
+            array($skip, 'integer')
+        );
+        $this->skip = EstraierPure_Utility::sanitize($skip);
+    }
     /**
      * Set the maximum number of retrieval.
      *
@@ -625,7 +643,10 @@ class EstraierPure_Condition
     {
         return $this->max;
     }
-
+    function skip()
+    {
+        return $this->skip;
+    }
     /**
      * Get options of retrieval.
      *
@@ -1068,7 +1089,7 @@ class EstraierPure_Node
 
     // }}}
     // {{{ setter methods
-
+        
     /**
      * Set the URL of a node server.
      *
@@ -2170,11 +2191,14 @@ class EstraierPure_Utility
         }
         if ($attrs = $cond->attrs()) {
             foreach ($attrs as $i => $attr) {
-                $params['attrs' . ($i + 1)] = $attr;
+                $params['attr' . ($i + 1)] = $attr;
             }
         }
         if ($order = $cond->order()) {
             $params['order'] = $order;
+        }
+        if ($skip = $cond->skip()) {
+            $params['skip'] = $skip;
         }
         $params['max'] = (($max = $cond->max()) > 0) ? $max : 1 << 30;
         if (($options = $cond->options()) > 0) {
@@ -2186,8 +2210,17 @@ class EstraierPure_Utility
         $params['wwidth'] = $wwidth;
         $params['hwidth'] = $hwidth;
         $params['awidth'] = $awidth;
+        $params['nomask0']='on';
+        $params['allmask']='on';
         $query = '';
         foreach ($params as $key => $value) {
+            $trimmedvalue = trim($value);
+            if (preg_match('/^(.*?)\*$/',$trimmedvalue, $matches)) {
+                $value = '[BW] '.$matches[1];
+            } else if (preg_match('/^\*(.*?)$/',$trimmedvalue, $matches)) {
+                $value = '[EW] '.$matches[1];
+            }
+            
             $query .= sprintf('&%s=%s', urlencode($key), urlencode($value));
         }
         $query = substr($query, 1);

@@ -1,0 +1,10 @@
+#!/usr/bin/env php
+<?php
+defined('DS')?null:define('DS',DIRECTORY_SEPARATOR);
+error_reporting(E_ALL);
+$argv = array_map('trim',$argv);
+array_shift($argv);
+$tests_dir = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'test');
+require_once(dirname(__FILE__).DS.'..'.DS.'lib'.DS.'utils'.DS.'scripts'.DS.'ci-test.php');
+
+?>

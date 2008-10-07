@@ -58,9 +58,9 @@ class AkHelperLoader extends AkObject
     {
         foreach ($helpers as $file=>$helper){
             $helper_class_name = AkInflector::camelize(AkInflector::demodulize(strstr($helper, 'Helper') ? $helper : $helper.'Helper'));
-
+            $helper_file_name = AkInflector::underscore($helper_class_name);
             if(is_int($file)){
-                $file = AK_HELPERS_DIR.DS.AkInflector::underscore($helper_class_name).'.php';
+                $file = AK_HELPERS_DIR.DS.$helper_file_name.'.php';
             }
 
             $full_path = preg_match('/[\\\\\/]+/',$file);
@@ -70,7 +70,7 @@ class AkHelperLoader extends AkObject
             }
             
             if(class_exists($helper_class_name)){
-                $attribute_name = $full_path ? AkInflector::underscore($helper_class_name) : substr($file,0,-4);
+                $attribute_name = $full_path ? $helper_file_name : substr($file,0,-4);
                 $this->_Handler->$attribute_name =& new $helper_class_name(&$this->_Handler);
                 if(method_exists($this->_Handler->$attribute_name,'setController')){
                     $this->_Handler->$attribute_name->setController(&$this->_Handler);
@@ -120,13 +120,13 @@ class AkHelperLoader extends AkObject
 
     function getHelperNames()
     {
-        $helpers = $this->getDefaultHandlerHelperNames();
-        $helpers = array_merge($helpers, $this->getApplicationHelperNames());
-        $helpers = array_merge($helpers, $this->getPluginHelperNames());
+        //$helpers = $this->getDefaultHandlerHelperNames();
+        $helpers = array_merge($this->getDefaultHandlerHelperNames(), $this->getApplicationHelperNames(), $this->getPluginHelperNames());
+        //$helpers = array_merge($helpers, $this->getPluginHelperNames());
 
         if(!empty($this->_Controller)){
-            $helpers = array_merge($helpers, $this->_Controller->getModuleHelper());
-            $helpers = array_merge($helpers, $this->_Controller->getCurrentControllerHelper());
+            $helpers = array_merge($helpers, $this->_Controller->getModuleHelper(), $this->_Controller->getCurrentControllerHelper());
+            //$helpers = array_merge($helpers, $this->_Controller->getCurrentControllerHelper());
         }
 
         return $helpers;

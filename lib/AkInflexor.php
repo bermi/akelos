@@ -14,6 +14,7 @@
  * @author Bermi Ferrer <bermi a.t akelos c.om>
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
+ * @deprecated use AkInflector::pluralize('país',null,'es') to use spanish dictionary in (config/inflector/es.yml)
  */
 
 require_once(AK_LIB_DIR.DS.'AkInflector.php');

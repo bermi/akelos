@@ -25,6 +25,10 @@ class AkResponse extends AkObject
     var $body = '';
     var $__Logger;
     
+    var $_output_flushed = false;
+    
+    var $_default_status = 200;
+    
     function set($data, $id = null)
     {
         if(isset($id)){
@@ -58,7 +62,15 @@ class AkResponse extends AkObject
             $this->_headers[] = $args[0];
         }
     }
-
+    function setContentTypeForFormat($format)
+    {
+        if (!empty($format)) {
+            $mime_type = Ak::mime_content_type('file.'.$format);
+            if (!empty($mime_type)) {
+                $this->addHeader('Content-Type', $mime_type);
+            }
+        }
+    }
     function outputResults()
     {
         $this->sendHeaders();
@@ -70,7 +82,10 @@ class AkResponse extends AkObject
             echo $this->body;
         }
     }
-
+    function getStatus()
+    {
+        return isset($this->_headers['Status'])?$this->_headers['Status']:$this->_default_status;
+    }
     function sendHeaders($terminate_if_redirected = true)
     {
         /**
@@ -84,11 +99,14 @@ class AkResponse extends AkObject
         if(isset($this->_headers['Cache-Control']) && $this->_headers['Cache-Control'] == 'no-cache'){
             $this->_headers['Cache-Control'] = 'private';
         }
-        if(!empty($this->_headers['Status'])){
-            $status = $this->_getStatusHeader($this->_headers['Status']);
-            array_unshift($this->_headers,  $status ? $status : (strstr('HTTP/1.1 '.$this->_headers['Status'],'HTTP') ? $this->_headers['Status'] : 'HTTP/1.1 '.$this->_headers['Status']));
-            unset($this->_headers['Status']);
+        if (empty($this->_headers['Status'])) {
+            $this->_headers['Status'] = $this->_default_status;
         }
+
+        $status = $this->_getStatusHeader($this->_headers['Status']);
+        array_unshift($this->_headers,  $status ? $status : (strstr('HTTP/1.1 '.$this->_headers['Status'],'HTTP') ? $this->_headers['Status'] : 'HTTP/1.1 '.$this->_headers['Status']));
+        unset($this->_headers['Status']);
+
         
         if(!empty($this->_headers) && is_array($this->_headers)){
             $this->addHeader('Connection: close');
@@ -121,7 +139,10 @@ class AkResponse extends AkObject
         
         $terminate_if_redirected ? (!empty($_redirected) ? exit() : null) : null;
     }
-    
+    function addSentHeader($header)
+    {
+        $this->_headers_sent[] = $header;
+    }
     function deleteHeader($header)
     {
         unset($this->_headers[$header]);

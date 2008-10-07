@@ -272,6 +272,8 @@ class AkInstaller
      */
     function addColumn($table_name, $column_details)
     {
+        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
+        AkDbSchemaCache::clear($table_name);
         $this->timestamps = false;
         $column_details = $this->_getColumnsAsAdodbDataDictionaryString($column_details);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->AddColumnSQL($table_name, $column_details));
@@ -279,6 +281,8 @@ class AkInstaller
 
     function changeColumn($table_name, $column_details)
     {
+        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
+        AkDbSchemaCache::clear($table_name);
         $this->timestamps = false;
         $column_details = $this->_getColumnsAsAdodbDataDictionaryString($column_details);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->AlterColumnSQL($table_name, $column_details));
@@ -286,11 +290,15 @@ class AkInstaller
 
     function removeColumn($table_name, $column_name)
     {
+        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
+        AkDbSchemaCache::clear($table_name);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->DropColumnSQL($table_name, $column_name));
     }
 
     function renameColumn($table_name, $old_column_name, $new_column_name)
     {
+        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
+        AkDbSchemaCache::clear($table_name);
         return $this->db->renameColumn($table_name, $old_column_name, $new_column_name);
     }
 
@@ -308,6 +316,8 @@ class AkInstaller
 
     function _createOrModifyTable($table_name, $column_options = null, $table_options = array())
     {
+        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
+        AkDbSchemaCache::clear($table_name);
         if(empty($column_options) && $this->_loadDbDesignerDbSchema()){
             $column_options = $this->db_designer_schema[$table_name];
         }elseif(empty($column_options)){
@@ -358,6 +368,8 @@ class AkInstaller
 
     function dropTable($table_name, $options = array())
     {
+        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
+        AkDbSchemaCache::clear(AkInflector::classify($table_name));
         $result = $this->tableExists($table_name) ? $this->db->execute('DROP TABLE '.$table_name) : true;
         if($result){
             unset($this->available_tables[array_search($table_name, $this->available_tables)]);
@@ -393,6 +405,8 @@ class AkInstaller
 
     function removeIndex($table_name, $columns_or_index_name)
     {
+        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
+        AkDbSchemaCache::clear($table_name);
         if(!$this->tableExists($table_name)){
             return false;
         }
@@ -407,11 +421,15 @@ class AkInstaller
 
     function dropIndex($table_name, $columns_or_index_name)
     {
+        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
+        AkDbSchemaCache::clear($table_name);
         return $this->removeIndex($table_name,$columns_or_index_name);
     }
 
     function createSequence($table_name)
     {
+        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
+        AkDbSchemaCache::clear($table_name);
         $result = $this->tableExists('seq_'.$table_name) ? false : $this->db->connection->CreateSequence('seq_'.$table_name);
         $this->available_tables[] = 'seq_'.$table_name;
         return $result;
@@ -419,6 +437,8 @@ class AkInstaller
 
     function dropSequence($table_name)
     {
+        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
+        AkDbSchemaCache::clear($table_name);
         $result = $this->tableExists('seq_'.$table_name) ? $this->db->connection->DropSequence('seq_'.$table_name) : true;
         if($result){
             unset($this->available_tables[array_search('seq_'.$table_name, $this->available_tables)]);

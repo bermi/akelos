@@ -281,44 +281,6 @@ class FrameworkSetup extends AkObject
         $configuration_template = <<<CONFIG
 <?php
 
-\$database_settings = array(
-    'production' => array(
-        'type' => '%production_database_type', // mysql, sqlite or pgsql
-        'database_file' => '%production_database_file', // you only need this for SQLite
-        'host' => '%production_database_host',
-        'port' => '',
-        'database_name' => '%production_database_name',
-        'user' => '%production_database_user',
-        'password' => '%production_database_password',
-        'options' => '' // persistent, debug, fetchmode, new
-    ),
-    
-    'development' => array(
-        'type' => '%development_database_type',
-        'database_file' => '%development_database_file',
-        'host' => '%development_database_host',
-        'port' => '',
-        'database_name' => '%development_database_name',
-        'user' => '%development_database_user',
-        'password' => '%development_database_password',
-        'options' => ''
-    ),
-    
-    // Warning: The database defined as 'testing' will be erased and
-    // re-generated from your development database when you run './script/test app'.
-    // Do not set this db to the same as development or production.
-    'testing' => array(
-        'type' => '%testing_database_type',
-        'database_file' => '%testing_database_file',
-        'host' => '%testing_database_host',
-        'port' => '',
-        'database_name' => '%testing_database_name',
-        'user' => '%testing_database_user',
-        'password' => '%testing_database_password',
-        'options' => ''
-    )
-);
-
 // If you want to write/delete/create files or directories using ftp instead of local file
 // access, you can set an ftp connection string like:
 // \$ftp_settings = 'ftp://username:password@example.com/path/to_your/base/dir';
@@ -348,6 +310,8 @@ include_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'boot.php');
 
 ?>
 CONFIG;
+
+
         if(empty($settings)){
             $settings = array();
             foreach (array('production','development','testing') as $mode){
@@ -381,7 +345,70 @@ CONFIG;
         return str_replace(array_keys($settings), array_values($settings), $configuration_template);
 
     }
+    function getDatabaseConfigurationFile($settings = array())
+    {
 
+        $configuration_template = <<<CONFIG
+production:
+        type: %production_database_type
+        database_file: %production_database_file
+        host: %production_database_host
+        port: 
+        database_name: %production_database_name
+        user: %production_database_user
+        password: %production_database_password
+        options: 
+
+    
+development:
+        type: %development_database_type
+        database_file: %development_database_file
+        host: %development_database_host
+        port: 
+        database_name: %development_database_name
+        user: %development_database_user
+        password: %development_database_password
+        options: 
+    
+# Warning: The database defined as 'testing' will be erased and
+# re-generated from your development database when you run './script/test app'.
+# Do not set this db to the same as development or production.
+testing:
+        type: %testing_database_type
+        database_file: %testing_database_file
+        host: %testing_database_host
+        port:
+        database_name: %testing_database_name
+        user: %testing_database_user
+        password: %testing_database_password
+        options:
+
+CONFIG;
+        if(empty($settings)){
+            $settings = array();
+            foreach (array('production','development','testing') as $mode){
+                $settings['%'.$mode.'_database_type'] = $this->getDatabaseType($mode);
+                if($settings['%'.$mode.'_database_type'] == 'sqlite'){
+
+                    $settings['%'.$mode.'_database_file'] = AK_CONFIG_DIR.DS.$this->getDatabaseName($mode).'-'.$this->random.'.sqlite';
+                    $settings['%'.$mode.'_database_user'] =
+                    $settings['%'.$mode.'_database_password'] =
+                    $settings['%'.$mode.'_database_host'] =
+                    $settings['%'.$mode.'_database_name'] = '';
+                }else{
+                    $settings['%'.$mode.'_database_user'] = $this->getDatabaseUser($mode);
+                    $settings['%'.$mode.'_database_password'] = $this->getDatabasePassword($mode);
+                    $settings['%'.$mode.'_database_host'] = $this->getDatabaseHost($mode);
+                    $settings['%'.$mode.'_database_name'] = $this->getDatabaseName($mode);
+                    $settings['%'.$mode.'_database_file'] = '';
+                }
+            }
+
+        }
+
+        return str_replace(array_keys($settings), array_values($settings), $configuration_template);
+
+    }
     function writeConfigurationFile($configuration_details)
     {
         if($this->canWriteConfigurationFile()){
@@ -389,7 +416,13 @@ CONFIG;
         }
         return false;
     }
-
+    function writeDatabaseConfigurationFile($configuration_details)
+    {
+        if($this->canWriteDbConfigurationFile()){
+            return Ak::file_put_contents(AK_CONFIG_DIR.DS.'database.yml', $configuration_details);
+        }
+        return false;
+    }
     function canWriteConfigurationFile()
     {
         if(isset($this->ftp_enabled)){
@@ -398,7 +431,14 @@ CONFIG;
         $file_path = AK_CONFIG_DIR.DS.'config.php';
         return !file_exists($file_path);
     }
-
+    function canWriteDbConfigurationFile()
+    {
+        if(isset($this->ftp_enabled)){
+            $this->testFtpSettings();
+        }
+        $file_path = AK_CONFIG_DIR.DS.'database.yml';
+        return !file_exists($file_path);
+    }
     function writeRoutesFile()
     {
         if(isset($this->ftp_enabled)){
@@ -459,6 +499,19 @@ CONFIG;
         return empty($application_name) ? 'my_app' : $application_name;
     }
 
+    function canWriteToTempDir()
+    {
+        return $this->_writeToTemporaryFile(AK_BASE_DIR.DS.'tmp'.DS.'test_file.txt');
+    }
+    function canWriteToLocaleDir()
+    {
+        return $this->_writeToTemporaryFile(AK_APP_DIR.DS.'locales'.DS.'test_file.txt');
+    }
+    
+    function canWriteToPublicDir()
+    {
+        return $this->_writeToTemporaryFile(AK_PUBLIC_DIR.DS.'test_file.txt');
+    }
     function needsFtpFileHandling()
     {
         return !$this->_writeToTemporaryFile(AK_CONFIG_DIR.DS.'test_file.txt');

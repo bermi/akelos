@@ -25,9 +25,12 @@
 * create frameworks based on naming conventions rather than
 * configurations.
 * 
-* It was ported to PHP for the Akelos Framework, a
-* multilingual Ruby on Rails like framework for PHP that will
-* be launched soon.
+* You can find the inflector rules in config/inflector.yml
+* To add your own inflector rules, please do so in config/inflector/mydictionary.yml
+* 
+* Using it:
+* 
+* AkInflector::pluralize('inglés',null,'es'); // ingleses, see config/inflector/es.yml
 * 
 * @author Bermi Ferrer Martinez <bermi a.t akelos c.om>
 * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
@@ -40,7 +43,92 @@ class AkInflector
     // ---- Public methods ---- //
 
     // {{{ pluralize()
-
+    function _loadConfig($dictionary)
+    {
+        static $_loaded = array();
+        if (!($return=Ak::getStaticVar('AkInflectorConfig::'.$dictionary))) {
+            $return = Ak::getSettings($dictionary,false);
+            
+            if ($return !== false) {
+                Ak::setStaticVar('AkInflectorConfig::'.$dictionary,$return);
+                $_loaded[$dictionary] = true;
+            } else {
+                trigger_error(Ak::t('Could not load inflector rules file: %file',array('%file'=>'config'.DS.$dictionary.'.yml')),E_USER_ERROR);
+            }
+            
+        }
+        return $return;
+    }
+    
+    function _inflect($word, $new_value, $type, $dictionary = null)
+    {
+        static $_cached;
+        static $_loaded;
+        
+        if ($dictionary == null || $dictionary=='inflector') {
+            $dictionary = 'inflector';
+        } else {
+            $dictionary = 'inflector/'.$dictionary;
+        }
+        if (!isset($_loaded[$dictionary])) {
+            
+            $_loaded[$dictionary] = true;
+            $_cached[$dictionary] = array('singularize'=>array(),'pluralize'=>array()); 
+        }
+        
+        $config = AkInflector::_loadConfig($dictionary);
+        if (!in_array($type,array('singularize','pluralize'))) {
+            return $word;
+        }
+        if(isset($new_value)){
+            $_cached[$dictionary][$type][$word] = $new_value;
+            return;
+        }
+        $_original_word = $word;
+        if(!isset($_cached[$dictionary][$type][$_original_word])){
+            $lowercased_word = strtolower($word);
+            if (in_array($lowercased_word,$config[$type]['uncountable'])){
+                return $word;
+            }
+            foreach ($config[$type]['irregular'] as $_plural=> $_singular){
+                if ($type == 'singularize') {
+                    if (preg_match('/('.$_singular.')$/iu', $word, $arr)) {
+                        $_cached[$dictionary][$type][$_original_word] = preg_replace('/('.$_singular.')$/i', substr($arr[0],0,1).substr($_plural,1), $word);
+                        return $_cached[$dictionary][$type][$_original_word];
+                    }
+                } else {
+                    if (preg_match('/('.$_plural.')$/iu', $word, $arr)) {
+                        $_cached[$dictionary][$type][$_original_word] = preg_replace('/('.$_plural.')$/i', substr($arr[0],0,1).substr($_singular,1), $word);
+                        return $_cached[$dictionary][$type][$_original_word];
+                    }
+                }
+            }
+            
+            $replacements = isset($config[$type]['replacements'])?$config[$type]['replacements']:false;
+            if ($replacements!==false) {
+                $replacements_keys = array_keys($replacements);
+                foreach ($replacements_keys as $idx=>$key) {
+                    $replacements_keys[$idx]  = '/'.$key.'/u';
+                }
+                $replacements_values = array_values($replacements);
+            }
+            foreach ($config[$type]['rules'] as $rule => $replacement) {
+                if (preg_match($rule.'u', $word, $match)) {
+                    if(strstr($replacement,'@') && $replacements){
+                        foreach ($match as $k=>$v){
+                            $replacement = preg_replace("/(@$k)/u",preg_replace($replacements_keys,$replacements_values, $v), $replacement);
+                        }
+                    }
+                    $_cached[$dictionary][$type][$_original_word] = preg_replace($rule.'u', $replacement, $word);
+                    return $_cached[$dictionary][$type][$_original_word];
+                }
+            }
+            $_cached[$dictionary][$type][$_original_word] = $word;
+            return $_cached[$dictionary][$type][$_original_word];
+        }
+        return $_cached[$dictionary][$type][$_original_word];
+    }
+    
     /**
     * Pluralizes English nouns.
     * 
@@ -49,67 +137,9 @@ class AkInflector
     * @param    string    $word    English noun to pluralize
     * @return string Plural noun
     */
-    function pluralize($word, $new_plural = null)
+    function pluralize($word, $new_plural = null, $dictionary = null)
     {
-        static $_cached;
-        if(isset($new_plural)){
-            $_cached[$word] = $new_plural;
-            return;
-        }
-        $_original_word = $word;
-        if(!isset($_cached[$_original_word])){
-            $plural = array(
-            '/(quiz)$/i' => '\1zes',
-            '/^(ox)$/i' => '\1en',
-            '/([m|l])ouse$/i' => '\1ice',
-            '/(matr|vert|ind)ix|ex$/i' => '\1ices',
-            '/(x|ch|ss|sh)$/i' => '\1es',
-            '/([^aeiouy]|qu)ies$/i' => '\1y',
-            '/([^aeiouy]|qu)y$/i' => '\1ies',
-            '/(hive)$/i' => '\1s',
-            '/(?:([^f])fe|([lr])f)$/i' => '\1\2ves',
-            '/sis$/i' => 'ses',
-            '/([ti])um$/i' => '\1a',
-            '/(buffal|tomat)o$/i' => '\1oes',
-            '/(bu)s$/i' => '\1ses',
-            '/(alias|status)/i'=> '\1es',
-            '/(octop|vir)us$/i'=> '\1i',
-            '/(ax|test)is$/i'=> '\1es',
-            '/s$/i'=> 's',
-            '/$/'=> 's');
-
-            $uncountable = array('equipment', 'information', 'rice', 'money', 'species', 'series', 'fish', 'sheep');
-
-            $irregular = array(
-            'person' => 'people',
-            'man' => 'men',
-            'child' => 'children',
-            'sex' => 'sexes',
-            'move' => 'moves');
-
-            $lowercased_word = strtolower($word);
-
-            if (in_array($lowercased_word,$uncountable)){
-                return $word;
-            }
-
-            foreach ($irregular as $_plural=> $_singular){
-                if (preg_match('/('.$_plural.')$/i', $word, $arr)) {
-                    $_cached[$_original_word] = preg_replace('/('.$_plural.')$/i', substr($arr[0],0,1).substr($_singular,1), $word);
-                    return $_cached[$_original_word];
-                }
-            }
-
-            foreach ($plural as $rule => $replacement) {
-                if (preg_match($rule, $word)) {
-                    $_cached[$_original_word] = preg_replace($rule, $replacement, $word);
-                    return $_cached[$_original_word];
-                }
-            }
-            $_cached[$_original_word] = false;
-            return false;
-        }
-        return $_cached[$_original_word];
+        return AkInflector::_inflect($word,$new_plural,'pluralize',$dictionary);
     }
 
     // }}}
@@ -123,76 +153,9 @@ class AkInflector
     * @param    string    $word    English noun to singularize
     * @return string Singular noun.
     */
-    function singularize($word, $new_singular = null)
+    function singularize($word, $new_singular = null, $dictionary = null)
     {
-        static $_cached;
-        if(isset($new_singular)){
-            $_cached[$word] = $new_singular;
-            return;
-        }
-        $_original_word = $word;
-        if(!isset($_cached[$_original_word])){
-            $singular = array (
-            '/(quiz)zes$/i' => '\\1',
-            '/(matr)ices$/i' => '\\1ix',
-            '/(vert|ind)ices$/i' => '\\1ex',
-            '/^(ox)en/i' => '\\1',
-            '/(alias|status|wax)es$/i' => '\\1',
-            '/([octop|vir])i$/i' => '\\1us',
-            '/(cris|ax|test)es$/i' => '\\1is',
-            '/(shoe)s$/i' => '\\1',
-            '/(o)es$/i' => '\\1',
-            '/(bus)es$/i' => '\\1',
-            '/([m|l])ice$/i' => '\\1ouse',
-            '/(x|ch|ss|sh)es$/i' => '\\1',
-            '/(m)ovies$/i' => '\\1ovie',
-            '/(s)eries$/i' => '\\1eries',
-            '/([^aeiouy]|qu)ies$/i' => '\\1y',
-            '/([lr])ves$/i' => '\\1f',
-            '/(tive)s$/i' => '\\1',
-            '/(hive)s$/i' => '\\1',
-            '/([^f])ves$/i' => '\\1fe',
-            '/(^analy)ses$/i' => '\\1sis',
-            '/((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$/i' => '\\1\\2sis',
-            '/([ti])a$/i' => '\\1um',
-            '/(n)ews$/i' => '\\1ews',
-            '/s$/i' => '',
-            );
-
-
-            $uncountable = array('equipment', 'information', 'rice', 'money', 'species', 'series', 'fish', 'sheep','sms');
-
-            $irregular = array(
-            'person' => 'people',
-            'man' => 'men',
-            'child' => 'children',
-            'sex' => 'sexes',
-            'database' => 'databases',
-            'move' => 'moves');
-
-            $lowercased_word = strtolower($word);
-
-            if (in_array($lowercased_word,$uncountable)){
-                return $word;
-            }
-
-            foreach ($irregular as $_singular => $_plural){
-                if (preg_match('/('.$_plural.')$/i', $word, $arr)) {
-                    $_cached[$_original_word] = preg_replace('/('.$_plural.')$/i', substr($arr[0],0,1).substr($_singular,1), $word);
-                    return $_cached[$_original_word];
-                }
-            }
-
-            foreach ($singular as $rule => $replacement) {
-                if (preg_match($rule, $word)) {
-                    $_cached[$_original_word] = preg_replace($rule, $replacement, $word);
-                    return $_cached[$_original_word];
-                }
-            }
-            $_cached[$_original_word] = $word;
-            return $word;
-        }
-        return $_cached[$_original_word];
+        return AkInflector::_inflect($word,$new_singular,'singularize',$dictionary);
     }
 
     // }}}

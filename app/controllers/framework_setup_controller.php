@@ -146,8 +146,14 @@ class FrameworkSetupController extends AkActionController
         }
 
         if(!empty($this->params['check'])){
-            if($this->FrameworkSetup->needsFtpFileHandling()){
-                $this->flash_now = $this->t('Bad file permission. Please change file system privileges or set up a FTP account below');
+            if (!$this->FrameworkSetup->canWriteToLocaleDir()) {
+                $this->flash_now = $this->t('Bad file permission. Please change file system privileges for "%dir"',array('%dir'=>AK_APP_DIR.DS.'locales'));
+            }else if($this->FrameworkSetup->needsFtpFileHandling()){
+                $this->flash_now = $this->t('Bad file permission. Please change file system privileges for "%dir" or set up a FTP account below',array('%dir'=>AK_CONFIG_DIR));
+            }else if (!$this->FrameworkSetup->canWriteToTempDir()) {
+                $this->flash_now = $this->t('Bad file permission. Please change file system privileges for "%dir"',array('%dir'=>AK_BASE_DIR.DS.'tmp'.DS.'test_file.txt'));
+            }else if (!$this->FrameworkSetup->canWriteToPublicDir()) {
+                $this->flash_now = $this->t('Bad file permission. Please change file system privileges for "%dir"',array('%dir'=>AK_PUBLIC_DIR));
             }else{
                 $this->redirectToAction('set_locales');
                 return ;
@@ -181,8 +187,11 @@ class FrameworkSetupController extends AkActionController
     function perform_setup()
     {
         $this->configuration_file = $this->FrameworkSetup->getConfigurationFile();
-        if($this->FrameworkSetup->canWriteConfigurationFile()){
+        $this->db_configuration_file = $this->FrameworkSetup->getDatabaseConfigurationFile();
+        if($this->FrameworkSetup->canWriteConfigurationFile() && 
+           $this->FrameworkSetup->canWriteDbConfigurationFile()){
             if( $this->FrameworkSetup->writeConfigurationFile($this->configuration_file) &&
+            $this->FrameworkSetup->writeDatabaseConfigurationFile($this->db_configuration_file) &&
             $this->FrameworkSetup->writeRoutesFile() &&
             $this->FrameworkSetup->runFrameworkInstaller()){
 
