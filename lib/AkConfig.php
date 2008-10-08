@@ -78,7 +78,8 @@
  * can be accessed via:
  * 
  * <code>
- * AkConfig::get('myconfig'); // loads myconfig.yml and section "AK_ENVIRONMENT"
+ * $config = new AkConfig();
+ * $config->get('myconfig'); // loads myconfig.yml and section "AK_ENVIRONMENT"
  * </code>
  * 
  * By default the configuration for the environment defined in AK_ENVIRONMENT will be loaded.
@@ -86,7 +87,8 @@
  * By providing the desired environment in the get call you can change that:
  * 
  * <code>
- * AkConfig::get('myconfig','production'); // loads myconfig.yml and section production
+ * $config = new AkConfig();
+ * $config->get('myconfig','production'); // loads myconfig.yml and section production
  * </code>
  *
  * = Config caching
