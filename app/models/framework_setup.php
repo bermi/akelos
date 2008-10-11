@@ -249,7 +249,7 @@ class FrameworkSetup extends AkObject
             if(!isset($unique_dsn[$dsn])){
                 $DbInstance =& AkDbAdapter::getInstance(array(
                 'type' => $this->getDatabaseType($mode),
-                'file' => AK_CONFIG_DIR.DS.$this->getDatabaseName($mode).'-'.$this->random.'.sqlite',
+                'database_file' => AK_CONFIG_DIR.DS.$this->getDatabaseName($mode).'-'.$this->random.'.sqlite',
                 'user' => $this->getDatabaseUser($mode),
                 'password' => $this->getDatabasePassword($mode),
                 'host' => $this->getDatabaseHost($mode),
