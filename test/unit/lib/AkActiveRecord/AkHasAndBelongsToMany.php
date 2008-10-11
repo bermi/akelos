@@ -8,14 +8,15 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
 
     function test_start()
     {
-        $this->installAndIncludeModels(array('Post', 'Tag'));
         $Installer = new AkInstaller();
         @$Installer->dropTable('posts_tags');
+        @$Installer->dropTable('friends_friends');
         @$Installer->dropTable('posts_users');
         @Ak::file_delete(AK_MODELS_DIR.DS.'post_tag.php');
         @Ak::file_delete(AK_MODELS_DIR.DS.'post_user.php');
+        @Ak::file_delete(AK_MODELS_DIR.DS.'friend_friend.php');
 
-        $this->installAndIncludeModels(array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'User'));
+        $this->installAndIncludeModels(array('Post', 'Tag','Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'User'));
     }
 
     /**/
@@ -429,7 +430,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
 
     }
 
-    /**/
+
 
     function test_should_allow_multiple_habtm_associates_on_fresh_association_owner()
     {
@@ -461,6 +462,20 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         
         $PostUsers = $PostUser->findAllBy('post_id', $Post->id);
         $this->assertEqual(count($PostUsers), 1);
+    }
+    
+    
+    function test_should_allow_same_model_habtm_associations()
+    {
+        $this->installAndIncludeModels(array('Friend'=>'id,name'));
+        
+        $Mary =& $this->Friend->create(array('name' => 'Mary'));
+
+        $Mary->friend->add($this->Friend->create(array('name' => 'James')));
+        
+        $Mary = $this->Friend->findFirstBy('name', 'Mary', array('include'=>'friends'));
+        
+        $this->assertEqual($Mary->friends[0]->name, 'James');
     }
 }
 
