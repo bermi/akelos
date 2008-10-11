@@ -30,7 +30,7 @@ $command = strtolower(array_shift($argv));
 array_unshift($argv, $script_name);
 $_SERVER['argv'] = $argv;
 
-$available_commands = array('test','list', 'sources', 'source', 'unsource', 'discover', 'install', 'update', 'remove', 'info');
+$available_commands = array('help','test','list', 'sources', 'source', 'unsource', 'discover', 'install', 'update', 'remove', 'info');
 
 if(!in_array($command, $available_commands)){
     echo <<<BANNER
@@ -49,6 +49,7 @@ COMMANDS
   unsource   Remove a plugin repository.
   sources    List currently configured plugin repositories.
   test       Run the unit tests for the plugin
+  help       Shows the plugin README help file
 
 
 EXAMPLES
@@ -85,6 +86,9 @@ EXAMPLES
     
   Test a plugin
     {$script_name} test acts_as_versioned
+    
+  Help for a given plugin
+    {$script_name} help calendar_helper
 
 BANNER;
     exit;
@@ -446,6 +450,27 @@ if($command == 'test') {
         passthru($exec_command);
     } else {
         echo "The test file $test_file does not exist.";
+        die("\n");
+    }
+    
+}
+
+
+if($command == 'help') {
+     $options = get_console_options_for('Plugin help', array(CONSOLE_GETARGS_PARAMS=>array('min'=>1,'max'=>1,'short' => 'p', 'desc' =>  "Specify a plugin name."),'phpbin'=>array('short'=>'b','max'=>1,'min'=>1,'desc'=>'Path to the php binary','default'=>'/usr/bin/env php')));
+
+    if(empty($options['parameters'])){
+        die("You must supply a plugin name.\n");
+    }
+    $plugin = $options['parameters'];
+    $plugin_name = basename($plugin);
+
+    $help_file = AK_PLUGINS_DIR.DS.$plugin_name.DS.'README';
+
+    if (file_exists($help_file)) {
+        echo file_get_contents($help_file)."\n";
+    } else {
+        echo "Could not find a README help file for the $plugin_name plugin.";
         die("\n");
     }
     
