@@ -1,7 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-defined('AK_ENVIRONMENT') ? null : define('AK_ENVIRONMENT', 'development');
 include(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
 require_once(AK_LIB_DIR.DS.'utils'.DS.'scripts'.DS.'migrate.php');
 
