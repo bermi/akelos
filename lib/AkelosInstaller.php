@@ -100,7 +100,9 @@ class AkelosInstaller
         $this->_makeDir($test_dir.DS.'fixtures'.DS.'app');
 
         $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'app'.DS.'application_controller.php');
+        $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'app'.DS.'base_action_controller.php');
         $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'app'.DS.'shared_model.php');
+        $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'app'.DS.'base_active_record.php');
 
         $this->_makeDir($test_dir.DS.'fixtures'.DS.'config');
         $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'config'.DS.'config.php');
