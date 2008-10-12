@@ -15,7 +15,11 @@ class AkDbSchemaCache
     function _generateCacheFileName($table, $environment = AK_ENVIRONMENT)
     {
         $namespace = Ak::sanitize_include($table, 'high');
-        $cacheFile = AK_CONFIG_DIR.DS.'cache'.DS.'activerecord'.DS.$environment.DS.$table.'.php';
+        $cacheDir = AK_CONFIG_DIR;
+        if (defined('AK_CONFIG_CACHE_TMP') && AK_CONFIG_CACHE_TMP) {
+            $cacheDir  = AK_TMP_DIR.DS.'ak_config';
+        }
+        $cacheFile = $cacheDir.DS.'cache'.DS.'activerecord'.DS.$environment.DS.$table.'.php';
         return $cacheFile;
     }
     

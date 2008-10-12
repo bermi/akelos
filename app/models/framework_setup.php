@@ -276,8 +276,15 @@ class FrameworkSetup extends AkObject
 
     function getConfigurationFile($settings = array())
     {
+        
+        $defineAkConfigCacheDir = '';
+        $res = @mkdir(AK_CONFIG_DIR.DS.'cache'.DS.'test',0777,true);
+        if (!$res) {
+            $defineAkConfigCacheDir =<<<EOD
+defined('AK_CONFIG_CACHE_TMP')?null:define('AK_CONFIG_CACHE_TMP',true);
+EOD;
 
-
+        }
         $configuration_template = <<<CONFIG
 <?php
 
@@ -300,6 +307,8 @@ define('AK_AVAILABLE_LOCALES', '%locales');
 define('AK_ACTIVE_RECORD_DEFAULT_LOCALES', '%locales');
 define('AK_APP_LOCALES', '%locales');
 define('AK_PUBLIC_LOCALES', '%locales');
+
+$defineAkConfigCacheDir
 
 %AK_URL_REWRITINGdefined('AK_URL_REWRITE_ENABLED') ? null : define('AK_URL_REWRITE_ENABLED', true);
 

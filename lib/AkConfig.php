@@ -105,7 +105,12 @@ class AkConfig
     function _generateCacheFileName($namespace, $environment = AK_ENVIRONMENT)
     {
         $namespace = Ak::sanitize_include($namespace, 'high');
-        $cacheFile = AK_CONFIG_DIR.DS.'cache'.DS.$environment.DS.$namespace.'.php';
+        $cacheDir = AK_CONFIG_DIR;
+        if (defined('AK_CONFIG_CACHE_TMP') && AK_CONFIG_CACHE_TMP) {
+            $cacheDir  = AK_TMP_DIR.DS.'ak_config';
+        }
+        $cacheFile = $cacheDir.DS.'cache'.DS.$environment.DS.$namespace.'.php';
+        
         return $cacheFile;
     }
     function _useReadCache($environment = AK_ENVIRONMENT)
@@ -124,6 +129,9 @@ class AkConfig
     function _useWriteCache($environment = AK_ENVIRONMENT)
     {
         switch ($environment) {
+            case 'setup':
+                return false;
+                break;
             case 'development':
             case 'testing':
                 return true;
@@ -164,7 +172,7 @@ class AkConfig
     }
     function _writeCache($config, $namespace, $environment = AK_ENVIRONMENT, $force = false)
     {
-        if (!$force && !$this->_useWriteCache($environment)) return false;
+        if (AK_ENVIRONMENT == 'setup' || (!$force &&!$this->_useWriteCache($environment)))  return false;
         
         $var_export = var_export($config,true);
         $cache = <<<CACHE
