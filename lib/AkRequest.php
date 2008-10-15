@@ -838,7 +838,8 @@ class AkRequest extends AkObject
     function _mapRoutes($Map = null)
     {
         require_once(AK_LIB_DIR.DS.'AkRouter.php');
-        if(is_file(AK_ROUTES_MAPPING_FILE)){
+
+        if(AK_ENVIRONMENT != 'setup' && is_file(AK_ROUTES_MAPPING_FILE)){
             if(empty($Map)){
                 $Map =& AkRouter();
             }
