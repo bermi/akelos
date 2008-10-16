@@ -87,7 +87,9 @@ class AkTestApplication extends AkUnitTest
         }
        
         $dom = new DOMDocument();
-        $dom->loadHtml($this->_response);
+        $response = preg_replace('/(<!DOCTYPE.*?>)/is','',$this->_response);
+
+        $dom->loadHtml($response);
         $xpath = new DOMXPath($dom);
         $node = $xpath->query($xpath_expression);
         return $node;
@@ -104,6 +106,7 @@ class AkTestApplication extends AkUnitTest
             $message = empty($message)?'Element found using xpath: %xpath':$message;
             $this->pass($message);
         }
+        return $node;
     }
     function assertNoXPath($xpath_expression, $message = null)
     {
