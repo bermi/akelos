@@ -42,20 +42,20 @@ class AkPluginInstaller extends AkInstaller
         $this->transactionStart();
         switch ($method_prefix) {
             case 'up':
-                $depdenciesOk = $this->_checkInstallDependencies();
+                $depdencies_ok = $this->_checkInstallDependencies();
                 
                 break;
             case 'down':
             case 'uninstall':
-                $depdenciesOk = $this->_checkUninstallDependencies();
+                $depdencies_ok = $this->_checkUninstallDependencies();
                 break;
             default:
-                $depdenciesOk = true;
+                $depdencies_ok = true;
         }
         
-        if ($depdenciesOk === false) {
+        if ($depdencies_ok === false) {
             $this->transactionFail();
-            return $depdenciesOk;
+            return $depdencies_ok;
         }
         if ($method_prefix == 'up') {
             if ($auto_install_files) {
@@ -316,18 +316,13 @@ $methodString
     {
         if (isset($this->php_min_version)) {
             if(version_compare(PHP_VERSION,$this->php_min_version,'<')) {
-                echo "\n";
-                Ak::t("This plugin requires at least php version: %version", array('%version',$this->php_min_version));
-                echo "\n";
-                return false;
+                trigger_error(Ak::t("This plugin requires at least php version: %version", array('%version'=>$this->php_min_version)), E_USER_ERROR);
             }
         }
+
         if (isset($this->php_max_version)) {
             if(version_compare(PHP_VERSION,$this->php_max_version,'>')) {
-                echo "\n";
-                Ak::t("This plugin runs only on php version <= %version", array('%version',$this->php_min_version));
-                echo "\n";
-                return false;
+                trigger_error("This plugin runs only on php version <= %version", array('%version'=>$this->php_min_version), E_USER_ERROR);
             }
         }
         if (isset($this->dependencies)) {
