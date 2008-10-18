@@ -301,6 +301,7 @@ class AkMailBase extends Mail
         if(empty($this->raw_headers)){
 
             $this->headers = $this->getHeaders(true);
+            
             if($this->isPart()){
                 $this->prepareHeadersForRendering(array(
                 'skip' => (array)@$options['skip'],
@@ -308,7 +309,13 @@ class AkMailBase extends Mail
                 ));
             }
             unset($this->headers['Charset']);
-            $this->raw_headers = array_pop($this->prepareHeaders($this->headers));
+            $headers = $this->prepareHeaders($this->headers);
+            if(!is_array($headers)){
+                trigger_error($headers->message, E_USER_NOTICE);
+                return false;
+            }else{
+                $this->raw_headers = array_pop($headers);
+            }
         }
         return $this->raw_headers;
     }
@@ -638,7 +645,8 @@ class AkMailBase extends Mail
 
     function getEncoded()
     {
-        return $this->getRawHeaders().AK_ACTION_MAILER_EOL.AK_ACTION_MAILER_EOL.$this->getBody();
+        $header = $this->getRawHeaders();
+        return $header ? $header.AK_ACTION_MAILER_EOL.AK_ACTION_MAILER_EOL.$this->getBody() : false;
     }
 
 }

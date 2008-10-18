@@ -341,6 +341,18 @@ class TestMailer extends AkActionMailer
         ));
     }
     
+    
+    function message_from_first_name($recipient)
+    {
+        $this->set(array(
+        'recipients' => $recipient,
+        'subject' => "from includes name",
+        'from' => array('Some "One' => "some.one@example.com"),
+        'body' => "testing"
+        ));
+    }
+
+
 
     function &receive($raw_email)
     {

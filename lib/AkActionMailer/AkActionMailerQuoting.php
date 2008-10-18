@@ -46,10 +46,10 @@ class AkActionMailerQuoting
             if (empty($line)){
                 continue;
             }
-            
+
             $line = preg_replace($search_pattern, 'sprintf( "=%02X", ord ( "$0" ) ) ;', $line );
             $length = strlen($line);
-            
+
             $last_char = ord($line[$length-1]);
             if (!($emulate_imap_8bit && ($k==count($lines)-1)) && ($last_char==0x09) || ($last_char==0x20)) {
                 $line[$length-1] = '=';
@@ -96,8 +96,13 @@ class AkActionMailerQuoting
             return join(", ".AK_ACTION_MAILER_EOL."     ",AkActionMailerQuoting::quoteAnyAddressIfNecessary($address, $charset));
         }elseif (preg_match('/^(\S.*)\s+(<?('.AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION.')>?)$/i', $address, $match)){
             $address = $match[3];
-            $phrase = AkActionMailerQuoting::quoteIfNecessary(preg_replace('/^[\'"](.*)[\'"]$/', '$1', $match[1]), $charset);
-            return "$phrase <$address>";
+            $quoted = AkActionMailerQuoting::quoteIfNecessary(trim($match[1],'\'"'), $charset);
+            $phrase = str_replace('"','\"', $quoted);
+            if($phrase[0] != '='){
+                return "\"$phrase\" <$address>";
+            }else{
+                return "$phrase <$address>";
+            }
         }else{
             return $address;
         }
@@ -109,7 +114,9 @@ class AkActionMailerQuoting
     function quoteAnyAddressIfNecessary($address = array(), $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
     {
         foreach ($address as $k=>$v){
-            $address[$k] = AkActionMailerQuoting::quoteAddressIfNecessary($v,$charset);
+            $address[$k] = is_string($k) ?
+            AkActionMailerQuoting::quoteAddressIfNecessary('"'.$k.'" <'.$v.'>', $charset) :
+            AkActionMailerQuoting::quoteAddressIfNecessary($v, $charset);
         }
         return $address;
     }

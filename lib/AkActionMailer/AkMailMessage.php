@@ -37,7 +37,7 @@ class AkMailMessage extends AkMailBase
 
     function getFrom()
     {
-        return $this->_getMessageHeaderFieldFormated($this->from);
+        return $this->_getMessageHeaderFieldFormated(!empty($this->from) ? $this->from : @$this->sender);
     }
 
     function getTo()
@@ -62,7 +62,6 @@ class AkMailMessage extends AkMailBase
 
     function setTo($to)
     {
-        //$this->to = $to;
         $this->setRecipients($to);
     }
 
@@ -103,7 +102,7 @@ class AkMailMessage extends AkMailBase
      */
     function setRecipients($recipients)
     {
-        $this->recipients = join(", ", (array)Ak::toArray($recipients));
+        $this->recipients = $this->_getMessageHeaderFieldFormated($recipients);
         $this->setHeader('To',$this->getTo());
     }
 
@@ -120,19 +119,19 @@ class AkMailMessage extends AkMailBase
         $charset = empty($charset) ? $this->getCharset() : $charset;
         return AkActionMailerQuoting::quoteIfNecessary($this->subject, $charset);
     }
-    
+
     function _getMessageHeaderFieldFormated($address_header_field)
     {
         $charset = empty($this->charset) ? AK_ACTION_MAILER_DEFAULT_CHARSET : $this->charset;
-        return join(", ",AkActionMailerQuoting::quoteAnyAddressIfNecessary(Ak::toArray($address_header_field), $charset));
+        return AkActionMailerQuoting::quoteAddressIfNecessary($address_header_field, $charset);
     }
-    
+
 
     function getRawMessage()
     {
         return AkMailComposer::getRawMessage($this);
     }
-    
+
     function getRawHeadersAndBody()
     {
         $Composer =& new AkMailComposer();

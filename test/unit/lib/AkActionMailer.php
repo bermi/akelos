@@ -17,6 +17,7 @@ class Tests_for_Mailers extends  AkUnitTest
         $this->recipient = 'test@localhost';
     }
 
+    /**/
     function test_inline_template()
     {
         $RenderMailer =& new RenderMailer();
@@ -477,7 +478,7 @@ EOF;
         $this->assertTrue($Created = $TestMailer->create('utf8_body', $this->recipient));
 
         $this->assertPattern("/\nFrom: =\?UTF-8\?Q\?Foo_.*?\?= <extended@example.com>\r/", $Created->getEncoded());
-        $this->assertPattern("/To: =\?UTF-8\?Q\?Foo_.*?\?= <extended@example.com>, Ex=\r\n ample Recipient <me/", $Created->getEncoded());
+        $this->assertPattern("/To: =\?UTF-8\?Q\?Foo_.*?\?= <extended@example.com>, \r\n     \"Example Recipient\" <me/", $Created->getEncoded());
     }
 
     function test_receive_decodes_base64_encoded_mail()
@@ -802,7 +803,16 @@ EOF;
         $this->assertPattern('/<a href="http:\/\/example.com\/offers\/">Our offers<\/a>/', $rendered_message);
         $this->assertNoPattern('/text_helper/', $rendered_message);
     }
-    /**/
+
+    function test_should_add_from_name()
+    {
+        $TestMailer =& new TestMailer();
+        $Message = $TestMailer->create('message_from_first_name', array('No One'=>'no.one@example.com'));
+        $rendered_message = $TestMailer->getRawMessage();
+       $this->assertPattern('/To: "No One" <no\.one@example\.com>/', $rendered_message);
+       $this->assertPattern('/From: "Some \\\"One" <some\.one@example\.com>/', $rendered_message);
+    }
+
 
 }
 

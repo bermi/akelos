@@ -32,11 +32,14 @@ class AkSmtpDelivery extends AkObject
             }
         }
 
-        if (PEAR::isError($smtp->mailFrom($Message->getFrom()))) {
+        $from = is_array($Message->from) ? array_shift(array_values($Message->from)) : $Message->from;
+
+        if (PEAR::isError($smtp->mailFrom($from))) {
             trigger_error('unable to set sender to [' . $from . ']', E_USER_ERROR);
         }
 
         $recipients = $SmtpClient->parseRecipients($Message->getRecipients());
+        
         if (PEAR::isError($recipients)) {
             return $recipients;
         }

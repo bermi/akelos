@@ -12,7 +12,6 @@ class AkPhpMailDelivery extends AkObject
         list($header, $body) = $Message->getRawHeadersAndBody();
 
         $header = preg_replace('/(To|Subject): [^\r]+\r\n/', '', $header);
-        
         return mail($to, $subject, $body, $header);
     }
 }
