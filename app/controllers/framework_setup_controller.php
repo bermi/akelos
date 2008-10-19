@@ -8,7 +8,6 @@ error_reporting(E_ALL);
 
 define('AK_WEB_REQUEST_CONNECT_TO_DATABASE_ON_INSTANTIATE', false);
 
-define('AK_URL_REWRITE_ENABLED', false);
 
 define('AK_AVAILABLE_LOCALES','en,ja,es');
 define('AK_APP_LOCALES','en,ja,es');
@@ -28,6 +27,13 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 require_once(AK_LIB_DIR.DS.'AkInflector.php');
 require_once(AK_LIB_DIR.DS.'Ak.php');
 require_once(AK_LIB_DIR.DS.'AkActionController.php');
+
+if(AK_CLI){
+    return ;
+}
+
+define('AK_URL_REWRITE_ENABLED', false);
+
 
 $_GET['controller'] = 'framework_setup';
 

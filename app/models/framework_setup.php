@@ -47,22 +47,6 @@ class FrameworkSetup extends AkObject
             $this->getDatabaseUser(),
             $this->getDatabasePassword())){
                 return true;
-                /**
-                 * @todo Checking if innodb is available break on some systems
-                 * we should investigate a better way to do this
-                 */
-                /*
-                $result = mysql_query($db, "SHOW VARIABLES LIKE 'have_innodb';");
-                return strstr(
-                strtolower(
-                @array_pop(
-                @mysql_fetch_row(
-                @mysql_query("SHOW VARIABLES LIKE 'have_innodb';", $db)
-                )
-                )
-                ),
-                'yes');
-                */
             }
         }
         return false;
@@ -188,6 +172,7 @@ class FrameworkSetup extends AkObject
         $dsn = $this->_getDsn($mode);
         if(!isset($connections[$dsn])){
             if(!$connections[$dsn] = @NewADOConnection($dsn)){
+                unset($connections[$dsn]);
                 return false;
             }
         }
@@ -256,8 +241,8 @@ class FrameworkSetup extends AkObject
                 'database_name' => $this->getDatabaseName($mode)
                 ));
 
-                $installer =& new FrameworkInstaller($DbInstance);
-                $installer->install(null, array('mode' => $mode));
+                $Installer =& new FrameworkInstaller($DbInstance);
+                $Installer->install(null, array('mode' => $mode));
                 $unique_dsn[$dsn] = true;
             }
         }

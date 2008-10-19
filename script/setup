@@ -69,6 +69,7 @@ $config =  array(
 'desc'    => 'Includes a copy of the framework into the application directory.'),
 
 
+
 'help' => array(
 'short'   => 'h',
 'max'     => 0,
@@ -113,9 +114,11 @@ if($args->getValue('quiet') == ''){
         echo "\nThere where some errors during the installation process:\n";
         echo "\n * ".join("\n    * ",$Installer->getErrors());
     }elseif(empty($Installer->options['force'])){
+
         echo "\n    Please point your browser to ".
         (empty($Installer->options['public_html']) ? $Installer->options['directory'] : $Installer->options['public_html']).
-        " in order to complete the installation process";
+        " in order to complete the installation process or\n\n".
+        " run \n\n    ./script/configure -i\n\nto configure the database datils\n";
     }
     echo "\n";
 }

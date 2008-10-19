@@ -367,5 +367,6 @@ class AkelosInstaller
             $shell->Run('C:\xampp\mysql\bin\mysqld --defaults-file=C:\xampp\mysql\bin\my.cnf --standalone --console', 0, false);
         }
     }
+
 }
 ?>

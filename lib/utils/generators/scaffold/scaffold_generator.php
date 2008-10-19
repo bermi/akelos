@@ -17,8 +17,11 @@
  */
 ak_define('ACTIVE_RECORD_VALIDATE_TABLE_NAMES', false);
 
+include_once(AK_LIB_DIR.DS.'AkInstaller.php');
+
 class ScaffoldGenerator extends  AkelosGenerator
 {
+    var $_skip_files = array();
     var $command_values = array('model_name','controller_name','(array)actions');
 
     function cast()
@@ -68,8 +71,22 @@ class ScaffoldGenerator extends  AkelosGenerator
     {
         $this->collisions = array();
         foreach (array_merge(array_values($this->files),array_values($this->user_actions)) as $file_name){
-            if(file_exists($file_name)){
-                $this->collisions[] = Ak::t('%file_name file already exists',array('%file_name'=>$file_name));
+            $user_answer = 5;
+            if($user_answer != 3 && file_exists($file_name)){
+                $message = Ak::t('%file_name file already exists',array('%file_name'=>$file_name));
+                $user_answer = AkInstaller::promptUserVar($message."\n".
+                "Would you like to:\n".
+                " 1) overwrite file\n".
+                " 2) keep existing file\n".
+                " 3) overwrite all\n".
+                " 4) keep all\n".
+                " 5) abort\n", array('default' => 5));
+                
+                if($user_answer == 2 || $user_answer == 4){
+                    $this->_skip_files[] = $file_name;
+                }elseif($user_answer == 5){
+                    $this->collisions[] = $message;
+                }
             }
         }
         return count($this->collisions) > 0;
@@ -135,7 +152,9 @@ class ScaffoldGenerator extends  AkelosGenerator
 
         $this->_template_vars = (array)$this;
         foreach ($this->files as $template=>$file_path){
-            $this->save($file_path, $this->render($template, !empty($this->sintags)));
+            if(!in_array($file_path,$this->_skip_files)){
+                $this->save($file_path, $this->render($template, !empty($this->sintags)));
+            }
         }
         foreach ($this->user_actions as $action=>$file_path){
             $this->assignVarToTemplate('action',$action);

@@ -1,11 +1,17 @@
-WARNING: IMPORTANT CHANGES AHEAD!
+[1205] Adding new configuration script to generate config.php and database.yml
+
+Run it only on fresh installs
+{{{
+./script/configure -h
+}}}
+will show available options.
+
+* Adding mechanism to solve conflicts when using the scaffold generator.
+
+
+[1185] WARNING: IMPORTANT CHANGES AHEAD!
 
 Using this version requires you do manually add/change files/folders to existing applications.
-
-
-SVN
-
-[1185] Merging Caching Branch into trunk:
 
 New features:
 

@@ -145,7 +145,7 @@ class AkInstaller
             }
         }
 
-        if($this->warn_if_same_version && $current_version == $version){
+        if($this->warn_if_same_version && $current_version == $version && AK_ENVIRONMENT != 'setup'){
             echo Ak::t("Can't go $action to version %version, you're already on version %version", array('%version'=>$version));
             return false;
         }
@@ -657,7 +657,7 @@ class AkInstaller
         if(empty($value) && empty($options['optional'])){
             echo "\n\nThis setting is not optional.";
             fclose($f);
-            return $this->promptUserVar($message, $options);
+            return AkInstaller::promptUserVar($message, $options);
         }
         fclose($f);
         return empty($value) ? $options['default'] : $value;
