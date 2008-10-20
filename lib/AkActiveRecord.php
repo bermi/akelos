@@ -228,8 +228,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     var $_BlobQueryStack = null;
 
-    var $_automated_max_length_validator = true;
-    var $_automated_validators_enabled = true;
+    var $_automated_max_length_validator = false;
+    var $_automated_validators_enabled = false;
     var $_automated_not_null_validator = false;
     var $_set_default_attribute_values_automatically = true;
 
@@ -3988,13 +3988,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
 
             if($this->_set_default_attribute_values_automatically){
-                //$this->_setDefaultAttributeValuesAutomatically();
+                $this->_setDefaultAttributeValuesAutomatically();
             }
 
             $this->validate();
 
             if($this->_automated_validators_enabled){
-                //$this->_runAutomatedValidators();
+                $this->_runAutomatedValidators();
             }
 
             $this->afterValidation();
@@ -4024,7 +4024,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * By default the Active Record will validate for the maximum length for database columns. You can
     * disable the automated validators by setting $this->_automated_validators_enabled to false.
     * Specific validators are (for now):
-    * $this->_automated_max_length_validator = true; // true by default, but you can set it to false on your model
+    * $this->_automated_max_length_validator = false; // false by default, but you can set it to true on your model
     * $this->_automated_not_null_validator = false; // disabled by default
     *
     * @access private
