@@ -114,6 +114,7 @@ class AkResponse extends AkObject
                 $header = trim((!is_numeric($k) ? $k.': ' : '').$v);
                 $this->_headers_sent[] = $header;
                 if(strtolower(substr($header,0,9)) == 'location:'){
+                    $header = str_replace(array("\n","\r"), '', $header);
                     $_redirected = true;
                     if(AK_DESKTOP){
                         $javascript_redirection = '<title>'.Ak::t('Loading...').'</title><script type="text/javascript">location = "'.substr($header,9).'";</script>';
