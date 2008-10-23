@@ -4563,7 +4563,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             if($print){
                 echo $result;
             }
-        }elseif(AK_ENVIRONMENT == 'development'){
+        }elseif(AK_DEV_MODE){
             $result =   "\n".
             str_replace("\n"," ",var_export($this->getAttributes(),true));
             $result .= "\n";

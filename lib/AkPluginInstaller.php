@@ -4,6 +4,8 @@ require_once(AK_LIB_DIR.DS.'AkInstaller.php');
 require_once(AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFile.php');
 
 
+defined('AK_PLUGINS_DIR') ? null : define('AK_PLUGINS_DIR', AK_APP_DIR.DS.'vendors'.DS.'plugins');
+
 class AkPluginInstaller extends AkInstaller
 {
     var $auto_install_files = true;

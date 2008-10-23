@@ -21,6 +21,8 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 file_exists(AK_APP_DIR.DS.'shared_model.php') ? require_once(AK_APP_DIR.DS.'shared_model.php') : null;
 defined('AK_APP_INSTALLERS_DIR') ? null : define('AK_APP_INSTALLERS_DIR', AK_APP_DIR.DS.'installers');
 
+defined('AK_VERBOSE_INSTALLER') ? null : define('AK_VERBOSE_INSTALLER', AK_DEV_MODE);
+
 // Install scripts might use more RAM than normal requests.
 @ini_set('memory_limit', -1);
 
@@ -73,7 +75,7 @@ class AkInstaller
     var $db;
     var $data_dictionary;
     var $available_tables = array();
-    var $vervose = true;
+    var $vervose = AK_VERBOSE_INSTALLER;
     var $module;
     var $warn_if_same_version = true;
 
@@ -113,9 +115,9 @@ class AkInstaller
 
     function _upgradeOrDowngrade($action, $version = null, $options = array())
     {
-        if(in_array('quiet',$options) && AK_ENVIRONMENT == 'development'){
+        if(in_array('quiet',$options) && AK_DEV_MODE){
             $this->vervose = false;
-        }elseif(!empty($this->vervose) && AK_ENVIRONMENT == 'development'){
+        }elseif(!empty($this->vervose) && AK_DEV_MODE){
             $this->debug(true);
         }
 
@@ -150,7 +152,7 @@ class AkInstaller
             return false;
         }
 
-        if(AK_CLI && !empty($this->vervose) && AK_ENVIRONMENT == 'development'){
+        if(AK_CLI && !empty($this->vervose) && AK_DEV_MODE){
             echo Ak::t(ucfirst($action).'grading');
         }
 
