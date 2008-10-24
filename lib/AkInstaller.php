@@ -132,7 +132,7 @@ class AkInstaller
             $versions = range($current_version+1,$version);
 
             if($current_version > $version){
-                echo Ak::t("You can't upgrade to version %version, when you are currently on version %current_version", array('%version'=>$version,'%current_version'=>$current_version));
+                echo Ak::t("You can't upgrade to version %version on the installer %installer_name, when you are currently on version %current_version", array('%version'=>$version,'%current_version'=>$current_version, '%installer_name' => $this->getInstallerName()))."\n";
                 return false;
             }
         }else{
@@ -142,13 +142,13 @@ class AkInstaller
             if($current_version == 0){
                 return true;
             }elseif($current_version < $version){
-                echo Ak::t("You can't downgrade to version %version, when you just have installed version %current_version", array('%version'=>$version,'%current_version'=>$current_version));
+                echo Ak::t("You can't downgrade to version %version on the installer %installer_name, when you just have installed version %current_version", array('%version'=>$version,'%current_version'=>$current_version, '%installer_name' => $this->getInstallerName()))."\n";
                 return false;
             }
         }
 
         if($this->warn_if_same_version && $current_version == $version && AK_ENVIRONMENT != 'setup'){
-            echo Ak::t("Can't go $action to version %version, you're already on version %version", array('%version'=>$version));
+            echo Ak::t("Can't go %action to version %version on the installer %installer_name, you're already on version %version", array('%version'=>$version, '%installer_name' => $this->getInstallerName(), '%action' => $action))."\n";
             return false;
         }
 
