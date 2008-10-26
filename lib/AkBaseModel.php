@@ -33,10 +33,10 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 * @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
 */
-class AkBaseModel extends AkObject 
+class AkBaseModel extends AkObject
 {
     var $_modelName;
-    
+
     /**
     * Returns current model name
     */
@@ -132,7 +132,7 @@ class AkBaseModel extends AkObject
         }
         return true;
     }
-    
+
     function t($string, $array = null)
     {
         return Ak::t($string, $array, AkInflector::underscore($this->getModelName()));
@@ -151,5 +151,34 @@ class AkBaseModel extends AkObject
     }
 }
 
+
+
+if(!defined('ADODB_OUTP')){
+    define('ADODB_OUTP', 'ak_show_sql_debug');
+    function ak_show_sql_debug($message){
+        if(is_array($message)){
+            foreach ($message as $msg){
+                return ak_show_sql_debug($msg);
+            }
+        }
+        $skip = array(
+        'SELECT LAST_INSERT_ID',
+        'SHOW COLUMNS',
+        'SHOW TABLES',
+        'SET AUTOCOMMIT',
+        );
+
+        $message = preg_replace('/^\([a-z]+\): /', '',trim($message,"\n-"));
+        if(preg_match('/^('. join("|", $skip) .')/', $message)){
+            return;
+        }
+
+        if(AK_CLI){
+            "\n$message;";
+        }else{
+            Ak::trace("$message");
+        }
+    }
+}
 
 ?>

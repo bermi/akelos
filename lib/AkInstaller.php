@@ -128,7 +128,9 @@ class AkInstaller
 
         if($action == 'up'){
             $newest_version = max($available_versions);
-            $version = isset($version[0]) && is_numeric($version[0]) ? $version[0] : $newest_version;
+            $version = isset($version) && is_numeric($version) ? $version :
+            (isset($version[0]) && is_numeric($version[0]) ? $version[0] : $newest_version);
+            
             $versions = range($current_version+1,$version);
 
             if($current_version > $version){
@@ -136,7 +138,9 @@ class AkInstaller
                 return false;
             }
         }else{
-            $version = !empty($version[0]) && is_numeric($version[0]) ? $version[0] : 0;
+            $version = isset($version) && is_numeric($version) ? $version :
+            (isset($version[0]) && is_numeric($version[0]) ? $version[0] : 0);
+            
             $versions = range($current_version, empty($version) ? 1 : $version+1);
 
             if($current_version == 0){
@@ -192,6 +196,7 @@ class AkInstaller
         $version_number = empty($version_number) ? ($method_prefix=='down' ? $version-1 : $version) : $version_number;
 
         $this->transactionStart();
+
         if($this->$method_name($options) === false){
             $this->transactionFail();
         }
@@ -228,7 +233,7 @@ class AkInstaller
         if (is_file($old_filename)){
             $this->setInstalledVersion(Ak::file_get_contents($old_filename),$options);  
             Ak::file_delete($old_filename); 
-            Ak::file_put_contents(AK_APP_INSTALLERS_DIR.DS.'versions'.DS.'NOTE',"Version information is now stored in the temp folder. \n\rYou can savely move this files here over there to tmp/installer_versions/* or delete this directory if empty.");     
+            Ak::file_put_contents(AK_APP_INSTALLERS_DIR.DS.'versions'.DS.'NOTE',"Version information is now stored in the temp folder. \n\rYou can safely move this files here over there to tmp/installer_versions/* or delete this directory if empty.");     
         }
     }
 
