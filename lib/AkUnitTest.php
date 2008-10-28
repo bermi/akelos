@@ -282,6 +282,13 @@ class AkUnitTest extends UnitTestCase
         }
         return !empty($this->$model_name) && is_object($this->$model_name) && strtolower(get_class($this->$model_name)) == strtolower($model_name);
     }
+    
+    function instantiateModels()
+    {
+        $args = func_get_args();
+        $models = (count($args) > 1) ? $args : Ak::stringToArray(@$args[0]);
+        call_user_func_array(array($this, 'instantiateModel'), $models);
+    }
 
     /**
      * Includes and instantiates given models

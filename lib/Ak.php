@@ -587,8 +587,8 @@ class Ak
     function trace($text = null, $line = null, $file = null)
     {
         static $counter = 0;
-        if(!AK_DEBUG){
-            //return;
+        if(AK_PRODUCTION_MODE){
+            return;
         }
 
         $line = isset($line) ? "Line: $line".(AK_CLI?"\n":"<br />") : "";

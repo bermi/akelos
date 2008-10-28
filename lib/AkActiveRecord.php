@@ -2425,7 +2425,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     function setTableName($table_name = null, $check_for_existence = AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES, $check_mode = false)
     {
-        static $available_tables;
+        !AK_TEST_MODE && $static_cached_tables = Ak::getStaticVar('available_tables');
+        
         if(empty($table_name)){
             $table_name = AkInflector::tableize($this->getModelName());
         }
@@ -2434,11 +2435,17 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 if(!isset($this->_db)){
                     $this->setConnection();
                 }
-                if (!AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA || ($available_tables = AkDbSchemaCache::getAvailableTables()) === false) {
-                    $available_tables = $this->_db->availableTables();
+                if (!AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA || 
+                    ($available_tables = AkDbSchemaCache::getAvailableTables()) === false) {
+                    if(!empty($static_cached_tables)){
+                        $available_tables = $static_cached_tables;
+                    }else{
+                        $available_tables = $this->_db->availableTables();
+                    }
                     if (AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA) {
                         AkDbSchemaCache::setAvailableTables($available_tables);
                     }
+                    !AK_TEST_MODE && Ak::setStaticVar('available_tables', $available_tables);
                 }
             }
             if(!in_array($table_name,(array)$available_tables)){

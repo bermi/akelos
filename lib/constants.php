@@ -282,6 +282,8 @@ defined('AK_DESKTOP') ? null : define('AK_DESKTOP', AK_SITE_URL == 'http://akelo
 defined('AK_ASSET_HOST') ? null : define('AK_ASSET_HOST','');
 
 defined('AK_DEV_MODE') ? null : define('AK_DEV_MODE', AK_ENVIRONMENT == 'development');
+defined('AK_TEST_MODE') ? null : define('AK_TEST_MODE', AK_ENVIRONMENT == 'testing');
+defined('AK_PRODUCTION_MODE') ? null : define('AK_PRODUCTION_MODE', AK_ENVIRONMENT == 'production');
 defined('AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES') ? null : define('AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES', AK_DEV_MODE);
 defined('AK_ENABLE_PROFILER') ? null : define('AK_ENABLE_PROFILER', false);
 defined('AK_PROFILER_GET_MEMORY') ? null : define('AK_PROFILER_GET_MEMORY',false);
