@@ -713,7 +713,7 @@ class AkActionMailer extends AkBaseModel
         $args = func_get_args();
         $base_url = '';
         if(isset($args[0]['base_url'])){
-            $base_url = preg_replace('/^(?!http[s]?:\/\/)(.+)/','http://$1', (isset($args[0]['base_url'])?rtrim($args[0]['base_url'],'/'):Ak::getSetting('mailer', 'base_url', AK_HOST)));
+            $base_url = rtrim(preg_replace('/^(?!http[s]?:\/\/)(.+)/','http://$1', (strstr($args[0]['base_url'],'.')?$args[0]['base_url']:Ak::getSetting('mailer', 'base_url', AK_HOST))),'/');
             unset($args[0]['base_url']);
         }
        
