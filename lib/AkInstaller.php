@@ -17,6 +17,7 @@
  */
 
 require_once(AK_LIB_DIR.DS.'Ak.php');
+require_once(AK_LIB_DIR.DS.'AkObject.php');
 require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 file_exists(AK_APP_DIR.DS.'shared_model.php') ? require_once(AK_APP_DIR.DS.'shared_model.php') : null;
 defined('AK_APP_INSTALLERS_DIR') ? null : define('AK_APP_INSTALLERS_DIR', AK_APP_DIR.DS.'installers');
@@ -70,7 +71,7 @@ defined('AK_VERBOSE_INSTALLER') ? null : define('AK_VERBOSE_INSTALLER', AK_DEV_M
  * default                        | string
  * 
  */
-class AkInstaller
+class AkInstaller extends AkObject 
 {
     var $db;
     var $data_dictionary;
@@ -156,8 +157,8 @@ class AkInstaller
             return false;
         }
 
-        if(AK_CLI && !empty($this->vervose) && AK_DEV_MODE){
-            echo Ak::t(ucfirst($action).'grading');
+        if(AK_CLI && !empty($this->vervose) && (AK_DEV_MODE || AK_TEST_MODE)){
+            echo Ak::t('[%installer_name] '.ucfirst($action).'grading to version %version', array('%version'=>$version, '%installer_name'=>$this->getInstallerName()));
         }
 
         if(!empty($versions) && is_array($versions)){
