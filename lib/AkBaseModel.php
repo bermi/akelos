@@ -153,32 +153,4 @@ class AkBaseModel extends AkObject
 
 
 
-if(!defined('ADODB_OUTP')){
-    define('ADODB_OUTP', 'ak_show_sql_debug');
-    function ak_show_sql_debug($message){
-        if(is_array($message)){
-            foreach ($message as $msg){
-                return ak_show_sql_debug($msg);
-            }
-        }
-        $skip = array(
-        'SELECT LAST_INSERT_ID',
-        'SHOW COLUMNS',
-        'SHOW TABLES',
-        'SET AUTOCOMMIT',
-        );
-
-        $message = preg_replace('/^\([a-z]+\): /', '',trim($message,"\n-"));
-        if(preg_match('/^('. join("|", $skip) .')/', $message)){
-            return;
-        }
-
-        if(AK_CLI){
-            "\n$message;";
-        }else{
-            Ak::trace("$message");
-        }
-    }
-}
-
 ?>
