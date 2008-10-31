@@ -158,7 +158,7 @@ class AkInstaller extends AkObject
         }
 
         if(AK_CLI && !empty($this->vervose) && (AK_DEV_MODE || AK_TEST_MODE)){
-            echo Ak::t('[%installer_name] '.ucfirst($action).'grading to version %version', array('%version'=>$version, '%installer_name'=>$this->getInstallerName()));
+            echo "\n".Ak::t('[%installer_name] '.ucfirst($action).'grading to version %version', array('%version'=>$version, '%installer_name'=>$this->getInstallerName()));
         }
 
         if(!empty($versions) && is_array($versions)){
