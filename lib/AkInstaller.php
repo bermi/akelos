@@ -79,6 +79,7 @@ class AkInstaller extends AkObject
     var $vervose = AK_VERBOSE_INSTALLER;
     var $module;
     var $warn_if_same_version = true;
+    var $use_transactions = true;
 
     function AkInstaller($db_connection = null)
     {
@@ -627,23 +628,24 @@ class AkInstaller extends AkObject
     */
     function transactionStart()
     {
-        return $this->db->startTransaction();
+        return ($this->use_transactions ? $this->db->startTransaction() : true);
     }
 
     function transactionComplete()
     {
-        return $this->db->stopTransaction();
+        return ($this->use_transactions ? $this->db->stopTransaction() : true);
     }
 
     function transactionFail()
     {
-        return $this->db->failTransaction();
+        return ($this->use_transactions ? $this->db->failTransaction() : true);
     }
 
     function transactionHasFailed()
     {
-        return $this->db->hasTransactionFailed();
+        return ($this->use_transactions ? $this->db->hasTransactionFailed() : false);
     }
+
 
     /**
      * Promts for a variable on console scripts
