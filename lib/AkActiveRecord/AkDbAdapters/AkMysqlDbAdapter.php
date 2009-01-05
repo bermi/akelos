@@ -80,5 +80,13 @@ class AkMysqlDbAdapter extends AkDbAdapter
         return "'".mysql_real_escape_string($value, $this->connection->_connectionID)."'";
     }
     
+    function connect($die_on_error=true)
+    {
+        parent::connect($die_on_error);
+        if(defined('AK_SET_UTF8_ON_MYSQL_CONNECT') && AK_SET_UTF8_ON_MYSQL_CONNECT){
+        	isset($this->connection->_connectionID) && mysql_set_charset('utf8', $this->connection->_connectionID);
+        }
+    }
+    
 }
 ?>

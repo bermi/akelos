@@ -1,3 +1,11 @@
+[1232] Important: Data integrity issue on MySQL
+
+Before rev.1232 MySQL on some setups, connections where opened using PHP's default 
+encoding latin1 this caused that UTF8 data written by Akelos could not be edited using other DB tools like phpMyAdmin
+
+This change solves the issue for new applications, but existing applications can fix this by backing up your database
+and following the steps at http://codesnippets.joyent.com/posts/show/84 before defining AK_SET_UTF8_ON_MYSQL_CONNECT on your configuration file.
+
 [1205] Adding new configuration script to generate config.php and database.yml
 
 Run it only on fresh installs
