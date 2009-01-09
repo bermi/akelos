@@ -84,9 +84,15 @@ class AkMysqlDbAdapter extends AkDbAdapter
     {
         parent::connect($die_on_error);
         if(defined('AK_SET_UTF8_ON_MYSQL_CONNECT') && AK_SET_UTF8_ON_MYSQL_CONNECT){
-        	isset($this->connection->_connectionID) && mysql_set_charset('utf8', $this->connection->_connectionID);
+        	if(isset($this->connection->_connectionID)){
+        	    if(function_exists('mysql_set_charset')){
+        	        mysql_set_charset('utf8', $this->connection->_connectionID);
+        	    }else{
+        	        mysql_query('SET CHARACTER SET "utf8"', $this->connection->_connectionID);
+        	    }
+        	    
+        	}
         }
-    }
-    
+    }    
 }
 ?>
