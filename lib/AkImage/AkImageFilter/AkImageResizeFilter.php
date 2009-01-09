@@ -43,7 +43,7 @@ class AkImageResizeFilter extends AkImageFilter
         $this->_setWidthAndHeight_($options);
         $this->options = array_merge($default_options, $options);
         $this->_recalculateTargetDimenssions();
-        $this->_variablizeOptions_($options);
+        $this->_variablizeOptions_($this->options);
     }
 
     function apply()
@@ -54,21 +54,6 @@ class AkImageResizeFilter extends AkImageFilter
     function getName()
     {
         return 'resize';
-    }
-
-    function _setWidthAndHeight_(&$options)
-    {
-        if(!empty($options['size'])){
-            list($options['width'], $options['height']) = split('x|X| ',trim(str_replace(' ','',$options['size'])).'x');
-            unset($options['size']);
-        }
-
-        if(strstr($options['width'],'%')){
-            $options['width'] = $this->_getProportionalWidth($options['width']);
-        }
-        if(strstr($options['height'],'%')){
-            $options['height'] = $this->_getProportionalHeight($options['height']);
-        }
     }
 
     function _recalculateTargetDimenssions()

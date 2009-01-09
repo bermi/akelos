@@ -47,6 +47,23 @@ class AkImageFilter
             $options[AkInflector::variablize($k)] = $v;
         }
     }
+    
+
+    function _setWidthAndHeight_(&$options)
+    {
+        if(!empty($options['size'])){
+            list($options['width'], $options['height']) = split('x|X| ',trim(str_replace(' ','',$options['size'])).'x');
+            unset($options['size']);
+        }
+
+        if(strstr($options['width'],'%')){
+            $options['width'] = $this->_getProportionalWidth($options['width']);
+        }
+        if(strstr($options['height'],'%')){
+            $options['height'] = $this->_getProportionalHeight($options['height']);
+        }
+    }
+    
 }
 
 

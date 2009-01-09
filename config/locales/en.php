@@ -161,5 +161,7 @@ $dictionary['You must supply a valid generator as the first command.
 
    Available generator are:';
 
+$dictionary['Connection to the database failed. %dsn'] = 'Connection to the database failed. %dsn';
+
 
 ?>

@@ -10,6 +10,7 @@ class Test_of_AkImage extends  AkUnitTest
     {
         $this->image_path = AK_TEST_DIR.DS.'fixtures'.DS.'public'.DS.'images'.DS.'akelos_framework_logo.png';
     }
+    
     function test_image_save_as()
     {
         $PngImage = new AkImage($this->image_path);
@@ -85,8 +86,65 @@ class Test_of_AkImage extends  AkUnitTest
         $Image = new AkImage($this->image_path.'_340x150.png');
         $this->assertEqual($Image->getWidth(), 340);
         $this->assertEqual($Image->getHeight(), 150);
-        
     }
+    
+    
+    function test_get_extra_resources()
+    {
+        $this->photo_path = AK_TEST_DIR.DS.'fixtures'.DS.'public'.DS.'images'.DS.'cristobal.jpg';
+        $this->watermark = AK_TEST_DIR.DS.'fixtures'.DS.'public'.DS.'images'.DS.'watermark.png';
+        if(!is_file($this->photo_path)){
+            Ak::file_put_contents($this->photo_path, Ak::url_get_contents('http://akelos.org/testing_resources/images/cristobal.jpg'));
+            Ak::file_put_contents($this->watermark, Ak::url_get_contents('http://akelos.org/testing_resources/images/watermark.png'));
+        }
+        $this->_run_extra_tests = is_file($this->photo_path);
+    }
+    
+    function test_image_crop()
+    {
+        if(!$this->_run_extra_tests) return;
+        
+        $Image = new AkImage();
+        $Image->load($this->photo_path);
+
+        $Image->transform('crop',array('x'=>20, 'y'=>0, 'size'=>'30x30'));
+        $Image->save($this->photo_path.'_30x30_crop.jpg');
+
+        $Image = new AkImage($this->photo_path.'_30x30_crop.jpg');
+        $this->assertEqual($Image->getWidth(), 30);
+        $this->assertEqual($Image->getHeight(), 30);
+    
+        $Image = new AkImage();
+        $Image->load($this->photo_path);
+
+        $Image->transform('crop',array('x'=>20, 'y'=>15, 'width'=>50));
+        $Image->save($this->photo_path.'_50_crop.jpg');
+
+        $Image = new AkImage($this->photo_path.'_50_crop.jpg');
+        $this->assertEqual($Image->getWidth(), 50);
+        $this->assertEqual($Image->getHeight(), 359);
+        
+        $Image = new AkImage();
+        $Image->load($this->photo_path);
+
+        $Image->transform('crop',array('x'=>0, 'y'=>15));
+        $Image->save($this->photo_path.'top_crop.jpg');
+
+        $Image = new AkImage($this->photo_path.'top_crop.jpg');
+        $this->assertEqual($Image->getWidth(), 499);
+        $this->assertEqual($Image->getHeight(), 359);
+    }
+
+    function test_image_watermark()
+    {
+        if(!$this->_run_extra_tests) return;
+
+        $Image = new AkImage();
+        $Image->load($this->photo_path);
+        $Image->transform('watermark',array('mark'=>$this->watermark));
+        $Image->save($this->photo_path.'_watermarked.jpg');
+        $this->assertEqual(md5_file($this->photo_path.'_watermarked.jpg'), (AK_PHP5?'234adf4a48224f8596e53d665bf41768':'40d25943550a1dd88fb0e2cab560b421'));     
+    }    
 }
 
 ak_test('Test_of_AkImage');
