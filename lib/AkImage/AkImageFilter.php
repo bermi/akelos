@@ -56,10 +56,10 @@ class AkImageFilter
             unset($options['size']);
         }
 
-        if(strstr($options['width'],'%')){
+        if(isset($options['width']) && strstr($options['width'],'%')){
             $options['width'] = $this->_getProportionalWidth($options['width']);
         }
-        if(strstr($options['height'],'%')){
+        if(isset($options['height']) && strstr($options['height'],'%')){
             $options['height'] = $this->_getProportionalHeight($options['height']);
         }
     }
