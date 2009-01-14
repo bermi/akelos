@@ -812,7 +812,7 @@ class AkActionController extends AkObject
                 $this->Response->redirect($options);
                 $this->Response->redirected_to = $options;
                 $this->performed_redirect = true;
-            }elseif ($options == 'back'){
+            }elseif ($options == 'back' && isset($this->Request->env['HTTP_REFERER']) && preg_match('/^\w+:\/\/.*/', $this->Request->env['HTTP_REFERER'])){
                 $this->redirectTo($this->Request->env['HTTP_REFERER']);
             }else{
                 $this->redirectTo($this->Request->getProtocol(). $this->Request->getHostWithPort(). $options);
@@ -2103,18 +2103,19 @@ class AkActionController extends AkObject
 
     function _handleFlashAttribute()
     {
-        $this->_flash_handled = true;
-
-        $next_flash = empty($this->flash) ? false : $this->flash;
-        $this->flash = array();
-        if(isset($_SESSION['__flash'])){
-            $this->flash = $_SESSION['__flash'];
+        if(!$this->_flash_handled){
+            $this->_flash_handled = true;
+            $next_flash = empty($this->flash) ? false : $this->flash;
+            $this->flash = array();
+            if(isset($_SESSION['__flash'])){
+                $this->flash = $_SESSION['__flash'];
+            }
+            $_SESSION['__flash'] = $next_flash;
+            if(!empty($this->flash_now)){
+                $this->flash = array_merge((array)$this->flash,(array)$this->flash_now);
+            }
+            $this->_handleFlashOptions();
         }
-        $_SESSION['__flash'] = $next_flash;
-        if(!empty($this->flash_now)){
-            $this->flash = array_merge((array)$this->flash,(array)$this->flash_now);
-        }
-        $this->_handleFlashOptions();
     }
 
     function _handleFlashOptions()
