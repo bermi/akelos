@@ -590,7 +590,6 @@ class AkHasAndBelongsToMany extends AkAssociation
             "WHERE ".$this->Owner->getTableName().'.'.$this->Owner->getPrimaryKey()." ".
             ($is_sqlite ? ' LIKE ' : ' = ').' '.$this->Owner->quotedId(); // (HACK FOR SQLITE) Otherwise returns wrong data
             $options['finder_sql'] .= !empty($options['conditions']) ? ' AND '.$options['conditions'].' ' : '';
-            $options['finder_sql'] .= !empty($options['conditions']) ? ' AND '.$options['conditions'].' ' : '';
         }
         if(empty($options['counter_sql'])){
             $options['counter_sql'] = substr_replace($options['finder_sql'],'SELECT COUNT(*)',0,strpos($options['finder_sql'],'*')+1);
