@@ -138,13 +138,14 @@ ak_compat('array_combine');
 * == Saving arrays, hashes, and other non-mappable objects in text columns ==
 * 
 * Active Record can serialize any object in text columns. To do so, you must specify this with by setting the attribute serialize with 
-* a comma separated list of columns or an array. 
+* an array where the Keys is the column name and the value should be either true or the class name of the object being serialized.
+*
 * This makes it possible to store arrays, hashes, and other non-mappeable objects without doing any additional work. Example:
 *
 * <code> 
 *   class User extends ActiveRecord
 *   {
-*      var $serialize = 'preferences';
+*      var $serialize = array('preferences' => true);
 *   }
 *
 *   $User = new User(array('preferences'=>array("background" => "black", "display" => 'large')));
@@ -1956,13 +1957,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      ====================================================================
      See also: Getting Attributes, Setting Attributes.
      */
-    /**
-    * Returns an array of all the attributes that have been specified for serialization as keys and the objects as values.
-    */
-    function getSerializedAttributes()
-    {
-        return isset($this->_serializedAttributes) ? $this->_serializedAttributes : array();
-    }
 
     function getAvailableAttributes()
     {
@@ -3081,15 +3075,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $this->castAttributeForDatabase($this->getPrimaryKey(), $this->getId());
     }
 
-    /**
-    * Specifies that the attribute by the name of attr_name should be serialized before saving to the database and unserialized after loading from the database. If class_name is specified, the serialized object must be of that class on retrieval, as a new instance of the object will be loaded with serialized values.
-    */
-    function setSerializeAttribute($attr_name, $class_name = null)
-    {
-        if($this->hasColumn($attr_name)){
-            $this->_serializedAttributes[$attr_name] = $class_name;
-        }
-    }
 
     function getAvailableAttributesQuoted()
     {
@@ -3176,6 +3161,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 break;
 
             default:
+                if(isset($this->serialize[$column_name])){
+                    $value = serialize($value);
+                }
                 $result = is_null($value) ? 'null' : ($add_quotes ? $this->_db->quote_string($value) : $value);
                 break;
         }
@@ -3208,6 +3196,11 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 }elseif ('binary' == $column_type && $this->_getDatabaseType() == 'postgre'){
                     $value = $this->_db->unescape_blob($value);
                     $value = empty($value) || trim($value) == 'null' ? null : $value;
+                }elseif(isset($this->serialize[$column_name])){
+                    if(!class_exists($this->serialize[$column_name])){
+                        Ak::import($this->serialize[$column_name]);
+                    }
+                    $value = unserialize($value);
                 }
             }
         }
