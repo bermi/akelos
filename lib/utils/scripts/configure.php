@@ -30,7 +30,7 @@ function prompt_var($question, $default_value = null, $cli_value = null)
 
 function set_db_user_and_pass(&$FrameworkSetup, &$db_user, &$db_pass, &$db_type, $defaults = true){
     global $options;
-    $db_type = prompt_var('Dabase type', 'mysql', $defaults?@$options['database']:null);
+    $db_type = prompt_var('Database type', 'mysql', $defaults?@$options['database']:null);
     $db_user = prompt_var('Database user', $FrameworkSetup->suggestUserName(), $defaults?@$options['user']:null);
     $db_pass = prompt_var('Database password', '', $defaults?@$options['password']:null);
     
