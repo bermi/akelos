@@ -99,12 +99,12 @@ class AkSintagsLexer extends AkLexer
 
     function _addVariableTokens()
     {
-        $this->addSpecialPattern('{[A-Za-z][\.A-Za-z0-9_-]*}','Text','Variable');
+        $this->addSpecialPattern('{\\\?[A-Za-z][\.A-Za-z0-9_-]*}','Text','Variable');
     }
 
     function _addConditionalVariableTokens()
     {
-        $this->addSpecialPattern('{[A-Za-z][\.A-Za-z0-9_-]*\?}','Text','ConditionalVariable');
+        $this->addSpecialPattern('{\\\?[A-Za-z][\.A-Za-z0-9_-]*\?}','Text','ConditionalVariable');
     }
 
     function _addConditionStartTokens()

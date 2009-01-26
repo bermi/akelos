@@ -204,9 +204,12 @@ class AkSintagsParser
 
     function ConditionalVariable($match, $state)
     {
+        $_skip_sanitizing = ($match[1] != '\\');
         $php_variable = $this->_convertSintagsVarToPhp(trim($match,'{}?'));
         if($php_variable){
-            $this->output .= '<?php echo empty('.$php_variable.') ? \'\' : '.$php_variable.'; ?>';
+            $this->output .= '<?php echo empty('.$php_variable.') ? \'\' : '.
+                ($_skip_sanitizing ? $php_variable : '$text_helper->h('.$php_variable.')').
+                '; ?>';
         }else{
             $this->output .= $match;
         }
@@ -221,9 +224,10 @@ class AkSintagsParser
 
     function Variable($match, $state)
     {
+        $_skip_sanitizing = ($match[1] != '\\');
         $php_variable = $this->_convertSintagsVarToPhp($match);
         if($php_variable){
-            $this->output .= '<?php echo '.$php_variable.'; ?>';
+            $this->output .= $_skip_sanitizing ? '<?php echo '.$php_variable.'; ?>' :  '<?php echo $text_helper->h('.$php_variable.'); ?>';
         }else{
             $this->output .= $match;
         }
@@ -236,7 +240,7 @@ class AkSintagsParser
         if(preg_match('/[\.-]_/',$var)){
             return false;
         }
-        $var = str_replace(array('-','.'),array('~','->'),trim($var,'-_.{}@'));
+        $var = str_replace(array('-','.'),array('~','->'),trim($var,'-_.{}@\\'));
         if(strstr($var,'~')){
             $pieces = explode('~',$var);
             $var = array_shift($pieces);

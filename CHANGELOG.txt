@@ -1,3 +1,18 @@
+[1241] Adding a new shotcut for sanitizing/escaping html entities variables on Sintags.
+
+Now you can use this Sintags 
+
+{{{
+    {\variable}
+}}}
+
+to generate this PHP code on the compiled template
+
+{{{
+    <?php echo $text_helper->h($variable); ?>
+}}}
+
+
 [1232] Important: Data integrity issue on MySQL
 
 Before rev.1232 MySQL on some setups, connections where opened using PHP's default 

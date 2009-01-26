@@ -1,4 +1,5 @@
 
+
 <?php 
 echo "{@url_for controller:page}";
 ?>
@@ -444,3 +445,35 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 ?>
 
 <?php } ?>
+
+===================================
+
+
+{\comment}
+
+-----------------------------------
+
+<?php echo $text_helper->h($comment); ?>
+
+
+===================================
+
+
+{\comment.one}
+
+-----------------------------------
+
+<?php echo $text_helper->h($comment->one); ?>
+
+===================================
+
+
+{\comment-two}
+
+-----------------------------------
+
+<?php echo $text_helper->h($comment['two']); ?>
+
+
+
+
