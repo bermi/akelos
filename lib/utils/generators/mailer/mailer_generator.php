@@ -26,6 +26,9 @@ class MailerGenerator extends  AkelosGenerator
         $this->class_name = AkInflector::camelize($this->class_name);
         $this->assignVarToTemplate('class_name', $this->class_name);
         $this->actions = Ak::toArray(@$this->actions);
+        if(empty($this->actions)){
+            trigger_error(Ak::t('You must supply at least one action for the mailer.'), E_USER_ERROR);
+        }
         $this->assignVarToTemplate('actions', $this->actions);
         $this->underscored_class_name = AkInflector::underscore($this->class_name);
         $this->model_path = 'app'.DS.'models'.DS.$this->underscored_class_name.'.php';
