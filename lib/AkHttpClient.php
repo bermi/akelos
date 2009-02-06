@@ -32,8 +32,19 @@ class AkHttpClient extends AkObject
     function customRequest($url, $http_verb = 'GET', $options = array(), $body = '')
     {
         $this->getRequestInstance($url, $http_verb, $options, $body);
-        return $this->sendRequest();
+		return empty($options['cache']) ? $this->sendRequest() : $this->returnCustomRequestFromCache($url,$options);
     }
+
+	function returnCustomRequestFromCache($url, $options)
+	{
+		$Cache = Ak::cache();
+        $Cache->init(is_numeric($options['cache']) ? $options['cache'] : 86400, !isset($options['cache_type']) ? 1 : $options['cache_type']);
+        if (!$data = $Cache->get('AkHttpClient_'.md5($url))) {
+            $data = $this->sendRequest();
+            $Cache->save($data);
+        }
+        return $data;
+	}
     
     function urlExists($url)
     {
