@@ -4515,8 +4515,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 }
             }elseif (is_array($this->act_as)){
                 foreach ($this->act_as as $type=>$options){
-                    $this->actsAs($type, $options);
-                }
+					if(is_numeric($type)){
+	                    $this->actsAs($options, array());
+					}else{
+	                    $this->actsAs($type, $options);						
+					}
+				}
             }
         }
     }
