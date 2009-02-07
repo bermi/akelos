@@ -56,7 +56,7 @@ class test_AkActiveRecord extends  AkUnitTest
 
         $this->assertEqual($AkTestUser->getModelName(), 'AkTestUser');
         $this->assertEqual($AkTestUser->getTableName(), 'ak_test_users');
-        $this->assertErrorPattern('/ak_test_user/',$AkTestUser->setTableName('ak_test_user'));
+        $this->assertErrorPattern('/ak_test_user/', $AkTestUser->setTableName('ak_test_user'));
 
         //$this->_createNewTestingModel('AkTestUnavailableDatabase');
         //$AkTestUnavailableDatabase = new AkTestUnavailableDatabase();
@@ -129,12 +129,12 @@ class test_AkActiveRecord extends  AkUnitTest
     // More of this testing in Test_of_db_inspection
     function Test_of_loadColumnsSettings()
     {
+        AkDbSchemaCache::shouldRefresh(false);
         $AkTestField = new AkTestField();
         $AkTestField->loadColumnsSettings();
         // Testing database settings cache on session (this might be changed in a future
-        AkDbSchemaCache::doRefresh(false);
-        $this->assertEqual($AkTestField->_columnsSettings,AkDbSchemaCache::getModelColumnSettings('AkTestField'));
-        AkDbSchemaCache::doRefresh(true);
+        $this->assertEqual($AkTestField->_columnsSettings, AkDbSchemaCache::get('AkTestField_column_settings'));
+        AkDbSchemaCache::shouldRefresh(true);
     }
 
     function Test_of_initiateColumnsToNull()
@@ -566,19 +566,6 @@ class test_AkActiveRecord extends  AkUnitTest
         $this->assertTrue($expected['user_name'] == $got['user_name'] || str_replace("\\","'",$expected['user_name']) == $got['user_name']);
         unset($expected['user_name'], $got['user_name'], $expected['last_name'], $got['last_name']);
         $this->assertEqual($expected, $got);
-    }
-
-    function Test_of_getSerializedAttributes_and_setSerializeAttribute()
-    {
-        $User = new AkTestUser();
-        $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
-        $User->setSerializeAttribute('user_name');
-        $User->setSerializeAttribute('name');
-        $User->setSerializeAttribute('not_valid');
-        $User->setSerializeAttribute('email','MimeEmail');
-        $expected = array('user_name' => null, 'email' => 'MimeEmail');
-        $this->assertEqual($expected, $User->getSerializedAttributes());
-
     }
 
     function Test_of_setAccessibleAttributes()

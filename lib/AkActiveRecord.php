@@ -32,14 +32,6 @@ defined('AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS') ? null : define
 defined('AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS') ? null : define('AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS', AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS);
 defined('AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS') ? null : define('AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS', AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS);
 
-// Forces loading database schema on every call
-if(AK_DEV_MODE) {
-    AkDbSchemaCache::doRefresh(true);
-} else if (AK_ENVIRONMENT == 'testing') {
-    AkDbSchemaCache::doRefresh(true);
-    define('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA',true);
-}
-
 defined('AK_ACTIVE_RECORD_ENABLE_PERSISTENCE') ? null : define('AK_ACTIVE_RECORD_ENABLE_PERSISTENCE', AK_ENVIRONMENT != 'testing');
 defined('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA') ? null : define('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA', AK_ACTIVE_RECORD_ENABLE_PERSISTENCE && AK_ENVIRONMENT != 'development');
 defined('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE') ? null : define('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE', 300);
@@ -2419,30 +2411,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     function setTableName($table_name = null, $check_for_existence = AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES, $check_mode = false)
     {
-        !AK_TEST_MODE && $static_cached_tables = Ak::getStaticVar('available_tables');
-        
         if(empty($table_name)){
             $table_name = AkInflector::tableize($this->getModelName());
         }
         if($check_for_existence){
-            if(!isset($available_tables) || $check_mode){
-                if(!isset($this->_db)){
-                    $this->setConnection();
-                }
-                if (!AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA || 
-                    ($available_tables = AkDbSchemaCache::getAvailableTables()) === false) {
-                    if(!empty($static_cached_tables)){
-                        $available_tables = $static_cached_tables;
-                    }else{
-                        $available_tables = $this->_db->availableTables();
-                    }
-                    if (AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA) {
-                        AkDbSchemaCache::setAvailableTables($available_tables);
-                    }
-                    !AK_TEST_MODE && Ak::setStaticVar('available_tables', $available_tables);
-                }
-            }
-            if(!in_array($table_name,(array)$available_tables)){
+            !isset($this->_db) && $this->setConnection();
+            if(!$this->_db->tableExists($table_name, true)){
                 if(!$check_mode){
                     trigger_error(Ak::t('Unable to set "%table_name" table for the model "%model".'.
                     '  There is no "%table_name" available into current database layout.'.
@@ -2541,11 +2515,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      */
     function _databaseTableInternals($table)
     {
-        if (!AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA || ($cache = AkDbSchemaCache::getDbTableInternals($table))===false) {
+        if (!$cache = AkDbSchemaCache::get('table_internals_for_'.$table)) {
             $cache = $this->_db->getColumnDetails($table);
-            if (AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA) {
-                AkDbSchemaCache::setDbTableInternals($table,$cache);
-            }
+            AkDbSchemaCache::set('table_internals_for_'.$table, $cache);
         }
         return $cache;
     }
@@ -2615,9 +2587,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if(is_null($this->_db)){
             $this->setConnection();
         }
-        $this->_columnsSettings = $force_reload ? null : $this->_getPersistedTableColumnSettings();
-
-        if(empty($this->_columnsSettings) || !AK_ACTIVE_RECORD_ENABLE_PERSISTENCE){
+        $this->_columnsSettings = ($force_reload ? null : $this->_getPersistedTableColumnSettings());
+        if(empty($this->_columnsSettings)){
             if(empty($this->_dataDictionary)){
                 $this->_dataDictionary =& $this->_db->getDictionary();
             }
@@ -2625,10 +2596,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $column_objects = $this->_databaseTableInternals($this->getTableName());
 
             if( !isset($this->_avoidTableNameValidation) &&
-            !is_array($column_objects) &&
-            !$this->_runCurrentModelInstallerIfExists($column_objects)){
-                trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())), E_USER_ERROR);
-                return false;
+                !is_array($column_objects) &&
+                !$this->_runCurrentModelInstallerIfExists($column_objects)){
+                    trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())), E_USER_ERROR);
+                    return false;
             }elseif (empty($column_objects)){
                 $this->_runCurrentModelInstallerIfExists($column_objects);
             }
@@ -2637,7 +2608,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     $this->setColumnSettings($column_objects[$k]->name, $column_objects[$k]);
                 }
             }
-            if(!empty($this->_columnsSettings) && AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA){
+            if(!empty($this->_columnsSettings)){
                 $this->_persistTableColumnSettings();
             }
         }
@@ -2690,20 +2661,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $this->_columnNames = $this->_columns = $this->_columnsSettings = $this->_contentColumns = array();
     }
 
-    /**
-    * @access private
-    */
-    function _getColumnsSettings()
-    {
-        return AkDbSchemaCache::getColumnsSettings();
-    }
 
     /**
     * @access private
     */
     function _getModelColumnSettings()
     {
-        return AkDbSchemaCache::getModelColumnSettings($this->getModelName());
+        return AkDbSchemaCache::get($this->getModelName().'_column_settings');
         
     }
 
@@ -2712,7 +2676,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function _persistTableColumnSettings()
     {
-        AkDbSchemaCache::setModelColumnSettings($this->getModelName(), $this->_columnsSettings);
+        AkDbSchemaCache::set($this->getModelName().'_column_settings', $this->_columnsSettings);
     }
 
     /**
@@ -2720,8 +2684,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function _getPersistedTableColumnSettings()
     {
-        return AkDbSchemaCache::getModelColumnSettings($this->getModelName());
-        
+        return AkDbSchemaCache::get($this->getModelName().'_column_settings');        
     }
 
     /**
@@ -4515,12 +4478,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 }
             }elseif (is_array($this->act_as)){
                 foreach ($this->act_as as $type=>$options){
-					if(is_numeric($type)){
-	                    $this->actsAs($options, array());
-					}else{
-	                    $this->actsAs($type, $options);						
-					}
-				}
+                    if(is_numeric($type)){
+                        $this->actsAs($options, array());
+                    }else{
+                        $this->actsAs($type, $options);						
+                    }
+                }
             }
         }
     }

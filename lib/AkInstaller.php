@@ -88,7 +88,7 @@ class AkInstaller extends AkObject
         }else {
             $this->db =& $db_connection;
         }
-
+        AkDbSchemaCache::clearAll();        
         $this->data_dictionary =& $this->db->getDictionary();
         $this->available_tables = $this->getAvailableTables();
     }

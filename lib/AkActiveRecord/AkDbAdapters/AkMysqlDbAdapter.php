@@ -68,11 +68,6 @@ class AkMysqlDbAdapter extends AkDbAdapter
         return $this->execute("ALTER TABLE $table_name CHANGE COLUMN $column_name $new_name $column_type_definition");
     }
     
-    function availableTables()
-    {
-        return $this->selectValues('SHOW TABLES');
-    }
-    
     /* QUOTING */ 
     
     function quote_string($value)

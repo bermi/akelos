@@ -170,6 +170,7 @@ class AkConfig
         }
         return $config;
     }
+    
     function _writeCache($config, $namespace, $environment = AK_ENVIRONMENT, $force = false)
     {
         if (AK_ENVIRONMENT == 'setup' || (!$force &&!$this->_useWriteCache($environment)))  return false;
@@ -206,6 +207,7 @@ CACHE;
         }
         $this->_setCacheValidity($namespace,$environment);
     }
+    
     function _generateConfigFileName($namespace,$environment = AK_ENVIRONMENT)
     {
         $namespace = Ak::sanitize_include($namespace, 'high');
@@ -272,7 +274,7 @@ CACHE;
     
     function _getConstant($name)
     {
-        return defined($name[1])?constant($name[1]):'';
+        return defined($name[1]) ? constant($name[1]) : '';
     }
     
     function &get($namespace, $environment = AK_ENVIRONMENT, $raise_error_if_config_file_not_found = true, $uncached = false)

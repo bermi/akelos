@@ -373,16 +373,43 @@ class AkDbAdapter extends AkObject
      *
      * @return unknown
      */
-    function availableTables()
+    function availableTables($force_lookup = false)
     {
-        return $this->connection->MetaTables();
+        $available_tables = array();
+        !AK_TEST_MODE && $available_tables = Ak::getStaticVar('available_tables');
+        if(!$force_lookup && empty($available_tables)){
+            if (($available_tables = AkDbSchemaCache::get('avaliable_tables')) === false) {
+                if(empty($available_tables)){
+                    $available_tables = $this->connection->MetaTables();                
+                }
+                AkDbSchemaCache::set('avaliable_tables', $available_tables);
+                !AK_TEST_MODE && Ak::setStaticVar('available_tables', $available_tables);
+            }
+        }
+        $available_tables = $force_lookup ? $this->connection->MetaTables() : $available_tables;
+        $force_lookup && !AK_TEST_MODE && Ak::setStaticVar('available_tables', $available_tables);
+        return $available_tables;
     }
+    
+    function tableExists($table_name)
+    {
+        // First try if cached
+        $available_tables = $this->availableTables();
+        if(!in_array($table_name,(array)$available_tables)){
+            // Force lookup and refresh cache
+           $available_tables = $this->availableTables(true);
+           return in_array($table_name,(array)$available_tables);
+        }
+        return true;
+    }
+    
     /**
      * caching the meta info
      *
      * @param unknown_type $table_name
      * @return unknown
      */
+    
     function getColumnDetails($table_name)
     {
         return $this->connection->MetaColumns($table_name);
