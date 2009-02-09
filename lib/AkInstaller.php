@@ -117,6 +117,7 @@ class AkInstaller extends AkObject
 
     function _upgradeOrDowngrade($action, $version = null, $options = array())
     {
+        AkDbSchemaCache::clearAll();
         if(in_array('quiet',$options) && AK_DEV_MODE){
             $this->vervose = false;
         }elseif(!empty($this->vervose) && AK_DEV_MODE){
@@ -458,10 +459,7 @@ class AkInstaller extends AkObject
 
     function getAvailableTables()
     {
-        if(empty($this->available_tables)){
-            $this->available_tables = $this->db->availableTables();
-        }
-        return $this->available_tables;
+        return $this->available_tables = $this->db->availableTables();;
     }
 
     function tableExists($table_name)
