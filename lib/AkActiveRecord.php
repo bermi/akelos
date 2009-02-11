@@ -266,7 +266,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         @$this->_instantiateDefaultObserver();
 
-        $this->setConnection();
+        $this->establishConnection();
 
         if(!empty($this->table_name)){
             $this->setTableName($this->table_name);
@@ -587,7 +587,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $sql = 'SELECT COUNT(*) '.substr($sql,strpos(str_replace(' from ',' FROM ', $sql),' FROM '));
         }
         if(!$this->isConnected()){
-            $this->setConnection();
+            $this->establishConnection();
         }
 
         return (integer)$this->_db->selectValue($sql);
@@ -2415,7 +2415,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $table_name = AkInflector::tableize($this->getModelName());
         }
         if($check_for_existence){
-            !isset($this->_db) && $this->setConnection();
+            !isset($this->_db) && $this->establishConnection();
             if(!$this->_db->tableExists($table_name, true)){
                 if(!$check_mode){
                     trigger_error(Ak::t('Unable to set "%table_name" table for the model "%model".'.
@@ -2585,7 +2585,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function loadColumnsSettings($force_reload = false)
     {
         if(is_null($this->_db)){
-            $this->setConnection();
+            $this->establishConnection();
         }
         $this->_columnsSettings = ($force_reload ? null : $this->_getPersistedTableColumnSettings());
         if(empty($this->_columnsSettings)){
@@ -4513,7 +4513,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function dbug()
     {
         if(!$this->isConnected()){
-            $this->setConnection();
+            $this->establishConnection();
         }
         $this->_db->connection->debug = $this->_db->connection->debug ? false : true;
         $this->db_debug =& $this->_db->connection->debug;
