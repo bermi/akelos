@@ -1,7 +1,7 @@
 <?php  echo '<?php'?>
 
 
-// Unit test for <?php  echo $class_name?>. (Testing docs at http://wiki.akelos.org/testing-guide)
+// Unit test for <?php  echo $class_name?>. (Testing docs at http://www.akelos.org/wiki/testing-guide)
 // Run this test with the command
 //  ./script/test model <?php  echo $class_name?>
 

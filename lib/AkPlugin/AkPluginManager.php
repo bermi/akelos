@@ -26,7 +26,7 @@
 require_once(AK_LIB_DIR.DS.'AkPlugin.php');
 
 defined('AK_PLUGINS_MAIN_REPOSITORY') ? null : define('AK_PLUGINS_MAIN_REPOSITORY', 'http://svn.akelos.org/plugins');
-defined('AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE') ? null : define('AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE', 'http://wiki.akelos.org/plugins');
+defined('AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE') ? null : define('AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE', 'http://www.akelos.org/wiki/plugins');
 
 /**
  * Plugin manager
@@ -290,9 +290,9 @@ class AkPluginManager extends AkObject
 
 
     /**
-     * Gets a list of repositories available at the web page defined by AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE (http://wiki.akelos.org/plugins by default)
+     * Gets a list of repositories available at the web page defined by AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE (http://www.akelos.org/wiki/plugins by default)
      * 
-     * @return array An array of non trusted repositories available at http://wiki.akelos.org/plugins
+     * @return array An array of non trusted repositories available at http://www.akelos.org/wiki/plugins
      * @access public 
      */
     function getDiscoveredRepositories()
@@ -359,7 +359,7 @@ class AkPluginManager extends AkObject
 
 
     /**
-     * Retrieves the URL's from the AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE (http://wiki.akelos.org/plugins by default)
+     * Retrieves the URL's from the AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE (http://www.akelos.org/wiki/plugins by default)
      * 
      * Plugins in that page must follow this convention:
      * 
@@ -373,7 +373,7 @@ class AkPluginManager extends AkObject
     {
 
         $repositories = array();
-        if(preg_match_all('/href="(http:\/\/(?!wiki\.akelos\.org)[^"]*plugins)/', Ak::url_get_contents($this->respository_discovery_page), $matches)){
+        if(preg_match_all('/href="(http:\/\/(?!www\.akelos\.org\/wiki\/)[^"]*plugins)/', Ak::url_get_contents($this->respository_discovery_page), $matches)){
             $repositories = array_unique($matches[1]);
         }
         return $repositories;

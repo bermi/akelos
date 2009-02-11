@@ -62,6 +62,7 @@ class AkResponse extends AkObject
             $this->_headers[] = $args[0];
         }
     }
+    
     function setContentTypeForFormat($format)
     {
         if (!empty($format)) {
@@ -71,10 +72,11 @@ class AkResponse extends AkObject
             }
         }
     }
+    
     function outputResults()
     {
         $this->sendHeaders();
-        if(is_object($this->body) && method_exists($this->body,'stream')){
+        if($this->_streamBody()){
             AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message("Sending response as stream") : null;
             $this->body->stream();
         }else{
@@ -82,10 +84,12 @@ class AkResponse extends AkObject
             echo $this->body;
         }
     }
+    
     function getStatus()
     {
         return isset($this->_headers['Status'])?$this->_headers['Status']:$this->_default_status;
     }
+    
     function sendHeaders($terminate_if_redirected = true)
     {
         /**
@@ -107,7 +111,7 @@ class AkResponse extends AkObject
         array_unshift($this->_headers,  $status ? $status : (strstr('HTTP/1.1 '.$this->_headers['Status'],'HTTP') ? $this->_headers['Status'] : 'HTTP/1.1 '.$this->_headers['Status']));
         unset($this->_headers['Status']);
 
-        
+        $_has_content_type = $_has_content_length = false;
         if(!empty($this->_headers) && is_array($this->_headers)){
             $this->addHeader('Connection: close');
             foreach ($this->_headers as $k=>$v){
@@ -121,29 +125,42 @@ class AkResponse extends AkObject
                         continue;
                     }
                 }
-                if(strtolower(substr($header,0,13)) == 'content-type:'){
+                if(!$_has_content_type && strtolower(substr($header,0,13)) == 'content-type:'){
                     $_has_content_type = true;
+                }elseif(!$_has_content_length && strtolower(substr($header,0,15)) == 'content-length:'){
+                    $_has_content_length = true;
                 }
+                
                 AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message("Sending header:  $header") : null;
                 header($header);
             }
         }
         
-        if(empty($_has_content_type) && defined('AK_CHARSET') && (empty($_redirected) || (!empty($_redirected) && !empty($javascript_redirection)))){
+        if(!$_has_content_type && defined('AK_CHARSET') && (empty($_redirected) || (!empty($_redirected) && !empty($javascript_redirection)))){
             header('Content-Type: text/html; charset='.AK_CHARSET);
             $this->_headers_sent[] = 'Content-Type: text/html; charset='.AK_CHARSET;
         }
         
+        if(!$_has_content_length && !$this->_streamBody()){
+            $length = strlen($this->body);
+            if($length > 0){
+                header('Content-Length: '.$length);
+                $this->_headers_sent[] = 'Content-Length: '.$length;   
+            }
+        }
+
         if(!empty($javascript_redirection)){
             echo $javascript_redirection;
         }
         
         $terminate_if_redirected ? (!empty($_redirected) ? exit() : null) : null;
     }
+    
     function addSentHeader($header)
     {
         $this->_headers_sent[] = $header;
     }
+    
     function deleteHeader($header)
     {
         unset($this->_headers[$header]);
@@ -209,6 +226,11 @@ class AkResponse extends AkObject
         504 => "HTTP/1.1 504 Gateway Time-out"
         );
         return empty($status_codes[$status_code]) ? false : $status_codes[$status_code];
+    }
+    
+    function _streamBody()
+    {
+        return is_object($this->body) && method_exists($this->body,'stream');
     }
 }
 
