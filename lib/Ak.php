@@ -1999,6 +1999,5 @@ class Ak
     }
 }
 
-Ak::profile('Ak.php class included'.__FILE__);
 
 ?>

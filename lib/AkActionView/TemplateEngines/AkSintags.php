@@ -213,8 +213,18 @@ class AkSintags
 
     function toPhp()
     {
-        $Parser =& new AkSintagsParser();
-        return $Parser->parse($this->_code);
+        $this->Parser =& new AkSintagsParser();
+        return $this->Parser->parse($this->_code);
+    }
+    
+    function getErrors()
+    {
+        return $this->Parser->getErrors();
+    }
+    
+    function getParsedCode()
+    {
+        return $this->Parser->parsed_code;
     }
 }
 

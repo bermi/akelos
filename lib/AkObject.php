@@ -58,7 +58,6 @@ class AkObject
     */
     function AkObject()
     {
-        Ak::profile('Instantiating '.get_class($this));
         $args = func_get_args();
         ____ak_shutdown_function(&$this);
         call_user_func_array(array(&$this, '__construct'), $args);
@@ -169,10 +168,8 @@ function ____ak_shutdown_function($details = false)
     static $_registered = false;
     static $___registered_objects = array();
     if($details === false){
-        Ak::profile('Calling shutdown destructors');
         foreach (array_keys($___registered_objects) as $k){
             if(!empty($___registered_objects[$k]) && is_object($___registered_objects[$k]) && method_exists($___registered_objects[$k],'__destruct')){
-                Ak::profile('Calling destructor for '.get_class($___registered_objects[$k]));
                 $___registered_objects[$k]->__destruct();
             }
         }

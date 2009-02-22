@@ -1997,7 +1997,6 @@ class AkActionController extends AkObject
     */
     function beforeAction($method = '')
     {
-        Ak::profile('Running before controller action filters '.__CLASS__.'::'.__FUNCTION__.' '.__LINE__);
         return $this->_callFilters($this->_beforeFilters, $method);
     }
 
@@ -2007,7 +2006,6 @@ class AkActionController extends AkObject
     */
     function afterAction($method = '')
     {
-        Ak::profile('Running after controller action filters '.__CLASS__.'::'.__FUNCTION__.' '.__LINE__);
         return $this->_callFilters(&$this->_afterFilters, $method);
     }
 

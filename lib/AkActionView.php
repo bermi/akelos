@@ -358,7 +358,6 @@ class AkActionView extends AkObject
 
     function renderPartialCollection($partial_name, $collection, $partial_spacer_template = null, $local_assigns = array())
     {
-        Ak::profile('Rendering partial Collection'.$partial_name);
         $collection_of_partials = array();
         $counter_name = $this->_partialCounterName($partial_name);
         if(empty($local_assigns[$counter_name])){
@@ -369,8 +368,6 @@ class AkActionView extends AkObject
             $local_assigns[$counter_name] = $counter+1;
             $collection_of_partials[] = $this->renderPartial($partial_name, $element, $local_assigns);
         }
-
-        Ak::profile('Finished rendering partial Collection'.$partial_name);
 
         if (empty($collection_of_partials)) {
             return ' ';

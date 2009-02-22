@@ -48,14 +48,20 @@ class AkPhpTemplateHandler
             $TemplateEngine =& new $____template_engine_name();
 
             $TemplateEngine->init(array(
-            'code' => $____code,
+            'code' => $____code
             ));
 
             $____code = $TemplateEngine->toPhp();
 
             if($____code === false){
-                trigger_error(join("\n",$TemplateEngine->getErrors()), E_USER_ERROR);
-                return false;
+                if(AK_PRODUCTION_MODE){
+                    trigger_error(join("\n",$TemplateEngine->getErrors()), E_USER_ERROR);
+                    return false;                    
+                }else{
+                    trigger_error(join("\n",$TemplateEngine->getErrors()), E_USER_NOTICE);
+                    echo highlight_string($TemplateEngine->getParsedCode(), true);
+                    die();
+                }
             }
             if(AK_TEMPLATE_SECURITY_CHECK && $this->_templateNeedsValidation()){
                 if(!$this->_assertForValidTemplate()){
@@ -150,7 +156,8 @@ class AkPhpTemplateHandler
         if(empty($this->_options['compiled_file_name'])){
             $template_filename = $this->_getTemplateFilename();
             $this->_options['compiled_file_name'] =  $this->_getCompiledTemplateBasePath().DS.
-            (empty($template_filename) ? 'tpl_'.md5($this->_options['code']) : $template_filename).'.php';
+            (empty($template_filename) ? 'tpl_'.md5($this->_options['code']) : $template_filename).'.'.
+            $this->_getHelpersChecksum().'.php';
         }
         return $this->_options['compiled_file_name'];
     }
@@ -162,6 +169,16 @@ class AkPhpTemplateHandler
             $options['ftp'] = false;
         }
         Ak::file_put_contents($this->_getCompiledTemplatePath(), $this->_options['code'], $options);
+    }
+    
+
+    function _getHelpersChecksum()
+    {
+        if(!isset($this->_helpers_checksum)){
+            require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkHelperLoader.php');
+            $this->_helpers_checksum = md5(serialize(AkHelperLoader::getInstantiatedHelperNames()));            
+        }
+        return $this->_helpers_checksum;
     }
 }
 

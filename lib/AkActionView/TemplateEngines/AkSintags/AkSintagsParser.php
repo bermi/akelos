@@ -5,6 +5,7 @@
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
 // | Copyright (c) 2002-2007, Akelos Media, S.L.  & Bermi Ferrer Martinez |
+// | Copyright (c) 2008-2009,  Bermi Ferrer Martinez                      |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
@@ -30,6 +31,8 @@ class AkSintagsParser
     var $_matches;
     var $_current_match;
     var $_block_vars = array();
+    var $_errors = array();
+    var $parsed_code = null;
     var $output;
     var $escape_chars = array(
     '\{' => '____AKST_OT____',
@@ -49,8 +52,12 @@ class AkSintagsParser
 
     function parse($raw)
     {
-        $this->_Lexer->parse($this->beforeParsing($this->_escapeChars($raw)));
-        return $this->afterParsing($this->getResults());
+        if(empty($this->parsed_code)){
+            $this->_Lexer->parse($this->beforeParsing($this->_escapeChars($raw)));
+            $this->parsed_code = $this->afterParsing($this->getResults());
+            return $this->hasErrors() ? false : $this->parsed_code;
+        }
+        return $this->parsed_code;
     }
 
     function beforeParsing($raw)
@@ -371,7 +378,7 @@ class AkSintagsParser
                     $this->output .= "\${$helper}->$method_name(";
                     return true;
                 }else{
-                    $this->raiseError(Ak::t('Could not find a helper to handle the method "%method" you called in your view', array('%method'=>$method_name)), E_USER_NOTICE);
+                    $this->addError(Ak::t('Could not find a helper to handle the method "%method" you called in your view', array('%method'=>$method_name)));
                 }
                 return false;
                 break;
@@ -586,7 +593,7 @@ class AkSintagsParser
                     }elseif(!strstr($match,'(') && $php_variable = $this->_convertSintagsVarToPhp($method_or_var_name)){
                         $this->_block_data[] = $php_variable;
                     }else{
-                        $this->raiseError(Ak::t('Could not find a helper to handle the method "%method" you called in your view', array('%method'=>$method_or_var_name)), E_USER_NOTICE);
+                        $this->addError(Ak::t('Could not find a helper to handle the method "%method" you called in your view', array('%method'=>$method_or_var_name)));
                     }
                 }
 
@@ -639,9 +646,9 @@ class AkSintagsParser
     }
 
 
-    function raiseError($error, $type = E_USER_NOTICE)
+    function addError($error)
     {
-        trigger_error($error, $type);
+        $this->_errors[] = $error;
     }
 
     function _tokenizeHelperStructures($raw_structures)
@@ -699,6 +706,16 @@ class AkSintagsParser
         }
         $this->_getAvailableHelpers();
         return empty($this->available_helpers[$method_name]) ? false : $this->available_helpers[$method_name];
+    }
+    
+    function hasErrors()
+    {
+        return !empty($this->_errors);
+    }
+    
+    function getErrors()
+    {
+        return $this->_errors;
     }
 
 }

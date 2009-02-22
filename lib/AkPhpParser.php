@@ -560,7 +560,6 @@ class AkPhpParser
     {
         return array_keys($this->errors);
     }
-
 }
 
 ?>
