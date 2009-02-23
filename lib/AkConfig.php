@@ -240,15 +240,17 @@ CACHE;
             }
             return false;
         }
+
         require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'spyc.php');
         $content = file_get_contents($yaml_file_name);
         $content = $this->_parseSettingsConstants($content);
         $config = Spyc::YAMLLoad($content);
         
-        if (!is_array($config)) return false;
+        if (!is_array($config)){
+            return false;
+        }
         
         $default = isset($config['default'])?$config['default']:array();
-        
         
         $configs = array();
         
@@ -256,14 +258,14 @@ CACHE;
         $environments = array_keys($config);
         $default_environments = array('testing','development','production');
         $environments = array_merge($default_environments, $environments);
+        
         foreach($environments as $env) {
-            
             $envConfig = $this->_merge($default, isset($config[$env])?$config[$env]:array());
             $this->_writeCache($envConfig,$namespace,$env,$this->_useWriteCache($environment));
             $configs[$env] = $envConfig;
         }
         
-        return isset($configs[$environment])?$configs[$environment]:$default;
+        return isset($configs[$environment]) ? $configs[$environment] : (in_array($environments, $environments) ? $default : false);
         
     }
     
@@ -284,7 +286,7 @@ CACHE;
             return $_configs[$namespace][$environment];
         }
         if ($uncached || !($config = $this->_readCache($namespace, $environment))) {
-            $config = $this->_readConfig($namespace, $environment,$raise_error_if_config_file_not_found);
+            $config = $this->_readConfig($namespace, $environment, $raise_error_if_config_file_not_found);
         }
         if (!isset($_configs[$namespace])) {
             $_configs[$namespace] = array($environment=>$config);

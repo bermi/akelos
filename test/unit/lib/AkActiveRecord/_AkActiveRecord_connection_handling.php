@@ -24,9 +24,8 @@ class AkActiveRecord_connection_handling_TestCase extends  AkUnitTest
         $this->assertFalse($development_connection===$default_connection);
         
         $this->assertFalse($Model->establishConnection('not_specified_profile'));
-        $this->assertError("The environment not_specified_profile is not allowed. Allowed environments: setup,testing,development,production");
         $this->assertError("Could not find the database profile 'not_specified_profile' in config/database.yml.");
-        
+
         $check_default_connection =& AkDbAdapter::getInstance();
         $this->assertReference($default_connection,$check_default_connection);
         $this->assertReference($default_connection->connection,$check_default_connection->connection);
@@ -41,6 +40,34 @@ class AkActiveRecord_connection_handling_TestCase extends  AkUnitTest
         //$this->assertNotEqual($available_tables_on_development,$development_connection->availableTables());
         //$this->assertEqual($available_tables_on_default,$development_connection->availableTables());
         
+    }
+    
+    function test_should_establish_multiple_connections()
+    {
+        if(AK_PHP5){
+            $db_settings = Ak::convert('yaml', 'array', AK_CONFIG_DIR.DS.'database.yml');
+            $db_settings['sqlite_databases'] = array(
+                    'database_file' => AK_TMP_DIR.DS.'testing_sqlite_database.sqlite',
+                    'type' => 'sqlite'
+                    );
+            file_put_contents(AK_CONFIG_DIR.DS.'database.yml', Ak::convert('array', 'yaml', $db_settings));
+        
+       
+            $this->installAndIncludeModels(array('TestOtherConnection'));
+
+            Ak::import('test_other_connection');
+            $OtherConnection = new TestOtherConnection(array('name'=>'Delia'));
+            $this->assertTrue($OtherConnection->save());
+        
+        
+            $this->installAndIncludeModels(array('DummyModel'=>'id,name'));
+            $Dummy = new DummyModel();
+        
+            $this->assertNotEqual($Dummy->getConnection(), $OtherConnection->getConnection());
+        
+            unset($db_settings['sqlite_databases']);
+            file_put_contents(AK_CONFIG_DIR.DS.'database.yml', Ak::convert('array', 'yaml', $db_settings));
+        }
     }
 
 }

@@ -54,6 +54,7 @@ class AkDbAdapter extends AkObject
         $dsn = $this->_constructDsn($this->settings);
         require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb.inc.php');
         $this->connection = AK_DEBUG ? NewADOConnection($dsn) : @NewADOConnection($dsn);
+
         if (!$this->connection){
             error_reporting(E_ALL);
             if(defined('AK_DATABASE_CONNECTION_FAILURE_CALLBACK') && function_exists(AK_DATABASE_CONNECTION_FAILURE_CALLBACK)){
@@ -93,9 +94,11 @@ class AkDbAdapter extends AkObject
         if (empty($connections[$settings_hash])){
             if (empty($database_specifications)) {
                 $settings_hash = AK_ENVIRONMENT;
-                $database_specifications = Ak::getSettings('database',false,$settings_hash);
+                $database_specifications = Ak::getSettings('database', false, $settings_hash);
             } else if (is_string($database_specifications)){
-                $environment_settings = Ak::getSettings('database',false,$database_specifications);
+                
+                $environment_settings = Ak::getSettings('database', false, $database_specifications);
+                
                 if (!empty($environment_settings)){
                     $database_specifications = $environment_settings;
                 } elseif(strstr($database_specifications, '://')) {

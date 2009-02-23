@@ -313,7 +313,6 @@ defined('AK_ACTION_CONTROLLER_DEFAULT_ACTION') ? null : define('AK_ACTION_CONTRO
 defined('AK_ERROR_REPORTING_ON_SCRIPTS') ? null : define('AK_ERROR_REPORTING_ON_SCRIPTS', E_ALL);
 defined('AK_BEEP_ON_ERRORS_WHEN_TESTING') ? null : define('AK_BEEP_ON_ERRORS_WHEN_TESTING', false);
 
-AK_DEV_MODE ? require_once(AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php') : null;
-
+AK_PRODUCTION_MODE ? null : require_once(AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php');
 
 ?>

@@ -1969,15 +1969,15 @@ class Ak
     function getSettings($namespace, $raise_error_if_config_file_not_found = true, $environment = AK_ENVIRONMENT)
     {
         static $_config;
-        if (!in_array($environment,Ak::toArray(AK_AVAILABLE_ENVIRONMENTS))) {
-            trigger_error('The environment '.$environment.' is not allowed. Allowed environments: '.AK_AVAILABLE_ENVIRONMENTS);
+        if ($raise_error_if_config_file_not_found && !in_array($environment,Ak::toArray(AK_AVAILABLE_ENVIRONMENTS))) {
+            trigger_error('The environment '.$environment.' is not allowed. Allowed environments: '.AK_AVAILABLE_ENVIRONMENTS, E_USER_ERROR);
             return false;
         }
         if (!isset($_config)) {
             require_once(AK_LIB_DIR.DS.'AkConfig.php');
             $_config = new AkConfig();
         }
-        return $_config->get($namespace,$environment,$raise_error_if_config_file_not_found);
+        return $_config->get($namespace, $environment, $raise_error_if_config_file_not_found);
     }
     
     function getSetting($namespace, $variable, $default_value = null)
