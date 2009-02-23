@@ -137,7 +137,7 @@ ak_compat('array_combine');
 * <code> 
 *   class User extends ActiveRecord
 *   {
-*      var $serialize = array('preferences' => true);
+*      var $serialize = array('preferences');
 *   }
 *
 *   $User = new User(array('preferences'=>array("background" => "black", "display" => 'large')));
@@ -3124,7 +3124,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 break;
 
             default:
-                if(isset($this->serialize[$column_name])){
+                if($this->_shouldSerializeColumn($column_name)){
                     $value = serialize($value);
                 }
                 $result = is_null($value) ? 'null' : ($add_quotes ? $this->_db->quote_string($value) : $value);
@@ -3159,10 +3159,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 }elseif ('binary' == $column_type && $this->_getDatabaseType() == 'postgre'){
                     $value = $this->_db->unescape_blob($value);
                     $value = empty($value) || trim($value) == 'null' ? null : $value;
-                }elseif(isset($this->serialize[$column_name])){
-                    if(!class_exists($this->serialize[$column_name])){
-                        Ak::import($this->serialize[$column_name]);
-                    }
+                }elseif($this->_shouldSerializeColumn($column_name)){
+                    $this->_ensureClassExistsForSerializedColumnBeforeUnserializing($column_name);
                     $value = unserialize($value);
                 }
             }
@@ -3203,7 +3201,34 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         $this->_BlobQueryStack[$column_name] = $blob_value;
     }
-
+    
+    /**
+    * @access private
+    */
+    function _shouldSerializeColumn($column_name)
+    {
+        if(empty($this->serialize)){
+            return false;
+        }elseif(!is_array($this->serialize)){
+            $this->serialize = Ak::toArray($this->serialize);
+        }
+        return isset($this->serialize[$column_name]) || in_array($column_name, $this->serialize);
+    }
+    
+    /**
+    * @access private
+    */
+    function _ensureClassExistsForSerializedColumnBeforeUnserializing($column_name)
+    {
+        static $imported_cache = array();
+        if(empty($imported_cache[$column_name])){
+            $class_name = isset($this->serialize[$column_name])  ? 
+                (is_string($this->serialize[$column_name]) ? $this->serialize[$column_name] : $column_name) : $column_name;
+            Ak::import($class_name);
+            $imported_cache[$column_name] = true;   
+        }
+    }
+    
     /**
     * @access private
     */

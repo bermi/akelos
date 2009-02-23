@@ -88,6 +88,14 @@ class test_AkActiveRecord_type_casting extends  AkUnitTest
         $this->assertEqual('10',$this->Post->{"posted_on(2i)"});
         $this->assertEqual('',$this->Post->{"posted_on(3i)"});
     }
+    
+    function test_should_serialize_attributes()
+    {
+        $User = new User(array('preferences'=>array("background" => "black", "display" => 'large')));
+        $User->save();
+        $User = $User->find($User->getId());
+        $this->assertEqual($User->get('preferences'), array("background" => "black", "display" => 'large'));
+    }
 }
 
 ak_test('test_AkActiveRecord_type_casting',true);
