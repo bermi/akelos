@@ -58,7 +58,7 @@ class AkPhpTemplateHandler
                     trigger_error(join("\n",$TemplateEngine->getErrors()), E_USER_ERROR);
                     return false;                    
                 }else{
-                    trigger_error(join("\n",$TemplateEngine->getErrors()), E_USER_NOTICE);
+                    trigger_error("Could not compile ".$this->_options['file_path']."\n\n".join("\n",$TemplateEngine->getErrors()), E_USER_ERROR);
                     echo highlight_string($TemplateEngine->getParsedCode(), true);
                     die();
                 }
