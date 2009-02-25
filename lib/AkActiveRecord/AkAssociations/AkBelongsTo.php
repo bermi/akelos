@@ -281,6 +281,27 @@ class AkBelongsTo extends AkAssociation
         }
         return true;
     }
+    
+    function ___afterDestroy(&$object)
+    {
+        $success = true;
+        $associated_ids = $object->getAssociatedIds();
+        foreach ($associated_ids as $associated_id){
+            if( isset($object->$associated_id->_associatedAs) &&
+            $object->$associated_id->_associatedAs == 'belongsTo' &&
+            $object->$associated_id->getAssociationOption('dependent')){
+                if ($object->$associated_id->getType() == 'belongsTo'){
+                    $object->$associated_id->load();
+                }
+                if(method_exists($object->$associated_id, 'destroy')){
+                    $success = $object->$associated_id->destroy() ? $success : false;
+                }
+            }
+        }
+        return $success;
+    }
+    
+    
 }
 
 
