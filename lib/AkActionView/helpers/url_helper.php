@@ -161,16 +161,16 @@ class UrlHelper extends AkObject
     * This is useful for creating link bars where you don't want to link
     * to the page currently being viewed.
     */
-    function link_to_unless_current($name, $options = array(), $html_options = array(), $parameters_for_method_reference)
+    function link_to_unless_current($name, $options = array(), $html_options = array(), $parameters_for_method_reference = null)
     {
-        return $this->current_page($options) ? $this->link_to_unless($options, $name, $options, $html_options, $parameters_for_method_reference) : null;
+        return !$this->current_page($options) ? $this->link_to_unless($options, $name, $options, $html_options, $parameters_for_method_reference) : $name;
     }
 
     /**
     * Create a link tag of the given +$name+ using an URL created by the set of +options+, unless +condition+
     * is true, in which case only the name is returned. 
     */
-    function link_to_unless($condition, $name, $options = array(), $html_options = array(), $parameters_for_method_reference)
+    function link_to_unless($condition, $name, $options = array(), $html_options = array(), $parameters_for_method_reference = null)
     {
         if ($condition !== true) {
             return $this->link_to($name, $options, $html_options, $parameters_for_method_reference);
@@ -182,7 +182,7 @@ class UrlHelper extends AkObject
     * Create a link tag of the given +name+ using an URL created by the set of +$options+, if +$condition+
     * is true, in which case only the name is returned. 
     */      
-    function link_to_if($condition, $name, $options = array(), $html_options = array(), $parameters_for_method_reference)
+    function link_to_if($condition, $name, $options = array(), $html_options = array(), $parameters_for_method_reference = null)
     {
         return $condition ? $this->link_to_unless($condition, $name, $options, $html_options, $parameters_for_method_reference) : null;
     }
@@ -192,7 +192,7 @@ class UrlHelper extends AkObject
     */
     function current_page($options)
     {
-        return ($this->url_for($options) == $this->_controller->_getCompleteRequestUri());
+        return ($this->url_for($options) == $this->_controller->Request->getPath());
     }
 
     /**
