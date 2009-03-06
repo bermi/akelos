@@ -18,20 +18,20 @@
 
 
 /**
-* Use these methods to generate HTML tags programmatically when you can't use a Builder. 
+* Use these methods to generate HTML tags programmatically when you can't use a Builder.
 * By default, they output XHTML compliant tags.
 */
-class TagHelper extends AkObject 
+class TagHelper extends AkObject
 {
     /**
-    * Returns an empty HTML tag of type *name* which by default is XHTML 
-    * compliant. Setting *open* to true will create an open tag compatible 
-    * with HTML 4.0 and below. Add HTML attributes by passing an attributes 
-    * array to *options*. For attributes with no value like (disabled and 
+    * Returns an empty HTML tag of type *name* which by default is XHTML
+    * compliant. Setting *open* to true will create an open tag compatible
+    * with HTML 4.0 and below. Add HTML attributes by passing an attributes
+    * array to *options*. For attributes with no value like (disabled and
     * readonly), give it a value of true in the *options* array.
     *
     * Examples:
-    * 
+    *
     *   <%= tag 'br' %>
     *    # => <br />
     *   <%= tag 'br', null, true %>
@@ -46,8 +46,8 @@ class TagHelper extends AkObject
 
     /**
     *  Returns an HTML block tag of type *name* surrounding the *content*. Add
-    * HTML attributes by passing an attributes array to *options*. For attributes 
-    * with no value like (disabled and readonly), give it a value of true in 
+    * HTML attributes by passing an attributes array to *options*. For attributes
+    * with no value like (disabled and readonly), give it a value of true in
     * the *options* array. You can use symbols or strings for the attribute names.
     *
     *   <%= content_tag 'p', 'Hello world!' %>
@@ -66,8 +66,8 @@ class TagHelper extends AkObject
     * Returns a CDATA section for the given +content+.  CDATA sections
     * are used to escape blocks of text containing characters which would
     * otherwise be recognized as markup. CDATA sections begin with the string
-    * <tt>&lt;![CDATA[</tt> and } with (and may not contain) the string 
-    * <tt>]]></tt>. 
+    * <tt>&lt;![CDATA[</tt> and } with (and may not contain) the string
+    * <tt>]]></tt>.
     */
     function cdata_section($content)
     {

@@ -34,8 +34,8 @@ defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION') ? null : define('AK_AUTOMATIC_CON
 *
 * Ak contains all the Akelos Framework static functions. This
 * class acts like a name space to avoid naming collisions
-* when PHP gets new functions into its core. And also to provide 
-* additional functionality to existing PHP functions mantaining the same interface  
+* when PHP gets new functions into its core. And also to provide
+* additional functionality to existing PHP functions mantaining the same interface
 *
 * @author Bermi Ferrer <bermi at akelos com>
 * @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
@@ -51,7 +51,7 @@ class Ak
     * reference to the default database connection by doing:
     *
     * $db =& Ak::db(); // get an adodb instance
-    * 
+    *
     * AdoDB manual can be found at http://phplens.com/adodb/
     *
     * @access public
@@ -211,8 +211,8 @@ class Ak
 
 
     /**
-     * Gets information about current locale from the locale settings on config/locales/LOCALE.php 
-     * 
+     * Gets information about current locale from the locale settings on config/locales/LOCALE.php
+     *
      * This are common settings on the locale file:
      * 'description' // Locale description Example. Spanish
      * 'charset' // 'ISO-8859-1';
@@ -481,7 +481,7 @@ class Ak
     /**
     * This static method will copy recursively all the files or directories from one
     * path within an Akelos application to another.
-    * 
+    *
     * It uses current installation settings, so it can perform copies via the filesystem or via FTP
     */
     function copy($origin, $target, $options = array())
@@ -528,7 +528,7 @@ class Ak
 
     /**
      * Returns a path restricting it to a base location
-     * 
+     *
      * This is used by Akelos to prevent functions namespaced under Ak
      * from writing out of the Akelos base directory for security reasons.
      */
@@ -553,7 +553,7 @@ class Ak
 
     /**
      * Perform a web request
-     * 
+     *
      * @param string $url URL we are going to request.
      * @param array $options Options for current request.
      *  Options are:
@@ -842,10 +842,10 @@ class Ak
 
     /**
     * Return formatted date.
-    * 
+    *
     * You can supply a format as defined at http://php.net/date
-    * 
-    * Default date is in ISO format 
+    *
+    * Default date is in ISO format
     */
     function getDate($timestamp = null, $format = null)
     {
@@ -877,18 +877,18 @@ class Ak
     *   AK_SENDMAIL = 0
     *   AK_SMTP = 1
     *
-    *   For future upgrades, you must define which constants must be declared and add 
+    *   For future upgrades, you must define which constants must be declared and add
     *   the functionality.
     *
     *   NOTE: If messaging method is SMTP, you must declare in config file (/config/config.php)
     *   the outgoing SMTP server and the authentication pair user/password as constants
     *   AK_SMTP_SERVER, AK_SMTP_USER and AK_SMTP_PASSWORD, respectively.
     *
-    * 
+    *
     *   @param $from
-    *   
+    *
     *   User who sends the mail.
-    *   
+    *
     *   @param $to
     *
     *   Receiver, or receivers of the mail.
@@ -899,24 +899,24 @@ class Ak
     *   user@example.com, anotheruser@example.com
     *   User <user@example.com>
     *   User <user@example.com>, Another User <anotheruser@example.com>
-    *    
+    *
     *   @param $subject
     *
     *   Subject of the email to be sent.  This must not contain any newline
     *   characters, or the mail may not be sent properly.
-    *    
+    *
     *   @param $body
     *
     *   Message to be sent.
-    *           
-    *   @param additional_headers (optional)   
+    *
+    *   @param additional_headers (optional)
     *
     *   Array to be inserted at the end of the email header.
     *
-    *   This is typically used to add extra headers (Bcc) in an associative array, where the 
-    *   array key is the header name (i.e., 'Bcc'), and the array value is the header value 
+    *   This is typically used to add extra headers (Bcc) in an associative array, where the
+    *   array key is the header name (i.e., 'Bcc'), and the array value is the header value
     *   (i.e., 'test'). The header produced from those values would be 'Bcc: test'.
-    *    
+    *
     *   @return boolean whether message has been sent or not.
     *
     */
@@ -1010,7 +1010,7 @@ class Ak
 
     /**
      * Select is a function for selecting items from double depth array.
-     * This is useful when you just need some fields for generating 
+     * This is useful when you just need some fields for generating
      * tables, select lists with only desired fields.
      *
      *   $People = array(
@@ -1019,9 +1019,9 @@ class Ak
      *    array('name'=>'Hilario','email'=>'hilario@example.com','address'=>'Carlet, 78'),
      *    array('name'=>'Bermi','email'=>'bermi@example.com','address'=>'Vilanova, 33'),
      *   );
-     * 
+     *
      *    $people_for_table_generation = Ak::select($People,'name','email');
-     *    
+     *
      *    Now $people_for_table_generation will hold an array with
      *    array (
      *        array ('name' => 'Jose','email' => 'jose@example.com'),
@@ -1296,7 +1296,7 @@ class Ak
 
 
     /**
-     * Gets an array or a comma separated list of models. Then it includes its 
+     * Gets an array or a comma separated list of models. Then it includes its
      * respective files and returns an array of available models.
      *
      * @return array available models
@@ -1323,7 +1323,7 @@ class Ak
 
         return $models;
     }
-    
+
     function import_mailer()
     {
         require_once(AK_LIB_DIR.DS.'AkActionMailer.php');
@@ -1352,24 +1352,24 @@ class Ak
         $args = func_get_args();
         return is_array($args[0]) ? $args[0] : (func_num_args() === 1 ? Ak::stringToArray($args[0]) : $args);
     }
-    
+
     /**
      * Returns an array including only the elements with provided keys.
-     * 
+     *
      * This is useful to limit the parameters of an array used by a method.
      *
      * This utility can be used for modifying arrays which is useful for securing record creation/updating.
      *
      * If you have this code on a controller
-     * 
+     *
      *     $this->user->setAttributes($this->params['user']);
-     * 
+     *
      * and your users table has a column named is_admin. All it would take to a malicious user is to modify the page html to add the need field and gain admin privileges.
-     * 
+     *
      * You could avoid by using the new Ak::pick method which will return and array with desired keys.
-     * 
+     *
      *     $this->user->setAttributes(Ak::pick('name,email', $this->params['user']));
-     * 
+     *
      */
     function pick($keys, $source_array)
     {
@@ -1379,18 +1379,18 @@ class Ak
         }
         return $result;
     }
-    
+
     /**
-     * Gets a copy of the first element of an array. Similar to array_shift but it does not modify the original array 
+     * Gets a copy of the first element of an array. Similar to array_shift but it does not modify the original array
      */
     function first()
     {
         $args = func_get_args();
         return array_shift(array_slice(is_array($args[0]) ? $args[0] : $args , 0));
     }
-    
+
     /**
-     * Gets a copy of the last element of an array. Similar to array_pop but it does not modify the original array 
+     * Gets a copy of the last element of an array. Similar to array_pop but it does not modify the original array
      */
     function last()
     {
@@ -1410,16 +1410,16 @@ class Ak
     /**
     * The Akelos Framework has an standardized way to convert between formats.
     * You can find available converters on AkConverters
-    * 
+    *
     * Usage Example: In order to convert from HTML to RTF you just need to call.
     * $rtf = Ak::convert('html','rtf', $my_html_file, array('font_size'=> 24));
-    * 
+    *
     * Where the last option is an array of options for selected converter.
-    * 
+    *
     * Previous example is the same as.
-    * 
+    *
     * $rtf = Ak::convert(array('from'=>'html','to'=>'rtf', 'source' => $my_html_file, 'font_size'=> 24));
-    * 
+    *
     * In order to create converters, you just need to name them "SourceFormatName + To + DestinationFormatName".
     * Whenever you need to call the, you need to specify the "path" option where your converter is located.
     * The only thing you converter must implement is a convert function. Passes options will be made available
@@ -1484,7 +1484,7 @@ class Ak
     /**
      * Converts given string to UTF-8
      *
-     * @param string $text 
+     * @param string $text
      * @param string $input_string_encoding
      * @return string UTF-8 encoded string
      */
@@ -1563,8 +1563,8 @@ class Ak
 
     /**
      * Convert an arbitrary PHP value into a JSON representation string.
-     * 
-     * For AJAX driven pages, JSON can come in handy – you can return send JavaScript objects 
+     *
+     * For AJAX driven pages, JSON can come in handy – you can return send JavaScript objects
      * directly from your actions.
      */
     function toJson($php_value)
@@ -1577,7 +1577,7 @@ class Ak
 
     /**
      * Converts a JSON representation string into a PHP value.
-     */    
+     */
     function fromJson($json_string)
     {
         require_once(AK_VENDOR_DIR.DS.'pear'.DS.'Services'.DS.'JSON.php');
@@ -1681,7 +1681,7 @@ class Ak
 
         return $sorted_array;
     }
-  
+
     function mime_content_type($file)
     {
         static $mime_types;
@@ -1802,7 +1802,7 @@ class Ak
 
     /**
      * Returns a PHP Object from an API resource
-     * 
+     *
      */
     function client_api($resource, $options = array())
     {
@@ -1847,13 +1847,13 @@ class Ak
         $PluginManager->loadPlugins();
         return $PluginManager;
     }
-    
+
     function setStaticVar($name,&$value)
     {
         $refhack =& Ak::_staticVar($name,$value);
         return $refhack;
     }
-    
+
     /**
     * Strategy for unifying in-function static vars used mainly for performance improvements framework-wide.
     *
@@ -1865,13 +1865,13 @@ class Ak
     *         if(!isset($cache[$var])){
     *           $cache[$var] = some_heavy_function($var);
     *         }
-    *         return $cache[$var]; 
-    *       } 
+    *         return $cache[$var];
+    *       }
     *     }
     *
     * Now imagine we want to create an application server which handles multiple requests on a single instantiation, with the showcased implementation this is not possible as we can't reset $cache, unless we hack badly every single method that uses this strategy.
     *
-    * We can refresh this static values the new Ak::getStaticVar method. So from previous example we will have to replace 
+    * We can refresh this static values the new Ak::getStaticVar method. So from previous example we will have to replace
     *
     *     static $chache;
     */
@@ -1880,13 +1880,13 @@ class Ak
         $refhack =& Ak::_staticVar($name,$refhackvar = null);
         return $refhack;
     }
-    
+
     function &unsetStaticVar($name)
     {
         $refhack =& Ak::_staticVar($name,$refhackvar = null,true);
         return $refhack;
     }
-    
+
     function &_staticVar($name, &$value, $destruct = false)
     {
         static $_memory;
@@ -1911,7 +1911,7 @@ class Ak
             } else {
                 $return = $false;
             }
-            
+
         } else if ($destruct === true) {
             if ($name !== null) {
                 $value = isset($_memory[$name])?$_memory[$name]:$null;
@@ -1928,7 +1928,7 @@ class Ak
         }
         return $return;
     }
-    
+
     /**
      *
      * @param array $options
@@ -1950,7 +1950,7 @@ class Ak
             }
             return;
         }
-        
+
         $options = array_merge($default_options, $options);
         foreach($options as $key => $value) {
             if(isset($parameters['available_options'])) {
@@ -1959,10 +1959,10 @@ class Ak
                }
             }
             $options[$key] = $value;
-            
+
         }
     }
-    
+
     /**
      * Returns YAML settings from config/$namespace.yml
      */
@@ -1979,7 +1979,7 @@ class Ak
         }
         return $_config->get($namespace, $environment, $raise_error_if_config_file_not_found);
     }
-    
+
     function getSetting($namespace, $variable, $default_value = null)
     {
         if($settings = Ak::getSettings($namespace)){
@@ -1987,12 +1987,12 @@ class Ak
          }
         return $default_value;
     }
-    
+
     function _parseSettingsConstants($settingsStr)
     {
         return preg_replace_callback('/\$\{(AK_.*?)\}/',array('Ak','_getConstant'),$settingsStr);
     }
-    
+
     function _getConstant($name)
     {
         return defined($name[1])?constant($name[1]):'';

@@ -28,7 +28,7 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 *
 * This class enables saving sessions into a database or memcache.
 * see: config/DEFAULT-DB-sessions.yml or  config/DEFAULT-MEMCACHE-sessions.yml
-* 
+*
 * This can
 * be usefull for multiple server sites, and to have more
 * control over sessions.
@@ -59,7 +59,7 @@ class AkSession extends AkObject
     * @var object $_driverInstance
     */
     var $_driverInstance;
-    
+
     var $sessions_enabled;
     /**
     * Original session value for avoiding hitting the cache system in case nothing has changed
@@ -68,21 +68,21 @@ class AkSession extends AkObject
     * @var string $_db
     */
     var $_original_sess_value = '';
-    
+
     function initHandler()
     {
         $settings = Ak::getSettings('sessions', false);
         $SessionHandler = &AkSession::lookupStore($settings);
         return $SessionHandler;
     }
-    
+
     function &lookupStore($options = null)
     {
         static $session_store;
         $false = false;
         if ($options === true && !empty($session_store)) {
             return $session_store;
-        } else if (is_array($options) && 
+        } else if (is_array($options) &&
                    isset($options['enabled']) && $options['enabled']==true &&
                    isset($options['handler']) &&
                    isset($options['handler']['type'])) {
@@ -101,7 +101,7 @@ class AkSession extends AkObject
         }
         return $false;
     }
-    
+
     function init($options = array(),$type = null)
     {
         $options = is_int($options) ? array('lifeTime'=>$options) : (is_array($options) ? $options : array());
@@ -125,6 +125,19 @@ class AkSession extends AkObject
                 $res = $this->_driverInstance->init($options);
                 $this->sessions_enabled = $res;
                 break;
+            case 4:
+                require_once(AK_LIB_DIR.'/AkSession/AkCookieSession.php');
+                $this->sessions_enabled = false;
+                $AkCookieSession = new AkCookieSession();
+                session_set_save_handler (
+                array(&$AkCookieSession, '_open'),
+                array(&$AkCookieSession, '_close'),
+                array(&$AkCookieSession, '_read'),
+                array(&$AkCookieSession, '_write'),
+                array(&$AkCookieSession, '_destroy'),
+                array(&$AkCookieSession, '_gc')
+                );
+                return;
             default:
                 $this->sessions_enabled = false;
                 break;
@@ -139,7 +152,7 @@ class AkSession extends AkObject
              array(&$this, '_destroy'),
              array(&$this, '_gc')
              );
-             
+
         }
     }
     /**
@@ -181,7 +194,7 @@ class AkSession extends AkObject
     function _close()
     {
         /**
-        * @todo Get from cached vars last time garbage collection was made to avoid hitting db 
+        * @todo Get from cached vars last time garbage collection was made to avoid hitting db
         * on every request
         */
         $this->_gc();
@@ -205,8 +218,8 @@ class AkSession extends AkObject
     * Session write handler
     *
     * @access protected
-    * @param    string    $id    
-    * @param    string    $data    
+    * @param    string    $id
+    * @param    string    $data
     * @return boolean
     */
     function _write($id, $data)
@@ -228,7 +241,7 @@ class AkSession extends AkObject
     * Session destroy handler
     *
     * @access protected
-    * @param    string    $id    
+    * @param    string    $id
     * @return boolean
     */
     function _destroy($id)

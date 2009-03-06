@@ -36,7 +36,7 @@ class AkDispatcher
     var $Request;
     var $Response;
     var $Controller;
-    
+
     function dispatch()
     {
         $this->Request =& AkRequest();
@@ -44,8 +44,8 @@ class AkDispatcher
         $this->Controller =& $this->Request->recognize();
         $this->Controller->process($this->Request, $this->Response);
     }
-    
-    
+
+
     /**
      * @todo Implement a mechanism for enabling multiple requests on the same dispatcher
      * this will allow using Akelos as an Application Server using the
