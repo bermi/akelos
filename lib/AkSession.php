@@ -125,19 +125,6 @@ class AkSession extends AkObject
                 $res = $this->_driverInstance->init($options);
                 $this->sessions_enabled = $res;
                 break;
-            case 4:
-                require_once(AK_LIB_DIR.'/AkSession/AkCookieSession.php');
-                $this->sessions_enabled = false;
-                $AkCookieSession = new AkCookieSession();
-                session_set_save_handler (
-                array(&$AkCookieSession, '_open'),
-                array(&$AkCookieSession, '_close'),
-                array(&$AkCookieSession, '_read'),
-                array(&$AkCookieSession, '_write'),
-                array(&$AkCookieSession, '_destroy'),
-                array(&$AkCookieSession, '_gc')
-                );
-                return;
             default:
                 $this->sessions_enabled = false;
                 break;

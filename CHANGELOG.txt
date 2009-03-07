@@ -1,3 +1,7 @@
+[1257] Sice rev.1247 until rev.1257 indexes where not added automatically by convention on migrations and installers. 
+
+Please verify your databases to make sure necesary indexes are in place.
+
 [1241] Adding a new shotcut for sanitizing/escaping html entities variables on Sintags.
 
 Now you can use this Sintags 

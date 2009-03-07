@@ -459,7 +459,7 @@ class AkInstaller extends AkObject
 
     function getAvailableTables()
     {
-        return $this->available_tables = $this->db->availableTables();;
+        return $this->available_tables = $this->db->availableTables(true);
     }
 
     function tableExists($table_name)
