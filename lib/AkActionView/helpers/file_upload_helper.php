@@ -26,34 +26,34 @@ class FileUploadHelper extends AkActionViewHelper
         if(empty($this->Cache)){
             require_once(AK_LIB_DIR.DS.'AkCache.php');
             $this->Cache =& new AkCache();
-            $this->Cache->init(3600*2);
+            $this->Cache->init(array('lifeTime'=>3600*2), 1);
         }
     }
 
     /**
      * Handles a gmail-like file upload.
-     * 
+     *
      * Just add this code at the beigining of the form action receiver.
-     * 
+     *
      *  if($this->file_upload_helper->handle_partial_upload('/tmp')){ // where /tmp is the temporary directory for uploaded files
      *      return;
      *  }
      *
      * You must add this javascript to your view:
-     * 
+     *
      * <script src="/javascripts/file_uploader.js" type="text/javascript"></script>
      * <script type="text/javascript">
      *  window.onload = function(){
      *     FileUploader.start('form_id', {partial:true}); // Change "form_id" for the id you supplied to your form
      *  }
      * </script>
-     * 
+     *
      * @param bool $send_json_response
      */
     function handle_partial_upload($temporary_directory = AK_TMP_DIR, $send_json_response = true)
     {
         $this->_instantiateCacheHandler();
-        
+
         $this->_setTempDir($temporary_directory);
 
         // Perform some garbage collection
@@ -70,23 +70,22 @@ class FileUploadHelper extends AkActionViewHelper
             }
             return true;
 
-
-            // We are requesting the file for downloading
-        }elseif (!$this->_controller->Request->isPost() && !empty($this->_controller->params['persistence_key'])){
-            $this->_send_file($this->_controller->params['persistence_key']);
-            return true;
-
-
             // We have "persisted_keys" into the post so lets look for them and populate the params with cached data
-        }elseif ($this->_controller->Request->isPost() && !empty($this->_controller->params['persisted_keys'])){
+        }elseif (!empty($this->_controller->params['persisted_files'])){
             if(!empty($this->_controller->params['persisted_files'])){
-                $files = $this->_get_persisted_files_params($this->_controller->params['persisted_files']);
+                $files = $_FILES = $this->_get_persisted_files_params($this->_controller->params['persisted_files']);
                 $this->_controller->params = array_merge_recursive($this->_controller->params, $files);
                 $this->_clean_up_persisted_on_shutdown($this->_controller->params['persisted_keys']);
                 unset($this->_controller->params['persisted_keys']);
                 unset($this->_controller->params['persisted_files']);
             }
             return false;
+
+        // We are requesting the file for downloading
+        }elseif (!$this->_controller->Request->isPost() && !empty($this->_controller->params['persistence_key'])){
+            $this->_send_file($this->_controller->params['persistence_key']);
+            return true;
+
         }else{
             return false;
         }
@@ -146,7 +145,7 @@ class FileUploadHelper extends AkActionViewHelper
                 $details['human_size'] = $this->_controller->number_helper->human_size($details['size']);
                 $file = $this->Cache->get($details['persistence_key'], 'persistent_files');
                 if (empty($file)) {
-                    $this->Cache->save(serialize(array_merge($details,array('contents'=>base64_encode(file_get_contents($details['tmp_name']))))));
+                    $this->Cache->save(serialize(array_merge($details,array('contents'=>base64_encode(file_get_contents($details['tmp_name']))))), $details['persistence_key'], 'persistent_files');
                 }
                 $result[$name] = $details;
             }elseif(is_array($details)){
@@ -194,7 +193,7 @@ class FileUploadHelper extends AkActionViewHelper
 
     function _clean_up_persisted_on_shutdown($keys = false)
     {
-        static $key_cache;
+        static $key_cache = array();
         if($keys === false){
             foreach ($key_cache as $key){
                 @unlink($this->_getTempDir().DS.'_file_uploader_file_'.$key);
