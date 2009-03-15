@@ -118,7 +118,7 @@ if($args->getValue('quiet') == ''){
         echo "\n    Please point your browser to ".
         (empty($Installer->options['public_html']) ? $Installer->options['directory'] : $Installer->options['public_html']).
         " in order to complete the installation process or\n\n".
-        " run \n\n    ./script/configure -i\n\nto configure the database datils\n";
+        " run \n\n    ./script/configure -i\n\nto configure the database details\n";
     }
     echo "\n";
 }
