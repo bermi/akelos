@@ -94,8 +94,8 @@ class Test_of_AkImage extends  AkUnitTest
         $this->photo_path = AK_TEST_DIR.DS.'fixtures'.DS.'public'.DS.'images'.DS.'cristobal.jpg';
         $this->watermark = AK_TEST_DIR.DS.'fixtures'.DS.'public'.DS.'images'.DS.'watermark.png';
         if(!is_file($this->photo_path)){
-            Ak::file_put_contents($this->photo_path, Ak::url_get_contents('http://akelos.org/testing_resources/images/cristobal.jpg'));
-            Ak::file_put_contents($this->watermark, Ak::url_get_contents('http://akelos.org/testing_resources/images/watermark.png'));
+            Ak::file_put_contents($this->photo_path, Ak::url_get_contents('http://www.akelos.org/testing_resources/images/cristobal.jpg'));
+            Ak::file_put_contents($this->watermark, Ak::url_get_contents('http://www.akelos.org/testing_resources/images/watermark.png'));
         }
         $this->_run_extra_tests = is_file($this->photo_path);
     }
