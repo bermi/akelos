@@ -323,15 +323,20 @@ class AkHasAndBelongsToMany extends AkAssociation
                     if(!empty($options['before_add']) && method_exists($this->Owner, $options['before_add']) && $this->Owner->{$options['before_add']}($Associated[$k]) === false ){
                         $succes = false;
                     }else{
-                        $Associated[$k]->$external_key = $Associated[$k]->isNewRecord();
-                        $this->Owner->{$this->association_id}[] =& $Associated[$k];
-                        $this->_setAssociatedMemberId($Associated[$k]);
-                        if($this->_relateAssociatedWithOwner($Associated[$k])){
-                            if($succes && !empty($options['after_add']) && method_exists($this->Owner, $options['after_add']) && $this->Owner->{$options['after_add']}($Associated[$k]) === false ){
+                        if(method_exists($Associated[$k], 'isNewRecord')){
+                            $Associated[$k]->$external_key = $Associated[$k]->isNewRecord();
+                            $this->Owner->{$this->association_id}[] =& $Associated[$k];
+                            $this->_setAssociatedMemberId($Associated[$k]);
+                            if($this->_relateAssociatedWithOwner($Associated[$k])){
+                                if($succes && !empty($options['after_add']) && method_exists($this->Owner, $options['after_add']) && $this->Owner->{$options['after_add']}($Associated[$k]) === false ){
+                                    $succes = false;
+                                }
+                            }else{
                                 $succes = false;
-                            }
+                            }                            
                         }else{
-                            $succes = false;
+                            trigger_error(Ak::t('Could not handle habtm association for %model_name::%association_name', array('%model_name' => $this->Owner->getModelName(), '%association_name' => $this->association_id)), E_USER_NOTICE);
+                            $succes = false;                        
                         }
                     }
                 }
