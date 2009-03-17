@@ -173,8 +173,9 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         $Post3->comment->add($Comment3_2);
         $User1->save();
         $User2->save();
-        //$Post1->save();
-        //$Post2->save();
+        $Post1->save();
+        $Post2->save();
+        $Post3->save();
         $Comment1_1->save();
         $Comment1_2->save();
         $Comment2_1->save();
