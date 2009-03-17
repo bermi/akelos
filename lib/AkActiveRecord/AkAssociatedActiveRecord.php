@@ -574,7 +574,8 @@ $available_associated_options [$sub_associated_option] []  = $newoption;
     function &findWithAssociations($options)
     {
         if (isset($options['group'])) {
-            return $this->_findWithAssociationsExt($options);
+            $result=&$this->_findWithAssociationsExt($options);
+            return $result;
         }
         $orgoptions =$options;
         $result = false;
@@ -599,7 +600,8 @@ $available_associated_options [$sub_associated_option] []  = $newoption;
             $association_options = empty($included_association_options[$association_id]) ? array() : $included_association_options[$association_id];
 
             if (isset($association_options['include'])) {
-                 return $this->_findWithAssociationsExt($orgoptions);
+                 $result=&$this->_findWithAssociationsExt($orgoptions);
+                 return $result;
             }
             
             $handler_name = $this->getCollectionHandlerName($association_id);
