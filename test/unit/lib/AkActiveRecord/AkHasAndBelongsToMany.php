@@ -67,7 +67,6 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
 
         $Property =& new Property($Property->getId());
         $Property->property_type->load();
-
         $this->assertEqual($Property->property_type->association_id, 'property_types');
         $this->assertEqual($Property->property_type->count(), 2);
 

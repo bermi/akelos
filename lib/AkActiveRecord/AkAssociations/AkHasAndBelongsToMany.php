@@ -422,9 +422,6 @@ class AkHasAndBelongsToMany extends AkAssociation
             $ids_to_nullify = array();
             $ids_to_delete = array();
             $items_to_remove_from_collection = array();
-            $AssociatedModel =& $this->getAssociatedModelInstance();
-
-            $owner_type = $this->_findOwnerTypeForAssociation($AssociatedModel, $this->Owner);
 
             $this->JoinObject->setPrimaryKey($options['join_class_primary_key']);
 
@@ -591,10 +588,11 @@ class AkHasAndBelongsToMany extends AkAssociation
         if(empty($options['finder_sql'])){
             $is_sqlite = $this->Owner->_db->type() == 'sqlite';
             $options['finder_sql'] = "SELECT {$options['table_name']}.* FROM {$options['table_name']} ".
-            $this->associationJoin().
-            "WHERE ".$this->Owner->getTableName().'.'.$this->Owner->getPrimaryKey()." ".
+            $this->associationJoin2().
+            "WHERE _{$options['join_class_name']}.{$options['foreign_key']} ".
             ($is_sqlite ? ' LIKE ' : ' = ').' '.$this->Owner->quotedId(); // (HACK FOR SQLITE) Otherwise returns wrong data
             $options['finder_sql'] .= !empty($options['conditions']) ? ' AND '.$options['conditions'].' ' : '';
+
         }
         if(empty($options['counter_sql'])){
             $options['counter_sql'] = substr_replace($options['finder_sql'],'SELECT COUNT(*)',0,strpos($options['finder_sql'],'*')+1);
@@ -613,7 +611,16 @@ class AkHasAndBelongsToMany extends AkAssociation
         "{$options['join_table']}.{$options['foreign_key']} = ".$this->Owner->getTableName().".".$this->Owner->getPrimaryKey()." ";
     }
 
+    function associationJoin2()
+    {
+        $Associated =& $this->getAssociatedModelInstance();
+        $options = $this->getOptions($this->association_id);
 
+        return "LEFT OUTER JOIN {$options['join_table']} AS _{$options['join_class_name']} ON ".
+        "_{$options['join_class_name']}.{$options['association_foreign_key']} = {$options['table_name']}.".$Associated->getPrimaryKey()." ".
+        "LEFT OUTER JOIN ".$this->Owner->getTableName()." AS _".$this->Owner->getModelName()." ON ".
+        "_{$options['join_class_name']}.{$options['foreign_key']} = _".$this->Owner->getModelName().".".$this->Owner->getPrimaryKey()." ";
+    }
 
     function count()
     {
@@ -698,7 +705,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         $finder_options['conditions'] =
         // We add previous conditions
         (!empty($options['conditions']) ?
-        ' AND '.$Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ' : '');
+        ''.$Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ' : '');
 
         return $finder_options;
     }
