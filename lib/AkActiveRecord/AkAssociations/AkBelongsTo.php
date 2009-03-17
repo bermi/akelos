@@ -32,7 +32,7 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 * * <tt>$Post->author->build($Author);</tt> (similar to <tt>$Post->author = new Author();</tt>)
 * * <tt>$Post->author->create($Author);</tt> (similar to <tt>$Post->author = new Author(); $Post->author->save();</tt>)
 *  The declaration can also include an options hash to specialize the behavior of the association.
-*  
+*
 *  Options are:
 *  * <tt>class_name</tt>  - specify the class name of the association. Use it only if that name can't be inferred
 *    from the association name. So <tt>belongsTo('author')</tt> will by default be linked to the 'Author' class, but
@@ -44,11 +44,11 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 *  * <tt>primary_key_name</tt> - specify the foreign key used for the association. By default this is guessed to be the name
 *    of the associated class in lower-case and "_id" suffixed. So a 'Person' class that makes a belongsTo association to a
 *    'Boss' class will use "boss_id" as the default primary_key_name.
-*  * <tt>counter_cache</tt> - caches the number of belonging objects on the associate class through use of increment_counter 
+*  * <tt>counter_cache</tt> - caches the number of belonging objects on the associate class through use of increment_counter
 *    and decrement_counter. The counter cache is incremented when an object of this class is created and decremented when it's
 *    destroyed. This requires that a column named "#{table_name}_count" (such as comments_count for a belonging Comment class)
 *    is used on the associate class (such as a Post class).
-* 
+*
 *  Option examples:
 *    belongsTo('firm', array('primary_key_name' => 'client_of'));
 *    belongsTo('author', array('class_name' => 'Person', 'primary_key_name' => 'author_id'));
@@ -117,7 +117,7 @@ class AkBelongsTo extends AkAssociation
         }
 
         $result =& $this->Owner->$association_id->find($primary_key_name_value);
-        
+
         return $result;
     }
 
@@ -141,7 +141,7 @@ class AkBelongsTo extends AkAssociation
     }
 
     /**
-    * Returns a new object of the associated type that has been instantiated with attributes 
+    * Returns a new object of the associated type that has been instantiated with attributes
     * and linked to this object through a foreign key and that has already been saved (if it passed the validation)
     */
     function &create($association_id, $attributes = array())
@@ -152,8 +152,8 @@ class AkBelongsTo extends AkAssociation
         $this->replace($association_id, $record, true);
         return $this->Owner->$association_id;
     }
-    
-    
+
+
     function &load($association_id)
     {
         if (!$this->Owner->isNewRecord()){
@@ -197,8 +197,8 @@ class AkBelongsTo extends AkAssociation
         $this->_build($association_id, $NewAssociated);
         return $NewAssociated;
     }
-    
-    
+
+
     function getAssociatedFinderSqlOptions($association_id, $options = array())
     {
         $default_options = array(
@@ -232,7 +232,7 @@ class AkBelongsTo extends AkAssociation
 
         return $finder_options;
     }
-    
+
     function constructSqlForInclusion($association_id)
     {
         return ' LEFT OUTER JOIN '.
@@ -271,7 +271,7 @@ class AkBelongsTo extends AkAssociation
     {
         $association_ids = $object->getAssociatedIds();
         foreach ($association_ids as $association_id){
-            if(!empty($object->$association_id) && is_object($object->$association_id) && method_exists($object->$association_id,'getType') && 
+            if(!empty($object->$association_id) && is_object($object->$association_id) && method_exists($object->$association_id,'getType') &&
             strtolower($object->belongsTo->getOption($association_id, 'class_name')) == strtolower($object->$association_id->getType())){
                 $primary_key_name = $this->Owner->$association_id->getAssociationOption('primary_key_name');
                 if($this->Owner->$association_id->getAssociationOption('counter_cache')){
@@ -281,8 +281,8 @@ class AkBelongsTo extends AkAssociation
         }
         return true;
     }
-    
-    function ___afterDestroy(&$object)
+
+    function afterDestroy(&$object)
     {
         $success = true;
         $associated_ids = $object->getAssociatedIds();
@@ -300,8 +300,8 @@ class AkBelongsTo extends AkAssociation
         }
         return $success;
     }
-    
-    
+
+
 }
 
 

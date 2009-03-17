@@ -7,7 +7,7 @@ if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
 defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest 
+class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
 {
     /**/
     function test_start()
@@ -111,11 +111,11 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
         //$this->assertReference($CarletPic->prueba, $Thumbnail);
 
         $this->assertTrue($CarletPic->save());
-        
+
         $this->assertEqual($CarletPic->main_thumbnail->caption, 'Our Office');
 
         $this->assertFalse($Thumbnail->findFirstBy('caption','Carlet'));
-                
+
         $this->assertTrue($OfficeThumbnail =& $Thumbnail->findFirstBy('caption', 'Our Office'));
         $this->assertEqual($OfficeThumbnail->getId(), $CarletPic->main_thumbnail->getId());
         $Thumbnail =& new Thumbnail(array('caption'=>'Lucky (our pet)'));
@@ -215,7 +215,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
 
         $Altea =& new Picture(array('title'=>'Altea3'));
         $Altea->main_thumbnail->assign(new Thumbnail(array('caption'=>'Altea3')));
-        
+
         $this->assertTrue($Altea->main_thumbnail->isNewRecord());
         $this->assertEqual($Altea->main_thumbnail->getType(), 'Thumbnail');
         $this->assertTrue($Altea->save());
@@ -240,7 +240,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
         $Thumbnail = $Thumbnail->findFirstBy('caption:has', 'Old town', array('include'=>'panorama'));
         $this->assertEqual($Thumbnail->panorama->title, 'Views from the old town');
     }
-    
+
 
     function test_primary_key_setting()
     {
@@ -284,22 +284,42 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
         $this->assertEqual($HilariosAccount->id, $Hilario->account->id);
 
     }
-    
+
     function test_should_load_resquested_list()
     {
         $this->installAndIncludeModels(array('TodoList', 'TodoTask'));
 
         $ListA =& new TodoList(array('name' => 'A'));
         $this->assertTrue($ListA->save());
-        
+
         $ListB =& new TodoList(array('name' => 'B'));
         $this->assertTrue($ListB->save());
-        
+
         $Task1 =& $ListB->task->create(array('details' => 1));
-        
+
         $Task1->todo_list->load(true);
-        
+
         $this->assertEqual($Task1->todo_list->getId(), $ListB->getId());
+    }
+
+    function test_should_delete_dependent_associates()
+    {
+        $this->installAndIncludeModels(array('Location', 'Group'));
+        $Location = new Location(array('name' => 'Palafolls'));
+        $this->assertTrue($Location->save());
+
+        $Group = new Group(array('name'=>'Crafters'));
+        $this->assertTrue($Group->save());
+
+        $Location->group->assign($Group);
+        $this->assertTrue($Location->save());
+
+        $Location = $this->Location->findFirstBy('name', 'Palafolls', array('include'=>'group'));
+        $Location->destroy();
+
+        $this->assertFalse($this->Location->findFirstBy('name', 'Palafolls'));
+        $this->assertFalse($this->Group->findFirstBy('name', 'Crafters'));
+
     }
         /**/
 }

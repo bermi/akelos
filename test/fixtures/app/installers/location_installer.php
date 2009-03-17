@@ -10,7 +10,8 @@ class LocationInstaller extends AkInstaller
         lft integer index,
         rgt integer index,
         owner_id int default 1,
-        name'
+        name,
+        group_id'
         );
     }
 
