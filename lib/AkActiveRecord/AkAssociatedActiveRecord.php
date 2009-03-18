@@ -285,7 +285,14 @@ class AkAssociatedActiveRecord extends AkBaseModel
                     $sub_association_object = &$this->$handler_name->getAssociatedModelInstance();
                     $main_association_class_name = $sub_association_object->getModelName();
                 }
-                foreach ( $association_options ['include'] as $sub_association_id ) {
+                foreach ( $association_options ['include'] as $idx=>$sub_association_id ) {
+                    if (!is_numeric($idx) && is_array($sub_association_id)) {
+                        $sub_options = $sub_association_id;
+                        $sub_association_id = $idx;
+                    } else {
+                        $sub_options = array();
+                    }
+                    
                     $sub_handler_name = $sub_association_object->getCollectionHandlerName($sub_association_id);
                     if (!$sub_handler_name) {
                         $sub_handler_name = $sub_association_id;
@@ -293,7 +300,6 @@ class AkAssociatedActiveRecord extends AkBaseModel
                     
                     $sub_associated_options = $sub_association_object->$sub_handler_name->getAssociatedFinderSqlOptions(
                                 $association_options);
-                                
                     $type = $sub_association_object->$sub_handler_name->getType();
                     
                     if ($type == 'hasMany' || $type ==
@@ -318,6 +324,26 @@ class AkAssociatedActiveRecord extends AkBaseModel
                         $pk = $sub_association_object->$sub_handler_name->getPrimaryKey();
                         $pluralize = false;
                         $name = $sub_association_id;
+                    }
+                    if (!empty($sub_options)) {
+                        if (isset($sub_options['order'])) {
+                            $order = $this->_addToOrderStatement(isset($options['order'])?$options['order']:'',isset($association_options['order'])?$association_options['order']:'','_'.($pluralize?AkInflector::pluralize($association_id):AkInflector::singularize($association_id)),'__owner');
+                            
+                            $order = $this->_addToOrderStatement($order,$sub_options['order'],'_'.$name,'_'.($pluralize?AkInflector::pluralize($association_id):AkInflector::singularize($association_id)));
+                            $options['order'] = $order;
+                        }
+                        if (isset($sub_options['conditions'])) {
+                            $conditions = $this->_addToConditionsStatement(isset($options['conditions'])?$options['conditions']:'',isset($association_options['conditions'])?$association_options['conditions']:'','_'.($pluralize?AkInflector::pluralize($association_id):AkInflector::singularize($association_id)),'__owner');
+                            
+                            $conditions = $this->_addToConditionsStatement($conditions,$sub_options['conditions'],'_'.$name,'_'.($pluralize?AkInflector::pluralize($association_id):AkInflector::singularize($association_id)));
+                            $options['conditions'] = $conditions;
+                        }
+                        if (isset($sub_options['bind'])) {
+                            $oldbinds = Ak::toArray($options['bind']);
+                            $subbinds = Ak::toArray($association_options['bind']);
+                            $binds = Ak::toArray($sub_options['bind']);
+                            $options['bind'] = array_merge($oldbinds,$subbinds,$binds);
+                        }
                     }
                     $extended_config[$name] = array('parent_class_name'=>$main_association_class_name,'parent_primary_key'=>$sub_association_object->getPrimaryKey(),'parent_handler_name'=>$handler_name,'primary_key'=>$sub_association_object->getPrimaryKey(),'belongs_to'=>$association_id);
                     
@@ -361,15 +387,93 @@ $available_associated_options [$sub_associated_option] []  = $newoption;
             
             }
         }
+        
         $sql = trim($this->constructFinderSqlWithAssociations($options));
         if (! empty($options ['bind']) && is_array($options ['bind']) && strstr($sql, '?')) {
             $sql = array_merge(array ($sql ), $options ['bind']);
         }
-        
         $result = & $this->_findBySqlWithAssociationsExt($sql, isset($options ['include']) ? $options ['include'] : array (), 
                 empty($options ['virtual_limit']) ? false : $options ['virtual_limit'], $extended_config);
         
         return $result;
+    }
+    function _addToOrderStatement($existing, $new, $prefix, $parent_prefix)
+    {
+        $defaultOrder = 'ASC';
+        
+        if (empty($existing)) {
+            $existing = '';
+        } else {
+            if (!stristr($existing,' ASC') && !stristr($existing,' DESC')) {
+                $existing.=' '.$defaultOrder;
+            }
+        }
+        $existing=$this->_addAlias($existing,$parent_prefix,array('ASC','DESC'));
+        $parts = preg_split('/( ASC| DESC)/i',$new);
+        foreach($parts as $i=>$part) {
+            
+            $newpart=$this->_addAlias($part,$prefix,array('ASC','DESC'));
+            $new = str_ireplace($part,$newpart,$new);
+        }
+        $return = $existing.(!empty($existing)?', ':'').$new;
+        
+        return $return;
+                           
+    }
+    function _addConditionAlias($text,$prefix)
+    {
+        //echo "addCond before $text\n";
+        $parts = preg_split('/(AND|OR)/i', $text);
+        foreach($parts as $part) {
+            //echo "addCond part $part\n";
+            preg_match('/(.*?)(=|<|>|<>|!=|IN|IS|IS\s+NOT)(.*)/i',$part, $mparts);
+            if (isset($mparts[1])) {
+                $pre = $this->_addAlias($mparts[1],$prefix);
+                $newpart = str_replace($mparts[1],$pre,$part);
+                $text=str_replace($part,$newpart,$text);
+            }
+        }
+        //echo "addCond after $text\n";
+        return $text;
+    }
+    function _addToConditionsStatement($existing, $new, $prefix, $parent_prefix)
+    {
+        
+        if (empty($existing)) {
+            $existing = '';
+        }
+        $existing=$this->_addConditionAlias($existing,$parent_prefix);
+        $new = $this->_addConditionAlias($new, $prefix);
+        $existing=trim($existing);
+        $new = trim($new);
+        $return = $existing.(!empty($existing)?' AND ':'').$new;
+        
+        return $return;
+                           
+    }
+    
+    function _addAlias($text,$prefix,$ignore = array()) {
+        
+        $orgtext = empty($text)?'':$text;
+        $text = preg_replace('/('.join('|',$ignore).')/i','',$text);
+        $words = preg_split('/(,|\s+)/',$text);
+        $orgwords = $words;
+        $newwords = array();
+        $replacewords = array();
+        foreach($words as $i=>$orgword) {
+            
+            $word = trim($orgword);
+            if (!preg_match('/_.*?\..*/',$word) && !empty($word)) {
+                $word = $prefix.'.'.$word;
+            }
+            if (!empty($word)) {
+                $newwords[] = $word;
+                $replacewords[] = $orgword;
+            }
+        }
+        
+        $newtext=str_ireplace($replacewords,$newwords,$orgtext);
+        return $newtext;
     }
     function &_findBySqlWithAssociationsExt($sql, $included_associations = array(), $virtual_limit = false, $extended_config = array())
     {
@@ -390,8 +494,14 @@ $available_associated_options [$sub_associated_option] []  = $newoption;
         foreach($included_associations as $assoc=>$options) {
             if (isset($options['include'])) {
                 $as = Ak::toArray($options['include']);
-                
-                $thirdpartyAssocs = array_merge($thirdpartyAssocs,$as);
+                $array=array();
+                foreach($as as $idx=>$a) {
+                    if (!is_numeric($idx)) {
+                        $a = $idx;
+                    }
+                    $array[]=$a;
+                }
+                $thirdpartyAssocs = array_merge($thirdpartyAssocs,$array);
                 
             }
             
@@ -462,7 +572,6 @@ $available_associated_options [$sub_associated_option] []  = $newoption;
             
             if(!empty($virtual_limit)){
                 $_included_results[$object_id] = $object_id;
-                //if (MY_DEBUG) var_dump($object_id);
                 if(count($_included_results) > $virtual_limit * $number_of_associates){
                     continue;
                 }
@@ -545,10 +654,6 @@ $available_associated_options [$sub_associated_option] []  = $newoption;
                                     
                                 }
                                 if ($base !==false && $base !== null && is_object($base)) {
-                                    if (!is_object($base)) {
-                                        if (MY_DEBUG) var_dump($base);
-                                    }
-                                    
                                     if (!is_numeric(key($values))) {
                                         $values = array($values);
                                     }
@@ -790,6 +895,21 @@ $available_associated_options [$sub_associated_option] []  = $newoption;
     }
 
 }
-
+if (!function_exists('str_ireplace')) {
+function str_ireplace($needle, $str, $haystack) {
+    
+    if (!is_array($needle)) {
+        $needle = array($needle);
+    }
+    if (!is_array($str)) {
+        $str = array($str);
+    }
+    foreach($needle as $i=>$n) {
+        $n = preg_quote($n, '/');
+        $haystack=preg_replace("/$n/i", $str[$i], $haystack);
+    }
+    return $haystack;
+}
+}
 
 ?>

@@ -25,6 +25,76 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
  * n-n-1 
  * n-n-m 
  */
+    function test_add_condition_statement()
+    {
+        $f = new Father();
+        $top_conditions = 'id = 1';
+        $top_prefix = '__owner';
+        $father_conditions = 'name="franz"';
+        $father_prefix = '_father';
+        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix);
+        $this->assertEqual('__owner.id = 1 AND _father.name="franz"', $result);
+        
+        $top_conditions = 'id = 1';
+        $top_prefix = '__owner';
+        $father_conditions = 'name IN ("franz","peter")';
+        $father_prefix = '_father';
+        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix);
+        $this->assertEqual('__owner.id = 1 AND _father.name IN ("franz","peter")', $result);
+        
+        $top_conditions = 'id = 1';
+        $top_prefix = '__owner';
+        $father_conditions = 'name <> "franz"';
+        $father_prefix = '_father';
+        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix);
+        $this->assertEqual('__owner.id = 1 AND _father.name <> "franz"', $result);
+        
+        $top_conditions = 'id = 1';
+        $top_prefix = '__owner';
+        $father_conditions = 'name < "franz"';
+        $father_prefix = '_father';
+        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix);
+        $this->assertEqual('__owner.id = 1 AND _father.name < "franz"', $result);
+        
+        $top_conditions = 'id = 1';
+        $top_prefix = '__owner';
+        $father_conditions = 'name > "franz"';
+        $father_prefix = '_father';
+        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix);
+        $this->assertEqual('__owner.id = 1 AND _father.name > "franz"', $result);
+        
+        $top_conditions = 'id = 1';
+        $top_prefix = '__owner';
+        $father_conditions = 'name != "franz"';
+        $father_prefix = '_father';
+        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix);
+        $this->assertEqual('__owner.id = 1 AND _father.name != "franz"', $result);
+        
+        $top_conditions = 'id = 1';
+        $top_prefix = '__owner';
+        $father_conditions = 'name IS "franz"';
+        $father_prefix = '_father';
+        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix);
+        $this->assertEqual('__owner.id = 1 AND _father.name IS "franz"', $result);
+        
+        $top_conditions = 'id = 1';
+        $top_prefix = '__owner';
+        $father_conditions = 'name IS NOT "franz"';
+        $father_prefix = '_father';
+        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix);
+        $this->assertEqual('__owner.id = 1 AND _father.name IS NOT "franz"', $result);
+        
+        /**
+         * bindable
+         */
+        $top_conditions = 'id = ?';
+        $top_prefix = '__owner';
+        $father_conditions = 'name = ?';
+        $father_prefix = '_father';
+        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix);
+        $this->assertEqual('__owner.id = ? AND _father.name = ?', $result);
+        //die;
+    }
     /**
      * testing automatic loading of BelongsTo->Owner->BelongsTo
      * 
@@ -42,13 +112,20 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         $Child->save();
         $Activity->save();
         
-        $Test = &$Activity->findFirstBy('name','Test',array('include'=>array('kid'=>array('include'=>'father'))));
+        $Test = &$Activity->findFirstBy('name','Test',array('conditions'=>'id=1','include'=>array('kid'=>array('conditions'=>'id=1','include'=>array('father'=>array('conditions'=>'id=1'))))));
         $this->assertEqual($Test->name,'Test');
         $this->assertEqual($Test->kid->name,'Johanna');
         $this->assertEqual($Test->kid->father->name,'Daddy');
-
+        
+        
+        $Test = &$Activity->findFirstBy('name','Test',array('conditions'=>'id=?','bind'=>1,'include'=>array('kid'=>array('conditions'=>'id=?','bind'=>1,'include'=>array('father'=>array('conditions'=>'id=?','bind'=>array(1)))))));
+        $this->assertEqual($Test->name,'Test');
+        $this->assertEqual($Test->kid->name,'Johanna');
+        $this->assertEqual($Test->kid->father->name,'Daddy');
+        //die;
     }
-
+    
+    
     
     function test_1_n_1()
     {
@@ -67,7 +144,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         $Child2->save();
         $Activity1->save();
         $Activity2->save();
-        $Test = &$Father->findFirstBy('name','Daddy',array('include'=>array('kid'=>array('include'=>'activities'))));
+        $Test = &$Father->findFirstBy('name','Daddy',array('include'=>array('kid'=>array('order'=>'id ASC','include'=>array('activities'=>array('order'=>'id ASC'))))));
         $this->assertEqual($Test->name,'Daddy');
         $this->assertEqual($Test->kids[0]->name,'Johanna');
         $this->assertEqual($Test->kids[1]->name,'John');
@@ -102,7 +179,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         $Comment2_1->save();
         $Comment2_2->save();
         
-        $Test = &$User->findFirstBy('name','Arno',array('include'=>array('posts'=>array('include'=>'comments'))));
+        $Test = &$User->findFirstBy('name','Arno',array('include'=>array('posts'=>array('include'=>array('comments'=>array('order'=>'id ASC'))))));
         $this->assertEqual($Test->name,'Arno');
         $this->assertEqual($Test->posts[0]->title,'Test1');
         $this->assertEqual($Test->posts[1]->title,'Test2');
@@ -114,7 +191,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         /**
          * singular in "post", plural in "comments"
          */
-        $Test = &$User->findFirstBy('name','Arno',array('include'=>array('post'=>array('include'=>'comments'))));
+        $Test = &$User->findFirstBy('name','Arno',array('include'=>array('post'=>array('include'=>array('comments'=>array('order'=>'id ASC'))))));
         $this->assertEqual($Test->name,'Arno');
         $this->assertEqual($Test->posts[0]->title,'Test1');
         $this->assertEqual($Test->posts[1]->title,'Test2');
@@ -126,7 +203,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         /**
          * plural in "posts", singular in "comment"
          */
-        $Test = &$User->findFirstBy('name','Arno',array('include'=>array('posts'=>array('include'=>'comment'))));
+        $Test = &$User->findFirstBy('name','Arno',array('include'=>array('posts'=>array('include'=>array('comments'=>array('order'=>'id ASC'))))));
         $this->assertEqual($Test->name,'Arno');
         $this->assertEqual($Test->posts[0]->title,'Test1');
         $this->assertEqual($Test->posts[1]->title,'Test2');
@@ -138,7 +215,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         /**
          * singular in "post", singular in "post"
          */
-        $Test = &$User->findFirstBy('name','Arno',array('include'=>array('post'=>array('include'=>'comment'))));
+        $Test = &$User->findFirstBy('name','Arno',array('include'=>array('post'=>array('include'=>array('comment'=>array('order'=>'id ASC'))))));
         $this->assertEqual($Test->name,'Arno');
         $this->assertEqual($Test->posts[0]->title,'Test1');
         $this->assertEqual($Test->posts[1]->title,'Test2');
@@ -182,7 +259,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         $Comment2_2->save();
         $Comment3_1->save();
         $Comment3_2->save();
-        $Test = &$User1->findAllBy('name','Arno',array('include'=>array('posts'=>array('include'=>'comments'))));
+        $Test = &$User1->findAllBy('name','Arno',array('include'=>array('posts'=>array('include'=>array('comments'=>array('order'=>'id ASC'))))));
         
         $this->assertEqual($Test[0]->email,'arno@bermilabs.com');
         $this->assertEqual($Test[1]->email,'arno2@bermilabs.com');
