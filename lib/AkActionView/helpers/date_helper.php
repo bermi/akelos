@@ -227,6 +227,12 @@ class DateHelper extends AkActionViewHelper
     /**
       * Returns a select tag with options for each of the seconds 0 through 59 with the current second selected.
       * The <tt>second</tt> can also be substituted for a second number.
+      *
+      * If you want to customize a bit this select by adding some text in the first option this is the way. 
+      * The following example will set '-- Select --' as the first option. If date is null or empty first 
+      * option will be selected, otherwise datetime passed will be selected.
+      *   $date_helper->select_second(['' | null | Ak::getDate()], array('prompt' => '-- Select --'));
+      *
       * Override the field name using the <tt>field_name</tt> option, 'second' by default.
       */
     function select_second($datetime, $options = array())
@@ -238,6 +244,12 @@ class DateHelper extends AkActionViewHelper
       * Returns a select tag with options for each of the minutes 0 through 59 with the current minute selected.
       * Also can return a select tag with options by <tt>minute_step</tt> from 0 through 59 with the 00 minute selected
       * The <tt>minute</tt> can also be substituted for a minute number.
+      *
+      * If you want to customize a bit this select by adding some text in the first option this is the way. 
+      * The following example will set '-- Select --' as the first option. If date is null or empty first 
+      * option will be selected, otherwise datetime passed will be selected.
+      *   $date_helper->select_second(['' | null | Ak::getDate()], array('prompt' => '-- Select --'));
+      *
       * Override the field name using the <tt>field_name</tt> option, 'minute' by default.
       */
     function select_minute($datetime, $options = array())
@@ -248,6 +260,12 @@ class DateHelper extends AkActionViewHelper
     /**
       * Returns a select tag with options for each of the hours 0 through 23 with the current hour selected.
       * The <tt>hour</tt> can also be substituted for a hour number.
+      *
+      * If you want to customize a bit this select by adding some text in the first option this is the way. 
+      * The following example will set '-- Select --' as the first option. If date is null or empty first 
+      * option will be selected, otherwise datetime passed will be selected.
+      *   $date_helper->select_hour(['' | null | Ak::getDate()], array('prompt' => '-- Select --'));
+      *
       * Override the field name using the <tt>:field_name</tt> option, 'hour' by default
       */
     function select_hour($datetime, $options = array())
@@ -259,6 +277,12 @@ class DateHelper extends AkActionViewHelper
       * Returns a select tag with options for each of the days 1 through 31 with the current day selected.
       * The <tt>date</tt> can also be substituted for a hour number.
       * Override the field name using the <tt>field_name</tt> option, 'day' by default.
+      *
+      * If you want to customize a bit this select by adding some text in the first option this is the way. 
+      * The following example will set '-- Select --' as the first option. If date is null or empty first 
+      * option will be selected, otherwise datetime passed will be selected.
+      *   $date_helper->select_day(['' | null | Ak::getDate()], array('prompt' => '-- Select --')); 
+      *
       */
     function select_day($date, $options = array())
     {
@@ -275,6 +299,11 @@ class DateHelper extends AkActionViewHelper
       *   $date_helper->select_month(Ak::getDate()); // Will use keys like "January", "March"
       *   $date_helper->select_month(Ak::getDate(), array('use_month_numbers' => true)); // Will use keys like "1", "3"
       *   $date_helper->select_month(Ak::getDate(), array('add_month_numbers' => true)); // Will use keys like "1 - January", "3 - March"
+      *
+      * If you want to customize a bit this select by adding some text in the first option this is the way. 
+      * The following example will set '-- Select --' as the first option. If date is null or empty first 
+      * option will be selected, otherwise datetime passed will be selected.
+      *   $date_helper->select_month(['' | null | Ak::getDate()], array('prompt' => '-- Select --'));
       *
       * Override the field name using the <tt>field_name</tt> option, 'month' by default.
       *
@@ -296,8 +325,6 @@ class DateHelper extends AkActionViewHelper
             $month_details = Ak::t('January,February,March,April,May,June,July,August,September,October,November,December',array(),'localize/date');
         }
 
-        $date = !empty($options['include_blank']) ? (!empty($date) ? $date : 0) : (!empty($date) ? $date : Ak::getDate());
-
         return DateHelper::_select_for('month', explode(',',$month_details),'n', $date, $options,'_add_one');
     }
 
@@ -309,6 +336,11 @@ class DateHelper extends AkActionViewHelper
       *
       *   $date_helper->select_year(Ak::getDate(), array('start_year' => 1992, 'end_year' => 2007)); // ascending year values
       *   $date_helper->select_year(Ak::getDate(), array('start_year' => 2005, 'end_year' => 1900)); //  descending year values
+      *
+      * If you want to customize a bit this select by adding some text in the first option this is the way. 
+      * The following example will set '-- Select --' as the first option. If date is null or empty first 
+      * option will be selected, otherwise datetime passed will be selected.
+      *   $date_helper->select_year(['' | null | Ak::getDate()], array('prompt' => '-- Select --'));
       *
       * Override the field name using the <tt>field_name</tt> option, 'year' by default.
       */
@@ -328,16 +360,17 @@ class DateHelper extends AkActionViewHelper
     function _select_for($select_type, $range, $date_format, $datetime, $options = array(), $unit_format_callback = '_leading_zero_on_single_digits')
     {
         $options_array = array();
-        
-        if (!empty($options['include_blank']) && $datetime == 0) {
+        if((!empty($options['prompt']) && ($datetime == null || empty($datetime))) || (!empty($options['include_blank']) && $datetime == 0)){
             $datetime_unit = "";
             $date_blank = true;
-        } else {
-            $datetime = empty($datetime) ? Ak::getDate() : $datetime;
+        }else{
+            $datetime = empty($datetime) && empty($options['prompt']) ? Ak::getDate() : $datetime;
             $datetime_unit = Ak::getDate(Ak::getTimestamp($datetime),$date_format);
             $date_blank = false;
-        } 
-
+        }
+        if (!empty($options['prompt'])){
+           $options_array[] = '<option value=""'.(empty($datetime_unit) ? ' selected="selected"' : '').'>'.$options['prompt'].'</option>';
+        }
         foreach ($range as $k=>$time_unit){
             if(is_string($time_unit)){
                 $k = !empty($unit_format_callback) ? DateHelper::$unit_format_callback($k) : $k;
