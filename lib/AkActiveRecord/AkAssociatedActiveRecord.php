@@ -783,8 +783,9 @@ $available_associated_options [$sub_associated_option] []  = $newoption;
         if(empty($options['order']) && !empty($options['sort'])){
             $options['order'] = $options['sort'];
         }
+        $sql  .= !empty($options['group']) ? ' GROUP BY  '.$options['group'] : '';
         $sql  .= !empty($options['order']) ? ' ORDER BY  '.$options['order'] : '';
-
+        
         $this->_db->addLimitAndOffset($sql,$options);
         return $sql;
     }
