@@ -23,9 +23,9 @@ class DateHelperTests extends HelpersUnitTester
         $this->assertEqual(DateHelper::distance_of_time_in_words('1780-01-01 17:18:14', '1780-01-01 17:18:53'), '1 minute');
 
         /**
-         * According to the Gregorian calendar, which is the civil calendar in use today, 
-         * years evenly divisible by 4 are leap years, with the exception of centurial years 
-         * that are not evenly divisible by 400. Therefore, the years 1700, 1800, 1900 and 2100 
+         * According to the Gregorian calendar, which is the civil calendar in use today,
+         * years evenly divisible by 4 are leap years, with the exception of centurial years
+         * that are not evenly divisible by 400. Therefore, the years 1700, 1800, 1900 and 2100
          * are not leap years, but 1600, 2000, and 2400 are leap years.
         */
         $this->assertEqual(DateHelper::distance_of_time_in_words('2100-02-01', '2100-03-01'), '28 days');
@@ -127,6 +127,10 @@ class DateHelperTests extends HelpersUnitTester
         $this->assertEqual(DateHelper::select_year(null,  array('prefix'=>'event_date_', 'prompt'=>'-- Select --', 'start_year'=>2008, 'end_year'=>2011)), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_year_with_prompt.txt'));
         $this->assertEqual(DateHelper::select_month(null, array('prefix'=>'event_date_', 'prompt'=>'-- Select --')), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_month_with_prompt.txt'));
         $this->assertEqual(DateHelper::select_day('',     array('prefix'=>'event_date_', 'prompt'=>'-- Select --')), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_day_with_prompt.txt'));
+    }
+    function test_should_add_id_into_select()
+    {
+        $this->assertEqual(DateHelper::select_year('', array('id'=>'year_id','prompt'=>'-- Select --', 'start_year'=>2008, 'end_year'=>2011)),file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_year_with_id.txt'));
     }
 }
 

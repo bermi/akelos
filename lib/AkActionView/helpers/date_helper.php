@@ -228,8 +228,8 @@ class DateHelper extends AkActionViewHelper
       * Returns a select tag with options for each of the seconds 0 through 59 with the current second selected.
       * The <tt>second</tt> can also be substituted for a second number.
       *
-      * If you want to customize a bit this select by adding some text in the first option this is the way. 
-      * The following example will set '-- Select --' as the first option. If date is null or empty first 
+      * If you want to customize a bit this select by adding some text in the first option this is the way.
+      * The following example will set '-- Select --' as the first option. If date is null or empty first
       * option will be selected, otherwise datetime passed will be selected.
       *   $date_helper->select_second(['' | null | Ak::getDate()], array('prompt' => '-- Select --'));
       *
@@ -245,8 +245,8 @@ class DateHelper extends AkActionViewHelper
       * Also can return a select tag with options by <tt>minute_step</tt> from 0 through 59 with the 00 minute selected
       * The <tt>minute</tt> can also be substituted for a minute number.
       *
-      * If you want to customize a bit this select by adding some text in the first option this is the way. 
-      * The following example will set '-- Select --' as the first option. If date is null or empty first 
+      * If you want to customize a bit this select by adding some text in the first option this is the way.
+      * The following example will set '-- Select --' as the first option. If date is null or empty first
       * option will be selected, otherwise datetime passed will be selected.
       *   $date_helper->select_second(['' | null | Ak::getDate()], array('prompt' => '-- Select --'));
       *
@@ -261,8 +261,8 @@ class DateHelper extends AkActionViewHelper
       * Returns a select tag with options for each of the hours 0 through 23 with the current hour selected.
       * The <tt>hour</tt> can also be substituted for a hour number.
       *
-      * If you want to customize a bit this select by adding some text in the first option this is the way. 
-      * The following example will set '-- Select --' as the first option. If date is null or empty first 
+      * If you want to customize a bit this select by adding some text in the first option this is the way.
+      * The following example will set '-- Select --' as the first option. If date is null or empty first
       * option will be selected, otherwise datetime passed will be selected.
       *   $date_helper->select_hour(['' | null | Ak::getDate()], array('prompt' => '-- Select --'));
       *
@@ -278,10 +278,10 @@ class DateHelper extends AkActionViewHelper
       * The <tt>date</tt> can also be substituted for a hour number.
       * Override the field name using the <tt>field_name</tt> option, 'day' by default.
       *
-      * If you want to customize a bit this select by adding some text in the first option this is the way. 
-      * The following example will set '-- Select --' as the first option. If date is null or empty first 
+      * If you want to customize a bit this select by adding some text in the first option this is the way.
+      * The following example will set '-- Select --' as the first option. If date is null or empty first
       * option will be selected, otherwise datetime passed will be selected.
-      *   $date_helper->select_day(['' | null | Ak::getDate()], array('prompt' => '-- Select --')); 
+      *   $date_helper->select_day(['' | null | Ak::getDate()], array('prompt' => '-- Select --'));
       *
       */
     function select_day($date, $options = array())
@@ -300,8 +300,8 @@ class DateHelper extends AkActionViewHelper
       *   $date_helper->select_month(Ak::getDate(), array('use_month_numbers' => true)); // Will use keys like "1", "3"
       *   $date_helper->select_month(Ak::getDate(), array('add_month_numbers' => true)); // Will use keys like "1 - January", "3 - March"
       *
-      * If you want to customize a bit this select by adding some text in the first option this is the way. 
-      * The following example will set '-- Select --' as the first option. If date is null or empty first 
+      * If you want to customize a bit this select by adding some text in the first option this is the way.
+      * The following example will set '-- Select --' as the first option. If date is null or empty first
       * option will be selected, otherwise datetime passed will be selected.
       *   $date_helper->select_month(['' | null | Ak::getDate()], array('prompt' => '-- Select --'));
       *
@@ -337,8 +337,8 @@ class DateHelper extends AkActionViewHelper
       *   $date_helper->select_year(Ak::getDate(), array('start_year' => 1992, 'end_year' => 2007)); // ascending year values
       *   $date_helper->select_year(Ak::getDate(), array('start_year' => 2005, 'end_year' => 1900)); //  descending year values
       *
-      * If you want to customize a bit this select by adding some text in the first option this is the way. 
-      * The following example will set '-- Select --' as the first option. If date is null or empty first 
+      * If you want to customize a bit this select by adding some text in the first option this is the way.
+      * The following example will set '-- Select --' as the first option. If date is null or empty first
       * option will be selected, otherwise datetime passed will be selected.
       *   $date_helper->select_year(['' | null | Ak::getDate()], array('prompt' => '-- Select --'));
       *
@@ -381,13 +381,14 @@ class DateHelper extends AkActionViewHelper
             }
         }
         return DateHelper::_select_html(empty($options['field_name']) ? $select_type : $options['field_name'],
-        $options_array, @$options['prefix'], @$options['include_blank'], @$options['discard_type'], @$options['disabled'], $date_blank);
+        $options_array, @$options['prefix'], @$options['include_blank'], @$options['discard_type'], @$options['disabled'], $date_blank, @$options['id']);
     }
 
-    function _select_html($type, $options, $prefix = null, $include_blank = false, $discard_type = false, $disabled = false, $date_blank = false)
+    function _select_html($type, $options, $prefix = null, $include_blank = false, $discard_type = false, $disabled = false, $date_blank = false,$id = null)
     {
-        return '<select name="'.(empty($prefix) ? AK_DATE_HELPER_DEFAULT_PREFIX : $prefix).
-        ($discard_type ? '' : $type).'"'.
+        $name = (empty($prefix) ? AK_DATE_HELPER_DEFAULT_PREFIX : $prefix).($discard_type ? '' : $type);
+        return '<select name="'.$name.'"'.
+        (!empty($id) ? ' id="'.$id.'"' : '').
         ($disabled ? ' disabled="disabled"' : '').">\n".
         ($include_blank && $date_blank ? "<option value=\"\" selected=\"selected\"></option>\n" : '').
         ($include_blank && !$date_blank ? "<option value=\"\"></option>\n" : '').
