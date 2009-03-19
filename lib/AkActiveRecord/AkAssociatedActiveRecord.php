@@ -643,11 +643,11 @@ $available_associated_options [$sub_associated_option] []  = $newoption;
                                         }
                                     }
                                 } else if(isset($objects[$i]->$owned_by)){
-                                    if (isset($objects[$i]->$owned_by->$relation_name)) {
+                                    if (isset($objects[$i]->$owned_by->$relation_name) && $objects[$i]->$owned_by->getId()==$owner_id) {
                                         $base = &$objects[$i]->$owned_by->$relation_name;
                                     } else {
                                         $relation_name = AkInflector::pluralize($relation_name)!=$relation_name?AkInflector::pluralize($relation_name):AkInflector::singularize($relation_name);
-                                        if (isset($objects[$i]->$owned_by->$relation_name)) {
+                                        if (isset($objects[$i]->$owned_by->$relation_name) && $objects[$i]->$owned_by->getId()==$owner_id) {
                                             $base = &$objects[$i]->$owned_by->$relation_name;
                                         }
                                     }
@@ -661,6 +661,12 @@ $available_associated_options [$sub_associated_option] []  = $newoption;
                                         $r=&$base->build($val,false);
                                         $r->_newRecord = false;
                                         $r->_loaded = true;
+                                    }
+                                    /**
+                                     * clear things, so that the next records dont get this data
+                                     */
+                                    if (isset($un_associated_items[$owned_by][$owner_id])) {
+                                        unset($un_associated_items[$owned_by][$owner_id]);
                                     }
                                 }
                                 
