@@ -17,15 +17,15 @@
 
 /**
  * CenteredCrop filter
- * 
+ *
  * Options are:
  * 'width'
  * 'height'
- * 
+ *
  * Example:
- * 
- *     $Image = new AkImage('/photo.jpg'); *     
- *     $Image->transform('crop',array('size'=>'105x105'));
+ *
+ *     $Image = new AkImage('/photo.jpg'); *
+ *     $Image->transform('centered_crop',array('size'=>'105x105'));
  *     $Image->save('/cropped.jpg');
  */
 class AkImageCenteredCropFilter extends AkImageFilter
@@ -36,7 +36,7 @@ class AkImageCenteredCropFilter extends AkImageFilter
         'width'=> $this->Image->getWidth(),
         'height'=> $this->Image->getHeight()
         );
-        
+
         $this->options = array_merge($default_options, $options);
         $this->_setWidthAndHeight_($this->options);
         $this->_variablizeOptions_($this->options);

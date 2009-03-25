@@ -141,7 +141,7 @@ class FileUploadHelper extends AkActionViewHelper
         $result = array();
         foreach ($params as $name=>$details){
             if(is_array($details) && !empty($details['name']) &&  !empty($details['tmp_name']) &&  !empty($details['size'])){
-                $details['persistence_key'] = md5($details['tmp_name']);
+                $details['persistence_key'] = md5($details['tmp_name'].Ak::uuid());
                 $details['human_size'] = $this->_controller->number_helper->human_size($details['size']);
                 $file = $this->Cache->get($details['persistence_key'], 'persistent_files');
                 if (empty($file)) {
