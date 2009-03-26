@@ -273,7 +273,7 @@ class AkLocaleManager extends AkObject
 
     /**
      * Returns an array which locales enabled on the public website.
-     * In order to define available languages you must define AK_PUBLIC_LOCALES 
+     * In order to define available languages you must define AK_PUBLIC_LOCALES
      * which a comma-separated list of locales
      *
      * @return array
