@@ -302,7 +302,20 @@ class FormOptionsHelperTests extends HelpersUnitTester
         '<option selected="selected" value="2">Visitor</option>'.
         '</select>');
     }
+    
+    function test_should_remove_select_option_once_implicitly_set()
+    {
+        $Person =& new MockAkActiveRecord($this);
+        $FormOptionsHelper = & new FormOptionsHelper();
+        $FormOptionsHelper->addObject('person',$Person);
 
+        $this->assertEqual(trim(str_replace("\n",'',
+        $FormOptionsHelper->select('person',  'role', array('Admin'=>1,'Moderator'=>2,'Visitor'=>3), array('selected' => 2)))),
+        '<select id="person_role" name="person[role]"><option value="1">Admin</option>'.
+        '<option selected="selected" value="2">Moderator</option>'.
+        '<option value="3">Visitor</option>'.
+        '</select>');
+    }
 }
 
 ak_test('FormOptionsHelperTests', true);

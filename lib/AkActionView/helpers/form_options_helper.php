@@ -351,7 +351,7 @@ class AkFormHelperOptionsInstanceTag extends AkFormHelperInstanceTag
     {
         $this->add_default_name_and_id($html_options);
         $selected_value = !empty($options['selected']) ? $options['selected'] : $this->getValue();
-
+        unset($options['selected']);
         return TagHelper::content_tag('select', $this->_addOptions($this->_template_object->options_for_select($choices, $selected_value, $options),
         $html_options, $this->getValue()), Ak::delete($html_options,'prompt','include_blank'));
     }
