@@ -115,6 +115,7 @@ class AkConfig
     }
     function _useReadCache($environment = AK_ENVIRONMENT)
     {
+        if(AK_CLI && AK_ENVIRONMENT != 'testing') return false;
         switch ($environment) {
             case 'development':
             case 'testing':
@@ -128,6 +129,7 @@ class AkConfig
     
     function _useWriteCache($environment = AK_ENVIRONMENT)
     {
+        if(AK_CLI && AK_ENVIRONMENT != 'testing') return false;
         switch ($environment) {
             case 'setup':
                 return false;
