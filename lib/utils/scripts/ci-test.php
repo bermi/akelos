@@ -17,6 +17,7 @@ class CI_Tests
     var $settings = array('executables'=>array(),'environments'=>array(),'default_executables'=>array());
     var $configured = array('ci-config.yaml'=>false,'environments'=>false);
     var $target_files;
+    var $test_files;
     var $target_executables;
     var $target_environments;
     var $debug=false;
@@ -536,7 +537,7 @@ class CI_Tests
             }elseif (in_array(strtolower($arg),$this->settings['environments'])){
                 $this->target_environments[] = $arg;
             }elseif ($filename = $this->constructTestFilename($arg)){
-                $this->target_files[] = $filename;
+                $this->test_files[] = $filename;
             }else{
                 switch ($arg){
                     case '-b':
@@ -567,6 +568,7 @@ class CI_Tests
         if (!$this->target_executables)  $this->target_executables  = $this->settings['default_executables'];
         if (!$this->target_files)        $this->target_files[]      = AK_CI_TEST_DIR.DS.'test'.DS.'ci-unit.php';
         if (!$this->target_environments) $this->target_environments = $this->settings['environments'];
+        if (!$this->test_files) $this->test_files = array();
     }
 
     function constructTestFilename($filename)
@@ -627,6 +629,7 @@ class CI_Tests
                     $this->info('Running tests for: '.$php_version);
                     foreach ($this->environmentsToRun() as $environment){
                         if ($this->isValidCombination($environment,$php_version)){
+                            
                             $return_value = $this->runCommand($php_version,$file,$environment);
                             if ($return_value !== 0) {
                                 $this->markError();
@@ -805,6 +808,9 @@ class CI_Tests
         if ($this->prepareEnvironment($environment)){
             $xmlFile = getcwd().DIRECTORY_SEPARATOR.'test-results-'.$php.'-'.str_replace(' ','-',$environment).'.xml';
             $command = $this->settings['executables'][$php].' '.$filename.' --xml '.$xmlFile.' "'.$php.'" "'.$environment.'"';
+            if (!empty($this->test_files)) {
+                $command.=' "'.implode('" "',$this->test_files).'" ';
+            }
             if ($this->options['test_mode']){
                 echo "Executing: ".$command."\n\r";
                 $return_value = 0;

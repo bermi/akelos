@@ -34,9 +34,32 @@ function load_tests($dir, &$test)
    }
    $d->close();
 }
+function load_test_files($dir, &$test, $test_files) 
+{
+    foreach($test_files as $test_file) {
+        if(!is_file($test_file)) {
+            $test_file = $dir.DS.$test_file;
+        }
 
-load_tests(AK_TEST_DIR.DS.'unit'.DS.'suites', $test);
-
+        $test->addTestFile($test_file);
+    }
+}
+ $test_files = array();
+if(count($_SERVER['argv'])>1) {
+    //$test_files = $_SERVER['argv'];
+   
+    for($i=count($_SERVER['argv'])-1;$i>0;$i--) {
+        if (is_file($_SERVER['argv'][$i]) && preg_match('/^.*\.php$/',$_SERVER['argv'][$i])) {
+            $test_files[] = $_SERVER['argv'][$i];
+        }
+    }
+    
+} 
+if(count($test_files)>0) {
+    load_test_files(AK_TEST_DIR.DS.'unit'.DS.'suites', $test, $test_files);
+} else {
+    load_tests(AK_TEST_DIR.DS.'unit'.DS.'suites', $test);
+}
 if (TextReporter::inCli()) {
     $writeXml = false;
     if (isset($_SERVER['argv'][1]) && $_SERVER['argv'][1]=='--xml') {
