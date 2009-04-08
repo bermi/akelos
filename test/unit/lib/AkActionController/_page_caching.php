@@ -321,13 +321,13 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
     function test_cache_skip()
     {
         $this->_flushCache('www.example.com');
-        $this->get('http://www.example.com/page_caching/skip',array(),array());
+        $this->get('http://www.example.com/page_caching/skip',array(),array(),array());
         $this->assertTextMatch('Hello<!--CACHE-SKIP-START-->
         
         You wont see me after the cache is rendered.
         
         <!--CACHE-SKIP-END-->');
-        $this->get('http://www.example.com/page_caching/skip',array(),array());
+        $this->get('http://www.example.com/page_caching/skip',array(),array(),array());
         $this->assertTextMatch('Hello');
     }
     
@@ -432,6 +432,43 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->assertHeader('Content-Type','text/csv');
         $this->assertTextMatch('hello,business');
         $this->assertHeader('X-Cached-By','Akelos');
+
+    }
+    
+    function test_format_specific_caching()
+    {
+        $this->_flushCache('www.example.com');
+        $this->get('http://www.example.com/page_caching/formatspecific');
+        $this->assertHeader('Content-Type','text/html');
+        $this->assertTextMatch('html format');
+        $this->_assertPageNotCached('/page_caching/formatspecific.html');
+        
+        $this->get('http://www.example.com/page_caching/formatspecific.js');
+        $this->assertHeader('Content-Type','application/x-javascript');
+        $this->assertTextMatch('javascript format');
+        $this->_assertPageCached('/page_caching/formatspecific.js');
+        $this->_assertPageNotCached('/page_caching/formatspecific.html');
+    }
+    
+    function test_caching_with_get_parameters()
+    {
+        $this->_flushCache('www.example.com');
+        
+        $this->get('http://www.example.com/page_caching/get_parameters',array('version'=>1));
+        $this->assertHeader('Content-Type','text/html');
+        $this->assertTextMatch('version:1');
+        $_GET=array('version'=>1);
+        $this->_assertPageCached('/page_caching/get_parameters.html');
+        $_GET=array();
+        $this->_assertPageNotCached('/page_caching/get_parameters.html');
+        
+        $this->get('http://www.example.com/page_caching/get_parameters');
+        $this->assertHeader('Content-Type','text/html');
+        $this->assertTextMatch('version:');
+        $_GET=array();
+        $this->_assertPageCached('/page_caching/get_parameters.html');
+        $_GET=array('version'=>1);
+        $this->_assertPageCached('/page_caching/get_parameters.html');
 
     }
 }

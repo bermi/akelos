@@ -16,8 +16,9 @@ class AkTestDispatcher extends AkDispatcher
     {
         $this->_controllerVars = $controllerVars;
     }
-    function get($url)
+    function get($url,$params = array())
     {
+        $_GET = $params;
         $_SERVER['REQUEST_METHOD'] = 'GET';
         return $this->process($url);
     }
@@ -62,6 +63,7 @@ class AkTestDispatcher extends AkDispatcher
         }
         if (isset($parts['query'])) {
             $parts = preg_split('&', $parts['query']);
+            
             foreach ($parts as $p) {
                 $gets = split('=',$p);
                 $_GET[$gets[0]]=isset($gets[1])?$gets[1]:null;
@@ -89,8 +91,8 @@ class AkTestDispatcher extends AkDispatcher
                     $this->Controller->$key = $value;
                 }
             }
+            
             $this->Controller->process(&$this->Request, &$this->Response);
-
         }
         return true;
     }

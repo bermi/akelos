@@ -4,7 +4,7 @@ class PageCachingController extends ApplicationController
 {
 
     var $caches_page = array('format','index','ok','no_content','found','not_found','simple', 'priority',
-                               'skip');
+                               'skip','formatspecific'=>array('format'=>'js'),'get_parameters'=>array('include_get_parameters'=>array('version')));
 
     var $caches_action = array('priority');
     
@@ -13,6 +13,19 @@ class PageCachingController extends ApplicationController
         
         $this->renderNothing(200);
         
+    }
+    function formatspecific()
+    {
+        if($this->respondToFormat()) return;
+        $this->renderText('html format');
+    }
+    function get_parameters()
+    {
+        $this->renderText('version:'.@$this->params['version']);
+    }
+    function _handleFormatspecificAsJs()
+    {
+        $this->renderText('javascript format');
     }
     
     function format()

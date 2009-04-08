@@ -716,6 +716,7 @@ EOF;
 
     function _setCachesPage($options)
     {
+        
         if (!$this->_perform_caching) return;
         if (is_string($options)) {
             $options = Ak::toArray($options);
@@ -726,11 +727,12 @@ EOF;
         $this->_caches_page = &$options;
 
         $actionName = $this->_controller->getActionName();
+        $format = $this->_controller->Request->getFormat();
         if ($this->_caching_type == null && isset($this->_caches_page[$actionName])) {
+            if (isset($this->_caches_page[$actionName]['format']) && $format !=$this->_caches_page[$actionName]['format']) return;
             $this->_caching_type = 'page';
             $this->_include_get_parameters = $this->_caches_page[$actionName]['include_get_parameters'];
             $this->_additional_headers = $this->_caches_page[$actionName]['headers'];
-
             $this->_controller->prependBeforeFilter(array(&$this,'beforePageCache'));
             $this->_controller->appendAfterFilter(array(&$this,'afterPageCache'));
         }
@@ -815,28 +817,50 @@ EOF;
         $cacheId = rtrim($cacheId,'/');
         $parts = split('/',$cacheId);
 
-        $hasExtension = preg_match('/.+\..{3,4}/',$parts[count($parts)-1]);
+        $hasExtension = preg_match('/.+\..{2,4}/',$parts[count($parts)-1]);
         if (!$hasExtension) {
             if (isset($this->_controller)) {
                 $cacheId.= '.'.$this->_controller->Request->getFormat();
             } else {
-                
                 list($format, $requestPath) = AkRequestMimeType::getFormat($path);
                 $cacheId.= '.'.$format;
             }
         }
         
         $getParameters = $_GET;
+        
         unset($getParameters['ak']);
         if (is_array($this->_include_get_parameters) && !empty($this->_include_get_parameters) && !empty($getParameters)) {
             $cacheableGetParameters = array();
+            sort($this->_include_get_parameters);
             foreach ($this->_include_get_parameters as $include_get) {
                 if (isset($getParameters[$include_get])) {
                     $cacheableGetParameters[] = $include_get .DS.$getParameters[$include_get];
                 }
             }
+            /**
+             * writing cache fragment for the get_params that should be cached
+             */
+            $this->writeFragment('get_params'.DS.$cacheId,serialize($this->_include_get_parameters));
             $cacheIdGetPart = implode(DS,$cacheableGetParameters);
             $cacheId .= DS . $cacheIdGetPart;
+        } else if (!$this->_controller) {
+            /**
+             * reading cacheable get_parameters and adding them to the cacheId
+             */
+            if(($useCacheGetParams = $this->readFragment('get_params'.DS.$cacheId))) {
+                $useCacheGetParams = unserialize($useCacheGetParams);
+                $cacheableGetParameters = array();
+                foreach($useCacheGetParams as $p) {
+                    if(isset($getParameters[$p])) {
+                        $cacheableGetParameters[]=$p.DS.$getParameters[$p];
+                    }
+                }
+                if (!empty($cacheableGetParameters)) {
+                    $cacheIdGetPart = implode(DS,$cacheableGetParameters);
+                    $cacheId .= DS . $cacheIdGetPart;
+                }
+            }
         }
         $cacheId=strlen($cacheId)>$this->_max_url_length?md5($cacheId):$cacheId;
         $cacheId = ($forcedLanguage!=null?$forcedLanguage:$this->_getDefaultLanguageForUser()).DS. $cacheId;

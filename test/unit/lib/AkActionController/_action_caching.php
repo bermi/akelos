@@ -28,7 +28,7 @@ class Test_AkActionControllerCachingActions extends AkTestApplication
         $cache_this = date('Y-m-d, H:i:s');
         
         $this->setIp('212.121.121.121');
-        $this->get('http://www.example.com/action_caching/index',array(),array('cache_this'=>$cache_this));
+        $this->get('http://www.example.com/action_caching/index',array(),array(),array('cache_this'=>$cache_this));
         $this->assertTextMatch($cache_this);
         $this->assertResponse(200);
         $this->_assertCacheExists('/'.Ak::lang().'/action_caching/index', array('host'=>'www.example.com'));
@@ -47,7 +47,7 @@ class Test_AkActionControllerCachingActions extends AkTestApplication
     {
         $this->_flushCache('test.host');
         $cache_this = date('Y-m-d, H:i:s');
-        $this->get('http://www.example.com/action_caching/show',array(),array('cache_this'=>$cache_this));
+        $this->get('http://www.example.com/action_caching/show',array(),array(),array('cache_this'=>$cache_this));
         $this->_assertCacheExists('/custom/show', array('host'=>'test.host'));
         $cached = $this->_getActionCache('/custom/show', array('host'=>'test.host'));
         $this->assertTextMatch($cache_this);
@@ -58,22 +58,22 @@ class Test_AkActionControllerCachingActions extends AkTestApplication
     {
         $cache_this = date('Y-m-d, H:i:s');
         
-        $this->get('http://www.example.com/action_caching/edit',array(),array('cache_this'=>$cache_this));
+        $this->get('http://www.example.com/action_caching/edit',array(),array(),array('cache_this'=>$cache_this));
         $this->_assertCacheExists('/edit', array('host'=>'test.host'));
 
-        $this->get('http://www.example.com/action_caching/edit/1',array(),array('cache_this'=>$cache_this));
+        $this->get('http://www.example.com/action_caching/edit/1',array(),array(),array('cache_this'=>$cache_this));
         $this->_assertCacheExists('/1;edit', array('host'=>'test.host'));
     }
     function test_cache_skip()
     {
         $this->_flushCache('www.example.com');
-        $this->get('http://www.example.com/action_caching/skip',array(),array());
+        $this->get('http://www.example.com/action_caching/skip',array(),array(),array());
         $this->assertTextMatch('Hello<!--CACHE-SKIP-START-->
         
         You wont see me after the cache is rendered.
         
         <!--CACHE-SKIP-END-->');
-        $this->get('http://www.example.com/action_caching/skip',array(),array());
+        $this->get('http://www.example.com/action_caching/skip',array(),array(),array());
         $this->assertTextMatch('Hello');
     }
     function test_cache_expiration()
@@ -82,12 +82,12 @@ class Test_AkActionControllerCachingActions extends AkTestApplication
         $time = time();
         $cache_this = date('Y-m-d, H:i:s',$time);
         
-        $this->get('http://www.example.com/action_caching/',array(),array('cache_this'=>$cache_this));
+        $this->get('http://www.example.com/action_caching/',array(),array(),array('cache_this'=>$cache_this));
         $this->assertTextMatch($cache_this);
         $this->_assertCacheExists('/'.Ak::lang().'/action_caching/index');
         
         $cache_this_new = date('Y-m-d, H:i:s',$time+10);
-        $this->get('http://www.example.com/action_caching/',array(),array('cache_this'=>$cache_this_new));
+        $this->get('http://www.example.com/action_caching/',array(),array(),array('cache_this'=>$cache_this_new));
         $this->assertHeader('X-Cached-By','Akelos-Action-Cache');
         $this->assertTextMatch($cache_this);
         
@@ -96,7 +96,7 @@ class Test_AkActionControllerCachingActions extends AkTestApplication
         $this->_assertCacheNotExists('/'.Ak::lang().'/action_caching/index');
         
         $cache_this_new = date('Y-m-d, H:i:s',$time+20);
-        $this->get('http://www.example.com/action_caching/',array(),array('cache_this'=>$cache_this_new));
+        $this->get('http://www.example.com/action_caching/',array(),array(),array('cache_this'=>$cache_this_new));
         $this->assertTextMatch($cache_this_new);
         $cached = $this->_getActionCache('/'.Ak::lang().'/action_caching/index');
         $this->assertEqual($cache_this_new, $cached);
@@ -110,24 +110,24 @@ class Test_AkActionControllerCachingActions extends AkTestApplication
         $this->_flushCache('xinc.eu');
         
         $cache_this_akelos = date('Y-m-d, H:i:s', time());
-        $this->get('http://akelos.org/action_caching/',array(),array('cache_this'=>$cache_this_akelos));
+        $this->get('http://akelos.org/action_caching/',array(),array(),array('cache_this'=>$cache_this_akelos));
         $akelos_cached = $this->_getActionCache('/'.Ak::lang().'/action_caching/index',array('host'=>'akelos.org'));
         $this->assertTextMatch($akelos_cached);
         
         $cache_this_www_akelos = date('Y-m-d, H:i:s', time()+10);
-        $this->get('http://www.akelos.org/action_caching/',array(),array('cache_this'=>$cache_this_www_akelos));
+        $this->get('http://www.akelos.org/action_caching/',array(),array(),array('cache_this'=>$cache_this_www_akelos));
         $www_akelos_cached = $this->_getActionCache('/'.Ak::lang().'/action_caching/index',array('host'=>'www.akelos.org'));
         $this->assertTextMatch($cache_this_www_akelos);
         
         $this->assertNotEqual($akelos_cached,$www_akelos_cached);
         
         $cache_this_www_akelos_new = date('Y-m-d, H:i:s', time()+20);
-        $this->get('http://www.akelos.org/action_caching/',array(),array('cache_this'=>$cache_this_www_akelos));
+        $this->get('http://www.akelos.org/action_caching/',array(),array(),array('cache_this'=>$cache_this_www_akelos));
         $this->assertTextMatch($cache_this_www_akelos);
         
         
         $cache_this_xinc = date('Y-m-d, H:i:s', time()+30);
-        $this->get('http://xinc.eu/action_caching/',array(),array('cache_this'=>$cache_this_xinc));
+        $this->get('http://xinc.eu/action_caching/',array(),array(),array('cache_this'=>$cache_this_xinc));
         $xinc_cached = $this->_getActionCache('/'.Ak::lang().'/action_caching/index',array('host'=>'xinc.eu'));
         $this->assertTextMatch($cache_this_xinc);
         
@@ -151,13 +151,13 @@ class Test_AkActionControllerCachingActions extends AkTestApplication
     {
         $cache_this = 'xml';
         $cache_this_rss = 'rss';
-        $this->get('http://www.example.com/action_caching/index.xml',array(),array('cache_this'=>$cache_this));
+        $this->get('http://www.example.com/action_caching/index.xml',array(),array(),array('cache_this'=>$cache_this));
         $this->assertHeader('Content-Type','application/xml');
-        $this->get('http://www.example.com/action_caching/index.xml',array(),array('cache_this'=>$cache_this));
+        $this->get('http://www.example.com/action_caching/index.xml',array(),array(),array('cache_this'=>$cache_this));
         $this->assertHeader('Content-Type','application/xml');
         $this->assertTextMatch('xml');
-        $this->get('http://www.example.com/action_caching/index.rss',array(),array('cache_this'=>$cache_this_rss));
-        $this->get('http://www.example.com/action_caching/index.rss',array(),array('cache_this'=>$cache_this_rss));
+        $this->get('http://www.example.com/action_caching/index.rss',array(),array(),array('cache_this'=>$cache_this_rss));
+        $this->get('http://www.example.com/action_caching/index.rss',array(),array(),array('cache_this'=>$cache_this_rss));
         $this->assertHeader('Content-Type','application/rss+xml');
         $this->assertTextMatch('rss');
         $this->_assertCacheExists('/'.Ak::lang().'/action_caching/index.rss');
@@ -167,9 +167,9 @@ class Test_AkActionControllerCachingActions extends AkTestApplication
     function test_file_extensions()
     {
         $cache_this = 'text';
-        $this->get('http://www.example.com/action_caching/index/kitten.jpg',array(),array('cache_this'=>$cache_this));
+        $this->get('http://www.example.com/action_caching/index/kitten.jpg',array(),array(),array('cache_this'=>$cache_this));
         $this->assertHeader('Content-Type','image/jpeg');
-        $this->_assertCacheExists('/'.Ak::lang().'/action_caching/index/kitten.jpg',array('host'=>'www.example.com'));
+        $this->_assertCacheExists('/'.Ak::lang().'/action_caching/index/kitten.jpg',array(),array('host'=>'www.example.com'));
     }
     
     function _getActionCache($path, $options = array())
@@ -199,12 +199,12 @@ class Test_AkActionControllerCachingActions extends AkTestApplication
         $this->assertTrue(true,'Need to test that /page is the same cache as /page/index');
         $this->_flushCache('xinc.eu');
         $cache_this_xinc = date('Y-m-d, H:i:s', time()+30);
-        $this->get('http://xinc.eu/action_caching/',array(),array('cache_this'=>$cache_this_xinc));
+        $this->get('http://xinc.eu/action_caching/',array(),array(),array('cache_this'=>$cache_this_xinc));
         $xinc_cached_normalized = $this->_getActionCache('/'.Ak::lang().'/action_caching/index',array('host'=>'xinc.eu'));
         $this->assertTextMatch($cache_this_xinc);
         $this->assertEqual($cache_this_xinc,$xinc_cached_normalized);
         
-        $this->get('http://xinc.eu/action_caching/index',array(),array('cache_this'=>$cache_this_xinc));
+        $this->get('http://xinc.eu/action_caching/index',array(),array(),array('cache_this'=>$cache_this_xinc));
         $this->assertTextMatch($cache_this_xinc);
     }
 }

@@ -248,13 +248,13 @@ class AkTestApplication extends AkUnitTest
     }
     
     
-    function get($url,$constants = array(), $controllerVars = array())
+    function get($url,$data = array(), $constants = array(), $controllerVars = array())
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
         ob_start();
         $rendered = $this->_init($url, $constants, $controllerVars);
         if (!$rendered) {
-            $res = $this->Dispatcher->get($url);
+            $res = $this->Dispatcher->get($url, $data);
             $this->_response = ob_get_clean();
         } else {
             $res=true;
