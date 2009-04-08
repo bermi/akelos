@@ -1364,15 +1364,21 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         $concat = empty($sql) ? '' : ' WHERE ';
         if (empty($conditions) && $this->_getDatabaseType() == 'sqlite') $conditions = '1';  // sqlite HACK
+        
+        if($this->getInheritanceColumn() !== false && $this->descendsFromActiveRecord($this)){
+            $type_condition = $this->typeCondition($table_alias);
+            $sql .= !empty($type_condition) ? $concat.$type_condition : '';
+            $concat = ' AND ';
+            if (!empty($conditions))
+            $conditions = '('.$conditions.')';
+        }
+        
         if(!empty($conditions)){
             $sql  .= $concat.$conditions;
             $concat = ' AND ';
         }
 
-        if($this->getInheritanceColumn() !== false && $this->descendsFromActiveRecord($this)){
-            $type_condition = $this->typeCondition($table_alias);
-            $sql .= !empty($type_condition) ? $concat.$type_condition : '';
-        }
+        
         return $sql;
     }
 

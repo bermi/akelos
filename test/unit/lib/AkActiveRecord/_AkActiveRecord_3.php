@@ -499,7 +499,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $conditions = "ak_test_users.last_name = 'Ferrer' AND ak_test_users.country = 25";
         $AkTestMember->setInheritanceColumn('role');
         $AkTestMember->addConditions($sql, $conditions);
-        $this->assertEqual($sql,$copy.' WHERE '.$conditions." AND ( ak_test_members.role = 'Ak test member' ) ");
+        $this->assertEqual($sql,$copy." WHERE ( ak_test_members.role = 'Ak test member' )  AND (".$conditions.")");
     }
 
     function Test_of_resetColumnInformation()
