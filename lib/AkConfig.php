@@ -163,7 +163,7 @@ class AkConfig
     
     function _readCache($namespace, $environment = AK_ENVIRONMENT, $force = false)
     {
-        if (!$force && !$this->_useReadCache($environment)) return false;
+        if (AK_CLI || (!$force && !$this->_useReadCache($environment))) return false;
         $cacheFileName = $this->_generateCacheFileName($namespace,$environment);
         if ($this->_checkCacheValidity($namespace, $environment)) {
             $config = include $cacheFileName;
@@ -175,7 +175,7 @@ class AkConfig
     
     function _writeCache($config, $namespace, $environment = AK_ENVIRONMENT, $force = false)
     {
-        if (AK_ENVIRONMENT == 'setup' || (!$force &&!$this->_useWriteCache($environment)))  return false;
+        if (AK_CLI || AK_ENVIRONMENT == 'setup' || (!$force &&!$this->_useWriteCache($environment)))  return false;
         
         $var_export = var_export($config,true);
         $cache = <<<CACHE
