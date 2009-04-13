@@ -427,15 +427,21 @@ class AkCacheHandler extends AkObject
         if (@$this->_settings['enabled'] == true) {
             $this->_perform_caching = true;
         }
-
+        $caches = false;
         foreach ($configuration_options as $option => $callback) {
             if (isset($configuration_object->$option)) {
+                if (in_array($option,array('caches_page','cachesPage','caches_action','cachesAction'))) {
+                    $caches=true;
+                }
                 if (is_array($callback)) {
                     call_user_func_array($callback,$configuration_object->$option);
                 } else {
                     $this->$callback($configuration_object->$option);
                 }
             }
+        }
+        if (!$caches) {
+            $this->_enableGzippedOutput();
         }
     }
     function _setPageCacheExtension($extension)
@@ -515,9 +521,12 @@ class AkCacheHandler extends AkObject
     {
         static $ETag;
         
+        $cacheIds = array();
+        
         if (!($this->_cachingAllowed() && $this->_perform_caching)) return;
 
         $cacheId = $this->_buildCacheId($path, $language);
+        
         $skipEtagSending = false;
         if ($orgStrlen != strlen($content)) $skipEtagSending = true;
         $notNormalizedCacheId = $this->_buildCacheId($path, $language,false);
@@ -532,7 +541,7 @@ class AkCacheHandler extends AkObject
         } else {
             $removeHeaders = array('content-encoding');
         }
-
+        $addHeaders = array_merge($addHeaders,$this->_additional_headers);
         $cacheGroup = $this->_buildCacheGroup();
 
         if ($sendETag && !headers_sent()) {
@@ -546,10 +555,10 @@ class AkCacheHandler extends AkObject
             }
         }
         //$addHeaders['ETag'] = $ETag;
-
-
+        $cacheIds[] = $cacheId;
+        $cacheIds[] = $notNormalizedCacheId;
         $cacheTimestamp = time();
-        $content = $this->_modifyCacheContent($content,$addHeaders, $removeHeaders);
+        $content = $this->_modifyCacheContent($content,$addHeaders, $removeHeaders,$cacheIds,$cacheGroup);
         $filename = $this->_storePageCache($content,$cacheId,$cacheGroup);
         $res = $this->_cache_store->save($filename,$cacheId,$cacheGroup);
         if ($notNormalizedCacheId != $cacheId) {
@@ -613,7 +622,7 @@ class AkCacheHandler extends AkObject
         $content = $timestamp.$this->_header_separator.$headerString . $this->_header_separator . $content;
         return $content;
     }
-    function _modifyCacheContent($content,$addHeaders = array(), $removeHeaders = array())
+    function _modifyCacheContent($content,$addHeaders = array(), $removeHeaders = array(), $cache_ids = array(), $cache_group = null)
     {
         $headers = $this->_controller->Response->_headers_sent;
         $finalHeaders = array();
@@ -634,11 +643,18 @@ class AkCacheHandler extends AkObject
         }
         $timestamp = time();
         $headerString = var_export($finalHeaders,true);
+        $cacheIdStr = var_export($cache_ids,true);
+        $pre_page_cache_script = $this->_pre_page_cache_script;
+        $post_page_cache_script = $this->_post_page_cache_script;
         //$functionStr = file_get_contents(dirname(__FILE__).DS.'cache_page_functions.txt');
         $content = preg_replace('/(<\?|<\?php|\?>)/','<?php echo "\1";?>', $content);
         $content = <<<EOF
 <?php
-global \$sendHeaders, \$returnHeaders, \$exit;
+global \$sendHeaders, \$returnHeaders, \$exit, \$pageCache;
+
+\$cacheIds = $cacheIdStr;
+\$cacheGroup = "$cache_group";
+$pre_page_cache_script
 
 \$modifiedTimestamp = $timestamp;
 \$headers = $headerString;
@@ -658,6 +674,9 @@ if (is_array(\$addHeaders)) {
 \$headers = array_merge(\$etagHeaders, \$headers);
 ?>
 $content<?php
+
+$post_page_cache_script
+
 if (\$exit) {
     exit(0);
 }
@@ -713,11 +732,32 @@ EOF;
         }
         $this->_Sweepers[] = &new $sweeper_class(&$this);
     }
-
+    function _enableGzippedOutput()
+    {
+        if(!$this->_gzipped_output_enabled && isset($this->_controller) && isset($this->_controller->Request) && $this->_controller->Request->getFormat()=='html') {
+            $this->_controller->prependBeforeFilter(array(&$this,'beforeNoCache'));
+            $this->_controller->appendAfterFilter(array(&$this,'afterNoCache'));
+            $this->_gzipped_output_enabled = true;
+        }
+    }
+    var $_gzipped_output_enabled = false;
+    var $_pre_page_cache_script;
+    var $_post_page_cache_script;
+    function setPrePageCacheScript($script)
+    {
+        $this->_pre_page_cache_script = $script;
+    }
+    function setPostPageCacheScript($script)
+    {
+        $this->_post_page_cache_script = $script;
+    }
     function _setCachesPage($options)
     {
         
-        if (!$this->_perform_caching) return;
+        if (!$this->_perform_caching) {
+            $this->_enableGzippedOutput();
+            return;
+        }
         if (is_string($options)) {
             $options = Ak::toArray($options);
         }
@@ -729,12 +769,17 @@ EOF;
         $actionName = $this->_controller->getActionName();
         $format = $this->_controller->Request->getFormat();
         if ($this->_caching_type == null && isset($this->_caches_page[$actionName])) {
-            if (isset($this->_caches_page[$actionName]['format']) && $format !=$this->_caches_page[$actionName]['format']) return;
+            if (isset($this->_caches_page[$actionName]['format']) && $format !=$this->_caches_page[$actionName]['format']) {
+                $this->_enableGzippedOutput();
+                return;
+            }
             $this->_caching_type = 'page';
             $this->_include_get_parameters = $this->_caches_page[$actionName]['include_get_parameters'];
             $this->_additional_headers = $this->_caches_page[$actionName]['headers'];
             $this->_controller->prependBeforeFilter(array(&$this,'beforePageCache'));
             $this->_controller->appendAfterFilter(array(&$this,'afterPageCache'));
+        } else {
+            $this->_enableGzippedOutput();
         }
     }
 
@@ -743,7 +788,29 @@ EOF;
         ob_start();
         return true;
     }
+    function beforeNoCache()
+    {
+        //return true;
+        $encodings = $this->_getAcceptedEncodings();
+        $xgzip = false;
+        $gzip = false;
+        if (($gzip=in_array('gzip',$encodings)) || ($xgzip=in_array('x-gzip',$encodings))) {
+            $this->_controller->Response->addHeader('Content-Encoding',$xgzip?'x-gzip':'gzip');
+            header('Content-Encoding: '.($xgzip?'x-gzip':'gzip'));
+            ob_start(array(&$this,'_gzipCache'));
+        } else {
+            ob_start();
+        }
+        return true;
+    }
+    function afterNoCache()
+    {
+        
+        $this->_controller->handleResponse();
+        ob_end_flush();
 
+        return true;
+    }
     function _scopeWithGzip($cacheId)
     {
         $cacheId = 'gzip' . DS . $cacheId;
@@ -754,8 +821,9 @@ EOF;
         $encodings = $this->_getAcceptedEncodings();
         $xgzip = false;
         $gzip = false;
-        $this->_controller->Response->addHeader('Cache-Control','private, max-age=0, must-revalidate');
-
+        if (!isset($this->_controller->Response->_headers['Cache-Control'])) {
+            $this->_controller->Response->addHeader('Cache-Control','private, max-age=0, must-revalidate');
+        }
         if (($gzip=in_array('gzip',$encodings)) || ($xgzip=in_array('x-gzip',$encodings))) {
             $this->_controller->Response->addHeader('Content-Encoding',$xgzip?'x-gzip':'gzip');
             $gzip = $gzip || $xgzip;
@@ -793,6 +861,7 @@ EOF;
         $gzip_contents = $pre.$gzip_contents;
         $gzip_contents.=pack('V', $gzip_crc);
         $gzip_contents.=pack('V', $gzip_size);
+
         return $gzip_contents;
     }
 
@@ -1093,7 +1162,10 @@ EOF;
     }
     function _setCachesAction($options)
     {
-        if (!$this->_perform_caching) return;
+        if (!$this->_perform_caching) {
+            $this->_enableGzippedOutput();
+            return;
+        }
         if (is_string($options)) {
             $options = Ak::toArray($options);
         }
@@ -1106,6 +1178,11 @@ EOF;
         $actionName = $this->_controller->getActionName();
 
         if ($this->_caching_type == null && isset($this->_caches_action[$actionName])) {
+            if (isset($this->_caches_page[$actionName]['format']) && $format !=$this->_caches_page[$actionName]['format']) {
+                $this->_enableGzippedOutput();
+                return;
+            }
+            
             $this->_caching_type = 'action';
             $this->_action_include_get_parameters = $this->_caches_action[$actionName]['include_get_parameters'];
             $path = $this->_caches_action[$actionName]['cache_path'];
@@ -1123,6 +1200,8 @@ EOF;
             $this->_action_cache_path = $this->_actionPath($this->_action_cache_path);
             $this->_controller->prependBeforeFilter(array(&$this,'beforeActionCache'));
             $this->_controller->appendAfterFilter(array(&$this,'afterActionCache'));
+        } else {
+            $this->_enableGzippedOutput();
         }
 
     }
