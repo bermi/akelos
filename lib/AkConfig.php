@@ -158,7 +158,10 @@ class AkConfig
     {
         $cacheFilename = $this->_generateCacheFileName($namespace,$environment);
         $configFilename = $this->_generateConfigFileName($namespace,$environment);
-        touch($cacheFilename,filemtime($configFilename));
+        
+        if(!touch($cacheFilename,filemtime($configFilename))){
+            echo "Error touching file $cacheFilename, check your permissions!\n";
+        };
     }
     
     function _readCache($namespace, $environment = AK_ENVIRONMENT, $force = false)
