@@ -53,7 +53,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         if(AK_WEB_REQUEST) {
             $headers = headers_list();
             if (in_array('Content-Encoding: gzip', $headers) || in_array('Content-Encoding: xgzip', $headers)) {
-                header('Content-Encoding: ');
+                header('Content-Encoding: none');
             }
         }
         while (ob_get_level()) {
