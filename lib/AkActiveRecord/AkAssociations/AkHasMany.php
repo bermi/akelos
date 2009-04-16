@@ -91,7 +91,6 @@ class AkHasMany extends AkAssociation
         'order' => false,
         'include_conditions_when_included' => true,
         'include_order_when_included' => true,
-        'group' => false,
         'foreign_key' => false,
         'dependent' => 'nullify',
         'finder_sql' => false,
