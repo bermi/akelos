@@ -593,16 +593,16 @@ class Ak
 
         $line = isset($line) ? "Line: $line".(AK_CLI?"\n":"<br />") : "";
         $file = isset($file) ? "File: $file".(AK_CLI?"\n":"<br />") : "";
+        $text = is_array($text) ? print_r($text, true) : $text;
 
         if(!isset($text)){
             $counter++;
             $text = '';
         }else {
-            $text = AK_CLI?'---> '.$text:'<b>---&gt;</b>'.$text;
+            $text = AK_CLI?'---> '.$text : htmlentities($text);
         }
 
-        echo AK_CLI?"----------------\n$line $file $text\n----------------\n":"<hr /><div>$line $file $text</div><hr />\n";
-
+        echo AK_CLI?"----------------\n$line $file $text\n----------------\n":"<hr /><pre>$line $file ".$text."</pre><hr />\n";
     }
 
 

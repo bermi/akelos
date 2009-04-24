@@ -32,20 +32,20 @@ class AkHttpClient extends AkObject
     function customRequest($url, $http_verb = 'GET', $options = array(), $body = '')
     {
         $this->getRequestInstance($url, $http_verb, $options, $body);
-		return empty($options['cache']) ? $this->sendRequest() : $this->returnCustomRequestFromCache($url,$options);
+        return empty($options['cache']) ? $this->sendRequest() : $this->returnCustomRequestFromCache($url,$options);
     }
 
-	function returnCustomRequestFromCache($url, $options)
-	{
-		$Cache = Ak::cache();
+    function returnCustomRequestFromCache($url, $options)
+    {
+        $Cache = Ak::cache();
         $Cache->init(is_numeric($options['cache']) ? $options['cache'] : 86400, !isset($options['cache_type']) ? 1 : $options['cache_type']);
         if (!$data = $Cache->get('AkHttpClient_'.md5($url))) {
             $data = $this->sendRequest();
             $Cache->save($data);
         }
         return $data;
-	}
-    
+    }
+
     function urlExists($url)
     {
         $this->getRequestInstance($url, 'GET');
@@ -70,15 +70,19 @@ class AkHttpClient extends AkObject
         require_once(AK_VENDOR_DIR.DS.'pear'.DS.'HTTP'.DS.'Request.php');
 
         $this->{'_setParamsFor'.ucfirst(strtolower($http_verb))}($url, $options['params']);
-        
+
         $this->HttpRequest =& new HTTP_Request($url);
 
         $user_name ? $this->HttpRequest->setBasicAuth($user_name, $password) : null;
 
         $this->HttpRequest->setMethod(constant('HTTP_REQUEST_METHOD_'.$http_verb));
-              
-        $http_verb == 'PUT' && !empty($options['params']) && $this->setBody($options['params']);
-        
+
+        if(!empty($body)){
+            $this->setBody($body);
+        }elseif ($http_verb == 'PUT' && !empty($options['params'])){
+            $this->setBody($options['params']);
+        }
+
         !empty($options['params']) && $this->addParams($options['params']);
 
         $this->addHeaders($options['header']);
@@ -122,7 +126,7 @@ class AkHttpClient extends AkObject
             }
         }
     }
-    
+
     function setBody($body)
     {
         Ak::compat('http_build_query');
@@ -157,7 +161,7 @@ class AkHttpClient extends AkObject
         !empty($_tmp) && parse_str($_tmp, $result);
         return $result;
     }
-    
+
     function getUrlWithParams($url, $params)
     {
         $parts = parse_url($url);
@@ -175,17 +179,17 @@ class AkHttpClient extends AkObject
             $params = $url_params;
         }
     }
-    
+
     function _setParamsForPost(&$url, &$params)
     {
         empty($params) && $params = $this->getParamsOnUrl($url);
     }
-    
+
     function _setParamsForPut(&$url, &$params)
     {
         empty($params) && $params = $this->getParamsOnUrl($url);
     }
-    
+
     function _setParamsForDelete(&$url, &$params)
     {
         if(!$this->getParamsOnUrl($url) && !empty($params)){
