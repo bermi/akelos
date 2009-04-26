@@ -1,5 +1,5 @@
 <?php
-Ak::compat('stripos');
+
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 // +----------------------------------------------------------------------+
@@ -964,6 +964,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $result =& $this->findWithAssociations($options);
         }else{
             $sql = $this->constructFinderSql($options);
+            if (isset($options['wrap'])) {
+                $sql = str_replace('{query}',$sql,$options['wrap']);
+            }
             if(!empty($options['bind']) && is_array($options['bind']) && strstr($sql,'?')){
                 $sql = array_merge(array($sql),$options['bind']);
             }
@@ -1001,6 +1004,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 if (!preg_match('/SELECT .* FROM/is', $conditions)) {
                     $options['conditions'] = $table_name.'.'.$this->getPrimaryKey().' = '.$ids[0].(empty($conditions)?'':' AND '.$conditions);
                 } else {
+                    Ak::compat('stripos');
                     if (false!==($pos=stripos($conditions,' WHERE '))) {
                         $before_where = substr($conditions,0, $pos);
                         $after_where = substr($conditions, $pos+7);
@@ -1023,6 +1027,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 if (!preg_match('/SELECT .* FROM/is', $conditions)) {
                     $options['conditions'] = $ids_condition.(empty($conditions)?'':' AND '.$conditions);
                 } else {
+                    Ak::compat('stripos');
                     if (false!==($pos=stripos($conditions,' WHERE '))) {
                         $before_where = substr($conditions,0, $pos);
                         $after_where = substr($conditions, $pos+7);
@@ -1053,7 +1058,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if (isset($options[0])){
             return false;
         }
-        $valid_keys = array('conditions', 'include', 'joins', 'limit', 'offset', 'group', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly');
+        $valid_keys = array('wrap','conditions', 'include', 'joins', 'limit', 'offset', 'group', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly');
         foreach (array_keys($options) as $key){
             if (!in_array($key,$valid_keys)){
                 return false;
@@ -1410,6 +1415,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     $conditions = '('.$conditions.')';
                 }
             } else {
+                Ak::compat('stripos');
                 if (($wherePos=stripos($sql,'WHERE'))!==false) {
                     if (!empty($type_condition)) {
                         $oldConditions = trim(substr($sql,$wherePos+5));

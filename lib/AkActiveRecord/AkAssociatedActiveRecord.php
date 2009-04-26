@@ -238,7 +238,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
     {
         $result = false;
         $options ['include'] = Ak::toArray($options ['include']);
-
+        
         $included_associations = array ();
         $included_association_options = array ();
         foreach ( $options ['include'] as $k => $v ) {
@@ -342,7 +342,11 @@ class AkAssociatedActiveRecord extends AkBaseModel
         $sql = trim($this->constructFinderSqlWithAssociations($options));
         
         $sql = preg_replace('/,\s*,/',' , ',$sql);
-
+        
+        if (isset($options['wrap'])) {
+            $sql = str_replace('{query}',$sql,$options['wrap']);
+        }
+        
         if (! empty($options ['bind']) && is_array($options ['bind']) && strstr($sql, '?')) {
             $sql = array_merge(array ($sql ), $options ['bind']);
         }
