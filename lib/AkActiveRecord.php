@@ -1,4 +1,5 @@
 <?php
+Ak::compat('stripos');
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 // +----------------------------------------------------------------------+
@@ -300,7 +301,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             foreach(array_keys($attributes[1]) as $k){
                 $attributes[1][$k] = $this->castAttributeFromDatabase($k, $attributes[1][$k]);
             }
-
+            
             $avoid_loading_associations = isset($attributes[1]['load_associations']) ? false : !empty($this->disableAutomatedAssociationLoading);
             $this->setAttributes($attributes[1], true);
         }else{
@@ -311,6 +312,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $this->_buildFinders();
         }
         empty($avoid_loading_associations) ? $this->loadAssociations() : null;
+       
     }
 
     function __destruct()
@@ -913,9 +915,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         $options = $this->_extractOptionsFromArgs($args);
         list($fetch,$options) = $this->_extractConditionsFromArgs($args,$options);
-
         $this->_sanitizeConditionsVariables($options);
-
         switch ($fetch) {
             case 'first':
                 // HACK: php4 pass by ref
@@ -944,6 +944,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         // TODO: virtual_limit is a hack
         // actually we fetch_all and return only the first row
         $options = array_merge($options, array((!empty($options['include']) ?'virtual_limit':'limit')=>1));
+        
         $result =& $this->_findEvery($options);
 
         if(!empty($result) && is_array($result)){
@@ -987,8 +988,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $num_ids = count($ids);
 
         //at this point $options['conditions'] can't be an array
-        $conditions = !empty($options['conditions']) ? ' AND '.$options['conditions'] : '';
-
+        //$conditions = !empty($options['conditions']) ? ' AND '.$options['conditions'] : '';
+        $conditions=!empty($options['conditions'])?$options['conditions']:'';
         switch ($num_ids){
             case 0 :
                 trigger_error($this->t('Couldn\'t find %object_name without an ID%conditions',array('%object_name'=>$this->getModelName(),'%conditions'=>$conditions)), E_USER_ERROR);
@@ -996,7 +997,19 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
             case 1 :
                 $table_name = !empty($options['include']) && $this->hasAssociations() ? '__owner' : $this->getTableName();
-                $options['conditions'] = $table_name.'.'.$this->getPrimaryKey().' = '.$ids[0].$conditions;
+                
+                if (!preg_match('/SELECT .* FROM/is', $conditions)) {
+                    $options['conditions'] = $table_name.'.'.$this->getPrimaryKey().' = '.$ids[0].(empty($conditions)?'':' AND '.$conditions);
+                } else {
+                    if (false!==($pos=stripos($conditions,' WHERE '))) {
+                        $before_where = substr($conditions,0, $pos);
+                        $after_where = substr($conditions, $pos+7);
+                        $options['conditions'] = $before_where.' WHERE ('.$table_name.'.'.$this->getPrimaryKey().' = '.$ids[0].') AND ('.$after_where.')';
+                    } else {
+                        $options['conditions'].=' WHERE '.$table_name.'.'.$this->getPrimaryKey().' = '.$ids[0];
+                    }
+                }
+                
                 $result =& $this->_findEvery($options);
                 if (!$expects_array && $result !== false){
                     return $result[0];
@@ -1007,7 +1020,17 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             default:
                 $without_conditions = empty($options['conditions']) ? true : false;
                 $ids_condition = $this->getPrimaryKey().' IN ('.join(', ',$ids).')';
-                $options['conditions'] = $ids_condition.$conditions;
+                if (!preg_match('/SELECT .* FROM/is', $conditions)) {
+                    $options['conditions'] = $ids_condition.(empty($conditions)?'':' AND '.$conditions);
+                } else {
+                    if (false!==($pos=stripos($conditions,' WHERE '))) {
+                        $before_where = substr($conditions,0, $pos);
+                        $after_where = substr($conditions, $pos+7);
+                        $options['conditions'] = $before_where.' WHERE ('.$ids_condition.') AND ('.$after_where.')';
+                    } else {
+                        $options['conditions'].=' WHERE '.$ids_condition;
+                    }
+                }
 
                 $result =& $this->_findEvery($options);
                 if(is_array($result) && (count($result) != $num_ids && $without_conditions)){
@@ -1350,7 +1373,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         $sql .= !empty($options['group']) ? ' GROUP BY '.$options['group'] : ''; 
         $sql .= !empty($options['order']) ? ' ORDER BY '.$options['order'] : '';
-
+        
         $this->_db->addLimitAndOffset($sql,$options);
 
         return $sql;
@@ -1362,20 +1385,59 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function addConditions(&$sql, $conditions = null, $table_alias = null)
     {
+        if (empty($sql)) {
+            $concat = '';
+        }
+        //if (is_string($conditions) && (stristr($conditions,' WHERE ') || stristr($conditions,'SELECT'))) {
+        if (is_string($conditions) && (preg_match('/^SELECT.*?WHERE/is',trim($conditions)))) {// || stristr($conditions,'SELECT'))) {
+            $concat = '';
+            $sql = $conditions;
+            $conditions = '';
+        } else {
+            
+            $concat = 'WHERE';
+        }
         $concat = empty($sql) ? '' : ' WHERE ';
+        if (stristr($sql,' WHERE ')) $concat = ' AND ';
         if (empty($conditions) && $this->_getDatabaseType() == 'sqlite') $conditions = '1';  // sqlite HACK
         
         if($this->getInheritanceColumn() !== false && $this->descendsFromActiveRecord($this)){
             $type_condition = $this->typeCondition($table_alias);
-            $sql .= !empty($type_condition) ? $concat.$type_condition : '';
-            $concat = ' AND ';
-            if (!empty($conditions))
-            $conditions = '('.$conditions.')';
+            if (empty($sql)) {
+                $sql .= !empty($type_condition) ? $concat.$type_condition : '';
+                $concat = ' AND ';
+                if (!empty($conditions)) {
+                    $conditions = '('.$conditions.')';
+                }
+            } else {
+                if (($wherePos=stripos($sql,'WHERE'))!==false) {
+                    if (!empty($type_condition)) {
+                        $oldConditions = trim(substr($sql,$wherePos+5));
+                        $sql = substr($sql,0,$wherePos).' WHERE '.$type_condition.' AND ('.$oldConditions.')';
+                        $concat = ' AND ';
+                    }
+                    if (!empty($conditions)) {
+                        $conditions = '('.$conditions.')';
+                    }
+                } else {
+                    if (!empty($type_condition)) {
+                        //$oldConditions = trim(substr($sql,$wherePos+5));
+                        $sql = $sql.' WHERE '.$type_condition.'';
+                        $concat = ' AND ';
+                    }
+                    if (!empty($conditions)) {
+                        $conditions = '('.$conditions.')';
+                    }
+                }
+                
+            }
         }
         
         if(!empty($conditions)){
-            $sql  .= $concat.$conditions;
-            $concat = ' AND ';
+            
+                $sql  .= $concat.$conditions;
+                $concat = ' AND ';
+            
         }
 
         
@@ -1484,7 +1546,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * eager loading associations.
     * that makes it possible to create objects of different types from the same table.
     */
-    function &instantiate($record, $set_as_new = true)
+    function &instantiate($record, $set_as_new = true, $call_after_instantiate = true)
     {
         $inheritance_column = $this->getInheritanceColumn();
         if(!empty($record[$inheritance_column])){
@@ -1505,9 +1567,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         $object->_newRecord = $set_as_new;
         
-        $object->afterInstantiate();
-        $object->notifyObservers('afterInstantiate');
-        
+        if ($call_after_instantiate) {
+            $object->afterInstantiate();
+            $object->notifyObservers('afterInstantiate');
+        }
         (AK_CLI && AK_ENVIRONMENT == 'development') ? $object ->toString() : null;
 
         return $object;
@@ -2527,7 +2590,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         return $cache;
     }
-
+    function getColumnsWithRegexBoundariesAndAlias($alias)
+    {
+            $columns = array_keys($this->getColumns());
+            foreach ($columns as $k=>$column){
+                $columns[$k] = '/([^_])\b('.$alias.')\.('.$column.')\b/';
+            }
+            return $columns;
+    }
     function getColumnsWithRegexBoundaries()
     {
         $columns = array_keys($this->getColumns());
@@ -3218,7 +3288,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }elseif(!is_array($this->serialize)){
             $this->serialize = Ak::toArray($this->serialize);
         }
-        return isset($this->serialize[$column_name]) || in_array($column_name, $this->serialize);
+        $return=isset($this->serialize[$column_name]) || in_array($column_name, $this->serialize);
+        return $return;
     }
     
     /**

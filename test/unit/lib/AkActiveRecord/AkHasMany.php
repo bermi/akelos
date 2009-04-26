@@ -301,6 +301,30 @@ class HasManyTestCase extends AkUnitTest
         $Loaded =& $Property->picture->find('all',array('include'=>'landlord'));
         $this->assertEqual('and a landlord',$Loaded[0]->landlord->name);        
     }
+    function xtest_has_many_finder_sql_with_foreign_key_value_replacement()
+    {
+        $this->installAndIncludeModels('Group,Location');
+        
+        $group = new Group(array('name'=>'Test Group'));
+        $location = new Location(array('name'=>'Barcelona'));
+        $this->assertTrue($location->save());
+        
+        $group->location->set($location);
+        $group->save();
+        //
+        $this->assertEqual(1,count($group->locations));
+        
+        $group2 = new Group($group->getId());
+        $this->assertEqual(1,$group2->location->count());
+        
+        $group3 = $this->Group->find($group->getId(),array('include'=>'locations'));
+        $this->assertEqual(1,$group3->location->count());
+        
+        $group4 = $this->Group->find($group->getId());
+        $group4->location->load();
+        $this->assertEqual(1,$group3->location->count());
+        $this->assertEqual('Barcelona',$group4->locations[0]->name);
+    }
 }
 
 ak_test('HasManyTestCase',true);

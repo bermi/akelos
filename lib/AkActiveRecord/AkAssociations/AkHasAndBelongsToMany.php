@@ -18,7 +18,7 @@
 
 defined('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES') ? null : define('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES' ,true);
 defined('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS') ? null : define('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS' , 'ActiveRecord');
-
+Ak::compat('stripos');
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 
 /**
@@ -160,7 +160,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         $options['join_class_name'] = empty($options['join_class_name']) ? join(array_map(array('AkInflector','classify'),array_map(array('AkInflector','singularize'), $join_tables))) : $options['join_class_name'];
         $options['foreign_key'] = empty($options['foreign_key']) ? AkInflector::underscore($owner_name).'_id' : $options['foreign_key'];
         $options['association_foreign_key'] = empty($options['association_foreign_key']) ? AkInflector::underscore($associated_name).'_id' : $options['association_foreign_key'];
-
+        
         $Collection =& $this->_setCollectionHandler($association_id, $options['handler_name']);
         $Collection->setOptions($association_id, $options);
 
@@ -381,7 +381,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         $this->deleteAll($objects);
         $this->add($objects);
     }
-
+    
     function setIds()
     {
         $ids = func_get_args();
@@ -430,6 +430,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                 if($JoinObjectsToDelete =& $this->JoinObject->findAllBy($options['foreign_key'].' AND '.$options['association_foreign_key'], $this->Owner->getId(), $id)){
                     foreach (array_keys($JoinObjectsToDelete) as $k) {
                         if($JoinObjectsToDelete[$k]->destroy()){
+                            $this->_deleted_join_object_values[$this->Owner->getId()][$id]=$JoinObjectsToDelete[$k]->getAttributes();
                             $items_to_remove_from_collection[] = $id;
                         }else{
                             $success = false;
@@ -537,6 +538,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
     function _relateAssociatedWithOwner(&$Associated)
     {
+        
         if(!$this->Owner->isNewRecord()){
             $success = true;
             $options = $this->getOptions($this->association_id);
@@ -552,8 +554,26 @@ class AkHasAndBelongsToMany extends AkAssociation
                 $association_foreign_key = $Associated->getId();
                 if($foreign_key != $this->JoinObject->get($options['foreign_key']) ||
                 $association_foreign_key != $this->JoinObject->get($options['association_foreign_key'])){
-
-                    $this->JoinObject =& $this->JoinObject->create(array($options['foreign_key']=> $foreign_key, $options['association_foreign_key']=> $association_foreign_key));
+                    $addValues = array();
+                    if (@isset($this->_deleted_join_object_values[$foreign_key][$association_foreign_key])) {
+                        $oldAttributes = $this->_deleted_join_object_values[$foreign_key][$association_foreign_key];
+                        $content_columns = array_keys($this->JoinObject->getContentColumns());
+                        
+                        foreach($content_columns as $c) {
+                            
+                            if (isset($oldAttributes[$c])) {
+                                $addValues[$c] = $oldAttributes[$c];
+                            }
+                        }
+                        
+                        $pkName=$options['join_class_primary_key'];
+                        if(isset($oldAttributes[$pkName])) {
+                            $addValues[$pkName] = $oldAttributes[$pkName];
+                        }
+                    }
+                    $attributes = array($options['foreign_key']=> $foreign_key, $options['association_foreign_key']=> $association_foreign_key);
+                    $attributes = array_merge($attributes,$addValues);
+                    $this->JoinObject =& $this->JoinObject->create($attributes);
                     $success = !$this->JoinObject->isNewRecord();
                 }
             }
@@ -581,21 +601,38 @@ class AkHasAndBelongsToMany extends AkAssociation
 
 
 
-
+    function _addTableAliasesToAssociatedSql($table_alias, $sql)
+    {
+        return preg_replace($this->Owner->getColumnsWithRegexBoundaries(),'\1'.$table_alias.'.\2',' '.$sql.' ');
+    }
     function constructSql()
     {
         $options = $this->getOptions($this->association_id);
         if(empty($options['finder_sql'])){
+            $owner_id=$this->Owner->quotedId();
+            if (empty($owner_id)) $owner_id=-1;
             $is_sqlite = $this->Owner->_db->type() == 'sqlite';
             $options['finder_sql'] = "SELECT {$options['table_name']}.* FROM {$options['table_name']} ".
             $this->associationJoin2().
             "WHERE _{$options['join_class_name']}.{$options['foreign_key']} ".
-            ($is_sqlite ? ' LIKE ' : ' = ').' '.$this->Owner->quotedId(); // (HACK FOR SQLITE) Otherwise returns wrong data
+            ($is_sqlite ? ' LIKE ' : ' = ').' '.$owner_id; // (HACK FOR SQLITE) Otherwise returns wrong data
             $options['finder_sql'] .= !empty($options['conditions']) ? ' AND '.$options['conditions'].' ' : '';
 
+        } else {
+            $owner_id=$this->Owner->quotedId();
+            if (empty($owner_id)) $owner_id=-1;
+            $options['finder_sql'] = str_replace(array(':foreign_key_value'),array($owner_id), $options['finder_sql']);
+        
         }
+         $options['finder_sql'].=!empty($options['group'])?' GROUP BY '.$options['group']:'';
+        $options['finder_sql'].=!empty($options['order'])?' ORDER BY '.$options['order']:'';
         if(empty($options['counter_sql'])){
             $options['counter_sql'] = substr_replace($options['finder_sql'],'SELECT COUNT(*)',0,strpos($options['finder_sql'],'*')+1);
+        } else {
+            $owner_id=$this->Owner->quotedId();
+            if (empty($owner_id)) $owner_id=-1;
+            $options['counter_sql'] = str_replace(array(':foreign_key_value'),array($owner_id), $options['counter_sql']);
+        
         }
         $this->setOptions($this->association_id, $options);
     }
@@ -678,6 +715,7 @@ class AkHasAndBelongsToMany extends AkAssociation
     function getAssociatedFinderSqlOptions($association_id, $options = array())
     {
         $options = $this->getOptions($this->association_id);
+        
         $Associated =& $this->getAssociatedModelInstance();
         $table_name = $Associated->getTableName();
         $owner_id = $this->Owner->quotedId();
@@ -689,7 +727,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                 $finder_options[$option] = trim($Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $value));
             }
         }
-
+        
         $finder_options['joins'] = $this->constructSqlForInclusion();
         $finder_options['selection'] = '';
 
@@ -704,17 +742,62 @@ class AkHasAndBelongsToMany extends AkAssociation
          */
         $finder_options['conditions'] =
         // We add previous conditions
-        (!empty($options['conditions']) ?
+        (!empty($finder_options['conditions']) ?
         ''.$Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ' : '');
 
         return $finder_options;
     }
+    function getAssociatedFinderSqlOptionsForInclusionChain($prefix, $parent_handler_name, $options = array(),$pluralize=false)
+    {
+        
+        $association_options = $this->getOptions($this->association_id);
+        $options = array_merge($association_options,$options);
+        $handler_name = $options['handler_name'];
+        $Associated =& $this->getAssociatedModelInstance();
+        $pk=$Associated->getPrimaryKey(); 
+        $finder_options = array();
 
+        foreach ($options as $option=>$value) {
+            if(!empty($value)  && !is_bool($value)){
+                if(is_string($value)) {
+                    $finder_options[$option] = trim($Associated->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $value));
+                } else if(is_array($value)) {
+                    
+                    foreach($value as $idx=>$v) {
+                        $value[$idx]=trim($Associated->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $v));
+                    }
+                    $finder_options[$option] = $value;
+                }else {
+                    $finder_options[$option] = $value;
+                }
+            }
+        }
+
+        $finder_options['joins'] = $this->constructSqlForInclusionChain($this->association_id,$handler_name,$parent_handler_name);
+        $finder_options['selection'] = '';
+        
+        $selection_parenthesis = $this->_getColumnParenthesis();//
+        foreach (array_keys($Associated->getColumns()) as $column_name){
+            $finder_options['selection'] .= $parent_handler_name.'__'.$handler_name.'.'.$column_name.' AS '.$selection_parenthesis.$prefix.'['.$handler_name.']'.($pluralize?'[@'.$pk.']':'').'['.$column_name.']'.$selection_parenthesis.', ';
+        }
+
+        $finder_options['selection'] = trim($finder_options['selection'], ', ');
+
+        /**
+         * @todo Refactorize me. This is too confusing
+         */
+        /**$finder_options['conditions'] =
+        // We add previous conditions
+        (!empty($finder_options['conditions']) ?
+        ''.$Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ' : '');*/
+
+        return $finder_options;
+    }
     function constructSqlForInclusion()
     {
         $Associated =& $this->getAssociatedModelInstance();
         $options = $this->getOptions($this->association_id);
-        return
+        return 
         ' LEFT OUTER JOIN '.
         $options['join_table'].' AS _'.$options['join_class_name'].
         ' ON '.
@@ -730,7 +813,26 @@ class AkHasAndBelongsToMany extends AkAssociation
         '_'.$options['join_class_name'].'.'.$options['association_foreign_key'].' ';
 
     }
+function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name)
+    {
+        $Associated =& $this->getAssociatedModelInstance();
+        $options = $this->getOptions($this->association_id);
+        return 
+        ' LEFT OUTER JOIN '.
+        $options['join_table'].' AS '.$parent_handler_name.'__'.$handler_name.'__'.$options['join_class_name'].
+        ' ON '.
+        $parent_handler_name.'.'.$this->Owner->getPrimaryKey().
+        ' = '.
+        ''.$parent_handler_name.'__'.$handler_name.'__'.$options['join_class_name'].'.'.$options['foreign_key'].
 
+        ' LEFT OUTER JOIN '.
+        $options['table_name'].' AS '.$parent_handler_name.'__'.$handler_name.
+        ' ON '.
+        ''.$parent_handler_name.'__'.$handler_name.'.'.$Associated->getPrimaryKey().
+        ' = '.
+        ''.$parent_handler_name.'__'.$handler_name.'__'.$options['join_class_name'].'.'.$options['association_foreign_key'].' ';
+
+    }
 
     function _hasCachedCounter()
     {
@@ -756,7 +858,74 @@ class AkHasAndBelongsToMany extends AkAssociation
     }
 
 
-    function find()
+    function _notWorkingYetfind()
+    {
+        $result = false;
+        if(!$this->Owner->isNewRecord()){
+            $args = func_get_args();
+            $num_args = func_num_args();
+            if(!empty($args[$num_args-1]) && is_array($args[$num_args-1])){
+                $options_in_args = true;
+                $options = $args[$num_args-1];
+            }else{
+                $options_in_args = false;
+                $options = array();
+            }
+            $is_sqlite = $this->Owner->_db->type()=='sqlite';
+            $has_and_belongs_to_many_options = $this->getOptions($this->association_id);
+            if (!is_array($options['conditions'])) {
+            $has_and_belongs_to_many_options['conditions'] = (!empty($options['conditions'])?$options['conditions'].' AND ':'').(!empty($has_and_belongs_to_many_options['conditions'])?$has_and_belongs_to_many_options['conditions'].' AND ':'').
+                ''.'__owner__'.$has_and_belongs_to_many_options['handler_name'].'__'.$has_and_belongs_to_many_options['join_class_name'].'.'.$has_and_belongs_to_many_options['foreign_key'].($is_sqlite ? ' LIKE ' : ' = ').' '.$this->Owner->quotedId();
+            } else {
+                $has_and_belongs_to_many_options['conditions'] = array(
+                $options['conditions'][0].' AND '.(!empty($has_and_belongs_to_many_options['conditions'])?$has_and_belongs_to_many_options['conditions'].' AND ':'').'__owner__'.$has_and_belongs_to_many_options['handler_name'].'__'.$has_and_belongs_to_many_options['join_class_name'].'.'.$has_and_belongs_to_many_options['foreign_key'].
+                ($is_sqlite ? ' LIKE ' : ' = ').' '.$this->Owner->quotedId());
+                $has_and_belongs_to_many_options['conditions'][1] = $options['conditions'][1];
+            }
+            if (!empty($has_and_belongs_to_many_options['bind'])) {
+                $has_and_belongs_to_many_options['bind'] = @Ak::toArray($has_and_belongs_to_many_options['bind']);
+            } else {
+                $has_and_belongs_to_many_options['bind'] = array();
+            }
+            if(!empty($options['bind'])) {
+                $has_and_belongs_to_many_options['bind'] = array_merge(Ak::toArray($options['bind']),$has_and_belongs_to_many_options['bind']);
+            }
+            
+            $finder_options = $this->getAssociatedFinderSqlOptionsForInclusionChain('owner','__owner',$has_and_belongs_to_many_options,true);
+
+            //$finder_options['include'] = array($this->association_id => array('include'=>Ak::toArray(@$options['include'])));
+            $finder_options['include'] = Ak::toArray(@$options['include']);
+            
+            $finder_options = array('conditions'=>@$finder_options['conditions'],'include'=>@$finder_options['include']);
+            
+            if(!empty($has_and_belongs_to_many_options['bind'])) {
+                if (!is_array($finder_options['conditions'])) {
+                    $finder_options['conditions'] = array($finder_options['conditions']);
+                }
+                $finder_options['conditions'] = array_merge($finder_options['conditions'],$has_and_belongs_to_many_options['bind']);
+            }
+            
+            if($options_in_args){
+                $args[$num_args-1] = $finder_options;
+            }else{
+                $args = empty($args) ? array('all') : $args;
+                array_push($args, $finder_options);
+            }
+            $Associated =& $this->getAssociatedModelInstance();
+            $result =& Ak::call_user_func_array(array(&$Associated,'find'), $args);
+
+            /**$assoc_id =$this->association_id;
+            if (isset($result->$assoc_id)) {
+                $result = &$result->$assoc_id;
+                if ($args[0]=='first') {
+                    $result =$result[0];
+                }
+            }*/
+            
+        }
+        return $result;
+    }
+    function &find()
     {
         $result = false;
         if(!$this->Owner->isNewRecord()){
@@ -774,22 +943,86 @@ class AkHasAndBelongsToMany extends AkAssociation
                 $options_in_args = false;
                 $options = array();
             }
-
-            $options['conditions'] = empty($options['conditions']) ? @$has_and_belongs_to_many_options['finder_sql'] :
+            /**if (isset($args[0]) && is_int($args[0])) {
+                $findId = $args[0];
+                $args[0] = 'first';
+                if (!isset($args[1])) {
+                    $args[1] = array();
+                } else if (!isset($args[1]['conditions'])) {
+                    $args[1]['conditions'] = array();
+                } else if (!is_arraY($args[1]['conditions'])) {
+                    $args[1]['conditions'] = array($args[1]['conditions']);
+                }
+                if (!isset($args[1]['conditions'][1])) {
+                    $args[1]['conditions'][1] = array();
+                } else if (!is_array($args[1]['conditions'][1])) {
+                    $args[1]['conditions'][1] = array($args[1]['conditions'][1]);
+                }
+                $args[1]['conditions'][1][]=$findId;
+            }*/
+            /**
+             * Buggy Part
+             */
+            /**$options['conditions'] = empty($options['conditions']) ? @$has_and_belongs_to_many_options['finder_sql'] :
             (empty($has_and_belongs_to_many_options['finder_sql'])  || strstr($options['conditions'], $has_and_belongs_to_many_options['finder_sql'])
             ? $options['conditions'] : $options['conditions'].' AND '.$has_and_belongs_to_many_options['finder_sql']);
+            */
+            if(empty($options['conditions'])) {
+                $options['conditions'] = @$has_and_belongs_to_many_options['finder_sql'];
+            } else if (empty($has_and_belongs_to_many_options['finder_sql'])  || (!is_array($options['conditions']) && strstr($options['conditions'], $has_and_belongs_to_many_options['finder_sql']))) {
+                $options['conditions'] = $options['conditions'];
+            } else {
+                if (stristr($has_and_belongs_to_many_options['finder_sql'],' WHERE ')) {
+                    $wherePos = stripos($has_and_belongs_to_many_options['finder_sql'],'WHERE');
+                    $oldConditions = substr($has_and_belongs_to_many_options['finder_sql'],$wherePos+5);
+                    if(is_array($options['conditions'])) {
+                        
+                        $newConditions = array_shift($options['conditions']);
+                        $bind =  $options['conditions'];
+                    } else {
+                        $newConditions = $options['conditions'];
+                        $bind = array();
+                    }
 
+                    $newConditions = $this->Owner->_addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$newConditions);
+                    $options['conditions'] = trim(substr($has_and_belongs_to_many_options['finder_sql'],0, $wherePos)).' WHERE ('.trim($newConditions).') AND ('.trim($oldConditions).')';
+                    if (!empty($bind)) {
+                        $options['conditions'] = array_merge(array($options['conditions']),$bind);
+                    }
+                } else {
+                    $options['conditions'] = '('.$options['conditions'].') AND ('.$has_and_belongs_to_many_options['finder_sql'].')';
+                }
+            }
+            $options['include'] = empty($options['include']) ? @$has_and_belongs_to_many_options['include'] : $options['include'];
+            $options['bind'] = empty($options['bind']) ? @$has_and_belongs_to_many_options['bind'] : $options['bind'];
             $options['order'] = empty($options['order']) ? @$has_and_belongs_to_many_options['order'] : $options['order'];
-
+            $options['group'] = empty($options['group']) ? @$has_and_belongs_to_many_options['group'] : $options['group'];
+            
             $options['select_prefix'] = '';
 
+            if (!empty($options['bind'])) {
+                $options['bind'] = Ak::toArray($options['bind']);
+                $options['bind'] = array_diff($options['bind'],array(''));
+                $options['conditions'] = is_array($options['conditions'])?$options['conditions']:array($options['conditions']);
+                $options['conditions'] = array_merge($options['conditions'],$options['bind']);
+                unset($options['bind']);
+            }
+            if (is_array($options['conditions'])) {
+                $options['conditions'][0]=trim($Associated->_addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$options['conditions'][0]));
+            } else {
+                empty($options['conditions']) ?null:$options['conditions']=trim($Associated->_addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$options['conditions']));
+            
+            }
+            empty($options['order']) ?null:$options['order']=trim($Associated->_addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$options['order']));
+            empty($options['group']) ?null:$options['group']=trim($Associated->_addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$options['group']));
+            
+            
             if($options_in_args){
                 $args[$num_args-1] = $options;
             }else{
                 $args = empty($args) ? array('all') : $args;
                 array_push($args, $options);
             }
-
             $result =& Ak::call_user_func_array(array(&$Associated,'find'), $args);
         }
 
@@ -806,7 +1039,7 @@ class AkHasAndBelongsToMany extends AkAssociation
     {
         return $this->count();
     }
-
+    
     function clear()
     {
         return $this->deleteAll();

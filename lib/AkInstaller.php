@@ -242,20 +242,50 @@ class AkInstaller extends AkObject
 
     function getInstalledVersion($options = array())
     {
-        $version_file = $this->_versionPath($options);
-
-        $this->_moveOldVersionsFileToNewLocation($options);
+        if(!($tableExists=$this->tableExists('akelos_migrations')) || false===($version = $this->db->selectValue(array('SELECT version FROM akelos_migrations WHERE name=?',$this->getInstallerName())))) {
+            
         
-        if(!is_file($version_file)){
-            $this->setInstalledVersion(0, $options);
-        }
-        return Ak::file_get_contents($this->_versionPath($options));
+            $version_file = $this->_versionPath($options);
+    
+            $this->_moveOldVersionsFileToNewLocation($options);
+            
+            if(!is_file($version_file)){
+                $version = 0;
+                $this->setInstalledVersion($version, $options);
+            } else {
+                $version = Ak::file_get_contents($this->_versionPath($options));
+                if(!$tableExists) {
+                    $this->_createMigrationsTable();
+                }
+                $this->db->execute(array('INSERT INTO akelos_migrations (name,version,created_at) VALUES (?,?,?)',$this->getInstallerName(),$version,Ak::getDate()));
+            }
+            
+            }
+            $this->log('Installed version of '.$this->getInstallerName().':'.$version);
+        return $version;
     }
-
+    
+    function _createMigrationsTable()
+    {
+        $this->createTable('akelos_migrations','id, name, version int');
+        $this->addIndex('akelos_migrations','UNIQUE name','unq_name');
+    }
 
     function setInstalledVersion($version, $options = array())
     {
-        return Ak::file_put_contents($this->_versionPath($options), $version);
+        if(!$this->tableExists('akelos_migrations')) {
+            $this->_createMigrationsTable();
+        }
+        /**
+         * this will produce an error if the unique index on name is violated, then we update
+         */
+        $this->log('Setting version of '.$this->getInstallerName().' to '.$version);
+        if($this->db->selectValue(array('SELECT version from akelos_migrations WHERE name = ?', $this->getInstallerName())) || !@$this->db->execute(array('INSERT INTO akelos_migrations (version,created_at,name) VALUES (?,?,?)',$version,Ak::getDate(),$this->getInstallerName()))) {
+            return @$this->db->execute(array('UPDATE akelos_migrations SET version=?, updated_at=? WHERE name=?',$version,Ak::getDate(),$this->getInstallerName()));
+        }
+
+        return true;
+
     }
 
 

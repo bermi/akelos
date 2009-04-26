@@ -93,7 +93,6 @@ class AkHasOne extends AkAssociation
         return $associated;
     }
 
-
     /**
      * Assigns the associate object, extracts the primary key, sets it as the foreign key, and saves the associate object.
      */
@@ -103,7 +102,7 @@ class AkHasOne extends AkAssociation
             $Associated->set($this->Owner->$association_id->getAssociationOption('foreign_key'), $this->Owner->getId());
             $Associated->save();
         }
-
+        
         $this->_build($association_id, &$Associated);
         $this->Owner->$association_id->_loaded = true;
         return $Associated;
@@ -138,10 +137,20 @@ class AkHasOne extends AkAssociation
         $finder_options = array();
 
         foreach ($options as $option=>$available) {
-            if($available){
-                $value = $this->Owner->$association_id->getAssociationOption($option);
-                empty($value) ? null : ($finder_options[$option] = trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql('_'.$association_id, $value)));
+
+            $value = $this->Owner->$association_id->getAssociationOption($option);
+            if (!empty($available)) {
+                
+                $value=$available;
             }
+            if (!empty($value)) {
+                if (is_string($value)) {
+                    $finder_options[$option] = trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql('_'.$association_id, $value));
+                } else {
+                    $finder_options[$option] = $value;
+                }
+            }
+               
         }
 
         $finder_options['joins'] = $this->Owner->$association_id->constructSqlForInclusion();
@@ -154,7 +163,49 @@ class AkHasOne extends AkAssociation
 
         return $finder_options;
     }
+    function getAssociatedFinderSqlOptionsForInclusionChain($association_id, $prefix, $parent_handler_name, $options = array(),$pluralize=false)
+    {
 
+        $default_options = array(
+        'conditions' => $this->Owner->$association_id->getAssociationOption('include_conditions_when_included'),
+        'order' => $this->Owner->$association_id->getAssociationOption('include_order_when_included')
+        );
+        $handler_name = $association_id;
+        if(empty($this->Owner->$association_id->__activeRecordObject)){
+            $this->build($association_id, array(), false);
+        }
+        $options = array_merge($default_options, $options);
+        $pk=$this->Owner->$association_id->getPrimaryKey();
+        $finder_options = array();
+
+        foreach ($options as $option=>$available) {
+
+            $value = $this->Owner->$association_id->getAssociationOption($option);
+            
+            if ((!empty($available) && $available!==true)|| $available===false) {
+                
+                $value=$available;
+            }
+            if (!empty($value) && !is_bool($value)) {
+                if (is_string($value)) {
+                    $finder_options[$option] = trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $value));
+                } else {
+                    $finder_options[$option] = $value;
+                }
+            }
+               
+        }
+        $finder_options['joins'] = $this->Owner->$association_id->constructSqlForInclusionChain($handler_name, $parent_handler_name);
+        $selection_parenthesis = $this->_getColumnParenthesis();//
+        $finder_options['selection'] = '';
+        foreach (array_keys($this->Owner->$association_id->getColumns()) as $column_name){
+            $finder_options['selection'] .= $parent_handler_name.'__'.$handler_name.'.'.$column_name.' AS '.$selection_parenthesis.$prefix.'['.$handler_name.']'.($pluralize?'[@'.$pk.']':'').'['.$column_name.']'.$selection_parenthesis.', ';
+        
+        }
+        $finder_options['selection'] = trim($finder_options['selection'], ', ');
+
+        return $finder_options;
+    }
     function constructSqlForInclusion($association_id)
     {
         return ' LEFT OUTER JOIN '.
@@ -164,7 +215,15 @@ class AkHasOne extends AkAssociation
         ' = '.
         '_'.$association_id.'.'.$this->Owner->$association_id->getAssociationOption('foreign_key').' ';
     }
-
+function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name)
+    {
+        return ' LEFT OUTER JOIN '.
+        $this->Owner->$association_id->getTableName().' AS '.$parent_handler_name.'__'.$handler_name.
+        ' ON '.
+        $parent_handler_name.'.'.$this->Owner->getPrimaryKey().
+        ' = '.
+        ''.$parent_handler_name.'__'.$handler_name.'.'.$this->Owner->$association_id->getAssociationOption('foreign_key').' ';
+    }
     function &build($association_id, $attributes = array(), $replace_existing = true)
     {
         $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
@@ -278,7 +337,9 @@ class AkHasOne extends AkAssociation
         if(empty($foreign_key_value)){
             return $conditions;
         }
-        return (empty($conditions) ? '' : $conditions.' AND ').$foreign_key.' = '.$this->Owner->castAttributeForDatabase($foreign_key, $foreign_key_value);
+        $foreign_key_value=$this->Owner->castAttributeForDatabase($foreign_key, $foreign_key_value);
+        if(empty($foreign_key_value)) $foreign_key_value=-1;
+        return (empty($conditions) ? '' : $conditions.' AND ').$foreign_key.' = '.$foreign_key_value;
     }
 
     function constructSql($association_id)

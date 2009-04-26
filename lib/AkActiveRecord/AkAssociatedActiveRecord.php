@@ -80,7 +80,9 @@ class AkAssociatedActiveRecord extends AkBaseModel
             }
             if(!empty($association_details) && $this->_loadAssociationHandler($association_type)){
                 $this->$association_type->initializeAssociated($association_details);
+                
                 $this->_associations[$association_type] =& $this->$association_type;
+                
             }
         }
     }
@@ -171,12 +173,18 @@ class AkAssociatedActiveRecord extends AkBaseModel
     {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->constructSqlForInclusion($this->getAssociationId()) : false;
     }
-
+    function constructSqlForInclusionChain($handler_name,$parent_handler_name)
+    {
+        return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->constructSqlForInclusionChain($this->getAssociationId(),$handler_name,$parent_handler_name) : false;
+    }
     function getAssociatedFinderSqlOptions($options = array())
     {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->getAssociatedFinderSqlOptions($this->getAssociationId(), $options) : false;
     }
-
+    function getAssociatedFinderSqlOptionsForInclusionChain($prefix, $parent_handler_name,$options = array(),$pluralize=false)
+    {
+        return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->getAssociatedFinderSqlOptionsForInclusionChain($this->getAssociationId(), $prefix, $parent_handler_name, $options,$pluralize) : false;
+    }
     function getAssociationOption($option)
     {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->getOption($this->getAssociationId(), $option) : false;
@@ -222,528 +230,430 @@ class AkAssociatedActiveRecord extends AkBaseModel
         return $this->getAssociatedType();
     }
 
-
     function hasAssociations()
     {
         return !empty($this->_associations) && count($this->_associations) > 0;
     }
-    
-    /**
-     * Experimental!!!!
-     * 
-     * Allows you to get a 2nd level association
-     * 
-     * Example:
-     * 
-     * $user->findBy('name','user',array('include'=>array('roles'=>array('include'=>'permissions'))));
-     *
-     * @param unknown_type $options
-     * @return unknown
-     */
-    function &_findWithAssociationsExt($options)
+    function &findWithAssociations($options)
     {
         $result = false;
         $options ['include'] = Ak::toArray($options ['include']);
-        $options ['order'] = empty($options ['order']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options ['order']);
-        $options ['group'] = empty($options ['group']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options ['group']);
-        $options ['conditions'] = empty($options ['conditions']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options ['conditions']);
-        
+
         $included_associations = array ();
         $included_association_options = array ();
         foreach ( $options ['include'] as $k => $v ) {
             if (is_numeric($k)) {
                 $included_associations [] = $v;
-                //$options['include'][$k] = AkInflector::pluralize($v);
             } else {
                 $included_associations [] = $k;
                 $included_association_options [$k] = $v;
             }
         }
-        
-        $available_associated_options = array ('order' => array (), 'conditions' => array (), 'joins' => array (), 'selection' => array () );
-        
+        unset($options['include']);
+        $parent_pk = $this->getPrimaryKey();
+        $available_associated_options = array ('bind'=> array (),'order' => array (), 'conditions' => array (), 'joins' => array (), 'selection' => array () );
+        $replacements = array();
         foreach ( $included_associations as $association_id ) {
             $association_options = empty($included_association_options [$association_id]) ? array () : $included_association_options [$association_id];
             
             $handler_name = $this->getCollectionHandlerName($association_id);
             $handler_name = empty($handler_name) ? $association_id : (in_array($handler_name, $included_associations) ? $association_id : $handler_name);
-            $associated_options = $this->$handler_name->getAssociatedFinderSqlOptions($association_options);
+            $type =$this->$handler_name->getType();
+            $multi = false;
+            $pk = false;
+            if (in_array($type,array('hasMany','hasAndBelongsToMany'))) {
+                $multi = true;
+                $instance = $this->$handler_name->getAssociatedModelInstance();
+                $pk=$instance->getPrimaryKey();
+                $table_name =$instance->getTableName();
+            } else {
+                $class = $this->$handler_name->getAssociationOption('class_name');
+                if(!class_exists($class)) {
+                    Ak::import($class);
+                }
+                $instance = new $class;
+                $table_name =$instance->getTableName();
+            }
 
-            foreach ( array_keys($available_associated_options) as $associated_option ) {
-                if (! empty($associated_options [$associated_option])) {
-                    $available_associated_options [$associated_option] [] = $associated_options [$associated_option];
+            $associated_options = $this->$handler_name->getAssociatedFinderSqlOptionsForInclusionChain('owner[@'.$parent_pk.']','__owner',$association_options,$multi);
+
+            $options ['order'] = empty($options ['order']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options ['order']);
+           
+            $options ['group'] = empty($options ['group']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options ['group']);
+            
+            $options ['conditions'] = empty($options ['conditions']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options ['conditions']);
+            
+            
+            foreach(array_keys($associated_options) as $option) {
+                if(isset($associated_options[$option]) && is_string($associated_options[$option]))$associated_options[$option]=trim($associated_options[$option]);
+                if(!empty($associated_options[$option])) {
+                    $available_associated_options[$option][]=$associated_options[$option];
                 }
             }
-            if (isset($association_options ['include'])) {
-                $extended_config = array();
-                $association_options ['include'] = Ak::toArray($association_options ['include']);
-                if (isset($this->$handler_name) && method_exists($this->$handler_name,'getModelName')) {
-                    $main_association_class_name = $this->$handler_name->getModelName();
+            $replacements['/^_('.$association_id.')\./']='__owner__'.$handler_name.'.';
+            $replacements['/ _('.$association_id.')\./'] = ' __owner__'.$handler_name.'.';
+            $replacements['/^_('.$table_name.')\./']='__owner__'.$handler_name.'.';
+            $replacements['/ _('.$table_name.')\./'] = ' __owner__'.$handler_name.'.';
+            $replacements['/^('.$table_name.')\./']='__owner__'.$handler_name.'.';
+            $replacements['/ ('.$table_name.')\./'] = ' __owner__'.$handler_name.'.';
+           
+            
+            $this->_prepareIncludes('owner[@'.$parent_pk.']',$multi,$this,$available_associated_options,$handler_name,$handler_name,$association_id,$options,$association_options,$replacements);
+            
+        }
+
+        $replace_regex = array_keys($replacements);
+        $replace_value = array_values($replacements);
+        if(isset($options['order'])) $options['order'] = preg_replace($replace_regex,$replace_value,$options['order']);
+        if(isset($options['conditions'])) $options['conditions'] = preg_replace($replace_regex,$replace_value,$options['conditions']);
+        if(isset($options['group']))$options['group'] = preg_replace($replace_regex,$replace_value,$options['group']);
+
+        foreach ( $available_associated_options as $option => $values ) {
+            if($option == 'order' || $option=='conditions' || $option == 'group') {
+                foreach($values as $idx=>$value) {
+                    $available_associated_options[$option][$idx] = preg_replace($replace_regex,$replace_value,$value);
+                }
+            }
+            
+            if (! empty($values) && $option!='include') {
+                $separator = $option == 'joins' ? ' ' : (in_array($option, array ('selection', 'order' )) ? ', ' : ' AND ');
+                $values = array_map('trim', $values);
+                
+                if ($option == 'joins' && ! empty($options [$option])) {
+                    $newJoinParts = array ();
+                    foreach ( $values as $part ) {
+                        
+                        if (! stristr($options [$option], $part) && !empty($part)) {
+                            $newJoinParts [] = $part;
+                        }
+                    }
+                    $values = $newJoinParts;
+                }
+                if($option!='include' && $option!='bind') {
+                $options [$option] = empty($options [$option]) ? join($separator, $values) : trim($options [$option]) . $separator . join(
+                        $separator, $values);
+                } else if ($option=='bind') {
+                    $options [$option] = array_merge($options [$option],$values);
+                }
+            
+            }
+        }
+        
+        $sql = trim($this->constructFinderSqlWithAssociations($options));
+        
+        $sql = preg_replace('/,\s*,/',' , ',$sql);
+
+        if (! empty($options ['bind']) && is_array($options ['bind']) && strstr($sql, '?')) {
+            $sql = array_merge(array ($sql ), $options ['bind']);
+        }
+
+        $result = & $this->_findBySqlWithAssociations($sql, empty($options ['virtual_limit']) ? false : $options ['virtual_limit']);
+        if (empty($result)) {
+            $result = false;
+        }
+        return $result;
+    }
+    
+    
+    function _prepareIncludes($prefix,$parent_is_plural, &$parent,&$available_associated_options,$handler_name,$parent_association_id,$association_id,&$options,&$association_options, &$replacements)
+    {
+        if (isset($association_options['include'])) {
+            $association_options['include'] = Ak::toArray($association_options['include']);
+        if (isset($parent->$handler_name) && method_exists($parent->$handler_name,'getModelName')) {
+                    $main_association_class_name = $parent->$handler_name->getModelName();
                     Ak::import($main_association_class_name);
                     $sub_association_object = new $main_association_class_name;
+                } else if (isset($parent->$handler_name) && method_exists($parent->$handler_name,'getAssociatedModelInstance')){
+                    $sub_association_object = &$parent->$handler_name->getAssociatedModelInstance();
                 } else {
-                    $sub_association_object = &$this->$handler_name->getAssociatedModelInstance();
-                    $main_association_class_name = $sub_association_object->getModelName();
+                    $sub_association_object = &$parent;
                 }
-                foreach ( $association_options ['include'] as $idx=>$sub_association_id ) {
+               
+        } else {
+            /**
+             * No included associations
+             */
+            return;
+        }
+   
+        foreach ( $association_options ['include'] as $idx=>$sub_association_id ) {
                     if (!is_numeric($idx) && is_array($sub_association_id)) {
                         $sub_options = $sub_association_id;
+                       
                         $sub_association_id = $idx;
                     } else {
                         $sub_options = array();
                     }
                     
                     $sub_handler_name = $sub_association_object->getCollectionHandlerName($sub_association_id);
+                    
                     if (!$sub_handler_name) {
                         $sub_handler_name = $sub_association_id;
                     }
-                    
-                    $sub_associated_options = $sub_association_object->$sub_handler_name->getAssociatedFinderSqlOptions(
-                                $association_options);
+
                     $type = $sub_association_object->$sub_handler_name->getType();
                     
                     if ($type == 'hasMany' || $type ==
                              'hasAndBelongsToMany') {
                        $instance=&$sub_association_object->$sub_handler_name->getAssociatedModelInstance();
+                       $table_name = $instance->getTableName();
                        $pk = $instance->getPrimaryKey();
-                       
                        $pluralize = true;
-                       
-                       $subs = Ak::toArray($options['include'][$association_id]['include']);
-                       $subs = array_diff($subs,array($sub_association_id));
-                       $name = AkInflector::singularize($sub_association_id)==$sub_association_id?AkInflector::pluralize($sub_association_id):$sub_association_id;
-                       $subs[] = $name;
-                       $options['include'][$association_id]['include'] = $subs;
                     } else if ( $type == 'belongsTo' || $type == 'hasOne') {
                         $class_name = $sub_association_object->$sub_handler_name->getAssociationOption('class_name');
-                        $ob = new $class_name;
-                        $pk = $ob->getPrimaryKey();
+                        if(!class_exists($class_name)) {
+                            Ak::import($class_name);
+                        }
+                        $instance = new $class_name;
+                        $table_name = $instance->getTableName();
+                        
+                        $pk = $instance->getPrimaryKey();
                         $pluralize = false;
-                        $name = $sub_association_id;
                     } else {
                         $pk = $sub_association_object->$sub_handler_name->getPrimaryKey();
+                        $instance = &$sub_association_object;
                         $pluralize = false;
-                        $name = $sub_association_id;
+                        $table_name = $instance->getTableName();
                     }
-                    if (!empty($sub_options)) {
-                        if (isset($sub_options['order'])) {
-                            $order = $this->_addToOrderStatement(isset($options['order'])?$options['order']:'',isset($association_options['order'])?$association_options['order']:'','_'.($pluralize?AkInflector::pluralize($association_id):AkInflector::singularize($association_id)),'__owner');
-                            
-                            $order = $this->_addToOrderStatement($order,$sub_options['order'],'_'.$name,'_'.($pluralize?AkInflector::pluralize($association_id):AkInflector::singularize($association_id)));
-                            $options['order'] = $order;
-                        }
-                        if (isset($sub_options['conditions'])) {
-                            $conditions = $this->_addToConditionsStatement(isset($options['conditions'])?$options['conditions']:'',isset($association_options['conditions'])?$association_options['conditions']:'','_'.($pluralize?AkInflector::pluralize($association_id):AkInflector::singularize($association_id)),'__owner');
-                            
-                            $conditions = $this->_addToConditionsStatement($conditions,$sub_options['conditions'],'_'.$name,'_'.($pluralize?AkInflector::pluralize($association_id):AkInflector::singularize($association_id)));
-                            $options['conditions'] = $conditions;
-                        }
-                        if (isset($sub_options['bind'])) {
-                            $oldbinds = Ak::toArray($options['bind']);
-                            $subbinds = Ak::toArray($association_options['bind']);
-                            $binds = Ak::toArray($sub_options['bind']);
-                            $options['bind'] = array_merge($oldbinds,$subbinds,$binds);
-                        }
-                    }
-                    $extended_config[$name] = array('parent_class_name'=>$main_association_class_name,'parent_primary_key'=>$sub_association_object->getPrimaryKey(),'parent_handler_name'=>$handler_name,'primary_key'=>$sub_association_object->getPrimaryKey(),'belongs_to'=>$association_id);
                     
-                    $extended_config[$name]['n-m'] = $pluralize;
-                    $extended_config[$name]['primary_key'] = $pk;
+                    $sub_associated_options = $sub_association_object->$sub_handler_name->getAssociatedFinderSqlOptionsForInclusionChain($prefix.'['.$handler_name.']'.($parent_is_plural?'[@'.$pk.']':''),'__owner__'.$parent_association_id,
+                                $sub_options, $pluralize);
+                    
+                    /**
+                     * Adding replacements for base options like order,conditions,group.
+                     * The table-aliases of the included associations will be replaced
+                     * with their respective __owner_$handler_name.$column_name representative.
+                     */
+                    $replacements['/([,\s])_('.$sub_association_id.')\./']='\\1__owner__'.$parent_association_id.'__'.$sub_handler_name.'.';
+                    $replacements['/([,\s])('.$sub_association_id.')\./']='\\1__owner__'.$parent_association_id.'__'.$sub_handler_name.'.';
+                    $replacements['/([,\s])_('.$table_name.')\./']='\\1__owner__'.$parent_association_id.'__'.$sub_handler_name.'.';
+                    $replacements['/([,\s])('.$table_name.')\./']='\\1__owner__'.$parent_association_id.'__'.$sub_handler_name.'.';
+                    $replacements['/([,\s])_('.$sub_handler_name.')\./']='\\1__owner__'.$parent_association_id.'__'.$sub_handler_name.'.';
+                    $replacements['/([,\s])('.$sub_handler_name.')\./']='\\1__owner__'.$parent_association_id.'__'.$sub_handler_name.'.';
+                    
+
                     foreach ( array_keys(
                             $available_associated_options) as $sub_associated_option ) {
-                        if (! empty($sub_associated_options [$sub_associated_option])) {
-
-                            $newoption = str_replace(
-                                    '__owner.', 
-                                    '_' . ($pluralize?AkInflector::pluralize($association_id):$association_id) .
-                                             '.', 
-                                            $sub_associated_options [$sub_associated_option]);
-                            
-$available_associated_options [$sub_associated_option] []  = $newoption;
+                             
+                        $newoption=isset($sub_associated_options [$sub_associated_option])?$sub_associated_options [$sub_associated_option]:'';
+                        if ($sub_associated_option!='bind' && $sub_associated_option!='include') {
+                            $newoption=trim($newoption);
+                            if(!empty($newoption)) {
+                                $available_associated_options [$sub_associated_option] []  = $newoption;
+                            }
+                        } else {
+                            $available_associated_options [$sub_associated_option] = array_merge($available_associated_options [$sub_associated_option],Ak::toArray($newoption));
                         }
-                    }
-                
-                }
 
-            }
-        }
-        $joins = array ();
-        foreach ( $available_associated_options as $option => $values ) {
-            if (! empty($values)) {
-                $separator = $option == 'joins' ? ' ' : (in_array($option, array ('selection', 'order' )) ? ', ' : ' AND ');
-                $values = array_map('trim', $values);
-                if ($option == 'joins' && ! empty($options [$option])) {
-                    $newJoinParts = array ();
-                    foreach ( $values as $part ) {
-                        if (! stristr($options [$option], $part)) {
-                            $newJoinParts [] = $part;
-                        }
                     }
-                    $values = $newJoinParts;
+                    if (!empty($sub_options)) {
+                         $this->_prepareIncludes($prefix.'['.$handler_name.']'.($parent_is_plural?'[@'.$pk.']':''),$pluralize,$instance,$available_associated_options,$sub_handler_name,$parent_association_id.'__'.$sub_handler_name,$sub_association_id,$options['include'][$association_id],$association_options['include'][$idx],$replacements);
+                    }
                 }
-                
-                $options [$option] = empty($options [$option]) ? join($separator, $values) : trim($options [$option]) . $separator . join(
-                        $separator, $values);
-            
-            }
-        }
-        
-        $sql = trim($this->constructFinderSqlWithAssociations($options));
-        if (! empty($options ['bind']) && is_array($options ['bind']) && strstr($sql, '?')) {
-            $sql = array_merge(array ($sql ), $options ['bind']);
-        }
-        $result = & $this->_findBySqlWithAssociationsExt($sql, isset($options ['include']) ? $options ['include'] : array (), 
-                empty($options ['virtual_limit']) ? false : $options ['virtual_limit'], $extended_config);
-        
-        return $result;
     }
-    function _addToOrderStatement($existing, $new, $prefix, $parent_prefix)
+
+    function constructCalculationSqlWithAssociations($sql, $options = array())
     {
-        $defaultOrder = 'ASC';
+        $calculation_function = isset($options['calculation']) && isset($options['calculation']['function'])?$options['calculation']['function']:'count';
+        $calculation_column = isset($options['calculation']) && isset($options['calculation']['column'])?$options['calculation']['column']:'*';
+        $calculation_alias = isset($options['calculation']) && isset($options['calculation']['alias'])?$options['calculation']['alias']:'count_all';
         
-        if (empty($existing)) {
-            $existing = '';
-        } else {
-            if (!stristr($existing,' ASC') && !stristr($existing,' DESC')) {
-                $existing.=' '.$defaultOrder;
-            }
-        }
-        $existing=$this->_addAlias($existing,$parent_prefix,array('ASC','DESC'));
-        $parts = preg_split('/( ASC| DESC)/i',$new);
-        foreach($parts as $i=>$part) {
-            
-            $newpart=$this->_addAlias($part,$prefix,array('ASC','DESC'));
-            $new = str_ireplace($part,$newpart,$new);
-        }
-        $return = $existing.(!empty($existing)?', ':'').$new;
+        $selection = $calculation_function.'( '.$calculation_column.' ) AS '.$calculation_alias.' ';
         
-        return $return;
-                           
+        $sql = preg_replace('/SELECT (.*?) FROM/i','SELECT '.$selection. ' FROM', $sql);
+        $groupBy = 'GROUP BY __owner.id';
+        if (preg_match('/GROUP BY (.*?)($|ORDER)/i',$sql,$matches)) {
+            $sql = str_replace($matches[1],'__owner.id',$sql);
+        }
+        return $sql;
     }
-    function _addConditionAlias($text,$prefix)
+
+    function &_calculateBySqlWithAssociations($sql)
     {
-        //echo "addCond before $text\n";
-        $parts = preg_split('/(AND|OR)/i', $text);
-        foreach($parts as $part) {
-            //echo "addCond part $part\n";
-            preg_match('/(.*?)(=|<|>|<>|!=|IN|IS|IS\s+NOT)(.*)/i',$part, $mparts);
-            if (isset($mparts[1])) {
-                $pre = $this->_addAlias($mparts[1],$prefix);
-                $newpart = str_replace($mparts[1],$pre,$part);
-                $text=str_replace($part,$newpart,$text);
-            }
+        $objects = array();
+        $results = $this->_db->execute ($sql,'find with associations');
+        if (!$results){
+            return $objects;
         }
-        //echo "addCond after $text\n";
-        return $text;
-    }
-    function _addToConditionsStatement($existing, $new, $prefix, $parent_prefix)
-    {
-        
-        if (empty($existing)) {
-            $existing = '';
-        }
-        $existing=$this->_addConditionAlias($existing,$parent_prefix);
-        $new = $this->_addConditionAlias($new, $prefix);
-        $existing=trim($existing);
-        $new = trim($new);
-        $return = $existing.(!empty($existing)?' AND ':'').$new;
-        
-        return $return;
-                           
+        return $results;
     }
     
-    function _addAlias($text,$prefix,$ignore = array()) {
-        
-        $orgtext = empty($text)?'':$text;
-        $text = preg_replace('/('.join('|',$ignore).')/i','',$text);
-        $words = preg_split('/(,|\s+)/',$text);
-        $orgwords = $words;
-        $newwords = array();
-        $replacewords = array();
-        foreach($words as $i=>$orgword) {
-            
-            $word = trim($orgword);
-            if (!preg_match('/_.*?\..*/',$word) && !empty($word)) {
-                $word = $prefix.'.'.$word;
-            }
-            if (!empty($word)) {
-                $newwords[] = $word;
-                $replacewords[] = $orgword;
-            }
-        }
-        
-        $newtext=str_ireplace($replacewords,$newwords,$orgtext);
-        return $newtext;
-    }
-    function &_findBySqlWithAssociationsExt($sql, $included_associations = array(), $virtual_limit = false, $extended_config = array())
+    function &_findBySqlWithAssociations($sql, $virtual_limit = false)
     {
         $objects = array();
         $results = $this->_db->execute ($sql,'find with associations ext');
         if (!$results){
             return $objects;
         }
-        $result =& $this->_generateObjectGraphFromResultSetExt($results,$included_associations,$virtual_limit,$extended_config);
+        
+        $result =& $this->_generateObjectGraphFromResultSet($results,$virtual_limit);
         return $result;
     
     }
-    function &_generateObjectGraphFromResultSetExt($results,$included_associations = array(), $virtual_limit = false,$internal_assocs = array())
+    /**
+     * Generates objects from special sql:
+     * SELECT id as owner[id]...
+     * 
+     * 
+     *
+     * @param ADOResultSet $results            a result set from Db->execute
+     * @param array $included_associations     just like in ->find(); $options['include']; but in fact unused
+     * @param mixed $virtual_limit             int or false; unsure if this works                     
+     * @return array                           ObjectGraph as an array
+     */
+    function &_generateObjectGraphFromResultSet($results, $virtual_limit = false)
     {
-        $objects = array();
-        $thirdpartyAssocs = array();
-
-        foreach($included_associations as $assoc=>$options) {
-            if (isset($options['include'])) {
-                $as = Ak::toArray($options['include']);
-                $array=array();
-                foreach($as as $idx=>$a) {
-                    if (!is_numeric($idx)) {
-                        $a = $idx;
-                    }
-                    $array[]=$a;
-                }
-                $thirdpartyAssocs = array_merge($thirdpartyAssocs,$array);
-                
-            }
-            
-        }
-        
-        $i = 0;
-        
-        $associated_ids = $this->getAssociatedIds();
-        
-        
-        
-        $number_of_associates = count($associated_ids);
-        
-        $_included_results = array(); // Used only in conjuntion with virtual limits for doing find('first',...include'=>...
-        $object_associates_details = array();
-        $un_associated_items = array();
+        $return = array();
         $ids = array();
-
-        $tmp = array();
-        $idx=0;
+        $sub_owner = array();
+        $owner = array();
+        $evals = array();
         while ($record = $results->FetchRow()) {
-           
-            $this_item_attributes = array();
-            $associated_items = array();
             
-            foreach ($record as $column=>$value){
-                if(!is_numeric($column)){
-                    if(substr($column,0,8) == '__owner_'){
-                        $attribute_name = substr($column,8);
-                        $this_item_attributes[$attribute_name] = $value;
-                       
-                    }elseif(preg_match('/^_('.join('|',$associated_ids).')_(.+)/',$column, $match)){
-                        $associated_items[$match[1]][$match[2]] = $value;
+            
+            foreach($record as $key=>$value) {
+                $orgkey=$key;
+                if (strstr($key,'@')) {
+                    $true=true;
+                    while($true) {
+                        $pos=@strrpos($key,'@');
+                        $length = @strpos(']',$key,$pos);
+                        $pk = @substr($key,$pos+1,$length+2);
+                        $kpos=@strpos(']',$key,$pos);
                         
-                    } else {
-                        preg_match('/^_('.join('|',$thirdpartyAssocs).')_(.+)$/',$column, $match);
+                        $subkey = @substr($key,0,$kpos+$pos-1).'[@'.$pk.']['.$pk.']';
+                        if (isset($record[$subkey])) {
+                            $id = $record[$subkey];
+                            //$kpos=strpos(']',$key,$pos);
+                            $oldsubkey = @substr($key,0,$kpos+$pos-1).'[@'.$pk.']';
                         
-                        if (isset($match[1])) {
-                        $config = isset($internal_assocs[$match[1]])?$internal_assocs[$match[1]]:false;
-                        if ($config !== false) {
-                        
-                        $aname = $config['n-m']?AkInflector::pluralize($config['belongs_to']):$config['belongs_to'];
-                        $pk  = isset($record['_'.$match[1].'_'.$config['primary_key']])?$record['_'.$match[1].'_'.$config['primary_key']]:'';
-                        empty($pk) ? isset($record['_'.AkInflector::pluralize($match[1]).'_'.$config['primary_key']]) ?
-                                     $pk = $record['_'.AkInflector::pluralize($match[1]).'_'.$config['primary_key']]: (isset($record['_'.AkInflector::singularize($match[1]).'_'.$config['primary_key']])?
-                                     $pk = $record['_'.AkInflector::singularize($match[1]).'_'.$config['primary_key']]:''): '';
-                        if (!empty($pk)) {
-                            if ($config['n-m']) {
-                                
-                                
-                                $un_associated_items[$config['belongs_to']][$associated_items[$aname][$config['parent_primary_key']]][$match[1]][$pk][$match[2]] = $value;
-                        
-                            } else {
-                                $un_associated_items[$config['belongs_to']][$associated_items[$aname][$config['parent_primary_key']]][$match[1]][$match[2]] = $value;
-                        
-                            }
-                        }
+                            $newsubkey = @substr($key,0,$kpos+$pos-1).'['.$id.']';
+                            
+                            $key = str_replace($oldsubkey,$newsubkey,$key);
+
                         } else {
-                            
+                            $id = 0;
+                            //$kpos=strpos(']',$key,$pos);
+                            $oldsubkey = @substr($key,0,$kpos+$pos-1).'[@'.$pk.']';
+                        
+                            $newsubkey = @substr($key,0,$kpos+$pos-1).'['.$id.']';
+                            $key = str_replace($oldsubkey,$newsubkey,$key);
                         }
+                        if(!strstr($key,'@')) {
+                            $true=false;
                         }
                     }
                 }
-            }
-            // We need to keep a pointer to unique parent elements in order to add associates to the first loaded item
-            $e = null;
-            $object_id = $this_item_attributes[$this->getPrimaryKey()];
-            
-            if(!empty($virtual_limit)){
-                $_included_results[$object_id] = $object_id;
-                if(count($_included_results) > $virtual_limit * $number_of_associates){
-                    continue;
-                }
-            }
 
-            if(!isset($ids[$object_id])){
-                $ids[$object_id] = $i;
-                $attributes_for_instantation = $this->getOnlyAvailableAttributes($this_item_attributes);
-                $attributes_for_instantation['load_associations'] = true;
-                $objects[$i] =& $this->instantiate($attributes_for_instantation, false);
-            }else{
-                $e = $i;
-                $i = $ids[$object_id];
-            }
-
-            foreach ($associated_items as $association_id=>$attributes){
-                if(count(array_diff($attributes, array(''))) > 0){
-                    $object_associates_details[$i][$association_id][md5(serialize($attributes))] = $attributes;
-                }
-            }
-
-            $i = !is_null($e) ? $e : $i+1;
-        }
-        if(!empty($object_associates_details)){
-            foreach ($object_associates_details as $i=>$object_associate_details){
+                $this->_addToOwner($owner,str_replace('owner[','[',$key),$value);
+                //unset($record[$orgkey]);
                 
-                foreach ($object_associate_details as $association_id => $associated_attributes){
-                    foreach ($associated_attributes as $attributes){
-                        if(count(array_diff($attributes, array(''))) > 0){
-                            if(!method_exists($objects[$i]->$association_id, 'build')){
-                                $handler_name = $this->getAssociatedHandlerName($association_id);
-                                $objects[$i]->$handler_name->build($attributes, false);
-                                $objects[$i]->$handler_name->_newRecord = false;
-                                $use_handler = $handler_name;
-                            } else if (isset($objects[$i]->$association_id) && method_exists($objects[$i]->$association_id, 'build')){
-                                $objects[$i]->$association_id->build($attributes, false);
-                                $objects[$i]->$association_id->_newRecord = false;
-                                $use_handler =$association_id;
-                            } 
-                            
-                        }
-                    }
-                    
-                    foreach($un_associated_items as $owned_by=>$data) {
-                        foreach ($data as $owner_id => $attributes) {
-                            if (!isset($attributes[0])) {
-                                $attributes = array($attributes);
-                            }
-                            foreach ($attributes as $att) {
-                                $plural = AkInflector::pluralize($owned_by);
-                                $relation_name = key($att);
-                               
-                                $values = $att[$relation_name];
+            }
+            unset($record);
+        }
 
-                                $base = false;
-                                if (isset($objects[$i]->$plural) && is_array($objects[$i]->$plural)) {
-                                    foreach($objects[$i]->$plural as $idx=>$o) {
-                                        if ($o->getID()==$owner_id) {
-                                            $base =&$o; 
-                                            $relation_name = AkInflector::singularize($relation_name);
-                                            if (isset($base->$relation_name)) {
-                                                $base = &$base->$relation_name;
-                                            } else {
-                                                 $relation_name = AkInflector::pluralize($relation_name)!=$relation_name?AkInflector::pluralize($relation_name):AkInflector::singularize($relation_name);
-                                                if (isset($base->$relation_name)) {
-                                                    $base = &$base->$relation_name;
-                                                }
-                                            }
-                                        }
-                                    }
-                                } else if(isset($objects[$i]->$owned_by)){
-                                    if (isset($objects[$i]->$owned_by->$relation_name) && $objects[$i]->$owned_by->getId()==$owner_id) {
-                                        $base = &$objects[$i]->$owned_by->$relation_name;
-                                    } else {
-                                        $relation_name = AkInflector::pluralize($relation_name)!=$relation_name?AkInflector::pluralize($relation_name):AkInflector::singularize($relation_name);
-                                        if (isset($objects[$i]->$owned_by->$relation_name) && $objects[$i]->$owned_by->getId()==$owner_id) {
-                                            $base = &$objects[$i]->$owned_by->$relation_name;
-                                        }
-                                    }
-                                    
-                                }
-                                if ($base !==false && $base !== null && is_object($base)) {
-                                    if (!is_numeric(key($values))) {
-                                        $values = array($values);
-                                    }
-                                    foreach($values as $val) {
-                                        $r=&$base->build($val,false);
-                                        $r->_newRecord = false;
-                                        $r->_loaded = true;
-                                    }
-                                    /**
-                                     * clear things, so that the next records dont get this data
-                                     */
-                                    if (isset($un_associated_items[$owned_by][$owner_id])) {
-                                        unset($un_associated_items[$owned_by][$owner_id]);
-                                    }
-                                }
-                                
-                            }
-                        }
-                    }
-                    
-                   
+        if (!empty($owner)) {
+            foreach($owner as $id=>$data) {
+
+                $available=$this->getOnlyAvailableAttributes($data);
+                
+                $diff = array_diff(array_keys($data),array_keys($available));
+                
+                $available['load_associations']=false;
+                
+                $obj=&$this->instantiate($available,false,false);
+                
+                $obj->_newRecord=false;
+
+                foreach(array_values($diff) as $rel) {
+                    $this->_setAssociations($rel,$data[$rel],$obj);
                 }
+                unset($owner[$id]);
+                unset($diff);
+                unset($available);
+                $obj->afterInstantiate();
+                $obj->notifyObservers('afterInstantiate');
+                $return[]=&$obj;
             }
+        } else {
+            $return = false;
         }
-
-        $result =& $objects;
-        return $result;
+            
+        return $return;
     }
-    function &findWithAssociations($options)
-    {
-        if (isset($options['group'])) {
-            $result=&$this->_findWithAssociationsExt($options);
-            return $result;
-        }
-        $orgoptions =$options;
-        $result = false;
-        $options['include'] = Ak::toArray($options['include']);
-        $options['order'] = empty($options['order']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options['order']);
-        $options['conditions'] = empty($options['conditions']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options['conditions']);
 
-        $included_associations = array();
-        $included_association_options = array();
-        foreach ($options['include'] as $k=>$v){
-            if(is_numeric($k)){
-                $included_associations[] = $v;
-            }else {
-                $included_associations[] = $k;
-                $included_association_options[$k] = $v;
+    function _addToOwner(&$owner, $key, $value) {
+
+        if(preg_match_all('/(\[.*?\])/',$key,$matches)) {
+            $count = count($matches[1]);
+            $last = &$owner;
+            for($idx=0;$idx<$count;$idx++) { 
+                $subkey = trim($matches[1][$idx],'[]');
+                if (!isset($last[$subkey])) {
+                    $last[$subkey] = array();
+                }
+                $last = &$last[$subkey];
             }
+            $last = $value;
         }
-        
-        $available_associated_options = array('order'=>array(), 'conditions'=>array(), 'joins'=>array(), 'selection'=>array());
+    }
+    
+    function _setAssociations($assoc_name, $val, &$parent) {
+        if (method_exists($parent,'getAssociationOption')) {
+            $class=$parent->getType();
+           
+            $instance = new $class;
+             //if (!$instance->$assoc_name) return;
+          if (isset($instance->$assoc_name) && method_exists($instance->$assoc_name,'getAssociationOption')) {
+            $class = $instance->$assoc_name->getAssociationOption('class_name');
+            $instance = new $class;
+             } else if (isset($parent->$assoc_name) && method_exists($parent->$assoc_name,'getAssociatedModelInstance')){
+                 
+                 $instance = $parent->$assoc_name->getAssociatedModelInstance();
+             } else if (isset($parent->$assoc_name) && !in_array($parent->$assoc_name->getType(),array('belongsTo','hasOne','hasOne','hasMany','hasAndBelongsToMany'))) {
+                 $instance = $parent->$assoc_name;
+             } else if (isset($instance->$assoc_name)) {
+                 $instance = $instance->$assoc_name->getAssociatedModelInstance();
+             } else {
+                 $this->log('Cannot find association:'.$assoc_name.' on '.$parent->getType());
+                 return;
+             }
+            
+        } else {
+            if (!$parent->$assoc_name) {
+                $this->log($parent->getType().'->'.$assoc_name.' does not have assoc');
+                return;
+            }
+            $instance = $parent->$assoc_name->getAssociatedModelInstance();
+        }
 
-        foreach ($included_associations as $association_id){
-            $association_options = empty($included_association_options[$association_id]) ? array() : $included_association_options[$association_id];
-
-            if (isset($association_options['include'])) {
-                 $result=&$this->_findWithAssociationsExt($orgoptions);
-                 return $result;
+        if (is_numeric(key($val))) {
+            $owner =$val;
+        } else {
+            $owner = array($val);
+        }
+        foreach($owner as $data) {
+           
+            $available=$instance->getOnlyAvailableAttributes($data);
+            
+            
+            $diff = @array_diff(array_keys($data),array_keys($available));
+            
+            $available['load_associations'] = false;
+            $obj=&$parent->$assoc_name->build($available,false);
+            
+            $obj->_newRecord = false;
+            $parent->$assoc_name->_loaded=true;
+            $obj->_loaded=true;
+            if(is_array($diff)) {
+                foreach(array_values($diff) as $rel) {
+                    $this->_setAssociations($rel,$data[$rel],$obj);
+                }
             }
             
-            $handler_name = $this->getCollectionHandlerName($association_id);
-            $handler_name = empty($handler_name) ? $association_id : (in_array($handler_name, $included_associations) ? $association_id : $handler_name);
-            $associated_options = $this->$handler_name->getAssociatedFinderSqlOptions($association_options);
-            foreach (array_keys($available_associated_options) as $associated_option){
-                if(!empty($associated_options[$associated_option])){
-                    $available_associated_options[$associated_option][] = $associated_options[$associated_option];
-                }
-            }
         }
-
-        foreach ($available_associated_options as $option=>$values){
-            if(!empty($values)){
-                $separator = $option == 'joins' ? ' ' : (in_array($option, array('selection','order')) ? ', ': ' AND ');
-                $values = array_map('trim', $values);
-                $options[$option] = empty($options[$option]) ?
-                join($separator, $values) :
-                trim($options[$option]).$separator.join($separator, $values);
-            }
-        }
-
-        $sql = trim($this->constructFinderSqlWithAssociations($options));
-
-        if(!empty($options['bind']) && is_array($options['bind']) && strstr($sql,'?')){
-            $sql = array_merge(array($sql),$options['bind']);
-        }
-        $result =& $this->_findBySqlWithAssociations($sql, $options['include'], empty($options['virtual_limit']) ? false : $options['virtual_limit']);
-
-        return $result;
     }
+    
 
 
     function getCollectionHandlerName($association_id)
@@ -756,7 +666,9 @@ $available_associated_options [$sub_associated_option] []  = $newoption;
         is_object($this->$collection_handler_name)  &&
         in_array($this->$collection_handler_name->getType(),array('hasMany','hasAndBelongsToMany'))){
             return $collection_handler_name;
-        }else{
+        } else if (isset($this->_associationIds[$association_id])) {
+            return $this->_associationIds[$association_id];
+        } else{
             return false;
         }
     }
@@ -769,9 +681,11 @@ $available_associated_options [$sub_associated_option] []  = $newoption;
     {
         $sql = 'SELECT ';
         $selection = '';
+        $parent_pk = $this->getPrimaryKey();
+        $parenthesis = $this->_db->type()=='mysql'?"'":'"';
         if($include_owner_as_selection){
             foreach (array_keys($this->getColumns()) as $column_name){
-                $selection .= '__owner.'.$column_name.' AS __owner_'.$column_name.', ';
+                $selection .= '__owner.'.$column_name.' AS '.$parenthesis.'owner[@'.$parent_pk.']['.$column_name.']'.$parenthesis.', ';
             }
             $selection .= (isset($options['selection']) ? $options['selection'].' ' : '');
             $selection = trim($selection,', ').' '; // never used by the unit tests
@@ -782,7 +696,7 @@ $available_associated_options [$sub_associated_option] []  = $newoption;
         $sql .= $selection;
         $sql .= 'FROM '.($include_owner_as_selection ? $this->getTableName().' AS __owner ' : $options['selection'].' ');
         $sql .= (!empty($options['joins']) ? $options['joins'].' ' : '');
-
+        
         empty($options['conditions']) ? null : $this->addConditions($sql, $options['conditions'], '__owner');
 
         // Create an alias for order
@@ -795,106 +709,13 @@ $available_associated_options [$sub_associated_option] []  = $newoption;
         $this->_db->addLimitAndOffset($sql,$options);
         return $sql;
     }
-
-
-    /**
-     * @todo Refactor in order to increase performance of associated inclussions
-     */
-    function &_findBySqlWithAssociations($sql, $included_associations = array(), $virtual_limit = false)
-    {
-        $objects = array();
-        $results = $this->_db->execute ($sql,'find with associations');
-        if (!$results){
-            return $objects;
-        }
-        $result =& $this->_generateObjectGraphFromResultSet($results,$included_associations,$virtual_limit);
-        return $result;
-    }
     
-    /**
-     * Pass hand-made sql directly to _db->execute and generate the OG with this method.
-     *
-     * @param ADOResultSet $results            a result set from Db->execute
-     * @param array $included_associations     just like in ->find(); $options['include']; but in fact unused
-     * @param mixed $virtual_limit             int or false; unsure if this works                     
-     * @return array                           ObjectGraph as an array
-     */
-    function &_generateObjectGraphFromResultSet($results,$included_associations = array(), $virtual_limit = false)
+
+    
+    function _addTableAliasesToAssociatedSqlWithAlias($add_alias, $alias,$sql)
     {
-        $objects = array();
-        
-        $i = 0;
-        $associated_ids = $this->getAssociatedIds();
-        $number_of_associates = count($associated_ids);
-        $_included_results = array(); // Used only in conjuntion with virtual limits for doing find('first',...include'=>...
-        $object_associates_details = array();
-        $ids = array();
-        while ($record = $results->FetchRow()) {
-            $this_item_attributes = array();
-            $associated_items = array();
-            foreach ($record as $column=>$value){
-                if(!is_numeric($column)){
-                    if(substr($column,0,8) == '__owner_'){
-                        $attribute_name = substr($column,8);
-                        $this_item_attributes[$attribute_name] = $value;
-                    }elseif(preg_match('/^_('.join('|',$associated_ids).')_(.+)/',$column, $match)){
-                        $associated_items[$match[1]][$match[2]] = $value;
-                    }
-                }
-            }
-
-            // We need to keep a pointer to unique parent elements in order to add associates to the first loaded item
-            $e = null;
-            $object_id = $this_item_attributes[$this->getPrimaryKey()];
-
-            if(!empty($virtual_limit)){
-                $_included_results[$object_id] = $object_id;
-                if(count($_included_results) > $virtual_limit * $number_of_associates){
-                    continue;
-                }
-            }
-
-            if(!isset($ids[$object_id])){
-                $ids[$object_id] = $i;
-                $attributes_for_instantation = $this->getOnlyAvailableAttributes($this_item_attributes);
-                $attributes_for_instantation['load_associations'] = true;
-                $objects[$i] =& $this->instantiate($attributes_for_instantation, false);
-            }else{
-                $e = $i;
-                $i = $ids[$object_id];
-            }
-
-            foreach ($associated_items as $association_id=>$attributes){
-                if(count(array_diff($attributes, array(''))) > 0){
-                    $object_associates_details[$i][$association_id][md5(serialize($attributes))] = $attributes;
-                }
-            }
-
-            $i = !is_null($e) ? $e : $i+1;
-        }
-
-        if(!empty($object_associates_details)){
-            foreach ($object_associates_details as $i=>$object_associate_details){
-                foreach ($object_associate_details as $association_id => $associated_attributes){
-                    foreach ($associated_attributes as $attributes){
-                        if(count(array_diff($attributes, array(''))) > 0){
-                            if(!method_exists($objects[$i]->$association_id, 'build')){
-                                $handler_name = $this->getAssociatedHandlerName($association_id);
-                                $objects[$i]->$handler_name->build($attributes, false);
-                            }else{
-                                $objects[$i]->$association_id->build($attributes, false);
-                                $objects[$i]->$association_id->_newRecord = false;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        $result =& $objects;
-        return $result;
+        return preg_replace($this->getColumnsWithRegexBoundariesAndAlias($alias),'\1'.$add_alias.'.\3',' '.$sql.' ');
     }
-
 
     function _addTableAliasesToAssociatedSql($table_alias, $sql)
     {

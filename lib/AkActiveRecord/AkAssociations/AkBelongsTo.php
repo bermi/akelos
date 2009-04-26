@@ -136,7 +136,7 @@ class AkBelongsTo extends AkAssociation
         $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
         Ak::import($class_name);
         $record =& new $class_name($attributes);
-        $record =& $this->Owner->$association_id->replace($record);
+        $record =& $this->Owner->$association_id->replace($record, !$replace);
         return $record;
     }
 
@@ -198,9 +198,61 @@ class AkBelongsTo extends AkAssociation
         return $NewAssociated;
     }
 
+    function getAssociatedFinderSqlOptionsForInclusionChain($association_id, $prefix, $parent_handler_name, $options = array(),$pluralize=false)
+    {
+        $default_options = array(
+        'conditions' => $this->Owner->$association_id->getAssociationOption('include_conditions_when_included'),
+        'order' => $this->Owner->$association_id->getAssociationOption('include_order_when_included')
+        );
+        $handler_name = $association_id;
+        if(empty($this->Owner->$association_id->__activeRecordObject)){
+            $this->build($association_id, array(), false);
+        }
+        $pk=$this->Owner->$association_id->getPrimaryKey();  
+        $options = Ak::toArray($options);
+        $options = array_merge($default_options, $options);
+        
+        $finder_options = array();
+        foreach ($options as $option=>$available) {
 
+            $value = $this->Owner->$association_id->getAssociationOption($option);
+            //Ak::getLogger()->message('option:'.$option.' - available:'.var_export($available,true).'-'.$value);
+            if ((!empty($available) && $available!==true) || $available===false) {
+                
+                $value=$available;
+            }
+            if (!empty($value) && !is_bool($value)) {
+                if (is_string($value)) {
+                    $finder_options[$option] = trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $value));
+                } else if(is_array($value)) {
+                    
+                    foreach($value as $idx=>$v) {
+                        $value[$idx]=trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $v));
+                    }
+                    $finder_options[$option] = $value;
+                }else {
+                    $finder_options[$option] = $value;
+                }
+            }
+               
+        }
+        
+        
+        $finder_options['joins'] = $this->Owner->$association_id->constructSqlForInclusionChain($handler_name, $parent_handler_name);
+
+        $finder_options['selection'] = '';
+        $selection_parenthesis = $this->_getColumnParenthesis();//$this->Owner->_db->type()=='mysql'?"'":'"';
+        foreach (array_keys($this->Owner->$association_id->getColumns()) as $column_name){
+            
+            $finder_options['selection'] .= $parent_handler_name.'__'.$handler_name.'.'.$column_name.' AS '.$selection_parenthesis.$prefix.'['.$handler_name.']'.($pluralize?'[@'.$pk.']':'').'['.$column_name.']'.$selection_parenthesis.', ';
+        }
+        $finder_options['selection'] = trim($finder_options['selection'], ', ');
+
+        return $finder_options;
+    }
     function getAssociatedFinderSqlOptions($association_id, $options = array())
     {
+        
         $default_options = array(
         'conditions' => $this->Owner->$association_id->getAssociationOption('include_conditions_when_included'),
         'order' => $this->Owner->$association_id->getAssociationOption('include_order_when_included')
@@ -211,8 +263,9 @@ class AkBelongsTo extends AkAssociation
         }
 
         $table_name = $this->Owner->$association_id->getTableName();
+        $options = Ak::toArray($options);
         $options = array_merge($default_options, $options);
-
+        
         $finder_options = array();
 
         foreach ($options as $option=>$available) {
@@ -242,7 +295,16 @@ class AkBelongsTo extends AkAssociation
         ' = '.
         '_'.$association_id.'.'.$this->Owner->$association_id->getPrimaryKey().' ';
     }
-
+    function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name)
+    {
+        //$handler_name = $association_id;
+        return ' LEFT OUTER JOIN '.
+        $this->Owner->$association_id->getTableName().' AS '.$parent_handler_name.'__'.$handler_name.
+        ' ON '.
+        ''.$parent_handler_name.'.'.$this->Owner->$association_id->getAssociationOption('primary_key_name').
+        ' = '.
+       ''.$parent_handler_name.'__'.$handler_name.'.'.$this->Owner->$association_id->getPrimaryKey().' ';
+    }
 
     /**
      * Triggers
@@ -289,13 +351,34 @@ class AkBelongsTo extends AkAssociation
         foreach ($associated_ids as $associated_id){
             if( isset($object->$associated_id->_associatedAs) &&
             $object->$associated_id->_associatedAs == 'belongsTo' &&
-            $object->$associated_id->getAssociationOption('dependent')){
+            $dependency=$object->$associated_id->getAssociationOption('dependent')){
                 if ($object->$associated_id->getType() == 'belongsTo'){
+                    
                     $object->$associated_id->load();
                 }
-                if(method_exists($object->$associated_id, 'destroy')){
+                
+            switch ($dependency) {
+                        
+                        case 'delete':
+                            if(method_exists($object->$associated_id, 'destroy')){
+                                $success = $object->$associated_id->delete() ? $success : false;
+                            }
+                        break;
+                        case 'nullify':
+                            if(method_exists($object->$associated_id, 'updateAttribute')){
+                                $success = $object->$associated_id->updateAttribute($object->$associated_id->getAssociationOption('primary_key_name'),null) ? $success : false;
+                            }
+                        case 'destroy':
+                        default:
+                        
+                            if(method_exists($object->$associated_id, 'destroy')){
+                                $success = $object->$associated_id->destroy() ? $success : false;
+                            }
+                        break;
+                    }
+                /**if(method_exists($object->$associated_id, 'destroy')){
                     $success = $object->$associated_id->destroy() ? $success : false;
-                }
+                }*/
             }
         }
         return $success;

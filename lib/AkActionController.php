@@ -412,13 +412,18 @@ class AkActionController extends AkObject
         $models = array_unique(array_merge(Ak::import($this->model), Ak::import($this->models), Ak::import($models), (empty($this->app_models)?array(): Ak::import($this->app_models))));
 
         unset($this->model, $this->models);
-
+        $getFinderOptionsExists=method_exists($this,'_getFinderOptions');
         foreach ($models as $model){
-            $this->instantiateModelClass($model, (empty($this->finder_options[$model])?array():$this->finder_options[$model]));
+            $custom_find = false;
+            if (empty($this->finder_options[$model]) && $getFinderOptionsExists) {
+                $this->finder_options[$model] = $this->_getFinderOptions($model);
+                $custom_find=true;
+            }
+            $this->instantiateModelClass($model, (empty($this->finder_options[$model])?array():$this->finder_options[$model]),$custom_find);
         }
     }
 
-    function instantiateModelClass($model_class_name, $finder_options = array())
+    function instantiateModelClass($model_class_name, $finder_options = array(), $custom_find = false)
     {
         $underscored_model_class_name = AkInflector::underscore($model_class_name);
         $controller_name = isset($this->controller_name)?$this->controller_name:$this->getControllerName();
@@ -435,6 +440,8 @@ class AkActionController extends AkObject
                     $model =& new $model_class_name();
                     if(empty($finder_options)){
                         $model =& $model->find($id);
+                    }else if ($custom_find) {
+                        $model =& $model->find('first',$finder_options);
                     }else{
                         $model =& $model->find($id, $finder_options);
                     }

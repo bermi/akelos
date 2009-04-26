@@ -305,22 +305,24 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
     function test_should_delete_dependent_associates()
     {
         $this->installAndIncludeModels(array('Location', 'Group'));
-        $Location = new Location(array('name' => 'Palafolls'));
+        $Location =& new Location(array('name' => 'Palafolls'));
         $this->assertTrue($Location->save());
 
-        $Group = new Group(array('name'=>'Crafters'));
+        $Group =& new Group(array('name'=>'Crafters'));
         $this->assertTrue($Group->save());
 
         $Location->group->assign($Group);
         $this->assertTrue($Location->save());
 
-        $Location = $this->Location->findFirstBy('name', 'Palafolls', array('include'=>'group'));
+        $Location = &$this->Location->findFirstBy('name', 'Palafolls', array('include'=>'group'));
         $Location->destroy();
-
+        //die;
         $this->assertFalse($this->Location->findFirstBy('name', 'Palafolls'));
         $this->assertFalse($this->Group->findFirstBy('name', 'Crafters'));
 
     }
+    
+    
         /**/
 }
 

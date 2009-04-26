@@ -104,7 +104,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->assertEqual($Property->property_type->count(), count($PropertyTypes));
 
         $Property =& $Property->findFirstBy('description','Gandia Palace');
-
+        
         $PropertyType->set('description', 'Palace');
 
         $Property->property_type->set($PropertyType);
@@ -114,16 +114,17 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->assertTrue(in_array('property_types', $Property->getAssociatedIds()));
 
         $Property = $Property->findFirstBy('description','Gandia Palace',array('include'=>'property_types'));
-
+        
         $this->assertIdentical($Property->property_type->count(), 1);
-
+        
         $this->assertTrue($Property->property_type->delete($Property->property_types[0]));
 
         $this->assertIdentical($Property->property_type->count(), 0);
-
+        
         $Property = $Property->findFirstBy('description','Gandia Palace');
+        
         $this->assertIdentical($Property->property_type->count(), 0);
-
+        
         // It should return existing Property even if it doesnt have property_types
         $this->assertTrue($Property->findFirstBy('description','Gandia Palace',array('include'=>'property_types')));
 
@@ -140,7 +141,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->assertTrue($Property->save());
 
         $this->assertTrue($Property =& $Property->findFirstBy('description', 'Luxury Downtown House'));
-
+        
         $Property->property_type->load();
 
         $this->assertEqual($Property->property_type->count(), 3);
@@ -149,7 +150,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->assertEqual($Apartment->get('description').$Apartment->getId(), $FoundApartment->get('description').$FoundApartment->getId());
 
         $FoundTypes = $Property->property_type->find();
-
+        
         $this->assertEqual(count($FoundTypes), $Property->property_type->count());
 
         $descriptions = array();
@@ -406,7 +407,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
             $this->assertEqual($Post->tag->count(), 1, 'Failed on #'.$i);  // dont know why but this fails sometimes, randomly -kaste
         }
 
-        $Post11 =& new Post(array('name' => 'Post 11'));
+        $Post11 =& new Post(array('title' => 'Post 11'));
         $this->assertTrue($Post11->save());
 
         $Post->tag->setByIds(1,2,3,4,5);
@@ -475,6 +476,81 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $Mary = $this->Friend->findFirstBy('name', 'Mary', array('include'=>'friends'));
         
         $this->assertEqual($Mary->friends[0]->name, 'James');
+    }
+    
+	function test_find_on_association_with_conditions_string_sql()
+    {
+        if (AK_PHP5) {
+            $this->installAndIncludeModels(array('Friend'=>'id,name'));
+            $Mary =& $this->Friend->create(array('name' => 'Mary'));
+            $Mary->friend->add($this->Friend->create(array('name' => 'James')));
+            
+            
+            //$db =& new AkDbAdapter(array());  // no conection details, we're using a Mock
+            Mock::generate('ADOConnection');
+            $connection =& new MockADOConnection();
+            $result = new ADORecordSet_array(-1);
+            $result->InitArray(array(array('id'=>1,'name'=>'James')),array('id'=>'I','name'=>'C'));
+            $connection->setReturnValue('Execute',$result);
+            if ($Mary->_db->type()=='sqlite') {
+                 $connection->expectAt(0,'Execute',array('SELECT friends.* FROM friends LEFT OUTER JOIN friends_friends AS _FriendFriend ON _FriendFriend.related_id = friends.id LEFT OUTER JOIN friends AS _Friend ON _FriendFriend.friend_id = _Friend.id WHERE (friends.name = \'James\') AND (_FriendFriend.friend_id  LIKE  1) AND 1'));
+            } else {
+                $connection->expectAt(0,'Execute',array('SELECT friends.* FROM friends LEFT OUTER JOIN friends_friends AS _FriendFriend ON _FriendFriend.related_id = friends.id LEFT OUTER JOIN friends AS _Friend ON _FriendFriend.friend_id = _Friend.id WHERE (friends.name = \'James\') AND (_FriendFriend.friend_id  =  1)'));
+            }
+            $oldConnection = $Mary->_db->connection;
+            $Mary->_db->connection =& $connection;
+            //$Mary->_db = $db;
+            $Mary->friend->find(array('conditions'=>"name = 'James'"));
+            $Mary->_db->connection = $oldConnection;
+        }
+    }
+    function test_find_on_association_with_conditions_string()
+    {
+        $this->installAndIncludeModels(array('Friend'=>'id,name'));
+        $Mary =& $this->Friend->create(array('name' => 'Mary'));
+        $Mary->friend->add($this->Friend->create(array('name' => 'James')));
+        $Mary->save();
+        $result = $Mary->friend->find(array('conditions'=>"name = 'James'"));
+        $James = $result[0];
+        $this->assertEqual($Mary->friends[0]->name, $James->name);
+    }
+    
+    function test_find_on_association_with_conditions_array_sql()
+    {
+        if (AK_PHP5) {
+            $this->installAndIncludeModels(array('Friend'=>'id,name'));
+            $Mary =& $this->Friend->create(array('name' => 'Mary'));
+            $Mary->friend->add($this->Friend->create(array('name' => 'James')));
+            
+            
+            //$db =& new AkDbAdapter(array());  // no conection details, we're using a Mock
+            Mock::generate('ADOConnection');
+            $connection =& new MockADOConnection();
+            $result = new ADORecordSet_array(-1);
+            $result->InitArray(array(array('id'=>1,'name'=>'James')),array('id'=>'I','name'=>'C'));
+            $connection->setReturnValue('Execute',$result);
+            if ($Mary->_db->type()=='sqlite') {
+                $connection->expectAt(0,'Execute',array('SELECT friends.* FROM friends LEFT OUTER JOIN friends_friends AS _FriendFriend ON _FriendFriend.related_id = friends.id LEFT OUTER JOIN friends AS _Friend ON _FriendFriend.friend_id = _Friend.id WHERE (friends.name = ?) AND (_FriendFriend.friend_id  LIKE  1) AND 1', array('James')));
+            
+            } else {
+                $connection->expectAt(0,'Execute',array('SELECT friends.* FROM friends LEFT OUTER JOIN friends_friends AS _FriendFriend ON _FriendFriend.related_id = friends.id LEFT OUTER JOIN friends AS _Friend ON _FriendFriend.friend_id = _Friend.id WHERE (friends.name = ?) AND (_FriendFriend.friend_id  =  1)', array('James')));
+            }
+            $oldConnection = $Mary->_db->connection;
+            $Mary->_db->connection =& $connection;
+            //$Mary->_db = $db;
+            $Mary->friend->find(array('conditions'=>array('name = ?','James')));
+            $Mary->_db->connection = $oldConnection;
+        }
+    }
+    function test_find_on_association_with_conditions_array()
+    {
+        $this->installAndIncludeModels(array('Friend'=>'id,name'));
+        $Mary =& $this->Friend->create(array('name' => 'Mary'));
+        $Mary->friend->add($this->Friend->create(array('name' => 'James')));
+        $Mary->save();
+        $result = $Mary->friend->find(array('conditions'=>array('name = ?','James')));
+        $James = $result[0];
+        $this->assertEqual($Mary->friends[0]->name, $James->name);
     }
 }
 

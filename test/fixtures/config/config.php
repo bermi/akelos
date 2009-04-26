@@ -18,7 +18,7 @@ define('AK_PUBLIC_DIR', AK_TEST_DIR.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEP
 defined('AK_TEST_HELPERS_DIR') ? null :
 define('AK_TEST_HELPERS_DIR', AK_TEST_DIR.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.'helpers');
 
-define('AK_SITE_URL_SUFFIX', str_replace(array(join(DIRECTORY_SEPARATOR,array_diff((array)@explode(DIRECTORY_SEPARATOR,AK_TEST_DIR),
+defined('AK_SITE_URL_SUFFIX')?null:define('AK_SITE_URL_SUFFIX', str_replace(array(join(DIRECTORY_SEPARATOR,array_diff((array)@explode(DIRECTORY_SEPARATOR,AK_TEST_DIR),
 (array)@explode('/',@$_SERVER['REQUEST_URI']))),DIRECTORY_SEPARATOR),array('','/'),AK_TEST_DIR));
 
 defined('AK_ENABLE_AKELOS_ARGS') ? null : define('AK_ENABLE_AKELOS_ARGS', true);
@@ -45,7 +45,7 @@ if(AK_TESTING_REWRITE_BASE){
 
 if(defined('AK_TEST_DATABASE_ON')){
     $default_profile = AK_ENVIRONMENT;
-    define('AK_DEFAULT_DATABASE_PROFILE', $default_profile);
+    defined('AK_DEFAULT_DATABASE_PROFILE')?null:define('AK_DEFAULT_DATABASE_PROFILE', $default_profile);
     //$GLOBALS['database_settings'] = $database_settings;
     include_once(AK_LIB_DIR.DS.'Ak.php');
     Ak::db();

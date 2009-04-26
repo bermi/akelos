@@ -76,6 +76,7 @@ if (TextReporter::inCli()) {
     
     if ($writeXml) {
         $contents = $reporter->getXml();
+        Ak::compat('file_put_contents');
         file_put_contents($file,$contents);
     }
     exit ($run ? 0 : 1);

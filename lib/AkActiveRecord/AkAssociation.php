@@ -108,7 +108,14 @@ class AkAssociation extends AkObserver
     {
         return array_keys($this->options);
     }
-
+    function _getColumnParenthesis()
+    {
+        static $type;
+        if (empty($type)) {
+            $type=$this->Owner->_db->type();
+        }
+        return $type=='mysql'?"'":'"';
+    }
 
     function &_build($association_id, &$AssociatedObject, $reference_associated = true)
     {
