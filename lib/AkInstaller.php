@@ -244,7 +244,7 @@ class AkInstaller extends AkObject
     {
         if(!($tableExists=$this->tableExists('akelos_migrations')) || !($version = $this->db->selectValue(array('SELECT version FROM akelos_migrations WHERE name=?',$this->getInstallerName())))) {
             
-        
+            if ($version===0) return 0;
             $version_file = $this->_versionPath($options);
     
             $this->_moveOldVersionsFileToNewLocation($options);
