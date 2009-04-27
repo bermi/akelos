@@ -242,8 +242,10 @@ class AkInstaller extends AkObject
 
     function getInstalledVersion($options = array())
     {
-        if(!($tableExists=$this->tableExists('akelos_migrations')) || (!($version = $this->db->selectValue(array('SELECT version FROM akelos_migrations WHERE name=?',$this->getInstallerName()))) && $version!=='0')) {
-              if ($version==='0') return 0;
+        $version = $this->db->selectValue(array('SELECT version FROM akelos_migrations WHERE name=?',$this->getInstallerName()));
+
+        if(!($tableExists=$this->tableExists('akelos_migrations')) || $version===NULL) {
+            
             $version_file = $this->_versionPath($options);
     
             $this->_moveOldVersionsFileToNewLocation($options);
@@ -279,7 +281,8 @@ class AkInstaller extends AkObject
          * this will produce an error if the unique index on name is violated, then we update
          */
         $this->log('Setting version of '.$this->getInstallerName().' to '.$version);
-        if($this->db->selectValue(array('SELECT version from akelos_migrations WHERE name = ?', $this->getInstallerName())) || !@$this->db->execute(array('INSERT INTO akelos_migrations (version,created_at,name) VALUES (?,?,?)',$version,Ak::getDate(),$this->getInstallerName()))) {
+        $old_version=$this->db->selectValue(array('SELECT version from akelos_migrations WHERE name = ?', $this->getInstallerName()));
+        if($old_version !== null || !@$this->db->execute(array('INSERT INTO akelos_migrations (version,created_at,name) VALUES (?,?,?)',$version,Ak::getDate(),$this->getInstallerName()))) {
             return @$this->db->execute(array('UPDATE akelos_migrations SET version=?, updated_at=? WHERE name=?',$version,Ak::getDate(),$this->getInstallerName()));
         }
 
