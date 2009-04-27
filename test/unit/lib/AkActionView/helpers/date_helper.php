@@ -122,15 +122,24 @@ class DateHelperTests extends HelpersUnitTester
         $this->blank_date = "";
         $this->assertEqual($this->date_helper->date_select('person','blank_date',array('include_blank'=>true, 'start_year'=>1973, 'end_year'=>1983)), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_'.__FUNCTION__.'.txt'));
     }
+
     function test_should_select_prompted_text()
     {
         $this->assertEqual(DateHelper::select_year(null,  array('prefix'=>'event_date_', 'prompt'=>'-- Select --', 'start_year'=>2008, 'end_year'=>2011)), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_year_with_prompt.txt'));
         $this->assertEqual(DateHelper::select_month(null, array('prefix'=>'event_date_', 'prompt'=>'-- Select --')), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_month_with_prompt.txt'));
         $this->assertEqual(DateHelper::select_day('',     array('prefix'=>'event_date_', 'prompt'=>'-- Select --')), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_day_with_prompt.txt'));
     }
+
     function test_should_add_id_into_select()
     {
         $this->assertEqual(DateHelper::select_year('', array('id'=>'year_id','prompt'=>'-- Select --', 'start_year'=>2008, 'end_year'=>2011)),file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_select_year_with_id.txt'));
+    }
+
+    function test_should_select_month_and_year_when_discarding_day()
+    {
+        $this->Person->setReturnValue('get', '2010-03', array('mid_date'));
+        $this->date_helper = new DateHelper(array('person'=>&$this->Person));
+        $this->assertEqual($this->date_helper->date_select('person','mid_date',array('start_year'=>2005, 'end_year'=>2015, 'discard_day'=> true)), file_get_contents(AK_TEST_HELPERS_DIR.DS.'date_helper_'.__FUNCTION__.'.txt'));
     }
 }
 

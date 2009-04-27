@@ -312,6 +312,13 @@ class DateHelper extends AkActionViewHelper
       */
     function select_month($date=null, $options = array())
     {
+
+        if(preg_match_all('/(\d{4}\-)?(\d{1,2})(\-\d{1,2})?/', $date, $matches) && !empty($matches[2][0])){
+           $date = $matches[2][0];
+           $ts = Ak::getTimestamp(isset($date) ? date('Y').'-'.$date.'-01' : null);
+           $date = Ak::getDate($ts);
+       }
+
         if(!empty($options['use_month_numbers'])){
             $month_details = '1,2,3,4,5,6,7,8,9,10,11,12';
         }elseif(!empty($options['add_month_numbers']) && empty($options['use_short_month'])){
@@ -346,7 +353,13 @@ class DateHelper extends AkActionViewHelper
       */
     function select_year($date = null, $options = array())
     {
-        $year = Ak::getDate(Ak::getTimestamp(isset($date) ? $date.'-01-01' : null),'Y');
+        if(!empty($date)){
+            $ts = Ak::getTimestamp(isset($date) ? substr($date, 0, 4).'-01-01' : null);
+            $date = Ak::getDate($ts);
+            $year = date('Y', $ts);
+        }else{
+            $year = Ak::getDate(Ak::getTimestamp(isset($date) ? $date.'-01-01' : null),'Y');
+        }
 
         $start_year = !empty($options['start_year']) ? $options['start_year'] : $year-5;
         $end_year = !empty($options['end_year']) ? $options['end_year'] : $year+5;
