@@ -242,7 +242,7 @@ class AkInstaller extends AkObject
 
     function getInstalledVersion($options = array())
     {
-        if(!($tableExists=$this->tableExists('akelos_migrations')) || false===($version = $this->db->selectValue(array('SELECT version FROM akelos_migrations WHERE name=?',$this->getInstallerName())))) {
+        if(!($tableExists=$this->tableExists('akelos_migrations')) || !($version = $this->db->selectValue(array('SELECT version FROM akelos_migrations WHERE name=?',$this->getInstallerName())))) {
             
         
             $version_file = $this->_versionPath($options);
