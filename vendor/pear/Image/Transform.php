@@ -135,7 +135,7 @@ class Image_Transform
      * @access protected
      */
     var $_options = array(
-        'quality'     => 75,
+        'quality'     => 100,
         'scaleMethod' => 'smooth',
         'canvasColor' => array(255, 255, 255),
         'pencilColor' => array(0, 0, 0),

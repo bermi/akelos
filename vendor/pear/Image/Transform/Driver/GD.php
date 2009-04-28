@@ -440,7 +440,7 @@ class Image_Transform_Driver_GD extends Image_Transform
                 if (is_numeric($quality)) {
                     $options['quality'] = $quality;
                 }
-                $quality = $this->_getOption('quality', $options, 75);
+                $quality = $this->_getOption('quality', $options, 100);
                 break;
         }
         if (!$this->supportsType($type, 'w')) {

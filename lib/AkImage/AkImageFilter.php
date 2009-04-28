@@ -16,27 +16,29 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
+
+
 class AkImageFilter
 {
     var $Image;
     var $options = array();
 
-    
+
     function setImage(&$Image)
     {
         $this->Image =& $Image;
     }
-    
+
     function &getImage()
     {
         return $this->Image;
     }
-    
+
     function getOptions()
     {
         return $this->options;
     }
-    
+
     /**
      * Options for pear ImageTransform are normally in lower camelCase so we need to remap the option keys
      * to adhere to the framework convention of underscored options
@@ -47,7 +49,7 @@ class AkImageFilter
             $options[AkInflector::variablize($k)] = $v;
         }
     }
-    
+
 
     function _setWidthAndHeight_(&$options)
     {
@@ -63,7 +65,7 @@ class AkImageFilter
             $options['height'] = $this->_getProportionalHeight($options['height']);
         }
     }
-    
+
 }
 
 
