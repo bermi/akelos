@@ -272,8 +272,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if(!empty($this->table_name)){
             $this->setTableName($this->table_name);
         }
+        $load_acts = isset($attributes[1]['load_acts']) ? $attributes[1]['load_acts'] : true;
         $this->act_as = !empty($this->acts_as) ? $this->acts_as : (empty($this->act_as) ? false : $this->act_as);
-        if (!empty($this->act_as)) {
+        if (!empty($this->act_as) && $load_acts) {
             $this->_loadActAsBehaviours();
         }
 
@@ -1058,7 +1059,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if (isset($options[0])){
             return false;
         }
-        $valid_keys = array('wrap','conditions', 'include', 'joins', 'limit', 'offset', 'group', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly');
+        $valid_keys = array('returns','load_acts','wrap','conditions', 'include', 'joins', 'limit', 'offset', 'group', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly');
         foreach (array_keys($options) as $key){
             if (!in_array($key,$valid_keys)){
                 return false;
@@ -1716,7 +1717,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         return true;
     }
-
+    
     function set($attribute, $value = null, $inspect_for_callback_child_method = true, $compose_after_set = true)
     {
         if(is_array($attribute)){

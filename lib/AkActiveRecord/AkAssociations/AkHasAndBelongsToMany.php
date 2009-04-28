@@ -787,7 +787,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         $join_obj = new $join_class;
         $join_class_columns = array_keys($join_obj->getColumns());
         foreach ($join_class_columns as $column_name){
-            $finder_options['selection'] .= $parent_handler_name.'__'.$handler_name.'__'.$join_class.'.'.$column_name.' AS '.$selection_parenthesis.$prefix.'['.$handler_name.']'.($pluralize?'[@'.$pk.']':'').'['.$join_class.']['.$column_name.']'.$selection_parenthesis.', ';
+            $finder_options['selection'] .= $parent_handler_name.'__'.$handler_name.'__'.$join_class.'.'.$column_name.' AS '.$selection_parenthesis.$prefix.'['.$handler_name.']'.($pluralize?'[@'.$pk.']':'').'[_'.$join_class.']['.$column_name.']'.$selection_parenthesis.', ';
         }
         
         $finder_options['selection'] = trim($finder_options['selection'], ', ');
