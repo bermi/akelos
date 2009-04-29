@@ -285,7 +285,7 @@ class AkImage extends Image_Transform
         if($filter->native_filter_constant = $this->getNativeFilerConstant($filter_name)){
             array_unshift($params, constant($filter->native_filter_constant));
             array_unshift($params, $this->Transform->imageHandle);
-            $filter->params = $params;
+            $filter->params = array_diff($params, array(''));
             $this->filters[] =& $filter;
         }
     }
