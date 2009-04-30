@@ -582,7 +582,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                     if (!isset($diff)) {
                         $diff = @array_diff(array_keys($data),$available_attributes);
                         $nondiff = array();
-                        foreach(array_keys($diff) as $d) {
+                        foreach($diff as $d) {
                             $nondiff[$d] = null;
                         }
                     }

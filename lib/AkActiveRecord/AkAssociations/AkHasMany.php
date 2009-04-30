@@ -484,8 +484,9 @@ class AkHasMany extends AkAssociation
              */
             $options['finder_sql'] = str_replace(array(':foreign_key_value'),array($owner_id), $options['finder_sql']);
         }
-        $options['group'] = str_replace(array(':foreign_key_value'),array($owner_id), $options['group']);
-        
+        if (isset($options['group'])) {
+            $options['group'] = str_replace(array(':foreign_key_value'),array($owner_id), $options['group']);
+        }
         
         if(empty($options['counter_sql']) && !empty($options['finder_sql'])){
             $options['counter_sql'] = $options['finder_sql'];
