@@ -593,6 +593,11 @@ class Ak
 
         $line = isset($line) ? "Line: $line".(AK_CLI?"\n":"<br />") : "";
         $file = isset($file) ? "File: $file".(AK_CLI?"\n":"<br />") : "";
+        if(is_object($text)){
+            $object_text = @(string)$text;
+            $text = empty($object_text) ? print_r($text, true) : $object_text;
+        }
+
         $text = is_array($text) ? print_r($text, true) : $text;
 
         if(!isset($text)){
