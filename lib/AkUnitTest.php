@@ -177,9 +177,19 @@ class AkUnitTest extends UnitTestCase
             }
         }
     }
-
+    function log($message)
+    {
+        if (AK_LOG_EVENTS){
+            static $logger;
+            if(empty($logger)) {
+                $logger = &Ak::getLogger();
+            }
+            $logger->log('unit-test',$message);
+        }
+    }
     function _reinstallModel($model, $table_definition = '')
     {
+        $this->log('Reinstalling model:'.$model);
         if (!$this->uninstallAndInstallMigration($model)){
             $table_name = AkInflector::tableize($model);
             if (empty($table_definition)) {
@@ -200,7 +210,9 @@ class AkUnitTest extends UnitTestCase
 
     function uninstallAndInstallMigration($installer_name)
     {
+        $this->log('Looking for installer:'.AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php');
         if (file_exists(AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php')){
+            $this->log('found installer:'.AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php');
             require_once(AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php');
             $installer_class_name = $installer_name.'Installer';
             $Installer =& new $installer_class_name();

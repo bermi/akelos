@@ -20,6 +20,7 @@
  */
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php');
+require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php');
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbAdapter.php');
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
 /**#@+
@@ -971,8 +972,17 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             if(!empty($options['bind']) && is_array($options['bind']) && strstr($sql,'?')){
                 $sql = array_merge(array($sql),$options['bind']);
             }
-            
-            $result =& $this->findBySql($sql);
+            if (!empty($options['returns']) && $options['returns']!='default') {
+                $options['returns'] = in_array($options['returns'],array('simulated','default','array'))?$options['returns']:'default';
+                if ($options['returns'] == 'simulated' && !AK_PHP5) {
+                    trigger_error(Ak::t('In PHP4 you cannot use the return type "simulated" on finders. Return type reset to "default"'),E_USER_WARNING);
+                    $options['returns'] = 'default';
+                }
+                $simulation_class = !empty($options['simulation_class']) && class_exists($options['simulation_class'])?$options['simulation_class']:'AkActiveRecordMock';
+                $result =& $this->findBySql($sql,null,null,null,$options['returns'],$simulation_class);
+            } else {
+                $result =& $this->findBySql($sql);
+            }
         }
 
         if(!empty($result) && is_array($result)){
@@ -1059,7 +1069,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if (isset($options[0])){
             return false;
         }
-        $valid_keys = array('returns','load_acts','wrap','conditions', 'include', 'joins', 'limit', 'offset', 'group', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly');
+        $valid_keys = array('simulation_class','returns','load_acts','wrap','conditions', 'include', 'joins', 'limit', 'offset', 'group', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly');
         foreach (array_keys($options) as $key){
             if (!in_array($key,$valid_keys)){
                 return false;
@@ -1151,7 +1161,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * $Post->findBySql("SELECT p.*, c.author FROM posts p, comments c WHERE p.id = c.post_id");
     * $Post->findBySql(array("SELECT * FROM posts WHERE author = ? AND created_on > ?", $author_id, $start_date));
     */
-    function &findBySql($sql, $limit = null, $offset = null, $bindings = null)
+    function &findBySql($sql, $limit = null, $offset = null, $bindings = null, $returns = 'default', $simulation_class = 'AkActiveRecordMock')
     {
         if ($limit || $offset){
             Ak::deprecateWarning("You're calling AR::findBySql with \$limit or \$offset parameters. This has been deprecated.");
@@ -1163,7 +1173,17 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $objects = array();
         $records = $this->_db->select ($sql,'selecting');
         foreach ($records as $record){
-            $objects[] =& $this->instantiate($this->getOnlyAvailableAttributes($record), false);
+            if ($returns == 'default') {
+                $objects[] =& $this->instantiate($this->getOnlyAvailableAttributes($record), false);
+            } else if ($returns == 'simulated') {
+                $objects[] = $this->getOnlyAvailableAttributes($record);
+            } else if ($returns == 'array') {
+                $objects[] = $this->getOnlyAvailableAttributes($record);
+            }
+        }
+        if ($returns == 'simulated') {
+            $false = false;
+            $objects = $this->_generateStdClasses($simulation_class,$objects,$this->getType(),$false,$false,array('__owner'=>array('pk'=>$this->getPrimaryKey(),'class'=>$this->getType())));
         }
         return $objects;
     }
@@ -1844,7 +1864,11 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function getId()
     {
-        return $this->{$this->getPrimaryKey()};
+        $pk=$this->getPrimaryKey();
+        if(empty($pk)) {
+            debug_print_backtrace();
+        }
+        return $this->{$pk};
     }
 
     /*/Getting Attributes*/

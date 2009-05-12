@@ -182,7 +182,18 @@ class AkLogger
         }
         return empty($details) ? $message.'</div>' : $message."<ul>\n$details\n</ul>\n</div>";
     }
-
+    function _walkParams($params)
+    {
+        $return = '';
+        foreach ($params as $k=>$v){
+                if(is_scalar($v)) {
+                    $return .= "\n\t\t- ".$k.": $v";
+                } else if(is_array($v)){
+                    $return.= "\n\t\t\t- $k:".var_export($v,true);
+                }
+            }
+            return $return;
+    }
     function _getLogFormatedAsString($type, $error_mode, $error_message, $serialized = false)
     {
         $message = date('r')."\t[$error_mode]\t$error_message";
@@ -192,9 +203,7 @@ class AkLogger
             $message .= (count($params) ? "\t".serialize($params) : '');
         }else{
             $details = '';
-            foreach ($params as $k=>$v){
-                $details .= "\n\t\t- ".$k.": $v";
-            }
+            $details.=$this->_walkParams($params);
             $message .= empty($details) ? "\n" : "\n\t".'PARAMS{'.$details."\t\n}\n";
         }
         return $message;

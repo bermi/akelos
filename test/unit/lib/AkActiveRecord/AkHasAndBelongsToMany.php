@@ -15,7 +15,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         @Ak::file_delete(AK_MODELS_DIR.DS.'post_tag.php');
         @Ak::file_delete(AK_MODELS_DIR.DS.'post_user.php');
         @Ak::file_delete(AK_MODELS_DIR.DS.'friend_friend.php');
-
+        
         $this->installAndIncludeModels(array('Post', 'Tag','Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'User'));
     }
 
@@ -367,6 +367,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         @$Installer->dropTable('groups_users');
         @Ak::file_delete(AK_MODELS_DIR.DS.'group_user.php');
 
+        
         $this->installAndIncludeModels('User', 'Group', array('instantiate' => true));
 
         $Admin =& $this->Group->create(array('name' => 'Admin'));

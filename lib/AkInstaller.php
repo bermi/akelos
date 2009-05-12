@@ -201,11 +201,12 @@ class AkInstaller extends AkObject
         $this->transactionStart();
 
         if($this->$method_name($options) === false){
+            $this->log($this->getInstallerName().': returned false');
             $this->transactionFail();
         }
         $success = !$this->transactionHasFailed();
         $this->transactionComplete();
-        if($success){
+        if($success || ($version_number==0 && $method_prefix=='down')){
             $this->setInstalledVersion($version_number, $options);
         }
         return $success;
@@ -242,9 +243,10 @@ class AkInstaller extends AkObject
 
     function getInstalledVersion($options = array())
     {
+        $this->_createMigrationsTable();
         $version = $this->db->selectValue(array('SELECT version FROM akelos_migrations WHERE name=?',$this->getInstallerName()));
 
-        if(!($tableExists=$this->tableExists('akelos_migrations')) || $version===NULL) {
+        if($version==NULL) {
             
             $version_file = $this->_versionPath($options);
     
@@ -254,29 +256,39 @@ class AkInstaller extends AkObject
                 $version = 0;
                 $this->setInstalledVersion($version, $options);
             } else {
-                $version = Ak::file_get_contents($this->_versionPath($options));
-                if(!$tableExists) {
-                    $this->_createMigrationsTable();
-                }
-                $this->db->execute(array('INSERT INTO akelos_migrations (name,version,created_at) VALUES (?,?,?)',$this->getInstallerName(),$version,Ak::getDate()));
+                $oldfile=$this->_versionPath($options);
+                $version = Ak::file_get_contents($oldfile);
+                //if(!$tableExists) {
+                //    $this->_createMigrationsTable();
+                //}
+                copy($oldfile,$oldfile.'.backup');
+                unlink($oldfile);
+                $this->log('message','got old version from file:'.$oldfile.'='.$version.' moved to backup-file:'.$oldfile.'.backup');
+                $this->setInstalledVersion($version, $options);
+                //$this->db->execute(array('INSERT INTO akelos_migrations (name,version,created_at) VALUES (?,?,?)',$this->getInstallerName(),$version,Ak::getDate()));
             }
             
-            }
-            $this->log('Installed version of '.$this->getInstallerName().':'.$version);
+        }
+        $this->log('Installed version of '.$this->getInstallerName().':'.$version);
         return $version;
     }
     
     function _createMigrationsTable()
     {
-        $this->createTable('akelos_migrations','id, name, version int');
-        $this->addIndex('akelos_migrations','UNIQUE name','unq_name');
+        if(!$this->tableExists('akelos_migrations')) {
+            AkDbSchemaCache::clearAll();
+            $this->data_dictionary =& $this->db->getDictionary();
+            $this->available_tables = $this->getAvailableTables();
+            $this->createTable('akelos_migrations','id, name, version int');
+            $this->addIndex('akelos_migrations','UNIQUE name','unq_name');
+        }
     }
 
     function setInstalledVersion($version, $options = array())
     {
-        if(!$this->tableExists('akelos_migrations')) {
+        //if(!$this->tableExists('akelos_migrations')) {
             $this->_createMigrationsTable();
-        }
+        //}
         /**
          * this will produce an error if the unique index on name is violated, then we update
          */
@@ -411,12 +423,29 @@ class AkInstaller extends AkObject
     function dropTable($table_name, $options = array())
     {
         require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
-        AkDbSchemaCache::clear(AkInflector::classify($table_name));
-        $result = $this->tableExists($table_name) ? $this->db->execute('DROP TABLE '.$table_name) : true;
+        //AkDbSchemaCache::clear(AkInflector::classify($table_name));
+        AkDbSchemaCache::clear($table_name);
+        $model_name = AkInflector::classify($table_name);
+        Ak::import($model_name);
+        if (class_exists($model_name)) {
+            $m = new $model_name();
+            if (method_exists($m,'beforeDropTable')) {
+                $this->log('message','Calling '.$model_name.'::beforeDropTable');
+                $m->beforeDropTable();
+            }
+        }
+        $result = $this->tableExists($table_name) ? $this->db->execute('DROP TABLE '.$table_name) : 1;
         if($result){
             unset($this->available_tables[array_search($table_name, $this->available_tables)]);
             if(!empty($options['sequence'])){
                 $this->dropSequence($table_name);
+            }
+            if($result===true && isset($m)) {
+            
+                if (method_exists($m,'afterDropTable')) {
+                    $this->log('message','Calling '.$model_name.'::afterDropTable');
+                    $m->afterDropTable();
+                }
             }
         }
     }

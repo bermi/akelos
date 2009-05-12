@@ -472,7 +472,7 @@ class Ak
             $path = $options['base_path'].DS.$path;
             if (!file_exists($path)){
                 Ak::make_dir(dirname($path), $options);
-                return mkdir($path);
+                return @mkdir($path);
             }
         }
         return false;

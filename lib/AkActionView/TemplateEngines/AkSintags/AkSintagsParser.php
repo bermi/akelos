@@ -682,6 +682,14 @@ class AkSintagsParser
                     foreach ($underscored_helper_names as $underscored_helper_name){
                         $helper_class_name = AkInflector::camelize($underscored_helper_name);
                         if(class_exists($helper_class_name)){
+                            $methods = get_class_methods($helper_class_name);
+                            $vars=get_class_vars($helper_class_name);
+                            if (AK_PHP5 && isset($vars['dynamic_helpers'])) {
+                                $dynamic_helpers = Ak::toArray($vars['dynamic_helpers']);
+                                foreach ($dynamic_helpers as $method_name){
+                                    $this->dynamic_helpers[$method_name] = $underscored_helper_name;
+                                }
+                            }
                             foreach (get_class_methods($helper_class_name) as $method_name){
                                 if($method_name[0] != '_'){
                                     $helpers[$method_name] = $underscored_helper_name;
@@ -705,7 +713,20 @@ class AkSintagsParser
             $method_name = 'translate';
         }
         $this->_getAvailableHelpers();
-        return empty($this->available_helpers[$method_name]) ? false : $this->available_helpers[$method_name];
+        //return empty($this->available_helpers[$method_name]) ? false : $this->available_helpers[$method_name];
+        if(empty($this->available_helpers[$method_name])) {
+            if (!empty($this->dynamic_helpers)) {
+                foreach($this->dynamic_helpers as $regex => $helper) {
+                    $regex = trim($regex,'/');
+                    if (@preg_match('/'.$regex.'/', $method_name)) {
+                        return $helper;
+                    }
+                }
+            }
+            return false;
+        } else {
+            return $this->available_helpers[$method_name];
+        }
     }
     
     function hasErrors()

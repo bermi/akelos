@@ -12,13 +12,20 @@ class AkUnitTestSuite extends GroupTest
     function AkUnitTestSuite()
     {
         $this->_init();
+        
     }
     
+    function log($message) {
+        if (AK_LOG_EVENTS){
+            $this->logger->log('unit-test',$message);
+        }
+    }
     function _includeFiles($files)
     {
         foreach ($files as $test) {
             if (!is_dir($test)) {
                 if (!in_array($test,$this->excludes)) {
+                    $this->log('Including testfile:'.$test);
                     $this->addTestFile($test);
                 }
             } else {
@@ -29,6 +36,7 @@ class AkUnitTestSuite extends GroupTest
     }
     function _init()
     {
+        $this->logger = &Ak::getLogger();
         $base = AK_TEST_DIR.DS.'unit'.DS.'lib'.DS;
         $this->GroupTest($this->title);
         $allFiles = glob($base.$this->baseDir);
@@ -46,6 +54,7 @@ class AkUnitTestSuite extends GroupTest
             $this->_includeFiles($allFiles);
         } else if (is_array($this->partial_tests)){
             foreach ($this->partial_tests as $test) {
+                //$this->log('Including partial testfile:'.$test);
                 $this->addTestFile($base.$this->baseDir.DS.$test.'.php');
             }
         } else {
@@ -53,6 +62,23 @@ class AkUnitTestSuite extends GroupTest
 
         }
     }
+    
+function run(&$reporter) {
+            $reporter->paintGroupStart($this->getLabel(), $this->getSize());
+            for ($i = 0, $count = count($this->_test_cases); $i < $count; $i++) {
+                if (is_string($this->_test_cases[$i])) {
+                    $class = $this->_test_cases[$i];
+                    $test = &new $class();
+                    //$this->log('Running test-class:'.$class);
+                    $test->run($reporter);
+                } else {
+                    //$this->log('Running test-class:'.$this->_test_cases[$i]->_label);
+                    $this->_test_cases[$i]->run($reporter);
+                }
+            }
+            $reporter->paintGroupEnd($this->getLabel());
+            return $reporter->getStatus();
+        }
 }
 
 }

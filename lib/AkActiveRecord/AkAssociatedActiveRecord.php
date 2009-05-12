@@ -158,8 +158,11 @@ class AkAssociatedActiveRecord extends AkBaseModel
     function &load()
     {
         $result = false;
-        if(!empty($this->_AssociationHandler)){
-            $result =& $this->_AssociationHandler->loadAssociated($this->getAssociationId());
+        $association_id = $this->getAssociationId();
+        if(!empty($this->_AssociationHandler) && (empty($this->_loaded))){
+            $result =& $this->_AssociationHandler->loadAssociated($association_id);
+        } else if (!empty($this->_AssociationHandler->Owner->$association_id)) {
+            $result = &$this->_AssociationHandler->Owner->$association_id;
         }
         return $result;
     }
@@ -254,7 +257,14 @@ class AkAssociatedActiveRecord extends AkBaseModel
         
         $load_acts = isset($options['load_acts'])?$options['load_acts']:true;
         
+        $config = array('__owner'=>array('class'=>$this->getType(),'pk'=>$this->getPrimaryKey()));
+        
         $returns = isset($options['returns'])?$options['returns']:'default';
+        if ($returns == 'simulated' && !AK_PHP5) {
+            trigger_error(Ak::t('In PHP4 you cannot use the return type "simulated" on finders. Return type reset to "default"'),E_USER_WARNING);
+            $returns = 'default';
+        }
+        $simulation_class = isset($options['simulation_class']) && class_exists($options['simulation_class'])?$options['simulation_class']:'AkActiveRecordMock';
         if (!in_array($returns,array('default','array','simulated'))) {
             $this->log('option "returns" must be one of default,array,simulated');
             $returns = 'default';
@@ -280,21 +290,29 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $handler_name = empty($handler_name) ? $association_id : (in_array($handler_name, $included_associations) ? $association_id : $handler_name);
             $type =$this->$handler_name->getType();
             $multi = false;
-            $pk = false;
+            
             if (in_array($type,array('hasMany','hasAndBelongsToMany'))) {
                 $multi = true;
                 $instance = $this->$handler_name->getAssociatedModelInstance();
-                $pk=$instance->getPrimaryKey();
+                $class = $instance->getType();
+                $pk_name = $instance->getPrimaryKey();
                 $table_name =$instance->getTableName();
             } else {
                 $class = $this->$handler_name->getAssociationOption('class_name');
                 if(!class_exists($class)) {
                     Ak::import($class);
                 }
-                $instance = new $class;
-                $table_name =$instance->getTableName();
+                
+                if(is_string($class)) {
+                    $instance = new $class;
+                    $pk_name = $instance->getPrimaryKey();
+                    $table_name =$instance->getTableName();
+                } else {
+                    
+                    continue;
+                }
             }
-
+            $config['__owner'][$handler_name] = array('class'=>$class,'association_id'=>$association_id,'pk'=>$pk_name);
             $associated_options = $this->$handler_name->getAssociatedFinderSqlOptionsForInclusionChain('owner[@'.$parent_pk.']','__owner',$association_options,$multi);
 
             $options ['order'] = empty($options ['order']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options ['order']);
@@ -318,10 +336,10 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $replacements['/ ('.$table_name.')\./'] = ' __owner__'.$handler_name.'.';
            
             
-            $this->_prepareIncludes('owner[@'.$parent_pk.']',$multi,$this,$available_associated_options,$handler_name,$handler_name,$association_id,$options,$association_options,$replacements);
+            $this->_prepareIncludes('owner[@'.$parent_pk.']',$multi,$this,$available_associated_options,$handler_name,$handler_name,$association_id,$options,$association_options,$replacements, $config['__owner']);
             
         }
-
+        //$this->log('Config:'.var_export($config,true));
         $replace_regex = array_keys($replacements);
         $replace_value = array_values($replacements);
         if(isset($options['order'])) $options['order'] = preg_replace($replace_regex,$replace_value,$options['order']);
@@ -364,14 +382,22 @@ class AkAssociatedActiveRecord extends AkBaseModel
         $sql = preg_replace('/,\s*,/',' , ',$sql);
         
         if (isset($options['wrap'])) {
+            $addLimit='';
+            if(preg_match('/LIMIT ([\d]+){1}(,){0,1}(\s*)([\d]+){0,1}/i',$sql,$matches) && strstr($options['wrap'],'{limit}')) {
+                $sql = str_replace($matches[0],'',$sql);
+                $addLimit = $matches[0];
+            }
             $sql = str_replace('{query}',$sql,$options['wrap']);
+            //if(!empty($addLimit)) {
+            $sql = str_replace('{limit}',$addLimit,$sql);
+            //}
         }
         
         if (! empty($options ['bind']) && is_array($options ['bind']) && strstr($sql, '?')) {
             $sql = array_merge(array ($sql ), $options ['bind']);
         }
 
-        $result = & $this->_findBySqlWithAssociations($sql, empty($options ['virtual_limit']) ? false : $options ['virtual_limit'], $load_acts, $returns);
+        $result = & $this->_findBySqlWithAssociations($sql, empty($options ['virtual_limit']) ? false : $options ['virtual_limit'], $load_acts, $returns,$simulation_class, $config);
         if (empty($result)) {
             $result = false;
         }
@@ -379,7 +405,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
     }
     
     
-    function _prepareIncludes($prefix,$parent_is_plural, &$parent,&$available_associated_options,$handler_name,$parent_association_id,$association_id,&$options,&$association_options, &$replacements)
+    function _prepareIncludes($prefix,$parent_is_plural, &$parent,&$available_associated_options,$handler_name,$parent_association_id,$association_id,&$options,&$association_options, &$replacements, &$config)
     {
         if (isset($association_options['include'])) {
             $association_options['include'] = Ak::toArray($association_options['include']);
@@ -420,6 +446,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                     if ($type == 'hasMany' || $type ==
                              'hasAndBelongsToMany') {
                        $instance=&$sub_association_object->$sub_handler_name->getAssociatedModelInstance();
+                       $class_name = $instance->getType();
                        $table_name = $instance->getTableName();
                        $pk = $instance->getPrimaryKey();
                        $pluralize = true;
@@ -436,10 +463,11 @@ class AkAssociatedActiveRecord extends AkBaseModel
                     } else {
                         $pk = $sub_association_object->$sub_handler_name->getPrimaryKey();
                         $instance = &$sub_association_object;
+                        $class_name =$instance->getType();
                         $pluralize = false;
                         $table_name = $instance->getTableName();
                     }
-                    
+                    $config[$handler_name][$sub_handler_name] = array('association_id'=>$sub_association_id,'class'=>$class_name,'pk'=>$pk);
                     $sub_associated_options = $sub_association_object->$sub_handler_name->getAssociatedFinderSqlOptionsForInclusionChain($prefix.'['.$handler_name.']'.($parent_is_plural?'[@'.$pk.']':''),'__owner__'.$parent_association_id,
                                 $sub_options, $pluralize);
                     
@@ -471,7 +499,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
                     }
                     if (!empty($sub_options)) {
-                         $this->_prepareIncludes($prefix.'['.$handler_name.']'.($parent_is_plural?'[@'.$pk.']':''),$pluralize,$instance,$available_associated_options,$sub_handler_name,$parent_association_id.'__'.$sub_handler_name,$sub_association_id,$options['include'][$association_id],$association_options['include'][$idx],$replacements);
+                         $this->_prepareIncludes($prefix.'['.$handler_name.']'.($parent_is_plural?'[@'.$pk.']':''),$pluralize,$instance,$available_associated_options,$sub_handler_name,$parent_association_id.'__'.$sub_handler_name,$sub_association_id,$options['include'][$association_id],$association_options['include'][$idx],$replacements,$config[$handler_name]);
                     }
                 }
     }
@@ -502,7 +530,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
         return $results;
     }
     
-    function &_findBySqlWithAssociations($sql, $virtual_limit = false, $load_acts = true, $returns = 'ActiveRecord')
+    function &_findBySqlWithAssociations($sql, $virtual_limit = false, $load_acts = true, $returns = 'default', $simulation_class = 'AkActiveRecordMock', $config = array())
     {
         $objects = array();
         $results = $this->_db->execute ($sql,'find with associations ext');
@@ -510,7 +538,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
             return $objects;
         }
         
-        $result =& $this->_generateObjectGraphFromResultSet($results,$virtual_limit, $load_acts, $returns);
+        $result =& $this->_generateObjectGraphFromResultSet($results,$virtual_limit, $load_acts, $returns, $simulation_class, $config);
         return $result;
     
     }
@@ -525,13 +553,16 @@ class AkAssociatedActiveRecord extends AkBaseModel
      * @param mixed $virtual_limit             int or false; unsure if this works                     
      * @return array                           ObjectGraph as an array
      */
-    function &_generateObjectGraphFromResultSet($results, $virtual_limit = false, $load_acts=true, $returns = 'ActiveRecord')
+    function &_generateObjectGraphFromResultSet($results, $virtual_limit = false, $load_acts=true, $returns = 'default',$simulation_class='AkActiveRecordMock', $config = array())
     {
         $return = array();
         $owner = array();
         $keys = array();
         while ($record = $results->FetchRow()) {
-            
+            /**
+             * implement limits here, config should have limits per association
+             * need offset as well
+             */
             foreach($record as $key=>$value) {
 
                 if (strstr($key,'@')) {
@@ -567,7 +598,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                     }
                 }
 
-                $this->_addToOwner($owner,str_replace('owner[','[',$key),$value);
+                $this->_addToOwner($owner,str_replace('owner[','[',$key),$value, $returns, $config['__owner']);
                 
             }
             unset($record);
@@ -605,37 +636,80 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 $return = false;
             }
         } else if ($returns == 'array') {
+            
+            $this->_reindexArray($owner);
             $return = $owner;
         } else if ($returns == 'simulated') {
-            include AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php';
+            include_once AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php';
             $false = false;
-            $return = &$this->_generateStdClasses($owner, $this->getType(), $false, $false);
+            $return = &$this->_generateStdClasses($simulation_class,$owner, $this->getType(), $false, $false, $config);
         }
         return $return;
     }
-    function _generateStdClasses($owner, $class, $handler_name, &$parent)
+    function _reindexArray(&$array)
     {
+        if (is_numeric(key($array))) {
+            $array = array_values($array);
+        }
+        foreach($array as $key => $value) {
+            if (is_array($value)) {
+                 $this->_reindexArray($array[$key]);
+            }
+        }
+    }
+    function _generateStdClasses($simulation_class,$owner, $class, $handler_name, &$parent, $config = array(), $config_key = '__owner')
+    {
+        /**echo "<pre>";
+        var_dump($config_key);
+        var_dump($config);
+        echo "</pre>";*/
+        
         $return = array();
         $singularize=false;
+        $pk = isset($config[$config_key]['pk'])?$config[$config_key]['pk']:'id';
         if (!is_numeric(key($owner))) {
             $singularize =true;
-            $key = isset($owner['id'])?$owner['id']:0;
+            
+            $key = isset($owner[$pk])?$owner[$pk]:0;
             $owner = array($key=>$owner);
         }
         if(is_array($owner))
         foreach($owner as $id=>$data) {
-            $obj = &new AkActiveRecordMock($id,$class, $handler_name, $parent);
+            require_once AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php';
+            $id = isset($data[$pk])?$data[$pk]:$id;
+            $obj = &new $simulation_class($id,$class, $handler_name, $parent);
             if(is_array($data))
             foreach($data as $key => $value) {
                 if ($key{0}=='_') continue;
                 if ( is_scalar($value)) {
                     $obj->$key = $value;
                 } else if (is_array($value)) {
-                    $assoc = $key;
-                    if(is_numeric(key($value))) {
-                        $key = AkInflector::pluralize($key);
+                    //$assoc = $key;
+                    $assoc = isset($config[$config_key][$key]['association_id'])?$config[$config_key][$key]['association_id']:false;
+                    //if(is_numeric(key($value))) {
+                    //    $key = AkInflector::pluralize($key);
+                    //}
+                   /** if ($handler_name!==false) {
+                        $config_key = '__owner';
+                    } else {
+                        $config_key = $handler_name;
+                    }*/
+                    if ($assoc) {
+                        $obj->$assoc = &$this->_generateStdClasses($simulation_class,$value, @$config[$config_key][$key]['class'], $key,$obj, @$config[$config_key], $key);
+                        //$this->log('setting assoc:'.$assoc);
+                        $obj->_addAssociation($assoc, $key);
+                    } else {
+                        /**$assoc = $key;
+                         $obj->$assoc = &$this->_generateStdClasses($simulation_class,$value, @$config[$config_key][$key]['class'], $key,$obj, @$config[$config_key], $key);
+                        $this->log('setting assoc with key:'.$assoc);
+                        $obj->_addAssociation($assoc, $key);*/
+                        //die('fuck');
+                        /**var_dump($key);
+                        var_dump($value);
+                        var_dump($config_key);
+                        var_dump($config);*/
+                        //var_dump(func_get_args());
                     }
-                    $obj->$key = &$this->_generateStdClasses($value, $class, $assoc,$obj);
                 }
             }
             $return[]=&$obj;
@@ -644,20 +718,45 @@ class AkAssociatedActiveRecord extends AkBaseModel
     }
     
     
-    
-    function _addToOwner(&$owner, $key, $value) {
+function org_addToOwner(&$owner, $key, $value) {
         
         if(preg_match_all('/\[(.*?)\]/',$key,$matches)) {
             $count = count($matches[1]);
             $last = &$owner;
             for($idx=0;$idx<$count;$idx++) { 
+                
                 if (!isset($last[$matches[1][$idx]])) {
                     $last[$matches[1][$idx]] = array();
                 }
                 $last = &$last[$matches[1][$idx]];
+                
             }
             $last = $value;
         }
+    }
+    function _addToOwner(&$owner, $key, $value, $returns, $config) {
+        
+        if(preg_match_all('/\[(.*?)\]/',$key,$matches)) {
+            $count = count($matches[1]);
+            $last = &$owner;
+            for($idx=0;$idx<$count;$idx++) { 
+                $key = $matches[1][$idx];
+                $association = $key;
+                
+                if (isset($config[$key]) && $returns == 'array') {
+                    $config = $config[$key];
+                    $association = $config['association_id'];
+                    //$this->log('using association:'.$association);
+                }
+                if (!isset($last[$association])) {
+                    $last[$association] = array();
+                }
+                $last = &$last[$association];
+                
+            }
+            $last = $value;
+        }
+        //$this->log('owner:'.var_export($owner,true));
     }
 
     function _setAssociations($assoc_name, $val, &$parent, $load_acts = true) {
@@ -737,10 +836,15 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 }
             }
             $available = @array_merge($data,$nondiff);
-                        
+            
+            if(empty($available[$instance->getPrimaryKey()])) {
+                $parent->$assoc_name->_loaded=true;
+                //return;
+                continue;
+            }
             $available['load_associations'] = false;
             $available['load_acts'] = $load_acts;
-
+            
             $obj=&$parent->$assoc_name->build($available,false);
             
             $obj->_newRecord = false;

@@ -575,6 +575,11 @@ class AkCacheHandler extends AkObject
         if (!file_exists(dirname($filename))) {
             $res = mkdir(dirname($filename),0755,true);
         }
+		if(!AK_PHP5) {
+	
+			Ak::compat('file_put_contents');
+	
+		}
         file_put_contents($filename, $content);
 
         return $filename;
