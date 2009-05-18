@@ -391,7 +391,7 @@ class Image_Transform_Driver_GD extends Image_Transform
             $icr_res = ImageCopyResampled($new_img, $this->imageHandle, 0, 0, 0, 0, $new_x, $new_y, $this->img_x, $this->img_y);
         }
         if (!$icr_res) {
-            ImageCopyResized($new_img, $this->imageHandle, 0, 0, 0, 0, $new_x, $new_y, $this->img_x, $this->img_y);
+            imagecopyresampled($new_img, $this->imageHandle, 0, 0, 0, 0, $new_x, $new_y, $this->img_x, $this->img_y);
         }
         $this->old_image = $this->imageHandle;
         $this->imageHandle = $new_img;

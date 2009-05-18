@@ -242,7 +242,7 @@ class Image_Tools_Watermark extends Image_Tools
                     $this->options['width'], $this->options['height'], $MW, $MH
                 );
             } else {
-                $result = imagecopyresized(
+                $result = imagecopyresampled(
                     $mark, $this->_mark, 0, 0, 0, 0,
                     $this->options['width'], $this->options['height'], $MW, $MH
                 );

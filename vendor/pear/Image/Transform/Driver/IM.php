@@ -338,7 +338,7 @@ class Image_Transform_Driver_IM extends Image_Transform
         if (!is_null($quality)) {
             $options['quality'] = $quality;
         }
-        $quality = $this->_getOption('quality', $options, 75);
+        $quality = $this->_getOption('quality', $options, 100);
 
         $cmd = $this->_prepare_cmd(
             IMAGE_TRANSFORM_IM_PATH,
@@ -377,7 +377,7 @@ class Image_Transform_Driver_IM extends Image_Transform
         if (!is_null($quality)) {
             $options['quality'] = $quality;
         }
-        $quality = $this->_getOption('quality', $options, 75);
+        $quality = $this->_getOption('quality', $options, 100);
 
         $this->_send_display_headers($type);
 

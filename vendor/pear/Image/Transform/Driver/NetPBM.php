@@ -545,7 +545,7 @@ class Image_Transform_Driver_NetPBM extends Image_Transform
         if (!is_null($quality)) {
             $options['quality'] = $quality;
         }
-        $quality = $this->_getOption('quality', $options, 75);
+        $quality = $this->_getOption('quality', $options, 100);
 
         $nullDevice = (OS_WINDOWS) ? 'nul' : '/dev/null';
 
@@ -573,7 +573,7 @@ class Image_Transform_Driver_NetPBM extends Image_Transform
         if (!is_null($quality)) {
             $options['quality'] = $quality;
         }
-        $quality = $this->_getOption('quality', $options, 75);
+        $quality = $this->_getOption('quality', $options, 100);
 
         header('Content-type: ' . $this->getMimeType($type));
         $cmd = $this->_postProcess($type, $quality);

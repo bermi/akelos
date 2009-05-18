@@ -203,7 +203,7 @@ class Image_Transform_Driver_Imagick extends Image_Transform
      *
      * @return none
      */
-    function display($type = '', $quality = 75)
+    function display($type = '', $quality = 100)
     {
         if ($type == '') {
             header('Content-type: image/' . $this->type);

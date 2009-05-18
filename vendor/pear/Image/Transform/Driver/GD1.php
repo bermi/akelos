@@ -72,7 +72,7 @@ Class Image_Transform_Driver_GD1 extends Image_Transform_Driver_GD
             return PEAR::raiseError('You have already resized the image without saving it.  Your previous resizing will be overwritten', null, PEAR_ERROR_TRIGGER, E_USER_NOTICE);
         }
         $new_img =ImageCreate($new_x,$new_y);
-        ImageCopyResized($new_img, $this->imageHandle, 0, 0, 0, 0, $new_x, $new_y, $this->img_x, $this->img_y);
+        imagecopyresampled($new_img, $this->imageHandle, 0, 0, 0, 0, $new_x, $new_y, $this->img_x, $this->img_y);
         $this->old_image = $this->imageHandle;
         $this->imageHandle = $new_img;
         $this->resized = true;
