@@ -68,7 +68,8 @@ class AkHasOne extends AkAssociation
         'order'=>false,
         'include_order_when_included'=>true,
         'dependent'=>false,
-        'counter_cache'=>false
+        'counter_cache'=>false,
+        'join_conditions'=>false
         );
 
         $options = array_merge($default_options, $options);
@@ -217,12 +218,17 @@ class AkHasOne extends AkAssociation
     }
 function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name)
     {
-        return ' LEFT OUTER JOIN '.
+        $return=' LEFT OUTER JOIN '.
         $this->Owner->$association_id->getTableName().' AS '.$parent_handler_name.'__'.$handler_name.
         ' ON '.
         $parent_handler_name.'.'.$this->Owner->getPrimaryKey().
         ' = '.
         ''.$parent_handler_name.'__'.$handler_name.'.'.$this->Owner->$association_id->getAssociationOption('foreign_key').' ';
+        $join_conditions = $this->Owner->$association_id->getAssociationOption('join_conditions');
+        if($join_conditions) {
+            $return.=' AND '.$join_conditions;
+        }
+        return $return;
     }
     function &build($association_id, $attributes = array(), $replace_existing = true)
     {
@@ -391,13 +397,34 @@ function constructSqlForInclusionChain($association_id,$handler_name, $parent_ha
         foreach ($associated_ids as $associated_id){
             if( isset($object->$associated_id->_associatedAs) &&
             $object->$associated_id->_associatedAs == 'hasOne' &&
-            $object->$associated_id->getAssociationOption('dependent')){
+            $dependency=$object->$associated_id->getAssociationOption('dependent')){
                 if ($object->$associated_id->getType() == 'hasOne'){
                     $object->$associated_id->load();
                 }
-                if(method_exists($object->$associated_id, 'destroy')){
+                if(empty($object->$associated_id->id) || $object->$associated_id->getType() == 'hasOne' || $object->$associated_id->isNewRecord()) return true;
+                switch ($dependency) {
+
+                        case 'delete':
+                            if(method_exists($object->$associated_id, 'delete')){
+                                $success = $object->$associated_id->delete($object->$associated_id->getId()) ? $success : false;
+                            }
+                        break;
+                        case 'nullify':
+                            if(method_exists($object->$associated_id, 'updateAttribute')){
+                                $success = $object->$associated_id->updateAttribute($object->$associated_id->getAssociationOption('primary_key_name'),null) ? $success : false;
+                            }
+                            break;
+                        case 'destroy':
+                        default:
+
+                            if(method_exists($object->$associated_id, 'destroy')){
+                                $success = $object->$associated_id->destroy() ? $success : false;
+                            }
+                        break;
+                    }
+                /**if(method_exists($object->$associated_id, 'destroy')){
                     $success = $object->$associated_id->destroy() ? $success : false;
-                }
+                }*/
             }
         }
         return $success;
