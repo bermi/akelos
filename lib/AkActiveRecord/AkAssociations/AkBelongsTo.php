@@ -356,7 +356,8 @@ class AkBelongsTo extends AkAssociation
 
                     $object->$associated_id->load();
                 }
-
+            if(empty($object->$associated_id->id) || $object->$associated_id->getType() == 'belongsTo' || $object->$associated_id->isNewRecord()) return true;
+                
             switch ($dependency) {
 
                         case 'delete':
@@ -368,6 +369,7 @@ class AkBelongsTo extends AkAssociation
                             if(method_exists($object->$associated_id, 'updateAttribute')){
                                 $success = $object->$associated_id->updateAttribute($object->$associated_id->getAssociationOption('primary_key_name'),null) ? $success : false;
                             }
+                            break;
                         case 'destroy':
                         default:
 
