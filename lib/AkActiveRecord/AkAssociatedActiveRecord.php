@@ -900,7 +900,7 @@ function org_addToOwner(&$owner, $key, $value) {
         $sql .= 'FROM '.($include_owner_as_selection ? $this->getTableName().' AS __owner ' : $options['selection'].' ');
         $sql .= (!empty($options['joins']) ? $options['joins'].' ' : '');
         
-        empty($options['conditions']) ? null : $this->addConditions($sql, $options['conditions'], '__owner');
+        empty($options['conditions']) ? null : $this->addConditions($sql, $options['conditions'], $include_owner_as_selection?'__owner':null);
 
         // Create an alias for order
         if(empty($options['order']) && !empty($options['sort'])){
