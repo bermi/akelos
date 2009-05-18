@@ -199,14 +199,14 @@ class AkInstaller extends AkObject
         $version_number = empty($version_number) ? ($method_prefix=='down' ? $version-1 : $version) : $version_number;
 
         $this->transactionStart();
-
+        
         if($this->$method_name($options) === false){
             $this->log($this->getInstallerName().': returned false');
             $this->transactionFail();
         }
         $success = !$this->transactionHasFailed();
         $this->transactionComplete();
-        if($success || ($version_number==0 && $method_prefix=='down')){
+        if($success){
             $this->setInstalledVersion($version_number, $options);
         }
         return $success;
@@ -425,28 +425,14 @@ class AkInstaller extends AkObject
         require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
         //AkDbSchemaCache::clear(AkInflector::classify($table_name));
         AkDbSchemaCache::clear($table_name);
-        $model_name = AkInflector::classify($table_name);
-        Ak::import($model_name);
-        if (class_exists($model_name)) {
-            $m = new $model_name();
-            if (method_exists($m,'beforeDropTable')) {
-                $this->log('message','Calling '.$model_name.'::beforeDropTable');
-                $m->beforeDropTable();
-            }
-        }
+        
         $result = $this->tableExists($table_name) ? $this->db->execute('DROP TABLE '.$table_name) : 1;
         if($result){
             unset($this->available_tables[array_search($table_name, $this->available_tables)]);
             if(!empty($options['sequence'])){
                 $this->dropSequence($table_name);
             }
-            if($result===true && isset($m)) {
             
-                if (method_exists($m,'afterDropTable')) {
-                    $this->log('message','Calling '.$model_name.'::afterDropTable');
-                    $m->afterDropTable();
-                }
-            }
         }
     }
 
