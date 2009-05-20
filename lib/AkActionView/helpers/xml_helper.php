@@ -72,11 +72,13 @@ class XmlHelper extends AkObject
         Ak::parseOptions($channel_options,$default_channel_options, $channel_parameters);
         
         $default_item_options = array('title'=>'name','description'=>'description','date'=>'created_at','author'=>false,'link'=>true,'guid'=>false);
-        $item_parameters = array('available_options'=>array('title','description','link','date','author','guid'));
+        $item_parameters = array('available_options'=>array('title','description','link','date','author','guid','content:encoded'));
         Ak::parseOptions($item_options,$default_item_options, $item_parameters);
         
         $return[] = $this->xml_instruct('xml',array('version'=>'1.0'));
-        $return[] = $this->xml_rss_open( array('version' => "2.0", 'xmlns' => array('dc' => "http://purl.org/dc/elements/1.1/", 'atom' => "http://www.w3.org/2005/Atom")));
+        $return[] = $this->xml_rss_open( array('version' => "2.0", 'xmlns' => array('dc' => "http://purl.org/dc/elements/1.1/", 
+                                                                                    'atom' => "http://www.w3.org/2005/Atom", 
+                                                                                    'content'=>'http://purl.org/rss/1.0/modules/content/')));
         $return[] = $this->xml_channel_open();
         $return[] = $this->xml_title($channel_options['title']);
         $return[] = $this->xml_description($channel_options['description']);
@@ -99,11 +101,19 @@ class XmlHelper extends AkObject
                 
                 !empty($guid)? $return[]=$this->xml_guid($guid,strstr($guid,'http://')?array():array('isPermaLink'=>'false')):(!empty($item_link)? $return[]=$this->xml_guid($item_link,strstr($item_link,'http://')?array():array('isPermaLink'=>'false')):null);
             }
+            
+            if(!empty($item_options['content:encoded'])) {
+                $encoded = $this->_getValue($item, $item_options['content:encoded']);
+                
+                !empty($encoded)? $return[]=$this->xml_content__encoded('<![CDATA['.$encoded.']]>'):null;
+            }
+            
             if(!empty($item_options['description'])) {
                 $description = $this->_getValue($item, $item_options['description']);
                 
                 !empty($description)? $return[]=$this->xml_description('<![CDATA['.$description.']]>'):null;
             }
+            
             if(!empty($item_options['date'])) {
                 $created_at = $this->_getValue($item, $item_options['date']);
                 !empty($created_at)? $return[]=$this->xml_dc__date($this->_generate_date($created_at)):null;
