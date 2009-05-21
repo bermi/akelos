@@ -328,6 +328,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                     $available_associated_options[$option][]=$associated_options[$option];
                 }
             }
+            $replacements['/ ('.$this->getTableName().')\./']=' __owner.';
             $replacements['/^_('.$association_id.')\./']='__owner__'.$handler_name.'.';
             $replacements['/ _('.$association_id.')\./'] = ' __owner__'.$handler_name.'.';
             $replacements['/^_('.$table_name.')\./']='__owner__'.$handler_name.'.';
