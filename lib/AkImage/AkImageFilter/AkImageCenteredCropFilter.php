@@ -44,30 +44,42 @@ class AkImageCenteredCropFilter extends AkImageFilter
 
     function apply()
     {
+        $height_ratio  = $this->Image->getHeight()/$this->options['height'];
+        $width_ratio  = $this->Image->getWidth()/$this->options['width'];
+        
         //width bigger
         if($this->Image->getWidth() > $this->Image->getHeight()){
-            $ratio  = $this->Image->getHeight()/$this->options['height'];
-            $width  = $this->Image->getWidth()/$ratio;
-            $height = $this->options['height'];
-            $x      = ($width-$this->options['width'])/2;
-            $y      = 0;
+            if($width_ratio>1){
+                $width  = $this->Image->getWidth()/$height_ratio;
+                $height = $this->options['height'];
+                $x      = ($width-$this->options['width'])/2;
+                $y      = 0;
+                
+                $this->_resizeAndCrop($width, $height, $x, $y);
+            }
         // height bigger
         }else{
-            $ratio  = $this->Image->getWidth()/$this->options['width'];
-            $height = $this->Image->getHeight()/$ratio;
-            $width  = $this->options['width'];
-            $x      = 0;
-            $y      = ($height-$this->options['height'])/2;
+            if($height_ratio>1){
+                $height = $this->Image->getHeight()/$width_ratio;
+                $width  = $this->options['width'];
+                $x      = 0;
+                $y      = ($height-$this->options['height'])/2;
+                
+                $this->_resizeAndCrop($width, $height, $x, $y);
+            }
         }
-        $this->Image->Transform->resize($width, $height);
-        $this->Image->Transform->crop($this->options['width'], $this->options['height'], $x, $y);
     }
 
     function getName()
     {
         return 'centered_crop';
     }
-
+    
+    private function _resizeAndCrop($width, $height, $x, $y)
+    {
+        $this->Image->Transform->resize($width, $height);
+        $this->Image->Transform->crop($this->options['width'], $this->options['height'], $x, $y);
+    }
 }
 
 ?>
