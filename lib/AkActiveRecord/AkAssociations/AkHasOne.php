@@ -411,7 +411,7 @@ function constructSqlForInclusionChain($association_id,$handler_name, $parent_ha
                         break;
                         case 'nullify':
                             if(method_exists($object->$associated_id, 'updateAttribute')){
-                                $success = $object->$associated_id->updateAttribute($object->$associated_id->getAssociationOption('primary_key_name'),null) ? $success : false;
+                                $success = $object->$associated_id->updateAttribute($object->$associated_id->getAssociationOption('foreign_key'),null) ? $success : false;
                             }
                             break;
                         case 'destroy':
