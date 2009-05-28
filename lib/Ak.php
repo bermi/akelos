@@ -192,9 +192,9 @@ class Ak
         }
 
         if(isset($controller) && isset($framework_dictionary[$controller.'_dictionary'][$string])){
-            $string = $framework_dictionary[$controller.'_dictionary'][$string];
+            $string = !empty($framework_dictionary[$controller.'_dictionary'][$string])?$framework_dictionary[$controller.'_dictionary'][$string]:$string;
         }else {
-            $string = isset($framework_dictionary[$string]) ? $framework_dictionary[$string] : $string;
+            $string = !empty($framework_dictionary[$string]) ? $framework_dictionary[$string] : $string;
         }
 
         if(isset($args) && is_array($args)){
