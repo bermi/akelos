@@ -18,7 +18,7 @@
 
 /**
  * Resizing filter
- * 
+ *
  * Options are:
  * 'width
  * 'height'

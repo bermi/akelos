@@ -18,13 +18,13 @@
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 
 /**
- * Adds the following methods for retrieval and query of collections of associated objects. 
- * collection is replaced with the singular form of current association, 
+ * Adds the following methods for retrieval and query of collections of associated objects.
+ * collection is replaced with the singular form of current association,
  * so var $has_many = 'clients' would hold an array of objects on $this->clients
  * and a collection handling interface instance on $this->client (singular form)
- * 
+ *
  * * collection->load($force_reload = false) - returns an array of all the associated objects. An empty array is returned if none are found.
- * * collection->add($object, ?) - adds one or more objects to the collection by setting their foreign keys to the collection's primary key. 
+ * * collection->add($object, ?) - adds one or more objects to the collection by setting their foreign keys to the collection's primary key.
  * (collection->push and $collection->concat are aliases to this method).
  * * collection->delete($object, ?) - removes one or more objects from the collection by setting their foreign keys to NULL. This will also destroy the objects if they?re declared as belongs_to and dependent on this model.
  * * collection->set($objects) - replaces the collections content by deleting and adding objects as appropriate.
@@ -52,9 +52,9 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
  *  * Firm->client->create() (similar to $c = new Client(array('firm_id' => $id)); $c->save(); return $c )
  *
  * The declaration can also include an options array to specialize the behavior of the association.
- * 
+ *
  * Options are:
- * 
+ *
  *  * 'class_name' - specify the class name of the association. Use it only if that name can't be inferred from the association name. So "$has_many = 'products'" will by default be linked to the Product class, but if the real class name is SpecialProduct, you?ll have to specify it with this option.
  *  * 'conditions' - specify the conditions that the associated objects must meet in order to be included as a "WHERE" sql fragment, such as "price > 5 AND name LIKE ?B%?".
  *  * 'order' - specify the order in which the associated objects are returned as a "ORDER BY" sql fragment, such as "last_name, first_name DESC"
@@ -163,7 +163,7 @@ class AkHasMany extends AkAssociation
                 $options = $this->getOptions($this->association_id);
                 $Associated =& $this->getAssociatedModelInstance();
                 $finder_options = array('conditions'=>$options['finder_sql']);
-                
+
                 //TODO: refactorize this
                 if(!empty($options['order'])){
                     $finder_options['order'] = $options['order'];
@@ -174,7 +174,7 @@ class AkHasMany extends AkAssociation
                 if(!empty($options['include'])){
                     $finder_options['include'] = $options['include'];
                 }
-                
+
                 if($FoundAssociates = $Associated->find('all',$finder_options)){
                     array_map(array(&$this,'_setAssociatedMemberId'),$FoundAssociates);
                     $this->Owner->{$this->association_id} =& $FoundAssociates;
@@ -191,7 +191,7 @@ class AkHasMany extends AkAssociation
 
 
     /**
-     * add($object), add(array($object, $object2)) - adds one or more objects to the collection by setting 
+     * add($object), add(array($object, $object2)) - adds one or more objects to the collection by setting
      * their foreign keys to the collection?s primary key. Items are saved automatically when parent has been saved.
      */
     function add(&$Associated)
@@ -208,9 +208,9 @@ class AkHasMany extends AkAssociation
                     $this->Owner->{$this->association_id}[] =& $Associated[$k];
                     $this->_setAssociatedMemberId($Associated[$k]);
                     if($this->_relateAssociatedWithOwner($Associated[$k])){
-                        
+
                         $succes = $Associated[$k]->save() ? $succes : false;
-                        
+
                         if($succes && !empty($options['after_add']) && method_exists($this->Owner, $options['after_add']) && $this->Owner->{$options['after_add']}($Associated[$k]) === false ){
                             $succes = false;
                         }
@@ -261,7 +261,7 @@ class AkHasMany extends AkAssociation
     {
         $ids = func_get_args();
         $ids = is_array($ids[0]) ? $ids[0] : $ids;
-        
+
         $AssociatedModel =& $this->getAssociatedModelInstance();
         if(!empty($ids)){
             $NewAssociates =& $AssociatedModel->find($ids);
@@ -366,7 +366,7 @@ class AkHasMany extends AkAssociation
                 if(!empty($options['before_remove']) && method_exists($this->Owner, $options['before_remove']) && $this->Owner->{$options['before_remove']}($records[$k]) === false ){
                     continue;
                 }
-                
+
                 if(isset($records[$k]->__activeRecordObject)){
                     $record_id = $records[$k]->getId();
                 }else{
@@ -387,13 +387,13 @@ class AkHasMany extends AkAssociation
                         unset($this->Owner->{$this->association_id}[$kk]);
                     }
                 }
-                
+
                 $this->_unsetAssociatedMemberId($records[$k]);
-                
+
                 if(!empty($options['after_remove']) && method_exists($this->Owner, $options['after_remove'])){
                     $this->Owner->{$options['after_remove']}($records[$k]);
                 }
-                
+
             }
             $this->Owner->notifyObservers('afterRemove');
         }
@@ -479,7 +479,7 @@ class AkHasMany extends AkAssociation
         } else {
             /**
              * we have a finder_sql and we replace placeholders for the association:
-             * 
+             *
              * :foreign_key_value
              */
             $options['finder_sql'] = str_replace(array(':foreign_key_value'),array($owner_id), $options['finder_sql']);
@@ -487,7 +487,7 @@ class AkHasMany extends AkAssociation
         if (isset($options['group'])) {
             $options['group'] = str_replace(array(':foreign_key_value'),array($owner_id), $options['group']);
         }
-        
+
         if(empty($options['counter_sql']) && !empty($options['finder_sql'])){
             $options['counter_sql'] = $options['finder_sql'];
         }elseif(empty($options['counter_sql'])){
@@ -585,13 +585,13 @@ class AkHasMany extends AkAssociation
         foreach (array_keys($Associated->getColumns()) as $column_name){
             $finder_options['selection'] .= '_'.$this->association_id.'.'.$column_name.' AS _'.$this->association_id.'_'.$column_name.', ';
         }
-        
+
         $finder_options['selection'] = trim($finder_options['selection'], ', ');
 
-        $finder_options['conditions'] = empty($options['conditions']) ? '' : 
+        $finder_options['conditions'] = empty($options['conditions']) ? '' :
 
         $Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ';
-        
+
         return $finder_options;
     }
     function getAssociatedFinderSqlOptionsForInclusionChain($prefix, $parent_handler_name, $options = array(),$pluralize=false)
@@ -611,7 +611,7 @@ class AkHasMany extends AkAssociation
                 if(is_string($value)) {
                     $finder_options[$option] = trim($Associated->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $value));
                 } else if(is_array($value)) {
-                    
+
                     foreach($value as $idx=>$v) {
                         $value[$idx]=trim($Associated->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $v));
                     }
@@ -621,21 +621,21 @@ class AkHasMany extends AkAssociation
                 }
             }
         }
-        
+
         $finder_options['joins'] = $this->constructSqlForInclusionChain($this->association_id,$handler_name,$parent_handler_name);
         $finder_options['selection'] = '';
-        
+
         $selection_parenthesis = $this->_getColumnParenthesis();//
         foreach (array_keys($Associated->getColumns()) as $column_name){
             $finder_options['selection'] .= $parent_handler_name.'__'.$handler_name.'.'.$column_name.' AS '.$selection_parenthesis.$prefix.'['.$handler_name.']'.($pluralize?'[@'.$pk.']':'').'['.$column_name.']'.$selection_parenthesis.', ';
         }
-        
+
         $finder_options['selection'] = trim($finder_options['selection'], ', ');
 
-        $finder_options['conditions'] = empty($finder_options['conditions']) ? '' : 
+        $finder_options['conditions'] = empty($finder_options['conditions']) ? '' :
 
         $Associated->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $options['conditions']).' ';
-        
+
         return $finder_options;
     }
     function constructSqlForInclusion()
@@ -678,7 +678,7 @@ class AkHasMany extends AkAssociation
     {
         static $ModelInstances;
             $class_name = $this->getOption($this->association_id, 'class_name');
-        if(empty($ModelInstances[$class_name])){  
+        if(empty($ModelInstances[$class_name])){
             Ak::import($class_name);
             $ModelInstances[$class_name] =& new $class_name();
         }
@@ -712,7 +712,7 @@ class AkHasMany extends AkAssociation
             } elseif (!empty($has_many_options['finder_sql']) && !strstr($options['conditions'], $has_many_options['finder_sql'])) {
                 $options['conditions'] .= ' AND '. $has_many_options['finder_sql'];
             }
-            
+
             $options['bind'] = empty($options['bind']) ? @$has_many_options['bind'] : $options['bind'];
             $options['order'] = empty($options['order']) ? @$has_many_options['order'] : $options['order'];
             $options['group'] = empty($options['group']) ? @$has_many_options['group'] : $options['group'];
@@ -725,14 +725,14 @@ class AkHasMany extends AkAssociation
                 $options['conditions'] = array_merge($options['conditions'],$options['bind']);
                 unset($options['bind']);
             }
-            
+
             if($options_in_args){
                 $args[$num_args-1] = $options;
             }else{
                 $args = empty($args) ? array('all') : $args;
                 array_push($args, $options);
             }
-            
+
             $result =& Ak::call_user_func_array(array(&$Associated,'find'), $args);
         }
 
@@ -806,7 +806,7 @@ class AkHasMany extends AkAssociation
                         break;
                     }
                 }
-                
+
                 $ids_to_nullify = empty($ids_to_nullify) ? false : array_diff($ids_to_nullify,array(''));
                 if(!empty($ids_to_nullify)){
                     $success = $object->{$k}[$key]->updateAll(

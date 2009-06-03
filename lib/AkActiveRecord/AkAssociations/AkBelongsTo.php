@@ -77,7 +77,7 @@ class AkBelongsTo extends AkAssociation
         //$options['table_name'] = empty($options['table_name']) ? AkInflector::tableize($options['class_name']) : $options['table_name'];
         $options['primary_key_name'] = empty($options['primary_key_name']) ? AkInflector::underscore($options['class_name']).'_id' : $options['primary_key_name'];
         if($options['counter_cache']){
-            $options['counter_cache_column'] = !isset($options['counter_cache_column']) ? AkInflector::underscore($options['class_name']).'_counter' : $options['counter_cache_column'];
+            $options['counter_cache_column'] = !isset($options['counter_cache_column']) ? $this->Owner->getTableName().'_counter' : $options['counter_cache_column'];
         }
 
         $this->setOptions($association_id, $options);
@@ -303,7 +303,7 @@ class AkBelongsTo extends AkAssociation
         ' ON '.
         ''.$parent_handler_name.'.'.$this->Owner->$association_id->getAssociationOption('primary_key_name').
         ' = '.
-       ''.$parent_handler_name.'__'.$handler_name.'.'.$this->Owner->$association_id->getPrimaryKey().' ';
+        ''.$parent_handler_name.'__'.$handler_name.'.'.$this->Owner->$association_id->getPrimaryKey().' ';
     }
 
     /**
@@ -356,30 +356,30 @@ class AkBelongsTo extends AkAssociation
 
                     $object->$associated_id->load();
                 }
-            if(empty($object->$associated_id->id) || $object->$associated_id->getType() == 'belongsTo' || $object->$associated_id->isNewRecord()) return true;
-                
-            switch ($dependency) {
+                if(empty($object->$associated_id->id) || $object->$associated_id->getType() == 'belongsTo' || $object->$associated_id->isNewRecord()) return true;
 
-                        case 'delete':
-                            if(method_exists($object->$associated_id, 'delete')){
-                                $success = $object->$associated_id->delete($object->$associated_id->getId()) ? $success : false;
-                            }
-                        break;
-                        case 'nullify':
-                            if(method_exists($object->$associated_id, 'updateAttribute')){
-                                $success = $object->$associated_id->updateAttribute($object->$associated_id->getAssociationOption('primary_key_name'),null) ? $success : false;
-                            }
-                            break;
-                        case 'destroy':
-                        default:
+                switch ($dependency) {
 
-                            if(method_exists($object->$associated_id, 'destroy')){
-                                $success = $object->$associated_id->destroy() ? $success : false;
-                            }
+                    case 'delete':
+                        if(method_exists($object->$associated_id, 'delete')){
+                            $success = $object->$associated_id->delete($object->$associated_id->getId()) ? $success : false;
+                        }
                         break;
-                    }
+                    case 'nullify':
+                        if(method_exists($object->$associated_id, 'updateAttribute')){
+                            $success = $object->$associated_id->updateAttribute($object->$associated_id->getAssociationOption('primary_key_name'),null) ? $success : false;
+                        }
+                        break;
+                    case 'destroy':
+                    default:
+
+                        if(method_exists($object->$associated_id, 'destroy')){
+                            $success = $object->$associated_id->destroy() ? $success : false;
+                        }
+                        break;
+                }
                 /**if(method_exists($object->$associated_id, 'destroy')){
-                    $success = $object->$associated_id->destroy() ? $success : false;
+                $success = $object->$associated_id->destroy() ? $success : false;
                 }*/
             }
         }

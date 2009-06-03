@@ -123,10 +123,10 @@ class FormOptionsHelper extends AkActionViewHelper
     }
 
     /**
-       * Accepts a container array and returns a string of option tags. Given a container where the elements respond to first and 
-       * last (such as a two-element array), the "lasts" serve as option values and the "firsts" as option text. Arrays are turned 
-       * into this form automatically, so the keys become "firsts" and values become lasts. If +selected+ is specified, the matching 
-       * "last" or element will get the selected option-tag.  +Selected+ may also be an array of values to be selected when using 
+       * Accepts a container array and returns a string of option tags. Given a container where the elements respond to first and
+       * last (such as a two-element array), the "lasts" serve as option values and the "firsts" as option text. Arrays are turned
+       * into this form automatically, so the keys become "firsts" and values become lasts. If +selected+ is specified, the matching
+       * "last" or element will get the selected option-tag.  +Selected+ may also be an array of values to be selected when using
        * a multiple select.
        *
        * Examples (call, result):
@@ -158,13 +158,13 @@ class FormOptionsHelper extends AkActionViewHelper
 
         $selected = (array)$selected;
         $options_for_select = '';
-        
+
         $compare_captions = !empty($selected) ? is_string(key(array_slice($selected,0,1))) : false;
-       
+
         foreach ($container as $text=>$value){
             $options_for_select .= TagHelper::content_tag('option',$text_is_value ? $value : $text,
-            array_merge($options, ($compare_captions ? 
-            (isset($selected[$text]) && $selected[$text] == $value) : 
+            array_merge($options, ($compare_captions ?
+            (isset($selected[$text]) && $selected[$text] == $value) :
             in_array($value, $selected)) ? array('value'=>$value,'selected'=>'selected') : array('value'=>$value))
             )."\n";
         }
@@ -212,7 +212,7 @@ class FormOptionsHelper extends AkActionViewHelper
       *         <option value="RWD">Rwanda</option>
       *         ....
       *     </optgroup>
-      *     
+      *
       *     <optgroup label="Asia">
       *         <option value="ZHN">China</option>
       *         <option value="IND">India</option>
@@ -298,8 +298,8 @@ class FormOptionsHelper extends AkActionViewHelper
     * world. Supply a TimeZone name as +selected+ to have it marked as the
     * selected option tag. You can also supply an array of TimeZones
     * as +$priority_zones+, so that they will be listed above the rest of the
-    * (long) list. 
-    * 
+    * (long) list.
+    *
     * The +selected+ parameter must be either +null+, or a string that names
     * a TimeZone.
     *
@@ -307,7 +307,7 @@ class FormOptionsHelper extends AkActionViewHelper
     * +model+ parameter be an object that responds to #all, and returns
     * an object with a toString() method and the TimeZone name provided by a 'name'
     * attribute
-    * 
+    *
     * For a list of supported timezones see: http://www.php.net/manual/en/timezones.php
     *
     * NOTE: Only the option tags are returned, you have to wrap this call in
@@ -332,7 +332,7 @@ class FormOptionsHelper extends AkActionViewHelper
             $zone_options .= $this->options_for_select($priority_zones, $selected);
             $zone_options .= '<option value="">-------------</option>'."\n";
         }
-        
+
         $zone_options .= $this->options_for_select(array_diff_assoc($zones_for_options,$priority_zones), $selected);
         return $zone_options;
 

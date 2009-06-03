@@ -65,8 +65,8 @@ require_once(AK_LIB_DIR.DS.'AkInflector.php');
 *
 * If the object name contains square brackets the id for the object will be inserted. Example:
 *
-*   <?= $form_helper->textfield("person[]", "name") ?> 
-* 
+*   <?= $form_helper->textfield("person[]", "name") ?>
+*
 * ...becomes:
 *
 *   <input type="text" id="person_<?= $person->id ?>_name" name="person[<?= $person->id ?>][name]" value="<?= $person->name ?>" />
@@ -88,7 +88,7 @@ class FormHelper extends AkActionViewHelper
 {
 
     /**
-     * 
+     *
       * Creates a form and a scope around a specific model object, which is then used as a base for questioning about
       * values for the fields. Examples:
       *
@@ -99,13 +99,13 @@ class FormHelper extends AkActionViewHelper
       *     Admin?    : <?= $f->check_box('admin'); ?>
       *   <?= $f->end_form_tag(); ?>
       *
-      * The form_for yields a form_builder object, in this example as $f, which emulates the API for the stand-alone 
+      * The form_for yields a form_builder object, in this example as $f, which emulates the API for the stand-alone
       * FormHelper methods, but without the object name. So instead of <tt>$form_helper->text_field('person', 'name');</tt>,
-      * you get away with <tt>$f->text_field('name');</tt>. 
+      * you get away with <tt>$f->text_field('name');</tt>.
       *
       * That in itself is a modest increase in comfort. The big news is that form_for allows us to more easily escape the instance
-      * variable convention, so while the stand-alone approach would require <tt>$form_helper->text_field('person', 'name', array('object' => $Person));</tt> 
-      * to work with local variables instead of instance ones, the form_for calls remain the same. You simply declare once with 
+      * variable convention, so while the stand-alone approach would require <tt>$form_helper->text_field('person', 'name', array('object' => $Person));</tt>
+      * to work with local variables instead of instance ones, the form_for calls remain the same. You simply declare once with
       * <tt>'person', $Person</tt> and all subsequent field calls save <tt>'person'</tt> and <tt>'object' => $Person</tt>.
       *
       * Also note that form_for doesn't create an exclusive scope. It's still possible to use both the stand-alone FormHelper methods
@@ -135,7 +135,7 @@ class FormHelper extends AkActionViewHelper
       *   <?php $person_form = $this->form_for('person', $Person, array('url' => array('action'=>'update'))); ?>
       *     First name: <?= $person_form->text_field('first_name'); ?>
       *     Last name : <?= person_form->text_field('last_name'); ?>
-      *     
+      *
       *     <?php $permission_fields = $form_helper->fields_for('permission', $Person->permission); ?>
       *       Admin?  : <?= $permission_fields->check_box('admin'); ?>
       *   <?= $person_form->end_form_tag(); ?>
@@ -256,7 +256,7 @@ class FormHelper extends AkActionViewHelper
             $column_name = $object_name;
             $object_name = $this->object_name;
         }
-    
+
         $object = null;
         if(isset($options['object'])){
             if(is_object($options['object'])){
@@ -315,7 +315,7 @@ class AkFormHelperInstanceTag extends TagHelper
         $this->_local_binding = $local_binding;
 
         if(empty($object) && !empty($this->_template_object->_controller->{$this->object_name})){
-            $this->object =& $this->_template_object->_controller->{$this->object_name};            
+            $this->object =& $this->_template_object->_controller->{$this->object_name};
         }else{
             $this->object =& $object;
         }
@@ -398,7 +398,7 @@ class AkFormHelperInstanceTag extends TagHelper
         DateHelper::select_month($date, array_merge($defaults,array('prefix'=>"{$this->object_name}[{$this->_column_name}(2)]"))) .
         DateHelper::select_year($date, array_merge($defaults,array('prefix'=>"{$this->object_name}[{$this->_column_name}(1)]")));
     }
-    
+
     function to_date_select_tag($options = array())
     {
         require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'date_helper.php');
@@ -407,9 +407,9 @@ class AkFormHelperInstanceTag extends TagHelper
         if(isset($this->object)){
             $DateHelper->_object[$object_name] =& $this->object;
         }
-        return $DateHelper->date_select($object_name, $this->_column_name, $options);          
+        return $DateHelper->date_select($object_name, $this->_column_name, $options);
     }
-    
+
     function to_datetime_select_tag($options = array())
     {
         require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'date_helper.php');
@@ -417,7 +417,7 @@ class AkFormHelperInstanceTag extends TagHelper
         $object_name = empty($this->_object_name) ? $this->object_name : $this->_object_name;
         if(isset($this->object)){
             $DateHelper->_object[$object_name] =& $this->object;
-        }        
+        }
         return $DateHelper->datetime_select($object_name, $this->_column_name, $options);
     }
 
@@ -455,7 +455,9 @@ class AkFormHelperInstanceTag extends TagHelper
     {
         $object = $this->getObject();
         if(!empty($object)){
-            return $object->get($this->_column_name);
+            if(method_exists($object, 'get')){
+                return $object->get($this->_column_name);
+            }
         }
     }
 
@@ -482,7 +484,7 @@ class AkFormHelperInstanceTag extends TagHelper
             $options['name'] = empty($options['name']) ? $this->tag_name() : $options['name'];
             $options['id'] = empty($options['id']) ? $this->tag_id() : $options['id'];
         }
-        
+
         if(!empty($options['multiple'])){
             if(substr($options['name'],-2) != '[]'){
                 $options['name'] = $options['name'].'[]';

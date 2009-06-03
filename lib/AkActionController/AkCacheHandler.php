@@ -21,7 +21,7 @@ require_once(AK_LIB_DIR.DS.'AkCache.php');
 require_once(AK_LIB_DIR.DS.'AkRequestMimeType.php');
 /**
  *
- * 
+ *
  * Akelos supports three types of caching:
  *
  * - Page Caching
@@ -198,7 +198,7 @@ require_once(AK_LIB_DIR.DS.'AkRequestMimeType.php');
  * as a whole.
  * This is useful when certain elements of an action change frequently or depend on complicated state
  * while other parts rarely change or can be shared amongst multiple parties.
- * 
+ *
  * The caching is doing using the cache helper available in the Action View.
  * A template with caching might look something like:
  *
@@ -211,7 +211,7 @@ require_once(AK_LIB_DIR.DS.'AkRequestMimeType.php');
  * This cache by default will bind to the action it was called from,
  * so if this code was part of the view for the topics/list action, you would
  * be able to invalidate it using:
- * 
+ *
  *    <tt>$this>expireFragment(array("controller" => "topics", "action" => "list"))</tt>.
  *
  * This default behavior is of limited use if you need to cache multiple fragments per action
@@ -225,12 +225,12 @@ require_once(AK_LIB_DIR.DS.'AkRequestMimeType.php');
  * The expiration call for this example is:
  *
  *   $this->expireFragment("cacheFragmentKey")
- * 
+ *
  */
 class AkCacheHandler extends AkObject
 {
     var $cache_strip = array('<!--CACHE-SKIP-START-->.*?<!--CACHE-SKIP-END-->','<div class=\"flash_[a-z]+\">.*?<\/div>');
-    
+
     /**
      * @var AkCache
      */
@@ -325,7 +325,7 @@ class AkCacheHandler extends AkObject
         }
         return $public_locales;
     }
-    
+
     function _getAvailableLocales()
     {
         static $available_locales;
@@ -352,7 +352,7 @@ class AkCacheHandler extends AkObject
             @session_start();
         }
     }
-    
+
     function _getDefaultLanguageForUser()
     {
         $this->_startSession();
@@ -367,7 +367,7 @@ class AkCacheHandler extends AkObject
                     return $browser_language;
                 }
             }
-    
+
             // Second run for only language code (en, es)
             foreach ($browser_languages as $browser_language){
                 if($pos = strpos($browser_language,'_')){
@@ -393,7 +393,7 @@ class AkCacheHandler extends AkObject
         }
         return array_unique($browser_languages);
     }
-    
+
     function _loadSettings($settings = null)
     {
         if ($settings == null) {
@@ -486,11 +486,11 @@ class AkCacheHandler extends AkObject
     function expirePage($path = null, $language=null)
     {
         if (!$this->_perform_caching || !$this->_cache_store) return;
-        
+
         if ($language == null && is_array($path) && !isset($path['lang'])) {
             $language = '*';
         }
-        
+
         if ((is_array($path) && isset($path['lang']) && $path['lang'] == '*') || $language == '*') {
             $langs = $this->_getPublicLocales();
             $res = true;
@@ -520,17 +520,17 @@ class AkCacheHandler extends AkObject
     function cachePage($content, $path = null, $language = null, $gzipped=false, $sendETag = false, $orgStrlen = null)
     {
         static $ETag;
-        
+
         $cacheIds = array();
-        
+
         if (!($this->_cachingAllowed() && $this->_perform_caching)) return;
 
         $cacheId = $this->_buildCacheId($path, $language);
-        
+
         $skipEtagSending = false;
         if ($orgStrlen != strlen($content)) $skipEtagSending = true;
         $notNormalizedCacheId = $this->_buildCacheId($path, $language,false);
-        
+
 
         $removeHeaders = array();
         $addHeaders = array();
@@ -576,9 +576,9 @@ class AkCacheHandler extends AkObject
             $res = mkdir(dirname($filename),0755,true);
         }
 		if(!AK_PHP5) {
-	
+
 			Ak::compat('file_put_contents');
-	
+
 		}
         file_put_contents($filename, $content);
 
@@ -602,7 +602,7 @@ class AkCacheHandler extends AkObject
         }
          return $content;
     }
-    
+
     function x_modifyCacheContent($content,$addHeaders = array(), $removeHeaders = array())
     {
         $headers = $this->_controller->Response->_headers_sent;
@@ -701,7 +701,7 @@ EOF;
             $options = Ak::toArray($options);
         }
         Ak::parseOptions($options, $default_options,array(),true);
-        
+
         foreach ($options as $sweeper => $params) {
             if (is_int($sweeper)) {
                 $sweeper = $params;
@@ -758,7 +758,7 @@ EOF;
     }
     function _setCachesPage($options)
     {
-        
+
         if (!$this->_perform_caching) {
             $this->_enableGzippedOutput();
             return;
@@ -810,7 +810,7 @@ EOF;
     }
     function afterNoCache()
     {
-        
+
         $this->_controller->handleResponse();
         ob_end_flush();
 
@@ -900,9 +900,9 @@ EOF;
                 $cacheId.= '.'.$format;
             }
         }
-        
+
         $getParameters = $_GET;
-        
+
         unset($getParameters['ak']);
         if (is_array($this->_include_get_parameters) && !empty($this->_include_get_parameters) && !empty($getParameters)) {
             $cacheableGetParameters = array();
@@ -941,7 +941,7 @@ EOF;
         $this->_lastCacheId = preg_replace('|'.DS.'+|','/',$cacheId);
         return $this->_lastCacheId;
     }
- 
+
     function &getCachedPage($path = null,$forcedLanguage = null)
     {
         $false = false;
@@ -1008,7 +1008,7 @@ EOF;
                 $options = $this->_pathFor($this->_controller->params);
             }
         }
-        
+
         $key = AkCache::expandCacheKey($options, isset($parameters['namespace'])?$parameters['namespace']:'fragments');
 
         return $key;
@@ -1047,6 +1047,7 @@ EOF;
 
     function cacheTplFragmentEnd($key = array(), $options = array())
     {
+        $contents = '';
         if (!$this->_cacheTplRendered($key, $options)) {
             $contents = ob_get_clean();
             $this->writeFragment($key, $contents, $options);
@@ -1066,11 +1067,11 @@ EOF;
     function readFragment($key, $options = array())
     {
         if (!$this->cacheConfigured()) return false;
-        
+
         $orgkey = $key;
-        
+
         $key = $this->fragmentCachekey($key, $options);
-        
+
         return $this->_cache_store->get($key, isset($options['host'])?
         $options['host']:$this->_buildCacheGroup());
     }
@@ -1078,7 +1079,7 @@ EOF;
     function expireFragment($key, $options = array())
     {
         if (!$this->cacheConfigured()) return;
-        
+
         if (is_array($key) && isset($key['lang']) && $key['lang'] == '*') {
             $langs = AkLocaleManager::getPublicLocales();
             $res = true;
@@ -1145,14 +1146,14 @@ EOF;
         $strlenBefore = strlen($contents);
         $contents = $this->_stripCacheSkipSections($contents);
         $strlenAfter = strlen($contents);
-        
+
         if ($strlenAfter != $strlenBefore) {
             /**
              * We dont want the flash message to be cached in the browser
              */
             $this->_controller->Response->addHeader('Expires', gmdate('D, d M Y H:i:s',0));
         }
-        
+
         $options = array();
         if (!empty($this->_action_cache_host)) {
             $options['host'] = $this->_action_cache_host;
@@ -1187,7 +1188,7 @@ EOF;
                 $this->_enableGzippedOutput();
                 return;
             }
-            
+
             $this->_caching_type = 'action';
             $this->_action_include_get_parameters = $this->_caches_action[$actionName]['include_get_parameters'];
             $path = $this->_caches_action[$actionName]['cache_path'];
@@ -1255,14 +1256,14 @@ EOF;
     function _pathFor($options = array(), $normalize = true)
     {
         $options = empty($options)?$this->_controller->params:$options;
-        $options['controller'] = !isset($options['controller']) ? (isset($this->_controller->params['controller']) ? 
+        $options['controller'] = !isset($options['controller']) ? (isset($this->_controller->params['controller']) ?
                                                                          $this->_controller->params['controller']:null):
                                                                  $options['controller'];
-        $options['action'] = !isset($options['action']) ? (isset($this->_controller->params['action']) ? 
+        $options['action'] = !isset($options['action']) ? (isset($this->_controller->params['action']) ?
                                                                  $this->_controller->params['action']:null):
                                                           $options['action'];
         $options['id'] = isset($options['id']) ? $options['id']: false;
-        
+
         $options['skip_relative_url_root']=true;
         $url = $this->_controller->urlFor($options);
         $parts = parse_url($url);
@@ -1309,7 +1310,7 @@ EOF;
     }
 
     /**
-     * methods used statically from the pagecache files 
+     * methods used statically from the pagecache files
      */
     function _handleIfModifiedSince($modifiedTimestamp, $exit=true,$sendHeaders = true, $returnHeaders = false)
     {
@@ -1323,8 +1324,8 @@ EOF;
         } else {
             $timestamp = 0;
         }
-        
-        
+
+
         $gmTime = mktime(gmdate('H'), gmdate('i'), gmdate('s'), gmdate('m'), gmdate('d'), gmdate('Y'));
         $time = time();
         $diff = $time - $gmTime;
@@ -1340,9 +1341,9 @@ EOF;
             if ($exit) {
                 exit;
             }
-            
+
             if ($returnHeaders) {
-                
+
                 return $headers;
             }
         } else {
@@ -1354,7 +1355,7 @@ EOF;
         }
         return $headers;
     }
-    
+
     function _handleEtag($headers,$sendHeaders, $returnHeaders, $exit)
     {
         $outHeaders = array();
@@ -1366,7 +1367,7 @@ EOF;
                     }
                     if ($returnHeaders) {
                         $outHeaders[] = 'Status: 304';
-                        
+
                     }
                     if ($exit) {
                         exit;
@@ -1377,13 +1378,13 @@ EOF;
         }
         return $outHeaders;
     }
-    
+
 
     function _handleEncodingAliases($header, $acceptedEncodings)
     {
         $_encodingAliases = array('gzip','x-gzip', 'compress', 'x-compress');
         $parts = split(': ',$header);
-        if (strtolower($parts[0])=='content-encoding' && 
+        if (strtolower($parts[0])=='content-encoding' &&
             isset($parts[1]) &&
             in_array($parts[1],$_encodingAliases)) {
             $acceptedEncodings = array_intersect($acceptedEncodings,$_encodingAliases);

@@ -1959,9 +1959,9 @@ class Ak
         $options = array_merge($default_options, $options);
         foreach($options as $key => $value) {
             if(isset($parameters['available_options'])) {
-               if (!isset($parameters['available_options'][$key])) {
-                   continue;
-               }
+                if (!isset($parameters['available_options'][$key])) {
+                    continue;
+                }
             }
             $options[$key] = $value;
 
@@ -1989,7 +1989,7 @@ class Ak
     {
         if($settings = Ak::getSettings($namespace)){
             return isset($settings[$variable]) ? $settings[$variable] : $default_value;
-         }
+        }
         return $default_value;
     }
 

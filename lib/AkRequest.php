@@ -33,12 +33,12 @@ $_SERVER['REQUEST_URI'] = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_UR
 require_once(AK_LIB_DIR.DS.'AkRequestMimeType.php');
 /**
 * Class that handles incoming request.
-* 
+*
 * The Request Object handles user request (CLI, GET, POST, session or
 * cookie requests), transforms it and sets it up for the
 * ApplicationController class, who takes control of the data
 * flow.
-* 
+*
 * @author Bermi Ferrer <bermi@akelos.com>
 * @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
@@ -48,11 +48,11 @@ class AkRequest extends AkObject
 
     /**
     * Array containing the request parameters.
-    * 
+    *
     * This property stores the parameters parsed from the
     * parseRequest() method. This array is used by addParams()
     * method.
-    * 
+    *
     * @access private
     * @var array $_request
     */
@@ -71,40 +71,40 @@ class AkRequest extends AkObject
     * @var array
     */
     var $env = array();
-    
-    var $mime_types = array( 
-                'text/html'                => 'html', 
-                'application/xhtml+xml'    => 'html', 
-                'application/xml'          => 'xml', 
-                'text/xml'                 => 'xml', 
-                'text/javascript'          => 'js', 
-                'application/javascript'   => 'js', 
-                'application/x-javascript' => 'js', 
+
+    var $mime_types = array(
+                'text/html'                => 'html',
+                'application/xhtml+xml'    => 'html',
+                'application/xml'          => 'xml',
+                'text/xml'                 => 'xml',
+                'text/javascript'          => 'js',
+                'application/javascript'   => 'js',
+                'application/x-javascript' => 'js',
                 'application/json'         => 'json',
-                'text/x-json'              => 'json', 
-                'application/rss+xml'      => 'rss', 
-                'application/atom+xml'     => 'atom', 
-                '*/*'                      => 'html', 
-                //'application/x-www-form-urlencoded' => 'www-form', 
+                'text/x-json'              => 'json',
+                'application/rss+xml'      => 'rss',
+                'application/atom+xml'     => 'atom',
+                '*/*'                      => 'html',
                 //'application/x-www-form-urlencoded' => 'www-form',
-                'default'                  => 'html', 
+                //'application/x-www-form-urlencoded' => 'www-form',
+                'default'                  => 'html',
             );
-            
+
     var $_format;
     /**
     * String parse method.
-    * 
+    *
     * This method gets a petition as parameter, using the "Ruby
     * on Rails" request format (see prettyURL in RoR documentation). The format is:
     * file.php?ak=/controller/action/id&paramN=valueN
-    * 
-    * This method requires for a previous execution of the _mergeRequest() method, 
+    *
+    * This method requires for a previous execution of the _mergeRequest() method,
     * in order to merge all the request all i one array.
     *
     * This method expands dynamically the class Request, adding a public property for
     * every parameter sent in the request.
     *
-    * 
+    *
     * @access public
     * @return array
     */
@@ -123,17 +123,17 @@ class AkRequest extends AkObject
     {
         $this->init();
         $this->getFormat();
-        
+
     }
 
     /**
     * Initialization method.
-    * 
+    *
     * Initialization method. Use this via the class constructor.
-    * 
+    *
     * @access public
     * @uses parseRequest
-    * @return void 
+    * @return void
     */
     function init()
     {
@@ -557,9 +557,9 @@ class AkRequest extends AkObject
     * $_SESSION['request'] <- This will override options provided by previous methods
     * $_COOKIE
     * $_POST
-    * $_GET 
+    * $_GET
     * Command line params
-    * 
+    *
     * @access public
     * @return void Void returned. Modifies the private property "
     */
@@ -639,14 +639,14 @@ class AkRequest extends AkObject
     /**
     * Builds (i.e., "expands") the Request class for accessing
     * the request parameters as public properties.
-    * For example, when the requests is "ak=/controller/action/id&parameter=value", 
+    * For example, when the requests is "ak=/controller/action/id&parameter=value",
     * once parsed, you can access the parameters of the request just like
     * an object, e.g.:
     *
     *   $value_to_get = $request->parameter
-    * 
+    *
     * @access private
-    * @return void 
+    * @return void
     */
     function _addParam($variable, $value)
     {
@@ -712,40 +712,40 @@ class AkRequest extends AkObject
     {
         $accept_header = isset($this->env['HTTP_ACCEPT'])?$this->env['HTTP_ACCEPT']:'';
         $accepts = array();
-        foreach (explode(',',$accept_header) as $index=>$acceptable){ 
-                 $mime_struct = $this->_parseMimeType($acceptable); 
-                 if (empty($mime_struct['q'])) $mime_struct['q'] = '1.0'; 
-                  
-                 //we need the original index inside this structure  
-                 //because usort happily rearranges the array on equality 
-                 //therefore we first compare the 'q' and then 'i' 
-                 $mime_struct['i'] = $index; 
-                 $accepts[] = $mime_struct; 
-             } 
-             usort($accepts,array(&$this,'_sortAcceptHeader')); 
-              
-             //we throw away the old index 
-             foreach ($accepts as $array){ 
-                 unset($array['i']); 
-             } 
-             return $accepts; 
+        foreach (explode(',',$accept_header) as $index=>$acceptable){
+                 $mime_struct = $this->_parseMimeType($acceptable);
+                 if (empty($mime_struct['q'])) $mime_struct['q'] = '1.0';
+
+                 //we need the original index inside this structure
+                 //because usort happily rearranges the array on equality
+                 //therefore we first compare the 'q' and then 'i'
+                 $mime_struct['i'] = $index;
+                 $accepts[] = $mime_struct;
+             }
+             usort($accepts,array(&$this,'_sortAcceptHeader'));
+
+             //we throw away the old index
+             foreach ($accepts as $array){
+                 unset($array['i']);
+             }
+             return $accepts;
     }
     function setFormat($format)
     {
         $this->_format = $format;
     }
-    
+
     function getFormat()
     {
 
-        
+
         if (isset($this->_format)) {
             return $this->_format;
         } else if (isset($this->_request['format'])) {
             $this->_format = $this->_request['format'];
         } else {
             list($format, $requestPath) = AkRequestMimeType::getFormat(@$this->_request['ak']);
-            
+
             $this->_format = $format;
             $this->_request['format'] = $format;
             if ($requestPath!=null) {
@@ -754,13 +754,13 @@ class AkRequest extends AkObject
         }
         return $this->_format;
     }
-    
+
 
     // {{{ recognize()
 
     /**
     * Recognizes a Request and returns the responsible controller instance
-    * 
+    *
     * @return AkActionController
     */
     function &recognize($Map = null)

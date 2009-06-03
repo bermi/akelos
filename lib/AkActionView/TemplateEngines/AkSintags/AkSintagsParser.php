@@ -362,10 +362,10 @@ class AkSintagsParser
             case AK_LEXER_ENTER:
                 if(preg_match('/=+$/', trim($match))){
                     $this->avoid_php_tags = $this->_current_function_opening = false;
-                    $this->output .= '<?php '.$this->_convertSintagsVarToPhp(trim($match,' =('.$this->_SINTAGS_OPEN_HELPER_TAG)).' = (';
+                    $this->output .= '<?php '.$this->_convertSintagsVarToPhp(trim($match," =(\n\t".$this->_SINTAGS_OPEN_HELPER_TAG)).' = (';
                     return true;
                 }
-                $method_name = trim($match,' =('.$this->_SINTAGS_OPEN_HELPER_TAG);
+                $method_name = trim($match," =(\n\t".$this->_SINTAGS_OPEN_HELPER_TAG);
                 if($helper = $this->_getHelperNameForMethod($method_name)){
                     $this->avoid_php_tags = !$is_inline_function && !strstr($match,'=');
                     $this->_current_function_opening = strlen($this->output);
@@ -728,12 +728,12 @@ class AkSintagsParser
             return $this->available_helpers[$method_name];
         }
     }
-    
+
     function hasErrors()
     {
         return !empty($this->_errors);
     }
-    
+
     function getErrors()
     {
         return $this->_errors;

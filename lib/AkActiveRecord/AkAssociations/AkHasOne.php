@@ -20,7 +20,7 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 
 /**
 * Adds the following methods for retrieval and query of a single associated object.
-* $association is replaced with the symbol passed as the first argument, so 
+* $association is replaced with the symbol passed as the first argument, so
 * <tt>hasOne('manager')</tt> would add among others <tt>$this->manager->getAttributes()</tt>.
 *
 * Example: An Account class declares <tt>hasOne('beneficiary');</tt>, which will add:
@@ -68,7 +68,6 @@ class AkHasOne extends AkAssociation
         'order'=>false,
         'include_order_when_included'=>true,
         'dependent'=>false,
-        'counter_cache'=>false,
         'join_conditions'=>false
         );
 
@@ -103,7 +102,7 @@ class AkHasOne extends AkAssociation
             $Associated->set($this->Owner->$association_id->getAssociationOption('foreign_key'), $this->Owner->getId());
             $Associated->save();
         }
-        
+
         $this->_build($association_id, &$Associated);
         $this->Owner->$association_id->_loaded = true;
         return $Associated;
@@ -141,7 +140,7 @@ class AkHasOne extends AkAssociation
 
             $value = $this->Owner->$association_id->getAssociationOption($option);
             if (!empty($available)) {
-                
+
                 $value=$available;
             }
             if (!empty($value)) {
@@ -151,7 +150,7 @@ class AkHasOne extends AkAssociation
                     $finder_options[$option] = $value;
                 }
             }
-               
+
         }
 
         $finder_options['joins'] = $this->Owner->$association_id->constructSqlForInclusion();
@@ -182,9 +181,9 @@ class AkHasOne extends AkAssociation
         foreach ($options as $option=>$available) {
 
             $value = $this->Owner->$association_id->getAssociationOption($option);
-            
+
             if ((!empty($available) && $available!==true)|| $available===false) {
-                
+
                 $value=$available;
             }
             if (!empty($value) && !is_bool($value)) {
@@ -194,14 +193,14 @@ class AkHasOne extends AkAssociation
                     $finder_options[$option] = $value;
                 }
             }
-               
+
         }
         $finder_options['joins'] = $this->Owner->$association_id->constructSqlForInclusionChain($handler_name, $parent_handler_name);
         $selection_parenthesis = $this->_getColumnParenthesis();//
         $finder_options['selection'] = '';
         foreach (array_keys($this->Owner->$association_id->getColumns()) as $column_name){
             $finder_options['selection'] .= $parent_handler_name.'__'.$handler_name.'.'.$column_name.' AS '.$selection_parenthesis.$prefix.'['.$handler_name.']'.($pluralize?'[@'.$pk.']':'').'['.$column_name.']'.$selection_parenthesis.', ';
-        
+
         }
         $finder_options['selection'] = trim($finder_options['selection'], ', ');
 
@@ -250,8 +249,8 @@ function constructSqlForInclusionChain($association_id,$handler_name, $parent_ha
 
 
     /**
-    * Returns a new object of the associated type that has been instantiated with attributes 
-    * and linked to this object through a foreign key and that has already been 
+    * Returns a new object of the associated type that has been instantiated with attributes
+    * and linked to this object through a foreign key and that has already been
     * saved (if it passed the validation)
     */
     function &create($association_id, $attributes = array(), $replace_existing = true)
@@ -321,7 +320,7 @@ function constructSqlForInclusionChain($association_id,$handler_name, $parent_ha
         'joins' => trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($table_name, $this->constructSql($association_id))),
         'order' => trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($table_name, $this->Owner->$association_id->getAssociationOption('order')))
         );
-        
+
         /**
         * todo we will use a select statement later
         */
