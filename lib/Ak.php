@@ -774,17 +774,19 @@ class Ak
 
 
 
-    function &getLogger()
+    function &getLogger($namespace = 'default')
     {
-        static $Logger;
-        if(empty($Logger)){
+        static $Logger = array();
+        if(empty($Logger[$namespace])){
             require_once(AK_LIB_DIR.DS.'AkLogger.php');
-            $Logger = new AkLogger();
+            $Logger[$namespace] = new AkLogger();
+            if($error_file != 'default'){
+                $Logger[$namespace]->error_file = AK_LOG_DIR.DS.$namespace.'.log';
+            }
         }
-        $return =& $Logger;
-        return $Logger;
+        $return =& $Logger[$namespace];
+        return $Logger[$namespace];
     }
-
 
     function get_constants()
     {
