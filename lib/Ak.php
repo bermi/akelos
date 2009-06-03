@@ -780,7 +780,7 @@ class Ak
         if(empty($Logger[$namespace])){
             require_once(AK_LIB_DIR.DS.'AkLogger.php');
             $Logger[$namespace] = new AkLogger();
-            if($error_file != 'default'){
+            if($namespace != 'default'){
                 $Logger[$namespace]->error_file = AK_LOG_DIR.DS.$namespace.'.log';
             }
         }
