@@ -32,7 +32,7 @@ if (! defined('T_OLD_FUNCTION')) {
 if (!defined('T_ML_COMMENT')) {
     define('T_ML_COMMENT', T_COMMENT);
 } else {
-    define('T_DOC_COMMENT', T_ML_COMMENT);
+    defined('T_DOC_COMMENT') ? null : define('T_DOC_COMMENT', T_ML_COMMENT);
 }
 /**#@-*/
 
