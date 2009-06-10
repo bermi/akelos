@@ -57,12 +57,12 @@ class ActiveRecordHelper extends AkActionViewHelper
     *       </p>
     *       <input type='submit' value='Create' />
     *     </form>
-    * 
+    *
     * It's possible to specialize the form builder by using a different action name and by supplying another
-    * block renderer that will be evaled by PHP. 
+    * block renderer that will be evaled by PHP.
     * Example (entry is a new record that has a message attribute using VARCHAR):
     *
-    *   $active_record_helper->form('entry', array('action'=>'sign','input_block' => 
+    *   $active_record_helper->form('entry', array('action'=>'sign','input_block' =>
     *  '<p><?=AkInflector::humanize($column)?>: <?=$this->input($record_name, $column)?></p><br />'
     *   );
     *
@@ -178,11 +178,11 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
         $column_name = $this->method_name = $this->_getColumnName($column_name, $object_name,  $template_object);
         $this->AkFormHelperInstanceTag($object_name, $column_name, $template_object);
     }
-    
+
     function to_tag($options = array())
     {
         $options = array_merge($this->object->getErrorsOn($this->method_name)==false?array():array("class"=>"fieldError"), $options);
-        
+
         switch ($this->get_column_type()) {
 
             case 'string':
@@ -196,6 +196,7 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
 
             case 'integer':
             case 'float':
+            case 'decimal':
             return $this->to_input_field_tag('text', $options);
             break;
 
@@ -207,7 +208,7 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
             case 'timestamp':
             return $this->to_datetime_select_tag($options);
             break;
-            
+
             case 'boolean':
             return $this->to_check_box_tag($options);
             break;
