@@ -590,28 +590,75 @@ class Ak
         if(AK_PRODUCTION_MODE){
             return;
         }
+        list($default_file, $default_line) = Ak::getLastFileAndLine();
+        $line = empty($line) ? $default_line : $line;
+        $file = empty($file) ? $default_file : $file;
 
-        $line = isset($line) ? "Line: $line".(AK_CLI?"\n":"<br />") : "";
-        $file = isset($file) ? "File: $file".(AK_CLI?"\n":"<br />") : "";
-        if(is_object($text)){
-            $object_text = @(string)$text;
-            $text = empty($object_text) ? print_r($text, true) : $object_text;
+        if(AK_CLI){
+            $text = Ak::dump($text, 'print_r');
+        }elseif (!empty($text)){
+            $rand = Ak::randomString();
+            $formatted = '';
+            $methods = array('print_r', 'var_dump', 'var_export');
+            foreach ($methods as $method){
+                $pre_style = 'display:none;';
+                if(defined('AK_TRACE_DUMP_METHOD')){
+                    if(AK_TRACE_DUMP_METHOD == $method){
+                        $pre_style = '';
+                    }
+                }elseif ($method == 'print_r'){
+                    $pre_style = '';
+                }
+                $element_id = $method.'_'.$rand;
+                $formatted .= "<div style='margin:10px;'><a href='javascript:void(0);' onclick='e_$element_id = document.getElementById(\"$element_id\"); e_$element_id.style.display = (e_$element_id.style.display == \"none\"?\"block\":\"none\");' title='Set the constant AK_TRACE_DUMP_METHOD to your favourite default method'>$method</a><br />".
+                                '<pre style="'.$pre_style.'" id="'.$element_id.'">'.htmlentities(Ak::dump($text, $method)).'</pre></div>';
+            }
+            $text = $formatted;
         }
-
-        $text = is_array($text) ? print_r($text, true) : $text;
 
         if(!isset($text)){
             $counter++;
             $text = '';
         }else {
-            $text = AK_CLI?'---> '.$text : htmlentities($text);
+            $text = AK_CLI?'---> '.$text : ($text);
         }
 
-        echo AK_CLI?"----------------\n$line $file $text\n----------------\n":"<hr /><pre>$line $file ".$text."</pre><hr />\n";
+        echo AK_CLI?"----------------\n$file ($line):\n $text\n----------------\n":"<div style='background-color:#fff;margin:10px;color:#000;font-family:sans-serif;border:3px solid #fc0;'><div style='background-color:#ffc;padding:10px;color:#000;font-family:sans-serif;'>$file <span style='font-weight:bold'>$line</span></div>".$text."</div>\n";
     }
 
+    /**
+     * Returns a string representation of one of these PHP methods var_dump, var_export, or print_r
+     */
+    function dump($var, $method = null, $max_length = null)
+    {
+        $method = empty($method) ? (defined('AK_TRACE_DUMP_METHOD') ? AK_TRACE_DUMP_METHOD : 'var_dump') : $method;
+        $methods = array('var_dump', 'var_export', 'print_r');
+        if(!in_array($method, $methods)){
+            trigger_error(Ak::t('Invalid dump method, valid options are %methods', array('%methods'=>join(", ", $methods))), E_USER_ERROR);
+            return false;
+        }
+        ob_start();
+        if(is_object($var)){
+            $object_text = @(string)$var;
+            empty($object_text) ? $method($var) : print($var);
+        }else{
+            is_array($var) ? $method($var) : print($var);
+        }
+        $contents = ob_get_contents();
+        $max_length = defined('AK_DUMP_MAX_LENGTH') ? AK_DUMP_MAX_LENGTH : 10000000;
+        $result = $max_length ? substr($contents, 0, $max_length) : $contents;
+        if($contents != $result){
+            $result .= ' ...dump truncated at max length of '.$max_length.' chars define AK_DUMP_MAX_LENGTH to false or to a larger number';
+        }
+        ob_end_clean();
+        return $result;
+    }
 
-
+    function getLastFileAndLine()
+    {
+        $backtrace = debug_backtrace();
+        return array($backtrace[1]['file'], $backtrace[1]['line']);
+    }
 
     /**
     * Outputs debug info given a PHP resource (vars, objects,
