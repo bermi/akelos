@@ -128,7 +128,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
                 foreach ($files as $k => $file){
                     $result .= "<li style='margin:0;padding:0;'>".($file['path']).
                     (empty($file['original_path'])?'':
-                    " <a href='javascript:void(0);' onclick='element_$k = document.getElementById(\"ak_debug_$k\"); element_$k.style.display = (element_$k.style.display == \"none\"?\"block\":\"none\");'>show source</a>
+                    " <a href='#".md5($file['original_path']).'-'.$line."' onclick='element_$k = document.getElementById(\"ak_debug_$k\"); element_$k.style.display = (element_$k.style.display == \"none\"?\"block\":\"none\");'>show source</a>
                 <div id='ak_debug_$k' style='display:none;'>".ak_highlight_file($file['original_path'], $line)."</div>").
                 "</li>";
                 }
@@ -139,6 +139,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         echo !AK_WEB_REQUEST ? html_entity_decode(strip_tags($result)) : $result.'<hr />';
 
         AK_WEB_REQUEST ? print('</pre>') : null;
+
     }
 
     function ak_show_source_line($file, $line, $highlight = '')
@@ -170,7 +171,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
 
 
         if($line_number > 0){
-            $lines[$line_number-1] = "<div style='border:1px solid red'>".$lines[$line_number-1]."</div>";
+            $lines[$line_number-1] = "<div style='border:1px solid red'><a name='".md5($file)."-$line_number' />".$lines[$line_number-1]."</div>";
         }
         $active_line_number=$line_number-1;
 

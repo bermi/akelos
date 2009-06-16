@@ -596,7 +596,7 @@ class Ak
 
         if(AK_CLI){
             $text = Ak::dump($text, 'print_r');
-        }elseif (!empty($text)){
+        }elseif (!empty($text) && !is_scalar($text)){
             $rand = Ak::randomString();
             $formatted = '';
             $methods = array('print_r', 'var_dump', 'var_export');
@@ -614,6 +614,8 @@ class Ak
                                 '<pre style="'.$pre_style.'" id="'.$element_id.'">'.htmlentities(Ak::dump($text, $method)).'</pre></div>';
             }
             $text = $formatted;
+        }elseif (is_scalar($text)){
+            $text = '<pre style="margin:10px;">'.htmlentities($text).'</pre>';
         }
 
         if(!isset($text)){
