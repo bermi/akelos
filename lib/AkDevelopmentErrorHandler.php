@@ -110,7 +110,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
             default:                    echo "Unknown error ($error_number)"; break;
         }
         //$result = ": <h3>$error_message</h3> in  $file on line $line\n";
-        $result = ": <h3>$error_message</h3>\n";
+        $result = "<h3>$error_message</h3>\n";
         //$result .= ak_show_source_line($file, $line);
         //ak_show_app_backtrace();
         if(AK_WEB_REQUEST){
@@ -136,7 +136,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
             }
         }
 
-        echo !AK_WEB_REQUEST ? html_entity_decode(strip_tags($result)) : $result.'<hr />';
+        echo !AK_WEB_REQUEST ? html_entity_decode(strip_tags($result)) : '<div style="background-color:#fff;margin:10px;padding:10px;color:#000;font-family:sans-serif;border:3px solid #f00;font-size:12px;">'. $result.'</div>';
 
         AK_WEB_REQUEST ? print('</pre>') : null;
 

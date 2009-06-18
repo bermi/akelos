@@ -179,14 +179,14 @@ class AkBelongsTo extends AkAssociation
             $this->Owner->set($primary_key, null);
         }else{
             $primary_key = $this->Owner->belongsTo->getOption($association_id, 'primary_key_name');
-            if($counter_cache_name && !$this->Owner->isNewRecord()){
-                $this->Owner->$association_id->incrementCounter($counter_cache_name, $NewAssociated->getId());
-                $previous_id = $this->Owner->get($primary_key);
-                if($previous_id){
-                    $this->Owner->$association_id->decrementCounter($counter_cache_name, $previous_id);
-                }
-            }
             if(!$NewAssociated->isNewRecord()){
+                if($counter_cache_name && !$this->Owner->isNewRecord() && method_exists($this->Owner->$association_id, 'incrementCounter')){
+                    $this->Owner->$association_id->incrementCounter($counter_cache_name, $NewAssociated->getId());
+                    $previous_id = $this->Owner->get($primary_key);
+                    if($previous_id){
+                        $this->Owner->$association_id->decrementCounter($counter_cache_name, $previous_id);
+                    }
+                }
                 $this->Owner->set($primary_key, $NewAssociated->getId());
             }
             $this->updated[$association_id] = true;
