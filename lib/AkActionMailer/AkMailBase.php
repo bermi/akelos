@@ -107,7 +107,7 @@ class AkMailBase extends Mail
     }
 
     /**
-     * Specify the charset to use for the message. 
+     * Specify the charset to use for the message.
      */
     function setCharset($charset, $append_to_content_type_as_attribute = true)
     {
@@ -217,7 +217,7 @@ class AkMailBase extends Mail
     }
 
     /**
-     * Specify the content disposition for the message. 
+     * Specify the content disposition for the message.
      */
     function setContentDisposition($content_disposition)
     {
@@ -225,7 +225,7 @@ class AkMailBase extends Mail
     }
 
     /**
-     * Specify the content transfer encoding for the message. 
+     * Specify the content transfer encoding for the message.
      */
     function setContentTransferEncoding($content_transfer_encoding)
     {
@@ -301,7 +301,7 @@ class AkMailBase extends Mail
         if(empty($this->raw_headers)){
 
             $this->headers = $this->getHeaders(true);
-            
+
             if($this->isPart()){
                 $this->prepareHeadersForRendering(array(
                 'skip' => (array)@$options['skip'],
@@ -389,7 +389,7 @@ class AkMailBase extends Mail
     {
         if(is_array($value)){
             $this->setHeaders($value, $options);
-        }else{
+        }elseif($this->headerIsAllowed($name)){
             $this->headers[$name] = $value;
         }
     }
@@ -398,18 +398,18 @@ class AkMailBase extends Mail
 
     /**
      * Generic setter
-     * 
+     *
      * Calling $this->set(array('body'=>'Hello World', 'subject' => 'First subject'));
      * is the same as calling $this->setBody('Hello World'); and $this->setSubject('First Subject');
-     * 
+     *
      * This simplifies creating mail objects from datasources.
-     * 
+     *
      * If the method does not exists the parameter will be added to the header.
      */
     function set($attributes = array())
     {
         foreach ((array)$attributes as $key=>$value){
-            if($key[0] != '_'){
+            if($key[0] != '_' && $this->headerIsAllowed($key)){
                 $attribute_setter = 'set'.AkInflector::camelize($key);
                 if(method_exists($this, $attribute_setter)){
                     $this->$attribute_setter($value);
@@ -446,7 +446,7 @@ class AkMailBase extends Mail
                 return 1;
             }
         }
-        
+
         $a_ct = strtolower($a->content_type);
         $b_ct = strtolower($b->content_type);
         $a_in = in_array($a_ct, $this->_parts_order);
@@ -476,13 +476,13 @@ class AkMailBase extends Mail
 
 
     /**
-     * Add a part to a multipart message, with an array of options like 
+     * Add a part to a multipart message, with an array of options like
      * (content-type, charset, body, headers, etc.).
-     * 
+     *
      *   function my_mail_message()
      *   {
      *     $this->setPart(array(
-     *       'content-type' => 'text/plain', 
+     *       'content-type' => 'text/plain',
      *       'body' => "hello, world",
      *       'transfer_encoding' => "base64"
      *     ));
@@ -597,7 +597,7 @@ class AkMailBase extends Mail
     /**
      * Add an attachment to a multipart message. This is simply a part with the
      * content-disposition set to "attachment".
-     * 
+     *
      *     $this->setAttachment("image/jpg", array(
      *       'body' => Ak::file_get_contents('hello.jpg'),
      *       'filename' => "hello.jpg"
@@ -647,6 +647,11 @@ class AkMailBase extends Mail
     {
         $header = $this->getRawHeaders();
         return $header ? $header.AK_ACTION_MAILER_EOL.AK_ACTION_MAILER_EOL.$this->getBody() : false;
+    }
+
+    function headerIsAllowed($header_name)
+    {
+        return preg_match('/default.?|template.?|.?deliver.?|server_settings|base_url|mailerName/', $header_name) != true;
     }
 
 }

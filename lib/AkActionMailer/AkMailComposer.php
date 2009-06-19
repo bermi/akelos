@@ -137,7 +137,7 @@ class AkMailComposer extends AkObject
         }
         $this->_setAttributesIfRequired();
     }
-    
+
     function _setAttributesIfRequired()
     {
         if(empty($this->ActionMailer->_setter_has_been_called)){

@@ -34,11 +34,11 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 * = Mailer Models
 *
 * To use AkActionMailer, you need to create a mailer model.
-*   
+*
 *   $ ./script/generate mailer Notifier
 *
-* The generated model inherits from AkActionMailer. Emails are defined by 
-* creating methods within the model which are then used to set variables to be 
+* The generated model inherits from AkActionMailer. Emails are defined by
+* creating methods within the model which are then used to set variables to be
 * used in the mail template, to change options on the mail, or to add attachments.
 *
 * Examples:
@@ -69,7 +69,7 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 * named after each key in the array containing the value that that key points to.
 *
 * So, for example, <tt>setBody(array("account" => $Recipient));</tt> would result
-* in an instance variable <tt>$account</tt> with the value of <tt>$Recipient</tt> being accessible in the 
+* in an instance variable <tt>$account</tt> with the value of <tt>$Recipient</tt> being accessible in the
 * view.
 *
 *
@@ -78,7 +78,7 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 * Like AkAkActionController, each mailer class has a corresponding view directory
 * in which each method of the class looks for a template with its name.
 * To define a template to be used with a mailing, create an <tt>.tpl</tt> file with the same name as the method
-* in your mailer model. For example, in the mailer defined above, the template at 
+* in your mailer model. For example, in the mailer defined above, the template at
 * <tt>app/views/notifier/signup_notification.tpl</tt> would be used to generate the email.
 *
 * Variables defined in the model are accessible as instance variables in the view.
@@ -92,16 +92,16 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 *
 *   You got a new note!
 *   <?=$text_helper->truncate($note->body, 25);?>
-* 
+*
 *
 * = Generating URLs for mailer views
 *
-* If your view includes URLs from the application, you need to use Ak::urlFor in 
+* If your view includes URLs from the application, you need to use Ak::urlFor in
 * the mailing method instead of the view.
-* Unlike controllers from Action View, the mailer instance doesn't have any 
-* context about the incoming request. That's why you need to jump this little 
-* hoop and supply all the details needed for the URL. 
-* 
+* Unlike controllers from Action View, the mailer instance doesn't have any
+* context about the incoming request. That's why you need to jump this little
+* hoop and supply all the details needed for the URL.
+*
 * Example:
 *
 *   function signupNotification($Recipient)
@@ -122,16 +122,16 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 *
 * = Sending mail
 *
-* Once a mailer action and template are defined, you can deliver your message or 
+* Once a mailer action and template are defined, you can deliver your message or
 * create it and save it for delivery later:
 *
 *   Notifier::deliver('signup_notification', $David); // sends the email
 *   $Message = Notifier::create('signup_notification', $David); // => A PEAR::Mail object
 *   Notifier::deliver($Message);
-* 
+*
 * You never instantiate your mailer class. Rather, your delivery instance
 * methods are automatically wrapped in class methods that are called statically
-* The <tt>signup_notification</tt> method defined above is delivered by invoking 
+* The <tt>signup_notification</tt> method defined above is delivered by invoking
 * <tt>$Notifier =& new Notifier(); $Notifier->signupNotification(); $Notifier->deliver();</tt>.
 *
 *
@@ -149,7 +149,7 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 *               'from'       => "system@example.com",
 *               'subject'    => "New account information",
 *               'body'       => array('account'   => $Recipient),
-*               'content_type' => text/html" //    Here's where the magic happens 
+*               'content_type' => text/html" //    Here's where the magic happens
 *           ));
 *       }
 *   }
@@ -168,25 +168,25 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 *               'from'       => "system@example.com",
 *               'subject'    => "New account information"
 *           ));
-* 
+*
 *           $this->addPart(array(
 *               'content_type' => "text/html",
 *               'body' => $this->renderMessage('signup-as-html', 'account' => $recipient)));
-* 
+*
 *           $this->addPart("text/plain", array(
 *               'transfer_encoding' = "base64",
 *               'body' => $this->renderMessage('signup-as-plain', 'account' => $recipient)));
 *       }
 *   }
-*  
+*
 * Multipart messages can also be used implicitly because AkActionMailer will automatically
 * detect and use multipart templates, where each template is named after the name of the action, followed
 * by the content type. Each such detected template will be added as separate part to the message.
-* 
+*
 * For example, if the following templates existed:
 * * signup_notification.text.plain.tpl
 * * signup_notification.text.html.tpl
-*  
+*
 * Each would be rendered and added as a separate part to the message,
 * with the corresponding content type. The same body array is passed to
 * each template.
@@ -212,7 +212,7 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 *           $this->addAttachment(array(
 *               'content_type' => 'image/jpeg',
 *               'body' => Ak::file_get_contents("an-image.jpg")));
-* 
+*
 *           $this->addAttachment('application/pdf', generate_your_pdf_here());
 *       }
 *   }
@@ -220,19 +220,19 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 *
 * = Configuration options
 *
-* These options are specified on the class level, as class attriibutes 
+* These options are specified on the class level, as class attriibutes
 * <tt>$AkActionMailerInstance->templateRoot = "/my/templates";</tt>
 *
 * * <tt>templateRoot</tt> - template root determines the base from which template references will be made.
 *
 * * <tt>server_settings</tt> -  Allows detailed configuration of the server:
-*   * <tt>address</tt> Allows you to use a remote mail server. Just change it 
+*   * <tt>address</tt> Allows you to use a remote mail server. Just change it
 *       from its default "localhost" setting.
 *   * <tt>port</tt> On the off chance that your mail server doesn't run on port 25, you can change it.
 *   * <tt>domain</tt> If you need to specify a HELO domain, you can do it here.
 *   * <tt>user_name</tt> If your mail server requires authentication, set the username in this setting.
 *   * <tt>password</tt> If your mail server requires authentication, set the password in this setting.
-*   * <tt>authentication</tt> If your mail server requires authentication, you need to specify the authentication type here. 
+*   * <tt>authentication</tt> If your mail server requires authentication, you need to specify the authentication type here.
 *     Options are: plain, login, cram_md5
 *
 * * <tt>delivery_method</tt> - Defines a delivery method. Possible values are 'php' (default), 'smtp', and 'test'.
@@ -243,10 +243,10 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 * * <tt>deliveries</tt> - Keeps an array of all the emails sent out through the Action Mailer with delivery_method 'test'. Most useful
 *   for unit and functional testing.
 *
-* * <tt>default_charset</tt> - The default charset used for the body and to encode the subject. Defaults to UTF-8. You can also 
+* * <tt>default_charset</tt> - The default charset used for the body and to encode the subject. Defaults to UTF-8. You can also
 *   pick a different charset from inside a method with <tt>$this->charset</tt>.
 * * <tt>default_content_type</tt> - The default content type used for the main part of the message. Defaults to "text/plain". You
-*   can also pick a different content type from inside a method with <tt>$this->content_type</tt>. 
+*   can also pick a different content type from inside a method with <tt>$this->content_type</tt>.
 * * <tt>default_mime_version</tt> - The default mime version used for the message. Defaults to "1.0". You
 *   can also pick a different value from inside a method with <tt>$this->mime_version</tt>.
 * * <tt>default_implicit_parts_order</tt> - When a message is built implicitly (i.e. multiple parts are assembled from templates
@@ -343,7 +343,7 @@ class AkActionMailer extends AkBaseModel
 
     /**
     * Specify the BCC addresses for the message.
-    */    
+    */
     function setBcc($bcc)
     {
         $this->Message->setBcc($bcc);
@@ -446,7 +446,7 @@ class AkActionMailer extends AkBaseModel
     *           $this->addAttachment(array(
     *               'content_type' => 'image/jpeg',
     *               'body' => Ak::file_get_contents("an-image.jpg")));
-    * 
+    *
     *           $this->addAttachment('application/pdf', generate_your_pdf_here());
     *       }
     *   }
@@ -461,12 +461,12 @@ class AkActionMailer extends AkBaseModel
 
     /**
      * Generic setter
-     * 
+     *
      * Calling $this->set(array('body'=>'Hello World', 'subject' => 'First subject'));
      * is the same as calling $this->setBody('Hello World'); and $this->setSubject('First Subject');
-     * 
+     *
      * This simplifies creating mail objects from datasources.
-     * 
+     *
      * If the method does not exists the parameter will be added to the body.
      */
     function set($attributes = array())
@@ -475,8 +475,9 @@ class AkActionMailer extends AkBaseModel
             $this->setTemplate($attributes['template']);
             unset($attributes['template']);
         }
+
         $this->Message->set($attributes);
-        
+
         $this->_setter_has_been_called = true;
     }
 
@@ -505,7 +506,7 @@ class AkActionMailer extends AkBaseModel
      * process incoming messages, you'll need to implement a #receive
      * method that accepts the email object as a parameter and then call
      * the AkActionMailer::recieve method using "parent::recieve($Message);"
-     * 
+     *
      *
      *   class MyMailer extends AkActionMailer{
      *     function receive($Message){
@@ -573,7 +574,7 @@ class AkActionMailer extends AkBaseModel
         }elseif(!empty($Message)){
             $this->Message =& $Message;
         }
-        
+
         !empty($this->Message) or trigger_error(Ak::t('No mail object available for delivery!'), E_USER_ERROR);
         if(!empty($this->perform_deliveries)){
             $this->{"perform".ucfirst(strtolower($this->delivery_method))."Delivery"}($this->Message);
@@ -694,7 +695,7 @@ class AkActionMailer extends AkBaseModel
 
     /**
      * Workarround for limited support of helpers on ActionMailer Views
-     * 
+     *
      * @todo refactor helpers to be controller agnostic
      */
     function getControllerName()
@@ -704,7 +705,7 @@ class AkActionMailer extends AkBaseModel
 
     /**
      * This is the url_for version for helpers and emails.
-     * 
+     *
      * As we do not have the context of a host being requested, we need to know
      * the base_url like http://example.com in oder to add it to the generated URL
      */
@@ -716,7 +717,7 @@ class AkActionMailer extends AkBaseModel
             $base_url = rtrim(preg_replace('/^(?!http[s]?:\/\/)(.+)/','http://$1', (strstr($args[0]['base_url'],'.')?$args[0]['base_url']:Ak::getSetting('mailer', 'base_url', AK_HOST))),'/');
             unset($args[0]['base_url']);
         }
-       
+
         unset($args[0]['only_path'], $args[0]['base_url']);
 
         return $base_url.call_user_func_array(array('Ak','toUrl'), $args);
@@ -724,7 +725,7 @@ class AkActionMailer extends AkBaseModel
 
     /**
      * Creates an instance of each available helper and links it into into current mailer.
-     * 
+     *
      * Mailer helpers work as Controller helpers but without the Request context
      */
     function getHelpers()
