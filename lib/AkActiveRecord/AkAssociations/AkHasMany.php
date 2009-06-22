@@ -498,7 +498,8 @@ class AkHasMany extends AkAssociation
         }
 
         if(!empty($options['counter_sql']) && strtoupper(substr($options['counter_sql'],0,6)) != 'SELECT'){
-            $options['counter_sql'] = 'SELECT COUNT(*) FROM '.$table_name.' WHERE '.$options['counter_sql'];
+            $count_table_name = $table_name == '__owner' ?  $Associated->getTableName().' as __owner' : $table_name;
+            $options['counter_sql'] = 'SELECT COUNT(*) FROM '.$count_table_name.' WHERE '.$options['counter_sql'];
         }
 
         $this->setOptions($this->association_id, $options);
