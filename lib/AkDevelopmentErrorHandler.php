@@ -242,6 +242,20 @@ float:left;
     }
 
     set_error_handler('ak_development_error_handler');
+
+    define('ADODB_OUTP', 'ak_trace_db_query');
+    !defined('AK_TRACE_ONLY_APP_DB_QUERIES') && define('AK_TRACE_ONLY_APP_DB_QUERIES', true);
+
+    function ak_trace_db_query($message, $new_line = true)
+    {
+        $details = Ak::getLastFileAndLineAndMethod(AK_TRACE_ONLY_APP_DB_QUERIES);
+        if(empty($details)){
+            $details = array(null, null, null);
+        }
+        Ak::trace(trim(html_entity_decode(strip_tags($message))), $details[1], $details[0], $details[2]);
+    }
+
+
 }
 
 ?>

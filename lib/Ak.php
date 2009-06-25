@@ -584,15 +584,16 @@ class Ak
     * @param    string    $file    Helper file
     * @return echoes result to screen
     */
-    function trace($text = null, $line = null, $file = null)
+    function trace($text = null, $line = null, $file = null, $method = null)
     {
         static $counter = 0;
         if(AK_PRODUCTION_MODE){
             return;
         }
-        list($default_file, $default_line) = Ak::getLastFileAndLine();
+        list($default_file, $default_line, $default_method) = Ak::getLastFileAndLineAndMethod();
         $line = empty($line) ? $default_line : $line;
         $file = empty($file) ? $default_file : $file;
+        $method = empty($method) ? $default_method : $method;
 
         if(AK_CLI){
             $text = Ak::dump($text, 'print_r');
@@ -625,7 +626,7 @@ class Ak
             $text = AK_CLI?'---> '.$text : ($text);
         }
 
-        echo AK_CLI?"----------------\n$file ($line):\n $text\n----------------\n":"<div style='background-color:#fff;margin:10px;color:#000;font-family:sans-serif;border:3px solid #fc0;font-size:12px;'><div style='background-color:#ffc;padding:10px;color:#000;font-family:sans-serif;'>$file <span style='font-weight:bold'>$line</span></div>".$text."</div>\n";
+        echo AK_CLI?"----------------\n$file ($line):\n $text\n----------------\n":"<div style='background-color:#fff;margin:10px;color:#000;font-family:sans-serif;border:3px solid #fc0;font-size:12px;'><div style='background-color:#ffc;padding:10px;color:#000;font-family:sans-serif;'>$file <span style='font-weight:bold'>$line</span> <span style='font-style:italic'>$method</span></div>".$text."</div>\n";
     }
 
     /**
@@ -656,10 +657,20 @@ class Ak
         return $result;
     }
 
-    function getLastFileAndLine()
+    function getLastFileAndLineAndMethod($only_app = false)
     {
         $backtrace = debug_backtrace();
-        return array($backtrace[1]['file'], $backtrace[1]['line']);
+        if(!$only_app){
+            return array($backtrace[1]['file'], $backtrace[1]['line'], @$backtrace[1]['function']);
+        }else{
+        for($i = 0; $i <= count($backtrace) - 1; $i++){
+            if(isset($backtrace[$i]["line"])){
+                if(strstr($backtrace[$i]["file"], AK_COMPILED_VIEWS_DIR) || strstr($backtrace[$i]["file"], AK_APP_DIR)){
+                    return array($backtrace[$i]["file"], $backtrace[$i]["line"], $backtrace[$i]["function"]);
+                }
+            }
+        }
+        }
     }
 
     /**
