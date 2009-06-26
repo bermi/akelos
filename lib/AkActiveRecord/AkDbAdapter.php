@@ -78,10 +78,10 @@ class AkDbAdapter extends AkObject
     {
         return !empty($this->connection);
     }
-    
+
 
     /**
-     * @static 
+     * @static
      * @param array $database_settings
      * @return AkDbAdapter
      */
@@ -96,9 +96,9 @@ class AkDbAdapter extends AkObject
                 $settings_hash = AK_ENVIRONMENT;
                 $database_specifications = Ak::getSettings('database', false, $settings_hash);
             } else if (is_string($database_specifications)){
-                
+
                 $environment_settings = Ak::getSettings('database', false, $database_specifications);
-                
+
                 if (!empty($environment_settings)){
                     $database_specifications = $environment_settings;
                 } elseif(strstr($database_specifications, '://')) {
@@ -108,14 +108,14 @@ class AkDbAdapter extends AkObject
                     global $database_settings;
                     if (isset($database_settings) && !file_exists(AK_CONFIG_DIR.DS.'database.yml')) {
                         trigger_error(Ak::t("You are still using the old config/config.php database configuration. Please upgrade to use the config/database.yml configuration."), E_USER_NOTICE);
-                    } 
+                    }
                     if (!file_exists(AK_CONFIG_DIR.DS.'database.yml')) {
                         trigger_error(Ak::t("Could not find the database configuration file in %dbconfig.",array('%dbconfig'=>AK_CONFIG_DIR.DS.'database.yml')),E_USER_ERROR);
                     } else {
                         trigger_error(Ak::t("Could not find the database profile '%profile_name' in config/database.yml.",array('%profile_name'=>$database_specifications)),E_USER_ERROR);
                     }
-                    
-                    
+
+
                     $return = false;
                     return $return;
                 }
@@ -179,7 +179,7 @@ class AkDbAdapter extends AkObject
         return $dsn;
 
     }
-    
+
     function _getDbSettingsFromDsn($dsn)
     {
         $settings = $result = parse_url($dsn);
@@ -188,7 +188,7 @@ class AkDbAdapter extends AkObject
         $result['database_name'] = trim($settings['path'],'/');
         return $result;
     }
-    
+
     function type()
     {
         return $this->settings['type'];
@@ -354,6 +354,9 @@ class AkDbAdapter extends AkObject
 
     function failTransaction()
     {
+        if(AK_DEBUG && !empty($this->connection->debug)){
+            Ak::trace(ak_backtrace(), null, null, null, false);
+        }
         return $this->connection->FailTrans();
     }
 
@@ -383,7 +386,7 @@ class AkDbAdapter extends AkObject
         if(!$force_lookup && empty($available_tables)){
             if (($available_tables = AkDbSchemaCache::get('avaliable_tables')) === false) {
                 if(empty($available_tables)){
-                    $available_tables = $this->connection->MetaTables();                
+                    $available_tables = $this->connection->MetaTables();
                 }
                 AkDbSchemaCache::set('avaliable_tables', $available_tables);
                 !AK_TEST_MODE && Ak::setStaticVar('available_tables', $available_tables);
@@ -393,7 +396,7 @@ class AkDbAdapter extends AkObject
         $force_lookup && !AK_TEST_MODE && Ak::setStaticVar('available_tables', $available_tables);
         return $available_tables;
     }
-    
+
     function tableExists($table_name)
     {
         // First try if cached
@@ -405,14 +408,14 @@ class AkDbAdapter extends AkObject
         }
         return true;
     }
-    
+
     /**
      * caching the meta info
      *
      * @param unknown_type $table_name
      * @return unknown
      */
-    
+
     function getColumnDetails($table_name)
     {
         return $this->connection->MetaColumns($table_name);

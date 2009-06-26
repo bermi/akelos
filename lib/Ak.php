@@ -584,12 +584,13 @@ class Ak
     * @param    string    $file    Helper file
     * @return echoes result to screen
     */
-    function trace($text = null, $line = null, $file = null, $method = null)
+    function trace($text = null, $line = null, $file = null, $method = null, $escape_html_entities = true)
     {
         static $counter = 0;
         if(AK_PRODUCTION_MODE){
             return;
         }
+        $html_entities_function = $escape_html_entities ? 'htmlentities' : 'trim';
         list($default_file, $default_line, $default_method) = Ak::getLastFileAndLineAndMethod();
         $line = empty($line) ? $default_line : $line;
         $file = empty($file) ? $default_file : $file;
@@ -612,11 +613,11 @@ class Ak
                 }
                 $element_id = $method.'_'.$rand;
                 $formatted .= "<div style='margin:10px;'><a href='javascript:void(0);' onclick='e_$element_id = document.getElementById(\"$element_id\"); e_$element_id.style.display = (e_$element_id.style.display == \"none\"?\"block\":\"none\");' title='Set the constant AK_TRACE_DUMP_METHOD to your favourite default method'>$method</a><br />".
-                                '<pre style="'.$pre_style.'" id="'.$element_id.'">'.htmlentities(Ak::dump($text, $method)).'</pre></div>';
+                                '<pre style="'.$pre_style.'" id="'.$element_id.'">'.$html_entities_function(Ak::dump($text, $method)).'</pre></div>';
             }
             $text = $formatted;
         }elseif (is_scalar($text)){
-            $text = '<pre style="margin:10px;">'.htmlentities($text).'</pre>';
+            $text = '<pre style="margin:10px;">'.$html_entities_function($text).'</pre>';
         }
 
         if(!isset($text)){
