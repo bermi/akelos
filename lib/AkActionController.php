@@ -595,7 +595,7 @@ class AkActionController extends AkObject
     */
     function render($options = null, $status = 200)
     {
-        if(empty($options['partial']) && $this->_hasPerformed()){
+        if(empty($options['inline']) && empty($options['partial']) && $this->_hasPerformed()){
             $this->_doubleRenderError(Ak::t("Can only render or redirect once per action"));
             return false;
         }
