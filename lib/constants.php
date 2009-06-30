@@ -1,17 +1,17 @@
 <?php
 
 /**
- * This file and the lib/constants.php file perform most part of Akelos 
+ * This file and the lib/constants.php file perform most part of Akelos
  * environment guessing.
- * 
+ *
  * You can retrieve a list of current settings by running Ak::get_constants();
  *
- * If you're running a high load site you might want to fine tune this options 
- * according to your environment. If you set the options implicitly you might 
- * gain in performance but loose in flexibility when moving to a different 
+ * If you're running a high load site you might want to fine tune this options
+ * according to your environment. If you set the options implicitly you might
+ * gain in performance but loose in flexibility when moving to a different
  * environment.
- * 
- * If you need to customize the framework default settings or specify 
+ *
+ * If you need to customize the framework default settings or specify
  * internationalization options, edit the files at config/environments/*
  */
 
@@ -26,7 +26,7 @@ defined('AK_CACHE_HANDLER_MEMCACHE') ? null: define('AK_CACHE_HANDLER_MEMCACHE',
 
 // If you need to customize the framework default settings or specify internationalization options,
 // edit the files config/testing.php, config/development.php, config/production.php
-if(AK_ENVIRONMENT != 'setup'){        
+if(AK_ENVIRONMENT != 'setup'){
     require_once(AK_CONFIG_DIR.DS.'environments'.DS.AK_ENVIRONMENT.'.php');
 }
 
@@ -152,8 +152,8 @@ function ak_generate_mock($name)
 
 /**
  * This function sets a constant and returns it's value. If constant has been already defined it
- * will reutrn its original value. 
- * 
+ * will reutrn its original value.
+ *
  * Returns null in case the constant does not exist
  *
  * @param string $name
@@ -217,7 +217,7 @@ if(!AK_CLI && AK_WEB_REQUEST){
     // Will force to IP4 for localhost until IP6 is supported by helpers
     ($_SERVER['SERVER_ADDR'] == '::1' ? '127.0.0.1' : $_SERVER['SERVER_ADDR']) :
     $_SERVER['SERVER_NAME']);
-    defined('AK_REMOTE_IP') ? null : define('AK_REMOTE_IP',(isset($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']);
+    defined('AK_REMOTE_IP') ? null : define('AK_REMOTE_IP',(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : (!empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : (!empty($_ENV['HTTP_X_FORWARDED_FOR']) ? $_ENV['HTTP_X_FORWARDED_FOR'] : (empty($_ENV['REMOTE_ADDR']) ? false : $_ENV['REMOTE_ADDR']))));
 
     defined('AK_SERVER_STANDARD_PORT') ? null : define('AK_SERVER_STANDARD_PORT', AK_PROTOCOL == 'https://' ? '443' : '80');
 
