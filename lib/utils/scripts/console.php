@@ -35,7 +35,7 @@ require_once(AK_LIB_DIR.DS.'AkInstaller.php');
 
 if ($id_dir = opendir(AK_MODELS_DIR.DS)){
     while (false !== ($file = readdir($id_dir))){
-        if ($file != "." && $file != ".." && $file != '.svn' && $file[0] != '_' && substr($file,-12,8) != '_service'){
+        if (substr($file,0,1) != '.' && $file[0] != '_' && substr($file,-12,8) != '_service'){
             if(!is_dir(AK_MODELS_DIR.DS.$file)){
                 include_once(AK_MODELS_DIR.DS.$file);
             }
