@@ -245,14 +245,23 @@ float:left;
 
     define('ADODB_OUTP', 'ak_trace_db_query');
     !defined('AK_TRACE_ONLY_APP_DB_QUERIES') && define('AK_TRACE_ONLY_APP_DB_QUERIES', true);
+    !defined('AK_TRACE_DB_QUERIES_INCLUDES_DB_TYPE') && define('AK_TRACE_DB_QUERIES_INCLUDES_DB_TYPE', false);
 
     function ak_trace_db_query($message, $new_line = true)
     {
+        if(!AK_TRACE_DB_QUERIES_INCLUDES_DB_TYPE){
+            $message = preg_replace('/\([a-z0-9]+\): /','', trim($message, "\n-"));
+        }
         $details = Ak::getLastFileAndLineAndMethod(AK_TRACE_ONLY_APP_DB_QUERIES);
         if(empty($details)){
             $details = array(null, null, null);
         }
-        Ak::trace(trim(html_entity_decode(strip_tags($message))), $details[1], $details[0], $details[2]);
+        $message = trim(html_entity_decode(strip_tags($message)));
+        if(AK_CLI){
+            echo $message."\n";
+        }else{
+            Ak::trace($message, $details[1], $details[0], $details[2]);
+        }
     }
 
 
