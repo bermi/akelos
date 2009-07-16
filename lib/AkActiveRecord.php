@@ -3300,7 +3300,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     $value = empty($value) || trim($value) == 'null' ? null : $value;
                 }elseif($this->_shouldSerializeColumn($column_name)){
                     $this->_ensureClassExistsForSerializedColumnBeforeUnserializing($column_name);
-                    $value = unserialize($value);
+                    $value = @unserialize($value);
                 }
             }
         }
