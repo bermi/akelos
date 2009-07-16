@@ -651,6 +651,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Updates all records with the SET-part of an SQL update statement in updates and returns an
     * integer with the number of rows updates. A subset of the records can be selected by specifying conditions. Example:
     * <code>$Billing->updateAll("category = 'authorized', approved = 1", "author = 'David'");</code>
+    * 
+    * Or using binds, the safer way:
+    * <code>$Billing->updateAll("category = 'authorized', approved = 1", array("author = ?","David"));</code>
     *
     * Important note: Conditions are not sanitized yet so beware of accepting
     * variable conditions when using this function
@@ -664,7 +667,20 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         * @todo sanitize sql conditions
         */
         $sql = 'UPDATE '.$this->getTableName().' SET '.$updates;
+        $binds = false;
+        if(is_array($conditions)) {
+            /*
+             * take the first item as the conditions, the following are binds
+             * 
+             */
+            $binds = $conditions;
+            $conditions=array_shift($binds);
+            
+        }
         $this->addConditions($sql, $conditions);
+        if($binds) {
+            $sql = array_merge(array($sql),$binds);
+        }
         return $this->_db->update($sql, $this->getModelName().' Update All');
     }
 
@@ -743,6 +759,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * <code>$Post->destroyAll("person_id = 5 AND (category = 'Something' OR category = 'Else')");</code>
     *
+    * Or using binds, the safer way:
+    * 
+    * <code>$Post->destroyAll(array("person_id = ? AND (category = ? OR category = ?)",5,"Something","Else"));</code>
+    * 
     * Important note: Conditions are not sanitized yet so beware of accepting
     * variable conditions when using this function
     */
@@ -755,7 +775,20 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         * @todo sanitize sql conditions
         */
         $sql = 'DELETE FROM '.$this->getTableName();
-        $this->addConditions($sql,$conditions);
+        $binds = false;
+        if(is_array($conditions)) {
+            /*
+             * take the first item as the conditions, the following are binds
+             * 
+             */
+            $binds = $conditions;
+            $conditions=array_shift($binds);
+            
+        }
+        $this->addConditions($sql, $conditions);
+        if($binds) {
+            $sql = array_merge(array($sql),$binds);
+        }
         return $this->_db->delete($sql,$this->getModelName().' Delete All');
     }
 
@@ -997,8 +1030,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function &_findFromIds($ids, $options)
     {
         $expects_array = is_array($ids[0]);
-        $ids = array_unique($expects_array ? (isset($ids[1]) ? array_merge($ids[0],$ids) : $ids[0]) : $ids);
-
+       
+        $ids = array_map(array($this, 'quotedId'),array_unique($expects_array ? (isset($ids[1]) ? array_merge($ids[0],$ids) : $ids[0]) : $ids));
         $num_ids = count($ids);
 
         //at this point $options['conditions'] can't be an array
@@ -1049,7 +1082,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 }
 
                 $result =& $this->_findEvery($options);
-                if(is_array($result) && (count($result) != $num_ids && $without_conditions)){
+                if(is_array($result) && ($num_ids==1 && count($result) != $num_ids && $without_conditions)){
                     $result = false;
                 }
                 return $result;
@@ -1057,7 +1090,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
 
     }
-
+    function quotedId($id = false)
+    {
+        return $this->castAttributeForDatabase($this->getPrimaryKey(), $id ? $id : $this->getId());
+    }
     function _extractOptionsFromArgs(&$args)
     {
         $last_arg = count($args)-1;
@@ -1178,6 +1214,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             } else if ($returns == 'simulated') {
                 $objects[] = $this->getOnlyAvailableAttributes($record);
             } else if ($returns == 'array') {
+                
                 $objects[] = $this->getOnlyAvailableAttributes($record);
             }
         }
@@ -1185,6 +1222,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $false = false;
             $objects = $this->_generateStdClasses($simulation_class,$objects,$this->getType(),$false,$false,array('__owner'=>array('pk'=>$this->getPrimaryKey(),'class'=>$this->getType())));
         }
+        
         return $objects;
     }
 
@@ -3139,12 +3177,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         return null;
     }
-
-    function quotedId()
-    {
-        return $this->castAttributeForDatabase($this->getPrimaryKey(), $this->getId());
-    }
-
 
     function getAvailableAttributesQuoted()
     {
