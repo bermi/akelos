@@ -133,7 +133,7 @@ class AkActionMailerQuoting
                 continue;
             }
             preg_match_all( '/.{1,'.($max_length - 2).'}([^=]{0,2})?/', $line, $match );
-            $line = implode('='.AK_ACTION_MAILER_EOL.' ', $match[0] );
+            $line = implode('='.AK_ACTION_MAILER_EOL, $match[0] );
 
             $lines[$k] = $line;
         }
