@@ -83,17 +83,24 @@ class AkDbSchemaCache
         }elseif(empty($environment)){
             $config = AkDbSchemaCache::_config(null, null, $called);
             $file_name = AkDbSchemaCache::getCacheFileName($called);
-            if(AK_LOG_EVENTS){
-                $Logger =& Ak::getLogger();
-                $Logger->message('Updating database settings on '.$file_name);
-            }
+            
             /**
             * @todo On PHP5 var_export requires objects that implement the __set_state magic method.
             *       As see on stangelanda at arrowquick dot benchmarks at comhttp://php.net/var_export
             *       serialize works faster without opcode caches. We should do our benchmarks with 
             *       var_export VS serialize using APC once we fix the __set_state magic on phpAdoDB
             */
-            Ak::file_put_contents($file_name, serialize($config));
+            if(AK_LOG_EVENTS){
+                    $Logger =& Ak::getLogger();
+            }
+            if(!AK_CLI) {
+                if(AK_LOG_EVENTS){
+                    $Logger->message('Updating database settings on '.$file_name);
+                }
+                Ak::file_put_contents($file_name, serialize($config));
+            } else if(AK_LOG_EVENTS){
+                $Logger->message('Skipping writing of cache file: '.$file_name);
+            }
         }
     }
     
