@@ -300,8 +300,214 @@ class AkMailParser
         }
         return ;
     }
+    function _extractCssRulesFromContent($contents,$cssRules=false)
+    {
+        if(empty($cssRules)) {
+            $cssRules=array('id'=>array(),'class'=>array(),'element'=>array());
+        }
+        if(preg_match_all('/(.*?)\{(.*?)\}/s',$contents,$rules)) {
+            Ak::getLogger()->log('message','rules from '.$contents.':'.var_export($rules,true));
+            $ruleNames=$rules[1];
+            foreach($ruleNames as $idx=>$ruleName) {
+                $ruleName=trim($ruleName);
+                switch(substr($ruleName,0,1)) {
+                    case '#':
+                        $ruleName=substr($ruleName,1);
+                        if(!isset($cssRules['id'][$ruleName])) {
+                            $cssRules['id'][$ruleName] = '';
+                        }
+                        $cssRules['id'][$ruleName].=trim(str_replace(array('[',']'),array('{','}'),$rules[2][$idx]));
+                        break;
+                    case '.':
+                        $ruleName=substr($ruleName,1);
+                        if(!isset($cssRules['class'][$ruleName])) {
+                            $cssRules['class'][$ruleName] = '';
+                        }
+                        $cssRules['class'][$ruleName].=trim($rules[2][$idx]);
+                        break;
+                    default:
+                        if(!isset($cssRules['element'][$ruleName])) {
+                            $cssRules['element'][$ruleName] = '';
+                        }
+                        $cssRules['element'][$ruleName].=trim($rules[2][$idx]);
+                }
+            }
+        }
+        return $cssRules;
+    }
+    function _extractCssRulesFromFile($path,$cssRules = false)
+    {
+        if(empty($cssRules)) {
+            $cssRules=array('id'=>array(),'class'=>array(),'element'=>array());
+        }
+        $path = $this->_getStylesheetPath($path);
+        $contents = Ak::file_get_contents($path);
+        $cssRules=$this->_extractCssRulesFromContent($contents);
+        return $cssRules;
+    }
+    /**
+     * On HTML Email it searches for the <a> tags and adds (if not present) a
+     * target="_blank" attribute to not annoy all those webmail users with a link
+     * opening inside their mail-page.
+     *
+     * @param AkMailBase $Mail
+     */
+    function addBlankTargetToLinks(&$Mail)
+    {
+        $html = &$Mail->body;
+        $links = array();
+        $replace=array();
+        if(preg_match_all('/<a[^>]+>/',$html,$matches)) {
+            foreach($matches[0] as $link) {
+                if(!strstr($link,'target=')) {
+                    $links[]=substr($link,0,-1).' target="_blank">';
+                    $replace[]=$link;
+                }
+            }
+            $modified_html = str_replace($replace,$links,$html);
+            if($modified_html !== false && $html != $modified_html) {
+                $html = $modified_html;
+            }
+        }
+    }
+    /**
+     * Extracts CSS rules from inline css and externally linked css-files, because
+     * HTML Email does not really support CSS, especially Webmailers dont. (see http://www.campaignmonitor.com/css/)
+     * Applys the #id,.class and element rules to the appropriate tags inside
+     * the <element style=""/> attribute.
+     * 
+     * Only simple css rules are supported like:
+     * 
+     * <code>
+     * <style>
+     * #id {
+     * font-size:11px;
+     * color:black;
+     * }
+     * 
+     * .class {
+     * color:orange;
+     * }
+     * 
+     * h1 {
+     * margin-top:20px;
+     * }
+     * </style>
+     * 
+     * <h1 id="id">Title</h1>
+     * <p class="class">Paragraph</p>
+     *
+     *</code>
+     * 
+     * Will be converted to:
+     * 
+     * <code>
+     * 
+     * <h1 id="id" style="margin-top:20px;color:orange;font-size:11px;color:black;">Title</h1>
+     * <p class="class" style="color:orange;">Paragraph</p>
+     *
+     *</code>
+     * 
+     * The order of the rules is:
+     * 
+     * 1. Element (h1)
+     * 2. Class (.class)
+     * 3. ID (#id)
+     * 
+     * Like that the #id values will have precedence over everything.
+     * 
+     * 
+     * @param AkMailBase $Mail
+     */
+    function applyCssStylesToTags(&$Mail)
+    {
+        $cssRules=$this->_extractCssRules($Mail);
+        $this->_applyCssRules($Mail,$cssRules);
+    }
     
-    
+    function _applyCssRules(&$Mail,$cssRules)
+    {
+        Ak::getLogger()->log('message','detected css rules:'.var_export($cssRules,true));
+        $html = &$Mail->body;
+        
+        
+        if(!empty($cssRules['element']))
+        foreach($cssRules['element'] as $name=>$style) {
+            if(preg_match_all('/(<'.$name.'.*?>)/s',$html,$matches)) {
+                foreach($matches[0] as $idx=>$fullMatch) {
+                    $replaceFullmatch=$fullMatch;
+                    if(preg_match('/style=[\'"](.*?)[\'"]/',$fullMatch,$smatches)) {
+                        $style=rtrim($smatches[1],' ;').';'.$style;
+                        $fullMatch=str_replace($smatches[0],' ',$fullMatch);
+                    }
+                    $newHtml=substr($fullMatch,0,-1).' style="'.str_replace('"',"'",$style).'">';
+                    $modified_html = str_replace($replaceFullmatch,$newHtml,$html);
+                    if($modified_html!=$html && $modified_html!==false) {
+                        $html=$modified_html;
+                    }
+                }
+            }
+        }
+        if(!empty($cssRules['class']))
+        foreach($cssRules['class'] as $name=>$style) {
+            if(preg_match_all('/(<[^>]+?class=[\'"][^>]*?'.$name.'[^>]*?[\'"][^>]*?>)/s',$html,$matches)) {
+                foreach($matches[0] as $idx=>$fullMatch) {
+                    $replaceFullmatch=$fullMatch;
+                    if(preg_match('/style=[\'"](.*?)[\'"]/',$fullMatch,$smatches)) {
+                        $style=rtrim($smatches[1],' ;').';'.$style;
+                        $fullMatch=str_replace($smatches[0],' ',$fullMatch);
+                    }
+                    $newHtml=substr($fullMatch,0,-1).' style="'.str_replace('"',"'",$style).'">';
+                    $modified_html = str_replace($replaceFullmatch,$newHtml,$html);
+                    if($modified_html!=$html && $modified_html!==false) {
+                        $html=$modified_html;
+                    }
+                }
+            }
+        }
+        if(!empty($cssRules['id']))
+        foreach($cssRules['id'] as $name=>$style) {
+            if(preg_match_all('/(<[^>]+?id=[\'"]'.$name.'[\'"][^>]*?>)/s',$html,$matches)) {
+                foreach($matches[0] as $idx=>$fullMatch) {
+                    $replaceFullmatch=$fullMatch;
+                    if(preg_match('/style=[\'"](.*?)[\'"]/',$fullMatch,$smatches)) {
+                        $style=rtrim($smatches[1],' ;').';'.$style;
+                        $fullMatch=str_replace($smatches[0],' ',$fullMatch);
+                    }
+                    $newHtml=substr($fullMatch,0,-1).' style="'.str_replace('"',"'",$style).'">';
+                    $modified_html = str_replace($replaceFullmatch,$newHtml,$html);
+                    if($modified_html!=$html && $modified_html!==false) {
+                        $html=$modified_html;
+                    }
+                }
+            }
+        }
+    }
+    function _extractCssRules(&$Mail)
+    {
+        $html =& $Mail->body;
+        $cssRules=array();
+        if(preg_match_all('/<link.*?rel=[\'"]stylesheet[\'"].*?href=[\'"](.*?)[\'"].*?\/>/',$html,$matches)) {
+            foreach($matches[1] as $idx=>$cssfile) {
+                
+                $cssRules=$this->_extractCssRulesFromFile($cssfile,$cssRules);
+                
+            }
+        }
+        /**
+         * get Inline Rules
+         */
+        if(preg_match_all('/<style[^>]*>(.*?)<\/style>/s',$html,$matches)) {
+            foreach($matches[1] as $idx=>$css) {
+                $cssRules=$this->_extractCssRulesFromContent($css,$cssRules);
+                $modified_html = str_replace($matches[0][$idx],'',$html);
+                if($modified_html != $html && $modified_html !==false) {
+                    $html=$modified_html;
+                }
+            }
+        }
+        return $cssRules;
+    }
     function extractImagesIntoInlineParts(&$Mail, $options = array())
     {
         $html =& $Mail->body;
@@ -337,7 +543,31 @@ class AkMailParser
             }
         }
     }
-    
+    function _getStylesheetPath($path)
+    {
+        if(preg_match('/^http(s)?:\/\//', $path)){
+            $path_info = pathinfo($path);
+            $base_file_name = Ak::sanitize_include($path_info['basename'], 'paranaoid');
+            if(empty($path_info['extension'])){ // no extension, we don't do magic stuff
+                $path = '';
+            }else{
+                $local_path = AK_TMP_DIR.DS.'mailer'.DS.'remote_css'.DS.md5($base_file_name['dirname']).DS.$base_file_name.'.'.$path_info['extension'];
+                if(!file_exists($local_path) || (time() > @filemtime($local_path)+7200)){
+                    if(!Ak::file_put_contents($local_path, Ak::url_get_contents($path))){
+                        return '';
+                    }
+                }
+                return $local_path;
+            }
+        }
+
+        $path = AK_PUBLIC_DIR.Ak::sanitize_include($path);
+
+        if(!file_exists($path)){
+            $path = '';
+        }
+        return $path;
+    }
     function _getImagePath($path)
     {
         if(preg_match('/^http(s)?:\/\//', $path)){

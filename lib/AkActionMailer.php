@@ -616,14 +616,21 @@ class AkActionMailer extends AkBaseModel
     {
         return $this->render(array_merge($options, array('file' => $method_name, 'body' => $body)));
     }
-
+    
     function render($options = array())
     {
-        $body = $options['body'];
-        unset($options['body']);
-        $Template =& $this->_initializeTemplateClass($body);
+        if(isset($options['body'])) {
+            $body = $options['body'];
+            unset($options['body']);
+            $Template =& $this->_initializeTemplateClass($body);
+        } else {
+            $Template =& $this->_initializeTemplateClass(null);
+        }
         $options['locals'] = array_merge((array)@$options['locals'], $this->getHelpers());
-        $options['locals'] = array_merge($options['locals'], array('mailer'=>&$this));
+        $options['locals'] = array_merge($options['locals'], array('mailer'=>&$this,'controller'=>&$this));
+        if(!empty($body)) {
+            $options['locals']['body'] = $body;
+        }
         return $Template->render($options);
     }
 
@@ -631,8 +638,6 @@ class AkActionMailer extends AkBaseModel
     {
         return $this->templateRoot.DS.$this->mailerName;
     }
-
-
 
     /**
     * Set up the default values for the various instance variables of this
@@ -664,7 +669,7 @@ class AkActionMailer extends AkBaseModel
         $TemplateInstance->_registerTemplateHandler('tpl','AkPhpTemplateHandler');
         return $TemplateInstance;
     }
-
+    
     function &getComposer()
     {
         if(empty($this->Composer)){
@@ -756,5 +761,6 @@ class AkActionMailer extends AkBaseModel
 
 
 }
+
 
 ?>

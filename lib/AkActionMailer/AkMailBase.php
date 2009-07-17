@@ -51,9 +51,14 @@ class AkMailBase extends Mail
         if(is_string($body)){
             $content_type = @$this->content_type;
             $this->body = stristr($content_type,'text/') ? str_replace(array("\r\n","\r"),"\n", $body) : $body;
-            if($this->_attach_html_images && $content_type == 'text/html'){
+            
+            if($content_type == 'text/html'){
                 $Parser = new AkMailParser();
-                $Parser->extractImagesIntoInlineParts($this);
+                $Parser->applyCssStylesToTags($this);
+                $Parser->addBlankTargetToLinks($this);
+                if($this->_attach_html_images) {
+                    $Parser->extractImagesIntoInlineParts($this);
+                }
             }
         }else{
             $this->body = $body;
