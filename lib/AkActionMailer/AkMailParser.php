@@ -581,6 +581,10 @@ class AkMailParser
                     if(!Ak::file_put_contents($local_path, Ak::url_get_contents($path))){
                         return '';
                     }
+                    
+                }
+                if(@filesize($local_path)<1) {
+                    return '';
                 }
                 return $local_path;
             }
