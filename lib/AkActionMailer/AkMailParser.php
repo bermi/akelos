@@ -433,14 +433,15 @@ class AkMailParser
         
         if(!empty($cssRules['element']))
         foreach($cssRules['element'] as $name=>$style) {
-            if(preg_match_all('/(<'.$name.'.*?>)/s',$html,$matches)) {
+            if(preg_match_all('/(<'.$name.'[^>]*?>)/s',$html,$matches)) {
                 foreach($matches[0] as $idx=>$fullMatch) {
                     $replaceFullmatch=$fullMatch;
-                    if(preg_match('/style=[\'"](.*?)[\'"]/',$fullMatch,$smatches)) {
+                    if(preg_match('/style=[\'"](.*?)[\'"]/s',$fullMatch,$smatches)) {
                         $style=rtrim($smatches[1],' ;').';'.$style;
                         $fullMatch=str_replace($smatches[0],' ',$fullMatch);
                     }
-                    $newHtml=substr($fullMatch,0,-1).' style="'.str_replace('"',"'",$style).'">';
+                    list($style,$addAttributes,$fullMatch)=$this->_uniqueStyle($style, $fullMatch);
+                    $newHtml=substr($fullMatch,0,-1).' style="'.str_replace('"',"'",$style).'"'.(!empty($addAttributes)?' '.implode(' ',$addAttributes):'').'>';
                     $modified_html = str_replace($replaceFullmatch,$newHtml,$html);
                     if($modified_html!=$html && $modified_html!==false) {
                         $html=$modified_html;
@@ -450,14 +451,24 @@ class AkMailParser
         }
         if(!empty($cssRules['class']))
         foreach($cssRules['class'] as $name=>$style) {
-            if(preg_match_all('/(<[^>]+?class=[\'"][^>]*?'.$name.'[^>]*?[\'"][^>]*?>)/s',$html,$matches)) {
+            if(preg_match_all('/<[^>]+?class=([\'"][^>]*?'.$name.'[^>]*?[\'"])[^>]*?>/s',$html,$matches)) {
                 foreach($matches[0] as $idx=>$fullMatch) {
                     $replaceFullmatch=$fullMatch;
-                    if(preg_match('/style=[\'"](.*?)[\'"]/',$fullMatch,$smatches)) {
+                    $classes=preg_split('/[\s\n]/',trim($matches[1][$idx],'\'"'));
+                    if(!in_array($name,$classes))continue;
+                    $classes=array_diff($classes,array($name));
+                    if(preg_match('/style=[\'"](.*?)[\'"]/s',$fullMatch,$smatches)) {
                         $style=rtrim($smatches[1],' ;').';'.$style;
                         $fullMatch=str_replace($smatches[0],' ',$fullMatch);
                     }
-                    $newHtml=substr($fullMatch,0,-1).' style="'.str_replace('"',"'",$style).'">';
+                    if(!empty($classes)) {
+                        $fullMatch = str_replace('class='.$matches[1][$idx],'class="'.implode(' ',$classes).'"',$fullMatch);
+                    } else {
+                        $fullMatch = str_replace('class='.$matches[1][$idx],'',$fullMatch);
+                    }
+                    list($style,$addAttributes,$fullMatch)=$this->_uniqueStyle($style, $fullMatch);
+                    $newHtml=substr($fullMatch,0,-1).' style="'.str_replace('"',"'",$style).'"'.(!empty($addAttributes)?' '.implode(' ',$addAttributes):'').'>';
+                    //$newHtml=substr($fullMatch,0,-1).' style="'.str_replace('"',"'",$this->_uniqueStyle($style)).'">';
                     $modified_html = str_replace($replaceFullmatch,$newHtml,$html);
                     if($modified_html!=$html && $modified_html!==false) {
                         $html=$modified_html;
@@ -467,14 +478,20 @@ class AkMailParser
         }
         if(!empty($cssRules['id']))
         foreach($cssRules['id'] as $name=>$style) {
-            if(preg_match_all('/(<[^>]+?id=[\'"]'.$name.'[\'"][^>]*?>)/s',$html,$matches)) {
+            if(preg_match_all('/<[^>]+?(id=[\'"]'.$name.'[\'"])[^>]*?>/s',$html,$matches)) {
                 foreach($matches[0] as $idx=>$fullMatch) {
                     $replaceFullmatch=$fullMatch;
-                    if(preg_match('/style=[\'"](.*?)[\'"]/',$fullMatch,$smatches)) {
+                    if(preg_match('/style=[\'"](.*?)[\'"]/s',$fullMatch,$smatches)) {
                         $style=rtrim($smatches[1],' ;').';'.$style;
                         $fullMatch=str_replace($smatches[0],' ',$fullMatch);
                     }
-                    $newHtml=substr($fullMatch,0,-1).' style="'.str_replace('"',"'",$style).'">';
+                    /**
+                     * removing id
+                     */
+                    $fullMatch=str_replace($matches[1][$idx],'',$fullMatch);
+                    list($style,$addAttributes,$fullMatch)=$this->_uniqueStyle($style, $fullMatch);
+                    $newHtml=substr($fullMatch,0,-1).' style="'.str_replace('"',"'",$style).'"'.(!empty($addAttributes)?' '.implode(' ',$addAttributes):'').'>';
+                    //$newHtml=substr($fullMatch,0,-1).' style="'.str_replace('"',"'",$this->_uniqueStyle($style)).'">';
                     $modified_html = str_replace($replaceFullmatch,$newHtml,$html);
                     if($modified_html!=$html && $modified_html!==false) {
                         $html=$modified_html;
@@ -483,6 +500,80 @@ class AkMailParser
             }
         }
     }
+    function _parseCssElementValue($name,$value)
+    {
+        switch($name) {
+            case 'width':
+            case 'height':
+                return $name.'="'.(strstr($value,'%')?$value:intval($value)).'"';
+                break;
+            case 'text-align':
+                return 'align="'.$value.'"';
+                break;
+            case 'vertical-align':
+                return 'valign="'.$value.'"';
+                break;
+            case 'margin':
+                $margins=preg_split('/\s+/',$value);
+                switch(count($margins)) {
+                    case 1:
+                        return 'marginheight="'.intval($value).'" marginwidth="'.intval($value).'" leftmargin="'.intval($value).'" topmargin="'.intval($value).'"';
+                    break;
+                    case 2:
+                    case 3:
+                        return 'marginheight="'.intval($margins[0]).'" marginwidth="'.intval($margins[1]).'" leftmargin="'.intval($margins[1]).'" topmargin="'.intval($margins[0]).'"';
+                    break;
+                    case 4:
+                        return 'marginheight="'.intval($margins[0]).'" marginwidth="'.intval($margins[3]).'" leftmargin="'.intval($margins[3]).'" topmargin="'.intval($margins[0]).'"';
+                     break;
+                }
+                break;
+            case 'margin-left':
+                return ' marginwidth="'.intval($value).'" leftmargin="'.intval($value).'"';
+                break;
+            case 'margin-top':
+                return 'marginheight="'.intval($value).'" topmargin="'.intval($value).'"';
+                break;
+            case 'background-color':
+                return 'bgColor="'.$value.'"';
+                break;
+            case 'border':
+                return $name.'="'.intval($value).'"';
+                break;
+            default:
+                return $name.'="'.$value.'"';
+        }
+    }
+    function _uniqueStyle($stylestring, $fullElement = '') {
+        $styles=split(';',$stylestring);
+        $newstyles=array();
+        $styleArray=array();
+        foreach($styles as $style) {
+            $parts = @split(':',$style,2);
+            
+            if(!empty($parts[1])) {
+                $styleArray[trim($parts[0])]=trim($parts[1]);
+            }
+        }
+        $possibleElementAttributes=array('width','height','border','text-align','vertical-align','margin','margin-top','margin-left','background-color');
+        $elementAttributes=array();
+        foreach($styleArray as $name => $value) {
+            if(in_array($name,$possibleElementAttributes)) {
+                if(preg_match('/'.$name.'=[\'"][^>]+?[\'"]/',$fullElement,$attrMatches)) {
+                    $fullElement = str_replace($attrMatches[0],$this->_parseCssElementValue($name,$value),$fullElement);
+                } else {
+                    $elementAttributes[]=$this->_parseCssElementValue($name,$value);
+                }
+            }
+            $newstyles[]=$name.': '.$value;
+        }
+        if(!empty($newstyles)) {
+            return array(implode(';',$newstyles),$elementAttributes,$fullElement);
+        } else {
+            return array($stylestring,array(),$fullElement);
+        }
+    }
+    
     function _extractCssRules(&$Mail)
     {
         $html =& $Mail->body;
@@ -508,6 +599,7 @@ class AkMailParser
         }
         return $cssRules;
     }
+    
     function extractImagesIntoInlineParts(&$Mail, $options = array())
     {
         $html =& $Mail->body;
@@ -522,6 +614,7 @@ class AkMailParser
 
             foreach ($images as $image){
                 $original_image_name = $image;
+                if(substr($image,0,4)=='cid:') continue;
                 $image = $this->_getImagePath($image);
                 if(!empty($image)){
                     $extenssion = substr($image, strrpos('.'.$image,'.'));
@@ -589,10 +682,10 @@ class AkMailParser
                 return $local_path;
             }
         }
-
-        $path = AK_PUBLIC_DIR.Ak::sanitize_include($path);
-
-        if(!file_exists($path)){
+        $org_path=$path;
+        $path = AK_PUBLIC_DIR.$path;
+        $path=realpath($path);
+        if(substr($path,0,strlen(AK_PUBLIC_DIR))!=AK_PUBLIC_DIR || !file_exists($path)){
             $path = '';
         }
         return $path;

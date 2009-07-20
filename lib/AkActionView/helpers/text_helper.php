@@ -428,13 +428,27 @@ class TextHelper extends AkObject
     function get_image_urls_from_html($text)
     {
         $linked_urls = array();
-        if(preg_match_all('/<img [^>]*src[ ]?=[ \'"]?(['.AK_VALID_URL_CHARS_REGEX.']+)[ \'"]?[^>]*>/i', $text, $linked_urls_pieces)){
+        if(preg_match_all('/<img[^>]+src[ ]?=[ \'"]?(['.AK_VALID_URL_CHARS_REGEX.']+)[ \'"]?[^>]*>/is', $text, $linked_urls_pieces)){
             $linked_urls = array_unique($linked_urls_pieces[1]);
         }
         return $linked_urls;
     }
 
-
+/**
+     * Returns an array with the image urls found on a text 
+     *  
+     *  Example: 
+     * $text_helper->get_linked_urls_from_text('<a href="http://akelos.com">Akelos.com</a>');
+     * //returns: array('http://akelos.com/images/logo.gif');
+     */
+    function get_image_urls_and_element_from_html($text)
+    {
+        $linked_urls = array();
+        if(preg_match_all('/<img[^>]+src[ ]?=[ \'"]?(['.AK_VALID_URL_CHARS_REGEX.']+)[ \'"]?[^>]*>/is', $text, $linked_urls_pieces)){
+            return $linked_urls_pieces;
+        }
+        return $linked_urls;
+    }
     /**
      * Cycles through items of an array every time it is called. 
      * This can be used to alternate classes for table rows:

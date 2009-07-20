@@ -254,6 +254,8 @@ class AkMailComposer extends AkObject
         }
         return $templates[$path];
     }
+    
+    
 
 
 }
