@@ -80,7 +80,7 @@ class FormOptionsHelper extends AkActionViewHelper
      * In addition, this allows a single partial to be used to generate form inputs for both edit and create forms.
      *
      * By default, $post.person_id is the selected option.  Specify 'selected' => value to use a different selection
-     * or 'selected' => null to leave all options unselected.
+     * or 'selected' => null to leave all options unselected. You can also specify a default value with 'default' => value.
      */
     function select($object_name,  $column_name, $choices, $options = array(), $html_options = array())
     {
@@ -351,6 +351,11 @@ class AkFormHelperOptionsInstanceTag extends AkFormHelperInstanceTag
     {
         $this->add_default_name_and_id($html_options);
         $selected_value = !empty($options['selected']) ? $options['selected'] : $this->getValue();
+
+        if (empty($selected_value) && isset($options['default'])){
+            $selected_value = $options['default'];
+        }
+
         unset($options['selected']);
         return TagHelper::content_tag('select', $this->_addOptions($this->_template_object->options_for_select($choices, $selected_value, $options),
         $html_options, $this->getValue()), Ak::delete($html_options,'prompt','include_blank'));

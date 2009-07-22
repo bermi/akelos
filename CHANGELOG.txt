@@ -1,3 +1,23 @@
+[1341] Adding support for finding within collections on finders.
+
+Now you can use on your finders
+
+{{{
+$Tag->find(array('conditions'=> array('name IN (?)', array('Tag 1', 'Tag 2'))));
+}}}
+
+And it will escape, quote and bind the attributes properly generating this SQL
+
+{{{
+SELECT * FROM tags WHERE name IN ('Tag 1', 'Tag 2')
+}}}
+
+You can also pass a collection of Active Record elements like those returned on by a finder.
+ 
+{{{
+$Tag->find(array('conditions'=> array('name IN (?)', $PopularTags->find())));
+}}}
+
 [1257] Sice rev.1247 until rev.1257 indexes where not added automatically by convention on migrations and installers. 
 
 Please verify your databases to make sure necesary indexes are in place.

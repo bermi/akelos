@@ -651,7 +651,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Updates all records with the SET-part of an SQL update statement in updates and returns an
     * integer with the number of rows updates. A subset of the records can be selected by specifying conditions. Example:
     * <code>$Billing->updateAll("category = 'authorized', approved = 1", "author = 'David'");</code>
-    * 
+    *
     * Or using binds, the safer way:
     * <code>$Billing->updateAll("category = 'authorized', approved = 1", array("author = ?","David"));</code>
     *
@@ -670,12 +670,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $binds = false;
         if(is_array($conditions)) {
             /*
-             * take the first item as the conditions, the following are binds
-             * 
-             */
+            * take the first item as the conditions, the following are binds
+            *
+            */
             $binds = $conditions;
             $conditions=array_shift($binds);
-            
+
         }
         $this->addConditions($sql, $conditions);
         if($binds) {
@@ -749,7 +749,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             return Ak::handleStaticCall();
         }
         $id = func_num_args() > 1 ? func_get_args() : $id;
-        return $this->deleteAll($this->getPrimaryKey().' IN ('.(is_array($id) ? join(', ',$id) : $id).')');
+        return $this->deleteAll($this->getPrimaryKey().' IN ('.join(', ', $this->castAttributesForDatabase($this->getPrimaryKey(), Ak::toArray($id))).')');
     }
 
 
@@ -760,9 +760,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * <code>$Post->destroyAll("person_id = 5 AND (category = 'Something' OR category = 'Else')");</code>
     *
     * Or using binds, the safer way:
-    * 
+    *
     * <code>$Post->destroyAll(array("person_id = ? AND (category = ? OR category = ?)",5,"Something","Else"));</code>
-    * 
+    *
     * Important note: Conditions are not sanitized yet so beware of accepting
     * variable conditions when using this function
     */
@@ -778,12 +778,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $binds = false;
         if(is_array($conditions)) {
             /*
-             * take the first item as the conditions, the following are binds
-             * 
-             */
+            * take the first item as the conditions, the following are binds
+            *
+            */
             $binds = $conditions;
             $conditions=array_shift($binds);
-            
+
         }
         $this->addConditions($sql, $conditions);
         if($binds) {
@@ -839,8 +839,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if(!$this->beforeDestroy() || !$this->notifyObservers('beforeDestroy')){
             return $this->transactionFail();
         }
-
-        $sql = 'DELETE FROM '.$this->getTableName().' WHERE '.$this->getPrimaryKey().' = '.$this->_db->quote_string($this->getId());
+        $sql = 'DELETE FROM '.$this->getTableName().' WHERE '.$this->getPrimaryKey().' = '.$this->castAttributeForDatabase($this->getPrimaryKey(), $this->getId());
         if ($this->_db->delete($sql,$this->getModelName().' Destroy') !== 1){
             return $this->transactionFail();
         }
@@ -1030,7 +1029,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function &_findFromIds($ids, $options)
     {
         $expects_array = is_array($ids[0]);
-       
+
         $ids = array_map(array($this, 'quotedId'),array_unique($expects_array ? (isset($ids[1]) ? array_merge($ids[0],$ids) : $ids[0]) : $ids));
         $num_ids = count($ids);
 
@@ -1067,7 +1066,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
             default:
                 $without_conditions = empty($options['conditions']) ? true : false;
-                $ids_condition = $this->getPrimaryKey().' IN ('.join(', ',$ids).')';
+                $ids_condition = $this->getPrimaryKey().' IN ('.join(', ', $this->castAttributesForDatabase($this->getPrimaryKey(), $ids)).')';
                 if (!preg_match('/SELECT .* FROM/is', $conditions)) {
                     $options['conditions'] = $ids_condition.(empty($conditions)?'':' AND '.$conditions);
                 } else {
@@ -1168,8 +1167,24 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 $options['conditions'] = join(' AND ',(array)$this->getAttributesQuoted($options['conditions']));
             }
         }
-
+        $this->_sanitizeConditionsCollections($options);
     }
+
+    function _sanitizeConditionsCollections(&$options)
+    {
+        if(!empty($options['bind']) && is_array($options['bind']) && preg_match_all('/([a-z]+) IN \(?\?\)?/i', $options['conditions'], $matches)){
+            $i = 0;
+            foreach($options['bind'] as $k => $v){
+                if(isset($matches[1][$i]) && is_array($v)){
+                    $value = join(', ', $this->castAttributesForDatabase($matches[1][$i], $v));
+                    $options['conditions'] = str_replace($matches[0][$i], str_replace('?', $value, $matches[0][$i]), $options['conditions']);
+                    unset($options['bind'][$k]);
+                    $i++;
+                }
+            }
+        }
+    }
+
 
     function &findFirst()
     {
@@ -1214,7 +1229,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             } else if ($returns == 'simulated') {
                 $objects[] = $this->getOnlyAvailableAttributes($record);
             } else if ($returns == 'array') {
-                
+
                 $objects[] = $this->getOnlyAvailableAttributes($record);
             }
         }
@@ -1222,7 +1237,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $false = false;
             $objects = $this->_generateStdClasses($simulation_class,$objects,$this->getType(),$false,$false,array('__owner'=>array('pk'=>$this->getPrimaryKey(),'class'=>$this->getType())));
         }
-        
+
         return $objects;
     }
 
@@ -1320,7 +1335,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         $conditions = array($sql);
         foreach ($query_values as $bind_value){
-            $conditions[] = $bind_value;
+            if($bind_value !== null){
+                $conditions[] = $bind_value;
+            }
         }
         /**
         * @todo merge_conditions
@@ -1419,6 +1436,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         foreach ($requested_columns as $attribute){
             $replacements[$attribute] = $this->castAttributeForDatabase($attribute, $this->get($attribute));
         }
+
         return trim(preg_replace('/('.join('|',array_keys($replacements)).')\s+([^\?]+)\s+\?/e', "isset(\$replacements['\\1']) ? '\\1 \\2 '.\$replacements['\\1']:'\\1 \\2 null'", $sql));
     }
 
@@ -1500,8 +1518,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         if(!empty($conditions)){
 
-                $sql  .= $concat.$conditions;
-                $concat = ' AND ';
+            $sql  .= $concat.$conditions;
+            $concat = ' AND ';
 
         }
 
@@ -2661,11 +2679,11 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
     function getColumnsWithRegexBoundariesAndAlias($alias)
     {
-            $columns = array_keys($this->getColumns());
-            foreach ($columns as $k=>$column){
-                $columns[$k] = '/([^_])\b('.$alias.')\.('.$column.')\b/';
-            }
-            return $columns;
+        $columns = array_keys($this->getColumns());
+        foreach ($columns as $k=>$column){
+            $columns[$k] = '/([^_])\b('.$alias.')\.('.$column.')\b/';
+        }
+        return $columns;
     }
     function getColumnsWithRegexBoundaries()
     {
@@ -2741,10 +2759,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $column_objects = $this->_databaseTableInternals($this->getTableName());
 
             if( !isset($this->_avoidTableNameValidation) &&
-                !is_array($column_objects) &&
-                !$this->_runCurrentModelInstallerIfExists($column_objects)){
-                    trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())), E_USER_ERROR);
-                    return false;
+            !is_array($column_objects) &&
+            !$this->_runCurrentModelInstallerIfExists($column_objects)){
+                trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())), E_USER_ERROR);
+                return false;
             }elseif (empty($column_objects)){
                 $this->_runCurrentModelInstallerIfExists($column_objects);
             }
@@ -3274,6 +3292,26 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return empty($this->_columns[$column_name]['notNull']) ? ($result === '' ? "''" : $result) : ($result === 'null' ? '' : $result);
     }
 
+    /**
+    * You can use this method for casting multiple attributes of the same time at once.
+    *
+    * You can pass an array of values or an array of Active Records that might be the response of a finder.
+    */
+    function castAttributesForDatabase($column_name, $values, $add_quotes = true)
+    {
+        $casted_values = array();
+        $values = !empty($values[0]) && is_object($values[0]) && method_exists($values[0], 'collect') && method_exists($values[0], 'getPrimaryKey') ?
+        $values[0]->collect($values, $values[0]->getPrimaryKey(), $column_name)
+        : Ak::toArray($values);
+        if(!empty($values)){
+            $casted_values = array();
+            foreach ($values as $value){
+                $casted_values[] = $this->castAttributeForDatabase($column_name, $value, $add_quotes);
+            }
+        }
+        return $casted_values;
+    }
+
     function castAttributeFromDatabase($column_name, $value)
     {
         if($this->hasColumn($column_name)){
@@ -3363,7 +3401,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         static $imported_cache = array();
         if(empty($imported_cache[$column_name])){
             $class_name = isset($this->serialize[$column_name])  ?
-                (is_string($this->serialize[$column_name]) ? $this->serialize[$column_name] : $column_name) : $column_name;
+            (is_string($this->serialize[$column_name]) ? $this->serialize[$column_name] : $column_name) : $column_name;
             Ak::import($class_name);
             $imported_cache[$column_name] = true;
         }
@@ -4512,10 +4550,11 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         foreach ($this->_errors as $attribute=>$errors){
             $full_messages[$attribute] = array();
+            $attribute_name = AkInflector::humanize($this->_delocalizeAttribute($attribute));
             foreach ($errors as $error){
                 $full_messages[$attribute][] = $this->t('%attribute_name %error', array(
-                '%attribute_name'=>AkInflector::humanize($this->_delocalizeAttribute($attribute)),
-                '%error'=>$error
+                '%attribute_name' => $attribute_name,
+                '%error' => $error
                 ));
             }
         }
@@ -5040,7 +5079,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         $array = Ak::xml_to_array($xml);
         $array = $this->_fromXmlCleanup($array);
-         return $this->_fromArray($array);
+        return $this->_fromArray($array);
     }
 
     function _fromXmlCleanup($array)

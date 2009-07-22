@@ -46,8 +46,8 @@ class AkActiveRecord_finders_TestCase extends  AkUnitTest
         $exptected = array('Comment 1','Comment 2');
         $this->assertTrue(in_array($Post->comments[0]->get('name'),$exptected));
         $this->assertTrue(in_array($Post->comments[1]->get('name'),$exptected));
-        
-        // so we could do this 
+
+        // so we could do this
         $this->assertTrue($Post =& $Post->find($Post->getId(), array('include'=>array('comments', 'tags'),'order'=>'_comments.id ASC, _tags.id ASC')));
         $this->assertEqual(count($Post->comments), 2);
         $this->assertEqual($Post->comments[0]->get('name'), 'Comment 1');
@@ -68,14 +68,34 @@ class AkActiveRecord_finders_TestCase extends  AkUnitTest
         $Post->tag->create(array('name'=>'Tag 2'));
 
         $this->assertTrue($Post->save());
-        
+
         $this->assertTrue($Post =& $this->Post->find($Post->getId(), array('include'=>'comments,tags','order'=>'_comments.id ASC, _tags.id ASC')));
-        
+
         $this->assertEqual($Post->tags[0]->name, 'Tag 1');
         $this->assertEqual($Post->tags[1]->name, 'Tag 2');
 
         $this->assertEqual($Post->comments[0]->name, 'Comment 1');
         $this->assertEqual($Post->comments[1]->name, 'Comment 2');
+    }
+
+    function test_should_bind_sql_bind_in()
+    {
+        $Tag =& new Tag();
+        $Tag->create(array('name'=>'Tag 1'));
+        $Tag->create(array('name'=>'Tag 2'));
+        $this->assertTrue($Tags = $Tag->find(array('conditions'=> array('name IN (?)', array('Tag 1', 'Tag 2')))));
+        $this->assertEqual($Tags[0]->name, 'Tag 1');
+        $this->assertEqual($Tags[1]->name, 'Tag 2');
+    }
+
+    function test_should_bind_sql_bind_in_using_active_records()
+    {
+        $Tag =& new Tag();
+        $Tag->create(array('name'=>'Tag 1'));
+        $Tag->create(array('name'=>'Tag 2'));
+        $this->assertTrue($Tags = $Tag->find(array('conditions'=> array('name IN (?)', $Tag->find()))));
+        $this->assertEqual($Tags[0]->name, 'Tag 1');
+        $this->assertEqual($Tags[1]->name, 'Tag 2');
     }
 
 
