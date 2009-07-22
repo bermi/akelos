@@ -84,7 +84,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $this->assertFalse($AkTestFields->findAll());
     }
 
-
+    
     function Test_of_destroy()
     {
         /**
@@ -131,7 +131,20 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $AkTestFields->destroyAll('');
         $this->assertFalse($AkTestFields->findAll());
     }
+    
+    function Test_of_deleteAll_with_binds()
+    {
+        $AkTestFields = new AkTestField();
+        $AkTestFields->transactionStart();
+        for ($i=1; $i < 10; $i++){
+            $AkTestFields->create(array('varchar_field' => 'new test field '.$i));
+        }
+        $AkTestFields->transactionComplete();
 
+        $this->assertEqual($AkTestFields->deleteAll(array("varchar_field LIKE ?",'new%')), 9);
+
+        
+    }
     function Test_of_transactions()
     {
         $AkTestUser = new AkTestUser();

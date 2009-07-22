@@ -104,10 +104,7 @@ class test_AkActiveRecord_2 extends  AkUnitTest
             $this->assertTrue($expected1 || $expected2);
         }
         
-        $Users = new AkTestUser();
-        $FoundUsers = $Users->find(3, 4, 5, 6);
-        $this->assertFalse($FoundUsers);
-
+        
         // with arrays of ids
         
         $Users = new AkTestUser();
@@ -123,10 +120,6 @@ class test_AkActiveRecord_2 extends  AkUnitTest
             $expected2 = ($User->first_name=='Bermi' && $User->last_name == 'Ferrer Martínez' && $User->user_name == 'bermi' && $User->email == 'bermi@example.com');
             $this->assertTrue($expected1 || $expected2);
         }
-        
-        $Users = new AkTestUser();
-        $FoundUsers = $Users->find(array(3, 4, 5, 6));
-        $this->assertFalse($FoundUsers);
         
         
         // with conditions of id
@@ -393,6 +386,20 @@ class test_AkActiveRecord_2 extends  AkUnitTest
     }
     
 
+    function Test_of_updateAll_with_binds()
+    {
+        $Users = new AkTestUser();
+        $modified_entries = $Users->updateAll("first_name = 'new_test_name', country = '50'", array("first_name = ?",'test_name'));
+        $this->assertEqual($modified_entries, 3);
+        
+        $FoundUsers = $Users->find(5, 6, 7);
+        
+        foreach ($FoundUsers as $FoundUser){
+            $this->assertEqual($FoundUser->first_name, 'new_test_name');
+            $this->assertEqual($FoundUser->country, 50);
+        }
+    }
+    
     function Test_of_updateAttribute()
     {
         $Users = new AkTestUser();
