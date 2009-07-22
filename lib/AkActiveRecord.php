@@ -1335,9 +1335,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         $conditions = array($sql);
         foreach ($query_values as $bind_value){
-            if($bind_value !== null){
-                $conditions[] = $bind_value;
-            }
+            $conditions[] = $bind_value;
         }
         /**
         * @todo merge_conditions
@@ -1398,6 +1396,15 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                             case 'finishes_with':
                                 $query_values[$parameter_count] = '%'.$query_values[$parameter_count];
                                 $new_sql .= $_tmp_parts[0]." LIKE ? ";
+                                break;
+                            case 'in':
+                                $values = join(', ', $this->castAttributesForDatabase($_tmp_parts[0], $query_values[$parameter_count]));
+                                if(!empty($values)){
+                                    $new_sql .= $_tmp_parts[0].' IN ('.$values.')';
+                                }else{
+                                    $new_sql = preg_replace('/(AND|OR) $/','', $new_sql);
+                                }
+                                unset($query_values[$parameter_count]);
                                 break;
                             default:
                                 $query_values[$parameter_count] = $query_values[$parameter_count];
