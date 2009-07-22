@@ -544,6 +544,9 @@ class AkMailParser
                 return $name.'="'.$value.'"';
         }
     }
+    
+    
+    
     function _uniqueStyle($stylestring, $fullElement = '') {
         $styles=split(';',$stylestring);
         $newstyles=array();
@@ -558,6 +561,7 @@ class AkMailParser
         $possibleElementAttributes=array('width','height','border','text-align','vertical-align','margin','margin-top','margin-left','background-color');
         $elementAttributes=array();
         foreach($styleArray as $name => $value) {
+            $name=strtolower($name);
             if(in_array($name,$possibleElementAttributes)) {
                 if(preg_match('/'.$name.'=[\'"][^>]+?[\'"]/',$fullElement,$attrMatches)) {
                     $fullElement = str_replace($attrMatches[0],$this->_parseCssElementValue($name,$value),$fullElement);
