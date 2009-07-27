@@ -23,7 +23,7 @@ defined('AK_VALID_URL_CHARS_REGEX') ? null : define('AK_VALID_URL_CHARS_REGEX','
 define('AK_AUTO_LINK_REGEX','/
         (                          # leading text
           <\w+.*?>|                # leading HTML tag, or
-          [^=!:\'"\/]|               # leading punctuation, or 
+          [^=!:\'"\/]|               # leading punctuation, or
           ^                        # beginning of line
         )
         (
@@ -41,10 +41,13 @@ define('AK_AUTO_LINK_REGEX','/
         ([[:punct:]]|\s|<|$)       # trailing text
         /x');
 
+defined('AK_DEFAULT_LOCALE_NAMESPACE') ? null : define('AK_DEFAULT_LOCALE_NAMESPACE', null);
+
+
 /**
-* Provides a set of methods for working with text strings that can help unburden 
-* the level of inline AkelosFramework code in the templates. In the example 
-* below we iterate over a collection of posts provided to the template and print 
+* Provides a set of methods for working with text strings that can help unburden
+* the level of inline AkelosFramework code in the templates. In the example
+* below we iterate over a collection of posts provided to the template and print
 * each title after making sure it doesn't run longer than 20 characters:
 *   {loop posts}
 *     Title: <?= $text_helper->truncate($post->title, 20) ?>
@@ -65,12 +68,12 @@ class TextHelper extends AkObject
 
 
     /**
-    * Truncates "$text" to the length of "length" and replaces the last three 
-    * characters with the "$truncate_string" if the "$text" is longer than 
+    * Truncates "$text" to the length of "length" and replaces the last three
+    * characters with the "$truncate_string" if the "$text" is longer than
     * "$length" and the last characters will be replaced with the +truncate_string+.
-    * If +break+ is specified and if it's present in +text+ and if its position is 
+    * If +break+ is specified and if it's present in +text+ and if its position is
     * lesser than +length+, then the truncated +text+ will be limited to +break+.
-    * 
+    *
     */
     function truncate($text, $length = 30, $truncate_string = '...', $break = false)
     {
@@ -90,24 +93,24 @@ class TextHelper extends AkObject
     }
 
     /**
-	* Highlights the string or array of strings "$phrase" where it is found in 
-	* the "$text" by surrounding it  like 
-	* <strong class="highlight">I'm a highlight phrase</strong>. 
-	* 
-	* The highlighter can be specialized by passing "$highlighter" as string 
+	* Highlights the string or array of strings "$phrase" where it is found in
+	* the "$text" by surrounding it  like
+	* <strong class="highlight">I'm a highlight phrase</strong>.
+	*
+	* The highlighter can be specialized by passing "$highlighter" as string
 	* with \1 where the phrase is supposed to be inserted.
-	* 
+	*
 	* Note: The "$phrase" is sanitized with preg_quote before use.
-	* 
+	*
 	* Examples:
-	*  
-	*  <?=$text_helper->highlight('I am highlighting the phrase','highlighting');?> 			
+	*
+	*  <?=$text_helper->highlight('I am highlighting the phrase','highlighting');?>
 	*  //outputs: I am <strong class="highlight">highlighting</strong> the phrase
-	* 
-	*  <?=$text_helper->highlight('I am highlighting the phrase', 
+	*
+	*  <?=$text_helper->highlight('I am highlighting the phrase',
 	*      array('highlighting','the')?>
 	*  //outputs: I am <strong class="highlight">highlighting</strong> <strong class="highlight">the</strong> phrase
-	* 
+	*
 	*/
     function highlight($text, $phrase, $highlighter = '<strong class="highlight">\1</strong>')
     {
@@ -116,15 +119,15 @@ class TextHelper extends AkObject
     }
 
     /**
- 	 * Extracts an excerpt from the "$text" surrounding the "$phrase" with a 
- 	 * number of characters on each side determined by "$radius". If the phrase 
-	 * isn't found, '' is returned. 
-	 * 
+ 	 * Extracts an excerpt from the "$text" surrounding the "$phrase" with a
+ 	 * number of characters on each side determined by "$radius". If the phrase
+	 * isn't found, '' is returned.
+	 *
 	 * Example:
-	 * 
+	 *
 	 *  <?=$text_helper->excerpt("hello my world", "my", 3);?>
 	 *  //outputs:  ...lo my wo...
-	 * 
+	 *
 	 */
     function excerpt($text, $phrase, $radius = 100, $excerpt_string = '...')
     {
@@ -225,7 +228,7 @@ class TextHelper extends AkObject
     }
 
     /**
-     * Returns the "$text" with all the Textile codes turned into HTML-tags, but 
+     * Returns the "$text" with all the Textile codes turned into HTML-tags, but
      * without the regular bounding <p> tag.
      */
     function textilize_without_paragraph($text, $options = array())
@@ -235,10 +238,10 @@ class TextHelper extends AkObject
 
     /**
 	 * Returns "$text" transformed into HTML using very simple formatting rules
-	* Surrounds paragraphs with <tt>&lt;p&gt;</tt> tags, and converts line 
-	* breaks into <tt>&lt;br /&gt;</tt> Two consecutive newlines(<tt>\n\n</tt>) 
-	* are considered as a paragraph, one newline (<tt>\n</tt>) is considered a 
-	* linebreak, three or more consecutive newlines are turned into two newlines 
+	* Surrounds paragraphs with <tt>&lt;p&gt;</tt> tags, and converts line
+	* breaks into <tt>&lt;br /&gt;</tt> Two consecutive newlines(<tt>\n\n</tt>)
+	* are considered as a paragraph, one newline (<tt>\n</tt>) is considered a
+	* linebreak, three or more consecutive newlines are turned into two newlines
 	*/
     function simple_format($text)
     {
@@ -254,13 +257,13 @@ class TextHelper extends AkObject
     }
 
     /**
-    * Turns all urls and email addresses into clickable links. The "$link" 
+    * Turns all urls and email addresses into clickable links. The "$link"
     * parameter can limit what should be linked.
-    * 
+    *
     * Options are "all" (default), "email_addresses", and "urls".
     *
     * Example:
-    * 
+    *
     *   <?=$text_helper->auto_link("Go to http://www.akelos.org and say hello to bermi@example.com");?>
     *   //outputs: Go to <a href="http://www.akelos.org">http://www.akelos.org</a> and
     *     say hello to <a href="mailto:example.com">bermi@example.com</a>
@@ -295,8 +298,8 @@ class TextHelper extends AkObject
 
 
     /**
-    * Strips all HTML tags from the input, including comments. 
-    * 
+    * Strips all HTML tags from the input, including comments.
+    *
     * Returns the tag free text.
     */
     function strip_tags($html)
@@ -315,7 +318,7 @@ class TextHelper extends AkObject
     /**
 	 * Turns all email addresses into clickable links.  You can provide an options
 	 * array in order to generate links using UrlHelper::mail_to()
-	 * 
+	 *
 	 * Example:
 	 *   $text_helper->auto_link_email_addresses($post->body);
 	 */
@@ -357,8 +360,8 @@ class TextHelper extends AkObject
 
 
     /**
-     * Turns all urls into clickable links.  
-     * 
+     * Turns all urls into clickable links.
+     *
      * Example:
      *  <?=$text_helper->auto_link_urls($post->body, array('all', 'target' => '_blank'));?>
      */
@@ -385,8 +388,8 @@ class TextHelper extends AkObject
 
     /**
      * Returns an array with all the urls found as key and their valid link url as value
-     *  
-     * Example: 
+     *
+     * Example:
      *  $text_helper->get_urls_from_text('www.akelos.com');
      *  //returns: array('www.akelos.com'=>'http://www.akelos.com');
      */
@@ -402,9 +405,9 @@ class TextHelper extends AkObject
     }
 
     /**
-     * Returns an array with the linked urls found on a text 
-     *  
-     *  Example: 
+     * Returns an array with the linked urls found on a text
+     *
+     *  Example:
      * $text_helper->get_linked_urls_from_text('<a href="http://akelos.com">Akelos.com</a>');
      * //returns: array('http://akelos.com');
      */
@@ -419,9 +422,9 @@ class TextHelper extends AkObject
 
 
     /**
-     * Returns an array with the image urls found on a text 
-     *  
-     *  Example: 
+     * Returns an array with the image urls found on a text
+     *
+     *  Example:
      * $text_helper->get_linked_urls_from_text('<a href="http://akelos.com">Akelos.com</a>');
      * //returns: array('http://akelos.com/images/logo.gif');
      */
@@ -435,9 +438,9 @@ class TextHelper extends AkObject
     }
 
 /**
-     * Returns an array with the image urls found on a text 
-     *  
-     *  Example: 
+     * Returns an array with the image urls found on a text
+     *
+     *  Example:
      * $text_helper->get_linked_urls_from_text('<a href="http://akelos.com">Akelos.com</a>');
      * //returns: array('http://akelos.com/images/logo.gif');
      */
@@ -450,7 +453,7 @@ class TextHelper extends AkObject
         return $linked_urls;
     }
     /**
-     * Cycles through items of an array every time it is called. 
+     * Cycles through items of an array every time it is called.
      * This can be used to alternate classes for table rows:
      *
      * {loop items}
@@ -526,11 +529,11 @@ class TextHelper extends AkObject
     {
         return Ak::locale($locale_setting, $locale);
     }
-    
+
     /**
     * Translate strings to the current locale.
     */
-    function translate($string, $args = null, $locale_namespace = null)
+    function translate($string, $args = null, $locale_namespace = AK_DEFAULT_LOCALE_NAMESPACE)
     {
         return Ak::t($string, $args, empty($locale_namespace) ?
         AkInflector::underscore($this->_controller->getControllerName()) : $locale_namespace);
@@ -539,7 +542,7 @@ class TextHelper extends AkObject
     /**
     * Alias for translate
     */
-    function t($string, $args = null, $locale_namespace = null)
+    function t($string, $args = null, $locale_namespace = AK_DEFAULT_LOCALE_NAMESPACE)
     {
         return TextHelper::translate($string, $args, $locale_namespace);
     }
@@ -553,13 +556,13 @@ class TextHelper extends AkObject
     /**
     * Converts an underscored or CamelCase word into a English
     * sentence.
-    * 
+    *
     * The titleize function converts text like "WelcomePage",
     * "welcome_page" or  "welcome page" to this "Welcome
     * Page".
     * If second parameter is set to 'first' it will only
     * capitalize the first character of the title.
-    * 
+    *
     * @access public
     * @static
     * @param    string    $word    Word to format as tile
@@ -577,13 +580,13 @@ class TextHelper extends AkObject
      * Use this function to automatically handle flash messages.
      *
      * Examples:
-     * 
+     *
      *    <?=$text_helper->flash();?>
      *    //will handle all flash messages automatically
-     * 
+     *
      *    <?=$text_helper->flash(null,array('secconds_to_close'=>5));?>
      *   //will handle all flash messages automatically and will close in 5 secconds. NOTE. you need to include javascript dependencies for using interactive options
-     *          
+     *
      */
     function flash($message = null, $options = array(), $html_options = array())
     {
@@ -670,7 +673,7 @@ class TextHelper extends AkObject
 
 
     /**
-     * Will atempt to close unmatched tags. This is useful for truncating messages 
+     * Will atempt to close unmatched tags. This is useful for truncating messages
      * and not breaking the layout.
      */
     function close_unmatched_html($html)
@@ -702,7 +705,7 @@ class TextHelper extends AkObject
         }
         return htmlentities($html, ENT_COMPAT, $charset);
     }
-    
+
     function h($html)
     {
         return TextHelper::html_escape($html);

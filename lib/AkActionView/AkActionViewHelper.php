@@ -15,11 +15,12 @@
  * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
+!defined('AK_DEFAULT_LOCALE_NAMESPACE') && define('AK_DEFAULT_LOCALE_NAMESPACE', null);
 
-class AkActionViewHelper extends AkObject 
+class AkActionViewHelper extends AkObject
 {
     var $locales_namespace = 'helpers';
-    
+
     function AkActionViewHelper()
     {
         $args = func_get_args();
@@ -29,7 +30,7 @@ class AkActionViewHelper extends AkObject
             }
         }
     }
-    
+
     function addObject($object_name, &$object)
     {
         $this->_object[$object_name] =& $object;
@@ -47,8 +48,8 @@ class AkActionViewHelper extends AkObject
     {
         $this->_controller =& $controller;
     }
-    
-    function t($string, $array = null, $name_space = null)
+
+    function t($string, $array = null, $name_space = AK_DEFAULT_LOCALE_NAMESPACE)
     {
         $name_space = empty($name_space) ? $this->locales_namespace : $name_space;
         return Ak::t($string, $array, $name_space);
