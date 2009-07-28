@@ -28,7 +28,7 @@ class LocaleDetectionController extends ApplicationController
         if(!empty($this->params['id']) && $this->params['id'] == 1234){
             $_SESSION['value'] = 1234;
         }
-        $this->renderText($_SESSION['value']);
+        $this->renderText(@$_SESSION['value']);
     }
     
 }
