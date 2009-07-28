@@ -313,19 +313,36 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 }
             }
             $config['__owner'][$handler_name] = array('class'=>$class,'association_id'=>$association_id,'pk'=>$pk_name);
+            
+            if(isset($association_options['conditions']) && is_array($association_options['conditions'])) {
+                $true=true;
+                $_conditions = array_shift($association_options['conditions']);
+                if(empty($association_options['bind'])) {
+                    $association_options['bind'] = array();
+                }
+                $association_options['bind'] = array_merge($association_options['bind'], $association_options['conditions']);
+                $association_options['conditions'] = $_conditions;
+            }
+            
             $associated_options = $this->$handler_name->getAssociatedFinderSqlOptionsForInclusionChain('owner[@'.$parent_pk.']','__owner',$association_options,$multi);
-
+            
             $options ['order'] = empty($options ['order']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options ['order']);
 
             $options ['group'] = empty($options ['group']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options ['group']);
 
+            
+            
             $options ['conditions'] = empty($options ['conditions']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options ['conditions']);
 
-
+        
             foreach(array_keys($associated_options) as $option) {
                 if(isset($associated_options[$option]) && is_string($associated_options[$option]))$associated_options[$option]=trim($associated_options[$option]);
                 if(!empty($associated_options[$option])) {
-                    $available_associated_options[$option][]=$associated_options[$option];
+                    if($option=='bind') {
+                        $available_associated_options[$option] = array_merge((array)$available_associated_options[$option],(array)$associated_options[$option]);
+                    } else {
+                        $available_associated_options[$option][]=$associated_options[$option];
+                    }
                 }
             }
             $replacements['/ ('.$this->getTableName().')\./']=' __owner.';
@@ -336,9 +353,9 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $replacements['/^('.$table_name.')\./']='__owner__'.$handler_name.'.';
             $replacements['/ ('.$table_name.')\./'] = ' __owner__'.$handler_name.'.';
 
-
+        
             $this->_prepareIncludes('owner[@'.$parent_pk.']',$multi,$this,$available_associated_options,$handler_name,$handler_name,$association_id,$options,$association_options,$replacements, $config['__owner']);
-
+        
         }
         //$this->log('Config:'.var_export($config,true));
         $replace_regex = array_keys($replacements);
@@ -346,18 +363,25 @@ class AkAssociatedActiveRecord extends AkBaseModel
         if(isset($options['order'])) $options['order'] = preg_replace($replace_regex,$replace_value,$options['order']);
         if(isset($options['conditions'])) $options['conditions'] = preg_replace($replace_regex,$replace_value,$options['conditions']);
         if(isset($options['group']))$options['group'] = preg_replace($replace_regex,$replace_value,$options['group']);
-
+    
         foreach ( $available_associated_options as $option => $values ) {
             if($option == 'order' || $option=='conditions' || $option == 'group') {
                 foreach($values as $idx=>$value) {
                     $available_associated_options[$option][$idx] = preg_replace($replace_regex,$replace_value,$value);
                 }
             }
-
+        
             if (! empty($values) && $option!='include') {
+            if(!empty($true)) {
+                //echo "<pre>";
+                //var_dump($option);
+                //var_dump($values);
+                //var_dump($associated_options);
+                //die;
+            }
                 $separator = $option == 'joins' ? ' ' : (in_array($option, array ('selection', 'order' )) ? ', ' : ' AND ');
                 $values = array_map('trim', $values);
-
+            
                 if ($option == 'joins' && ! empty($options [$option])) {
                     $newJoinParts = array ();
                     foreach ( $values as $part ) {
@@ -471,7 +495,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $config[$handler_name][$sub_handler_name] = array('association_id'=>$sub_association_id,'class'=>$class_name,'pk'=>$pk);
             $sub_associated_options = $sub_association_object->$sub_handler_name->getAssociatedFinderSqlOptionsForInclusionChain($prefix.'['.$handler_name.']'.($parent_is_plural?'[@'.$pk.']':''),'__owner__'.$parent_association_id,
             $sub_options, $pluralize);
-
+            
             /**
                      * Adding replacements for base options like order,conditions,group.
                      * The table-aliases of the included associations will be replaced
@@ -495,7 +519,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                         $available_associated_options [$sub_associated_option] []  = $newoption;
                     }
                 } else {
-                    $available_associated_options [$sub_associated_option] = array_merge($available_associated_options [$sub_associated_option],Ak::toArray($newoption));
+                    $available_associated_options [$sub_associated_option] = array_merge((array)$available_associated_options [$sub_associated_option],Ak::toArray($newoption));
                 }
 
             }
