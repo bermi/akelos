@@ -306,7 +306,7 @@ class AkMailParser
             $cssRules=array('id'=>array(),'class'=>array(),'element'=>array());
         }
         if(preg_match_all('/(.*?)\{(.*?)\}/s',$contents,$rules)) {
-            Ak::getLogger()->log('message','rules from '.$contents.':'.var_export($rules,true));
+            //Ak::getLogger()->log('message','rules from '.$contents.':'.var_export($rules,true));
             $ruleNames=$rules[1];
             foreach($ruleNames as $idx=>$ruleName) {
                 $ruleName=trim($ruleName);
@@ -427,7 +427,7 @@ class AkMailParser
     
     function _applyCssRules(&$Mail,$cssRules)
     {
-        Ak::getLogger()->log('message','detected css rules:'.var_export($cssRules,true));
+        //Ak::getLogger()->log('message','detected css rules:'.var_export($cssRules,true));
         $html = &$Mail->body;
         
         
@@ -620,6 +620,7 @@ class AkMailParser
                 $original_image_name = $image;
                 if(substr($image,0,4)=='cid:') continue;
                 $image = $this->_getImagePath($image);
+                
                 if(!empty($image)){
                     $extenssion = substr($image, strrpos('.'.$image,'.'));
                     $image_name = Ak::uuid().'.'.$extenssion;
@@ -673,7 +674,7 @@ class AkMailParser
             if(empty($path_info['extension'])){ // no extension, we don't do magic stuff
                 $path = '';
             }else{
-                $local_path = AK_TMP_DIR.DS.'mailer'.DS.'remote_images'.DS.md5($base_file_name['dirname']).DS.$base_file_name.'.'.$path_info['extension'];
+                $local_path = AK_TMP_DIR.DS.'mailer'.DS.'remote_images'.DS.md5($path).DS.$base_file_name.'.'.$path_info['extension'];
                 if(!file_exists($local_path) || (time() > @filemtime($local_path)+7200)){
                     if(!Ak::file_put_contents($local_path, Ak::url_get_contents($path))){
                         return '';

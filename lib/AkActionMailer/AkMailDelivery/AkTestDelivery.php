@@ -4,7 +4,7 @@ class AkTestDelivery extends AkObject
 {
     function deliver(&$Mailer, $settings = array())
     {
-        $encoded_message = $Mailer->Message->getEncoded();
+        $encoded_message = $Mailer->getRawMessage();
         $settings['ActionMailer']->deliveries[] = $encoded_message;
         if(AK_DEV_MODE){
             $Logger = Ak::getLogger('mail');
