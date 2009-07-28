@@ -2642,7 +2642,7 @@ class AkActionController extends AkObject
             $lang = isset($this->params['lang']) ? $this->params['lang'] : $locale;
 
             if($locale != $lang){
-                $this->redirectTo(array_merge($this->Request->getParams(),array('lang'=>$locale)));
+                $this->redirectTo(array_merge($this->Request->getUrlParams(),array('lang'=>$locale)));
                 return true;
             }
         }

@@ -220,7 +220,7 @@ class AkRequest extends AkObject
                 }
             }
         }
-        
+
         if(defined('AK_LOG_EVENTS') && AK_LOG_EVENTS){
             $this->Logger =& Ak::getLogger();
             $this->Logger->message($this->Logger->formatText('Request','green').' from '.$this->getRemoteIp(), $this->getParams());
@@ -295,7 +295,7 @@ class AkRequest extends AkObject
     function getLocaleFromUrl()
     {
         $locale = Ak::get_url_locale();
-        if(strstr(AK_CURRENT_URL,AK_SITE_URL.'/'.$locale)){
+        if(strstr(AK_CURRENT_URL,AK_SITE_URL.$locale)){
             return $locale;
         }
         return '';

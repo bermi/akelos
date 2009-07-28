@@ -264,11 +264,13 @@ class AkLocaleManager extends AkObject
             define('AK_APP_LOCALES',join(',',array_keys($this->available_locales)));
         }
         $lang = $this->_getLocaleForRequest($Request);
+        $previous_lang = $this->getNavigationLanguage();
 
         $this->rememberNavigationLanguage($lang);
 
         $Request->_request['lang'] = $lang;
         $Request->lang = $lang;
+        $Request->previous_lang = $previous_lang;
     }
 
     /**
