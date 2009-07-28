@@ -188,7 +188,7 @@ class AkRequest extends AkObject
 
     function checkForRoutedRequests(&$Router)
     {
-        $ak_request = isset($this->_request['ak']) ? '/'.trim($this->_request['ak'],'/').'/' : '/';
+        $ak_request = isset($this->_request['ak']) ? str_replace('//','/', '/'.trim($this->_request['ak'],'/').'/') : '/';
 
         if($found = $Router->toParams($ak_request)){
             if(!isset($found['controller'])){
