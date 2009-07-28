@@ -60,7 +60,7 @@ class AkRequestMimeType extends AkObject
         $method = AkRequestMimeType::getMethod();
         $format = AkRequestMimeType::_lookupMimeType('default');
 
-        if (preg_match('/^([^\.]+)\.(.+)$/', $requestPath, $matches)) {
+        if (preg_match('/^([^\.]+)\.([a-zA-z0-9\.]+)$/', $requestPath, $matches)) {
             $format = isset($matches[2])?strtolower($matches[2]):null;
             $orgformat = $format;
             if ($format == 'htm') {

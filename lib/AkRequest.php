@@ -152,11 +152,6 @@ class AkRequest extends AkObject
 
             $this->_init_check = true;
         }
-
-        if(defined('AK_LOG_EVENTS') && AK_LOG_EVENTS){
-            $this->Logger =& Ak::getLogger();
-            $this->Logger->message($this->Logger->formatText('Request','green').' from '.$this->getRemoteIp(), $this->getParams());
-        }
     }
 
     function get($var_name)
@@ -224,6 +219,11 @@ class AkRequest extends AkObject
                     $this->_request[$k] = $v;
                 }
             }
+        }
+        
+        if(defined('AK_LOG_EVENTS') && AK_LOG_EVENTS){
+            $this->Logger =& Ak::getLogger();
+            $this->Logger->message($this->Logger->formatText('Request','green').' from '.$this->getRemoteIp(), $this->getParams());
         }
     }
 
