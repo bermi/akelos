@@ -94,33 +94,33 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 *   <?=$text_helper->truncate($note->body, 25);?>
 *
 * = Mailer layouts
-* 
+*
 * Similar to the layouts for Controller/action views you can define layouts for your mailers.
 * Each mailer can provide layouts based on the content-type.
-* 
+*
 * For example, if the following templates exist:
 * * layout.text.plain.tpl
 * * layout.text.html.tpl
-* 
+*
 * they will be used as the layout for the text/plain and text/html part of the message.
-* 
+*
 * As in normal views you define the layout:
-* 
+*
 * <html>
 *   <body>
 *     <h2>{Title}</h2>
-* 
+*
 *     <!-- content body comes here -->
 *      {content_for_layout?}
 *     <!-- end content -->
-* 
+*
 *     <p class="footer">
 *       {footer_message?}
 *     </p>
 *   </body>
 * </html>
 *
-* 
+*
 * = Generating URLs for mailer views
 *
 * If your view includes URLs from the application, you need to use Ak::urlFor in
@@ -161,7 +161,7 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 * The <tt>signup_notification</tt> method defined above is delivered by invoking
 * <tt>$Notifier =& new Notifier(); $Notifier->signupNotification(); $Notifier->deliver();</tt>.
 *
-* 
+*
 *
 * = HTML email
 *
@@ -641,16 +641,16 @@ class AkActionMailer extends AkBaseModel
 
     /**
      * Renders a message.
-     * 
+     *
      * The template for the message to be rendered is located based on convention:
-     * 
+     *
      * AK_APP_VIEWS_DIR/mailer_name/method_name.tpl
-     * 
+     *
      * To render a multi/part message place templates with the content-type in the mailer_name folder:
-     * 
+     *
      * AK_APP_VIEWS_DIR/mailer_name/method_name.text.html.tpl
      * AK_APP_VIEWS_DIR/mailer_name/method_name.text.plain.tpl
-     * 
+     *
      * @param string $method_name
      * @param array $body
      * @param array $options
@@ -658,7 +658,7 @@ class AkActionMailer extends AkBaseModel
      */
     function renderMessage($method_name, $body, $options = array())
     {
-        
+
         $file_name = basename($method_name);
         $fparts=split('\.',$file_name);
         $extension=array_pop($fparts);
@@ -666,46 +666,16 @@ class AkActionMailer extends AkBaseModel
         $content_type = join('.',$fparts);
         $this->current_content_type = join('/',$fparts);
         $this->current_template_extension = $extension;
-        
-        $dirname = dirname($method_name);
-        if($content_type) {
-            $layout_filename='layout.'.$content_type.'.'.$extension;
-            $layout_path = $dirname.DS.$layout_filename;
-            
-            if(file_exists($layout_path)) {
-                $layout_options=array_merge($options, array('file' => $method_name, 'body' => $body));
-                
-                $this->render(false,true,@$layout_options['body']);
-                return $this->_renderWithALayout($layout_options, $layout_path);
-            }
+
+        if($content_type && ($layout_path = $this->_getLayoutPath($method_name, $content_type, $extension))) {
+            $layout_options = array_merge($options, array('file' => $method_name, 'body' => $body));
+            $this->render(false,true,@$layout_options['body']);
+            return $this->_renderWithALayout($layout_options, $layout_path);
         }
         return $this->render(array_merge($options, array('file' => $method_name, 'body' => $body)));
-        
     }
-    function _renderWithALayout($options = array(), $layout_file)
-    {
-        static $body;
-        if(isset($options['body'])) {
-            $body = $options['body'];
-            unset($options['body']);
-            $Template =& $this->_initializeTemplateClass($body);
-        } else {
-            $Template =& $this->_initializeTemplateClass($body);
-        }
-        $options['locals'] = array_merge((array)@$options['locals'], $this->getHelpers());
-        $options['locals'] = array_merge($options['locals'], array('mailer'=>&$this,'controller'=>&$this));
-        if(!empty($body)) {
-            $options['locals']['body'] = $body;
-        } else {
-            $options['locals']['body'] = array();
-        }
-        $options['locals']['body']['content_for_layout']=$Template->render($options);
-        
-        $layout_options=$options;
-        $layout_options['file'] = $layout_file;
-        $LayoutTemplate =& $this->_initializeTemplateClass($options['locals']['body']);
-        return $LayoutTemplate->render($layout_options);
-    }
+
+
     function render($options = array(),$set_body_only=false,$set_body=null)
     {
         static $body;
@@ -720,7 +690,7 @@ class AkActionMailer extends AkBaseModel
         } else {
             $Template =& $this->_initializeTemplateClass($body);
         }
-        
+
         if(isset($options['partial']) && !empty($this->current_content_type)) {
             /**
              * choose the partial for this content-type
@@ -731,13 +701,13 @@ class AkActionMailer extends AkBaseModel
             $contentTypePartialFilename=join('.',$partialParts).'.'.
                                         str_replace('/','.',$this->current_content_type).'.'.
                                         $partialExtension;
-            
+
             $testContentTypePartialPath=$this->getTemplatePath().DS.$partialDir.DS.'_'.$contentTypePartialFilename;
-            
+
             if(file_exists($testContentTypePartialPath)) {
                 $options['partial'] = $options['partial'].'.'.str_replace('/','.',$this->current_content_type);
             }
-            
+
         }
         $options['locals'] = array_merge((array)@$options['locals'], $this->getHelpers());
         $options['locals'] = array_merge($options['locals'], array('mailer'=>&$this,'controller'=>&$this));
@@ -782,7 +752,7 @@ class AkActionMailer extends AkBaseModel
         $TemplateInstance->_registerTemplateHandler('tpl','AkPhpTemplateHandler');
         return $TemplateInstance;
     }
-    
+
     function &getComposer()
     {
         if(empty($this->Composer)){
@@ -872,8 +842,42 @@ class AkActionMailer extends AkBaseModel
     }
 
 
+    function _getLayoutPath($method_name, $content_type = null, $extension = null)
+    {
+        $dirname = dirname($method_name);
+        if(is_file($dirname.DS.'layout.'.$content_type.'.'.$extension)){
+            return $dirname.DS.'layout.'.$content_type.'.'.$extension;
+        }elseif(is_file($dirname.DS.'layout.'.$extension)){
+            return is_file($dirname.DS.'layout.'.$extension);
+        }
+        return false;
+    }
 
+    function _renderWithALayout($options = array(), $layout_file)
+    {
+        static $body;
+        if(isset($options['body'])) {
+            $body = $options['body'];
+            unset($options['body']);
+            $Template =& $this->_initializeTemplateClass($body);
+        } else {
+            $Template =& $this->_initializeTemplateClass($body);
+        }
+        $options['locals'] = array_merge((array)@$options['locals'], $this->getHelpers());
+        $options['locals'] = array_merge($options['locals'], array('mailer'=>&$this,'controller'=>&$this));
+        if(!empty($body)) {
+            $options['locals']['body'] = $body;
+        } else {
+            $options['locals']['body'] = array();
+        }
+        $options['locals']['body']['content_for_layout']=$Template->render($options);
+
+        $layout_options=$options;
+        $layout_options['file'] = $layout_file;
+        $LayoutTemplate =& $this->_initializeTemplateClass($options['locals']['body']);
+        return $LayoutTemplate->render($layout_options);
+    }
 }
 
-    
+
 ?>

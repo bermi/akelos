@@ -51,7 +51,7 @@ class AkMailBase extends Mail
         if(is_string($body)){
             $content_type = @$this->content_type;
             $this->body = stristr($content_type,'text/') ? str_replace(array("\r\n","\r"),"\n", $body) : $body;
-            
+
             if($content_type == 'text/html'){
                 $Parser = new AkMailParser();
                 $Parser->applyCssStylesToTags($this);
@@ -163,7 +163,7 @@ class AkMailBase extends Mail
         return $this->_getAttributesForHeader('content_type');
     }
 
-    function bodyToString($Mail = null)
+    function bodyToString($Mail = null, $only_first_text_part = false)
     {
         $Mail = empty($Mail) ? $this : $Mail;
         $result = '';
@@ -177,19 +177,31 @@ class AkMailBase extends Mail
                     $result .= $value;
                 }
             }
+            if($only_first_text_part && !empty($result)){
+                return $result;
+            }
             if($field == 'parts' && !empty($value) && is_array($value)){
                 foreach ($value as $part){
                     if(!empty($part->data) && !empty($part->original_filename)){
                         $result .= "Attachment: ";
-                        $result .= $this->bodyToString($part)."\n";
+                        $result .= $Mail->bodyToString($part)."\n";
                     }else{
-                        $result .= $this->bodyToString($part)."\n";
+                        $result .= $Mail->bodyToString($part)."\n";
+                    }
+                    if($only_first_text_part && !empty($result)){
+                        return $result;
                     }
                 }
             }
         }
 
         return $result;
+    }
+
+    function getTextPlainPart($Mail = null)
+    {
+        $Mail = empty($Mail) ? $this : $Mail;
+        return $Mail->bodyToString($Mail, true);
     }
 
     function isMainMessage()
