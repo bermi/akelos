@@ -869,7 +869,17 @@ class AkAssociatedActiveRecord extends AkBaseModel
             }
             $available['load_associations'] = false;
             $available['load_acts'] = $load_acts;
-
+            /**
+             * unserializing data
+             */
+            /**$serialized_attributes = !empty($instance->serialize)? Ak::toArray($instance->serialize):array();
+            $serialized_attributes = array_intersect(array_keys($available),$serialized_attributes);
+            foreach($serialized_attributes as $serialized_attribute) {
+                if($instance->_shouldSerializeColumn($serialized_attribute)) {
+                    $available[$serialized_attribute] = @unserialize($available[$serialized_attribute]);
+                }
+            }*/
+            $available = $this->_castAttributesFromDatabase($available,$instance);
             $obj=&$parent->$assoc_name->build($available,false);
 
             $obj->_newRecord = false;
@@ -883,7 +893,43 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
         }
     }
+    function _castAttributesFromDatabase($attributes = array(),$record = null)
+    {
+        foreach($attributes as $key => $value) {
+            $attributes[$key] = $this->_castAttributeFromDatabase($key,$value,$record);
+        }
+        return $attributes;
+    }
+    function _castAttributeFromDatabase($column_name,$value, $record)
+    {
+        $column_type = $record->getColumnType($column_name);
 
+        if($column_type){
+            if('integer' == $column_type){
+                return is_null($value) ? null : (integer)$value;
+                //return is_null($value) ? null : $value;    // maybe for bigint we can do this
+            }elseif('boolean' == $column_type){
+                if (is_null($value)) {
+                    return null;
+                }
+                if ($this->_getDatabaseType()=='postgre'){
+                    return $value=='t' ? true : false;
+                }
+                return (integer)$value === 1 ? true : false;
+            }elseif(!empty($value) && 'date' == $column_type && strstr(trim($value),' ')){
+                return substr($value,0,10) == '0000-00-00' ? null : str_replace(substr($value,strpos($value,' ')), '', $value);
+            }elseif (!empty($value) && 'datetime' == $column_type && substr($value,0,10) == '0000-00-00'){
+                return null;
+            }elseif ('binary' == $column_type && $this->_getDatabaseType() == 'postgre'){
+                $value = $this->_db->unescape_blob($value);
+                $value = empty($value) || trim($value) == 'null' ? null : $value;
+            }elseif($record->_shouldSerializeColumn($column_name)){
+                $this->_ensureClassExistsForSerializedColumnBeforeUnserializing($column_name);
+                $value = @unserialize($value);
+            }
+        }
+        return $value;
+    }
     function getCollectionHandlerName($association_id)
     {
         if(isset($this->$association_id) && is_object($this->$association_id) && method_exists($this->$association_id,'getAssociatedFinderSqlOptions')){
