@@ -18,10 +18,10 @@
 
 /**
 * Action View templates can be written in two ways. If the template file has a +.tpl+ extension then it uses PHP.
-* 
+*
 * = PHP
-* 
-* You trigger PHP by using embeddings such as <? ?>, <?php ?> and <?= ?>. The difference is whether you want output or not. Consider the 
+*
+* You trigger PHP by using embeddings such as <? ?>, <?php ?> and <?= ?>. The difference is whether you want output or not. Consider the
 * following loop for names:
 *
 *   <b>Names of all the people</b>
@@ -52,7 +52,7 @@
 *   <title><?= $page_title ?></title>
 *
 * == Passing local variables to sub templates
-* 
+*
 * You can pass local variables to sub templates by using an array with the variable names as keys and the objects as values:
 *
 *   <?= $controller->render("shared/header", array('headline'=>'Welcome','person'=> $person )) ?>
@@ -62,18 +62,18 @@
 *   Headline: <?= $headline ?>
 *   First name: <?= $person->first_name ?>
 *
-* 
+*
 * == JavaScriptGenerator ==
 *
 * @todo Fully implement Javascript Generators
 *
-* JavaScriptGenerator templates end in +.js.tpl+. Unlike conventional templates which are used to 
-* render the results of an action, these templates generate instructions on how to modify an already rendered page. This makes it easy to 
-* modify multiple elements on your page in one declarative Ajax response. Actions with these templates are called in the background with Ajax 
+* JavaScriptGenerator templates end in +.js.tpl+. Unlike conventional templates which are used to
+* render the results of an action, these templates generate instructions on how to modify an already rendered page. This makes it easy to
+* modify multiple elements on your page in one declarative Ajax response. Actions with these templates are called in the background with Ajax
 * and make updates to the page where the request originated from.
-* 
-* An instance of the JavaScriptGenerator object named +page+ is automatically made available to your template, 
-* which is implicitly wrapped in an AkActionView/Helpers/PrototypeHelper::update_page method. 
+*
+* An instance of the JavaScriptGenerator object named +page+ is automatically made available to your template,
+* which is implicitly wrapped in an AkActionView/Helpers/PrototypeHelper::update_page method.
 *
 * When an .js.tpl action is called with +linkToRemote+, the generated JavaScript is automatically evaluated.  Example:
 *
@@ -86,7 +86,7 @@
 *   <% visual_effect :highlight, 'user-list' %>
 *
 * This refreshes the sidebar, removes a person element and highlights the user list.
-* 
+*
 * See the AkActionView/Helpers/PrototypeHelper/JavaScriptGenerator documentation for more details.
 */
 class AkActionView extends AkObject
@@ -142,8 +142,8 @@ class AkActionView extends AkObject
     }
 
     /**
-    * Renders the template present at <tt>template_path</tt>. If <tt>use_full_path</tt> is set to true, 
-    * it's relative to the template_root, otherwise it's absolute. The array in <tt>local_assigns</tt> 
+    * Renders the template present at <tt>template_path</tt>. If <tt>use_full_path</tt> is set to true,
+    * it's relative to the template_root, otherwise it's absolute. The array in <tt>local_assigns</tt>
     * is made available as local variables.
     */
     function renderFile($template_path, $use_full_path = true, $local_assigns = array())
@@ -162,10 +162,15 @@ class AkActionView extends AkObject
             $template_file_name = $this->getFullTemplatePath($template_path, $template_extension);
         }
 
+        if(AK_DEBUG && AK_CALLED_FROM_LOCALHOST && defined('AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS') && AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS){
+            $files_name = trim((str_replace(AK_BASE_DIR,'',realpath($template_file_name))), '/');
+            return "\n\n<span title='file: $files_name'>".$this->renderTemplate($template_extension, null, $template_file_name, $local_assigns)."\n\n</span>";
+        }
         return $this->renderTemplate($template_extension, null, $template_file_name, $local_assigns);
     }
+
     /**
-    * Renders the template present at <tt>template_path</tt> (relative to the template_root). 
+    * Renders the template present at <tt>template_path</tt> (relative to the template_root).
     * The array in <tt>local_assigns</tt> is made available as local variables.
     */
     function render($options = array())
@@ -301,55 +306,55 @@ class AkActionView extends AkObject
 
     /**
     * Partial Views
-    * 
-    *  There's also a convenience method for rendering sub templates within the current controller that depends on a single object 
-    *  (we call this kind of sub templates for partials). It relies on the fact that partials should follow the naming convention of being 
-    *  prefixed with an underscore -- as to separate them from regular templates that could be rendered on their own. 
-    * 
+    *
+    *  There's also a convenience method for rendering sub templates within the current controller that depends on a single object
+    *  (we call this kind of sub templates for partials). It relies on the fact that partials should follow the naming convention of being
+    *  prefixed with an underscore -- as to separate them from regular templates that could be rendered on their own.
+    *
     *  In a template for AdvertiserController::account:
-    * 
+    *
     *   <?= $controller->render(array('partial' => 'account')); ?>
-    * 
-    *  This would render "advertiser/_account.tpl" and pass the instance variable $controller->account in as a local variable $account to 
+    *
+    *  This would render "advertiser/_account.tpl" and pass the instance variable $controller->account in as a local variable $account to
     *  the template for display.
-    * 
+    *
     *  In another template for Advertiser::buy, we could have:
-    * 
+    *
     *    <?= $controller->render(array('partial' =>'account','locals'=>array('account'=>$buyer)));  ?>
-    * 
+    *
     *    <?php foreach($advertisements as $ad) : ?>
     *      <?= $controller->render(array('partial'=>'ad','locals'=>array('ad'=>$ad))); ?>
     *    <?php endforeach; ?>
-    * 
-    *  This would first render "advertiser/_account.tpl" with $buyer passed in as the local variable $account, then render 
+    *
+    *  This would first render "advertiser/_account.tpl" with $buyer passed in as the local variable $account, then render
     *  "advertiser/_ad.tpl" and pass the local variable $ad to the template for display.
-    * 
+    *
     *  == Rendering a collection of partials
-    * 
+    *
     *  The example of partial use describes a familiar pattern where a template needs to iterate over an array and render a sub
     *  template for each of the elements. This pattern has been implemented as a single method that accepts an array and renders
     *  a partial by the same name as the elements contained within. So the three-lined example in "Using partials" can be rewritten
     *  with a single line:
-    * 
+    *
     *    <?= $controller->render(array('partial'=>'ad','collection'=>(array)$advertisements)); ?>
-    * 
+    *
     *  This will render "advertiser/_ad.tpl" and pass the local variable +ad+ to the template for display. An iteration counter
-    *  will automatically be made available to the template with a name of the form +partial_name_counter+. In the case of the 
+    *  will automatically be made available to the template with a name of the form +partial_name_counter+. In the case of the
     *  example above, the template would be fed +ad_counter+.
-    * 
+    *
     *  == Rendering shared partials
-    * 
+    *
     *  Two controllers can share a set of partials and render them like this:
-    * 
+    *
     *    <?= $controller->render(array('partial'=>'advertiser/ad', 'locals' => array('ad' => $advertisement ))); ?>
-    * 
+    *
     *  This will render the partial "advertiser/_ad.tpl" regardless of which controller this is being called from.
     */
     function renderPartial($partial_path, $object, $local_assigns = array())
     {
         $path = $this->_partialPathPiece($partial_path);
         $partial_name = $this->_partialPathName($partial_path);
-        
+
         $object =& $this->_extractingObject($partial_name, $local_assigns);
         $local_assigns = array_merge((array)@$this->_controllerInstance->_assigns, (array)$local_assigns);
         $this->_addObjectToLocalAssigns_($partial_name, $local_assigns, $object);
@@ -440,8 +445,8 @@ class AkActionView extends AkObject
      * Variables assigned using this method will act on any controller or action. Use this in conjunction
      * with your application helpers in order to allow variable passing from inside your views.
      * This is used for example on the capture helper.
-     * 
-     * @static 
+     *
+     * @static
      */
     function _addGlobalVar($var_name, $value, $_retrieve = false)
     {
@@ -454,13 +459,13 @@ class AkActionView extends AkObject
         }
     }
      /**
-     * @static 
+     * @static
      */
     function _getGlobals()
     {
         return AkActionView::_addGlobalVar(null,null,true);
     }
-    
+
 }
 
 ?>

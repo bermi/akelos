@@ -273,6 +273,8 @@ if(!AK_CLI && AK_WEB_REQUEST){
     defined('AK_ASSET_URL_PREFIX') ? null : define('AK_ASSET_URL_PREFIX', '');
 }
 
+define('AK_CALLED_FROM_LOCALHOST', AK_REMOTE_IP == '127.0.0.1');
+
 defined('AK_SESSION_HANDLER') ? null : define('AK_SESSION_HANDLER', 0);
 defined('AK_SESSION_EXPIRE') ? null : define('AK_SESSION_EXPIRE', 600);
 defined('AK_SESSION_NAME') ? null : define('AK_SESSION_NAME', 'AK_'.substr(md5(AK_HOST.AK_APP_DIR),0,6));
