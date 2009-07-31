@@ -175,7 +175,7 @@ class UrlHelper extends AkObject
         if ($condition !== true) {
             return $this->link_to($name, $options, $html_options, $parameters_for_method_reference);
         }
-        return '';
+        return $name;
     }
 
     /**
@@ -184,7 +184,7 @@ class UrlHelper extends AkObject
     */      
     function link_to_if($condition, $name, $options = array(), $html_options = array(), $parameters_for_method_reference = null)
     {
-        return $condition ? $this->link_to_unless($condition, $name, $options, $html_options, $parameters_for_method_reference) : null;
+        return $this->link_to_unless(!$condition, $name, $options, $html_options, $parameters_for_method_reference);
     }
 
     /**

@@ -43,7 +43,7 @@ class UrlHelperTests extends HelpersUnitTester
         $this->assertEqual($this->url->link_to('Help', array('action' => 'help'), array('post' => true)),'<a href="/url/for/test" onclick="var f = document.createElement(\'form\'); document.body.appendChild(f); f.method = \'POST\'; f.action = this.href; f.submit();return false;">Help</a>');
         $this->assertEqual($this->url->link_to('Destroy account', array('action' => 'destroy'), array('confirm' => 'Are you sure?'), array('post' => true)),'<a href="/url/for/test" onclick="return confirm(\'Are you sure?\');">Destroy account</a>');
 
-        $this->assertEqual($this->url->link_to_unless(true,'Destroy account', array('action' => 'destroy'), array('confirm' => 'Are you sure?'), array('post' => true)),'');
+        $this->assertEqual($this->url->link_to_unless(true,'Destroy account', array('action' => 'destroy'), array('confirm' => 'Are you sure?'), array('post' => true)),'Destroy account');
         $this->assertEqual($this->url->link_to_unless(false,'Destroy account', array('action' => 'destroy'), array('confirm' => 'Are you sure?'), array('post' => true)),'<a href="/url/for/test" onclick="return confirm(\'Are you sure?\');">Destroy account</a>');
         $this->assertEqual($this->url->_popup_javascript_function('A'),'window.open(this.href);');
         $this->assertEqual($this->url->_popup_javascript_function(array('A','B','C')),'window.open(this.href,\'A\',\'C\');');
@@ -61,6 +61,24 @@ class UrlHelperTests extends HelpersUnitTester
     {
         $escaped_iacute = '%26%69%61%63%75%74%65%3b';
         $this->assertTrue(strstr($this->url->mail_to('test@example.com', 'mounstro de pulsa aquí', array('encode' => 'javascript')), $escaped_iacute));
+    }
+    
+    function test_link_to_unless()
+    {
+        $condition = false;
+        $this->assertEqual('<a href="http://www.example.com">link</a>',$this->url->link_to_unless($condition,'link','http://www.example.com'));
+        
+        $condition = true;
+        $this->assertEqual('link',$this->url->link_to_unless($condition,'link','http://www.example.com'));
+    }
+    
+    function test_link_to_if()
+    {
+        $condition = true;
+        $this->assertEqual('<a href="http://www.example.com">link</a>',$this->url->link_to_if($condition,'link','http://www.example.com'));
+        
+        $condition = false;
+        $this->assertEqual('link',$this->url->link_to_if($condition,'link','http://www.example.com'));
     }
 }
 
