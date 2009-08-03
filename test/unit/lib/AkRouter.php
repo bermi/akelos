@@ -155,7 +155,7 @@ class Test_of_AkRouter_Class extends  UnitTestCase
         $this->assertEqual($this->Router->toUrl($input_value),$expected);
 
         $input_value = array('controller'=>'blog','action'=>'view','id'=>'newest','format'=>'printer_friendly');
-        $expected = AK_URL_REWRITE_ENABLED ? '/blog/view/newest/?format=printer_friendly' : '/?ak=/blog/view/newest/&format=printer_friendly';
+        $expected = AK_URL_REWRITE_ENABLED ? '/blog/view/newest.printer_friendly' : '/?ak=/blog/view/newest.printer_friendly';
         $this->assertEqual($this->Router->toUrl($input_value),$expected);
 
         $input_value = array('controller' => 'articles','action' => 'view_headlines','year' => '2005','month' => '10', 'day' => null);

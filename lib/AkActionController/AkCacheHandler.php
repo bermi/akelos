@@ -507,7 +507,7 @@ class AkCacheHandler extends AkObject
         $notGzippedRes=$this->_cache_store->remove($cacheId,$cacheGroup);
         $gZippedCacheId = $this->_scopeWithGzip($cacheId);
         $gzippedRes=$this->_cache_store->remove($gZippedCacheId,$cacheGroup);
-
+        
         if ($notNormalizedCacheId != $cacheId) {
             $notNormalizedNotGzippedRes=$this->_cache_store->remove($notNormalizedCacheId,$cacheGroup);
             $notNormalizedGZippedCacheId = $this->_scopeWithGzip($notNormalizedCacheId);
@@ -526,7 +526,7 @@ class AkCacheHandler extends AkObject
         if (!($this->_cachingAllowed() && $this->_perform_caching)) return;
 
         $cacheId = $this->_buildCacheId($path, $language);
-
+        
         $skipEtagSending = false;
         if ($orgStrlen != strlen($content)) $skipEtagSending = true;
         $notNormalizedCacheId = $this->_buildCacheId($path, $language,false);
@@ -719,8 +719,8 @@ EOF;
 
     function _initSweeper($sweeper, $options = array())
     {
-        if (isset($options['only']) && !in_array($this->_controller->getActionName(), $options['only'])) return;
-        if (isset($options['except']) && !in_array($this->_controller->getActionName(), $options['except'])) return;
+        if (!empty($options['only']) && !in_array($this->_controller->getActionName(), $options['only'])) return;
+        if (!empty($options['except']) && !in_array($this->_controller->getActionName(), $options['except'])) return;
 
         $sweeper_class = AkInflector::classify($sweeper);
 
@@ -790,7 +790,9 @@ EOF;
 
     function beforePageCache()
     {
+        $this->_page_cache_params=$this->_controller->params;//@$_REQUEST['ak'];
         ob_start();
+        
         return true;
     }
     function beforeNoCache()
@@ -837,7 +839,7 @@ EOF;
             /**
              *  Caching unzipped content
              */
-            $this->cachePage($this->_stripCacheSkipSections($contents),array(),null,false,true, strlen($contents));
+            $this->cachePage($this->_stripCacheSkipSections($contents),$this->_page_cache_params,null,false,true, strlen($contents));
             $org_contents = $this->_gzipCache($contents);
             echo $org_contents;
             $contents = $this->_gzipCache($this->_stripCacheSkipSections($contents));
@@ -848,11 +850,11 @@ EOF;
              *  Caching gzipped content
              */
             $gzippedContents = $this->_gzipCache($this->_stripCacheSkipSections($contents));
-            $this->cachePage($gzippedContents,array(),null,true,true, strlen($contents));
+            $this->cachePage($gzippedContents,$this->_page_cache_params,null,true,true, strlen($contents));
             echo $contents;
             $contents = $this->_stripCacheSkipSections($contents);
         }
-        $this->cachePage($contents,array(),null,$gzip, false, strlen($contents));
+        $this->cachePage($contents,$this->_page_cache_params,null,$gzip, false, strlen($contents));
         return true;
     }
 
@@ -874,7 +876,7 @@ EOF;
     {
         if ($path === null) {
             $path = @$_REQUEST['ak'];
-
+            
         } else if (is_array($path)) {
             unset($path['lang']);
             $path = $this->_pathFor($path, $normalize);
@@ -945,7 +947,9 @@ EOF;
     function &getCachedPage($path = null,$forcedLanguage = null)
     {
         $false = false;
-        if (!$this->_cachingAllowed()) return $false;
+        if (!$this->_cachingAllowed()) {
+            return $false;
+        }
         $false = false;
         if ($this->_cache_store!=false) {
             if ($path === null) {
@@ -958,8 +962,8 @@ EOF;
             }
             $cacheGroup = $this->_buildCacheGroup();
             $cache = $this->_cache_store->get($cacheId, $cacheGroup);
-
-            if ($cache != false) {
+            
+            if (file_exists($cache)) {
                 return $cache;
             } else {
 
@@ -1265,12 +1269,15 @@ EOF;
         $options['id'] = isset($options['id']) ? $options['id']: false;
 
         $options['skip_relative_url_root']=true;
-        $url = $this->_controller->urlFor($options);
+        $url = $this->_controller->rewrite($this->_controller->rewriteOptions($options));
         $parts = parse_url($url);
         $path = isset($parts['path'])?$parts['path']:'';
         if ($normalize && (!isset($options['action']) || (isset($options['action']) && $options['action']==AK_DEFAULT_ACTION && !strstr($path,'/'.AK_DEFAULT_ACTION)))) {
             $path = rtrim($path,'/');
             $parts = preg_split('/\/+/',$path);
+            if(!empty($options['format']) && preg_match('/(\.'.$options['format'].')$/',$parts[count($parts)-1],$matches)) {
+                $parts[count($parts)-1] = str_replace($matches[1],'',$parts[count($parts)-1]);
+            }
             $parts[] = AK_DEFAULT_ACTION;
             $path = implode('/', $parts);
         }

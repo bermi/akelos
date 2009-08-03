@@ -291,6 +291,10 @@ class AkRouter extends AkObject
                                     $_parsed = '/'.$url_params['lang'].$_parsed;
                                     unset($url_params['lang']);
                                 }
+                                if(!empty($url_params['format'])){
+                                    $_parsed = rtrim($_parsed,'/').'.'.$url_params['format'];
+                                    unset($url_params['format']);
+                                }
                                 $_parsed .= count($url_params) ? '?'.http_build_query($url_params) : '';
                             }else{
                                 $_parsed = count($url_params) ? '/?ak='.$_parsed.'&'.http_build_query($url_params) : '/?ak='.$_parsed;
