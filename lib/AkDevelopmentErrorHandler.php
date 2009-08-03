@@ -19,21 +19,18 @@ if(defined('AK_DEBUG') && AK_DEBUG){
     {
         $result = '';
         $bt = debug_backtrace();
-        $result .= ("\n\nBacktrace (most recent call first):\n\n\n");
+        $result .= ("\nBacktrace (most recent call first):\n");
         for($i = 0; $i <= count($bt) - 1; $i++)
         {
             if($bt[$i]["function"]!='ak_backtrace' && $bt[$i]["function"]!='ak_development_error_handler'){
-                if(!isset($bt[$i]["file"])){
-                    $result .= ("[PHP core called function]\n");
-                }
                 if(isset($bt[$i]["line"])){
                     if(strstr($bt[$i]["file"], AK_COMPILED_VIEWS_DIR) || strstr($bt[$i]["file"], AK_APP_DIR)){
-                        $result .= '<div style="background-color:#ededed;padding:3px;border:1px solid #ccc;">'.ak_show_source_line($bt[$i]["file"],$bt[$i]["line"], $bt[$i]["function"]).'</div>';
+                        $result .= '<div style="background-color:#ededed;padding:10px;border:1px solid #ccc;">'.ak_show_source_line($bt[$i]["file"],$bt[$i]["line"], $bt[$i]["function"], (array)@$bt[$i]['args']).'</div>';
                     }elseif(!$only_app){
-                        $result .= '<div>'.ak_show_source_line($bt[$i]["file"],$bt[$i]["line"], $bt[$i]["function"]).'</div>';
+                        $result .= '<div style="margin:20px 0;padding:10px;border:1px solid #ccc;">'.ak_show_source_line($bt[$i]["file"],$bt[$i]["line"], $bt[$i]["function"], (array)@$bt[$i]['args']).'</div>';
                     }
                 }
-                $result .= ("\n\n");
+
             }
         }
         return $result;
@@ -94,23 +91,24 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         if(!defined('E_RECOVERABLE_ERROR')) define('E_RECOVERABLE_ERROR', 4096);
 
         switch($error_number){
-            case E_ERROR:               echo "Error";                  break;
-            case E_WARNING:             echo "Warning";                break;
-            case E_PARSE:               echo "Parse Error";            break;
-            case E_NOTICE:              echo "Notice";                 break;
-            case E_CORE_ERROR:          echo "Core Error";             break;
-            case E_CORE_WARNING:        echo "Core Warning";           break;
-            case E_COMPILE_ERROR:       echo "Compile Error";          break;
-            case E_COMPILE_WARNING:     echo "Compile Warning";        break;
-            case E_USER_ERROR:          echo "User Error";             break;
-            case E_USER_WARNING:        echo "User Warning";           break;
-            case E_USER_NOTICE:         echo "User Notice";            break;
-            case E_STRICT:              echo "Strict Notice";          break;
-            case E_RECOVERABLE_ERROR:   echo "Recoverable Error";      break;
-            default:                    echo "Unknown error ($error_number)"; break;
+            case E_ERROR:               $error_type = "Error";                  break;
+            case E_WARNING:             $error_type = "Warning";                break;
+            case E_PARSE:               $error_type = "Parse Error";            break;
+            case E_NOTICE:              $error_type = "Notice";                 break;
+            case E_CORE_ERROR:          $error_type = "Core Error";             break;
+            case E_CORE_WARNING:        $error_type = "Core Warning";           break;
+            case E_COMPILE_ERROR:       $error_type = "Compile Error";          break;
+            case E_COMPILE_WARNING:     $error_type = "Compile Warning";        break;
+            case E_USER_ERROR:          $error_type = "User Error";             break;
+            case E_USER_WARNING:        $error_type = "User Warning";           break;
+            case E_USER_NOTICE:         $error_type = "User Notice";            break;
+            case E_STRICT:              $error_type = "Strict Notice";          break;
+            case E_RECOVERABLE_ERROR:   $error_type = "Recoverable Error";      break;
+            default:                    $error_type = "Unknown error ($error_number)"; break;
         }
+
         //$result = ": <h3>$error_message</h3> in  $file on line $line\n";
-        $result = "<h3>$error_message</h3>\n";
+        $result = "<h3 style='padding:5px; background-color:#f00;color:#fff'>($error_type) $error_message</h3>";
         //$result .= ak_show_source_line($file, $line);
         //ak_show_app_backtrace();
         if(AK_WEB_REQUEST){
@@ -136,13 +134,13 @@ if(defined('AK_DEBUG') && AK_DEBUG){
             }
         }
 
-        echo !AK_WEB_REQUEST ? html_entity_decode(strip_tags($result)) : '<div style="background-color:#fff;margin:10px;padding:10px;color:#000;font-family:sans-serif;border:3px solid #f00;font-size:12px;">'. $result.'</div>';
+        echo !AK_WEB_REQUEST ? html_entity_decode(strip_tags($result)) : '<div style="background-color:#fff;margin:10px;padding:10px;color:#000;font-family:sans-serif;border-bottom:3px solid #f00;font-size:12px;">'. $result.'</div>';
 
         AK_WEB_REQUEST ? print('</pre>') : null;
 
     }
 
-    function ak_show_source_line($file, $line, $highlight = '')
+    function ak_show_source_line($file, $line, $highlight = '', $params = array())
     {
         $result = ("File: ".$file."\n");
         $file = explode("\n", file_get_contents($file));
@@ -158,7 +156,39 @@ if(defined('AK_DEBUG') && AK_DEBUG){
             }
             $result .=  "    code: ".$colored;
         }
+
+
+        if(!empty($params)){
+            $result .=  "\n    <span style='color:#ccc;'>params:</span> \n".'<div style="background-color:#cff;margin:10px;padding:10px;color:#000;font-family:sans-serif;border:1px solid #0ff;font-size:12px;">'.ak_show_params($params).'</div>';;
+        }
+
         $result .=  "\n\n";
+        return $result;
+    }
+
+    function ak_show_params($params, $number_of_recursions = 0, $currently_inspecting = 'Array')
+    {
+
+        $preffix = (str_repeat('        ',$number_of_recursions));
+        if($number_of_recursions == 10){
+            return $preffix.$currently_inspecting.' [recusive limit reached]';
+        }
+        $number_of_recursions++;
+        $result = '';
+        if(!empty($params)){
+            foreach ((array)$params as $k => $param){
+
+                $result .=  $preffix."(".gettype($param).'): ';
+                if(is_scalar($param)){
+                    $result .=  $param;
+                }elseif (is_object($param)){
+                    $result .=  trim(get_class($param));
+                }else{
+                    $result .=  " => (\n        $preffix$k => ".trim(ak_show_params($param, $number_of_recursions))."\n$preffix)";
+                }
+                $result .=  $preffix." \n";
+            }
+        }
         return $result;
     }
 
