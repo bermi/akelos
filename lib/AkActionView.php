@@ -162,10 +162,17 @@ class AkActionView extends AkObject
             $template_file_name = $this->getFullTemplatePath($template_path, $template_extension);
         }
 
-        if(AK_DEBUG && AK_CALLED_FROM_LOCALHOST && defined('AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS') && AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS){
+        $format = '';
+        if(isset($local_assigns['params']['format']) && $local_assigns['params']['format'] != 'html'){
+            $format = Ak::sanitize_include($local_assigns['params']['format'],'paranoid');
+            $template_extension = $format.'.'.$template_extension;
+        }
+
+        if(AK_DEBUG && AK_CALLED_FROM_LOCALHOST && defined('AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS') && AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS && empty($format)){
             $files_name = trim((str_replace(AK_BASE_DIR,'',realpath($template_file_name))), '/');
             return "\n\n<span title='file: $files_name'>".$this->renderTemplate($template_extension, null, $template_file_name, $local_assigns)."\n\n</span>";
         }
+
         return $this->renderTemplate($template_extension, null, $template_file_name, $local_assigns);
     }
 
@@ -203,6 +210,15 @@ class AkActionView extends AkObject
         $____controller_extras = isset($this->_controllerInstance) ? array('controller_name' => $this->_controllerInstance->getControllerName(), 'controller' => &$this->_controllerInstance) : array();
         $____local_assigns = array_merge(array_merge($this->_getGlobals(),(array)@$this->assigns,array_merge((array)@$this->_local_assigns,
         array_merge((array)$____local_assigns, $____controller_extras))));
+
+        if(strstr($____template_extension,'.')){
+            $____format = substr($____template_extension, 0, strpos($____template_extension,'.'));
+            $____template_extension = substr($____template_extension, strpos($____template_extension,'.')+1);
+            $____file_path_for_format = preg_replace("/\.$____template_extension$/", ".$____format.$____template_extension", $____file_path);
+            if(is_file($____file_path_for_format)){
+                $____file_path = $____file_path_for_format;
+            }
+        }
 
         if(!empty($this->_template_handlers[$____template_extension])){
             $____handler =& $this->_template_handlers[$____template_extension];
@@ -458,7 +474,7 @@ class AkActionView extends AkObject
             $_global_vars[$var_name] =& $value;
         }
     }
-     /**
+    /**
      * @static
      */
     function _getGlobals()

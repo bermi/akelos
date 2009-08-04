@@ -93,13 +93,13 @@ if(!class_exists('AkResponse')){
         function sendHeaders($terminate_if_redirected = true)
         {
             /**
-         * Fix a problem with IE 6.0 on opening downloaded files:
-         * If Cache-Control: IE removes the file it just downloaded from
-         * its cache immediately
-         * after it displays the "open/save" dialog, which means that if you
-         * hit "open" the file isn't there anymore when the application that
-         * is called for handling the download is run, so let's workaround that
-         */
+            * Fix a problem with IE 6.0 on opening downloaded files:
+            * If Cache-Control: IE removes the file it just downloaded from
+            * its cache immediately
+            * after it displays the "open/save" dialog, which means that if you
+            * hit "open" the file isn't there anymore when the application that
+            * is called for handling the download is run, so let's workaround that
+            */
             if(isset($this->_headers['Cache-Control']) && $this->_headers['Cache-Control'] == 'no-cache'){
                 $this->_headers['Cache-Control'] = 'private';
             }
@@ -112,6 +112,7 @@ if(!class_exists('AkResponse')){
             unset($this->_headers['Status']);
 
             $_has_content_type = $_has_content_length = false;
+            $_can_add_charset = defined('AK_CHARSET');
             if(!empty($this->_headers) && is_array($this->_headers)){
                 $this->addHeader('Connection: close');
                 foreach ($this->_headers as $k=>$v){
@@ -125,9 +126,13 @@ if(!class_exists('AkResponse')){
                             continue;
                         }
                     }
-                    if(!$_has_content_type && strtolower(substr($header,0,13)) == 'content-type:'){
+                    $lowercase_header = strtolower($header);
+                    if(!$_has_content_type && substr($lowercase_header,0,13) == 'content-type:'){
+                        if(!strstr($lowercase_header,'charset') && $_can_add_charset && (empty($_redirected) || (!empty($_redirected) && !empty($javascript_redirection)))){
+                            $header = $header.'; charset='.AK_CHARSET;
+                        }
                         $_has_content_type = true;
-                    }elseif(!$_has_content_length && strtolower(substr($header,0,15)) == 'content-length:'){
+                    }elseif(!$_has_content_length && substr($lowercase_header,0,15) == 'content-length:'){
                         $_has_content_length = true;
                     }
 
@@ -135,8 +140,8 @@ if(!class_exists('AkResponse')){
                     header($header);
                 }
             }
-
-            if(!$_has_content_type && defined('AK_CHARSET') && (empty($_redirected) || (!empty($_redirected) && !empty($javascript_redirection)))){
+            $_can_add_charset = !$_can_add_charset ? false : (empty($_redirected) || (!empty($_redirected) && !empty($javascript_redirection)));
+            if(!$_has_content_type && $_can_add_charset){
                 header('Content-Type: text/html; charset='.AK_CHARSET);
                 $this->_headers_sent[] = 'Content-Type: text/html; charset='.AK_CHARSET;
             }

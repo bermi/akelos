@@ -23,7 +23,8 @@ $partial_tests = array(
 'page_caching',
 'action_caching',
 'sweeper',
-'respond_to_format'
+'respond_to_format',
+'renders_format',
 );
 
 foreach ($partial_tests as $partial_test){
