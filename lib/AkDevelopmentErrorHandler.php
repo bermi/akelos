@@ -184,7 +184,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
                 }elseif (is_object($param)){
                     $result .=  trim(get_class($param));
                 }else{
-                    $result .=  " => (\n        $preffix$k => ".trim(ak_show_params($param, $number_of_recursions))."\n$preffix)";
+                    $result .=  " => (\n        $preffix".(!is_numeric($k)?"$k => ":'').trim(ak_show_params($param, $number_of_recursions))."\n$preffix)";
                 }
                 $result .=  $preffix." \n";
             }
