@@ -471,7 +471,11 @@ class AkActionView extends AkObject
             return $_global_vars;
         }
         if($var_name[0] != '_'){
-            $_global_vars[$var_name] =& $value;
+            if(isset($_global_vars[$var_name]) && is_string($_global_vars[$var_name])){
+                $_global_vars[$var_name] .= $value;
+            }else{
+                $_global_vars[$var_name] =& $value;
+            }
         }
     }
     /**

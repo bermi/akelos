@@ -9,7 +9,7 @@ require_once(AK_LIB_DIR.DS.'AkRequest.php');
 ak_generate_mock('AkRequest');
 
 
-class CaptureHelperTests extends HelpersUnitTester 
+class CaptureHelperTests extends HelpersUnitTester
 {
     function setUp()
     {
@@ -40,7 +40,7 @@ class CaptureHelperTests extends HelpersUnitTester
         $globals = AkActionView::_getGlobals();
         $this->assertEqual($globals['content_for_test_2'], $str);
     }
-    
+
     function test_content_for()
     {
         $str = "test CaptureHelper content_for";
@@ -49,6 +49,20 @@ class CaptureHelperTests extends HelpersUnitTester
         $this->assertEqual($this->capture_helper->end(), $str);
         $globals = AkActionView::_getGlobals();
         $this->assertEqual($globals['content_for_content_for'], $str);
+    }
+
+    function test_concatenation()
+    {
+        $this->capture_helper->content_for('concatenation');
+        echo 'A';
+        $this->assertEqual($this->capture_helper->end(), 'A');
+
+        $this->capture_helper->content_for('concatenation');
+        echo 'B';
+        $this->assertEqual($this->capture_helper->end(), 'B');
+
+        $globals = AkActionView::_getGlobals();
+        $this->assertEqual($globals['content_for_concatenation'], 'AB');
     }
 }
 
