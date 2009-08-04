@@ -18,20 +18,20 @@
 
 /**
 * AkInflector for pluralize and singularize English nouns.
-* 
+*
 * This AkInflector is a port of Ruby on Rails AkInflector.
-* 
+*
 * It can be really helpful for developers that want to
 * create frameworks based on naming conventions rather than
 * configurations.
-* 
+*
 * You can find the inflector rules in config/inflector.yml
 * To add your own inflector rules, please do so in config/inflector/mydictionary.yml
-* 
+*
 * Using it:
-* 
+*
 * AkInflector::pluralize('inglés',null,'es'); // ingleses, see config/inflector/es.yml
-* 
+*
 * @author Bermi Ferrer Martinez <bermi a.t akelos c.om>
 * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
@@ -48,34 +48,34 @@ class AkInflector
         static $_loaded = array();
         if (!($return=Ak::getStaticVar('AkInflectorConfig::'.$dictionary))) {
             $return = Ak::getSettings($dictionary,false);
-            
+
             if ($return !== false) {
                 Ak::setStaticVar('AkInflectorConfig::'.$dictionary,$return);
                 $_loaded[$dictionary] = true;
             } else {
                 trigger_error(Ak::t('Could not load inflector rules file: %file',array('%file'=>'config'.DS.$dictionary.'.yml')),E_USER_ERROR);
             }
-            
+
         }
         return $return;
     }
-    
+
     function _inflect($word, $new_value, $type, $dictionary = null)
     {
         static $_cached;
         static $_loaded;
-        
+
         if ($dictionary == null || $dictionary=='inflector') {
             $dictionary = 'inflector';
         } else {
             $dictionary = 'inflector/'.$dictionary;
         }
         if (!isset($_loaded[$dictionary])) {
-            
+
             $_loaded[$dictionary] = true;
-            $_cached[$dictionary] = array('singularize'=>array(),'pluralize'=>array()); 
+            $_cached[$dictionary] = array('singularize'=>array(),'pluralize'=>array());
         }
-        
+
         $config = AkInflector::_loadConfig($dictionary);
         if (!in_array($type,array('singularize','pluralize'))) {
             return $word;
@@ -103,7 +103,7 @@ class AkInflector
                     }
                 }
             }
-            
+
             $replacements = isset($config[$type]['replacements'])?$config[$type]['replacements']:false;
             if ($replacements!==false) {
                 $replacements_keys = array_keys($replacements);
@@ -128,10 +128,10 @@ class AkInflector
         }
         return $_cached[$dictionary][$type][$_original_word];
     }
-    
+
     /**
     * Pluralizes English nouns.
-    * 
+    *
     * @access public
     * @static
     * @param    string    $word    English noun to pluralize
@@ -147,7 +147,7 @@ class AkInflector
 
     /**
     * Singularizes English nouns.
-    * 
+    *
     * @access public
     * @static
     * @param    string    $word    English noun to singularize
@@ -179,13 +179,13 @@ class AkInflector
     /**
     * Converts an underscored or CamelCase word into a English
     * sentence.
-    * 
+    *
     * The titleize function converts text like "WelcomePage",
     * "welcome_page" or  "welcome page" to this "Welcome
     * Page".
     * If second parameter is set to 'first' it will only
     * capitalize the first character of the title.
-    * 
+    *
     * @access public
     * @static
     * @param    string    $word    Word to format as tile
@@ -205,11 +205,11 @@ class AkInflector
 
     /**
     * Returns given word as CamelCased
-    * 
+    *
     * Converts a word like "send_email" to "SendEmail". It
     * will remove non alphanumeric character from the word, so
     * "who's online" will be converted to "WhoSOnline"
-    * 
+    *
     * @access public
     * @static
     * @see variablize
@@ -236,12 +236,12 @@ class AkInflector
 
     /**
     * Converts a word "into_it_s_underscored_version"
-    * 
+    *
     * Convert any "CamelCased" or "ordinary Word" into an
     * "underscored_word".
-    * 
+    *
     * This can be really useful for creating friendly URLs.
-    * 
+    *
     * @access public
     * @static
     * @param    string    $word    Word to underscore
@@ -264,14 +264,14 @@ class AkInflector
 
     /**
     * Returns a human-readable string from $word
-    * 
+    *
     * Returns a human-readable string from $word, by replacing
     * underscores with a space, and by upper-casing the initial
     * character by default.
-    * 
+    *
     * If you need to uppercase all the words you just have to
     * pass 'all' as a second parameter.
-    * 
+    *
     * @access public
     * @static
     * @param    string    $word    String to "humanize"
@@ -290,11 +290,11 @@ class AkInflector
 
     /**
     * Same as camelize but first char is lowercased
-    * 
+    *
     * Converts a word like "send_email" to "sendEmail". It
     * will remove non alphanumeric character from the word, so
     * "who's online" will be converted to "whoSOnline"
-    * 
+    *
     * @access public
     * @static
     * @see camelize
@@ -313,9 +313,9 @@ class AkInflector
     /**
     * Converts a class name to its table name according to rails
     * naming conventions.
-    * 
+    *
     * Converts "Person" to "people"
-    * 
+    *
     * @access public
     * @static
     * @see classify
@@ -333,9 +333,9 @@ class AkInflector
     /**
     * Converts a table name to its class name according to Akelos
     * naming conventions.
-    * 
+    *
     * Converts "people" to "Person"
-    * 
+    *
     * @access public
     * @static
     * @see tableize
@@ -352,9 +352,9 @@ class AkInflector
 
     /**
     * Converts number to its ordinal English form.
-    * 
+    *
     * This method converts 13 to 13th, 2 to 2nd ...
-    * 
+    *
     * @access public
     * @static
     * @param    integer    $number    Number to get its ordinal value
@@ -395,9 +395,9 @@ class AkInflector
         $module_name = str_replace('::', '/', $module_name);
         return (strstr($module_name, '/') ? preg_replace('/^.*\//', '', $module_name) : (strstr($module_name, '_') ? substr($module_name, 1+strrpos($module_name,'_')) : $module_name));
     }
-    
+
     /**
-     * Transforms a string to its unaccented version. 
+     * Transforms a string to its unaccented version.
      * This might be useful for generating "friendly" URLs
      */
     function unaccent($text)
@@ -420,10 +420,16 @@ class AkInflector
         return trim(AkInflector::underscore(AkInflector::unaccent($text)),'_');
     }
 
+
+    function slugize($text)
+    {
+        return str_replace('_','-', AkInflector::urlize($text));
+    }
+
     /**
-    * Returns $class_name in underscored form, with "_id" tacked on at the end. 
+    * Returns $class_name in underscored form, with "_id" tacked on at the end.
     * This is for use in dealing with the database.
-    * 
+    *
     * @param string $class_name
     * @return string
     */
@@ -469,7 +475,7 @@ class AkInflector
     {
         return AkInflector::singularize(AkInflector::pluralize($singular)) == $singular;
     }
-    
+
     function is_plural($plural)
     {
         return AkInflector::pluralize(AkInflector::singularize($plural)) == $plural;
