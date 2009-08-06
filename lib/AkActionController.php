@@ -149,11 +149,14 @@ class AkActionController extends AkObject
 
     function process(&$Request, &$Response)
     {
+        AK_ENABLE_PROFILER &&  Ak::profile('AkActionController::process() start');
         AK_LOG_EVENTS && empty($this->_Logger) ? ($this->_Logger =& Ak::getLogger()) : null;
 
         $this->Request =& $Request;
         $this->Response =& $Response;
         $this->params = $this->Request->getParams();
+        AK_ENABLE_PROFILER &&  Ak::profile('Got request paramenters');
+
         $this->_action_name = $this->Request->getAction();
 
         $actionExists = $this->_ensureActionExists();
@@ -164,16 +167,21 @@ class AkActionController extends AkObject
         }
 
         Ak::t('Akelos'); // We need to get locales ready
+        AK_ENABLE_PROFILER &&  Ak::profile('Got multilingual ');
+
 
         if($this->_high_load_mode !== true){
             if(!empty($this->_auto_instantiate_models)){
                 $this->instantiateIncludedModelClasses();
+                AK_ENABLE_PROFILER &&  Ak::profile('Instantiated models');
             }
             if(!empty($this->_enable_plugins)){
                 $this->loadPlugins();
+                AK_ENABLE_PROFILER &&  Ak::profile('Instantiated plugins');
             }
             if(!empty($this->helpers)){
                 $this->instantiateHelpers();
+                AK_ENABLE_PROFILER &&  Ak::profile('Instantiated helpers');
             }
         }else{
             $this->_enableLayoutOnRender = false;
@@ -194,7 +202,6 @@ class AkActionController extends AkObject
         }
 
         $this->_identifyRequest();
-
 
         $this->performActionWithFilters($this->_action_name);
 
@@ -1990,8 +1997,11 @@ class AkActionController extends AkObject
     function performActionWithFilters($method = '')
     {
         if ($this->beforeAction($method) !== false && !$this->_hasPerformed()){
+            AK_ENABLE_PROFILER &&  Ak::profile("Called $method  before filters");
             $this->performActionWithoutFilters($method);
+            AK_ENABLE_PROFILER &&  Ak::profile("Performed $method  action");
             $this->afterAction($method);
+            AK_ENABLE_PROFILER &&  Ak::profile("Called $method  after filters");
             return true;
         }
         return false;
@@ -2885,11 +2895,10 @@ class AkActionController extends AkObject
 
     function _initExtensions()
     {
-
         $this->_initCacheHandler();
-
         //$this->_registerModule('caching','AkActionControllerCaching','AkActionController/Caching.php');
     }
+
     function _initCacheHandler()
     {
         // TODOARNO

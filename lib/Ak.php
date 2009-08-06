@@ -1043,19 +1043,43 @@ class Ak
 
 
     /**
-    * @todo move this out of here and use Pear Benchmark instead
-    */
+     * Add a profile message that can be displayed after executing the script
+     *
+     * You can add benchmark markers by calling
+     *
+     *    Ak::profile('Searching for books');
+     *
+     * To display the results you need to call
+     *
+     *     Ak::profile(true);
+     *
+     * You might also find handy adding this to your application controller.
+     *
+     *     class ApplicationController extends BaseActionController
+     *     {
+     *         function __construct(){
+     *             $this->afterFilter('_displayBenchmark');
+     *             parent::__construct();
+     *         }
+     *         public function _displayBenchmark(){
+     *             Ak::profile(true);
+     *         }
+     *     }
+     *
+     * IMPORTANT NOTE: You must define AK_ENABLE_PROFILER to true for this to work.
+     */
     function profile($message = '')
     {
-        static $profiler;
-        if(AK_DEV_MODE && AK_ENABLE_PROFILER){
-            if(!isset($profiler)){
-                @require_once(AK_LIB_DIR.DS.'AkProfiler.php');
-                $profiler = new AkProfiler();
-                $profiler->init();
-                register_shutdown_function(array(&$profiler,'showReport'));
-            }else {
-                $profiler->setFlag($message);
+        if(AK_ENABLE_PROFILER){
+            if(!$ProfileTimer = $Timer = Ak::getStaticVar('ProfileTimer')){
+                require_once 'Benchmark/Timer.php';
+                $ProfileTimer = new Benchmark_Timer();
+                $ProfileTimer->start();
+                Ak::setStaticVar('ProfileTimer', $ProfileTimer);
+            }elseif($message === true){
+                $ProfileTimer->display();
+            }else{
+                $ProfileTimer->setMarker($message);
             }
         }
     }
@@ -2069,7 +2093,22 @@ class Ak
     {
         return defined($name[1])?constant($name[1]):'';
     }
+
+    /**
+     * Get a models a model instance. Including and instantiating the model for us.
+     *
+     * This kinds mimics the ideal (new Model())->find() wich does not exist on PHP yet.
+     *
+     * On Akelos we can do Ak::get('Model')->find();
+     */
+    function get($model_name)
+    {
+        Ak::import($model_name);
+        return new $model_name();
+    }
+
 }
 
+AK_ENABLE_PROFILER &&  Ak::profile();
 
 ?>

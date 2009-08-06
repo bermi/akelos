@@ -15,6 +15,41 @@
 // $Id: Timer.php,v 1.13 2005/05/24 13:42:06 toggg Exp $
 //
 
+if(!function_exists('memory_get_usage')){
+    function memory_get_usage()
+    {
+        if ( substr(PHP_OS,0,3) == 'WIN') {
+            $tmp = explode(',"'.getmypid().'",',`TASKLIST /FO "CSV"`);
+            $tmp = explode("\n",$tmp[1]);
+            $tmp = explode('"',trim($tmp[0],'"KB '));
+            return intval(str_replace(array('.',','),array(''),$tmp[count($tmp)-1]))*1024;
+        }else{
+            $pid = getmypid();
+            exec("ps -o rss -p $pid", $output);
+            return $output[1] *1024;
+        }
+        return false;
+    }
+}
+
+
+if(!function_exists('number_to_human_size')){
+    function number_to_human_size($size, $decimal = 1)
+    {
+        if(is_numeric($size )){
+            $position = 0;
+            $units = array( ' Bytes', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB');
+            while( $size >= 1024 && ( $size / 1024 ) >= 1 ) {
+                $size /= 1024;
+                $position++;
+            }
+            return round( $size, $decimal ) . $units[$position];
+        }else {
+            return '0 Bytes';
+        }
+    }
+}
+
 require_once 'PEAR.php';
 
 /**
@@ -137,6 +172,8 @@ class Benchmark_Timer extends PEAR {
      */
     function setMarker($name) {
         $this->markers[$name] = $this->_getMicrotime();
+        $this->_memory[$name] = memory_get_usage();
+        $this->_files[$name] = count(get_included_files());
     }
 
     /**
@@ -150,6 +187,8 @@ class Benchmark_Timer extends PEAR {
     function timeElapsed($start = 'Start', $end = 'Stop') {
         if ($end == 'Stop' && !isset($this->markers['Stop'])) {
             $this->markers['Stop'] = $this->_getMicrotime();
+            $this->_memory['Stop'] = memory_get_usage();
+            $this->_files['Stop'] = count(get_included_files());
         }
 
         if (extension_loaded('bcmath')) {
@@ -184,11 +223,22 @@ class Benchmark_Timer extends PEAR {
                 $diff  = $time - $temp;
                 $total = $total + $diff;
             }
+            $initial_memory = !isset($initial_memory) ? $this->_memory[$marker] : $initial_memory+$tmp_memory;
+            $files = !isset($files) ? $this->_files[$marker] : $files+$previous_files;
+
+            $tmp_memory = @$this->_memory[$marker]-$initial_memory;
 
             $result[$i]['name']  = $marker;
             $result[$i]['time']  = $time;
             $result[$i]['diff']  = $diff;
             $result[$i]['total'] = $total;
+            $result[$i]['memory'] = number_to_human_size($tmp_memory);
+            $result[$i]['total_memory'] = number_to_human_size(@$this->_memory[$marker]);
+            $result[$i]['files'] = @$this->_files[$marker] - $files;
+            $result[$i]['total_files'] = @$this->_files[$marker];
+
+            $previous_files = $result[$i]['files'];
+            $previous_memory = $result[$i]['files'];
 
             $this->maxStringLength = (strlen($marker) > $this->maxStringLength ? strlen($marker) + 1 : $this->maxStringLength);
 
@@ -228,8 +278,15 @@ class Benchmark_Timer extends PEAR {
         $dashes = '';
 
         if ($http) {
-            $out = '<table border="1">'."\n";
-            $out .= '<tr><td>&nbsp;</td><td align="center"><b>time index</b></td><td align="center"><b>ex time</b></td><td align="center"><b>%</b></td>'.
+            $out = '<table style="border:3px solid #ddd;margin:10px;background-color:#fff;color:#000;font-family:sans-serif;">'."\n";
+            $out .= '<tr>
+            <td>&nbsp;</td>
+            <td align="center" style="border:1px solid #fff;padding:6px 10px;"><b>memory</b></td>
+            <td align="center" style="border:1px solid #fff;padding:6px 10px;"><b>total memory</b></td>
+            <td align="center" style="border:1px solid #fff;padding:6px 10px;"><b>included files</b></td>
+            <td align="center" style="border:1px solid #fff;padding:6px 10px;"><b>total files</b></td>
+            <td align="center" style="border:1px solid #fff;padding:6px 10px;"><b>execution time</b></td>
+            <td align="center"><b>%</b></td>'.
             ($showTotal ?
               '<td align="center"><b>elapsed</b></td><td align="center"><b>%</b></td>'
                : '')."</tr>\n";
@@ -249,14 +306,21 @@ class Benchmark_Timer extends PEAR {
             $tperc = (($v['total'] * 100) / $total);
 
             if ($http) {
-                $out .= "<tr><td><b>" . $v['name'] .
-                       "</b></td><td>" . $v['time'] .
-                       "</td><td>" . $v['diff'] .
-                       "</td><td align=\"right\">" . number_format($perc, 2, '.', '') .
+
+                $bg_color = $perc > 30 ? ($perc > 60 ? 'fcc' : 'ffc') : 'eee';
+                $style = "border:1px solid #fff;padding:6px 10px;background-color:#$bg_color;";
+
+                $out .= "<tr><td style='$style'><b>" . $v['name'] .
+                       "</b></td><td style='$style'>" . $v['memory'] .
+                       "</b></td><td style='$style'>" . $v['total_memory'] .
+                       "</b></td><td style='$style'>" . $v['files'] .
+                       "</b></td><td style='$style'>" . $v['total_files'] .
+                       "</td><td style='$style'>" . $v['diff'] .
+                       "</td><td align=\"right\" style='$style'>" . number_format($perc, 2, '.', '') .
                        "%</td>".
                        ($showTotal ?
-                            "<td>" . $v['total'] .
-                            "</td><td align=\"right\">" .
+                            "<td style='border:1px solid #fff;padding:6px 10px;'>" . $v['total'] .
+                            "</td><td align=\"right\" style='border:1px solid #fff;padding:6px 10px;'>" .
                             number_format($tperc, 2, '.', '') .
                             "%</td>" : '').
                        "</tr>\n";
@@ -276,7 +340,15 @@ class Benchmark_Timer extends PEAR {
         }
 
         if ($http) {
-            $out .= "<tr style='background: silver;'><td><b>total</b></td><td>-</td><td>${total}</td><td>100.00%</td>".($showTotal ? "<td>-</td><td>-</td>" : "")."</tr>\n";
+            $out .= "<tr style='border:1px solid #fff;background-color:#666;color:#fff'>
+            <td style='padding:6px 10px;'><b>total</b></td>
+            <td style='padding:6px 10px;'>-</td>
+            <td style='padding:6px 10px;'>-</td>
+            <td style='padding:6px 10px;'>-</td>
+            <td style='padding:6px 10px;'>-</td>
+            <td style='padding:6px 10px;'>${total}</td>
+            <td style='padding:6px 10px;'>100.00%</td>
+            ".($showTotal ? "<td>-</td><td>-</td>" : "")."</tr>\n";
             $out .= "</table>\n";
         } else {
             $out .= str_pad('total', $this->maxStringLength);

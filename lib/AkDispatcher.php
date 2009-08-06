@@ -39,9 +39,11 @@ class AkDispatcher
 
     function dispatch()
     {
+        AK_ENABLE_PROFILER &&  Ak::profile(__CLASS__.'::'.__FUNCTION__.'() call');
         $this->Request =& AkRequest();
         $this->Response =& AkResponse();
         $this->Controller =& $this->Request->recognize();
+        AK_ENABLE_PROFILER &&  Ak::profile('Request::recognize() completed');
         $this->Controller->process($this->Request, $this->Response);
     }
 
