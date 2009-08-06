@@ -271,8 +271,8 @@ class AkCacheHandler extends AkObject
      */
     var $_max_cache_id_length = 240;
     /*
-     * @var int
-     */
+    * @var int
+    */
     var $_max_url_length = 120;
 
 
@@ -435,6 +435,8 @@ class AkCacheHandler extends AkObject
                 }
                 if (is_array($callback)) {
                     call_user_func_array($callback,$configuration_object->$option);
+                } elseif(is_string($configuration_object->$option) && method_exists($configuration_object, $configuration_object->$option)) {
+                    $this->$callback($configuration_object->{$configuration_object->$option}());
                 } else {
                     $this->$callback($configuration_object->$option);
                 }
@@ -477,12 +479,12 @@ class AkCacheHandler extends AkObject
         return $this->_cache_store && $this->_perform_caching;
     }
     /*
-     * ########################################################################
-     * #
-     * #               From AkActionControllerCachingPages
-     * #
-     * ########################################################################
-     */
+    * ########################################################################
+    * #
+    * #               From AkActionControllerCachingPages
+    * #
+    * ########################################################################
+    */
     function expirePage($path = null, $language=null)
     {
         if (!$this->_perform_caching || !$this->_cache_store) return;
@@ -507,7 +509,7 @@ class AkCacheHandler extends AkObject
         $notGzippedRes=$this->_cache_store->remove($cacheId,$cacheGroup);
         $gZippedCacheId = $this->_scopeWithGzip($cacheId);
         $gzippedRes=$this->_cache_store->remove($gZippedCacheId,$cacheGroup);
-        
+
         if ($notNormalizedCacheId != $cacheId) {
             $notNormalizedNotGzippedRes=$this->_cache_store->remove($notNormalizedCacheId,$cacheGroup);
             $notNormalizedGZippedCacheId = $this->_scopeWithGzip($notNormalizedCacheId);
@@ -526,7 +528,7 @@ class AkCacheHandler extends AkObject
         if (!($this->_cachingAllowed() && $this->_perform_caching)) return;
 
         $cacheId = $this->_buildCacheId($path, $language);
-        
+
         $skipEtagSending = false;
         if ($orgStrlen != strlen($content)) $skipEtagSending = true;
         $notNormalizedCacheId = $this->_buildCacheId($path, $language,false);
@@ -575,11 +577,11 @@ class AkCacheHandler extends AkObject
         if (!file_exists(dirname($filename))) {
             $res = mkdir(dirname($filename),0755,true);
         }
-		if(!AK_PHP5) {
+        if(!AK_PHP5) {
 
-			Ak::compat('file_put_contents');
+            Ak::compat('file_put_contents');
 
-		}
+        }
         file_put_contents($filename, $content);
 
         return $filename;
@@ -600,7 +602,7 @@ class AkCacheHandler extends AkObject
                 return false;
             }
         }
-         return $content;
+        return $content;
     }
 
     function x_modifyCacheContent($content,$addHeaders = array(), $removeHeaders = array())
@@ -696,7 +698,7 @@ EOF;
     {
         require_once(AK_LIB_DIR.DS.'AkActionController'.DS.'AkCacheSweeper.php');
         $default_options = array('only'=>array(),
-                                 'except'=>array());
+        'except'=>array());
         if (is_string($options)) {
             $options = Ak::toArray($options);
         }
@@ -767,7 +769,7 @@ EOF;
             $options = Ak::toArray($options);
         }
         $default_options = array('include_get_parameters'=>array(),
-                                 'headers'=> array('X-Cached-By'=>'Akelos'));
+        'headers'=> array('X-Cached-By'=>'Akelos'));
         Ak::parseOptions($options, $default_options,array(),true);
         $this->_caches_page = &$options;
 
@@ -792,9 +794,10 @@ EOF;
     {
         $this->_page_cache_params=$this->_controller->params;//@$_REQUEST['ak'];
         ob_start();
-        
+
         return true;
     }
+
     function beforeNoCache()
     {
         //return true;
@@ -810,6 +813,7 @@ EOF;
         }
         return true;
     }
+
     function afterNoCache()
     {
 
@@ -818,11 +822,13 @@ EOF;
 
         return true;
     }
+
     function _scopeWithGzip($cacheId)
     {
         $cacheId = 'gzip' . DS . $cacheId;
         return $cacheId;
     }
+
     function afterPageCache()
     {
         $encodings = $this->_getAcceptedEncodings();
@@ -876,7 +882,7 @@ EOF;
     {
         if ($path === null) {
             $path = @$_REQUEST['ak'];
-            
+
         } else if (is_array($path)) {
             unset($path['lang']);
             $path = $this->_pathFor($path, $normalize);
@@ -962,7 +968,7 @@ EOF;
             }
             $cacheGroup = $this->_buildCacheGroup();
             $cache = $this->_cache_store->get($cacheId, $cacheGroup);
-            
+
             if (file_exists($cache)) {
                 return $cache;
             } else {
@@ -995,12 +1001,12 @@ EOF;
         else return $group;
     }
     /*
-     * ########################################################################
-     * #
-     * #               From AkActionControllerCachingFragments
-     * #
-     * ########################################################################
-     */
+    * ########################################################################
+    * #
+    * #               From AkActionControllerCachingFragments
+    * #
+    * ########################################################################
+    */
     function fragmentCacheKey($options, $parameters = array())
     {
         if (isset($parameters['namespace']) && $parameters['namespace'] == 'actions') {
@@ -1099,29 +1105,19 @@ EOF;
         $options['host']:$this->_buildCacheGroup());
     }
     /*
-     * ########################################################################
-     * #
-     * #               From AkActionControllerCachingActions
-     * #
-     * ########################################################################
-     */
+    * ########################################################################
+    * #
+    * #               From AkActionControllerCachingActions
+    * #
+    * ########################################################################
+    */
     function beforeActionCache()
     {
         if (!empty($this->_action_include_get_parameters)) {
-            $getParameters = array();
-            foreach ($this->_action_include_get_parameters as $includeGet) {
-                if (isset($_GET[$includeGet])) {
-                    $getParameters[] = $includeGet.'='.$_GET[$includeGet];
-                }
-            }
-            $getString = implode(DS,$getParameters);
-        } else {
-            $getString = '';
+            $params = !empty($this->_controller->params) ? $this->_controller->params : $_GET;
+            $this->_action_cache_path = $this->_addParametersToPath($this->_action_cache_path, $params, $this->_action_include_get_parameters);
         }
-        if (empty($this->_action_cache_path)) {
-            $path = $this->_pathFor().(!empty($getString)?DS.$getString:'');
-            $this->_action_cache_path = $path;
-        }
+
         $options = array();
         if (!empty($this->_action_cache_host)) {
             $options['host'] = $this->_action_cache_host;
@@ -1180,8 +1176,11 @@ EOF;
             $options = Ak::toArray($options);
         }
 
-        $default_options = array('include_get_parameters'=>array(),
-                                 'cache_path'=>'');
+        $default_options = array(
+        'include_get_parameters'=>array(),
+        'cache_path'=>''
+        );
+
         Ak::parseOptions($options, $default_options,array(),true);
         $this->_caches_action = $options;
 
@@ -1208,15 +1207,15 @@ EOF;
                 $this->_action_cache_host = $this->_controller->Request->getHost();
             }
             $this->_action_cache_path = $this->_actionPath($this->_action_cache_path);
-            $this->_controller->prependBeforeFilter(array(&$this,'beforeActionCache'));
+
+            $this->_controller->beforeFilter(array(&$this,'beforeActionCache'));
             $this->_controller->appendAfterFilter(array(&$this,'afterActionCache'));
         } else {
             $this->_enableGzippedOutput();
         }
-
     }
 
-    function _actionPath($options)
+    function _actionPath($options, $parameters = array())
     {
         $extension = $this->_controller->Request->getFormat();//$this->_extractExtension($this->_controller->Request->getPath());
         if (is_array($options)) {
@@ -1227,7 +1226,7 @@ EOF;
             $path = $options;
         }
         $path = $this->_normalize($path);
-        $path = $this->_addExtension($path, $extension);
+        $path = $this->_addParametersToPath(strstr($path, ".$extension") ? $path : $this->_addExtension($path, $extension), $parameters);
         return $path;
     }
 
@@ -1257,21 +1256,24 @@ EOF;
         preg_match('/^[^\.]+\.(.+)$/',$file_path, $matches);
         return isset($matches[1])?$matches[1]:null;
     }
+
     function _pathFor($options = array(), $normalize = true)
     {
         $options = empty($options)?$this->_controller->params:$options;
         $options['controller'] = !isset($options['controller']) ? (isset($this->_controller->params['controller']) ?
-                                                                         $this->_controller->params['controller']:null):
-                                                                 $options['controller'];
-        $options['action'] = !isset($options['action']) ? (isset($this->_controller->params['action']) ?
-                                                                 $this->_controller->params['action']:null):
-                                                          $options['action'];
+        $this->_controller->params['controller']:null):
+        $options['controller'];
+        $options['action'] = !isset($options['action']) ?
+            (isset($this->_controller->params['action']) ? $this->_controller->params['action'] : null ) :
+            $options['action'];
         $options['id'] = isset($options['id']) ? $options['id']: false;
 
         $options['skip_relative_url_root']=true;
         $url = $this->_controller->rewrite($this->_controller->rewriteOptions($options));
+
         $parts = parse_url($url);
         $path = isset($parts['path'])?$parts['path']:'';
+
         if ($normalize && (!isset($options['action']) || (isset($options['action']) && $options['action']==AK_DEFAULT_ACTION && !strstr($path,'/'.AK_DEFAULT_ACTION)))) {
             $path = rtrim($path,'/');
             $parts = preg_split('/\/+/',$path);
@@ -1283,6 +1285,25 @@ EOF;
         }
         $path = rtrim($path,'/');
 
+
+        return $path;
+    }
+
+    function _addParametersToPath($path, $parameters = array(), $only = array())
+    {
+        unset($parameters['namespace'], $parameters['host']);
+        if (!empty($parameters)) {
+            ksort($parameters);
+            foreach ($parameters as $k => $v) {
+                if(empty($only) || in_array($k, $only)){
+                    $extra_params[] = $k.'='.$v;
+                }
+            }
+            $params_string = implode(DS,$extra_params);
+        }
+        if(!empty($params_string)){
+            $path .= DS.$params_string;
+        }
         return $path;
     }
 
@@ -1392,8 +1413,8 @@ EOF;
         $_encodingAliases = array('gzip','x-gzip', 'compress', 'x-compress');
         $parts = split(': ',$header);
         if (strtolower($parts[0])=='content-encoding' &&
-            isset($parts[1]) &&
-            in_array($parts[1],$_encodingAliases)) {
+        isset($parts[1]) &&
+        in_array($parts[1],$_encodingAliases)) {
             $acceptedEncodings = array_intersect($acceptedEncodings,$_encodingAliases);
             if (isset($acceptedEncodings[0])) {
                 $header =$parts[0].': '.$acceptedEncodings[0];
