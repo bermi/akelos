@@ -65,12 +65,13 @@ if(defined('AK_DEBUG') && AK_DEBUG){
 
     function ak_development_error_handler($error_number, $error_message, $file, $line)
     {
-        static $_errors_shown = false;
+        static $_sent_errors = array(), $_errors_shown = false;
 
         $error_number = $error_number & error_reporting();
         if($error_number == 0){
             return;
         }
+
         /**
          * resetting content-encoding header to nil,
          * if it was set to gzip before, otherwise we get an encoding error
@@ -84,8 +85,6 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         while (ob_get_level()) {
             ob_end_clean();
         }
-
-        AK_WEB_REQUEST ? print('<pre>') : null;
 
         if(!defined('E_STRICT')) define('E_STRICT', 2048);
         if(!defined('E_RECOVERABLE_ERROR')) define('E_RECOVERABLE_ERROR', 4096);
@@ -106,6 +105,16 @@ if(defined('AK_DEBUG') && AK_DEBUG){
             case E_RECOVERABLE_ERROR:   $error_type = "Recoverable Error";      break;
             default:                    $error_type = "Unknown error ($error_number)"; break;
         }
+
+
+        if(isset($_sent_errors[$error_type.$error_message])){
+            return;
+        }else{
+            $_sent_errors[$error_type.$error_message] = true;
+        }
+
+
+        AK_WEB_REQUEST ? print('<pre>') : null;
 
         //$result = ": <h3>$error_message</h3> in  $file on line $line\n";
         $result = "<h3 style='padding:5px; background-color:#f00;color:#fff'>($error_type) $error_message</h3>";
