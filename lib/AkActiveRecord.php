@@ -1089,10 +1089,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
 
     }
+
     function quotedId($id = false)
     {
         return $this->castAttributeForDatabase($this->getPrimaryKey(), $id ? $id : $this->getId());
     }
+
     function _extractOptionsFromArgs(&$args)
     {
         $last_arg = count($args)-1;
@@ -1104,13 +1106,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if (isset($options[0])){
             return false;
         }
-        $valid_keys = array('simulation_class','returns','load_acts','wrap','conditions', 'include', 'joins', 'limit', 'offset', 'group', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly');
+        $valid_keys = array('simulation_class','returns','load_acts','wrap','conditions', 'include', 'joins', 'limit', 'offset', 'group', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly', 'load_associations', 'load_acts');
         foreach (array_keys($options) as $key){
-            if (!in_array($key,$valid_keys)){
-                return false;
+            if (in_array($key,$valid_keys)){
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     function _extractConditionsFromArgs($args, $options)
