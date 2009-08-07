@@ -187,7 +187,14 @@ class HasManyTestCase extends AkUnitTest
 
         $this->assertEqual($VillaAltea->pictures[0]->get('title'), 'Garden');
     }
-
+    function test_association_create_and_reference_back_to_belongsTo()
+    {
+        $Property =& new Property(array('description'=>'Hollywood Mansion'));
+        $this->assertTrue($Property->save());
+        $Pool =& $Property->picture->create(array('title'=>'Pool views'));
+        $this->assertReference($Pool, $Property->pictures[0]);
+        $this->assertReference($Property, $Property->pictures[0]->property);
+    }
     function test_clean_up_dependencies()
     {
         $Property =& new Property(array('description'=>'Ruins in Matamon'));

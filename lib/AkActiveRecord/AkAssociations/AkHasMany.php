@@ -443,6 +443,21 @@ class AkHasMany extends AkAssociation
                     return false;
                 }
                 $Associated->set($foreign_key, $this->Owner->getId());
+                
+                /**
+                 * Set the Owner as belongsTo association, if defined
+                 */
+                $associatedIds=$Associated->getAssociatedIds();
+                foreach($associatedIds as $assoc_id) {
+                    $collection_handler=$Associated->getCollectionHandlerName($assoc_id);
+                    $handler=empty($collection_handler)?$assoc_id:$collection_handler;
+                    if($Associated->$handler->getType()=='belongsTo' && 
+                    $this->Owner->getType()==$Associated->$handler->getAssociationOption('class_name')
+                     ) {
+                        $Associated->$handler->_AssociationHandler->_build($assoc_id,$this->Owner);
+                    }
+                }
+                
                 return true;
             }
         }
@@ -634,7 +649,7 @@ class AkHasMany extends AkAssociation
         $finder_options['selection'] = trim($finder_options['selection'], ', ');
 
         $finder_options['conditions'] = empty($finder_options['conditions']) ? '' :
-
+        
         $Associated->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $options['conditions']).' ';
 
         return $finder_options;
