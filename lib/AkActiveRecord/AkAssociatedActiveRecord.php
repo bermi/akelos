@@ -257,7 +257,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
         $load_acts = isset($options['load_acts'])?$options['load_acts']:true;
 
-        $config = array('__owner'=>array('class'=>$this->getType(),'pk'=>$this->getPrimaryKey()));
+        $config = array('__owner'=>array('class'=>$this->getType(),'pk'=>$this->getPrimaryKey(),'instance'=>$this));
 
         $returns = isset($options['returns'])?$options['returns']:'default';
         if ($returns == 'simulated' && !AK_PHP5) {
@@ -312,7 +312,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                     continue;
                 }
             }
-            $config['__owner'][$handler_name] = array('class'=>$class,'association_id'=>$association_id,'pk'=>$pk_name);
+            $config['__owner'][$handler_name] = array('class'=>$class,'association_id'=>$association_id,'pk'=>$pk_name,'instance'=>$instance);
             
             if(isset($association_options['conditions']) && is_array($association_options['conditions'])) {
                 $true=true;
@@ -492,7 +492,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 $pluralize = false;
                 $table_name = $instance->getTableName();
             }
-            $config[$handler_name][$sub_handler_name] = array('association_id'=>$sub_association_id,'class'=>$class_name,'pk'=>$pk);
+            $config[$handler_name][$sub_handler_name] = array('association_id'=>$sub_association_id,'class'=>$class_name,'pk'=>$pk, 'instance'=>$instance);
             $sub_associated_options = $sub_association_object->$sub_handler_name->getAssociatedFinderSqlOptionsForInclusionChain($prefix.'['.$handler_name.']'.($parent_is_plural?'[@'.$pk.']':''),'__owner__'.$parent_association_id,
             $sub_options, $pluralize);
             
@@ -768,9 +768,11 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 $key = $matches[1][$idx];
                 $association = $key;
 
-                if (isset($config[$key]) && $returns == 'array') {
+                if (isset($config[$key])) {
                     $config = $config[$key];
-                    $association = $config['association_id'];
+                    if($returns=='array') {
+                        $association = $config['association_id'];
+                    }
                     //$this->log('using association:'.$association);
                 }
                 if (!isset($last[$association])) {
@@ -779,6 +781,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 $last = &$last[$association];
 
             }
+            $value=$this->_castAttributeFromDatabase($association,$value,$config['instance']);
             $last = $value;
         }
         //$this->log('owner:'.var_export($owner,true));
@@ -879,7 +882,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                     $available[$serialized_attribute] = @unserialize($available[$serialized_attribute]);
                 }
             }*/
-            $available = $this->_castAttributesFromDatabase($available,$instance);
+            //$available = $this->_castAttributesFromDatabase($available,$instance);
             $obj=&$parent->$assoc_name->build($available,false);
 
             $obj->_newRecord = false;

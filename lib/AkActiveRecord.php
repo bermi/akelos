@@ -841,7 +841,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         $sql = 'DELETE FROM '.$this->getTableName().' WHERE '.$this->getPrimaryKey().' = '.$this->castAttributeForDatabase($this->getPrimaryKey(), $this->getId());
         if ($this->_db->delete($sql,$this->getModelName().' Destroy') !== 1){
-            return $this->transactionFail();
+             return $this->transactionFail();
         }
 
         if (!$this->afterDestroy() || !$this->notifyObservers('afterDestroy')){
@@ -1089,12 +1089,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
 
     }
-
     function quotedId($id = false)
     {
         return $this->castAttributeForDatabase($this->getPrimaryKey(), $id ? $id : $this->getId());
     }
-
     function _extractOptionsFromArgs(&$args)
     {
         $last_arg = count($args)-1;
@@ -1229,10 +1227,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             if ($returns == 'default') {
                 $objects[] =& $this->instantiate($this->getOnlyAvailableAttributes($record), false);
             } else if ($returns == 'simulated') {
-                $objects[] = $this->getOnlyAvailableAttributes($record);
+                $objects[] = $this->_castAttributesFromDatabase($this->getOnlyAvailableAttributes($record),$this);
             } else if ($returns == 'array') {
 
-                $objects[] = $this->getOnlyAvailableAttributes($record);
+                $objects[] = $this->_castAttributesFromDatabase($this->getOnlyAvailableAttributes($record),$this);
             }
         }
         if ($returns == 'simulated') {
@@ -3032,9 +3030,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     ====================================================================
     */
 
-    function t($string, $array = null)
+    function t($string, $array = null,$model=null)
     {
-        return Ak::t($string, $array, AkInflector::underscore($this->getModelName()));
+        return Ak::t($string, $array, empty($model)?AkInflector::underscore($this->getModelName()):$model);
     }
 
     function getInternationalizedColumns()
@@ -3410,8 +3408,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         static $imported_cache = array();
         if(empty($imported_cache[$column_name])){
             $class_name = isset($this->serialize[$column_name])  ?
-            (is_string($this->serialize[$column_name]) ? $this->serialize[$column_name] : $column_name) : $column_name;
-            Ak::import($class_name);
+            (is_string($this->serialize[$column_name]) ? $this->serialize[$column_name] : $column_name) : false;
+            if($class_name) {
+                Ak::import($class_name);
+            }
             $imported_cache[$column_name] = true;
         }
     }
