@@ -73,6 +73,19 @@ class AkActiveRecord_nested_finders_TestCase extends  AkUnitTest
         $this->assertEqual(array(4,5,6),$found_first_aa->bbs[1]->other);
         $this->assertEqual(array('es','de'),$found_first_aa->bbs[0]->languages);
         $this->assertEqual(array(1,2,3),$found_first_aa->bbs[0]->other);
+        
+        /**
+         * now find them back and test the serialized bb values as array
+         */
+        
+        $found_first_aa = $this->Aa->findFirstBy('name','first aa',array('returns'=>'array','include'=>array('bbs'=>array('order' => 'id ASC'))));
+        $this->assertTrue($found_first_aa);
+        $this->assertTrue($found_first_aa['bbs']);
+        $this->assertEqual(2,count($found_first_aa['bbs']));
+        $this->assertEqual(array('en','fr'),$found_first_aa['bbs'][1]['languages']);
+        $this->assertEqual(array(4,5,6),$found_first_aa['bbs'][1]['other']);
+        $this->assertEqual(array('es','de'),$found_first_aa['bbs'][0]['languages']);
+        $this->assertEqual(array(1,2,3),$found_first_aa['bbs'][0]['other']);
     }
     
     function test_find_aa_include_bbs_and_ccs()
