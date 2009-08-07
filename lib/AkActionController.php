@@ -203,6 +203,7 @@ class AkActionController extends AkObject
 
         $this->_identifyRequest();
 
+
         $this->performActionWithFilters($this->_action_name);
 
 
@@ -788,9 +789,9 @@ class AkActionController extends AkObject
      *
      * @see Ak::t
      */
-    function t($string, $array = null)
+    function t($string, $array = null, $controller=null)
     {
-        return Ak::t($string, $array, AkInflector::underscore($this->getControllerName()));
+        return Ak::t($string, $array, empty($controller)?AkInflector::underscore($this->getControllerName()):$controller);
     }
 
 
@@ -2895,10 +2896,11 @@ class AkActionController extends AkObject
 
     function _initExtensions()
     {
+
         $this->_initCacheHandler();
+
         //$this->_registerModule('caching','AkActionControllerCaching','AkActionController/Caching.php');
     }
-
     function _initCacheHandler()
     {
         // TODOARNO
