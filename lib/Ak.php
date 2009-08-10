@@ -141,8 +141,11 @@ class Ak
     */
     function t($string, $args = null, $controller = null)
     {
-        static $framework_dictionary = array(), $lang, $_dev_shutdown = true, $locale_manager_class = false, $_custom_dev_shutdown = false;
-        
+        static $framework_dictionary = array(),$required=false, $lang, $_dev_shutdown = true, $locale_manager_class = false, $_custom_dev_shutdown = false;
+        if(!$required) {
+            $required=true;
+            require_once(AK_LIB_DIR.DS.'AkLocaleManager.php');
+        }
         if(AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES && ($locale_manager_class == false || $locale_manager_class == 'AkLocaleManager')) {
             if(!$_custom_dev_shutdown && defined('AK_LOCALE_MANAGER') && class_exists(AK_LOCALE_MANAGER) && in_array('AkLocaleManager',class_parents(AK_LOCALE_MANAGER))) {
                 $locale_manager_class = AK_LOCALE_MANAGER;
@@ -156,7 +159,7 @@ class Ak
             $locale_manager_class = 'AkLocaleManager';
         }
         if((AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES || (defined('AK_TEST_TRANSLATIONS') && AK_TEST_TRANSLATIONS)) && !empty($string) && is_string($string)){
-            require_once(AK_LIB_DIR.DS.'AkLocaleManager.php');
+            
             // This adds used strings to a stack for storing new entries on the locale file after shutdown
             call_user_func_array(array($locale_manager_class,'getUsedLanguageEntries'),array($string,$controller));
             if($_dev_shutdown && (!defined('AK_TEST_TRANSLATIONS') || !AK_TEST_TRANSLATIONS)){
@@ -173,7 +176,7 @@ class Ak
             }
            
             $dictionary=call_user_func_array(array($locale_manager_class,'getCoreDictionary'),array($lang));
-            $framework_dictionary = array_merge($framework_dictionary,$dictionary);
+            $framework_dictionary = array_merge((array)$framework_dictionary,(array)$dictionary);
             
             if(!defined('AK_LOCALE')){
                 define('AK_LOCALE', $lang);
