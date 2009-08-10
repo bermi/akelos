@@ -141,14 +141,26 @@ class Ak
     */
     function t($string, $args = null, $controller = null)
     {
-        static $framework_dictionary = array(), $lang, $_dev_shutdown = true;
-
-        if(AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES && !empty($string) && is_string($string)){
+        static $framework_dictionary = array(), $lang, $_dev_shutdown = true, $locale_manager_class = false, $_custom_dev_shutdown = false;
+        
+        if(AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES && ($locale_manager_class == false || $locale_manager_class == 'AkLocaleManager')) {
+            if(!$_custom_dev_shutdown && defined('AK_LOCALE_MANAGER') && class_exists(AK_LOCALE_MANAGER) && in_array('AkLocaleManager',class_parents(AK_LOCALE_MANAGER))) {
+                $locale_manager_class = AK_LOCALE_MANAGER;
+                $_custom_dev_shutdown=true;
+                register_shutdown_function(array($locale_manager_class,'updateLocaleFiles'));
+            } else {
+                $locale_manager_class = 'AkLocaleManager';
+            }
+            
+        } else {
+            $locale_manager_class = 'AkLocaleManager';
+        }
+        if((AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES || (defined('AK_TEST_TRANSLATIONS') && AK_TEST_TRANSLATIONS)) && !empty($string) && is_string($string)){
             require_once(AK_LIB_DIR.DS.'AkLocaleManager.php');
             // This adds used strings to a stack for storing new entries on the locale file after shutdown
-            AkLocaleManager::getUsedLanguageEntries($string, $controller);
-            if($_dev_shutdown){
-                register_shutdown_function(array('AkLocaleManager','updateLocaleFiles'));
+            call_user_func_array(array($locale_manager_class,'getUsedLanguageEntries'),array($string,$controller));
+            if($_dev_shutdown && (!defined('AK_TEST_TRANSLATIONS') || !AK_TEST_TRANSLATIONS)){
+                register_shutdown_function(array($locale_manager_class,'updateLocaleFiles'));
                 $_dev_shutdown = false;
             }
         }
@@ -159,10 +171,10 @@ class Ak
             }else{
                 $lang = Ak::lang();
             }
-            if(is_file(AK_CONFIG_DIR.DS.'locales'.DS.$lang.'.php')){
-                require(AK_CONFIG_DIR.DS.'locales'.DS.$lang.'.php');
-                $framework_dictionary = array_merge($framework_dictionary,$dictionary);
-            }
+           
+            $dictionary=call_user_func_array(array($locale_manager_class,'getCoreDictionary'),array($lang));
+            $framework_dictionary = array_merge($framework_dictionary,$dictionary);
+            
             if(!defined('AK_LOCALE')){
                 define('AK_LOCALE', $lang);
             }
@@ -186,11 +198,10 @@ class Ak
             return @$string[$try_whith_lang];
         }
 
-        if(isset($controller) && !isset($framework_dictionary[$controller.'_dictionary']) && is_file(AK_APP_DIR.DS.'locales'.DS.$controller.DS.$lang.'.php')){
-            require(AK_APP_DIR.DS.'locales'.DS.$controller.DS.$lang.'.php');
-            $framework_dictionary[$controller.'_dictionary'] = (array)$dictionary;
+        if(isset($controller) && !isset($framework_dictionary[$controller.'_dictionary'])) { // && is_file(AK_APP_DIR.DS.'locales'.DS.$controller.DS.$lang.'.php')){
+             $framework_dictionary[$controller.'_dictionary'] = call_user_func_array(array($locale_manager_class,'getDictionary'),array($lang,$controller));
         }
-
+        
         if(isset($controller) && isset($framework_dictionary[$controller.'_dictionary'][$string])){
             $string = !empty($framework_dictionary[$controller.'_dictionary'][$string])?$framework_dictionary[$controller.'_dictionary'][$string]:$string;
         }else {
@@ -200,7 +211,6 @@ class Ak
         if(isset($args) && is_array($args)){
             $string = @str_replace(array_keys($args), array_values($args),$string);
         }
-
         /**
         * @todo Prepare for multiple locales by inspecting AK_DEFAULT_LOCALE
         */
@@ -225,7 +235,7 @@ class Ak
     function locale($locale_setting, $locale = null)
     {
         static $settings;
-
+        
         // We initiate the locale settings
         Ak::t('Akelos');
 
@@ -234,7 +244,7 @@ class Ak
         if (empty($settings[$locale])) {
             if(func_num_args() != 3){ // First time we ask for something using this locale so we will load locale details
                 $requested_locale = $locale;
-                if(@include(AK_CONFIG_DIR.DS.'locales'.DS.Ak::sanitize_include($requested_locale).'.php')){
+                if(@include(AK_CONFIG_DIR.DS.'locales'.DS.Ak::sanitize_include($requested_locale,'high').'.php')){
                     $locale = !empty($locale) && is_array($locale) ? $locale : array();
                     Ak::locale(null, $requested_locale, $locale);
                     return Ak::locale($locale_setting, $requested_locale);
@@ -274,8 +284,8 @@ class Ak
     function langs()
     {
         static $langs;
-        if(!empty($lang)){
-            return $lang;
+        if(!empty($langs)){
+            return $langs;
         }
         $lang = Ak::lang();
         if(defined('AK_APP_LOCALES')){
@@ -1067,7 +1077,7 @@ class Ak
      *     }
      *
      * IMPORTANT NOTE: You must define AK_ENABLE_PROFILER to true for this to work.
-     */
+    */
     function profile($message = '')
     {
         if(AK_ENABLE_PROFILER){
@@ -1078,7 +1088,7 @@ class Ak
                 Ak::setStaticVar('ProfileTimer', $ProfileTimer);
             }elseif($message === true){
                 $ProfileTimer->display();
-            }else{
+            }else {
                 $ProfileTimer->setMarker($message);
             }
         }

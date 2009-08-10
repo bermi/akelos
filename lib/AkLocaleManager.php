@@ -130,29 +130,38 @@ class AkLocaleManager extends AkObject
     function getUsedLanguageEntries($lang_entry = null, $controller = null)
     {
         static $_locale_entries = array();
-
+        
         if(isset($controller)){
             $_locale_entries[$controller][$lang_entry] = $lang_entry;
-        } else {
+        } else if(isset($lang_entry)) {
             $_locale_entries[$lang_entry] = $lang_entry;
         }
-
         if(!isset($lang_entry)){
             return $_locale_entries;
         }
     }
-
+    function _getNewEntries($array,$existing = array())
+    {
+        foreach($array as $key => $value) {
+            $value=trim($value);
+            if(empty($value) || isset($existing[$key])) unset($array[$key]);
+        }
+        return $array;
+    }
     /**
      * @todo Refactor this method
      */
     function updateLocaleFiles()
     {
+        if(defined('AK_LOCALE_MANAGER') && class_exists(AK_LOCALE_MANAGER) && in_array('AkLocaleManager',class_parents(AK_LOCALE_MANAGER))) {
+            return;
+        }
+        
         $new_core_entries = array();
         $new_controller_entries = array();
         $new_controller_files = array();
         $used_entries = AkLocaleManager::getUsedLanguageEntries();
-        require(AK_CONFIG_DIR.DS.'locales'.DS.AK_FRAMEWORK_LANGUAGE.'.php');
-        $core_dictionary = $dictionary;
+        list($core_locale,$core_dictionary) = self::getCoreDictionary(AK_FRAMEWORK_LANGUAGE);
         $controllers_dictionaries = array();
 
         foreach ($used_entries as $k=>$v){
@@ -160,15 +169,15 @@ class AkLocaleManager extends AkObject
             if(is_array($v)){
                 if(!isset($controllers_dictionaries[$k])){
                     $controller = $k;
-                    $module_lang_file = AK_APP_DIR.DS.'locales'.DS.$controller.DS.AK_FRAMEWORK_LANGUAGE.'.php';
-                    if(is_file($module_lang_file)){
-                        require($module_lang_file);
-                        $controllers_dictionaries[$controller] = array_merge((array)$dictionary, (array)$v);
-                        $existing_controllers_dictionaries[$controller] = (array)$dictionary;
-                    }else{
-                        $controllers_dictionaries[$controller] = (array)$v;
-                        $new_controller_files[$controller] = $module_lang_file;
+                    
+                    $controllers_dictionaries[$controller]=self::getDictionary(AK_FRAMEWORK_LANGUAGE,$controller);
+                    if(!empty($controllers_dictionaries[$controller])) {
+                        $existing_controllers_dictionaries[$controller] =$controllers_dictionaries[$controller];
+                    } else {
+                        $new_controller_files[$controller] = true;
                     }
+                    $controllers_dictionaries[$controller]=array_merge($controllers_dictionaries[$controller], (array)$v);
+                    
                 }
             }else {
                 if(!isset($core_dictionary[$k])){
@@ -177,75 +186,48 @@ class AkLocaleManager extends AkObject
             }
         }
 
-        $dictionary_file = '';
-        foreach ($new_controller_files as $controller=>$file_name){
-            $dictionary_file = "<?php\n\n// File created on: ".date("Y-m-d G:i:s",Ak::time())."\n\n\$dictionary = array();\n\n";
-            foreach ($controllers_dictionaries[$controller] as $k=>$entry){
-                $entry = str_replace("'","\\'",$entry);
-                $dictionary_file .= "\n\$dictionary['$entry'] = '$entry';";
+        foreach ($new_controller_files as $controller=>$true){
+            self::setDictionary($controllers_dictionaries[$controller],AK_FRAMEWORK_LANGUAGE,$controller,"File created on: ".date("Y-m-d G:i:s",Ak::time()));
+            foreach (Ak::langs() as $lang){
+                if($lang != AK_FRAMEWORK_LANGUAGE){
+                    $dictionary  = self::getDictionary($lang,$controller);
+                    self::setDictionary(array_merge($controllers_dictionaries[$controller],$dictionary),$lang,$controller);
+                }
             }
             unset($controllers_dictionaries[$controller]);
-            $dictionary_file .= "\n\n\n?>";
-            Ak::file_put_contents($file_name,$dictionary_file);
         }
 
         // Module files
         foreach ((array)$controllers_dictionaries as $controller => $controller_entries){
-            $dictionary_file = '';
-            foreach ($controller_entries as $entry){
-                if($entry == '' || isset($existing_controllers_dictionaries[$controller][$entry])) {
-                    continue;
-                }
-                $entry = str_replace("'","\\'",$entry);
-                $dictionary_file .= "\n\$dictionary['$entry'] = '$entry';";
-            }
-            if($dictionary_file != ''){
-                $original_file = Ak::file_get_contents(AK_APP_DIR.DS.'locales'.DS.$controller.DS.AK_FRAMEWORK_LANGUAGE.'.php');
-                $original_file = rtrim($original_file,"?> \n\r");
-                $new_entries = "\n\n// ".date("Y-m-d G:i:s",Ak::time())."\n\n".$dictionary_file."\n\n\n?>\n";
-                $dictionary_file = $original_file.$new_entries;
-                Ak::file_put_contents(AK_APP_DIR.DS.'locales'.DS.$controller.DS.AK_FRAMEWORK_LANGUAGE.'.php', $dictionary_file);
-
+            $controller_entries=self::_getNewEntries($controller_entries,(array)@$existing_controllers_dictionaries[$controller]);
+            if(!empty($controller_entries)) {
+                $dictionary  = self::getDictionary(AK_FRAMEWORK_LANGUAGE,$controller);
+                self::setDictionary(array_merge($dictionary,$controller_entries),AK_FRAMEWORK_LANGUAGE,$controller);
                 foreach (Ak::langs() as $lang){
                     if($lang != AK_FRAMEWORK_LANGUAGE){
-                        $lang_file = @Ak::file_get_contents(AK_APP_DIR.DS.'locales'.DS.$controller.DS.$lang.'.php');
-                        if(empty($lang_file)){
-                            $dictionary_file = $original_file;
-                        }else{
-                            $lang_file = rtrim($lang_file,"?> \n\r");
-                            $dictionary_file = $lang_file;
-                        }
-                        Ak::file_put_contents(AK_APP_DIR.DS.'locales'.DS.$controller.DS.$lang.'.php', $dictionary_file.$new_entries);
+                        $dictionary  = self::getDictionary($lang,$controller);
+                        self::setDictionary(array_merge($dictionary,$controller_entries),$lang,$controller);
                     }
                 }
             }
         }
 
         // Core locale files
-        $dictionary_file = '';
-        foreach ($new_core_entries as $core_entry){
-            if($core_entry == '') {
-                continue;
-            }
-            $core_entry = str_replace("'","\\'",$core_entry);
-            $dictionary_file .= "\n\$dictionary['$core_entry'] = '$core_entry';";
-        }
-        if($dictionary_file != ''){
-            $original_file = Ak::file_get_contents(AK_CONFIG_DIR.DS.'locales'.DS.AK_FRAMEWORK_LANGUAGE.'.php');
-            $original_file = rtrim($original_file,"?> \n\r");
-            $new_entries = "\n\n// ".date("Y-m-d G:i:s",Ak::time())."\n\n".$dictionary_file."\n\n\n?>\n";
-            $dictionary_file = $original_file.$new_entries;
-            Ak::file_put_contents(AK_CONFIG_DIR.DS.'locales'.DS.AK_FRAMEWORK_LANGUAGE.'.php', $dictionary_file);
+        $new_core_entries=self::_getNewEntries($new_core_entries);
+        if(!empty($new_core_entries)) {
+            self::setCoreDictionary($core_locale,array_merge($core_dictionary,$new_core_entries),AK_FRAMEWORK_LANGUAGE);
             foreach (Ak::langs() as $lang){
                 if($lang != AK_FRAMEWORK_LANGUAGE){
-                    $lang_file = Ak::file_get_contents(AK_CONFIG_DIR.DS.'locales'.DS.$lang.'.php');
-                    if(empty($lang_file)){
-                        $dictionary_file = str_replace("\$locale['description'] = 'English';","\$locale['description'] = '$lang';", $original_file);
-                    }else{
-                        $lang_file = rtrim($lang_file,"?> \n\r");
-                        $dictionary_file = $lang_file;
+                    list($l,$dictionary)  = self::getCoreDictionary($lang);
+                    if(empty($l)) {
+                        $l=$core_locale;
+                        $l['description']=$lang;
+                        $l['locale_description']=$lang;
                     }
-                    Ak::file_put_contents(AK_CONFIG_DIR.DS.'locales'.DS.$lang.'.php', $dictionary_file.$new_entries);
+                    if(empty($dictionary)) {
+                        $dictionary=$core_dictionary;
+                    }
+                    self::setCoreDictionary($l,array_merge($dictionary,$new_core_entries),$lang);
                 }
             }
         }
@@ -290,7 +272,76 @@ class AkLocaleManager extends AkObject
         }
         return $public_locales;
     }
+    function getCoreDictionary($language,$set=false,$set_data=null)
+    {
+            static $dictionaries=array();
+            $path = AK_CONFIG_DIR.DS.'locales'.DS.basename($language).'.php';
+            if($set===true && is_array($set_data)) {
+                $dictionaries[$path]=$set_data;
+                return;
+            }
+            if(!isset($dictionaries[$path])) {
+                if(is_file($path)) {
+                    
+                    require($path);
+                    
+                    $dictionaries[$path]=array((array)@$locale,(array)@$dictionary);
+                } else {
+                    $dictionaries[$path]=array(array(),array());
+                }
+                
+            }
+            return $dictionaries[$path];
+           
+    }
+    
+    
+    function getDictionary($language,$namespace=false,$set=false,$set_data=null)
+    {
+        static $dictionaries=array();
+        $path = AK_APP_DIR.DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
+        
+        if($set===true && is_array($set_data)) {
+            $dictionaries[$path]=$set_data;
+            return;
+        }
+        if(empty($dictionaries[$path])) {
+            if(is_file($path)) {
+                require($path);
+                $dictionaries[$path]=(array)$dictionary;
+                return $dictionaries[$path];
+            } 
+            $dictionaries[$path]=array();
+        }
+        return $dictionaries[$path];
+    }
+    function setCoreDictionary($locale,$dictionary, $language,$comment=null)
+    {
 
+        $path = AK_CONFIG_DIR.DS.'locales'.DS.basename($language).'.php';
+        AkLocaleManager::getCoreDictionary($language,true,array($locale,$dictionary));
+        return Ak::file_put_contents($path,"<?php\n/** $comment */\n\n\$locale=".var_export((array)$locale,true).";\n\n\$dictionary=".var_export((array)$dictionary,true).";\n");
+    }
+    function deleteDictionary($language,$namespace)
+    {
+        $path = AK_APP_DIR.DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
+        AkLocaleManager::getDictionary($language,$namespace,true,array());
+        clearstatcache();
+        return (file_exists($path)?@unlink($path):false);
+    }
+    function deleteCoreDictionary($language)
+    {
+        $path = AK_CONFIG_DIR.DS.'locales'.DS.basename($language).'.php';
+        AkLocaleManager::getCoreDictionary($language,true,array(array(),array()));
+        clearstatcache();
+        return (file_exists($path)?@unlink($path):false);
+    }
+    function setDictionary($dictionary,$language,$namespace=false,$comment=null)
+    {
+        $path = AK_APP_DIR.DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
+        AkLocaleManager::getDictionary($language,$namespace,true,$dictionary);
+        return Ak::file_put_contents($path,"<?php\n/** $comment */\n\n\$dictionary=".var_export((array)$dictionary,true).";\n");
+    }
     function _getLocaleForRequest(&$Request)
     {
         $lang = $this->getNavigationLanguage();

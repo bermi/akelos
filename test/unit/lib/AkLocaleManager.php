@@ -234,6 +234,47 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
         $this->assertFalse($result);
         
     }
+    
+    function test_locale_setting_getting_deleting_methods()
+    {
+        !defined('AK_TEST_TRANSLATIONS')?define('AK_TEST_TRANSLATIONS',true):null;
+        $translation_key=Ak::randomString(8);
+        $namespace = Ak::randomString(8);
+        $translation=Ak::t($translation_key,null,$namespace);
+        $this->assertEqual($translation_key,$translation);
+        AkLocaleManager::updateLocaleFiles();
+        $dictionary = AkLocaleManager::getDictionary(AK_FRAMEWORK_LANGUAGE,$namespace);
+        $this->assertEqual(array($translation_key=>$translation_key),$dictionary);
+        
+        $dictionary[$translation_key] = 'Spanish';
+        AkLocaleManager::setDictionary($dictionary,'es',$namespace);
+        $dictionary = AkLocaleManager::getDictionary('es',$namespace);
+        $this->assertEqual(array($translation_key=>'Spanish'),$dictionary);
+        
+        Ak::t('dummy',null,$namespace);
+        AkLocaleManager::updateLocaleFiles();
+        $dictionary = AkLocaleManager::getDictionary(AK_FRAMEWORK_LANGUAGE,$namespace);
+        $this->assertEqual(array($translation_key=>$translation_key,'dummy'=>'dummy'),$dictionary);
+        
+        $this->assertTrue(AkLocaleManager::deleteDictionary(AK_FRAMEWORK_LANGUAGE,$namespace));
+        $this->assertEqual(array(),AkLocaleManager::getDictionary(AK_FRAMEWORK_LANGUAGE,$namespace));
+        
+    }
+    
+    function test_framework_config_locale_update()
+    {
+        $langs=Ak::langs();
+        $translation_key=Ak::randomString(8);
+        $this->assertEqual(Ak::t($translation_key),$translation_key);
+        AkLocaleManager::updateLocaleFiles();
+        list($locales,$core_dictionary) = AkLocaleManager::getCoreDictionary(AK_FRAMEWORK_LANGUAGE);
+        $this->assertTrue(isset($core_dictionary[$translation_key]));
+        
+        foreach($langs as $lang) {
+            list($locales,$core_dictionary) = AkLocaleManager::getCoreDictionary($lang);
+            $this->assertTrue(isset($core_dictionary[$translation_key]));
+        }
+    }
 
 }
 
