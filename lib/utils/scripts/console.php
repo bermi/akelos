@@ -36,7 +36,7 @@ require_once(AK_LIB_DIR.DS.'AkInstaller.php');
 if ($id_dir = opendir(AK_MODELS_DIR.DS)){
     while (false !== ($file = readdir($id_dir))){
         if (substr($file,0,1) != '.' && $file[0] != '_' && substr($file,-12,8) != '_service'){
-            if(!is_dir(AK_MODELS_DIR.DS.$file)){
+            if(!is_dir(AK_MODELS_DIR.DS.$file) && preg_match('/^[a-z0-9_]+\.php$/', $file)){
                 include_once(AK_MODELS_DIR.DS.$file);
             }
         }
@@ -85,11 +85,11 @@ while(true){
         $last_command = $command;
 
         $_script_name = array_shift(explode(' ',trim($command).' '));
-        
+
         $_script_file_name = AK_OS == 'WINDOWS' ? $_script_name : AK_SCRIPT_DIR.DS.$_script_name;
 
         if (file_exists($_script_file_name)){
-            
+
             $command = trim(substr(trim($command),strlen($_script_name)));
                 echo "\n";
                 passthru((AK_OS == 'WINDOWS' ? 'php -q ':'').$_script_file_name.' '.escapeshellcmd($command));
