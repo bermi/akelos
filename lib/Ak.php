@@ -2114,10 +2114,10 @@ class Ak
      *
      * On Akelos we can do Ak::get('Model')->find();
      */
-    function get($model_name)
+    function get($model_name, $attributes = array())
     {
         Ak::import($model_name);
-        return new $model_name();
+        return new $model_name($attributes);
     }
 
 }
