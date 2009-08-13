@@ -28,34 +28,34 @@ defined('AK_VERBOSE_INSTALLER') ? null : define('AK_VERBOSE_INSTALLER', AK_DEV_M
 @ini_set('memory_limit', -1);
 
 /**
- * 
+ *
  * == Column Types ==
- * 
+ *
  * Akelos natively supports the following column data types.
- * 
- * integer|int, float, decimal, 
+ *
+ * integer|int, float, decimal,
  * string, text,
  * datetime|timestamp, date,
  * binary,
  * boolean
- * 
- * Caution: Because boolean is virtual tinyint on mysql, you can't use tinyint for other things! 
- * 
- *  
+ *
+ * Caution: Because boolean is virtual tinyint on mysql, you can't use tinyint for other things!
+ *
+ *
  * == Default settings for columns ==
- * 
+ *
  * AkInstaller suggests some default values for the column-details.
- * 
+ *
  * So
  * <code>
  *     $this->createTable('Post','title,body,created_at,is_draft');
  * </code>
- * 
- * will actually create something like this: 
- * 
+ *
+ * will actually create something like this:
+ *
  *     title => string(255), body => text, created_at => datetime, is_draft => boolean not null default 0 index
- *   
- * 
+ *
+ *
  * column_name                    | default setting
  * -------------------------------+--------------------------------------------
  * id                             | integer not null auto_increment primary_key
@@ -69,9 +69,9 @@ defined('AK_VERBOSE_INSTALLER') ? null : define('AK_VERBOSE_INSTALLER', AK_DEV_M
  * is_*,has_*,do_*,does_*,are_*   | boolean not null default 0 index
  * *somename                      | multilingual column => en_somename, es_somename
  * default                        | string
- * 
+ *
  */
-class AkInstaller extends AkObject 
+class AkInstaller extends AkObject
 {
     var $db;
     var $data_dictionary;
@@ -88,7 +88,7 @@ class AkInstaller extends AkObject
         }else {
             $this->db =& $db_connection;
         }
-        AkDbSchemaCache::clearAll();        
+        AkDbSchemaCache::clearAll();
         $this->data_dictionary =& $this->db->getDictionary();
         $this->available_tables = $this->getAvailableTables();
     }
@@ -133,7 +133,7 @@ class AkInstaller extends AkObject
             $newest_version = max($available_versions);
             $version = isset($version) && is_numeric($version) ? $version :
             (isset($version[0]) && is_numeric($version[0]) ? $version[0] : $newest_version);
-            
+
             $versions = range($current_version+1,$version);
 
             if($current_version > $version){
@@ -143,7 +143,7 @@ class AkInstaller extends AkObject
         }else{
             $version = isset($version) && is_numeric($version) ? $version :
             (isset($version[0]) && is_numeric($version[0]) ? $version[0] : 0);
-            
+
             $versions = range($current_version, empty($version) ? 1 : $version+1);
 
             if($current_version == 0){
@@ -199,7 +199,7 @@ class AkInstaller extends AkObject
         $version_number = empty($version_number) ? ($method_prefix=='down' ? $version-1 : $version) : $version_number;
 
         $this->transactionStart();
-        
+
         if($this->$method_name($options) === false){
             $this->log($this->getInstallerName().': returned false');
             $this->transactionFail();
@@ -222,7 +222,7 @@ class AkInstaller extends AkObject
         $mode = empty($options['mode']) ? AK_ENVIRONMENT : $options['mode'];
         return AK_TMP_DIR.DS.'installer_versions'.DS.(empty($this->module)?'':$this->module.DS).$mode.'_'.$this->getInstallerName().'_version.txt';
     }
-    
+
     // DEPRECATED
     function _versionPath_Deprecated($options = array())
     {
@@ -233,11 +233,11 @@ class AkInstaller extends AkObject
     // DEPRECATED
     function _moveOldVersionsFileToNewLocation($options)
     {
-        $old_filename = $this->_versionPath_Deprecated($options); 
+        $old_filename = $this->_versionPath_Deprecated($options);
         if (is_file($old_filename)){
-            $this->setInstalledVersion(Ak::file_get_contents($old_filename),$options);  
-            Ak::file_delete($old_filename); 
-            Ak::file_put_contents(AK_APP_INSTALLERS_DIR.DS.'versions'.DS.'NOTE',"Version information is now stored in the temp folder. \n\rYou can safely move this files here over there to tmp/installer_versions/* or delete this directory if empty.");     
+            $this->setInstalledVersion(Ak::file_get_contents($old_filename),$options);
+            Ak::file_delete($old_filename);
+            Ak::file_put_contents(AK_APP_INSTALLERS_DIR.DS.'versions'.DS.'NOTE',"Version information is now stored in the temp folder. \n\rYou can safely move this files here over there to tmp/installer_versions/* or delete this directory if empty.");
         }
     }
 
@@ -247,11 +247,11 @@ class AkInstaller extends AkObject
         $version = $this->db->selectValue(array('SELECT version FROM akelos_migrations WHERE name=?',$this->getInstallerName()));
 
         if($version==NULL) {
-            
+
             $version_file = $this->_versionPath($options);
-    
+
             $this->_moveOldVersionsFileToNewLocation($options);
-            
+
             if(!is_file($version_file)){
                 $version = 0;
                 $this->setInstalledVersion($version, $options);
@@ -267,12 +267,12 @@ class AkInstaller extends AkObject
                 $this->setInstalledVersion($version, $options);
                 //$this->db->execute(array('INSERT INTO akelos_migrations (name,version,created_at) VALUES (?,?,?)',$this->getInstallerName(),$version,Ak::getDate()));
             }
-            
+
         }
         $this->log('Installed version of '.$this->getInstallerName().':'.$version);
         return $version;
     }
-    
+
     function _createMigrationsTable()
     {
         if(!$this->tableExists('akelos_migrations')) {
@@ -322,12 +322,11 @@ class AkInstaller extends AkObject
     }
 
     /**
-     * Adds a new column to the table called $table_name 
+     * Adds a new column to the table called $table_name
      */
     function addColumn($table_name, $column_details)
     {
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
-        AkDbSchemaCache::clear($table_name);
+        $this->clearSchemaCacheForTable($table_name);
         $this->timestamps = false;
         $column_details = $this->_getColumnsAsAdodbDataDictionaryString($column_details);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->AddColumnSQL($table_name, $column_details));
@@ -335,8 +334,7 @@ class AkInstaller extends AkObject
 
     function changeColumn($table_name, $column_details)
     {
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
-        AkDbSchemaCache::clear($table_name);
+        $this->clearSchemaCacheForTable($table_name);
         $this->timestamps = false;
         $column_details = $this->_getColumnsAsAdodbDataDictionaryString($column_details);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->AlterColumnSQL($table_name, $column_details));
@@ -344,15 +342,13 @@ class AkInstaller extends AkObject
 
     function removeColumn($table_name, $column_name)
     {
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
-        AkDbSchemaCache::clear($table_name);
+        $this->clearSchemaCacheForTable($table_name);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->DropColumnSQL($table_name, $column_name));
     }
 
     function renameColumn($table_name, $old_column_name, $new_column_name)
     {
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
-        AkDbSchemaCache::clear($table_name);
+        $this->clearSchemaCacheForTable($table_name);
         return $this->db->renameColumn($table_name, $old_column_name, $new_column_name);
     }
 
@@ -368,10 +364,15 @@ class AkInstaller extends AkObject
         return $this->_createOrModifyTable($table_name, $column_options, $table_options);
     }
 
-    function _createOrModifyTable($table_name, $column_options = null, $table_options = array())
+    function clearSchemaCacheForTable($table_name)
     {
         require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
         AkDbSchemaCache::clear($table_name);
+    }
+
+    function _createOrModifyTable($table_name, $column_options = null, $table_options = array())
+    {
+        $this->clearSchemaCacheForTable($table_name);
         if(empty($column_options) && $this->_loadDbDesignerDbSchema()){
             $column_options = $this->db_designer_schema[$table_name];
         }elseif(empty($column_options)){
@@ -425,14 +426,14 @@ class AkInstaller extends AkObject
         require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
         //AkDbSchemaCache::clear(AkInflector::classify($table_name));
         AkDbSchemaCache::clear($table_name);
-        
+
         $result = $this->tableExists($table_name) ? $this->db->execute('DROP TABLE '.$table_name) : 1;
         if($result){
             unset($this->available_tables[array_search($table_name, $this->available_tables)]);
             if(!empty($options['sequence'])){
                 $this->dropSequence($table_name);
             }
-            
+
         }
     }
 
@@ -478,15 +479,13 @@ class AkInstaller extends AkObject
 
     function dropIndex($table_name, $columns_or_index_name)
     {
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
-        AkDbSchemaCache::clear($table_name);
+        $this->clearSchemaCacheForTable($table_name);
         return $this->removeIndex($table_name,$columns_or_index_name);
     }
 
     function createSequence($table_name)
     {
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
-        AkDbSchemaCache::clear($table_name);
+        $this->clearSchemaCacheForTable($table_name);
         $result = $this->tableExists('seq_'.$table_name) ? false : $this->db->connection->CreateSequence('seq_'.$table_name);
         $this->available_tables[] = 'seq_'.$table_name;
         return $result;
@@ -494,8 +493,7 @@ class AkInstaller extends AkObject
 
     function dropSequence($table_name)
     {
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
-        AkDbSchemaCache::clear($table_name);
+        $this->clearSchemaCacheForTable($table_name);
         $result = $this->tableExists('seq_'.$table_name) ? $this->db->connection->DropSequence('seq_'.$table_name) : true;
         if($result){
             unset($this->available_tables[array_search('seq_'.$table_name, $this->available_tables)]);
@@ -587,7 +585,7 @@ class AkInstaller extends AkObject
     }
 
     /**
-     * Returns a key => value pair of regular expressions that will trigger methods 
+     * Returns a key => value pair of regular expressions that will trigger methods
      * to cast database columns to their respective default values or a replacement expression.
      */
     function getDefaultColumnAttributesRules()
@@ -665,7 +663,7 @@ class AkInstaller extends AkObject
     *   $UserInstalller->transactionStart();
     *   $UserInstalller->addTable('id, name');
     *
-    *    if(!isCompatible()){ 
+    *    if(!isCompatible()){
     *       $User->transactionFail();
     *    }
     *
@@ -717,7 +715,7 @@ class AkInstaller extends AkObject
         fclose($f);
         return empty($value) ? $options['default'] : $value;
     }
-    
+
     //DEPRECATED
     function promtUserVar($message, $options = array())
     {
@@ -804,13 +802,13 @@ class AkInstaller extends AkObject
         echo Ak::t("Description:
     Database migrations is a sort of SCM like subversion, but for database settings.
 
-    The migration command takes the name of an installer located on your 
+    The migration command takes the name of an installer located on your
     /app/installers folder and runs one of the following commands:
-    
-    - \"install\" + (options version number): Will update to the provided version 
+
+    - \"install\" + (options version number): Will update to the provided version
     number or to the latest one in no version is given.
-    
-    - \"uninstall\" + (options version number): Will downgrade to the provided 
+
+    - \"uninstall\" + (options version number): Will downgrade to the provided
     version number or to the lowest one in no version is given.
 
     Current version number will be sorted at app/installers/installer_name_version.txt.
@@ -818,7 +816,7 @@ class AkInstaller extends AkObject
 Example:
     >> migrate framework install
 
-    Will run the default database schema for the framework. 
+    Will run the default database schema for the framework.
     This generates the tables for handling database driven sessions and cache.
 
 ");
