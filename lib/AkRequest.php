@@ -816,7 +816,11 @@ class AkRequest extends AkObject
         }
         $Controller =& new $controller_class_name(array('controller'=>true));
         $Controller->_module_path = $module_path;
-        isset($_SESSION) ? $Controller->session =& $_SESSION : null;
+
+        if(isset($_SESSION)){
+            $Controller->session =& $_SESSION;
+            $Controller->appendAfterFilter(array(&$this,'_saveRefererIfNotRedirected'));
+        }
         return $Controller;
 
     }
@@ -888,6 +892,25 @@ class AkRequest extends AkObject
         }else{
             return false;
         }
+    }
+
+    function getReferer()
+    {
+        $referer = AK_HOST;
+        if(isset($_SESSION['_ak_referer']) && preg_match('/^\w+:\/\/.*/', $_SESSION['_ak_referer'])){
+            $referer = $_SESSION['_ak_referer'];
+        }elseif(isset($this->env['HTTP_REFERER']) && preg_match('/^\w+:\/\/.*/', $this->env['HTTP_REFERER'])){
+            $referer = $this->env['HTTP_REFERER'];
+        }
+        return $referer;
+    }
+
+    function _saveRefererIfNotRedirected()
+    {
+        if(isset($_SESSION)){
+            $_SESSION['_ak_referer'] = $this->getRequestUri().$this->getPath();
+        }
+        return true;
     }
 }
 
