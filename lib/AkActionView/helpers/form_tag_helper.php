@@ -31,7 +31,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'asset_tag_helper.php'
 
 class FormTagHelper  extends AkActionViewHelper
 {
-    
+
     /**
       * Starts a form tag that points the action to an url configured with <tt>url_for_options</tt> just like
       * $controller->urlFor. The method for the form defaults to POST.
@@ -47,10 +47,10 @@ class FormTagHelper  extends AkActionViewHelper
             $html_options['enctype'] = 'multipart/form-data';
             unset($html_options['multipart']);
         }
-        
+
         // we need to avoid double ampersand scaping when calling TagHelper::tag method
-        $html_options['action'] = str_replace('&amp;', '&', $this->_controller->urlFor($url_for_options)); 
-        
+        $html_options['action'] = str_replace('&amp;', '&', $this->_controller->urlFor($url_for_options));
+
 
         return TagHelper::tag('form', $html_options, true);
     }
@@ -95,7 +95,7 @@ class FormTagHelper  extends AkActionViewHelper
       * * <tt>'disabled'</tt> - If set to true, the user will not be able to use this input.
       * * <tt>'size'</tt> - The number of visible characters that will fit in the input.
       * * <tt>'maxlength'</tt> - The maximum number of characters that the browser will allow the user to enter.
-      * 
+      *
       * An array of standard HTML options for the tag.
       */
     function text_field_tag($name, $value = null, $options = array())

@@ -180,14 +180,16 @@ class AkSintagsParser
     function TranslationToken($match)
     {
         $this->output.= ltrim($match,'\\');
-        $php_variable = $this->_convertSintagsVarToPhp(trim($match,'%'));
+        $php_variable = $this->_convertSintagsVarToPhp(ltrim($match,'\%'));
         if($match[0] != '\\' && $php_variable){
-            $this->_translation_tokens[] = '\''.$match.'\' => @'.$php_variable;
+            if($match[1] != '\\' && !strstr($php_variable, '$params[')){
+                $this->_translation_tokens[] = '\''.$match.'\' => @'.$php_variable;
+            }else{
+                $this->_translation_tokens[] = '\''.$match.'\' => $text_helper->h(@'.$php_variable.')';
+            }
         }
         return true;
     }
-
-
 
     //------------------------------------
     //  VARIABLE TRANSLATIONS

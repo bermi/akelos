@@ -98,6 +98,19 @@ class AkActiveRecord_finders_TestCase extends  AkUnitTest
         $this->assertEqual($Tags[1]->name, 'Tag 2');
     }
 
+    function test_should_find_using_named_bindings()
+    {
+        $this->installAndIncludeModels(array('Hybrid'=>'id,customer_id,input,parent_id'));
+        $Hybrid =& new Hybrid();
+
+        $customer_id = 12;
+        $input = 'abc';
+        $parent_id = 123;
+        $Hybrid->create(array('customer_id'=>$customer_id, 'input' => $input, 'parent_id' => $parent_id));
+        $results = $Hybrid->find('all', array( 'conditions' => array('customer_id = :customer_id AND input = :input AND parent_id = :parent_id', ':customer_id' => $customer_id, ':input' => $input, ':parent_id' => $parent_id )));
+
+        $this->assertEqual(Ak::pick('customer_id,input,parent_id', $results[0]->getAttributes()), array('customer_id' => $customer_id, 'input' => $input, 'parent_id' => $parent_id));
+    }
 
 }
 

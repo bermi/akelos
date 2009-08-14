@@ -89,7 +89,7 @@ class AkSintagsLexer extends AkLexer
         $this->addEntryPattern('_{','Text','Translation');
         $this->addExitPattern('}','Translation');
 
-        $this->addSpecialPattern('\x5C?\x25[A-Za-z][\.A-Za-z0-9_-]*','Translation','TranslationToken');
+        $this->addSpecialPattern('\x5C?\x25\x5C?[A-Za-z][\.A-Za-z0-9_-]*','Translation','TranslationToken');
     }
 
     function _addVariableTranslationTokens()

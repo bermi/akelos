@@ -476,4 +476,25 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 
 
 
+===================================
+ 
+ 
+_{Signed up using %params-email address}
+
+-----------------------------------
+
+<?php echo $text_helper->translate('Signed up using %params-email address', array('%params-email' => $text_helper->h(@$params['email']))); ?>
+
+
+===================================
+
+
+_{Signed up using %\email address}
+
+-----------------------------------
+
+<?php echo $text_helper->translate('Signed up using %\email address', array('%\email' => $text_helper->h(@$email))); ?>
+
+
+
 
