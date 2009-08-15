@@ -57,6 +57,14 @@ class AkRequest extends AkObject
     * @var array $_request
     */
     var $_request = array();
+    
+    /**
+     * Keeps the original routing params received via the url,
+     * this is needed for later modifying the current url for example
+     *
+     * @var array
+     */
+    var $_route_params = array();
 
     var $_init_check = false;
     var $__internationalization_support_enabled = false;
@@ -190,31 +198,31 @@ class AkRequest extends AkObject
     {
         $ak_request = isset($this->_request['ak']) ? str_replace('//','/', '/'.trim($this->_request['ak'],'/').'/') : '/';
 
-        if($found = $Router->toParams($ak_request)){
-            if(!isset($found['controller'])){
+        if($this->_route_params = $Router->toParams($ak_request)){
+            if(!isset($this->_route_params['controller'])){
                 trigger_error(Ak::t('No controller was specified.'), E_USER_WARNING);
             }
-            if(!isset($found['action'])){
+            if(!isset($this->_route_params['action'])){
                 trigger_error(Ak::t('No action was specified.'), E_USER_WARNING);
             }
 
-            if(isset($found['controller'])){
-                if($this->_addParam('controller',$found['controller'])){
-                    $this->controller = $this->_request['controller'] = $found['controller'];
+            if(isset($this->_route_params['controller'])){
+                if($this->_addParam('controller',$this->_route_params['controller'])){
+                    $this->controller = $this->_request['controller'] = $this->_route_params['controller'];
                 }
             }
-            if(isset($found['action'])){
-                if($this->_addParam('action',$found['action'])){
-                    $this->action = $this->_request['action'] = $found['action'];
+            if(isset($this->_route_params['action'])){
+                if($this->_addParam('action',$this->_route_params['action'])){
+                    $this->action = $this->_request['action'] = $this->_route_params['action'];
                 }
             }
-            if(isset($found['module'])){
-                if($this->_addParam('module',$found['module'])){
-                    $this->module = $this->_request['module'] = $found['module'];
+            if(isset($this->_route_params['module'])){
+                if($this->_addParam('module',$this->_route_params['module'])){
+                    $this->module = $this->_request['module'] = $this->_route_params['module'];
                 }
             }
 
-            foreach ($found as $k=>$v){
+            foreach ($this->_route_params as $k=>$v){
                 if($this->_addParam($k,$v)){
                     $this->_request[$k] = $v;
                 }
@@ -227,7 +235,11 @@ class AkRequest extends AkObject
         }
     }
 
-
+    function getRouteParams()
+    {
+        return $this->_route_params;
+    }
+    
     function isValidControllerName($controller_name)
     {
         return $this->_validateTechName($controller_name);
