@@ -192,11 +192,16 @@ class AkInstaller extends AkObject
     function _runInstallerMethod($method_prefix, $version, $options = array(), $version_number = null)
     {
         $method_name = $method_prefix.'_'.$version;
-        if(!method_exists($this, $method_name)){
-            return $method_prefix == 'down';
-        }
-
         $version_number = empty($version_number) ? ($method_prefix=='down' ? $version-1 : $version) : $version_number;
+
+        if(!method_exists($this, $method_name)){
+            if($method_prefix == 'down'){
+                $this->setInstalledVersion($version_number, $options);
+                return true;
+            }else{
+                return false;
+            }
+        }
 
         $this->transactionStart();
 
@@ -287,7 +292,7 @@ class AkInstaller extends AkObject
     function setInstalledVersion($version, $options = array())
     {
         //if(!$this->tableExists('akelos_migrations')) {
-            $this->_createMigrationsTable();
+        $this->_createMigrationsTable();
         //}
         /**
          * this will produce an error if the unique index on name is violated, then we update
