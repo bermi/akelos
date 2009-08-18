@@ -193,7 +193,7 @@ class AkInstaller extends AkObject
     {
         $method_name = $method_prefix.'_'.$version;
         if(!method_exists($this, $method_name)){
-            return false;
+            return $method_prefix == 'down';
         }
 
         $version_number = empty($version_number) ? ($method_prefix=='down' ? $version-1 : $version) : $version_number;
