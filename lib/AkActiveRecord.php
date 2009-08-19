@@ -426,7 +426,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     function &findOrCreateBy()
     {
         $args = func_get_args();
-        $Item =& Ak::call_user_func_array(array(&$this,'findFirstBy'), $args);
+        $Item =& call_user_func_array(array(&$this,'findFirstBy'), $args);
         if(!$Item){
             $attributes = array();
 
@@ -1172,12 +1172,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     function _sanitizeConditionsCollections(&$options)
     {
-        if(!empty($options['bind']) && is_array($options['bind']) && preg_match_all('/([a-z]+) IN \(?\?\)?/i', $options['conditions'], $matches)){
+        if(!empty($options['bind']) && is_array($options['bind']) && preg_match_all('/([a-zA-Z_]+)\s+IN\s+\(?\?\)?/i', $options['conditions'], $matches)){
             $i = 0;
             foreach($options['bind'] as $k => $v){
                 if(isset($matches[1][$i]) && is_array($v)){
                     $value = join(', ', $this->castAttributesForDatabase($matches[1][$i], $v));
-                    $options['conditions'] = str_replace($matches[0][$i], str_replace('?', $value, $matches[0][$i]), $options['conditions']);
+                    $startpos=strpos($options['conditions'],$matches[0][$i]);
+                    $endpos=$startpos+strlen($matches[0][$i]);
+                    $options['conditions'] = substr($options['conditions'],0,$startpos).str_replace('?', $value, $matches[0][$i]).substr( $options['conditions'],$endpos);
                     unset($options['bind'][$k]);
                     $i++;
                 }
@@ -1192,7 +1194,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             return Ak::handleStaticCall();
         }
         $args = func_get_args();
-        $result =& Ak::call_user_func_array(array(&$this,'find'), array_merge(array('first'),$args));
+        $result =& call_user_func_array(array(&$this,'find'), array_merge(array('first'),$args));
         return $result;
     }
 
@@ -1202,7 +1204,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             return Ak::handleStaticCall();
         }
         $args = func_get_args();
-        $result =& Ak::call_user_func_array(array(&$this,'find'), array_merge(array('all'),$args));
+        $result =& call_user_func_array(array(&$this,'find'), array_merge(array('all'),$args));
         return $result;
     }
 
@@ -1252,7 +1254,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         $args = func_get_args();
         array_unshift($args,'first');
-        $result =& Ak::call_user_func_array(array(&$this,'findBy'), $args);
+        $result =& call_user_func_array(array(&$this,'findBy'), $args);
         return $result;
     }
 
@@ -1265,7 +1267,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $options = $this->_extractOptionsFromArgs($args);
         $options['order'] = $this->getPrimaryKey().' DESC';
         array_push($args, $options);
-        $result =& Ak::call_user_func_array(array(&$this,'findFirstBy'), $args);
+        $result =& call_user_func_array(array(&$this,'findFirstBy'), $args);
         return $result;
     }
 
@@ -1276,7 +1278,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         $args = func_get_args();
         array_unshift($args,'all');
-        $result =& Ak::call_user_func_array(array(&$this,'findBy'), $args);
+        $result =& call_user_func_array(array(&$this,'findBy'), $args);
         return $result;
     }
 
@@ -1342,7 +1344,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         */
         $options['conditions'] = $conditions;
 
-        $result =& Ak::call_user_func_array(array(&$this,'find'), array($fetch,$options));
+        $result =& call_user_func_array(array(&$this,'find'), array($fetch,$options));
         return $result;
     }
 
