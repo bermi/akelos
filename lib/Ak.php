@@ -154,12 +154,12 @@ class Ak
             } else {
                 $locale_manager_class = 'AkLocaleManager';
             }
-            
+
         } else {
             $locale_manager_class = 'AkLocaleManager';
         }
         if((AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES || (defined('AK_TEST_TRANSLATIONS') && AK_TEST_TRANSLATIONS)) && !empty($string) && is_string($string)){
-            
+
             // This adds used strings to a stack for storing new entries on the locale file after shutdown
             call_user_func_array(array($locale_manager_class,'getUsedLanguageEntries'),array($string,$controller));
             if($_dev_shutdown && (!defined('AK_TEST_TRANSLATIONS') || !AK_TEST_TRANSLATIONS)){
@@ -174,10 +174,10 @@ class Ak
             }else{
                 $lang = Ak::lang();
             }
-           
+
             $dictionary=call_user_func_array(array($locale_manager_class,'getCoreDictionary'),array($lang));
             $framework_dictionary = array_merge((array)$framework_dictionary,(array)$dictionary);
-            
+
             if(!defined('AK_LOCALE')){
                 define('AK_LOCALE', $lang);
             }
@@ -204,7 +204,7 @@ class Ak
         if(isset($controller) && !isset($framework_dictionary[$controller.'_dictionary'])) { // && is_file(AK_APP_DIR.DS.'locales'.DS.$controller.DS.$lang.'.php')){
              $framework_dictionary[$controller.'_dictionary'] = call_user_func_array(array($locale_manager_class,'getDictionary'),array($lang,$controller));
         }
-        
+
         if(isset($controller) && isset($framework_dictionary[$controller.'_dictionary'][$string])){
             $string = !empty($framework_dictionary[$controller.'_dictionary'][$string])?$framework_dictionary[$controller.'_dictionary'][$string]:$string;
         }else {
@@ -238,7 +238,7 @@ class Ak
     function locale($locale_setting, $locale = null)
     {
         static $settings;
-        
+
         // We initiate the locale settings
         Ak::t('Akelos');
 
@@ -1162,7 +1162,7 @@ class Ak
         return $resulting_array;
     }
 
-    function collect(&$source_array, $key_index, $value_index)
+    function collect($source_array, $key_index, $value_index)
     {
         $resulting_array = array();
         if(!empty($source_array) && is_array($source_array)) {
