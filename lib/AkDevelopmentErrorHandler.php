@@ -13,6 +13,15 @@
  * @package ActiveSupport
  */
 
+if(!defined('AK_DEBUG_OUTPUT_AS_HTML')){
+    if(AK_WEB_REQUEST){
+        $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strstr(strtolower($_SERVER['HTTP_X_REQUESTED_WITH']),'xmlhttprequest');
+        define('AK_DEBUG_OUTPUT_AS_HTML', !$is_ajax);
+    }else{
+        define('AK_DEBUG_OUTPUT_AS_HTML', false);
+    }
+}
+
 if(defined('AK_DEBUG') && AK_DEBUG){
 
     function ak_backtrace($only_app = false)
@@ -114,13 +123,13 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         }
 
 
-        AK_WEB_REQUEST ? print('<pre>') : null;
+        AK_DEBUG_OUTPUT_AS_HTML ? print('<pre>') : null;
 
         //$result = ": <h3>$error_message</h3> in  $file on line $line\n";
-        $result = "<h3 style='padding:5px; background-color:#f00;color:#fff'>($error_type) $error_message</h3>";
+        $result = "<div style='text-align:left;'><h3 style='padding:5px; background-color:#f00;color:#fff'>($error_type) $error_message</h3>";
         //$result .= ak_show_source_line($file, $line);
         //ak_show_app_backtrace();
-        if(AK_WEB_REQUEST){
+        if(AK_DEBUG_OUTPUT_AS_HTML){
             $result .= " <a href='javascript:void(0);' onclick='ak_lib_backtrace = document.getElementById(\"ak_lib_backtrace\").style.display = \"block\";document.getElementById(\"ak_app_backtrace\").style.display = \"none\";this.style.display = \"none\"'>show full trace</a>";
             $result .= '<div id="ak_app_backtrace">'.ak_backtrace(true).'</div>';
         }
@@ -142,10 +151,11 @@ if(defined('AK_DEBUG') && AK_DEBUG){
                 $result .= "</ul><div style='clear:both;'></div>";
             }
         }
+        $result .= '</div>';
 
-        echo !AK_WEB_REQUEST ? html_entity_decode(strip_tags($result)) : '<div style="background-color:#fff;margin:10px;padding:10px;color:#000;font-family:sans-serif;border-bottom:3px solid #f00;font-size:12px;">'. $result.'</div>';
+        echo !AK_DEBUG_OUTPUT_AS_HTML ? html_entity_decode(strip_tags($result)) : '<div style="background-color:#fff;margin:10px;padding:10px;color:#000;font-family:sans-serif;border-bottom:3px solid #f00;font-size:12px;">'. $result.'</div>';
 
-        AK_WEB_REQUEST ? print('</pre>') : null;
+        AK_DEBUG_OUTPUT_AS_HTML ? print('</pre>') : null;
 
     }
 
@@ -224,6 +234,7 @@ float:left;
 color:#000;
 background-color:#fff;
 width:700px;
+text-align:left;
 }
 .ak_line_numbers{
 border-right:1px solid #ccc;
@@ -288,6 +299,9 @@ float:left;
 
     function ak_trace_db_query($message, $new_line = true)
     {
+        if(Ak::getStaticVar('ak_trace_db_query') === false){
+            return ;
+        }
         if(!AK_TRACE_DB_QUERIES_INCLUDES_DB_TYPE){
             $message = preg_replace('/\([a-z0-9]+\): /','', trim($message, "\n-"));
         }
@@ -296,7 +310,7 @@ float:left;
             $details = array(null, null, null);
         }
         $message = trim(html_entity_decode(strip_tags($message)));
-        if(AK_CLI){
+        if(!AK_DEBUG_OUTPUT_AS_HTML){
             echo $message."\n";
         }else{
             Ak::trace($message, $details[1], $details[0], $details[2]);
