@@ -24,7 +24,7 @@ if(!defined('AK_DEBUG_OUTPUT_AS_HTML')){
 
 if(defined('AK_DEBUG') && AK_DEBUG){
 
-    function ak_backtrace($only_app = false)
+    function ak_backtrace($only_app = false, $html_output = AK_DEBUG_OUTPUT_AS_HTML)
     {
         $result = '';
         $bt = debug_backtrace();
@@ -42,7 +42,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
 
             }
         }
-        return $result;
+        return $html_output ? $result : html_entity_decode(strip_tags($result));
     }
 
     function ak_show_app_backtrace()
@@ -164,10 +164,11 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         $result = ("File: ".$file."\n");
         $file = explode("\n", file_get_contents($file));
         $code = (trim($file[$line-1]));
-        $code = strstr($code, '<?') ? $code : "<? $code";
+
+        $code = AK_DEBUG_OUTPUT_AS_HTML ? (strstr($code, '<?') ? $code : "<? $code") : $code;
         $result .= ("    line: ".$line."\n");
-        $colored = preg_replace("/".('<span style="color: #0000BB">&lt;\?&nbsp;<\/span>')."(.*)/", "$1", highlight_string($code, true));
-        if(!empty($highlight) && strstr($colored, $highlight)){
+        $colored = AK_DEBUG_OUTPUT_AS_HTML ? (preg_replace("/".('<span style="color: #0000BB">&lt;\?&nbsp;<\/span>')."(.*)/", "$1", highlight_string($code, true))) : $code;
+        if(AK_DEBUG_OUTPUT_AS_HTML && !empty($highlight) && strstr($colored, $highlight)){
             $result .=  "    code: ".str_replace($highlight, '<strong style="border:1px solid red;padding:3px;background-color:#ffc;">'.$highlight."</strong>", $colored);
         }else{
             if(!empty($highlight)){

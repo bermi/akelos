@@ -57,7 +57,7 @@ class AkRequest extends AkObject
     * @var array $_request
     */
     var $_request = array();
-    
+
     /**
      * Keeps the original routing params received via the url,
      * this is needed for later modifying the current url for example
@@ -164,7 +164,7 @@ class AkRequest extends AkObject
 
     function get($var_name)
     {
-        return $this->_request[$var_name];
+        return isset($this->_request[$var_name]) ? $this->_request[$var_name] : null;
     }
 
     function getParams()
@@ -239,7 +239,7 @@ class AkRequest extends AkObject
     {
         return $this->_route_params;
     }
-    
+
     function isValidControllerName($controller_name)
     {
         return $this->_validateTechName($controller_name);
