@@ -3345,7 +3345,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 }elseif ('binary' == $column_type && $this->_getDatabaseType() == 'postgre'){
                     $value = $this->_db->unescape_blob($value);
                     $value = empty($value) || trim($value) == 'null' ? null : $value;
-                }elseif($this->_shouldSerializeColumn($column_name)){
+                }elseif($this->_shouldSerializeColumn($column_name) && is_string($value)){
                     $this->_ensureClassExistsForSerializedColumnBeforeUnserializing($column_name);
                     $value = @unserialize($value);
                 }

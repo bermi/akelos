@@ -781,7 +781,9 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 $last = &$last[$association];
 
             }
-            $value=$this->_castAttributeFromDatabase($association,$value,$config['instance']);
+            if($returns=='array') {
+                $value=$this->_castAttributeFromDatabase($association,$value,$config['instance']);
+            }
             $last = $value;
         }
         //$this->log('owner:'.var_export($owner,true));
@@ -872,17 +874,8 @@ class AkAssociatedActiveRecord extends AkBaseModel
             }
             $available['load_associations'] = false;
             $available['load_acts'] = $load_acts;
-            /**
-             * unserializing data
-             */
-            /**$serialized_attributes = !empty($instance->serialize)? Ak::toArray($instance->serialize):array();
-            $serialized_attributes = array_intersect(array_keys($available),$serialized_attributes);
-            foreach($serialized_attributes as $serialized_attribute) {
-                if($instance->_shouldSerializeColumn($serialized_attribute)) {
-                    $available[$serialized_attribute] = @unserialize($available[$serialized_attribute]);
-                }
-            }*/
-            //$available = $this->_castAttributesFromDatabase($available,$instance);
+            
+            $available = $this->_castAttributesFromDatabase($available,$instance);
             $obj=&$parent->$assoc_name->build($available,false);
 
             $obj->_newRecord = false;
