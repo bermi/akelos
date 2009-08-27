@@ -919,7 +919,7 @@ class AkRequest extends AkObject
 
     function _saveRefererIfNotRedirected()
     {
-        if(isset($_SESSION)){
+        if(isset($_SESSION) && !$this->isAjax()){
             $_SESSION['_ak_referer'] = $this->getRequestUri().$this->getPath();
         }
         return true;
