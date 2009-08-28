@@ -126,7 +126,35 @@ class TestMailer extends AkActionMailer
         ));
 
     }
+    function multipart_with_long_russian_utf8_subject($recipient)
+    {
+        $this->set(array(
+        'recipients' => $recipient,
+        'subject' => "Это какое-то осмысленное надеюсь, длинный русский текст с некоторыми Nice kyrillic символы в нем, и я могу использовать его для моих целей тестирования",
+        'from' => "test@example.com",
+        'charset' => "UTF-8",
+        'parts' => array(
+        array('content_type' => 'text/plain', 'body' => 'blah'),
+        array('content_type' => 'text/html', 'body' => '<b>blah</b>'),
+        )
+        ));
 
+    }
+    
+function multipart_with_long_russian_utf8_sender($recipient)
+    {
+        $this->set(array(
+        'recipients' => $recipient,
+        'subject' => "Это какое-то",
+        'from' => "какое <test@example.com>",
+        'charset' => "UTF-8",
+        'parts' => array(
+        array('content_type' => 'text/plain', 'body' => 'blah'),
+        array('content_type' => 'text/html', 'body' => '<b>blah</b>'),
+        )
+        ));
+
+    }
     function explicitly_multipart_example($recipient, $content_type = null)
     {
         empty($content_type) ? null : $this->setContentType($content_type);

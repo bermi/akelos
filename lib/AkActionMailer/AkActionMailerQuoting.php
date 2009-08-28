@@ -30,10 +30,49 @@ class AkActionMailerQuoting
      */
     function quotedPrintable($text, $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
     {
-        $text = str_replace(' ','_', preg_replace('/[^a-z ]/ie', 'AkActionMailerQuoting::quotedPrintableEncode("$0")', $text));
-        return "=?$charset?Q?$text?=";
+        $pre="=?$charset?Q?";
+        $start=0;
+        $length=10;
+        /**
+         * Splitting string into characters with /u modifier,
+         * to handle multibyte strings in utf-8
+         */
+        $chars=preg_split('//u',$text);
+        $parts=array();
+        /**
+         * slicing them into chunks of 10 characters and encoding them with qp
+         */
+        while(count($subchars=array_slice($chars,$start,$length))>0) {
+            $text = str_replace(' ','_', preg_replace('/[^a-z ]/ie', 'AkActionMailerQuoting::quotedPrintableEncode("$0")', join('',$subchars)));
+            $parts[]=$pre.$text.'?=';
+            $start+=$length;
+        }
+        $return=array_shift($parts);
+        foreach($parts as $part) {
+            $return.="\r\n ".$part;
+        }
+        
+        return $return;
     }
-
+    function base64encode($text, $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
+    {
+        $pre="=?$charset?B?";
+        $start=0;
+        $length=10;
+        $chars=preg_split('//u',$text);
+        $parts=array();
+        while(count($subchars=array_slice($chars,$start,$length))>0) {
+            $text = base64_encode(join('',$subchars));
+            $parts[]=$pre.$text.'?=';
+            $start+=$length;
+        }
+        $return=array_shift($parts);
+        foreach($parts as $part) {
+            $return.="\r\n ".$part;
+        }
+        
+        return $return;
+    }
     /**
      * Convert the given character to quoted printable format, taking into
      * account multi-byte characters
@@ -71,7 +110,7 @@ class AkActionMailerQuoting
     {
         return preg_match(AK_ACTION_MAILER_CHARS_NEEDING_QUOTING_REGEX,$text) ? AkActionMailerQuoting::quotedPrintable($text,$charset) : $text;
     }
-
+   
     /**
     * Quote any of the given strings if they contain any "illegal" characters
     */

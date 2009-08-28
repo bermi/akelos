@@ -366,7 +366,7 @@ EOF;
 
         $Mail = AkMailBase::parse($msg);
         $this->assertEqual("testing testing \326\244", $Mail->subject);
-        $this->assertEqual("=?UTF-8?Q?testing_testing_=D6=A4?=", $Mail->getSubject('UTF-8'));
+        $this->assertEqual("=?UTF-8?Q?testing_t?=\r\n =?UTF-8?Q?esting_=D6=A4?=",$Mail->getSubject('UTF-8'));
 
     }
 
@@ -477,8 +477,8 @@ EOF;
         $TestMailer =& new TestMailer();
         $this->assertTrue($Created = $TestMailer->create('utf8_body', $this->recipient));
 
-        $this->assertPattern("/\nFrom: =\?UTF-8\?Q\?Foo_.*?\?= <extended@example.com>\r/", $Created->getEncoded());
-        $this->assertPattern("/To: =\?UTF-8\?Q\?Foo_.*?\?= <extended@example.com>, \r\n     \"Example Recipient\" <me/", $Created->getEncoded());
+        $this->assertPattern("/\nFrom: =\?UTF-8\?Q\?Foo_=C3=A1=C3=AB=C3=B4_=C3=AE\?=\r\n =\?UTF-8\?Q\?=C3=BC\?= <extended@example.com>\r/", $Created->getEncoded());
+        $this->assertPattern("/To: =\?UTF-8\?Q\?Foo_=C3=A1=C3=AB=C3=B4_=C3=AE\?=\r\n =\?UTF-8\?Q\?=C3=BC\?= <extended@example.com>, \r\n     \"Example Recipient\" <me/", $Created->getEncoded());
     }
 
     function test_receive_decodes_base64_encoded_mail()
@@ -568,7 +568,19 @@ EOF;
         $this->assertTrue($Created = $TestMailer->create('multipart_with_utf8_subject', $this->recipient));
         $this->assertPattern("/\nSubject: =\?UTF-8\?Q\?Foo_.*?\?=/", $Created->getEncoded());
     }
-
+    function test_multipart_with_long_russian_utf8_subject()
+    {
+        $TestMailer =& new TestMailer();
+        $this->assertTrue($Created = $TestMailer->create('multipart_with_long_russian_utf8_subject', $this->recipient));
+        $this->assertPattern("/\nSubject: =\?UTF-8\?Q\?=D0=AD=D1=82=D0=BE_=D0=BA=D0=B0=D0=BA=D0=BE=D0=B5\?=\r\n =\?UTF-8\?Q\?-=D1=82=D0=BE_=D0=BE=D1=81=D0=BC=D1=8B=D1=81=D0=BB\?=\r\n =\?UTF-8\?Q\?=D0=B5=D0=BD=D0=BD=D0=BE=D0=B5_=D0=BD=D0=B0=D0=B4=D0=B5\?=\r\n =\?UTF-8\?Q\?=D1=8E=D1=81=D1=8C,_=D0=B4=D0=BB=D0=B8=D0=BD=D0=BD\?=\r\n =\?UTF-8\?Q\?=D1=8B=D0=B9_=D1=80=D1=83=D1=81=D1=81=D0=BA=D0=B8=D0=B9\?=\r\n =\?UTF-8\?Q\?_=D1=82=D0=B5=D0=BA=D1=81=D1=82_=D1=81_=D0=BD\?=\r\n =\?UTF-8\?Q\?=D0=B5=D0=BA=D0=BE=D1=82=D0=BE=D1=80=D1=8B=D0=BC=D0=B8_\?=\r\n =\?UTF-8\?Q\?Nice_kyril\?=\r\n =\?UTF-8\?Q\?lic_=D1=81=D0=B8=D0=BC=D0=B2=D0=BE=D0=BB\?=\r\n =\?UTF-8\?Q\?=D1=8B_=D0=B2_=D0=BD=D0=B5=D0=BC,_=D0=B8\?=\r\n =\?UTF-8\?Q\?_=D1=8F_=D0=BC=D0=BE=D0=B3=D1=83_=D0=B8=D1=81\?=\r\n =\?UTF-8\?Q\?=D0=BF=D0=BE=D0=BB=D1=8C=D0=B7=D0=BE=D0=B2=D0=B0=D1=82=D1=8C\?=\r\n =\?UTF-8\?Q\?_=D0=B5=D0=B3=D0=BE_=D0=B4=D0=BB=D1=8F_=D0=BC\?=\r\n =\?UTF-8\?Q\?=D0=BE=D0=B8=D1=85_=D1=86=D0=B5=D0=BB=D0=B5=D0=B9_\?=\r\n =\?UTF-8\?Q\?=D1=82=D0=B5=D1=81=D1=82=D0=B8=D1=80=D0=BE=D0=B2=D0=B0=D0=BD\?=\r\n =\?UTF-8\?Q\?=D0=B8=D1=8F\?=/", $Created->getEncoded());
+    }
+    
+    function test_multipart_with_long_russian_utf8_sender()
+    {
+        $TestMailer =& new TestMailer();
+        $this->assertTrue($Created = $TestMailer->create('multipart_with_long_russian_utf8_sender', $this->recipient));
+        $this->assertPattern("/\From: =\?UTF-8\?Q\?=D0=BA=D0=B0=D0=BA=D0=BE=D0=B5\?= <test@example.com>/", $Created->getEncoded());
+    }
     function test_implicitly_multipart_with_utf8()
     {
         $TestMailer =& new TestMailer();
