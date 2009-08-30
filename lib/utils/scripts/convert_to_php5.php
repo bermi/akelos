@@ -42,7 +42,7 @@ function convert_to_php5($code){
     $replacements = array(
     '/&(\s?)new /' => '$1new ',
     '/(\s{4,})function /' => '$1public function ',
-    '/([\(,])(\s?)&(\s?)\$/' => '$1$2$3$',
+    '/(?<!array)([\(,])(\s?)&(\s?)\$/' => '$1$2$3$',
     '/(\s{4,})var(\s+)\$/' =>   '$1public$2$');
 
     foreach ($replacements as $k => $v){
