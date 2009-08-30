@@ -1,0 +1,10 @@
+#!/usr/bin/env php
+<?php
+
+@include(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
+
+!defined('AK_LIB_DIR') && define('AK_LIB_DIR', 'lib');
+!defined('DS') && define('DS', DIRECTORY_SEPARATOR);
+require_once(AK_LIB_DIR.DS.'utils'.DS.'scripts'.DS.'convert_to_php5.php');
+
+?>

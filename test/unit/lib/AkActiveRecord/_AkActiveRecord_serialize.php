@@ -5,12 +5,12 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class test_AkActiveRecord_serialize extends  AkUnitTest
 {
-    function setUp()
+    public function setUp()
     {
         $this->includeAndInstatiateModels('Bb,Cc');
     }
 
-    function test_first_level_serialization()
+    public function test_first_level_serialization()
     {
         $bb1 = &$this->Bb->create(array('name'=>'first bb','languages'=>array('en','es','de')));
         $cc1 = &$this->Cc->create(array('name'=>'first cc'));
@@ -28,7 +28,7 @@ class test_AkActiveRecord_serialize extends  AkUnitTest
 
     }
 
-    function test_first_level_serialization_with_association_finder()
+    public function test_first_level_serialization_with_association_finder()
     {
         $bb1 = &$this->Bb->create(array('name'=>'first bb','languages'=>array('en','es','de')));
         $cc1 = &$this->Cc->create(array('name'=>'first cc'));
