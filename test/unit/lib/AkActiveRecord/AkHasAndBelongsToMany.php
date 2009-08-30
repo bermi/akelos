@@ -6,7 +6,7 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 class HasAndBelongsToManyTestCase extends  AkUnitTest
 {
 
-    function test_start()
+    public function test_start()
     {
         $Installer = new AkInstaller();
         @$Installer->dropTable('posts_tags');
@@ -15,28 +15,28 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         @Ak::file_delete(AK_MODELS_DIR.DS.'post_tag.php');
         @Ak::file_delete(AK_MODELS_DIR.DS.'post_user.php');
         @Ak::file_delete(AK_MODELS_DIR.DS.'friend_friend.php');
-        
+
         $this->installAndIncludeModels(array('Post', 'Tag','Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'User'));
     }
 
     /**/
-    function test_getAssociatedModelInstance_should_return_a_single_instance()  // bug-fix
+    public function test_getAssociatedModelInstance_should_return_a_single_instance()  // bug-fix
     {
         $this->assertReference($this->Post->tag->getAssociatedModelInstance(),$this->Post->tag->getAssociatedModelInstance());
     }
 
 
-    function test_for_has_and_belongs_to_many()
+    public function test_for_has_and_belongs_to_many()
     {
 
-        $Property =& new Property(array('description'=>'Gandia Palace'));
+        $Property = new Property(array('description'=>'Gandia Palace'));
         $this->assertEqual($Property->property_type->getType(), 'hasAndBelongsToMany');
         $this->assertTrue(is_array($Property->property_types) && count($Property->property_types) === 0);
 
         $Property->property_type->load();
         $this->assertEqual($Property->property_type->count(), 0);
 
-        $Chalet =& new PropertyType(array('description'=>'Chalet'));
+        $Chalet = new PropertyType(array('description'=>'Chalet'));
 
         $Property->property_type->add($Chalet);
         $this->assertEqual($Property->property_type->count(), 1);
@@ -46,7 +46,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $Property->property_type->add($Chalet);
         $this->assertEqual($Property->property_type->count(), 1);
 
-        $Condo =& new PropertyType(array('description'=>'Condominium'));
+        $Condo = new PropertyType(array('description'=>'Condominium'));
         $Property->property_type->add($Condo);
 
         $this->assertEqual($Property->property_type->count(), 2);
@@ -65,7 +65,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->assertReference($Chalet, $Property->property_types[0]);
         $this->assertReference($Condo, $Property->property_types[1]);
 
-        $Property =& new Property($Property->getId());
+        $Property = new Property($Property->getId());
         $Property->property_type->load();
         $this->assertEqual($Property->property_type->association_id, 'property_types');
         $this->assertEqual($Property->property_type->count(), 2);
@@ -90,7 +90,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
 
 
         $Property =& $Property->findFirstBy('description','Gandia Palace');
-        $PropertyType =& new PropertyType();
+        $PropertyType = new PropertyType();
 
         $PropertyTypes =& $PropertyType->find();
 
@@ -104,7 +104,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->assertEqual($Property->property_type->count(), count($PropertyTypes));
 
         $Property =& $Property->findFirstBy('description','Gandia Palace');
-        
+
         $PropertyType->set('description', 'Palace');
 
         $Property->property_type->set($PropertyType);
@@ -114,21 +114,21 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->assertTrue(in_array('property_types', $Property->getAssociatedIds()));
 
         $Property = $Property->findFirstBy('description','Gandia Palace',array('include'=>'property_types'));
-        
+
         $this->assertIdentical($Property->property_type->count(), 1);
-        
+
         $this->assertTrue($Property->property_type->delete($Property->property_types[0]));
 
         $this->assertIdentical($Property->property_type->count(), 0);
-        
+
         $Property = $Property->findFirstBy('description','Gandia Palace');
-        
+
         $this->assertIdentical($Property->property_type->count(), 0);
-        
+
         // It should return existing Property even if it doesnt have property_types
         $this->assertTrue($Property->findFirstBy('description','Gandia Palace',array('include'=>'property_types')));
 
-        $Property =& new Property(array('description'=> 'Luxury Downtown House'));
+        $Property = new Property(array('description'=> 'Luxury Downtown House'));
         $Apartment =& $PropertyType->create(array('description'=>'Apartment'));
         $Loft =& $PropertyType->create(array('description'=>'Loft'));
         $Penthouse =& $PropertyType->create(array('description'=>'Penthouse'));
@@ -141,7 +141,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->assertTrue($Property->save());
 
         $this->assertTrue($Property =& $Property->findFirstBy('description', 'Luxury Downtown House'));
-        
+
         $Property->property_type->load();
 
         $this->assertEqual($Property->property_type->count(), 3);
@@ -150,7 +150,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->assertEqual($Apartment->get('description').$Apartment->getId(), $FoundApartment->get('description').$FoundApartment->getId());
 
         $FoundTypes = $Property->property_type->find();
-        
+
         $this->assertEqual(count($FoundTypes), $Property->property_type->count());
 
         $descriptions = array();
@@ -171,7 +171,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
 
         $this->assertEqual($Property->property_type->getSize(), 0);
 
-        $Property =& new Property();
+        $Property = new Property();
 
         $LandProperty =& $Property->property_type->build(array('description'=>'Land'));
 
@@ -189,12 +189,12 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
 
         $this->assertEqual($LandProperty->property_types[0]->get('description'), 'Land');
 
-        $Property =& new Property(array('description'=>'Seaside house in Altea'));
+        $Property = new Property(array('description'=>'Seaside house in Altea'));
         $SeasidePropertyType =& $Property->property_type->create(array('description'=>'Seaside property'));
         $this->assertReference($SeasidePropertyType, $Property->property_types[0]);
         $this->assertTrue($SeasidePropertyType->isNewRecord());
 
-        $Property =& new Property(array('description'=>'Bermi\'s appartment in Altea'));
+        $Property = new Property(array('description'=>'Bermi\'s appartment in Altea'));
         $this->assertTrue($Property->save());
         $SeasidePropertyType =& $Property->property_type->create(array('description'=>'Seaside property'));
         $this->assertReference($SeasidePropertyType, $Property->property_types[0]);
@@ -217,16 +217,16 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
 
     }
 
-    function test_find_on_unsaved_models_including_associations()
+    public function test_find_on_unsaved_models_including_associations()
     {
-        $Property =& new Property('description->','Chalet by the sea');
+        $Property = new Property('description->','Chalet by the sea');
 
-        $PropertyType =& new PropertyType();
+        $PropertyType = new PropertyType();
         $this->assertTrue($PropertyTypes = $PropertyType->findAll());
         $Property->property_type->add($PropertyTypes);
         $this->assertTrue($Property->save());
 
-        $Property =& new Property();
+        $Property = new Property();
 
         $expected = array();
         foreach (array_keys($PropertyTypes) as $k){
@@ -241,10 +241,10 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
     }
 
 
-    function test_clean_up_dependencies()
+    public function test_clean_up_dependencies()
     {
-        $Property =& new Property('description->','Luxury Estate');
-        $PropertyType =& new PropertyType();
+        $Property = new Property('description->','Luxury Estate');
+        $PropertyType = new PropertyType();
         $this->assertTrue($PropertyType =& $PropertyType->create(array('description'=>'Mansion')));
         $Property->property_type->add($PropertyType);
         $this->assertTrue($Property->save());
@@ -265,15 +265,15 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
     }
 
 
-    function test_double_assignation()
+    public function test_double_assignation()
     {
-        $AkelosOffice =& new Property(array('description'=>'Akelos new Office'));
+        $AkelosOffice = new Property(array('description'=>'Akelos new Office'));
         $this->assertTrue($AkelosOffice->save());
 
-        $PalafollsOffice =& new Property(array('description'=>"Bermi's home office"));
+        $PalafollsOffice = new Property(array('description'=>"Bermi's home office"));
         $this->assertTrue($PalafollsOffice->save());
 
-        $CoolOffice =& new PropertyType(array('description'=>'Cool office'));
+        $CoolOffice = new PropertyType(array('description'=>'Cool office'));
         $this->assertTrue($CoolOffice->save());
 
         $AkelosOffice->property_type->add($CoolOffice);
@@ -284,13 +284,13 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
     }
 
 
-    function test_scope_for_multiple_member_deletion()
+    public function test_scope_for_multiple_member_deletion()
     {
-        $PisoJose =& new Property('description->','Piso Jose');
-        $PisoBermi =& new Property('description->','Piso Bermi');
+        $PisoJose = new Property('description->','Piso Jose');
+        $PisoBermi = new Property('description->','Piso Bermi');
 
-        $Atico =& new PropertyType('description->','Ático');
-        $Apartamento =& new PropertyType('description->','Apartamento');
+        $Atico = new PropertyType('description->','Ático');
+        $Apartamento = new PropertyType('description->','Apartamento');
 
         $this->assertTrue($PisoJose->save() && $PisoBermi->save() && $Atico->save() && $Apartamento->save());
 
@@ -323,10 +323,10 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
     }
 
 
-    function test_associated_uniqueness()
+    public function test_associated_uniqueness()
     {
-        $Property =& new Property();
-        $PropertyType =& new PropertyType();
+        $Property = new Property();
+        $PropertyType = new PropertyType();
 
         $this->assertTrue($RanchoMaria =& $Property->create(array('description'=>'Rancho Maria')));
         $this->assertTrue($Rancho =&  $PropertyType->create(array('description'=>'Rancho')));
@@ -348,10 +348,10 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $this->assertEqual($Rancho->property->count(), 1);
     }
 
-    function test_should_include_associates_using_simple_finder()
+    public function test_should_include_associates_using_simple_finder()
     {
-        $Property =& new Property();
-        $PropertyType =& new PropertyType();
+        $Property = new Property();
+        $PropertyType = new PropertyType();
         $this->assertTrue($Rancho =&  $PropertyType->findFirstBy('description','Rancho Type', array('include'=>'properties')));
 
         $this->assertTrue($RanchoMaria =& $Property->find($Rancho->properties[0]->getId(), array('include'=>'property_types')));
@@ -361,13 +361,13 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
     }
 
 
-    function test_should_remove_associated_using_the_right_key()
+    public function test_should_remove_associated_using_the_right_key()
     {
-        $Installer =& new AkInstaller();
+        $Installer = new AkInstaller();
         @$Installer->dropTable('groups_users');
         @Ak::file_delete(AK_MODELS_DIR.DS.'group_user.php');
 
-        
+
         $this->installAndIncludeModels('User', 'Group', array('instantiate' => true));
 
         $Admin =& $this->Group->create(array('name' => 'Admin'));
@@ -398,17 +398,17 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
     }
 
 
-    function test_remove_existing_associates_before_setting_by_id()
+    public function test_remove_existing_associates_before_setting_by_id()
     {
 
         foreach (range(1,10) as $i){
-            $Post =& new Post(array('title' => 'Post '.$i));
+            $Post = new Post(array('title' => 'Post '.$i));
             $Post->tag->create(array('name' => 'Tag '.$i));
             $this->assertTrue($Post->save());
             $this->assertEqual($Post->tag->count(), 1, 'Failed on #'.$i);  // dont know why but this fails sometimes, randomly -kaste
         }
 
-        $Post11 =& new Post(array('title' => 'Post 11'));
+        $Post11 = new Post(array('title' => 'Post 11'));
         $this->assertTrue($Post11->save());
 
         $Post->tag->setByIds(1,2,3,4,5);
@@ -433,9 +433,9 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
 
 
 
-    function test_should_allow_multiple_habtm_associates_on_fresh_association_owner()
+    public function test_should_allow_multiple_habtm_associates_on_fresh_association_owner()
     {
-        $Bermi =& new User(array('name'=>'Bermi'));
+        $Bermi = new User(array('name'=>'Bermi'));
         $Bermi->post->set(new Post(array('title' => 'Bermi Post')));
         $Bermi->save();
 
@@ -445,7 +445,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
     }
 
 
-    function test_should_remove_existing_associates_when_setting_new_ones_and_parent_is_saved()
+    public function test_should_remove_existing_associates_when_setting_new_ones_and_parent_is_saved()
     {
         for ($i=0; $i < 3; $i++){
             $Bermi =& $this->User->findFirstBy('name', 'Bermi');
@@ -456,56 +456,54 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
 
         $this->assertEqual($Bermi->post->count(true), 1);
 
-        $PostUser =& new PostUser();
+        $PostUser = new PostUser();
         $PostUsers = $PostUser->findAllBy('user_id', $Bermi->id);
 
         $this->assertEqual(count($PostUsers), 1);
-        
+
         $PostUsers = $PostUser->findAllBy('post_id', $Post->id);
         $this->assertEqual(count($PostUsers), 1);
     }
-    
-    
-    function test_should_allow_same_model_habtm_associations()
+
+
+    public function test_should_allow_same_model_habtm_associations()
     {
         $this->installAndIncludeModels(array('Friend'=>'id,name'));
-        
+
         $Mary =& $this->Friend->create(array('name' => 'Mary'));
 
         $Mary->friend->add($this->Friend->create(array('name' => 'James')));
-        
+
         $Mary = $this->Friend->findFirstBy('name', 'Mary', array('include'=>'friends'));
-        
+
         $this->assertEqual($Mary->friends[0]->name, 'James');
     }
-    
-	function test_find_on_association_with_conditions_string_sql()
+
+    public function test_find_on_association_with_conditions_string_sql()
     {
-        if (AK_PHP5) {
-            $this->installAndIncludeModels(array('Friend'=>'id,name'));
-            $Mary =& $this->Friend->create(array('name' => 'Mary'));
-            $Mary->friend->add($this->Friend->create(array('name' => 'James')));
-            
-            
-            //$db =& new AkDbAdapter(array());  // no conection details, we're using a Mock
-            Mock::generate('ADOConnection');
-            $connection =& new MockADOConnection();
-            $result = new ADORecordSet_array(-1);
-            $result->InitArray(array(array('id'=>1,'name'=>'James')),array('id'=>'I','name'=>'C'));
-            $connection->setReturnValue('Execute',$result);
-            if ($Mary->_db->type()=='sqlite') {
-                 $connection->expectAt(0,'Execute',array('SELECT friends.* FROM friends LEFT OUTER JOIN friends_friends AS _FriendFriend ON _FriendFriend.related_id = friends.id LEFT OUTER JOIN friends AS _Friend ON _FriendFriend.friend_id = _Friend.id WHERE (friends.name = \'James\') AND (_FriendFriend.friend_id  LIKE  1) AND 1'));
-            } else {
-                $connection->expectAt(0,'Execute',array('SELECT friends.* FROM friends LEFT OUTER JOIN friends_friends AS _FriendFriend ON _FriendFriend.related_id = friends.id LEFT OUTER JOIN friends AS _Friend ON _FriendFriend.friend_id = _Friend.id WHERE (friends.name = \'James\') AND (_FriendFriend.friend_id  =  1)'));
-            }
-            $oldConnection = $Mary->_db->connection;
-            $Mary->_db->connection =& $connection;
-            //$Mary->_db = $db;
-            $Mary->friend->find(array('conditions'=>"name = 'James'"));
-            $Mary->_db->connection = $oldConnection;
+        $this->installAndIncludeModels(array('Friend'=>'id,name'));
+        $Mary =& $this->Friend->create(array('name' => 'Mary'));
+        $Mary->friend->add($this->Friend->create(array('name' => 'James')));
+
+
+        //$db = new AkDbAdapter(array());  // no conection details, we're using a Mock
+        Mock::generate('ADOConnection');
+        $connection = new MockADOConnection();
+        $result = new ADORecordSet_array(-1);
+        $result->InitArray(array(array('id'=>1,'name'=>'James')),array('id'=>'I','name'=>'C'));
+        $connection->setReturnValue('Execute',$result);
+        if ($Mary->_db->type()=='sqlite') {
+            $connection->expectAt(0,'Execute',array('SELECT friends.* FROM friends LEFT OUTER JOIN friends_friends AS _FriendFriend ON _FriendFriend.related_id = friends.id LEFT OUTER JOIN friends AS _Friend ON _FriendFriend.friend_id = _Friend.id WHERE (friends.name = \'James\') AND (_FriendFriend.friend_id  LIKE  1) AND 1'));
+        } else {
+            $connection->expectAt(0,'Execute',array('SELECT friends.* FROM friends LEFT OUTER JOIN friends_friends AS _FriendFriend ON _FriendFriend.related_id = friends.id LEFT OUTER JOIN friends AS _Friend ON _FriendFriend.friend_id = _Friend.id WHERE (friends.name = \'James\') AND (_FriendFriend.friend_id  =  1)'));
         }
+        $oldConnection = $Mary->_db->connection;
+        $Mary->_db->connection =& $connection;
+        //$Mary->_db = $db;
+        $Mary->friend->find(array('conditions'=>"name = 'James'"));
+        $Mary->_db->connection = $oldConnection;
     }
-    function test_find_on_association_with_conditions_string()
+    public function test_find_on_association_with_conditions_string()
     {
         $this->installAndIncludeModels(array('Friend'=>'id,name'));
         $Mary =& $this->Friend->create(array('name' => 'Mary'));
@@ -515,35 +513,33 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
         $James = $result[0];
         $this->assertEqual($Mary->friends[0]->name, $James->name);
     }
-    
-    function test_find_on_association_with_conditions_array_sql()
+
+    public function test_find_on_association_with_conditions_array_sql()
     {
-        if (AK_PHP5) {
-            $this->installAndIncludeModels(array('Friend'=>'id,name'));
-            $Mary =& $this->Friend->create(array('name' => 'Mary'));
-            $Mary->friend->add($this->Friend->create(array('name' => 'James')));
-            
-            
-            //$db =& new AkDbAdapter(array());  // no conection details, we're using a Mock
-            Mock::generate('ADOConnection');
-            $connection =& new MockADOConnection();
-            $result = new ADORecordSet_array(-1);
-            $result->InitArray(array(array('id'=>1,'name'=>'James')),array('id'=>'I','name'=>'C'));
-            $connection->setReturnValue('Execute',$result);
-            if ($Mary->_db->type()=='sqlite') {
-                $connection->expectAt(0,'Execute',array('SELECT friends.* FROM friends LEFT OUTER JOIN friends_friends AS _FriendFriend ON _FriendFriend.related_id = friends.id LEFT OUTER JOIN friends AS _Friend ON _FriendFriend.friend_id = _Friend.id WHERE (friends.name = ?) AND (_FriendFriend.friend_id  LIKE  1) AND 1', array('James')));
-            
-            } else {
-                $connection->expectAt(0,'Execute',array('SELECT friends.* FROM friends LEFT OUTER JOIN friends_friends AS _FriendFriend ON _FriendFriend.related_id = friends.id LEFT OUTER JOIN friends AS _Friend ON _FriendFriend.friend_id = _Friend.id WHERE (friends.name = ?) AND (_FriendFriend.friend_id  =  1)', array('James')));
-            }
-            $oldConnection = $Mary->_db->connection;
-            $Mary->_db->connection =& $connection;
-            //$Mary->_db = $db;
-            $Mary->friend->find(array('conditions'=>array('name = ?','James')));
-            $Mary->_db->connection = $oldConnection;
+        $this->installAndIncludeModels(array('Friend'=>'id,name'));
+        $Mary =& $this->Friend->create(array('name' => 'Mary'));
+        $Mary->friend->add($this->Friend->create(array('name' => 'James')));
+
+
+        //$db = new AkDbAdapter(array());  // no conection details, we're using a Mock
+        Mock::generate('ADOConnection');
+        $connection = new MockADOConnection();
+        $result = new ADORecordSet_array(-1);
+        $result->InitArray(array(array('id'=>1,'name'=>'James')),array('id'=>'I','name'=>'C'));
+        $connection->setReturnValue('Execute',$result);
+        if ($Mary->_db->type()=='sqlite') {
+            $connection->expectAt(0,'Execute',array('SELECT friends.* FROM friends LEFT OUTER JOIN friends_friends AS _FriendFriend ON _FriendFriend.related_id = friends.id LEFT OUTER JOIN friends AS _Friend ON _FriendFriend.friend_id = _Friend.id WHERE (friends.name = ?) AND (_FriendFriend.friend_id  LIKE  1) AND 1', array('James')));
+
+        } else {
+            $connection->expectAt(0,'Execute',array('SELECT friends.* FROM friends LEFT OUTER JOIN friends_friends AS _FriendFriend ON _FriendFriend.related_id = friends.id LEFT OUTER JOIN friends AS _Friend ON _FriendFriend.friend_id = _Friend.id WHERE (friends.name = ?) AND (_FriendFriend.friend_id  =  1)', array('James')));
         }
+        $oldConnection = $Mary->_db->connection;
+        $Mary->_db->connection =& $connection;
+        //$Mary->_db = $db;
+        $Mary->friend->find(array('conditions'=>array('name = ?','James')));
+        $Mary->_db->connection = $oldConnection;
     }
-    function test_find_on_association_with_conditions_array()
+    public function test_find_on_association_with_conditions_array()
     {
         $this->installAndIncludeModels(array('Friend'=>'id,name'));
         $Mary =& $this->Friend->create(array('name' => 'Mary'));

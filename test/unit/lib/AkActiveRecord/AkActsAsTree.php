@@ -7,25 +7,25 @@ if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
     define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
 }
 
-class test_AkActiveRecord_actAsTree extends  AkUnitTest 
+class test_AkActiveRecord_actAsTree extends  AkUnitTest
 {
 
-    function test_start()
+    public function test_start()
     {
         $this->installAndIncludeModels(array(
-            'Category'=>'id, parent_id, description, department string(25)'
-            ));
-        Ak::import('DependentCategory');        
+        'Category'=>'id, parent_id, description, department string(25)'
+        ));
+        Ak::import('DependentCategory');
     }
 
-    function Test_of_actsAsTree_instatiation()
+    public function Test_of_actsAsTree_instatiation()
     {
-        $Categories =& new Category();
+        $Categories = new Category();
         $this->assertEqual($Categories->actsLike(), 'active record,tree');
 
         $this->assertEqual($Categories->tree->_parent_column_name,'parent_id');
 
-        $Categories =& new Category();
+        $Categories = new Category();
 
         $this->assertErrorPattern('/columns are required/',$Categories->actsAs('tree', array('parent_column'=>'not_available')));
 
@@ -33,9 +33,9 @@ class test_AkActiveRecord_actAsTree extends  AkUnitTest
 
     }
 
-    function Test_of_Test_of_init()
+    public function Test_of_Test_of_init()
     {
-        $Categories =& new Category();
+        $Categories = new Category();
         $Categories->tree->init(array('scope'=> 'category_id = ? AND completed = 0','custom_attribute'=>'This is not allowed here'));
 
         $this->assertEqual($Categories->tree->getScopeCondition(), 'category_id = null AND completed = 0');
@@ -43,31 +43,31 @@ class test_AkActiveRecord_actAsTree extends  AkUnitTest
     }
 
 
-    function Test_of__ensureIsActiveRecordInstance()
+    public function Test_of__ensureIsActiveRecordInstance()
     {
-        $Categories =& new Category();
-        $Object =& new AkObject();
-        $this->assertErrorPattern('/is not an active record/',$Categories->tree->_ensureIsActiveRecordInstance(&$Object));
+        $Categories = new Category();
+        $Object = new AkObject();
+        $this->assertErrorPattern('/is not an active record/',$Categories->tree->_ensureIsActiveRecordInstance($Object));
     }
 
-    function Test_of_getType()
+    public function Test_of_getType()
     {
-        $Categories =& new Category();
+        $Categories = new Category();
         $this->assertEqual($Categories->tree->getType(), 'tree');
     }
 
 
-    function Test_of_getScopeCondition_and_setScopeCondition()
+    public function Test_of_getScopeCondition_and_setScopeCondition()
     {
-        $Categories =& new Category();
+        $Categories = new Category();
         $this->assertEqual($Categories->tree->getScopeCondition(), ($Categories->_db->type() == 'postgre') ? 'true' : '1');
         $Categories->tree->setScopeCondition('true');
         $this->assertEqual($Categories->tree->getScopeCondition(), 'true');
     }
 
-    function Test_of_getters_and_setters()
+    public function Test_of_getters_and_setters()
     {
-        $Categories =& new Category();
+        $Categories = new Category();
 
         $Categories->tree->setParentColumnName('column_name');
         $this->assertEqual($Categories->tree->getParentColumnName(), 'column_name');
@@ -78,12 +78,12 @@ class test_AkActiveRecord_actAsTree extends  AkUnitTest
         $this->assertFalse($Categories->tree->getDependent());
     }
 
-    function Test_of_hasChildren_and_hasParent()
+    public function Test_of_hasChildren_and_hasParent()
     {
-        $CategoryA =& new Category();
+        $CategoryA = new Category();
         $CategoryA->description = "Cat A";
 
-        $CategoryAa =& new Category();
+        $CategoryAa = new Category();
         $CategoryAa->description = "Cat Aa";
 
         $this->assertFalse($CategoryA->tree->hasChildren());
@@ -100,15 +100,15 @@ class test_AkActiveRecord_actAsTree extends  AkUnitTest
     }
 
 
-    function Test_of_addChild_and_children()
+    public function Test_of_addChild_and_children()
     {
-        $CategoryA =& new Category();
+        $CategoryA = new Category();
         $CategoryA->description = "Cat A";
 
-        $CategoryAa =& new Category();
+        $CategoryAa = new Category();
         $CategoryAa->description = "Cat Aa";
 
-        $CategoryAb =& new Category();
+        $CategoryAb = new Category();
         $CategoryAb->description = "Cat Ab";
 
         $CategoryA->tree->addChild($CategoryAa);
@@ -121,18 +121,18 @@ class test_AkActiveRecord_actAsTree extends  AkUnitTest
         $this->assertErrorPattern('/Cannot add myself as a child to myself/', $CategoryA->tree->addChild($CategoryA));
     }
 
-    function Test_of_childrenCount()
+    public function Test_of_childrenCount()
     {
-        $CategoryA =& new Category();
+        $CategoryA = new Category();
         $CategoryA->description = "Cat A";
 
-        $CategoryB =& new Category();
+        $CategoryB = new Category();
         $CategoryB->description = "Cat B";
 
-        $CategoryAa =& new Category();
+        $CategoryAa = new Category();
         $CategoryAa->description = "Cat Aa";
 
-        $CategoryAb =& new Category();
+        $CategoryAb = new Category();
         $CategoryAb->description = "Cat Ab";
 
         $CategoryA->tree->addChild($CategoryAa);
@@ -144,15 +144,15 @@ class test_AkActiveRecord_actAsTree extends  AkUnitTest
         $this->assertEqual(0, $CategoryAb->tree->childrenCount());
     }
 
-    function Test_of_parent()
+    public function Test_of_parent()
     {
-        $CategoryA =& new Category();
+        $CategoryA = new Category();
         $CategoryA->description = "Cat A";
 
-        $CategoryAa =& new Category();
+        $CategoryAa = new Category();
         $CategoryAa->description = "Cat Aa";
 
-        $CategoryAb =& new Category();
+        $CategoryAb = new Category();
         $CategoryAb->description = "Cat Ab";
 
         $CategoryA->tree->addChild($CategoryAa);
@@ -164,18 +164,18 @@ class test_AkActiveRecord_actAsTree extends  AkUnitTest
         $this->assertEqual($CategoryA->getId(), $catAbParent->getId());
     }
 
-    function Test_of_beforeDestroy()
+    public function Test_of_beforeDestroy()
     {
-        $CategoryA =& new DependentCategory();
+        $CategoryA = new DependentCategory();
         $CategoryA->description = "Cat A";
 
-        $CategoryB =& new Category();
+        $CategoryB = new Category();
         $CategoryB->description = "Cat B";
 
-        $CategoryAa =& new DependentCategory();
+        $CategoryAa = new DependentCategory();
         $CategoryAa->description = "Cat Aa";
 
-        $CategoryBa =& new Category();
+        $CategoryBa = new Category();
         $CategoryBa->description = "Cat Ba";
 
         $CategoryA->tree->addChild($CategoryAa);

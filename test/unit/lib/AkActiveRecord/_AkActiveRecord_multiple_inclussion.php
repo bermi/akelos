@@ -7,26 +7,26 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
 {
-    function test_start()
+    public function test_start()
     {
         $this->installAndIncludeModels(array('File', 'Tag','Tagging'));
     }
 
 
-    function test_for_multiple_inclussion()
+    public function test_for_multiple_inclussion()
     {
-        $AkelosLogFile =& new File(array('name'=>'akelos.log'));
+        $AkelosLogFile = new File(array('name'=>'akelos.log'));
         $this->assertTrue($AkelosLogFile->save());
 
         $LogTag =& $AkelosLogFile->tag->create(array('name'=>'logs'));
 
-        $KasteLogFile =& new File(array('name'=>'kaste.log'));
+        $KasteLogFile = new File(array('name'=>'kaste.log'));
         $this->assertTrue($KasteLogFile->save());
 
         $KasteLogFile->tag->add($LogTag);
 
 
-        $BermiLogFile =& new File(array('name'=>'bermi.log'));
+        $BermiLogFile = new File(array('name'=>'bermi.log'));
         $this->assertTrue($BermiLogFile->save());
 
         $BermiLogFile->tag->add($LogTag);
@@ -34,7 +34,7 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
 
         $ids = array($AkelosLogFile->getId(), $KasteLogFile->getId(), $BermiLogFile->getId());
 
-        $File =& new File();
+        $File = new File();
         $Files =& $File->find($ids, array(
         'include'=>array('tags', 'taggings')
         ));
@@ -47,8 +47,8 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
                 $this->assertEqual($Tagging->tag_id, $LogTag->id);
             }
         }
-        
-        $File =& new File();
+
+        $File = new File();
         $this->assertTrue($Files =& $File->find($ids, array(
         'conditions'=>"name = 'kaste.log'"
         )));
@@ -57,7 +57,7 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
         /**
          * @todo Implement eager loading for second-level associations
          */
-        $File =& new File();
+        $File = new File();
         $Files =& $File->find('all', array(
         'include'=>array('taggings')
         ));
@@ -89,7 +89,7 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
             }
         }
 
-        $File =& new File();
+        $File = new File();
         $Files =& $File->find('all', array('include'=>array('tags')));
 
         $tag_ids = array();
@@ -99,7 +99,7 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
             }
         }
 
-        $Tag =& new Tag();
+        $Tag = new Tag();
         $Tags =& $Tag->find($tag_ids, array('include'=>'taggings'));
 
         foreach (array_keys($Files) as $k){
@@ -111,7 +111,7 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
                 }
             }
         }
-        
+
     }
 }
 

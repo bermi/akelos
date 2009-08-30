@@ -9,36 +9,36 @@ class test_AkHasMany_Specs_TestCase extends AkUnitTest
      * @hasMany    pictures, :dependent => 'destroy'
      * @var ActiveRecord
      */
-    var $Property;
-    
+    public $Property;
+
     /**
      * @belongsTo  property
      * @var ActiveRecord
      */
-    var $Picture;
-    function setUp()
+    public $Picture;
+    public function setUp()
     {
         $this->installAndIncludeModels(array('Property','Picture'));
     }
-    
-    function test_deletion_from_collection_should_destroy_the_active_record()
+
+    public function test_deletion_from_collection_should_destroy_the_active_record()
     {
-        $Property =& new Property(array('description'=>'This is a Property'));
+        $Property = new Property(array('description'=>'This is a Property'));
         $Picture =& $Property->picture->create(array('title'=>'Front'));
         $this->assertTrue($Property->save());
 
-        $this->assertTrue(is_a($Picture, 'AkActiveRecord'));        
-        
+        $this->assertTrue(is_a($Picture, 'AkActiveRecord'));
+
         $Property->picture->delete($Picture);
-        
+
         $StoredProperty = $this->Property->find('first');
         $this->assertEqual($Property->getId(), $StoredProperty->getId());
         $this->assertFalse($this->Picture->find('first'));
     }
-    
-    function test_destroying_should_cascade()
+
+    public function test_destroying_should_cascade()
     {
-        $Property =& new Property(array('description'=>'This is a Property'));
+        $Property = new Property(array('description'=>'This is a Property'));
         $Picture =& $Property->picture->create(array('title'=>'Front'));
 
         $Property->destroy();

@@ -10,16 +10,6 @@ DirectoryIndex index.php
    php_value session.name           "AK_SESSID"
 </IfModule>
 
-<IfModule mod_php4.c>
-   php_value register_globals        0
-   php_value magic_quotes_gpc        0
-   php_value magic_quotes_runtime    0
-   php_value magic_quotes_sybase     0
-   php_value arg_separator.output    "&amp;"
-   php_value default_charset    "utf-8"
-   php_value session.name           "AK_SESSID"
-</IfModule>
-
 # On some servers this directive might be needed
 # Options +FollowSymLinks
   

@@ -7,12 +7,12 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class test_AkActiveRecord_findOrCreateBy extends  AkUnitTest
 {
-    function test_start()
+    public function test_start()
     {
         $this->installAndIncludeModels(array('Account'));
     }
 
-    function test_should_create_new_users()
+    public function test_should_create_new_users()
     {
         $Account = new Account();
         $Bermi =& $Account->findOrCreateBy('username', 'Bermi');
@@ -35,7 +35,7 @@ class test_AkActiveRecord_findOrCreateBy extends  AkUnitTest
         $this->assertEqual($SavedAlicia->getId(), $Alicia->getId());
     }
 
-    function test_should_return_existing_record()
+    public function test_should_return_existing_record()
     {
         $Account = new Account();
         $Alicia =& $Account->findFirstBy('username', 'Alicia');

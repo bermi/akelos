@@ -10,28 +10,28 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
 class test_AkActiveRecord_validators extends  AkUnitTest
 {
 
-    function test_start()
+    public function test_start()
     {
         $this->installAndIncludeModels(
-            array('TestPerson'=>
-               'id, 
-                user_name string(32), 
-                first_name string(200), 
-                last_name string(200), 
-                city string(40), 
-                state string(40), 
-                email string(150), 
-                country string(2), 
-                age int, 
-                password string(32), 
-                tos boolean, 
-                score int' 
-            ));
-        
-        $this->installAndIncludeModels(array('Picture', 'Landlord'));
+        array('TestPerson'=>
+        'id,
+                user_name string(32),
+                first_name string(200),
+                last_name string(200),
+                city string(40),
+                state string(40),
+                email string(150),
+                country string(2),
+                age int,
+                password string(32),
+                tos boolean,
+                score int'
+                ));
+
+                $this->installAndIncludeModels(array('Picture', 'Landlord'));
     }
 
-    function Test_of_isBlank()
+    public function Test_of_isBlank()
     {
         $Person = new TestPerson();
         $this->assertTrue($Person->isBlank());
@@ -42,7 +42,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertFalse($Person->isBlank(0));
     }
 
-    function Test_of_addError()
+    public function Test_of_addError()
     {
         $Person = new TestPerson();
         $Person->addError('user_name');
@@ -55,7 +55,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertTrue(count($Person->_errors['user_name']) == 2);
     }
 
-    function Test_of_clearErrors()
+    public function Test_of_clearErrors()
     {
         $Person = new TestPerson();
         $Person->addError('user_name');
@@ -65,7 +65,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertTrue(count($Person->_errors) == 0);
     }
 
-    function Test_of_hasErrors()
+    public function Test_of_hasErrors()
     {
         $Person = new TestPerson();
         $this->assertFalse($Person->hasErrors());
@@ -73,7 +73,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertTrue($Person->hasErrors());
     }
 
-    function Test_of_getErrorsOn()
+    public function Test_of_getErrorsOn()
     {
         $Person = new TestPerson();
         $this->assertFalse($Person->getErrorsOn('user_name'));
@@ -83,7 +83,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertEqual($Person->getErrorsOn('user_name'),array($Person->_defaultErrorMessages['invalid'],'not nice'));
     }
 
-    function Test_of_countErrors()
+    public function Test_of_countErrors()
     {
         $Person = new TestPerson();
         $this->assertEqual($Person->countErrors(), 0);
@@ -95,7 +95,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertEqual($Person->countErrors(), 3);
     }
 
-    function Test_of_isInvalid()
+    public function Test_of_isInvalid()
     {
         $Person = new TestPerson();
         $this->assertFalse($Person->isInvalid('user_name'));
@@ -103,7 +103,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertTrue($Person->isInvalid('user_name'));
     }
 
-    function Test_of_getErrors()
+    public function Test_of_getErrors()
     {
         $Person = new TestPerson();
         $this->assertTrue(is_array($Person->getErrors()));
@@ -122,7 +122,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertEqual($Person->getErrors(), $expected);
     }
 
-    function Test_of_getFullErrorMessages()
+    public function Test_of_getFullErrorMessages()
     {
         $Person = new TestPerson();
         $this->assertTrue(is_array($Person->getFullErrorMessages()));
@@ -142,7 +142,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
     }
 
 
-    function Test_of_addErrorOnEmpty()
+    public function Test_of_addErrorOnEmpty()
     {
         $Person = new TestPerson();
         $Person->addErrorOnEmpty('user_name');
@@ -154,7 +154,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertEqual($Person->getErrors(), $expected);
     }
 
-    function Test_of_addErrorOnBlank()
+    public function Test_of_addErrorOnBlank()
     {
         $Person = new TestPerson();
         $Person->addErrorOnBlank('user_name');
@@ -166,7 +166,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertEqual($Person->getErrors(), $expected);
     }
 
-    function Test_of_addErrorOnBoundaryBreaking()
+    public function Test_of_addErrorOnBoundaryBreaking()
     {
         $Person = new TestPerson();
         $Person->set('age',17);
@@ -190,12 +190,12 @@ class test_AkActiveRecord_validators extends  AkUnitTest
     }
 
 
-    function Test_of_addErrorOnBoundryBreaking()
+    public function Test_of_addErrorOnBoundryBreaking()
     {
         //this is an alias of addErrorOnBoundaryBreaking
     }
 
-    function Test_of_addErrorToBase()
+    public function Test_of_addErrorToBase()
     {
         $Person = new TestPerson();
         $Person->addErrorToBase('Nothing has changed');
@@ -206,7 +206,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertEqual($Person->getErrors(), $expected);
     }
 
-    function Test_of_getBaseErrors()
+    public function Test_of_getBaseErrors()
     {
         $Person = new TestPerson();
         $this->assertEqual($Person->getBaseErrors(), array());
@@ -220,7 +220,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
 
 
-    function Test_of_errorsToString()
+    public function Test_of_errorsToString()
     {
         $Person = new TestPerson();
         $Person->addErrorOnBlank('user_name');
@@ -230,7 +230,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
     }
 
 
-    function Test_of_validatesConfirmationOf()
+    public function Test_of_validatesConfirmationOf()
     {
         $Person = new TestPerson();
         $Person->validatesConfirmationOf('user_name');
@@ -257,7 +257,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
     }
 
 
-    function Test_of_validatesAcceptanceOf()
+    public function Test_of_validatesAcceptanceOf()
     {
         $Person = new TestPerson();
         $Person->validatesAcceptanceOf('tos');
@@ -272,7 +272,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
     }
 
 
-    function Test_of_validatesPresenceOf()
+    public function Test_of_validatesPresenceOf()
     {
         $Person = new TestPerson();
         $Person->validatesPresenceOf('user_name');
@@ -288,7 +288,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
 
 
-    function Test_of_validatesLengthOf()
+    public function Test_of_validatesLengthOf()
     {
         $Person = new TestPerson();
 
@@ -373,12 +373,12 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
     }
 
-    function Test_of_validatesSizeOf()
+    public function Test_of_validatesSizeOf()
     {
         //alias for validatesLengthOf
     }
 
-    function Test_of_validatesUniquenessOf()
+    public function Test_of_validatesUniquenessOf()
     {
         $Person = new TestPerson('user_name->','bermi','first_name->','Bermi','last_name->','Ferrer','country->','ES','tos->',1);
         $this->assertTrue($Person->save());
@@ -407,7 +407,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
     }
 
-    function Test_of_validatesUniquenessOfUsingMultipleScopes()
+    public function Test_of_validatesUniquenessOfUsingMultipleScopes()
     {
         $Person = new TestPerson('user_name->','admin','first_name->','Sam','last_name->','','country->','ES','tos->',1);
         $this->assertTrue($Person->save());
@@ -422,7 +422,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
     }
 
-    function Test_of_validatesUniquenessOfConditionally()
+    public function Test_of_validatesUniquenessOfConditionally()
     {
         $Person = new TestPerson('user_name->','james','first_name->','James','last_name->','','country->','ES','tos->',1);
         $this->assertTrue($Person->save());
@@ -440,7 +440,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
 
 
-    function Test_of_validatesFormatOf()
+    public function Test_of_validatesFormatOf()
     {
         $Person = new TestPerson();
         $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
@@ -554,7 +554,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
     }
 
-    function Test_of_validatesInclusionOf()
+    public function Test_of_validatesInclusionOf()
     {
         $Person = new TestPerson();
         $Person->validatesInclusionOf('gender', array('male', 'female'), "woah! what are you then!??!!");
@@ -607,7 +607,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
     }
 
 
-    function Test_of_validatesExclusionOf()
+    public function Test_of_validatesExclusionOf()
     {
         $Person = new TestPerson();
         $Person->validatesExclusionOf('gender', array('too much'), "don't lie");
@@ -644,7 +644,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertEqual($Person->getErrorsOn('age'),$Person->_defaultErrorMessages['exclusion']);
     }
 
-    function Test_of_validatesNumericalityOf()
+    public function Test_of_validatesNumericalityOf()
     {
         $Person = new TestPerson();
 
@@ -670,7 +670,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $Person->age = 18;
         $Person->validatesNumericalityOf('age');
         $this->assertFalse($Person->hasErrors());
-        
+
         $Person->clearErrors();
         $Person->age = '18';
         $Person->validatesNumericalityOf('age','not_valid',true);
@@ -687,7 +687,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertTrue($Person->hasErrors());
     }
 
-    function Test_of_validateOnCreate()
+    public function Test_of_validateOnCreate()
     {
         $Person = new TestPerson('user_name->','hilario','first_name->','Hilario','last_name->','Hervás','country->','ES','tos->',1);
         $Person->validateOnCreate();
@@ -699,7 +699,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertFalse($Person->save());
     }
 
-    function Test_of_validateOnUpdate()
+    public function Test_of_validateOnUpdate()
     {
         $Person = new TestPerson('email->','email@example.com');
         $Person->validateOnUpdate();
@@ -711,7 +711,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
     }
 
 
-    function Test_of_validate()
+    public function Test_of_validate()
     {
         $Person = new TestPerson('first_name->','Alicia');
         $Person->validate();
@@ -722,7 +722,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertEqual($Person->getErrorsOn('first_name'),$Person->_defaultErrorMessages['blank']);
     }
 
-    function Test_of_isValid()
+    public function Test_of_isValid()
     {
         $Person = new TestPerson('country->','ES');
         $this->assertFalse($Person->isValid());
@@ -736,16 +736,16 @@ class test_AkActiveRecord_validators extends  AkUnitTest
     }
 
 
-    function Test_of_validatesAssociated()
+    public function Test_of_validatesAssociated()
     {
-        $Picture =& new Picture('title->','Carlet');
-        
-        $Landlord =& new Landlord();
+        $Picture = new Picture('title->','Carlet');
+
+        $Landlord = new Landlord();
         $Landlord->test_validators = array('validatesPresenceOf'=>array('name'));
         $Picture->landlord->assign($Landlord);
 
         $Picture->validatesAssociated('landlord');
-        
+
         $this->assertEqual($Picture->getErrorsOn('landlord'),$Picture->_defaultErrorMessages['invalid']);
     }
 

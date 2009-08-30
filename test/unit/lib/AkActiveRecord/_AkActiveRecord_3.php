@@ -5,7 +5,7 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class test_AkActiveRecord_3 extends  AkUnitTest
 {
-    function _test_AkActiveRecord()  // dont reinstall, this test relies on _AkActiveRecord_1.php
+    public function _test_AkActiveRecord()  // dont reinstall, this test relies on _AkActiveRecord_1.php
     {
         $this->installAndIncludeModels(array(
         'AkTestUser'=>'id I AUTO KEY, user_name C(32), first_name C(200), last_name C(200), email C(150), country I, password C(32), created_at T, updated_at T, expires_on T',
@@ -14,13 +14,13 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         'AkTestField'=>'id I AUTO KEY,varchar_field C(255),longtext_field XL,text_field X,logblob_field B,date_field D,
                     datetime_field T,tinyint_field L(2),integer_field I,smallint_field I2,bigint_field I8,double_field F,
                     numeric_field N,bytea_field B,timestamp_field T,
-                    boolean_field boolean,int2_field I2,int4_field I4,int8_field I8,foat_field F,varchar4000_field X, 
+                    boolean_field boolean,int2_field I2,int4_field I4,int8_field I8,foat_field F,varchar4000_field X,
                     clob_field XL,nvarchar2000_field X2,blob_field B,nvarchar_field C2(255),
                     decimal1_field L(2),decimal3_field I1,decimal5_field I2,decimal10_field I4,decimal20_field I8,decimal_field N,
                     created_at T,updated_at T,expires_on T'));
     }
 
-    function Test_of_toggleAttributeAndSave()
+    public function Test_of_toggleAttributeAndSave()
     {
         $AkTestFields = new AkTestField();
 
@@ -51,7 +51,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
     }
 
 
-    function Test_of_delete()
+    public function Test_of_delete()
     {
         $AkTestFields = new AkTestField();
         $AkTestField = $AkTestFields->find(2, 3, 4, 5, 6);
@@ -64,7 +64,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $this->assertFalse($AkTestFields->find(2, 3, 4, 5, 6));
     }
 
-    function Test_of_deleteAll()
+    public function Test_of_deleteAll()
     {
         $AkTestFields = new AkTestField();
         $this->assertEqual(count($AkTestFields->findAll()), 5);
@@ -84,8 +84,8 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $this->assertFalse($AkTestFields->findAll());
     }
 
-    
-    function Test_of_destroy()
+
+    public function Test_of_destroy()
     {
         /**
         * @todo check persistance of destroyed objects
@@ -115,7 +115,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
 
     }
 
-    function Test_of_destroyAll()
+    public function Test_of_destroyAll()
     {
         $AkTestFields = new AkTestField();
 
@@ -131,8 +131,8 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $AkTestFields->destroyAll('');
         $this->assertFalse($AkTestFields->findAll());
     }
-    
-    function Test_of_deleteAll_with_binds()
+
+    public function Test_of_deleteAll_with_binds()
     {
         $AkTestFields = new AkTestField();
         $AkTestFields->transactionStart();
@@ -143,9 +143,9 @@ class test_AkActiveRecord_3 extends  AkUnitTest
 
         $this->assertEqual($AkTestFields->deleteAll(array("varchar_field LIKE ?",'new%')), 9);
 
-        
+
     }
-    function Test_of_transactions()
+    public function Test_of_transactions()
     {
         $AkTestUser = new AkTestUser();
         //$AkTestUser->_db->debug = true;
@@ -173,7 +173,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         //$AkTestUser->_db->debug = false;
     }
 
-    function Test_of_cloneRecord()
+    public function Test_of_cloneRecord()
     {
         $AkTestUser = new AkTestUser();
         $User = $AkTestUser->find('first');
@@ -187,7 +187,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
     }
 
 
-    function Test_of_find2()
+    public function Test_of_find2()
     {
 
         $Users = new AkTestUser('first_name=>','Tim','last_name->',"O'Reilly",'user_name->','tim_oreilly');
@@ -231,7 +231,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
 
     }
 
-    function Test_of_binary_data_on_database()
+    public function Test_of_binary_data_on_database()
     {
         $long_string = file_get_contents(AK_LIB_DIR.DS.'AkActiveRecord.php');
 
@@ -326,7 +326,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
 
     }
 
-    function Test_of_findBy()
+    public function Test_of_findBy()
     {
         $Users = new AkTestUser();
 
@@ -373,7 +373,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $this->assertEqual(count($AkTestField), 3);
     }
 
-    function Test_of_findAllBy()
+    public function Test_of_findAllBy()
     {
         $Users = new AkTestUser();
 
@@ -414,7 +414,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $this->assertEqual(count($AkTestField), 3);
     }
 
-    function Test_of_findFirstBy()
+    public function Test_of_findFirstBy()
     {
         $Users = new AkTestUser();
 
@@ -446,7 +446,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $this->assertEqual($AkTestField->varchar_field, '4 string');
     }
 
-    function Test_of_findLastBy()
+    public function Test_of_findLastBy()
     {
         $Users = new AkTestUser();
 
@@ -460,7 +460,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
 
     }
 
-    function Test_of_getInheritanceColumn()
+    public function Test_of_getInheritanceColumn()
     {
         $AkTestUser = new AkTestUser();
 
@@ -479,7 +479,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
 
 
 
-    function Test_of_setInheritanceColumn()
+    public function Test_of_setInheritanceColumn()
     {
         $AkTestUser = new AkTestUser();
 
@@ -489,7 +489,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
     }
 
 
-    function Test_of_typeCondition()
+    public function Test_of_typeCondition()
     {
         $AkTestMember = new AkTestMember();
         $AkTestMember->setInheritanceColumn('role');
@@ -497,7 +497,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $this->assertEqual($AkTestMember->typeCondition(),"( ak_test_members.role = 'Ak test member' ) ");
     }
 
-    function Test_of_addConditions()
+    public function Test_of_addConditions()
     {
         $AkTestUser = new AkTestUser();
         $sql = 'SELECT * FROM ak_test_users';
@@ -515,7 +515,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $this->assertEqual($sql,$copy." WHERE ( ak_test_members.role = 'Ak test member' )  AND (".$conditions.")");
     }
 
-    function Test_of_resetColumnInformation()
+    public function Test_of_resetColumnInformation()
     {
         $AkTestUser = new AkTestUser();
         $AkTestUser->getColumns(); // Loads settings
@@ -525,7 +525,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
 
 
 
-    function Test_of_freeze_and_isFrozen()
+    public function Test_of_freeze_and_isFrozen()
     {
         $AkTestMember = new AkTestMember();
         $this->assertFalse($AkTestMember->isFrozen());
@@ -534,7 +534,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
     }
 
 
-    function Test_of_count()
+    public function Test_of_count()
     {
         $AkTestUser = new AkTestUser();
         $this->assertEqual($AkTestUser->count(), count($AkTestUser->find()));
@@ -542,7 +542,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $this->assertEqual($AkTestUser->count("first_name = 'Tim'"), count($AkTestUser->findAll("first_name = 'Tim'")));
     }
 
-    function Test_of_countBySql()
+    public function Test_of_countBySql()
     {
         $AkTestUser = new AkTestUser();
         $this->assertEqual($AkTestUser->countBySql("SELECT COUNT(*) FROM ak_test_users"), count($AkTestUser->find()));

@@ -94,11 +94,7 @@ class test_of_Ak_object_inspection extends  UnitTestCase
 
     function Test_get_this_object_methods()
     {
-        if(AK_PHP5){
-            $expected_methods = array('AkTestingObjectInspectionChild','child_function','child_method');
-        }else {
-            $expected_methods = array('aktestingobjectinspectionchild','child_function','child_method');
-        }
+        $expected_methods = array('AkTestingObjectInspectionChild','child_function','child_method');
         $resulting_methods = Ak::get_this_object_methods($this->AkTestingObjectInspectionChildInstance);
         $this->assertEqual($expected_methods,$resulting_methods);
     }

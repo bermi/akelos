@@ -143,13 +143,11 @@ class Test_of_AkImage extends  AkUnitTest
         $Image->load($this->photo_path);
         $Image->transform('watermark',array('mark'=>$this->watermark));
         $Image->save($this->photo_path.'_watermarked.jpg');
-        $this->assertEqual(md5_file($this->photo_path.'_watermarked.jpg'), (AK_PHP5?'234adf4a48224f8596e53d665bf41768':'40d25943550a1dd88fb0e2cab560b421'));
+        $this->assertEqual(md5_file($this->photo_path.'_watermarked.jpg'), '234adf4a48224f8596e53d665bf41768');
     }
 
     function test_should_apply_native_filters()
     {
-        if(!AK_PHP5) return;
-
         $native_filters = array(
         'negate' =>         array('params' => array(), 'hash' => '8b44f26c9646ac69a1b48bbc66622184'),
         'grayscale' =>      array('params' => array(), 'hash' => 'd08a0ad61f4fd5b343c0a4af6d810ddf'),

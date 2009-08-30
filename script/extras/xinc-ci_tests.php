@@ -51,7 +51,7 @@ class CI_Tests
     function parseArgs($args)
     {
         array_shift($args);
-        
+
         while (count($args) > 0){
             $arg = array_shift($args);
             $arg = strtolower($arg);
@@ -270,25 +270,25 @@ class CI_Tests
         echo <<<BANNER
 Usage:
 
-ci_tests [php4|php5] [mysql|postgres|sqlite] [-b] [test-files]
+ci_tests php5 [mysql|postgres|sqlite] [-b] [test-files]
    -b   break on first error
    -t   test-mode, don't run the commands actually
    -n x repeat tests x times
    -?   this help
 
 Examples:
-> ci_tests 
+> ci_tests
 run all unit tests in any combination.
 
 > ci_tests php5 postgres mysql AkHasMany AkBelongsTo
 run AkHasMany and AkBelongsTo on PHP5 using the postgres and mysql-db.
 
 Setup:
-1.  Copy DEFAULT-ci-config.yaml to config/ci-config.yaml and set it up  
+1.  Copy DEFAULT-ci-config.yaml to config/ci-config.yaml and set it up
 
 2.  Copy config/config.php to config/mysql-testing.php, config/postgres-testing.php [...] and modify the database settings at least for the testing environment. You can configure the filename for these config-files in the script directly if you must.
 
-3.  Expects to be run from inside the test folder structure. So to speak your current directory must be */test or a subdir. The script itself can be placed whereever you want. You can define a (shell-)macro and quickly swap between different installations and test again. ;-) 
+3.  Expects to be run from inside the test folder structure. So to speak your current directory must be */test or a subdir. The script itself can be placed whereever you want. You can define a (shell-)macro and quickly swap between different installations and test again. ;-)
 
 This script backups config/config.php to config-backup.php (and restores it after run).
 
