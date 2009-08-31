@@ -18,7 +18,7 @@
 
 class AkHtmlToMarkdown
 {
-    function convert()
+    public function convert()
     {
         require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'html2text.php');
         $Converter = new html2text(true, 0, false);

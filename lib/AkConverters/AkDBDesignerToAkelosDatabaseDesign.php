@@ -17,13 +17,13 @@
  */
 class AkDBDesignerToAkelosDatabaseDesign
 {
-    var $_parser;
-    var $_stack = array();
-    var $_errors = array();
-    var $db_schema = array();
-    var $current_table;
+    public $_parser;
+    public $_stack = array();
+    public $_errors = array();
+    public $db_schema = array();
+    public $current_table;
 
-    function AkDBDesignerToAkelosDatabaseDesign()
+    public function AkDBDesignerToAkelosDatabaseDesign()
     {
         $this->_parser = xml_parser_create();
         xml_set_object($this->_parser, &$this);
@@ -32,32 +32,32 @@ class AkDBDesignerToAkelosDatabaseDesign
     }
 
 
-    function addError($error)
+    public function addError($error)
     {
         $this->_errors[] = $error.' on line '.$this->getCurrentLine();
     }
 
-    function getCurrentLine()
+    public function getCurrentLine()
     {
         return xml_get_current_line_number($this->_parser) + $this->_startLine;
     }
 
-    function hasErrors(&$xhtml)
+    public function hasErrors(&$xhtml)
     {
         return count($this->getErrors()) > 0;
     }
 
-    function getErrors()
+    public function getErrors()
     {
         return array_unique($this->_errors);
     }
 
-    function showErrors()
+    public function showErrors()
     {
         echo '<ul><li>'.join("</li>\n<li>", $this->getErrors()).'</li></ul>';
     }
 
-    function convert()
+    public function convert()
     {
         if (!xml_parse($this->_parser, $this->source)) {
             $this->addError(Ak::t('DBDesigner file is not well-formed.').' '.xml_error_string(xml_get_error_code($this->_parser)));
@@ -71,7 +71,7 @@ class AkDBDesignerToAkelosDatabaseDesign
     }
 
 
-    function tagOpen($parser, $tag, $attributes)
+    public function tagOpen($parser, $tag, $attributes)
     {
         if(!empty($attributes['Tablename'])){
             $this->current_table = $attributes['Tablename'];
@@ -88,7 +88,7 @@ class AkDBDesignerToAkelosDatabaseDesign
         }
     }
 
-    function getDataType($type)
+    public function getDataType($type)
     {
         (int)$type = $type;
         $dbdesigner_data_types = array(
@@ -132,7 +132,7 @@ class AkDBDesignerToAkelosDatabaseDesign
 
     }
 
-    function tagClose($parser, $tag)
+    public function tagClose($parser, $tag)
     {
     }
 }

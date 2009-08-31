@@ -18,9 +18,9 @@
 
 class AkMsWordToMany
 {
-    var $_file_type_codes = array('doc' => 0,'dot' => 1,'txt'=>2,'rtf'=>6,'unicode'=>7,'htm'=>8,'html'=>8,'asc'=>9,'wri'=>13,'wp.doc'=>24,'wps'=>28);
+    public $_file_type_codes = array('doc' => 0,'dot' => 1,'txt'=>2,'rtf'=>6,'unicode'=>7,'htm'=>8,'html'=>8,'asc'=>9,'wri'=>13,'wp.doc'=>24,'wps'=>28);
 
-    function convert()
+    public function convert()
     {
         $word = new COM('word.application') or die('Unable to instantiate Word');
         $word->Visible = false;
@@ -37,7 +37,7 @@ class AkMsWordToMany
         return $result;
     }
 
-    function init()
+    public function init()
     {
         $this->ext = empty($this->ext) ? 'doc' : strtolower(trim($this->ext,'.'));
         $this->tmp_name = Ak::randomString();

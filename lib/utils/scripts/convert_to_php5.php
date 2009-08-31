@@ -3,6 +3,7 @@
 array_shift($argv);
 $options = $argv;
 
+$promt = true;
 $arg_options = array(
 'output_without_writing_files' => 'o',
 'silent' => 's',
@@ -15,7 +16,7 @@ foreach ($arg_options as $var_name => $key){
         unset($argv[array_search('-'.$key, $argv)]);
         $$var_name = true;
     }else{
-        $$var_name = false;
+        $$var_name = isset($$var_name) ? $$var_name : false;
     }
 }
 

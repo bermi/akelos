@@ -18,7 +18,7 @@
 
 class AkHtmlToSmartypants
 {
-    function convert()
+    public function convert()
     {
         require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'smartypants.php');
         $Smartypants = new SmartyPantsTypographer_Parser();

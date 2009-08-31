@@ -18,7 +18,7 @@
 
 class AkIntegerToString
 {
-    function convert()
+    public function convert()
     {
         return "".$this->source."";
     }

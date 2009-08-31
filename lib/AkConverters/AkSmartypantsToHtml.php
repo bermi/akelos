@@ -18,7 +18,7 @@
 
 class AkSmartypantsToHtml
 {
-    function convert()
+    public function convert()
     {
         return $this->source;
     }

@@ -18,7 +18,7 @@
 
 class AkXdocToText
 {
-    function convert()
+    public function convert()
     {
         $xdoc2txt_bin = AK_VENDOR_DIR.DS.'hyperestraier'.DS.'xdoc2txt.exe';
         
@@ -40,7 +40,7 @@ class AkXdocToText
         return $result;
     }
 
-    function init()
+    public function init()
     {
         $this->ext = empty($this->ext) ? 'doc' : strtolower(trim($this->ext,'.'));
         $this->tmp_name = Ak::randomString();

@@ -18,9 +18,9 @@
 
 class AkMsExcelToMany
 {
-    var $_file_type_codes = array('csv' => 6,'msdos' => 21,'xls'=>-4143,'rtf'=>6,'unicode'=>7,'doc'=>0,'html'=>8,'txt'=>4);
+    public $_file_type_codes = array('csv' => 6,'msdos' => 21,'xls'=>-4143,'rtf'=>6,'unicode'=>7,'doc'=>0,'html'=>8,'txt'=>4);
 
-    function convert()
+    public function convert()
     {
         $excel = new COM('excel.application') or die('Unable to instantiate Excel');
         $excel->Visible = false;
@@ -36,7 +36,7 @@ class AkMsExcelToMany
         return $result;
     }
 
-    function init()
+    public function init()
     {
         $this->ext = empty($this->ext) ? 'xls' : strtolower(trim($this->ext,'.'));
         $this->tmp_name = Ak::randomString();

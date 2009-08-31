@@ -17,11 +17,11 @@
  */
 class AkHtmlToRtf
 {
-    var $font_face = 0;
-    var $font_size = 24;
+    public $font_face = 0;
+    public $font_size = 24;
 
     // Convert special characters to ASCII
-    function escapeCharacter($character)
+    public function escapeCharacter($character)
     {
         $escaped = '';
         if(ord($character) >= 0x00 && ord($character) < 0x20){
@@ -47,7 +47,7 @@ class AkHtmlToRtf
         return $escaped;
     }
 
-    function specialCharacters($text)
+    public function specialCharacters($text)
     {
         $text_buffer = '';
         for($i = 0; $i < strlen($text); $i++){
@@ -56,7 +56,7 @@ class AkHtmlToRtf
         return $text_buffer;
     }
 
-    function convert()
+    public function convert()
     {
         $this->source = str_replace(
         array('<ul>','<UL>','<ol>','<OL>','</ul>','</UL>','</ol>','</OL>'),

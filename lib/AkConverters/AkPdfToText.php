@@ -20,7 +20,7 @@
 class AkPdfToText
 {
 
-    function extractTextFromPdf($postScriptData)
+    public function extractTextFromPdf($postScriptData)
     {
         if (!is_string($postScriptData)) {
             return '';
@@ -69,7 +69,7 @@ class AkPdfToText
 
     }
 
-    function convert()
+    public function convert()
     {
         $searchstart = 'stream';
         $searchend = 'endstream';

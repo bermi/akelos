@@ -18,7 +18,7 @@
 
 class AkExcelToArray
 {
-    function convert()
+    public function convert()
     {
         $this->handler->read($this->source_file);
         
@@ -40,7 +40,7 @@ class AkExcelToArray
         return $result;
     }
 
-    function init()
+    public function init()
     {
         if(empty($this->handler)){
             require_once(AK_VENDOR_DIR.DS.'Excel'.DS.'reader.php');

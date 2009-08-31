@@ -18,7 +18,7 @@
 
 class AkArrayToYaml
 {
-    function convert()
+    public function convert()
     {
         require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'spyc.php');
         return Spyc::YAMLDump($this->source);

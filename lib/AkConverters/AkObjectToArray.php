@@ -18,11 +18,11 @@
 
 class AkObjectToArray
 {
-    function convert()
+    public function convert()
     {
         return $this->_walkObject($this->source);
     }
-    function _convertNumeric($value)
+    public function _convertNumeric($value)
     {
         if (is_string($value) && !ereg('\d',$value{0})) {
             return $value;
@@ -37,7 +37,7 @@ class AkObjectToArray
         }
         return $value;
     }
-    function _walkObject($obj)
+    public function _walkObject($obj)
     {
         $return = array();
         foreach($obj as $key=>$value) {

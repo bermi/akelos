@@ -18,7 +18,7 @@
 
 class AkHtmlToText
 {
-    function convert()
+    public function convert()
     {
         require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'html2text.php');
         $Converter = new html2text(true, 0, false);
@@ -33,7 +33,7 @@ class AkHtmlToText
 
 
 
-    function _simplifyMarkdown($markdown)
+    public function _simplifyMarkdown($markdown)
     {
         $markdown = trim($markdown);
         if(strstr($markdown,"\n")){

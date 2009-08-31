@@ -18,7 +18,7 @@
 
 class AkFloatToString
 {
-    function convert()
+    public function convert()
     {
         return "".$this->source."";
     }

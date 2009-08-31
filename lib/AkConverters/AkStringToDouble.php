@@ -18,7 +18,7 @@
 
 class AkStringToDouble
 {
-    function convert()
+    public function convert()
     {
         return doubleval($this->source);
     }
