@@ -4,7 +4,7 @@ class AkMailPart extends AkMailBase
 {
 
 
-    function prepareHeadersForRendering($options = array())
+    public function prepareHeadersForRendering($options = array())
     {
         if($this->isMultipart()){
             $this->filterHeaders(array('only' => array('Content-Type')));
@@ -13,7 +13,7 @@ class AkMailPart extends AkMailBase
         }
     }
 
-    function filterHeaders($options = array())
+    public function filterHeaders($options = array())
     {
         $default_options = array(
 

@@ -3,7 +3,7 @@
 
 class AkSmtpDelivery extends AkObject
 {
-    function deliver(&$Mailer, $settings = array())
+    public function deliver(&$Mailer, $settings = array())
     {
         $Message =& $Mailer->Message;
         
@@ -11,7 +11,7 @@ class AkSmtpDelivery extends AkObject
 
         include_once 'Net/SMTP.php';
 
-        if (!($smtp = &new Net_SMTP($SmtpClient->host, $SmtpClient->port, $SmtpClient->localhost))) {
+        if (!($smtp = new Net_SMTP($SmtpClient->host, $SmtpClient->port, $SmtpClient->localhost))) {
             return PEAR::raiseError('unable to instantiate Net_SMTP object');
         }
 

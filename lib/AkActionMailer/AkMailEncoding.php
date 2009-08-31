@@ -25,7 +25,7 @@ class AkMailEncoding extends Mail_mimeDecode
      * override it using the Akelos charset transcoding engine to get the result
      * as UTF-8
      */
-    function _decodeHeader($encoded_header)
+    public function _decodeHeader($encoded_header)
     {
         $encoded_header =  str_replace(array('_',"\r","\n =?"),array(' ',"\n","\n=?"),
         preg_replace('/\?\=([^=^\n^\r]+)?\=\?/', "?=$1\n=?",$encoded_header));
@@ -43,7 +43,7 @@ class AkMailEncoding extends Mail_mimeDecode
         return trim(preg_replace("/(%0A|%0D|\n+|\r+)/i",'',$decoded));
     }
 
-    function decode()
+    public function decode()
     {
         $this->_include_bodies = $this->_decode_bodies = $this->_decode_headers = true;
 
@@ -58,7 +58,7 @@ class AkMailEncoding extends Mail_mimeDecode
     
     ////
 
-    function _encodeAddress($address_string, $header_name = '', $names = true)
+    public function _encodeAddress($address_string, $header_name = '', $names = true)
     {
         $headers = '';
         $addresses = Ak::toArray($address_string);
@@ -85,7 +85,7 @@ class AkMailEncoding extends Mail_mimeDecode
         return empty($headers) ? false : (!empty($header_name) ? $header_name.': '.$headers.AK_MAIL_HEADER_EOL : $headers);
     }
 
-    function _isValidAddress($email)
+    public function _isValidAddress($email)
     {
         return preg_match(AK_EMAIL_REGULAR_EXPRESSION, $email);
     }

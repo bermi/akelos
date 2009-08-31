@@ -2,7 +2,7 @@
 
 class AkTestDelivery extends AkObject
 {
-    function deliver(&$Mailer, $settings = array())
+    public function deliver(&$Mailer, $settings = array())
     {
         $encoded_message = $Mailer->getRawMessage();
         $settings['ActionMailer']->deliveries[] = $encoded_message;

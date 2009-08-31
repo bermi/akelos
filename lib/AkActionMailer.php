@@ -45,7 +45,7 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 *
 *  class Notifier extends AkActionMailer
 *  {
-*    function signupNotification($Recipient)
+*    public function signupNotification($Recipient)
 *    {
 *      $this->setRecipients($Recipient->getEmailAddressWithName());
 *      $this->setFrom("system@example.com");
@@ -159,7 +159,7 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 * You never instantiate your mailer class. Rather, your delivery instance
 * methods are automatically wrapped in class methods that are called statically
 * The <tt>signup_notification</tt> method defined above is delivered by invoking
-* <tt>$Notifier =& new Notifier(); $Notifier->signupNotification(); $Notifier->deliver();</tt>.
+* <tt>$Notifier = new Notifier(); $Notifier->signupNotification(); $Notifier->deliver();</tt>.
 *
 *
 *
@@ -170,7 +170,7 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 *
 *   class ApplicationMailer extends AkActionMailer
 *   {
-*       function signupNotification($Recipient)
+*       public function signupNotification($Recipient)
 *       {
 *           $this->setAttributes(array(
 *               'recipients' => $Recipient->getEmailAddressWithName(),
@@ -189,7 +189,7 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 *
 *   class ApplicationMailer extends AkActionMailer
 *   {
-*       function signupNotification($Recipient)
+*       public function signupNotification($Recipient)
 *       {
 *           $this->setAttributes(array(
 *               'recipients' => $Recipient->getEmailAddressWithName(),
@@ -229,7 +229,7 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 *   class ApplicationMailer extends AkActionMailer
 *   {
 *       // attachments
-*       function signupNotification($Recipient)
+*       public function signupNotification($Recipient)
 *       {
 *           $this->setAttributes(array(
 *               'recipients' => $Recipient->getEmailAddressWithName(),
@@ -285,8 +285,8 @@ ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu
 */
 class AkActionMailer extends AkBaseModel
 {
-    var $templateRoot;
-    var $server_settings = array(
+    public $templateRoot;
+    public $server_settings = array(
     'address'        => 'localhost',
     'port'           => 25,
     'domain'         => 'localhost.localdomain',
@@ -295,28 +295,28 @@ class AkActionMailer extends AkBaseModel
     'authentication' => null
     );
 
-    var $delivery_method = 'php';
-    var $perform_deliveries = true;
-    var $deliveries = array();
-    var $default_charset = AK_ACTION_MAILER_DEFAULT_CHARSET;
-    var $default_content_type = 'text/plain';
-    var $default_mime_version = '1.0';
-    var $default_implicit_parts_order = array('multipart/alternative', 'text/html', 'text/enriched', 'text/plain');
-    var $Message;
-    var $Composer;
-    var $_defaultMailDriverName = 'AkMailMessage';
+    public $delivery_method = 'php';
+    public $perform_deliveries = true;
+    public $deliveries = array();
+    public $default_charset = AK_ACTION_MAILER_DEFAULT_CHARSET;
+    public $default_content_type = 'text/plain';
+    public $default_mime_version = '1.0';
+    public $default_implicit_parts_order = array('multipart/alternative', 'text/html', 'text/enriched', 'text/plain');
+    public $Message;
+    public $Composer;
+    public $_defaultMailDriverName = 'AkMailMessage';
 
-    function __construct($Driver = null)
+    public function __construct($Driver = null)
     {
         $this->loadSettings();
         if(empty($Driver)){
-            $this->Message =& new $this->_defaultMailDriverName();
+            $this->Message = new $this->_defaultMailDriverName();
         }else{
             $this->Message =& $Driver;
         }
     }
 
-    function loadSettings()
+    public function loadSettings()
     {
         if($settings = Ak::getSettings('mailer', false)){
             foreach ($settings as $k=>$v){
@@ -330,7 +330,7 @@ class AkActionMailer extends AkBaseModel
     * template name, without the extension or directory, and may be used to
     * have multiple mailer methods share the same template.
     */
-    function setTemplate($template_name)
+    public function setTemplate($template_name)
     {
         $this->template = $template_name;
     }
@@ -340,7 +340,7 @@ class AkActionMailer extends AkBaseModel
     * mailer's class name. If you want to use a template in a non-standard
     * location, you can use this to specify that location.
     */
-    function setMailerName($mailerName)
+    public function setMailerName($mailerName)
     {
         $this->mailerName = $mailerName;
     }
@@ -353,7 +353,7 @@ class AkActionMailer extends AkBaseModel
     * specifies the variables to pass to the template when it is rendered),
     * or a string, in which case it specifies the actual text of the message.
     */
-    function setBody($body)
+    public function setBody($body)
     {
         if(is_array($body) && count($body) == 1 && array_key_exists(0,$body)){
             $body = $body[0];
@@ -364,7 +364,7 @@ class AkActionMailer extends AkBaseModel
     /**
     * Specify the CC addresses for the message.
     */
-    function setCc($cc)
+    public function setCc($cc)
     {
         $this->Message->setCc($cc);
     }
@@ -372,7 +372,7 @@ class AkActionMailer extends AkBaseModel
     /**
     * Specify the BCC addresses for the message.
     */
-    function setBcc($bcc)
+    public function setBcc($bcc)
     {
         $this->Message->setBcc($bcc);
     }
@@ -380,7 +380,7 @@ class AkActionMailer extends AkBaseModel
      * Specify the charset to use for the message. This defaults to the
      *  +default_charset+ specified for AkActionMailer.
      */
-    function setCharset($charset)
+    public function setCharset($charset)
     {
         $this->Message->setCharset($charset);
     }
@@ -389,7 +389,7 @@ class AkActionMailer extends AkBaseModel
      * Specify the content type for the message. This defaults to <tt>text/plain</tt>
      * in most cases, but can be automatically set in some situations.
      */
-    function setContentType($content_type)
+    public function setContentType($content_type)
     {
         $this->Message->setContentType($content_type);
     }
@@ -397,7 +397,7 @@ class AkActionMailer extends AkBaseModel
     /**
      * Specify the from address for the message.
      */
-    function setFrom($from)
+    public function setFrom($from)
     {
         $this->Message->setFrom($from);
     }
@@ -405,7 +405,7 @@ class AkActionMailer extends AkBaseModel
     /**
      * Specify additional headers to be added to the message.
      */
-    function setHeaders($headers)
+    public function setHeaders($headers)
     {
         $this->Message->setHeaders($headers);
     }
@@ -414,7 +414,7 @@ class AkActionMailer extends AkBaseModel
     * Specify the order in which parts should be sorted, based on content-type.
     * This defaults to the value for the +default_implicit_parts_order+.
     */
-    function setImplicitPartsOrder($implicit_parts_order)
+    public function setImplicitPartsOrder($implicit_parts_order)
     {
         $this->Message->setImplicitPartsOrder($implicit_parts_order);
     }
@@ -423,7 +423,7 @@ class AkActionMailer extends AkBaseModel
     /**
      * Defaults to "1.0", but may be explicitly given if needed.
      */
-    function setMimeVersion($mime_version)
+    public function setMimeVersion($mime_version)
     {
         $this->Message->setMimeVersion($mime_version);
     }
@@ -432,7 +432,7 @@ class AkActionMailer extends AkBaseModel
      * The recipient addresses for the message, either as a string (for a single
      * address) or an array (for multiple addresses).
      */
-    function setRecipients($recipients)
+    public function setRecipients($recipients)
     {
         $this->Message->setRecipients($recipients);
     }
@@ -441,7 +441,7 @@ class AkActionMailer extends AkBaseModel
     * The date on which the message was sent. If not set (the default), the
     * header will be set by the delivery agent.
     */
-    function setSentOn($date)
+    public function setSentOn($date)
     {
         $this->Message->setSentOn($date);
     }
@@ -450,7 +450,7 @@ class AkActionMailer extends AkBaseModel
     /**
      * Specify the subject of the message.
      */
-    function setSubject($subject)
+    public function setSubject($subject)
     {
         $this->Message->setSubject($subject);
     }
@@ -463,7 +463,7 @@ class AkActionMailer extends AkBaseModel
     *   class ApplicationMailer extends AkActionMailer
     *   {
     *       // attachments
-    *       function signupNotification($Recipient)
+    *       public function signupNotification($Recipient)
     *       {
     *           $this->setAttributes(array(
     *               'recipients' => $Recipient->getEmailAddressWithName(),
@@ -481,7 +481,7 @@ class AkActionMailer extends AkBaseModel
     *
     *
      */
-    function addAttachment()
+    public function addAttachment()
     {
         $args = func_get_args();
         return call_user_func_array(array(&$this->Message, 'setAttachment'), $args);
@@ -497,7 +497,7 @@ class AkActionMailer extends AkBaseModel
      *
      * If the method does not exists the parameter will be added to the body.
      */
-    function set($attributes = array())
+    public function set($attributes = array())
     {
         if(!empty($attributes['template'])){
             $this->setTemplate($attributes['template']);
@@ -513,7 +513,7 @@ class AkActionMailer extends AkBaseModel
     /**
      * Gets a well formed mail in plain text
      */
-    function getEncoded()
+    public function getEncoded()
     {
         $this->Message->getEncoded();
     }
@@ -521,7 +521,7 @@ class AkActionMailer extends AkBaseModel
     /**
      * The mail object instance referenced by this mailer.
      */
-    function &getMail()
+    public function &getMail()
     {
         return $this->Message;
     }
@@ -537,13 +537,13 @@ class AkActionMailer extends AkBaseModel
      *
      *
      *   class MyMailer extends AkActionMailer{
-     *     function receive($Message){
+     *     public function receive($Message){
      *          parent::receive($Message);
      *       ...
      *     }
      *   }
      */
-    function &receive($raw_mail)
+    public function &receive($raw_mail)
     {
         $this->Message =& AkMailBase::parse($raw_mail);
         return $this->Message;
@@ -558,13 +558,13 @@ class AkActionMailer extends AkBaseModel
      *   $email->setHeader("frobnicate");
      *   MyMailer::deliver($email);
      */
-    function deliverDirectly(&$Message)
+    public function deliverDirectly(&$Message)
     {
-        $Message =& new $this->_defaultMailDriverName ($Message);
+        $Message = new $this->_defaultMailDriverName ($Message);
         $Message->send();
     }
 
-    function getRawMessage()
+    public function getRawMessage()
     {
         if(empty($this->Message->_has_been_created_by_mailer)){
             trigger_error(Ak::t('You need to create() a message before getting it as raw text.'),E_USER_ERROR);
@@ -579,7 +579,7 @@ class AkActionMailer extends AkBaseModel
      * Initialize the mailer via the given +method_name+. The body will be
      * rendered and a new AkMailMessage object created.
      */
-    function &create($method_name, $parameters, $content_type = '')
+    public function &create($method_name, $parameters, $content_type = '')
     {
         $Composer =& $this->getComposer();
         $args = func_get_args();
@@ -594,7 +594,7 @@ class AkActionMailer extends AkBaseModel
     * object (from the AkActionMailer::create method). If no cached mail object exists, and
     * no alternate has been given as the parameter, this will fail.
     */
-    function deliver($method_name, $parameters = null, $Message = null)
+    public function deliver($method_name, $parameters = null, $Message = null)
     {
         if(empty($Message) &&
         (empty($this->Message) || (!empty($this->Message) && get_class($this->Message) != get_class($this)))){
@@ -611,7 +611,7 @@ class AkActionMailer extends AkBaseModel
         return $this->Message;
     }
 
-    function performSmtpDelivery(&$Message, $settings = array())
+    public function performSmtpDelivery(&$Message, $settings = array())
     {
         $default_settings = array(
         'host'     =>  @$this->server_settings['address'],
@@ -628,12 +628,12 @@ class AkActionMailer extends AkBaseModel
 
     }
 
-    function performPhpDelivery(&$Message, $settings = array())
+    public function performPhpDelivery(&$Message, $settings = array())
     {
         return $this->_deliverUsingMailDeliveryMethod('PhpMail', $Message, $settings);
     }
 
-    function performTestDelivery(&$Message)
+    public function performTestDelivery(&$Message)
     {
         return $this->_deliverUsingMailDeliveryMethod('Test', $Message, array('ActionMailer'=>&$this));
 
@@ -656,7 +656,7 @@ class AkActionMailer extends AkBaseModel
      * @param array $options
      * @return string the rendered message
      */
-    function renderMessage($method_name, $body, $options = array())
+    public function renderMessage($method_name, $body, $options = array())
     {
 
         $file_name = basename($method_name);
@@ -676,7 +676,7 @@ class AkActionMailer extends AkBaseModel
     }
 
 
-    function render($options = array(),$set_body_only=false,$set_body=null)
+    public function render($options = array(),$set_body_only=false,$set_body=null)
     {
         static $body;
         if($set_body_only===true) {
@@ -717,7 +717,7 @@ class AkActionMailer extends AkBaseModel
         return $Template->render($options);
     }
 
-    function getTemplatePath()
+    public function getTemplatePath()
     {
         return $this->templateRoot.DS.$this->mailerName;
     }
@@ -727,7 +727,7 @@ class AkActionMailer extends AkBaseModel
     * mailer. Subclasses may override this method to provide different
     * defaults.
     */
-    function initializeDefaults($method_name)
+    public function initializeDefaults($method_name)
     {
         foreach (array('charset','content_type','implicit_parts_order', 'mime_version') as $attribute) {
             $method = 'set'.AkInflector::camelize($attribute);
@@ -744,16 +744,16 @@ class AkActionMailer extends AkBaseModel
     }
 
 
-    function &_initializeTemplateClass($assigns)
+    public function &_initializeTemplateClass($assigns)
     {
         require_once(AK_LIB_DIR.DS.'AkActionView.php');
-        $TemplateInstance =& new AkActionView($this->getTemplatePath(), $assigns, $this);
+        $TemplateInstance = new AkActionView($this->getTemplatePath(), $assigns, $this);
         require_once (AK_LIB_DIR.DS.'AkActionView'.DS.'AkPhpTemplateHandler.php');
         $TemplateInstance->_registerTemplateHandler('tpl','AkPhpTemplateHandler');
         return $TemplateInstance;
     }
 
-    function &getComposer()
+    public function &getComposer()
     {
         if(empty($this->Composer)){
             $this->setComposer();
@@ -761,12 +761,12 @@ class AkActionMailer extends AkBaseModel
         return $this->Composer;
     }
 
-    function setComposer($Composer = null)
+    public function setComposer($Composer = null)
     {
         if(!empty($Composer)){
             $this->Composer = $Composer;
         }else{
-            $this->Composer =& new AkMailComposer();
+            $this->Composer = new AkMailComposer();
             $this->Composer->init($this);
         }
     }
@@ -775,7 +775,7 @@ class AkActionMailer extends AkBaseModel
     /**
      * Alias for getModelName
      */
-    function getMailerName()
+    public function getMailerName()
     {
         return $this->getModelName();
     }
@@ -786,7 +786,7 @@ class AkActionMailer extends AkBaseModel
      *
      * @todo refactor helpers to be controller agnostic
      */
-    function getControllerName()
+    public function getControllerName()
     {
         return $this->getModelName();
     }
@@ -797,7 +797,7 @@ class AkActionMailer extends AkBaseModel
      * As we do not have the context of a host being requested, we need to know
      * the base_url like http://example.com in oder to add it to the generated URL
      */
-    function urlFor()
+    public function urlFor()
     {
         $args = func_get_args();
         $base_url = '';
@@ -816,7 +816,7 @@ class AkActionMailer extends AkBaseModel
      *
      * Mailer helpers work as Controller helpers but without the Request context
      */
-    function getHelpers()
+    public function getHelpers()
     {
         require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkHelperLoader.php');
         $HelperLoader = new AkHelperLoader();
@@ -824,7 +824,7 @@ class AkActionMailer extends AkBaseModel
         return $HelperLoader->getHelpersForMailer();
     }
 
-    function _deliverUsingMailDeliveryMethod($method, &$Message, $options)
+    public function _deliverUsingMailDeliveryMethod($method, &$Message, $options)
     {
         $handler_name = 'Ak'.AkInflector::camelize(Ak::sanitize_include($method, 'paranoid')).'Delivery';
         $handler_path = AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailDelivery'.DS.$handler_name.'.php';
@@ -842,7 +842,7 @@ class AkActionMailer extends AkBaseModel
     }
 
 
-    function _getLayoutPath($method_name, $content_type = null, $extension = null)
+    public function _getLayoutPath($method_name, $content_type = null, $extension = null)
     {
         $dirname = dirname($method_name);
         if(is_file($dirname.DS.'layout.'.$content_type.'.'.$extension)){
@@ -853,7 +853,7 @@ class AkActionMailer extends AkBaseModel
         return false;
     }
 
-    function _renderWithALayout($options = array(), $layout_file)
+    public function _renderWithALayout($options = array(), $layout_file)
     {
         static $body;
         if(isset($options['body'])) {

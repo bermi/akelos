@@ -3,7 +3,7 @@
 
 class AkPhpMailDelivery extends AkObject
 {
-    function deliver(&$Mailer, $settings = array())
+    public function deliver(&$Mailer, $settings = array())
     {
         $Message =& $Mailer->Message;
         $to = $Message->getTo();

@@ -28,7 +28,7 @@ class AkActionMailerQuoting
      * Convert the given text into quoted printable format, with an instruction
      * that the text be eventually interpreted in the given charset.
      */
-    function quotedPrintable($text, $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
+    public function quotedPrintable($text, $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
     {
         $pre="=?$charset?Q?";
         $start=0;
@@ -54,7 +54,7 @@ class AkActionMailerQuoting
         
         return $return;
     }
-    function base64encode($text, $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
+    public function base64encode($text, $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
     {
         $pre="=?$charset?B?";
         $start=0;
@@ -77,7 +77,7 @@ class AkActionMailerQuoting
      * Convert the given character to quoted printable format, taking into
      * account multi-byte characters
      */
-    function quotedPrintableEncode($character, $emulate_imap_8bit = AK_ACTION_MAILER_EMULATE_IMAP_8_BIT)
+    public function quotedPrintableEncode($character, $emulate_imap_8bit = AK_ACTION_MAILER_EMULATE_IMAP_8_BIT)
     {
         $lines = preg_split("/(?:\r\n|\r|\n)/", $character);
         $search_pattern = $emulate_imap_8bit ? '/[^\x20\x21-\x3C\x3E-\x7E]/e' : '/[^\x09\x20\x21-\x3C\x3E-\x7E]/e';
@@ -106,7 +106,7 @@ class AkActionMailerQuoting
     /**
     * Quote the given text if it contains any "illegal" characters
     */
-    function quoteIfNecessary($text, $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
+    public function quoteIfNecessary($text, $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
     {
         return preg_match(AK_ACTION_MAILER_CHARS_NEEDING_QUOTING_REGEX,$text) ? AkActionMailerQuoting::quotedPrintable($text,$charset) : $text;
     }
@@ -114,7 +114,7 @@ class AkActionMailerQuoting
     /**
     * Quote any of the given strings if they contain any "illegal" characters
     */
-    function quoteAnyIfNecessary($strings = array(), $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
+    public function quoteAnyIfNecessary($strings = array(), $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
     {
         foreach ($strings as $k=>$v){
             $strings[$k] = AkActionMailerQuoting::quoteIfNecessary($charset, $v);
@@ -129,7 +129,7 @@ class AkActionMailerQuoting
      * it needs to be. This allows extended characters to be used in the
      * "to", "from", "cc", and "bcc" headers.
      */
-    function quoteAddressIfNecessary($address, $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
+    public function quoteAddressIfNecessary($address, $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
     {
         if(is_array($address)){
             return join(", ".AK_ACTION_MAILER_EOL."     ",AkActionMailerQuoting::quoteAnyAddressIfNecessary($address, $charset));
@@ -150,7 +150,7 @@ class AkActionMailerQuoting
     /**
      *  Quote any of the given addresses, if they need to be.
      */
-    function quoteAnyAddressIfNecessary($address = array(), $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
+    public function quoteAnyAddressIfNecessary($address = array(), $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
     {
         foreach ($address as $k=>$v){
             $address[$k] = is_string($k) ?
@@ -160,7 +160,7 @@ class AkActionMailerQuoting
         return $address;
     }
 
-    function chunkQuoted($quoted_string, $max_length = 74)
+    public function chunkQuoted($quoted_string, $max_length = 74)
     {
         if(empty($max_length) || !is_string($quoted_string)){
             return $quoted_string;

@@ -2,21 +2,21 @@
 
 class AkMailParser
 {
-    var $decode_body = true;
-    var $content_type = 'text/plain';
-    var $recode_messages = true;
-    var $recode_to_charset = AK_ACTION_MAILER_DEFAULT_CHARSET;
-    var $raw_message = '';
-    var $options = array();
+    public $decode_body = true;
+    public $content_type = 'text/plain';
+    public $recode_messages = true;
+    public $recode_to_charset = AK_ACTION_MAILER_DEFAULT_CHARSET;
+    public $raw_message = '';
+    public $options = array();
 
-    var $html_charset_on_recoding_failure = false;
+    public $html_charset_on_recoding_failure = false;
 
-    var $headers = array();
-    var $body;
-    var $parts;
+    public $headers = array();
+    public $body;
+    public $parts;
 
 
-    function AkMailParser($options = array())
+    public function AkMailParser($options = array())
     {
         $this->options = $options;
         $default_options = array(
@@ -31,10 +31,10 @@ class AkMailParser
         }
     }
 
-    function parse($raw_message = '', $options = array(), $object_type = 'AkMailMessage')
+    public function parse($raw_message = '', $options = array(), $object_type = 'AkMailMessage')
     {
         $parser_class = empty($options['parser_class']) ? 'AkMailParser' : $options['parser_class'];
-        $Parser =& new $parser_class($options);
+        $Parser = new $parser_class($options);
         $Mail = new $object_type();
         $raw_message = empty($raw_message) ? $Parser->raw_message : $raw_message;
         if(!empty($raw_message)){
@@ -50,25 +50,25 @@ class AkMailParser
         return $Mail;
     }
 
-    function getContentTypeProcessorMethodName()
+    public function getContentTypeProcessorMethodName()
     {
         $content_type = $this->findHeaderValueOrDefaultTo('content-type', $this->content_type);
         $method_name = 'getParsed'.ucfirst(strtolower(substr($content_type,0,strpos($content_type,"/")))).'Body';
         return method_exists($this, $method_name) ? $method_name : 'getParsedTextBody';
     }
 
-    function getContentDisposition()
+    public function getContentDisposition()
     {
         return $this->_findHeader('content-disposition');
     }
 
 
-    function getParsedTextBody($body)
+    public function getParsedTextBody($body)
     {
         $this->body = $this->_getDecodedBody($body);
     }
 
-    function getParsedMultipartBody($body)
+    public function getParsedMultipartBody($body)
     {
         static $recursion_protection;
 
@@ -95,13 +95,13 @@ class AkMailParser
         }
     }
 
-    function getParsedMessageBody($body)
+    public function getParsedMessageBody($body)
     {
         $Parser = new AkMailParser($this->options);
         $this->body = $Parser->parse($body);
     }
 
-    function _getDecodedBody($body)
+    public function _getDecodedBody($body)
     {
         $encoding = trim(strtolower($this->_findHeaderValue('content-transfer-encoding')));
         $charset = trim(strtolower($this->_findHeaderAttributeValue('content-type','charset')));
@@ -114,25 +114,25 @@ class AkMailParser
         return empty($charset) ? $body : ($charset && $this->recode_messages ? Ak::recode($body, $this->recode_to_charset, $charset, $this->html_charset_on_recoding_failure) : $body);
     }
 
-    function _findHeaderValue($name)
+    public function _findHeaderValue($name)
     {
         $header = $this->_findHeader($name);
         return !empty($header['value']) ? $header['value'] : false;
     }
 
-    function _findHeaderAttributeValue($name, $attribute)
+    public function _findHeaderAttributeValue($name, $attribute)
     {
         $header = $this->_findHeader($name);
         return !empty($header['attributes'][$attribute]) ? $header['attributes'][$attribute] : false;
     }
 
-    function findHeaderValueOrDefaultTo($name, $default)
+    public function findHeaderValueOrDefaultTo($name, $default)
     {
         $value = $this->_findHeaderValue($name);
         return !empty($value) ? $value : $default;
     }
 
-    function _findHeader($name)
+    public function _findHeader($name)
     {
         $results = array();
         foreach ($this->headers as $header) {
@@ -143,7 +143,7 @@ class AkMailParser
         return empty($results) ? false : (count($results) > 1 ? $results : array_shift($results));
     }
 
-    function getParsedRawHeaders($raw_headers)
+    public function getParsedRawHeaders($raw_headers)
     {
         $raw_header_lines = array_diff(array_map('trim',explode("\n",$raw_headers."\n")), array(''));
         $headers = array();
@@ -156,7 +156,7 @@ class AkMailParser
         return $headers;
     }
 
-    function _parseHeaderLine($header_line)
+    public function _parseHeaderLine($header_line)
     {
         $header = array();
         if(preg_match("/^([A-Za-z\-]+)\: *(.*)$/",$header_line,$match)){
@@ -169,12 +169,12 @@ class AkMailParser
 
     }
 
-    function _headerCanHaveAttributes($header)
+    public function _headerCanHaveAttributes($header)
     {
         return !in_array(strtolower($header['name']), array('subject','to','from','cc','bcc'));
     }
 
-    function _extractAttributesForHeader_(&$header)
+    public function _extractAttributesForHeader_(&$header)
     {
         $attributes = array();
         if(preg_match_all("/([A-Z\-_ ]+)".
@@ -206,7 +206,7 @@ class AkMailParser
         $header['attributes'] = empty($attributes) ? false : $attributes;
     }
 
-    function _decodeHeader_(&$header)
+    public function _decodeHeader_(&$header)
     {
         if(!empty($header['value'])){
             $encoded_header =  preg_replace('/\?\=([^=^\n^\r]+)?\=\?/', "?=$1\n=?",$header['value']);
@@ -235,7 +235,7 @@ class AkMailParser
     /**
      * RFC 2231 Implementation
      */
-    function _decodeHeaderAttribute($header_attribute, $charset = '')
+    public function _decodeHeaderAttribute($header_attribute, $charset = '')
     {
         if(preg_match("/^([A-Z0-9\-]+)(\'[A-Z\-]{2,5}\')?/i",$header_attribute,$match)){
             $charset = $match[1];
@@ -244,7 +244,7 @@ class AkMailParser
         return Ak::recode($header_attribute, 'UTF-8', $charset);
     }
 
-    function _getRawHeaderAndBody($raw_part)
+    public function _getRawHeaderAndBody($raw_part)
     {
         return
         array_map('trim',
@@ -254,7 +254,7 @@ class AkMailParser
         )."\n\n",2));
     }
 
-    function _expandHeadersOnMailObject(&$Mail)
+    public function _expandHeadersOnMailObject(&$Mail)
     {
         if(!empty($Mail->headers)){
             foreach ($Mail->headers as $details){
@@ -282,7 +282,7 @@ class AkMailParser
     }
 
     
-    function importStructure(&$MailOrPart, $structure = array())
+    public function importStructure(&$MailOrPart, $structure = array())
     {
         if(isset($structure['header'])){
             $structure['headers'] = $structure['header'];
@@ -300,7 +300,7 @@ class AkMailParser
         }
         return ;
     }
-    function _extractCssRulesFromContent($contents,$cssRules=false)
+    public function _extractCssRulesFromContent($contents,$cssRules=false)
     {
         if(empty($cssRules)) {
             $cssRules=array('id'=>array(),'class'=>array(),'element'=>array());
@@ -335,7 +335,7 @@ class AkMailParser
         }
         return $cssRules;
     }
-    function _extractCssRulesFromFile($path,$cssRules = false)
+    public function _extractCssRulesFromFile($path,$cssRules = false)
     {
         if(empty($cssRules)) {
             $cssRules=array('id'=>array(),'class'=>array(),'element'=>array());
@@ -352,7 +352,7 @@ class AkMailParser
      *
      * @param AkMailBase $Mail
      */
-    function addBlankTargetToLinks(&$Mail)
+    public function addBlankTargetToLinks(&$Mail)
     {
         $html = &$Mail->body;
         $links = array();
@@ -419,13 +419,13 @@ class AkMailParser
      * 
      * @param AkMailBase $Mail
      */
-    function applyCssStylesToTags(&$Mail)
+    public function applyCssStylesToTags(&$Mail)
     {
         $cssRules=$this->_extractCssRules($Mail);
         $this->_applyCssRules($Mail,$cssRules);
     }
     
-    function _applyCssRules(&$Mail,$cssRules)
+    public function _applyCssRules(&$Mail,$cssRules)
     {
         //Ak::getLogger()->log('message','detected css rules:'.var_export($cssRules,true));
         $html = &$Mail->body;
@@ -500,7 +500,7 @@ class AkMailParser
             }
         }
     }
-    function _parseCssElementValue($name,$value)
+    public function _parseCssElementValue($name,$value)
     {
         switch($name) {
             case 'width':
@@ -547,7 +547,7 @@ class AkMailParser
     
     
     
-    function _uniqueStyle($stylestring, $fullElement = '') {
+    public function _uniqueStyle($stylestring, $fullElement = '') {
         $styles=split(';',$stylestring);
         $newstyles=array();
         $styleArray=array();
@@ -578,7 +578,7 @@ class AkMailParser
         }
     }
     
-    function _extractCssRules(&$Mail)
+    public function _extractCssRules(&$Mail)
     {
         $html =& $Mail->body;
         $cssRules=array();
@@ -604,7 +604,7 @@ class AkMailParser
         return $cssRules;
     }
     
-    function extractImagesIntoInlineParts(&$Mail, $options = array())
+    public function extractImagesIntoInlineParts(&$Mail, $options = array())
     {
         $html =& $Mail->body;
         require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'text_helper.php');
@@ -641,7 +641,7 @@ class AkMailParser
             }
         }
     }
-    function _getStylesheetPath($path)
+    public function _getStylesheetPath($path)
     {
         if(preg_match('/^http(s)?:\/\//', $path)){
             $path_info = pathinfo($path);
@@ -666,7 +666,7 @@ class AkMailParser
         }
         return $path;
     }
-    function _getImagePath($path)
+    public function _getImagePath($path)
     {
         if(preg_match('/^http(s)?:\/\//', $path)){
             $path_info = pathinfo($path);
