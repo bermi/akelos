@@ -3,12 +3,15 @@
 array_shift($argv);
 $options = $argv;
 
-$path = array_shift($options);
-
-if(is_file($path)){
-    $files = array($path);
+if(count($argv) == 1){
+    $path = array_shift($options);
+    if(is_file($path)){
+        $files = array($path);
+    }else{
+        $files = ak_dir($path, array('recurse' => true));
+    }
 }else{
-    $files = ak_dir($path, array('recurse' => true));
+    $files = $argv;
 }
 
 if(empty($files)){
