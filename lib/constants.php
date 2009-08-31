@@ -315,6 +315,10 @@ defined('AK_ACTION_CONTROLLER_DEFAULT_ACTION') ? null : define('AK_ACTION_CONTRO
 defined('AK_ERROR_REPORTING_ON_SCRIPTS') ? null : define('AK_ERROR_REPORTING_ON_SCRIPTS', E_ALL);
 defined('AK_BEEP_ON_ERRORS_WHEN_TESTING') ? null : define('AK_BEEP_ON_ERRORS_WHEN_TESTING', false);
 
+defined('AK_FRAMEWORK_LANGUAGE') ? null : define('AK_FRAMEWORK_LANGUAGE', 'en');
+defined('AK_DEV_MODE') ? null : define('AK_DEV_MODE', false);
+defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION') ? null : define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
+
 AK_PRODUCTION_MODE ? null : require_once(AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php');
 
 ?>

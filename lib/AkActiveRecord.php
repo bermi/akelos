@@ -1,21 +1,18 @@
 <?php
 
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActiveRecord
+ * @package ActiveSupport
  * @subpackage Base
- * @component Active Record
- * @author Bermi Ferrer <bermi a.t akelos c.om> 2004 - 2007
- * @author Kaste 2007
- * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
+ * @author Kaste
+ * @author Arno Schneider <arno a.t bermilabs c.om>
+ * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
@@ -399,10 +396,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function &create($attributes = null)
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
-
         if(func_num_args() > 1){
             $attributes = func_get_args();
         }
@@ -584,9 +577,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       */
     function countBySql($sql)
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
         if(!stristr($sql, 'COUNT') && stristr($sql, ' FROM ')){
             $sql = 'SELECT COUNT(*) '.substr($sql,strpos(str_replace(' from ',' FROM ', $sql),' FROM '));
         }
@@ -610,9 +600,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function update($id, $attributes)
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
         if(is_array($id)){
             $results = array();
             foreach ($id as $idx=>$single_id){
@@ -660,9 +647,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function updateAll($updates, $conditions = null)
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
         /**
         * @todo sanitize sql conditions
         */
@@ -745,9 +729,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function delete($id)
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
         $id = func_num_args() > 1 ? func_get_args() : $id;
         return $this->deleteAll($this->getPrimaryKey().' IN ('.join(', ', $this->castAttributesForDatabase($this->getPrimaryKey(), Ak::toArray($id))).')');
     }
@@ -768,9 +749,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function deleteAll($conditions = null)
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
         /**
         * @todo sanitize sql conditions
         */
@@ -801,10 +779,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function destroy($id = null)
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
-
         $id = func_num_args() > 1 ? func_get_args() : $id;
 
         if(isset($id)){
@@ -941,10 +915,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function &find()
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
-
         $args = func_get_args();
 
         $options = $this->_extractOptionsFromArgs($args);
@@ -1190,9 +1160,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     function &findFirst()
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
         $args = func_get_args();
         $result =& call_user_func_array(array(&$this,'find'), array_merge(array('first'),$args));
         return $result;
@@ -1200,9 +1167,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     function &findAll()
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
         $args = func_get_args();
         $result =& call_user_func_array(array(&$this,'find'), array_merge(array('all'),$args));
         return $result;
@@ -1219,9 +1183,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if ($limit || $offset){
             Ak::deprecateWarning("You're calling AR::findBySql with \$limit or \$offset parameters. This has been deprecated.");
             $this->_db->addLimitAndOffset($sql, array('limit'=>$limit,'offset'=>$offset));
-        }
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
         }
         $objects = array();
         $records = $this->_db->select ($sql,'selecting');
@@ -1249,9 +1210,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function &findFirstBy()
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
         $args = func_get_args();
         array_unshift($args,'first');
         $result =& call_user_func_array(array(&$this,'findBy'), $args);
@@ -1260,9 +1218,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     function &findLastBy()
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
         $args = func_get_args();
         $options = $this->_extractOptionsFromArgs($args);
         $options['order'] = $this->getPrimaryKey().' DESC';
@@ -1273,9 +1228,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     function &findAllBy()
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
         $args = func_get_args();
         array_unshift($args,'all');
         $result =& call_user_func_array(array(&$this,'findBy'), $args);
@@ -1292,9 +1244,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function &findBy()
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
         $args = func_get_args();
         $find_by_sql = array_shift($args);
         if($find_by_sql == 'all' || $find_by_sql == 'first'){
@@ -2180,9 +2129,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     function getAttributeNames()
     {
-        if(!isset($this->_activeRecordHasBeenInstantiated)){
-            return Ak::handleStaticCall();
-        }
         $attributes = array_keys($this->getAvailableAttributes());
         $names = array_combine($attributes,array_map(array(&$this,'getAttributeCaption'), $attributes));
         natsort($names);

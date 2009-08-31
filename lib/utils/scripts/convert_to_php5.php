@@ -3,6 +3,28 @@
 array_shift($argv);
 $options = $argv;
 
+$arg_options = array(
+'output_without_writing_files' => 'o',
+'silent' => 's',
+'propmt' => 'p',
+'dry_run' => 'd',
+);
+
+foreach ($arg_options as $var_name => $key){
+    if(in_array('-'.$key, $argv)){
+        unset($argv[array_search('-'.$key, $argv)]);
+        $$var_name = true;
+    }else{
+        $$var_name = false;
+    }
+}
+
+if($output_without_writing_files){
+    $promt = false;
+    $silent = true;
+}
+
+
 if(count($argv) == 1){
     $path = array_shift($options);
     if(is_file($path)){
@@ -18,7 +40,7 @@ if(empty($files)){
     die("\nNo files found!\n");
 }
 
-if(ak_prompt("These files will be converted to PHP5:\n\n".join("\n", $files)."\n\nDid you backup these files?", array('default'=>'yes')) == 'yes'){
+if(!$promt || ak_prompt("These files will be converted to PHP5:\n\n".join("\n", $files)."\n\nDid you backup these files?", array('default'=>'yes')) == 'yes'){
     foreach ($files as $file){
         $php4_contents = file_get_contents($file);
         $php5_contents = convert_to_php5($php4_contents);
@@ -27,37 +49,51 @@ if(ak_prompt("These files will be converted to PHP5:\n\n".join("\n", $files)."\n
         $php5_lines = (array_diff(explode("\n", $php5_contents), explode("\n", $php4_contents)));
 
         if(!empty($php5_lines)){
-            echo "\n\n--------\nPHP5 version for $file\n--------\n\n".$php5_contents."\n\n";
-            echo "\n\n--------\n\nModified lines for $file:\n";
-            foreach ($php4_lines as $line_number => $php4_line){
-                echo "\n- $php4_line";
-                echo "\n+ ".$php5_lines[$line_number];
+            if(!$silent){
+                echo "\n\n--------\nPHP5 version for $file\n--------\n\n".$php5_contents."\n\n";
+                echo "\n\n--------\n\nModified lines for $file:\n";
+                foreach ($php4_lines as $line_number => $php4_line){
+                    echo "\n- $php4_line";
+                    echo "\n+ ".$php5_lines[$line_number];
+                }
+                echo "\n--------\n\n";
             }
 
-            echo "\n--------\n\n";
+            if(!$promt || ak_prompt("Do you want to replace $file with the above contents?", array('default'=>'yes')) == 'yes'){
+                if(!$output_without_writing_files){
+                    if(!$dry_run){
+                        file_put_contents($file, $php5_contents);
+                    }
+                }else{
+                    echo $php5_contents;
+                }
 
-            if(ak_prompt("Do you want to replace $file with the above contents?", array('default'=>'yes')) == 'yes'){
-                file_put_contents($file, $php5_contents);
             }else {
-                echo "\nSkiping $file\n\n";
+                if(!$silent){
+                    echo "\nSkiping $file\n\n";
+                }
             }
         }else{
-            echo "\nNo changes for $file\n\n";
+            if(!$silent){
+                echo "\nNo changes for $file\n\n";
+            }
         }
     }
 }else {
-    echo "Take your time to backup your files as something might go wrong while converting to PHP5";
+    if(!$silent){
+        echo "Take your time to backup your files as something might go wrong while converting to PHP5";
+    }
 }
 
-
-echo "\n";
-
+if(!$silent){
+    echo "\n";
+}
 
 function convert_to_php5($code){
     $replacements = array(
     '/&(\s?)new /' => '$1new ',
     '/(\s{4,})function /' => '$1public function ',
-    '/(?<!array)([\(,])(\s?)&(\s?)\$/' => '$1$2$3$',
+    // '/(?<!array)([\(,])(\s?)&(\s?)\$/' => '$1$2$3$',
     '/(\s{4,})var(\s+)\$/' =>   '$1public$2$');
 
     foreach ($replacements as $k => $v){
