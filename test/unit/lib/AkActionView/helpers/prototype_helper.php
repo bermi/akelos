@@ -9,10 +9,10 @@ ak_generate_mock('AkRequest');
 
 class PrototypeHelperTests extends HelpersUnitTester
 {
-    function test_setup()
+    public function test_setup()
     {
-        $this->controller = &new AkActionController();
-        $this->controller->Request =& new MockAkRequest($this);
+        $this->controller = new AkActionController();
+        $this->controller->Request = new MockAkRequest($this);
         $this->controller->controller_name = 'test';
         $this->controller->instantiateHelpers();
         
@@ -23,7 +23,7 @@ class PrototypeHelperTests extends HelpersUnitTester
      * TODO: Complete test_remote_form_for() and test_form_remote_for()
      */
 
-    function test_link_to_remote()
+    public function test_link_to_remote()
     {
         $this->assertEqual(
             $this->PrototypeHelper->link_to_remote('test', array('url' => 'http://www.akelos.org', 'update' => 'listing')),
@@ -41,7 +41,7 @@ class PrototypeHelperTests extends HelpersUnitTester
 
     }
 
-    function test_periodically_call_remote()
+    public function test_periodically_call_remote()
     {
         $this->assertEqual(
             $this->PrototypeHelper->periodically_call_remote(array('url' => 'http://localhost', 'update' => 'listing', 'frequency' => 1)),
@@ -54,7 +54,7 @@ class PrototypeHelperTests extends HelpersUnitTester
         );
     }
 
-    function test_form_remote_tag()
+    public function test_form_remote_tag()
     {
         $this->assertEqual(
             $this->PrototypeHelper->form_remote_tag(array('url' => array('controller' => 'foo', 'action' => 'bar'), 'update' => 'div_to_update', 'html' => array('id' => 'form_id'))),
@@ -70,15 +70,15 @@ class PrototypeHelperTests extends HelpersUnitTester
         );
     }
 
-    function test_remote_form_for()
+    public function test_remote_form_for()
     {
     }
 
-    function test_form_remote_for()
+    public function test_form_remote_for()
     {
     }
 
-    function test_submit_to_remote()
+    public function test_submit_to_remote()
     {
         $this->assertEqual(
             $this->PrototypeHelper->submit_to_remote("More beer!", "1000000", array('update' => 'empty_bottle','url'=>'http://www.example.com/')),
@@ -91,7 +91,7 @@ class PrototypeHelperTests extends HelpersUnitTester
         );
     }
 
-    function test_update_element_function()
+    public function test_update_element_function()
     {
         $this->assertEqual(
             $this->PrototypeHelper->update_element_function('products', array('position' => 'bottom'), array('content' => '<p>New product!</p>')),
@@ -99,12 +99,12 @@ class PrototypeHelperTests extends HelpersUnitTester
         );
     }
 
-    function test_evaluate_remote_response()
+    public function test_evaluate_remote_response()
     {
         $this->assertEqual($this->PrototypeHelper->evaluate_remote_response(), 'eval(request.responseText)');
     }
 
-    function test_remote_function()
+    public function test_remote_function()
     {
         $this->assertEqual(
             $this->PrototypeHelper->remote_function(array('url' => 'http://akelos.org', 'update' => 'div_update')),
@@ -112,7 +112,7 @@ class PrototypeHelperTests extends HelpersUnitTester
         );
     }
 
-    function test_observe_field()
+    public function test_observe_field()
     {
         $this->assertEqual(
             $this->PrototypeHelper->observe_field('form_id', array('url' => 'http://akelos.org', 'frequency' => 2, 'update' => 'div_update')),
@@ -124,7 +124,7 @@ class PrototypeHelperTests extends HelpersUnitTester
         );
     }
 
-    function test_observe_form()
+    public function test_observe_form()
     {
         $this->assertEqual(
             $this->PrototypeHelper->observe_form('form_id', array('url' => 'http://akelos.org', 'frequency' => 2, 'update' => 'div_update')),

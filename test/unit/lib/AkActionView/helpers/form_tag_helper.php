@@ -6,12 +6,12 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_tag_helper.php')
 
 class FormTagHelperTests extends HelpersUnitTester 
 {    
-    function test_for_form_tag_helpers()
+    public function test_for_form_tag_helpers()
     {
-        //$ActiveRecord = &new MockAkActiveRecord($this);
+        //$ActiveRecord = new MockAkActiveRecord($this);
         //$ActiveRecord->setReturnValue('get', '1978-06-16 04:37:00');
 
-        $Controller = &new MockAkActionController($this);
+        $Controller = new MockAkActionController($this);
         $Controller->setReturnValue('urlFor','/url/for/test');
         $form_tag = new FormTagHelper();
         $form_tag->setController($Controller);

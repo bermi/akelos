@@ -7,7 +7,7 @@ defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
 if(!defined('ALL_TESTS_RUNNER') && empty($test)){
-    $test = &new GroupTest('Akelos Framework Action Controller Tests');
+    $test = new GroupTest('Akelos Framework Action Controller Tests');
     define('ALL_TESTS_RUNNER', false);
 }
 

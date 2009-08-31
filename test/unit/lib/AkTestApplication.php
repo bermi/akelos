@@ -6,15 +6,15 @@ require_once(AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestApplication.php');
 
 class MockTestApplication extends AkTestApplication
 {
-    var $passes = array();
-    var $failures = array();
+    public $passes = array();
+    public $failures = array();
     
-    function pass($message)
+    public function pass($message)
     {
         $this->passes[] = $message;
     }
     
-    function fail($message)
+    public function fail($message)
     {
         $this->failures[] = $message;
     }
@@ -22,7 +22,7 @@ class MockTestApplication extends AkTestApplication
 
 class Test_of_AkTestApplication extends  AkUnitTest
 {
-    function test_assert_valid_xhtml()
+    public function test_assert_valid_xhtml()
     {
         $test_app = new MockTestApplication();
         $test_app->_response = file_get_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'valid_xhtml.html');
@@ -43,7 +43,7 @@ class Test_of_AkTestApplication extends  AkUnitTest
 
     }
     
-    function x_test_assert_xpath()
+    public function x_test_assert_xpath()
     {
         $test_app = new MockTestApplication();
         $test_app->_response = file_get_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'valid_xhtml.html');

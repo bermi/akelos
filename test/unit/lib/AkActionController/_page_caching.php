@@ -5,9 +5,9 @@ require_once(AK_LIB_DIR.DS.'AkCache.php');
 class Test_AkActionControllerCachingPages extends AkTestApplication
 {
 
-    var $lastModified;
+    public $lastModified;
 
-    function testRequest()
+    public function testRequest()
     {
         $this->_flushCache('www.example.com');
         $this->setIp('212.121.121.121');
@@ -16,7 +16,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->assertResponse(200);
     }
 
-    function _flushCache($host)
+    public function _flushCache($host)
     {
         $fileCache=AkCache::lookupStore(true);
         if ($fileCache!==false) {
@@ -24,7 +24,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         }
     }
 
-    function test_should_cache_get_with_ok_status()
+    public function test_should_cache_get_with_ok_status()
     {
         $this->setIp('212.121.121.121');
         $this->get('http://www.example.com/page_caching/ok');
@@ -35,7 +35,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
 
 
     }
-    function test_should_cache_get_with_ok_status_gzipped_and_unzipped()
+    public function test_should_cache_get_with_ok_status_gzipped_and_unzipped()
     {
         $this->_flushCache('www.example.com');
 
@@ -54,7 +54,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->assertTrue($this->_assertPageCached('/page_caching/simple'));
     }
 
-    function test_should_cache_get_with_ok_status_gzipped()
+    public function test_should_cache_get_with_ok_status_gzipped()
     {
         $this->_flushCache('www.example.com');
         $this->setIp('212.121.121.121');
@@ -70,7 +70,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->assertTrue($this->_assertPageCached('/page_caching/simple'));
 
     }
-    function gzdecode($data) {
+    public function gzdecode($data) {
         $len = strlen($data);
         if ($len < 18 || strcmp(substr($data,0,2),"\x1f\x8b")) {
             return null;  // Not GZIP format (See RFC 1952)
@@ -187,7 +187,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         }
         return $data;
     }
-    function test_should_cache_get_with_ok_status_xgzipped()
+    public function test_should_cache_get_with_ok_status_xgzipped()
     {
         $this->_flushCache('www.example.com');
         $this->setIp('212.121.121.121');
@@ -202,7 +202,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->assertTrue($this->_assertPageCached('/page_caching/simple'));
 
     }
-    function _expirePage($path)
+    public function _expirePage($path)
     {
         $controller=$this->getController();
         if ($controller) {
@@ -211,7 +211,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
             return false;
         }
     }
-    function _getCachedPage($path)
+    public function _getCachedPage($path)
     {
         $controller=$this->getController();
         if ($controller) {
@@ -225,19 +225,19 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         return $cachedPage;
     }
 
-    function _assertPageCached($path, $message = false)
+    public function _assertPageCached($path, $message = false)
     {
         $cachedPage = $this->_getCachedPage($path);
         $this->assertTrue($cachedPage!=false,$message==false?"$path should be cached":$message);
         return $cachedPage!=false && file_exists($cachedPage);
     }
-    function _assertPageNotCached($path, $message = '%s')
+    public function _assertPageNotCached($path, $message = '%s')
     {
         $cachedPage = $this->_getCachedPage($path);
         $this->assertTrue($cachedPage==false,sprintf($message,$path));
         return $cachedPage==false;
     }
-    function test_last_modified()
+    public function test_last_modified()
     {
         $this->setIp('212.121.121.121');
         $this->addIfModifiedSince('Sat, 12 Jul 2008 15:59:46 GMT');
@@ -247,7 +247,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->lastModified = $this->getHeader('Last-Modified');
     }
 
-    function test_if_modified_since_304()
+    public function test_if_modified_since_304()
     {
         $this->setIp('212.121.121.121');
         $this->addIfModifiedSince($this->lastModified);
@@ -256,7 +256,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->assertResponse(304);
     }
 
-    function test_should_cache_with_custom_path()
+    public function test_should_cache_with_custom_path()
     {
         $this->setIp('212.121.121.121');
         $this->get('http://www.example.com/page_caching/custom_path');
@@ -264,7 +264,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->assertTrue($this->_assertPageCached('/index.html'));
     }
 
-    function test_should_expire_cache_with_custom_path()
+    public function test_should_expire_cache_with_custom_path()
     {
         $this->get('http://www.example.com/page_caching/custom_path');
         $this->assertTrue($this->_assertPageCached('/index.html'));
@@ -273,21 +273,21 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->assertTrue($this->_assertPageNotCached('/index.html'));
     }
 
-    function test_should_cache_without_trailing_slash_on_url()
+    public function test_should_cache_without_trailing_slash_on_url()
     {
         $controller=$this->getController();
         $controller->cachePage('cached content', '/page_caching_test/trailing_slash');
         $this->assertTrue($this->_assertPageCached('/page_caching_test/trailing_slash.html'));
     }
 
-    function test_should_cache_with_trailing_slash_on_url()
+    public function test_should_cache_with_trailing_slash_on_url()
     {
         $controller=$this->getController();
         $controller->cachePage('cached content', '/page_caching_test/trailing_slash/');
         $this->assertTrue($this->_assertPageCached('/page_caching_test/trailing_slash.html'));
     }
 
-    function test_caches_only_get_and_ok()
+    public function test_caches_only_get_and_ok()
     {
         $methods = array('get','post','put','delete');
         $actions = array('ok','no_content','found','not_found');
@@ -303,7 +303,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
             }
         }
     }
-    function test_expiry_of_locale_based_normalized_url()
+    public function test_expiry_of_locale_based_normalized_url()
     {
         $this->assertTrue(true, 'Need to test that expirePage(array("action"=>"index","controller"=>"page","lang"=>"es")) on expires cache http://mydomain.com/es/page and http://mydomain.com/es/page/index');
         
@@ -318,7 +318,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         
     }
     
-    function test_cache_skip()
+    public function test_cache_skip()
     {
         $this->_flushCache('www.example.com');
         $this->get('http://www.example.com/page_caching/skip',array(),array(),array());
@@ -331,7 +331,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->assertTextMatch('Hello');
     }
     
-    function test_expiry_of_alllocale_based_normalized_urls()
+    public function test_expiry_of_alllocale_based_normalized_urls()
     {
         $this->assertTrue(true, 'Need to test that expirePage(array("action"=>"index","controller"=>"page","lang"=>"*")) on expires cache http://mydomain.com/**/page and http://mydomain.com/**/page/index');
         $this->get('http://www.example.com/es/page_caching');
@@ -350,7 +350,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->_assertPageNotCached('/en/page_caching/index');
         $this->_assertPageNotCached('/en/page_caching/index.html');
     }
-    function test_page_cache_priority_before_action_cache() 
+    public function test_page_cache_priority_before_action_cache() 
     {
         $this->assertTrue(true,'Need to test that if actioncache and pagecache are configured, the page cache is getting the priority 1');
         $this->_flushCache('www.example.com');
@@ -359,7 +359,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->_assertPageCached('/page_caching/priority');
     }
 
-    function test_normalization_of_urls_render_cache()
+    public function test_normalization_of_urls_render_cache()
     {
         $this->_flushCache('www.example.com');
         $this->assertTrue(true, 'Need to test that http://mydomain.com/page renders the same cached version as http://mydomain.com/page/index');
@@ -369,7 +369,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $etag2 = $this->getHeader('ETag');
         $this->assertEqual($etag1,$etag2);
     }
-    function test_expiry_of_normalized_urls()
+    public function test_expiry_of_normalized_urls()
     {
         $this->assertTrue(true, 'Need to test that expirePage(array("action"=>"index","controller"=>"page")) expires caches  http://mydomain.com/page and http://mydomain.com/page/index');
         $this->get('http://www.example.com/page_caching');
@@ -382,13 +382,13 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->_assertPageNotCached('/page_caching/index.html');
     }
     
-    function test_clean_cache()
+    public function test_clean_cache()
     {
         $this->_flushCache('www.example.com');
 
     }
     
-    function test_format_caching()
+    public function test_format_caching()
     {
         $this->_flushCache('www.example.com');
         $this->get('http://www.example.com/page_caching/format');
@@ -435,7 +435,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
 
     }
     
-    function test_format_specific_caching()
+    public function test_format_specific_caching()
     {
         $this->_flushCache('www.example.com');
         $this->get('http://www.example.com/page_caching/formatspecific');
@@ -450,7 +450,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->_assertPageNotCached('/page_caching/formatspecific.html');
     }
     
-    function test_caching_with_get_parameters()
+    public function test_caching_with_get_parameters()
     {
         $this->_flushCache('www.example.com');
         

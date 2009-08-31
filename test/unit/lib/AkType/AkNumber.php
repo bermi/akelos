@@ -3,7 +3,7 @@ require_once(AK_LIB_DIR.DS.'AkType.php');
 
 class Test_AkNumber extends AkUnitTest
 {
-    function test_constructor_default()
+    public function test_constructor_default()
     {
         $now = time();
         $number = new AkNumber(3);
@@ -14,7 +14,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1<=$val);
     }
     
-    function test_constructor_magic_string()
+    public function test_constructor_magic_string()
     {
         $now = time();
         $number = &AkT(1,'year.from.now');
@@ -24,7 +24,7 @@ class Test_AkNumber extends AkUnitTest
     }
     
     
-    function test_time_units()
+    public function test_time_units()
     {
         $this->assertEqual(20,AkT(20,'seconds'));
         $this->assertEqual(1200,AkT(20,'minutes'));
@@ -35,7 +35,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertEqual(51840000,AkT(20,'months'));
         $this->assertEqual(630720000,AkT(20,'years'));
     }
-    function test_byte_units()
+    public function test_byte_units()
     {
         $this->assertEqual(20,AkT(20,'bytes'));
         $this->assertEqual(20480,AkT(20,'kilobytes'));
@@ -45,7 +45,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertEqual(22517998136852480,AkT(20,'petabytes'));
         //$this->assertEqual(1152921504606846976,AkT(1,'exabytes'));
     }
-    function test_years_from_now()
+    public function test_years_from_now()
     {
         $now = time();
         $number = &AkT(1,'year.from.now');
@@ -66,7 +66,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1+$oneyear*2<=$number);
     }
     
-    function test_years_ago()
+    public function test_years_ago()
     {
         $now = time();
         $number = &AkT(1,'year.ago');
@@ -85,7 +85,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1-$oneyear*2<=$number);
     }
     
-    function test_months_from_now()
+    public function test_months_from_now()
     {
         $now = time();
         $number = &AkT(1,'month.from.now');
@@ -104,7 +104,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1+$onemonth*2<=$number);
     }
     
-    function test_months_ago()
+    public function test_months_ago()
     {
         $now = time();
         $number = &AkT(1,'month.ago');
@@ -123,7 +123,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1-$onemonth*2<=$number);
     }
     
-    function test_weeks_from_now()
+    public function test_weeks_from_now()
     {
         $now = time();
         $number = &AkT(1,'week.from.now');
@@ -142,7 +142,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1+$oneweek*2<=$number);
     }
     
-    function test_weeks_ago()
+    public function test_weeks_ago()
     {
         $now = time();
         $number = &AkT(1,'week.ago');
@@ -161,7 +161,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1-$oneweek*2<=$number);
     }
     
-    function test_days_from_now()
+    public function test_days_from_now()
     {
         $now = time();
         $number = &AkT(1,'day.from.now');
@@ -180,7 +180,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1+$oneday*2<=$number);
     }
     
-    function test_days_ago()
+    public function test_days_ago()
     {
         $now = time();
         $number = &AkT(1,'day.ago');
@@ -199,7 +199,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1-$oneday*2<=$number);
     }
     
-    function test_hours_from_now()
+    public function test_hours_from_now()
     {
         $now = time();
         $number = &AkT(1,'hour.from.now');
@@ -218,7 +218,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1+$onehour*2<=$number);
     }
     
-    function test_hours_ago()
+    public function test_hours_ago()
     {
         $now = time();
         $number = &AkT(1,'hour.ago');
@@ -237,7 +237,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1-$onehour*2<=$number);
     }
     
-    function test_minutes_from_now()
+    public function test_minutes_from_now()
     {
         $now = time();
         $number = &AkT(1,'minute.from.now');
@@ -256,7 +256,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1+$oneminute*2<=$number);
     }
     
-    function test_minutes_ago()
+    public function test_minutes_ago()
     {
         $now = time();
         $number = &AkT(1,'minute.ago');
@@ -275,7 +275,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1-$oneminute*2<=$number);
     }
     
-    function test_seconds_from_now()
+    public function test_seconds_from_now()
     {
         $now = time();
         $number = &AkT(1,'second.from.now');
@@ -294,7 +294,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1+$onesecond*2<=$number);
     }
     
-    function test_seconds_ago()
+    public function test_seconds_ago()
     {
         $now = time();
         $number = &AkT(1,'second.ago');
@@ -313,14 +313,14 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now-1-$onesecond*2<=$number);
     }
     
-    function test_to_date()
+    public function test_to_date()
     {
         $now = date('Y-m-d H:i:s');
         $date = &AkT(0,'now.toDate');
         $this->assertEqual($now,$date);
     }
     
-    function test_ordinalize()
+    public function test_ordinalize()
     {
         $number = &AkT(1);
         $expect = '1st';
@@ -347,7 +347,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertEqual($expect,$number);
     }
     
-    function test_quantify()
+    public function test_quantify()
     {
         $number = &AkT(1);
         $expected = '1 Comment';
@@ -370,7 +370,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertEqual($expected, $quantity);
     }
     
-    function test_until()
+    public function test_until()
     {
         $now = time();
         $until = $now + AkT(20,'minutes');
@@ -380,7 +380,7 @@ class Test_AkNumber extends AkUnitTest
         $result_date = date('Y-m-d H:i:s', $result_timestamp);
     }
     
-    function test_since()
+    public function test_since()
     {
         $now = time();
         $since = $now - AkT(20,'minutes');

@@ -5,12 +5,12 @@ require_once(AK_LIB_DIR.DS.'Ak.php');
 
 class test_Ak_var_manipulation extends  UnitTestCase
 {
-    function test_for_to_array()
+    public function test_for_to_array()
     {
         $this->assertEqual(Ak::toArray('es,en,va'),array('es','en','va'));
     }    
     
-    function test_for_string_to_array()
+    public function test_for_string_to_array()
     {
         $this->assertEqual(Ak::stringToArray('es,en,va'),array('es','en','va'));
         $this->assertEqual(Ak::stringToArray('es , en , va'),array('es','en','va'));

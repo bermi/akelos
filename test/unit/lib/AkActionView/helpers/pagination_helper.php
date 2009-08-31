@@ -9,7 +9,7 @@ class PaginationHelperTests extends HelpersUnitTester
     /**
      * @todo Add tests for pagination helper
      */
-    function tests_pending()
+    public function tests_pending()
     {
         
     }

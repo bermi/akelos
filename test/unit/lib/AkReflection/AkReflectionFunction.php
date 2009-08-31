@@ -5,7 +5,7 @@ require_once(AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFunction.php');
 
 class AkReflectionFunction_TestCase extends  UnitTestCase
 {
-    function test_string_constructor()
+    public function test_string_constructor()
     {
         $string ='
             /**
@@ -14,7 +14,7 @@ class AkReflectionFunction_TestCase extends  UnitTestCase
              * @param $param1
              * @param $param2
              */
-            function &method2(&$param1,$param2) {
+            public function &method2($param1,$param2) {
             
             }
         }';
@@ -23,7 +23,7 @@ class AkReflectionFunction_TestCase extends  UnitTestCase
        
     }
     
-    function test_array_constructor()
+    public function test_array_constructor()
     {
         $string ='
             /**
@@ -32,7 +32,7 @@ class AkReflectionFunction_TestCase extends  UnitTestCase
              * @param $param1
              * @param $param2
              */
-            function &method2(&$param1,$param2) {
+            public function &method2($param1,$param2) {
                 $default_options = array("test"=>1,
                                          "test2"=>3,
                                          "test3"=>$this->value);
@@ -49,7 +49,7 @@ class AkReflectionFunction_TestCase extends  UnitTestCase
 
     }
     
-    function test_add_doc_block_tag()
+    public function test_add_doc_block_tag()
     {
         $string ='
             /**
@@ -58,7 +58,7 @@ class AkReflectionFunction_TestCase extends  UnitTestCase
              * @param $param1
              * @param $param2
              */
-            function &method2(&$param1,$param2) {
+            public function &method2($param1,$param2) {
                 $default_options = array("test"=>1,
                                          "test2"=>3,
                                          "test3"=>$this->value);

@@ -6,7 +6,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'tag_helper.php');
 
 class TagHelperTests extends HelpersUnitTester
 {
-    function test_TagHelper()
+    public function test_TagHelper()
     {
         $this->assertEqual(TagHelper::tag('br'),'<br />');
         $this->assertEqual(TagHelper::tag('input',array('type'=>'text','value'=>'Insert your text >> "HERE"')),
@@ -23,7 +23,7 @@ class TagHelperTests extends HelpersUnitTester
         '<![CDATA[Have a look "HERE"]]>');
     }
 
-    function test_for_not_double_escaping_entities()
+    public function test_for_not_double_escaping_entities()
     {
         $this->assertEqual(TagHelper::escape_once("1 > 2 &amp; 3"), "1 &gt; 2 &amp; 3");
     }

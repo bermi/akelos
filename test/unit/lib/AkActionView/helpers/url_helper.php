@@ -7,9 +7,9 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'asset_tag_helper.php'
 
 class UrlHelperTests extends HelpersUnitTester
 {
-    function setup()
+    public function setup()
     {
-        $this->Controller = &new MockAkActionController($this);
+        $this->Controller = new MockAkActionController($this);
         $this->Controller->setReturnValue('urlFor', '/url/for/test');
         //$this->Controller->setReturnValue('_getCompleteRequestUri','/url/for/test');
 
@@ -17,7 +17,7 @@ class UrlHelperTests extends HelpersUnitTester
         $this->url->setController($this->Controller);
     }
 
-    function test_for_UrlHelper()
+    public function test_for_UrlHelper()
     {
         $this->assertReference($this->Controller, $this->url->_controller);
 
@@ -57,13 +57,13 @@ class UrlHelperTests extends HelpersUnitTester
 
     }
 
-    function test_should_encode_utf8_characters_as_entities_when_encoding_mail_to_links()
+    public function test_should_encode_utf8_characters_as_entities_when_encoding_mail_to_links()
     {
         $escaped_iacute = '%26%69%61%63%75%74%65%3b';
         $this->assertTrue(strstr($this->url->mail_to('test@example.com', 'mounstro de pulsa aquí', array('encode' => 'javascript')), $escaped_iacute));
     }
     
-    function test_link_to_unless()
+    public function test_link_to_unless()
     {
         $condition = false;
         $this->assertEqual('<a href="http://www.example.com">link</a>',$this->url->link_to_unless($condition,'link','http://www.example.com'));
@@ -72,7 +72,7 @@ class UrlHelperTests extends HelpersUnitTester
         $this->assertEqual('link',$this->url->link_to_unless($condition,'link','http://www.example.com'));
     }
     
-    function test_link_to_if()
+    public function test_link_to_if()
     {
         $condition = true;
         $this->assertEqual('<a href="http://www.example.com">link</a>',$this->url->link_to_if($condition,'link','http://www.example.com'));

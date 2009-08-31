@@ -48,7 +48,7 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
     {
         $Categories = new NestedCategory();
         $Object = new AkObject();
-        $this->assertErrorPattern('/is not an active record/',$Categories->nested_set->_ensureIsActiveRecordInstance(&$Object));
+        $this->assertErrorPattern('/is not an active record/',$Categories->nested_set->_ensureIsActiveRecordInstance($Object));
     }
 
     public function Test_of_getType()

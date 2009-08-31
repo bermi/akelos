@@ -15,17 +15,17 @@ ak_generate_mock('AkRequest');
 
 class ActiveRecordHelperTests extends HelpersUnitTester
 {
-    function test_setup()
+    public function test_setup()
     {
-        $this->controller = &new AkActionController();
-        $this->controller->Request =& new MockAkRequest($this);
+        $this->controller = new AkActionController();
+        $this->controller->Request = new MockAkRequest($this);
         $this->controller->controller_name = 'test';
         $this->controller->instantiateHelpers();
 
         $this->active_record_helper =& $this->controller->active_record_helper;
         $this->installAndIncludeModels(array('ProtectedPerson','Property'));
 
-        $this->controller->ProtectedPerson =& new ProtectedPerson();
+        $this->controller->ProtectedPerson = new ProtectedPerson();
         $this->LuckyLuke =& $this->controller->ProtectedPerson;
         $this->controller->ProtectedPerson->name = "Lucky Luke";
         $this->controller->ProtectedPerson->created_by = "1";
@@ -34,13 +34,13 @@ class ActiveRecordHelperTests extends HelpersUnitTester
         $this->controller->ProtectedPerson->created_at = Ak::getDate(mktime(8,42,36,3,27,1982));
         $this->controller->ProtectedPerson->updated_at = Ak::getDate(mktime(8,42,36,3,27,1982));
         
-        $this->controller->Property =& new Property('description->','阿尔罕布拉宫','details->','阿尔罕布拉宫 <> & (阿拉伯语: الحمراء‎‎ = Al Ħamrā\'; 即"红色城堡")');
+        $this->controller->Property = new Property('description->','阿尔罕布拉宫','details->','阿尔罕布拉宫 <> & (阿拉伯语: الحمراء‎‎ = Al Ħamrā\'; 即"红色城堡")');
         $this->alhambra =& $this->controller->Property;
         $this->alhambra->save();
     }
     
 
-    function tests_input()
+    public function tests_input()
     {
         $this->assertEqual(
             $this->active_record_helper->input('ProtectedPerson', 'name'),
@@ -63,7 +63,7 @@ class ActiveRecordHelperTests extends HelpersUnitTester
         );
     }
 
-    function test_form()
+    public function test_form()
     {
         $this->assertEqual(
             $this->active_record_helper->form('ProtectedPerson'),
@@ -71,7 +71,7 @@ class ActiveRecordHelperTests extends HelpersUnitTester
         );
     }
     
-    function test_should_render_limited_form_fields()
+    public function test_should_render_limited_form_fields()
     {
         $this->assertEqual(
             $this->active_record_helper->form('ProtectedPerson', array('columns'=>array('id','name'))),
@@ -79,7 +79,7 @@ class ActiveRecordHelperTests extends HelpersUnitTester
         );
     }
 
-    function test_error_message_on()
+    public function test_error_message_on()
     {
         $this->LuckyLuke->addError('name');
         $this->assertEqual(
@@ -93,7 +93,7 @@ class ActiveRecordHelperTests extends HelpersUnitTester
         );
     }
 
-    function test_error_messages_for()
+    public function test_error_messages_for()
     {
         $this->LuckyLuke->addError('birthday');
         $this->assertEqual(
@@ -107,7 +107,7 @@ class ActiveRecordHelperTests extends HelpersUnitTester
         );
     }
     
-    function test_textarea_should_escape_characters_correctly()
+    public function test_textarea_should_escape_characters_correctly()
     {
         $this->assertEqual(
             $this->active_record_helper->form('Property'),

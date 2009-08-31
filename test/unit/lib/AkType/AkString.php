@@ -3,19 +3,19 @@ require_once(AK_LIB_DIR.DS.'AkType.php');
 
 class Test_AkString extends AkUnitTest
 {
-    function test_constructor_default()
+    public function test_constructor_default()
     {
         $string = new AkString('test');
         $this->assertEqual('test',$string->toString());
     }
     
-    function test_constructor_magic_string()
+    public function test_constructor_magic_string()
     {
         $string = &AkT('test');
         $this->assertEqual('test',$string->toString());
     }
 
-    function test_at()
+    public function test_at()
     {
         $string = &AkT('test');
         $this->assertEqual('t',$string->at(0));
@@ -27,7 +27,7 @@ class Test_AkString extends AkUnitTest
         $this->assertEqual('s',$char);
     }
     
-    function test_ends_with()
+    public function test_ends_with()
     {
         $string = &AkT("test ends with\nstring");
         $this->assertTrue($string->endsWith("h\nstring"));
@@ -39,7 +39,7 @@ class Test_AkString extends AkUnitTest
         $this->assertFalse($endswith);
         
     }
-    function test_starts_with()
+    public function test_starts_with()
     {
         $string = &AkT("test ends with\nstring");
         $this->assertTrue($string->startsWith("test ends with\n"));
@@ -51,14 +51,14 @@ class Test_AkString extends AkUnitTest
         $this->assertFalse($startswith);
         
     }
-    function test_first()
+    public function test_first()
     {
         $string = &AkT("test string");
         $this->assertEqual('t',$string->first());
         $this->assertEqual('te',$string->first(2));
         $this->assertEqual('tes',$string->first(3));
     }
-    function test_last()
+    public function test_last()
     {
         $string = &AkT("test string");
         $this->assertEqual('g',$string->last());
@@ -66,32 +66,32 @@ class Test_AkString extends AkUnitTest
         $this->assertEqual('ing',$string->last(3));
         $this->assertEqual('test string',$string->last(20));
     }
-    function test_from()
+    public function test_from()
     {
         $string = &AkT("test string");
         $this->assertEqual('est string',$string->from(1));
         
         $this->assertEqual('',$string->from(11));
     }
-    function test_to()
+    public function test_to()
     {
         $string = &AkT("test string");
         $this->assertEqual('t',$string->to(1));
         
         $this->assertEqual('test ',$string->to(5));
     }
-    function test_humanize()
+    public function test_humanize()
     {
         $string = &AkT("this_is_a_test");
         $this->assertEqual('This is a test',$string->humanize());
     }
-    function test_tableize()
+    public function test_tableize()
     {
         $string = &AkT("This is a test");
         $this->assertEqual('this_is_a_tests',$string->tableize());
     }
     
-    function test_titleize()
+    public function test_titleize()
     {
         $string = &AkT("This is a test");
         $this->assertEqual('This Is A Test',$string->titleize());
@@ -102,14 +102,14 @@ class Test_AkString extends AkUnitTest
         $string = &AkT("ThisIsATest");
         $this->assertEqual('This Is A Test',$string->titleize());
     }
-    function test_length()
+    public function test_length()
     {
         $text = "this_is_a_test";
         $string = &AkT($text);
         $this->assertEqual(strlen($text),$string->length());
     }
     
-    function test_pluralize()
+    public function test_pluralize()
     {
         $text = "Comment";
         $string = &AkT($text);
@@ -122,7 +122,7 @@ class Test_AkString extends AkUnitTest
         $this->assertEqual('ingleses',$string);
     }
     
-    function test_singularize()
+    public function test_singularize()
     {
         $text = "Comments";
         $string = &AkT($text);

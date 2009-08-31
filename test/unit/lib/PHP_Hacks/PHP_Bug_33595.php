@@ -6,20 +6,20 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 require_once(AK_LIB_DIR.DS.'AkProfiler.php');
 
 class PHP_Bug_33595_A extends AkObject{
-    var $two = null;
-    var $data = null;
+    public $two = null;
+    public $data = null;
 }
 
 
 class PHP_Bug_33595_B extends AkObject{
-    var $one = null;
+    public $one = null;
 }
 
 
 class PHP_Bug_33595_TestCase extends AkUnitTest
 {
 
-    function test_should_increase_memory()
+    public function test_should_increase_memory()
     {
         $this->log_memory(true);
 
@@ -33,7 +33,7 @@ class PHP_Bug_33595_TestCase extends AkUnitTest
 
     }
 
-    function test_should_not_increase_memory()
+    public function test_should_not_increase_memory()
     {
         $this->log_memory(true);
 
@@ -46,10 +46,10 @@ class PHP_Bug_33595_TestCase extends AkUnitTest
         memory increase was '.$bytes.' bytes but should be lower than 500 bytes'); 
     }
     
-    function instantiate_grow_and_unset($use_free_memory_hack = true)
+    public function instantiate_grow_and_unset($use_free_memory_hack = true)
     {
-        $One =& new PHP_Bug_33595_A();
-        $Two =& new PHP_Bug_33595_B();
+        $One = new PHP_Bug_33595_A();
+        $Two = new PHP_Bug_33595_B();
 
         $One->two =& $Two;
         $Two->one =& $One;
@@ -66,7 +66,7 @@ class PHP_Bug_33595_TestCase extends AkUnitTest
         unset($Two);
     }
 
-    function log_memory($reset = false, $vervose = false)
+    public function log_memory($reset = false, $vervose = false)
     {
         ($reset || empty($this->initial)) && $this->initial = memory_get_usage();
         $this->current = memory_get_usage();

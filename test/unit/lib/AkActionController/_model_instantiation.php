@@ -5,7 +5,7 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class _AkActionController_model_instantiation extends AkWebTestCase
 {
-    function test_setup()
+    public function test_setup()
     {
         $TestSetup = new AkUnitTest();
         $TestSetup->installAndIncludeModels(array('Post','Comment','Tag'));
@@ -20,7 +20,7 @@ class _AkActionController_model_instantiation extends AkWebTestCase
         $this->post_id = $Post->id;
     }
     
-    function test_should_access_public_action()
+    public function test_should_access_public_action()
     {
         $this->setMaximumRedirects(0);
         $this->get(AK_TESTING_URL.'/post/comments/'.$this->post_id);

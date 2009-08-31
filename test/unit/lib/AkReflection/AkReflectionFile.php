@@ -6,7 +6,7 @@ require_once(AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFile.php');
 class AkReflectionFile_TestCase extends  UnitTestCase
 {
 
-    function test_single_class()
+    public function test_single_class()
     {
         $filename = AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'reflection_test_class.php';
         $file = new AkReflectionFile($filename);
@@ -15,7 +15,7 @@ class AkReflectionFile_TestCase extends  UnitTestCase
         $this->assertEqual('ReflectionTestClass1',$classes[0]->getName());
     }
     
-    function test_multiple_classes()
+    public function test_multiple_classes()
     {
         $filename = AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'reflection_test_classes.php';
         $file = new AkReflectionFile($filename);
@@ -25,7 +25,7 @@ class AkReflectionFile_TestCase extends  UnitTestCase
         $this->assertEqual('ReflectionTestClass2',$classes[1]->getName());
     }
     
-    function test_special1()
+    public function test_special1()
     {
         $filename = AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'reflection_doc_block_test_class.php';
         $file = new AkReflectionFile($filename);

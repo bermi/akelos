@@ -34,7 +34,7 @@ class test_AkActiveRecord_observer extends  AkUnitTest
 
         $params = 'ObservedAccount';
         $Auditor =& Ak::singleton('TestAuditor',$params);
-        $Auditor->observe(&$Observed);
+        $Auditor->observe($Observed);
 
         $ObeserversReference =& $Observed->getObservers();
 

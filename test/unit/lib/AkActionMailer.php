@@ -7,10 +7,10 @@ require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
 class Tests_for_Mailers extends  AkUnitTest
 {
-    function setup()
+    public function setup()
     {
         Ak::import_mailer('render_mailer,first_mailer,second_mailer,helper_mailer,test_mailer');
-        $this->Mailer =& new AkActionMailer();
+        $this->Mailer = new AkActionMailer();
         $this->Mailer->delivery_method = 'test';
         $this->Mailer->perform_deliveries = true;
         $this->Mailer->deliveries = array();
@@ -18,72 +18,72 @@ class Tests_for_Mailers extends  AkUnitTest
     }
 
     /**/
-    function test_inline_template()
+    public function test_inline_template()
     {
-        $RenderMailer =& new RenderMailer();
+        $RenderMailer = new RenderMailer();
         $Mail = $RenderMailer->create('inline_template', $this->recipient);
         $this->assertEqual("Hello, World", $Mail->body);
     }
 
-    function test_file_template()
+    public function test_file_template()
     {
-        $RenderMailer =& new RenderMailer();
+        $RenderMailer = new RenderMailer();
         $Mail = $RenderMailer->create('file_template',$this->recipient);
         $this->assertEqual("Hello there,\n\nMr. test@localhost", trim($Mail->body));
     }
 
     // FirstSecondHelper
-    function test_ordering()
+    public function test_ordering()
     {
-        $FirstMailer =& new FirstMailer();
+        $FirstMailer = new FirstMailer();
         $Mail = $FirstMailer->create('share', $this->recipient);
         $this->assertEqual('first mail', trim($Mail->body));
 
-        $SecondMailer =& new SecondMailer();
+        $SecondMailer = new SecondMailer();
         $Mail = $SecondMailer->create('share', $this->recipient);
         $this->assertEqual('second mail', trim($Mail->body));
 
 
-        $FirstMailer =& new FirstMailer();
+        $FirstMailer = new FirstMailer();
         $Mail = $FirstMailer->create('share', $this->recipient);
         $this->assertEqual('first mail', trim($Mail->body));
 
-        $SecondMailer =& new SecondMailer();
+        $SecondMailer = new SecondMailer();
         $Mail = $SecondMailer->create('share', $this->recipient);
         $this->assertEqual('second mail', trim($Mail->body));
     }
 
-    function test_use_helper()
+    public function test_use_helper()
     {
-        $HelperMailer =& new HelperMailer();
+        $HelperMailer = new HelperMailer();
         $Mail = $HelperMailer->create('use_helper', $this->recipient);
         $this->assertPattern('/Mr\. Joe Person/', trim($Mail->body));
     }
 
-    function test_use_example_helper()
+    public function test_use_example_helper()
     {
-        $HelperMailer =& new HelperMailer();
+        $HelperMailer = new HelperMailer();
         $Mail = $HelperMailer->create('use_example_helper', $this->recipient);
         $this->assertPattern('/<em><strong><small>emphasize me!/', trim($Mail->body));
     }
 
-    function test_use_helper_method()
+    public function test_use_helper_method()
     {
-        $HelperMailer =& new HelperMailer();
+        $HelperMailer = new HelperMailer();
         $Mail = $HelperMailer->create('use_helper_method', $this->recipient);
         $this->assertPattern('/HelperMailer/', trim($Mail->body));
     }
 
-    function test_use_mail_helper()
+    public function test_use_mail_helper()
     {
-        $HelperMailer =& new HelperMailer();
+        $HelperMailer = new HelperMailer();
         $Mail = $HelperMailer->create('use_mail_helper', $this->recipient);
         $this->assertPattern('/  But soft!/', trim($Mail->body));
         $this->assertPattern("/east,\n  and Juliet/", trim($Mail->body));
     }
 
 
-    function test_quote_multibyte_chars()
+    public function test_quote_multibyte_chars()
     {
         $original = "\303\246 \303\270 and \303\245";
         $result = AkActionMailerQuoting::quotedPrintableEncode($original);
@@ -91,7 +91,7 @@ class Tests_for_Mailers extends  AkUnitTest
         $this->assertEqual($unquoted, $original);
     }
 
-    function test_mime_header_to_utf()
+    public function test_mime_header_to_utf()
     {
         $headers = array(
         "Subject: =?ISO-8859-1?Q?=C9ste_es_el_sof=E1_del_q_habl=E9_=5B?=\n\r =?ISO-8859-1?Q?Fwd=3A_Sof=E1=2E=5D_?="=>'Subject: Éste es el sofá del q hablé [Fwd: Sofá.]',
@@ -120,13 +120,13 @@ class Tests_for_Mailers extends  AkUnitTest
 
     // test an email that has been created using \r\n newlines, instead of
     // \n newlines.
-    function test_email_quoted_with_0d0a()
+    public function test_email_quoted_with_0d0a()
     {
         $Mail = AkMailBase::parse(file_get_contents(AK_TEST_DIR.'/fixtures/data/action_mailer/raw_email_quoted_with_0d0a'));
         $this->assertPattern('/Elapsed time/', $Mail->body);
     }
 
-    function test_email_with_partially_quoted_subject()
+    public function test_email_with_partially_quoted_subject()
     {
         $Mail = AkMailBase::parse(file_get_contents(AK_TEST_DIR.'/fixtures/data/action_mailer/raw_email_with_partially_quoted_subject'));
         $this->assertEqual("Re: Test: \"\346\274\242\345\255\227\" mid \"\346\274\242\345\255\227\" tail", $Mail->subject);
@@ -155,24 +155,24 @@ class Tests_for_Mailers extends  AkUnitTest
 
 class Tests_for_AkActionMailer extends  AkUnitTest
 {
-    function encode($text, $charset = 'utf-8')
+    public function encode($text, $charset = 'utf-8')
     {
         return AkActionMailerQuoting::quotedPrintable($text, $charset);
     }
 
-    function &new_mail($charset = 'utf-8')
+    public function &new_mail($charset = 'utf-8')
     {
-        $Mail =& new AkMailMessage();
+        $Mail = new AkMailMessage();
         $Mail->setMimeVersion('1.0');
         $Mail->setContentType('text/plain; charset:'.$charset);
         return $Mail;
 
     }
 
-    function setup()
+    public function setup()
     {
         Ak::import_mailer('render_mailer,first_mailer,second_mailer,helper_mailer,test_mailer');
-        $this->Mailer =& new AkActionMailer();
+        $this->Mailer = new AkActionMailer();
         $this->Mailer->delivery_method = 'test';
         $this->Mailer->perform_deliveries = true;
         $this->Mailer->deliveries = array();
@@ -181,9 +181,9 @@ class Tests_for_AkActionMailer extends  AkUnitTest
 
     /**/
 
-    function test_nested_parts()
+    public function test_nested_parts()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Created = $TestMailer->create('nested_multipart', $this->recipient);
 
 
@@ -200,15 +200,15 @@ class Tests_for_AkActionMailer extends  AkUnitTest
 
     }
 
-    function test_attachment_with_custom_header()
+    public function test_attachment_with_custom_header()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Created = $TestMailer->create('attachment_with_custom_header', $this->recipient);
         $this->assertEqual( "<test@test.com>", $Created->parts[1]->getHeader('Content-ID'));
     }
 
 
-    function test_signed_up()
+    public function test_signed_up()
     {
         $Expected =& $this->new_mail();
         $Expected->setTo($this->recipient);
@@ -218,7 +218,7 @@ class Tests_for_AkActionMailer extends  AkUnitTest
         $Expected->setDate(Ak::getTimestamp("2004-12-12"));
 
 
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Created = $TestMailer->create('signed_up', $this->recipient));
         $this->assertEqual($Expected->getEncoded(), $Created->getEncoded());
 
@@ -229,7 +229,7 @@ class Tests_for_AkActionMailer extends  AkUnitTest
     }
 
 
-    function test_custom_template()
+    public function test_custom_template()
     {
         $Expected =& $this->new_mail();
         $Expected->setTo($this->recipient);
@@ -237,13 +237,13 @@ class Tests_for_AkActionMailer extends  AkUnitTest
         $Expected->setBody("Hello there,\n\nMr. $this->recipient");
         $Expected->setFrom("system@example.com");
 
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Created = $TestMailer->create('custom_template', $this->recipient));
         $this->assertEqual($Expected->getEncoded(), $Created->getEncoded());
 
     }
 
-    function test_cancelled_account()
+    public function test_cancelled_account()
     {
         $Expected =& $this->new_mail();
         $Expected->setTo($this->recipient);
@@ -252,7 +252,7 @@ class Tests_for_AkActionMailer extends  AkUnitTest
         $Expected->setFrom("system@example.com");
         $Expected->setDate("2004-12-12");
 
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Created = $TestMailer->create('cancelled_account', $this->recipient));
 
         $this->assertEqual($Expected->getEncoded(), $Created->getEncoded());
@@ -263,7 +263,7 @@ class Tests_for_AkActionMailer extends  AkUnitTest
     }
 
 
-    function test_cc_bcc()
+    public function test_cc_bcc()
     {
         $Expected =& $this->new_mail();
         $Expected->setTo($this->recipient);
@@ -275,7 +275,7 @@ class Tests_for_AkActionMailer extends  AkUnitTest
         $Expected->setBcc("root@example.com");
 
 
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Created = $TestMailer->create('cc_bcc', $this->recipient));
 
         $this->assertEqual($Expected->getEncoded(), $Created->getEncoded());
@@ -287,7 +287,7 @@ class Tests_for_AkActionMailer extends  AkUnitTest
 
 
 
-    function test_iso_charset()
+    public function test_iso_charset()
     {
         $Expected =& $this->new_mail();
         $Expected->setTo($this->recipient);
@@ -299,7 +299,7 @@ class Tests_for_AkActionMailer extends  AkUnitTest
         $Expected->setCc("nobody@example.com");
         $Expected->setBcc("root@example.com");
 
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
 
         $this->assertTrue($Created = $TestMailer->create('iso_charset', $this->recipient));
 
@@ -314,7 +314,7 @@ class Tests_for_AkActionMailer extends  AkUnitTest
     }
 
 
-    function test_unencoded_subject()
+    public function test_unencoded_subject()
     {
         $Expected =& $this->new_mail();
         $Expected->setTo($this->recipient);
@@ -325,7 +325,7 @@ class Tests_for_AkActionMailer extends  AkUnitTest
         $Expected->setCc("nobody@example.com");
         $Expected->setBcc("root@example.com");
 
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
 
         $this->assertTrue($Created = $TestMailer->create('unencoded_subject', $this->recipient));
 
@@ -339,9 +339,9 @@ class Tests_for_AkActionMailer extends  AkUnitTest
     }
 
 
-    function test_perform_deliveries_flag()
+    public function test_perform_deliveries_flag()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
 
         $TestMailer->perform_deliveries = false;
         $this->assertTrue($TestMailer->deliver('signed_up', $this->recipient));
@@ -354,7 +354,7 @@ class Tests_for_AkActionMailer extends  AkUnitTest
     }
 
 
-    function test_unquote_quoted_printable_subject()
+    public function test_unquote_quoted_printable_subject()
     {
         $msg = <<<EOF
 From: me@example.com
@@ -371,7 +371,7 @@ EOF;
     }
 
 
-    function test_unquote_7bit_subject()
+    public function test_unquote_7bit_subject()
     {
         $msg = <<<EOF
 From: me@example.com
@@ -388,7 +388,7 @@ EOF;
     }
 
 
-    function test_unquote_7bit_body()
+    public function test_unquote_7bit_body()
     {
         $msg = <<<EOF
 From: me@example.com
@@ -405,7 +405,7 @@ EOF;
 
     }
 
-    function test_unquote_quoted_printable_body()
+    public function test_unquote_quoted_printable_body()
     {
         $msg = <<<EOF
 From: me@example.com
@@ -422,7 +422,7 @@ EOF;
 
     }
 
-    function test_unquote_base64_body()
+    public function test_unquote_base64_body()
     {
         $msg = <<<EOF
 From: me@example.com
@@ -440,7 +440,7 @@ EOF;
 
 
 
-    function test_extended_headers()
+    public function test_extended_headers()
     {
         $this->recipient = "Grytøyr <test@localhost>";
         $Expected =& $this->new_mail();
@@ -453,7 +453,7 @@ EOF;
         $Expected->setCc("Grytøyr <stian2@example.com>");
         $Expected->setBcc("Grytøyr <stian3@example.com>");
 
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
 
         $this->assertTrue($Created = $TestMailer->create('extended_headers', $this->recipient));
 
@@ -464,52 +464,52 @@ EOF;
         $this->assertEqual($Expected->getEncoded(), $TestMailer->deliveries[0]);
     }
 
-    function test_utf8_body_is_not_quoted()
+    public function test_utf8_body_is_not_quoted()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Created = $TestMailer->create('utf8_body', $this->recipient));
         $this->assertPattern('/åœö blah/', $Created->getBody());
     }
 
-    function test_multiple_utf8_recipients()
+    public function test_multiple_utf8_recipients()
     {
         $this->recipient = array("\"Foo áëô îü\" <extended@example.com>", "\"Example Recipient\" <me@example.com>");
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Created = $TestMailer->create('utf8_body', $this->recipient));
 
         $this->assertPattern("/\nFrom: =\?UTF-8\?Q\?Foo_=C3=A1=C3=AB=C3=B4_=C3=AE\?=\r\n =\?UTF-8\?Q\?=C3=BC\?= <extended@example.com>\r/", $Created->getEncoded());
         $this->assertPattern("/To: =\?UTF-8\?Q\?Foo_=C3=A1=C3=AB=C3=B4_=C3=AE\?=\r\n =\?UTF-8\?Q\?=C3=BC\?= <extended@example.com>, \r\n     \"Example Recipient\" <me/", $Created->getEncoded());
     }
 
-    function test_receive_decodes_base64_encoded_mail()
+    public function test_receive_decodes_base64_encoded_mail()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $TestMailer->receive(file_get_contents(AK_TEST_DIR."/fixtures/data/action_mailer/raw_email"));
         $this->assertPattern("/Jamis/", $TestMailer->received_body);
 
     }
 
-    function test_receive_attachments()
+    public function test_receive_attachments()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Mail =& $TestMailer->receive(file_get_contents(AK_TEST_DIR."/fixtures/data/action_mailer/raw_email2"));
         $Attachment = Ak::last($Mail->attachments);
         $this->assertEqual("smime.p7s", $Attachment->original_filename);
         $this->assertEqual("application/pkcs7-signature", $Attachment->content_type);
     }
 
-    function test_decode_attachment_without_charset()
+    public function test_decode_attachment_without_charset()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Mail =& $TestMailer->receive(file_get_contents(AK_TEST_DIR."/fixtures/data/action_mailer/raw_email3"));
         $Attachment = Ak::last($Mail->attachments);
         $this->assertEqual(1026, Ak::size($Attachment->data));
     }
 
 
-    function test_attachment_using_content_location()
+    public function test_attachment_using_content_location()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Mail =& $TestMailer->receive(file_get_contents(AK_TEST_DIR."/fixtures/data/action_mailer/raw_email12"));
 
         $this->assertEqual(1, Ak::size($Mail->attachments));
@@ -519,9 +519,9 @@ EOF;
     }
 
 
-    function test_attachment_with_text_type()
+    public function test_attachment_with_text_type()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Mail =& $TestMailer->receive(file_get_contents(AK_TEST_DIR."/fixtures/data/action_mailer/raw_email13"));
 
         $this->assertTrue($Mail->hasAttachments());
@@ -533,64 +533,64 @@ EOF;
 
 
 
-    function test_decode_part_without_content_type()
+    public function test_decode_part_without_content_type()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Mail =& $TestMailer->receive(file_get_contents(AK_TEST_DIR."/fixtures/data/action_mailer/raw_email4"));
         $this->assertNoErrors();
     }
 
-    function test_decode_message_without_content_type()
+    public function test_decode_message_without_content_type()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Mail =& $TestMailer->receive(file_get_contents(AK_TEST_DIR."/fixtures/data/action_mailer/raw_email5"));
         $this->assertNoErrors();
     }
 
-    function test_decode_message_with_incorrect_charset()
+    public function test_decode_message_with_incorrect_charset()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Mail =& $TestMailer->receive(file_get_contents(AK_TEST_DIR."/fixtures/data/action_mailer/raw_email6"));
         $this->assertNoErrors();
     }
 
 
-    function test_multipart_with_mime_version()
+    public function test_multipart_with_mime_version()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Created = $TestMailer->create('multipart_with_mime_version', $this->recipient));
         $this->assertEqual('1.1', $Created->mime_version);
     }
 
-    function test_multipart_with_utf8_subject()
+    public function test_multipart_with_utf8_subject()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Created = $TestMailer->create('multipart_with_utf8_subject', $this->recipient));
         $this->assertPattern("/\nSubject: =\?UTF-8\?Q\?Foo_.*?\?=/", $Created->getEncoded());
     }
-    function test_multipart_with_long_russian_utf8_subject()
+    public function test_multipart_with_long_russian_utf8_subject()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Created = $TestMailer->create('multipart_with_long_russian_utf8_subject', $this->recipient));
         $this->assertPattern("/\nSubject: =\?UTF-8\?Q\?=D0=AD=D1=82=D0=BE_=D0=BA=D0=B0=D0=BA=D0=BE=D0=B5\?=\r\n =\?UTF-8\?Q\?-=D1=82=D0=BE_=D0=BE=D1=81=D0=BC=D1=8B=D1=81=D0=BB\?=\r\n =\?UTF-8\?Q\?=D0=B5=D0=BD=D0=BD=D0=BE=D0=B5_=D0=BD=D0=B0=D0=B4=D0=B5\?=\r\n =\?UTF-8\?Q\?=D1=8E=D1=81=D1=8C,_=D0=B4=D0=BB=D0=B8=D0=BD=D0=BD\?=\r\n =\?UTF-8\?Q\?=D1=8B=D0=B9_=D1=80=D1=83=D1=81=D1=81=D0=BA=D0=B8=D0=B9\?=\r\n =\?UTF-8\?Q\?_=D1=82=D0=B5=D0=BA=D1=81=D1=82_=D1=81_=D0=BD\?=\r\n =\?UTF-8\?Q\?=D0=B5=D0=BA=D0=BE=D1=82=D0=BE=D1=80=D1=8B=D0=BC=D0=B8_\?=\r\n =\?UTF-8\?Q\?Nice_kyril\?=\r\n =\?UTF-8\?Q\?lic_=D1=81=D0=B8=D0=BC=D0=B2=D0=BE=D0=BB\?=\r\n =\?UTF-8\?Q\?=D1=8B_=D0=B2_=D0=BD=D0=B5=D0=BC,_=D0=B8\?=\r\n =\?UTF-8\?Q\?_=D1=8F_=D0=BC=D0=BE=D0=B3=D1=83_=D0=B8=D1=81\?=\r\n =\?UTF-8\?Q\?=D0=BF=D0=BE=D0=BB=D1=8C=D0=B7=D0=BE=D0=B2=D0=B0=D1=82=D1=8C\?=\r\n =\?UTF-8\?Q\?_=D0=B5=D0=B3=D0=BE_=D0=B4=D0=BB=D1=8F_=D0=BC\?=\r\n =\?UTF-8\?Q\?=D0=BE=D0=B8=D1=85_=D1=86=D0=B5=D0=BB=D0=B5=D0=B9_\?=\r\n =\?UTF-8\?Q\?=D1=82=D0=B5=D1=81=D1=82=D0=B8=D1=80=D0=BE=D0=B2=D0=B0=D0=BD\?=\r\n =\?UTF-8\?Q\?=D0=B8=D1=8F\?=/", $Created->getEncoded());
     }
     
-    function test_multipart_with_long_russian_utf8_sender()
+    public function test_multipart_with_long_russian_utf8_sender()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Created = $TestMailer->create('multipart_with_long_russian_utf8_sender', $this->recipient));
         $this->assertPattern("/\From: =\?UTF-8\?Q\?=D0=BA=D0=B0=D0=BA=D0=BE=D0=B5\?= <test@example.com>/", $Created->getEncoded());
     }
-    function test_implicitly_multipart_with_utf8()
+    public function test_implicitly_multipart_with_utf8()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Created = $TestMailer->create('implicitly_multipart_with_utf8', $this->recipient));
         $this->assertPattern("/\nSubject: =\?UTF-8\?Q\?Foo_.*?\?=/", $Created->getEncoded());
     }
 
-    function test_explicitly_multipart_with_content_type()
+    public function test_explicitly_multipart_with_content_type()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Mail = $TestMailer->create('explicitly_multipart_example', $this->recipient));
 
         $this->assertEqual(3, Ak::size($Mail->parts));
@@ -608,9 +608,9 @@ EOF;
 
     }
 
-    function test_explicitly_multipart_with_invalid_content_type()
+    public function test_explicitly_multipart_with_invalid_content_type()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Mail = $TestMailer->create('explicitly_multipart_example', $this->recipient, 'text/xml'));
 
         $this->assertEqual(3, Ak::size($Mail->parts));
@@ -619,9 +619,9 @@ EOF;
     }
 
 
-    function test_implicitly_multipart_messages()
+    public function test_implicitly_multipart_messages()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Mail = $TestMailer->create('implicitly_multipart_example', $this->recipient));
 
         $this->assertEqual(3, Ak::size($Mail->parts));
@@ -639,9 +639,9 @@ EOF;
 
     }
 
-    function test_implicitly_multipart_messages_with_custom_order()
+    public function test_implicitly_multipart_messages_with_custom_order()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Mail = $TestMailer->create('implicitly_multipart_example', $this->recipient, null, array("text/yaml", "text/plain")));
 
         $this->assertEqual(3, Ak::size($Mail->parts));
@@ -650,9 +650,9 @@ EOF;
         $this->assertEqual("text/yaml", $Mail->parts[2]->content_type);
     }
 
-    function test_implicitly_multipart_messages_with_charset()
+    public function test_implicitly_multipart_messages_with_charset()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Mail = $TestMailer->create('implicitly_multipart_example', $this->recipient, 'iso-8859-1'));
         $this->assertEqual("multipart/alternative", $Mail->content_type);
 
@@ -662,79 +662,79 @@ EOF;
     }
 
 
-    function test_html_mail()
+    public function test_html_mail()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Mail = $TestMailer->create('html_mail', $this->recipient));
         $this->assertEqual("text/html", $Mail->content_type);
     }
 
-    function test_html_mail_with_underscores()
+    public function test_html_mail_with_underscores()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Mail = $TestMailer->create('html_mail_with_underscores', $this->recipient));
         $this->assertEqual('<a href="http://google.com" target="_blank">_Google</a>', $Mail->body);
     }
 
-    function test_various_newlines()
+    public function test_various_newlines()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Mail = $TestMailer->create('various_newlines', $this->recipient));
         $this->assertEqual("line #1\nline #2\nline #3\nline #4\n\n".
         "line #5\n\nline#6\n\nline #7", $Mail->body);
     }
 
-    function test_various_newlines_multipart()
+    public function test_various_newlines_multipart()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Mail = $TestMailer->create('various_newlines_multipart', $this->recipient));
         $this->assertEqual("line #1\nline #2\nline #3\nline #4\n\n", $Mail->parts[0]->body);
         $this->assertEqual("<p>line #1</p>\n<p>line #2</p>\n<p>line #3</p>\n<p>line #4</p>\n\n", $Mail->parts[1]->body);
     }
 
-    function test_headers_removed_on_smtp_delivery()
+    public function test_headers_removed_on_smtp_delivery()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $this->assertTrue($Mail = $TestMailer->create('various_newlines_multipart', $this->recipient));
         $this->assertEqual("line #1\nline #2\nline #3\nline #4\n\n", $Mail->parts[0]->body);
         $this->assertEqual("<p>line #1</p>\n<p>line #2</p>\n<p>line #3</p>\n<p>line #4</p>\n\n", $Mail->parts[1]->body);
     }
 
 
-    function test_recursive_multipart_processing()
+    public function test_recursive_multipart_processing()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Mail =& $TestMailer->receive(file_get_contents(AK_TEST_DIR."/fixtures/data/action_mailer/raw_email7"));
         $this->assertEqual("This is the first part.\n\nAttachment: test.rb\nAttachment: test.pdf\n\n\nAttachment: smime.p7s\n", $Mail->bodyToString());
     }
 
-    function test_decode_encoded_attachment_filename()
+    public function test_decode_encoded_attachment_filename()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Mail =& $TestMailer->receive(file_get_contents(AK_TEST_DIR."/fixtures/data/action_mailer/raw_email8"));
         $Attachment = Ak::last($Mail->attachments);
         $this->assertEqual("01QuienTeDijat.Pitbull.mp3", $Attachment->original_filename);
     }
 
 
-    function test_wrong_mail_header()
+    public function test_wrong_mail_header()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Mail =& $TestMailer->receive(file_get_contents(AK_TEST_DIR."/fixtures/data/action_mailer/raw_email9"));
         $this->assertTrue(empty($Mail->quite));
     }
 
-    function test_decode_message_with_unquoted_atchar_in_header()
+    public function test_decode_message_with_unquoted_atchar_in_header()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Mail =& $TestMailer->receive(file_get_contents(AK_TEST_DIR."/fixtures/data/action_mailer/raw_email11"));
         $this->assertTrue(!empty($Mail->from));
     }
 
 
-    function test_should_encode_alternative_message_from_templates()
+    public function test_should_encode_alternative_message_from_templates()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Message = $TestMailer->create('alternative_message_from_templates', $this->recipient);
         $rendered_message = $TestMailer->getRawMessage();
 
@@ -749,9 +749,9 @@ EOF;
         $this->assertPattern('/--[a-f0-9]{32}--/', $rendered_message);
     }
 
-    function test_should_encode_alternative_message_from_templates_with_embeded_images()
+    public function test_should_encode_alternative_message_from_templates_with_embeded_images()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Message = $TestMailer->create('alternative_message_from_templates', $this->recipient, true);
 
         $rendered_message = $TestMailer->getRawMessage();
@@ -789,9 +789,9 @@ EOF;
 
     }
 
-    function test_should_encode_alternative_message_from_templates_with_external_embeded_images()
+    public function test_should_encode_alternative_message_from_templates_with_external_embeded_images()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Message = $TestMailer->create('alternative_message_from_templates', $this->recipient, true, true);
         //$TestMailer->delivery_method = 'php';
         //$TestMailer->deliver($Message);
@@ -800,25 +800,25 @@ EOF;
         $this->assertPattern('/==\r\n\r\n--[a-f0-9]{32}\r\nContent-Type: image\/png;/', $rendered_message, 'Two images embeded');
     }
 
-    function test_should_deliver_creating_message()
+    public function test_should_deliver_creating_message()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Message = $TestMailer->deliver('alternative_message_from_templates', $this->recipient);
         $this->assertPattern('/Subject: Alternative message from template/', $TestMailer->deliveries[0]);
     }
 
-    function test_should_allow_using_text_helper_on_mail_views()
+    public function test_should_allow_using_text_helper_on_mail_views()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Message = $TestMailer->create('message_with_helpers', $this->recipient);
         $rendered_message = $TestMailer->getRawMessage();
         $this->assertPattern('/<a href="http:\/\/example.com\/offers\/">Our offers<\/a>/', $rendered_message);
         $this->assertNoPattern('/text_helper/', $rendered_message);
     }
 
-    function test_should_add_from_name()
+    public function test_should_add_from_name()
     {
-        $TestMailer =& new TestMailer();
+        $TestMailer = new TestMailer();
         $Message = $TestMailer->create('message_from_first_name', array('No One'=>'no.one@example.com'));
         $rendered_message = $TestMailer->getRawMessage();
        $this->assertPattern('/To: "No One" <no\.one@example\.com>/', $rendered_message);

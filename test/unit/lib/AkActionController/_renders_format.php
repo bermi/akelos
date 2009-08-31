@@ -4,7 +4,7 @@ require_once(AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestApplication.php');
 
 class Test_AkActionControllerRendersFormat extends AkWebTestCase
 {
-    function test_should_render_requested_format()
+    public function test_should_render_requested_format()
     {
 
         $this->get(AK_TESTING_URL.'/formats/index.xml');

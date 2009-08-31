@@ -11,13 +11,13 @@ ak_generate_mock('AkRequest');
 defined('AK_TEST_MEMCACHED_CHECKFILE')? null: define('AK_TEST_MEMCACHED_CHECKFILE',AK_TEST_DIR.DS.DS.'unit'.DS.'config'.DS.'memcached');
 class CacheHelperTests extends HelpersUnitTester 
 {
-    var $fragment_key;
+    public $fragment_key;
     
-    function setUp()
+    public function setUp()
     {
-        $this->controller = &new AkActionController();
+        $this->controller = new AkActionController();
         $this->controller->_initCacheHandler();
-        $this->controller->Request =& new MockAkRequest($this);
+        $this->controller->Request = new MockAkRequest($this);
         $this->controller->controller_name = 'test';
         $this->controller->instantiateHelpers();
 
@@ -29,18 +29,18 @@ class CacheHelperTests extends HelpersUnitTester
         
     }
     
-    function test_helper_instance()
+    public function test_helper_instance()
     {
         $this->assertIsA($this->cache_helper,'CacheHelper');
     }
     
-    function _test_init()
+    public function _test_init()
     {
         $this->fragment_key = 'key_'.time().microtime(true).'_'.rand(0,1000000);
         $this->fragment_text = "Test Cache Helper With String Key:". $this->fragment_key;
     }
     
-    function test_all_caches()
+    public function test_all_caches()
     {
         $cacheHandlers = array('cache_lite'=>1,'akadodbcache'=>2);
         $memcacheEnabled = $this->_checkIfEnabled(AK_TEST_MEMCACHED_CHECKFILE);
@@ -63,7 +63,7 @@ class CacheHelperTests extends HelpersUnitTester
     }
     
     
-    function _test_cache_with_string_key($class)
+    public function _test_cache_with_string_key($class)
     {
         ob_start();
         if (!$this->cache_helper->begin($this->fragment_key)) {
@@ -79,7 +79,7 @@ class CacheHelperTests extends HelpersUnitTester
         $this->assertEqual($this->fragment_text, $contents);
     }
 
-    function _test_cache_with_string_key_cached($class)
+    public function _test_cache_with_string_key_cached($class)
     {
         ob_start();
         if (!$this->cache_helper->begin($this->fragment_key)) {

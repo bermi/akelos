@@ -12,7 +12,7 @@ require_once(AK_LIB_DIR.DS.'AkPluginInstaller.php');
 
 class AkPluginInstaller_TestCase extends  AkUnitTest 
 {
-    function setUp()
+    public function setUp()
     {
         $this->installer = new AkPluginInstaller();
         $tplFilename = AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'plugin_installer_target_class.php.tpl';
@@ -22,7 +22,7 @@ class AkPluginInstaller_TestCase extends  AkUnitTest
     }
 
     
-    function test_install_methods()
+    public function test_install_methods()
     {
         $this->installer->installExtensions('file:'.AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'plugin_installer_method_extensions.php','TEST');
         $checkFilename = AK_APP_DIR.DS.'plugin_installer_target_class.php';
@@ -34,7 +34,7 @@ class AkPluginInstaller_TestCase extends  AkUnitTest
     }
     
     
-    function test_remove_methods()
+    public function test_remove_methods()
     {
         $this->installer->installExtensions('file:'.AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'plugin_installer_method_extensions.php','TEST');
         $checkFilename = AK_APP_DIR.DS.'plugin_installer_target_class.php';

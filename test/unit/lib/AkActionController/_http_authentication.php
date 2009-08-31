@@ -5,7 +5,7 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 class _AkActionController_http_authentication extends AkWebTestCase
 {
 
-    function test_should_access_public_action()
+    public function test_should_access_public_action()
     {
         $this->setMaximumRedirects(0);
         $this->get(AK_TESTING_URL.'/authentication');
@@ -13,7 +13,7 @@ class _AkActionController_http_authentication extends AkWebTestCase
         $this->assertTextMatch('Everyone can see me!');
     }
 
-    function test_should_show_login_with_realm()
+    public function test_should_show_login_with_realm()
     {
         $this->setMaximumRedirects(0);
         $this->get(AK_TESTING_URL.'/authentication/edit');
@@ -21,7 +21,7 @@ class _AkActionController_http_authentication extends AkWebTestCase
         $this->assertNoText("I'm only accessible if you know the password");
     }
 
-    function test_should_fail_login()
+    public function test_should_fail_login()
     {
         $this->setMaximumRedirects(0);
         $this->get(AK_TESTING_URL.'/authentication/edit');
@@ -30,7 +30,7 @@ class _AkActionController_http_authentication extends AkWebTestCase
         $this->assertNoText("I'm only accessible if you know the password");
     }
 
-    function test_should_login()
+    public function test_should_login()
     {
         $this->setMaximumRedirects(0);
         $this->get(AK_TESTING_URL.'/authentication/edit');

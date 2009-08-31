@@ -12,7 +12,7 @@ require_once(AK_LIB_DIR.DS.'Ak.php');
 
 class test_AkFileFunctionsUsingFtp extends  UnitTestCase
 {
-    function Test_file_put_contents()
+    public function Test_file_put_contents()
     {
         $file_name = AK_TMP_DIR.DS.'test_file_1.txt';
         $content = 'This is the content of file 1';
@@ -49,7 +49,7 @@ class test_AkFileFunctionsUsingFtp extends  UnitTestCase
         
     }
 
-    function Test_file_get_contents()
+    public function Test_file_get_contents()
     {
         $file_name = AK_TMP_DIR.DS.'test_file_1.txt';
         $content = 'This is the NEW content for file 1';
@@ -73,7 +73,7 @@ class test_AkFileFunctionsUsingFtp extends  UnitTestCase
         
     }
     
-    function Test_file_delete()
+    public function Test_file_delete()
     {
         $this->assertTrue(Ak::file_delete(AK_TMP_DIR.DS.'test_file_1.txt'));
         $this->assertTrue(Ak::file_delete(AK_TMP_DIR.DS.'test_file_2.txt'));
@@ -84,7 +84,7 @@ class test_AkFileFunctionsUsingFtp extends  UnitTestCase
 
     }
     
-    function Test_directory_delete()
+    public function Test_directory_delete()
     {
         $this->assertTrue(Ak::directory_delete('ak_test_folder'));
         $this->assertFalse(Ak::directory_delete('../../'));
@@ -98,7 +98,7 @@ class test_AkFileFunctionsUsingFtp extends  UnitTestCase
 
 class Test_of_Ak_static_file_functions_using_ftp extends  UnitTestCase
 {
-    function Test_connect()
+    public function Test_connect()
     {
         $connection = AkFtp::connect();
         $this->assertTrue($connection);
@@ -106,13 +106,13 @@ class Test_of_Ak_static_file_functions_using_ftp extends  UnitTestCase
         $this->assertIdentical($connection, AkFtp::connect());
     }
 
-    function Test_disconnect()
+    public function Test_disconnect()
     {
         $this->assertTrue(AkFtp::disconnect());
     }
     
 
-    function Test_file_put_contents()
+    public function Test_file_put_contents()
     {
         $file_name = AK_TMP_DIR.DS.'test_file_1.txt';
         $content = 'This is the content of file 1';
@@ -143,7 +143,7 @@ class Test_of_Ak_static_file_functions_using_ftp extends  UnitTestCase
         $this->assertTrue(Ak::file_put_contents($file_name, $content));
     }
 
-    function Test_file_get_contents()
+    public function Test_file_get_contents()
     {
         $file_name = AK_TMP_DIR.DS.'test_file_1.txt';
         $content = 'This is the NEW content for file 1';
@@ -163,7 +163,7 @@ class Test_of_Ak_static_file_functions_using_ftp extends  UnitTestCase
         
     }
     
-    function Test_file_delete()
+    public function Test_file_delete()
     {
         $this->assertTrue(Ak::file_delete(AK_TMP_DIR.DS.'test_file_1.txt'));
         $this->assertTrue(Ak::file_delete(AK_TMP_DIR.DS.'test_file_2.txt'));
@@ -173,7 +173,7 @@ class Test_of_Ak_static_file_functions_using_ftp extends  UnitTestCase
 
     }
     
-    function Test_directory_delete()
+    public function Test_directory_delete()
     {
         $this->assertTrue(Ak::directory_delete('ak_test_folder'));
         $this->assertFalse(Ak::directory_delete('../../'));
@@ -184,7 +184,7 @@ class Test_of_Ak_static_file_functions_using_ftp extends  UnitTestCase
     }
 
     
-    function Test_make_dir()
+    public function Test_make_dir()
     {
         $this->assertTrue(AkFtp::make_dir('new_dir_1'));
         $this->assertTrue(AkFtp::make_dir('/new_dir_2'));
@@ -214,7 +214,7 @@ class Test_of_Ak_static_file_functions_using_ftp extends  UnitTestCase
         
     }
     
-    function Test_delete()
+    public function Test_delete()
     {
         $this->assertTrue(AkFtp::delete('new_dir_8/*'));
         
@@ -239,7 +239,7 @@ class Test_of_Ak_static_file_functions_using_ftp extends  UnitTestCase
         $this->assertTrue(AkFtp::delete('/new_dir_8/'));
     }
     
-    function Test_is_dir()
+    public function Test_is_dir()
     {
         $path = 'invalid path';
         $this->assertFalse(AkFtp::is_dir($path));

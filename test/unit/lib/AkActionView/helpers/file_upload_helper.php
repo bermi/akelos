@@ -9,7 +9,7 @@ class FileUploadHelperTests extends HelpersUnitTester
     /**
      * @todo Add tests for file upload helper
      */
-    function tests_pending()
+    public function tests_pending()
     {
         
     }

@@ -6,16 +6,16 @@ require_once(AK_LIB_DIR.DS.'AkRequest.php');
 
 class AkRequestTestCase extends  AkUnitTest
 {
-    var $test_request;
-    var $test_request2;
-    var $test_request3;
-    var $test_request4;
-    var $test_request5;
+    public $test_request;
+    public $test_request2;
+    public $test_request3;
+    public $test_request4;
+    public $test_request5;
 
-    var $_testRequestInstance;
-    var $_original_values;
+    public $_testRequestInstance;
+    public $_original_values;
 
-    function setUp()
+    public function setUp()
     {
         $sess_request = isset($_SESSION['request']) ? $_SESSION['request'] : null;
         $this->_original_values = array($sess_request, $_COOKIE, $_POST, $_GET, $_REQUEST);
@@ -60,12 +60,12 @@ class AkRequestTestCase extends  AkUnitTest
 
 
 
-        $this->_testRequestInstance =& new AkRequest();
+        $this->_testRequestInstance = new AkRequest();
         $this->_testRequestInstance->init();
 
     }
 
-    function tearDown()
+    public function tearDown()
     {
         unset($this->_testRequestInstance);
 
@@ -78,7 +78,7 @@ class AkRequestTestCase extends  AkUnitTest
     }
 
 
-    function Test_mergeRequest()
+    public function Test_mergeRequest()
     {
         $gpc_param = get_magic_quotes_gpc() ? "Isn't it ironic" : 'Isn\\\'t it ironic';
 
@@ -99,7 +99,7 @@ class AkRequestTestCase extends  AkUnitTest
     }
 
 
-    function Test_parseAkRequestString()
+    public function Test_parseAkRequestString()
     {
         $expected_values = array('user','list','100');
 
@@ -117,7 +117,7 @@ class AkRequestTestCase extends  AkUnitTest
 
 
 
-    function test_for_getRemoteIp()
+    public function test_for_getRemoteIp()
     {
         $Request = new AkRequest();
 
@@ -143,7 +143,7 @@ class AkRequestTestCase extends  AkUnitTest
         $this->assertEqual($Request->getRemoteIp(),'64.68.15.11');
     }
 
-    function test_for_getDomain()
+    public function test_for_getDomain()
     {
         $Request = new AkRequest();
 
@@ -162,7 +162,7 @@ class AkRequestTestCase extends  AkUnitTest
         $Request->env = $env_backup;
     }
 
-    function test_for_getSubDomains()
+    public function test_for_getSubDomains()
     {
         $Request = new AkRequest();
 
@@ -177,7 +177,7 @@ class AkRequestTestCase extends  AkUnitTest
     }
 
     
-    function test_should_normalize_single_level_file_uploads()
+    public function test_should_normalize_single_level_file_uploads()
     {
         $Request = new AkRequest();
         $_FILES = array ( 
@@ -191,7 +191,7 @@ class AkRequestTestCase extends  AkUnitTest
         $this->assertEqual($Request->_getNormalizedFilesArray(), $normalized);
     }
 
-    function test_should_normalize_multi_level_but_flat_file_uploads()
+    public function test_should_normalize_multi_level_but_flat_file_uploads()
     {
         $Request = new AkRequest();
         $_FILES = array ( 'image' => array ( 'name' => array ( 'file' => array ( 'a' => 'mod_rewrite_cheat_sheet.pdf', 'b' => 'microformats_cheat_sheet.pdf', 'c' => '', ), ), 'type' => array ( 'file' => array ( 'a' => 'application/pdf', 'b' => 'application/pdf', 'c' => '', ), ), 'tmp_name' => array ( 'file' => array ( 'a' => '/tmp/phporGMwx', 'b' => '/tmp/phpGycyd6', 'c' => '', ), ), 'error' => array ( 'file' => array ( 'a' => 0, 'b' => 0, 'c' => 4, ), ), 'size' => array ( 'file' => array ( 'a' => 332133, 'b' => 427735, 'c' => 0, ), ), ), );
@@ -200,7 +200,7 @@ class AkRequestTestCase extends  AkUnitTest
         $this->assertEqual($Request->_getNormalizedFilesArray(), $normalized);
     }
 
-    function test_should_normalize_multi_level_as_array_file_uploads()
+    public function test_should_normalize_multi_level_as_array_file_uploads()
     {
         $Request = new AkRequest();
         $_FILES = array ( 'image' => array ( 'name' => array ( 'file' => array ( 0 => 'mod_rewrite_cheat_sheet.pdf', 1 => 'microformats_cheat_sheet.pdf', 2 => '', ), ), 'type' => array ( 'file' => array ( 0 => 'application/pdf', 1 => 'application/pdf', 2 => '', ), ), 'tmp_name' => array ( 'file' => array ( 0 => '/tmp/phpoOcNXs', 1 => '/tmp/php4xVEbv', 2 => '', ), ), 'error' => array ( 'file' => array ( 0 => 0, 1 => 0, 2 => 4, ), ), 'size' => array ( 'file' => array ( 0 => 332133, 1 => 427735, 2 => 0, ), ), ), );
@@ -209,7 +209,7 @@ class AkRequestTestCase extends  AkUnitTest
         $this->assertEqual($Request->_getNormalizedFilesArray(), $normalized);
     }
 
-    function test_should_normalize_simple_level_as_array_file_uploads()
+    public function test_should_normalize_simple_level_as_array_file_uploads()
     {
         $Request = new AkRequest();
         $_FILES = array ( 'image' => array ( 'name' => array ( 0 => 'mod_rewrite_cheat_sheet.pdf', 1 => 'microformats_cheat_sheet.pdf', 2 => '', ), 'type' => array ( 0 => 'application/pdf', 1 => 'application/pdf', 2 => '', ), 'tmp_name' => array ( 0 => '/tmp/phpXpfUKA', 1 => '/tmp/phpkB6MnX', 2 => '', ), 'error' => array ( 0 => 0, 1 => 0, 2 => 4, ), 'size' => array ( 0 => 332133, 1 => 427735, 2 => 0, ), ), );

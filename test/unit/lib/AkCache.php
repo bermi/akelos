@@ -12,18 +12,18 @@ defined('AK_TEST_MEMCACHED_CHECKFILE')? null: define('AK_TEST_MEMCACHED_CHECKFIL
 class AkCache_TestCase extends  AkUnitTest 
 {
     
-    var $_driverInstance = NULL;
-    var $Cache = NULL;
-    var $id = 'test case cache id';
-    var $group = 'test case group to cacth';
-    var $text_to_catch = 'this is the text to catch on the test case of the AkCache class';
+    public $_driverInstance = NULL;
+    public $Cache = NULL;
+    public $id = 'test case cache id';
+    public $group = 'test case group to cacth';
+    public $text_to_catch = 'this is the text to catch on the test case of the AkCache class';
     
-    function test_install_db_tables()
+    public function test_install_db_tables()
     {
         $this->resetFrameworkDatabaseTables();
     }
 
-    function test_all_caches()
+    public function test_all_caches()
     {
         $cacheHandlers = array('cache_lite'=>1,'akadodbcache'=>2);
         $memcacheEnabled = $this->_checkIfEnabled(AK_TEST_MEMCACHED_CHECKFILE);
@@ -36,7 +36,7 @@ class AkCache_TestCase extends  AkUnitTest
         foreach ($cacheHandlers as $class=>$type) {
             foreach ($unitTests as $test) {
                 unset($this->Cache);
-                $this->Cache =& new AkCache();
+                $this->Cache = new AkCache();
                 $this->$test($type,$class);
                 
             }
@@ -44,7 +44,7 @@ class AkCache_TestCase extends  AkUnitTest
         }
     }
     
-    function _testInit($type, $class)
+    public function _testInit($type, $class)
     {
         //No driver is loaded
         $this->Cache->init(null,0);
@@ -56,7 +56,7 @@ class AkCache_TestCase extends  AkUnitTest
         
     }
     
-    function _test_get_and_save($type, $class)
+    public function _test_get_and_save($type, $class)
     {
         
         //No cache
@@ -80,7 +80,7 @@ class AkCache_TestCase extends  AkUnitTest
 
     }
     
-    function _testremove($type,$class)
+    public function _testremove($type,$class)
     {
         
         $this->Cache->init(1,0);
@@ -99,7 +99,7 @@ class AkCache_TestCase extends  AkUnitTest
 
     }
     
-    function _Testclean($type, $class)
+    public function _Testclean($type, $class)
     {
                 
         //AkCache::clean($group = 'false', $mode = 'ingroup');

@@ -7,12 +7,12 @@ require_once(AK_LIB_DIR.DS.'AkRouter.php');
 class Test_of_AkRouter_Class extends  UnitTestCase
 {
 
-    var $Router;
-    var $url_prefix = '';
+    public $Router;
+    public $url_prefix = '';
 
-    function Test_of_AkRouter_Class()
+    public function Test_of_AkRouter_Class()
     {
-        $this->Router =& new AkRouter();
+        $this->Router = new AkRouter();
 
         $this->Router->_loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
@@ -35,12 +35,12 @@ class Test_of_AkRouter_Class extends  UnitTestCase
     }
 
 
-    function Test_connect()
+    public function Test_connect()
     {
         $this->assertEqual(count($this->Router->getRoutes()) , 12,'Wrong number of routes loaded. We expected 12');
     }
 
-    function Test_toParams()
+    public function Test_toParams()
     {
         $input_value = '/lists/show/123/featured=1';
         $expected = array('controller'=>'todo','action'=>'show','id'=>123,'option'=>'featured=1');
@@ -123,7 +123,7 @@ class Test_of_AkRouter_Class extends  UnitTestCase
     }
 
 
-    function Test_toUrl()
+    public function Test_toUrl()
     {
         $input_value = array('controller'=>'page','action'=>'view_page','webpage'=>'index');
         $expected = '/';
@@ -180,7 +180,7 @@ class Test_of_AkRouter_Class extends  UnitTestCase
 
     }
 
-    function test_url_with_optional_variables()
+    public function test_url_with_optional_variables()
     {
         $input_value = array('controller'=>'topic','action'=>'view', 'id'=>4);
         $expected = $this->url_prefix.'/topic/4/';
@@ -196,12 +196,12 @@ class Test_of_AkRouter_Class extends  UnitTestCase
 class Test_for_default_routes extends  UnitTestCase
 {
 
-    var $Router;
-    var $url_prefix = '';
+    public $Router;
+    public $url_prefix = '';
 
-    function Test_for_default_routes()
+    public function Test_for_default_routes()
     {
-        $this->Router =& new AkRouter();
+        $this->Router = new AkRouter();
 
         $this->Router->_loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
@@ -212,12 +212,12 @@ class Test_for_default_routes extends  UnitTestCase
     }
 
 
-    function Test_connect()
+    public function Test_connect()
     {
         $this->assertEqual(count($this->Router->getRoutes()) , 2,'Wrong number of routes loaded. We expected 12');
     }
 
-    function Test_toUrl()
+    public function Test_toUrl()
     {
         $input_value = array('controller'=>'page','action'=>'listing');
         $expected = '/page/listing/';
@@ -230,36 +230,36 @@ class Test_for_default_routes extends  UnitTestCase
 class Tests_for_url_constants_named_as_url_variables extends  UnitTestCase
 {
 
-    var $Router;
-    var $url_prefix = '';
+    public $Router;
+    public $url_prefix = '';
 
-    function setup()
+    public function setup()
     {
-        $this->Router =& new AkRouter();
+        $this->Router = new AkRouter();
         $this->Router->_loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
     }
 
-    function test_same_pieces_1()
+    public function test_same_pieces_1()
     {
         $this->Router->connect('/foo/id/:id', array('controller'=>'some'), array('id'=>'[0-9]+'));
         $this->assertEqual($this->Router->toParams('/foo/id/1'), array('controller'=>'some', 'id'=>'1'));
     }
 
-    function test_same_pieces_4()
+    public function test_same_pieces_4()
     {
         $this->Router->connect('/foo/bar/*bar', array('controller'=>'some'));
         $this->assertEqual($this->Router->toParams('/foo/bar/foobar'), array ('bar' => array ( 0 => 'foobar'), 'controller' => 'some'));
         $this->assertEqual($this->Router->toParams('/foo/bar/foobar/foobar2'), array('controller'=>'some', 'bar'=>array(0=>'foobar',1=>'foobar2')));
     }
 
-    function test_same_pieces_5()
+    public function test_same_pieces_5()
     {
         $this->Router->connect('/foo/bar/*bar', array('controller'=>'some', 'bar'=>1));
         $this->assertEqual($this->Router->toParams('/foo/bar/foobar'), array('controller'=>'some', 'bar'=>array(0=>'foobar')));
     }
 
-    function test_same_pieces_6()
+    public function test_same_pieces_6()
     {
         $this->Router->connect('/foo/:bar',	array('variable'=>'ok'));
         $this->Router->connect('/baz/:bar',	array('variable2'=>'ok', 'bar'=>COMPULSORY));
@@ -276,17 +276,17 @@ class Tests_for_url_constants_named_as_url_variables extends  UnitTestCase
 
 class Test_for_middle_optional_values_when_generating_urls extends  UnitTestCase
 {
-    var $Router;
-    var $url_prefix = '';
+    public $Router;
+    public $url_prefix = '';
 
-    function setup()
+    public function setup()
     {
-        $this->Router =& new AkRouter();
+        $this->Router = new AkRouter();
         $this->Router->_loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
     }
 
-    function test_middle_values()
+    public function test_middle_values()
     {
         $this->Router->connect('/news/feed/:type/:category',
         array('controller'=>'news','action'=>'feed','type'=>'atom','category'=>'all'));
@@ -307,18 +307,18 @@ class Test_for_middle_optional_values_when_generating_urls extends  UnitTestCase
 class Test_router_conflicts extends  UnitTestCase
 {
 
-    var $Router;
-    var $url_prefix = '';
+    public $Router;
+    public $url_prefix = '';
 
-    function Test_for_default_routes()
+    public function Test_for_default_routes()
     {
-        $this->Router =& new AkRouter();
+        $this->Router = new AkRouter();
         $this->Router->_loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
         $this->Router->connect('/:controller/:action/:value');
     }
 
-    function test_should_allow_variables_with_slashes()
+    public function test_should_allow_variables_with_slashes()
     {
         $params = array('controller'=>'page','action'=>'redirect', 'value'=>'http://akelos.org/download/');
         $url = '/page/redirect/http%3A%2F%2Fakelos.org%2Fdownload%2F/';
@@ -326,7 +326,7 @@ class Test_router_conflicts extends  UnitTestCase
         $this->assertEqual($this->Router->toParams($this->url_prefix.$url), $params);
     }
 
-    function test_should_trigger_error_on_forbidden_router_variable()
+    public function test_should_trigger_error_on_forbidden_router_variable()
     {
         $this->Router->connect('/:this');
         $this->assertErrorPattern('/reserved word this/');

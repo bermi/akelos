@@ -6,12 +6,12 @@ require_once(AK_LIB_DIR.DS.'AkImage.php');
 
 class Test_of_AkImage extends  AkUnitTest
 {
-    function setUp()
+    public function setUp()
     {
         $this->image_path = AK_TEST_DIR.DS.'fixtures'.DS.'public'.DS.'images'.DS.'akelos_framework_logo.png';
     }
 
-    function test_image_save_as()
+    public function test_image_save_as()
     {
         $PngImage = new AkImage($this->image_path);
         $this->assertEqual($PngImage->getExtension(), 'png');
@@ -26,7 +26,7 @@ class Test_of_AkImage extends  AkUnitTest
         $this->assertEqual($GifImage->getExtension(), 'gif');
     }
 
-    function test_image_resize()
+    public function test_image_resize()
     {
         $Image = new AkImage();
         $Image->load($this->image_path);
@@ -89,7 +89,7 @@ class Test_of_AkImage extends  AkUnitTest
     }
 
 
-    function test_get_extra_resources()
+    public function test_get_extra_resources()
     {
         $this->photo_path = AK_TEST_DIR.DS.'fixtures'.DS.'public'.DS.'images'.DS.'cristobal.jpg';
         $this->watermark = AK_TEST_DIR.DS.'fixtures'.DS.'public'.DS.'images'.DS.'watermark.png';
@@ -100,7 +100,7 @@ class Test_of_AkImage extends  AkUnitTest
         $this->_run_extra_tests = is_file($this->photo_path);
     }
 
-    function test_image_crop()
+    public function test_image_crop()
     {
         if(!$this->_run_extra_tests) return;
 
@@ -135,7 +135,7 @@ class Test_of_AkImage extends  AkUnitTest
         $this->assertEqual($Image->getHeight(), 359);
     }
 
-    function test_image_watermark()
+    public function test_image_watermark()
     {
         if(!$this->_run_extra_tests) return;
 
@@ -146,7 +146,7 @@ class Test_of_AkImage extends  AkUnitTest
         $this->assertEqual(md5_file($this->photo_path.'_watermarked.jpg'), '234adf4a48224f8596e53d665bf41768');
     }
 
-    function test_should_apply_native_filters()
+    public function test_should_apply_native_filters()
     {
         $native_filters = array(
         'negate' =>         array('params' => array(), 'hash' => '8b44f26c9646ac69a1b48bbc66622184'),

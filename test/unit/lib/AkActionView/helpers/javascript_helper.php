@@ -6,7 +6,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_helper.php
 
 class JavaScriptHelperTests extends HelpersUnitTester 
 {    
-    function test_for_JavascriptHelper()
+    public function test_for_JavascriptHelper()
     {
         require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_helper.php');
         
@@ -31,7 +31,7 @@ class JavaScriptHelperTests extends HelpersUnitTester
         $this->assertEqual($javascript->escape_javascript($input), $expected);
     }
     
-    function test_javascript_tag()
+    public function test_javascript_tag()
     {
         $javascript = new JavaScriptHelper();
 

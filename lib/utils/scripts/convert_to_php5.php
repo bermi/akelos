@@ -8,26 +8,38 @@ $path = array_shift($options);
 if(is_file($path)){
     $files = array($path);
 }else{
-    $files = array();
-    $dir_list = ak_dir($path, array('recurse' => true));
-    foreach ($dir_list as $entry){
-        $file = $path.$entry;
-        if(is_file($file)){
-            $files[] = $file;
-        }
-    }
+    $files = ak_dir($path, array('recurse' => true));
 }
 
-if(ak_prompt("Did you backup these files?:".join("\n", $files), array('default'=>'yes')) == 'yes'){
+if(empty($files)){
+    die("\nNo files found!\n");
+}
+
+if(ak_prompt("These files will be converted to PHP5:\n\n".join("\n", $files)."\n\nDid you backup these files?", array('default'=>'yes')) == 'yes'){
     foreach ($files as $file){
         $php4_contents = file_get_contents($file);
         $php5_contents = convert_to_php5($php4_contents);
 
-        echo "\n\n--------\nPHP5 file contents\n--------\n\n".$php5_contents."\n\n";
-        if(ak_prompt("Do you want to replace $file with the above contents?", array('default'=>'yes')) == 'yes'){
-            file_put_contents($file, $php5_contents);
-        }else {
-            echo "\nSkiping $file\n\n";
+        $php4_lines = (array_diff(explode("\n", $php4_contents), explode("\n", $php5_contents)));
+        $php5_lines = (array_diff(explode("\n", $php5_contents), explode("\n", $php4_contents)));
+
+        if(!empty($php5_lines)){
+            echo "\n\n--------\nPHP5 version for $file\n--------\n\n".$php5_contents."\n\n";
+            echo "\n\n--------\n\nModified lines for $file:\n";
+            foreach ($php4_lines as $line_number => $php4_line){
+                echo "\n- $php4_line";
+                echo "\n+ ".$php5_lines[$line_number];
+            }
+
+            echo "\n--------\n\n";
+
+            if(ak_prompt("Do you want to replace $file with the above contents?", array('default'=>'yes')) == 'yes'){
+                file_put_contents($file, $php5_contents);
+            }else {
+                echo "\nSkiping $file\n\n";
+            }
+        }else{
+            echo "\nNo changes for $file\n\n";
         }
     }
 }else {
@@ -74,9 +86,13 @@ function ak_dir($path, $options = array())
             while (false !== ($file = readdir($id_dir))){
                 if ($file != "." && $file != ".." && $file != '.svn'){
                     if(!empty($options['files']) && !is_dir($path.DS.$file)){
-                        $result[] = $file;
+                        $result[] = $path.DS.$file;
                     }elseif(!empty($options['dirs'])){
-                        $result[][$file] = !empty($options['recurse']) ? ak_dir($path.DS.$file, $options) : $file;
+                        if(!empty($options['recurse'])){
+                            $result = array_merge($result, ak_dir($path.DS.$file, $options));
+                        }else{
+                            $result[] = $path.DS.$file;
+                        }
                     }
                 }
             }

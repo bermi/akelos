@@ -5,7 +5,7 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 class _AkActionController_locale_detection extends AkWebTestCase 
 {
 
-    function test_request_LocaleDetectionController()
+    public function test_request_LocaleDetectionController()
     {
         $this->setMaximumRedirects(0);
         $this->get(AK_TESTING_URL.'/locale_detection');
@@ -14,21 +14,21 @@ class _AkActionController_locale_detection extends AkWebTestCase
 
     }
     
-    function test_Language_header_detection()
+    public function test_Language_header_detection()
     {
         $this->addHeader('Accept-Language: es,en-us,en;q=0.5');
         $this->get(AK_TESTING_URL.'/locale_detection/check_header');
         $this->assertTextMatch('es,en-us,en;q=0.5');
     }
     
-    function test_detect_default_language()
+    public function test_detect_default_language()
     {
         $this->addHeader('Accept-Language: es,en-us,en;q=0.5');
         $this->get(AK_TESTING_URL.'/locale_detection/get_language');
         $this->assertTextMatch('es'); 
     }
         
-    function test_session_are_working()
+    public function test_session_are_working()
     {
         $this->get(AK_TESTING_URL.'/locale_detection/session/1234');
         $this->assertTextMatch('1234'); 
@@ -37,13 +37,13 @@ class _AkActionController_locale_detection extends AkWebTestCase
         $this->assertTextMatch('1234'); 
     }
     
-    function test_session_are_fresh_on_new_request()
+    public function test_session_are_fresh_on_new_request()
     {
         $this->get(AK_TESTING_URL.'/locale_detection/session/');
         $this->assertNoText('1234'); 
     }
     
-    function test_language_change()
+    public function test_language_change()
     {
         $this->assertEqual( array('en','es'), Ak::langs() );
         
@@ -69,7 +69,7 @@ class _AkActionController_locale_detection extends AkWebTestCase
         
     }
     
-    function test_language_change_on_ak()
+    public function test_language_change_on_ak()
     {
         $this->assertEqual( array('en','es'), Ak::langs() );
         

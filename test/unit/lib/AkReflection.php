@@ -6,7 +6,7 @@ require_once(AK_LIB_DIR.DS.'AkReflection.php');
 if (!class_exists('AkReflection_TestCase')) {
 class AkReflection_TestCase extends  UnitTestCase
 {
-    function setUp()
+    public function setUp()
     {
         /**
          * AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'reflection_test_class.php'
@@ -16,7 +16,7 @@ class AkReflection_TestCase extends  UnitTestCase
     
     
     
-    function test_parse_function()
+    public function test_parse_function()
     {
         $function = '   function testFunction($param) { testbody(); }';
         $this->reflection->_parse($function);
@@ -33,7 +33,7 @@ class AkReflection_TestCase extends  UnitTestCase
          *
          * @return boolean
          */
-        function &_getPriorizedPlugins()
+        public function &_getPriorizedPlugins()
         {
             if(!empty($this->_plugin_instances) && empty($this->_priorized_plugins)){
                 ksort($this->_plugin_instances);
@@ -59,7 +59,7 @@ class AkReflection_TestCase extends  UnitTestCase
         $this->assertEqual('_getPriorizedPlugins',$functionStructure[0]['name']);
 
     }
-    function test_parse_require_include()
+    public function test_parse_require_include()
     {
         $function = '
         require_once(AK_APP_DIR.DS.\'require_once.php\');
@@ -74,7 +74,7 @@ class AkReflection_TestCase extends  UnitTestCase
         $this->assertEqual(array("AK_APP_DIR.DS.'include.php'"),$structure['include']);
         
     }
-    function test_parse_class()
+    public function test_parse_class()
     {
         $function = '
         require_once(AK_APP_DIR.DS.\'test.php\');

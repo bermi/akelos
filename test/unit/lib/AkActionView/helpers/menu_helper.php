@@ -10,24 +10,24 @@ ak_generate_mock('AkRequest');
 
 class MenuHelperTests extends HelpersUnitTester 
 {
-    function setUp()
+    public function setUp()
     {
-        $this->controller = &new AkActionController();
-        $this->controller->Request =& new MockAkRequest($this);
+        $this->controller = new AkActionController();
+        $this->controller->Request = new MockAkRequest($this);
         $this->controller->controller_name = 'test';
         $this->controller->instantiateHelpers();
         
         $this->menu_helper =& $this->controller->menu_helper;
     }
     
-    function test_should_get_controller_methods()
+    public function test_should_get_controller_methods()
     {
         $controller_file_name = 'authentication_controller.php';
         require_once(AK_CONTROLLERS_DIR.DS.$controller_file_name);
         $this->assertTrue(in_array('authenticate',$this->menu_helper->_get_this_class_methods('AuthenticationController')));
     }
 
-    function test_should_get_all_controllers_with_their_actions()
+    public function test_should_get_all_controllers_with_their_actions()
     {
         $available_controllers = (array)Ak::dir(AK_CONTROLLERS_DIR, array('dirs'=>false));
         $got = $this->menu_helper->_get_default_full_menu();
@@ -38,7 +38,7 @@ class MenuHelperTests extends HelpersUnitTester
         $this->assertTrue(in_array('authenticate',$got['authentication']));
     }
     
-    function tests_menu_for_controllers()
+    public function tests_menu_for_controllers()
     {
 
         $this->assertEqual(

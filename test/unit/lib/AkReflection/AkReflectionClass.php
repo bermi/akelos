@@ -5,11 +5,11 @@ require_once(AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionClass.php');
 
 class AkReflectionClass_TestCase extends  UnitTestCase
 {
-    function test_string_constructor()
+    public function test_string_constructor()
     {
         $string ='class Test {
         
-            function method1($param1) {
+            public function method1($param1) {
             
             }
             /**
@@ -18,7 +18,7 @@ class AkReflectionClass_TestCase extends  UnitTestCase
              * @param $param1
              * @param $param2
              */
-            function &method2(&$param1,$param2) {
+            public function &method2($param1,$param2) {
             
             }
         }';
@@ -39,11 +39,11 @@ class AkReflectionClass_TestCase extends  UnitTestCase
         $this->assertEqual('void',$docBlock->getTag('return'));
     }
     
-    function test_array_constructor()
+    public function test_array_constructor()
     {
         $string ='class Test {
         
-            function method1($param1) {
+            public function method1($param1) {
             
             }
             /**
@@ -52,7 +52,7 @@ class AkReflectionClass_TestCase extends  UnitTestCase
              * @param $param1
              * @param $param2
              */
-            function &method2(&$param1,$param2) {
+            public function &method2($param1,$param2) {
             
             }
         }';
@@ -80,7 +80,7 @@ class AkReflectionClass_TestCase extends  UnitTestCase
         $this->assertEqual(1,count($voidMethods));
     }
     
-    function test_get_methods_filtered()
+    public function test_get_methods_filtered()
     {
         $file = AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'reflection_test_class.php';
         $class = new AkReflectionClass(file_get_contents($file));

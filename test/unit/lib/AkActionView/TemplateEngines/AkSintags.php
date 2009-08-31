@@ -8,21 +8,21 @@ define('AK_SINTAGS_AVALABLE_HELPERS', 'a:9:{s:7:"url_for";s:10:"url_helper";s:7:
 
 class Test_of_AkSintags extends  UnitTestCase
 {
-    function test_sintags()
+    public function test_sintags()
     {
         $this->_run_from_file('sintags_test_data.txt');
     }
-    function test_sintags_helpers()
+    public function test_sintags_helpers()
     {
         $this->_run_from_file('sintags_helpers_data.txt');
     }
     
-    function test_sintags_blocks()
+    public function test_sintags_blocks()
     {
         $this->_run_from_file('sintags_blocks_data.txt');
     }
     
-    function _run_from_file($file_name, $all_in_one_test = true)
+    public function _run_from_file($file_name, $all_in_one_test = true)
     {
         $multiple_expected_php = $multiple_sintags = '';
         $tests = explode('===================================',file_get_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.$file_name));
@@ -36,7 +36,7 @@ class Test_of_AkSintags extends  UnitTestCase
                 $multiple_sintags .= $sintags;
                 $multiple_expected_php .= $expected_php;
             }
-            $AkSintags =& new AkSintagsParser();
+            $AkSintags = new AkSintagsParser();
             $php = $AkSintags->parse($sintags);
             if($php != $expected_php){
                 Ak::trace("GENERATED: \n".$php);
@@ -48,7 +48,7 @@ class Test_of_AkSintags extends  UnitTestCase
         }
 
         if($all_in_one_test){
-            $AkSintags =& new AkSintagsParser();
+            $AkSintags = new AkSintagsParser();
             $php = $AkSintags->parse($multiple_sintags);
             if($php != $multiple_expected_php){
                 Ak::trace("GENERATED: \n".$php);

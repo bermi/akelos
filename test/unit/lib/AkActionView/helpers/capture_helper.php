@@ -11,17 +11,17 @@ ak_generate_mock('AkRequest');
 
 class CaptureHelperTests extends HelpersUnitTester
 {
-    function setUp()
+    public function setUp()
     {
-        $this->controller = &new AkActionController();
-        $this->controller->Request =& new MockAkRequest($this);
+        $this->controller = new AkActionController();
+        $this->controller->Request = new MockAkRequest($this);
         $this->controller->controller_name = 'test';
         $this->controller->instantiateHelpers();
 
         $this->capture_helper =& $this->controller->capture_helper;
     }
 
-    function test_begin_without_label()
+    public function test_begin_without_label()
     {
         $str = "test CaptureHelper #1";
         $this->capture_helper->begin();
@@ -31,7 +31,7 @@ class CaptureHelperTests extends HelpersUnitTester
         $this->assertEqual(isset($globals['content_for_']) ? $globals['content_for_'] : null, null);
     }
 
-    function test_begin_with_label()
+    public function test_begin_with_label()
     {
         $str = "test CaptureHelper #2";
         $this->capture_helper->begin('test_2');
@@ -41,7 +41,7 @@ class CaptureHelperTests extends HelpersUnitTester
         $this->assertEqual($globals['content_for_test_2'], $str);
     }
 
-    function test_content_for()
+    public function test_content_for()
     {
         $str = "test CaptureHelper content_for";
         $this->capture_helper->content_for('content_for');
@@ -51,7 +51,7 @@ class CaptureHelperTests extends HelpersUnitTester
         $this->assertEqual($globals['content_for_content_for'], $str);
     }
 
-    function test_concatenation()
+    public function test_concatenation()
     {
         $this->capture_helper->content_for('concatenation');
         echo 'A';

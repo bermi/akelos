@@ -6,7 +6,7 @@ defined('AK_ENABLE_PROFILER') ? null : define('AK_ENABLE_PROFILER',true);
 require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
 if(!defined('ALL_TESTS_RUNNER') && empty($test)){
-    $test = &new GroupTest('Akelos Framework AkRequest Tests');
+    $test = new GroupTest('Akelos Framework AkRequest Tests');
     define('ALL_TESTS_RUNNER', false);
 }
 

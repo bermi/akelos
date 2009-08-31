@@ -8,12 +8,12 @@ require_once(AK_LIB_DIR.DS.'AkConfig.php');
 
 class AkTestConfig extends AkConfig
 {
-    function AkTestConfig()
+    public function AkTestConfig()
     {
         $this->cache_read = false;
         $this->cache_write = false;
     }
-    function _readCache($namespace, $environment = AK_ENVIRONMENT, $force = false)
+    public function _readCache($namespace, $environment = AK_ENVIRONMENT, $force = false)
     {
         $config = parent::_readCache($namespace, $environment, $force);
         if ($config) {
@@ -22,20 +22,20 @@ class AkTestConfig extends AkConfig
         return $config;
     }
     
-    function _writeCache($config, $namespace, $environment = AK_ENVIRONMENT, $force = false)
+    public function _writeCache($config, $namespace, $environment = AK_ENVIRONMENT, $force = false)
     {
         $this->cache_write=true;
         parent::_writeCache($config, $namespace, $environment, $force);
     }
     
-    function _generateCacheFileName($namespace, $environment = AK_ENVIRONMENT)
+    public function _generateCacheFileName($namespace, $environment = AK_ENVIRONMENT)
     {
         $namespace = Ak::sanitize_include($namespace, 'high');
         $cacheFile = AK_TEST_DIR.DS.'fixtures'.DS.'config'.DS.'cache'.DS.$environment.DS.$namespace.'.php';
         return $cacheFile;
     }
     
-    function _generateConfigFileName($namespace,$environment = AK_ENVIRONMENT)
+    public function _generateConfigFileName($namespace,$environment = AK_ENVIRONMENT)
     {
         $namespace = Ak::sanitize_include($namespace, 'high');
         $yaml_file_name = AK_TEST_DIR.DS.'fixtures'.DS.'config'.DS.$namespace.'.yml';
@@ -46,18 +46,18 @@ class AkTestConfig extends AkConfig
 class AkConfig_TestCase extends  AkUnitTest 
 {
 
-    function setUp()
+    public function setUp()
     {
         $this->config = new AkTestConfig();
     }
-    function test_generate_cache_filename()
+    public function test_generate_cache_filename()
     {
         $expected = AK_TEST_DIR.DS.'fixtures'.DS.'config'.DS.'cache'.DS.'testing'.DS.'testconfig1.php';
         $result = $this->config->_generateCacheFileName('testconfig1','testing');
         $this->assertEqual($expected, $result);
     }
     
-    function test_write_cache()
+    public function test_write_cache()
     {
         $expectedFileName = AK_TEST_DIR.DS.'fixtures'.DS.'config'.DS.'cache'.DS.'testing'.DS.'testconfig1.php';
         $config = array('test1'=>1,'test2'=>array('test3'=>3));
@@ -66,7 +66,7 @@ class AkConfig_TestCase extends  AkUnitTest
         $this->assertEqual($config, $cachedConfig);
     }
     
-    function test_read_cache()
+    public function test_read_cache()
     {
         $config = array('test1'=>1,'test2'=>array('test3'=>3));
         $this->config->_writeCache($config,'testconfig1','testing');
@@ -75,7 +75,7 @@ class AkConfig_TestCase extends  AkUnitTest
         
     }
     
-    function test_read_config()
+    public function test_read_config()
     {
         $expectedConfig =array('value1'=>1,'value2'=>2,'value3'=>array('subvalue1'=>1,'subvalue2'=>2,'subvalue3'=>5,
                                'subvalue4'=>array('subsubvalue1'=>2)));
@@ -94,7 +94,7 @@ class AkConfig_TestCase extends  AkUnitTest
         
     }
     
-    function test_parse_setting_constant()
+    public function test_parse_setting_constant()
     {
         $string = '${AK_ENVIRONMENT}';
         $expected = AK_ENVIRONMENT;
@@ -107,7 +107,7 @@ class AkConfig_TestCase extends  AkUnitTest
         $this->assertEqual($expected, $result);
     }
     
-    function test_get_with_and_without_cache()
+    public function test_get_with_and_without_cache()
     {
         $expectedFileName = AK_TEST_DIR.DS.'fixtures'.DS.'config'.DS.'cache'.DS.'testing'.DS.'testconfig1.php';
         @unlink($expectedFileName);

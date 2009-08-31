@@ -9,7 +9,7 @@ class ScriptaculousHelperTests extends HelpersUnitTester
     /**
      * @todo Add tests for scriptaculous helper
      */
-    function tests_pending()
+    public function tests_pending()
     {
         
     }

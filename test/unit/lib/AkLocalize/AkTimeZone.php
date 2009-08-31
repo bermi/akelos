@@ -8,82 +8,82 @@ ak_generate_mock('AkTestTime');
 
 class TimeZoneTestCase extends AkUnitTest
 {
-    function setup()
+    public function setup()
     {
         $this->MockTime = new MockAkTestTime($this);
         $this->MockTime->setReturnValue('now','Sun Jul 25 14:49:00 UTC 2004');
         $this->timestamp = gmmktime(14,49,00,7,25,2004);
     }
 
-    function test_should_return_positive_formatted_offset()
+    public function test_should_return_positive_formatted_offset()
     {
         $zone = $this->_createTimeZone("Test", 4200);
         $this->assertEqual("+01:10", $zone->getFormattedOffset());
     }
 
-    function test_should_return_negative_formatted_offset()
+    public function test_should_return_negative_formatted_offset()
     {
         $zone = $this->_createTimeZone("Test", -4200);
         $this->assertEqual("-01:10", $zone->getFormattedOffset());
     }
 
-    function test_now()
+    public function test_now()
     {
         $Zone = $this->_createTimeZone("Test", 4200);
         $Zone->_timestamp = $this->timestamp;
         $this->assertEqual(gmmktime(15, 59,00,7,25,2004), $Zone->now());
     }
 
-    function test_now_with_dst_on_winter()
+    public function test_now_with_dst_on_winter()
     {
         $Zone = $this->_createTimeZone("Australia/Sydney");
         $Zone->_timestamp = $this->timestamp;
         $this->assertEqual($Zone->dateTime(), '2004-07-26 00:49:00');
     }
 
-    function test_now_with_dst_on_summer()
+    public function test_now_with_dst_on_summer()
     {
         $Zone = $this->_createTimeZone("Europe/Madrid");
         $Zone->_timestamp = $this->timestamp;
         $this->assertEqual($Zone->time(), '16:49');
     }
 
-    function test_now_with_dst_on_summer_on_Canada_Saskatchewan()
+    public function test_now_with_dst_on_summer_on_Canada_Saskatchewan()
     {
         $Zone = $this->_createTimeZone("Canada/Saskatchewan");
         $Zone->_timestamp = $this->timestamp;
         $this->assertEqual($Zone->dateTime(), '2004-07-25 08:49:00');
     }
 
-    function test_now_with_dst_on_summer_on_America_Chicago()
+    public function test_now_with_dst_on_summer_on_America_Chicago()
     {
         $Zone = $this->_createTimeZone("America/Chicago");
         $Zone->_timestamp = $this->timestamp;
         $this->assertEqual($Zone->dateTime(), '2004-07-25 09:49:00');
     }
 
-    function test_today()
+    public function test_today()
     {
         $Zone = $this->_createTimeZone("Test", 43200);
         $Zone->_timestamp = $this->timestamp;
         $this->assertEqual(Ak::getDate(mktime(0,0,0,7,26,2004), Ak::locale('date_format')), $Zone->today());
     }
 
-    function test_should_adjust_negative()
+    public function test_should_adjust_negative()
     {
         $Zone = $this->_createTimeZone("Test", -4200);
         $Zone->_timestamp = $this->timestamp;
         $this->assertEqual(mktime(23,55,0,7,24,2004), $Zone->adjust(mktime(1,5,0,7,25,2004)));
     }
 
-    function test_should_adjust_positive()
+    public function test_should_adjust_positive()
     {
         $Zone = $this->_createTimeZone("Test", 4200);
         $Zone->_timestamp = $this->timestamp;
         $this->assertEqual(mktime(1,5,0,7,26,2004), $Zone->adjust(mktime(23,55,0,7,25,2004)));
     }
 
-    function test_should_unadjust()
+    public function test_should_unadjust()
     {
         $Zone = $this->_createTimeZone("Test", 4200);
         $Zone->_timestamp = $this->timestamp;
@@ -91,7 +91,7 @@ class TimeZoneTestCase extends AkUnitTest
     }
 
 
-    function test_should_unadjust_with_dst_on_summer()
+    public function test_should_unadjust_with_dst_on_summer()
     {
         $Zone = $this->_createTimeZone("Europe/Madrid");
         $Zone->_timestamp = $this->timestamp;
@@ -99,14 +99,14 @@ class TimeZoneTestCase extends AkUnitTest
     }
 
 
-    function test_should_unadjust_with_dst_on_winter()
+    public function test_should_unadjust_with_dst_on_winter()
     {
         $Zone = $this->_createTimeZone("Australia/Sydney");
         $Zone->_timestamp = $this->timestamp;
         $this->assertEqual(mktime(14,49,00,7,25,2004), $Zone->unadjust(mktime(00,49,00,7,26,2004)));
     }
 
-    function test_should_compare_timezones()
+    public function test_should_compare_timezones()
     {
         $Zone1 = $this->_createTimeZone("Test", 4200);
         $Zone2 = $this->_createTimeZone("Test", 5600);
@@ -121,7 +121,7 @@ class TimeZoneTestCase extends AkUnitTest
         $this->assertTrue($Zone1->compare($Zone1) == 0);
     }
 
-    function test_should_compare_zones_at_the_same_offset_one_of_them_using_dst()
+    public function test_should_compare_zones_at_the_same_offset_one_of_them_using_dst()
     {
         $Zone1 = $this->_createTimeZone("Africa/Ceuta"); // has dst
         $Zone2 = $this->_createTimeZone("Africa/Malabo");
@@ -130,14 +130,14 @@ class TimeZoneTestCase extends AkUnitTest
         $this->assertTrue($Zone1->compare($Zone2) == -1);
     }
 
-    function test_to_string()
+    public function test_to_string()
     {
         $Zone = $this->_createTimeZone("Test", 4200);
         $Zone->_timestamp = $this->timestamp;
         $this->assertEqual("(GMT+01:10) Test", $Zone->toString());
     }
 
-    function test_should_be_sorted()
+    public function test_should_be_sorted()
     {
         $Zones =& AkTimeZone::all();
         foreach (range(1,count($Zones)-1) as $i){
@@ -145,7 +145,7 @@ class TimeZoneTestCase extends AkUnitTest
         }
     }
     
-    function _createTimeZone()
+    public function _createTimeZone()
     {
         $args = func_get_args();
         $TimeZone = new AkTimeZone();

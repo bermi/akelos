@@ -8,31 +8,31 @@ require_once(AK_LIB_DIR.DS.'Ak.php');
 //This class is used to check class inspection functions
 class AkTestingObjectInspectionParent
 {
-    var $parent_var;
-    var $parent_var_null = null;
-    var $parent_var_string = 'abc';
-    var $parent_var_int = 123;
+    public $parent_var;
+    public $parent_var_null = null;
+    public $parent_var_string = 'abc';
+    public $parent_var_int = 123;
 
-    function AkTestingObjectInspectionParent(){
+    public function AkTestingObjectInspectionParent(){
     }
-    function parent_function(){
+    public function parent_function(){
     }
-    function &parent_method(){
+    public function &parent_method(){
     }
 }
 class AkTestingObjectInspectionChild extends AkTestingObjectInspectionParent
 {
-    var $child_var;
-    var $child_var_null = null;
-    var $child_var_string = 'abc';
-    var $child_var_int = 123;
+    public $child_var;
+    public $child_var_null = null;
+    public $child_var_string = 'abc';
+    public $child_var_int = 123;
 
-    function AkTestingObjectInspectionChild(){
+    public function AkTestingObjectInspectionChild(){
         parent::AkTestingObjectInspectionParent();
     }
-    function child_function(){
+    public function child_function(){
     }
-    function &child_method(){
+    public function &child_method(){
     }
 }
 
@@ -41,20 +41,20 @@ class AkTestingObjectInspectionChild extends AkTestingObjectInspectionParent
 class test_of_Ak_object_inspection extends  UnitTestCase
 {
 
-    var $AkTestingObjectInspectionChildInstance;
+    public $AkTestingObjectInspectionChildInstance;
 
-    function setUp()
+    public function setUp()
     {
         $this->AkTestingObjectInspectionChildInstance = new AkTestingObjectInspectionChild();
     }
 
-    function tearDown()
+    public function tearDown()
     {
         unset($this->AkTestingObjectInspectionChildInstance);
     }
 
 
-    function Test_db()
+    public function Test_db()
     {
         require_once(AK_CONTRIB_DIR.'/adodb/adodb.inc.php');
 
@@ -63,7 +63,7 @@ class test_of_Ak_object_inspection extends  UnitTestCase
         $this->assertReference($db,Ak::db(),'Checking db connection singleton');
     }
 
-    function Test_t()
+    public function Test_t()
     {
         $text_to_translate = 'Hello, %name, today is %weekday';
         $vars_to_replace = array('%name'=>'Bermi','%weekday'=>'monday');
@@ -74,7 +74,7 @@ class test_of_Ak_object_inspection extends  UnitTestCase
 
     }
 
-    function Test_debug()
+    public function Test_debug()
     {
         ob_start();
         Ak::debug($this->AkTestingObjectInspectionChildInstance);
@@ -85,21 +85,21 @@ class test_of_Ak_object_inspection extends  UnitTestCase
 
     }
 
-    function Test_get_object_info()
+    public function Test_get_object_info()
     {
         $this->assertNotEqual(md5(serialize(Ak::get_object_info($this->AkTestingObjectInspectionChildInstance))),
         md5(serialize(Ak::get_object_info($this->AkTestingObjectInspectionChildInstance,true))),'Object inspection does not exclude parent class methods');
 
     }
 
-    function Test_get_this_object_methods()
+    public function Test_get_this_object_methods()
     {
         $expected_methods = array('AkTestingObjectInspectionChild','child_function','child_method');
         $resulting_methods = Ak::get_this_object_methods($this->AkTestingObjectInspectionChildInstance);
         $this->assertEqual($expected_methods,$resulting_methods);
     }
 
-    function Test_get_this_object_attributes()
+    public function Test_get_this_object_attributes()
     {
         $expected_attributes = array('child_var'=>null,'child_var_null'=>null,'child_var_string'=>'abc','child_var_int'=>123);
         $resulting_attributes = Ak::get_this_object_attributes($this->AkTestingObjectInspectionChildInstance);
@@ -107,7 +107,7 @@ class test_of_Ak_object_inspection extends  UnitTestCase
     }
 
 
-    function Test_for_getTimestamp()
+    public function Test_for_getTimestamp()
     {
         $this->assertEqual(Ak::getTimestamp(), Ak::time());
         $this->assertEqual('17:52:03', Ak::getDate(Ak::getTimestamp('17:52:03'),'H:i:s'));
@@ -118,12 +118,12 @@ class test_of_Ak_object_inspection extends  UnitTestCase
         $this->assertEqual('2192-10-09 01:02:03', Ak::getDate(Ak::getTimestamp('2192-10-9 01:02:03')));
     }
 
-    function Test_for_getDate()
+    public function Test_for_getDate()
     {
     }
 
 
-    function Test_of_encrypt_decrypt()
+    public function Test_of_encrypt_decrypt()
     {
         $original = "Este es el texto que quiero encriptar";
         $this->assertEqual(Ak::decrypt(Ak::encrypt($original)), $original);
@@ -138,7 +138,7 @@ class test_of_Ak_object_inspection extends  UnitTestCase
 
     /**/
     
-    function Test_of_compress_decompress()
+    public function Test_of_compress_decompress()
     {
         $original = Ak::file_get_contents(__FILE__);
         $compressed = Ak::compress($original);
@@ -155,7 +155,7 @@ class test_of_Ak_object_inspection extends  UnitTestCase
     }
     /**/
 
-    function Test_for_StatusKeys()
+    public function Test_for_StatusKeys()
     {
         $Object = new Ak();
         

@@ -14,24 +14,24 @@ require_once(AK_LIB_DIR.DS.'AkDbSession.php');
 
 class Test_of_AkDbSession_Class extends  WebTestCase
 {
-    var $sessionLife = NULL;
+    public $sessionLife = NULL;
    
-    function test_install_db_tables()
+    public function test_install_db_tables()
     {
         require_once(dirname(__FILE__).'/../../fixtures/app/installers/framework_installer.php');
-        $installer =& new FrameworkInstaller();
+        $installer = new FrameworkInstaller();
         $installer->uninstall();
         $installer->install();
         
     }
 
-    function setUp()
+    public function setUp()
     {   
         $this->_test_script = str_replace('/fixtures/public','',trim(AK_TESTING_URL,'/')).
         '/mocks/test_script_AkDbSession.php';
     }
     
-    function Test_open()
+    public function Test_open()
     {
         $browser =& $this->getBrowser();
         $this->get("$this->_test_script?open_check=1");
@@ -41,7 +41,7 @@ class Test_of_AkDbSession_Class extends  WebTestCase
         $this->assertWantedText($expected_session_id,'Sessions are not working correctly');
     }
         
-    function Test_read_write()
+    public function Test_read_write()
     {
         $expected = 'test_value';
         $this->get("$this->_test_script?key=test_key&value=$expected");
@@ -50,7 +50,7 @@ class Test_of_AkDbSession_Class extends  WebTestCase
         $this->_test_script.'?key=test_key');
     }
         
-    function Test_destroy()
+    public function Test_destroy()
     {
         $expected = 'value not found';
         $this->get("$this->_test_script?key=test_key&value=test_value");
@@ -59,7 +59,7 @@ class Test_of_AkDbSession_Class extends  WebTestCase
         $this->assertWantedText($expected,'session_destroy(); is not working as expected');
     }
     
-    function Test_gc()
+    public function Test_gc()
     {
         $expected = 'value not found';
         $copy = $this;

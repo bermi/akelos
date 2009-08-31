@@ -14,9 +14,9 @@ defined('AK_TEST_MEMCACHED_CHECKFILE')? null: define('AK_TEST_MEMCACHED_CHECKFIL
 
 class Test_of_AkSession_Class extends  WebTestCase
 {
-    var $sessionLife = NULL;
+    public $sessionLife = NULL;
    
-    function _checkIfEnabled($file = null)
+    public function _checkIfEnabled($file = null)
     {
         if ($file == null) {
             $file = isset($this->check_file)?$this->check_file:null;
@@ -30,21 +30,21 @@ class Test_of_AkSession_Class extends  WebTestCase
         return true;
     }
     
-    function test_install_db_tables()
+    public function test_install_db_tables()
     {
         require_once(dirname(__FILE__).'/../../fixtures/app/installers/framework_installer.php');
-        $installer =& new FrameworkInstaller();
+        $installer = new FrameworkInstaller();
         $installer->uninstall();
         $installer->install();
         
     }
 
-    function setUp()
+    public function setUp()
     {   
         $this->_test_script = str_replace('/fixtures/public','',trim(AK_TESTING_URL,'/')).
         '/mocks/test_script_AkSession.php';
     }
-    function test_all_session_handlers()
+    public function test_all_session_handlers()
     {
         $cacheHandlers = array('cache_lite'=>1,'akadodbcache'=>2);
         $memcacheEnabled = $this->_checkIfEnabled(AK_TEST_MEMCACHED_CHECKFILE);
@@ -60,7 +60,7 @@ class Test_of_AkSession_Class extends  WebTestCase
             }
         }
     }
-    function _Test_open($type, $class)
+    public function _Test_open($type, $class)
     {
         $browser =& $this->getBrowser();
         $this->get("$this->_test_script?open_check=1&handler=".$type);
@@ -70,7 +70,7 @@ class Test_of_AkSession_Class extends  WebTestCase
         $this->assertWantedText($expected_session_id,'Sessions are not working correctly');
     }
         
-    function _Test_read_write($type, $class)
+    public function _Test_read_write($type, $class)
     {
         $expected = 'test_value';
         $this->get("$this->_test_script?key=test_key&value=$expected&handler=".$type);
@@ -79,7 +79,7 @@ class Test_of_AkSession_Class extends  WebTestCase
         $this->_test_script.'?key=test_key&handler='.$type);
     }
         
-    function _Test_destroy($type, $class)
+    public function _Test_destroy($type, $class)
     {
         $expected = 'value not found';
         $this->get("$this->_test_script?key=test_key&value=test_value&handler=".$type);
@@ -88,7 +88,7 @@ class Test_of_AkSession_Class extends  WebTestCase
         $this->assertWantedText($expected,'session_destroy(); is not working as expected');
     }
     
-    function _Test_gc($type, $class)
+    public function _Test_gc($type, $class)
     {
         $expected = 'value not found';
         $copy = $this;

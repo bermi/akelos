@@ -7,7 +7,7 @@ require_once(AK_LIB_DIR.DS.'AkInflector.php');
 
 class Test_of_AkInflector extends  UnitTestCase
 {
-    var $SingularToPlural = array(
+    public $SingularToPlural = array(
     "search"      => "searches",
     "switch"      => "switches",
     "fix"         => "fixes",
@@ -107,40 +107,40 @@ class Test_of_AkInflector extends  UnitTestCase
     "edge" => "edges"
     );
 
-    var $CamelToUnderscore = array(
+    public $CamelToUnderscore = array(
     "Product"               => "product",
     "SpecialGuest"          => "special_guest",
     "ApplicationController" => "application_controller",
     "Area51Controller"      => "area51_controller",
     );
 
-    var $CamelToUnderscoreWithoutReverse = array(
+    public $CamelToUnderscoreWithoutReverse = array(
     "HTMLTidy"              => "html_tidy",
     "HTMLTidyGenerator"     => "html_tidy_generator",
     "FreeBSD"               => "free_bsd",
     "HTML"                  => "html",
     );
 
-    var $ClassNameToForeignKeyWithUnderscore = array(
+    public $ClassNameToForeignKeyWithUnderscore = array(
     "Person" => "person_id",
     );
 
-    var $ClassNameToForeignKeyWithoutUnderscore = array(
+    public $ClassNameToForeignKeyWithoutUnderscore = array(
     "Person" => "personid",
     );
 
-    var $ClassNameToTableName = array(
+    public $ClassNameToTableName = array(
     "PrimarySpokesman" => "primary_spokesmen",
     "NodeChild"        => "node_children"
     );
 
-    var $UnderscoreToHuman = array(
+    public $UnderscoreToHuman = array(
     "employee_salary" => "Employee salary",
     "employee_id"     => "Employee",
     "underground"     => "Underground"
     );
 
-    var $MixtureToTitleCase = array(
+    public $MixtureToTitleCase = array(
     'active_record'       => 'Active Record',
     'ActiveRecord'        => 'Active Record',
     'action web service'  => 'Action Web Service',
@@ -150,7 +150,7 @@ class Test_of_AkInflector extends  UnitTestCase
     'Actionwebservice'    => 'Actionwebservice'
     );
 
-    var $OrdinalNumbers = array(
+    public $OrdinalNumbers = array(
     "0" => "0th",
     "1" => "1st",
     "2" => "2nd",
@@ -181,13 +181,13 @@ class Test_of_AkInflector extends  UnitTestCase
     "1001" => "1001st"
     );
 
-    function Test_of_pluralize_plurals()
+    public function Test_of_pluralize_plurals()
     {
         $this->assertEqual('plurals', AkInflector::pluralize("plurals"));
         $this->assertEqual('Plurals', AkInflector::pluralize("Plurals"));
     }
 
-    function Test_of_pluralize_singular()
+    public function Test_of_pluralize_singular()
     {
         foreach ($this->SingularToPlural as $singular=>$plural){
             $this->assertEqual($plural, AkInflector::pluralize($singular));
@@ -195,7 +195,7 @@ class Test_of_AkInflector extends  UnitTestCase
         }
     }
 
-    function Test_of_singularize_plural()
+    public function Test_of_singularize_plural()
     {
         foreach ($this->SingularToPlural as $singular=>$plural){
             $this->assertEqual($singular, AkInflector::singularize($plural));
@@ -203,21 +203,21 @@ class Test_of_AkInflector extends  UnitTestCase
         }
     }
 
-    function Test_of_titleize()
+    public function Test_of_titleize()
     {
         foreach ($this->MixtureToTitleCase as $source=>$expected){
             $this->assertEqual($expected, AkInflector::titleize($source));
         }
     }
 
-    function Test_of_camelize()
+    public function Test_of_camelize()
     {
         foreach ($this->CamelToUnderscore as $camel=>$underscore){
             $this->assertEqual($camel, AkInflector::camelize($underscore));
         }
     }
 
-    function Test_of_underscore()
+    public function Test_of_underscore()
     {
         foreach ($this->CamelToUnderscore as $camel=>$underscore){
             $this->assertEqual($underscore, AkInflector::underscore($camel));
@@ -228,7 +228,7 @@ class Test_of_AkInflector extends  UnitTestCase
         }
     }
     
-    function Test_of_foreignKey()
+    public function Test_of_foreignKey()
     {
         foreach ($this->ClassNameToForeignKeyWithUnderscore as $class=>$foreign_key){
             $this->assertEqual($foreign_key, AkInflector::foreignKey($class));
@@ -239,67 +239,67 @@ class Test_of_AkInflector extends  UnitTestCase
 
     }
 
-    function Test_of_tableize()
+    public function Test_of_tableize()
     {
         foreach ($this->ClassNameToTableName as $class_name=>$table_name){
             $this->assertEqual($table_name, AkInflector::tableize($class_name));
         }
     }
 
-    function Test_of_classify()
+    public function Test_of_classify()
     {
         foreach ($this->ClassNameToTableName as $class_name=>$table_name){
             $this->assertEqual($class_name, AkInflector::classify($table_name));
         }
     }
 
-    function Test_of_humanize()
+    public function Test_of_humanize()
     {
         foreach ($this->UnderscoreToHuman as $underscore=>$human){
             $this->assertEqual($human, AkInflector::humanize($underscore));
         }
     }
 
-    function Test_of_ordinalize()
+    public function Test_of_ordinalize()
     {
         foreach ($this->OrdinalNumbers as $number=>$ordinalized){
             $this->assertEqual($ordinalized, AkInflector::ordinalize($number));
         }
     }
     
-    function Test_of_unnaccent()
+    public function Test_of_unnaccent()
     {
         $this->assertEqual(   'AAAAAAACEEEEIIIIDNOOOOOOUUUUYTsaaaaaaaceeeeiiiienoooooouuuuyty', 
         AkInflector::unaccent('ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ'));
     }
 
-    function Test_for_setting_custom_plurals()
+    public function Test_for_setting_custom_plurals()
     {
         AkInflector::pluralize('camión', 'camiones');
         $this->assertEqual(AkInflector::pluralize('camión'), 'camiones');
     }
     
-    function Test_for_setting_custom_singulars()
+    public function Test_for_setting_custom_singulars()
     {
         AkInflector::singularize('camiones', 'camión');
         $this->assertEqual(AkInflector::singularize('camiones'), 'camión');
     }
     
-    function test_should_detect_singulars()
+    public function test_should_detect_singulars()
     {
         foreach (array_keys($this->SingularToPlural) as $singular){
             $this->assertTrue(AkInflector::is_singular($singular), $singular.' is not detected as singular');
         }
     }
     
-    function test_should_detect_plurals()
+    public function test_should_detect_plurals()
     {
         foreach (array_values($this->SingularToPlural) as $plural){
             $this->assertTrue(AkInflector::is_plural($plural), $plural.' is not detected as plural');
         }
     }
     
-    function test_should_demodulize()
+    public function test_should_demodulize()
     {
         $this->assertEqual(AkInflector::demodulize('admin/dashboard_controller'), 'dashboard_controller');
         $this->assertEqual(AkInflector::demodulize('Admin_DashboardController'), 'DashboardController');
@@ -307,22 +307,22 @@ class Test_of_AkInflector extends  UnitTestCase
         $this->assertEqual(AkInflector::demodulize('User'), 'User');
     }
 
-    function test_should_get_controller_file_name()
+    public function test_should_get_controller_file_name()
     {
         $this->assertEqual(AkInflector::toControllerFilename('admin'), AK_CONTROLLERS_DIR.DS.'admin_controller.php');
         $this->assertEqual(AkInflector::toControllerFilename('user_authentication'), AK_CONTROLLERS_DIR.DS.'user_authentication_controller.php');
         $this->assertEqual(AkInflector::toControllerFilename('admin/users'), AK_CONTROLLERS_DIR.DS.'admin'.DS.'users_controller.php');
     }
-    function test_singularize_singular()
+    public function test_singularize_singular()
     {
         $this->assertEqual('resize',AkInflector::singularize('resize'));
     }
-    function test_simple_tableize()
+    public function test_simple_tableize()
     {
         $this->assertEqual('Pictures',AkInflector::pluralize('Picture'));
         $this->assertEqual('pictures',AkInflector::tableize('picture'));
     }
-    function test_spanish_dictionary()
+    public function test_spanish_dictionary()
     {
         $this->assertNotEqual('tijeras',AkInflector::singularize('tijeras'));
         $this->assertEqual('tijeras',AkInflector::singularize('tijeras',null,'es'));

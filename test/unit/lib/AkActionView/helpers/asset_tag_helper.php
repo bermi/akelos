@@ -8,17 +8,17 @@ ak_generate_mock('AkRequest');
 
 class AssetTagHelperTests extends HelpersUnitTester
 {
-    function setUp()
+    public function setUp()
     {
         $this->testing_url_path = $this->testing_url_path == '/' ? '' : $this->testing_url_path;
-        $this->controller = &new MockAkActionController($this);
+        $this->controller = new MockAkActionController($this);
         $this->controller->asset_host = AK_ASSET_HOST;
         $this->controller->setReturnValue('urlFor','/url/for/test');
         $this->asset_tag_helper = new AssetTagHelper();
         $this->asset_tag_helper->setController($this->controller);
     }
 
-    function test_auto_discovery_link_tag()
+    public function test_auto_discovery_link_tag()
     {
         $this->assertEqual(
         $this->asset_tag_helper->auto_discovery_link_tag(),
@@ -38,13 +38,13 @@ class AssetTagHelperTests extends HelpersUnitTester
         );
     }
 
-    function test_javascript_path()
+    public function test_javascript_path()
     {
         $this->assertEqual($this->asset_tag_helper->javascript_path('ajax'), $this->testing_url_path.'/javascripts/ajax.js');
         $this->assertEqual($this->asset_tag_helper->javascript_path('superfx.javascript'), $this->testing_url_path.'/javascripts/superfx.javascript');
     }
 
-    function test_javascript_include_tag()
+    public function test_javascript_include_tag()
     {
         $this->assertEqual(
         $this->asset_tag_helper->javascript_include_tag('ajax'),
@@ -80,13 +80,13 @@ class AssetTagHelperTests extends HelpersUnitTester
         $this->assertEqual($defaults_count,count($this->asset_tag_helper->_get_javascript_included_defaults()));
     }
 
-    function test_stylesheet_path()
+    public function test_stylesheet_path()
     {
         $this->assertEqual($this->asset_tag_helper->stylesheet_path('cool'), $this->testing_url_path.'/stylesheets/cool.css');
         $this->assertEqual($this->asset_tag_helper->stylesheet_path('cooler.style'), $this->testing_url_path.'/stylesheets/cooler.style');
     }
 
-    function test_stylesheet_link_tag()
+    public function test_stylesheet_link_tag()
     {
         $this->assertEqual(
         $this->asset_tag_helper->stylesheet_link_tag('cool',array('media'=>'all')),
@@ -99,7 +99,7 @@ class AssetTagHelperTests extends HelpersUnitTester
         );
     }
 
-    function test_image_tag()
+    public function test_image_tag()
     {
         $this->assertEqual(
         $this->asset_tag_helper->image_tag('summer_in_toronto',array('size' => '200x1000')),
@@ -119,27 +119,27 @@ class AssetTagHelperTests extends HelpersUnitTester
         );
     }
 
-    function test_image_path()
+    public function test_image_path()
     {
         $this->assertEqual($this->asset_tag_helper->image_path('photo'),$this->testing_url_path.'/images/photo.png');
         $this->assertEqual($this->asset_tag_helper->image_path('photo.jpg'),$this->testing_url_path.'/images/photo.jpg');
     }
 
-    function test_compute_public_path()
+    public function test_compute_public_path()
     {
         $this->assertEqual($this->asset_tag_helper->_compute_public_path('test','javascripts','js'), $this->testing_url_path.'/javascripts/test.js');
         $this->assertEqual($this->asset_tag_helper->_compute_public_path('http://www.example.com/logo.png'), 'http://www.example.com/logo.png');
     }
 
-    function test_stylesheet_for_current_controller()
+    public function test_stylesheet_for_current_controller()
     {
-        $controller =& new MockAkActionController($this);
+        $controller = new MockAkActionController($this);
         $controller->asset_host = AK_ASSET_HOST;
         $controller->setReturnValue('urlFor','/url/for/test');
         $controller->setReturnValue('getControllerName','valid_controller');
         $controller->setReturnValue('urlFor','/url/for/test');
         
-        $asset_tag_helper =& new AssetTagHelper();
+        $asset_tag_helper = new AssetTagHelper();
         $asset_tag_helper->setController($controller);
 
         $this->assertEqual(
@@ -148,7 +148,7 @@ class AssetTagHelperTests extends HelpersUnitTester
         );
 
 
-        $controller = &new MockAkActionController($this);
+        $controller = new MockAkActionController($this);
         $controller->asset_host = AK_ASSET_HOST;
         $controller->setReturnValue('urlFor','/url/for/test');
         $asset_tag_helper = new AssetTagHelper();
@@ -159,9 +159,9 @@ class AssetTagHelperTests extends HelpersUnitTester
         $this->assertEqual($asset_tag_helper->stylesheet_for_current_controller(), '');
     }
 
-    function test_javascript_for_current_controller()
+    public function test_javascript_for_current_controller()
     {
-        $controller = &new MockAkActionController($this);
+        $controller = new MockAkActionController($this);
         $controller->asset_host = AK_ASSET_HOST;
         $controller->setReturnValue('urlFor','/url/for/test');
         $asset_tag_helper = new AssetTagHelper();
@@ -175,7 +175,7 @@ class AssetTagHelperTests extends HelpersUnitTester
         );
 
 
-        $controller = &new MockAkActionController($this);
+        $controller = new MockAkActionController($this);
         $controller->asset_host = AK_ASSET_HOST;
         $controller->setReturnValue('urlFor','/url/for/test');
         $asset_tag_helper = new AssetTagHelper();

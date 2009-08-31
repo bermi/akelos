@@ -4,7 +4,7 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class AkRequestInvalidRequestsIntegrationTest extends AkWebTestCase
 {
-    function test_should_show_public_dot_404_dot_php()
+    public function test_should_show_public_dot_404_dot_php()
     {
         $this->setMaximumRedirects(0);
         $this->get(AK_TESTING_URL.'/invalid');

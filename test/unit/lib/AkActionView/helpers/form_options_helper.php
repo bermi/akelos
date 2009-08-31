@@ -6,9 +6,9 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_options_helper.p
 
 class FormOptionsHelperTests extends HelpersUnitTester
 {
-    function test_for_formOptionsHelper()
+    public function test_for_formOptionsHelper()
     {
-        $FormOptionsHelper = & new FormOptionsHelper();
+        $FormOptionsHelper =  new FormOptionsHelper();
 
         $this->assertEqual(trim(str_replace("\n",'',
         $FormOptionsHelper->options_for_select(array('Admin','Moderator','Visitor','Demo'), 'Visitor'))),
@@ -27,14 +27,14 @@ class FormOptionsHelperTests extends HelpersUnitTester
         '<option value="4">Demo</option>')));
 
 
-        $Person =& new MockAkActiveRecord($this);
+        $Person = new MockAkActiveRecord($this);
         $Person->setReturnValue('get', 'Bermi', array('name'));
         $Person->setReturnValue('get', '3', array('role'));
         $Person->setReturnValue('get', '3', array('id'));
-        $Controller =& new MockAkActionController($this);
+        $Controller = new MockAkActionController($this);
 
 
-        $AkFormHelperOptionsInstanceTag =& new AkFormHelperOptionsInstanceTag('person','role',&$FormOptionsHelper,null,&$Person);
+        $AkFormHelperOptionsInstanceTag = new AkFormHelperOptionsInstanceTag('person','role',$FormOptionsHelper,null,$Person);
 
         $this->assertEqual($AkFormHelperOptionsInstanceTag->getValue(), '3');
 
@@ -45,17 +45,17 @@ class FormOptionsHelperTests extends HelpersUnitTester
         '<option value="b">b</option>'.
         '</select>');
 
-        $Person1 =& new MockAkActiveRecord($this);
+        $Person1 = new MockAkActiveRecord($this);
         $Person1->setReturnValue('get', 'Admin', array('role'));
         $Person1->setReturnValue('get', '1', array('id'));
-        $Person2 =& new MockAkActiveRecord($this);
+        $Person2 = new MockAkActiveRecord($this);
         $Person2->setReturnValue('get', 'Demo', array('role'));
         $Person2->setReturnValue('get', '2', array('id'));
-        $Person3 =& new MockAkActiveRecord($this);
+        $Person3 = new MockAkActiveRecord($this);
         $Person3->setReturnValue('get', 'Visitor', array('role'));
         $Person3->setReturnValue('get', '3', array('id'));
 
-        $collection = array(&$Person1,&$Person2,&$Person3);
+        $collection = array(&$Person1,$Person2,$Person3);
         $this->assertEqual(trim(str_replace("\n",'',
         $AkFormHelperOptionsInstanceTag->to_collection_select_tag($collection, 'id', 'role',array('prompt'=>true)))),
         '<select id="person_role" name="person[role]"><option value="1">Admin</option>'.
@@ -68,8 +68,8 @@ class FormOptionsHelperTests extends HelpersUnitTester
         ob_end_clean();
 
 
-        $Person =& new MockAkActiveRecord($this);
-        $AkFormHelperOptionsInstanceTag =& new AkFormHelperOptionsInstanceTag('person','role',&$FormOptionsHelper,null,&$Person);
+        $Person = new MockAkActiveRecord($this);
+        $AkFormHelperOptionsInstanceTag = new AkFormHelperOptionsInstanceTag('person','role',$FormOptionsHelper,null,$Person);
 
         $this->assertEqual(
             $AkFormHelperOptionsInstanceTag->to_select_tag(array('a','b'),array(), array('prompt' => true)),
@@ -86,9 +86,9 @@ class FormOptionsHelperTests extends HelpersUnitTester
             file_get_contents(AK_TEST_HELPERS_DIR.DS.'form_options_helper_to_select_include_blank_prompt.txt')
         );
 
-        $Person =& new MockAkActiveRecord($this);
+        $Person = new MockAkActiveRecord($this);
         $Person->setReturnValue('get', 'USA', array('country'));
-        $AkFormHelperOptionsInstanceTag =& new AkFormHelperOptionsInstanceTag('person','country',&$FormOptionsHelper,null,&$Person);
+        $AkFormHelperOptionsInstanceTag = new AkFormHelperOptionsInstanceTag('person','country',$FormOptionsHelper,null,$Person);
 
         $countrie_select = $AkFormHelperOptionsInstanceTag->to_country_select_tag(array('Spain'=>'ESP','United States'=>'USA'));
 
@@ -99,9 +99,9 @@ class FormOptionsHelperTests extends HelpersUnitTester
         unset($countrie_select);
 
 
-        $Person =& new MockAkActiveRecord($this);
+        $Person = new MockAkActiveRecord($this);
         $Person->setReturnValue('get', array('(GMT+01:00) Europe/Madrid'=>'Europe/Madrid', '(GMT) Europe/London'=>'Europe/London'), array('timezone'));
-        $AkFormHelperOptionsInstanceTag =& new AkFormHelperOptionsInstanceTag('person','timezone',&$FormOptionsHelper,null,&$Person);
+        $AkFormHelperOptionsInstanceTag = new AkFormHelperOptionsInstanceTag('person','timezone',$FormOptionsHelper,null,$Person);
 
         $timezone_select_html = $AkFormHelperOptionsInstanceTag->to_time_zone_select_tag(array('(GMT+01:00) Europe/Madrid'=>'Europe/Madrid'),array(),array('multiple'=>'multiple'));
         $this->assertTrue(strstr($timezone_select_html,'<select id="person_timezone" multiple="multiple" name="person[timezone][]">'));
@@ -112,9 +112,9 @@ class FormOptionsHelperTests extends HelpersUnitTester
         unset($timezone_select_html);
 
 
-        $Person =& new MockAkActiveRecord($this);
+        $Person = new MockAkActiveRecord($this);
         $Person->setReturnValue('get', 'Moderator', array('role'));
-        $FormOptionsHelper = & new FormOptionsHelper();
+        $FormOptionsHelper =  new FormOptionsHelper();
         $FormOptionsHelper->addObject('person',$Person);
 
         $this->assertEqual(trim(str_replace("\n",'',
@@ -125,19 +125,19 @@ class FormOptionsHelperTests extends HelpersUnitTester
         '</select>');
 
 
-        $Category_1 =& new MockAkActiveRecord($this);
+        $Category_1 = new MockAkActiveRecord($this);
         $Category_1->setReturnValue('get', 'Tech', array('description'));
         $Category_1->setReturnValue('get', '23', array('id'));
-        $Category_2 =& new MockAkActiveRecord($this);
+        $Category_2 = new MockAkActiveRecord($this);
         $Category_2->setReturnValue('get', 'News', array('description'));
         $Category_2->setReturnValue('get', '3', array('id'));
-        $Category_3 =& new MockAkActiveRecord($this);
+        $Category_3 = new MockAkActiveRecord($this);
         $Category_3->setReturnValue('get', 'Education', array('description'));
         $Category_3->setReturnValue('get', '6', array('id'));
 
         $Person->setReturnValue('get', '6', array('category'));
 
-        $Person->categories = array(&$Category_1,&$Category_2,&$Category_3);
+        $Person->categories = array(&$Category_1,$Category_2,$Category_3);
 
         $this->assertEqual(trim(str_replace("\n",'',
         $FormOptionsHelper->collection_select('person', 'category', $Person->categories, 'id', 'description'))),
@@ -223,23 +223,23 @@ class FormOptionsHelperTests extends HelpersUnitTester
 
 
 
-        $Project =& new MockAkActiveRecord($this);
+        $Project = new MockAkActiveRecord($this);
 
-        $Person =& new MockAkActiveRecord($this);
+        $Person = new MockAkActiveRecord($this);
         $Person->setReturnValue('get', '100', array('id'));
         $Person->setReturnValue('get', 'Bermi', array('name'));
 
-        $Person2 =& new MockAkActiveRecord($this);
+        $Person2 = new MockAkActiveRecord($this);
         $Person2->setReturnValue('get', '200', array('id'));
         $Person2->setReturnValue('get', 'Hilario', array('name'));
 
-        $Person3 =& new MockAkActiveRecord($this);
+        $Person3 = new MockAkActiveRecord($this);
         $Person3->setReturnValue('get', '250', array('id'));
         $Person3->setReturnValue('get', 'Salavert', array('name'));
 
-        $Project->People = array(&$Person, &$Person2, &$Person3);
+        $Project->People = array(&$Person, $Person2, $Person3);
 
-        $FormOptionsHelper = & new FormOptionsHelper();
+        $FormOptionsHelper =  new FormOptionsHelper();
 
         $this->assertEqual(
         $FormOptionsHelper->options_from_collection_for_select($Project->People,'id','name'),
@@ -281,11 +281,11 @@ class FormOptionsHelperTests extends HelpersUnitTester
          */
     }
 
-    function test_numerical_indexes_for_select()
+    public function test_numerical_indexes_for_select()
     {
-        $Person =& new MockAkActiveRecord($this);
+        $Person = new MockAkActiveRecord($this);
         $Person->setReturnValue('get', '2', array('role'));
-        $FormOptionsHelper = & new FormOptionsHelper();
+        $FormOptionsHelper =  new FormOptionsHelper();
         $FormOptionsHelper->addObject('person',$Person);
 
         $this->assertEqual(trim(str_replace("\n",'',
@@ -303,10 +303,10 @@ class FormOptionsHelperTests extends HelpersUnitTester
         '</select>');
     }
     
-    function test_should_remove_select_option_once_implicitly_set()
+    public function test_should_remove_select_option_once_implicitly_set()
     {
-        $Person =& new MockAkActiveRecord($this);
-        $FormOptionsHelper = & new FormOptionsHelper();
+        $Person = new MockAkActiveRecord($this);
+        $FormOptionsHelper =  new FormOptionsHelper();
         $FormOptionsHelper->addObject('person',$Person);
 
         $this->assertEqual(trim(str_replace("\n",'',

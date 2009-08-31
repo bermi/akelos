@@ -12,9 +12,9 @@ require_once(AK_APIS_DIR.DS.'todo_api.php');
 class AkActionWebServiceApiTests extends  UnitTestCase
 {
 
-    function test_web_service_api()
+    public function test_web_service_api()
     {
-        $TodoApi =& new TodoApi();
+        $TodoApi = new TodoApi();
 
         // hasApiMethod
         $this->assertTrue($TodoApi->hasApiMethod('create_list'));
@@ -63,22 +63,22 @@ class AkActionWebServiceApiTests extends  UnitTestCase
         //echo "<pre>".print_r($TodoApi,true)."</pre>";
     }
     
-    function test_service_generator()
+    public function test_service_generator()
     {
-        $TodoApi =& new TodoApi();
+        $TodoApi = new TodoApi();
         ob_start();
         require_once(AK_LIB_DIR.DS.'utils'.DS.'generators'.DS.'AkelosGenerator.php');
         $Generator = new AkelosGenerator();
         $Generator->runCommand('service Todo');
         ob_end_clean();
         require_once(AK_MODELS_DIR.DS.'todo_service.php');
-        $TodoService =& new TodoService();
+        $TodoService = new TodoService();
         foreach (array_keys($TodoApi->getApiMethods()) as $method){
             $this->assertTrue(method_exists($TodoService, $method));
         }
     }
     
-    function test_clear()
+    public function test_clear()
     {
         Ak::file_delete(AK_MODELS_DIR.DS.'todo_service.php');
     }

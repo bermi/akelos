@@ -6,7 +6,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'number_helper.php');
 
 class NumberHelperTests extends HelpersUnitTester 
 {    
-    function test_for_NumberHelper()
+    public function test_for_NumberHelper()
     {
         $number = new NumberHelper();
         $this->assertEqual($number->number_to_phone(1235551234),'123-555-1234');

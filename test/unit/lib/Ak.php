@@ -3,14 +3,14 @@ require_once(AK_LIB_DIR.DS.'Ak.php');
 
 class Test_Ak extends AkUnitTest
 {
-    function test_static_var_set_value_null()
+    public function test_static_var_set_value_null()
     {
         $null = null;
         $return = Ak::setStaticVar('testVar1',$null);
         $this->assertEqual(null,$return);
     }
     
-    function test_static_var_set_value_true()
+    public function test_static_var_set_value_true()
     {
         $true = true;
         $return = Ak::setStaticVar('testVar1',$true);
@@ -18,7 +18,7 @@ class Test_Ak extends AkUnitTest
         $this->assertEqual(true,Ak::getStaticVar('testVar1'));
     }
     
-    function test_static_var_set_value_false()
+    public function test_static_var_set_value_false()
     {
         $false = false;
         $return = Ak::setStaticVar('testVar1',$false);
@@ -26,7 +26,7 @@ class Test_Ak extends AkUnitTest
         $this->assertEqual(false,Ak::getStaticVar('testVar1'));
     }
     
-    function test_static_var_set_value_array()
+    public function test_static_var_set_value_array()
     {
         $value = array(1);
         $return = Ak::setStaticVar('testVar1',$value);
@@ -47,7 +47,7 @@ class Test_Ak extends AkUnitTest
         $this->assertEqual($retrievedObject->id, $obj1->id);
         
     }
-    function test_static_var_set_value_float()
+    public function test_static_var_set_value_float()
     {
         $value = 13.59;
         $return = Ak::setStaticVar('testVar1',$value);
@@ -55,7 +55,7 @@ class Test_Ak extends AkUnitTest
         $this->assertEqual($value,Ak::getStaticVar('testVar1'));
     }
 
-    function test_static_var_set_value_object_referenced()
+    public function test_static_var_set_value_object_referenced()
     {
         $value = new stdClass;
         $value->id = 1;
@@ -67,7 +67,7 @@ class Test_Ak extends AkUnitTest
         $this->assertEqual($value->id, $storedValue->id);
     }
     
-    function test_static_var_destruct_single_var()
+    public function test_static_var_destruct_single_var()
     {
         $value = new stdClass;
         $value->id = 1;
@@ -82,7 +82,7 @@ class Test_Ak extends AkUnitTest
         
     }
     
-    function test_static_var_destruct_all_vars()
+    public function test_static_var_destruct_all_vars()
     {
         $value = new stdClass;
         $value->id = 1;

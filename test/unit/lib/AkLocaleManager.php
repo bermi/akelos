@@ -8,25 +8,25 @@ require_once(AK_LIB_DIR.DS.'AkLocaleManager.php');
 class Test_of_AkLocaleManager_Class extends  AkUnitTest
 {
 
-    var $LocaleManager;
+    public $LocaleManager;
 
-    function setUp()
+    public function setUp()
     {
-        $this->LocaleManager =& new AkLocaleManager();
+        $this->LocaleManager = new AkLocaleManager();
     }
 
-    function tearDown()
+    public function tearDown()
     {
         unset ($this->LocaleManager);
     }
 
-    function Test_of__getAvailableLocales()
+    public function Test_of__getAvailableLocales()
     {
         $available_locales = $this->LocaleManager->_getAvailableLocales();
         $this->assertTrue(is_array($available_locales['en']) && count($available_locales) > 0 ,'Locale en was not found on config/locales folder.');
     }
 
-    function Test_of__parseLocaleConfigString()
+    public function Test_of__parseLocaleConfigString()
     {
 
         $config_string = 'en';
@@ -69,7 +69,7 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
 
 
 
-    function Test_of_getBrowserLanguages()
+    public function Test_of_getBrowserLanguages()
     {
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = $this->LocaleManager->_browser_language = 'en-us,en,es-es;q=0.5;';
         
@@ -92,7 +92,7 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
     }
 
 
-    function Test_of_getDefaultLanguageForUser()
+    public function Test_of_getDefaultLanguageForUser()
     {
         unset($_SERVER['HTTP_ACCEPT_LANGUAGE']);
         $this->LocaleManager->available_locales = array('en_us'=>array('en_us'),'en'=>array('en'),'es_es'=>array('es_es'));
@@ -117,7 +117,7 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
 
     }
 
-    function Test_of__getDefaultLocale()
+    public function Test_of__getDefaultLocale()
     {
         $this->LocaleManager->available_locales = array('es_es'=>array('es_es'));
         $result = $this->LocaleManager->_getDefaultLocale();
@@ -145,7 +145,7 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
     }
 
 
-    function Test_of_getLangFromUrl()
+    public function Test_of_getLangFromUrl()
     {
         $Request = new AkObject();
 
@@ -223,7 +223,7 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
     }
 
 
-    function Test_of_getLocaleFromAlias()
+    public function Test_of_getLocaleFromAlias()
     {
         $this->LocaleManager->available_locales = $this->LocaleManager->_parseLocaleConfigString('es, en, fr (france)');
         $result = $this->LocaleManager->getLocaleFromAlias('france');
@@ -235,7 +235,7 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
         
     }
     
-    function test_locale_setting_getting_deleting_methods()
+    public function test_locale_setting_getting_deleting_methods()
     {
         !defined('AK_TEST_TRANSLATIONS')?define('AK_TEST_TRANSLATIONS',true):null;
         $translation_key=Ak::randomString(8);
@@ -261,7 +261,7 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
         
     }
     
-    function test_framework_config_locale_update()
+    public function test_framework_config_locale_update()
     {
         $langs=Ak::langs();
         $translation_key=Ak::randomString(8);

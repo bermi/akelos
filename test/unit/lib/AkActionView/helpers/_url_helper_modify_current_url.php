@@ -5,7 +5,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'url_helper.php');
 
 class Test_AkActionView_helpers_url_helper_modify_current_url extends AkTestApplication
 {
-    function test_modify_current_url()
+    public function test_modify_current_url()
     {
         $this->get('/modify');
         $this->assertTextMatch('index');
