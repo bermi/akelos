@@ -7,8 +7,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActiveSupport
- * @subpackage Base
+ * @package ActiveRecord
+ * @component Active Record
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  * @author Kaste
  * @author Arno Schneider <arno a.t bermilabs c.om>
@@ -88,12 +88,12 @@ ak_compat('array_combine');
 * <code>
 *   class User extends ActiveRecord
 *   {
-*     function authenticateUnsafely($user_name, $password)
+*     public function authenticateUnsafely($user_name, $password)
 *     {
 *          return findFirst("user_name = '$user_name' AND password = '$password'");
 *     }
 *
-*     function authenticateSafely($user_name, $password)
+*     public function authenticateSafely($user_name, $password)
 *     {
 *          return findFirst("user_name = ? AND password = ?", $user_name, $password);
 *     }
@@ -136,7 +136,7 @@ ak_compat('array_combine');
 * <code>
 *   class User extends ActiveRecord
 *   {
-*      var $serialize = array('preferences');
+*      public $serialize = array('preferences');
 *   }
 *
 *   $User = new User(array('preferences'=>array("background" => "black", "display" => 'large')));
@@ -185,55 +185,52 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * @access private
     */
     //var $disableAutomatedAssociationLoading = true;
-    var $_tableName;
-    var $_db;
-    var $_newRecord;
-    var $_freeze;
-    var $_dataDictionary;
-    var $_primaryKey;
-    var $_inheritanceColumn;
+    public $_tableName;
+    public $_db;
+    public $_newRecord;
+    public $_freeze;
+    public $_dataDictionary;
+    public $_primaryKey;
+    public $_inheritanceColumn;
 
-    var $_associations;
+    public $_associations;
 
-    var $_internationalize;
+    public $_internationalize;
 
-    var $_errors = array();
+    public $_errors = array();
 
-    var $_attributes = array();
+    public $_attributes = array();
 
-    var $_protectedAttributes = array();
-    var $_accessibleAttributes = array();
+    public $_protectedAttributes = array();
+    public $_accessibleAttributes = array();
 
-    var $_recordTimestamps = true;
+    public $_recordTimestamps = true;
 
     // Column description
-    var $_columnNames = array();
+    public $_columnNames = array();
     // Array of column objects for the table associated with this class.
-    var $_columns = array();
+    public $_columns = array();
     // Columns that can be edited/viewed
-    var $_contentColumns = array();
-    // Methods that will be dinamically loaded for the model (EXPERIMENTAL) This pretends to generate something similar to Ruby on Rails finders.
-    // If you set array('findOneByUsernameAndPassword', 'findByCompany', 'findAllByExipringDate')
-    // You'll get $User->findOneByUsernameAndPassword('admin', 'pass');
-    var $_dynamicMethods = false;
-    var $_combinedAttributes = array();
+    public $_contentColumns = array();
 
-    var $_BlobQueryStack = null;
+    public $_combinedAttributes = array();
 
-    var $_automated_max_length_validator = false;
-    var $_automated_validators_enabled = false;
-    var $_automated_not_null_validator = false;
-    var $_set_default_attribute_values_automatically = true;
+    public $_BlobQueryStack = null;
+
+    public $_automated_max_length_validator = false;
+    public $_automated_validators_enabled = false;
+    public $_automated_not_null_validator = false;
+    public $_set_default_attribute_values_automatically = true;
 
     // This is needed for enabling support for static active record instantation under php
-    var $_activeRecordHasBeenInstantiated = true;
+    public $_activeRecordHasBeenInstantiated = true;
 
-    var $__ActsLikeAttributes = array();
+    public $__ActsLikeAttributes = array();
 
     /**
     * Holds a hash with all the default error messages, such that they can be replaced by your own copy or localizations.
     */
-    var $_defaultErrorMessages = array(
+    public $_defaultErrorMessages = array(
     'inclusion' =>  "is not included in the list",
     'exclusion' => "is reserved",
     'invalid' => "is invalid",
@@ -248,17 +245,17 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     'not_a_number' => "is not a number"
     );
 
-    var $__activeRecordObject = true;
+    public $__activeRecordObject = true;
 
     /**#@-*/
 
-    function __construct()
+    public function __construct()
     {
         $attributes = (array)func_get_args();
         return $this->init($attributes);
     }
 
-    function init($attributes = array())
+    public function init($attributes = array())
     {
         AK_LOG_EVENTS ? ($this->Logger =& Ak::getLogger()) : null;
         $this->_internationalize = is_null($this->_internationalize) && AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT ? count($this->getAvailableLocales()) > 1 : $this->_internationalize;
@@ -307,14 +304,11 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $this->newRecord($attributes);
         }
 
-        if($this->_dynamicMethods){
-            $this->_buildFinders();
-        }
         empty($avoid_loading_associations) ? $this->loadAssociations() : null;
 
     }
 
-    function __destruct()
+    public function __destruct()
     {
 
     }
@@ -325,7 +319,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * In both instances, valid attribute keys are determined by the column names of the associated table; hence you can't
     * have attributes that aren't part of the table columns.
     */
-    function newRecord($attributes)
+    public function newRecord($attributes)
     {
         $this->_newRecord = true;
 
@@ -344,7 +338,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns a clone of the record that hasn't been assigned an id yet and is treated as a new record.
     */
-    function cloneRecord()
+    public function cloneRecord()
     {
         $model_name = $this->getModelName();
         $attributes = $this->getAttributesBeforeTypeCast();
@@ -358,7 +352,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns true if this object hasn't been saved yet that is, a record for the object doesn't exist yet.
     */
-    function isNewRecord()
+    public function isNewRecord()
     {
         if(!isset($this->_newRecord) && !isset($this->{$this->getPrimaryKey()})){
             $this->_newRecord = true;
@@ -371,7 +365,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Reloads the attributes of this object from the database.
     */
-    function reload()
+    public function reload()
     {
         /**
         * @todo clear cache
@@ -394,20 +388,20 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Creates an object, instantly saves it as a record (if the validation permits it), and returns it.
     * If the save fail under validations, the unsaved object is still returned.
     */
-    function &create($attributes = null)
+    public function &create($attributes = null)
     {
         if(func_num_args() > 1){
             $attributes = func_get_args();
         }
         $model = $this->getModelName();
 
-        $object =& new $model();
+        $object = new $model();
         $object->setAttributes($attributes);
         $object->save();
         return $object;
     }
 
-    function createOrUpdate($validate = true)
+    public function createOrUpdate($validate = true)
     {
         if($validate && !$this->isValid()){
             $this->transactionFail();
@@ -416,7 +410,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $this->isNewRecord() ? $this->_create() : $this->_update();
     }
 
-    function &findOrCreateBy()
+    public function &findOrCreateBy()
     {
         $args = func_get_args();
         $Item =& call_user_func_array(array(&$this,'findFirstBy'), $args);
@@ -445,7 +439,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * @access private
     */
-    function _create()
+    public function _create()
     {
         if (!$this->beforeCreate() || !$this->notifyObservers('beforeCreate')){
             return $this->transactionFail();
@@ -492,7 +486,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return true;
     }
 
-    function _setRecordTimestamps()
+    public function _setRecordTimestamps()
     {
         if (!$this->_recordTimestamps){
             return;
@@ -534,7 +528,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * - No record exists: Creates a new record with values matching those of the object attributes.
     * - A record does exist: Updates the record with values matching those of the object attributes.
     */
-    function save($validate = true)
+    public function save($validate = true)
     {
         if($this->isFrozen()){
             return false;
@@ -575,7 +569,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       *
       *   $Product->countBySql("SELECT COUNT(*) FROM sales s, customers c WHERE s.customer_id = c.id");
       */
-    function countBySql($sql)
+    public function countBySql($sql)
     {
         if(!stristr($sql, 'COUNT') && stristr($sql, ' FROM ')){
             $sql = 'SELECT COUNT(*) '.substr($sql,strpos(str_replace(' from ',' FROM ', $sql),' FROM '));
@@ -598,7 +592,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Finds the record from the passed id, instantly saves it with the passed attributes (if the validation permits it),
     * and returns it. If the save fail under validations, the unsaved object is still returned.
     */
-    function update($id, $attributes)
+    public function update($id, $attributes)
     {
         if(is_array($id)){
             $results = array();
@@ -616,7 +610,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Updates a single attribute and saves the record. This is especially useful for boolean flags on existing records.
     */
-    function updateAttribute($name, $value, $should_validate=true)
+    public function updateAttribute($name, $value, $should_validate=true)
     {
         $this->setAttribute($name, $value);
         return $this->save($should_validate);
@@ -627,7 +621,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Updates all the attributes in from the passed array and saves the record. If the object is
     * invalid, the saving will fail and false will be returned.
     */
-    function updateAttributes($attributes, $object = null)
+    public function updateAttributes($attributes, $object = null)
     {
         isset($object) ? $object->setAttributes($attributes) : $this->setAttributes($attributes);
 
@@ -645,7 +639,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Important note: Conditions are not sanitized yet so beware of accepting
     * variable conditions when using this function
     */
-    function updateAll($updates, $conditions = null)
+    public function updateAll($updates, $conditions = null)
     {
         /**
         * @todo sanitize sql conditions
@@ -675,7 +669,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * @access private
     */
-    function _update()
+    public function _update()
     {
         if(!$this->beforeUpdate() || !$this->notifyObservers('beforeUpdate')){
             return $this->transactionFail();
@@ -727,7 +721,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Deletes the record with the given id without instantiating an object first. If an array of
     * ids is provided, all of them are deleted.
     */
-    function delete($id)
+    public function delete($id)
     {
         $id = func_num_args() > 1 ? func_get_args() : $id;
         return $this->deleteAll($this->getPrimaryKey().' IN ('.join(', ', $this->castAttributesForDatabase($this->getPrimaryKey(), Ak::toArray($id))).')');
@@ -747,7 +741,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Important note: Conditions are not sanitized yet so beware of accepting
     * variable conditions when using this function
     */
-    function deleteAll($conditions = null)
+    public function deleteAll($conditions = null)
     {
         /**
         * @todo sanitize sql conditions
@@ -777,7 +771,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Deletes the record in the database and freezes this instance to reflect that no changes should be
     * made (since they can't be persisted).
     */
-    function destroy($id = null)
+    public function destroy($id = null)
     {
         $id = func_num_args() > 1 ? func_get_args() : $id;
 
@@ -808,7 +802,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-    function _destroy()
+    public function _destroy()
     {
         if(!$this->beforeDestroy() || !$this->notifyObservers('beforeDestroy')){
             return $this->transactionFail();
@@ -832,7 +826,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     *   $Person->destroyAll("last_login < '2004-04-04'");
     */
-    function destroyAll($conditions)
+    public function destroyAll($conditions)
     {
         if($objects = $this->find('all',array('conditions'=>$conditions))){
             $results = count($objects);
@@ -863,7 +857,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * $Person->exists(5);
     */
-    function exists($id)
+    public function exists($id)
     {
         return $this->find('first',array('conditions' => array($this->getPrimaryKey().' = '.$id))) !== false;
     }
@@ -913,37 +907,26 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *   $Person->find('all', array('include' => array('account', 'friends'));
     * </code>
     */
-    function &find()
+    public function &find()
     {
         $args = func_get_args();
-
         $options = $this->_extractOptionsFromArgs($args);
         list($fetch,$options) = $this->_extractConditionsFromArgs($args,$options);
         $this->_sanitizeConditionsVariables($options);
         switch ($fetch) {
             case 'first':
-                // HACK: php4 pass by ref
-                $result =& $this->_findInitial($options);
-                return $result;
-                break;
+                return $this->_findInitial($options);
 
             case 'all':
-                // HACK: php4 pass by ref
-                $result =& $this->_findEvery($options);
-                return $result;
-                break;
+                return $this->_findEvery($options);
 
             default:
-                // HACK: php4 pass by ref
-                $result =& $this->_findFromIds($args, $options);
-                return $result;
-                break;
+                return $this->_findFromIds($args, $options);
         }
-        $result = false;
-        return $result;
+        return false;
     }
 
-    function &_findInitial($options)
+    public function &_findInitial($options)
     {
         // TODO: virtual_limit is a hack
         // actually we fetch_all and return only the first row
@@ -962,7 +945,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     }
 
-    function &_findEvery($options)
+    public function &_findEvery($options)
     {
         if((!empty($options['include']) && $this->hasAssociations())){
             $result =& $this->findWithAssociations($options);
@@ -976,10 +959,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             }
             if (!empty($options['returns']) && $options['returns']!='default') {
                 $options['returns'] = in_array($options['returns'],array('simulated','default','array'))?$options['returns']:'default';
-                if ($options['returns'] == 'simulated' && !AK_PHP5) {
-                    trigger_error(Ak::t('In PHP4 you cannot use the return type "simulated" on finders. Return type reset to "default"'),E_USER_WARNING);
-                    $options['returns'] = 'default';
-                }
                 $simulation_class = !empty($options['simulation_class']) && class_exists($options['simulation_class'])?$options['simulation_class']:'AkActiveRecordMock';
                 $result =& $this->findBySql($sql,null,null,null,$options['returns'],$simulation_class);
             } else {
@@ -996,7 +975,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     }
 
-    function &_findFromIds($ids, $options)
+    public function &_findFromIds($ids, $options)
     {
         $expects_array = is_array($ids[0]);
 
@@ -1017,7 +996,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 if (!preg_match('/SELECT .* FROM/is', $conditions)) {
                     $options['conditions'] = $table_name.'.'.$this->getPrimaryKey().' = '.$ids[0].(empty($conditions)?'':' AND '.$conditions);
                 } else {
-                    Ak::compat('stripos');
                     if (false!==($pos=stripos($conditions,' WHERE '))) {
                         $before_where = substr($conditions,0, $pos);
                         $after_where = substr($conditions, $pos+7);
@@ -1040,7 +1018,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 if (!preg_match('/SELECT .* FROM/is', $conditions)) {
                     $options['conditions'] = $ids_condition.(empty($conditions)?'':' AND '.$conditions);
                 } else {
-                    Ak::compat('stripos');
                     if (false!==($pos=stripos($conditions,' WHERE '))) {
                         $before_where = substr($conditions,0, $pos);
                         $after_where = substr($conditions, $pos+7);
@@ -1059,17 +1036,17 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
 
     }
-    function quotedId($id = false)
+    public function quotedId($id = false)
     {
         return $this->castAttributeForDatabase($this->getPrimaryKey(), $id ? $id : $this->getId());
     }
-    function _extractOptionsFromArgs(&$args)
+    public function _extractOptionsFromArgs(&$args)
     {
         $last_arg = count($args)-1;
         return isset($args[$last_arg]) && is_array($args[$last_arg]) && $this->_isOptionsHash($args[$last_arg]) ? array_pop($args) : array();
     }
 
-    function _isOptionsHash($options)
+    public function _isOptionsHash($options)
     {
         if (isset($options[0])){
             return false;
@@ -1083,7 +1060,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return false;
     }
 
-    function _extractConditionsFromArgs($args, $options)
+    public function _extractConditionsFromArgs($args, $options)
     {
         if(empty($args)){
             $fetch = 'all';
@@ -1120,7 +1097,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return array($fetch,$options);
     }
 
-    function _sanitizeConditionsVariables(&$options)
+    public function _sanitizeConditionsVariables(&$options)
     {
         if(!empty($options['conditions']) && is_array($options['conditions'])){
             if (isset($options['conditions'][0]) && strstr($options['conditions'][0], '?') && count($options['conditions']) > 1){
@@ -1140,7 +1117,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $this->_sanitizeConditionsCollections($options);
     }
 
-    function _sanitizeConditionsCollections(&$options)
+    public function _sanitizeConditionsCollections(&$options)
     {
         if(!empty($options['bind']) && is_array($options['bind']) && preg_match_all('/([a-zA-Z_]+)\s+IN\s+\(?\?\)?/i', $options['conditions'], $matches)){
             $i = 0;
@@ -1158,14 +1135,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function &findFirst()
+    public function &findFirst()
     {
         $args = func_get_args();
         $result =& call_user_func_array(array(&$this,'find'), array_merge(array('first'),$args));
         return $result;
     }
 
-    function &findAll()
+    public function &findAll()
     {
         $args = func_get_args();
         $result =& call_user_func_array(array(&$this,'find'), array_merge(array('all'),$args));
@@ -1178,7 +1155,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * $Post->findBySql("SELECT p.*, c.author FROM posts p, comments c WHERE p.id = c.post_id");
     * $Post->findBySql(array("SELECT * FROM posts WHERE author = ? AND created_on > ?", $author_id, $start_date));
     */
-    function &findBySql($sql, $limit = null, $offset = null, $bindings = null, $returns = 'default', $simulation_class = 'AkActiveRecordMock')
+    public function &findBySql($sql, $limit = null, $offset = null, $bindings = null, $returns = 'default', $simulation_class = 'AkActiveRecordMock')
     {
         if ($limit || $offset){
             Ak::deprecateWarning("You're calling AR::findBySql with \$limit or \$offset parameters. This has been deprecated.");
@@ -1208,7 +1185,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * This function pretends to emulate RoR finders until AkActiveRecord::addMethod becomes stable on future PHP versions.
     * @todo use PHP5 __call method for handling the magic finder methods like findFirstByUnsenameAndPassword('bermi','pass')
     */
-    function &findFirstBy()
+    public function &findFirstBy()
     {
         $args = func_get_args();
         array_unshift($args,'first');
@@ -1216,7 +1193,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $result;
     }
 
-    function &findLastBy()
+    public function &findLastBy()
     {
         $args = func_get_args();
         $options = $this->_extractOptionsFromArgs($args);
@@ -1226,7 +1203,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $result;
     }
 
-    function &findAllBy()
+    public function &findAllBy()
     {
         $args = func_get_args();
         array_unshift($args,'all');
@@ -1242,7 +1219,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *   findBy('is_active = true AND session_id', session_id());
     *
     */
-    function &findBy()
+    public function &findBy()
     {
         $args = func_get_args();
         $find_by_sql = array_shift($args);
@@ -1298,7 +1275,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function _getFindBySqlAndColumns($find_by_sql, &$query_values)
+    public function _getFindBySqlAndColumns($find_by_sql, &$query_values)
     {
         $sql = str_replace(array('(',')','||','|','&&','&','  '),array(' ( ',' ) ',' OR ',' OR ',' AND ',' AND ',' '), $find_by_sql);
         $operators = array('AND','and','(',')','&','&&','NOT','<>','OR','|','||');
@@ -1385,7 +1362,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      *
      * @return string
      */
-    function _getVariableSqlCondition($variable_condition)
+    public function _getVariableSqlCondition($variable_condition)
     {
         $query_values = array();
         list($sql, $requested_columns) = $this->_getFindBySqlAndColumns($variable_condition, $query_values);
@@ -1399,7 +1376,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function constructFinderSql($options, $select_from_prefix = 'default')
+    public function constructFinderSql($options, $select_from_prefix = 'default')
     {
         $sql = isset($options['select_prefix']) ? $options['select_prefix'] : ($select_from_prefix == 'default' ? 'SELECT '.(!empty($options['joins'])?$this->getTableName().'.':'') .'* FROM '.$this->getTableName() : $select_from_prefix);
         $sql .= !empty($options['joins']) ? ' '.$options['joins'] : '';
@@ -1423,7 +1400,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Adds a sanitized version of $conditions to the $sql string. Note that the passed $sql string is changed.
     */
-    function addConditions(&$sql, $conditions = null, $table_alias = null)
+    public function addConditions(&$sql, $conditions = null, $table_alias = null)
     {
         if (empty($sql)) {
             $concat = '';
@@ -1450,7 +1427,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     $conditions = '('.$conditions.')';
                 }
             } else {
-                Ak::compat('stripos');
                 if (($wherePos=stripos($sql,'WHERE'))!==false) {
                     if (!empty($type_condition)) {
                         $oldConditions = trim(substr($sql,$wherePos+5));
@@ -1488,7 +1464,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Gets a sanitized version of the input array. Each element will be escaped
     */
-    function getSanitizedConditionsArray($conditions_array)
+    public function getSanitizedConditionsArray($conditions_array)
     {
         $result = array();
         foreach ($conditions_array as $k=>$v){
@@ -1505,7 +1481,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * This functions is used to get the conditions from an AkRequest object
     */
-    function getConditions($conditions, $prefix = '', $model_name = null)
+    public function getConditions($conditions, $prefix = '', $model_name = null)
     {
         $model_name = isset($model_name) ? $model_name : $this->getModelName();
         $model_conditions = !empty($conditions[$model_name]) ? $conditions[$model_name] : $conditions;
@@ -1529,56 +1505,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * @access private
     */
-    function _quoteColumnName($column_name)
+    public function _quoteColumnName($column_name)
     {
         return $this->_db->nameQuote.$column_name.$this->_db->nameQuote;
-    }
-
-
-
-
-    /**
-    * EXPERIMENTAL: Will allow to create finders when PHP includes aggregate_methods as a stable feature on PHP4, for PHP5 we might use __call
-    *
-    * @access private
-    */
-    function _buildFinders($finderFunctions = array('find','findFirst'))
-    {
-        if(!$this->_dynamicMethods){
-            return;
-        }
-        $columns = !is_array($this->_dynamicMethods) ? array_keys($this->getColumns()) : $this->_dynamicMethods;
-        $class_name = 'ak_'.md5(serialize($columns));
-        if(!class_exists($class_name)){
-            $permutations = Ak::permute($columns);
-            $implementations = '';
-            foreach ($finderFunctions as $finderFunction){
-                foreach ($permutations as $permutation){
-                    $permutation = array_map(array('AkInflector','camelize'),$permutation);
-                    foreach ($permutation as $k=>$v){
-                        $method_name = $finderFunction.'By'.join($permutation,'And');
-                        $implementation = 'function &'.$method_name.'(';
-                        $first_param = '';
-                        $params = '';
-                        $i = 1;
-                        foreach ($permutation as $column){
-                            $column = AkInflector::underscore($column);
-                            $params .= "$$column, ";
-                            $first_param .= "$column ";
-                            $i++;
-                        }
-                        $implementation .= trim($params,' ,')."){\n";
-                        $implementation .= '$options = func_num_args() == '.$i.' ? func_get_arg('.($i-1).') : array();'."\n";
-                        $implementation .= 'return $this->'.$finderFunction.'By(\''.$first_param.'\', '.trim($params,' ,').", \$options);\n }\n";
-                        $implementations[$method_name] = $implementation;
-                        array_shift($permutation);
-                    }
-                }
-            }
-            eval('class '.$class_name.' { '.join("\n",$implementations).' } ');
-        }
-
-        aggregate_methods(&$this, $class_name);
     }
 
 
@@ -1587,7 +1516,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * eager loading associations.
     * that makes it possible to create objects of different types from the same table.
     */
-    function &instantiate($record, $set_as_new = true, $call_after_instantiate = true)
+    public function &instantiate($record, $set_as_new = true, $call_after_instantiate = true)
     {
         $inheritance_column = $this->getInheritanceColumn();
         if(!empty($record[$inheritance_column])){
@@ -1604,7 +1533,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
 
         $model_name = isset($inheritance_model_name) ? $inheritance_model_name : $this->getModelName();
-        $object =& new $model_name('attributes', $record);
+        $object = new $model_name('attributes', $record);
 
         $object->_newRecord = $set_as_new;
 
@@ -1625,7 +1554,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                            Table inheritance
      ====================================================================
      */
-    function descendsFromActiveRecord(&$object)
+    public function descendsFromActiveRecord(&$object)
     {
         if(substr(strtolower(get_parent_class($object)),-12) == 'activerecord'){
             return true;
@@ -1640,7 +1569,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
      * Gets the column name for use with single table inheritance. Can be overridden in subclasses.
     */
-    function getInheritanceColumn()
+    public function getInheritanceColumn()
     {
         return empty($this->_inheritanceColumn) ? ($this->hasColumn('type') ? 'type' : false ) : $this->_inheritanceColumn;
     }
@@ -1648,7 +1577,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
      * Defines the column name for use with single table inheritance. Can be overridden in subclasses.
      */
-    function setInheritanceColumn($column_name)
+    public function setInheritanceColumn($column_name)
     {
         if(!$this->hasColumn($column_name)){
             trigger_error(Ak::t('Could not set "%column_name" as the inheritance column as this column is not available on the database.',array('%column_name'=>$column_name)), E_USER_NOTICE);
@@ -1663,7 +1592,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function getSubclasses()
+    public function getSubclasses()
     {
         $current_class = get_class($this);
         $subclasses = array();
@@ -1682,7 +1611,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function typeCondition($table_alias = null)
+    public function typeCondition($table_alias = null)
     {
         $inheritance_column = $this->getInheritanceColumn();
         $type_condition = array();
@@ -1703,7 +1632,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     ====================================================================
     See also: Getting Attributes, Model Attributes, Toggling Attributes, Counting Attributes.
     */
-    function setAttribute($attribute, $value, $inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS, $compose_after_set = true)
+    public function setAttribute($attribute, $value, $inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS, $compose_after_set = true)
     {
         if($attribute[0] == '_'){
             return false;
@@ -1752,7 +1681,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return true;
     }
 
-    function set($attribute, $value = null, $inspect_for_callback_child_method = true, $compose_after_set = true)
+    public function set($attribute, $value = null, $inspect_for_callback_child_method = true, $compose_after_set = true)
     {
         if(is_array($attribute)){
             return $this->setAttributes($attribute);
@@ -1768,7 +1697,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * specify which attributes can be accessed in with the $this->setAccessibleAttributes method.
     * Then all the attributes not included in that won?t be allowed to be mass-assigned.
     */
-    function setAttributes($attributes, $override_attribute_protection = false)
+    public function setAttributes($attributes, $override_attribute_protection = false)
     {
         $this->parseAkelosArgs($attributes);
         if(!$override_attribute_protection){
@@ -1782,7 +1711,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function setId($value)
+    public function setId($value)
     {
         if($this->isFrozen()){
             return false;
@@ -1801,7 +1730,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     See also: Setting Attributes, Model Attributes, Toggling Attributes, Counting Attributes.
     */
 
-    function getAttribute($attribute, $inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS)
+    public function getAttribute($attribute, $inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS)
     {
         if($attribute[0] == '_'){
             return false;
@@ -1843,7 +1772,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return null;
     }
 
-    function get($attribute = null, $inspect_for_callback_child_method = true)
+    public function get($attribute = null, $inspect_for_callback_child_method = true)
     {
         return !isset($attribute) ? $this->getAttributes($inspect_for_callback_child_method) : $this->getAttribute($attribute, $inspect_for_callback_child_method);
     }
@@ -1851,7 +1780,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns an array of all the attributes with their names as keys and clones of their objects as values in case they are objects.
     */
-    function getAttributes()
+    public function getAttributes()
     {
         $attributes = array();
         $available_attributes = $this->getAvailableAttributes();
@@ -1876,7 +1805,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Every Active Record class must use "id" as their primary ID. This getter overwrites the native id method, which isn't being used in this context.
     */
-    function getId()
+    public function getId()
     {
         $pk=$this->getPrimaryKey();
         if(empty($pk)) {
@@ -1897,7 +1826,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Turns an attribute that's currently true into false and vice versa. Returns attribute value.
     */
-    function toggleAttribute($attribute)
+    public function toggleAttribute($attribute)
     {
         $value = $this->getAttribute($attribute);
         $new_value = $value ? false : true;
@@ -1909,7 +1838,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Toggles the attribute and saves the record.
     */
-    function toggleAttributeAndSave($attribute)
+    public function toggleAttributeAndSave($attribute)
     {
         $value = $this->toggleAttribute($attribute);
         if($this->updateAttribute($attribute, $value)){
@@ -1934,7 +1863,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * be computed every time. Especially important for looping over a collection where each element
     * require a number of aggregate values. Like the $DiscussionBoard that needs to list both the number of posts and comments.
     */
-    function incrementCounter($counter_name, $id, $difference = 1)
+    public function incrementCounter($counter_name, $id, $difference = 1)
     {
         return $this->updateAll("$counter_name = $counter_name + $difference", $this->getPrimaryKey().' = '.$this->castAttributeForDatabase($this->getPrimaryKey(), $id)) === 1;
     }
@@ -1942,7 +1871,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Works like AkActiveRecord::incrementCounter, but decrements instead.
     */
-    function decrementCounter($counter_name, $id, $difference = 1)
+    public function decrementCounter($counter_name, $id, $difference = 1)
     {
         return $this->updateAll("$counter_name = $counter_name - $difference", $this->getPrimaryKey().' = '.$this->castAttributeForDatabase($this->getPrimaryKey(), $id)) === 1;
     }
@@ -1950,7 +1879,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Initializes the attribute to zero if null and subtracts one. Only makes sense for number-based attributes. Returns attribute value.
     */
-    function decrementAttribute($attribute)
+    public function decrementAttribute($attribute)
     {
         if(!isset($this->$attribute)){
             $this->$attribute = 0;
@@ -1961,7 +1890,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Decrements the attribute and saves the record.
     */
-    function decrementAndSaveAttribute($attribute)
+    public function decrementAndSaveAttribute($attribute)
     {
         return $this->updateAttribute($attribute,$this->decrementAttribute($attribute));
     }
@@ -1970,7 +1899,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Initializes the attribute to zero if null and adds one. Only makes sense for number-based attributes. Returns attribute value.
     */
-    function incrementAttribute($attribute)
+    public function incrementAttribute($attribute)
     {
         if(!isset($this->$attribute)){
             $this->$attribute = 0;
@@ -1981,7 +1910,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Increments the attribute and saves the record.
     */
-    function incrementAndSaveAttribute($attribute)
+    public function incrementAndSaveAttribute($attribute)
     {
         return $this->updateAttribute($attribute,$this->incrementAttribute($attribute));
     }
@@ -2000,7 +1929,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * If you'd rather start from an all-open default and restrict attributes as needed,
     * have a look at AkActiveRecord::setProtectedAttributes().
     */
-    function setAccessibleAttributes()
+    public function setAccessibleAttributes()
     {
         $args = func_get_args();
         $this->_accessibleAttributes = array_unique(array_merge((array)$this->_accessibleAttributes, $args));
@@ -2016,7 +1945,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      * <code>
      *   class Customer extends ActiveRecord
      *    {
-     *      function Customer()
+     *      public function Customer()
      *      {
      *          $this->setProtectedAttributes('credit_rating');
      *      }
@@ -2031,13 +1960,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      *    $Customer->credit_rating // => 'Average'
      *  </code>
      */
-    function setProtectedAttributes()
+    public function setProtectedAttributes()
     {
         $args = func_get_args();
         $this->_protectedAttributes = array_unique(array_merge((array)$this->_protectedAttributes, $args));
     }
 
-    function removeAttributesProtectedFromMassAssignment($attributes)
+    public function removeAttributesProtectedFromMassAssignment($attributes)
     {
         if(!empty($this->_accessibleAttributes) && is_array($this->_accessibleAttributes) &&  is_array($attributes)){
             foreach (array_keys($attributes) as $k){
@@ -2064,12 +1993,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      See also: Getting Attributes, Setting Attributes.
      */
 
-    function getAvailableAttributes()
+    public function getAvailableAttributes()
     {
         return array_merge($this->getColumns(), $this->getAvailableCombinedAttributes());
     }
 
-    function getAttributeCaption($attribute)
+    public function getAttributeCaption($attribute)
     {
         return $this->t(AkInflector::humanize($attribute));
     }
@@ -2077,7 +2006,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
      * This function is useful in case you need to know if attributes have been assigned to an object.
      */
-    function hasAttributesDefined()
+    public function hasAttributesDefined()
     {
         $attributes = join('',$this->getAttributes());
         return empty($attributes);
@@ -2087,7 +2016,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns the primary key field.
     */
-    function getPrimaryKey()
+    public function getPrimaryKey()
     {
         if(!isset($this->_primaryKey)){
             $this->setPrimaryKey();
@@ -2095,7 +2024,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $this->_primaryKey;
     }
 
-    function getColumnNames()
+    public function getColumnNames()
     {
         if(empty($this->_columnNames)){
             $columns = $this->getColumns();
@@ -2111,7 +2040,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Returns an array of columns objects where the primary id, all columns ending in "_id" or "_count",
     * and columns used for single table inheritance has been removed.
     */
-    function getContentColumns()
+    public function getContentColumns()
     {
         $inheritance_column = $this->getInheritanceColumn();
         $columns = $this->getColumns();
@@ -2127,7 +2056,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns an array of names for the attributes available on this object sorted alphabetically.
     */
-    function getAttributeNames()
+    public function getAttributeNames()
     {
         $attributes = array_keys($this->getAvailableAttributes());
         $names = array_combine($attributes,array_map(array(&$this,'getAttributeCaption'), $attributes));
@@ -2139,7 +2068,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns true if the specified attribute has been set by the user or by a database load and is neither null nor empty?
     */
-    function isAttributePresent($attribute)
+    public function isAttributePresent($attribute)
     {
         $value = $this->getAttribute($attribute);
         return !empty($value);
@@ -2151,7 +2080,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * @param string $attribute
     * @return boolean
     */
-    function hasAttribute ($attribute)
+    public function hasAttribute ($attribute)
     {
         empty($this->_columns) ? $this->getColumns() : $this->_columns; // HINT: only used by HasAndBelongsToMany joinObjects, if the table is not present yet!
         return isset($this->_columns[$attribute]) || (!empty($this->_combinedAttributes) && $this->isCombinedAttribute($attribute));
@@ -2196,7 +2125,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *    <?php
     *    class User extends ActiveRecord
     *    {
-    *        function User()
+    *        public function User()
     *        {
     *            // You can use a multiple patterns array where "%s, %s" will be used for combining fields and "%[^,], %s" will be used
     *            // for decomposing fields. (as you can see you can also use regular expressions on your patterns)
@@ -2211,12 +2140,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *            return $this->init($attributes);
     *
     *        }
-    *        function compose_email_link()
+    *        public function compose_email_link()
     *        {
     *            $args = func_get_arg(0);
     *            return "<a href=\'mailto:{$args[\'email\']}\'>{$args[\'name\']}</a>";
     *        }
-    *        function parse_email_link($email_link)
+    *        public function parse_email_link($email_link)
     *        {
     *            $results = sscanf($email_link, "<a href=\'mailto:%[^\']\'>%[^<]</a>");
     *            return array(\'email\'=>$results[0],\'name\'=>$results[1]);
@@ -2229,7 +2158,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *    <?php
     *    class User extends ActiveRecord
     *    {
-    *       var $combined_attributes array(
+    *       public $combined_attributes array(
     *       array('name', array("%s, %s","%[^,], %s"), 'last_name', 'first_name')
     *       array('email_link', array("compose_email_link","parse_email_link"), 'email', 'name')
     *       );
@@ -2246,12 +2175,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * @param string $attribute
     * @return boolean
     */
-    function isCombinedAttribute ($attribute)
+    public function isCombinedAttribute ($attribute)
     {
         return !empty($this->_combinedAttributes) && isset($this->_combinedAttributes[$attribute]);
     }
 
-    function addCombinedAttributeConfiguration($attribute)
+    public function addCombinedAttributeConfiguration($attribute)
     {
         $args = is_array($attribute) ? $attribute : func_get_args();
         $columns = array_slice($args,2);
@@ -2271,7 +2200,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-    function composeCombinedAttributes()
+    public function composeCombinedAttributes()
     {
 
         if(!empty($this->_combinedAttributes)){
@@ -2282,7 +2211,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-    function composeCombinedAttribute($combined_attribute)
+    public function composeCombinedAttribute($combined_attribute)
     {
         if($this->isCombinedAttribute($combined_attribute)){
             $config = $this->_combinedAttributes[$combined_attribute];
@@ -2305,7 +2234,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _getCombinedAttributesWhereThisAttributeIsUsed($attribute)
+    public function _getCombinedAttributesWhereThisAttributeIsUsed($attribute)
     {
         $result = array();
         foreach ($this->_combinedAttributes as $combined_attribute=>$settings){
@@ -2317,7 +2246,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function requiredForCombination($attribute)
+    public function requiredForCombination($attribute)
     {
         foreach ($this->_combinedAttributes as $settings){
             if(in_array($attribute,$settings)){
@@ -2327,12 +2256,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return false;
     }
 
-    function hasCombinedAttributes()
+    public function hasCombinedAttributes()
     {
         return count($this->getCombinedSubattributes()) === 0 ? false :true;
     }
 
-    function getCombinedSubattributes($attribute)
+    public function getCombinedSubattributes($attribute)
     {
         $result = array();
         if(is_array($this->_combinedAttributes[$attribute])){
@@ -2347,7 +2276,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $result;
     }
 
-    function decomposeCombinedAttributes()
+    public function decomposeCombinedAttributes()
     {
         if(!empty($this->_combinedAttributes)){
             $attributes = array_keys($this->_combinedAttributes);
@@ -2357,7 +2286,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-    function decomposeCombinedAttribute($combined_attribute, $used_on_combined_fields = false)
+    public function decomposeCombinedAttribute($combined_attribute, $used_on_combined_fields = false)
     {
         if(isset($this->$combined_attribute) && $this->isCombinedAttribute($combined_attribute)){
             $config = $this->_combinedAttributes[$combined_attribute];
@@ -2395,7 +2324,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-    function getAvailableCombinedAttributes()
+    public function getAvailableCombinedAttributes()
     {
         $combined_attributes = array();
         foreach ($this->_combinedAttributes as $attribute=>$details){
@@ -2439,7 +2368,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *       )
     *     )
     */
-    function &establishConnection($specification_or_profile = AK_DEFAULT_DATABASE_PROFILE)
+    public function &establishConnection($specification_or_profile = AK_DEFAULT_DATABASE_PROFILE)
     {
         $adapter =& AkDbAdapter::getInstance($specification_or_profile);
         return $this->setConnection(&$adapter);
@@ -2449,7 +2378,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns true if a connection that's accessible to this class have already been opened.
     */
-    function isConnected()
+    public function isConnected()
     {
         return isset($this->_db);
     }
@@ -2458,7 +2387,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Returns the connection currently associated with the class. This can also be used to
     * "borrow" the connection to do database work unrelated to any of the specific Active Records.
     */
-    function &getConnection()
+    public function &getConnection()
     {
         return $this->_db;
     }
@@ -2466,7 +2395,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Sets the connection for the class.
     */
-    function &setConnection($db_adapter = null)
+    public function &setConnection($db_adapter = null)
     {
         if (is_null($db_adapter)){
             $db_adapter =& AkDbAdapter::getInstance();
@@ -2477,7 +2406,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _getDatabaseType()
+    public function _getDatabaseType()
     {
         return $this->_db->type();
     }
@@ -2493,7 +2422,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Defines the primary key field ? can be overridden in subclasses.
     */
-    function setPrimaryKey($primary_key = 'id')
+    public function setPrimaryKey($primary_key = 'id')
     {
         if(!$this->hasColumn($primary_key)){
             trigger_error($this->t('Opps! We could not find primary key column %primary_key on the table %table, for the model %model',array('%primary_key'=>$primary_key,'%table'=>$this->getTableName(), '%model'=>$this->getModelName())),E_USER_ERROR);
@@ -2503,7 +2432,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function getTableName($modify_for_associations = true)
+    public function getTableName($modify_for_associations = true)
     {
         if(!isset($this->_tableName)){
             // We check if we are on a inheritance Table Model
@@ -2520,7 +2449,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $this->_tableName;
     }
 
-    function setTableName($table_name = null, $check_for_existence = AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES, $check_mode = false)
+    public function setTableName($table_name = null, $check_for_existence = AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES, $check_mode = false)
     {
         if(empty($table_name)){
             $table_name = AkInflector::tableize($this->getModelName());
@@ -2542,7 +2471,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function getOnlyAvailableAttributes($attributes)
+    public function getOnlyAvailableAttributes($attributes)
     {
         $table_name = $this->getTableName();
         $ret_attributes = array();
@@ -2561,7 +2490,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $ret_attributes;
     }
 
-    function getColumnsForAttributes($attributes)
+    public function getColumnsForAttributes($attributes)
     {
         $ret_attributes = array();
         $table_name = $this->getTableName();
@@ -2583,7 +2512,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * @param string $name Name of table to look in
     * @return boolean
     */
-    function hasColumn($column)
+    public function hasColumn($column)
     {
         empty($this->_columns) ? $this->getColumns() : $this->_columns;
         return isset($this->_columns[$column]);
@@ -2605,7 +2534,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * that a new instance, or one populated from a passed-in array, still has all the attributes
     * that instances loaded from the database would.
     */
-    function attributesFromColumnDefinition()
+    public function attributesFromColumnDefinition()
     {
         $attributes = array();
 
@@ -2624,7 +2553,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      *
      * @access private
      */
-    function _databaseTableInternals($table)
+    public function _databaseTableInternals($table)
     {
         if (!$cache = AkDbSchemaCache::get('table_internals_for_'.$table)) {
             $cache = $this->_db->getColumnDetails($table);
@@ -2632,7 +2561,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         return $cache;
     }
-    function getColumnsWithRegexBoundariesAndAlias($alias)
+    public function getColumnsWithRegexBoundariesAndAlias($alias)
     {
         $columns = array_keys($this->getColumns());
         foreach ($columns as $k=>$column){
@@ -2640,7 +2569,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         return $columns;
     }
-    function getColumnsWithRegexBoundaries()
+    public function getColumnsWithRegexBoundaries()
     {
         $columns = array_keys($this->getColumns());
         foreach ($columns as $k=>$column){
@@ -2655,7 +2584,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * @access private
     */
-    function _runCurrentModelInstallerIfExists(&$column_objects)
+    public function _runCurrentModelInstallerIfExists(&$column_objects)
     {
         static $installed_models = array();
         if(!defined('AK_AVOID_AUTOMATIC_ACTIVE_RECORD_INSTALLERS') && !in_array($this->getModelName(), $installed_models)){
@@ -2682,7 +2611,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns an array of column objects for the table associated with this class.
     */
-    function getColumns($force_reload = false)
+    public function getColumns($force_reload = false)
     {
         if(empty($this->_columns) || $force_reload){
             $this->_columns = $this->getColumnSettings($force_reload);
@@ -2691,7 +2620,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return (array)$this->_columns;
     }
 
-    function getColumnSettings($force_reload = false)
+    public function getColumnSettings($force_reload = false)
     {
         if(empty($this->_columnsSettings) || $force_reload){
             $this->loadColumnsSettings($force_reload);
@@ -2700,7 +2629,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return isset($this->_columnsSettings) ? $this->_columnsSettings : array();
     }
 
-    function loadColumnsSettings($force_reload = false)
+    public function loadColumnsSettings($force_reload = false)
     {
         if(is_null($this->_db)){
             $this->establishConnection();
@@ -2735,7 +2664,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
 
 
-    function setColumnSettings($column_name, $column_object)
+    public function setColumnSettings($column_name, $column_object)
     {
         $this->_columnsSettings[$column_name] = array();
         $this->_columnsSettings[$column_name]['name'] = $column_object->name;
@@ -2773,7 +2702,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Resets all the cached information about columns, which will cause they to be reloaded on the next request.
     */
-    function resetColumnInformation()
+    public function resetColumnInformation()
     {
         $this->_clearPersitedColumnSettings();
         $this->_columnNames = $this->_columns = $this->_columnsSettings = $this->_contentColumns = array();
@@ -2783,7 +2712,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _getModelColumnSettings()
+    public function _getModelColumnSettings()
     {
         return AkDbSchemaCache::get($this->getModelName().'_column_settings');
 
@@ -2792,7 +2721,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _persistTableColumnSettings()
+    public function _persistTableColumnSettings()
     {
         AkDbSchemaCache::set($this->getModelName().'_column_settings', $this->_columnsSettings);
     }
@@ -2800,7 +2729,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _getPersistedTableColumnSettings()
+    public function _getPersistedTableColumnSettings()
     {
         return AkDbSchemaCache::get($this->getModelName().'_column_settings');
     }
@@ -2808,21 +2737,21 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _clearPersitedColumnSettings()
+    public function _clearPersitedColumnSettings()
     {
         AkDbSchemaCache::clear($this->getModelName());
     }
 
 
 
-    function initiateAttributeToNull($attribute)
+    public function initiateAttributeToNull($attribute)
     {
         if(!isset($this->$attribute)){
             $this->$attribute = null;
         }
     }
 
-    function initiateColumnsToNull()
+    public function initiateColumnsToNull()
     {
         if(isset($this->_columnsSettings) && is_array($this->_columnsSettings)){
             array_map(array(&$this,'initiateAttributeToNull'),array_keys($this->_columnsSettings));
@@ -2858,7 +2787,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * @return string One of this 'string','text','integer','float','datetime','timestamp',
     * 'time', 'name','date', 'binary', 'boolean'
     */
-    function getAkelosDataType(&$adodb_column_object)
+    public function getAkelosDataType(&$adodb_column_object)
     {
         $config_var_name = AkInflector::variablize($adodb_column_object->name.'_data_type');
         if(!empty($this->{$config_var_name})){
@@ -2932,7 +2861,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      * This method retrieves current class name that will be used to map
      * your database to this object.
      */
-    function getClassForDatabaseTableMapping()
+    public function getClassForDatabaseTableMapping()
     {
         $class_name = get_class($this);
         if(is_subclass_of($this,'akactiverecord') || is_subclass_of($this,'AkActiveRecord')){
@@ -2953,12 +2882,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $class_name;
     }
 
-    function getDisplayField()
+    public function getDisplayField()
     {
         return  empty($this->displayField) && $this->hasAttribute('name') ? 'name' : (isset($this->displayField) && $this->hasAttribute($this->displayField) ? $this->displayField : $this->getPrimaryKey());
     }
 
-    function setDisplayField($attribute_name)
+    public function setDisplayField($attribute_name)
     {
         if($this->hasAttribute($attribute_name)){
             $this->displayField = $attribute_name;
@@ -2978,12 +2907,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     ====================================================================
     */
 
-    function t($string, $array = null,$model=null)
+    public function t($string, $array = null,$model=null)
     {
         return Ak::t($string, $array, empty($model)?AkInflector::underscore($this->getModelName()):$model);
     }
 
-    function getInternationalizedColumns()
+    public function getInternationalizedColumns()
     {
         static $cache;
         $model = $this->getModelName();
@@ -3006,7 +2935,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $cache[$model];
     }
 
-    function getAvailableLocales()
+    public function getAvailableLocales()
     {
         static $available_locales;
         if(empty($available_locales)){
@@ -3019,7 +2948,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $available_locales;
     }
 
-    function getCurrentLocale()
+    public function getCurrentLocale()
     {
         static $current_locale;
         if(empty($current_locale)){
@@ -3033,7 +2962,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function getAttributeByLocale($attribute, $locale)
+    public function getAttributeByLocale($attribute, $locale)
     {
         $internationalizable_columns = $this->getInternationalizedColumns();
         if(!empty($internationalizable_columns[$attribute]) && is_array($internationalizable_columns[$attribute]) && in_array($locale, $internationalizable_columns[$attribute])){
@@ -3041,7 +2970,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-    function getAttributeLocales($attribute)
+    public function getAttributeLocales($attribute)
     {
         $attribute_locales = array();
         foreach ($this->getAvailableLocales() as $locale){
@@ -3052,7 +2981,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $attribute_locales;
     }
 
-    function setAttributeByLocale($attribute, $value, $locale)
+    public function setAttributeByLocale($attribute, $value, $locale)
     {
         $internationalizable_columns = $this->getInternationalizedColumns();
 
@@ -3062,7 +2991,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     }
 
-    function setAttributeLocales($attribute, $values = array())
+    public function setAttributeLocales($attribute, $values = array())
     {
         foreach ($values as $locale=>$value){
             $this->setAttributeByLocale($attribute, $value, $locale);
@@ -3072,7 +3001,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _delocalizeAttribute($attribute)
+    public function _delocalizeAttribute($attribute)
     {
         return $this->_isInternationalizeCandidate($attribute) ? substr($attribute,3) : $attribute;
     }
@@ -3080,7 +3009,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _isInternationalizeCandidate($column_name)
+    public function _isInternationalizeCandidate($column_name)
     {
         $pos = strpos($column_name,'_');
         return $pos === 2 && in_array(substr($column_name,0,$pos),$this->getAvailableLocales());
@@ -3089,7 +3018,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _addInternationalizedColumn($column_name)
+    public function _addInternationalizedColumn($column_name)
     {
         $this->_columnsSettings[$column_name]['i18n'] = true;
     }
@@ -3103,7 +3032,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      *
      * @access private
      */
-    function _groupInternationalizedAttribute($attribute, $value)
+    public function _groupInternationalizedAttribute($attribute, $value)
     {
         if($this->_internationalize && $this->_isInternationalizeCandidate($attribute)){
             if(!empty($this->$attribute)){
@@ -3129,7 +3058,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     See also: Database Reflection.
     */
 
-    function getAttributesBeforeTypeCast()
+    public function getAttributesBeforeTypeCast()
     {
         $attributes_array = array();
         $available_attributes = $this->getAvailableAttributes();
@@ -3143,7 +3072,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function getAttributeBeforeTypeCast($attribute)
+    public function getAttributeBeforeTypeCast($attribute)
     {
         if(isset($this->{$attribute.'_before_type_cast'})){
             return $this->{$attribute.'_before_type_cast'};
@@ -3151,13 +3080,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return null;
     }
 
-    function getAvailableAttributesQuoted()
+    public function getAvailableAttributesQuoted()
     {
         return $this->getAttributesQuoted($this->getAttributes());
     }
 
 
-    function getAttributesQuoted($attributes_array)
+    public function getAttributesQuoted($attributes_array)
     {
         $set = array();
         $attributes_array = $this->getSanitizedConditionsArray($attributes_array);
@@ -3168,19 +3097,19 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $set;
     }
 
-    function getColumnType($column_name)
+    public function getColumnType($column_name)
     {
         empty($this->_columns) ? $this->getColumns() : null;
         return empty($this->_columns[$column_name]['type']) ? false : $this->_columns[$column_name]['type'];
     }
 
-    function getColumnScale($column_name)
+    public function getColumnScale($column_name)
     {
         empty($this->_columns) ? $this->getColumns() : null;
         return empty($this->_columns[$column_name]['scale']) ? false : $this->_columns[$column_name]['scale'];
     }
 
-    function castAttributeForDatabase($column_name, $value, $add_quotes = true)
+    public function castAttributeForDatabase($column_name, $value, $add_quotes = true)
     {
         $result = '';
         switch ($this->getColumnType($column_name)) {
@@ -3252,7 +3181,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * You can pass an array of values or an array of Active Records that might be the response of a finder.
     */
-    function castAttributesForDatabase($column_name, $values, $add_quotes = true)
+    public function castAttributesForDatabase($column_name, $values, $add_quotes = true)
     {
         $casted_values = array();
         $values = !empty($values[0]) && is_object($values[0]) && method_exists($values[0], 'collect') && method_exists($values[0], 'getPrimaryKey') ?
@@ -3267,7 +3196,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $casted_values;
     }
 
-    function castAttributeFromDatabase($column_name, $value)
+    public function castAttributeFromDatabase($column_name, $value)
     {
         if($this->hasColumn($column_name)){
             $column_type = $this->getColumnType($column_name);
@@ -3308,7 +3237,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * @access private
     */
-    function _castDateParametersFromDateHelper_(&$params)
+    public function _castDateParametersFromDateHelper_(&$params)
     {
         if(empty($params)){
             return;
@@ -3329,7 +3258,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _addBlobQueryStack($column_name, $blob_value)
+    public function _addBlobQueryStack($column_name, $blob_value)
     {
         $this->_BlobQueryStack[$column_name] = $blob_value;
     }
@@ -3337,7 +3266,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _shouldSerializeColumn($column_name)
+    public function _shouldSerializeColumn($column_name)
     {
         if(empty($this->serialize)){
             return false;
@@ -3351,7 +3280,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _ensureClassExistsForSerializedColumnBeforeUnserializing($column_name)
+    public function _ensureClassExistsForSerializedColumnBeforeUnserializing($column_name)
     {
         static $imported_cache = array();
         if(empty($imported_cache[$column_name])){
@@ -3367,7 +3296,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _updateBlobFields($condition)
+    public function _updateBlobFields($condition)
     {
         if(!empty($this->_BlobQueryStack) && is_array($this->_BlobQueryStack)){
             foreach ($this->_BlobQueryStack as $column=>$value){
@@ -3403,7 +3332,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * This behavior can be turned off by setting <tt>AkActiveRecord::lock_optimistically = false</tt>.
     */
-    function isLockingEnabled()
+    public function isLockingEnabled()
     {
         return (!isset($this->lock_optimistically) || $this->lock_optimistically !== false) && $this->hasColumn('lock_version');
     }
@@ -3446,7 +3375,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *   {
     *       // Strip everything but digits, so the user can specify "555 234 34" or
     *       // "5552-3434" or both will mean "55523434"
-    *       function beforeValidationOnCreate
+    *       public function beforeValidationOnCreate
     *       {
     *           if(!empty($this->number)){
     *               $this->number = ereg_replace('[^0-9]*','',$this->number);
@@ -3457,9 +3386,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *   class Subscription extends ActiveRecord
     *   {
     *       // Note: This is not implemented yet
-    *       var $beforeCreate  = 'recordSignup';
+    *       public $beforeCreate  = 'recordSignup';
     *
-    *       function recordSignup()
+    *       public function recordSignup()
     *       {
     *         $this->signed_up_on = date("Y-m-d");
     *       }
@@ -3469,15 +3398,15 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *   {
     *       //Destroys the associated clients and people when the firm is destroyed
     *       // Note: This is not implemented yet
-    *       var $beforeDestroy = array('destroyAssociatedPeople', 'destroyAssociatedClients');
+    *       public $beforeDestroy = array('destroyAssociatedPeople', 'destroyAssociatedClients');
     *
-    *       function destroyAssociatedPeople()
+    *       public function destroyAssociatedPeople()
     *       {
     *           $Person = new Person();
     *           $Person->destroyAll("firm_id=>", $this->id);
     *       }
     *
-    *       function destroyAssociatedClients()
+    *       public function destroyAssociatedClients()
     *       {
     *           $Client = new Client();
     *           $Client->destroyAll("client_of=>", $this->id);
@@ -3496,21 +3425,21 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * @access public
     */
 
-    function beforeCreate(){return true;}
-    function beforeValidation(){return true;}
-    function beforeValidationOnCreate(){return true;}
-    function beforeValidationOnUpdate(){return true;}
-    function beforeSave(){return true;}
-    function beforeUpdate(){return true;}
-    function afterUpdate(){return true;}
-    function afterValidation(){return true;}
-    function afterValidationOnCreate(){return true;}
-    function afterValidationOnUpdate(){return true;}
-    function afterInstantiate(){return true;}
-    function afterCreate(){return true;}
-    function afterDestroy(){return true;}
-    function beforeDestroy(){return true;}
-    function afterSave(){return true;}
+    public function beforeCreate(){return true;}
+    public function beforeValidation(){return true;}
+    public function beforeValidationOnCreate(){return true;}
+    public function beforeValidationOnUpdate(){return true;}
+    public function beforeSave(){return true;}
+    public function beforeUpdate(){return true;}
+    public function afterUpdate(){return true;}
+    public function afterValidation(){return true;}
+    public function afterValidationOnCreate(){return true;}
+    public function afterValidationOnUpdate(){return true;}
+    public function afterInstantiate(){return true;}
+    public function afterCreate(){return true;}
+    public function afterDestroy(){return true;}
+    public function beforeDestroy(){return true;}
+    public function afterSave(){return true;}
 
     /*/Callbacks*/
 
@@ -3535,23 +3464,23 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *   $User->transactionComplete();
     */
 
-    function transactionStart()
+    public function transactionStart()
     {
         return $this->_db->startTransaction();
     }
 
-    function transactionComplete()
+    public function transactionComplete()
     {
         return $this->_db->stopTransaction();
     }
 
-    function transactionFail()
+    public function transactionFail()
     {
         $this->_db->failTransaction();
         return false;
     }
 
-    function transactionHasFailed()
+    public function transactionHasFailed()
     {
         return $this->_db->hasTransactionFailed();
     }
@@ -3574,7 +3503,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     *   class Person extends ActiveRecord
     *   {
-    *       function validate()
+    *       public function validate()
     *       {
     *           $this->addErrorOnEmpty(array('first_name', 'last_name'));
     *           if(!preg_match('/[0-9]{4,12}/', $this->phone_number)){
@@ -3582,14 +3511,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *           }
     *       }
     *
-    *       function validateOnCreate() // is only run the first time a new object is saved
+    *       public function validateOnCreate() // is only run the first time a new object is saved
     *       {
     *           if(!isValidDiscount($this->membership_discount)){
     *               $this->addError("membership_discount", "has expired");
     *           }
     *       }
     *
-    *       function validateOnUpdate()
+    *       public function validateOnUpdate()
     *       {
     *           if($this->countChangedAttributes() == 0){
     *               $this->addErrorToBase("No changes have occurred");
@@ -3618,7 +3547,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       *  Model:
       *     class Person extends ActiveRecord
       *     {
-      *         function validate()
+      *         public function validate()
       *         {
       *             $this->validatesConfirmationOf('password');
       *             $this->validatesConfirmationOf('email_address', "should match confirmation");
@@ -3634,7 +3563,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       * is not null.
       *
       */
-    function validatesConfirmationOf($attribute_names, $message = 'confirmation')
+    public function validatesConfirmationOf($attribute_names, $message = 'confirmation')
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
         $attribute_names = Ak::toArray($attribute_names);
@@ -3651,7 +3580,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       *
       * class Person extends ActiveRecord
       * {
-      *     function validateOnCreate()
+      *     public function validateOnCreate()
       *     {
       *         $this->validatesAcceptanceOf('terms_of_service');
       *         $this->validatesAcceptanceOf('eula', "must be abided");
@@ -3665,7 +3594,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       * @param accept 1
       * Specifies value that is considered accepted.  The default value is a string "1", which makes it easy to relate to an HTML checkbox.
       */
-    function validatesAcceptanceOf($attribute_names, $message = 'accepted', $accept = 1)
+    public function validatesAcceptanceOf($attribute_names, $message = 'accepted', $accept = 1)
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
@@ -3682,10 +3611,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     *   class Book extends ActiveRecord
     *   {
-    *       var $has_many = 'pages';
-    *       var $belongs_to = 'library';
+    *       public $has_many = 'pages';
+    *       public $belongs_to = 'library';
     *
-    *       function validate(){
+    *       public function validate(){
     *           $this->validatesAssociated(array('pages', 'library'));
     *       }
     *   }
@@ -3695,8 +3624,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     *   class Page extends ActiveRecord
     *   {
-    *       var $belongs_to = 'book';
-    *       function validate(){
+    *       public $belongs_to = 'book';
+    *       public function validate(){
     *           $this->validatesAssociated('book');
     *       }
     *   }
@@ -3706,7 +3635,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * NOTE: This validation will not fail if the association hasn't been assigned. If you want to ensure that the association
     * is both present and guaranteed to be valid, you also need to use validatesPresenceOf.
     */
-    function validatesAssociated($attribute_names, $message = 'invalid')
+    public function validatesAssociated($attribute_names, $message = 'invalid')
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
         $attribute_names = Ak::toArray($attribute_names);
@@ -3725,7 +3654,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-    function isBlank($value = null)
+    public function isBlank($value = null)
     {
         return trim((string)$value) == '';
     }
@@ -3733,7 +3662,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
       * Validates that the specified attributes are not blank (as defined by AkActiveRecord::isBlank()).
       */
-    function validatesPresenceOf($attribute_names, $message = 'blank')
+    public function validatesPresenceOf($attribute_names, $message = 'blank')
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
@@ -3748,7 +3677,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       *
       * class Person extends ActiveRecord
       * {
-      *     function validate()
+      *     public function validate()
       *     {
       *         $this->validatesLengthOf('first_name', array('maximum'=>30));
       *         $this->validatesLengthOf('last_name', array('maximum'=>30,'message'=> "less than %d if you don't mind"));
@@ -3774,7 +3703,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       * <tt>wrong_length</tt> - The error message if using the "is" method and the attribute is the wrong size (default "is" "is the wrong length (should be %d characters)")
       * <tt>message</tt> - The error message to use for a "minimum", "maximum", or "is" violation.  An alias of the appropriate too_long/too_short/wrong_length message
       */
-    function validatesLengthOf($attribute_names, $options = array())
+    public function validatesLengthOf($attribute_names, $options = array())
     {
         // Merge given options with defaults.
         $default_options = array(
@@ -3857,7 +3786,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return true;
     }
 
-    function validatesSizeOf($attribute_names, $options = array())
+    public function validatesSizeOf($attribute_names, $options = array())
     {
         return validatesLengthOf($attribute_names, $options);
     }
@@ -3868,7 +3797,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     *  class Person extends ActiveRecord
     *   {
-    *       function validate()
+    *       public function validate()
     *       {
     *           $this->validatesUniquenessOf('passport_number');
     *           $this->validatesUniquenessOf('user_name', array('scope' => "account_id"));
@@ -3880,7 +3809,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     *   class TeacherSchedule extends ActiveRecord
     *   {
-    *       function validate()
+    *       public function validate()
     *       {
     *           $this->validatesUniquenessOf('passport_number');
     *           $this->validatesUniquenessOf('teacher_id', array('scope' => array("semester_id", "class_id"));
@@ -3899,7 +3828,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * occur (e.g. 'if' => 'allowValidation', or 'if' => '$this->signup_step > 2').  The
     * method, or string should return or evaluate to a true or false value.
     */
-    function validatesUniquenessOf($attribute_names, $options = array())
+    public function validatesUniquenessOf($attribute_names, $options = array())
     {
         $default_options = array('case_sensitive'=>true, 'message'=>'taken');
         $options = array_merge($default_options, $options);
@@ -3960,7 +3889,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * <code>
     *   class Person extends ActiveRecord
     *   {
-    *       function validate()
+    *       public function validate()
     *       {
     *           $this->validatesFormatOf('email', "/^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/");
     *       }
@@ -3987,7 +3916,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * <tt>$message</tt> - A custom error message (default is: "is invalid")
     * <tt>$regular_expression</tt> - The regular expression used to validate the format with (note: must be supplied!)
     */
-    function validatesFormatOf($attribute_names, $regular_expression, $message = 'invalid', $regex_function = 'preg_match')
+    public function validatesFormatOf($attribute_names, $regular_expression, $message = 'invalid', $regex_function = 'preg_match')
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
@@ -4015,7 +3944,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * <tt>$message</tt> - Specifies a customer error message (default is: "is not included in the list")
     * <tt>$allow_null</tt> - If set to true, skips this validation if the attribute is null (default is: false)
     */
-    function validatesInclusionOf($attribute_names, $array_of_possibilities, $message = 'inclusion', $allow_null = false)
+    public function validatesInclusionOf($attribute_names, $array_of_possibilities, $message = 'inclusion', $allow_null = false)
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
@@ -4032,7 +3961,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     *   class Person extends ActiveRecord
     *   {
-    *       function validate()
+    *       public function validate()
     *       {
     *           $this->validatesExclusionOf('username', array('admin', 'superuser'), "You don't belong here");
     *           $this->validatesExclusionOf('age', range(30,60), "This site is only for under 30 and over 60");
@@ -4044,7 +3973,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * <tt>$message</tt> - Specifies a customer error message (default is: "is reserved")
     * <tt>$allow_null</tt> - If set to true, skips this validation if the attribute is null (default is: false)
     */
-    function validatesExclusionOf($attribute_names, $array_of_possibilities, $message = 'exclusion', $allow_null = false)
+    public function validatesExclusionOf($attribute_names, $array_of_possibilities, $message = 'exclusion', $allow_null = false)
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
@@ -4065,7 +3994,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     *   class Person extends ActiveRecord
     *   {
-    *       function validate()
+    *       public function validate()
     *       {
     *           $this->validatesNumericalityOf('value');
     *       }
@@ -4076,7 +4005,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * <tt>$only_integer</tt> Specifies whether the value has to be an integer, e.g. an integral value (default is false)
     * <tt>$allow_null</tt> Skip validation if attribute is null (default is false).
     */
-    function validatesNumericalityOf($attribute_names, $message = 'not_a_number', $only_integer = false, $allow_null = false)
+    public function validatesNumericalityOf($attribute_names, $message = 'not_a_number', $only_integer = false, $allow_null = false)
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
 
@@ -4105,7 +4034,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns true if no errors were added otherwise false.
     */
-    function isValid()
+    public function isValid()
     {
         $this->clearErrors();
         if($this->beforeValidation() && $this->notifyObservers('beforeValidation')){
@@ -4153,7 +4082,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * @access private
     */
-    function _runAutomatedValidators()
+    public function _runAutomatedValidators()
     {
         foreach ($this->_columns as $column_name=>$column_settings){
             if($this->_automated_max_length_validator &&
@@ -4173,7 +4102,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * @access private
     */
-    function _setDefaultAttributeValuesAutomatically()
+    public function _setDefaultAttributeValuesAutomatically()
     {
         foreach ($this->_columns as $column_name=>$column_settings){
             if(empty($column_settings['primaryKey']) && isset($column_settings['hasDefault']) && $column_settings['hasDefault'] && (!isset($this->$column_name) || is_null($this->$column_name))){
@@ -4193,21 +4122,21 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Overwrite this method for validation checks on all saves and use addError($field, $message); for invalid attributes.
     */
-    function validate()
+    public function validate()
     {
     }
 
     /**
     * Overwrite this method for validation checks used only on creation.
     */
-    function validateOnCreate()
+    public function validateOnCreate()
     {
     }
 
     /**
     * Overwrite this method for validation checks used only on updates.
     */
-    function validateOnUpdate()
+    public function validateOnUpdate()
     {
     }
 
@@ -4225,16 +4154,16 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * @access private
     */
-    var $_observable_state;
+    public $_observable_state;
 
     /**
     * @access private
     */
-    function _instantiateDefaultObserver()
+    public function _instantiateDefaultObserver()
     {
         $default_observer_name = ucfirst($this->getModelName().'Observer');
         if(class_exists($default_observer_name)){
-            //$Observer =& new $default_observer_name($this);
+            //$Observer = new $default_observer_name($this);
             Ak::singleton($default_observer_name,  $this);
         }
     }
@@ -4244,7 +4173,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * registered observer.
     * @return true (this is used internally for triggering observers on default callbacks)
     */
-    function notifyObservers ($method = null)
+    public function notifyObservers ($method = null)
     {
         $observers =& $this->getObservers();
         $observer_count = count($observers);
@@ -4271,12 +4200,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function setObservableState($state_message)
+    public function setObservableState($state_message)
     {
         $this->_observable_state = $state_message;
     }
 
-    function getObservableState()
+    public function getObservableState()
     {
         return $this->_observable_state;
     }
@@ -4289,7 +4218,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * @param $options array of options for the observer
     * @return void
     */
-    function addObserver(&$observer)
+    public function addObserver(&$observer)
     {
         $staticVarNs='AkActiveRecord::observers::' . $this->_modelName;
         $observer_class_name = get_class($observer);
@@ -4315,7 +4244,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Register the reference to an object object
     * @return void
     */
-    function &getObservers()
+    public function &getObservers()
     {
         $staticVarNs='AkActiveRecord::observers::' . $this->_modelName;
         $key = 'objects';
@@ -4346,7 +4275,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns the Errors array that holds all information about attribute error messages.
     */
-    function getErrors()
+    public function getErrors()
     {
         return $this->_errors;
     }
@@ -4357,7 +4286,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * as a whole. These error messages doesn't get prepended with any field name when iterating
     * with yieldEachFullError, so they should be complete sentences.
     */
-    function addErrorToBase($message)
+    public function addErrorToBase($message)
     {
         $this->addError($this->getModelName(), $message);
     }
@@ -4365,7 +4294,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns errors assigned to base object through addToBase according to the normal rules of getErrorsOn($attribute).
     */
-    function getBaseErrors()
+    public function getBaseErrors()
     {
         $errors = $this->getErrors();
         return (array)@$errors[$this->getModelName()];
@@ -4378,7 +4307,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * error can be added to the same $attribute in which case an array will be returned on a call to <tt>getErrorsOn($attribute)</tt>.
     * If no $message is supplied, "invalid" is assumed.
     */
-    function addError($attribute, $message = 'invalid')
+    public function addError($attribute, $message = 'invalid')
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
         $this->_errors[$attribute][] = $message;
@@ -4387,7 +4316,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Will add an error message to each of the attributes in $attributes that is empty.
     */
-    function addErrorOnEmpty($attribute_names, $message = 'empty')
+    public function addErrorOnEmpty($attribute_names, $message = 'empty')
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
         $attribute_names = Ak::toArray($attribute_names);
@@ -4401,7 +4330,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Will add an error message to each of the attributes in $attributes that is blank (using $this->isBlank).
     */
-    function addErrorOnBlank($attribute_names, $message = 'blank')
+    public function addErrorOnBlank($attribute_names, $message = 'blank')
     {
         $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
         $attribute_names = Ak::toArray($attribute_names);
@@ -4416,7 +4345,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Will add an error message to each of the attributes in $attributes that has a length outside of the passed boundary $range.
     * If the length is above the boundary, the too_long_message message will be used. If below, the too_short_message.
     */
-    function addErrorOnBoundaryBreaking($attribute_names, $range_begin, $range_end, $too_long_message = 'too_long', $too_short_message = 'too_short')
+    public function addErrorOnBoundaryBreaking($attribute_names, $range_begin, $range_end, $too_long_message = 'too_long', $too_short_message = 'too_short')
     {
         $too_long_message = isset($this->_defaultErrorMessages[$too_long_message]) ? $this->_defaultErrorMessages[$too_long_message] : $too_long_message;
         $too_short_message = isset($this->_defaultErrorMessages[$too_short_message]) ? $this->_defaultErrorMessages[$too_short_message] : $too_short_message;
@@ -4433,7 +4362,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     }
 
-    function addErrorOnBoundryBreaking ($attributes, $range_begin, $range_end, $too_long_message = 'too_long', $too_short_message = 'too_short')
+    public function addErrorOnBoundryBreaking ($attributes, $range_begin, $range_end, $too_long_message = 'too_long', $too_short_message = 'too_short')
     {
         $this->addErrorOnBoundaryBreaking($attributes, $range_begin, $range_end, $too_long_message, $too_short_message);
     }
@@ -4441,7 +4370,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns true if the specified $attribute has errors associated with it.
     */
-    function isInvalid($attribute)
+    public function isInvalid($attribute)
     {
         return $this->getErrorsOn($attribute);
     }
@@ -4451,7 +4380,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Returns the error message, if one error is associated with the specified $attribute.
     * Returns an array of error messages, if more than one error is associated with the specified $attribute.
     */
-    function getErrorsOn($attribute)
+    public function getErrorsOn($attribute)
     {
         if (empty($this->_errors[$attribute])){
             return false;
@@ -4467,7 +4396,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Yields each attribute and associated message per error added.
     */
-    function yieldEachError()
+    public function yieldEachError()
     {
         foreach ($this->_errors as $errors){
             foreach ($errors as $error){
@@ -4476,7 +4405,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-    function yieldError($message)
+    public function yieldError($message)
     {
         $messages = is_array($message) ? $message : array($message);
         foreach ($messages as $message){
@@ -4489,7 +4418,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Yields each full error message added. So Person->addError("first_name", "can't be empty") will be returned
     * through iteration as "First name can't be empty".
     */
-    function yieldEachFullError()
+    public function yieldEachFullError()
     {
         $full_messages = $this->getFullErrorMessages();
         foreach ($full_messages as $full_message){
@@ -4501,7 +4430,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns all the full error messages in an array.
     */
-    function getFullErrorMessages()
+    public function getFullErrorMessages()
     {
         $full_messages = array();
 
@@ -4521,7 +4450,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns true if no errors have been added.
     */
-    function hasErrors()
+    public function hasErrors()
     {
         return !empty($this->_errors);
     }
@@ -4529,7 +4458,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Removes all the errors that have been added.
     */
-    function clearErrors()
+    public function clearErrors()
     {
         $this->_errors = array();
     }
@@ -4538,7 +4467,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Returns the total number of errors added. Two errors added to the same attribute will be counted as such
     * with this as well.
     */
-    function countErrors()
+    public function countErrors()
     {
         $error_count = 0;
         foreach ($this->_errors as $errors){
@@ -4549,7 +4478,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    function errorsToString($print = false)
+    public function errorsToString($print = false)
     {
         $result = "\n<div id='errors'>\n<ul class='error'>\n";
         foreach ($this->getFullErrorMessages() as $error){
@@ -4579,7 +4508,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      * Example:
      * $this->actsAs('list', array('scope' => 'todo_list'));
      */
-    function actsAs($behaviour, $options = array())
+    public function actsAs($behaviour, $options = array())
     {
         $class_name = $this->_getActAsClassName($behaviour);
         $underscored_place_holder = AkInflector::underscore($behaviour);
@@ -4596,7 +4525,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _getActAsClassName($behaviour)
+    public function _getActAsClassName($behaviour)
     {
         $class_name = AkInflector::camelize($behaviour);
         return file_exists(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActsAsBehaviours'.DS.'AkActsAs'.$class_name.'.php') && !class_exists('ActsAs'.$class_name) ?
@@ -4606,7 +4535,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function &_getActAsInstance($class_name, $options)
+    public function &_getActAsInstance($class_name, $options)
     {
         if(!class_exists($class_name)){
             if(substr($class_name,0,2) == 'Ak'){
@@ -4620,7 +4549,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $false = false;
             return $false;
         }else{
-            $ActAsInstance =& new $class_name($this, $options);
+            $ActAsInstance = new $class_name($this, $options);
             return $ActAsInstance;
         }
     }
@@ -4628,7 +4557,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _loadActAsBehaviours()
+    public function _loadActAsBehaviours()
     {
         //$this->act_as = !empty($this->acts_as) ? $this->acts_as : (empty($this->act_as) ? false : $this->act_as);
         if(!empty($this->act_as)){
@@ -4652,7 +4581,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns a comma separated list of possible acts like (active record, nested set, list)....
     */
-    function actsLike()
+    public function actsLike()
     {
         $result = 'active record';
         foreach ($this->__ActsLikeAttributes as $type){
@@ -4671,7 +4600,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
 
 
-    function dbug()
+    public function dbug()
     {
         if(!$this->isConnected()){
             $this->establishConnection();
@@ -4680,7 +4609,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $this->db_debug =& $this->_db->connection->debug;
     }
 
-    function toString($print = false)
+    public function toString($print = false)
     {
         $result = '';
         if(!AK_CLI || (AK_ENVIRONMENT == 'testing' && !AK_CLI)){
@@ -4711,7 +4640,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $result;
     }
 
-    function dbugging($trace_this_on_debug_mode = null)
+    public function dbugging($trace_this_on_debug_mode = null)
     {
         if(!empty($this->_db->debug) && !empty($trace_this_on_debug_mode)){
             $message = !is_scalar($trace_this_on_debug_mode) ? var_export($trace_this_on_debug_mode, true) : (string)$trace_this_on_debug_mode;
@@ -4722,7 +4651,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
 
 
-    function debug ($data = 'active_record_class', $_functions=0)
+    public function debug ($data = 'active_record_class', $_functions=0)
     {
         if(!AK_DEBUG && !AK_DEV_MODE){
             return;
@@ -4809,7 +4738,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      *        array ('name' => 'Bermi','email' => 'bermi@example.com')
      *    );
      */
-    function select(&$source_array)
+    public function select(&$source_array)
     {
         $resulting_array = array();
         if(!empty($source_array) && is_array($source_array) && func_num_args() > 1) {
@@ -4841,7 +4770,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      *        array ('18' => 'bermi@example.com')
      *    );
      */
-    function collect(&$source_array, $key_index, $value_index)
+    public function collect(&$source_array, $key_index, $value_index)
     {
         $resulting_array = array();
         if(!empty($source_array) && is_array($source_array)) {
@@ -4868,7 +4797,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      *              )
      * @return string in Json Format
      */
-    function toJson($options = array())
+    public function toJson($options = array())
     {
         if (is_array($options) && isset($options[0]) && is_a($options[0], 'AkActiveRecord')) {
             $options = array('collection'=>$options);
@@ -4958,16 +4887,16 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         return Ak::toJson($data);
     }
-    function _convert_column_to_xml_element($col)
+    public function _convert_column_to_xml_element($col)
     {
         return str_replace('_','-',$col);
     }
-    function _convert_column_from_xml_element($col)
+    public function _convert_column_from_xml_element($col)
     {
         return str_replace('-','_',$col);
     }
 
-    function _parseXmlAttributes($attributes)
+    public function _parseXmlAttributes($attributes)
     {
         $new = array();
         foreach($attributes as $key=>$value)
@@ -4977,7 +4906,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $new;
     }
 
-    function &_generateModelFromArray($modelName,$attributes)
+    public function &_generateModelFromArray($modelName,$attributes)
     {
         if (isset($attributes[0]) && is_array($attributes[0])) {
             $attributes = $attributes[0];
@@ -4998,7 +4927,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $record;
     }
 
-    function _fromArray($array)
+    public function _fromArray($array)
     {
         $data  = $array;
         $modelName = $this->getModelName();
@@ -5032,14 +4961,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      * @param string $xml
      * @return AkActiveRecord
      */
-    function fromXml($xml)
+    public function fromXml($xml)
     {
         $array = Ak::xml_to_array($xml);
         $array = $this->_fromXmlCleanup($array);
         return $this->_fromArray($array);
     }
 
-    function _fromXmlCleanup($array)
+    public function _fromXmlCleanup($array)
     {
         $result = array();
         $key = key($array);
@@ -5063,7 +4992,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      * @param string $json
      * @return AkActiveRecord
      */
-    function fromJson($json)
+    public function fromJson($json)
     {
         $json = Ak::fromJson($json);
         $array = Ak::convert('Object','Array',$json);
@@ -5097,7 +5026,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      *              )
      * @return string in Xml Format
      */
-    function toXml($options = array())
+    public function toXml($options = array())
     {
         if (is_array($options) && isset($options[0]) && is_a($options[0], 'AkActiveRecord')) {
             $options = array('collection'=>$options);
@@ -5204,7 +5133,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      *
      * @param array of ActiveRecords[optional] $data
      */
-    function toYaml($data = null)
+    public function toYaml($data = null)
     {
         return Ak::convert('active_record', 'yaml', empty($data) ? $this : $data);
     }
@@ -5227,7 +5156,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * @deprecated
     */
-    function parseAkelosArgs(&$args)
+    public function parseAkelosArgs(&$args)
     {
         if(!AK_ENABLE_AKELOS_ARGS){
             $this->_castDateParametersFromDateHelper_($args);
@@ -5259,7 +5188,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * Acts like Php explode() function but uses any of this as valid separators ' AND ',' and ',' + ',' ',',',';'
     */
-    function getArrayFromAkString($string)
+    public function getArrayFromAkString($string)
     {
         if(is_array($string)){
             return $string;
@@ -5270,7 +5199,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /*/Utilities*/
 
 
-    function getAttributeCondition($argument)
+    public function getAttributeCondition($argument)
     {
         if(is_array($argument)){
             return 'IN (?)';
@@ -5290,7 +5219,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    var $_calculation_options = array('conditions', 'joins', 'order', 'select', 'group', 'having', 'distinct', 'limit', 'offset');
+    public $_calculation_options = array('conditions', 'joins', 'order', 'select', 'group', 'having', 'distinct', 'limit', 'offset');
 
     /**
       * Count operates using three different approaches.
@@ -5323,7 +5252,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       *
       * Note: $Person->count('all') will not work because it will use 'all' as the condition.  Use $Person->count() instead.
       */
-    function count()
+    public function count()
     {
         $args = func_get_args();
         list($column_name, $options) = $this->_constructCountOptionsFromLegacyArgs($args);
@@ -5335,7 +5264,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       *
       *     $Person->average('age');
       */
-    function average($column_name, $options = array())
+    public function average($column_name, $options = array())
     {
         return $this->calculate('avg', $column_name, $options);
     }
@@ -5345,7 +5274,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       *
       *   $Person->minimum('age');
       */
-    function minimum($column_name, $options = array())
+    public function minimum($column_name, $options = array())
     {
         return $this->calculate('min', $column_name, $options);
     }
@@ -5355,7 +5284,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       *
       *   $Person->maximum('age');
       */
-    function maximum($column_name, $options = array())
+    public function maximum($column_name, $options = array())
     {
         return $this->calculate('max', $column_name, $options);
     }
@@ -5365,7 +5294,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       *
       *   $Person->sum('age');
       */
-    function sum($column_name, $options = array())
+    public function sum($column_name, $options = array())
     {
         return $this->calculate('sum', $column_name, $options);
     }
@@ -5397,7 +5326,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       *   $Person->minimum('age', array('conditions' => array('last_name != ?', 'Drake'))); // Selects the minimum age for everyone with a last name other than 'Drake'
       *   $Person->minimum('age', array('having' => 'min(age) > 17', 'group' => 'last'_name)); // Selects the minimum age for any family without any minors
       */
-    function calculate($operation, $column_name, $options = array())
+    public function calculate($operation, $column_name, $options = array())
     {
         $this->_validateCalculationOptions($options);
         $column_name = empty($options['select']) ? $column_name : $options['select'];
@@ -5415,7 +5344,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _constructCountOptionsFromLegacyArgs($args)
+    public function _constructCountOptionsFromLegacyArgs($args)
     {
         $options = array();
         $column_name = 'all';
@@ -5449,7 +5378,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _constructCalculationSql($operation, $column_name, $options)
+    public function _constructCalculationSql($operation, $column_name, $options)
     {
         $operation = strtolower($operation);
         $aggregate_alias = $this->_getColumnAliasFor($operation, $column_name);
@@ -5483,7 +5412,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _executeSimpleCalculation($operation, $column_name, $column, $options)
+    public function _executeSimpleCalculation($operation, $column_name, $column, $options)
     {
         $value = $this->_db->selectValue($this->_constructCalculationSql($operation, $column_name, $options));
         return $this->_typeCastCalculatedValue($value, $column, $operation);
@@ -5492,7 +5421,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _executeGroupedCalculation($operation, $column_name, $column, $options)
+    public function _executeGroupedCalculation($operation, $column_name, $column, $options)
     {
         $group_field = $options['group'];
         $group_alias = $this->_getColumnAliasFor($group_field);
@@ -5513,7 +5442,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _validateCalculationOptions($options = array())
+    public function _validateCalculationOptions($options = array())
     {
         $invalid_options = array_diff(array_keys($options),$this->_calculation_options);
         if(!empty($invalid_options)){
@@ -5531,7 +5460,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * @access private
     */
-    function _getColumnAliasFor()
+    public function _getColumnAliasFor()
     {
         $args = func_get_args();
         $keys = strtolower(join(' ',(!empty($args) ? (is_array($args[0]) ? $args[0] : $args) : array())));
@@ -5541,7 +5470,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _getColumnFor($field)
+    public function _getColumnFor($field)
     {
         $field_name = ltrim(substr($field,strpos($field,'.')),'.');
         if(in_array($field_name,$this->getColumnNames())){
@@ -5553,7 +5482,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * @access private
     */
-    function _typeCastCalculatedValue($value, $column, $operation = null)
+    public function _typeCastCalculatedValue($value, $column, $operation = null)
     {
         $operation = strtolower($operation);
         if($operation == 'count'){
@@ -5567,7 +5496,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     /*/Calculations*/
 
-    function hasBeenModified()
+    public function hasBeenModified()
     {
         return Ak::objectHasBeenModified($this);
     }
@@ -5577,12 +5506,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *
     * @todo implement freeze correctly for its intended use
     */
-    function freeze()
+    public function freeze()
     {
         return $this->_freeze = true;
     }
 
-    function isFrozen()
+    public function isFrozen()
     {
         return !empty($this->_freeze);
     }
@@ -5590,12 +5519,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Alias for getModelName()
     */
-    function getType()
+    public function getType()
     {
         return $this->getModelName();
     }
 
-    function &objectCache()
+    public function &objectCache()
     {
         static $cache;
         $false = false;
@@ -5618,7 +5547,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     provided in phpAdodb and that will move to a separated driver for each db
     engine in a future
     */
-    function _extractValueFromDefault($default)
+    public function _extractValueFromDefault($default)
     {
         if($this->_getDatabaseType() == 'postgre'){
             if(preg_match("/^'(.*)'::/", $default, $match)){

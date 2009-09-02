@@ -1,18 +1,18 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
 /**
  * @package ActiveRecord
  * @subpackage Associations
- * @author Bermi Ferrer <bermi a.t akelos c.om>
- * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
+ * @author Kaste
+ * @author Arno Schneider <arno a.t bermilabs c.om>
+ * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
@@ -54,9 +54,9 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 */
 class AkHasOne extends AkAssociation
 {
-    var $associated_ids = array();
+    public $associated_ids = array();
 
-    function &addAssociated($association_id, $options = array())
+    public function &addAssociated($association_id, $options = array())
     {
         $default_options = array(
         'class_name' => empty($options['class_name']) ? AkInflector::camelize($association_id) : $options['class_name'],
@@ -96,7 +96,7 @@ class AkHasOne extends AkAssociation
     /**
      * Assigns the associate object, extracts the primary key, sets it as the foreign key, and saves the associate object.
      */
-    function &assign($association_id, &$Associated)
+    public function &assign($association_id, &$Associated)
     {
         if(!$this->Owner->isNewRecord()){
             $Associated->set($this->Owner->$association_id->getAssociationOption('foreign_key'), $this->Owner->getId());
@@ -108,19 +108,19 @@ class AkHasOne extends AkAssociation
         return $Associated;
     }
 
-    function getAssociatedId($association_id)
+    public function getAssociatedId($association_id)
     {
         return isset($this->associated_ids[$association_id]) ? $this->associated_ids[$association_id] : false;
     }
 
 
-    function getType()
+    public function getType()
     {
         return 'hasOne';
     }
 
 
-    function getAssociatedFinderSqlOptions($association_id, $options = array())
+    public function getAssociatedFinderSqlOptions($association_id, $options = array())
     {
         $default_options = array(
         'conditions' => $this->Owner->$association_id->getAssociationOption('include_conditions_when_included'),
@@ -163,7 +163,8 @@ class AkHasOne extends AkAssociation
 
         return $finder_options;
     }
-    function getAssociatedFinderSqlOptionsForInclusionChain($association_id, $prefix, $parent_handler_name, $options = array(),$pluralize=false)
+
+    public function getAssociatedFinderSqlOptionsForInclusionChain($association_id, $prefix, $parent_handler_name, $options = array(),$pluralize=false)
     {
 
         $default_options = array(
@@ -206,7 +207,8 @@ class AkHasOne extends AkAssociation
 
         return $finder_options;
     }
-    function constructSqlForInclusion($association_id)
+
+    public function constructSqlForInclusion($association_id)
     {
         return ' LEFT OUTER JOIN '.
         $this->Owner->$association_id->getTableName().' AS _'.$association_id.
@@ -215,7 +217,8 @@ class AkHasOne extends AkAssociation
         ' = '.
         '_'.$association_id.'.'.$this->Owner->$association_id->getAssociationOption('foreign_key').' ';
     }
-function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name)
+
+    function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name)
     {
         $return=' LEFT OUTER JOIN '.
         $this->Owner->$association_id->getTableName().' AS '.$parent_handler_name.'__'.$handler_name.
@@ -229,12 +232,13 @@ function constructSqlForInclusionChain($association_id,$handler_name, $parent_ha
         }
         return $return;
     }
-    function &build($association_id, $attributes = array(), $replace_existing = true)
+
+    public function &build($association_id, $attributes = array(), $replace_existing = true)
     {
         $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
         $foreign_key = $this->Owner->$association_id->getAssociationOption('foreign_key');
         Ak::import($class_name);
-        $record =& new $class_name($attributes);
+        $record = new $class_name($attributes);
         if ($replace_existing){
             $record =& $this->replace($association_id, $record, true);
         }
@@ -247,13 +251,12 @@ function constructSqlForInclusionChain($association_id,$handler_name, $parent_ha
         return $record;
     }
 
-
     /**
     * Returns a new object of the associated type that has been instantiated with attributes
     * and linked to this object through a foreign key and that has already been
     * saved (if it passed the validation)
     */
-    function &create($association_id, $attributes = array(), $replace_existing = true)
+    public function &create($association_id, $attributes = array(), $replace_existing = true)
     {
         $this->build($association_id, $attributes, $replace_existing);
         $this->Owner->$association_id->save();
@@ -261,7 +264,7 @@ function constructSqlForInclusionChain($association_id,$handler_name, $parent_ha
         return $this->Owner->$association_id;
     }
 
-    function &replace($association_id, &$NewAssociated, $dont_save = false)
+    public function &replace($association_id, &$NewAssociated, $dont_save = false)
     {
         $Associated =& $this->loadAssociated($association_id);
         if(!empty($Associated->__activeRecordObject) && !empty($NewAssociated->__activeRecordObject) && $Associated->getId() == $NewAssociated->getId()){
@@ -302,7 +305,7 @@ function constructSqlForInclusionChain($association_id,$handler_name, $parent_ha
         return $result;
     }
 
-    function &findAssociated($association_id)
+    public function &findAssociated($association_id)
     {
         $false = false;
         if(!$this->Owner->getId()){
@@ -326,14 +329,14 @@ function constructSqlForInclusionChain($association_id,$handler_name, $parent_ha
         */
         $sql = $this->Owner->constructFinderSqlWithAssociations($finder_options, false);//.' LIMIT 1';
         if($results =& $this->Owner->$association_id->findBySql($sql)){
-            $result =& $results[0];
+            return $results[0];
         }
 
-        return $result;
+        return $false;
     }
 
 
-    function constructSqlConditions($association_id)
+    public function constructSqlConditions($association_id)
     {
         $foreign_key = $this->Owner->$association_id->getAssociationOption('foreign_key');
         $conditions = $this->Owner->$association_id->getAssociationOption('conditions');
@@ -347,7 +350,7 @@ function constructSqlForInclusionChain($association_id,$handler_name, $parent_ha
         return (empty($conditions) ? '' : $conditions.' AND ').$foreign_key.' = '.$foreign_key_value;
     }
 
-    function constructSql($association_id)
+    public function constructSql($association_id)
     {
         $foreign_key = $this->Owner->$association_id->getAssociationOption('foreign_key');
         $table_name = $this->Owner->$association_id->getAssociationOption('table_name');
@@ -360,7 +363,7 @@ function constructSqlForInclusionChain($association_id,$handler_name, $parent_ha
     /**
      * Triggers
      */
-    function afterSave(&$object)
+    public function afterSave(&$object)
     {
         $success = true;
         $associated_ids = $object->getAssociatedIds();
@@ -389,7 +392,7 @@ function constructSqlForInclusionChain($association_id,$handler_name, $parent_ha
     }
 
 
-    function afterDestroy(&$object)
+    public function afterDestroy(&$object)
     {
         $success = true;
         $associated_ids = $object->getAssociatedIds();
@@ -403,27 +406,24 @@ function constructSqlForInclusionChain($association_id,$handler_name, $parent_ha
                 if(empty($object->$associated_id->id) || $object->$associated_id->getType() == 'hasOne' || $object->$associated_id->isNewRecord()) return true;
                 switch ($dependency) {
 
-                        case 'delete':
-                            if(method_exists($object->$associated_id, 'delete')){
-                                $success = $object->$associated_id->delete($object->$associated_id->getId()) ? $success : false;
-                            }
+                    case 'delete':
+                        if(method_exists($object->$associated_id, 'delete')){
+                            $success = $object->$associated_id->delete($object->$associated_id->getId()) ? $success : false;
+                        }
                         break;
-                        case 'nullify':
-                            if(method_exists($object->$associated_id, 'updateAttribute')){
-                                $success = $object->$associated_id->updateAttribute($object->$associated_id->getAssociationOption('foreign_key'),null) ? $success : false;
-                            }
-                            break;
-                        case 'destroy':
-                        default:
+                    case 'nullify':
+                        if(method_exists($object->$associated_id, 'updateAttribute')){
+                            $success = $object->$associated_id->updateAttribute($object->$associated_id->getAssociationOption('foreign_key'),null) ? $success : false;
+                        }
+                        break;
+                    case 'destroy':
+                    default:
 
-                            if(method_exists($object->$associated_id, 'destroy')){
-                                $success = $object->$associated_id->destroy() ? $success : false;
-                            }
+                        if(method_exists($object->$associated_id, 'destroy')){
+                            $success = $object->$associated_id->destroy() ? $success : false;
+                        }
                         break;
-                    }
-                /**if(method_exists($object->$associated_id, 'destroy')){
-                    $success = $object->$associated_id->destroy() ? $success : false;
-                }*/
+                }
             }
         }
         return $success;

@@ -1,10 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2008-2009, Bermi Ferrer Martinez                       |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
@@ -12,14 +10,15 @@
  * @package ActiveRecord
  * @subpackage Base
  * @component DbSchemaCache
- * @author Arno Schneider 2008
- * @author Bermi Ferrer 2009
+ * @author Arno Schneider <arno a.t bermilabs c.om>
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
+ * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
- 
+
 class AkDbSchemaCache
 {
-    function shouldRefresh($set = null)
+    public function shouldRefresh($set = null)
     {
         static $refresh;
         if(!isset($refresh)){
@@ -29,12 +28,12 @@ class AkDbSchemaCache
         return $refresh;
     }
 
-    function getCacheFileName($environment = AK_ENVIRONMENT)
+    public function getCacheFileName($environment = AK_ENVIRONMENT)
     {
         return AkDbSchemaCache::getCacheDir().DS.$environment.'.serialized';
     }
-    
-    function getCacheDir()
+
+    public function getCacheDir()
     {
         $cache_dir = AK_CONFIG_DIR;
         if (defined('AK_CONFIG_CACHE_TMP') && AK_CONFIG_CACHE_TMP) {
@@ -42,8 +41,8 @@ class AkDbSchemaCache
         }
         return $cache_dir.DS.'cache'.DS.'activerecord';
     }
-    
-    function clear($table, $environment = AK_ENVIRONMENT)
+
+    public function clear($table, $environment = AK_ENVIRONMENT)
     {
         AkDbSchemaCache::_config($table, null, $environment, true);
         AkDbSchemaCache::_config('database_table_internals_'.$table, null, $environment, true);
@@ -53,8 +52,8 @@ class AkDbSchemaCache
             $Logger->message('Clearing database settings cache for '.$table);
         }
     }
-    
-    function clearAll()
+
+    public function clearAll()
     {
         if(AK_LOG_EVENTS){
             $Logger =& Ak::getLogger();
@@ -62,19 +61,19 @@ class AkDbSchemaCache
         }
         Ak::directory_delete(AkDbSchemaCache::getCacheDir());
     }
-    
-    function get($key, $environment = AK_ENVIRONMENT)
+
+    public function get($key, $environment = AK_ENVIRONMENT)
     {
-        return AkDbSchemaCache::_config($key, null, $environment, false);   
+        return AkDbSchemaCache::_config($key, null, $environment, false);
     }
-    
-    function set($key, $value, $environment = AK_ENVIRONMENT)
+
+    public function set($key, $value, $environment = AK_ENVIRONMENT)
     {
         AkDbSchemaCache::_updateCacheFileAfterExecution($environment);
         return AkDbSchemaCache::_config($key, $value, $environment, !is_null($value));
     }
-    
-    function _updateCacheFileAfterExecution($environment = null)
+
+    public function _updateCacheFileAfterExecution($environment = null)
     {
         static $called = false, $_environment;
         if($called == false && !AkDbSchemaCache::shouldRefresh()){
@@ -83,11 +82,11 @@ class AkDbSchemaCache
         }elseif(empty($environment)){
             $config = AkDbSchemaCache::_config(null, null, $called);
             $file_name = AkDbSchemaCache::getCacheFileName($called);
-            
+
             /**
             * @todo On PHP5 var_export requires objects that implement the __set_state magic method.
             *       As see on stangelanda at arrowquick dot benchmarks at comhttp://php.net/var_export
-            *       serialize works faster without opcode caches. We should do our benchmarks with 
+            *       serialize works faster without opcode caches. We should do our benchmarks with
             *       var_export VS serialize using APC once we fix the __set_state magic on phpAdoDB
             */
             if(AK_LOG_EVENTS){
@@ -103,8 +102,8 @@ class AkDbSchemaCache
             }
         }
     }
-    
-    function _config($key = null, $value = null, $environment = AK_ENVIRONMENT, $unset = false)
+
+    public function _config($key = null, $value = null, $environment = AK_ENVIRONMENT, $unset = false)
     {
         if(AkDbSchemaCache::shouldRefresh()){
             return false;

@@ -29,64 +29,64 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
 
 /**
  * acts_as_tree
- * 
+ *
  * Makes your model acts as a tree (surprise!). Consider the following example:
- * 
+ *
  * class Category extends ActiveRecord {
  *   var $acts_as = 'tree';
  * }
- * 
+ *
  * $Category = new Category;
- * 
+ *
  * $CategoryA = $Category->create();
  * $CategoryAa = $Category->create();
  * $CategoryAa1 = $Category->create();
  * $CategoryAa2 = $Category->create();
  * $CategoryAb = $Category->create();
  * $CategoryB = $Category->create();
- * 
+ *
  * $CategoryA->tree->addChild($CategoryAa)
  * $CategoryA->tree->addChild($CategoryAb)
  * $CategoryAa->tree->addChild($CategoryAa1)
  * $CategoryAa->tree->addChild($CategoryAa2)
- * 
- * 
+ *
+ *
  * This will effectively give you:
- * 
+ *
  * Category A
  *  \_ Category Aa
  *      \_ Category Aa1
  *      \_ Category Aa2
  *  \_ Category Ab
  * Category B
- * 
- * 
+ *
+ *
  * OK. Admittedly you won't get a graph in real life. But at least the following functions:
- * 
+ *
  * $CategoryA->tree->hasChildren()		# ==> true
  * $CategoryA->tree->childrenCount()	# ==> 2
  * $CategoryA->tree->getChildren() 		# ==> array($CategoryAa, $CategoryAb)
  * // fairly expensive operation follows
  * // (yes, array(parent, array_of_children) is not nice but unfortunately PHP doesn't allow for objects as keys)
  * $CategoryA->tree->getDescendants()	# ==> array(array($CategoryAa, array($CategoryAa1, $CategoryAa2)), $CategoryAb)
- * 
+ *
  * $CategoryAa->tree->getChildren()		# ==> array($CategoryAa1, $CategoryAa2)
  * $CategoryAa->tree->getSiblings()		# ==> array($CategoryAb)
  * $CategoryAa->tree->hasParent()		# ==> true
  * $CategoryAa->tree->getParent()		# ==> $CategoryA
- * 
+ *
  * $CatagoryAa1->tree->hasChildren()	# ==> false
  * $CategoryAa1->tree->getParent()		# ==> $CategoryAa
  * // fairly expensive operation follows
  * $CategoryAa1->tree->getAncestors()	# ==> array($CategoryAa, $CategoryA)
  * // fairly expensive operation follows
  * $CategoryAa1->tree->getAncestors(1)	# ==> array($CategoryAa)
- *  
- * 
+ *
+ *
  * To make this work your model needs a parent_id column (whose name can be overriden with +parent_column+. Furthermore
  * you can set the +dependent+ option to automatically delete all children if their parent gets deleted. Otherwise they
  * will become orphants (i.e. have parent_id = NULL)
- * 
+ *
  * (Note that on adding a child it will be saved. If the parent has been unsaved until now it will also be saved.)
  */
 class AkActsAsTree extends AkObserver
@@ -99,26 +99,26 @@ class AkActsAsTree extends AkObserver
     *
     * * +parent_column+ - specifies the column name to use for keeping the position integer (default: parent_id)
     * * +dependent+ - set to true to automatically delete all children when its parent is deleted
-    * * +scope+ - restricts what is to be considered a list. Given a symbol, it'll attach "_id" 
-    *   (if that hasn't been already) and use that as the foreign key restriction. It's also possible 
+    * * +scope+ - restricts what is to be considered a list. Given a symbol, it'll attach "_id"
+    *   (if that hasn't been already) and use that as the foreign key restriction. It's also possible
     *   to give it an entire string that is interpolated if you need a tighter scope than just a foreign key.
     *   Example: <tt>actsAsTree(array('scope' => array('todo_list_id = ? AND completed = 0',$todo_list_id)));</tt>
     */
 
-    var $parent_column = 'parent_id';
-    var $scope;
-    var $scope_condition;
-    var $_parent_column_name = 'parent_id';
-    var $_dependent = false;
+    public $parent_column = 'parent_id';
+    public $scope;
+    public $scope_condition;
+    public $_parent_column_name = 'parent_id';
+    public $_dependent = false;
 
-    var $_ActiveRecordInstance;
+    public $_ActiveRecordInstance;
 
-    function AkActsAsTree(&$ActiveRecordInstance)
+    public function AkActsAsTree(&$ActiveRecordInstance)
     {
         $this->_ActiveRecordInstance =& $ActiveRecordInstance;
     }
 
-    function init($options = array())
+    public function init($options = array())
     {
         empty($options['parent_column']) ? null : ($this->_parent_column_name = $options['parent_column']);
         empty($options['dependent']) ? null : ($this->_dependent = $options['dependent']);
@@ -128,7 +128,7 @@ class AkActsAsTree extends AkObserver
     }
 
 
-    function _ensureIsActiveRecordInstance(&$ActiveRecordInstance)
+    public function _ensureIsActiveRecordInstance(&$ActiveRecordInstance)
     {
         if(is_object($ActiveRecordInstance) && method_exists($ActiveRecordInstance,'actsLike')){
             $this->_ActiveRecordInstance =& $ActiveRecordInstance;
@@ -148,21 +148,16 @@ class AkActsAsTree extends AkObserver
         return true;
     }
 
-    function reloadActiveRecordInstance(&$nodeInstance)
-    {
-        AK_PHP5 ? null : $nodeInstance->tree->_ensureIsActiveRecordInstance($nodeInstance);
-    }
-
-    function getType()
+    public function getType()
     {
         return 'tree';
     }
-    
-    function getScopeCondition()
+
+    public function getScopeCondition()
     {
         if (!empty($this->variable_scope_condition)){
             return $this->_ActiveRecordInstance->_getVariableSqlCondition($this->variable_scope_condition);
-            
+
         // True condition in case we don't have a scope
         }elseif(empty($this->scope_condition) && empty($this->scope)){
             $this->scope_condition = ($this->_ActiveRecordInstance->_db->type() == 'postgre') ? 'true' : '1';
@@ -173,7 +168,7 @@ class AkActsAsTree extends AkObserver
     }
 
 
-    function setScopeCondition($scope_condition)
+    public function setScopeCondition($scope_condition)
     {
         if(!is_array($scope_condition) && strstr($scope_condition, '?')){
             $this->variable_scope_condition = $scope_condition;
@@ -182,7 +177,7 @@ class AkActsAsTree extends AkObserver
         }
     }
 
-    function getScopedColumn($column)
+    public function getScopedColumn($column)
     {
         if($this->_ActiveRecordInstance->hasColumn($column)){
             $value = $this->_ActiveRecordInstance->get($column);
@@ -194,38 +189,38 @@ class AkActsAsTree extends AkObserver
         }
     }
 
-    function getParentColumnName()
+    public function getParentColumnName()
     {
         return $this->_parent_column_name;
     }
 
-    function setParentColumnName($parent_column_name)
+    public function setParentColumnName($parent_column_name)
     {
         $this->_parent_column_name = $parent_column_name;
     }
 
-    function getDependent()
+    public function getDependent()
     {
         return $this->_dependent;
     }
 
-    function setDependent($val)
+    public function setDependent($val)
     {
         $this->_dependent = (bool)$val;
     }
 
-    function hasChildren()
+    public function hasChildren()
     {
         return $this->childrenCount() > 0;
     }
 
-    function hasParent()
+    public function hasParent()
     {
         $parent_id = $this->_ActiveRecordInstance->{$this->getParentColumnName()};
         return !empty($parent_id);
     }
 
-    function addChild( &$child )
+    public function addChild( &$child )
     {
         $this->_ActiveRecordInstance->transactionStart();
 
@@ -253,22 +248,21 @@ class AkActsAsTree extends AkObserver
 
         $this->_ActiveRecordInstance->transactionComplete();
 
-        $this->reloadActiveRecordInstance($child);
         return $child;
     }
 
-    function childrenCount()
+    public function childrenCount()
     {
-        
+
         return $this->_ActiveRecordInstance->isNewRecord() ? 0 : $this->_ActiveRecordInstance->count(" ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." = ".$this->_ActiveRecordInstance->getId());
     }
 
-    function getChildren()
+    public function getChildren()
     {
         return $this->_ActiveRecordInstance->isNewRecord() ? false : $this->_ActiveRecordInstance->findAll(" ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." = ".$this->_ActiveRecordInstance->getId());
     }
 
-    function getParent()
+    public function getParent()
     {
         if (!$this->hasParent()){
             return false;
@@ -281,7 +275,7 @@ class AkActsAsTree extends AkObserver
     /**
      * @param	integer	$level	How deep do you want to search? everything <= 0 means infinite deep
      */
-    function getAncestors($level=0)
+    public function getAncestors($level=0)
     {
         if (!$this->hasParent()) {
             return array();
@@ -302,7 +296,7 @@ class AkActsAsTree extends AkObserver
     }
 
 
-    function getSiblings($options = array())
+    public function getSiblings($options = array())
     {
         $default_options = array('include_self'=>false);
         $options = array_merge($default_options, $options);
@@ -311,8 +305,8 @@ class AkActsAsTree extends AkObserver
         return $this->_ActiveRecordInstance->findAll(' '. $this->getScopeCondition().
         ' AND '. $parent_condition.$id_condition);
     }
-    
-    function getSelfAndSiblings()
+
+    public function getSelfAndSiblings()
     {
         return $this->getSiblings(array('include_self'=>true));
     }
@@ -320,7 +314,7 @@ class AkActsAsTree extends AkObserver
     /**
      * @param	integer	$level	How deep do you want to search? everything <= 0 means infinite deep
      */
-    function getDescendants($level=0)
+    public function getDescendants($level=0)
     {
         if (!$this->hasChildren()) {
             return array();
@@ -328,7 +322,7 @@ class AkActsAsTree extends AkObserver
 
         return $this->_recursiveGetDescendants($level, $this->getChildren());
     }
-    function _recursiveGetDescendants($level, $from) {
+    public function _recursiveGetDescendants($level, $from) {
         --$level;
 
         if ($level == 0) {
@@ -347,7 +341,7 @@ class AkActsAsTree extends AkObserver
         return $children;
     }
 
-    function beforeDestroy(&$object)
+    public function beforeDestroy(&$object)
     {
         if(!$object->tree->hasChildren()){
             return true;

@@ -22,57 +22,57 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
 * This act provides the capabilities for sorting and reordering a number of objects in list.
 * The class that has this specified needs to have a "position" column defined as an integer on
 * the mapped database table.
-* 
+*
 * Todo list example:
 * <code>
 *   class TodoList extends ActiveRecord
 *   {
-*       var $has_many = array('todo_items', array('order' => "position"));
+*       public $has_many = array('todo_items', array('order' => "position"));
 *   }
-* 
+*
 *   class TodoItem extends ActiveRecord
 *   {
-*       var $belongs_to = 'todo_list';
-*       var $acts_as = array('list' => array('scope' => 'todo_list')); 
+*       public $belongs_to = 'todo_list';
+*       public $acts_as = array('list' => array('scope' => 'todo_list'));
 *   }
-*     
-*   $TodoList =& new TodoList();
+*
+*   $TodoList = new TodoList();
 *
 *   $TodoList->list->moveToBottom();
 * </code>
 */
 class AkActsAsList extends AkObserver
 {
-    var $column = 'position';
-    var $scope = '';
-    var $scope_condition;
+    public $column = 'position';
+    public $scope = '';
+    public $scope_condition;
     /**
     * Configuration options are:
-    * 
+    *
     * * +column+ - specifies the column name to use for keeping the position integer (default: position)
-    * * +scope+ - restricts what is to be considered a list. 
-    *   Example: 
-    * 
+    * * +scope+ - restricts what is to be considered a list.
+    *   Example:
+    *
     * class TodoTask extends ActiveRecord
     * {
     *   var $acts_as = array('list'=> array('scope'=> array('todo_list_id','completed = 0')));
     *   var $belongs_to = 'todo_list';
     * }
     */
-    var $_ActiveRecordInstance;
-    function AkActsAsList(&$ActiveRecordInstance)
+    public $_ActiveRecordInstance;
+    public function AkActsAsList(&$ActiveRecordInstance)
     {
         $this->_ActiveRecordInstance =& $ActiveRecordInstance;
     }
 
-    function init($options = array())
+    public function init($options = array())
     {
         $this->column = !empty($options['column']) ? $options['column'] : $this->column;
         $this->scope = !empty($options['scope']) ? $options['scope'] : $this->scope;
         return $this->_ensureIsActiveRecordInstance($this->_ActiveRecordInstance);
     }
 
-    function _ensureIsActiveRecordInstance(&$ActiveRecordInstance)
+    public function _ensureIsActiveRecordInstance(&$ActiveRecordInstance)
     {
         if(is_object($ActiveRecordInstance) && method_exists($ActiveRecordInstance,'actsLike')){
             $this->_ActiveRecordInstance =& $ActiveRecordInstance;
@@ -90,34 +90,29 @@ class AkActsAsList extends AkObserver
         return true;
     }
 
-    function reloadActiveRecordInstance(&$listObject)
-    {
-        AK_PHP5 ? null : $listObject->list->setActiveRecordInstance(&$listObject);
-    }
-
-    function getType()
+    public function getType()
     {
         return 'list';
     }
 
-    function beforeDestroy(&$object)
+    public function beforeDestroy(&$object)
     {
         $object->list->_ActiveRecordInstance->reload();
         return true;
     }
 
-    function afterSave(&$object)
+    public function afterSave(&$object)
     {
         $object->list->_ActiveRecordInstance->reload();
         return true;
     }
 
-    function afterDestroy(&$object)
+    public function afterDestroy(&$object)
     {
         return $object->list->removeFromList();
     }
 
-    function beforeCreate(&$object)
+    public function beforeCreate(&$object)
     {
         $object->list->_addToBottom();
         return true;
@@ -131,7 +126,7 @@ class AkActsAsList extends AkObserver
     */
 
 
-    function insertAt($position = 1)
+    public function insertAt($position = 1)
     {
         return $this->insertAtPosition($position);
     }
@@ -139,7 +134,7 @@ class AkActsAsList extends AkObserver
     /**
     * This function saves the object using save() before inserting it into the list
     */
-    function insertAtPosition($position)
+    public function insertAtPosition($position)
     {
         $this->_ActiveRecordInstance->transactionStart();
         if($this->_ActiveRecordInstance->isNewRecord()){
@@ -158,7 +153,7 @@ class AkActsAsList extends AkObserver
         return true;
     }
 
-    function moveLower()
+    public function moveLower()
     {
         $this->_ActiveRecordInstance->transactionStart();
         if($LowerItem = $this->getLowerItem()){
@@ -173,7 +168,7 @@ class AkActsAsList extends AkObserver
         return false;
     }
 
-    function moveHigher()
+    public function moveHigher()
     {
         $this->_ActiveRecordInstance->transactionStart();
         if($HigherItem = $this->getHigherItem()){
@@ -188,7 +183,7 @@ class AkActsAsList extends AkObserver
         return false;
     }
 
-    function moveToBottom()
+    public function moveToBottom()
     {
         if($this->isInList()){
             $this->_ActiveRecordInstance->transactionStart();
@@ -203,7 +198,7 @@ class AkActsAsList extends AkObserver
         return false;
     }
 
-    function moveToTop()
+    public function moveToTop()
     {
         if($this->isInList()){
             $this->_ActiveRecordInstance->transactionStart();
@@ -218,17 +213,17 @@ class AkActsAsList extends AkObserver
         return false;
     }
 
-    function assumeBottomPosition()
+    public function assumeBottomPosition()
     {
         return $this->_ActiveRecordInstance->updateAttribute($this->column, $this->getBottomPosition($this->_ActiveRecordInstance->getId()) + 1);
     }
 
-    function assumeTopPosition()
+    public function assumeTopPosition()
     {
         return $this->_ActiveRecordInstance->updateAttribute($this->column, 1);
     }
 
-    function getBottomPosition($except = null)
+    public function getBottomPosition($except = null)
     {
         return ($item = $this->getBottomItem($except)) ? $item->getAttribute($this->column) : 0;
     }
@@ -236,7 +231,7 @@ class AkActsAsList extends AkObserver
     /**
     * Returns an instance of the item that's on the very bottom of the list. Returns false if there's none
     */
-    function getBottomItem($except = null)
+    public function getBottomItem($except = null)
     {
         $conditions = $this->getScopeCondition();
 
@@ -246,7 +241,7 @@ class AkActsAsList extends AkObserver
         return $this->_ActiveRecordInstance->find('first', array('conditions' => $conditions, 'order' => "{$this->column} DESC"));
     }
 
-    function isInList()
+    public function isInList()
     {
         return !empty($this->_ActiveRecordInstance->{$this->column});
     }
@@ -254,7 +249,7 @@ class AkActsAsList extends AkObserver
     /**
     * This has the effect of moving all the higher items up one.
     */
-    function decrementPositionsOnHigherItems($position)
+    public function decrementPositionsOnHigherItems($position)
     {
         return $this->_ActiveRecordInstance->updateAll("{$this->column} = ({$this->column} - 1)", $this->getScopeCondition()." AND {$this->column} <= $position");
     }
@@ -262,7 +257,7 @@ class AkActsAsList extends AkObserver
     /**
     * This has the effect of moving all the lower items up one.
     */
-    function decrementPositionsOnLowerItems()
+    public function decrementPositionsOnLowerItems()
     {
         if($this->isInList()){
             $this->_ActiveRecordInstance->updateAll("{$this->column} = ({$this->column} - 1)", $this->getScopeCondition()." AND {$this->column} > ".$this->_ActiveRecordInstance->getAttribute($this->column));
@@ -274,7 +269,7 @@ class AkActsAsList extends AkObserver
     /**
     * This has the effect of moving all the higher items down one.
     */
-    function incrementPositionsOnHigherItems()
+    public function incrementPositionsOnHigherItems()
     {
         if($this->isInList()){
             $this->_ActiveRecordInstance->updateAll("{$this->column} = ({$this->column} + 1)", $this->getScopeCondition()." AND {$this->column} < ".$this->_ActiveRecordInstance->getAttribute($this->column));
@@ -286,17 +281,17 @@ class AkActsAsList extends AkObserver
     /**
     * This has the effect of moving all the lower items down one.
     */
-    function incrementPositionsOnLowerItems($position)
+    public function incrementPositionsOnLowerItems($position)
     {
         return $this->_ActiveRecordInstance->updateAll("{$this->column} = ({$this->column} + 1)", $this->getScopeCondition()." AND {$this->column} >= $position");
     }
 
-    function incrementPositionsOnAllItems()
+    public function incrementPositionsOnAllItems()
     {
         return $this->_ActiveRecordInstance->updateAll("{$this->column} = ({$this->column} + 1)",  $this->getScopeCondition());
     }
 
-    function removeFromList()
+    public function removeFromList()
     {
         if($this->isInList()){
             if($this->decrementPositionsOnLowerItems()){
@@ -307,7 +302,7 @@ class AkActsAsList extends AkObserver
         return false;
     }
 
-    function incrementPosition()
+    public function incrementPosition()
     {
         if($this->isInList()){
             return $this->_ActiveRecordInstance->updateAttribute($this->column, $this->_ActiveRecordInstance->getAttribute($this->column) + 1);
@@ -315,7 +310,7 @@ class AkActsAsList extends AkObserver
         return false;
     }
 
-    function decrementPosition()
+    public function decrementPosition()
     {
         if($this->isInList()){
             return $this->_ActiveRecordInstance->updateAttribute($this->column, $this->_ActiveRecordInstance->getAttribute($this->column) - 1);
@@ -323,7 +318,7 @@ class AkActsAsList extends AkObserver
         return false;
     }
 
-    function isFirst()
+    public function isFirst()
     {
         if($this->isInList()){
             return $this->_ActiveRecordInstance->getAttribute($this->column) == 1;
@@ -331,7 +326,7 @@ class AkActsAsList extends AkObserver
         return false;
     }
 
-    function isLast()
+    public function isLast()
     {
         if($this->isInList()){
             return $this->_ActiveRecordInstance->getAttribute($this->column) == $this->getBottomPosition();
@@ -339,7 +334,7 @@ class AkActsAsList extends AkObserver
         return false;
     }
 
-    function getHigherItem()
+    public function getHigherItem()
     {
         if($this->isInList()){
             return $this->_ActiveRecordInstance->find('first', array('conditions' => $this->getScopeCondition()." AND {$this->column} = ".($this->_ActiveRecordInstance->getAttribute($this->column) - 1)));
@@ -347,7 +342,7 @@ class AkActsAsList extends AkObserver
         return false;
     }
 
-    function getLowerItem()
+    public function getLowerItem()
     {
         if($this->isInList()){
             return $this->_ActiveRecordInstance->find('first', array('conditions' => $this->getScopeCondition()." AND {$this->column} = ".($this->_ActiveRecordInstance->getAttribute($this->column) + 1)));
@@ -355,17 +350,17 @@ class AkActsAsList extends AkObserver
         return false;
     }
 
-    function addToListTop()
+    public function addToListTop()
     {
         $this->incrementPositionsOnAllItems();
     }
 
-    function _addToBottom()
+    public function _addToBottom()
     {
         $this->_ActiveRecordInstance->{$this->column} = $this->getBottomPosition() + 1;
     }
 
-    function getScopeCondition()
+    public function getScopeCondition()
     {
         if (!empty($this->variable_scope_condition)){
             return $this->_ActiveRecordInstance->_getVariableSqlCondition($this->variable_scope_condition);
@@ -379,7 +374,7 @@ class AkActsAsList extends AkObserver
         return  $this->scope_condition;
     }
 
-    function setScopeCondition($scope_condition)
+    public function setScopeCondition($scope_condition)
     {
         if(!is_array($scope_condition) && strstr($scope_condition, '?')){
             $this->variable_scope_condition = $scope_condition;
@@ -388,7 +383,7 @@ class AkActsAsList extends AkObserver
         }
     }
 
-    function getScopedColumn($column)
+    public function getScopedColumn($column)
     {
         if($this->_ActiveRecordInstance->hasColumn($column)){
             $value = $this->_ActiveRecordInstance->get($column);

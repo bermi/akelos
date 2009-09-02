@@ -57,7 +57,7 @@ class AkActsAsNestedSet extends AkObserver
     *    |   |  |  C 1.1  |  |  C 1.2 |  |   |  |  C 2.1  |  |  C 2.2 |  |   |
     *    1   2  3_________4  5________6  7   8  9_________10 11_______12 13  14
     *    |   |___________________________|   |___________________________|   |
-    *    |___________________________________________________________________| 
+    *    |___________________________________________________________________|
     *
     * The numbers represent the left and right boundaries.  The table them might
     * look like this:
@@ -75,13 +75,13 @@ class AkActsAsNestedSet extends AkObserver
     *
     * To get the count, it's (LEFT - RIGHT + 1)/2, etc.
     *
-    * To get the direct parent, it falls back to using the PARENT_ID field.   
+    * To get the direct parent, it falls back to using the PARENT_ID field.
     *
     * There are instance methods for all of these.
     *
     * The structure is good if you need to group things together; the downside is that
     * keeping data integrity is a pain, and both adding and removing and entry
-    * require a full table write.        
+    * require a full table write.
     *
     * This sets up a beforeDestroy() trigger to prune the tree correctly if one of it's
     * elements gets deleted.
@@ -98,19 +98,19 @@ class AkActsAsNestedSet extends AkObserver
     *   Example: <tt>actsAsList(array('scope' => array('todo_list_id = ? AND completed = 0',$todo_list_id)));</tt>
     */
 
-    var $_scope_condition;
-    var $_left_column_name = 'lft';
-    var $_right_column_name = 'rgt';
-    var $_parent_column_name = 'parent_id';
+    public $_scope_condition;
+    public $_left_column_name = 'lft';
+    public $_right_column_name = 'rgt';
+    public $_parent_column_name = 'parent_id';
 
-    var $_ActiveRecordInstance;
+    public $_ActiveRecordInstance;
 
-    function AkActsAsNestedSet(&$ActiveRecordInstance)
+    public function AkActsAsNestedSet(&$ActiveRecordInstance)
     {
         $this->_ActiveRecordInstance =& $ActiveRecordInstance;
     }
 
-    function init($options = array())
+    public function init($options = array())
     {
         empty($options['parent_column']) ? null : ($this->_parent_column_name = $options['parent_column']);
         empty($options['left_column']) ? null : ($this->_left_column_name = $options['left_column']);
@@ -120,7 +120,7 @@ class AkActsAsNestedSet extends AkObserver
     }
 
 
-    function _ensureIsActiveRecordInstance(&$ActiveRecordInstance)
+    public function _ensureIsActiveRecordInstance(&$ActiveRecordInstance)
     {
         if(is_object($ActiveRecordInstance) && method_exists($ActiveRecordInstance,'actsLike')){
             $this->_ActiveRecordInstance =& $ActiveRecordInstance;
@@ -140,17 +140,12 @@ class AkActsAsNestedSet extends AkObserver
         return true;
     }
 
-    function reloadActiveRecordInstance(&$nodeInstance)
-    {
-        AK_PHP5 ? null : $nodeInstance->nested_set->_ensureIsActiveRecordInstance($nodeInstance);
-    }
-
-    function getType()
+    public function getType()
     {
         return 'nested set';
     }
 
-    function getScopeCondition()
+    public function getScopeCondition()
     {
         if (!empty($this->variable_scope_condition)){
             return $this->_ActiveRecordInstance->_getVariableSqlCondition($this->variable_scope_condition);
@@ -165,7 +160,7 @@ class AkActsAsNestedSet extends AkObserver
     }
 
 
-    function setScopeCondition($scope_condition)
+    public function setScopeCondition($scope_condition)
     {
         if(!is_array($scope_condition) && strstr($scope_condition, '?')){
             $this->variable_scope_condition = $scope_condition;
@@ -174,7 +169,7 @@ class AkActsAsNestedSet extends AkObserver
         }
     }
 
-    function getScopedColumn($column)
+    public function getScopedColumn($column)
     {
         if($this->_ActiveRecordInstance->hasColumn($column)){
             $value = $this->_ActiveRecordInstance->get($column);
@@ -186,30 +181,30 @@ class AkActsAsNestedSet extends AkObserver
         }
     }
 
-    function getLeftColumnName()
+    public function getLeftColumnName()
     {
         return $this->_left_column_name;
     }
-    function setLeftColumnName($left_column_name)
+    public function setLeftColumnName($left_column_name)
     {
         $this->_left_column_name = $left_column_name;
     }
 
-    function getRightColumnName()
+    public function getRightColumnName()
     {
         return $this->_right_column_name;
     }
-    function setRightColumnName($right_column_name)
+    public function setRightColumnName($right_column_name)
     {
         $this->_right_column_name = $right_column_name;
     }
 
 
-    function getParentColumnName()
+    public function getParentColumnName()
     {
         return $this->_parent_column_name;
     }
-    function setParentColumnName($parent_column_name)
+    public function setParentColumnName($parent_column_name)
     {
         $this->_parent_column_name = $parent_column_name;
     }
@@ -217,7 +212,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
     * Returns true is this is a root node.
     */
-    function isRoot()
+    public function isRoot()
     {
         $left_id = $this->_ActiveRecordInstance->get($this->getLeftColumnName());
         return ($this->_ActiveRecordInstance->get($this->getParentColumnName()) == null) && ($left_id == 1) && ($this->_ActiveRecordInstance->get($this->getRightColumnName()) > $left_id);
@@ -226,7 +221,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
     * Returns true is this is a child node
     */
-    function isChild()
+    public function isChild()
     {
         $parent_id = $this->_ActiveRecordInstance->get($this->getParentColumnName());
         $left_id = $this->_ActiveRecordInstance->get($this->getLeftColumnName());
@@ -236,7 +231,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
     * Returns true if we have no idea what this is
     */
-    function isUnknown()
+    public function isUnknown()
     {
         return !$this->isRoot() && !$this->isChild();
     }
@@ -245,9 +240,9 @@ class AkActsAsNestedSet extends AkObserver
     * Added a child to this object in the tree.  If this object hasn't been initialized,
     * it gets set up as a root node.  Otherwise, this method will update all of the
     * other elements in the tree and shift them to the right. Keeping everything
-    * balanced. 
+    * balanced.
     */
-    function addChild( &$child )
+    public function addChild( &$child )
     {
         $self =& $this->_ActiveRecordInstance;
         $self->reload();
@@ -295,7 +290,6 @@ class AkActsAsNestedSet extends AkObserver
             $self->updateAll( "$right_column = ($right_column + 2)",  $this->getScopeCondition()." AND $right_column >= $right_bound" );
             $self->save();
             $child->save();
-            $this->reloadActiveRecordInstance($child);
             $self->transactionComplete();
             return $child;
         }
@@ -305,7 +299,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
     * Returns the parent Object
     */
-    function &getParent()
+    public function &getParent()
     {
         if(!$this->isChild()){
             $result = false;
@@ -321,7 +315,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
     * Returns an array of parent Objects this is usefull to make breadcrum like stuctures
     */
-    function &getParents()
+    public function &getParents()
     {
         $Ancestors =& $this->getAncestors();
         return $Ancestors;
@@ -332,7 +326,7 @@ class AkActsAsNestedSet extends AkObserver
     * Prunes a branch off of the tree, shifting all of the elements on the right
     * back to the left so the counts still work.
     */
-    function beforeDestroy(&$object)
+    public function beforeDestroy(&$object)
     {
         if(!empty($object->__avoid_nested_set_before_destroy_recursion)){
             return true;
@@ -393,13 +387,13 @@ class AkActsAsNestedSet extends AkObserver
     /**
      * on creation, set automatically lft and rgt to the end of the tree
      */
-    function beforeCreate(&$object)
+    public function beforeCreate(&$object)
     {
         $object->nested_set->_setLeftAndRightToTheEndOfTheTree();
         return true;
     }
 
-    function _setLeftAndRightToTheEndOfTheTree()
+    public function _setLeftAndRightToTheEndOfTheTree()
     {
         $left = $this->getLeftColumnName();
         $right = $this->getRightColumnName();
@@ -414,7 +408,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
      * Returns the single root
      */
-    function getRoot()
+    public function getRoot()
     {
         return $this->_ActiveRecordInstance->find('first', array('conditions' => " ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." IS NULL "));
     }
@@ -422,16 +416,16 @@ class AkActsAsNestedSet extends AkObserver
     /**
      * Returns roots when multiple roots (or virtual root, which is the same)
      */
-    function getRoots()
+    public function getRoots()
     {
         return $this->_ActiveRecordInstance->find('all', array('conditions' => " ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." IS NULL ",'order' => $this->getLeftColumnName()));
     }
 
 
     /**
-     * Returns an array of all parents 
+     * Returns an array of all parents
      */
-    function &getAncestors()
+    public function &getAncestors()
     {
         $Ancestors =& $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
         $this->getLeftColumnName().' < '.$this->_ActiveRecordInstance->get($this->getLeftColumnName()).' AND '.
@@ -443,7 +437,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
      * Returns the array of all parents and self
      */
-    function &getSelfAndAncestors()
+    public function &getSelfAndAncestors()
     {
         if($result =& $this->getAncestors()){
             array_push($result, $this->_ActiveRecordInstance);
@@ -457,7 +451,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
      * Returns the array of all children of the parent, except self
      */
-    function getSiblings($search_for_self = false)
+    public function getSiblings($search_for_self = false)
     {
         return $this->_ActiveRecordInstance->find('all', array('conditions' => ' (('.$this->getScopeCondition().' AND '.
         $this->getParentColumnName().' = '.$this->_ActiveRecordInstance->get($this->getParentColumnName()).' AND '.
@@ -469,7 +463,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
      * Returns the array of all children of the parent, included self
      */
-    function getSelfAndSiblings()
+    public function getSelfAndSiblings()
     {
         $parent_id = $this->_ActiveRecordInstance->get($this->getParentColumnName());
         if(empty($parent_id) || !$result = $this->getSiblings(true)){
@@ -480,10 +474,10 @@ class AkActsAsNestedSet extends AkObserver
 
 
     /**
-     * Returns the level of this object in the tree 
+     * Returns the level of this object in the tree
      * root level is 0
      */
-    function getLevel()
+    public function getLevel()
     {
         $parent_id = $this->_ActiveRecordInstance->get($this->getParentColumnName());
         if(empty($parent_id)){
@@ -498,7 +492,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
     * Returns the number of all nested children of this object.
     */
-    function countChildren()
+    public function countChildren()
     {
         $children_count = ($this->_ActiveRecordInstance->get($this->getRightColumnName()) - $this->_ActiveRecordInstance->get($this->getLeftColumnName()) - 1)/2;
         return $children_count > 0 ? $children_count : 0;
@@ -508,7 +502,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
      * Returns a set of only this entry's immediate children
      */
-    function getChildren()
+    public function getChildren()
     {
         return $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
         $this->getParentColumnName().' = '.$this->_ActiveRecordInstance->getId()
@@ -518,7 +512,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
      * Returns a set of all of its children and nested children
      */
-    function getAllChildren()
+    public function getAllChildren()
     {
         $args = func_get_args();
         $excluded_ids = array();
@@ -552,7 +546,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
      * Returns a set of itself and all of its nested children
      */
-    function getFullSet($exclude = null)
+    public function getFullSet($exclude = null)
     {
         if($this->_ActiveRecordInstance->isNewRecord() || $this->_ActiveRecordInstance->get($this->getRightColumnName()) - $this->_ActiveRecordInstance->get($this->getLeftColumnName()) == 1 ){
             $result = array($this->_ActiveRecordInstance);
@@ -567,7 +561,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
      * Move the node to the left of another node
      */
-    function moveToLeftOf($node)
+    public function moveToLeftOf($node)
     {
         return $this->moveTo($node, 'left');
     }
@@ -575,7 +569,7 @@ class AkActsAsNestedSet extends AkObserver
     /**
      * Move the node to the left of another node
      */
-    function moveToRightOf($node)
+    public function moveToRightOf($node)
     {
         return $this->moveTo($node, 'right');
     }
@@ -583,12 +577,12 @@ class AkActsAsNestedSet extends AkObserver
     /**
      * Move the node to the child of another node
      */
-    function moveToChildOf($node)
+    public function moveToChildOf($node)
     {
         return $this->moveTo($node, 'child');
     }
 
-    function moveTo($target, $position)
+    public function moveTo($target, $position)
     {
         if($this->_ActiveRecordInstance->isNewRecord()){
             trigger_error(Ak::t('You cannot move a new node'), E_USER_ERROR);

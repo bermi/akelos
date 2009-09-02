@@ -1,18 +1,18 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
 /**
  * @package ActiveRecord
  * @subpackage Associations
- * @author Bermi Ferrer <bermi a.t akelos c.om>
- * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
+ * @author Kaste
+ * @author Arno Schneider <arno a.t bermilabs c.om>
+ * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
@@ -20,18 +20,18 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
 
 class AkAssociation extends AkObserver
 {
-    var $Owner;
-    var $options = array();
-    var $models = array();
+    public $Owner;
+    public $options = array();
+    public $models = array();
 
-    function AkAssociation(&$Owner)
+    public function AkAssociation(&$Owner)
     {
         $this->Owner =& $Owner;
         $this->observe($this->Owner);
         $this->_setAssociationAccesorAliasReferences();
     }
 
-    function initializeAssociated($options)
+    public function initializeAssociated($options)
     {
         $options = is_string($options) ? array_map('trim',array_diff(explode(',',$options.','), array(''))) : $options;
         if(is_array($options)){
@@ -50,7 +50,7 @@ class AkAssociation extends AkObserver
         }
     }
 
-    function setAssociationId($association_id)
+    public function setAssociationId($association_id)
     {
         $association_id = strtolower(AkInflector::underscore($association_id));
         if(isset($this->Owner->$association_id)){
@@ -64,7 +64,7 @@ class AkAssociation extends AkObserver
         }
     }
 
-    function _setAssociationAccesorAliasReferences()
+    public function _setAssociationAccesorAliasReferences()
     {
         $underscored_alias = AkInflector::underscore($this->getType());
         if(!isset($this->Owner->$underscored_alias)){
@@ -72,43 +72,43 @@ class AkAssociation extends AkObserver
         }
     }
 
-    function setOptions($association_id, $options)
+    public function setOptions($association_id, $options)
     {
         $this->options[$association_id] = $options;
     }
 
-    function getOptions($association_id)
+    public function getOptions($association_id)
     {
         return $this->options[$association_id];
     }
 
-    function getOption($association_id, $option_name)
+    public function getOption($association_id, $option_name)
     {
         return isset($this->options[$association_id][$option_name]) ? $this->options[$association_id][$option_name] : false;
     }
 
-    function &addModel($association_id, &$associated_model)
+    public function &addModel($association_id, &$associated_model)
     {
         $this->models[$association_id] =& $associated_model;
         return $this->models[$association_id];
 
     }
 
-    function &getModel($association_id)
+    public function &getModel($association_id)
     {
         return $this->models[$association_id];
     }
 
-    function &getModels()
+    public function &getModels()
     {
         return $this->models;
     }
 
-    function getAssociatedIds()
+    public function getAssociatedIds()
     {
         return array_keys($this->options);
     }
-    function _getColumnParenthesis()
+    public function _getColumnParenthesis()
     {
         static $type;
         if (empty($type)) {
@@ -117,7 +117,7 @@ class AkAssociation extends AkObserver
         return $type=='mysql'?"'":'"';
     }
 
-    function &_build($association_id, &$AssociatedObject, $reference_associated = true)
+    public function &_build($association_id, &$AssociatedObject, $reference_associated = true)
     {
         if($reference_associated){
             $this->Owner->$association_id =& $AssociatedObject;
@@ -131,23 +131,25 @@ class AkAssociation extends AkObserver
         return $this->Owner->$association_id;
     }
 
-    function setAssociatedId($association_id, $associated_id)
+    public function setAssociatedId($association_id, $associated_id)
     {
         $this->Owner->_associationIds[$association_id]  = $associated_id;
         $this->associated_ids[$association_id] = $associated_id;
     }
 
-    function &loadAssociated($association_id)
+    public function &loadAssociated($association_id, $return_false_if_not_found = false)
     {
         if (!$this->Owner->isNewRecord()){
             if(empty($this->Owner->$association_id->_loaded)){
                 if($Associated =& $this->findAssociated($association_id)){
                     $Associated->_loaded = true;
                     $this->_build($association_id, $Associated, false);
+                }elseif ($return_false_if_not_found){
+                    $false = false;
+                    return $false;
                 }
             }
         }
-
         return $this->Owner->$association_id;
     }
 
@@ -155,46 +157,46 @@ class AkAssociation extends AkObserver
      * Class interfaces. All Association objects must implement the following methods
      */
 
-    function addAssociated($association_id, $options = array())
+    public function addAssociated($association_id, $options = array())
     {
         trigger_error(__FUNCTION__.' must be defined into your specific association handler');
     }
 
-    function getType()
+    public function getType()
     {
         trigger_error(__FUNCTION__.' must be defined into your specific association handler');
     }
 
-    function getAssociatedFinderSqlOptions()
+    public function getAssociatedFinderSqlOptions()
     {
         trigger_error(__FUNCTION__.' must be defined into your specific association handler');
     }
 
-    function isOwnerAnActiveRecord()
+    public function isOwnerAnActiveRecord()
     {
         return $this->__activeRecordObject;
     }
 
 
-    function _hasTablePrefix($association_id)
+    public function _hasTablePrefix($association_id)
     {
         return isset($this->$association_id->_associationTablePrefixes[$this->$association_id->_tableName]);
     }
 
-    function _saveLoadedHandler($association_id, $associated)
+    public function _saveLoadedHandler($association_id, $associated)
     {
         $this->Owner->_association_handler_copies[$association_id] = $associated;
     }
 
-    function _getLoadedHandler($association_id)
+    public function _getLoadedHandler($association_id)
     {
         return $this->Owner->_association_handler_copies[$association_id];
     }
 
     /**
- 	* Recurses through $owner and its superclasses until it finds the class which defines the association to the given $associatedModel 
- 	*/ 
-    function _findOwnerTypeForAssociation(&$AssociatedModel, $Owner) {
+ 	* Recurses through $owner and its superclasses until it finds the class which defines the association to the given $associatedModel
+ 	*/
+    public function _findOwnerTypeForAssociation(&$AssociatedModel, $Owner) {
         if (!is_object($Owner)) {
             $Owner = new $Owner;
         }

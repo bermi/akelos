@@ -30,7 +30,7 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 * 
 *     class CommentObserver extends AkObserver
 *     {
-*         function afterSave($comment)
+*         public function afterSave($comment)
 *         {
 *             Ak::mail("admin@example.com", "New comment was posted",
 *                     $comment->toString());
@@ -47,18 +47,18 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 * than the class you're interested in observing, you can use the
 * AkActiveRecord->observe() class method:
 * 
-*     function afterUpdate(&$account)
+*     public function afterUpdate(&$account)
 *     {
-*         $AuditTrail =& new AuditTrail($account, "UPDATED");
+*         $AuditTrail = new AuditTrail($account, "UPDATED");
 *         $AuditTrail->save();
 *     }
 * 
 * If the audit observer needs to watch more than one kind of object, this can be
 * specified with multiple arguments:
 * 
-*     function afterUpdate(&$record)
+*     public function afterUpdate(&$record)
 *     {
-*         $ObservedRecord =& new AuditTrail($record, "UPDATED");
+*         $ObservedRecord = new AuditTrail($record, "UPDATED");
 *         $ObservedRecord->save();
 *     }
 * 
@@ -79,7 +79,7 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 * In the Akelos Framework, this can be done in controllers using the short-hand
 * of for example: 
 * 
-*     $ComentObserverInstance =& new CommentObserver();
+*     $ComentObserverInstance = new CommentObserver();
 *     $Model->addObserver(&$ComentObserverInstance);
 *
 */
@@ -94,13 +94,13 @@ class AkObserver extends AkObject
      * 
      * @var array
      */
-    var $observe = array();
+    public $observe = array();
     /**
     * $_observing array of models that we're observing
     */
-    var $_observing = array();
+    public $_observing = array();
 
-    function __construct()
+    public function __construct()
     {
         $num_args = func_num_args();
         for ($i = 0; $i < $num_args; $i++){
@@ -119,7 +119,7 @@ class AkObserver extends AkObject
      * in var $observe = array(...)
      *
      */
-    function _initModelObserver()
+    public function _initModelObserver()
     {
         
         $this->observe = Ak::toArray($this->observe);
@@ -133,7 +133,7 @@ class AkObserver extends AkObject
     * Constructs the Observer
     * @param $subject the name or names of the Models to observe
     */
-    function observe (&$target)
+    public function observe (&$target)
     {
         static $memo;
         $model_name = $target->getModelName();
@@ -149,7 +149,7 @@ class AkObserver extends AkObject
     * Constructs the Observer
     * @param $subject the name or names of the Models to observe
     */
-    function setObservedModels ()
+    public function setObservedModels ()
     {        
         $args = func_get_args();
         $models = func_num_args() == 1 ? ( is_array($args[0]) ? $args[0] : array($args[0]) ) : $args;
@@ -163,13 +163,13 @@ class AkObserver extends AkObject
             if (!class_exists($class_name)){
                 require_once(AkInflector::toModelFilename($class_name));
             }
-            $model =& new $class_name();
+            $model = new $class_name();
             $this->observe(&$model);
         }
     }
     
 
-    function update($state = '')
+    public function update($state = '')
     {
     }
 

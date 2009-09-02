@@ -1,20 +1,22 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
 /**
  * @package ActiveRecord
  * @subpackage Associations
- * @author Bermi Ferrer <bermi a.t akelos c.om>
- * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
+ * @author Kaste
+ * @author Arno Schneider <arno a.t bermilabs c.om>
+ * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
+
+
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 
 /**
@@ -79,10 +81,10 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
  */
 class AkHasMany extends AkAssociation
 {
-    var $associated_ids = array();
-    var $association_id;
+    public $associated_ids = array();
+    public $association_id;
 
-    function &addAssociated($association_id, $options = array())
+    public function &addAssociated($association_id, $options = array())
     {
 
         $default_options = array(
@@ -124,12 +126,12 @@ class AkHasMany extends AkAssociation
         return $Collection;
     }
 
-    function getType()
+    public function getType()
     {
         return 'hasMany';
     }
 
-    function &_setCollectionHandler($association_id, $handler_name)
+    public function &_setCollectionHandler($association_id, $handler_name)
     {
         if(isset($this->Owner->$association_id)){
             if(!is_array($this->Owner->$association_id)){
@@ -148,13 +150,13 @@ class AkHasMany extends AkAssociation
             E_USER_ERROR);
             return false;
         }else{
-            $this->Owner->$handler_name =& new AkHasMany($this->Owner);
+            $this->Owner->$handler_name = new AkHasMany($this->Owner);
         }
         return $this->Owner->$handler_name;
     }
 
 
-    function &load($force_reload = false)
+    public function &load($force_reload = false)
     {
         $options = $this->getOptions($this->association_id);
         if($force_reload || empty($this->Owner->{$options['handler_name']}->_loaded)){
@@ -194,7 +196,7 @@ class AkHasMany extends AkAssociation
      * add($object), add(array($object, $object2)) - adds one or more objects to the collection by setting
      * their foreign keys to the collection?s primary key. Items are saved automatically when parent has been saved.
      */
-    function add(&$Associated)
+    public function add(&$Associated)
     {
         if(is_array($Associated)){
             $succes = true;
@@ -226,12 +228,12 @@ class AkHasMany extends AkAssociation
         }
     }
 
-    function push(&$record)
+    public function push(&$record)
     {
         return $this->add($record);
     }
 
-    function concat(&$record)
+    public function concat(&$record)
     {
         return $this->add($record);
     }
@@ -239,25 +241,25 @@ class AkHasMany extends AkAssociation
     /**
     * Remove all records from this association
     */
-    function deleteAll($Skip = null)
+    public function deleteAll($Skip = null)
     {
         $this->load();
         return $this->delete($this->Owner->{$this->association_id}, $Skip);
     }
 
-    function reset()
+    public function reset()
     {
         $options = $this->getOptions($this->association_id);
         $this->Owner->{$options['handler_name']}->_loaded = false;
     }
 
-    function set(&$objects)
+    public function set(&$objects)
     {
         $this->deleteAll($objects);
         $this->add($objects);
     }
 
-    function setIds()
+    public function setIds()
     {
         $ids = func_get_args();
         $ids = is_array($ids[0]) ? $ids[0] : $ids;
@@ -269,13 +271,13 @@ class AkHasMany extends AkAssociation
         }
     }
 
-    function setByIds()
+    public function setByIds()
     {
         $ids = func_get_args();
         call_user_func_array(array($this,'setIds'), $ids);
     }
 
-    function addId($id)
+    public function addId($id)
     {
         $AssociatedModel =& $this->getAssociatedModelInstance();
         if($NewAssociated = $AssociatedModel->find($id)){
@@ -285,7 +287,7 @@ class AkHasMany extends AkAssociation
     }
 
 
-    function delete(&$Associated, $Skip = null)
+    public function delete(&$Associated, $Skip = null)
     {
         $success = true;
         if(!is_array($Associated)){
@@ -316,17 +318,17 @@ class AkHasMany extends AkAssociation
                     switch ($options['dependent']) {
                         case 'destroy':
                             $success = $Associated[$k]->destroy() ? $success : false;
-                        break;
+                            break;
                         case 'delete_all':
                             $ids_to_delete[] = $Associated[$k]->getId();
-                        break;
+                            break;
                         case 'nullify':
                             $id_to_nullify = $Associated[$k]->quotedId();
                             if(!empty($id_to_nullify)){
                                 $ids_to_nullify[] = $id_to_nullify;
                             }
                         default:
-                        break;
+                            break;
                     }
                 }
             }
@@ -352,7 +354,7 @@ class AkHasMany extends AkAssociation
     /**
     * Remove records from the collection. Use delete() in order to trigger database dependencies
     */
-    function removeFromCollection(&$records)
+    public function removeFromCollection(&$records)
     {
         if(!is_array($records)){
             $records_array = array();
@@ -402,7 +404,7 @@ class AkHasMany extends AkAssociation
 
 
 
-    function _setAssociatedMemberId(&$Member)
+    public function _setAssociatedMemberId(&$Member)
     {
         if(empty($Member->__hasManyMemberId)) {
             $Member->__hasManyMemberId = Ak::randomString();
@@ -413,14 +415,14 @@ class AkHasMany extends AkAssociation
         }
     }
 
-    function _unsetAssociatedMemberId(&$Member)
+    public function _unsetAssociatedMemberId(&$Member)
     {
         $id = $this->_getAssociatedMemberId($Member);
         unset($this->associated_ids[$id]);
         unset($Member->__hasManyMemberId);
     }
 
-    function _getAssociatedMemberId(&$Member)
+    public function _getAssociatedMemberId(&$Member)
     {
         if(!empty($Member->__hasManyMemberId)) {
             return array_search($Member->__hasManyMemberId, $this->associated_ids);
@@ -428,13 +430,13 @@ class AkHasMany extends AkAssociation
         return false;
     }
 
-    function _hasAssociatedMember(&$Member)
+    public function _hasAssociatedMember(&$Member)
     {
         return !empty($Member->__hasManyMemberId);
     }
 
 
-    function _relateAssociatedWithOwner(&$Associated)
+    public function _relateAssociatedWithOwner(&$Associated)
     {
         if(!$this->Owner->isNewRecord()){
             if(method_exists($Associated, 'getModelName')){
@@ -443,7 +445,7 @@ class AkHasMany extends AkAssociation
                     return false;
                 }
                 $Associated->set($foreign_key, $this->Owner->getId());
-                
+
                 /**
                  * Set the Owner as belongsTo association, if defined
                  */
@@ -451,20 +453,20 @@ class AkHasMany extends AkAssociation
                 foreach($associatedIds as $assoc_id) {
                     $collection_handler=$Associated->getCollectionHandlerName($assoc_id);
                     $handler=empty($collection_handler)?$assoc_id:$collection_handler;
-                    if($Associated->$handler->getType()=='belongsTo' && 
+                    if($Associated->$handler->getType()=='belongsTo' &&
                     $this->Owner->getType()==$Associated->$handler->getAssociationOption('class_name')
-                     ) {
+                    ) {
                         $Associated->$handler->_AssociationHandler->_build($assoc_id,$this->Owner);
                     }
                 }
-                
+
                 return true;
             }
         }
         return false;
     }
 
-    function &_build($association_id, &$AssociatedObject, $reference_associated = true)
+    public function &_build($association_id, &$AssociatedObject, $reference_associated = true)
     {
         if($reference_associated){
             $this->Owner->$association_id =& $AssociatedObject;
@@ -481,7 +483,7 @@ class AkHasMany extends AkAssociation
 
 
 
-    function constructSql($set_owner_table_has_included = true)
+    public function constructSql($set_owner_table_has_included = true)
     {
         $options = $this->getOptions($this->association_id);
         $Associated =& $this->getAssociatedModelInstance();
@@ -522,7 +524,7 @@ class AkHasMany extends AkAssociation
 
 
 
-    function count($force_count = false)
+    public function count($force_count = false)
     {
         $count = 0;
         $options = $this->getOptions($this->association_id);
@@ -552,17 +554,17 @@ class AkHasMany extends AkAssociation
         return $count;
     }
 
-    function size()
+    public function size()
     {
         return $this->count();
     }
 
 
-    function &build($attributes = array(), $set_as_new_record = true)
+    public function &build($attributes = array(), $set_as_new_record = true)
     {
         $options = $this->getOptions($this->association_id);
         Ak::import($options['class_name']);
-        $record =& new $options['class_name']($attributes);
+        $record = new $options['class_name']($attributes);
         $record->_newRecord = $set_as_new_record;
         $this->Owner->{$this->association_id}[] =& $record;
         $this->_setAssociatedMemberId($record);
@@ -570,7 +572,7 @@ class AkHasMany extends AkAssociation
         return $record;
     }
 
-    function &create($attributes = array())
+    public function &create($attributes = array())
     {
         $record =& $this->build($attributes);
         if(!$this->Owner->isNewRecord()){
@@ -580,7 +582,7 @@ class AkHasMany extends AkAssociation
     }
 
 
-    function getAssociatedFinderSqlOptions($association_id, $options = array())
+    public function getAssociatedFinderSqlOptions($association_id, $options = array())
     {
         $options = $this->getOptions($this->association_id);
         $Associated =& $this->getAssociatedModelInstance();
@@ -610,7 +612,7 @@ class AkHasMany extends AkAssociation
 
         return $finder_options;
     }
-    function getAssociatedFinderSqlOptionsForInclusionChain($prefix, $parent_handler_name, $options = array(),$pluralize=false)
+    public function getAssociatedFinderSqlOptionsForInclusionChain($prefix, $parent_handler_name, $options = array(),$pluralize=false)
     {
 
         $association_options = $this->getOptions($this->association_id);
@@ -649,12 +651,12 @@ class AkHasMany extends AkAssociation
         $finder_options['selection'] = trim($finder_options['selection'], ', ');
 
         $finder_options['conditions'] = empty($finder_options['conditions']) ? '' :
-        
+
         $Associated->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $options['conditions']).' ';
 
         return $finder_options;
     }
-    function constructSqlForInclusion()
+    public function constructSqlForInclusion()
     {
         $Associated =& $this->getAssociatedModelInstance();
         $options = $this->getOptions($this->association_id);
@@ -666,7 +668,7 @@ class AkHasMany extends AkAssociation
         '_'.$this->association_id.'.'.$options['foreign_key'].' ';
     }
 
-    function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name)
+    public function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name)
     {
         $Associated =& $this->getAssociatedModelInstance();
         $options = $this->getOptions($this->association_id);
@@ -678,31 +680,32 @@ class AkHasMany extends AkAssociation
         ' = '.
         ''.$parent_handler_name.'__'.$handler_name.'.'.$options['foreign_key'].' ';
     }
-    function _hasCachedCounter()
+
+    public function _hasCachedCounter()
     {
         $Associated =& $this->getAssociatedModelInstance();
         return $Associated->isAttributePresent($this->_getCachedCounterAttributeName());
     }
 
-    function _getCachedCounterAttributeName()
+    public function _getCachedCounterAttributeName()
     {
         return $this->association_id.'_count';
     }
 
 
-    function &getAssociatedModelInstance()
+    public function &getAssociatedModelInstance()
     {
         static $ModelInstances;
-            $class_name = $this->getOption($this->association_id, 'class_name');
+        $class_name = $this->getOption($this->association_id, 'class_name');
         if(empty($ModelInstances[$class_name])){
             Ak::import($class_name);
-            $ModelInstances[$class_name] =& new $class_name();
+            $ModelInstances[$class_name] = new $class_name();
         }
         return $ModelInstances[$class_name];
     }
 
 
-    function &find()
+    public function &find()
     {
         $result = false;
         if(!$this->Owner->isNewRecord()){
@@ -756,17 +759,17 @@ class AkHasMany extends AkAssociation
     }
 
 
-    function isEmpty()
+    public function isEmpty()
     {
         return $this->count() === 0;
     }
 
-    function getSize()
+    public function getSize()
     {
         return $this->count();
     }
 
-    function clear()
+    public function clear()
     {
         return $this->deleteAll();
     }
@@ -774,18 +777,18 @@ class AkHasMany extends AkAssociation
     /**
     * Triggers
     */
-    function afterCreate(&$object)
+    public function afterCreate(&$object)
     {
         return $this->_afterCallback($object);
     }
 
-    function afterUpdate(&$object)
+    public function afterUpdate(&$object)
     {
         return $this->_afterCallback($object);
     }
 
 
-    function beforeDestroy(&$object)
+    public function beforeDestroy(&$object)
     {
         $success = true;
 
@@ -804,22 +807,22 @@ class AkHasMany extends AkAssociation
                     switch ($object->$v->options[$k]['dependent']) {
 
                         case 'destroy':
-                        $success = $object->{$k}[$key]->destroy() ? $success : false;
-                        break;
+                            $success = $object->{$k}[$key]->destroy() ? $success : false;
+                            break;
 
                         case 'delete_all':
-                        $ids_to_delete[] = $object->{$k}[$key]->getId();
-                        break;
+                            $ids_to_delete[] = $object->{$k}[$key]->getId();
+                            break;
 
                         case 'nullify':
-                        $id_to_nullify = $object->{$k}[$key]->quotedId();
-                        if(!empty($id_to_nullify)){
-                            $ids_to_nullify[] = $id_to_nullify;
-                        }
-                        break;
+                            $id_to_nullify = $object->{$k}[$key]->quotedId();
+                            if(!empty($id_to_nullify)){
+                                $ids_to_nullify[] = $id_to_nullify;
+                            }
+                            break;
 
                         default:
-                        break;
+                            break;
                     }
                 }
 
@@ -839,11 +842,9 @@ class AkHasMany extends AkAssociation
         return $success;
     }
 
-    function _afterCallback(&$object)
+    public function _afterCallback(&$object)
     {
-
         $success = true;
-
         $object_id = $object->getId();
         foreach (array_keys($object->hasMany->models) as $association_id){
             $CollectionHandler =& $object->hasMany->models[$association_id];
@@ -861,8 +862,6 @@ class AkHasMany extends AkAssociation
         }
         return $success;
     }
-
 }
-
 
 ?>

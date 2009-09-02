@@ -1,10 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
@@ -12,11 +10,13 @@
  * @package ActiveRecord
  * @subpackage Base
  * @component DbAdapter
- * @author Bermi Ferrer <bermi a.t akelos c.om> 2004 - 2007
- * @author Kaste 2007
- * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
+ * @author Kaste
+ * @author Arno Schneider <arno a.t bermilabs c.om>
+ * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
+
 
 defined('AK_AVAILABLE_DATABASES') ? null : define('AK_AVAILABLE_DATABASES', 'mysql,pgsql,sqlite');
 
@@ -25,16 +25,16 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 class AkDbAdapter extends AkObject
 {
 
-    var $connection;
-    var $settings;
-    var $dictionary;
-    var $debug=false;
-    var $logger;
+    public $connection;
+    public $settings;
+    public $dictionary;
+    public $debug=false;
+    public $logger;
 
     /**
      * @param array $database_settings
      */
-    function __construct($database_settings, $auto_connect = false)
+    public function __construct($database_settings, $auto_connect = false)
     {
         $this->settings = $database_settings;
         if ($auto_connect){
@@ -45,11 +45,11 @@ class AkDbAdapter extends AkObject
         }
     }
 
-    function __destruct()
+    public function __destruct()
     {
     }
 
-    function connect($die_on_error=true)
+    public function connect($die_on_error=true)
     {
         $dsn = $this->_constructDsn($this->settings);
         require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb.inc.php');
@@ -61,9 +61,6 @@ class AkDbAdapter extends AkObject
                 $fn = AK_DATABASE_CONNECTION_FAILURE_CALLBACK;
                 $fn();
             }
-            if(!AK_PHP5 && $this->type() == 'sqlite'){
-                trigger_error(Ak::t("\nWarning, sqlite support is not available by default on PHP4.\n Check your PHP version by running \"env php -v\", and change the first line in your scripts/ so they point to a php5 binary\n\n"),E_USER_WARNING);
-            }
             trigger_error(Ak::t("Connection to the database failed. %dsn",
             array('%dsn'=> AK_DEBUG ? preg_replace('/\/\/(\w+):(.*)@/i','//$1:******@', urldecode($dsn))."\n" : '')),
             ($die_on_error?E_USER_ERROR:E_USER_WARNING));
@@ -74,7 +71,7 @@ class AkDbAdapter extends AkObject
         }
     }
 
-    function connected()
+    public function connected()
     {
         return !empty($this->connection);
     }
@@ -85,7 +82,7 @@ class AkDbAdapter extends AkObject
      * @param array $database_settings
      * @return AkDbAdapter
      */
-    function &getInstance($database_specifications = AK_DEFAULT_DATABASE_PROFILE, $auto_connect = true)
+    static public function &getInstance($database_specifications = AK_DEFAULT_DATABASE_PROFILE, $auto_connect = true)
     {
         static $connections;
 
@@ -129,7 +126,7 @@ class AkDbAdapter extends AkObject
                 $class_name = 'Ak'.ucfirst($designated_database).'DbAdapter';
                 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbAdapters'.DS.$class_name.'.php');
             }
-            $connections[$settings_hash] =& new $class_name($database_specifications,$auto_connect);
+            $connections[$settings_hash] = new $class_name($database_specifications,$auto_connect);
         }
         return $connections[$settings_hash];
     }
@@ -138,7 +135,7 @@ class AkDbAdapter extends AkObject
      * @param array $settings
      * @return string
      */
-    function _hash($settings)
+    public function _hash($settings)
     {
         if(!is_array($settings)){
             return AK_ENVIRONMENT;
@@ -149,7 +146,7 @@ class AkDbAdapter extends AkObject
         return join(':',$settings);
     }
 
-    function &getDictionary()
+    public function &getDictionary()
     {
         if (empty($this->dictionary)){
             if (!$this->connected()){
@@ -165,7 +162,7 @@ class AkDbAdapter extends AkObject
      * @param array $database_settings
      * @return string
      */
-    function _constructDsn($database_settings)
+    public function _constructDsn($database_settings)
     {
         if(is_string($database_settings)){
             return $database_settings;
@@ -180,7 +177,7 @@ class AkDbAdapter extends AkObject
 
     }
 
-    function _getDbSettingsFromDsn($dsn)
+    public function _getDbSettingsFromDsn($dsn)
     {
         $settings = $result = parse_url($dsn);
         $result['type'] = $settings['scheme'];
@@ -189,12 +186,12 @@ class AkDbAdapter extends AkObject
         return $result;
     }
 
-    function type()
+    public function type()
     {
         return $this->settings['type'];
     }
 
-    function debug($on = 'switch')
+    public function debug($on = 'switch')
     {
         if ($on == 'switch') {
             $this->debug = !$this->debug;
@@ -204,7 +201,7 @@ class AkDbAdapter extends AkObject
         return $this->debug;
     }
 
-    function _log($message)
+    public function _log($message)
     {
         if (!AK_LOG_EVENTS){
             return;
@@ -212,7 +209,7 @@ class AkDbAdapter extends AkObject
         $this->logger->message($message);
     }
 
-    function addLimitAndOffset(&$sql,$options)
+    public function addLimitAndOffset(&$sql,$options)
     {
         if (isset($options['limit']) && $limit = $options['limit']){
             $sql .= " LIMIT $limit";
@@ -225,7 +222,7 @@ class AkDbAdapter extends AkObject
 
     /* DATABASE STATEMENTS - CRUD */
 
-    function execute($sql, $message = 'SQL')
+    public function execute($sql, $message = 'SQL')
     {
         if (is_array($sql)) {
             $sql_string = array_shift($sql);
@@ -243,22 +240,22 @@ class AkDbAdapter extends AkObject
         return $result;
     }
 
-    function incrementsPrimaryKeyAutomatically()
+    public function incrementsPrimaryKeyAutomatically()
     {
         return true;
     }
 
-    function getLastInsertedId($table,$pk)
+    public function getLastInsertedId($table,$pk)
     {
         return $this->connection->Insert_ID($table,$pk);
     }
 
-    function getAffectedRows()
+    public function getAffectedRows()
     {
         return $this->connection->Affected_Rows();
     }
 
-    function insert($sql,$id=null,$pk=null,$table=null,$message = '')
+    public function insert($sql,$id=null,$pk=null,$table=null,$message = '')
     {
         $result = $this->execute($sql,$message);
         if (!$result){
@@ -267,13 +264,13 @@ class AkDbAdapter extends AkObject
         return is_null($id) ? $this->getLastInsertedId($table,$pk) : $id;
     }
 
-    function update($sql,$message = '')
+    public function update($sql,$message = '')
     {
         $result = $this->execute($sql,$message);
         return ($result) ? $this->getAffectedRows() : false;
     }
 
-    function delete($sql,$message = '')
+    public function delete($sql,$message = '')
     {
         $result = $this->execute($sql,$message);
         return ($result) ? $this->getAffectedRows() : false;
@@ -282,7 +279,7 @@ class AkDbAdapter extends AkObject
     /**
     * Returns a single value, the first column from the first row, from a record
     */
-    function selectValue($sql)
+    public function selectValue($sql)
     {
         $result = $this->selectOne($sql);
         return !is_null($result) ? array_shift($result) : null;
@@ -292,7 +289,7 @@ class AkDbAdapter extends AkObject
      * Returns an array of the values of the first column in a select:
      *   sqlSelectValues("SELECT id FROM companies LIMIT 3") => array(1,2,3)
      */
-    function selectValues($sql)
+    public function selectValues($sql)
     {
         $values = array();
         if($results = $this->select($sql)){
@@ -307,7 +304,7 @@ class AkDbAdapter extends AkObject
      * Returns a record array of the first row with the column names as keys and column values
      * as values.
      */
-    function selectOne($sql)
+    public function selectOne($sql)
     {
         $result = $this->select($sql);
         return  !is_null($result) ? array_shift($result) : null;
@@ -316,7 +313,7 @@ class AkDbAdapter extends AkObject
     /**
      * alias for select
      */
-    function selectAll($sql)
+    public function selectAll($sql)
     {
         return $this->select($sql);
     }
@@ -325,7 +322,7 @@ class AkDbAdapter extends AkObject
     * Returns an array of record hashes with the column names as keys and
     * column values as values.
     */
-    function select($sql, $message = '')
+    public function select($sql, $message = '')
     {
         $result = $this->execute($sql, $message);
         if (!$result){
@@ -342,17 +339,17 @@ class AkDbAdapter extends AkObject
 
     /* TRANSACTIONS */
 
-    function startTransaction()
+    public function startTransaction()
     {
         return $this->connection->StartTrans();
     }
 
-    function stopTransaction()
+    public function stopTransaction()
     {
         return $this->connection->CompleteTrans();
     }
 
-    function failTransaction()
+    public function failTransaction()
     {
         if(AK_DEBUG && !empty($this->connection->debug)){
             Ak::trace(ak_backtrace(), null, null, null, false);
@@ -360,14 +357,14 @@ class AkDbAdapter extends AkObject
         return $this->connection->FailTrans();
     }
 
-    function hasTransactionFailed()
+    public function hasTransactionFailed()
     {
         return $this->connection->HasFailedTrans();
     }
 
     /* SCHEMA */
 
-    function renameColumn($table_name,$column_name,$new_name)
+    public function renameColumn($table_name,$column_name,$new_name)
     {
         trigger_error(Ak::t('renameColumn is not available for your DbAdapter. Using %db_type.',array('%db_type'=>$this->type())));
     }
@@ -379,7 +376,7 @@ class AkDbAdapter extends AkObject
      *
      * @return unknown
      */
-    function availableTables($force_lookup = false)
+    public function availableTables($force_lookup = false)
     {
         $available_tables = array();
         !AK_TEST_MODE && $available_tables = Ak::getStaticVar('available_tables');
@@ -397,14 +394,14 @@ class AkDbAdapter extends AkObject
         return $available_tables;
     }
 
-    function tableExists($table_name)
+    public function tableExists($table_name)
     {
         // First try if cached
         $available_tables = $this->availableTables();
         if(!in_array($table_name,(array)$available_tables)){
             // Force lookup and refresh cache
-           $available_tables = $this->availableTables(true);
-           return in_array($table_name,(array)$available_tables);
+            $available_tables = $this->availableTables(true);
+            return in_array($table_name,(array)$available_tables);
         }
         return true;
     }
@@ -416,7 +413,7 @@ class AkDbAdapter extends AkObject
      * @return unknown
      */
 
-    function getColumnDetails($table_name)
+    public function getColumnDetails($table_name)
     {
         return $this->connection->MetaColumns($table_name);
     }
@@ -427,36 +424,36 @@ class AkDbAdapter extends AkObject
      * @param unknown_type $table_name
      * @return unknown
      */
-    function getIndexes($table_name)
+    public function getIndexes($table_name)
     {
         return $this->connection->MetaIndexes($table_name);
     }
 
     /* QUOTING */
 
-    function quote_string($value)
+    public function quote_string($value)
     {
         return $this->connection->qstr($value);
     }
 
-    function quote_datetime($value)
+    public function quote_datetime($value)
     {
         return $this->connection->DBTimeStamp($value);
     }
 
-    function quote_date($value)
+    public function quote_date($value)
     {
         return $this->connection->DBDate($value);
     }
 
     // will be moved to postgre
-    function escape_blob($value)
+    public function escape_blob($value)
     {
         return $this->connection->BlobEncode($value);
     }
 
     // will be moved to postgre
-    function unescape_blob($value)
+    public function unescape_blob($value)
     {
         return $this->connection->BlobDecode($value);
     }

@@ -1,18 +1,19 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
 /**
  * @package ActiveRecord
  * @subpackage Associations
- * @author Bermi Ferrer <bermi a.t akelos c.om>
- * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
+ * @subpackage Belongs to
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
+ * @author Kaste
+ * @author Arno Schneider <arno a.t bermilabs c.om>
+ * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
@@ -56,9 +57,9 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 */
 class AkBelongsTo extends AkAssociation
 {
-    var $associated_ids = array();
+    public $associated_ids = array();
 
-    function &addAssociated($association_id, $options = array())
+    public function &addAssociated($association_id, $options = array())
     {
 
         $default_options = array(
@@ -67,14 +68,12 @@ class AkBelongsTo extends AkAssociation
         'remote',
         'conditions',
         'order',
-        //'dependent',
         'instantiate'=>false,
         'counter_cache' => false
         );
 
         $options = array_merge($default_options, $options);
 
-        //$options['table_name'] = empty($options['table_name']) ? AkInflector::tableize($options['class_name']) : $options['table_name'];
         $options['primary_key_name'] = empty($options['primary_key_name']) ? AkInflector::underscore($options['class_name']).'_id' : $options['primary_key_name'];
         if($options['counter_cache']){
             $options['counter_cache_column'] = !isset($options['counter_cache_column']) ? $this->Owner->getTableName().'_counter' : $options['counter_cache_column'];
@@ -98,13 +97,13 @@ class AkBelongsTo extends AkAssociation
     }
 
 
-    function getType()
+    public function getType()
     {
         return 'belongsTo';
     }
 
 
-    function &findAssociated($association_id)
+    public function &findAssociated($association_id)
     {
         $result = false;
         $primary_key_name = $this->Owner->$association_id->getAssociationOption('primary_key_name');
@@ -121,7 +120,7 @@ class AkBelongsTo extends AkAssociation
         return $result;
     }
 
-    function &assign($association_id, &$Associated)
+    public function &assign($association_id, &$Associated)
     {
         $primary_key_name = $this->Owner->$association_id->getAssociationOption('primary_key_name');
         if($Associated->save()){
@@ -131,11 +130,11 @@ class AkBelongsTo extends AkAssociation
         return $Associated;
     }
 
-    function &build($association_id, $attributes = array(), $replace = true)
+    public function &build($association_id, $attributes = array(), $replace = true)
     {
         $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
         Ak::import($class_name);
-        $record =& new $class_name($attributes);
+        $record = new $class_name($attributes);
         $record =& $this->Owner->$association_id->replace($record, !$replace);
         return $record;
     }
@@ -144,17 +143,17 @@ class AkBelongsTo extends AkAssociation
     * Returns a new object of the associated type that has been instantiated with attributes
     * and linked to this object through a foreign key and that has already been saved (if it passed the validation)
     */
-    function &create($association_id, $attributes = array())
+    public function &create($association_id, $attributes = array())
     {
         $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
-        $record =& new $class_name($attributes);
+        $record = new $class_name($attributes);
         $record->save();
         $this->replace($association_id, $record, true);
         return $this->Owner->$association_id;
     }
 
 
-    function &load($association_id)
+    public function &load($association_id)
     {
         if (!$this->Owner->isNewRecord()){
             if(empty($this->Owner->$association_id->_loaded)){
@@ -167,7 +166,7 @@ class AkBelongsTo extends AkAssociation
         return $this->Owner->$association_id;
     }
 
-    function &replace($association_id, &$NewAssociated)
+    public function &replace($association_id, &$NewAssociated)
     {
         $counter_cache_name = $this->Owner->belongsTo->getOption($association_id, 'counter_cache_column');
         if(empty($NewAssociated)){
@@ -198,7 +197,7 @@ class AkBelongsTo extends AkAssociation
         return $NewAssociated;
     }
 
-    function getAssociatedFinderSqlOptionsForInclusionChain($association_id, $prefix, $parent_handler_name, $options = array(),$pluralize=false)
+    public function getAssociatedFinderSqlOptionsForInclusionChain($association_id, $prefix, $parent_handler_name, $options = array(),$pluralize=false)
     {
         $default_options = array(
         'conditions' => $this->Owner->$association_id->getAssociationOption('include_conditions_when_included'),
@@ -216,9 +215,8 @@ class AkBelongsTo extends AkAssociation
         foreach ($options as $option=>$available) {
 
             $value = $this->Owner->$association_id->getAssociationOption($option);
-            //Ak::getLogger()->message('option:'.$option.' - available:'.var_export($available,true).'-'.$value);
-            if ((!empty($available) && $available!==true) || $available===false) {
 
+            if ((!empty($available) && $available!==true) || $available===false) {
                 $value=$available;
             }
             if (!empty($value) && !is_bool($value)) {
@@ -250,7 +248,8 @@ class AkBelongsTo extends AkAssociation
 
         return $finder_options;
     }
-    function getAssociatedFinderSqlOptions($association_id, $options = array())
+
+    public function getAssociatedFinderSqlOptions($association_id, $options = array())
     {
 
         $default_options = array(
@@ -286,7 +285,7 @@ class AkBelongsTo extends AkAssociation
         return $finder_options;
     }
 
-    function constructSqlForInclusion($association_id)
+    public function constructSqlForInclusion($association_id)
     {
         return ' LEFT OUTER JOIN '.
         $this->Owner->$association_id->getTableName().' AS _'.$association_id.
@@ -295,7 +294,8 @@ class AkBelongsTo extends AkAssociation
         ' = '.
         '_'.$association_id.'.'.$this->Owner->$association_id->getPrimaryKey().' ';
     }
-    function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name)
+
+    public function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name)
     {
         //$handler_name = $association_id;
         return ' LEFT OUTER JOIN '.
@@ -310,7 +310,7 @@ class AkBelongsTo extends AkAssociation
      * Triggers
      */
 
-    function beforeSave(&$object)
+    public function beforeSave(&$object)
     {
         $association_ids = $object->getAssociatedIds();
         foreach ($association_ids as $association_id){
@@ -329,7 +329,7 @@ class AkBelongsTo extends AkAssociation
         return true;
     }
 
-    function beforeDestroy(&$object)
+    public function beforeDestroy(&$object)
     {
         $association_ids = $object->getAssociatedIds();
         foreach ($association_ids as $association_id){
@@ -344,7 +344,7 @@ class AkBelongsTo extends AkAssociation
         return true;
     }
 
-    function afterDestroy(&$object)
+    public function afterDestroy(&$object)
     {
         $success = true;
         $associated_ids = $object->getAssociatedIds();
@@ -378,15 +378,10 @@ class AkBelongsTo extends AkAssociation
                         }
                         break;
                 }
-                /**if(method_exists($object->$associated_id, 'destroy')){
-                $success = $object->$associated_id->destroy() ? $success : false;
-                }*/
             }
         }
         return $success;
     }
-
-
 }
 
 
