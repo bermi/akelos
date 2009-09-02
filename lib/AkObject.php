@@ -18,7 +18,6 @@ if(!class_exists('AkObject')){
 
     class AkObject
     {
-
         /**
         * Object-to-string conversion
         *
@@ -30,6 +29,23 @@ if(!class_exists('AkObject')){
         public function toString()
         {
             return get_class($this);
+        }
+
+        public function __construct()
+        {
+        }
+
+        public function __destruct()
+        {
+            unset($this);
+        }
+
+        /**
+        * Clone class (Zend Engine 2 compatibility trick)
+        */
+        public function __clone()
+        {
+            return $this;
         }
 
         public function __toString()
