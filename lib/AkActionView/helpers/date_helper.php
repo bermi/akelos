@@ -133,7 +133,7 @@ class DateHelper extends AkActionViewHelper
 
         $date = !empty($options['include_blank']) ? (!empty($date) ? $date : 0) : (!empty($date) ? $date : Ak::getDate());
 
-        $options['order'] = empty($options['order']) ? explode(',',Ak::t('year,month,day',array(),'localize/date')) : $options['order'];
+        $options['order'] = empty($options['order']) ? $this->_get_default_order_for_date_select() : $options['order'];
 
         $discard = array(
         'year'=>!empty($options['discard_year']),
@@ -150,6 +150,29 @@ class DateHelper extends AkActionViewHelper
             }
         }
         return $date_select;
+    }
+
+    function _get_default_order_for_date_select()
+    {
+        $default_order = Ak::locale('long_date_format');
+        $tokens = array(
+        'year' => array('Y','y', 'o'),
+        'month' => array('m','F', 'M', 'n'),
+        'day' => array('d','D', 'j', 'l', 'N', 'w', 'z'),
+        );
+
+        $date_select_order = array();
+        if(preg_match('/[^\w]?([\w])[^\w]?([\w])[^\w]?([\w])[^\w]?/', $default_order, $matches)){
+            array_shift($matches);
+            foreach ($matches as $match){
+                foreach ($tokens as $type => $shotcuts){
+                    if(in_array($match, $shotcuts)){
+                        $date_select_order[] = $type;
+                    }
+                }
+            }
+        }
+        return $date_select_order;
     }
 
     /**
@@ -314,10 +337,10 @@ class DateHelper extends AkActionViewHelper
     {
 
         if(preg_match_all('/(\d{4}\-)?(\d{1,2})(\-\d{1,2})?/', $date, $matches) && !empty($matches[2][0])){
-           $date = $matches[2][0];
-           $ts = Ak::getTimestamp(isset($date) ? date('Y').'-'.$date.'-01' : null);
-           $date = Ak::getDate($ts);
-       }
+            $date = $matches[2][0];
+            $ts = Ak::getTimestamp(isset($date) ? date('Y').'-'.$date.'-01' : null);
+            $date = Ak::getDate($ts);
+        }
 
         if(!empty($options['use_month_numbers'])){
             $month_details = '1,2,3,4,5,6,7,8,9,10,11,12';
@@ -382,7 +405,7 @@ class DateHelper extends AkActionViewHelper
             $date_blank = false;
         }
         if (!empty($options['prompt'])){
-           $options_array[] = '<option value=""'.(empty($datetime_unit) ? ' selected="selected"' : '').'>'.$options['prompt'].'</option>';
+            $options_array[] = '<option value=""'.(empty($datetime_unit) ? ' selected="selected"' : '').'>'.$options['prompt'].'</option>';
         }
         foreach ($range as $k=>$time_unit){
             if(is_string($time_unit)){
