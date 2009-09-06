@@ -393,6 +393,9 @@ class AkAssociatedActiveRecord extends AkBaseModel
                     $options [$option] = empty($options [$option]) ? join($separator, $values) : trim($options [$option]) . $separator . join(
                     $separator, $values);
                 } else if ($option=='bind') {
+                    if(!isset($options [$option])) {
+                        $options [$option]=array();
+                    }
                     $options [$option] = array_merge($options [$option],$values);
                 }
 
@@ -580,7 +583,9 @@ class AkAssociatedActiveRecord extends AkBaseModel
         $return = array();
         $owner = array();
         $keys = array();
+        $record_counter=0;
         while ($record = $results->FetchRow()) {
+            $record_counter++;
             /**
              * implement limits here, config should have limits per association
              * need offset as well

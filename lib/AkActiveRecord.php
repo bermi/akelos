@@ -1328,7 +1328,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                             case 'in':
                                 $values = join(', ', $this->castAttributesForDatabase($_tmp_parts[0], $query_values[$parameter_count]));
                                 if(!empty($values)){
-                                    $new_sql .= $_tmp_parts[0].' IN ('.$values.')';
+                                    $new_sql .= $_tmp_parts[0].' IN ('.$values.') ';
                                 }else{
                                     $new_sql = preg_replace('/(AND|OR) $/','', $new_sql);
                                 }
