@@ -207,8 +207,45 @@ class Ak
 
         return $string;
     }
-
-
+    
+    /**
+    * Translate strings from a language to another language.
+    *
+    * @access public
+    * @static
+    * @param    string    $string    The string to be translated.
+    * @param    string/array    $target_language    A string containing the 
+    *           target language or an array containing 0 => from, 1 => to.
+    * @return string The untranslated string.
+    */
+    public static function translate($string, $target_language, $namespace = false)
+    {
+        $from = is_array($target_language) ? $target_language[0] : 'en' ;
+        $to = is_array($target_language) ? $target_language[1] : $target_language ;
+        
+        if($from != 'en'){
+          $string = Ak::untranslate($string, $from, $namespace);
+        }
+        
+        $dictionary = AkLocaleManager::getDictionary($to, $namespace);
+        return !empty($dictionary[$string]) ? $dictionary[$string] : $string;
+    }
+    
+    /**
+    * Untranslate strings from a locale to english.
+    *
+    * @access public
+    * @static
+    * @param    string    $string    The string to be untranslated.
+    * @param    string    $current_language    A string containing the current language.
+    * @return string The untranslated string.
+    */
+    public static function untranslate($string, $current_language, $namespace = false)
+    {
+        $dictionary = AkLocaleManager::getDictionary($current_language, $namespace);
+        $untranslated_string = array_search($string, $dictionary);
+        return $untranslated_string ? $untranslated_string : $string;
+    }
 
     /**
      * Gets information about current locale from the locale settings on config/locales/LOCALE.php
