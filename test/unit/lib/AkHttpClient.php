@@ -72,10 +72,21 @@ class Test_of_AkHttpClient extends  AkUnitTest
             $this->assertEqual($this->Client->$verb($this->url.'/json', array('params'=>$params)), $expected, "$verb passing params via params option");
         }
     }
-    
-    public function should_accept_redirects()
+
+    public function test_should_accept_redirects()
     {
         $this->assertEqual(Ak::url_get_contents($this->url.'/redirect_1'), 3);
+    }
+
+    public function test_should_keep_cookies()
+    {
+        $this->assertEqual(Ak::url_get_contents($this->url.'/persisting_cookies', array('cookies' => false)), 1);
+        $this->assertEqual(Ak::url_get_contents($this->url.'/persisting_cookies', array('cookies' => true)), 1);
+        $this->assertEqual(Ak::url_get_contents($this->url.'/persisting_cookies', array('cookies' => true)), 2);
+        $this->assertEqual(Ak::url_get_contents($this->url.'/persisting_cookies', array('cookies' => true)), 3);
+        $this->assertEqual(Ak::url_get_contents($this->url.'/persisting_cookies'), 1);
+        $this->assertEqual(Ak::url_get_contents($this->url.'/persisting_cookies', array('cookies' => false)), 1);
+        $this->assertEqual(Ak::url_get_contents($this->url.'/persisting_cookies', array('cookies' => true)), 1);
     }
 
 }

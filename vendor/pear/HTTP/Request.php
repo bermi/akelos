@@ -315,8 +315,8 @@ class HTTP_Request
         $this->_proxy_user = null;
         $this->_proxy_pass = null;
 
-        $this->_allowRedirects = false;
-        $this->_maxRedirects   = 3;
+        $this->_allowRedirects = true;
+        $this->_maxRedirects   = 5;
         $this->_redirects      = 0;
 
         $this->_timeout  = null;

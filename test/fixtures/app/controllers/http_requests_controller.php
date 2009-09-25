@@ -35,18 +35,26 @@ class HttpRequestsController extends ApplicationController
     {
         $this->redirectToAction('redirect_2');
     }
-    
+
     function redirect_2()
     {
         $this->redirectToAction('print_3');
     }
-    
+
     function print_3()
     {
         $this->renderText('3');
     }
-    
-    
+
+    function persisting_cookies()
+    {
+        if(!isset($_SESSION['cookie_counter'])){
+            $_SESSION['cookie_counter'] = 0;
+        }
+        $_SESSION['cookie_counter']++;
+        $this->renderText($_SESSION['cookie_counter']);
+    }
+
 }
 
 ?>

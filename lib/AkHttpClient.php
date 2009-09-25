@@ -6,6 +6,8 @@ class AkHttpClient extends AkObject
     var $HttpRequest;
     var $error;
     var $Response;
+    var $_cookie_path;
+    var $_cookie_jar = 'default';
 
     function get($url, $options = array())
     {
@@ -85,6 +87,8 @@ class AkHttpClient extends AkObject
 
         !empty($options['params']) && $this->addParams($options['params']);
 
+        isset($options['cookies']) &&  $this->addCookieHeader($options, $url);
+
         $this->addHeaders($options['header']);
 
         return $this->HttpRequest;
@@ -137,11 +141,76 @@ class AkHttpClient extends AkObject
     {
         $this->Response = $this->HttpRequest->sendRequest();
         $this->code = $this->HttpRequest->getResponseCode();
+        $this->persistCookies();
         if (PEAR::isError($this->Response)) {
             $this->error = $this->Response->getMessage();
             return false;
         } else {
             return $return_body ? $this->HttpRequest->getResponseBody() : true;
+        }
+    }
+
+
+    function addCookieHeader(&$options, $url)
+    {
+        if(isset($options['cookies'])){
+            $url_details = parse_url($url);
+            $jar = Ak::sanitize_include((empty($options['jar']) ? $this->_cookie_jar : $options['jar']), 'paranoid');
+            $this->setCookiePath(AK_TMP_DIR.DS.'cookies'.DS.$jar.DS.Ak::sanitize_include($url_details['host'],'paranoid'));
+            if($options['cookies'] === false){
+                $this->deletePersistedCookie();
+                return;
+            }
+            if($cookie_value = $this->getPersistedCookie()){
+                $this->_persisted_cookie = $cookie_value;
+                $options['header']['cookie'] = $cookie_value;
+            }
+        }
+    }
+
+    function setCookiePath($path)
+    {
+        $this->_cookie_path = $path;
+    }
+
+    function getPersistedCookie()
+    {
+        if(file_exists($this->_cookie_path)){
+            return Ak::file_get_contents($this->_cookie_path);
+        }
+        return false;
+    }
+
+    function deletePersistedCookie()
+    {
+        if(file_exists($this->_cookie_path)){
+            Ak::file_delete($this->_cookie_path);
+            $this->_cookie_path = false;
+            return;
+        }
+        return false;
+    }
+
+    function persistCookies()
+    {
+        if($this->_cookie_path){
+            $cookies_from_response = $this->HttpRequest->getResponseCookies();
+            if(!empty($this->_persisted_cookie)){
+                $this->HttpRequest->_cookies = array();
+                $persisted_cookies = $this->HttpRequest->_response->_parseCookie($this->_persisted_cookie);
+                $this->HttpRequest->_cookies = $cookies_from_response;
+            }
+            if(!empty($cookies_from_response)){
+                $all_cookies = array_merge(isset($persisted_cookies)?$persisted_cookies:array(), $cookies_from_response);
+                $cookies = array();
+                foreach($all_cookies as $cookie){
+                    if(!empty($cookie['value'])){
+                        $cookies[$cookie['name']] = "{$cookie['name']}={$cookie['value']}";
+                    }
+                }
+                $cookie_string = trim(join($cookies, '; '));
+                Ak::file_put_contents($this->_cookie_path, $cookie_string);
+            }
         }
     }
 

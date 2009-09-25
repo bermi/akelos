@@ -16,6 +16,8 @@
  */
 
 defined('AK_PHP5') ? null : define('AK_PHP5', version_compare(PHP_VERSION, '5', '>=') == 1 ? true : false);
+defined('AK_PHP53') ? null : define('AK_PHP53', version_compare(PHP_VERSION, '5.3', '>=') == 1 ? true : false);
+defined('AK_PHP6') ? null : define('AK_PHP6', version_compare(PHP_VERSION, '6', '>=') == 1 ? true : false);
 
 defined('AK_CONFIG_DIR') ? null : define('AK_CONFIG_DIR', AK_BASE_DIR.DS.'config');
 
@@ -63,7 +65,15 @@ $_SERVER['PHP_SELF'] .'?'.(isset($_SERVER['argv']) ? $_SERVER['argv'][0] : $_SER
 
 defined('AK_DEBUG') ? null : define('AK_DEBUG', AK_ENVIRONMENT == 'production' ? 0 : 1);
 
-defined('AK_ERROR_REPORTING') ? null : define('AK_ERROR_REPORTING', AK_DEBUG ? E_ALL : 0);
+if(!defined('AK_ERROR_REPORTING')){
+    if(AK_PHP6){
+        define('AK_ERROR_REPORTING', E_ALL ^ E_DEPRECATED ^ E_NOTICE ^ E_STRICT);
+    }elseif(AK_PHP53){
+        define('AK_ERROR_REPORTING', E_ALL ^ E_DEPRECATED ^ E_NOTICE);
+    }else{
+        define('AK_ERROR_REPORTING', E_ALL ^ E_NOTICE);
+    }
+}
 
 @error_reporting(AK_ERROR_REPORTING);
 
@@ -319,6 +329,6 @@ defined('AK_FRAMEWORK_LANGUAGE') ? null : define('AK_FRAMEWORK_LANGUAGE', 'en');
 defined('AK_DEV_MODE') ? null : define('AK_DEV_MODE', false);
 defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION') ? null : define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
 
-AK_PRODUCTION_MODE ? null : require_once(AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php');
+AK_CLI || AK_PRODUCTION_MODE ? null : require_once(AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php');
 
 ?>
