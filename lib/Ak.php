@@ -2137,6 +2137,18 @@ class Ak
         Ak::import($model_name);
         return new $model_name($attributes);
     }
+    
+    /**
+    * PHP modulo % returns the dividend which is not the expected result on 
+    * Math operations where the divisor is expected.
+    * 
+    * For example PHP will return -5%7 = -5 when expected was 2
+    */
+    public function modulo($a, $n)
+    {
+        $n = abs($n);
+        return $n===0 ? null : $a-$n*floor($a/$n);
+    }
 
 }
 
