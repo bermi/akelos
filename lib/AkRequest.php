@@ -788,7 +788,7 @@ class AkRequest extends AkObject
         if(!empty($params['module'])){
             $module_path = trim(str_replace(array('/','\\'), DS, Ak::sanitize_include($params['module'], 'high')), DS).DS;
             $module_shared_model = AK_CONTROLLERS_DIR.DS.trim($module_path,DS).'_controller.php';
-            $module_class_peffix = str_replace(' ','_',AkInflector::titleize(str_replace(DS,' ', trim($module_path, DS)))).'_';
+            $module_class_peffix = AkInflector::camelize($params['module']).'_';
         }
 
         $controller_file_name = AkInflector::underscore($params['controller']).'_controller.php';
