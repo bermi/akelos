@@ -4,13 +4,13 @@ require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
 require_once(AK_LIB_DIR.DS.'AkRouter.php');
 
-class Test_of_AkRouter_Class extends  UnitTestCase
+class AkRouterTestCase extends  AkUnitTest 
 {
 
     public $Router;
     public $url_prefix = '';
 
-    public function Test_of_AkRouter_Class()
+    public function __construct()
     {
         $this->Router = new AkRouter();
 
@@ -193,13 +193,13 @@ class Test_of_AkRouter_Class extends  UnitTestCase
     }
 }
 
-class Test_for_default_routes extends  UnitTestCase
+class DefaultRoutesTestCase extends  AkUnitTest 
 {
 
     public $Router;
     public $url_prefix = '';
 
-    public function Test_for_default_routes()
+    public function __construct()
     {
         $this->Router = new AkRouter();
 
@@ -208,9 +208,7 @@ class Test_for_default_routes extends  UnitTestCase
 
         $this->Router->connect('/:controller/:action/:id', array('controller' => 'page', 'action' => 'index'));
         $this->Router->connect('/', array('controller' => 'page', 'action' => 'index'));
-
     }
-
 
     public function Test_connect()
     {
@@ -227,7 +225,7 @@ class Test_for_default_routes extends  UnitTestCase
 }
 
 # Fixes issue 27 reported by Jacek Jedrzejewski
-class Tests_for_url_constants_named_as_url_variables extends  UnitTestCase
+class UrlConstantsNamedAsUrlVariablesTestCase extends  AkUnitTest 
 {
 
     public $Router;
@@ -274,7 +272,7 @@ class Tests_for_url_constants_named_as_url_variables extends  UnitTestCase
 }
 
 
-class Test_for_middle_optional_values_when_generating_urls extends  UnitTestCase
+class MiddleOptionalValuesWhenGeneratingUrlsTestCase extends  AkUnitTest 
 {
     public $Router;
     public $url_prefix = '';
@@ -304,13 +302,13 @@ class Test_for_middle_optional_values_when_generating_urls extends  UnitTestCase
 
 
 
-class Test_router_conflicts extends  UnitTestCase
+class RouterConflictsTestCase extends  AkUnitTest 
 {
 
     public $Router;
     public $url_prefix = '';
 
-    public function Test_for_default_routes()
+    public function __construct()
     {
         $this->Router = new AkRouter();
         $this->Router->_loadUrlRewriteSettings();
@@ -333,10 +331,32 @@ class Test_router_conflicts extends  UnitTestCase
     }
 }
 
-ak_test('Test_of_AkRouter_Class');
-ak_test('Test_for_default_routes');
-ak_test('Tests_for_url_constants_named_as_url_variables');
-ak_test('Test_for_middle_optional_values_when_generating_urls');
-ak_test('Test_router_conflicts');
+class RouterModulesTestCase extends  AkUnitTest 
+{
+
+    public $Router;
+    public $url_prefix = '';
+
+    public function __construct()
+    {
+        $this->Router = new AkRouter();
+        $this->Router->_loadUrlRewriteSettings();
+        $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
+        $this->Router->connect('/module_alias/:controller/:action/:id', array('controller' => 'test', 'action' => 'index', 'module'=>'testing_module'));
+    }
+
+    public function test_should_set_underscored_module()
+    {
+        $params = array('controller'=>'test','action'=>'show', 'id'=> 123, 'module' => 'testing_module');
+        $url = '/module_alias/test/show/123/';
+        $this->assertEqual($this->Router->toUrl($params), $url);
+        $this->assertEqual($this->Router->toParams($this->url_prefix.$url), $params);
+
+        $params = array('controller'=>'other','module' => 'testing_module');
+        $url = '/module_alias/other/';
+        $this->assertEqual($this->Router->toUrl($params), $url);
+        $this->assertEqual(array_diff($this->Router->toParams($this->url_prefix.$url), array('')), array('controller'=>'other','module' => 'testing_module', 'action' => 'index'));
+    }
+}
 
 ?>
