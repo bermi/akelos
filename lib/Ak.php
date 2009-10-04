@@ -968,7 +968,7 @@ class Ak
         }elseif (!empty($format)){
             return $use_adodb ? adodb_date($format, $timestamp) : date($format, $timestamp);
         }
-        trigger_error(Ak::t('You must supply a valid UNIX timetamp. You can get the timestamp by calling Ak::getTimestamp("2006-09-27 20:45:57")'));
+        trigger_error(Ak::t('You must supply a valid UNIX timestamp. You can get the timestamp by calling Ak::getTimestamp("2006-09-27 20:45:57")'));
         return false;
     }
 
