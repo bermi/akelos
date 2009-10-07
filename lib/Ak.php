@@ -129,6 +129,7 @@ class Ak
     public static function t($string, $args = null, $controller = null)
     {
         static $framework_dictionary = array(),$required=false, $lang, $_dev_shutdown = true, $locale_manager_class = false, $_custom_dev_shutdown = false;
+        $original_string = $string;
         if(!$required) {
             $required=true;
             require_once(AK_LIB_DIR.DS.'AkLocaleManager.php');
@@ -175,17 +176,29 @@ class Ak
 
         if(!empty($string) && is_array($string)){
             if(!empty($string[$lang])){
-                return $string[$lang];
+                if(defined('AK_TRANSLATION_DEBUG') && AK_TRANSLATION_DEBUG){
+                    return 'namespace: "'.$controller.'", original: "'.$original_string.'": '.$string[$lang];
+                } else { 
+                    return $string[$lang];
+                }
             }
             $try_whith_lang = $args !== false && empty($string[$lang]) ? Ak::base_lang() : $lang;
             if(empty($string[$try_whith_lang]) && $args !== false){
                 foreach (Ak::langs() as $try_whith_lang){
                     if(!empty($string[$try_whith_lang])){
-                        return $string[$try_whith_lang];
+                        if(defined('AK_TRANSLATION_DEBUG') && AK_TRANSLATION_DEBUG){
+                            return 'namespace: "'.$controller.'", original: "'.$original_string.'": '.$string[$try_whith_lang];
+                        } else { 
+                            return $string[$try_whith_lang];
+                        }
                     }
                 }
             }
-            return @$string[$try_whith_lang];
+            if(defined('AK_TRANSLATION_DEBUG') && AK_TRANSLATION_DEBUG){
+                return 'namespace: "'.$controller.'", original: "'.$original_string.'": '.@$string[$try_whith_lang];
+            } else { 
+                return @$string[$try_whith_lang];
+            }
         }
 
         if(isset($controller) && !isset($framework_dictionary[$controller.'_dictionary'])) { // && is_file(AK_APP_DIR.DS.'locales'.DS.$controller.DS.$lang.'.php')){
@@ -204,8 +217,11 @@ class Ak
         /**
         * @todo Prepare for multiple locales by inspecting AK_DEFAULT_LOCALE
         */
-
-        return $string;
+        if(defined('AK_TRANSLATION_DEBUG') && AK_TRANSLATION_DEBUG){
+            return 'namespace: "'.$controller.'", original: "'.$original_string.'": '.$string;
+        } else { 
+            return $string;
+        }
     }
     
     /**

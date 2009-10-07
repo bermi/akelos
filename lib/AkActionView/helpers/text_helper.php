@@ -535,14 +535,8 @@ class TextHelper extends AkObject
     */
     function translate($string, $args = null, $locale_namespace = AK_DEFAULT_LOCALE_NAMESPACE)
     {
-        if(defined('AK_TRANSLATION_DEBUG') && AK_TRANSLATION_DEBUG){
-            $namespace=empty($locale_namespace) ?
-            AkInflector::underscore($this->_controller->getControllerName()) : $locale_namespace;
-            return 'namespace: "'.$namespace.'", original: "'.$string.'": '.Ak::t($string, $args, $namespace);
-        } else {
-            return Ak::t($string, $args, empty($locale_namespace) ?
-            AkInflector::underscore($this->_controller->getControllerName()) : $locale_namespace);
-        }
+        return Ak::t($string, $args, empty($locale_namespace) ?
+        AkInflector::underscore($this->_controller->getControllerName()) : $locale_namespace);
     }
 
     /**
