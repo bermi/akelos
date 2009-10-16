@@ -44,7 +44,7 @@ if (!defined('AK_TEST_DATABASE_ON')) {
 // auto will enable all the locales at config/locales/ dir
 defined('AK_AVAILABLE_LOCALES') ? null : define('AK_AVAILABLE_LOCALES', 'auto');
 
-defined('AK_AVAILABLE_ENVIRONMENTS') ? null : define('AK_AVAILABLE_ENVIRONMENTS',"setup,testing,development,production");
+defined('AK_AVAILABLE_ENVIRONMENTS') ? null : define('AK_AVAILABLE_ENVIRONMENTS',"setup,testing,development,production,staging");
 // Set these constants in order to allow only these locales on web requests
 // defined('AK_ACTIVE_RECORD_DEFAULT_LOCALES') ? null : define('AK_ACTIVE_RECORD_DEFAULT_LOCALES','en,es');
 // defined('AK_APP_LOCALES') ? null : define('AK_APP_LOCALES','en,es');
