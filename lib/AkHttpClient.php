@@ -1,43 +1,53 @@
 <?php
 
+// +----------------------------------------------------------------------+
+// | Akelos Framework - http://www.akelos.org                             |
+// +----------------------------------------------------------------------+
+
+/**
+ * @package ActionWebservice
+ * @subpackage WebClient
+ * @author Bermi Ferrer
+ */
+
 
 class AkHttpClient extends AkObject
 {
-    var $HttpRequest;
-    var $error;
-    var $Response;
-    var $_cookie_path;
-    var $_cookie_jar = 'default';
+    public $HttpRequest;
+    public $error;
+    public $Response;
+    private $_cookie_path;
+    private $_cookie_jar = 'default';
 
-    function get($url, $options = array())
+    public function get($url, $options = array())
     {
         return $this->customRequest($url, 'GET', $options);
     }
 
-    function post($url, $options = array(), $body = '')
+    public function post($url, $options = array(), $body = '')
     {
         return $this->customRequest($url, 'POST', $options, $body);
     }
 
-    function put($url, $options = array(), $body = '')
+    public function put($url, $options = array(), $body = '')
     {
         return $this->customRequest($url, 'PUT', $options, $body);
     }
 
-    function delete($url, $options = array())
+    public function delete($url, $options = array())
     {
         return $this->customRequest($url, 'DELETE', $options);
     }
 
     // prefix_options, query_options = split_options(options)
 
-    function customRequest($url, $http_verb = 'GET', $options = array(), $body = '')
+    public function customRequest($url, $http_verb = 'GET', $options = array(), $body = '')
     {
         $this->getRequestInstance($url, $http_verb, $options, $body);
         return empty($options['cache']) ? $this->sendRequest() : $this->returnCustomRequestFromCache($url,$options);
     }
 
-    function returnCustomRequestFromCache($url, $options)
+    public function returnCustomRequestFromCache($url, $options)
     {
         $Cache = Ak::cache();
         $Cache->init(is_numeric($options['cache']) ? $options['cache'] : 86400, !isset($options['cache_type']) ? 1 : $options['cache_type']);
@@ -48,14 +58,14 @@ class AkHttpClient extends AkObject
         return $data;
     }
 
-    function urlExists($url)
+    public function urlExists($url)
     {
         $this->getRequestInstance($url, 'GET');
         $this->sendRequest(false);
         return $this->code == 200;
     }
 
-    function getRequestInstance($url, $http_verb = 'GET', $options = array(), $body = '')
+    public function getRequestInstance($url, $http_verb = 'GET', $options = array(), $body = '')
     {
         $default_options = array(
         'header' => array(),
@@ -73,7 +83,7 @@ class AkHttpClient extends AkObject
 
         $this->{'_setParamsFor'.ucfirst(strtolower($http_verb))}($url, $options['params']);
 
-        $this->HttpRequest =& new HTTP_Request($url);
+        $this->HttpRequest = new HTTP_Request($url);
 
         $user_name ? $this->HttpRequest->setBasicAuth($user_name, $password) : null;
 
@@ -94,35 +104,35 @@ class AkHttpClient extends AkObject
         return $this->HttpRequest;
     }
 
-    function addHeaders($headers)
+    public function addHeaders($headers)
     {
         foreach ($headers as $k=>$v){
             $this->addHeader($k, $v);
         }
     }
 
-    function addHeader($name, $value)
+    public function addHeader($name, $value)
     {
         $this->HttpRequest->removeHeader($name);
         $this->HttpRequest->addHeader($name, $value);
     }
 
-    function getResponseHeader($name)
+    public function getResponseHeader($name)
     {
         return $this->HttpRequest->getResponseHeader($name);
     }
 
-    function getResponseHeaders()
+    public function getResponseHeaders()
     {
         return $this->HttpRequest->getResponseHeader();
     }
 
-    function getResponseCode()
+    public function getResponseCode()
     {
         return $this->HttpRequest->getResponseCode();
     }
 
-    function addParams($params = array())
+    public function addParams($params = array())
     {
         if(!empty($params)){
             foreach (array_keys($params) as $k){
@@ -131,13 +141,13 @@ class AkHttpClient extends AkObject
         }
     }
 
-    function setBody($body)
+    public function setBody($body)
     {
         Ak::compat('http_build_query');
         $this->HttpRequest->setBody(http_build_query((array)$body));
     }
 
-    function sendRequest($return_body = true)
+    public function sendRequest($return_body = true)
     {
         $this->Response = $this->HttpRequest->sendRequest();
         $this->code = $this->HttpRequest->getResponseCode();
@@ -151,7 +161,7 @@ class AkHttpClient extends AkObject
     }
 
 
-    function addCookieHeader(&$options, $url)
+    public function addCookieHeader(&$options, $url)
     {
         if(isset($options['cookies'])){
             $url_details = parse_url($url);
@@ -168,12 +178,12 @@ class AkHttpClient extends AkObject
         }
     }
 
-    function setCookiePath($path)
+    public function setCookiePath($path)
     {
         $this->_cookie_path = $path;
     }
 
-    function getPersistedCookie()
+    public function getPersistedCookie()
     {
         if(file_exists($this->_cookie_path)){
             return Ak::file_get_contents($this->_cookie_path);
@@ -181,7 +191,7 @@ class AkHttpClient extends AkObject
         return false;
     }
 
-    function deletePersistedCookie()
+    public function deletePersistedCookie()
     {
         if(file_exists($this->_cookie_path)){
             Ak::file_delete($this->_cookie_path);
@@ -191,7 +201,7 @@ class AkHttpClient extends AkObject
         return false;
     }
 
-    function persistCookies()
+    public function persistCookies()
     {
         if($this->_cookie_path){
             $cookies_from_response = $this->HttpRequest->getResponseCookies();
@@ -214,12 +224,12 @@ class AkHttpClient extends AkObject
         }
     }
 
-    function _extractUserNameAndPasswordFromUrl(&$url)
+    private function _extractUserNameAndPasswordFromUrl(&$url)
     {
         return array(null,null);
     }
 
-    function getParamsOnUrl($url)
+    public function getParamsOnUrl($url)
     {
         $parts = parse_url($url);
         if($_tmp = (empty($parts['query']) ? false : $parts['query'])){
@@ -231,7 +241,7 @@ class AkHttpClient extends AkObject
         return $result;
     }
 
-    function getUrlWithParams($url, $params)
+    public function getUrlWithParams($url, $params)
     {
         $parts = parse_url($url);
         Ak::compat('http_build_query');
@@ -239,7 +249,7 @@ class AkHttpClient extends AkObject
         return $this->_httpRenderQuery($parts);
     }
 
-    function _setParamsForGet(&$url, &$params)
+    private function _setParamsForGet(&$url, &$params)
     {
         $url_params = $this->getParamsOnUrl($url);
         if(!count($url_params) && !empty($params)){
@@ -249,24 +259,24 @@ class AkHttpClient extends AkObject
         }
     }
 
-    function _setParamsForPost(&$url, &$params)
+    private function _setParamsForPost(&$url, &$params)
     {
         empty($params) && $params = $this->getParamsOnUrl($url);
     }
 
-    function _setParamsForPut(&$url, &$params)
+    private function _setParamsForPut(&$url, &$params)
     {
         empty($params) && $params = $this->getParamsOnUrl($url);
     }
 
-    function _setParamsForDelete(&$url, &$params)
+    private function _setParamsForDelete(&$url, &$params)
     {
         if(!$this->getParamsOnUrl($url) && !empty($params)){
             $url = $this->getUrlWithParams($url, $params);
         }
     }
 
-    function _httpRenderQuery($parts)
+    private function _httpRenderQuery($parts)
     {
         return is_array($parts) ? (
         (isset($parts['scheme']) ? $parts['scheme'].':'.((strtolower($parts['scheme']) == 'mailto') ? '' : '//') : '').
