@@ -1,19 +1,13 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
 /**
  * @package ActiveSupport
  * @subpackage Cache
  * @author Bermi Ferrer <bermi a.t akelos c.om>
- * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 
@@ -48,7 +42,7 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 * // First we include the cache class and
 * // create a cache instance
 * include_once(AK_LIB_DIR.'/AkCache.php');
-* $Cache =& new AkCache();
+* $Cache = new AkCache();
 *
 * // Now we define some details for this cache
 * $seconds = 3600; // seconds of life for this cache
@@ -72,7 +66,7 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 * [http://pear.php.net/manual/en/package.caching.cache-lite.php
 * pear Cache_Lite] as driver for file based cache.
 * In fact you can access an instance of Cache_Lite by
-* accesing $Cache->_driverInstance.
+* accesing $Cache->DriverInstance.
 *
 * @author Bermi Ferrer <bermi at akelos dot com>
 * @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
@@ -84,21 +78,15 @@ class AkCache extends AkObject
 {
 
     /**
-    * Handles an instance of current Cache driver
-    *
-    * @access private
-    * @var object $_driverInstance
+    * Enables / Disables caching
     */
-    var $_driverInstance = NULL;
-
-    /**
-    * Ecnables / Disables caching
-    *
-    * @access public
-    * @var boolean true
-    */
-    var $cache_enabled = true;
+    public $cache_enabled = true;
     
+    /**
+    * Handles an instance of current Cache driver
+    */
+    public $DriverInstance = NULL;
+
     
     /**
      * Instantiates and configures the AkCache store.
@@ -134,7 +122,7 @@ class AkCache extends AkObject
      * @param mixed $options
      * @return mixed   false if no cache could be configured or AkCache instance
      */
-    function &lookupStore($options = null)
+    public function &lookupStore($options = null)
     {
         static $cache_store;
         $false = false;
@@ -160,7 +148,7 @@ class AkCache extends AkObject
         return $false;
     }
     
-    function expandCacheKey($key, $namespace = null)
+    public function expandCacheKey($key, $namespace = null)
     {
         $expanded_cache_key = $namespace != null? $namespace : '';
         if (isset($_ENV['AK_CACHE_ID'])) {
@@ -233,7 +221,7 @@ class AkCache extends AkObject
     * - 3: Memcached - The fastest option
     * @return void
     */
-    function init($options = null, $cache_type = null)
+    public function init($options = null, $cache_type = null)
     {
         $options = is_int($options) ? array('lifeTime'=>$options) : (is_array($options) ? $options : array());
 
@@ -251,18 +239,18 @@ class AkCache extends AkObject
                  if(!is_dir($options['cacheDir'])){
                     Ak::make_dir($options['cacheDir'], array('base_path'=>dirname($options['cacheDir'])));
                 }
-                $this->_driverInstance =& new Cache_Lite($options);
+                $this->DriverInstance = new Cache_Lite($options);
                 break;
             case 2:
                 require_once(AK_LIB_DIR.'/AkCache/AkAdodbCache.php');
-                $this->_driverInstance =& new AkAdodbCache();
-                $res = $this->_driverInstance->init($options);
+                $this->DriverInstance = new AkAdodbCache();
+                $res = $this->DriverInstance->init($options);
                 $this->cache_enabled = $res;
                 break;
             case 3:
                 require_once(AK_LIB_DIR.'/AkCache/AkMemcache.php');
-                $this->_driverInstance =& new AkMemcache();
-                $res = $this->_driverInstance->init($options);
+                $this->DriverInstance = new AkMemcache();
+                $res = $this->DriverInstance->init($options);
                 $this->cache_enabled = $res;
                 break;
             default:
@@ -280,9 +268,9 @@ class AkCache extends AkObject
     * @param    string    $group    Name of the cache group.
     * @return mixed Data of the cache (or false if no cache available)
     */
-    function get($id, $group = 'default')
+    public function get($id, $group = 'default')
     {
-        return $this->cache_enabled ? $this->_driverInstance->get($id, $group) : false;
+        return $this->cache_enabled ? $this->DriverInstance->get($id, $group) : false;
     }
 
 
@@ -295,9 +283,9 @@ class AkCache extends AkObject
     * @param    string    $group    Name of the cache group
     * @return boolean True if no problem
     */
-    function save($data, $id = null, $group = 'default')
+    public function save($data, $id = null, $group = 'default')
     {
-        return $this->cache_enabled ? $this->_driverInstance->save($data, $id, $group) : true;
+        return $this->cache_enabled ? $this->DriverInstance->save($data, $id, $group) : true;
     }
 
 
@@ -309,9 +297,9 @@ class AkCache extends AkObject
     * @param    string    $group    Name of the cache group
     * @return boolean True if no problem
     */
-    function remove($id, $group = 'default')
+    public function remove($id, $group = 'default')
     {
-        return $this->cache_enabled ? $this->_driverInstance->remove($id, $group) : true;
+        return $this->cache_enabled ? $this->DriverInstance->remove($id, $group) : true;
     }
 
 
@@ -334,9 +322,9 @@ class AkCache extends AkObject
     * - notingroup
     * @return boolean True if no problem
     */
-    function clean($group = false, $mode = 'ingroup')
+    public function clean($group = false, $mode = 'ingroup')
     {
-        return $this->cache_enabled ? $this->_driverInstance->clean($group, $mode) : true;
+        return $this->cache_enabled ? $this->DriverInstance->clean($group, $mode) : true;
     }
 
 }
