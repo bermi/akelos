@@ -31,6 +31,7 @@ class AkSintagsLexer extends AkLexer
     'Block',
     'Helper',
     'EscapedText',
+    'HelperTranslation',
     'Translation',
     'VariableTranslation',
     'EndTag',
@@ -92,6 +93,15 @@ class AkSintagsLexer extends AkLexer
         $this->addSpecialPattern('\x5C?\x25\x5C?[A-Za-z][\.A-Za-z0-9_-]*','Translation','TranslationToken');
     }
 
+    function _addHelperTranslationTokens()
+    {
+        $this->addEntryPattern('_\'','Hash','HelperTranslation');
+        $this->addEntryPattern('_\'','Helper','HelperTranslation');
+        $this->addExitPattern('\'','HelperTranslation');
+
+        $this->addSpecialPattern('\x5C?\x25\x5C?[A-Za-z][\.A-Za-z0-9_-]*','HelperTranslation','TranslationToken');
+    }
+
     function _addVariableTranslationTokens()
     {
         $this->addSpecialPattern('{_[A-Za-z][\.A-Za-z0-9_-]*}','Text','VariableTranslation');
@@ -144,10 +154,6 @@ class AkSintagsLexer extends AkLexer
             $this->addPattern('[A-Za-z0-9_, \n\t\x7c]+[ \n\t]*\x7c','ignore');
             $this->addExitPattern('\x7D[ \n\t]*'.$this->_SINTAGS_CLOSE_HELPER_TAG, 'ignore');
         }
-
-
-
-
     }
 
     function _addHelperTokens()

@@ -174,6 +174,30 @@ class AkSintagsParser
 
 
     //------------------------------------
+    //  HELPER TRANSLATION TOKEN
+    //------------------------------------
+    
+    function HelperTranslation($match, $state)
+    {
+        switch ($state){
+            case AK_LEXER_ENTER:
+                $this->_translation_tokens = array();
+                $this->output .= '$text_helper->translate(\'';
+                break;
+            case AK_LEXER_UNMATCHED:
+                $this->output.= $this->_unescapeChars($match, false);
+                break;
+            case AK_LEXER_EXIT:
+                if (!empty($this->_translation_tokens)) {
+                    $this->output .= '\', array('.join(', ',$this->_translation_tokens).'))';
+                } else {
+                    $this->output .= '\')';
+                }
+        }
+        return true;
+    }
+
+    //------------------------------------
     //  TRANSLATIONS TOKEN
     //------------------------------------
 
@@ -217,8 +241,8 @@ class AkSintagsParser
         $php_variable = $this->_convertSintagsVarToPhp(trim($match,'{}?'));
         if($php_variable){
             $this->output .= '<?php echo empty('.$php_variable.') ? \'\' : '.
-                ($_skip_sanitizing ? $php_variable : '$text_helper->h('.$php_variable.')').
-                '; ?>';
+            ($_skip_sanitizing ? $php_variable : '$text_helper->h('.$php_variable.')').
+            '; ?>';
         }else{
             $this->output .= $match;
         }

@@ -1,4 +1,14 @@
 
+
+<%= link_to 'name', :vals => { 'plain text', _'translated text', _'translated text with %variable' } %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to('name', array('vals' => array('plain text', $text_helper->translate('translated text'), $text_helper->translate('translated text with %variable', array('%variable' => @$variable))))); ?>
+
+
+===================================
+
 <%= render :partial => "account", :locals => { :account => @buyer } %>
 
 -----------------------------------
@@ -328,3 +338,52 @@
 -----------------------------------
 
 <?php echo $text_helper->translate($text_helper->h('<b>foo</b>')); ?>
+
+===================================
+
+<%= link_to _'translated text' %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to($text_helper->translate('translated text')); ?>
+
+===================================
+
+<%= link_to _'translated text', :action => 'index' %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to($text_helper->translate('translated text'), array('action' => 'index')); ?>
+
+===================================
+
+<%= link_to _'translator\'s text', :action => 'index' %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to($text_helper->translate('translator\'s text'), array('action' => 'index')); ?>
+
+===================================
+
+<%= link_to [_'translated text'] %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to(array($text_helper->translate('translated text'))); ?>
+
+===================================
+
+<%= _'translated text with %variable', '%variable' => variable %>
+
+-----------------------------------
+
+<?php echo $text_helper->translate('translated text with %variable', array('%variable' => $variable)); ?>
+
+===================================
+
+<%= link_to 'name', :vals => { 'plain text', _'translated text', _'translated text' } %>
+
+-----------------------------------
+
+<?php echo $url_helper->link_to('name', array('vals' => array('plain text', $text_helper->translate('translated text'), $text_helper->translate('translated text')))); ?>
+

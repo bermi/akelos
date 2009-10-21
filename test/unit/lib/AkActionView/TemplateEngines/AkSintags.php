@@ -31,7 +31,7 @@ class Test_of_AkSintags extends  UnitTestCase
             $sintags = trim($sintags);
             $expected_php = trim($php);
             if(empty($sintags)){
-                break;
+                return;
             }else{
                 $multiple_sintags .= $sintags;
                 $multiple_expected_php .= $expected_php;
