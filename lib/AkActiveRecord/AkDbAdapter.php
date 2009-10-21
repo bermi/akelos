@@ -84,11 +84,10 @@ class AkDbAdapter extends AkObject
      */
     static public function &getInstance($database_specifications = AK_DEFAULT_DATABASE_PROFILE, $auto_connect = true)
     {
-        static $connections;
-
         $settings_hash = is_string($database_specifications) ? $database_specifications : AkDbAdapter::_hash($database_specifications);
+        $static_var_name = 'AkDbAdapter_getInstance_'.$settings_hash;
 
-        if (empty($connections[$settings_hash])){
+        if (!$Connection = Ak::getStaticVar($static_var_name)){
             if (empty($database_specifications)) {
                 $settings_hash = AK_ENVIRONMENT;
                 $database_specifications = Ak::getSettings('database', false, $settings_hash);
@@ -126,9 +125,10 @@ class AkDbAdapter extends AkObject
                 $class_name = 'Ak'.ucfirst($designated_database).'DbAdapter';
                 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbAdapters'.DS.$class_name.'.php');
             }
-            $connections[$settings_hash] = new $class_name($database_specifications,$auto_connect);
+            $Connection = new $class_name($database_specifications,$auto_connect);
+            Ak::setStaticVar($static_var_name, $Connection);
         }
-        return $connections[$settings_hash];
+        return $Connection;
     }
 
     /**

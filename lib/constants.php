@@ -135,7 +135,7 @@ function ak_test($test_case_name, $use_sessions = false)
 {
     if(!defined('ALL_TESTS_CALL')){
         $use_sessions ? @session_start() : null;
-        $test = &new $test_case_name();
+        $test = new $test_case_name();
         if (defined('AK_CLI') && AK_CLI || TextReporter::inCli() || (defined('AK_CONSOLE_MODE') && AK_CONSOLE_MODE) || (defined('AK_WEB_REQUEST') && !AK_WEB_REQUEST)) {
             $test->run(new TextReporter());
         }else{
@@ -317,6 +317,7 @@ defined('AK_LOG_EVENTS') ? null : define('AK_LOG_EVENTS', false);
 
 defined('AK_ROUTES_MAPPING_FILE') ? null : define('AK_ROUTES_MAPPING_FILE', AK_CONFIG_DIR.DS.'routes.php');
 defined('AK_OS') ? null : define('AK_OS', (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'WINDOWS' : 'UNIX'));
+defined('AK_CAN_FORK') ? null : define('AK_CAN_FORK', function_exists('pcntl_fork'));
 defined('AK_CHARSET') ? null : define('AK_CHARSET', 'UTF-8');
 
 defined('AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE') ? null : define('AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE', 'web_request');

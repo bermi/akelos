@@ -974,12 +974,12 @@ class Ak
     */
     public static function getDate($timestamp = null, $format = null)
     {
-        $timestamp = !isset($timestamp) ? Ak::time() : $timestamp;
+        $timestamp = empty($timestamp) ? Ak::time() : $timestamp;
         $use_adodb = $timestamp <= -3600 || $timestamp >= 2147468400;
         if($use_adodb){
             require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb-time.inc.php');
         }
-        if(!isset($format)){
+        if(empty($format)){
             return $use_adodb ? adodb_date('Y-m-d H:i:s', $timestamp) : date('Y-m-d H:i:s', $timestamp);
         }elseif (!empty($format)){
             return $use_adodb ? adodb_date($format, $timestamp) : date($format, $timestamp);
@@ -2033,6 +2033,10 @@ class Ak
     public static function &_staticVar($name, &$value, $destruct = false)
     {
         static $_memory;
+        if(!AK_CAN_FORK || (!$pid = getmypid())){
+            $pid = 0;   
+        }
+        
         $null = null;
         $true = true;
         $false = false;
@@ -2041,15 +2045,15 @@ class Ak
             /**
              * GET mode
              */
-            if (isset($_memory[$name])) {
-                $return = &$_memory[$name];
+            if (isset($_memory[$pid][$name])) {
+                $return = &$_memory[$pid][$name];
             }
         } else if ($value !== null) {
             /**
              * SET mode
              */
             if (is_string($name)) {
-                $_memory[$name] = &$value;
+                $_memory[$pid][$name] = &$value;
                 $return = $true;
             } else {
                 $return = $false;
@@ -2057,14 +2061,14 @@ class Ak
 
         } else if ($destruct === true) {
             if ($name !== null) {
-                $value = isset($_memory[$name])?$_memory[$name]:$null;
+                $value = isset($_memory[$pid][$name])?$_memory[$pid][$name]:$null;
                 if (is_object($value) && method_exists($value,'__destruct')) {
                     $value->__destruct();
                 }
                 unset($value);
-                unset($_memory[$name]);
+                unset($_memory[$pid][$name]);
             } else {
-                foreach ($_memory as $name => $value) {
+                foreach ($_memory[$pid] as $name => $value) {
                     Ak::unsetStaticVar($name);
                 }
             }
