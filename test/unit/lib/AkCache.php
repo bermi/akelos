@@ -12,7 +12,7 @@ defined('AK_TEST_MEMCACHED_CHECKFILE')? null: define('AK_TEST_MEMCACHED_CHECKFIL
 class AkCache_TestCase extends  AkUnitTest 
 {
     
-    public $_driverInstance = NULL;
+    public $DriverInstance = NULL;
     public $Cache = NULL;
     public $id = 'test case cache id';
     public $group = 'test case group to cacth';
@@ -48,11 +48,11 @@ class AkCache_TestCase extends  AkUnitTest
     {
         //No driver is loaded
         $this->Cache->init(null,0);
-        $this->assertNull($this->Cache->_driverInstance,'Checking that no driver is loaded when cache is disabled');
+        $this->assertNull($this->Cache->DriverInstance,'Checking that no driver is loaded when cache is disabled');
         
         //Pear Cache Lite driver is loaded
         $this->Cache->init(null,$type);
-        $this->assertIsA($this->Cache->_driverInstance,$class);
+        $this->assertIsA($this->Cache->DriverInstance,$class);
         
     }
     
