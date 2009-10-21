@@ -196,7 +196,7 @@
 	 * Helper class for FetchFields -- holds info on a column
 	 */
 	class ADOFieldObject { 
-		var $name = '';
+		public $name = '';
 		var $max_length=0;
 		var $type="";
 /*
@@ -205,7 +205,7 @@
 		// actually, this has already been built-in in the postgres, fbsql AND mysql module? ^-^
 		// so we can as well make not_null standard (leaving it at "false" does not harm anyways)
 
-		var $has_default = false; // this one I have done only in mysql and postgres for now ... 
+		public $has_default = false; // this one I have done only in mysql and postgres for now ... 
 			// others to come (dannym)
 		var $default_value; // default, if any, and supported. Check has_default first.
 */
@@ -236,7 +236,7 @@
 	//
 	var $dataProvider = 'native';
 	var $databaseType = '';		/// RDBMS currently in use, eg. odbc, mysql, mssql					
-	var $database = '';			/// Name of database to be used.	
+	public $database = '';			/// Name of database to be used.	
 	var $host = ''; 			/// The hostname of the database server	
 	var $user = ''; 			/// The username which is used to connect to the database server. 
 	var $password = ''; 		/// Password for the username. For security, we no longer store it.
@@ -278,7 +278,7 @@
 	var $sysTimeStamp = false; /// name of function that returns the current timestamp
 	var $arrayClass = 'ADORecordSet_array'; /// name of class used to generate array recordsets, which are pre-downloaded recordsets
 	
-	var $noNullStrings = false; /// oracle specific stuff - if true ensures that '' is converted to ' '
+	public $noNullStrings = false; /// oracle specific stuff - if true ensures that '' is converted to ' '
 	var $numCacheHits = 0; 
 	var $numCacheMisses = 0;
 	var $pageExecuteCountRows = true;
@@ -289,16 +289,16 @@
 	var $autoRollback = false; // autoRollback on PConnect().
 	var $poorAffectedRows = false; // affectedRows not working or unreliable
 	
-	var $fnExecute = false;
+	public $fnExecute = false;
 	var $fnCacheExecute = false;
 	var $blobEncodeType = false; // false=not required, 'I'=encode to integer, 'C'=encode to char
 	var $rsPrefix = "ADORecordSet_";
 	
-	var $autoCommit = true; 	/// do not modify this yourself - actually private
+	public $autoCommit = true; 	/// do not modify this yourself - actually private
 	var $transOff = 0; 			/// temporarily disable transactions
 	var $transCnt = 0; 			/// count of nested transactions
 	
-	var $fetchMode=false;
+	public $fetchMode=false;
 	 //
 	 // PRIVATE VARS
 	 //
@@ -308,9 +308,9 @@
 	var $_errorMsg = false;		/// A variable which was used to keep the returned last error message.  The value will
 								/// then returned by the errorMsg() function	
 	var $_errorCode = false;	/// Last error code, not guaranteed to be used - only by oci8					
-	var $_queryID = false;		/// This variable keeps the last created result link identifier
+	public $_queryID = false;		/// This variable keeps the last created result link identifier
 	
-	var $_isPersistentConnection = false;	/// A boolean variable to state whether its a persistent connection or normal connection.	*/
+	public $_isPersistentConnection = false;	/// A boolean variable to state whether its a persistent connection or normal connection.	*/
 	var $_bindInputArray = false; /// set to true if ADOConnection.Execute() permits binding of array parameters.
 	var $_evalAll = false;
 	var $_affected = false;
@@ -326,7 +326,7 @@
 		die('Virtual Class -- cannot instantiate');
 	}
 	
-	function Version()
+	public function Version()
 	{
 	global $ADODB_vers;
 	
@@ -344,12 +344,12 @@
 		return array('description' => '', 'version' => '');
 	}
 	
-	function IsConnected()
+	public function IsConnected()
 	{
     	return !empty($this->_connectionID);
 	}
 	
-	function _findvers($str)
+	public function _findvers($str)
 	{
 		if (preg_match('/([0-9]+\.([0-9\.])+)/',$str, $arr)) return $arr[1];
 		else return '';
@@ -383,7 +383,7 @@
 		
 	}
 	
-	function Time()
+	public function Time()
 	{
 		$rs =& $this->_Execute("select $this->sysTimeStamp");
 		if ($rs && !$rs->EOF) return $this->UnixTimeStamp(reset($rs->fields));
@@ -402,7 +402,7 @@
 	 *
 	 * @return true or false
 	 */	  
-	function Connect($argHostname = "", $argUsername = "", $argPassword = "", $argDatabaseName = "", $forceNew = false) 
+	public function Connect($argHostname = "", $argUsername = "", $argPassword = "", $argDatabaseName = "", $forceNew = false) 
 	{
 		if ($argHostname != "") $this->host = $argHostname;
 		if ($argUsername != "") $this->user = $argUsername;
@@ -432,7 +432,7 @@
 		return $ret;
 	}	
 	
-	function _nconnect($argHostname, $argUsername, $argPassword, $argDatabaseName)
+	public function _nconnect($argHostname, $argUsername, $argPassword, $argDatabaseName)
 	{
 		return $this->_connect($argHostname, $argUsername, $argPassword, $argDatabaseName);
 	}
@@ -448,7 +448,7 @@
 	 *
 	 * @return true or false
 	 */	  
-	function NConnect($argHostname = "", $argUsername = "", $argPassword = "", $argDatabaseName = "") 
+	public function NConnect($argHostname = "", $argUsername = "", $argPassword = "", $argDatabaseName = "") 
 	{
 		return $this->Connect($argHostname, $argUsername, $argPassword, $argDatabaseName, true);
 	}
@@ -588,12 +588,12 @@
 		return false;
 	}
 	
-	function CommitLock($table)
+	public function CommitLock($table)
 	{
 		return $this->CommitTrans();
 	}
 	
-	function RollbackLock($table)
+	public function RollbackLock($table)
 	{
 		return $this->RollbackTrans();
 	}
@@ -858,7 +858,7 @@
 	}
 	
 	
-	function _Execute($sql,$inputarr=false)
+	public function _Execute($sql,$inputarr=false)
 	{
 
 		if ($this->debug) {
@@ -884,13 +884,13 @@
 		} 
 		
 		if ($this->_queryID === true) { // return simplified recordset for inserts/updates/deletes with lower overhead
-			$rs =& new ADORecordSet_empty();
+			$rs = new ADORecordSet_empty();
 			return $rs;
 		}
 		
 		// return real recordset from select statement
 		$rsclass = $this->rsPrefix.$this->databaseType;
-		$rs =& new $rsclass($this->_queryID,$this->fetchMode);
+		$rs = new $rsclass($this->_queryID,$this->fetchMode);
 		$rs->connection = &$this; // Pablo suggestion
 		$rs->Init();
 		if (is_array($sql)) $rs->sql = $sql[0];
@@ -1024,14 +1024,14 @@
 		return ($this->_errorMsg) ? -1 : 0;
 	}
 	
-	function MetaError($err=false)
+	public function MetaError($err=false)
 	{
 		include_once(ADODB_DIR."/adodb-error.inc.php");
 		if ($err === false) $err = $this->ErrorNo();
 		return adodb_error($this->dataProvider,$this->databaseType,$err);
 	}
 	
-	function MetaErrorMsg($errno)
+	public function MetaErrorMsg($errno)
 	{
 		include_once(ADODB_DIR."/adodb-error.inc.php");
 		return adodb_errormsg($errno);
@@ -1207,7 +1207,7 @@
 		
 		$arrayClass = $this->arrayClass;
 		
-		$rs2 =& new $arrayClass();
+		$rs2 = new $arrayClass();
 		$rs2->connection = &$this;
 		$rs2->sql = $rs->sql;
 		$rs2->dataProvider = $this->dataProvider;
@@ -1225,7 +1225,7 @@
 		return $arr;
 	}
 	
-	function &GetAssoc($sql, $inputarr=false,$force_array = false, $first2cols = false)
+	public function &GetAssoc($sql, $inputarr=false,$force_array = false, $first2cols = false)
 	{
 		$rs =& $this->Execute($sql, $inputarr);
 		if (!$rs) {
@@ -1236,7 +1236,7 @@
 		return $arr;
 	}
 	
-	function &CacheGetAssoc($secs2cache, $sql=false, $inputarr=false,$force_array = false, $first2cols = false)
+	public function &CacheGetAssoc($secs2cache, $sql=false, $inputarr=false,$force_array = false, $first2cols = false)
 	{
 		if (!is_numeric($secs2cache)) {
 			$first2cols = $force_array;
@@ -1274,7 +1274,7 @@
 		return $ret;
 	}
 	
-	function CacheGetOne($secs2cache,$sql=false,$inputarr=false)
+	public function CacheGetOne($secs2cache,$sql=false,$inputarr=false)
 	{
 		$ret = false;
 		$rs = &$this->CacheExecute($secs2cache,$sql,$inputarr);
@@ -1286,7 +1286,7 @@
 		return $ret;
 	}
 	
-	function GetCol($sql, $inputarr = false, $trim = false)
+	public function GetCol($sql, $inputarr = false, $trim = false)
 	{
 	  	$rv = false;
 	  	$rs = &$this->Execute($sql, $inputarr);
@@ -1308,7 +1308,7 @@
 	  	return $rv;
 	}
 	
-	function CacheGetCol($secs, $sql = false, $inputarr = false,$trim=false)
+	public function CacheGetCol($secs, $sql = false, $inputarr = false,$trim=false)
 	{
 	  	$rv = false;
 	  	$rs = &$this->CacheExecute($secs, $sql, $inputarr);
@@ -1367,12 +1367,12 @@
 		return $arr;
 	}
 	
-	function &CacheGetAll($secs2cache,$sql=false,$inputarr=false)
+	public function &CacheGetAll($secs2cache,$sql=false,$inputarr=false)
 	{
 		return $this->CacheGetArray($secs2cache,$sql,$inputarr);
 	}
 	
-	function &CacheGetArray($secs2cache,$sql=false,$inputarr=false)
+	public function &CacheGetArray($secs2cache,$sql=false,$inputarr=false)
 	{
 	global $ADODB_COUNTRECS;
 		
@@ -1420,7 +1420,7 @@
 		return $false;
 	}
 	
-	function &CacheGetRow($secs2cache,$sql=false,$inputarr=false)
+	public function &CacheGetRow($secs2cache,$sql=false,$inputarr=false)
 	{
 		$rs =& $this->CacheExecute($secs2cache,$sql,$inputarr);
 		if ($rs) {
@@ -1453,7 +1453,7 @@
 	* returns 0 = fail, 1 = update, 2 = insert 
 	*/
 	
-	function Replace($table, $fieldArray, $keyCol, $autoQuote=false, $has_autoinc=false)
+	public function Replace($table, $fieldArray, $keyCol, $autoQuote=false, $has_autoinc=false)
 	{
 		global $ADODB_INCLUDED_LIB;
 		if (empty($ADODB_INCLUDED_LIB)) include_once(ADODB_DIR.'/adodb-lib.inc.php');
@@ -1771,7 +1771,7 @@
 	*	$conn->UpdateBlob('blobtable','blobcol',$blob,'id=1');
 	*/
 	
-	function UpdateBlob($table,$column,$val,$where,$blobtype='BLOB')
+	public function UpdateBlob($table,$column,$val,$where,$blobtype='BLOB')
 	{
 		return $this->Execute("UPDATE $table SET $column=? WHERE $where",array($val)) != false;
 	}
@@ -1794,27 +1794,27 @@
 		return $this->UpdateBlob($table,$column,$val,$where,$blobtype);
 	}
 	
-	function BlobDecode($blob)
+	public function BlobDecode($blob)
 	{
 		return $blob;
 	}
 	
-	function BlobEncode($blob)
+	public function BlobEncode($blob)
 	{
 		return $blob;
 	}
 	
-	function SetCharSet($charset)
+	public function SetCharSet($charset)
 	{
 		return false;
 	}
 	
-	function IfNull( $field, $ifNull ) 
+	public function IfNull( $field, $ifNull ) 
 	{
 		return " CASE WHEN $field is null THEN $ifNull ELSE $field END ";
 	}
 	
-	function LogSQL($enable=true)
+	public function LogSQL($enable=true)
 	{
 		include_once(ADODB_DIR.'/adodb-perf.inc.php');
 		
@@ -1827,7 +1827,7 @@
 		return $old;
 	}
 	
-	function GetCharSet()
+	public function GetCharSet()
 	{
 		return false;
 	}
@@ -2003,7 +2003,7 @@
 	}
 	
 	
-	function _findschema(&$table,&$schema)
+	public function _findschema(&$table,&$schema)
 	{
 		if (!$schema && ($at = strpos($table,'.')) !== false) {
 			$schema = substr($table,0,$at);
@@ -2042,7 +2042,7 @@
 
 			$retarr = array();
 			while (!$rs->EOF) { //print_r($rs->fields);
-				$fld =& new ADOFieldObject();
+				$fld = new ADOFieldObject();
 				$fld->name = $rs->fields[0];
 				$fld->type = $rs->fields[1];
 				if (isset($rs->fields[3]) && $rs->fields[3]) {
@@ -2080,7 +2080,7 @@
 	          )
 		)		
       */
-     function &MetaIndexes($table, $primary = false, $owner = false)
+     public function &MetaIndexes($table, $primary = false, $owner = false)
      {
 	 		$false = false;
             return $false;
@@ -2119,7 +2119,7 @@
 	 * 
 	 * @return concatenated string
 	 */ 	 
-	function Concat()
+	public function Concat()
 	{	
 		$arr = func_get_args();
 		return implode($this->concat_operator, $arr);
@@ -2229,7 +2229,7 @@
 	 * @return a date formated as user desires
 	 */
 	 
-	function UserDate($v,$fmt='Y-m-d',$gmt=false)
+	public function UserDate($v,$fmt='Y-m-d',$gmt=false)
 	{
 		$tt = $this->UnixDate($v);
 
@@ -2262,7 +2262,7 @@
 		return ($gmt) ? adodb_gmdate($fmt,$tt) : adodb_date($fmt,$tt);
 	}
 	
-	function escape($s,$magic_quotes=false)
+	public function escape($s,$magic_quotes=false)
 	{
 		return $this->addq($s,$magic_quotes);
 	}
@@ -2446,7 +2446,7 @@
 	var $sql; 				/// sql text
 	var $EOF = false;		/// Indicates that the current record position is after the last record in a Recordset object. 
 	
-	var $emptyTimeStamp = '&nbsp;'; /// what to display when $time==0
+	public $emptyTimeStamp = '&nbsp;'; /// what to display when $time==0
 	var $emptyDate = '&nbsp;'; /// what to display when $time==0
 	var $debug = false;
 	var $timeCreated=0; 	/// datetime in Unix format rs created -- for cached recordsets
@@ -2466,7 +2466,7 @@
 	var $_obj; 				/** Used by FetchObj */
 	var $_names;			/** Used by FetchObj */
 	
-	var $_currentPage = -1;	/** Added by Iv�n Oliva to implement recordset pagination */
+	public $_currentPage = -1;	/** Added by Iv�n Oliva to implement recordset pagination */
 	var $_atFirstPage = false;	/** Added by Iv�n Oliva to implement recordset pagination */
 	var $_atLastPage = false;	/** Added by Iv�n Oliva to implement recordset pagination */
 	var $_lastPageNo = -1; 
@@ -2486,7 +2486,7 @@
 	
 	
 	
-	function Init()
+	public function Init()
 	{
 		if ($this->_inited) return;
 		$this->_inited = true;
@@ -2584,7 +2584,7 @@
 		return $results;
 	}
 	
-	function &GetAll($nRows = -1)
+	public function &GetAll($nRows = -1)
 	{
 		$arr =& $this->GetArray($nRows);
 		return $arr;
@@ -2970,7 +2970,7 @@
 		return $this->fields[$colname];
 	}
 	
-	function GetAssocKeys($upper=true)
+	public function GetAssocKeys($upper=true)
 	{
 		$this->bind = array();
 		for ($i=0; $i < $this->_numOfFields; $i++) {
@@ -3136,7 +3136,7 @@
 	function &FetchObject($isupper=true)
 	{
 		if (empty($this->_obj)) {
-			$this->_obj =& new ADOFetchObj();
+			$this->_obj = new ADOFetchObj();
 			$this->_names = array();
 			for ($i=0; $i <$this->_numOfFields; $i++) {
 				$f = $this->FetchField($i);
@@ -3355,7 +3355,7 @@
 		}
 	}
 	
-	function _close() {}
+	public function _close() {}
 	
 	/**
 	 * set/returns the current recordset page when paginating
@@ -3375,7 +3375,7 @@
 		return $this->_atFirstPage;
 	}
 	
-	function LastPageNo($page = false)
+	public function LastPageNo($page = false)
 	{
 		if ($page != false) $this->_lastPageNo = $page;
 		return $this->_lastPageNo;
@@ -3407,7 +3407,7 @@
 	{
 		var $databaseType = 'array';
 
-		var $_array; 	// holds the 2-dimensional data array
+		public $_array; 	// holds the 2-dimensional data array
 		var $_types;	// the array of types of each column (C B I L M)
 		var $_colnames;	// names of each column in array
 		var $_skiprow1;	// skip 1st row because it holds column names
@@ -3474,7 +3474,7 @@
 			$this->Init();
 		}
 		
-		function &GetArray($nRows=-1)
+		public function &GetArray($nRows=-1)
 		{
 			if ($nRows == -1 && $this->_currentRow <= 0 && !$this->_skiprow1) {
 				return $this->_array;
@@ -3484,7 +3484,7 @@
 			}
 		}
 		
-		function _initrs()
+		public function _initrs()
 		{
 			$this->_numOfRows =  sizeof($this->_array);
 			if ($this->_skiprow1) $this->_numOfRows -= 1;
@@ -3512,7 +3512,7 @@
 			return $this->fields[$this->bind[strtoupper($colname)]];
 		}
 		
-		function &FetchField($fieldOffset = -1) 
+		public function &FetchField($fieldOffset = -1) 
 		{
 			if (isset($this->_fieldobjects)) {
 				return $this->_fieldobjects[$fieldOffset];
@@ -3525,7 +3525,7 @@
 			return $o;
 		}
 			
-		function _seek($row)
+		public function _seek($row)
 		{
 			if (sizeof($this->_array) && 0 <= $row && $row < $this->_numOfRows) {
 				$this->_currentRow = $row;
@@ -3536,7 +3536,7 @@
 			return false;
 		}
 		
-		function MoveNext() 
+		public function MoveNext() 
 		{
 			if (!$this->EOF) {		
 				$this->_currentRow++;
@@ -3556,7 +3556,7 @@
 			return false;
 		}	
 	
-		function _fetch()
+		public function _fetch()
 		{
 			$pos = $this->_currentRow;
 			
@@ -3569,7 +3569,7 @@
 			return true;
 		}
 		
-		function _close() 
+		public function _close() 
 		{
 			return true;	
 		}
@@ -3715,7 +3715,7 @@
 				return $false;
 			}
 			
-			$obj =& new $cls();
+			$obj = new $cls();
 		}
 		
 		# constructor should not fail
@@ -3794,7 +3794,7 @@
 		@include_once(ADODB_DIR."/perf/perf-$drivername.inc.php");
 		$class = "Perf_$drivername";
 		if (!class_exists($class)) return $false;
-		$perf =& new $class($conn);
+		$perf = new $class($conn);
 		
 		return $perf;
 	}
@@ -3814,7 +3814,7 @@
 		}
 		include_once($path);
 		$class = "ADODB2_$drivername";
-		$dict =& new $class();
+		$dict = new $class();
 		$dict->dataProvider = $conn->dataProvider;
 		$dict->connection = &$conn;
 		$dict->upperName = strtoupper($drivername);

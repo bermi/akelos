@@ -269,7 +269,7 @@ If the function is defined (somewhere in an include), then you can correct for d
 In this example, we apply daylights savings in June or July, adding one hour. This is extremely
 unrealistic as it does not take into account time-zone, geographic location, current year.
 
-function adodb_daylight_sv(&$arr, $is_gmt)
+public function adodb_daylight_sv(&$arr, $is_gmt)
 {
 	if ($is_gmt) return;
 	$m = $arr['mon'];

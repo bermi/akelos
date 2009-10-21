@@ -79,16 +79,16 @@ class ADODB_oci8 extends ADOConnection {
 	var $_getarray = false; // currently not working
 	var $leftOuter = '';  // oracle wierdness, $col = $value (+) for LEFT OUTER, $col (+)= $value for RIGHT OUTER
 	var $session_sharing_force_blob = false; // alter session on updateblob if set to true 
-	var $firstrows = true; // enable first rows optimization on SelectLimit()
+	public $firstrows = true; // enable first rows optimization on SelectLimit()
 	var $selectOffsetAlg1 = 100; // when to use 1st algorithm of selectlimit.
 	var $NLS_DATE_FORMAT = 'YYYY-MM-DD';  // To include time, use 'RRRR-MM-DD HH24:MI:SS'
- 	var $useDBDateFormatForTextInput=false;
+ 	public $useDBDateFormatForTextInput=false;
 	var $datetime = false; // MetaType('DATE') returns 'D' (datetime==false) or 'T' (datetime == true)
 	var $_refLOBs = array();
 	
 	// var $ansiOuter = true; // if oracle9
     
-	function ADODB_oci8() 
+	public function ADODB_oci8() 
 	{
 		$this->_hasOCIFetchStatement = ADODB_PHPVER >= 0x4200;
 		if (defined('ADODB_EXTENSION')) $this->rsPrefix .= 'ext_';
@@ -137,7 +137,7 @@ class ADODB_oci8 extends ADOConnection {
 			return $retarr;
 	}
 	
-	function Time()
+	public function Time()
 	{
 		$rs =& $this->Execute("select TO_CHAR($this->sysTimeStamp,'YYYY-MM-DD HH24:MI:SS') from dual");
 		if ($rs && !$rs->EOF) return $this->UnixTimeStamp(reset($rs->fields));
@@ -239,7 +239,7 @@ NATSOFT.DOMAIN =
 		return true;
    	}
 	
-	function ServerInfo()
+	public function ServerInfo()
 	{
 		$arr['compat'] = $this->GetOne('select value from sys.database_compatible_level');
 		$arr['description'] = @OCIServerVersion($this->_connectionID);
@@ -258,13 +258,13 @@ NATSOFT.DOMAIN =
 		return $this->_connect($argHostname, $argUsername, $argPassword, $argDatabasename,2);
 	}
 	
-	function _affectedrows()
+	public function _affectedrows()
 	{
 		if (is_resource($this->_stmt)) return @OCIRowCount($this->_stmt);
 		return 0;
 	}
 	
-	function IfNull( $field, $ifNull ) 
+	public function IfNull( $field, $ifNull ) 
 	{
 		return " NVL($field, $ifNull) "; // if Oracle
 	}
@@ -287,13 +287,13 @@ NATSOFT.DOMAIN =
 		return 'TO_DATE('.adodb_date($this->fmtTimeStamp,$ts).",'RRRR-MM-DD, HH:MI:SS AM')";
 	}
 	
-	function RowLock($tables,$where,$flds='1 as ignore') 
+	public function RowLock($tables,$where,$flds='1 as ignore') 
 	{
 		if ($this->autoCommit) $this->BeginTrans();
 		return $this->GetOne("select $flds from $tables where $where for update");
 	}
 	
-	function &MetaTables($ttype=false,$showSchema=false,$mask=false) 
+	public function &MetaTables($ttype=false,$showSchema=false,$mask=false) 
 	{
 		if ($mask) {
 			$save = $this->metaTablesSQL;
@@ -309,7 +309,7 @@ NATSOFT.DOMAIN =
 	}
 	
 	// Mark Newnham 
-	function &MetaIndexes ($table, $primary = FALSE, $owner=false)
+	public function &MetaIndexes ($table, $primary = FALSE, $owner=false)
 	{
         // save old fetch mode
         global $ADODB_FETCH_MODE;
@@ -375,7 +375,7 @@ NATSOFT.DOMAIN =
         return $indexes;
 	}
 	
-	function BeginTrans()
+	public function BeginTrans()
 	{	
 		if ($this->transOff) return true;
 		$this->transCnt += 1;
@@ -384,7 +384,7 @@ NATSOFT.DOMAIN =
 		return true;
 	}
 	
-	function CommitTrans($ok=true) 
+	public function CommitTrans($ok=true) 
 	{ 
 		if ($this->transOff) return true;
 		if (!$ok) return $this->RollbackTrans();
@@ -396,7 +396,7 @@ NATSOFT.DOMAIN =
 		return $ret;
 	}
 	
-	function RollbackTrans()
+	public function RollbackTrans()
 	{
 		if ($this->transOff) return true;
 		if ($this->transCnt) $this->transCnt -= 1;
@@ -407,12 +407,12 @@ NATSOFT.DOMAIN =
 	}
 	
 	
-	function SelectDB($dbName) 
+	public function SelectDB($dbName) 
 	{
 		return false;
 	}
 
-	function ErrorMsg() 
+	public function ErrorMsg() 
 	{
 		if ($this->_errorMsg !== false) return $this->_errorMsg;
 
@@ -427,7 +427,7 @@ NATSOFT.DOMAIN =
 		return $this->_errorMsg;
 	}
 
-	function ErrorNo() 
+	public function ErrorNo() 
 	{
 		if ($this->_errorCode !== false) return $this->_errorCode;
 		
@@ -649,7 +649,7 @@ NATSOFT.DOMAIN =
 	* before UpdateBlob() then...
 	*/
 
-	function UpdateBlob($table,$column,$val,$where,$blobtype='BLOB')
+	public function UpdateBlob($table,$column,$val,$where,$blobtype='BLOB')
 	{
 		
 		//if (strlen($val) < 4000) return $this->Execute("UPDATE $table SET $column=:blob WHERE $where",array('blob'=>$val)) != false;
@@ -889,7 +889,7 @@ NATSOFT.DOMAIN =
 		return $rez;
 	}
 	
-	function Param($name,$type=false)
+	public function Param($name,$type=false)
 	{
 		return ':'.$name;
 	}
@@ -935,7 +935,7 @@ NATSOFT.DOMAIN =
 		  $db->bind($stmt,1); $db->bind($stmt,2); $db->bind($stmt,3); 
 		  $db->execute($stmt);
 	*/ 
-	function _query($sql,$inputarr)
+	public function _query($sql,$inputarr)
 	{
 		
 		if (is_array($sql)) { // is prepared sql
@@ -1060,7 +1060,7 @@ NATSOFT.DOMAIN =
 		$this->_connectionID = false;
 	}
 	
-	function MetaPrimaryKeys($table, $owner=false,$internalKey=false)
+	public function MetaPrimaryKeys($table, $owner=false,$internalKey=false)
 	{
 		if ($internalKey) return array('ROWID');
 		
@@ -1135,12 +1135,12 @@ SELECT /*+ RULE */ distinct b.column_name
 	}
 
 	
-	function CharMax()
+	public function CharMax()
 	{
 		return 4000;
 	}
 	
-	function TextMax()
+	public function TextMax()
 	{
 		return 4000;
 	}
@@ -1183,13 +1183,13 @@ SELECT /*+ RULE */ distinct b.column_name
 
 class ADORecordset_oci8 extends ADORecordSet {
 
-	var $databaseType = 'oci8';
+	public $databaseType = 'oci8';
 	var $bind=false;
 	var $_fieldobjs;
 	
 	//var $_arr = false;
 		
-	function ADORecordset_oci8($queryID,$mode=false)
+	public function ADORecordset_oci8($queryID,$mode=false)
 	{
 		if ($mode === false) { 
 			global $ADODB_FETCH_MODE;
@@ -1210,7 +1210,7 @@ class ADORecordset_oci8 extends ADORecordSet {
 	}
 
 
-	function Init()
+	public function Init()
 	{
 		if ($this->_inited) return;
 		
@@ -1240,7 +1240,7 @@ class ADORecordset_oci8 extends ADORecordSet {
 		}
 	}
 	
-	function _initrs()
+	public function _initrs()
 	{
 		$this->_numOfRows = -1;
 		$this->_numOfFields = OCInumcols($this->_queryID);
@@ -1256,7 +1256,7 @@ class ADORecordset_oci8 extends ADORecordSet {
 			  fields in a certain query result. If the field offset isn't specified, the next field that wasn't yet retrieved by
 			  fetchField() is retrieved.		*/
 
-	function &_FetchField($fieldOffset = -1)
+	public function &_FetchField($fieldOffset = -1)
 	{
 		$fld = new ADOFieldObject;
 		$fieldOffset += 1;
@@ -1296,7 +1296,7 @@ class ADORecordset_oci8 extends ADORecordSet {
 	}	*/
 	
 	
-	function MoveNext()
+	public function MoveNext()
 	{
 		if (@OCIfetchinto($this->_queryID,$this->fields,$this->fetchMode)) {
 			$this->_currentRow += 1;
@@ -1381,12 +1381,12 @@ class ADORecordset_oci8 extends ADORecordSet {
 	
 
 
-	function _seek($row)
+	public function _seek($row)
 	{
 		return false;
 	}
 
-	function _fetch() 
+	public function _fetch() 
 	{
 		return @OCIfetchinto($this->_queryID,$this->fields,$this->fetchMode);
 	}
@@ -1394,7 +1394,7 @@ class ADORecordset_oci8 extends ADORecordSet {
 	/*		close() only needs to be called if you are worried about using too much memory while your script
 			is running. All associated result memory for the specified result identifier will automatically be freed.		*/
 
-	function _close() 
+	public function _close() 
 	{
 		if ($this->connection->_stmt === $this->_queryID) $this->connection->_stmt = false;
 		if (!empty($this->_refcursor)) {
@@ -1406,7 +1406,7 @@ class ADORecordset_oci8 extends ADORecordSet {
 		
 	}
 
-	function MetaType($t,$len=-1)
+	public function MetaType($t,$len=-1)
 	{
 		if (is_object($t)) {
 			$fieldobj = $t;
@@ -1452,7 +1452,7 @@ class ADORecordset_oci8 extends ADORecordSet {
 }
 
 class ADORecordSet_ext_oci8 extends ADORecordSet_oci8 {	
-	function ADORecordSet_ext_oci8($queryID,$mode=false) 
+	public function ADORecordSet_ext_oci8($queryID,$mode=false) 
 	{
 		if ($mode === false) { 
 			global $ADODB_FETCH_MODE;
@@ -1470,7 +1470,7 @@ class ADORecordSet_ext_oci8 extends ADORecordSet_oci8 {
 		$this->_queryID = $queryID;
 	}
 	
-	function MoveNext()
+	public function MoveNext()
 	{
 		return adodb_movenext($this);
 	}

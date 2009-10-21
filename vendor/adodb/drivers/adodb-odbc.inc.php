@@ -21,7 +21,7 @@ if (!defined('ADODB_DIR')) die();
 
 class ADODB_odbc extends ADOConnection {
 	var $databaseType = "odbc";	
-	var $fmtDate = "'Y-m-d'";
+	public $fmtDate = "'Y-m-d'";
 	var $fmtTimeStamp = "'Y-m-d, h:i:sA'";
 	var $replaceQuote = "''"; // string to use to replace quotes
 	var $dataProvider = "odbc";
@@ -31,7 +31,7 @@ class ADODB_odbc extends ADOConnection {
 								// breaking backward-compat
 	//var $longreadlen = 8000; // default number of chars to return for a Blob/Long field
 	var $_bindInputArray = false;	
-	var $curmode = SQL_CUR_USE_DRIVER; // See sqlext.h, SQL_CUR_DEFAULT == SQL_CUR_USE_DRIVER == 2L
+	public $curmode = SQL_CUR_USE_DRIVER; // See sqlext.h, SQL_CUR_DEFAULT == SQL_CUR_USE_DRIVER == 2L
 	var $_genSeqSQL = "create table %s (id integer)";
 	var $_autocommit = true;
 	var $_haserrorfunctions = true;
@@ -39,7 +39,7 @@ class ADODB_odbc extends ADOConnection {
 	var $_lastAffectedRows = 0;
 	var $uCaseTables = true; // for meta* functions, uppercase table names
 	
-	function ADODB_odbc() 
+	public function ADODB_odbc() 
 	{ 	
 		$this->_haserrorfunctions = ADODB_PHPVER >= 0x4050;
 		$this->_has_stupid_odbc_fetch_api_change = ADODB_PHPVER >= 0x4200;
@@ -88,7 +88,7 @@ class ADODB_odbc extends ADOConnection {
 	}
 
 	
-	function ServerInfo()
+	public function ServerInfo()
 	{
 	
 		if (!empty($this->host) && ADODB_PHPVER >= 0x4300) {
@@ -118,7 +118,7 @@ class ADODB_odbc extends ADOConnection {
 	}
 
 	
-	function CreateSequence($seqname='adodbseq',$start=1)
+	public function CreateSequence($seqname='adodbseq',$start=1)
 	{
 		if (empty($this->_genSeqSQL)) return false;
 		$ok = $this->Execute(sprintf($this->_genSeqSQL,$seqname));
@@ -127,7 +127,7 @@ class ADODB_odbc extends ADOConnection {
 		return $this->Execute("insert into $seqname values($start)");
 	}
 	
-	var $_dropSeqSQL = 'drop table %s';
+	public $_dropSeqSQL = 'drop table %s';
 	function DropSequence($seqname)
 	{
 		if (empty($this->_dropSeqSQL)) return false;
@@ -170,7 +170,7 @@ class ADODB_odbc extends ADOConnection {
 	}
 
 
-	function ErrorMsg()
+	public function ErrorMsg()
 	{
 		if ($this->_haserrorfunctions) {
 			if ($this->_errorMsg !== false) return $this->_errorMsg;
@@ -179,7 +179,7 @@ class ADODB_odbc extends ADOConnection {
 		} else return ADOConnection::ErrorMsg();
 	}
 	
-	function ErrorNo()
+	public function ErrorNo()
 	{
 		
 		if ($this->_haserrorfunctions) {
@@ -200,7 +200,7 @@ class ADODB_odbc extends ADOConnection {
 	
 	
 
-	function BeginTrans()
+	public function BeginTrans()
 	{	
 		if (!$this->hasTransactions) return false;
 		if ($this->transOff) return true; 
@@ -209,7 +209,7 @@ class ADODB_odbc extends ADOConnection {
 		return odbc_autocommit($this->_connectionID,false);
 	}
 	
-	function CommitTrans($ok=true) 
+	public function CommitTrans($ok=true) 
 	{ 
 		if ($this->transOff) return true; 
 		if (!$ok) return $this->RollbackTrans();
@@ -220,7 +220,7 @@ class ADODB_odbc extends ADOConnection {
 		return $ret;
 	}
 	
-	function RollbackTrans()
+	public function RollbackTrans()
 	{
 		if ($this->transOff) return true; 
 		if ($this->transCnt) $this->transCnt -= 1;
@@ -230,7 +230,7 @@ class ADODB_odbc extends ADOConnection {
 		return $ret;
 	}
 	
-	function MetaPrimaryKeys($table)
+	public function MetaPrimaryKeys($table)
 	{
 	global $ADODB_FETCH_MODE;
 	
@@ -264,7 +264,7 @@ class ADODB_odbc extends ADOConnection {
 	
 	
 	
-	function &MetaTables($ttype=false)
+	public function &MetaTables($ttype=false)
 	{
 	global $ADODB_FETCH_MODE;
 	
@@ -370,7 +370,7 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/odbc/htm/od
 		}
 	}
 	
-	function &MetaColumns($table)
+	public function &MetaColumns($table)
 	{
 	global $ADODB_FETCH_MODE;
 	
@@ -422,7 +422,7 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/odbc/htm/od
 		}
 		if (empty($qid)) return $false;
 		
-		$rs =& new ADORecordSet_odbc($qid);
+		$rs = new ADORecordSet_odbc($qid);
 		$ADODB_FETCH_MODE = $savem;
 		
 		if (!$rs) return $false;
@@ -477,7 +477,7 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/odbc/htm/od
 		return $retarr;
 	}
 	
-	function Prepare($sql)
+	public function Prepare($sql)
 	{
 		if (! $this->_bindInputArray) return $sql; // no binding
 		$stmt = odbc_prepare($this->_connectionID,$sql);
@@ -577,7 +577,7 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/odbc/htm/od
 		return $ret;
 	}
 
-	function _affectedrows()
+	public function _affectedrows()
 	{
 		return $this->_lastAffectedRows;
 	}
@@ -590,13 +590,13 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/odbc/htm/od
 
 class ADORecordSet_odbc extends ADORecordSet {	
 	
-	var $bind = false;
+	public $bind = false;
 	var $databaseType = "odbc";		
-	var $dataProvider = "odbc";
+	public $dataProvider = "odbc";
 	var $useFetchArray;
 	var $_has_stupid_odbc_fetch_api_change;
 	
-	function ADORecordSet_odbc($id,$mode=false)
+	public function ADORecordSet_odbc($id,$mode=false)
 	{
 		if ($mode === false) {  
 			global $ADODB_FETCH_MODE;
@@ -644,7 +644,7 @@ class ADORecordSet_odbc extends ADORecordSet {
 	}
 	
 		
-	function _initrs()
+	public function _initrs()
 	{
 	global $ADODB_COUNTRECS;
 		$this->_numOfRows = ($ADODB_COUNTRECS) ? @odbc_num_rows($this->_queryID) : -1;
@@ -655,7 +655,7 @@ class ADORecordSet_odbc extends ADORecordSet {
 		$this->_has_stupid_odbc_fetch_api_change = ADODB_PHPVER >= 0x4200;
 	}	
 	
-	function _seek($row)
+	public function _seek($row)
 	{
 		return false;
 	}
@@ -687,7 +687,7 @@ class ADORecordSet_odbc extends ADORecordSet {
 	}
 	
 	
-	function MoveNext() 
+	public function MoveNext() 
 	{
 		if ($this->_numOfRows != 0 && !$this->EOF) {		
 			$this->_currentRow++;
@@ -710,7 +710,7 @@ class ADORecordSet_odbc extends ADORecordSet {
 		return false;
 	}	
 	
-	function _fetch()
+	public function _fetch()
 	{
 
 		if ($this->_has_stupid_odbc_fetch_api_change)
@@ -729,7 +729,7 @@ class ADORecordSet_odbc extends ADORecordSet {
 		return false;
 	}
 	
-	function _close() 
+	public function _close() 
 	{
 		return @odbc_free_result($this->_queryID);		
 	}

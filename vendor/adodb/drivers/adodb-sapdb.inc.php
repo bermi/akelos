@@ -23,7 +23,7 @@ define('ADODB_SAPDB',1);
 
 class ADODB_SAPDB extends ADODB_odbc {
 	var $databaseType = "sapdb";	
-	var $concat_operator = '||';
+	public $concat_operator = '||';
 	var $sysDate = 'DATE';
 	var $sysTimeStamp = 'TIMESTAMP';
 	var $fmtDate = "'Y-m-d'";	/// used by DBDate() as the default date format used by the database
@@ -31,13 +31,13 @@ class ADODB_SAPDB extends ADODB_odbc {
 	var $hasInsertId = true;
 	var $_bindInputArray = true;
 	
-	function ADODB_SAPDB()
+	public function ADODB_SAPDB()
 	{
 		//if (strncmp(PHP_OS,'WIN',3) === 0) $this->curmode = SQL_CUR_USE_ODBC;
 		$this->ADODB_odbc();
 	}
 	
-	function ServerInfo()
+	public function ServerInfo()
 	{
 		$info = ADODB_odbc::ServerInfo();
 		if (!$info['version'] && preg_match('/([0-9.]+)/',$info['description'],$matches)) {
@@ -46,14 +46,14 @@ class ADODB_SAPDB extends ADODB_odbc {
 		return $info;
 	}
 
-	function MetaPrimaryKeys($table)
+	public function MetaPrimaryKeys($table)
 	{
 		$table = $this->Quote(strtoupper($table));
 
 		return $this->GetCol("SELECT columnname FROM COLUMNS WHERE tablename=$table AND mode='KEY' ORDER BY pos");
 	}
 		
- 	function &MetaIndexes ($table, $primary = FALSE)
+ 	public function &MetaIndexes ($table, $primary = FALSE)
 	{
 		$table = $this->Quote(strtoupper($table));
 
@@ -92,7 +92,7 @@ class ADODB_SAPDB extends ADODB_odbc {
         return $indexes;
 	}
 	
- 	function &MetaColumns ($table)
+ 	public function &MetaColumns ($table)
 	{
 		global $ADODB_FETCH_MODE;
 		$save = $ADODB_FETCH_MODE;
@@ -140,7 +140,7 @@ class ADODB_SAPDB extends ADODB_odbc {
 		return $retarr;
 	}
 	
-	function MetaColumnNames($table)
+	public function MetaColumnNames($table)
 	{
 		$table = $this->Quote(strtoupper($table));
 
@@ -172,9 +172,9 @@ class ADODB_SAPDB extends ADODB_odbc {
 
 class  ADORecordSet_sapdb extends ADORecordSet_odbc {	
 	
-	var $databaseType = "sapdb";		
+	public $databaseType = "sapdb";		
 	
-	function ADORecordSet_sapdb($id,$mode=false)
+	public function ADORecordSet_sapdb($id,$mode=false)
 	{
 		$this->ADORecordSet_odbc($id,$mode);
 	}

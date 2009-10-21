@@ -15,11 +15,11 @@ if (!defined('ADODB_DIR')) die();
 
 class ADODB2_sqlite extends ADODB_DataDict {
 	
-	var $databaseType = 'sqlite';
+	public $databaseType = 'sqlite';
 	var $seqField = false;
 	
  	
- 	function ActualType($meta)
+ 	public function ActualType($meta)
 	{
 		switch($meta) {
 		case 'C': return 'VARCHAR';
@@ -48,7 +48,7 @@ class ADODB2_sqlite extends ADODB_DataDict {
 		}
 	}
 
-    function MetaType($t,$len=-1,$fieldobj=false)
+    public function MetaType($t,$len=-1,$fieldobj=false)
 	{
         if (is_object($t)) {
             $fieldobj = $t;
@@ -72,7 +72,7 @@ class ADODB2_sqlite extends ADODB_DataDict {
 	}
 	
 	
-	function DropColumnSQL($tabname, $flds)
+	public function DropColumnSQL($tabname, $flds)
 	{
 		if ($this->debug) ADOConnection::outp("DropColumnSQL not supported");
 		return array();

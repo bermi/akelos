@@ -16,11 +16,11 @@ if (!defined('ADODB_DIR')) die();
 
 class ADODB2_sapdb extends ADODB_DataDict {
 	
-	var $databaseType = 'sapdb';
+	public $databaseType = 'sapdb';
 	var $seqField = false;	
-	var $renameColumn = 'RENAME COLUMN %s.%s TO %s';
+	public $renameColumn = 'RENAME COLUMN %s.%s TO %s';
  	
- 	function ActualType($meta)
+ 	public function ActualType($meta)
 	{
 		switch($meta) {
 		case 'C': return 'VARCHAR';
@@ -49,7 +49,7 @@ class ADODB2_sapdb extends ADODB_DataDict {
 		}
 	}
 	
-	function MetaType($t,$len=-1,$fieldobj=false)
+	public function MetaType($t,$len=-1,$fieldobj=false)
 	{
 		if (is_object($t)) {
 			$fieldobj = $t;
@@ -91,7 +91,7 @@ class ADODB2_sapdb extends ADODB_DataDict {
 		return $suffix;
 	}
 
-	function AddColumnSQL($tabname, $flds)
+	public function AddColumnSQL($tabname, $flds)
 	{
 		$tabname = $this->TableName ($tabname);
 		$sql = array();
@@ -99,7 +99,7 @@ class ADODB2_sapdb extends ADODB_DataDict {
 		return array( 'ALTER TABLE ' . $tabname . ' ADD (' . implode(', ',$lines) . ')' );
 	}
 	
-	function AlterColumnSQL($tabname, $flds)
+	public function AlterColumnSQL($tabname, $flds)
 	{
 		$tabname = $this->TableName ($tabname);
 		$sql = array();
@@ -107,7 +107,7 @@ class ADODB2_sapdb extends ADODB_DataDict {
 		return array( 'ALTER TABLE ' . $tabname . ' MODIFY (' . implode(', ',$lines) . ')' );
 	}
 
-	function DropColumnSQL($tabname, $flds)
+	public function DropColumnSQL($tabname, $flds)
 	{
 		$tabname = $this->TableName ($tabname);
 		if (!is_array($flds)) $flds = explode(',',$flds);

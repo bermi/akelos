@@ -48,7 +48,7 @@ PDO_PARAM_INPUT_OUTPUT = 0x80000000
 };
 */
 	
-function adodb_pdo_type($t)
+public function adodb_pdo_type($t)
 {
 	switch($t) {
 	case 2: return 'VARCHAR';
@@ -63,7 +63,7 @@ function adodb_pdo_type($t)
 
 class ADODB_pdo_pgsql extends ADODB_pdo {
 var $metaDatabasesSQL = "select datname from pg_database where datname not in ('template0','template1') order by 1";
-    var $metaTablesSQL = "select tablename,'T' from pg_tables where tablename not like 'pg\_%'
+    public $metaTablesSQL = "select tablename,'T' from pg_tables where tablename not like 'pg\_%'
 	and tablename not in ('sql_features', 'sql_implementation_info', 'sql_languages',
 	 'sql_packages', 'sql_sizing', 'sql_sizing_profiles') 
 	union 
@@ -90,10 +90,10 @@ WHERE relkind in ('r','v') AND (c.relname='%s' or c.relname = lower('%s'))
 	var $metaKeySQL = "SELECT ic.relname AS index_name, a.attname AS column_name,i.indisunique AS unique_key, i.indisprimary AS primary_key 
 	FROM pg_class bc, pg_class ic, pg_index i, pg_attribute a WHERE bc.oid = i.indrelid AND ic.oid = i.indexrelid AND (i.indkey[0] = a.attnum OR i.indkey[1] = a.attnum OR i.indkey[2] = a.attnum OR i.indkey[3] = a.attnum OR i.indkey[4] = a.attnum OR i.indkey[5] = a.attnum OR i.indkey[6] = a.attnum OR i.indkey[7] = a.attnum) AND a.attrelid = bc.oid AND bc.relname = '%s'";
 	
-	var $hasAffectedRows = true;
+	public $hasAffectedRows = true;
 	var $hasLimit = false;	// set to true for pgsql 7 only. support pgsql/mysql SELECT * FROM TABLE LIMIT 10
 	// below suggested by Freek Dijkstra 
-	var $true = 't';		// string that represents TRUE for a database
+	public $true = 't';		// string that represents TRUE for a database
 	var $false = 'f';		// string that represents FALSE for a database
 	var $fmtDate = "'Y-m-d'";	// used by DBDate() as the default date format used by the database
 	var $fmtTimeStamp = "'Y-m-d G:i:s'"; // used by DBTimeStamp as the default timestamp fmt.
@@ -106,14 +106,14 @@ WHERE relkind in ('r','v') AND (c.relname='%s' or c.relname = lower('%s'))
 	var $random = 'random()';		/// random function
 	var $concat_operator='||';
 	 
-	function ServerInfo()
+	public function ServerInfo()
 	{
 		$arr['description'] = ADOConnection::GetOne("select version()");
 		$arr['version'] = ADOConnection::_findvers($arr['description']);
 		return $arr;
 	}
 	
-	function &SelectLimit($sql,$nrows=-1,$offset=-1,$inputarr=false,$secs2cache=0) 
+	public function &SelectLimit($sql,$nrows=-1,$offset=-1,$inputarr=false,$secs2cache=0) 
 	{
 		 $offsetStr = ($offset >= 0) ? " OFFSET $offset" : '';
 		 $limitStr  = ($nrows >= 0)  ? " LIMIT $nrows" : '';
@@ -125,7 +125,7 @@ WHERE relkind in ('r','v') AND (c.relname='%s' or c.relname = lower('%s'))
 		return $rs;
 	}
 	
-	function &MetaTables($ttype=false,$showSchema=false,$mask=false) 
+	public function &MetaTables($ttype=false,$showSchema=false,$mask=false) 
 	{
 		$info = $this->ServerInfo();
 		if ($info['version'] >= 7.3) {
@@ -156,7 +156,7 @@ select viewname,'V' from pg_views where viewname like $mask";
 		return $ret;
 	}
 	
-function &MetaColumns($table,$normalize=true) 
+public function &MetaColumns($table,$normalize=true) 
 	{
 	global $ADODB_FETCH_MODE;
 	
@@ -270,23 +270,23 @@ function &MetaColumns($table,$normalize=true)
 
 class ADODB_pdo_base extends ADODB_pdo {
 
-	function ServerInfo()
+	public function ServerInfo()
 	{
 		return ADOConnection::ServerInfo();
 	}
 	
-	function &SelectLimit($sql,$nrows=-1,$offset=-1,$inputarr=false,$secs2cache=0)
+	public function &SelectLimit($sql,$nrows=-1,$offset=-1,$inputarr=false,$secs2cache=0)
 	{
 		$ret = ADOConnection::SelectLimit($sql,$nrows,$offset,$inputarr,$secs2cache);
 		return $ret;
 	}
 	
-	function MetaTables()
+	public function MetaTables()
 	{
 		return false;
 	}
 	
-	function MetaColumns()
+	public function MetaColumns()
 	{
 		return false;
 	}
@@ -295,25 +295,25 @@ class ADODB_pdo_base extends ADODB_pdo {
 
 class ADODB_pdo extends ADOConnection {
 	var $databaseType = "pdo";	
-	var $dataProvider = "pdo";
+	public $dataProvider = "pdo";
 	var $fmtDate = "'Y-m-d'";
 	var $fmtTimeStamp = "'Y-m-d, h:i:sA'";
 	var $replaceQuote = "''"; // string to use to replace quotes
 	var $hasAffectedRows = true;
 	var $_bindInputArray = true;	
-	var $_genSeqSQL = "create table %s (id integer)";
+	public $_genSeqSQL = "create table %s (id integer)";
 	var $_autocommit = true;
 	var $_haserrorfunctions = true;
 	var $_lastAffectedRows = 0;
 	
-	var $dsnType = '';
+	public $dsnType = '';
 	var $stmt = false;
 	
-	function ADODB_pdo()
+	public function ADODB_pdo()
 	{
 	}
 	
-	function _UpdatePDO()
+	public function _UpdatePDO()
 	{
 		$d = &$this->_driver;
 		$this->fmtDate = $d->fmtDate;
@@ -325,7 +325,7 @@ class ADODB_pdo extends ADOConnection {
 		$this->concat_operator = $d->concat_operator;
 	}
 	
-	function Time()
+	public function Time()
 	{
 		return false;
 	}
@@ -372,7 +372,7 @@ class ADODB_pdo extends ADOConnection {
 	/*------------------------------------------------------------------------------*/
 	
 	
-	function &SelectLimit($sql,$nrows=-1,$offset=-1,$inputarr=false,$secs2cache=0) 
+	public function &SelectLimit($sql,$nrows=-1,$offset=-1,$inputarr=false,$secs2cache=0) 
 	{	
 		$save = $this->_driver->fetchMode;
 		$this->_driver->fetchMode = $this->fetchMode;
@@ -382,22 +382,22 @@ class ADODB_pdo extends ADOConnection {
 	}
 	
 	
-	function ServerInfo()
+	public function ServerInfo()
 	{
 		return $this->_driver->ServerInfo();
 	}
 	
-	function MetaTables($ttype=false,$showSchema=false,$mask=false)
+	public function MetaTables($ttype=false,$showSchema=false,$mask=false)
 	{
 		return $this->_driver->MetaTables($ttype,$showSchema,$mask);
 	}
 	
-	function MetaColumns($table,$normalize=true)
+	public function MetaColumns($table,$normalize=true)
 	{
 		return $this->_driver->MetaColumns($table,$normalize);
 	}
 	
-	function ErrorMsg()
+	public function ErrorMsg()
 	{
 		if ($this->_stmt) $arr = $this->_stmt->errorInfo();
 		else $arr = $this->_connectionID->errorInfo();
@@ -408,14 +408,14 @@ class ADODB_pdo extends ADOConnection {
 		} else return '-1';
 	}
 	
-	function InParameter(&$stmt,&$var,$name,$maxLen=4000,$type=false)
+	public function InParameter(&$stmt,&$var,$name,$maxLen=4000,$type=false)
 	{
 		$obj = $stmt[1];
 		if ($type) $obj->bindParam($name,$var,$type,$maxLen);
 		else $obj->bindParam($name, $var);
 	}
 	
-	function ErrorNo()
+	public function ErrorNo()
 	{
 		if ($this->_stmt) $err = $this->_stmt->errorCode();
 		else {
@@ -427,7 +427,7 @@ class ADODB_pdo extends ADOConnection {
 		return $err;
 	}
 
-	function BeginTrans()
+	public function BeginTrans()
 	{	
 		if (!$this->hasTransactions) return false;
 		if ($this->transOff) return true; 
@@ -437,7 +437,7 @@ class ADODB_pdo extends ADOConnection {
 		return $this->_connectionID->beginTransaction();
 	}
 	
-	function CommitTrans($ok=true) 
+	public function CommitTrans($ok=true) 
 	{ 
 		if (!$this->hasTransactions) return false;
 		if ($this->transOff) return true; 
@@ -450,7 +450,7 @@ class ADODB_pdo extends ADOConnection {
 		return $ret;
 	}
 	
-	function RollbackTrans()
+	public function RollbackTrans()
 	{
 		if (!$this->hasTransactions) return false;
 		if ($this->transOff) return true; 
@@ -462,7 +462,7 @@ class ADODB_pdo extends ADOConnection {
 		return $ret;
 	}
 	
-	function Prepare($sql)
+	public function Prepare($sql)
 	{
 		$this->_stmt = $this->_connectionID->prepare($sql);
 		if ($this->_stmt) return array($sql,$this->_stmt);
@@ -470,7 +470,7 @@ class ADODB_pdo extends ADOConnection {
 		return false;
 	}
 	
-	function PrepareStmt($sql)
+	public function PrepareStmt($sql)
 	{
 		$stmt = $this->_connectionID->prepare($sql);
 		if (!$stmt) return false;
@@ -504,12 +504,12 @@ class ADODB_pdo extends ADOConnection {
 		return true;
 	}
 
-	function _affectedrows()
+	public function _affectedrows()
 	{
 		return ($this->_stmt) ? $this->_stmt->rowCount() : 0;
 	}
 	
-	function _insertid()
+	public function _insertid()
 	{
 		return ($this->_connectionID) ? $this->_connectionID->lastInsertId() : 0;
 	}
@@ -517,18 +517,18 @@ class ADODB_pdo extends ADOConnection {
 
 class ADOPDOStatement {
 
-	var $databaseType = "pdo";		
-	var $dataProvider = "pdo";
+	public $databaseType = "pdo";		
+	public $dataProvider = "pdo";
 	var $_stmt;
 	var $_connectionID;
 	
-	function ADOPDOStatement($stmt,$connection)
+	public function ADOPDOStatement($stmt,$connection)
 	{
 		$this->_stmt = $stmt;
 		$this->_connectionID = $connection;
 	}
 	
-	function Execute($inputArr=false)
+	public function Execute($inputArr=false)
 	{
 		$savestmt = $this->_connectionID->_stmt;
 		$rs = $this->_connectionID->Execute(array(false,$this->_stmt),$inputArr);
@@ -536,19 +536,19 @@ class ADOPDOStatement {
 		return $rs;
 	}
 	
-	function InParameter(&$var,$name,$maxLen=4000,$type=false)
+	public function InParameter(&$var,$name,$maxLen=4000,$type=false)
 	{
 
 		if ($type) $this->_stmt->bindParam($name,$var,$type,$maxLen);
 		else $this->_stmt->bindParam($name, $var);
 	}
 	
-	function Affected_Rows()
+	public function Affected_Rows()
 	{
 		return ($this->_stmt) ? $this->_stmt->rowCount() : 0;
 	}
 	
-	function ErrorMsg()
+	public function ErrorMsg()
 	{
 		if ($this->_stmt) $arr = $this->_stmt->errorInfo();
 		else $arr = $this->_connectionID->errorInfo();
@@ -559,12 +559,12 @@ class ADOPDOStatement {
 		} else return '-1';
 	}
 	
-	function NumCols()
+	public function NumCols()
 	{
 		return ($this->_stmt) ? $this->_stmt->columnCount() : 0;
 	}
 	
-	function ErrorNo()
+	public function ErrorNo()
 	{
 		if ($this->_stmt) return $this->_stmt->errorCode();
 		else return $this->_connectionID->errorInfo();
@@ -577,11 +577,11 @@ class ADOPDOStatement {
 
 class ADORecordSet_pdo extends ADORecordSet {	
 	
-	var $bind = false;
+	public $bind = false;
 	var $databaseType = "pdo";		
-	var $dataProvider = "pdo";
+	public $dataProvider = "pdo";
 	
-	function ADORecordSet_pdo($id,$mode=false)
+	public function ADORecordSet_pdo($id,$mode=false)
 	{
 		if ($mode === false) {  
 			global $ADODB_FETCH_MODE;
@@ -602,7 +602,7 @@ class ADORecordSet_pdo extends ADORecordSet {
 	}
 
 	
-	function Init()
+	public function Init()
 	{
 		if ($this->_inited) return;
 		$this->_inited = true;
@@ -621,7 +621,7 @@ class ADORecordSet_pdo extends ADORecordSet {
 		}
 	}
 	
-	function _initrs()
+	public function _initrs()
 	{
 	global $ADODB_COUNTRECS;
 	
@@ -651,12 +651,12 @@ class ADORecordSet_pdo extends ADORecordSet {
 		return $o;
 	}
 	
-	function _seek($row)
+	public function _seek($row)
 	{
 		return false;
 	}
 	
-	function _fetch()
+	public function _fetch()
 	{
 		if (!$this->_queryID) return false;
 		
@@ -664,12 +664,12 @@ class ADORecordSet_pdo extends ADORecordSet {
 		return !empty($this->fields);
 	}
 	
-	function _close() 
+	public function _close() 
 	{
 		$this->_queryID = false;
 	}
 	
-	function Fields($colname)
+	public function Fields($colname)
 	{
 		if ($this->adodbFetchMode != ADODB_FETCH_NUM) return @$this->fields[$colname];
 		

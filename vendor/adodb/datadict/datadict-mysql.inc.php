@@ -19,10 +19,10 @@ class ADODB2_mysql extends ADODB_DataDict {
 	var $alterTableAddIndex = true;
 	var $dropTable = 'DROP TABLE IF EXISTS %s'; // requires mysql 3.22 or later
 	
-	var $dropIndex = 'DROP INDEX %s ON %s';
+	public $dropIndex = 'DROP INDEX %s ON %s';
 	var $renameColumn = 'ALTER TABLE %s CHANGE COLUMN %s %s %s';	// needs column-definition!
 	
-	function MetaType($t,$len=-1,$fieldobj=false)
+	public function MetaType($t,$len=-1,$fieldobj=false)
 	{
 		if (is_object($t)) {
 			$fieldobj = $t;
@@ -139,7 +139,7 @@ class ADODB2_mysql extends ADODB_DataDict {
 		ON tbl_name (col_name[(length)],... )
 	*/
 	
-	function _IndexSQL($idxname, $tabname, $flds, $idxoptions)
+	public function _IndexSQL($idxname, $tabname, $flds, $idxoptions)
 	{
 		$sql = array();
 		

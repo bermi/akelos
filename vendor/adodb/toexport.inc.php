@@ -60,7 +60,7 @@ function rs2tabout(&$rs,$addtitles=true)
 	if ($fp) fclose($fp);
 }
 
-function _adodb_export(&$rs,$sep,$sepreplace,$fp=false,$addtitles=true,$quote = '"',$escquote = '"',$replaceNewLine = ' ')
+public function _adodb_export(&$rs,$sep,$sepreplace,$fp=false,$addtitles=true,$quote = '"',$escquote = '"',$replaceNewLine = ' ')
 {
 	if (!$rs) return '';
 	//----------

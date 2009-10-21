@@ -28,7 +28,7 @@ class perf_db2 extends adodb_perf{
 		  timer decimal(16,6) NOT NULL
 		)";
 		
-	var $settings = array(
+	public $settings = array(
 	'Ratios',
 		'data cache hit ratio' => array('RATIO',
 			"SELECT 
@@ -56,12 +56,12 @@ class perf_db2 extends adodb_perf{
 	);
 
 
-	function perf_db2(&$conn)
+	public function perf_db2(&$conn)
 	{
 		$this->conn =& $conn;
 	}
 	
-	function Explain($sql,$partial=false)
+	public function Explain($sql,$partial=false)
 	{
 		$save = $this->conn->LogSQL(false);
 		if ($partial) {
@@ -91,7 +91,7 @@ class perf_db2 extends adodb_perf{
 	}
 	
 	
-	function Tables()
+	public function Tables()
 	{
 		$rs = $this->conn->Execute("select tabschema,tabname,card as rows,
 			npages pages_used,fpages pages_allocated, tbspace tablespace  

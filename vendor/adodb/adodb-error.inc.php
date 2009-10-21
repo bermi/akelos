@@ -43,7 +43,7 @@ if (!defined("DB_ERROR_SYNTAX")) {
 	define("DB_ERROR_ACCESS_VIOLATION",   -26);
 }
 
-function adodb_errormsg($value)
+public function adodb_errormsg($value)
 {
 global $ADODB_LANG,$ADODB_LANG_ARRAY;
 
@@ -55,7 +55,7 @@ global $ADODB_LANG,$ADODB_LANG_ARRAY;
 	return isset($ADODB_LANG_ARRAY[$value]) ? $ADODB_LANG_ARRAY[$value] : $ADODB_LANG_ARRAY[DB_ERROR];
 }
 
-function adodb_error($provider,$dbType,$errno)
+public function adodb_error($provider,$dbType,$errno)
 {
 	//var_dump($errno);
 	if (is_numeric($errno) && $errno == 0) return 0;
@@ -88,7 +88,7 @@ function adodb_error($provider,$dbType,$errno)
 
 //**************************************************************************************
 
-function adodb_error_pg($errormsg)
+public function adodb_error_pg($errormsg)
 {
 	if (is_numeric($errormsg)) return (integer) $errormsg;
     static $error_regexps = array(
@@ -112,7 +112,7 @@ function adodb_error_pg($errormsg)
     return DB_ERROR;
 }
 	
-function adodb_error_odbc()
+public function adodb_error_odbc()
 {
 static $MAP = array(
             '01004' => DB_ERROR_TRUNCATED,
@@ -143,7 +143,7 @@ static $MAP = array(
 		return $MAP;
 }
 
-function adodb_error_ibase()
+public function adodb_error_ibase()
 {
 static $MAP = array(
             -104 => DB_ERROR_SYNTAX,
@@ -173,7 +173,7 @@ static $MAP = array(
 		return $MAP;
 }
 
-function adodb_error_ifx()
+public function adodb_error_ifx()
 {
 static $MAP = array(
             '-201'    => DB_ERROR_SYNTAX,
@@ -191,7 +191,7 @@ static $MAP = array(
 	   return $MAP;
 }
 
-function adodb_error_oci8()
+public function adodb_error_oci8()
 {
 static $MAP = array(
 			 1 => DB_ERROR_ALREADY_EXISTS,
@@ -210,7 +210,7 @@ static $MAP = array(
 	return $MAP;
 }
 
-function adodb_error_mssql()
+public function adodb_error_mssql()
 {
 static $MAP = array(
 		  208 => DB_ERROR_NOSUCHTABLE,
@@ -220,7 +220,7 @@ static $MAP = array(
 	return $MAP;
 }
 
-function adodb_error_sqlite()
+public function adodb_error_sqlite()
 {
 static $MAP = array(
 		  1 => DB_ERROR_SYNTAX
@@ -229,7 +229,7 @@ static $MAP = array(
 	return $MAP;
 }
 
-function adodb_error_mysql()
+public function adodb_error_mysql()
 {
 static $MAP = array(
            1004 => DB_ERROR_CANNOT_CREATE,

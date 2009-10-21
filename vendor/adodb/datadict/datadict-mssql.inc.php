@@ -20,7 +20,7 @@ class ADODB2_mssql extends ADODB_DataDict {
 	var $renameColumn = "EXEC sp_rename '%s.%s','%s'";
 	//var $alterCol = ' ALTER COLUMN ';
 	
-	function MetaType($t,$len=-1,$fieldobj=false)
+	public function MetaType($t,$len=-1,$fieldobj=false)
 	{
 		if (is_object($t)) {
 			$fieldobj = $t;
@@ -44,7 +44,7 @@ class ADODB2_mssql extends ADODB_DataDict {
 		}
 	}
 	
-	function ActualType($meta)
+	public function ActualType($meta)
 	{
 		switch(strtoupper($meta)) {
 
@@ -75,7 +75,7 @@ class ADODB2_mssql extends ADODB_DataDict {
 	}
 	
 	
-	function AddColumnSQL($tabname, $flds)
+	public function AddColumnSQL($tabname, $flds)
 	{
 		$tabname = $this->TableName ($tabname);
 		$f = array();
@@ -103,7 +103,7 @@ class ADODB2_mssql extends ADODB_DataDict {
 	}
 	*/
 	
-	function DropColumnSQL($tabname, $flds)
+	public function DropColumnSQL($tabname, $flds)
 	{
 		$tabname = $this->TableName ($tabname);
 		if (!is_array($flds))
@@ -233,7 +233,7 @@ CREATE TABLE
 	}
 	
 	
-	function _GetSize($ftype, $ty, $fsize, $fprec)
+	public function _GetSize($ftype, $ty, $fsize, $fprec)
 	{
 		switch ($ftype) {
 		case 'INT':

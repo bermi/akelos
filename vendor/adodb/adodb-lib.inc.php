@@ -429,7 +429,7 @@ function &_adodb_pageexecute_all_rows(&$zthis, $sql, $nrows, $page,
 	return $rsreturn;
 }
 
-// Iván Oliva version
+// Ivï¿½n Oliva version
 function &_adodb_pageexecute_no_last_page(&$zthis, $sql, $nrows, $page, $inputarr=false, $secs2cache=0) 
 {
 
@@ -655,7 +655,7 @@ static $cacheCols;
 		//because we have to call MetaType.
 		//php can't do a $rsclass::MetaType()
 		$rsclass = $zthis->rsPrefix.$zthis->databaseType;
-		$recordSet =& new $rsclass(-1,$zthis->fetchMode);
+		$recordSet =  new $rsclass(-1,$zthis->fetchMode);
 		$recordSet->connection = &$zthis;
 		
 		if (is_string($cacheRS) && $cacheRS == $rs) {

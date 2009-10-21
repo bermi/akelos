@@ -15,12 +15,12 @@ if (!defined('ADODB_DIR')) die();
 
 class ADODB2_ibase extends ADODB_DataDict {
 	
-	var $databaseType = 'ibase';
+	public $databaseType = 'ibase';
 	var $seqField = false;
 	var $dropTable = '';
 	
  	
- 	function ActualType($meta)
+ 	public function ActualType($meta)
 	{
 		switch($meta) {
 		case 'C': return 'VARCHAR';
@@ -56,7 +56,7 @@ class ADODB2_ibase extends ADODB_DataDict {
 	}
 	
 	
-	function DropColumnSQL($tabname, $flds)
+	public function DropColumnSQL($tabname, $flds)
 	{
 		if ($this->debug) ADOConnection::outp("DropColumnSQL not supported");
 		return array();

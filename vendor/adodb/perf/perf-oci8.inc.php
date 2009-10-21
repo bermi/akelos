@@ -17,10 +17,10 @@ if (!defined('ADODB_DIR')) die();
 
 class perf_oci8 extends ADODB_perf{
 	
-	var $tablesSQL = "select segment_name as \"tablename\", sum(bytes)/1024 as \"size_in_k\",tablespace_name as \"tablespace\",count(*) \"extents\" from sys.user_extents 
+	public $tablesSQL = "select segment_name as \"tablename\", sum(bytes)/1024 as \"size_in_k\",tablespace_name as \"tablespace\",count(*) \"extents\" from sys.user_extents 
 	   group by segment_name,tablespace_name";
 	 
-	var $version;
+	public $version;
 	var $createTableSQL = "CREATE TABLE adodb_logsql (
 		  created date NOT NULL,
 		  sql0 varchar(250) NOT NULL,
@@ -30,7 +30,7 @@ class perf_oci8 extends ADODB_perf{
 		  timer decimal(16,6) NOT NULL
 		)";
 	
-	var $settings = array(
+	public $settings = array(
 	'Ratios',
 		'data cache hit ratio' => array('RATIOH',
 			"select round((1-(phy.value / (cur.value + con.value)))*100,2) 
@@ -162,7 +162,7 @@ having count(*) > 100)",'These are sql statements that should be using bind vari
 	);
 	
 	
-	function perf_oci8(&$conn)
+	public function perf_oci8(&$conn)
 	{
 		$savelog = $conn->LogSQL(false);	
 		$this->version = $conn->ServerInfo();
@@ -170,7 +170,7 @@ having count(*) > 100)",'These are sql statements that should be using bind vari
 		$this->conn =& $conn;
 	}
 	
-	function WarnPageCost($val)
+	public function WarnPageCost($val)
 	{
 		if ($val == 100) $s = '<font color=red><b>Too High</b>. </font>';
 		else $s = '';
@@ -178,7 +178,7 @@ having count(*) > 100)",'These are sql statements that should be using bind vari
 		return $s.'Recommended is 20-50 for TP, and 50 for data warehouses. Default is 100. See <a href=http://www.dba-oracle.com/oracle_tips_cost_adj.htm>optimizer_index_cost_adj</a>. ';
 	}
 	
-	function WarnIndexCost($val)
+	public function WarnIndexCost($val)
 	{
 		if ($val == 0) $s = '<font color=red><b>Too Low</b>. </font>';
 		else $s = '';
@@ -188,7 +188,7 @@ having count(*) > 100)",'These are sql statements that should be using bind vari
 			 See <a href=http://www.dba-oracle.com/oracle_tips_cbo_part1.htm>optimizer_index_caching</a>.';
 		}
 	
-	function PGA()
+	public function PGA()
 	{
 		if ($this->version['version'] < 9) return 'Oracle 9i or later required';
 		
@@ -208,7 +208,7 @@ having count(*) > 100)",'These are sql statements that should be using bind vari
 		return reset($rs->fields);
 	}
 	
-	function Explain($sql,$partial=false) 
+	public function Explain($sql,$partial=false) 
 	{
 		$savelog = $this->conn->LogSQL(false);
 		$rs =& $this->conn->SelectLimit("select ID FROM PLAN_TABLE");
@@ -287,7 +287,7 @@ CONNECT BY prior id=parent_id and statement_id='$id'");
 	}
 	
 	
-	function CheckMemory()
+	public function CheckMemory()
 	{
 		if ($this->version['version'] < 9) return 'Oracle 9i or later required';
 		

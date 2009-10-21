@@ -70,7 +70,7 @@ $ADODB_INCLUDED_CSV = 1;
 	
 		$savefetch = isset($rs->adodbFetchMode) ? $rs->adodbFetchMode : $rs->fetchMode;
 		$class = $rs->connection->arrayClass;
-		$rs2 =& new $class();
+		$rs2 = new $class();
 		$rs2->sql = $rs->sql;
 		$rs2->oldProvider = $rs->dataProvider; 
 		$rs2->InitArrayFields($rows,$flds);
@@ -129,7 +129,7 @@ $ADODB_INCLUDED_CSV = 1;
 						return $false;
 					}
 					
-					$rs =& new $rsclass($val=true);
+					$rs = new $rsclass($val=true);
 					$rs->fields = array();
 					$rs->timeCreated = $meta[1];
 					$rs->EOF = true;
@@ -224,7 +224,7 @@ $ADODB_INCLUDED_CSV = 1;
 					$flds = false;
 					break;
 				}
-				$fld =& new ADOFieldObject();
+				$fld = new ADOFieldObject();
 				$fld->name = urldecode($o2[0]);
 				$fld->type = $o2[1];
 				$fld->max_length = $o2[2];
@@ -252,7 +252,7 @@ $ADODB_INCLUDED_CSV = 1;
 			if (get_magic_quotes_runtime()) $err .= ". Magic Quotes Runtime should be disabled!";
 			return $false;
 		}
-		$rs =& new $rsclass();
+		$rs = new $rsclass();
 		$rs->timeCreated = $ttl;
 		$rs->InitArrayFields($arr,$flds);
 		return $rs;

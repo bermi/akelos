@@ -19,14 +19,14 @@ include_once(ADODB_DIR.'/drivers/adodb-oci8.inc.php');
 
 class ADODB_oci805 extends ADODB_oci8 {
 	var $databaseType = "oci805";	
-	var $connectSID = true;
+	public $connectSID = true;
 	
-	function ADODB_oci805() 
+	public function ADODB_oci805() 
 	{
 		$this->ADODB_oci8();
 	}
 	
-	function &SelectLimit($sql,$nrows=-1,$offset=-1, $inputarr=false,$secs2cache=0)
+	public function &SelectLimit($sql,$nrows=-1,$offset=-1, $inputarr=false,$secs2cache=0)
 	{
 		// seems that oracle only supports 1 hint comment in 8i
 		if (strpos($sql,'/*+') !== false)
@@ -50,7 +50,7 @@ class ADODB_oci805 extends ADODB_oci8 {
 }
 
 class ADORecordset_oci805 extends ADORecordset_oci8 {	
-	var $databaseType = "oci805";
+	public $databaseType = "oci805";
 	function ADORecordset_oci805($id,$mode=false)
 	{
 		$this->ADORecordset_oci8($id,$mode);

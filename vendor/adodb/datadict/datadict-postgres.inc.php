@@ -15,14 +15,14 @@ if (!defined('ADODB_DIR')) die();
 
 class ADODB2_postgres extends ADODB_DataDict {
 	
-	var $databaseType = 'postgres';
+	public $databaseType = 'postgres';
 	var $seqField = false;
 	var $seqPrefix = 'SEQ_';
 	var $addCol = ' ADD COLUMN';
 	var $quote = '"';
 	var $renameTable = 'ALTER TABLE %s RENAME TO %s'; // at least since 7.1
 	
-	function MetaType($t,$len=-1,$fieldobj=false)
+	public function MetaType($t,$len=-1,$fieldobj=false)
 	{
 		if (is_object($t)) {
 			$fieldobj = $t;
@@ -86,7 +86,7 @@ class ADODB2_postgres extends ADODB_DataDict {
 		}
 	}
  	
- 	function ActualType($meta)
+ 	public function ActualType($meta)
 	{
 		switch($meta) {
 		case 'C': return 'VARCHAR';
@@ -251,7 +251,7 @@ class ADODB2_postgres extends ADODB_DataDict {
 		return $aSql;
 	}
 	
-	function DropTableSQL($tabname)
+	public function DropTableSQL($tabname)
 	{
 		$sql = ADODB_DataDict::DropTableSQL($tabname);
 		

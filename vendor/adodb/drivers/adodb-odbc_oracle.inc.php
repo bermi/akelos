@@ -19,11 +19,11 @@ if (!defined('_ADODB_ODBC_LAYER')) {
 
  
 class  ADODB_odbc_oracle extends ADODB_odbc {	
-	var $databaseType = 'odbc_oracle';
- 	var $replaceQuote = "''"; // string to use to replace quotes
+	public $databaseType = 'odbc_oracle';
+ 	public $replaceQuote = "''"; // string to use to replace quotes
 	var $concat_operator='||';
 	var $fmtDate = "'Y-m-d 00:00:00'"; 
-	var $fmtTimeStamp = "'Y-m-d h:i:sA'";
+	public $fmtTimeStamp = "'Y-m-d h:i:sA'";
 	var $metaTablesSQL = 'select table_name from cat';
 	var $metaColumnsSQL = "select cname,coltype,width from col where tname='%s' order by colno";
 	var $sysDate = "TRUNC(SYSDATE)";
@@ -31,12 +31,12 @@ class  ADODB_odbc_oracle extends ADODB_odbc {
 	
 	//var $_bindInputArray = false;
 	
-	function ADODB_odbc_oracle()
+	public function ADODB_odbc_oracle()
 	{
 		$this->ADODB_odbc();
 	}
 		
-	function &MetaTables() 
+	public function &MetaTables() 
 	{
 		$false = false;
 		$rs = $this->Execute($this->metaTablesSQL);
@@ -50,7 +50,7 @@ class  ADODB_odbc_oracle extends ADODB_odbc {
 		return $arr2;
 	}
 	
-	function &MetaColumns($table) 
+	public function &MetaColumns($table) 
 	{
 		
 		$rs = $this->Execute(sprintf($this->metaColumnsSQL,strtoupper($table)));
@@ -104,9 +104,9 @@ class  ADODB_odbc_oracle extends ADODB_odbc {
  
 class  ADORecordSet_odbc_oracle extends ADORecordSet_odbc {	
 	
-	var $databaseType = 'odbc_oracle';
+	public $databaseType = 'odbc_oracle';
 	
-	function ADORecordSet_odbc_oracle($id,$mode=false)
+	public function ADORecordSet_odbc_oracle($id,$mode=false)
 	{
 		return $this->ADORecordSet_odbc($id,$mode);
 	}

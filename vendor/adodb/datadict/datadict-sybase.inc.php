@@ -16,9 +16,9 @@ if (!defined('ADODB_DIR')) die();
 class ADODB2_sybase extends ADODB_DataDict {
 	var $databaseType = 'sybase';
 	
-	var $dropIndex = 'DROP INDEX %2$s.%1$s';
+	public $dropIndex = 'DROP INDEX %2$s.%1$s';
 	
-	function MetaType($t,$len=-1,$fieldobj=false)
+	public function MetaType($t,$len=-1,$fieldobj=false)
 	{
 		if (is_object($t)) {
 			$fieldobj = $t;
@@ -42,7 +42,7 @@ class ADODB2_sybase extends ADODB_DataDict {
 		}
 	}
 	
-	function ActualType($meta)
+	public function ActualType($meta)
 	{
 		switch(strtoupper($meta)) {
 		case 'C': return 'VARCHAR';
@@ -72,7 +72,7 @@ class ADODB2_sybase extends ADODB_DataDict {
 	}
 	
 	
-	function AddColumnSQL($tabname, $flds)
+	public function AddColumnSQL($tabname, $flds)
 	{
 		$tabname = $this->TableName ($tabname);
 		$f = array();
@@ -86,7 +86,7 @@ class ADODB2_sybase extends ADODB_DataDict {
 		return $sql;
 	}
 	
-	function AlterColumnSQL($tabname, $flds)
+	public function AlterColumnSQL($tabname, $flds)
 	{
 		$tabname = $this->TableName ($tabname);
 		$sql = array();
@@ -98,7 +98,7 @@ class ADODB2_sybase extends ADODB_DataDict {
 		return $sql;
 	}
 	
-	function DropColumnSQL($tabname, $flds)
+	public function DropColumnSQL($tabname, $flds)
 	{
 		$tabname = $this->TableName($tabname);
 		if (!is_array($flds)) $flds = explode(',',$flds);

@@ -24,29 +24,29 @@ if (!defined('LDAP_ASSOC')) {
 }
 
 class ADODB_ldap extends ADOConnection {
-    var $databaseType = 'ldap';
+    public $databaseType = 'ldap';
 	var $dataProvider = 'ldap';
 	
 	# Connection information
-    var $username = false;
-    var $password = false;
+    public $username = false;
+    public $password = false;
     
     # Used during searches
-    var $filter;
-    var $dn;
+    public $filter;
+    public $dn;
 	var $version;
 	var $port = 389;
 
 	# Options configuration information
 	var $LDAP_CONNECT_OPTIONS;
 
-	function ADODB_ldap() 
+	public function ADODB_ldap() 
 	{		
 	}
   		
 	// returns true or false
 	
-	function _connect( $host, $username, $password, $ldapbase)
+	public function _connect( $host, $username, $password, $ldapbase)
 	{
 	global $LDAP_CONNECT_OPTIONS;
 		
@@ -139,7 +139,7 @@ class ADODB_ldap extends ADOConnection {
 	);
 */
 
-	function _inject_bind_options( $options ) {
+	public function _inject_bind_options( $options ) {
 		foreach( $options as $option ) {
 			ldap_set_option( $this->_connectionID, $option["OPTION_NAME"], $option["OPTION_VALUE"] )
 				or die( "Unable to set server option: " . $option["OPTION_NAME"] );
@@ -161,12 +161,12 @@ class ADODB_ldap extends ADOConnection {
 		$this->_connectionID = false;
 	}
     
-	function SelectDB($db) {
+	public function SelectDB($db) {
 		$this->database = $db;
 		return true;
 	} // SelectDB
 
-    function ServerInfo()
+    public function ServerInfo()
     {
         if( !empty( $this->version ) ) return $this->version;
         $version = array();
@@ -269,11 +269,11 @@ class ADODB_ldap extends ADOConnection {
 
 class ADORecordSet_ldap extends ADORecordSet{	
 	
-	var $databaseType = "ldap";
+	public $databaseType = "ldap";
 	var $canSeek = false;
 	var $_entryID; /* keeps track of the entry resource identifier */
 	
-	function ADORecordSet_ldap($queryID,$mode=false) 
+	public function ADORecordSet_ldap($queryID,$mode=false) 
 	{
 		if ($mode === false) { 
 			global $ADODB_FETCH_MODE;
@@ -297,7 +297,7 @@ class ADORecordSet_ldap extends ADORecordSet{
 		$this->ADORecordSet($queryID);	
 	}
 	
-	function _initrs()
+	public function _initrs()
 	{
 	   /* 
 	   This could be teaked to respect the $COUNTRECS directive from ADODB
@@ -331,7 +331,7 @@ class ADORecordSet_ldap extends ADORecordSet{
 		return $results; 
 	}
     
-    function &GetRowAssoc()
+    public function &GetRowAssoc()
 	{
         $results = array();
         foreach ( $this->fields as $k=>$v ) {
@@ -348,7 +348,7 @@ class ADORecordSet_ldap extends ADORecordSet{
 		return $results; 
 	}
 		
-    function GetRowNums()
+    public function GetRowNums()
     {
         $results = array();
         foreach ( $this->fields as $k=>$v ) {
@@ -366,7 +366,7 @@ class ADORecordSet_ldap extends ADORecordSet{
         return $results;
     }
 	
-	function _fetch()
+	public function _fetch()
 	{		
 		if ( $this->_currentRow >= $this->_numOfRows && $this->_numOfRows >= 0 )
         	return false;
@@ -397,7 +397,7 @@ class ADORecordSet_ldap extends ADORecordSet{
         return ( is_array( $this->fields ) );        
 	}
 	
-	function _close() {
+	public function _close() {
 		@ldap_free_result( $this->_queryID );	
 		$this->_queryID = false;
 	}

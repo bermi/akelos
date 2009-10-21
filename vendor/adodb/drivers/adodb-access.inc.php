@@ -19,7 +19,7 @@ if (!defined('_ADODB_ODBC_LAYER')) {
  	define('_ADODB_ACCESS',1);
 
 class  ADODB_access extends ADODB_odbc {	
-	var $databaseType = 'access';
+	public $databaseType = 'access';
 	var $hasTop = 'top';		// support mssql SELECT TOP 10 * FROM TABLE
 	var $fmtDate = "#Y-m-d#";
 	var $fmtTimeStamp = "#Y-m-d h:i:sA#"; // note not comma
@@ -28,7 +28,7 @@ class  ADODB_access extends ADODB_odbc {
 	var $sysTimeStamp = 'NOW';
 	var $hasTransactions = false;
 	
-	function ADODB_access()
+	public function ADODB_access()
 	{
 	global $ADODB_EXTENSION;
 	
@@ -36,14 +36,14 @@ class  ADODB_access extends ADODB_odbc {
 		$this->ADODB_odbc();
 	}
 	
-	function Time()
+	public function Time()
 	{
 		return time();
 	}
 	
-	function BeginTrans() { return false;}
+	public function BeginTrans() { return false;}
 	
-	function IfNull( $field, $ifNull ) 
+	public function IfNull( $field, $ifNull ) 
 	{
 		return " IIF(IsNull($field), $ifNull, $field) "; // if Access
 	}
@@ -75,9 +75,9 @@ class  ADODB_access extends ADODB_odbc {
  
 class  ADORecordSet_access extends ADORecordSet_odbc {	
 	
-	var $databaseType = "access";		
+	public $databaseType = "access";		
 	
-	function ADORecordSet_access($id,$mode=false)
+	public function ADORecordSet_access($id,$mode=false)
 	{
 		return $this->ADORecordSet_odbc($id,$mode);
 	}

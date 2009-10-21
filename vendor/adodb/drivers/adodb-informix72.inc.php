@@ -27,34 +27,34 @@ class ADODB_informix72 extends ADOConnection {
 	var $fmtTimeStamp = "'Y-m-d H:i:s'";
 	var $hasInsertID = true;
 	var $hasAffectedRows = true;
-    var $substr = 'substr';
+    public $substr = 'substr';
 	var $metaTablesSQL="select tabname,tabtype from systables where tabtype in ('T','V') and owner!='informix'"; //Don't get informix tables and pseudo-tables
 
 
-	var $metaColumnsSQL = 
+	public $metaColumnsSQL = 
 		"select c.colname, c.coltype, c.collength, d.default,c.colno
 		from syscolumns c, systables t,outer sysdefaults d
 		where c.tabid=t.tabid and d.tabid=t.tabid and d.colno=c.colno
 		and tabname='%s' order by c.colno";
 
-	var $metaPrimaryKeySQL =
+	public $metaPrimaryKeySQL =
 		"select part1,part2,part3,part4,part5,part6,part7,part8 from
 		systables t,sysconstraints s,sysindexes i where t.tabname='%s'
 		and s.tabid=t.tabid and s.constrtype='P'
 		and i.idxname=s.idxname";
 
-	var $concat_operator = '||';
+	public $concat_operator = '||';
 
-	var $lastQuery = false;
+	public $lastQuery = false;
 	var $has_insertid = true;
 
-	var $_autocommit = true;
+	public $_autocommit = true;
 	var $_bindInputArray = true;  // set to true if ADOConnection.Execute() permits binding of array parameters.
 	var $sysDate = 'TODAY';
 	var $sysTimeStamp = 'CURRENT';
 	var $cursorType = IFX_SCROLL; // IFX_SCROLL or IFX_HOLD or 0
    
-	function ADODB_informix72()
+	public function ADODB_informix72()
 	{
 		// alternatively, use older method:
 		//putenv("DBDATE=Y4MD-");
@@ -69,7 +69,7 @@ class ADODB_informix72 extends ADOConnection {
 		}
 	}
 	
-	function ServerInfo()
+	public function ServerInfo()
 	{
 	    if (isset($this->version)) return $this->version;
 	
@@ -81,13 +81,13 @@ class ADODB_informix72 extends ADOConnection {
 
 
 
-	function _insertid()
+	public function _insertid()
 	{
 		$sqlca =ifx_getsqlca($this->lastQuery);
 		return @$sqlca["sqlerrd1"];
 	}
 
-	function _affectedrows()
+	public function _affectedrows()
 	{
 		if ($this->lastQuery) {
 		   return @ifx_affected_rows ($this->lastQuery);
@@ -95,7 +95,7 @@ class ADODB_informix72 extends ADOConnection {
 		return 0;
 	}
 
-	function BeginTrans()
+	public function BeginTrans()
 	{
 		if ($this->transOff) return true;
 		$this->transCnt += 1;
@@ -104,7 +104,7 @@ class ADODB_informix72 extends ADOConnection {
 		return true;
 	}
 
-	function CommitTrans($ok=true) 
+	public function CommitTrans($ok=true) 
 	{ 
 		if (!$ok) return $this->RollbackTrans();
 		if ($this->transOff) return true;
@@ -114,7 +114,7 @@ class ADODB_informix72 extends ADOConnection {
 		return true;
 	}
 
-	function RollbackTrans()
+	public function RollbackTrans()
 	{
 		if ($this->transOff) return true;
 		if ($this->transCnt) $this->transCnt -= 1;
@@ -123,7 +123,7 @@ class ADODB_informix72 extends ADOConnection {
 		return true;
 	}
 
-	function RowLock($tables,$where,$flds='1 as ignore')
+	public function RowLock($tables,$where,$flds='1 as ignore')
 	{
 		if ($this->_autocommit) $this->BeginTrans();
 		return $this->GetOne("select $flds from $tables where $where for update");
@@ -132,14 +132,14 @@ class ADODB_informix72 extends ADOConnection {
 	/*	Returns: the last error message from previous database operation
 		Note: This function is NOT available for Microsoft SQL Server.	*/
 
-	function ErrorMsg() 
+	public function ErrorMsg() 
 	{
 		if (!empty($this->_logsql)) return $this->_errorMsg;
 		$this->_errorMsg = ifx_errormsg();
 		return $this->_errorMsg;
 	}
 
-	function ErrorNo()
+	public function ErrorNo()
 	{
 		preg_match("/.*SQLCODE=([^\]]*)/",ifx_error(),$parse);
 		if (is_array($parse) && isset($parse[1])) return (int)$parse[1]; 
@@ -147,7 +147,7 @@ class ADODB_informix72 extends ADOConnection {
 	}
 
    
-    function &MetaColumns($table)
+    public function &MetaColumns($table)
 	{
 	global $ADODB_FETCH_MODE;
 	
@@ -199,12 +199,12 @@ class ADODB_informix72 extends ADOConnection {
 		return $false;
 	}
 	
-   function &xMetaColumns($table)
+   public function &xMetaColumns($table)
    {
 		return ADOConnection::MetaColumns($table,false);
    }
 
-	 function MetaForeignKeys($table, $owner=false, $upper=false) //!Eos
+	 public function MetaForeignKeys($table, $owner=false, $upper=false) //!Eos
 	{
 		$sql = "
 			select tr.tabname,updrule,delrule,
@@ -236,20 +236,20 @@ class ADODB_informix72 extends ADOConnection {
 		return $a;
 	 }
 
-   function UpdateBlob($table, $column, $val, $where, $blobtype = 'BLOB')
+   public function UpdateBlob($table, $column, $val, $where, $blobtype = 'BLOB')
    {
    		$type = ($blobtype == 'TEXT') ? 1 : 0;
 		$blobid = ifx_create_blob($type,0,$val);
 		return $this->Execute("UPDATE $table SET $column=(?) WHERE $where",array($blobid));
    }
 
-   function BlobDecode($blobid)
+   public function BlobDecode($blobid)
    {
    		return function_exists('ifx_byteasvarchar') ? $blobid : @ifx_get_blob($blobid);
    }
    
 	// returns true or false
-   function _connect($argHostname, $argUsername, $argPassword, $argDatabasename)
+   public function _connect($argHostname, $argUsername, $argPassword, $argDatabasename)
 	{
 		if (!function_exists('ifx_connect')) return null;
 		
@@ -263,7 +263,7 @@ class ADODB_informix72 extends ADOConnection {
 	}
 
 	// returns true or false
-   function _pconnect($argHostname, $argUsername, $argPassword, $argDatabasename)
+   public function _pconnect($argHostname, $argUsername, $argPassword, $argDatabasename)
 	{
 		if (!function_exists('ifx_connect')) return null;
 		
@@ -342,11 +342,11 @@ class ADODB_informix72 extends ADOConnection {
 
 class ADORecordset_informix72 extends ADORecordSet {
 
-	var $databaseType = "informix72";
+	public $databaseType = "informix72";
 	var $canSeek = true;
 	var $_fieldprops = false;
 
-	function ADORecordset_informix72($id,$mode=false)
+	public function ADORecordset_informix72($id,$mode=false)
 	{
 		if ($mode === false) { 
 			global $ADODB_FETCH_MODE;
@@ -380,18 +380,18 @@ class ADORecordset_informix72 extends ADORecordSet {
 		return $ret;
 	}
 
-	function _initrs()
+	public function _initrs()
 	{
 		$this->_numOfRows = -1; // ifx_affected_rows not reliable, only returns estimate -- ($ADODB_COUNTRECS)? ifx_affected_rows($this->_queryID):-1;
 		$this->_numOfFields = ifx_num_fields($this->_queryID);
 	}
 
-	function _seek($row)
+	public function _seek($row)
 	{
 		return @ifx_fetch_row($this->_queryID, (int) $row);
 	}
 
-   function MoveLast()
+   public function MoveLast()
    {
 	  $this->fields = @ifx_fetch_row($this->_queryID, "LAST");
 	  if ($this->fields) $this->EOF = false;
@@ -407,7 +407,7 @@ class ADORecordset_informix72 extends ADORecordSet {
 	  return true;
    }
 
-   function MoveFirst()
+   public function MoveFirst()
 	{
 	  $this->fields = @ifx_fetch_row($this->_queryID, "FIRST");
 	  if ($this->fields) $this->EOF = false;
@@ -423,7 +423,7 @@ class ADORecordset_informix72 extends ADORecordSet {
 	  return true;
    }
 
-   function _fetch($ignore_fields=false)
+   public function _fetch($ignore_fields=false)
    {
 
 		$this->fields = @ifx_fetch_row($this->_queryID);

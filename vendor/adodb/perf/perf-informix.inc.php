@@ -32,9 +32,9 @@ class perf_informix extends adodb_perf{
 		timer decimal(16,6) NOT NULL
 	)";
 	
-	var $tablesSQL = "select a.tabname tablename, ti_nptotal*2 size_in_k, ti_nextns extents, ti_nrows records from systables c, sysmaster:systabnames a, sysmaster:systabinfo b where c.tabname not matches 'sys*' and c.partnum = a.partnum and c.partnum = b.ti_partnum";
+	public $tablesSQL = "select a.tabname tablename, ti_nptotal*2 size_in_k, ti_nextns extents, ti_nrows records from systables c, sysmaster:systabnames a, sysmaster:systabinfo b where c.tabname not matches 'sys*' and c.partnum = a.partnum and c.partnum = b.ti_partnum";
 	
-	var $settings = array(
+	public $settings = array(
 	'Ratios',
 		'data cache hit ratio' => array('RATIOH',
 		"select round((1-(wt.value / (rd.value + wr.value)))*100,2)
@@ -61,7 +61,7 @@ class perf_informix extends adodb_perf{
 	
 	);
 	
-	function perf_informix(&$conn)
+	public function perf_informix(&$conn)
 	{
 		$this->conn =& $conn;
 	}

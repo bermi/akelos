@@ -22,7 +22,7 @@ class ADODB_postgres7 extends ADODB_postgres64 {
 	var $ansiOuter = true;
 	var $charSet = true; //set to true for Postgres 7 and above - PG client supports encodings
 	
-	function ADODB_postgres7() 
+	public function ADODB_postgres7() 
 	{
 		$this->ADODB_postgres64();
 		if (ADODB_ASSOC_CASE !== 2) {
@@ -132,7 +132,7 @@ class ADORecordSet_postgres7 extends ADORecordSet_postgres64{
 	var $databaseType = "postgres7";
 	
 	
-	function ADORecordSet_postgres7($queryID,$mode=false) 
+	public function ADORecordSet_postgres7($queryID,$mode=false) 
 	{
 		$this->ADORecordSet_postgres64($queryID,$mode);
 	}
@@ -163,12 +163,12 @@ class ADORecordSet_assoc_postgres7 extends ADORecordSet_postgres64{
 	var $databaseType = "postgres7";
 	
 	
-	function ADORecordSet_assoc_postgres7($queryID,$mode=false) 
+	public function ADORecordSet_assoc_postgres7($queryID,$mode=false) 
 	{
 		$this->ADORecordSet_postgres64($queryID,$mode);
 	}
 	
-	function _fetch()
+	public function _fetch()
 	{
 		if ($this->_currentRow >= $this->_numOfRows && $this->_numOfRows >= 0)
         	return false;
@@ -203,7 +203,7 @@ class ADORecordSet_assoc_postgres7 extends ADORecordSet_postgres64{
 		$this->fields = $arr;
 	}
 	
-	function MoveNext() 
+	public function MoveNext() 
 	{
 		if (!$this->EOF) {
 			$this->_currentRow++;

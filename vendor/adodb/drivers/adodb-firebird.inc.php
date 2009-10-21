@@ -17,16 +17,16 @@ include_once(ADODB_DIR."/drivers/adodb-ibase.inc.php");
 
 class ADODB_firebird extends ADODB_ibase {
 	var $databaseType = "firebird";	
-	var $dialect = 3;
+	public $dialect = 3;
 	
-	var $sysTimeStamp = "cast('NOW' as timestamp)";
+	public $sysTimeStamp = "cast('NOW' as timestamp)";
 	
-	function ADODB_firebird()
+	public function ADODB_firebird()
 	{	
 		$this->ADODB_ibase();
 	}
 	
-	function ServerInfo()
+	public function ServerInfo()
 	{
 		$arr['dialect'] = $this->dialect;
 		switch($arr['dialect']) {
@@ -65,9 +65,9 @@ class ADODB_firebird extends ADODB_ibase {
 
 class  ADORecordSet_firebird extends ADORecordSet_ibase {	
 	
-	var $databaseType = "firebird";		
+	public $databaseType = "firebird";		
 	
-	function ADORecordSet_firebird($id,$mode=false)
+	public function ADORecordSet_firebird($id,$mode=false)
 	{
 		$this->ADORecordSet_ibase($id,$mode);
 	}

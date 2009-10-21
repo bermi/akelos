@@ -15,11 +15,11 @@ if (!defined('ADODB_DIR')) die();
 
 class ADODB2_generic extends ADODB_DataDict {
 	
-	var $databaseType = 'generic';
+	public $databaseType = 'generic';
 	var $seqField = false;
 	
  	
- 	function ActualType($meta)
+ 	public function ActualType($meta)
 	{
 		switch($meta) {
 		case 'C': return 'VARCHAR';
@@ -55,7 +55,7 @@ class ADODB2_generic extends ADODB_DataDict {
 	}
 	
 	
-	function DropColumnSQL($tabname, $flds)
+	public function DropColumnSQL($tabname, $flds)
 	{
 		if ($this->debug) ADOConnection::outp("DropColumnSQL not supported");
 		return array();

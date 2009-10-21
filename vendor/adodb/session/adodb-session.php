@@ -114,7 +114,7 @@ class ADODB_Session {
 	
 	/*
 	
-	function Lock($lock=null)
+	public function Lock($lock=null)
 	{
 	static $_lock = false;
 	

@@ -25,42 +25,42 @@
 
     private $rs;
 
-    function __construct($rs) 
+    public function __construct($rs) 
 	{
         $this->rs = $rs;
     }
-    function rewind() 
+    public function rewind() 
 	{
         $this->rs->MoveFirst();
     }
 
-	function valid() 
+	public function valid() 
 	{
         return !$this->rs->EOF;
     }
 	
-    function key() 
+    public function key() 
 	{
         return $this->rs->_currentRow;
     }
 	
-    function current() 
+    public function current() 
 	{
         return $this->rs->fields;
     }
 	
-    function next() 
+    public function next() 
 	{
         $this->rs->MoveNext();
     }
 	
-	function __call($func, $params)
+	public function __call($func, $params)
 	{
 		return call_user_func_array(array($this->rs, $func), $params);
 	}
 
 	
-	function hasMore()
+	public function hasMore()
 	{
 		return !$this->rs->EOF;
 	}
@@ -69,7 +69,7 @@
 
 
 class ADODB_BASE_RS implements IteratorAggregate {
-    function getIterator() {
+    public function getIterator() {
         return new ADODB_Iterator($this);
     }
 	

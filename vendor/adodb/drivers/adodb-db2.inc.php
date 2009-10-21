@@ -93,7 +93,7 @@ define('ADODB_DB2',1);
 
 class ADODB_DB2 extends ADODB_odbc {
 	var $databaseType = "db2";	
-	var $concat_operator = '||';
+	public $concat_operator = '||';
 	var $sysDate = 'CURRENT_DATE';
 	var $sysTimeStamp = 'CURRENT TIMESTAMP';
 	// The complete string representation of a timestamp has the form 
@@ -102,20 +102,20 @@ class ADODB_DB2 extends ADODB_odbc {
 	var $ansiOuter = true;
 	var $identitySQL = 'values IDENTITY_VAL_LOCAL()';
 	var $_bindInputArray = true;
-	 var $hasInsertID = true;
+	 public $hasInsertID = true;
 	
-	function ADODB_DB2()
+	public function ADODB_DB2()
 	{
 		if (strncmp(PHP_OS,'WIN',3) === 0) $this->curmode = SQL_CUR_USE_ODBC;
 		$this->ADODB_odbc();
 	}
 	
-	function IfNull( $field, $ifNull ) 
+	public function IfNull( $field, $ifNull ) 
 	{
 		return " COALESCE($field, $ifNull) "; // if DB2 UDB
 	}
 	
-	function ServerInfo()
+	public function ServerInfo()
 	{
 		//odbc_setoption($this->_connectionID,1,101 /*SQL_ATTR_ACCESS_MODE*/, 1 /*SQL_MODE_READ_ONLY*/);
 		$vers = $this->GetOne('select versionnumber from sysibm.sysversions');
@@ -123,18 +123,18 @@ class ADODB_DB2 extends ADODB_odbc {
 		return array('description'=>'DB2 ODBC driver', 'version'=>$vers);
 	}
 	
-	function _insertid()
+	public function _insertid()
 	{
 		return $this->GetOne($this->identitySQL);
 	}
 	
-	function RowLock($tables,$where,$flds='1 as ignore')
+	public function RowLock($tables,$where,$flds='1 as ignore')
 	{
 		if ($this->_autocommit) $this->BeginTrans();
 		return $this->GetOne("select $flds from $tables where $where for update");
 	}
 	
-	function &MetaTables($ttype=false,$showSchema=false, $qtable="%", $qschema="%")
+	public function &MetaTables($ttype=false,$showSchema=false, $qtable="%", $qschema="%")
 	{
 	global $ADODB_FETCH_MODE;
 	
@@ -178,7 +178,7 @@ class ADODB_DB2 extends ADODB_odbc {
 		return $arr2;
 	}
 
-	function &MetaIndexes ($table, $primary = FALSE, $owner=false)
+	public function &MetaIndexes ($table, $primary = FALSE, $owner=false)
 	{
         // save old fetch mode
         global $ADODB_FETCH_MODE;
@@ -272,7 +272,7 @@ class ADODB_DB2 extends ADODB_odbc {
 	} 
  
 	
-	function &SelectLimit($sql,$nrows=-1,$offset=-1,$inputArr=false)
+	public function &SelectLimit($sql,$nrows=-1,$offset=-1,$inputArr=false)
 	{
 		if ($offset <= 0) {
 		// could also use " OPTIMIZE FOR $nrows ROWS "
@@ -295,14 +295,14 @@ class ADODB_DB2 extends ADODB_odbc {
 
 class  ADORecordSet_db2 extends ADORecordSet_odbc {	
 	
-	var $databaseType = "db2";		
+	public $databaseType = "db2";		
 	
-	function ADORecordSet_db2($id,$mode=false)
+	public function ADORecordSet_db2($id,$mode=false)
 	{
 		$this->ADORecordSet_odbc($id,$mode);
 	}
 
-	function MetaType($t,$len=-1,$fieldobj=false)
+	public function MetaType($t,$len=-1,$fieldobj=false)
 	{
 		if (is_object($t)) {
 			$fieldobj = $t;

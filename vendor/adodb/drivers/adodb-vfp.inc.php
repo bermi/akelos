@@ -34,17 +34,17 @@ class ADODB_vfp extends ADODB_odbc {
 	var $hasTransactions = false;
 	var $curmode = false ; // See sqlext.h, SQL_CUR_DEFAULT == SQL_CUR_USE_DRIVER == 2L
 	
-	function ADODB_vfp()
+	public function ADODB_vfp()
 	{
 		$this->ADODB_odbc();
 	}
 	
-	function Time()
+	public function Time()
 	{
 		return time();
 	}
 	
-	function BeginTrans() { return false;}
+	public function BeginTrans() { return false;}
 	
 	// quote string to be sent back to database
 	function qstr($s,$nofixquotes=false)
@@ -69,10 +69,10 @@ class ADODB_vfp extends ADODB_odbc {
 
 class  ADORecordSet_vfp extends ADORecordSet_odbc {	
 	
-	var $databaseType = "vfp";		
+	public $databaseType = "vfp";		
 
 	
-	function ADORecordSet_vfp($id,$mode=false)
+	public function ADORecordSet_vfp($id,$mode=false)
 	{
 		return $this->ADORecordSet_odbc($id,$mode);
 	}

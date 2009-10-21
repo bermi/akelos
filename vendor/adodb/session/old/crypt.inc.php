@@ -14,7 +14,7 @@ class MD5Crypt{
 				return $tmp;
 		}
 
-		function Encrypt($txt,$key)
+		public function Encrypt($txt,$key)
 		{
 				srand((double)microtime()*1000000);
 				$encrypt_key = md5(rand(0,32000));
@@ -30,7 +30,7 @@ class MD5Crypt{
 				return base64_encode($this->keyED($tmp,$key));
 		}
 
-		function Decrypt($txt,$key)
+		public function Decrypt($txt,$key)
 		{
 				$txt = $this->keyED(base64_decode($txt),$key);
 				$tmp = "";
@@ -42,7 +42,7 @@ class MD5Crypt{
 				return $tmp;
 		}
 
-		function RandPass()
+		public function RandPass()
 		{
 				$randomPassword = "";
 				srand((double)microtime()*1000000);

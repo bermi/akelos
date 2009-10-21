@@ -21,7 +21,7 @@ if (!defined('_ADODB_ODBC_LAYER')) {
 
  
 class  ADODB_odbc_mssql extends ADODB_odbc {	
-	var $databaseType = 'odbc_mssql';
+	public $databaseType = 'odbc_mssql';
 	var $fmtDate = "'Y-m-d'";
 	var $fmtTimeStamp = "'Y-m-d h:i:sA'";
 	var $_bindInputArray = true;
@@ -40,7 +40,7 @@ class  ADODB_odbc_mssql extends ADODB_odbc {
 	var $connectStmt = 'SET CONCAT_NULL_YIELDS_NULL OFF'; # When SET CONCAT_NULL_YIELDS_NULL is ON, 
 														  # concatenating a null value with a string yields a NULL result
 	
-	function ADODB_odbc_mssql()
+	public function ADODB_odbc_mssql()
 	{
 		$this->ADODB_odbc();
 		//$this->curmode = SQL_CUR_USE_ODBC;	
@@ -60,12 +60,12 @@ class  ADODB_odbc_mssql extends ADODB_odbc {
 		return $arr;
 	}
 
-	function IfNull( $field, $ifNull ) 
+	public function IfNull( $field, $ifNull ) 
 	{
 		return " ISNULL($field, $ifNull) "; // if MS SQL Server
 	}
 	
-	function _insertid()
+	public function _insertid()
 	{
 	// SCOPE_IDENTITY()
 	// Returns the last IDENTITY value inserted into an IDENTITY column in 
@@ -76,7 +76,7 @@ class  ADODB_odbc_mssql extends ADODB_odbc {
 	}
 	
 	
-	function MetaForeignKeys($table, $owner=false, $upper=false)
+	public function MetaForeignKeys($table, $owner=false, $upper=false)
 	{
 	global $ADODB_FETCH_MODE;
 	
@@ -115,7 +115,7 @@ order by constraint_name, referenced_table_name, keyno";
 		return $arr2;
 	}
 	
-	function &MetaTables($ttype=false,$showSchema=false,$mask=false) 
+	public function &MetaTables($ttype=false,$showSchema=false,$mask=false) 
 	{
 		if ($mask) {$this->debug=1;
 			$save = $this->metaTablesSQL;
@@ -130,13 +130,13 @@ order by constraint_name, referenced_table_name, keyno";
 		return $ret;
 	}
 	
-	function &MetaColumns($table)
+	public function &MetaColumns($table)
 	{
 		$arr = ADOConnection::MetaColumns($table);
 		return $arr;
 	}
 	
-	function _query($sql,$inputarr)
+	public function _query($sql,$inputarr)
 	{
 		if (is_string($sql)) $sql = str_replace('||','+',$sql);
 		return ADODB_odbc::_query($sql,$inputarr);
@@ -168,7 +168,7 @@ order by constraint_name, referenced_table_name, keyno";
 		return $false;	  
 	}
 	
-	function &SelectLimit($sql,$nrows=-1,$offset=-1, $inputarr=false,$secs2cache=0)
+	public function &SelectLimit($sql,$nrows=-1,$offset=-1, $inputarr=false,$secs2cache=0)
 	{
 		if ($nrows > 0 && $offset <= 0) {
 			$sql = preg_replace(
@@ -244,9 +244,9 @@ order by constraint_name, referenced_table_name, keyno";
  
 class  ADORecordSet_odbc_mssql extends ADORecordSet_odbc {	
 	
-	var $databaseType = 'odbc_mssql';
+	public $databaseType = 'odbc_mssql';
 	
-	function ADORecordSet_odbc_mssql($id,$mode=false)
+	public function ADORecordSet_odbc_mssql($id,$mode=false)
 	{
 		return $this->ADORecordSet_odbc($id,$mode);
 	}	

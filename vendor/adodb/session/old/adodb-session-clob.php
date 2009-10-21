@@ -67,7 +67,7 @@ To force non-persistent connections, call adodb_session_open first before sessio
 	 
 	 To do this, define a notification function, say NotifyFn:
 	 
-	 	function NotifyFn($expireref, $sesskey)
+	 	public function NotifyFn($expireref, $sesskey)
 	 	{
 	 	}
 	 

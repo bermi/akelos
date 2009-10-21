@@ -49,7 +49,7 @@ class ADODB_mysqli extends ADOConnection {
 	var $nameQuote = '`';		/// string to use to quote identifiers and names
 	var $optionFlags = array(array(MYSQLI_READ_DEFAULT_GROUP,0));
 	
-	function ADODB_mysqli() 
+	public function ADODB_mysqli() 
 	{			
 	 // if(!extension_loaded("mysqli"))
 	      ;//trigger_error("You must have the mysqli extension installed.", E_USER_ERROR);
@@ -120,12 +120,12 @@ class ADODB_mysqli extends ADOConnection {
 	    return $this->_connect($argHostname, $argUsername, $argPassword, $argDatabasename);
 	  }
 	
-	function IfNull( $field, $ifNull ) 
+	public function IfNull( $field, $ifNull ) 
 	{
 		return " IFNULL($field, $ifNull) "; // if MySQL
 	}
 	
-	function ServerInfo()
+	public function ServerInfo()
 	{
 		$arr['description'] = $this->GetOne("select version()");
 		$arr['version'] = ADOConnection::_findvers($arr['description']);
@@ -133,7 +133,7 @@ class ADODB_mysqli extends ADOConnection {
 	}
 	
 	
-	function BeginTrans()
+	public function BeginTrans()
 	{	  
 		if ($this->transOff) return true;
 		$this->transCnt += 1;
@@ -142,7 +142,7 @@ class ADODB_mysqli extends ADOConnection {
 		return true;
 	}
 	
-	function CommitTrans($ok=true) 
+	public function CommitTrans($ok=true) 
 	{
 		if ($this->transOff) return true; 
 		if (!$ok) return $this->RollbackTrans();
@@ -153,7 +153,7 @@ class ADODB_mysqli extends ADOConnection {
 		return true;
 	}
 	
-	function RollbackTrans()
+	public function RollbackTrans()
 	{
 		if ($this->transOff) return true;
 		if ($this->transCnt) $this->transCnt -= 1;
@@ -187,7 +187,7 @@ class ADODB_mysqli extends ADOConnection {
 	  return "'$s'";
 	}
 	
-	function _insertid()
+	public function _insertid()
 	{
 	  $result = @mysqli_insert_id($this->_connectionID);
 	  if ($result == -1){
@@ -213,7 +213,7 @@ class ADODB_mysqli extends ADOConnection {
 	var $_genSeq2SQL = "insert into %s values (%s)";
 	var $_dropSeqSQL = "drop table %s";
 	
-	function CreateSequence($seqname='adodbseq',$startID=1)
+	public function CreateSequence($seqname='adodbseq',$startID=1)
 	{
 		if (empty($this->_genSeqSQL)) return false;
 		$u = strtoupper($seqname);
@@ -223,7 +223,7 @@ class ADODB_mysqli extends ADOConnection {
 		return $this->Execute(sprintf($this->_genSeq2SQL,$seqname,$startID-1));
 	}
 	
-	function GenID($seqname='adodbseq',$startID=1)
+	public function GenID($seqname='adodbseq',$startID=1)
 	{
 		// post-nuke sets hasGenID to false
 		if (!$this->hasGenID) return false;
@@ -245,7 +245,7 @@ class ADODB_mysqli extends ADOConnection {
 		return $this->genID;
 	}
 	
-  	function &MetaDatabases()
+  	public function &MetaDatabases()
 	{
 		$query = "SHOW DATABASES";
 		$ret =& $this->Execute($query);
@@ -253,7 +253,7 @@ class ADODB_mysqli extends ADOConnection {
 	}
 
 	  
-	function &MetaIndexes ($table, $primary = FALSE)
+	public function &MetaIndexes ($table, $primary = FALSE)
 	{
 		// save old fetch mode
 		global $ADODB_FETCH_MODE;
@@ -405,7 +405,7 @@ class ADODB_mysqli extends ADOConnection {
 		return "from_unixtime(unix_timestamp($date)+($dayFraction)*24*3600)";
 	}
 	
-	function &MetaTables($ttype=false,$showSchema=false,$mask=false) 
+	public function &MetaTables($ttype=false,$showSchema=false,$mask=false) 
 	{	
 		$save = $this->metaTablesSQL;
 		if ($showSchema && is_string($showSchema)) {
@@ -422,7 +422,7 @@ class ADODB_mysqli extends ADOConnection {
 		return $ret;
 	}
 	
- 	function &MetaColumns($table) 
+ 	public function &MetaColumns($table) 
 	{
 		$false = false;
 		if (!$this->metaColumnsSQL)
@@ -525,7 +525,7 @@ class ADODB_mysqli extends ADOConnection {
 	}
 	
 	
-	function Prepare($sql)
+	public function Prepare($sql)
 	{
 		return $sql;
 		
@@ -617,10 +617,10 @@ class ADODB_mysqli extends ADOConnection {
 
 class ADORecordSet_mysqli extends ADORecordSet{	
 	
-	var $databaseType = "mysqli";
+	public $databaseType = "mysqli";
 	var $canSeek = true;
 	
-	function ADORecordSet_mysqli($queryID, $mode = false) 
+	public function ADORecordSet_mysqli($queryID, $mode = false) 
 	{
 	  if ($mode === false) 
 	   { 
@@ -646,7 +646,7 @@ class ADORecordSet_mysqli extends ADORecordSet{
 	  $this->ADORecordSet($queryID);	
 	}
 	
-	function _initrs()
+	public function _initrs()
 	{
 	global $ADODB_COUNTRECS;
 	
@@ -654,7 +654,7 @@ class ADORecordSet_mysqli extends ADORecordSet{
 		$this->_numOfFields = @mysqli_num_fields($this->_queryID);
 	}
 	
-	function &FetchField($fieldOffset = -1) 
+	public function &FetchField($fieldOffset = -1) 
 	{	
 	  $fieldnr = $fieldOffset;
 	  if ($fieldOffset != -1) {
@@ -688,7 +688,7 @@ class ADORecordSet_mysqli extends ADORecordSet{
 	  return $this->fields[$this->bind[strtoupper($colname)]];
 	}
 	
-	function _seek($row)
+	public function _seek($row)
 	{
 	  if ($this->_numOfRows == 0) 
 	    return false;
@@ -715,13 +715,13 @@ class ADORecordSet_mysqli extends ADORecordSet{
 		return false;
 	}	
 	
-	function _fetch()
+	public function _fetch()
 	{
 		$this->fields = mysqli_fetch_array($this->_queryID,$this->fetchMode);  
 	  	return is_array($this->fields);
 	}
 	
-	function _close() 
+	public function _close() 
 	{
 		mysqli_free_result($this->_queryID); 
 	  	$this->_queryID = false;	

@@ -59,9 +59,9 @@ class ADODB_postgres64 extends ADOConnection{
 	var $dataProvider = 'postgres';
 	var $hasInsertID = true;
 	var $_resultid = false;
-  	var $concat_operator='||';
+  	public $concat_operator='||';
 	var $metaDatabasesSQL = "select datname from pg_database where datname not in ('template0','template1') order by 1";
-    var $metaTablesSQL = "select tablename,'T' from pg_tables where tablename not like 'pg\_%'
+    public $metaTablesSQL = "select tablename,'T' from pg_tables where tablename not like 'pg\_%'
 	and tablename not in ('sql_features', 'sql_implementation_info', 'sql_languages',
 	 'sql_packages', 'sql_sizing', 'sql_sizing_profiles') 
 	union 
@@ -88,7 +88,7 @@ WHERE relkind in ('r','v') AND (c.relname='%s' or c.relname = lower('%s'))
 	var $metaKeySQL = "SELECT ic.relname AS index_name, a.attname AS column_name,i.indisunique AS unique_key, i.indisprimary AS primary_key 
 	FROM pg_class bc, pg_class ic, pg_index i, pg_attribute a WHERE bc.oid = i.indrelid AND ic.oid = i.indexrelid AND (i.indkey[0] = a.attnum OR i.indkey[1] = a.attnum OR i.indkey[2] = a.attnum OR i.indkey[3] = a.attnum OR i.indkey[4] = a.attnum OR i.indkey[5] = a.attnum OR i.indkey[6] = a.attnum OR i.indkey[7] = a.attnum) AND a.attrelid = bc.oid AND bc.relname = '%s'";
 	
-	var $hasAffectedRows = true;
+	public $hasAffectedRows = true;
 	var $hasLimit = false;	// set to true for pgsql 7 only. support pgsql/mysql SELECT * FROM TABLE LIMIT 10
 	// below suggested by Freek Dijkstra 
 	var $true = 'TRUE';		// string that represents TRUE for a database
@@ -105,7 +105,7 @@ WHERE relkind in ('r','v') AND (c.relname='%s' or c.relname = lower('%s'))
 	var $autoRollback = true; // apparently pgsql does not autorollback properly before php 4.3.4
 							// http://bugs.php.net/bug.php?id=25404
 							
-	var $_bindInputArray = false; // requires postgresql 7.3+ and ability to modify database
+	public $_bindInputArray = false; // requires postgresql 7.3+ and ability to modify database
 	var $disableBlobs = false; // set to true to disable blob checking, resulting in 2-5% improvement in performance.
 	
 	// The last (fmtTimeStamp is not entirely correct: 
@@ -116,12 +116,12 @@ WHERE relkind in ('r','v') AND (c.relname='%s' or c.relname = lower('%s'))
 	// to know what the concequences are. The other values are correct (wheren't in 0.94)
 	// -- Freek Dijkstra 
 
-	function ADODB_postgres64() 
+	public function ADODB_postgres64() 
 	{
 	// changes the metaColumnsSQL, adds columns: attnum[6]
 	}
 	
-	function ServerInfo()
+	public function ServerInfo()
 	{
 		if (isset($this->version)) return $this->version;
 		
@@ -162,7 +162,7 @@ a different OID if a database must be reloaded. */
 
 // I get this error with PHP before 4.0.6 - jlim
 // Warning: This compilation does not support pg_cmdtuples() in d:/inetpub/wwwroot/php/adodb/adodb-postgres.inc.php on line 44
-   function _affectedrows()
+   public function _affectedrows()
    {
    		if (!is_resource($this->_resultid) || get_resource_type($this->_resultid) !== 'pgsql result') return false;
 	   	return pg_cmdtuples($this->_resultid);
@@ -177,7 +177,7 @@ a different OID if a database must be reloaded. */
 		return @pg_Exec($this->_connectionID, "begin");
 	}
 	
-	function RowLock($tables,$where,$flds='1 as ignore') 
+	public function RowLock($tables,$where,$flds='1 as ignore') 
 	{
 		if (!$this->transCnt) $this->BeginTrans();
 		return $this->GetOne("select $flds from $tables where $where for update");
@@ -201,7 +201,7 @@ a different OID if a database must be reloaded. */
 		return @pg_Exec($this->_connectionID, "rollback");
 	}
 	
-	function MetaTables($ttype=false,$showSchema=false,$mask=false) 
+	public function MetaTables($ttype=false,$showSchema=false,$mask=false) 
 	{
 		$info = $this->ServerInfo();
 		if ($info['version'] >= 7.3) {
@@ -425,7 +425,7 @@ select viewname,'V' from pg_views where viewname like $mask";
 		return $this->Execute("UPDATE $table SET $column='".$this->BlobEncode($val)."'::bytea WHERE $where");
 	}
 	
-	function OffsetDate($dayFraction,$date=false)
+	public function OffsetDate($dayFraction,$date=false)
 	{		
 		if (!$date) $date = $this->sysDate;
 		return "($date+interval'$dayFraction days')";
@@ -547,7 +547,7 @@ select viewname,'V' from pg_views where viewname like $mask";
 		
 	}
 
-	  function &MetaIndexes ($table, $primary = FALSE)
+	  public function &MetaIndexes ($table, $primary = FALSE)
       {
          global $ADODB_FETCH_MODE;
                 
@@ -657,7 +657,7 @@ WHERE c2.relname=\'%s\' or c2.relname=lower(\'%s\')';
 		return true;
 	}
 	
-	function _nconnect($argHostname, $argUsername, $argPassword, $argDatabaseName)
+	public function _nconnect($argHostname, $argUsername, $argPassword, $argDatabaseName)
 	{
 	 	return $this->_connect($argHostname, $argUsername, $argPassword, $argDatabaseName,-1);
 	}
@@ -773,7 +773,7 @@ WHERE c2.relname=\'%s\' or c2.relname=lower(\'%s\')';
 		return $this->_errorMsg;
 	}
 	
-	function ErrorNo()
+	public function ErrorNo()
 	{
 		$e = $this->ErrorMsg();
 		if (strlen($e)) {
@@ -842,7 +842,7 @@ class ADORecordSet_postgres64 extends ADORecordSet{
 		$this->ADORecordSet($queryID);
 	}
 	
-	function &GetRowAssoc($upper=true)
+	public function &GetRowAssoc($upper=true)
 	{
 		if ($this->fetchMode == PGSQL_ASSOC && !$upper) return $this->fields;
 		$row =& ADORecordSet::GetRowAssoc($upper);
@@ -897,13 +897,13 @@ class ADORecordSet_postgres64 extends ADORecordSet{
 		return @pg_fetch_row($this->_queryID,$row);
 	}
 	
-	function _decode($blob)
+	public function _decode($blob)
 	{
 		eval('$realblob="'.adodb_str_replace(array('"','$'),array('\"','\$'),$blob).'";');
 		return $realblob;	
 	}
 	
-	function _fixblobs()
+	public function _fixblobs()
 	{
 		if ($this->fetchMode == PGSQL_NUM || $this->fetchMode == PGSQL_BOTH) {
 			foreach($this->_blobArr as $k => $v) {
@@ -935,7 +935,7 @@ class ADORecordSet_postgres64 extends ADORecordSet{
 		return false;
 	}		
 	
-	function _fetch()
+	public function _fetch()
 	{
 				
 		if ($this->_currentRow >= $this->_numOfRows && $this->_numOfRows >= 0)

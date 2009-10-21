@@ -26,36 +26,36 @@ class ADODB_odbtp extends ADOConnection{
 	var $hasGenID = true;
 	var $hasMoveFirst = true;
 
-	var $_genSeqSQL = "create table %s (seq_name char(30) not null unique , seq_value integer not null)";
+	public $_genSeqSQL = "create table %s (seq_name char(30) not null unique , seq_value integer not null)";
 	var $_dropSeqSQL = "delete from adodb_seq where seq_name = '%s'";
 	var $_bindInputArray = false;
 	var $_useUnicodeSQL = false;
 	var $_canPrepareSP = false;
 	var $_dontPoolDBC = true;
 
-	function ADODB_odbtp()
+	public function ADODB_odbtp()
 	{
 	}
 
-	function ServerInfo()
+	public function ServerInfo()
 	{
 		return array('description' => @odbtp_get_attr( ODB_ATTR_DBMSNAME, $this->_connectionID),
 		             'version' => @odbtp_get_attr( ODB_ATTR_DBMSVER, $this->_connectionID));
 	}
 
-	function ErrorMsg()
+	public function ErrorMsg()
 	{
 		if (empty($this->_connectionID)) return @odbtp_last_error();
 		return @odbtp_last_error($this->_connectionID);
 	}
 
-	function ErrorNo()
+	public function ErrorNo()
 	{
 		if (empty($this->_connectionID)) return @odbtp_last_error_state();
 			return @odbtp_last_error_state($this->_connectionID);
 	}
 
-	function _insertid()
+	public function _insertid()
 	{
 	// SCOPE_IDENTITY()
 	// Returns the last IDENTITY value inserted into an IDENTITY column in
@@ -65,7 +65,7 @@ class ADODB_odbtp extends ADOConnection{
 			return $this->GetOne($this->identitySQL);
 	}
 
-	function _affectedrows()
+	public function _affectedrows()
 	{
 		if ($this->_queryID) {
 			return @odbtp_affected_rows ($this->_queryID);
@@ -73,7 +73,7 @@ class ADODB_odbtp extends ADOConnection{
 		return 0;
 	}
 
-	function CreateSequence($seqname='adodbseq',$start=1)
+	public function CreateSequence($seqname='adodbseq',$start=1)
 	{
 		//verify existence
 		$num = $this->GetOne("select seq_value from adodb_seq");
@@ -97,13 +97,13 @@ class ADODB_odbtp extends ADOConnection{
 		return $this->Execute("insert into adodb_seq values('$seqname',$start)");
 	}
 
-	function DropSequence($seqname)
+	public function DropSequence($seqname)
 	{
 		if (empty($this->_dropSeqSQL)) return false;
 		return $this->Execute(sprintf($this->_dropSeqSQL,$seqname));
 	}
 
-	function GenID($seq='adodbseq',$start=1)
+	public function GenID($seq='adodbseq',$start=1)
 	{
 		$seqtab='adodb_seq';
 		if( $this->odbc_driver == ODB_DRIVER_FOXPRO) {
@@ -147,7 +147,7 @@ class ADODB_odbtp extends ADOConnection{
 	//for access : DRIVER={Microsoft Access Driver (*.mdb)};DBQ=c:\path_to_access_db\base_test.mdb;UID=root;PWD=;
 	//for mssql : DRIVER={SQL Server};SERVER=myserver;UID=myuid;PWD=mypwd;DATABASE=OdbtpTest;
 	//if uid & pwd can be separate
-    function _connect($HostOrInterface, $UserOrDSN='', $argPassword='', $argDatabase='')
+    public function _connect($HostOrInterface, $UserOrDSN='', $argPassword='', $argDatabase='')
 	{
 		$this->_connectionID = @odbtp_connect($HostOrInterface,$UserOrDSN,$argPassword,$argDatabase);
 		if ($this->_connectionID === false) {
@@ -253,13 +253,13 @@ class ADODB_odbtp extends ADOConnection{
         return true;
 	}
 
-	function _pconnect($HostOrInterface, $UserOrDSN='', $argPassword='', $argDatabase='')
+	public function _pconnect($HostOrInterface, $UserOrDSN='', $argPassword='', $argDatabase='')
 	{
 		$this->_dontPoolDBC = false;
   		return $this->_connect($HostOrInterface, $UserOrDSN, $argPassword, $argDatabase);
 	}
 
-	function SelectDB($dbName)
+	public function SelectDB($dbName)
 	{
 		if (!@odbtp_select_db($dbName, $this->_connectionID)) {
 			return false;
@@ -268,7 +268,7 @@ class ADODB_odbtp extends ADOConnection{
 		return true;
 	}
 	
-	function &MetaTables($ttype='',$showSchema=false,$mask=false)
+	public function &MetaTables($ttype='',$showSchema=false,$mask=false)
 	{
 	global $ADODB_FETCH_MODE;
 
@@ -290,7 +290,7 @@ class ADODB_odbtp extends ADOConnection{
 		return $arr2;
 	}
 	
-	function &MetaColumns($table,$upper=true)
+	public function &MetaColumns($table,$upper=true)
 	{
 	global $ADODB_FETCH_MODE;
 
@@ -334,7 +334,7 @@ class ADODB_odbtp extends ADOConnection{
 		return $retarr;
 	}
 
-	function &MetaPrimaryKeys($table, $owner='')
+	public function &MetaPrimaryKeys($table, $owner='')
 	{
 	global $ADODB_FETCH_MODE;
 
@@ -351,7 +351,7 @@ class ADODB_odbtp extends ADOConnection{
 		return $arr2;
 	}
 
-	function &MetaForeignKeys($table, $owner='', $upper=false)
+	public function &MetaForeignKeys($table, $owner='', $upper=false)
 	{
 	global $ADODB_FETCH_MODE;
 
@@ -381,7 +381,7 @@ class ADODB_odbtp extends ADOConnection{
 		return $arr2;
 	}
 
-	function BeginTrans()
+	public function BeginTrans()
 	{
 		if (!$this->hasTransactions) return false;
 		if ($this->transOff) return true;
@@ -396,7 +396,7 @@ class ADODB_odbtp extends ADOConnection{
 		return true;
 	}
 
-	function CommitTrans($ok=true)
+	public function CommitTrans($ok=true)
 	{
 		if ($this->transOff) return true;
 		if (!$ok) return $this->RollbackTrans();
@@ -407,7 +407,7 @@ class ADODB_odbtp extends ADOConnection{
 		return $ret;
 	}
 
-	function RollbackTrans()
+	public function RollbackTrans()
 	{
 		if ($this->transOff) return true;
 		if ($this->transCnt) $this->transCnt -= 1;
@@ -417,7 +417,7 @@ class ADODB_odbtp extends ADOConnection{
 		return $ret;
 	}
 
-	function &SelectLimit($sql,$nrows=-1,$offset=-1, $inputarr=false,$secs2cache=0)
+	public function &SelectLimit($sql,$nrows=-1,$offset=-1, $inputarr=false,$secs2cache=0)
 	{
 		// TOP requires ORDER BY for Visual FoxPro
 		if( $this->odbc_driver == ODB_DRIVER_FOXPRO ) {
@@ -427,7 +427,7 @@ class ADODB_odbtp extends ADOConnection{
 		return $ret;
 	}
 
-	function Prepare($sql)
+	public function Prepare($sql)
 	{
 		if (! $this->_bindInputArray) return $sql; // no binding
 		$stmt = @odbtp_prepare($sql,$this->_connectionID);
@@ -438,7 +438,7 @@ class ADODB_odbtp extends ADOConnection{
 		return array($sql,$stmt,false);
 	}
 
-	function PrepareSP($sql)
+	public function PrepareSP($sql)
 	{
 		if (!$this->_canPrepareSP) return $sql; // Can't prepare procedures
 
@@ -492,7 +492,7 @@ class ADODB_odbtp extends ADOConnection{
 		$conn->UpdateBlob('blobtable','blobcol',$blob,'id=1');
 	*/
 
-	function UpdateBlob($table,$column,$val,$where,$blobtype='image')
+	public function UpdateBlob($table,$column,$val,$where,$blobtype='image')
 	{
 		$sql = "UPDATE $table SET $column = ? WHERE $where";
 		if( !($stmt = @odbtp_prepare($sql, $this->_connectionID)) )
@@ -504,7 +504,7 @@ class ADODB_odbtp extends ADOConnection{
 		return @odbtp_execute( $stmt ) != false;
 	}
 
-	function IfNull( $field, $ifNull )
+	public function IfNull( $field, $ifNull )
 	{
 		switch( $this->odbc_driver ) {
 			case ODB_DRIVER_MSSQL:
@@ -515,7 +515,7 @@ class ADODB_odbtp extends ADOConnection{
 		return " CASE WHEN $field is null THEN $ifNull ELSE $field END ";
 	}
 
-	function _query($sql,$inputarr=false)
+	public function _query($sql,$inputarr=false)
 	{
  		if ($inputarr) {
 			if (is_array($sql)) {
@@ -550,7 +550,7 @@ class ADODB_odbtp extends ADOConnection{
         return $stmtid;
 	}
 
-	function _close()
+	public function _close()
 	{
 		$ret = @odbtp_close($this->_connectionID);
 		$this->_connectionID = false;
@@ -560,10 +560,10 @@ class ADODB_odbtp extends ADOConnection{
 
 class ADORecordSet_odbtp extends ADORecordSet {
 
-	var $databaseType = 'odbtp';
+	public $databaseType = 'odbtp';
 	var $canSeek = true;
 
-	function ADORecordSet_odbtp($queryID,$mode=false)
+	public function ADORecordSet_odbtp($queryID,$mode=false)
 	{
 		if ($mode === false) {
 			global $ADODB_FETCH_MODE;
@@ -573,7 +573,7 @@ class ADORecordSet_odbtp extends ADORecordSet {
 		$this->ADORecordSet($queryID);
 	}
 
-	function _initrs()
+	public function _initrs()
 	{
 		$this->_numOfFields = @odbtp_num_fields($this->_queryID);
 		if (!($this->_numOfRows = @odbtp_num_rows($this->_queryID)))
@@ -593,7 +593,7 @@ class ADORecordSet_odbtp extends ADORecordSet {
 		}
 	}
 
-	function &FetchField($fieldOffset = 0)
+	public function &FetchField($fieldOffset = 0)
 	{
 		$off=$fieldOffset; // offsets begin at 0
 		$o= new ADOFieldObject();
@@ -605,12 +605,12 @@ class ADORecordSet_odbtp extends ADORecordSet {
 		return $o;
 	}
 
-	function _seek($row)
+	public function _seek($row)
 	{
 		return @odbtp_data_seek($this->_queryID, $row);
 	}
 
-	function fields($colname)
+	public function fields($colname)
 	{
 		if ($this->fetchMode & ADODB_FETCH_ASSOC) return $this->fields[$colname];
 
@@ -624,7 +624,7 @@ class ADORecordSet_odbtp extends ADORecordSet {
 		return $this->fields[$this->bind[strtoupper($colname)]];
 	}
 
-	function _fetch_odbtp($type=0)
+	public function _fetch_odbtp($type=0)
 	{
 		switch ($this->fetchMode) {
 			case ADODB_FETCH_NUM:
@@ -639,12 +639,12 @@ class ADORecordSet_odbtp extends ADORecordSet {
 		return is_array($this->fields);
 	}
 
-	function _fetch()
+	public function _fetch()
 	{
 		return $this->_fetch_odbtp();
 	}
 
-	function MoveFirst()
+	public function MoveFirst()
 	{
 		if (!$this->_fetch_odbtp(ODB_FETCH_FIRST)) return false;
 		$this->EOF = false;
@@ -652,7 +652,7 @@ class ADORecordSet_odbtp extends ADORecordSet {
 		return true;
     }
 
-	function MoveLast()
+	public function MoveLast()
 	{
 		if (!$this->_fetch_odbtp(ODB_FETCH_LAST)) return false;
 		$this->EOF = false;
@@ -660,7 +660,7 @@ class ADORecordSet_odbtp extends ADORecordSet {
 		return true;
 	}
 
-	function NextRecordSet()
+	public function NextRecordSet()
 	{
 		if (!@odbtp_next_result($this->_queryID)) return false;
 		$this->_inited = false;
@@ -670,7 +670,7 @@ class ADORecordSet_odbtp extends ADORecordSet {
 		return true;
 	}
 
-	function _close()
+	public function _close()
 	{
 		return @odbtp_free_query($this->_queryID);
 	}
@@ -678,9 +678,9 @@ class ADORecordSet_odbtp extends ADORecordSet {
 
 class ADORecordSet_odbtp_mssql extends ADORecordSet_odbtp {
 
-	var $databaseType = 'odbtp_mssql';
+	public $databaseType = 'odbtp_mssql';
 
-	function ADORecordSet_odbtp_mssql($id,$mode=false)
+	public function ADORecordSet_odbtp_mssql($id,$mode=false)
 	{
 		return $this->ADORecordSet_odbtp($id,$mode);
 	}
@@ -688,9 +688,9 @@ class ADORecordSet_odbtp_mssql extends ADORecordSet_odbtp {
 
 class ADORecordSet_odbtp_access extends ADORecordSet_odbtp {
 
-	var $databaseType = 'odbtp_access';
+	public $databaseType = 'odbtp_access';
 
-	function ADORecordSet_odbtp_access($id,$mode=false)
+	public function ADORecordSet_odbtp_access($id,$mode=false)
 	{
 		return $this->ADORecordSet_odbtp($id,$mode);
 	}
@@ -698,9 +698,9 @@ class ADORecordSet_odbtp_access extends ADORecordSet_odbtp {
 
 class ADORecordSet_odbtp_vfp extends ADORecordSet_odbtp {
 
-	var $databaseType = 'odbtp_vfp';
+	public $databaseType = 'odbtp_vfp';
 
-	function ADORecordSet_odbtp_vfp($id,$mode=false)
+	public function ADORecordSet_odbtp_vfp($id,$mode=false)
 	{
 		return $this->ADORecordSet_odbtp($id,$mode);
 	}
@@ -708,9 +708,9 @@ class ADORecordSet_odbtp_vfp extends ADORecordSet_odbtp {
 
 class ADORecordSet_odbtp_oci8 extends ADORecordSet_odbtp {
 
-	var $databaseType = 'odbtp_oci8';
+	public $databaseType = 'odbtp_oci8';
 
-	function ADORecordSet_odbtp_oci8($id,$mode=false)
+	public function ADORecordSet_odbtp_oci8($id,$mode=false)
 	{
 		return $this->ADORecordSet_odbtp($id,$mode);
 	}
@@ -718,9 +718,9 @@ class ADORecordSet_odbtp_oci8 extends ADORecordSet_odbtp {
 
 class ADORecordSet_odbtp_sybase extends ADORecordSet_odbtp {
 
-	var $databaseType = 'odbtp_sybase';
+	public $databaseType = 'odbtp_sybase';
 
-	function ADORecordSet_odbtp_sybase($id,$mode=false)
+	public function ADORecordSet_odbtp_sybase($id,$mode=false)
 	{
 		return $this->ADORecordSet_odbtp($id,$mode);
 	}

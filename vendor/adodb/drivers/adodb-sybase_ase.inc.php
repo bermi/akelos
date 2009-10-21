@@ -10,13 +10,13 @@
   Contributed by Interakt Online. Thx Cristian MARIN cristic#interaktonline.com
 */
 class ADODB_sybase_ase extends ADODB_sybase {
- 	var $databaseType = "sybase_ase";
+ 	public $databaseType = "sybase_ase";
 	
-	 var $metaTablesSQL="SELECT sysobjects.name FROM sysobjects, sysusers WHERE sysobjects.type='U' AND sysobjects.uid = sysusers.uid";
-	 var $metaColumnsSQL = "SELECT syscolumns.name AS field_name, systypes.name AS type, systypes.length AS width FROM sysobjects, syscolumns, systypes WHERE sysobjects.name='%s' AND syscolumns.id = sysobjects.id AND systypes.type=syscolumns.type";
-	 var $metaDatabasesSQL ="SELECT a.name FROM master.dbo.sysdatabases a, master.dbo.syslogins b WHERE a.suid = b.suid and a.name like '%' and a.name != 'tempdb' and a.status3 != 256  order by 1";
+	 public $metaTablesSQL="SELECT sysobjects.name FROM sysobjects, sysusers WHERE sysobjects.type='U' AND sysobjects.uid = sysusers.uid";
+	 public $metaColumnsSQL = "SELECT syscolumns.name AS field_name, systypes.name AS type, systypes.length AS width FROM sysobjects, syscolumns, systypes WHERE sysobjects.name='%s' AND syscolumns.id = sysobjects.id AND systypes.type=syscolumns.type";
+	 public $metaDatabasesSQL ="SELECT a.name FROM master.dbo.sysdatabases a, master.dbo.syslogins b WHERE a.suid = b.suid and a.name like '%' and a.name != 'tempdb' and a.status3 != 256  order by 1";
 
-	function ADODB_sybase_ase()
+	public function ADODB_sybase_ase()
 	{
 	}
 	
@@ -50,7 +50,7 @@ class ADODB_sybase_ase extends ADODB_sybase {
 		return $false;
 	}
 
-	function MetaDatabases()
+	public function MetaDatabases()
 	{
 			$arr = array();
 			if ($this->metaDatabasesSQL!='') {
@@ -77,7 +77,7 @@ class ADODB_sybase_ase extends ADODB_sybase {
 
 			$retarr = array();
 			while (!$rs->EOF) {
-				$fld =& new ADOFieldObject();
+				$fld = new ADOFieldObject();
 				$fld->name = $rs->Fields('field_name');
 				$fld->type = $rs->Fields('type');
 				$fld->max_length = $rs->Fields('width');
@@ -90,12 +90,12 @@ class ADODB_sybase_ase extends ADODB_sybase {
 		return $false;
 	}
 	
-	function getProcedureList($schema)
+	public function getProcedureList($schema)
 	{
 			return false;
 	}
 
-	function ErrorMsg()
+	public function ErrorMsg()
 	{
 		if (!function_exists('sybase_connect')){
 				return 'Your PHP doesn\'t contain the Sybase connection module!';

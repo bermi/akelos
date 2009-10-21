@@ -24,7 +24,7 @@ class ADODB_csv extends ADOConnection {
 	var $databaseProvider = 'csv';
 	var $hasInsertID = true;
 	var $hasAffectedRows = true;	
-	var $fmtTimeStamp = "'Y-m-d H:i:s'";
+	public $fmtTimeStamp = "'Y-m-d H:i:s'";
 	var $_affectedrows=0;
 	var $_insertid=0;
 	var $_url;
@@ -32,21 +32,21 @@ class ADODB_csv extends ADOConnection {
 	var $hasTransactions = false;
 	var $_errorNo = false;
 	
-	function ADODB_csv() 
+	public function ADODB_csv() 
 	{		
 	}
 	
-	function _insertid()
+	public function _insertid()
 	{
 			return $this->_insertid;
 	}
 	
-	function _affectedrows()
+	public function _affectedrows()
 	{
 			return $this->_affectedrows;
 	}
   
-  	function &MetaDatabases()
+  	public function &MetaDatabases()
 	{
 		return false;
 	}
@@ -68,7 +68,7 @@ class ADODB_csv extends ADOConnection {
 		return true;
 	}
 	
- 	function &MetaColumns($table) 
+ 	public function &MetaColumns($table) 
 	{
 		return false;
 	}
@@ -168,13 +168,13 @@ class ADODB_csv extends ADOConnection {
 	}
 
 	/*	Returns: the last error message from previous database operation	*/	
-	function ErrorMsg() 
+	public function ErrorMsg() 
 	{
 			return $this->_errorMsg;
 	}
 	
 	/*	Returns: the last error number from previous database operation	*/	
-	function ErrorNo() 
+	public function ErrorNo() 
 	{
 		return $this->_errorNo;
 	}
@@ -192,7 +192,7 @@ class ADORecordset_csv extends ADORecordset {
 		$this->ADORecordset($id,$mode);
 	}
 	
-	function _close()
+	public function _close()
 	{
 		return true;
 	}

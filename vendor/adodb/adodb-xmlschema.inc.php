@@ -135,7 +135,7 @@ class dbObject {
 		
 	}
 	
-	function create() {
+	public function create() {
 		return array();
 	}
 	
@@ -350,7 +350,7 @@ class dbTable extends dbObject {
 	*/
 	function &addIndex( $attributes ) {
 		$name = strtoupper( $attributes['NAME'] );
-		$this->indexes[$name] =& new dbIndex( $this, $attributes );
+		$this->indexes[$name] = new dbIndex( $this, $attributes );
 		return $this->indexes[$name];
 	}
 	
@@ -362,7 +362,7 @@ class dbTable extends dbObject {
 	*/
 	function &addData( $attributes ) {
 		if( !isset( $this->data ) ) {
-			$this->data =& new dbData( $this, $attributes );
+			$this->data = new dbData( $this, $attributes );
 		}
 		return $this->data;
 	}
@@ -758,9 +758,9 @@ class dbIndex extends dbObject {
 */
 class dbData extends dbObject {
 	
-	var $data = array();
+	public $data = array();
 	
-	var $row;
+	public $row;
 	
 	/**
 	* Initializes the new dbIndex object.
@@ -1748,7 +1748,7 @@ class adoSchema {
 		return $result;
 	}
 	
-	function TransformSchema( $schema, $xsl, $schematype='string' )
+	public function TransformSchema( $schema, $xsl, $schematype='string' )
 	{
 		// Fail if XSLT extension is not available
 		if( ! function_exists( 'xslt_create' ) ) {

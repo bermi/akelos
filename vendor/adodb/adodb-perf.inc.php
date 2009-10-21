@@ -214,7 +214,7 @@ class adodb_perf {
 	var $maxLength = 2000;
 	
     // Sets the tablename to be used            
-    function table($newtable = false)
+    public function table($newtable = false)
     {
         static $_table;
 
@@ -346,7 +346,7 @@ Committed_AS:   348732 kB
 		}
 	}
 	
-	function Tracer($sql)
+	public function Tracer($sql)
 	{
         $perf_table = adodb_perf::table();
 		$saveE = $this->conn->fnExecute;
@@ -379,7 +379,7 @@ Committed_AS:   348732 kB
 		return false;
 	}
 	
-	function InvalidSQL($numsql = 10)
+	public function InvalidSQL($numsql = 10)
 	{
 	
 		if (isset($_GET['sql'])) return;
@@ -401,7 +401,7 @@ Committed_AS:   348732 kB
 	/*
 		This script identifies the longest running SQL
 	*/	
-	function _SuspiciousSQL($numsql = 10)
+	public function _SuspiciousSQL($numsql = 10)
 	{
 		global $ADODB_FETCH_MODE;
 		
@@ -458,18 +458,18 @@ Committed_AS:   348732 kB
 		
 	}
 	
-	function CheckMemory()
+	public function CheckMemory()
 	{
 		return '';
 	}
 	
 	
-	function SuspiciousSQL($numsql=10)
+	public function SuspiciousSQL($numsql=10)
 	{
 		return adodb_perf::_SuspiciousSQL($numsql);
 	}
 
-	function ExpensiveSQL($numsql=10)
+	public function ExpensiveSQL($numsql=10)
 	{
 		return adodb_perf::_ExpensiveSQL($numsql);
 	}
@@ -620,7 +620,7 @@ Committed_AS:   348732 kB
 	/***********************************************************************************************/
 
 	
-	function UI($pollsecs=5)
+	public function UI($pollsecs=5)
 	{
 	
     $perf_table = adodb_perf::table();
@@ -832,7 +832,7 @@ Committed_AS:   348732 kB
 		return $html;	
 	}
 	
-	function Tables($orderby='1')
+	public function Tables($orderby='1')
 	{
 		if (!$this->tablesSQL) return false;
 		
@@ -844,7 +844,7 @@ Committed_AS:   348732 kB
 	}
 	
 
-	function CreateLogTable()
+	public function CreateLogTable()
 	{
 		if (!$this->createTableSQL) return false;
 		
@@ -854,7 +854,7 @@ Committed_AS:   348732 kB
 		return ($ok) ? true : false;
 	}
 	
-	function DoSQLForm()
+	public function DoSQLForm()
 	{
 	
 		
@@ -931,13 +931,13 @@ Committed_AS:   348732 kB
 		} // foreach
 	}
 	
-	function SplitSQL($sql)
+	public function SplitSQL($sql)
 	{
 		$arr = explode(';',$sql);
 		return $arr;
 	}
 	
-	function undomq(&$m) 
+	public function undomq(&$m) 
 	{
 	if (get_magic_quotes_gpc()) {
 		// undo the damage
@@ -974,7 +974,7 @@ Committed_AS:   348732 kB
      * @author Markus Staab
      * @return Returns <code>true</code> on success and <code>false</code> on error
      */
-    function OptimizeTables()
+    public function OptimizeTables()
     {
         $args = func_get_args();
         $numArgs = func_num_args();
@@ -1005,7 +1005,7 @@ Committed_AS:   348732 kB
      * @author Markus Staab
      * @return Returns <code>true</code> on success and <code>false</code> on error
      */
-    function OptimizeTable( $table, $mode = ADODB_OPT_LOW) 
+    public function OptimizeTable( $table, $mode = ADODB_OPT_LOW) 
     {
         ADOConnection::outp( sprintf( "<p>%s: '%s' not implemented for driver '%s'</p>", __CLASS__, __FUNCTION__, $this->conn->databaseType));
         return false;
@@ -1019,7 +1019,7 @@ Committed_AS:   348732 kB
      * @author Markus Staab
      * @return Returns <code>true</code> on success and <code>false</code> on error
      */
-    function optimizeDatabase() 
+    public function optimizeDatabase() 
     {
         $conn = $this->conn;
         if ( !$conn) return false;

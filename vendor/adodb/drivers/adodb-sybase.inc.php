@@ -20,13 +20,13 @@ if (!defined('ADODB_DIR')) die();
 
 class ADODB_sybase extends ADOConnection {
 	var $databaseType = "sybase";	
-	var $dataProvider = 'sybase';
+	public $dataProvider = 'sybase';
 	var $replaceQuote = "''"; // string to use to replace quotes
 	var $fmtDate = "'Y-m-d'";
 	var $fmtTimeStamp = "'Y-m-d H:i:s'";
 	var $hasInsertID = true;
 	var $hasAffectedRows = true;
-  	var $metaTablesSQL="select name from sysobjects where type='U' or type='V'";
+  	public $metaTablesSQL="select name from sysobjects where type='U' or type='V'";
 	// see http://sybooks.sybase.com/onlinebooks/group-aw/awg0800e/dbrfen8/@ebt-link;pt=5981;uf=0?target=0;window=new;showtoc=true;book=dbrfen8
 	var $metaColumnsSQL = "SELECT c.column_name, c.column_type, c.width FROM syscolumn c, systable t WHERE t.table_name='%s' AND c.table_id=t.table_id AND t.table_type='BASE'";
 	/*
@@ -35,12 +35,12 @@ class ADODB_sybase extends ADOConnection {
 	where o.name='%s'";
 	*/
 	var $concat_operator = '+'; 
-	var $arrayClass = 'ADORecordSet_array_sybase';
+	public $arrayClass = 'ADORecordSet_array_sybase';
 	var $sysDate = 'GetDate()';
 	var $leftOuter = '*=';
 	var $rightOuter = '=*';
 	
-	function ADODB_sybase() 
+	public function ADODB_sybase() 
 	{			
 	}
  
@@ -56,7 +56,7 @@ class ADODB_sybase extends ADOConnection {
 	}
 
 			  
-	function BeginTrans()
+	public function BeginTrans()
 	{	
 	
 		if ($this->transOff) return true;
@@ -66,7 +66,7 @@ class ADODB_sybase extends ADOConnection {
 		return true;
 	}
 	
-	function CommitTrans($ok=true) 
+	public function CommitTrans($ok=true) 
 	{ 
 		if ($this->transOff) return true;
 		
@@ -77,7 +77,7 @@ class ADODB_sybase extends ADOConnection {
 		return true;
 	}
 	
-	function RollbackTrans()
+	public function RollbackTrans()
 	{
 		if ($this->transOff) return true;
 		$this->transCnt -= 1;
@@ -94,7 +94,7 @@ class ADODB_sybase extends ADOConnection {
 		
 	}	
 		
-	function SelectDB($dbName) 
+	public function SelectDB($dbName) 
 	{
 		$this->databaseName = $dbName;
 		if ($this->_connectionID) {
@@ -107,7 +107,7 @@ class ADODB_sybase extends ADOConnection {
 		Note: This function is NOT available for Microsoft SQL Server.	*/	
 
 	
-	function ErrorMsg()
+	public function ErrorMsg()
 	{
 		if ($this->_logsql) return $this->_errorMsg;
 		if (function_exists('sybase_get_last_message'))
@@ -172,12 +172,12 @@ class ADODB_sybase extends ADOConnection {
 		return @sybase_close($this->_connectionID);
 	}
 	
-	function UnixDate($v)
+	public function UnixDate($v)
 	{
 		return ADORecordSet_array_sybase::UnixDate($v);
 	}
 	
-	function UnixTimeStamp($v)
+	public function UnixTimeStamp($v)
 	{
 		return ADORecordSet_array_sybase::UnixTimeStamp($v);
 	}	
@@ -188,7 +188,7 @@ class ADODB_sybase extends ADOConnection {
     # Used ASA SQL Reference Manual -- http://sybooks.sybase.com/onlinebooks/group-aw/awg0800e/dbrfen8/@ebt-link;pt=16756?target=%25N%15_12018_START_RESTART_N%25
     # to convert similar Microsoft SQL*Server (mssql) API into Sybase compatible version
     // Format date column in sql string given an input format that understands Y M D
-    function SQLDate($fmt, $col=false)
+    public function SQLDate($fmt, $col=false)
     {
         if (!$col) $col = $this->sysTimeStamp;
         $s = '';
@@ -250,7 +250,7 @@ class ADODB_sybase extends ADOConnection {
 	# Added 2003-10-07 by Chris Phillipson
     # Used ASA SQL Reference Manual -- http://sybooks.sybase.com/onlinebooks/group-aw/awg0800e/dbrfen8/@ebt-link;pt=5981;uf=0?target=0;window=new;showtoc=true;book=dbrfen8
     # to convert similar Microsoft SQL*Server (mssql) API into Sybase compatible version
-    function MetaPrimaryKeys($table)
+    public function MetaPrimaryKeys($table)
     {
         $sql = "SELECT c.column_name " .
                "FROM syscolumn c, systable t " .
@@ -275,12 +275,12 @@ $ADODB_sybase_mths = array(
 
 class ADORecordset_sybase extends ADORecordSet {	
 
-	var $databaseType = "sybase";
+	public $databaseType = "sybase";
 	var $canSeek = true;
 	// _mths works only in non-localised system
 	var  $_mths = array('JAN'=>1,'FEB'=>2,'MAR'=>3,'APR'=>4,'MAY'=>5,'JUN'=>6,'JUL'=>7,'AUG'=>8,'SEP'=>9,'OCT'=>10,'NOV'=>11,'DEC'=>12);	
 
-	function ADORecordset_sybase($id,$mode=false)
+	public function ADORecordset_sybase($id,$mode=false)
 	{
 		if ($mode === false) { 
 			global $ADODB_FETCH_MODE;
@@ -308,19 +308,19 @@ class ADORecordset_sybase extends ADORecordSet {
 		return $o;
 	}
 	
-	function _initrs()
+	public function _initrs()
 	{
 	global $ADODB_COUNTRECS;
 		$this->_numOfRows = ($ADODB_COUNTRECS)? @sybase_num_rows($this->_queryID):-1;
 		$this->_numOfFields = @sybase_num_fields($this->_queryID);
 	}
 	
-	function _seek($row) 
+	public function _seek($row) 
 	{
 		return @sybase_data_seek($this->_queryID, $row);
 	}		
 
-	function _fetch($ignore_fields=false) 
+	public function _fetch($ignore_fields=false) 
 	{
 		if ($this->fetchMode == ADODB_FETCH_NUM) {
 			$this->fields = @sybase_fetch_row($this->_queryID);
@@ -353,7 +353,7 @@ class ADORecordset_sybase extends ADORecordSet {
 		return ADORecordSet_array_sybase::UnixDate($v);
 	}
 	
-	function UnixTimeStamp($v)
+	public function UnixTimeStamp($v)
 	{
 		return ADORecordSet_array_sybase::UnixTimeStamp($v);
 	}
@@ -383,7 +383,7 @@ class ADORecordSet_array_sybase extends ADORecordSet_array {
 		return  mktime(0,0,0,$themth,$rr[2],$rr[3]);
 	}
 	
-	function UnixTimeStamp($v)
+	public function UnixTimeStamp($v)
 	{
 	global $ADODB_sybase_mths;
 		//11.02.2001 Toni Tunkkari toni.tunkkari@finebyte.com

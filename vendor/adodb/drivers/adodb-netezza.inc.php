@@ -20,14 +20,14 @@ if (!defined('ADODB_DIR')) die();
 include_once(ADODB_DIR.'/drivers/adodb-postgres64.inc.php');
 
 class ADODB_netezza extends ADODB_postgres64 {
-    var $databaseType = 'netezza';	
-	var $dataProvider = 'netezza';
+    public $databaseType = 'netezza';	
+	public $dataProvider = 'netezza';
 	var $hasInsertID = false;
 	var $_resultid = false;
-  	var $concat_operator='||';
-  	var $random = 'random';
+  	public $concat_operator='||';
+  	public $random = 'random';
 	var $metaDatabasesSQL = "select objname from _v_object_data where objtype='database' order by 1";
-    var $metaTablesSQL = "select objname from _v_object_data where objtype='table' order by 1";
+    public $metaTablesSQL = "select objname from _v_object_data where objtype='table' order by 1";
 	var $isoDates = true; // accepts dates in ISO format
 	var $sysDate = "CURRENT_DATE";
 	var $sysTimeStamp = "CURRENT_TIMESTAMP";
@@ -39,7 +39,7 @@ class ADODB_netezza extends ADODB_postgres64 {
 	var $metaKeySQL = "";
 	var $hasAffectedRows = true;
 	var $hasLimit = true;	
-	var $true = 't';		// string that represents TRUE for a database
+	public $true = 't';		// string that represents TRUE for a database
 	var $false = 'f';		// string that represents FALSE for a database
 	var $fmtDate = "'Y-m-d'";	// used by DBDate() as the default date format used by the database
 	var $fmtTimeStamp = "'Y-m-d G:i:s'"; // used by DBTimeStamp as the default timestamp fmt.
@@ -48,12 +48,12 @@ class ADODB_netezza extends ADODB_postgres64 {
 							// http://bugs.php.net/bug.php?id=25404
 
 							
-	function ADODB_netezza() 
+	public function ADODB_netezza() 
 	{
 	
 	}
 	
-	function &MetaColumns($table,$upper=true) 
+	public function &MetaColumns($table,$upper=true) 
 	{
 	
 	// Changed this function to support Netezza which has no concept of keys
@@ -139,7 +139,7 @@ class ADORecordSet_netezza extends ADORecordSet_postgres64
 	var $databaseType = "netezza";
 	var $canSeek = true;
 	
-	function ADORecordSet_netezza($queryID,$mode=false) 
+	public function ADORecordSet_netezza($queryID,$mode=false) 
 	{
 		if ($mode === false) { 
 			global $ADODB_FETCH_MODE;

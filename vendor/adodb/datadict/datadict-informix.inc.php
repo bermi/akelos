@@ -15,11 +15,11 @@ if (!defined('ADODB_DIR')) die();
 
 class ADODB2_informix extends ADODB_DataDict {
 	
-	var $databaseType = 'informix';
+	public $databaseType = 'informix';
 	var $seqField = false;
 	
  	
-	function ActualType($meta)
+	public function ActualType($meta)
 	{
 		switch($meta) {
 		case 'C': return 'VARCHAR';// 255
@@ -48,14 +48,14 @@ class ADODB2_informix extends ADODB_DataDict {
 		}
 	}
 
-	function AlterColumnSQL($tabname, $flds)
+	public function AlterColumnSQL($tabname, $flds)
 	{
 		if ($this->debug) ADOConnection::outp("AlterColumnSQL not supported");
 		return array();
 	}
 	
 	
-	function DropColumnSQL($tabname, $flds)
+	public function DropColumnSQL($tabname, $flds)
 	{
 		if ($this->debug) ADOConnection::outp("DropColumnSQL not supported");
 		return array();

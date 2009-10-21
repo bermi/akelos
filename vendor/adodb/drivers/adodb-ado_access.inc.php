@@ -20,7 +20,7 @@ if (!defined('_ADODB_ADO_LAYER')) {
 }
 
 class  ADODB_ado_access extends ADODB_ado {	
-	var $databaseType = 'ado_access';
+	public $databaseType = 'ado_access';
 	var $hasTop = 'top';		// support mssql SELECT TOP 10 * FROM TABLE
 	var $fmtDate = "#Y-m-d#";
 	var $fmtTimeStamp = "#Y-m-d h:i:sA#";// note no comma
@@ -28,25 +28,25 @@ class  ADODB_ado_access extends ADODB_ado {
 	var $sysTimeStamp = 'NOW';
 	var $hasTransactions = false;
 	
-	function ADODB_ado_access()
+	public function ADODB_ado_access()
 	{
 		$this->ADODB_ado();
 	}
 	
-	function BeginTrans() { return false;}
+	public function BeginTrans() { return false;}
 	
-	function CommitTrans() { return false;}
+	public function CommitTrans() { return false;}
 	
-	function RollbackTrans() { return false;}
+	public function RollbackTrans() { return false;}
 
 }
 
  
 class  ADORecordSet_ado_access extends ADORecordSet_ado {	
 	
-	var $databaseType = "ado_access";		
+	public $databaseType = "ado_access";		
 	
-	function ADORecordSet_ado_access($id,$mode=false)
+	public function ADORecordSet_ado_access($id,$mode=false)
 	{
 		return $this->ADORecordSet_ado($id,$mode);
 	}

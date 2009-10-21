@@ -15,11 +15,11 @@ if (!defined('ADODB_DIR')) die();
 
 class ADODB2_access extends ADODB_DataDict {
 	
-	var $databaseType = 'access';
+	public $databaseType = 'access';
 	var $seqField = false;
 	
  	
- 	function ActualType($meta)
+ 	public function ActualType($meta)
 	{
 		switch($meta) {
 		case 'C': return 'TEXT';
@@ -66,24 +66,24 @@ class ADODB2_access extends ADODB_DataDict {
 		return $suffix;
 	}
 	
-	function CreateDatabase($dbname,$options=false)
+	public function CreateDatabase($dbname,$options=false)
 	{
 		return array();
 	}
 	
 	
-	function SetSchema($schema)
+	public function SetSchema($schema)
 	{
 	}
 
-	function AlterColumnSQL($tabname, $flds)
+	public function AlterColumnSQL($tabname, $flds)
 	{
 		if ($this->debug) ADOConnection::outp("AlterColumnSQL not supported");
 		return array();
 	}
 	
 	
-	function DropColumnSQL($tabname, $flds)
+	public function DropColumnSQL($tabname, $flds)
 	{
 		if ($this->debug) ADOConnection::outp("DropColumnSQL not supported");
 		return array();

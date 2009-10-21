@@ -28,12 +28,12 @@ class ADODB_mssqlpo extends ADODB_mssql {
 	var $databaseType = "mssqlpo";
 	var $concat_operator = '||'; 
 	
-	function ADODB_mssqlpo()
+	public function ADODB_mssqlpo()
 	{
 		ADODB_mssql::ADODB_mssql();
 	}
 
-	function PrepareSP($sql)
+	public function PrepareSP($sql)
 	{
 		if (!$this->_has_mssql_init) {
 			ADOConnection::outp( "PrepareSP: mssql_init only available since PHP 4.1.0");
@@ -45,7 +45,7 @@ class ADODB_mssqlpo extends ADODB_mssql {
 		return array($sql,$stmt);
 	}
 	
-	function _query($sql,$inputarr)
+	public function _query($sql,$inputarr)
 	{
 		if (is_string($sql)) $sql = str_replace('||','+',$sql);
 		return ADODB_mssql::_query($sql,$inputarr);

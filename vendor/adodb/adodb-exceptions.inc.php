@@ -25,7 +25,7 @@ var $params = '';
 var $host = '';
 var $database = '';
 	
-	function __construct($dbms, $fn, $errno, $errmsg, $p1, $p2, $thisConnection)
+	public function __construct($dbms, $fn, $errno, $errmsg, $p1, $p2, $thisConnection)
 	{
 		switch($fn) {
 		case 'EXECUTE':

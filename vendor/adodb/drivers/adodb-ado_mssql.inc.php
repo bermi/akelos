@@ -25,7 +25,7 @@ if (!defined('_ADODB_ADO_LAYER')) {
 
 
 class  ADODB_ado_mssql extends ADODB_ado {        
-	var $databaseType = 'ado_mssql';
+	public $databaseType = 'ado_mssql';
 	var $hasTop = 'top';
 	var $hasInsertID = true;
 	var $sysDate = 'convert(datetime,convert(char,GetDate(),102),102)';
@@ -38,22 +38,22 @@ class  ADODB_ado_mssql extends ADODB_ado {
 	
 	//var $_inTransaction = 1; // always open recordsets, so no transaction problems.
 	
-	function ADODB_ado_mssql()
+	public function ADODB_ado_mssql()
 	{
 	        $this->ADODB_ado();
 	}
 	
-	function _insertid()
+	public function _insertid()
 	{
 	        return $this->GetOne('select @@identity');
 	}
 	
-	function _affectedrows()
+	public function _affectedrows()
 	{
 	        return $this->GetOne('select @@rowcount');
 	}
 	
-	function MetaColumns($table)
+	public function MetaColumns($table)
 	{
         $table = strtoupper($table);
         $arr= array();
@@ -88,9 +88,9 @@ class  ADODB_ado_mssql extends ADODB_ado {
 	
 	class  ADORecordSet_ado_mssql extends ADORecordSet_ado {        
 	
-	var $databaseType = 'ado_mssql';
+	public $databaseType = 'ado_mssql';
 	
-	function ADORecordSet_ado_mssql($id,$mode=false)
+	public function ADORecordSet_ado_mssql($id,$mode=false)
 	{
 	        return $this->ADORecordSet_ado($id,$mode);
 	}

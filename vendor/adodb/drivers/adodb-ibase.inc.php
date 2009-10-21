@@ -54,7 +54,7 @@ class ADODB_ibase extends ADOConnection {
 	var $blobEncodeType = 'C';
 	var $role = false;
 	
-	function ADODB_ibase() 
+	public function ADODB_ibase() 
 	{
 		 if (defined('IBASE_DEFAULT')) $this->ibasetrans = IBASE_DEFAULT;
   	}
@@ -102,7 +102,7 @@ class ADODB_ibase extends ADOConnection {
 	}	
 	
 	
-	function MetaPrimaryKeys($table,$owner_notused=false,$internalKey=false)
+	public function MetaPrimaryKeys($table,$owner_notused=false,$internalKey=false)
 	{	
 		if ($internalKey) return array('RDB$DB_KEY');
 		
@@ -118,7 +118,7 @@ class ADODB_ibase extends ADOConnection {
 		return false;	  
 	}
 	
-	function ServerInfo()
+	public function ServerInfo()
 	{
 		$arr['dialect'] = $this->dialect;
 		switch($arr['dialect']) {
@@ -133,7 +133,7 @@ class ADODB_ibase extends ADOConnection {
 		return $arr;
 	}
 
-	function BeginTrans()
+	public function BeginTrans()
 	{	 
 		if ($this->transOff) return true;
 		$this->transCnt += 1;
@@ -142,7 +142,7 @@ class ADODB_ibase extends ADOConnection {
 		return $this->_transactionID;
 	}
 	
-	function CommitTrans($ok=true) 
+	public function CommitTrans($ok=true) 
 	{ 
 		if (!$ok) return $this->RollbackTrans();
 		if ($this->transOff) return true;
@@ -174,7 +174,7 @@ class ADODB_ibase extends ADOConnection {
 		return $ret;
 	}
 	
-	function RollbackTrans()
+	public function RollbackTrans()
 	{
 		if ($this->transOff) return true;
 		if ($this->transCnt) $this->transCnt -= 1;
@@ -187,7 +187,7 @@ class ADODB_ibase extends ADOConnection {
 		return $ret;
 	}
 	
-	function &MetaIndexes ($table, $primary = FALSE, $owner=false)
+	public function &MetaIndexes ($table, $primary = FALSE, $owner=false)
 	{
         // save old fetch mode
         global $ADODB_FETCH_MODE;
@@ -250,20 +250,20 @@ class ADODB_ibase extends ADOConnection {
 	}
 	
 	
-	function CreateSequence($seqname,$startID=1)
+	public function CreateSequence($seqname,$startID=1)
 	{
 		$ok = $this->Execute(("INSERT INTO RDB\$GENERATORS (RDB\$GENERATOR_NAME) VALUES (UPPER('$seqname'))" ));
 		if (!$ok) return false;
 		return $this->Execute("SET GENERATOR $seqname TO ".($startID-1).';');
 	}
 	
-	function DropSequence($seqname)
+	public function DropSequence($seqname)
 	{
 		$seqname = strtoupper($seqname);
 		$this->Execute("delete from RDB\$GENERATORS where RDB\$GENERATOR_NAME='$seqname'");
 	}
 	
-	function GenID($seqname='adodbseq',$startID=1)
+	public function GenID($seqname='adodbseq',$startID=1)
 	{
 		$getnext = ("SELECT Gen_ID($seqname,1) FROM RDB\$DATABASE");
 		$rs = @$this->Execute($getnext);
@@ -280,28 +280,28 @@ class ADODB_ibase extends ADOConnection {
 		return $this->genID;
 	}
 
-	function SelectDB($dbName) 
+	public function SelectDB($dbName) 
 	{
 		   return false;
 	}
 
-	function _handleerror()
+	public function _handleerror()
 	{
 		$this->_errorMsg = ibase_errmsg();
 	}
 
-	function ErrorNo() 
+	public function ErrorNo() 
 	{
 		if (preg_match('/error code = ([\-0-9]*)/i', $this->_errorMsg,$arr)) return (integer) $arr[1];
 		else return 0;
 	}
 
-	function ErrorMsg() 
+	public function ErrorMsg() 
 	{
 			return $this->_errorMsg;
 	}
 
-	function Prepare($sql)
+	public function Prepare($sql)
 	{
 		$stmt = ibase_prepare($this->_connectionID,$sql);
 		if (!$stmt) return false;
@@ -372,7 +372,7 @@ class ADODB_ibase extends ADOConnection {
 	}
 
 	 // returns true or false
-	 function _close()
+	 public function _close()
 	 {	   
 		if (!$this->autoCommit) @ibase_rollback($this->_connectionID);
 		return @ibase_close($this->_connectionID);
@@ -537,7 +537,7 @@ class ADODB_ibase extends ADOConnection {
 		else return $retarr;	
 	}
 	
-	function BlobEncode( $blob ) 
+	public function BlobEncode( $blob ) 
 	{
 		$blobid = ibase_blob_create( $this->_connectionID);
 		ibase_blob_add( $blobid, $blob );
@@ -568,7 +568,7 @@ class ADODB_ibase extends ADOConnection {
 		return( $realblob );
 	} 
 	
-	function UpdateBlobFile($table,$column,$path,$where,$blobtype='BLOB') 
+	public function UpdateBlobFile($table,$column,$path,$where,$blobtype='BLOB') 
 	{ 
 		$fd = fopen($path,'rb'); 
 		if ($fd === false) return false; 
@@ -630,7 +630,7 @@ class ADODB_ibase extends ADOConnection {
 	} 
 	
 	
-	function OldUpdateBlob($table,$column,$val,$where,$blobtype='BLOB')
+	public function OldUpdateBlob($table,$column,$val,$where,$blobtype='BLOB')
 	{
 		$blob_id = ibase_blob_create($this->_connectionID);
 		ibase_blob_add($blob_id, $val);
@@ -700,11 +700,11 @@ class ADODB_ibase extends ADOConnection {
 class ADORecordset_ibase extends ADORecordSet
 {
 
-	var $databaseType = "ibase";
+	public $databaseType = "ibase";
 	var $bind=false;
 	var $_cacheType;
 	
-	function ADORecordset_ibase($id,$mode=false)
+	public function ADORecordset_ibase($id,$mode=false)
 	{
 	global $ADODB_FETCH_MODE;
 	
@@ -717,7 +717,7 @@ class ADORecordset_ibase extends ADORecordSet
 			fields in a certain query result. If the field offset isn't specified, the next field that wasn't yet retrieved by
 			fetchField() is retrieved.		*/
 
-	function &FetchField($fieldOffset = -1)
+	public function &FetchField($fieldOffset = -1)
 	{
 			 $fld = new ADOFieldObject;
 			 $ibf = ibase_field_info($this->_queryID,$fieldOffset);
@@ -746,7 +746,7 @@ class ADORecordset_ibase extends ADORecordSet
 			 return $fld;
 	}
 
-	function _initrs()
+	public function _initrs()
 	{
 		$this->_numOfRows = -1;
 		$this->_numOfFields = @ibase_num_fields($this->_queryID);
@@ -758,12 +758,12 @@ class ADORecordset_ibase extends ADORecordSet
 		}				
 	}
 
-	function _seek($row)
+	public function _seek($row)
 	{
 		return false;
 	}
 	
-	function _fetch() 
+	public function _fetch() 
 	{
 		$f = @ibase_fetch_row($this->_queryID); 
 		if ($f === false) {
@@ -820,12 +820,12 @@ class ADORecordset_ibase extends ADORecordSet
 	}
 	
 
-	function _close() 
+	public function _close() 
 	{
 			return @ibase_free_result($this->_queryID);
 	}
 
-	function MetaType($t,$len=-1,$fieldobj=false)
+	public function MetaType($t,$len=-1,$fieldobj=false)
 	{
 		if (is_object($t)) {
 			$fieldobj = $t;

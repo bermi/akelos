@@ -28,18 +28,18 @@ class ADODB_oci8po extends ADODB_oci8 {
 	var $metaColumnsSQL = "select lower(cname),coltype,width, SCALE, PRECISION, NULLS, DEFAULTVAL from col where tname='%s' order by colno"; //changed by smondino@users.sourceforge. net
 	var $metaTablesSQL = "select lower(table_name),table_type from cat where table_type in ('TABLE','VIEW')";
 	
-	function ADODB_oci8po()
+	public function ADODB_oci8po()
 	{
 		$this->_hasOCIFetchStatement = ADODB_PHPVER >= 0x4200;
 		# oci8po does not support adodb extension: adodb_movenext()
 	}
 	
-	function Param($name)
+	public function Param($name)
 	{
 		return '?';
 	}
 	
-	function Prepare($sql,$cursor=false)
+	public function Prepare($sql,$cursor=false)
 	{
 		$sqlarr = explode('?',$sql);
 		$sql = $sqlarr[0];
@@ -76,14 +76,14 @@ class ADODB_oci8po extends ADODB_oci8 {
 
 class ADORecordset_oci8po extends ADORecordset_oci8 {
 
-	var $databaseType = 'oci8po';
+	public $databaseType = 'oci8po';
 	
-	function ADORecordset_oci8po($queryID,$mode=false)
+	public function ADORecordset_oci8po($queryID,$mode=false)
 	{
 		$this->ADORecordset_oci8($queryID,$mode);
 	}
 
-	function Fields($colname)
+	public function Fields($colname)
 	{
 		if ($this->fetchMode & OCI_ASSOC) return $this->fields[$colname];
 		
@@ -195,7 +195,7 @@ class ADORecordset_oci8po extends ADORecordset_oci8 {
 		$this->fields = $arr;
 	}
 	
-	function _fetch() 
+	public function _fetch() 
 	{
 		$ret = @OCIfetchinto($this->_queryID,$this->fields,$this->fetchMode);
 		if ($ret) {

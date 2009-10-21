@@ -20,12 +20,12 @@ include_once(ADODB_DIR."/drivers/adodb-ibase.inc.php");
 class ADODB_borland_ibase extends ADODB_ibase {
 	var $databaseType = "borland_ibase";	
 	
-	function ADODB_borland_ibase()
+	public function ADODB_borland_ibase()
 	{
 		$this->ADODB_ibase();
 	}
 	
-	function BeginTrans()
+	public function BeginTrans()
 	{	 
 		if ($this->transOff) return true;
 		$this->transCnt += 1;
@@ -34,7 +34,7 @@ class ADODB_borland_ibase extends ADODB_ibase {
 		return $this->_transactionID;
 	}
 	
-	function ServerInfo()
+	public function ServerInfo()
 	{
 		$arr['dialect'] = $this->dialect;
 		switch($arr['dialect']) {
@@ -81,9 +81,9 @@ class ADODB_borland_ibase extends ADODB_ibase {
 
 class  ADORecordSet_borland_ibase extends ADORecordSet_ibase {	
 	
-	var $databaseType = "borland_ibase";		
+	public $databaseType = "borland_ibase";		
 	
-	function ADORecordSet_borland_ibase($id,$mode=false)
+	public function ADORecordSet_borland_ibase($id,$mode=false)
 	{
 		$this->ADORecordSet_ibase($id,$mode);
 	}

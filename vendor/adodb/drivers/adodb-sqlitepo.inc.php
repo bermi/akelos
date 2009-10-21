@@ -22,9 +22,9 @@ if (!defined('ADODB_DIR')) die();
 include_once(ADODB_DIR.'/drivers/adodb-sqlite.inc.php');
 
 class ADODB_sqlitepo extends ADODB_sqlite {
-   var $databaseType = 'sqlitepo';
+   public $databaseType = 'sqlitepo';
 
-   function ADODB_sqlitepo()
+   public function ADODB_sqlitepo()
    {
       $this->ADODB_sqlite();
    }
@@ -36,15 +36,15 @@ class ADODB_sqlitepo extends ADODB_sqlite {
 
 class ADORecordset_sqlitepo extends ADORecordset_sqlite {
 
-   var $databaseType = 'sqlitepo';
+   public $databaseType = 'sqlitepo';
 
-   function ADORecordset_sqlitepo($queryID,$mode=false)
+   public function ADORecordset_sqlitepo($queryID,$mode=false)
    {
       $this->ADORecordset_sqlite($queryID,$mode);
    }
    
    // Modified to strip table names from returned fields
-   function _fetch($ignore_fields=false)
+   public function _fetch($ignore_fields=false)
    {
       $this->fields = array();
       $fields = @sqlite_fetch_array($this->_queryID,$this->fetchMode);

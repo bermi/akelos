@@ -28,10 +28,10 @@ class ADODB_Pager {
 	var $rs;	// recordset generated
 	var $curr_page;	// current page number before Render() called, calculated in constructor
 	var $rows;		// number of rows per page
-    var $linksPerPage=10; // number of links per page in navigation bar
-    var $showPageLinks; 
+    public $linksPerPage=10; // number of links per page in navigation bar
+    public $showPageLinks; 
 
-	var $gridAttributes = 'width=100% border=1 bgcolor=white';
+	public $gridAttributes = 'width=100% border=1 bgcolor=white';
 	
 	// Localize text strings here
 	var $first = '<code>|&lt;</code>';
@@ -130,7 +130,7 @@ class ADODB_Pager {
 	
 	//---------------------------------------------------
 	// original code by "Pablo Costa" <pablo@cbsp.com.br> 
-        function render_pagelinks()
+        public function render_pagelinks()
         {
         global $PHP_SELF;
             $pages        = $this->rs->LastPageNo();

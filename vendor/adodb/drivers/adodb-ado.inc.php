@@ -37,7 +37,7 @@ class ADODB_ado extends ADOConnection {
 	var $poorAffectedRows = true; 
 	var $charPage;
 		
-	function ADODB_ado() 
+	public function ADODB_ado() 
 	{ 	
 		$this->_affectedRows = new VARIANT;
 	}
@@ -48,7 +48,7 @@ class ADODB_ado extends ADOConnection {
 		return array('description' => $desc, 'version' => '');
 	}
 	
-	function _affectedrows()
+	public function _affectedrows()
 	{
 		if (PHP_VERSION >= 5) return $this->_affectedRows;
 		
@@ -147,7 +147,7 @@ class ADODB_ado extends ADOConnection {
 
 */
 	
-	function &MetaTables()
+	public function &MetaTables()
 	{
 		$arr= array();
 		$dbc = $this->_connectionID;
@@ -169,7 +169,7 @@ class ADODB_ado extends ADOConnection {
 		return $arr;
 	}
 	
-	function &MetaColumns($table)
+	public function &MetaColumns($table)
 	{
 		$table = strtoupper($table);
 		$arr = array();
@@ -248,7 +248,7 @@ class ADODB_ado extends ADOConnection {
 	}
 
 	
-	function BeginTrans() 
+	public function BeginTrans() 
 	{ 
 		if ($this->transOff) return true;
 		
@@ -281,7 +281,7 @@ class ADODB_ado extends ADOConnection {
 	
 	/*	Returns: the last error message from previous database operation	*/	
 
-	function ErrorMsg() 
+	public function ErrorMsg() 
 	{
 		$errc = $this->_connectionID->Errors;
 		if ($errc->Count == 0) return '';
@@ -289,7 +289,7 @@ class ADODB_ado extends ADOConnection {
 		return $err->Description;
 	}
 	
-	function ErrorNo() 
+	public function ErrorNo() 
 	{
 		$errc = $this->_connectionID->Errors;
 		if ($errc->Count == 0) return 0;
@@ -314,15 +314,15 @@ class ADODB_ado extends ADOConnection {
 
 class ADORecordSet_ado extends ADORecordSet {	
 	
-	var $bind = false;
+	public $bind = false;
 	var $databaseType = "ado";	
 	var $dataProvider = "ado";	
 	var $_tarr = false; // caches the types
 	var $_flds; // and field objects
 	var $canSeek = true;
-  	var $hideErrors = true;
+  	public $hideErrors = true;
 		  
-	function ADORecordSet_ado($id,$mode=false)
+	public function ADORecordSet_ado($id,$mode=false)
 	{
 		if ($mode === false) { 
 			global $ADODB_FETCH_MODE;
@@ -366,7 +366,7 @@ class ADORecordSet_ado extends ADORecordSet {
 	}
 
 		
-	function _initrs()
+	public function _initrs()
 	{
 		$rs = $this->_queryID;
 		$this->_numOfRows = $rs->RecordCount;
@@ -598,7 +598,7 @@ class ADORecordSet_ado extends ADORecordSet {
 		return true;
 	}
 	
-		function NextRecordSet()
+		public function NextRecordSet()
 		{
 			$rs = $this->_queryID;
 			$this->_queryID = $rs->NextRecordSet();
