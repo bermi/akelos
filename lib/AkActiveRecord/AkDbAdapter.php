@@ -381,11 +381,11 @@ class AkDbAdapter extends AkObject
         $available_tables = array();
         !AK_TEST_MODE && $available_tables = Ak::getStaticVar('available_tables');
         if(!$force_lookup && empty($available_tables)){
-            if (($available_tables = AkDbSchemaCache::get('avaliable_tables')) === false) {
+            if (($available_tables = AkDbSchemaCache::get('available_tables')) === false) {
                 if(empty($available_tables)){
                     $available_tables = $this->connection->MetaTables();
                 }
-                AkDbSchemaCache::set('avaliable_tables', $available_tables);
+                AkDbSchemaCache::set('available_tables', $available_tables);
                 !AK_TEST_MODE && Ak::setStaticVar('available_tables', $available_tables);
             }
         }
