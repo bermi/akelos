@@ -178,7 +178,7 @@ class Ak
             if(!empty($string[$lang])){
                 if(defined('AK_TRANSLATION_DEBUG') && AK_TRANSLATION_DEBUG){
                     return 'namespace: "'.$controller.'", original: "'.$original_string.'": '.$string[$lang];
-                } else { 
+                } else {
                     return $string[$lang];
                 }
             }
@@ -188,7 +188,7 @@ class Ak
                     if(!empty($string[$try_whith_lang])){
                         if(defined('AK_TRANSLATION_DEBUG') && AK_TRANSLATION_DEBUG){
                             return 'namespace: "'.$controller.'", original: "'.$original_string.'": '.$string[$try_whith_lang];
-                        } else { 
+                        } else {
                             return $string[$try_whith_lang];
                         }
                     }
@@ -196,13 +196,13 @@ class Ak
             }
             if(defined('AK_TRANSLATION_DEBUG') && AK_TRANSLATION_DEBUG){
                 return 'namespace: "'.$controller.'", original: "'.$original_string.'": '.@$string[$try_whith_lang];
-            } else { 
+            } else {
                 return @$string[$try_whith_lang];
             }
         }
 
         if(isset($controller) && !isset($framework_dictionary[$controller.'_dictionary'])) { // && is_file(AK_APP_DIR.DS.'locales'.DS.$controller.DS.$lang.'.php')){
-             $framework_dictionary[$controller.'_dictionary'] = call_user_func_array(array($locale_manager_class,'getDictionary'),array($lang,$controller));
+            $framework_dictionary[$controller.'_dictionary'] = call_user_func_array(array($locale_manager_class,'getDictionary'),array($lang,$controller));
         }
 
         if(isset($controller) && isset($framework_dictionary[$controller.'_dictionary'][$string])){
@@ -219,11 +219,11 @@ class Ak
         */
         if(defined('AK_TRANSLATION_DEBUG') && AK_TRANSLATION_DEBUG){
             return 'namespace: "'.$controller.'", original: "'.$original_string.'": '.$string;
-        } else { 
+        } else {
             return $string;
         }
     }
-    
+
     /**
     * Translate strings from a language to another language.
     *
@@ -238,15 +238,15 @@ class Ak
     {
         $from = is_array($target_language) ? $target_language[0] : 'en' ;
         $to = is_array($target_language) ? $target_language[1] : $target_language ;
-        
+
         if($from != 'en'){
-          $string = Ak::untranslate($string, $from, $namespace);
+            $string = Ak::untranslate($string, $from, $namespace);
         }
-        
+
         $dictionary = AkLocaleManager::getDictionary($to, $namespace);
         return !empty($dictionary[$string]) ? $dictionary[$string] : $string;
     }
-    
+
     /**
     * Untranslate strings from a locale to english.
     *
@@ -666,7 +666,7 @@ class Ak
                 }
                 $element_id = $method.'_'.$rand;
                 $formatted .= "<div style='margin:10px;'><a href='javascript:void(0);' onclick='e_$element_id = document.getElementById(\"$element_id\"); e_$element_id.style.display = (e_$element_id.style.display == \"none\"?\"block\":\"none\");' title='Set the constant AK_TRACE_DUMP_METHOD to your favourite default method'>$method</a><br />".
-                                '<pre style="'.$pre_style.'" id="'.$element_id.'">'.$html_entities_function(Ak::dump($text, $method)).'</pre></div>';
+                '<pre style="'.$pre_style.'" id="'.$element_id.'">'.$html_entities_function(Ak::dump($text, $method)).'</pre></div>';
             }
             $text = $formatted;
         }elseif (is_scalar($text)){
@@ -717,13 +717,13 @@ class Ak
         if(!$only_app){
             return array($backtrace[1]['file'], $backtrace[1]['line'], @$backtrace[1]['function']);
         }else{
-        for($i = 0; $i <= count($backtrace) - 1; $i++){
-            if(isset($backtrace[$i]["line"])){
-                if(strstr($backtrace[$i]["file"], AK_COMPILED_VIEWS_DIR) || strstr($backtrace[$i]["file"], AK_APP_DIR)){
-                    return array($backtrace[$i]["file"], $backtrace[$i]["line"], $backtrace[$i]["function"]);
+            for($i = 0; $i <= count($backtrace) - 1; $i++){
+                if(isset($backtrace[$i]["line"])){
+                    if(strstr($backtrace[$i]["file"], AK_COMPILED_VIEWS_DIR) || strstr($backtrace[$i]["file"], AK_APP_DIR)){
+                        return array($backtrace[$i]["file"], $backtrace[$i]["line"], $backtrace[$i]["function"]);
+                    }
                 }
             }
-        }
         }
     }
 
@@ -2034,9 +2034,9 @@ class Ak
     {
         static $_memory;
         if(!AK_CAN_FORK || (!$pid = getmypid())){
-            $pid = 0;   
+            $pid = 0;
         }
-        
+
         $null = null;
         $true = true;
         $false = false;
@@ -2157,7 +2157,7 @@ class Ak
         Ak::import($model_name);
         return new $model_name($attributes);
     }
-    
+
     /**
     * PHP modulo % returns the dividend which is not the expected result on 
     * Math operations where the divisor is expected.
@@ -2168,6 +2168,29 @@ class Ak
     {
         $n = abs($n);
         return $n===0 ? null : $a-$n*floor($a/$n);
+    }
+
+    /**
+     * Akelos version of pcntl_fork wich prevents forked processes from killing the database connection.
+     * 
+     * See http://dev.mysql.com/doc/refman/5.0/en/gone-away.html
+     * 
+     * This is done by closing the connection before forking and reconnecting on the child & parent process.
+     * 
+     * @return Same as pcntl_fork (PID of the children to the parent, 0 to the children process and -1 if fails).
+     */
+    public function pcntl_fork()
+    {
+        $db = Ak::db();
+        $can_connect = (isset($db->connection) && method_exists($db->connection, 'connect'));
+        // Disconnect on the parent so we we don't have a zombie connection once the child closes the reused connection
+        $can_connect && $db->connection->close();
+        $pid = pcntl_fork();
+        // Connecting on the child process
+        $can_connect && $db->connection->connect();
+        // Reconect on the parent
+        $pid > 0 && $can_connect && $db->connection->connect();
+        return $pid;
     }
 
 }
