@@ -32,7 +32,10 @@
                 array_push($attributes, $this->source->getAttributes());
             }
 
-            return self::arr_to_csv($attributes);
+            require_once(AK_LIB_DIR.DS.'AkConverters'.DS.'AkArrayToCsv.php');
+            $converter = new AkArrayToCsv();
+            $converter->source = $attributes;
+            return $converter->convert();
         }
 
         public function _isActiveRecord(&$Candidate)
@@ -46,22 +49,6 @@
             }elseif ($this->_isActiveRecord($this->source)){
                 return array($this->source->getColumnNames());
             }
-        }
-
-        static public function arr_to_csv_line($arr) {
-            $line = array();
-            foreach ($arr as $v) {
-                $line[] = is_array($v) ? self::arr_to_csv_line($v) : '"' . str_replace('"', '""', $v) . '"';
-            }
-            return implode(",", $line);
-        }
-
-        static public function arr_to_csv($arr) {
-            $lines = array();
-            foreach ($arr as $v) {
-                $lines[] = self::arr_to_csv_line($v);
-            }
-            return implode("\n", $lines);
         }
     }
 
