@@ -1,0 +1,496 @@
+[1341] Adding support for finding within collections on finders.
+
+Now you can use on your finders
+
+{{{
+$Tag->find(array('conditions'=> array('name IN (?)', array('Tag 1', 'Tag 2'))));
+}}}
+
+And it will escape, quote and bind the attributes properly generating this SQL
+
+{{{
+SELECT * FROM tags WHERE name IN ('Tag 1', 'Tag 2')
+}}}
+
+You can also pass a collection of Active Record elements like those returned on by a finder.
+ 
+{{{
+$Tag->find(array('conditions'=> array('name IN (?)', $PopularTags->find())));
+}}}
+
+[1257] Sice rev.1247 until rev.1257 indexes where not added automatically by convention on migrations and installers. 
+
+Please verify your databases to make sure necesary indexes are in place.
+
+[1241] Adding a new shotcut for sanitizing/escaping html entities variables on Sintags.
+
+Now you can use this Sintags 
+
+{{{
+    {\variable}
+}}}
+
+to generate this PHP code on the compiled template
+
+{{{
+    <?php echo $text_helper->h($variable); ?>
+}}}
+
+
+[1232] Important: Data integrity issue on MySQL
+
+Before rev.1232 MySQL on some setups, connections where opened using PHP's default 
+encoding latin1 this caused that UTF8 data written by Akelos could not be edited using other DB tools like phpMyAdmin
+
+This change solves the issue for new applications, but existing applications can fix this by backing up your database
+and following the steps at http://codesnippets.joyent.com/posts/show/84 before defining AK_SET_UTF8_ON_MYSQL_CONNECT on your configuration file.
+
+[1205] Adding new configuration script to generate config.php and database.yml
+
+Run it only on fresh installs
+{{{
+./script/configure -h
+}}}
+will show available options.
+
+* Adding mechanism to solve conflicts when using the scaffold generator.
+
+
+[1185] WARNING: IMPORTANT CHANGES AHEAD!
+
+Using this version requires you do manually add/change files/folders to existing applications.
+
+New features:
+
+1. Configuration
+ 1.1. Yaml Configuration (see inline doc at: http://svn.akelos.org/trunk/lib/AkConfig.php)
+
+2. Caching (see inline doc at: http://svn.akelos.org/trunk/lib/AkActionController/AkCacheHandler.php)
+ 2.1 Memcache Cache Handler
+ 2.2 Page Caching
+ 2.3 Action Caching
+ 2.4 Fragment Caching
+ 2.5 Cache Sweepers
+
+3. ActiveRecord
+ 3.1 toXml (RoR style) (see inline doc at: http://svn.akelos.org/trunk/lib/AkActiveRecord.php)
+ 3.2 fromXml 
+ 3.3 toJson (RoR style) (see inline doc at: http://svn.akelos.org/trunk/lib/AkActiveRecord.php)
+ 3.4 fromJson
+ 3.5 AkDbSchemaCache
+
+4. ActionController
+ 4.1 respondToFormat (see inline doc at: http://svn.akelos.org/trunk/lib/AkActionController.php)
+
+5. Functional Testing (AkTestApplication) (see example usage in: http://svn.akelos.org/trunk/test/unit/lib/AkActionController/_page_caching.php)
+
+Refactoring / Improvements:
+
+6. Unit Testing Fixtures 
+
+class AkSomeTest extends AkUnitTest
+{
+/**
+ * grabs AK_BASE_DIR/test/fixtures/data/posts.yaml and inserts the data in the db
+ * example:
+ * 
+ * posts.yaml:
+ * entry1:
+ *    id: 1
+ *    name: test1
+ * entry2:
+ *    id: 2
+ *    name: test2
+ *
+ * model instances are available via $this->posts['entry1] and $this->posts['entry2]
+ */
+ var $fixtures = 'posts';
+    
+  ...
+}
+
+7. AkSession
+   
+  Session handling can now be configured via config/sessions.yml.
+  Besides file storage you can use Memcache or Db Storage for sessions.
+
+8. AkPluginInstaller
+
+
+
+-------
+
+
+SVN
+
+* [977]  Adding the Action Mailer framework, for sending emails from your Akelos application.
+
+ActionMailer is an Akelos service-layer package for creating email messages.
+
+=== Generate a mailer ===
+
+Creates a stub file using the generator:
+
+{{{
+./script/generate mailer Notifier
+}}}
+
+A file is created in your app/models directory named notifier.php:
+
+{{{
+class Notifier extends AkActionMailer{
+}
+}}}
+
+There are some new conventions for the Action Mailer:
+
+  * Action Mailer implementations have views. The above example will reference files in app/views/notifier
+  * Each email that you want to send should have one associated method within the class.
+  * You don’t call that method. Ever.
+  * Instead, you call some dynamic methods, as we’ll see below.
+
+=== Example: ===
+
+==== The scenario ====
+
+Let’s assume we’re sending an email to a new user to our website to thank them for signing up, and that user is an object coming from an Active Record that has already been created.
+
+=== Notifier ===
+
+Add the following method to your Notifier:
+
+{{{
+function signup_thanks($User){ 
+  //Email header info MUST be added here
+  $this->set(array( 
+    'recipients' => $User->email, 
+    'from' => 'accounts@example.com', 
+    'subject' => 'Thank you for registering with our website', 
+    // Email body parameters (for the view) go here 
+    'body' => array( 'User' => $User ) 
+    )); 
+}
+}}}
+
+=== Controller ===
+
+And the following snippet to the controller in your application that needs to send an email:
+
+{{{
+function show_page_after_account_creation(){ 
+  Ak::import_mailer('notifier'); 
+  $Notifier = new Notifier(); 
+  $Notifier->deliver('signup_thanks', $this->User); 
+} 
+}}}
+
+You could also import the model into you controller as usual, but before you'll need to `require(AK_LIB_'DIR.'/AkActionMailer.php')`.
+
+=== View ===
+
+The body of the email comes from a .tpl file in app/views/notifier – In this example; app/views/notifier/signup_thanks.tpl:
+
+{{{
+Dear {User.first_name} {User.last_name},
+Thanks for signing up with us!
+}}}
+
+==== HTML and Text messages ====
+
+If you want to send two alternative messages (text/plain and text/html), the Akelos convention is to have two views like:
+
+{{{
+app/views/notifier/signup_thanks.text.plain.tpl
+app/views/notifier/signup_thanks.text.html.tpl
+}}}
+
+If you add images to your html message Akelos will embed them automatically into the message body unless you set the attribute `_attach_html_images` to false in you mailer.
+
+---
+
+You can find more documentation on the Action Mailer at the AkActionMailer inline documentation and on the unit tests, document configuration, helpers and receiving emails.
+
+
+
+* [977] Added new system for retrieving configurations from YAML files.
+
+You just need to call Ak::getSettings($namespace), where namespace is "config/$namespace.yml"
+
+* [977] Added new AkMailerTest, for testing ActionMailer models. This tester will copy your application views from the app/views to test/fixtures/app/views unless you implicitly set AkMailerTest::avoid''copying''views to true.
+* [977] Adding Ak::import_mailer() which works like Ak::import(), but imports lib/AkActionMailer.php before doing so. We might deprecate this once we drop support for PHP4.
+* [977] Whenever a charset is not supported by mb_* AkelosAkCharset will now default to the PhpRecoding engine on that specific recoding task.
+* [977] Adding Ak::first() and Ak::last(), which work like PHP functions shift(), and pop() but without modifying source array.
+* [977] Added a new system for unifying in-function static vars used mainly for performance improvements framework-wide.
+
+Before we had
+
+{{{
+class A{
+  function b($var){
+    static $chache;
+    if(!isset($cache[$var])){
+      $cache[$var] = some_heavy_function($var);
+    }
+    return $cache[$var]; 
+  } 
+}
+}}}
+
+Now imagine we want to create an application server which handles multiple requests on a single instantiation, with the showcased implementation this is not possible as we can't reset $cache, unless we hack badly every single method that uses this strategy.
+
+We can refresh this static values the new `Ak::getStaticVar` method. So from previous example we will have to replace
+
+{{{
+static $chache;
+}}}
+
+with
+
+{{{
+$chache =&amp; Ak::getStaticVar(__CLASS__.'::'.__FUNCTION__);
+}}}
+
+You should not use this strategy on those situations where static vars should never be modified from other methods different of the model implementing it.
+
+
+* [556] Adding a new HTTP client for performing REST requests at lib/AkHttpClient. See unit tests for details.
+
+* [556] Adding support for accepting PUT HTTP requests.
+
+* [556] Changing Ak::DeprecateWarning to Ak::deprecateWarning in order to match coding conventions.
+
+* [556] Adding support for reporting unknown actions using a public/405.php file when working on production mode. 404.php remains the file for controller not found errors.
+
+* [556] Logging invalid controller/action requests.
+
+* [556] Modifying Ak::url_get_contents. It does not require curl anymore. 
+
+Now it works like 
+
+{{{
+$Client = new AkHttpClient();
+$Client->get('url', array('params'=>.....));
+}}}
+
+* [549] AK_COMPILED_VIEWS_DIR is now set to AK_TMP_DIR/views. This means your compiled views will be generated inside the tmp folder unless you set AK_COMPILED_VIEWS_DIR to false to keep them side to side to your views.
+
+* [549] On those cases where your host do not support FTP and Apache runs as nobody, you will need to set the right permissions for ./app/locales if you want new i18n text to be added automagically. Same for ./logs. Compiled views and cache will go into a temporary folder.
+
+* [549] In those cases where ./tmp is not writable, Akelos will set AK_TMP_DIR to a new folder in your Operating System tmp dir. 
+
+This sometimes might lead to problems when Open Base forbids including files from the temporary path. In that case you'll need to chmod the ./tmp dir so Akelos knows where to put tmp files.
+
+In case you want to make a portable app that needs to write/read files, you can set the AK_TMP_DIR as a base for working with those files like:
+
+{{{
+Ak::file_puts_contents($dir, $content, array('base_path'=>AK_TMP_DIR));
+}}}
+
+* [511] Action Controllers now will automatically load singular named helpers and models if the controller has the plural form.
+
+* [510] Added a handy utility for modifying arrays which is useful for securing record creation/updating.
+
+If you have this code on a controller
+{{{
+  $this->user->setAttributes($this->params['user']);
+}}}
+
+and your users table has a column named is_admin. All it would take to a malicious user is to modify the page html to add the need field and gain admin privileges.
+
+You could avoid it by using the new Ak::pick method which will return and array with desired keys. For deleting keys instead of selecting them you can use Ak::delete()
+
+{{{
+  $this->user->setAttributes(Ak::pick('name,email', $this->params['user']));
+}}}
+
+* [509] Parameters given to url_for do not need to be urlencoded anymore. This allows using variables with slashes.
+
+* [476] Adding includeAndInstatiateModels and uninstallAndInstallMigration to AkUnitTest
+
+* Making it possible to include models by default by declaring in your application_controller.php
+
+{{{
+  var $app_models = 'user,role';
+}}}
+
+this way you can avoid adding controller-wide models into every single controller.
+
+* HTTP authentication now can have its own failure message by implementing a **access_denied** method into the application controller.
+
+----------------------
+
+* Model generator now supports customizing first migration version column setting from the command line like:
+
+    ./generate model Video title, length double, author, is_searchable
+
+* Relocated Active Record database adapters, behaviors and associations into lib/AkActiveRecord/AkDbAdapters, AkActsAsBehaviours and AkAssociations respectively.
+
+----------
+
+## Merging Kaste's branch with the trunk.
+
+    WARNING: IMPORTANT CHANGES AHEAD!
+
+* [387] Refactored AkActiveRecord::find(). 
+* [387] API-change: removed find('first', $id, $options) cause finding one id is always "first". Use find($id, $options); instead.
+* [395] Deprecated AkActiveRecord::find($sql) which silently expanded to AkActiveRecord::find('first', $sql).
+This was ambiguous because find($sql, $bind_variables*) expanded to find('all',*)
+Use AkActiveRecord::find('first', $sql) instead.
+* [396] Added AkDbAdapter between ADODb and the Active Record.
+* [396] Expanded AkUnitTest so its easy to generate Models on the fly like: 
+
+    $AkUnitTest->installAndIncludeModels(array('Article'=>'id,name,description'));
+
+Creates the table 'articles' with specified columns and builds the ActiveRecord Model (class) 'Article'.
+* [396] AkActiveRecord::toYaml now handles ActiveRecord collections.
+
+    User::toYaml($found_users);
+
+* [407] Fixed typos on the Active Record like $asssociated_ids....
+* [407] Improved and refactored Active Record unit tests.
+* [405] Fixed AkHasAndBelongsToMany/AkHasMany::getAssociatedModelInstance which Singleton was badly implemented.
+* [416] Avoided unsetting database profiles.
+* [416] Added support for extra database profiles you can quickly test with different db-adapters like:
+
+    ActiveRecord::establishConnection('super_user');
+    ./test _some_test_case.php sqlite_test_profile 
+
+* [417] Changed NewDataDictionary(db->connection) to db->getDictionary();
+* [418] AkHasAndBelongsToMany now uses AkInstaller to create the join table. Because of that it creates the sequence_table for sqlite straight away.
+* [419] Fixed singleton implementation of Ak::getLogger() 
+* [425] AkInstaller: Added magic 'lock_version' column.
+
+    'lock_version' => 'lock_version int default=1'
+
+* [427] Refactored the Active Record "callback"-chain. Fixes #95 and #94.
+* [427] Added create, update and execute methods to AkDbAdapter.
+* [428] Adding support for late bindings on AkDbAdapter::execute()
+This allows you to safely sanitize parameters before adding them to your custom SQL queries.
+
+    AkDbAdapter::execute(array('select * from articles where id=?', 1));
+
+* [429] Added addLimitAndOffset method to AkDbAdapter for delegating limits and offsets.
+* [431] Implemented renameColumn in AkDbAdapter. Closes #47 and #96.
+* [436] Removed AkActiveRecord::sqlSelect* (now in AkDbAdapter)
+* [437] Moved transactions to AkDbAdapter
+* [439] Fixed a serious issue in a TEST that could lead to data loss in the development database. 
+* [441] Replacing MetaTables() and MetaColumns() with  AkDbAdapter::availableTables() and AkDbAdapter::getColumnDetails($table). 
+* [446] Improved the MenuHeper
+* [446] Changed default options for AkPluginManager::updatePlugin(). Disables externals and checkout.
+* [448] AkActiveRecord::findBySql now uses AkDbAdapter::select
+* [450] AkActiveRecord::incrementCounter() and decrementCounter() now are pseudo-static.
+* [450] AkActiveRecord::updateAttribute() now validates when saving by default. Pass 'false' as third argument to bypass validation.
+* [451] AkInstaller automatically sets '*_count'-columns => 'columnname int default 0'
+* [458] Fixed #103, quoting strings on PostgreSQL.
+* [459] Adding decimal-type support on Active Records.
+* [459] Datatypes for PostgreSQL changed. You need to update/change your table schemas! Run migrations!
+Before this, we kinda hacked Mysql-behavior into PostgreSQL. Thus we didnt used features of Postgre on one side. 
+
+In the long run we had to fix - better now than later - since the design problems only "multiply" when time goes by.  
+
+At this point we wanted to implement the decimal/numeric datatype. And so we had to decide whether to hack further or to solve the underlying issue. This means we HAD to correct a wrong implementation.  
+
+    (simplified type>) Akelos      Postgre (<Actual Type) 
+
+Until now we had:
+
+    boolean  => numeric(1) 
+    integer  => numeric(X,0) 
+                       
+From now on we have:
+    boolean  => bool 
+    integer  => integer  (int4) 
+    decimal  => numeric 
+                                   
+To guide you through this we'll have a test at test/unit/lib/AkActiveRecord/_PostgreSQL_datatype_migration.php. 
+
+First make you comfortably with this test and make it pass. This is a test against a dummy-table of course. 
+(When you're on Postgre 7 you have to modify this test. But you'll see that.)  
+
+Next write appropriate migrations/installers for your real tables. (Again: You should always begin with a test.) 
+
+Keep in mind that we typecast TINYINT as boolean on MySQL. So you cannot use tinyint for other things.                                              
+* [459] Boolean columns now actually have three possible states: true, false and null. Before that null=>false!
+* [461] ActiveRecordHelper::error_messages_for and error_message_on now translate the error messages.
+* [467] NULL values can be saved on boolean and decimal columns. Fixes #114 and #113.
+
+#### End of Kaste merge
+
+-----------
+
+* AkInstaller::createTable() will now add created_at and updated_at columns automatically unless you have one of 
+  them in your table declaration or set the option 'timestamp' => false
+    
+    function up_1(){
+        $this->createTable('user', 'id, first_name, last_name, email'); // will add created_at, and updated_at
+    }
+
+  to avoid it
+
+    function up_1(){
+          $this->createTable('user', 'id, first_name, last_name, email', array('timestamp'=>false)); // nothing extra
+    }   
+  
+  or
+  
+    function up_1(){
+          $this->createTable('user', 'id, first_name, last_name, email, updated_at'); // nothing extra
+    }   
+      
+* Simplifying unit test calls for models and core tests. Updated generators to reflect this new way of calling tests.
+  If you stick with the convention of prefixing your test cases with TestCase you will no longer need to call ak__test('testcaseclass')
+  
+  Running models test can now be done with simply
+    ./script/test model User
+    
+  Core tests can be called without the full path like
+    ./script/test AkActiveRecord
+
+* Rearranged scripts to include as little code as possible in the application space. This should make updates easier.
+
+* Removed AkInflector::modulize as it had a misleading name, use AkInflector::classify instead [420]
+
+* Added support for HTTP Authentication [412]. Example:
+
+    <?php
+    
+    class PostController extends ApplicationController
+    {
+        var $_authorized_users = array('bermi' => 'secret');
+        
+        function __construct()
+        {
+            $this->beforeFilter(array('authenticate' => array('except' => array('index'))));
+        }
+    
+        function index() 
+        {
+            $this->renderText("Everyone can see me!");
+        }
+    
+        function edit()
+        {
+            $this->renderText("I'm only accessible if you know the password");
+        }
+    
+        function authenticate()
+        {
+            /**
+            * You can either use an array like $this->_authorized_users or
+            * an Model instance that implements an authenticate method like Model::authenticate($user,$pass, $controller);
+            */
+            return $this->_authenticateOrRequestWithHttpBasic('My Blog', $this->_authorized_users);
+        }
+    }
+    
+    ?>
+
+* Added public/500.php and public/404.php for handling errors on production mode.
+
+
+0.8
+----------------------
+
+ * First public release
+
+

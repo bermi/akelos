@@ -1,0 +1,6 @@
+enabled: true
+handler:
+    type: 3 #1=PEAR,2=AdoDB,3=Memcache
+    options: 
+            servers:
+                - 127.0.0.1:11211

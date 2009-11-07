@@ -1,0 +1,1 @@
+Plain text to {recipient}.

@@ -1,0 +1,4 @@
+<select id="person_role" name="person[role]"><option value=""></option>
+<option value="a">a</option>
+<option value="b">b</option>
+</select>

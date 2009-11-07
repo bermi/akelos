@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+
+ob_start('ob_logstdout', 2);
+
+define('AK_CONSOLE_MODE', true);
+define('AK_ENABLE_AKELOS_ARGS', true); 
+include(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
+require_once(AK_LIB_DIR.DS.'utils'.DS.'scripts'.DS.'console.php');
+
+
+
+?>

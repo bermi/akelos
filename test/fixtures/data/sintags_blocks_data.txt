@@ -1,0 +1,96 @@
+
+
+<% keys {|key| echo $key} %>
+
+-----------------------------------
+
+<?php 
+if(!empty($keys)){
+    foreach (array_keys((array)$keys) as $ak_sintags_key){
+        $key =& $keys[$ak_sintags_key];
+        echo $key;
+    }
+}?>
+
+===================================
+
+<% keys, values {|key| ++$key } %>
+
+-----------------------------------
+
+<?php 
+if(!empty($keys)){
+    foreach (array_keys((array)$keys) as $ak_sintags_key){
+        $key =& $keys[$ak_sintags_key];
+        ++$key ;
+    }
+}if(!empty($values)){
+    foreach (array_keys((array)$values) as $ak_sintags_key){
+        $key =& $values[$ak_sintags_key];
+        ++$key ;
+    }
+}?>
+
+===================================
+
+
+<% incremented = keys {|key| ++$key} %>
+
+-----------------------------------
+<?php 
+if(!empty($keys)){
+    $incremented = array();
+    foreach (array_keys((array)$keys) as $ak_sintags_key){
+        $key =& $keys[$ak_sintags_key];
+        ++$key;
+        $incremented[$ak_sintags_key] = $keys[$ak_sintags_key];
+    }
+}?>
+
+===================================
+
+<% simple_var = 'value' %>
+
+-----------------------------------
+
+<?php $simple_var = ('value'); ?>
+
+===================================
+
+<% simple_var = var-foo %>
+
+-----------------------------------
+
+<?php $simple_var = ($var['foo']); ?>
+
+===================================
+
+<%= var = var.foo %>
+
+-----------------------------------
+
+<?php $var = ($var->foo); ?>
+
+===================================
+
+<% url = url_for(:controller => 'page') %>
+
+-----------------------------------
+
+<?php $url = ($url_helper->url_for( array('controller' => 'page'))); ?>
+
+===================================
+
+<% url = {:controller => 'page'} %>
+
+-----------------------------------
+
+<?php $url = (array('controller' => 'page')); ?>
+
+===================================
+
+<% url = :controller => 'page' %>
+
+-----------------------------------
+
+<?php $url = ( array('controller' => 'page')); ?>

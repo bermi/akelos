@@ -1,0 +1,388 @@
+<?php
+
+// +----------------------------------------------------------------------+
+// | Akelos Framework - http://www.akelos.org                             |
+// +----------------------------------------------------------------------+
+// | Released under the GNU Lesser General Public License, see LICENSE.txt|
+// +----------------------------------------------------------------------+
+
+/**
+ * @package ActiveRecord
+ * @subpackage Associations
+ * @subpackage Belongs to
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
+ * @author Kaste
+ * @author Arno Schneider <arno a.t bermilabs c.om>
+ * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
+ * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
+ */
+
+require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
+
+/**
+* Adds the following methods for retrieval and query for a single associated object that this object holds an id to.
+* * <tt>belongsTo->assign($association_id, $Associate);</tt> - assigns the associate object, extracts the primary key, and sets it as the foreign key.
+* * <tt>belongsTo->build($association_id, $attributes = array())</tt> - returns a new object of the associated type that has been instantiated
+*   with +attributes+ and linked to this object through a foreign key but has not yet been saved.
+* * <tt>belongsTo->create($association_id, $attributes = array())</tt> - returns a new object of the associated type that has been instantiated
+*   with +attributes+ and linked to this object through a foreign key and that has already been saved (if it passed the validation).
+*
+* Example: A Post class declares <tt>belongsTo('author')</tt>, which will add:
+* * <tt>$Post->author->load()</tt> (similar to <tt>$Author->find($author_id)</tt>)
+* * <tt>$Post->author->assign($Author)</tt> (similar to <tt>$Post->author_id = $Author->getId();</tt>)
+* * <tt>$Post->author->build($Author);</tt> (similar to <tt>$Post->author = new Author();</tt>)
+* * <tt>$Post->author->create($Author);</tt> (similar to <tt>$Post->author = new Author(); $Post->author->save();</tt>)
+*  The declaration can also include an options hash to specialize the behavior of the association.
+*
+*  Options are:
+*  * <tt>class_name</tt>  - specify the class name of the association. Use it only if that name can't be inferred
+*    from the association name. So <tt>belongsTo('author')</tt> will by default be linked to the 'Author' class, but
+*    if the real class name is 'Person', you'll have to specify it with this option.
+*  * <tt>conditions</tt>  - specify the conditions that the associated object must meet in order to be included as a "WHERE"
+*    sql fragment, such as "authorized = 1".
+*  * <tt>order</tt>       - specify the order from which the associated object will be picked at the top. Specified as
+*    an "ORDER BY" sql fragment, such as "last_name, first_name DESC"
+*  * <tt>primary_key_name</tt> - specify the foreign key used for the association. By default this is guessed to be the name
+*    of the associated class in lower-case and "_id" suffixed. So a 'Person' class that makes a belongsTo association to a
+*    'Boss' class will use "boss_id" as the default primary_key_name.
+*  * <tt>counter_cache</tt> - caches the number of belonging objects on the associate class through use of increment_counter
+*    and decrement_counter. The counter cache is incremented when an object of this class is created and decremented when it's
+*    destroyed. This requires that a column named "#{table_name}_count" (such as comments_count for a belonging Comment class)
+*    is used on the associate class (such as a Post class).
+*
+*  Option examples:
+*    belongsTo('firm', array('primary_key_name' => 'client_of'));
+*    belongsTo('author', array('class_name' => 'Person', 'primary_key_name' => 'author_id'));
+*    belongsTo('valid_coupon', array('class_name' => 'Coupon', 'primary_key_name' => 'coupon_id', 'conditions' => "'discounts' > 'payments_count'"));
+*/
+class AkBelongsTo extends AkAssociation
+{
+    public $associated_ids = array();
+
+    public function &addAssociated($association_id, $options = array())
+    {
+
+        $default_options = array(
+        'class_name' => empty($options['class_name']) ? AkInflector::camelize($association_id) : $options['class_name'],
+        'primary_key_name',
+        'remote',
+        'conditions',
+        'order',
+        'instantiate'=>false,
+        'counter_cache' => false
+        );
+
+        $options = array_merge($default_options, $options);
+
+        $options['primary_key_name'] = empty($options['primary_key_name']) ? AkInflector::underscore($options['class_name']).'_id' : $options['primary_key_name'];
+        if($options['counter_cache']){
+            $options['counter_cache_column'] = !isset($options['counter_cache_column']) ? $this->Owner->getTableName().'_counter' : $options['counter_cache_column'];
+        }
+
+        $this->setOptions($association_id, $options);
+
+        $associated = $this->addModel($association_id,  new AkAssociatedActiveRecord());
+
+        $this->setAssociatedId($association_id, $associated->getId());
+
+        $this->_build($association_id, $associated);
+
+        $this->_saveLoadedHandler($association_id, $associated);
+
+        if($options['instantiate']){
+            $associated =& $this->assign($association_id,  new $options['class_name']($this->Owner->get($options['primary_key_name'])));
+        }
+
+        return $associated;
+    }
+
+
+    public function getType()
+    {
+        return 'belongsTo';
+    }
+
+
+    public function &findAssociated($association_id)
+    {
+        $result = false;
+        $primary_key_name = $this->Owner->$association_id->getAssociationOption('primary_key_name');
+        $primary_key_name_value = $this->Owner->get($primary_key_name);
+        if(!$primary_key_name_value){
+            return $result;
+        }
+        if(empty($this->Owner->$association_id->__activeRecordObject)){
+            $this->build($association_id, array(), false);
+        }
+
+        $result =& $this->Owner->$association_id->find($primary_key_name_value);
+
+        return $result;
+    }
+
+    public function &assign($association_id, &$Associated)
+    {
+        $primary_key_name = $this->Owner->$association_id->getAssociationOption('primary_key_name');
+        if($Associated->save()){
+            $this->Owner->set($primary_key_name, $Associated->getId());
+        }
+        $Associated =& $this->_build($association_id, &$Associated);
+        return $Associated;
+    }
+
+    public function &build($association_id, $attributes = array(), $replace = true)
+    {
+        $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
+        Ak::import($class_name);
+        $record = new $class_name($attributes);
+        $record =& $this->Owner->$association_id->replace($record, !$replace);
+        return $record;
+    }
+
+    /**
+    * Returns a new object of the associated type that has been instantiated with attributes
+    * and linked to this object through a foreign key and that has already been saved (if it passed the validation)
+    */
+    public function &create($association_id, $attributes = array())
+    {
+        $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
+        $record = new $class_name($attributes);
+        $record->save();
+        $this->replace($association_id, $record, true);
+        return $this->Owner->$association_id;
+    }
+
+
+    public function &load($association_id)
+    {
+        if (!$this->Owner->isNewRecord()){
+            if(empty($this->Owner->$association_id->_loaded)){
+                if($Associated =& $this->findAssociated($association_id)){
+                    $Associated->_loaded = true;
+                    $this->_build($association_id, $Associated, false);
+                }
+            }
+        }
+        return $this->Owner->$association_id;
+    }
+
+    public function &replace($association_id, &$NewAssociated)
+    {
+        $counter_cache_name = $this->Owner->belongsTo->getOption($association_id, 'counter_cache_column');
+        if(empty($NewAssociated)){
+            $primary_key = $this->Owner->belongsTo->getOption($association_id, 'primary_key_name');
+            if($counter_cache_name && isset($this->Owner->$association_id->$counter_cache_name) && !$this->Owner->isNewRecord()){
+                $this->Owner->$association_id->decrementCounter($counter_cache_name, $this->Owner->get($primary_key));
+            }
+            $this->Owner->$association_id =& $this->_getLoadedHandler($association_id);
+            $this->Owner->set($primary_key, null);
+        }else{
+            $primary_key = $this->Owner->belongsTo->getOption($association_id, 'primary_key_name');
+            if(!$NewAssociated->isNewRecord()){
+                if($counter_cache_name && !$this->Owner->isNewRecord() && method_exists($this->Owner->$association_id, 'incrementCounter')){
+                    $this->Owner->$association_id->incrementCounter($counter_cache_name, $NewAssociated->getId());
+                    $previous_id = $this->Owner->get($primary_key);
+                    if($previous_id){
+                        $this->Owner->$association_id->decrementCounter($counter_cache_name, $previous_id);
+                    }
+                }
+                $this->Owner->set($primary_key, $NewAssociated->getId());
+            }
+            $this->updated[$association_id] = true;
+
+            $this->updated[$association_id] = true;
+            $this->loaded[$association_id] = true;
+        }
+        $this->_build($association_id, $NewAssociated);
+        return $NewAssociated;
+    }
+
+    public function getAssociatedFinderSqlOptionsForInclusionChain($association_id, $prefix, $parent_handler_name, $options = array(),$pluralize=false)
+    {
+        $default_options = array(
+        'conditions' => $this->Owner->$association_id->getAssociationOption('include_conditions_when_included'),
+        'order' => $this->Owner->$association_id->getAssociationOption('include_order_when_included')
+        );
+        $handler_name = $association_id;
+        if(empty($this->Owner->$association_id->__activeRecordObject)){
+            $this->build($association_id, array(), false);
+        }
+        $pk=$this->Owner->$association_id->getPrimaryKey();
+        $options = Ak::toArray($options);
+        $options = array_merge($default_options, $options);
+
+        $finder_options = array();
+        foreach ($options as $option=>$available) {
+
+            $value = $this->Owner->$association_id->getAssociationOption($option);
+
+            if ((!empty($available) && $available!==true) || $available===false) {
+                $value=$available;
+            }
+            if (!empty($value) && !is_bool($value)) {
+                if (is_string($value)) {
+                    $finder_options[$option] = trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $value));
+                } else if(is_array($value)) {
+
+                    foreach($value as $idx=>$v) {
+                        $value[$idx]=trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $v));
+                    }
+                    $finder_options[$option] = $value;
+                }else {
+                    $finder_options[$option] = $value;
+                }
+            }
+
+        }
+
+
+        $finder_options['joins'] = $this->Owner->$association_id->constructSqlForInclusionChain($handler_name, $parent_handler_name);
+
+        $finder_options['selection'] = '';
+        $selection_parenthesis = $this->_getColumnParenthesis();//$this->Owner->_db->type()=='mysql'?"'":'"';
+        foreach (array_keys($this->Owner->$association_id->getColumns()) as $column_name){
+
+            $finder_options['selection'] .= $parent_handler_name.'__'.$handler_name.'.'.$column_name.' AS '.$selection_parenthesis.$prefix.'['.$handler_name.']'.($pluralize?'[@'.$pk.']':'').'['.$column_name.']'.$selection_parenthesis.', ';
+        }
+        $finder_options['selection'] = trim($finder_options['selection'], ', ');
+
+        return $finder_options;
+    }
+
+    public function getAssociatedFinderSqlOptions($association_id, $options = array())
+    {
+
+        $default_options = array(
+        'conditions' => $this->Owner->$association_id->getAssociationOption('include_conditions_when_included'),
+        'order' => $this->Owner->$association_id->getAssociationOption('include_order_when_included')
+        );
+
+        if(empty($this->Owner->$association_id->__activeRecordObject)){
+            $this->build($association_id, array(), false);
+        }
+
+        $table_name = $this->Owner->$association_id->getTableName();
+        $options = Ak::toArray($options);
+        $options = array_merge($default_options, $options);
+
+        $finder_options = array();
+
+        foreach ($options as $option=>$available) {
+            if($available){
+                $value = $this->Owner->$association_id->getAssociationOption($option);
+                empty($value) ? null : ($finder_options[$option] = trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql('_'.$association_id, $value)));
+            }
+        }
+
+        $finder_options['joins'] = $this->Owner->$association_id->constructSqlForInclusion();
+
+        $finder_options['selection'] = '';
+        foreach (array_keys($this->Owner->$association_id->getColumns()) as $column_name){
+            $finder_options['selection'] .= '_'.$association_id.'.'.$column_name.' AS _'.$association_id.'_'.$column_name.', ';
+        }
+        $finder_options['selection'] = trim($finder_options['selection'], ', ');
+
+        return $finder_options;
+    }
+
+    public function constructSqlForInclusion($association_id)
+    {
+        return ' LEFT OUTER JOIN '.
+        $this->Owner->$association_id->getTableName().' AS _'.$association_id.
+        ' ON '.
+        '__owner.'.$this->Owner->$association_id->getAssociationOption('primary_key_name').
+        ' = '.
+        '_'.$association_id.'.'.$this->Owner->$association_id->getPrimaryKey().' ';
+    }
+
+    public function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name)
+    {
+        //$handler_name = $association_id;
+        return ' LEFT OUTER JOIN '.
+        $this->Owner->$association_id->getTableName().' AS '.$parent_handler_name.'__'.$handler_name.
+        ' ON '.
+        ''.$parent_handler_name.'.'.$this->Owner->$association_id->getAssociationOption('primary_key_name').
+        ' = '.
+        ''.$parent_handler_name.'__'.$handler_name.'.'.$this->Owner->$association_id->getPrimaryKey().' ';
+    }
+
+    /**
+     * Triggers
+     */
+
+    public function beforeSave(&$object)
+    {
+        $association_ids = $object->getAssociatedIds();
+        foreach ($association_ids as $association_id){
+            if( !empty($object->$association_id->__activeRecordObject) &&
+            strtolower($object->belongsTo->getOption($association_id, 'class_name')) == strtolower($object->$association_id->getType())){
+                $primary_key_name = $this->Owner->belongsTo->getOption($association_id, 'primary_key_name');
+                if($object->$association_id->isNewRecord() && !$object->$association_id->hasAttributesDefined()){
+                    $object->$association_id->save(true);
+                }
+                $primary_key_name_value = $object->$association_id->getId();
+                if(!empty($primary_key_name_value)){
+                    $object->set($primary_key_name, $primary_key_name_value);
+                }
+            }
+        }
+        return true;
+    }
+
+    public function beforeDestroy(&$object)
+    {
+        $association_ids = $object->getAssociatedIds();
+        foreach ($association_ids as $association_id){
+            if(!empty($object->$association_id) && is_object($object->$association_id) && method_exists($object->$association_id,'getType') &&
+            strtolower($object->belongsTo->getOption($association_id, 'class_name')) == strtolower($object->$association_id->getType())){
+                $primary_key_name = $this->Owner->$association_id->getAssociationOption('primary_key_name');
+                if($this->Owner->$association_id->getAssociationOption('counter_cache')){
+                    $object->$association_id->decrementCounter(AkInflector::pluralize($association_id).'_count', $object->get($primary_key_name));
+                }
+            }
+        }
+        return true;
+    }
+
+    public function afterDestroy(&$object)
+    {
+        $success = true;
+        $associated_ids = $object->getAssociatedIds();
+        foreach ($associated_ids as $associated_id){
+            if( isset($object->$associated_id->_associatedAs) &&
+            $object->$associated_id->_associatedAs == 'belongsTo' &&
+            $dependency=$object->$associated_id->getAssociationOption('dependent')){
+                if ($object->$associated_id->getType() == 'belongsTo'){
+
+                    $object->$associated_id->load();
+                }
+                if(empty($object->$associated_id->id) || $object->$associated_id->getType() == 'belongsTo' || $object->$associated_id->isNewRecord()) return true;
+
+                switch ($dependency) {
+
+                    case 'delete':
+                        if(method_exists($object->$associated_id, 'delete')){
+                            $success = $object->$associated_id->delete($object->$associated_id->getId()) ? $success : false;
+                        }
+                        break;
+                    case 'nullify':
+                        if(method_exists($object->$associated_id, 'updateAttribute')){
+                            $success = $object->$associated_id->updateAttribute($object->$associated_id->getAssociationOption('primary_key_name'),null) ? $success : false;
+                        }
+                        break;
+                    case 'destroy':
+                    default:
+
+                        if(method_exists($object->$associated_id, 'destroy')){
+                            $success = $object->$associated_id->destroy() ? $success : false;
+                        }
+                        break;
+                }
+            }
+        }
+        return $success;
+    }
+}
+
+
+?>

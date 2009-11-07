@@ -1,0 +1,17 @@
+#!/usr/bin/env php
+<?php
+
+if(defined('E_DEPRECATED')){
+    error_reporting(E_ALL ^ E_DEPRECATED);
+}else{
+    error_reporting(E_ALL);
+}
+defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
+defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
+require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
+$argv = array_map('trim',$argv);
+array_shift($argv);
+$tests_dir = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'test');
+require_once(AK_LIB_DIR.DS.'utils'.DS.'scripts'.DS.'test.php');
+
+?>

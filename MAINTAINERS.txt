@@ -1,0 +1,13 @@
+Bermi Ferrer Martinez <bermi-a.t-akelos-d.ot-co.m> Lead developer
+
+Kaste <thdz DOT x gmx net> Core Contributor
+
+Jose Salavert <salavert-a-t-akelos-d.ot-co.m> Core Contributor
+
+Jerome Loyet,  <jerome-a-t-nospam-loyet net> Core Contributor
+
+Niels Ganser <niels.ganser.nospam-gmail-d.ot-co.m> Core Contributor
+
+See THANKS.txt for the complete list of people who has made Akelos possible
+
+…your name here? Send your patches to http://trac.akelos.org

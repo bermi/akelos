@@ -1,0 +1,127 @@
+#!/usr/bin/env php
+<?php
+
+define('DS', DIRECTORY_SEPARATOR);
+define('AK_OS', (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'WINDOWS' : 'UNIX'));
+define('AK_PHP5', version_compare(PHP_VERSION, '5', '>=') == 1 ? true : false);
+
+define('AK_BASE_DIR', str_replace(DS.'script'.DS.'setup','',__FILE__));
+@ini_set("include_path",(AK_BASE_DIR.DS.'vendor'.DS.'pear'.PATH_SEPARATOR.ini_get("include_path")));
+
+
+if(!empty($_SERVER['argv'][1]) && $_SERVER['argv'][1][0] != '-'){
+    $_SERVER['argv'][0] = '-d';
+}
+
+require_once (dirname(__FILE__).DS.'..'.DS.'lib'.DS.'AkelosInstaller.php');
+require_once (dirname(__FILE__).DS.'..'.DS.'lib'.DS.'Ak.php');
+require_once (dirname(__FILE__).DS.'..'.DS.'vendor'.DS.'pear'.DS.'PHP'.DS.'Compat'.DS.'Function'.DS.'file_put_contents.php');
+require_once (dirname(__FILE__).DS.'..'.DS.'vendor'.DS.'pear'.DS.'Console'.DS.'Getargs.php');
+
+$config =  array(
+
+
+'directory' => array(
+'short'   => 'd',
+'max'     => 1,
+'min'     => 1,
+'desc'    => 'Destination directory for installing the application.'),
+
+
+
+'force' => array(
+'short'   => 'f',
+'max'     => 0,
+'min'     => 0,
+'default' => 'false',
+'desc'    => 'Overwrite files that already exist.'),
+
+
+'skip' => array(
+'short'   => 's',
+'max'     => 0,
+'min'     => 0,
+'default' => 'false',
+'desc'    => 'Skip files that already exist.'),
+
+
+'quiet' => array(
+'short'   => 'q',
+'max'     => 0,
+'min'     => 0,
+'default' => 'false',
+'desc'    => 'Suppress normal output.'),
+
+
+'public_html' => array(
+'short'   => 'p',
+'max'     => 1,
+'min'     => 1,
+'desc'    => 'Location where the application will be accesed by the webserver.'),
+
+
+
+'dependencies' => array(
+'short'   => 'deps',
+'max'     => 0,
+'min'     => 0,
+'default' => 'true',
+'desc'    => 'Includes a copy of the framework into the application directory.'),
+
+
+
+'help' => array(
+'short'   => 'h',
+'max'     => 0,
+'min'     => 0,
+'desc'    => 'Show this help message.'),
+
+'version' => array(
+'short'   => 'v',
+'max'     => 0,
+'min'     => 0,
+'desc'    => 'Print the akelos version.'),
+
+);
+
+
+
+
+$args =& Console_Getargs::factory($config);
+
+if (PEAR::isError($args)) {
+    if ($args->getCode() === CONSOLE_GETARGS_ERROR_USER) {
+        echo Console_Getargs::getHelp($config, null, $args->getMessage())."\n";
+    } else if ($args->getCode() === CONSOLE_GETARGS_HELP) {
+        echo @Console_Getargs::getHelp($config)."\n";
+    }
+    exit;
+}
+
+$options = $args->getValues();
+
+if(empty($options)){
+    echo Console_Getargs::getHelp($config)."\n";
+    exit;
+}
+
+$Installer = new AkelosInstaller($options);
+
+$Installer->install();
+
+if($args->getValue('quiet') == ''){
+    if($Installer->hasErrors()){
+        echo "\nThere where some errors during the installation process:\n";
+        echo "\n * ".join("\n    * ",$Installer->getErrors());
+    }elseif(empty($Installer->options['force'])){
+
+        echo "\n    Please point your browser to ".
+        (empty($Installer->options['public_html']) ? $Installer->options['directory'] : $Installer->options['public_html']).
+        " in order to complete the installation process or\n\n".
+        " run \n\n    ./script/configure -i\n\nto configure the database details\n";
+    }
+    echo "\n";
+}
+
+
+?>

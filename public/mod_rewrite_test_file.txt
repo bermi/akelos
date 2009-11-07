@@ -1,0 +1,1 @@
+Please add "define('AK_URL_REWRITE_ENABLED',true);" to your config/config.php file to avoid hitting this file every time.

@@ -1,0 +1,30 @@
+default:
+    host:                   localhost
+    
+testing:
+    type:
+    database_file:
+    port:
+    database_name:
+    user:
+    password:
+    options:
+    
+    
+development:
+    type:                   mysql
+    database_file:
+    port:
+    database_name:
+    user:
+    password:
+    options:
+    
+production:
+    type:                   mysql
+    database_file:
+    port:
+    database_name:
+    user:
+    password:
+    options:

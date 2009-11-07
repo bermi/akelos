@@ -1,0 +1,12 @@
+#!/usr/bin/env php
+<?php
+
+define('AK_ENVIRONMENT', 'setup');
+defined('DS') ? null : define('DS', DIRECTORY_SEPARATOR);
+define('AK_BASE_DIR', str_replace(DS.'script'.DS.'configure','',__FILE__));
+
+include(AK_BASE_DIR.DS.'app'.DS.'controllers'.DS.'framework_setup_controller.php');
+
+require_once(AK_LIB_DIR.DS.'utils'.DS.'scripts'.DS.'configure.php');
+
+?>

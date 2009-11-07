@@ -1,0 +1,17 @@
+#this file must be located in config/ci-config.yaml
+test-installation: /Users/bermi/Projects/akelos/ci-tests
+test-url: http://localhost/akelos-ci-tests/test/fixtures/public
+memcached-socket: localhost:11211
+
+executables:
+  php53:    /opt/local/bin/php
+
+environments:
+  - mysql  # will look for config/mysql.yml
+
+default_executables:
+  - php53
+
+valid_combinations:
+  php53:
+    - mysql
