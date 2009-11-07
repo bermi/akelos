@@ -1,4 +1,6 @@
-Bermi Ferrer Martinez <bermi-a.t-akelos-d.ot-co.m> Lead developer
+Bermi Ferrer Martinez <bermi-a.t-bermilabs-d.ot-co.m> Lead developer
+
+Arno Schneider <arno-a.t-bermilabs-d.ot-co.m> Core Contributor
 
 Kaste <thdz DOT x gmx net> Core Contributor
 
