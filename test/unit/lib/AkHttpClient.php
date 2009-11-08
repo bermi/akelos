@@ -1,9 +1,8 @@
 <?php
 
 require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
-require_once(AK_LIB_DIR.DS.'AkHttpClient.php');
 
-class Test_of_AkHttpClient extends  AkUnitTest
+class AkHttpClientTestCase extends  AkUnitTest
 {
     public $url = '';
     public $verbs = array('get', 'post', 'put', 'delete');
@@ -20,7 +19,7 @@ class Test_of_AkHttpClient extends  AkUnitTest
         $this->assertEqual($this->Client->get($this->url.'/verb'), 'get');
         $this->assertEqual(Ak::url_get_contents($this->url.'/verb'), 'get');
     }
-
+/*
     public function  test_post_verb()
     {
         $this->assertEqual($this->Client->post($this->url.'/verb'), 'post');
@@ -64,7 +63,7 @@ class Test_of_AkHttpClient extends  AkUnitTest
     {
         $params = array('testing'=>array('user'=>'bermi','nested'=>array('one','two')));
         $expected = Ak::toJson($params['testing']);
-        Ak::compat('http_build_query');
+
         $query = http_build_query($params);
 
         foreach ($this->verbs as $verb){
@@ -88,9 +87,6 @@ class Test_of_AkHttpClient extends  AkUnitTest
         $this->assertEqual(Ak::url_get_contents($this->url.'/persisting_cookies', array('cookies' => false)), 1);
         $this->assertEqual(Ak::url_get_contents($this->url.'/persisting_cookies', array('cookies' => true)), 1);
     }
-
+    /**/
 }
 
-ak_test('Test_of_AkHttpClient', true);
-
-?>

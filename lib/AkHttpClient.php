@@ -79,11 +79,11 @@ class AkHttpClient extends AkObject
 
         list($user_name, $password) = $this->_extractUserNameAndPasswordFromUrl($url);
 
-        require_once(AK_VENDOR_DIR.DS.'pear'.DS.'HTTP'.DS.'Request.php');
+        require_once(AK_VENDOR_DIR.DS.'pear'.DS.'HTTP'.DS.'Request2.php');
 
         $this->{'_setParamsFor'.ucfirst(strtolower($http_verb))}($url, $options['params']);
 
-        $this->HttpRequest = new HTTP_Request($url);
+        $this->HttpRequest = new HTTP_Request2($url);
 
         $user_name ? $this->HttpRequest->setBasicAuth($user_name, $password) : null;
 
@@ -94,9 +94,8 @@ class AkHttpClient extends AkObject
         }elseif ($http_verb == 'PUT' && !empty($options['params'])){
             $this->setBody($options['params']);
         }
-
+        
         !empty($options['params']) && $this->addParams($options['params']);
-
         isset($options['cookies']) &&  $this->addCookieHeader($options, $url);
 
         $this->addHeaders($options['header']);
@@ -113,8 +112,7 @@ class AkHttpClient extends AkObject
 
     public function addHeader($name, $value)
     {
-        $this->HttpRequest->removeHeader($name);
-        $this->HttpRequest->addHeader($name, $value);
+        $this->HttpRequest->setHeader($name, $value);
     }
 
     public function getResponseHeader($name)

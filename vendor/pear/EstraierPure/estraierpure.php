@@ -80,7 +80,7 @@ if (!defined('ESTRAIERPURE_DEBUG')) {
  * Specifies http client type.
  *
  * If set to `1', EstraierPure_Utility::shuttle_url() uses stream functions.
- * By default, uses PEAR::HTTP_Request.
+ * By default, uses PEAR::HTTP_Request2.
  */
 if (!defined('ESTRAIERPURE_USE_HTTP_STREAM')) {
     define('ESTRAIERPURE_USE_HTTP_STREAM', 0);
@@ -2211,7 +2211,7 @@ class EstraierPure_Utility
      * @access  public
      * @static
      * @uses    PEAR
-     * @uses    HTTP_Request
+     * @uses    HTTP_Request2
      */
     static function shuttle_url($url, $pxhost = null, $pxport = null, $outsec = -1,
                                        $reqheads = null, $reqbody = null, $res = null)
@@ -2270,7 +2270,7 @@ class EstraierPure_Utility
             $meta_data = stream_get_meta_data($fp);
             if (strcasecmp($meta_data['wrapper_type'], 'cURL') == 0) {
                 $errmsg = 'EstraierPure does not work with the cURL'
-                        . ' HTTP stream wrappers, please use PEAR::HTTP_Request.';
+                        . ' HTTP stream wrappers, please use PEAR::HTTP_Request2.';
                 $err = PEAR::raiseError($errmsg);
                 self::push_error($err);
                 return $err;
@@ -2304,7 +2304,7 @@ class EstraierPure_Utility
 
             // }}}
         } else {
-            // {{{{ using PEAR::HTTP_Request
+            // {{{{ using PEAR::HTTP_Request2
 
             // set request parameters
             $params = array();
@@ -2322,8 +2322,8 @@ class EstraierPure_Utility
                 $params['readTimeout'] = array($outsec, 0);
             }
 
-            // create an instance of HTTP_Request
-            $req = new HTTP_Request($url, $params);
+            // create an instance of HTTP_Request2
+            $req = new HTTP_Request2($url, $params);
             if (is_null($reqbody)) {
                 $req->setMethod('GET');
             } else {
@@ -2498,7 +2498,7 @@ class EstraierPure_Response
      *
      * @param   bool    $save_heads     Whether to store response headers.
      * @param   bool    $save_body      Whether to store response body.
-     * @see     HTTP_Request::sendRequest()
+     * @see     HTTP_Request2::sendRequest()
      * @access  public
      */
     public function __construct($save_heads = false, $save_body = true)

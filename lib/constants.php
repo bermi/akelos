@@ -196,6 +196,8 @@ function ak_autoload($name, $path = null)
         'AkAdodbCache'      => AK_LIB_DIR.DS.'AkCache'.DS.'AkAdodbCache.php',
         'AkDbSession'      => AK_LIB_DIR.DS.'AkDbSession.php',
         'AkActiveRecord'      => AK_LIB_DIR.DS.'AkActiveRecord.php',
+        'AkHttpClient'      => AK_LIB_DIR.DS.'AkHttpClient.php',
+        
         'ActiveRecord'      => AK_APP_DIR.DS.'shared_model.php',
         
         );
