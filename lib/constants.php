@@ -176,6 +176,8 @@ function ak_autoload($name, $path = null)
 
     if(empty($paths)){
         $paths = array(
+
+        // ActiveSupport
         'Ak'            => AK_LIB_DIR.DS.'Ak.php',
         'AkObject'      => AK_LIB_DIR.DS.'AkObject.php',
         'AkInstaller'   => AK_LIB_DIR.DS.'AkInstaller.php',
@@ -185,12 +187,19 @@ function ak_autoload($name, $path = null)
         'AkMemcache'      => AK_LIB_DIR.DS.'AkCache'.DS.'AkMemcache.php',
         'AkAdodbCache'      => AK_LIB_DIR.DS.'AkCache'.DS.'AkAdodbCache.php',
         'AkDbSession'      => AK_LIB_DIR.DS.'AkDbSession.php',
-        'AkActiveRecord'      => AK_LIB_DIR.DS.'AkActiveRecord.php',
         'AkHttpClient'      => AK_LIB_DIR.DS.'AkHttpClient.php',
-        
+
+        // ActiveRecord
+        'AkBaseModel'      => AK_LIB_DIR.DS.'AkBaseModel.php',
+        'AkActiveRecord'      => AK_LIB_DIR.DS.'AkActiveRecord.php',
+        'AkAssociatedActiveRecord'      => AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php',
+        'AkActiveRecordMock'      => AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php',
+        'AkDbAdapter'      => AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbAdapter.php',
+        'AkDbSchemaCache'      => AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php',
         'ActiveRecord'      => AK_APP_DIR.DS.'shared_model.php',
-        
+
         );
+
     }elseif (!empty($path)){
         $paths[$name] = $path;
     }

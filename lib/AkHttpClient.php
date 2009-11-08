@@ -159,7 +159,6 @@ class AkHttpClient extends AkObject
         }
     }
 
-
     public function addCookieHeader(&$options, $url)
     {
         if(isset($options['cookies'])){
@@ -223,7 +222,7 @@ class AkHttpClient extends AkObject
         }
     }
 
-    private function _extractUserNameAndPasswordFromUrl(&$url)
+    protected function _extractUserNameAndPasswordFromUrl(&$url)
     {
         return array(null,null);
     }
@@ -248,7 +247,7 @@ class AkHttpClient extends AkObject
         return $this->_httpRenderQuery($parts);
     }
 
-    private function _setParamsForGet(&$url, &$params)
+    protected function _setParamsForGet(&$url, &$params)
     {
         $url_params = $this->getParamsOnUrl($url);
         if(!count($url_params) && !empty($params)){
@@ -258,24 +257,24 @@ class AkHttpClient extends AkObject
         }
     }
 
-    private function _setParamsForPost(&$url, &$params)
+    protected function _setParamsForPost(&$url, &$params)
     {
         empty($params) && $params = $this->getParamsOnUrl($url);
     }
 
-    private function _setParamsForPut(&$url, &$params)
+    protected function _setParamsForPut(&$url, &$params)
     {
         empty($params) && $params = $this->getParamsOnUrl($url);
     }
 
-    private function _setParamsForDelete(&$url, &$params)
+    protected function _setParamsForDelete(&$url, &$params)
     {
         if(!$this->getParamsOnUrl($url) && !empty($params)){
             $url = $this->getUrlWithParams($url, $params);
         }
     }
 
-    private function _httpRenderQuery($parts)
+    protected function _httpRenderQuery($parts)
     {
         return is_array($parts) ? (
         (isset($parts['scheme']) ? $parts['scheme'].':'.((strtolower($parts['scheme']) == 'mailto') ? '' : '//') : '').

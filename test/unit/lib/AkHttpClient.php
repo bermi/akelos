@@ -24,7 +24,6 @@ class AkHttpClientTestCase extends  AkUnitTest
     function __destruct()
     {
         file_put_contents($this->ht_access_path, $this->original_ht_access);
-        parent::__destruct();
     }
     
     public function setup()

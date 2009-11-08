@@ -22,11 +22,13 @@ require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'web_tester.php');
 
 class AkUnitTest extends UnitTestCase
 {
-    public $module = '';
-    public $insert_models_data = false;
-    public $instantiate_models = false;
+    public
+    $module = '',
+    $insert_models_data = false,
+    $instantiate_models = false;
 
-    public function AkUnitTest($label = false) {
+    public function AkUnitTest($label = false)
+    {
         parent::__construct($label);
         $this->_configure();
     }
@@ -39,7 +41,8 @@ class AkUnitTest extends UnitTestCase
      *    @return array        List of test names.
      *    @access public
      */
-    public function getTests() {
+    public function getTests()
+    {
         $methods = array();
         if (isset($this->skip) && $this->skip == true) {
             return $methods;
@@ -52,13 +55,13 @@ class AkUnitTest extends UnitTestCase
         return $methods;
     }
 
-    public function _configure()
+    protected function _configure()
     {
         $this->skip = !$this->_checkIfEnabled();
         $this->_loadFixtures();
     }
 
-    public function _checkIfEnabled($file = null)
+    protected function _checkIfEnabled($file = null)
     {
         if ($file == null) {
             $file = isset($this->check_file)?$this->check_file:null;
@@ -73,7 +76,7 @@ class AkUnitTest extends UnitTestCase
     }
 
 
-    public function _loadFixtures($loadFixture = null)
+    protected function _loadFixtures($loadFixture = null)
     {
         if (isset($this->fixtures)) {
             $this->fixtures = is_array($this->fixtures)?$this->fixtures:Ak::toArray($this->fixtures);
@@ -124,7 +127,6 @@ class AkUnitTest extends UnitTestCase
         }
     }
 
-
     /**
      * Re-installs the table for a given Modelname and includes or even instantiates the Model.
      * Looks in test/fixtures/app/models for the models and in test/fixtures/app/installers for the appropriate installers.
@@ -163,6 +165,7 @@ class AkUnitTest extends UnitTestCase
             }
         }
     }
+
     public function log($message)
     {
         if (AK_LOG_EVENTS){
@@ -173,7 +176,8 @@ class AkUnitTest extends UnitTestCase
             $logger->log('unit-test',$message);
         }
     }
-    public function _reinstallModel($model, $table_definition = '')
+
+    protected function _reinstallModel($model, $table_definition = '')
     {
         $this->log('Reinstalling model:'.$model);
         if (!$this->uninstallAndInstallMigration($model)){
@@ -209,7 +213,7 @@ class AkUnitTest extends UnitTestCase
         return false;
     }
 
-    public function _includeOrGenerateModel($model_name)
+    protected function _includeOrGenerateModel($model_name)
     {
         if (file_exists(AK_MODELS_DIR.DS.AkInflector::underscore($model_name).'.php')){
             require_once(AK_MODELS_DIR.DS.AkInflector::underscore($model_name).'.php');
@@ -217,30 +221,14 @@ class AkUnitTest extends UnitTestCase
             if (class_exists($model_name)){
                 return true;
             }
-            $model_source_code = "class ".$model_name." extends ActiveRecord { ";
-            if (!AK_PHP5) $model_source_code .= $this->__fix_for_PHP4($model_name);
-            $model_source_code .= "}";
+            $model_source_code = "class ".$model_name." extends ActiveRecord { }";
             $has_errors = @eval($model_source_code) === false;
             if ($has_errors) trigger_error(Ak::t('Could not declare the model %modelname.',array('%modelname'=>$model_name)),E_USER_ERROR);
         }
     }
 
-    public function __fix_for_PHP4($model_name)
-    {
-        $table_name = AkInflector::tableize($model_name);
-        return "function $model_name()
-    {
-        \$this->setModelName('$model_name');
-        \$attributes = (array)func_get_args();
-        \$this->setTableName('$table_name');
-        \$this->init(\$attributes);
-    }";
-
-    }
-
     public function populateTables()
     {
-
         $args = func_get_args();
         $tables = !empty($args) ? (is_array($args[0]) ? $args[0] : (count($args) > 1 ? $args : Ak::toArray($args))) : array();
         foreach ($tables as $table){

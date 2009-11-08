@@ -21,7 +21,7 @@ if(empty($options['hide_error_reporting'])){
 }else{
     unset($options['hide_error_reporting']);
 }
-die();
+
 foreach ($options as $_test_file){
     if(preg_match('/^Ak/i', $_test_file)){
         $_test_file = 'unit'.DS.'lib'.DS.$_test_file;
