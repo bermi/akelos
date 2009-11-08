@@ -174,7 +174,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
             return;
         }
 
-        $User = new User(array('name'=>'Arno','email'=>'arno@bermilabs.com'));
+        $User = new User(array('name'=>'Arno','email'=>'no-spam@bermilabs.com'));
         $Post1 = new Post(array('title'=>'Test1'));
         $Post2 = new Post(array('title'=>'Test2'));
         $Comment1_1 = new Comment(array('name'=>'Comment1_1'));
@@ -290,8 +290,8 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
             return;
         }
 
-        $User1 = new User(array('name'=>'Arno','email'=>'arno@bermilabs.com'));
-        $User2 = new User(array('name'=>'Arno','email'=>'arno2@bermilabs.com'));
+        $User1 = new User(array('name'=>'Arno','email'=>'no-spam@bermilabs.com'));
+        $User2 = new User(array('name'=>'Arno','email'=>'no-spam2@bermilabs.com'));
         $Post1 = new Post(array('title'=>'Test1'));
         $Post2 = new Post(array('title'=>'Test2'));
         $Post3 = new Post(array('title'=>'Test3'));
@@ -325,8 +325,8 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         $Test = &$User1->findAllBy('name','Arno',array('order'=>'id ASC','include'=>array('posts'=>array('order'=>'id ASC','include'=>array('comments'=>array('order'=>'id ASC'))))));
         //Ak::debug($Test);
         //die;
-        $this->assertEqual($Test[0]->email,'arno@bermilabs.com');
-        $this->assertEqual($Test[1]->email,'arno2@bermilabs.com');
+        $this->assertEqual($Test[0]->email,'no-spam@bermilabs.com');
+        $this->assertEqual($Test[1]->email,'no-spam2@bermilabs.com');
         $this->assertEqual($Test[0]->posts[0]->title,'Test1');
         $this->assertEqual($Test[0]->posts[1]->title,'Test2');
         $this->assertEqual($Test[0]->posts[0]->comments[0]->name,'Comment1_1');

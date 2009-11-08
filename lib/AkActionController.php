@@ -811,7 +811,7 @@ class AkActionController extends AkObject
     *
     * Examples:
     *   redirectTo(array('action' => 'show', 'id' => 5));
-    *   redirectTo('http://www.akelos.com');
+    *   redirectTo('http://www.bermilabs.com');
     *   redirectTo('/images/screenshot.jpg');
     *   redirectTo('back');
     *

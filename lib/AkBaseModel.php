@@ -27,7 +27,6 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
  * See also <AkActiveRecord> and <AkActionMailer> as those are the ones you will usually inherit from
 *
 * @author Bermi Ferrer <bermi a.t bermilabs c.om>
-* @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
 */
 class AkBaseModel extends AkObject

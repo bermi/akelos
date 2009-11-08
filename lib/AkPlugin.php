@@ -18,7 +18,6 @@ defined('AK_PLUGINS') ? null : define('AK_PLUGINS', 'auto');
  * @package    Plugins
  * @subpackage Base
  * @author     Bermi Ferrer <bermi a.t bermilabs c.om> 2007
- * @copyright  Copyright (c) 2002-2007, Akelos Media, S.L. http://www.akelos.org
  * @license    GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 class AkPlugin
@@ -108,7 +107,6 @@ class AkPlugin
  * @package    Plugins
  * @subpackage Loader
  * @author     Bermi Ferrer <bermi a.t bermilabs c.om> 2007
- * @copyright  Copyright (c) 2002-2007, Akelos Media, S.L. http://www.akelos.org
  * @license    GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 class AkPluginLoader

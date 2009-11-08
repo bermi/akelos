@@ -150,10 +150,10 @@ class AkRequestTestCase extends  AkUnitTest
 
         $this->assertEqual($Request->getDomain(), 'localhost');
 
-        $Request->_host = 'www.dev.akelos.com';
+        $Request->_host = 'www.dev.bermilabs.com';
 
-        $this->assertEqual($Request->getDomain(),'akelos.com');
-        $this->assertEqual($Request->getDomain(2),'dev.akelos.com');
+        $this->assertEqual($Request->getDomain(),'bermilabs.com');
+        $this->assertEqual($Request->getDomain(2),'dev.bermilabs.com');
 
         $Request->env = $env_backup;
     }
@@ -164,7 +164,7 @@ class AkRequestTestCase extends  AkUnitTest
 
         $env_backup = $Request->env;
 
-        $Request->_host = 'www.dev.akelos.com';
+        $Request->_host = 'www.dev.bermilabs.com';
 
         $this->assertEqual($Request->getSubdomains(), array('www','dev'));
         $this->assertEqual($Request->getSubdomains(2),array('www'));

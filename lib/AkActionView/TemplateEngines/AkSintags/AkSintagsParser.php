@@ -3,7 +3,6 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002-2007, Akelos Media, S.L.  & Bermi Ferrer Martinez |
 // | Copyright (c) 2008-2009,  Bermi Ferrer Martinez                      |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+

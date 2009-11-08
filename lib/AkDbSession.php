@@ -45,7 +45,6 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 * </code>
 *
 * @author Bermi Ferrer <bermi at akelos com>
-* @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
 * @since 0.1
 * @deprecated use AkSession instead

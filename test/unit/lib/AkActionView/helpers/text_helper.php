@@ -107,7 +107,7 @@ class TextHelperTests extends HelpersUnitTester
         $this->assertEqual($this->text->auto_link_urls('www.thebigmover.com'),'<a href="http://www.thebigmover.com">www.thebigmover.com</a>');
         $this->assertEqual($this->text->auto_link_urls('www.thebigmover.com nested www.thebigmover.com/search'),'<a href="http://www.thebigmover.com">www.thebigmover.com</a> nested <a href="http://www.thebigmover.com/search">www.thebigmover.com/search</a>');
         $this->assertEqual($this->text->auto_link_urls('Visit http://www.thebigmover.com now'),'Visit <a href="http://www.thebigmover.com">http://www.thebigmover.com</a> now');
-        $this->assertEqual($this->text->auto_link_urls('Visit http://www.thebigmover.com now and later http://www.akelos.com'),'Visit <a href="http://www.thebigmover.com">http://www.thebigmover.com</a> now and later <a href="http://www.akelos.com">http://www.akelos.com</a>');
+        $this->assertEqual($this->text->auto_link_urls('Visit http://www.thebigmover.com now and later http://www.bermilabs.com'),'Visit <a href="http://www.thebigmover.com">http://www.thebigmover.com</a> now and later <a href="http://www.bermilabs.com">http://www.bermilabs.com</a>');
     }
 
     public function test_strip_links()

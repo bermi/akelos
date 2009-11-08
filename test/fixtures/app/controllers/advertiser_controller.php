@@ -11,7 +11,7 @@ class AdvertiserController extends AkActionController
     function buy()
     {
         $this->buyer =& new stdClass();
-        $this->buyer->name = 'Akelos Media';
+        $this->buyer->name = 'Bermi Labs';
         
         $ad1 = new stdClass();
         $ad1->name = 'first_ad';

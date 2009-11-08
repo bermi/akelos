@@ -11,8 +11,7 @@
  * @package ActiveSupport
  * @subpackage Converters
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @copyright Copyright (c) 2002-2007, Akelos Media, S.L. http://www.akelos.org
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
+  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 class AkRemoteConverter
 {
@@ -31,7 +30,7 @@ class AkRemoteConverter
         $data = "data=$data";
         if ($fp = fsockopen($details['host'], $port)) {
             fwrite($fp, "POST $path/{$_SERVER['SERVER_NAME']}/{$from}_to_{$to} HTTP/1.1\r\n".
-            "Host: webservices.akelos.com\r\nContent-type: application/x-www-form-urlencoded\r\n".
+            "Host: webservices.bermilabs.com\r\nContent-type: application/x-www-form-urlencoded\r\n".
             "User-Agent: Mozilla 4.0\r\nContent-length: ".strlen($data)."\r\nConnection: close\r\n\r\n$data");
             $result = '';
             while (!feof($fp)) {

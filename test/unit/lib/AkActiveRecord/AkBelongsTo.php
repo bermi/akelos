@@ -18,7 +18,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
     /**/
     public function test_for_single_has_one_association()
     {
-        $Picture = new Picture(array('title'=>'The Akelos Media Team at SIMO'));
+        $Picture = new Picture(array('title'=>'The Bermi Labs Team at SIMO'));
         $this->assertReference($Picture, $Picture->hasOne->Owner);
         $this->assertEqual($Picture->main_thumbnail->getAssociationId(), 'main_thumbnail');
         $this->assertEqual($Picture->main_thumbnail->getType(), 'hasOne');
@@ -48,10 +48,10 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
 
         $SimoPic = $Picture->findFirstBy('title:has','SIMO', array('include'=>'main_thumbnail'));
 
-        $this->assertEqual($SimoPic->title, 'The Akelos Media Team at SIMO');
+        $this->assertEqual($SimoPic->title, 'The Bermi Labs Team at SIMO');
         $this->assertEqual($SimoPic->main_thumbnail->caption, 'SIMO 2005');
 
-        $Picture = new Picture(array('title'=>'The Akelos Media Team at CeBIT'));
+        $Picture = new Picture(array('title'=>'The Bermi Labs Team at CeBIT'));
         $Picture->main_thumbnail->build(array('caption' => 'CeBIT 2005'));
         $this->assertTrue($Picture->save());
         $this->assertFalse($Picture->isNewRecord());
@@ -59,17 +59,17 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
 
         $CeBitPic = $Picture->findFirstBy('title:has','CeBIT', array('include'=>'main_thumbnail'));
 
-        $this->assertEqual($CeBitPic->title, 'The Akelos Media Team at CeBIT');
+        $this->assertEqual($CeBitPic->title, 'The Bermi Labs Team at CeBIT');
         $this->assertEqual($CeBitPic->main_thumbnail->caption, 'CeBIT 2005');
 
-        $Picture = new Picture(array('title'=>'The Akelos Media Team at Carlet'));
+        $Picture = new Picture(array('title'=>'The Bermi Labs Team at Carlet'));
 
         $this->assertTrue($Picture->save());
 
         $this->assertFalse($Picture->findFirstBy('title:has','Carlet', array('include'=>'main_thumbnail')));
 
         $this->assertTrue($CarletPic = $Picture->findFirstBy('title:has','Carlet', array('include'=>array('main_thumbnail'=>array('conditions'=>false)))));
-        $this->assertEqual($CarletPic->title,'The Akelos Media Team at Carlet');
+        $this->assertEqual($CarletPic->title,'The Bermi Labs Team at Carlet');
 
         ///////////
         $this->assertReference($CarletPic->main_thumbnail->_AssociationHandler->Owner, $CarletPic);
@@ -79,7 +79,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
         ///////////
         $this->assertReference($CarletPic->main_thumbnail->_AssociationHandler->Owner, $CarletPic);
 
-        $this->assertEqual($CarletPic->title, 'The Akelos Media Team at Carlet');
+        $this->assertEqual($CarletPic->title, 'The Bermi Labs Team at Carlet');
         $this->assertEqual($CarletPic->main_thumbnail->getType(), 'hasOne');
 
         $CarletPic->main_thumbnail->create(array('caption'=>'Carlet'));
@@ -145,7 +145,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
         $Thumbnail = $Thumbnail->findFirstBy('caption:has','Lucky', array('include'=>'picture'));
 
         $this->assertEqual($Thumbnail->picture->getType(), 'Picture');
-        $this->assertEqual($Thumbnail->picture->title, 'The Akelos Media Team at Carlet');
+        $this->assertEqual($Thumbnail->picture->title, 'The Bermi Labs Team at Carlet');
 
         $Alicia = $Thumbnail->create('caption->','Alicia');
         $this->assertTrue(!$Alicia->isNewRecord());

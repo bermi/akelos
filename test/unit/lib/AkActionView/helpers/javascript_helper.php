@@ -13,7 +13,7 @@ class JavaScriptHelperTests extends HelpersUnitTester
         $javascript = new JavaScriptHelper();
         
         $this->assertEqual($javascript->link_to_function('Greeting', "alert('Hello world!')"),'<a href="#" onclick="alert(\'Hello world!\'); return false;">Greeting</a>');
-        $this->assertEqual($javascript->link_to_function('my link', "if confirm('Really?'){ do_delete(); }",array('href'=>'http://www.akelos.com')),'<a href="http://www.akelos.com" onclick="if confirm(\'Really?\'){ do_delete(); }; return false;">my link</a>');
+        $this->assertEqual($javascript->link_to_function('my link', "if confirm('Really?'){ do_delete(); }",array('href'=>'http://www.bermilabs.com')),'<a href="http://www.bermilabs.com" onclick="if confirm(\'Really?\'){ do_delete(); }; return false;">my link</a>');
 
         
         $this->assertEqual($javascript->button_to_function("Greeting", "alert('Hello world!')"),'<input onclick="alert(\'Hello world!\');" type="button" value="Greeting" />');

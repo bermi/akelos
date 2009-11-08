@@ -51,8 +51,8 @@ class AkRouterTestCase extends  AkUnitTest
         $this->assertEqual($this->Router->toParams($input_value),$expected);
 
 
-        $input_value = '/redirect/'.urlencode('http://www.akelos.com/buscar_dominio');
-        $expected = array('controller'=>'redirect','url'=>'http://www.akelos.com/buscar_dominio');
+        $input_value = '/redirect/'.urlencode('http://www.bermilabs.com/buscar_dominio');
+        $expected = array('controller'=>'redirect','url'=>'http://www.bermilabs.com/buscar_dominio');
         $this->assertEqual($this->Router->toParams($input_value),$expected);
 
         $input_value = '/regex/abc/123';

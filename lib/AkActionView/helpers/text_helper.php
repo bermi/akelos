@@ -387,8 +387,8 @@ class TextHelper extends AkObject
      * Returns an array with all the urls found as key and their valid link url as value
      *
      * Example:
-     *  $text_helper->get_urls_from_text('www.akelos.com');
-     *  //returns: array('www.akelos.com'=>'http://www.akelos.com');
+     *  $text_helper->get_urls_from_text('www.bermilabs.com');
+     *  //returns: array('www.bermilabs.com'=>'http://www.bermilabs.com');
      */
     function get_urls_from_text($text)
     {
@@ -405,8 +405,8 @@ class TextHelper extends AkObject
      * Returns an array with the linked urls found on a text
      *
      *  Example:
-     * $text_helper->get_linked_urls_from_text('<a href="http://akelos.com">Akelos.com</a>');
-     * //returns: array('http://akelos.com');
+     * $text_helper->get_linked_urls_from_text('<a href="http://bermilabs.com">Akelos.com</a>');
+     * //returns: array('http://bermilabs.com');
      */
     function get_linked_urls_from_text($text)
     {
@@ -422,8 +422,8 @@ class TextHelper extends AkObject
      * Returns an array with the image urls found on a text
      *
      *  Example:
-     * $text_helper->get_linked_urls_from_text('<a href="http://akelos.com">Akelos.com</a>');
-     * //returns: array('http://akelos.com/images/logo.gif');
+     * $text_helper->get_linked_urls_from_text('<a href="http://bermilabs.com">Akelos.com</a>');
+     * //returns: array('http://bermilabs.com/images/logo.gif');
      */
     function get_image_urls_from_html($text)
     {
@@ -438,8 +438,8 @@ class TextHelper extends AkObject
      * Returns an array with the image urls found on a text
      *
      *  Example:
-     * $text_helper->get_linked_urls_from_text('<a href="http://akelos.com">Akelos.com</a>');
-     * //returns: array('http://akelos.com/images/logo.gif');
+     * $text_helper->get_linked_urls_from_text('<a href="http://bermilabs.com">Akelos.com</a>');
+     * //returns: array('http://bermilabs.com/images/logo.gif');
      */
     function get_image_urls_and_element_from_html($text)
     {

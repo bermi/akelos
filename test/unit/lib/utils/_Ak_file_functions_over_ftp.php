@@ -3,7 +3,7 @@
 define('AK_UPLOAD_FILES_USING_FTP', true);
 define('AK_READ_FILES_USING_FTP', true);
 define('AK_DELETE_FILES_USING_FTP', true);
-define('AK_FTP_PATH', 'ftp://tests:tests@tests.akelos.com');
+define('AK_FTP_PATH', 'ftp://tests:tests@tests.bermilabs.com');
 define('AK_FTP_AUTO_DISCONNECT', true);
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');

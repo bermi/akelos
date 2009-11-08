@@ -14,8 +14,7 @@
  * @package Plugins
  * @subpackage Manager
  * @author Bermi Ferrer <bermi a.t bermilabs c.om> 2007
- * @copyright Copyright (c) 2002-2007, Akelos Media, S.L. http://www.akelos.org
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
+  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 @set_time_limit(0);
@@ -32,8 +31,7 @@ defined('AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE') ? null : define('AK_PLUGINS_REPO
  * @package Plugins
  * @subpackage Manager
  * @author Bermi Ferrer <bermi a.t bermilabs c.om> 2007
- * @copyright Copyright (c) 2002-2007, Akelos Media, S.L. http://www.akelos.org
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
+  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 class AkPluginManager extends AkObject
 {

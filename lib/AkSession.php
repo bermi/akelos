@@ -39,7 +39,6 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 *
 * @author Bermi Ferrer <bermi at akelos com>
 * @author Arno Schneider <arno at bermilabs com>
-* @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
 * @since 0.9
 * @version $Revision 0.9 $

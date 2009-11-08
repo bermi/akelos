@@ -10,7 +10,6 @@
 // +----------------------------------------------------------------------+
 // | Akelos PHP Application Framework                                     |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002-2005, Akelos Media, S.L.  http://www.akelos.org/  |
 // | Released under the GNU Lesser General Public License                 |
 // +----------------------------------------------------------------------+
 // | You should have received the following files along with this library |
@@ -31,7 +30,6 @@
 * ISO-8859-4 strings, to UTF-8 multibyte format and vice versa.
 *
 * @author Bermi Ferrer Martinez <bermi@akelos.org>
-* @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
 * @link http://www.unicode.org/Public/MAPPINGS/ Original Mapping taken from Unicode.org
 * @since 0.1

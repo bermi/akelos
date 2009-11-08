@@ -34,7 +34,7 @@ class Test_of_AkActionController_partials extends  AkWebTestCase
     public function test_render_partial_doc_example()
     {
         $this->get(AK_TESTING_URL.'/advertiser/buy');
-        $this->assertTextMatch('Akelos MediaFirst adSeccond ad');
+        $this->assertTextMatch('Bermi LabsFirst adSeccond ad');
     }
 
     public function test_render_partial_collection_doc_example()

@@ -36,8 +36,7 @@ require_once(AK_LIB_DIR.DS.'AkRequestMimeType.php');
 * ApplicationController class, who takes control of the data
 * flow.
 *
-* @author Bermi Ferrer <bermi@akelos.com>
-* @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
+* @author Bermi Ferrer <bermi a.t bermilabs dot co.m>
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
 */
 class AkRequest extends AkObject
@@ -387,7 +386,7 @@ class AkRequest extends AkObject
     }
 
     /**
-    * Returns the domain part of a host, such as akelos.com in 'www.akelos.com'. You can specify
+    * Returns the domain part of a host, such as bermilabs.com in 'www.bermilabs.com'. You can specify
     * a different <tt>tld_length</tt>, such as 2 to catch akelos.co.uk in 'www.akelos.co.uk'.
     */
     function getDomain($tld_length = 1)
@@ -398,7 +397,7 @@ class AkRequest extends AkObject
     }
 
     /**
-    * Returns all the subdomains as an array, so ['dev', 'www'] would be returned for 'dev.www.akelos.com'.
+    * Returns all the subdomains as an array, so ['dev', 'www'] would be returned for 'dev.www.bermilabs.com'.
     * You can specify a different <tt>tld_length</tt>, such as 2 to catch ['www'] instead of ['www', 'akelos']
     * in 'www.akelos.co.uk'.
     */
