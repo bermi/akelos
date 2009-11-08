@@ -927,12 +927,7 @@ function refs($m)
     function txtgps($thing)
     {
         if (isset($_POST[$thing])) {
-            if (get_magic_quotes_gpc()) {
-                return stripslashes($_POST[$thing]);
-            }
-            else {
                 return $_POST[$thing];
-            }
         }
         else {
             return '';

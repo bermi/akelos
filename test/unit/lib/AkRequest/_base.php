@@ -46,7 +46,6 @@ class AkRequestTestCase extends  AkUnitTest
         'cookie_param'=>'get',
         'session_param'=>'get',
         'general_param'=>'get',
-        'gpc_param'=>'Isn\\\'t it ironic'
         );
 
         $_REQUEST = array(
@@ -80,8 +79,6 @@ class AkRequestTestCase extends  AkUnitTest
 
     public function Test_mergeRequest()
     {
-        $gpc_param = get_magic_quotes_gpc() ? "Isn't it ironic" : 'Isn\\\'t it ironic';
-
         $expected = array(
         'cmd_param'=>'cmd',
         'get_param'=>'get',
@@ -90,7 +87,6 @@ class AkRequestTestCase extends  AkUnitTest
         'session_param'=>'session',
         'general_param'=>'session',
         'ak'=>'/session_controller/session_action',
-        'gpc_param'=>$gpc_param,
         );
 
         $this->_testRequestInstance->_mergeRequest();

@@ -22,7 +22,7 @@ DirectoryIndex index.php
   #
   # Example:
   #   Alias /myakelosapp /path/to/myakelosapp/public
-  # RewriteBase /test/fixtures/public
+  RewriteBase /akelos-ci-tests/test/fixtures/public
 
   # If you don't want The Akelos Framework to look in certain directories,
   # use the following rewrite rules so that Apache won't rewrite certain requests

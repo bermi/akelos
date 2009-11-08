@@ -144,7 +144,6 @@ class AkRequest extends AkObject
     {
         if(!$this->_init_check){
             $this->env =& $_SERVER;
-            $this->_fixGpcMagic();
             $this->_urlDecode();
 
             $this->_mergeRequest();
@@ -673,32 +672,6 @@ class AkRequest extends AkObject
     }
 
     // }}}
-
-
-    /**
-    * Correct double-escaping problems caused by "magic quotes" in some PHP
-    * installations.
-    */
-    function _fixGpcMagic()
-    {
-        if(!defined('AK_GPC_MAGIC_FIXED')){
-            if (get_magic_quotes_gpc()) {
-                array_walk($_GET, array('AkRequest', '_fixGpc'));
-                array_walk($_POST, array('AkRequest', '_fixGpc'));
-                array_walk($_COOKIE, array('AkRequest', '_fixGpc'));
-            }
-            define('AK_GPC_MAGIC_FIXED',true);
-        }
-    }
-
-    function _fixGpc(&$item)
-    {
-        if (is_array($item)) {
-            array_walk($item, array('AkRequest', '_fixGpc'));
-        }else {
-            $item = stripslashes($item);
-        }
-    }
 
 
     function _urlDecode()

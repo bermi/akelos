@@ -364,7 +364,7 @@ class System_Daemon
      * 
      * @see start()
      */
-    protected function __construct()
+    public function __construct()
     {
         
     }    

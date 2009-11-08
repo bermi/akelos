@@ -6,16 +6,37 @@ class AkHttpClientTestCase extends  AkUnitTest
 {
     public $url = '';
     public $verbs = array('get', 'post', 'put', 'delete');
+    public $ht_access_path = '';
+    public $original_ht_access = '';
 
+    function __construct()
+    {
+        $this->ht_access_path = AK_FIXTURES_DIR.DS.'public'.DS.'.htaccess';
+        $this->original_ht_access = file_get_contents($this->ht_access_path);
+        file_put_contents($this->ht_access_path, str_replace(
+        '# RewriteBase /test/fixtures/public',
+        'RewriteBase '.str_replace(AK_PROTOCOL.AK_HOST, '', AK_TESTING_URL),
+        $this->original_ht_access));
+        
+        parent::__construct();
+    }
+    
+    function __destruct()
+    {
+        file_put_contents($this->ht_access_path, $this->original_ht_access);
+        parent::__destruct();
+    }
+    
     public function setup()
     {
         $this->url = AK_TESTING_URL.'/http_requests';
         $this->Client = new AkHttpClient();
     }
-
+    
     public function  test_get_verb()
     {
-        $this->assertEqual($this->Client->get($this->url), 'Hello unit tester');
+        //$this->assertEqual($this->Client->get($this->url), 'Hello unit tester');
+        Ak::trace($this->url.'/verb');
         $this->assertEqual($this->Client->get($this->url.'/verb'), 'get');
         $this->assertEqual(Ak::url_get_contents($this->url.'/verb'), 'get');
     }

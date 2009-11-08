@@ -808,9 +808,6 @@ class Pager_Common
                 unset($qs[$exclude]);
             }
         }
-        if (count($qs) && get_magic_quotes_gpc()){
-            $this->_recursive_stripslashes($qs);
-        }
         return $qs;
     }
 
