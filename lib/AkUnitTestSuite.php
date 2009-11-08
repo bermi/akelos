@@ -1,7 +1,6 @@
 <?php
-require_once(AK_LIB_DIR.DS.'AkUnitTest.php');
 
-if (!defined('AK_UNIT_TEST_SUITE')) { define('AK_UNIT_TEST_SUITE',true);
+defined('AK_UNIT_TEST_SUITE') || define('AK_UNIT_TEST_SUITE',true);
 
 class AkUnitTestSuite extends GroupTest
 {
@@ -12,9 +11,9 @@ class AkUnitTestSuite extends GroupTest
     function AkUnitTestSuite()
     {
         $this->_init();
-        
+
     }
-    
+
     function log($message) {
         if (AK_LOG_EVENTS){
             $this->logger->log('unit-test',$message);
@@ -62,23 +61,24 @@ class AkUnitTestSuite extends GroupTest
 
         }
     }
-    
-function run(&$reporter) {
-            $reporter->paintGroupStart($this->getLabel(), $this->getSize());
-            for ($i = 0, $count = count($this->_test_cases); $i < $count; $i++) {
-                if (is_string($this->_test_cases[$i])) {
-                    $class = $this->_test_cases[$i];
-                    $test = &new $class();
-                    //$this->log('Running test-class:'.$class);
-                    $test->run($reporter);
-                } else {
-                    //$this->log('Running test-class:'.$this->_test_cases[$i]->_label);
-                    $this->_test_cases[$i]->run($reporter);
-                }
+
+    function run(&$reporter) 
+    {
+        $reporter->paintGroupStart($this->getLabel(), $this->getSize());
+        for ($i = 0, $count = count($this->_test_cases); $i < $count; $i++) {
+            if (is_string($this->_test_cases[$i])) {
+                $class = $this->_test_cases[$i];
+                $test = &new $class();
+                //$this->log('Running test-class:'.$class);
+                $test->run($reporter);
+            } else {
+                //$this->log('Running test-class:'.$this->_test_cases[$i]->_label);
+                $this->_test_cases[$i]->run($reporter);
             }
-            $reporter->paintGroupEnd($this->getLabel());
-            return $reporter->getStatus();
         }
+        $reporter->paintGroupEnd($this->getLabel());
+        return $reporter->getStatus();
+    }
 }
 
 }
