@@ -636,7 +636,7 @@ class XML_Parser extends PEAR
  *
  * There are three advantages over using the standard PEAR_Error:
  * - All messages will be prefixed
- * - check for XML_Parser error, using is_a( $error, 'XML_Parser_Error' )
+ * - check for XML_Parser error, using ( $error instanceof XML_Parser_Error )
  * - messages can be generated from the xml_parser resource
  *
  * @package XML_Parser

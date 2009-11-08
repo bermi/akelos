@@ -653,7 +653,7 @@ class PEAR_ErrorStack {
         } else {
             $logger = &$GLOBALS['_PEAR_ERRORSTACK_DEFAULT_LOGGER'];
         }
-        if (is_a($logger, 'Log')) {
+        if ($logger instanceof Log) {
             $levels = array(
                 'exception' => PEAR_LOG_CRIT,
                 'alert' => PEAR_LOG_ALERT,

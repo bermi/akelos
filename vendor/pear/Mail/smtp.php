@@ -230,7 +230,7 @@ class Mail_smtp extends Mail {
         $this->_sanitizeHeaders($headers);
 
         $headerElements = $this->prepareHeaders($headers);
-        if (is_a($headerElements, 'PEAR_Error')) {
+        if ($headerElements instanceof PEAR_Error) {
             $this->_smtp->rset();
             return $headerElements;
         }
@@ -262,14 +262,14 @@ class Mail_smtp extends Mail {
         }
 
         $recipients = $this->parseRecipients($recipients);
-        if (is_a($recipients, 'PEAR_Error')) {
+        if ($recipients instanceof PEAR_Error) {
             $this->_smtp->rset();
             return $recipients;
         }
 
         foreach ($recipients as $recipient) {
             $res = $this->_smtp->rcptTo($recipient);
-            if (is_a($res, 'PEAR_Error')) {
+            if ($res instanceof PEAR_Error) {
                 $error = $this->_error("Failed to add recipient: $recipient", $res);
                 $this->_smtp->rset();
                 return PEAR::raiseError($error, PEAR_MAIL_SMTP_ERROR_RECIPIENT);
@@ -278,7 +278,7 @@ class Mail_smtp extends Mail {
 
         /* Send the message's headers and the body as SMTP data. */
         $res = $this->_smtp->data($textHeaders . "\r\n\r\n" . $body);
-        if (is_a($res, 'PEAR_Error')) {
+        if ($res instanceof PEAR_Error) {
             $error = $this->_error('Failed to send data', $res);
             $this->_smtp->rset();
             return PEAR::raiseError($error, PEAR_MAIL_SMTP_ERROR_DATA);

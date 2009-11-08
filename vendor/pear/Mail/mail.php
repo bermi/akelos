@@ -94,7 +94,7 @@ class Mail_mail extends Mail {
         }
 
         $result = $this->_sanitizeHeaders($headers);
-        if (is_a($result, 'PEAR_Error')) {
+        if ($result instanceof PEAR_Error) {
             return $result;
         }
 
@@ -117,7 +117,7 @@ class Mail_mail extends Mail {
 
         // Flatten the headers out.
         $headerElements = $this->prepareHeaders($headers);
-        if (is_a($headerElements, 'PEAR_Error')) {
+        if ($headerElements instanceof PEAR_Error) {
             return $headerElements;
         }
         list(, $text_headers) = $headerElements;

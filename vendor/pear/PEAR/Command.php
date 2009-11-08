@@ -160,7 +160,7 @@ class PEAR_Command
     function &setFrontendClass($uiclass)
     {
         if (is_object($GLOBALS['_PEAR_Command_uiobject']) &&
-              is_a($GLOBALS['_PEAR_Command_uiobject'], $uiclass)) {
+              ($GLOBALS['_PEAR_Command_uiobject'] instanceof $uiclass)) {
             return $GLOBALS['_PEAR_Command_uiobject'];
         }
         if (!class_exists($uiclass)) {

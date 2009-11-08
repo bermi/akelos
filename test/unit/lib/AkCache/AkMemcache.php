@@ -56,7 +56,7 @@ class Test_AkMemcache extends  UnitTestCase
     }
     public function test_set_and_get_string()
     {
-        if (!is_a($this->memcache,'AkCache')) {
+        if (!($this->memcache instanceof AkCache)) {
             $this->fail('Caching is not enabled. Please enable caching for the unit test');
             return;
         }
@@ -69,7 +69,7 @@ class Test_AkMemcache extends  UnitTestCase
     
     public function test_set_and_get_integer()
     {
-        if (!is_a($this->memcache,'AkCache')) {
+        if (!($this->memcache instanceof AkCache)) {
             $this->fail('Caching is not enabled. Please enable caching for the unit test');
             return;
         }
@@ -81,7 +81,7 @@ class Test_AkMemcache extends  UnitTestCase
     }
     public function test_set_and_get_float()
     {
-        if (!is_a($this->memcache,'AkCache')) {
+        if (!($this->memcache instanceof AkCache)) {
             $this->fail('Caching is not enabled. Please enable caching for the unit test');
             return;
         }
@@ -93,7 +93,7 @@ class Test_AkMemcache extends  UnitTestCase
     }
     public function test_set_and_get_array()
     {
-        if (!is_a($this->memcache,'AkCache')) {
+        if (!($this->memcache instanceof AkCache)) {
             $this->fail('Caching is not enabled. Please enable caching for the unit test');
             return;
         }
@@ -106,7 +106,7 @@ class Test_AkMemcache extends  UnitTestCase
     
     public function test_set_and_get_object()
     {
-        if (!is_a($this->memcache,'AkCache')) {
+        if (!($this->memcache instanceof AkCache)) {
             $this->fail('Caching is not enabled. Please enable caching for the unit test');
             return;
         }
@@ -121,7 +121,7 @@ class Test_AkMemcache extends  UnitTestCase
     
     public function test_set_and_get_objects_within_arrays()
     {
-        if (!is_a($this->memcache,'AkCache')) {
+        if (!($this->memcache instanceof AkCache)) {
             $this->fail('Caching is not enabled. Please enable caching for the unit test');
             return;
         }
@@ -140,7 +140,7 @@ class Test_AkMemcache extends  UnitTestCase
     
     public function test_set_and_get_large_strings()
     {
-        if (!is_a($this->memcache,'AkCache')) {
+        if (!($this->memcache instanceof AkCache)) {
             $this->fail('Caching is not enabled. Please enable caching for the unit test');
             return;
         }
@@ -153,7 +153,7 @@ class Test_AkMemcache extends  UnitTestCase
     
     public function test_set_and_get_binary_data()
     {
-        if (!is_a($this->memcache,'AkCache')) {
+        if (!($this->memcache instanceof AkCache)) {
             $this->fail('Caching is not enabled. Please enable caching for the unit test');
             return;
         }
@@ -166,7 +166,7 @@ class Test_AkMemcache extends  UnitTestCase
     
     public function test_set_and_get_really_large_string()
     {
-        if (!is_a($this->memcache,'AkCache')) {
+        if (!($this->memcache instanceof AkCache)) {
             $this->fail('Caching is not enabled. Please enable caching for the unit test');
             return;
         }
@@ -178,7 +178,7 @@ class Test_AkMemcache extends  UnitTestCase
     }
     public function test_set_and_get_really_really_large_string()
     {
-        if (!is_a($this->memcache,'AkCache')) {
+        if (!($this->memcache instanceof AkCache)) {
             $this->fail('Caching is not enabled. Please enable caching for the unit test');
             return;
         }
@@ -191,7 +191,7 @@ class Test_AkMemcache extends  UnitTestCase
     
     public function test_set_and_remove_key()
     {
-        if (!is_a($this->memcache,'AkCache')) {
+        if (!($this->memcache instanceof AkCache)) {
             $this->fail('Caching is not enabled. Please enable caching for the unit test');
             return;
         }
@@ -207,7 +207,7 @@ class Test_AkMemcache extends  UnitTestCase
     
     public function test_flush_group()
     {
-        if (!is_a($this->memcache,'AkCache')) {
+        if (!($this->memcache instanceof AkCache)) {
             $this->fail('Caching is not enabled. Please enable caching for the unit test');
             return;
         }

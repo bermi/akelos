@@ -27,7 +27,7 @@ class test_AkHasMany_Specs_TestCase extends AkUnitTest
         $Picture =& $Property->picture->create(array('title'=>'Front'));
         $this->assertTrue($Property->save());
 
-        $this->assertTrue(is_a($Picture, 'AkActiveRecord'));
+        $this->assertTrue($Picture instanceof AkActiveRecord);
 
         $Property->picture->delete($Picture);
 

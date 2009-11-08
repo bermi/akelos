@@ -149,6 +149,8 @@ class AkHttpClient extends AkObject
     public function sendRequest($return_body = true)
     {
         $this->Response = $this->HttpRequest->sendRequest();
+
+        echo AkConfig::getErrorReportingLevelDescription()."\n";
         $this->code = $this->HttpRequest->getResponseCode();
         $this->persistCookies();
         if (PEAR::isError($this->Response)) {

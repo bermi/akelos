@@ -49,7 +49,7 @@ class CacheHelperTests extends HelpersUnitTester
         }
         $unitTests = array('_test_cache_with_string_key','_test_cache_with_string_key_cached');
         
-        if(is_a($this->controller->_CacheHandler,'AkCacheHandler')) {
+        if($this->controller->_CacheHandler instanceof AkCacheHandler) {
         foreach ($cacheHandlers as $class=>$type) {
             $this->controller->_CacheHandler->_setCacheStore($type);
             $this->_test_init();

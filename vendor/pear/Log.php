@@ -578,7 +578,7 @@ class Log
      */
     function attach(&$observer)
     {
-        if (!is_a($observer, 'Log_observer')) {
+        if (!($observer instanceof Log_observer)) {
             return false;
         }
 
@@ -600,7 +600,7 @@ class Log
      */
     function detach($observer)
     {
-        if (!is_a($observer, 'Log_observer') ||
+        if (!($observer instanceof Log_observer) ||
             !isset($this->_listeners[$observer->_id])) {
             return false;
         }

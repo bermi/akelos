@@ -168,7 +168,7 @@ class Log_composite extends Log
     function addChild(&$child)
     {
         /* Make sure this is a Log instance. */
-        if (!is_a($child, 'Log')) {
+        if (!($child instanceof Log)) {
             return false;
         }
 
@@ -188,7 +188,7 @@ class Log_composite extends Log
      */
     function removeChild($child)
     {
-        if (!is_a($child, 'Log') || !isset($this->_children[$child->_id])) {
+        if (!($child instanceof Log) || !isset($this->_children[$child->_id])) {
             return false;
         }
 

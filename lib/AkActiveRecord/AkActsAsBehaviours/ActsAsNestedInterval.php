@@ -860,7 +860,7 @@ class AkActsAsNestedInterval extends AkObserver
                 $parent_class_name = get_class($this->_ActiveRecordInstance);
                 foreach (array_keys($exclude) as $k){
                     $Item =& $exclude[$k];
-                    if(is_a($Item,$parent_class_name)){
+                    if($Item instanceof $parent_class_name){
                         $ItemToExclude =& $Item;
                     }else{
                         $ItemToExclude =& $this->_ActiveRecordInstance->find($Item);
@@ -934,7 +934,7 @@ class AkActsAsNestedInterval extends AkObserver
         if (is_numeric($target)){
             $target =& $this->_ActiveRecordInstance->find($target);
         }
-        if(!$target || !is_a($target, get_class($this->_ActiveRecordInstance))){
+        if(!$target){
             trigger_error(Ak::t('Invalid target'), E_USER_NOTICE);
             return false;
         }

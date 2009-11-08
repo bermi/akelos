@@ -35,7 +35,7 @@ class AkHttpClientTestCase extends  AkUnitTest
     public function  test_get_verb()
     {
         //$this->assertEqual($this->Client->get($this->url), 'Hello unit tester');
-        Ak::trace($this->url.'/verb');
+        echo AkConfig::getErrorReportingLevelDescription()."\n";
         $this->assertEqual($this->Client->get($this->url.'/verb'), 'get');
         //$this->assertEqual(Ak::url_get_contents($this->url.'/verb'), 'get');
     }
@@ -110,3 +110,4 @@ class AkHttpClientTestCase extends  AkUnitTest
     /**/
 }
 
+ak_test('AkHttpClientTestCase');

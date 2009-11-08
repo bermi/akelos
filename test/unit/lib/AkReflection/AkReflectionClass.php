@@ -32,7 +32,7 @@ class AkReflectionClass_TestCase extends  UnitTestCase
         $this->assertEqual('method2',$methods[1]->getName());
         $this->assertTrue($methods[1]->returnByReference());
         $docBlock = $methods[1]->getDocBlock();
-        $this->assertTrue(is_a($docBlock,'AkReflectionDocBlock'));
+        $this->assertTrue($docBlock instanceof  AkReflectionDocBlock);
         $this->assertEqual('comment',$docBlock->getComment());
         $params =$docBlock->getParams();
         $this->assertEqual(2,count($params));
@@ -68,7 +68,7 @@ class AkReflectionClass_TestCase extends  UnitTestCase
         $this->assertEqual('method2',$methods[1]->getName());
         $this->assertTrue($methods[1]->returnByReference());
         $docBlock = $methods[1]->getDocBlock();
-        $this->assertTrue(is_a($docBlock,'AkReflectionDocBlock'));
+        $this->assertTrue($docBlock instanceof AkReflectionDocBlock);
         $this->assertEqual('comment',$docBlock->getComment());
         $params =$docBlock->getParams();
         $this->assertEqual(2,count($params));

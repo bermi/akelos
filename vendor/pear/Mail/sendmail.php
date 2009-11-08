@@ -109,18 +109,18 @@ class Mail_sendmail extends Mail {
         }
 
         $result = $this->_sanitizeHeaders($headers);
-        if (is_a($result, 'PEAR_Error')) {
+        if ($result instanceof PEAR_Error) {
             return $result;
         }
 
         $recipients = $this->parseRecipients($recipients);
-        if (is_a($recipients, 'PEAR_Error')) {
+        if ($recipients instanceof PEAR_Error) {
             return $recipients;
         }
         $recipients = escapeShellCmd(implode(' ', $recipients));
 
         $headerElements = $this->prepareHeaders($headers);
-        if (is_a($headerElements, 'PEAR_Error')) {
+        if ($headerElements instanceof PEAR_Error) {
             return $headerElements;
         }
         list($from, $text_headers) = $headerElements;

@@ -47,11 +47,6 @@ require_once 'PEAR.php';
 require_once 'PHP/Compat.php';
 
 /**
- * is_a(), since PHP 4.2.0
- */
-@PHP_Compat::loadFunction('is_a');
-
-/**
  * image_type_to_mime_type, since PHP 4.3.0
  */
 @PHP_Compat::loadFunction('image_type_to_mime_type');
@@ -283,7 +278,7 @@ class Image_Tools
     function Image_Tools($options = array())
     {
         PEAR::setErrorHandling(PEAR_ERROR_TRIGGER);
-        if (is_a($this, 'Image_Tools') && !is_subclass_of($this, 'Image_Tools')) {
+        if ((__CLASS__ == 'Image_Tools') && !is_subclass_of($this, 'Image_Tools')) {
             PEAR::raiseError('Cannot instanciate Image_Tools directly',
                              IMAGE_TOOLS_BASE_ERR_INSTANCIATION_FORBIDEN);
         }
@@ -343,7 +338,7 @@ class Image_Tools
         }
 
         @$obj =& new $className($options);
-        if (!is_object($obj) || !is_a($obj, $className)) {
+        if (!is_object($obj) || !($obj instanceof $className)) {
             return PEAR::raiseError('Could not instanciate image tool '.$className,
                                     IMAGE_TOOLS_BASE_ERR_INSTANCIATION_FAILED);
         }
@@ -441,7 +436,7 @@ class Image_Tools
                 }
                 break;
             default:
-                if (is_a($value, $type)) {
+                if ($value instanceof $type) {
                     return true;
                 }
                 break;

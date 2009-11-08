@@ -1452,7 +1452,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         $model_name = isset($model_name) ? $model_name : $this->getModelName();
         $model_conditions = !empty($conditions[$model_name]) ? $conditions[$model_name] : $conditions;
-        if(is_a($this->$model_name)){
+        if($this->$model_name instanceof $model_name){
             $model_instance = $this->$model_name;
         }else{
             $model_instance = $this;
@@ -4700,7 +4700,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      */
     public function toJson($options = array())
     {
-        if (is_array($options) && isset($options[0]) && is_a($options[0], 'AkActiveRecord')) {
+        if (is_array($options) && isset($options[0]) && ($options[0] instanceof AkActiveRecord)) {
             $options = array('collection'=>$options);
         }
         if (isset($options['collection']) && is_array($options['collection']) && $options['collection'][0]->_modelName == $this->_modelName) {
@@ -4757,7 +4757,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     if (is_array($this->$key)) {
                         $data[$associationElement] = array();
                         foreach ($this->$key as $el) {
-                            if (is_a($el,'AkActiveRecord')) {
+                            if ($el instanceof AkActiveRecord) {
                                 $attributes = $el->getAttributes();
                                 foreach($attributes as $ak=>$av) {
                                     $type = $el->getColumnType($ak);
@@ -4771,7 +4771,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                         }
                     } else {
                         $el = $this->$key->load();
-                        if (is_a($el,'AkActiveRecord')) {
+                        if ($el instanceof AkActiveRecord) {
                             $attributes = $el->getAttributes();
                             foreach($attributes as $ak=>$av) {
                                 $type = $el->getColumnType($ak);
@@ -4931,7 +4931,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      */
     public function toXml($options = array())
     {
-        if (is_array($options) && isset($options[0]) && is_a($options[0], 'AkActiveRecord')) {
+        if (is_array($options) && isset($options[0]) && ($options[0] instanceof AkActiveRecord)) {
             $options = array('collection'=>$options);
         }
         if (isset($options['collection']) && is_array($options['collection']) && $options['collection'][0]->_modelName == $this->_modelName) {
@@ -5010,14 +5010,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                         $associationElement = $this->_convertColumnToXmlElement($associationElement);
                         $xml .= '<'.$associationElement.'>';
                         foreach ($this->$key as $el) {
-                            if (is_a($el,'AkActiveRecord')) {
+                            if ($el instanceof AkActiveRecord) {
                                 $xml .= $el->toXml(array('skip_instruct'=>true));
                             }
                         }
                         $xml .= '</' . $associationElement .'>';
                     } else {
                         $el = $this->$key->load();
-                        if (is_a($el,'AkActiveRecord')) {
+                        if ($el instanceof AkActiveRecord) {
                             $xml.=$el->toXml(array('skip_instruct'=>true));
                         }
                     }

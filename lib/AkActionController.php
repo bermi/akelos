@@ -2792,7 +2792,7 @@ class AkActionController extends AkObject
             if(is_array($login_procedure)){
                 if(!isset($login_procedure['handler'])){
                     return isset($login_procedure[$user_name]) && $login_procedure[$user_name] == $password;
-                }elseif(is_a($login_procedure['handler']) && method_exists($login_procedure['handler'], $login_procedure['method'])){
+                }elseif(is_object($login_procedure['handler']) && method_exists($login_procedure['handler'], $login_procedure['method'])){
                     return $login_procedure['handler']->$login_procedure['method']($user_name, $password, $this);
                 }
             }elseif(method_exists($login_procedure, 'authenticate')){

@@ -98,7 +98,7 @@ class Ak
                     include(AK_ROUTES_MAPPING_FILE);
                 }
             }
-        } else if (is_a($options,'akrouter') && $set_routes) {
+        } else if (($options instanceof AkRouter) && $set_routes) {
             $Map = $options;
             return;
         }

@@ -39,10 +39,10 @@ class IXR_Value {
             return 'double';
         }
         // Deal with IXR object types base64 and date
-        if (is_object($this->data) && is_a($this->data, 'IXR_Date')) {
+        if (is_object($this->data) && ($this->data instanceof IXR_Date)) {
             return 'date';
         }
-        if (is_object($this->data) && is_a($this->data, 'IXR_Base64')) {
+        if (is_object($this->data) && ($this->data instanceof IXR_Base64)) {
             return 'base64';
         }
         // If it is a normal PHP object convert it in to a struct
@@ -288,7 +288,7 @@ class IXR_Server {
         }
         $result = $this->call($this->message->methodName, $this->message->params);
         // Is the result an error?
-        if (is_a($result, 'IXR_Error')) {
+        if ($result instanceof IXR_Error) {
             $this->error($result);
         }
         // Encode the result
@@ -405,7 +405,7 @@ EOD;
             } else {
                 $result = $this->call($method, $params);
             }
-            if (is_a($result, 'IXR_Error')) {
+            if ($result instanceof IXR_Error) {
                 $return[] = array(
                     'faultCode' => $result->code,
                     'faultString' => $result->message
@@ -735,7 +735,7 @@ class IXR_IntrospectionServer extends IXR_Server {
                     break;
                 case 'date':
                 case 'dateTime.iso8601':
-                    if (!is_a($arg, 'IXR_Date')) {
+                    if (!($arg instanceof IXR_Date)) {
                         $ok = false;
                     }
                     break;

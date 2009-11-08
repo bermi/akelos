@@ -29,7 +29,7 @@ require_once(AK_LIB_DIR . DS . 'AkActiveRecord' . DS . 'AkObserver.php');
  *     var $observe = array("List", "Item");
  *
  *     function afterSave(&$record) {
- *         $list = is_a($record,"List") ? $record : $record->list;
+ *         $list = ($record instanceof List) ? $record : $record->list;
  *         $this->expirePage(array("controller" => "lists", "action" => "public", "id" => $list->id));
  *         $this->expireAction(array("controller" => "lists", "action" => "all"));
  *         foreach($list->shares as $share) {

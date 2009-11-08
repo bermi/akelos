@@ -93,7 +93,7 @@ class Mail
         }
 
         $result = $this->_sanitizeHeaders($headers);
-        if (is_a($result, 'PEAR_Error')) {
+        if ($result instanceof PEAR_Error) {
             return $result;
         }
 
@@ -160,7 +160,7 @@ class Mail
                 include_once 'Mail/RFC822.php';
                 $parser = new Mail_RFC822();
                 $addresses = $parser->parseAddressList($value, 'localhost', false);
-                if (is_a($addresses, 'PEAR_Error')) {
+                if ($addresses instanceof PEAR_Error) {
                     return $addresses;
                 }
 
@@ -228,7 +228,7 @@ class Mail
         $addresses = Mail_RFC822::parseAddressList($recipients, 'localhost', false);
 
         // If parseAddressList() returned a PEAR_Error object, just return it.
-        if (is_a($addresses, 'PEAR_Error')) {
+        if ($addresses instanceof PEAR_Error) {
             return $addresses;
         }
 
