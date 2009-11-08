@@ -138,6 +138,16 @@ function ak_test($test_case_name, $use_sessions = false, $prevent_double_test_ru
     }
 }
 
+function ak_test_run_case_if_executed($test_case_name, $show_enviroment_flags = true)
+{
+    if (count(debug_backtrace()) == 1) {
+        if($show_enviroment_flags){
+            echo "(".AK_ENVIRONMENT." mode) Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n";
+        }
+        ak_test($test_case_name);
+    }
+}
+
 function ak_compat($function_name)
 {
     if(!function_exists($function_name)){

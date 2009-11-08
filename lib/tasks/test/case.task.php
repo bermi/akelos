@@ -16,10 +16,10 @@ if(empty($options)){
 
 $____skip_tests = array('Simple','Unit','Web','AkWeb');
 
-if(empty($options['hide_error_reporting'])){
-    echo "Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n";
+if(empty($options['hide_enviroment_flags'])){
+    echo "(".AK_ENVIRONMENT." mode) Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n";
 }else{
-    unset($options['hide_error_reporting']);
+    unset($options['hide_enviroment_flags']);
 }
 
 foreach ($options as $_test_file){

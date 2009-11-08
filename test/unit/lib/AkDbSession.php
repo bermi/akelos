@@ -67,3 +67,5 @@ class AkDbSession_TestCase extends  WebTestCase
     /**/
 }
 
+ak_test_run_case_if_executed('AkDbSession_TestCase');
+

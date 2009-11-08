@@ -149,12 +149,11 @@ class AkHttpClient extends AkObject
     public function sendRequest($return_body = true)
     {
         $this->Response = $this->HttpRequest->sendRequest();
-
-        echo AkConfig::getErrorReportingLevelDescription()."\n";
         $this->code = $this->HttpRequest->getResponseCode();
         $this->persistCookies();
         if (PEAR::isError($this->Response)) {
             $this->error = $this->Response->getMessage();
+            trigger_error($this->error, E_USER_NOTICE);
             return false;
         } else {
             return $return_body ? $this->HttpRequest->getResponseBody() : true;
@@ -166,7 +165,8 @@ class AkHttpClient extends AkObject
         if(isset($options['cookies'])){
             $url_details = parse_url($url);
             $jar = Ak::sanitize_include((empty($options['jar']) ? $this->_cookie_jar : $options['jar']), 'paranoid');
-            $this->setCookiePath(AK_TMP_DIR.DS.'cookies'.DS.$jar.DS.Ak::sanitize_include($url_details['host'],'paranoid'));
+
+            $this->setCookiePath('cookies'.DS.$jar.DS.Ak::sanitize_include($url_details['host'],'paranoid'));
             if($options['cookies'] === false){
                 $this->deletePersistedCookie();
                 return;
@@ -185,16 +185,16 @@ class AkHttpClient extends AkObject
 
     public function getPersistedCookie()
     {
-        if(file_exists($this->_cookie_path)){
-            return Ak::file_get_contents($this->_cookie_path);
+        if(file_exists(AK_TMP_DIR.DS.$this->_cookie_path)){
+            return Ak::file_get_contents($this->_cookie_path, array('base_path' => AK_TMP_DIR));
         }
         return false;
     }
 
     public function deletePersistedCookie()
     {
-        if(file_exists($this->_cookie_path)){
-            Ak::file_delete($this->_cookie_path);
+        if(file_exists(AK_TMP_DIR.DS.$this->_cookie_path)){
+            Ak::file_delete($this->_cookie_path, array('base_path' => AK_TMP_DIR));
             $this->_cookie_path = false;
             return;
         }
@@ -219,7 +219,7 @@ class AkHttpClient extends AkObject
                     }
                 }
                 $cookie_string = trim(join($cookies, '; '));
-                Ak::file_put_contents($this->_cookie_path, $cookie_string);
+                Ak::file_put_contents($this->_cookie_path, $cookie_string, array('base_path' => AK_TMP_DIR));
             }
         }
     }

@@ -404,18 +404,14 @@ class Ak
 
             return AkFtp::put_contents($file_name, $content);
         }else{
+
             if(!is_dir(dirname($options['base_path'].DS.$file_name))){
                 Ak::make_dir(dirname($options['base_path'].DS.$file_name), $options);
             }
 
             if(!$result = file_put_contents($options['base_path'].DS.$file_name, $content)){
                 if(!empty($content)){
-                    Ak::trace("Could not write to file: \"".$options['base_path'].DS."$file_name\". Please change file/dir permissions or enable FTP file handling by".
-                    " setting the following on your config/".AK_ENVIRONMENT.".php file \n<pre>define('AK_UPLOAD_FILES_USING_FTP', true);\n".
-                    "define('AK_READ_FILES_USING_FTP', false);\n".
-                    "define('AK_DELETE_FILES_USING_FTP', true);\n".
-                    "define('AK_FTP_PATH', 'ftp://username:password@example.com/path_to_the_framework');\n".
-                    "define('AK_FTP_AUTO_DISCONNECT', true);\n</pre>");
+                    trigger_error(Ak::t("Could not write to file: %file_name. Please change file/dir permissions or enable FTP file handling on your Akelos application.", array('%file_name' => '"'.$options['base_path'].DS.$file_name.'"')),  E_USER_ERROR);
                 }
             }
             return $result;
@@ -514,6 +510,7 @@ class Ak
         'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
         'base_path' => AK_BASE_DIR
         );
+
         $options = array_merge($default_options, $options);
 
         $path = trim(str_replace($options['base_path'], '',$path),DS);
@@ -525,12 +522,14 @@ class Ak
             $path = $options['base_path'].DS.$path;
             if (!file_exists($path)){
                 Ak::make_dir(dirname($path), $options);
-                return @mkdir($path);
+                return mkdir($path);
+            }else{
+                return true;
             }
         }
         return false;
     }
-    
+
     static function rmdir_tree($directory)
     {
         $files = glob($directory.'*', GLOB_MARK);
@@ -545,7 +544,7 @@ class Ak
             rmdir($directory);
         }
     }
-    
+
     /**
     * This static method will copy recursively all the files or directories from one
     * path within an Akelos application to another.
@@ -638,6 +637,7 @@ class Ak
         if(empty($method) || !in_array($method, array('get','post','put','delete'))){
             trigger_error(Ak::t('Invalid HTTP method %method', array('%method'=>$options['method'])), E_USER_ERROR);
         }
+        //print_r($options);
         return $Client->$method($url, $options);
     }
 

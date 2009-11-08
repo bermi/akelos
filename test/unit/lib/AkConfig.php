@@ -101,3 +101,4 @@ class AkConfig_TestCase extends  AkUnitTest
     }
 }
 
+ak_test_run_case_if_executed('AkConfig_TestCase');

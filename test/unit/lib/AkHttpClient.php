@@ -17,29 +17,28 @@ class AkHttpClientTestCase extends  AkUnitTest
         '# RewriteBase /test/fixtures/public',
         'RewriteBase '.str_replace(AK_PROTOCOL.AK_HOST, '', AK_TESTING_URL),
         $this->original_ht_access));
-        
+
         parent::__construct();
     }
-    
+
     function __destruct()
     {
         file_put_contents($this->ht_access_path, $this->original_ht_access);
     }
-    
+
     public function setup()
     {
         $this->url = AK_TESTING_URL.'/http_requests';
         $this->Client = new AkHttpClient();
     }
-    
+
     public function  test_get_verb()
     {
-        //$this->assertEqual($this->Client->get($this->url), 'Hello unit tester');
-        echo AkConfig::getErrorReportingLevelDescription()."\n";
+        $this->assertEqual($this->Client->get($this->url), 'Hello unit tester');
         $this->assertEqual($this->Client->get($this->url.'/verb'), 'get');
-        //$this->assertEqual(Ak::url_get_contents($this->url.'/verb'), 'get');
+        $this->assertEqual(Ak::url_get_contents($this->url.'/verb'), 'get');
     }
-/*
+
     public function  test_post_verb()
     {
         $this->assertEqual($this->Client->post($this->url.'/verb'), 'post');
@@ -107,7 +106,6 @@ class AkHttpClientTestCase extends  AkUnitTest
         $this->assertEqual(Ak::url_get_contents($this->url.'/persisting_cookies', array('cookies' => false)), 1);
         $this->assertEqual(Ak::url_get_contents($this->url.'/persisting_cookies', array('cookies' => true)), 1);
     }
-    /**/
 }
 
-ak_test('AkHttpClientTestCase');
+ak_test_run_case_if_executed('AkHttpClientTestCase');

@@ -55,7 +55,7 @@ require_once 'Net/Socket.php';
 /**
  * URL handling class
  */ 
-require_once 'Net/URL2.php';
+require_once 'Net/URL.php';
 
 /**#@+
 * Constants for HTTP request methods
@@ -124,7 +124,7 @@ class HTTP_Request
     * @access private
     */
     /**
-    * Instance of Net_URL2
+    * Instance of Net_URL
     * @var Net_URL
     */
     public $_url;
@@ -399,7 +399,7 @@ class HTTP_Request
     */
     public function setURL($url)
     {
-        $this->_url = new Net_URL2($url, $this->_useBrackets);
+        $this->_url = new Net_URL($url, $this->_useBrackets);
 
         if (!empty($this->_url->user) || !empty($this->_url->pass)) {
             $this->setBasicAuth($this->_url->user, $this->_url->pass);
@@ -675,7 +675,7 @@ class HTTP_Request
     */
     public function sendRequest($saveBody = true)
     {
-        if (!($this->_url instanceof Net_URL2)) {
+        if (!($this->_url instanceof Net_URL)) {
             return PEAR::raiseError('No URL given', HTTP_REQUEST_ERROR_URL);
         }
 
@@ -771,7 +771,7 @@ class HTTP_Request
 
             // Absolute URL
             if (preg_match('/^https?:\/\//i', $redirect)) {
-                $this->_url = new Net_URL2($redirect);
+                $this->_url = new Net_URL($redirect);
                 $this->addHeader('Host', $this->_generateHostHeader());
                 // Absolute path
             } elseif ($redirect{0} == '/') {
@@ -784,7 +784,7 @@ class HTTP_Request
                 } else {
                     $redirect = dirname($this->_url->path) . '/' . $redirect;
                 }
-                $redirect = Net_URL2::resolvePath($redirect);
+                $redirect = Net_URL::resolvePath($redirect);
                 $this->_url->path = $redirect;
 
                 // Filename, no path
