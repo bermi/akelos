@@ -3,6 +3,7 @@ Active Support:
     - AkCache
     - AkConfig
     - AkHttpClient
+    - AkImage
 Action Controller: 
     - AkDbSession
     #- 'AkActionController/*'

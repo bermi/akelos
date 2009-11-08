@@ -221,11 +221,11 @@ class Image_Transform
             return PEAR::raiseError('Image library not supported... aborting.',
                 IMAGE_TRANSFORM_ERROR_UNSUPPORTED);
         }
-        $obj =& new $classname;
+        $obj = new $classname;
 
         // Check startup error
-        if ($error =& $obj->isError()) {
-            $obj =& $error;
+        if ($error = $obj->isError()) {
+            $obj = $error;
         }
         return $obj;
     }
@@ -240,7 +240,7 @@ class Image_Transform
     function &isError($error = null)
     {
         if (!is_null($error)) {
-            $this->_error =& $error;
+            $this->_error = $error;
         }
         return $this->_error;
     }

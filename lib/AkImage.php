@@ -15,8 +15,8 @@
 
 defined('AK_IMAGE_DRIVER') ? null : define('AK_IMAGE_DRIVER', 'GD');
 
+
 require_once(AK_VENDOR_DIR.DS.'pear'.DS.'Image'.DS.'Transform.php');
-require_once(AK_LIB_DIR.DS.'AkImage'.DS.'AkImageFilter.php');
 
 /**
  * AkImage provides a simple interface for image manipulation within Akelos
@@ -103,7 +103,7 @@ class AkImage extends Image_Transform
 
     function AkImage($image_path = null, $tranform_using = AK_IMAGE_DRIVER)
     {
-        $this->Transform =& Image_Transform::factory($tranform_using);
+        $this->Transform = Image_Transform::factory($tranform_using);
 
         if(PEAR::isError($this->Transform)){
             trigger_error($this->Transform->getMessage(), E_USER_ERROR);
@@ -161,17 +161,17 @@ class AkImage extends Image_Transform
 
     function addFilter($filter_name, $options = array())
     {
-        if(AK_PHP5 && $this->isNativeFiler($filter_name)){
+        if($this->isNativeFiler($filter_name)){
             $this->addNativeFilter($filter_name, $options);
         }elseif($this->_filterExists($filter_name)){
             $class_name = $this->_getFilterClassName($filter_name);
-            $filter =& new $class_name();
+            $filter = new $class_name();
             if(method_exists($filter,'init')){
                 $filter->init();
             }
             $filter->setImage($this);
             $filter->setOptions($options);
-            $this->filters[] =& $filter;
+            $this->filters[] = $filter;
             return true;
         }
         return false;
@@ -283,7 +283,7 @@ class AkImage extends Image_Transform
             array_unshift($params, constant($filter->native_filter_constant));
             array_unshift($params, $this->Transform->imageHandle);
             $filter->params = array_diff($params, array(''));
-            $this->filters[] =& $filter;
+            $this->filters[] = $filter;
         }
     }
 

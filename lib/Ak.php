@@ -2157,7 +2157,7 @@ class Ak
     * 
     * For example PHP will return -5%7 = -5 when expected was 2
     */
-    public function modulo($a, $n)
+    static function modulo($a, $n)
     {
         $n = abs($n);
         return $n===0 ? null : $a-$n*floor($a/$n);
@@ -2172,7 +2172,7 @@ class Ak
      * 
      * @return Same as pcntl_fork (PID of the children to the parent, 0 to the children process and -1 if fails).
      */
-    public function pcntl_fork()
+    static function pcntl_fork()
     {
         $db = Ak::db();
         $can_connect = (isset($db->connection) && method_exists($db->connection, 'connect'));
@@ -2190,7 +2190,7 @@ class Ak
     /**
      * Getting the temporary directory
     */
-    function get_tmp_dir_name()
+    static function get_tmp_dir_name()
     {
         if(!defined('AK_TMP_DIR')){
             if(defined('AK_BASE_DIR') && is_writable(AK_BASE_DIR.DS.'tmp')){
@@ -2307,31 +2307,29 @@ function ak_autoload($name, $path = null)
     if(empty($paths)){
         $paths = array(
 
-        // ActiveSupport
-        'AkObject'      => AK_LIB_DIR.DS.'AkObject.php',
-        'AkInstaller'   => AK_LIB_DIR.DS.'AkInstaller.php',
-        'AkConfig'      => AK_LIB_DIR.DS.'AkConfig.php',
-        'AkUnitTest'      => AK_LIB_DIR.DS.'AkUnitTest.php',
-        'AkCache'      => AK_LIB_DIR.DS.'AkCache.php',
-        'AkMemcache'      => AK_LIB_DIR.DS.'AkCache'.DS.'AkMemcache.php',
-        'AkAdodbCache'      => AK_LIB_DIR.DS.'AkCache'.DS.'AkAdodbCache.php',
-        'AkDbSession'      => AK_LIB_DIR.DS.'AkDbSession.php',
-        'AkHttpClient'      => AK_LIB_DIR.DS.'AkHttpClient.php',
-        'AkImage'      => AK_LIB_DIR.DS.'AkImage.php',
-        'AkInflector'      => AK_LIB_DIR.DS.'AkInflector.php',
-        'AkRequestMimeType'      => AK_LIB_DIR.DS.'AkRequestMimeType.php',
-
-        // ActiveRecord
-        'AkBaseModel'      => AK_LIB_DIR.DS.'AkBaseModel.php',
-        'AkActiveRecord'      => AK_LIB_DIR.DS.'AkActiveRecord.php',
-        'AkAssociatedActiveRecord'      => AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php',
-        'AkActiveRecordMock'      => AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php',
-        'AkDbAdapter'      => AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbAdapter.php',
-        'AkDbSchemaCache'      => AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php',
-        'ActiveRecord'      => AK_APP_DIR.DS.'shared_model.php',
-
+        'ActiveRecord'              =>  AK_APP_DIR.DS.'shared_model.php',
+        'AkActiveRecord'            =>  AK_LIB_DIR.DS.'AkActiveRecord.php',
+        'AkActiveRecordMock'        =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php',
+        'AkAdodbCache'              =>  AK_LIB_DIR.DS.'AkCache'.DS.'AkAdodbCache.php',
+        'AkAssociatedActiveRecord'  =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php',
+        'AkBaseModel'               =>  AK_LIB_DIR.DS.'AkBaseModel.php',
+        'AkCache'                   =>  AK_LIB_DIR.DS.'AkCache.php',
+        'AkConfig'                  =>  AK_LIB_DIR.DS.'AkConfig.php',
+        'AkDbAdapter'               =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbAdapter.php',
+        'AkDbSchemaCache'           =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php',
+        'AkDbSession'               =>  AK_LIB_DIR.DS.'AkDbSession.php',
+        'AkHttpClient'              =>  AK_LIB_DIR.DS.'AkHttpClient.php',
+        'AkImage'                   =>  AK_LIB_DIR.DS.'AkImage.php',
+        'AkImageFilter'             =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageFilter.php',
+        'AkInflector'               =>  AK_LIB_DIR.DS.'AkInflector.php',
+        'AkInstaller'               =>  AK_LIB_DIR.DS.'AkInstaller.php',
+        'AkMemcache'                =>  AK_LIB_DIR.DS.'AkCache'.DS.'AkMemcache.php',
+        'AkObject'                  =>  AK_LIB_DIR.DS.'AkObject.php',
+        'AkRequestMimeType'         =>  AK_LIB_DIR.DS.'AkRequestMimeType.php',
+        'AkUnitTest'                =>  AK_LIB_DIR.DS.'AkUnitTest.php',
 
         );
+
 
     }elseif (!empty($path)){
         $paths[$name] = $path;
