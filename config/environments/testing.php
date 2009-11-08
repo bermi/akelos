@@ -3,8 +3,8 @@
 // Define constants that are used only on a testing environment
 // See file boot.php for more info
 
-@ini_set('display_errors', 1);
-@ini_set('memory_limit', -1);
-error_reporting(E_STRICT)
+ini_set('display_errors', 1);
+ini_set('memory_limit', -1);
+error_reporting(-1);
 
 ?>

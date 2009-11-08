@@ -62,7 +62,7 @@ $files = array_diff($files, array(''));
 
 include_once(AK_LIB_DIR.DS.'AkUnitTest.php');
 
-$TestSuite = new TestSuite('Unit tests for Akelos'.(empty($component_title)?'':' ('.$component_title.')'));
+$TestSuite = new TestSuite('Unit tests for Akelos ('.(empty($component_title)?'all components':$component_title).").\nError reporting set to: ".AkConfig::getErrorReportingLevelDescription());
 $Reporter = new TextReporter();
 
 foreach ($files as $file_path){

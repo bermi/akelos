@@ -65,16 +65,6 @@ $_SERVER['PHP_SELF'] .'?'.(isset($_SERVER['argv']) ? $_SERVER['argv'][0] : $_SER
 
 defined('AK_DEBUG') ? null : define('AK_DEBUG', AK_ENVIRONMENT == 'production' ? 0 : 1);
 
-if(!defined('AK_ERROR_REPORTING')){
-    if(AK_PHP6){
-        define('AK_ERROR_REPORTING', E_ALL ^ E_DEPRECATED ^ E_NOTICE ^ E_STRICT);
-    }elseif(AK_PHP53){
-        define('AK_ERROR_REPORTING', E_ALL ^ E_DEPRECATED ^ E_NOTICE);
-    }else{
-        define('AK_ERROR_REPORTING', E_ALL ^ E_NOTICE);
-    }
-}
-
 defined('AK_APP_DIR') ? null : define('AK_APP_DIR', AK_BASE_DIR.DS.'app');
 defined('AK_APIS_DIR') ? null : define('AK_APIS_DIR', AK_APP_DIR.DS.'apis');
 defined('AK_MODELS_DIR') ? null : define('AK_MODELS_DIR', AK_APP_DIR.DS.'models');
@@ -215,8 +205,6 @@ function ak_autoload($name, $path = null)
 spl_autoload_register('ak_autoload');
 
 
-AK_PHP5 || function_exists('clone') ? null : eval('function clone($object){return $object;}');
-
 defined('AK_TMP_DIR') ? null : define('AK_TMP_DIR', ak_get_tmp_dir_name());
 defined('AK_COMPILED_VIEWS_DIR') ? null : define('AK_COMPILED_VIEWS_DIR', AK_TMP_DIR.DS.'views');
 defined('AK_CACHE_DIR') ? null : define('AK_CACHE_DIR', AK_TMP_DIR.DS.'cache');
@@ -246,7 +234,6 @@ if(AK_ENVIRONMENT != 'setup'){
 }
 
 @ini_set("arg_separator.output","&");
-
 @ini_set("include_path",(AK_LIB_DIR.PATH_SEPARATOR.AK_MODELS_DIR.PATH_SEPARATOR.AK_CONTRIB_DIR.DS.'pear'.PATH_SEPARATOR.ini_get("include_path")));
 
 if(!AK_CLI && AK_WEB_REQUEST){
@@ -362,7 +349,7 @@ defined('AK_CHARSET') ? null : define('AK_CHARSET', 'UTF-8');
 defined('AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE') ? null : define('AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE', 'web_request');
 defined('AK_ACTION_CONTROLLER_DEFAULT_ACTION') ? null : define('AK_ACTION_CONTROLLER_DEFAULT_ACTION', 'index');
 
-defined('AK_ERROR_REPORTING_ON_SCRIPTS') ? null : define('AK_ERROR_REPORTING_ON_SCRIPTS', E_ALL);
+//defined('AK_ERROR_REPORTING_ON_SCRIPTS') ? null : define('AK_ERROR_REPORTING_ON_SCRIPTS', E_ALL);
 defined('AK_BEEP_ON_ERRORS_WHEN_TESTING') ? null : define('AK_BEEP_ON_ERRORS_WHEN_TESTING', false);
 
 defined('AK_FRAMEWORK_LANGUAGE') ? null : define('AK_FRAMEWORK_LANGUAGE', 'en');

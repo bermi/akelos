@@ -38,7 +38,7 @@ class AkHttpClientTestCase extends  AkUnitTest
         //$this->assertEqual($this->Client->get($this->url), 'Hello unit tester');
         Ak::trace($this->url.'/verb');
         $this->assertEqual($this->Client->get($this->url.'/verb'), 'get');
-        $this->assertEqual(Ak::url_get_contents($this->url.'/verb'), 'get');
+        //$this->assertEqual(Ak::url_get_contents($this->url.'/verb'), 'get');
     }
 /*
     public function  test_post_verb()

@@ -61,7 +61,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
                         $file[$bt[$i]["file"]] = explode("\n", file_get_contents($bt[$i]["file"]));
                     }
                 }
-                $result .= ("    function called: ".$bt[$i]["function"])."\n";
+                $result .= ("    public function called: ".$bt[$i]["function"])."\n";
                 if(isset($bt[$i]["line"])){
                     $result .= ("    line: ".$bt[$i]["line"]."\n");
                     $result .=  "    code: ".highlight_string((trim($file[$bt[$i]["file"]][$bt[$i]["line"]-1])),true);
@@ -245,12 +245,6 @@ width:30px;
 float:left;
 }
         </style></head><body>";
-        /*
-        <tr><td class='line-no'>1</td><td rowspan='".count($lines)."'><code>".
-        join("<br />", $lines)."</code></td></tr><tr><td>".
-        join("</td></tr><tr><td class='line-no'>", range(2,count($lines))).
-        "</td></tr></table></body></html>";
-        */
 
         $result .= "<div class='ak_line_numbers'><div>".join('</div><div>', range(1, count($lines)))."</div></div>";
         $result .= '<div class="ak_code_list" onclick="this.select()">';
@@ -317,8 +311,5 @@ float:left;
             Ak::trace($message, $details[1], $details[0], $details[2]);
         }
     }
-
-
 }
 
-?>

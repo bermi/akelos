@@ -223,6 +223,29 @@ CACHE;
         return true;
     }
 
+    static function getErrorReportingLevelDescription($error_reporting_level = null)
+    {
+        if(is_null($error_reporting_level)){
+            $error_reporting_level = error_reporting();
+        }
+        $_constants = get_defined_constants(true);
+        $internal_constants = !empty($_constants['internal']) ? $_constants['internal'] : (array)@$_constants['mhash'];
+        unset($_constants);
+        
+        $result = array();
+        if(($error_reporting_level & E_ALL) == E_ALL){
+            $result[] = 'E_ALL';
+            $error_reporting_level &=~ E_ALL;
+        }
+        foreach($internal_constants as $error_reporting_level_name => $constant){
+            if(preg_match('/^E_/', $error_reporting_level_name)){
+                if(($error_reporting_level & $constant) == $constant){
+                    $result[] = $error_reporting_level_name;
+                }
+            }
+        }
+        return join(' | ',$result);
+    }
 
     protected function _useReadCache($environment = AK_ENVIRONMENT)
     {
