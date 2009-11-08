@@ -17,3 +17,8 @@ makelos_task('test:case', array(
     'description' => 'Runs a single test case file'
 ));
 
+
+makelos_task('test:core', array(
+    'description' => 'Runs Akelos core test suite'
+));
+

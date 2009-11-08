@@ -1,11 +1,9 @@
 <?php
 
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
@@ -15,7 +13,7 @@
  * 
  * @package Plugins
  * @subpackage Manager
- * @author Bermi Ferrer <bermi a.t akelos c.om> 2007
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om> 2007
  * @copyright Copyright (c) 2002-2007, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
@@ -33,7 +31,7 @@ defined('AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE') ? null : define('AK_PLUGINS_REPO
  * 
  * @package Plugins
  * @subpackage Manager
- * @author Bermi Ferrer <bermi a.t akelos c.om> 2007
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om> 2007
  * @copyright Copyright (c) 2002-2007, Akelos Media, S.L. http://www.akelos.org
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */

@@ -1,18 +1,15 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002-2006, Akelos Media, S.L.  & Bermi Ferrer Martinez |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
 /**
  * @package ActiveRecord
  * @subpackage Base
- * @author Bermi Ferrer <bermi a.t akelos c.om>
- * @copyright Copyright (c) 2002-2006, Akelos Media, S.L. http://www.akelos.org
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
@@ -29,7 +26,7 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
  * 
  * See also <AkActiveRecord> and <AkActionMailer> as those are the ones you will usually inherit from
 *
-* @author Bermi Ferrer <bermi a.t akelos c.om>
+* @author Bermi Ferrer <bermi a.t bermilabs c.om>
 * @copyright Copyright (c) 2002-2005, Akelos Media, S.L. http://www.akelos.org
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
 */

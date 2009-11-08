@@ -32,11 +32,8 @@ foreach ($options as $_test_file){
         echo "\nCould not load $_test_file test file\n";
     }else{
         include $_test_file;
-
         foreach(get_declared_classes() as $____class){
-
             if(preg_match('/(.+)TestCase$/i', $____class, $match)){
-
                 if(!preg_match('/^('.join('|',$____skip_tests).')$/i',$match[1])){
                     $____skip_tests[] = $match[1];
                     ak_test($match[1].'TestCase', false, true, $reporter);

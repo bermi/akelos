@@ -2,7 +2,7 @@
 
 defined('AK_UNIT_TEST_SUITE') || define('AK_UNIT_TEST_SUITE',true);
 
-class AkUnitTestSuite extends GroupTest
+class AkUnitTestSuite extends TestSuite
 {
     var $baseDir = '';
     var $partial_tests = array();
@@ -62,7 +62,7 @@ class AkUnitTestSuite extends GroupTest
         }
     }
 
-    function run(&$reporter) 
+    function run(&$reporter)
     {
         $reporter->paintGroupStart($this->getLabel(), $this->getSize());
         for ($i = 0, $count = count($this->_test_cases); $i < $count; $i++) {
@@ -79,6 +79,4 @@ class AkUnitTestSuite extends GroupTest
         $reporter->paintGroupEnd($this->getLabel());
         return $reporter->getStatus();
     }
-}
-
 }

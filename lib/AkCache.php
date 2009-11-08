@@ -7,7 +7,7 @@
 /**
  * @package ActiveSupport
  * @subpackage Cache
- * @author Bermi Ferrer <bermi a.t akelos c.om>
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
 
