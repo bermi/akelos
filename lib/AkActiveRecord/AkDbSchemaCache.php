@@ -18,7 +18,7 @@
 
 class AkDbSchemaCache
 {
-    static public function shouldRefresh($set = null)
+    static function shouldRefresh($set = null)
     {
         static $refresh;
         if(!isset($refresh)){
@@ -28,21 +28,18 @@ class AkDbSchemaCache
         return $refresh;
     }
 
-    static public function getCacheFileName($environment = AK_ENVIRONMENT)
+    static function getCacheFileName($environment = AK_ENVIRONMENT)
     {
         return AkDbSchemaCache::getCacheDir().DS.$environment.'.serialized';
     }
 
-    static public function getCacheDir()
+    static function getCacheDir()
     {
-        $cache_dir = AK_CONFIG_DIR;
-        if (defined('AK_CONFIG_CACHE_TMP') && AK_CONFIG_CACHE_TMP) {
-            $cache_dir  = AK_TMP_DIR.DS.'ak_config';
-        }
+        $cache_dir  = AK_TMP_DIR.DS.'ak_config';
         return $cache_dir.DS.'cache'.DS.'activerecord';
     }
 
-    static public function clear($table, $environment = AK_ENVIRONMENT)
+    static function clear($table, $environment = AK_ENVIRONMENT)
     {
         AkDbSchemaCache::config($table, null, $environment, true);
         AkDbSchemaCache::config('database_table_internals_'.$table, null, $environment, true);
@@ -53,27 +50,27 @@ class AkDbSchemaCache
         }
     }
 
-    static public function clearAll()
+    static function clearAll()
     {
         if(AK_LOG_EVENTS){
             $Logger = Ak::getLogger();
             $Logger->message('Clearing all database settings from cache');
         }
-        Ak::directory_delete(AkDbSchemaCache::getCacheDir());
+        Ak::rmdir_tree(AkDbSchemaCache::getCacheDir());
     }
 
-    static public function get($key, $environment = AK_ENVIRONMENT)
+    static function get($key, $environment = AK_ENVIRONMENT)
     {
         return AkDbSchemaCache::config($key, null, $environment, false);
     }
 
-    static public function set($key, $value, $environment = AK_ENVIRONMENT)
+    static function set($key, $value, $environment = AK_ENVIRONMENT)
     {
         AkDbSchemaCache::updateCacheFileAfterExecution($environment);
         return AkDbSchemaCache::config($key, $value, $environment, !is_null($value));
     }
 
-    static public function updateCacheFileAfterExecution($environment = null)
+    static function updateCacheFileAfterExecution($environment = null)
     {
         static $called = false, $_environment;
         if($called == false && !AkDbSchemaCache::shouldRefresh()){
@@ -90,7 +87,7 @@ class AkDbSchemaCache
             *       var_export VS serialize using APC once we fix the __set_state magic on phpAdoDB
             */
             if(AK_LOG_EVENTS){
-                    $Logger = Ak::getLogger();
+                $Logger = Ak::getLogger();
             }
             if(!AK_CLI) {
                 if(AK_LOG_EVENTS){
@@ -103,7 +100,7 @@ class AkDbSchemaCache
         }
     }
 
-    static public function config($key = null, $value = null, $environment = AK_ENVIRONMENT, $unset = false)
+    static function config($key = null, $value = null, $environment = AK_ENVIRONMENT, $unset = false)
     {
         if(AkDbSchemaCache::shouldRefresh()){
             return false;

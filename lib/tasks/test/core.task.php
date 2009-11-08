@@ -60,9 +60,6 @@ $files = array_unique($files);
 $files = array_reverse($files);
 $files = array_diff($files, array(''));
 
-print_r($files);
-
-die();
 include_once(AK_LIB_DIR.DS.'AkUnitTest.php');
 
 $TestSuite = new TestSuite('Unit tests for Akelos'.(empty($component_title)?'':' ('.$component_title.')'));

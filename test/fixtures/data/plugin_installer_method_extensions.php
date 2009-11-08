@@ -21,7 +21,7 @@ class PluginInstallerMethodExtensions
         
     }
     
-    public static function _extension4()
+    static function _extension4()
     {
         
     }

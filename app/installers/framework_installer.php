@@ -2,7 +2,7 @@
 
 class FrameworkInstaller extends AkInstaller
 {
-    function up_1()
+    public function up_1()
     {
         $this->createTable('cache', '
         id string(65) not null primary key unique,
@@ -10,7 +10,7 @@ class FrameworkInstaller extends AkInstaller
         cache_data binary,
         expire datetime'
         , array('timestamp'=>false));
-                
+
         $this->createTable('sessions', '
         id string(32) not null primary key,
         expire datetime,
@@ -18,11 +18,10 @@ class FrameworkInstaller extends AkInstaller
         , array('timestamp'=>false));
     }
 
-    function down_1()
+    public function down_1()
     {
         $this->dropTable('cache');
         $this->dropTable('sessions');
     }
 }
 
-?>

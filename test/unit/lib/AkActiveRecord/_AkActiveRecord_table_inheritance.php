@@ -14,7 +14,6 @@ class test_AkActiveRecord_table_inheritance extends  AkUnitTest
 {
     public function test_start()
     {
-        //$this->resetFrameworkDatabaseTables();
         $this->installAndIncludeModels(array('Event', 'Concert','OpenHouseMeeting'));
     }
 

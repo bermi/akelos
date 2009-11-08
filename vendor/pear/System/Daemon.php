@@ -380,7 +380,7 @@ class System_Daemon
      *
      * @return void
      */
-    static public function autoload($className)
+    static function autoload($className)
     {
         $parent     = 'System_';
         $parent_len = strlen($parent);
@@ -413,7 +413,7 @@ class System_Daemon
      * @see _optionsInit()
      * @see _summon()
      */
-    static public function start()
+    static function start()
     {
         // Conditionally add loglevel mappings that are not supported in all PHP versions.
         // They will be in string representation and have to be converted & unset
@@ -516,7 +516,7 @@ class System_Daemon
      * @see start()
      * @see stop()
      */
-    static public function iterate($sleepSeconds = 0)
+    static function iterate($sleepSeconds = 0)
     {
         self::_optionObjSetup();
         if ($sleepSeconds !== 0) {
@@ -533,7 +533,7 @@ class System_Daemon
      * @return void
      * @see start()
      */
-    static public function stop()
+    static function stop()
     {
         self::log(self::LOG_INFO, "stopping ".
             self::getOption("appName")." daemon", 
@@ -547,7 +547,7 @@ class System_Daemon
      * @return void
      * @see _die()
      */
-    static public function restart()
+    static function restart()
     {
         self::log(self::LOG_INFO, "restarting ".
             self::getOption("appName")." daemon",
@@ -564,7 +564,7 @@ class System_Daemon
      * @return boolean
      * @see $_sigHandlers
      */
-    static public function setSigHandler($signal, $handler)
+    static function setSigHandler($signal, $handler)
     {
         if (!isset(self::$_sigHandlers[$signal])) {
             // The signal should be defined already
@@ -588,7 +588,7 @@ class System_Daemon
      *
      * @return boolean
      */
-    static public function setOption($name, $value)
+    static function setOption($name, $value)
     {
         if (!self::_optionObjSetup()) {
             return false;
@@ -605,7 +605,7 @@ class System_Daemon
      *
      * @return boolean
      */
-    static public function setOptions($use_options)
+    static function setOptions($use_options)
     {
         if (!self::_optionObjSetup()) {
             return false;
@@ -622,7 +622,7 @@ class System_Daemon
      *
      * @return mixed
      */
-    static public function getOption($name)
+    static function getOption($name)
     {
         if (!self::_optionObjSetup()) {
             return false;
@@ -636,7 +636,7 @@ class System_Daemon
      * 
      * @return array
      */
-    static public function getOptions()
+    static function getOptions()
     {
         if (!self::_optionObjSetup()) {
             return false;
@@ -655,7 +655,7 @@ class System_Daemon
      *
      * @return boolean
      */
-    static public function phpErrors($errno, $errstr, $errfile, $errline)
+    static function phpErrors($errno, $errstr, $errfile, $errline)
     {
         // Ignore suppressed errors
         if (error_reporting() == 0) {
@@ -701,7 +701,7 @@ class System_Daemon
      * @see _logLevels
      * @see logLocation
      */
-    static public function log($level, $str, $file = false, $class = false, 
+    static function log($level, $str, $file = false, $class = false, 
         $function = false, $line = false)
     {
         // If verbosity level is not matched, don't do anything        
@@ -810,7 +810,7 @@ class System_Daemon
      * 
      * @return boolean
      */
-    static public function writeAutoRun($overwrite=false)
+    static function writeAutoRun($overwrite=false)
     {
         // Init Options (needed for properties of init.d script)
         if (self::_optionsInit(false) === false) {
@@ -856,7 +856,7 @@ class System_Daemon
      * @see setSigHandler()
      * @see $_sigHandlers
      */
-    static public function defaultSigHandler( $signo )
+    static function defaultSigHandler( $signo )
     {
         // Must be public or else will throw a 
         // fatal error: Call to protected method
@@ -899,7 +899,7 @@ class System_Daemon
      * 
      * @return boolean
      */
-    static public function isInBackground()
+    static function isInBackground()
     {
         return self::$_processIsChild;
     }//end isInBackground()
@@ -910,7 +910,7 @@ class System_Daemon
      * 
      * @return boolean
      */
-    static public function isDying()
+    static function isDying()
     {
         return self::$_isDying;
     }//end isDying() 
@@ -926,7 +926,7 @@ class System_Daemon
      *
      * @return boolean
      */
-    static public function fileExistsInPath($file)
+    static function fileExistsInPath($file)
     {
         // Using explode on the include_path is three times faster than using fopen
 
@@ -963,7 +963,7 @@ class System_Daemon
      *
      * @return boolean
      */
-    static public function isRunning() 
+    static function isRunning() 
     {
         if (!file_exists(self::getOption("appPidLocation"))) {
             return false;

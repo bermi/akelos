@@ -82,7 +82,7 @@ class AkLocaleManager extends AkObject
         return $locales;
     }
 
-    static public function getBrowserLanguages()
+    static function getBrowserLanguages()
     {
         $browser_accepted_languages = str_replace('-','_', strtolower(preg_replace('/q=[0-9\.]+,*/','',@$_SERVER['HTTP_ACCEPT_LANGUAGE'])));
         $browser_languages = (array_diff(split(';|,',$browser_accepted_languages.','), array('')));
@@ -124,7 +124,7 @@ class AkLocaleManager extends AkObject
     }
 
 
-    static public function getUsedLanguageEntries($lang_entry = null, $controller = null)
+    static function getUsedLanguageEntries($lang_entry = null, $controller = null)
     {
         static $_locale_entries = array();
 
@@ -149,7 +149,7 @@ class AkLocaleManager extends AkObject
     /**
      * @todo Refactor this method
      */
-    static public function updateLocaleFiles()
+    static function updateLocaleFiles()
     {
         if(defined('AK_LOCALE_MANAGER') && class_exists(AK_LOCALE_MANAGER) && in_array('AkLocaleManager',class_parents(AK_LOCALE_MANAGER))) {
             return;
@@ -238,7 +238,7 @@ class AkLocaleManager extends AkObject
      */
 
 
-    static public function initApplicationInternationalization(&$Request)
+    static function initApplicationInternationalization(&$Request)
     {
         if(!defined('AK_APP_LOCALES')){
             define('AK_APP_LOCALES',join(',',array_keys($this->available_locales)));
@@ -260,7 +260,7 @@ class AkLocaleManager extends AkObject
      *
      * @return array
      */
-    static public function getPublicLocales()
+    static function getPublicLocales()
     {
         static $public_locales;
         if(empty($public_locales)){
@@ -271,7 +271,7 @@ class AkLocaleManager extends AkObject
         return $public_locales;
     }
 
-    static public function getCoreDictionary($language,$set=false,$set_data=null)
+    static function getCoreDictionary($language,$set=false,$set_data=null)
     {
         static $dictionaries=array();
         $path = AK_CONFIG_DIR.DS.'locales'.DS.basename($language).'.php';
@@ -293,7 +293,7 @@ class AkLocaleManager extends AkObject
         return $dictionaries[$path];
     }
 
-    static public function getDictionary($language,$namespace=false,$set=false,$set_data=null)
+    static function getDictionary($language,$namespace=false,$set=false,$set_data=null)
     {
         static $dictionaries=array();
         $path = AK_APP_DIR.DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
@@ -313,7 +313,7 @@ class AkLocaleManager extends AkObject
         return $dictionaries[$path];
     }
     
-    static public function setCoreDictionary($locale, $dictionary, $language, $comment=null)
+    static function setCoreDictionary($locale, $dictionary, $language, $comment=null)
     {
 
         $path = AK_CONFIG_DIR.DS.'locales'.DS.basename($language).'.php';
@@ -321,7 +321,7 @@ class AkLocaleManager extends AkObject
         return Ak::file_put_contents($path,"<?php\n/** $comment */\n\n\$locale=".var_export((array)$locale,true).";\n\n\$dictionary=".var_export((array)$dictionary,true).";\n");
     }
     
-    static public function deleteDictionary($language, $namespace)
+    static function deleteDictionary($language, $namespace)
     {
         $path = AK_APP_DIR.DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
         AkLocaleManager::getDictionary($language,$namespace,true,array());
@@ -329,7 +329,7 @@ class AkLocaleManager extends AkObject
         return (file_exists($path)?@unlink($path):false);
     }
     
-    static public function deleteCoreDictionary($language)
+    static function deleteCoreDictionary($language)
     {
         $path = AK_CONFIG_DIR.DS.'locales'.DS.basename($language).'.php';
         AkLocaleManager::getCoreDictionary($language,true,array(array(),array()));
@@ -337,7 +337,7 @@ class AkLocaleManager extends AkObject
         return (file_exists($path)?@unlink($path):false);
     }
     
-    static public function setDictionary($dictionary,$language,$namespace=false,$comment=null)
+    static function setDictionary($dictionary,$language,$namespace=false,$comment=null)
     {
         $path = AK_APP_DIR.DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
         AkLocaleManager::getDictionary($language,$namespace,true,$dictionary);
@@ -372,7 +372,7 @@ class AkLocaleManager extends AkObject
     }
 
 
-    static public function getLangFromUrl(&$Request)
+    static function getLangFromUrl(&$Request)
     {
         $lang = false;
 
@@ -408,7 +408,7 @@ class AkLocaleManager extends AkObject
         return $lang;
     }
 
-    static public function rememberNavigationLanguage($lang)
+    static function rememberNavigationLanguage($lang)
     {
         if(isset($_SESSION) && !empty($lang)){
             $_SESSION['lang'] = $lang;

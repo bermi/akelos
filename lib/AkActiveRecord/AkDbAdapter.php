@@ -78,7 +78,7 @@ class AkDbAdapter extends AkObject
      * @param array $database_settings
      * @return AkDbAdapter
      */
-    static public function &getInstance($database_specifications = AK_DEFAULT_DATABASE_PROFILE, $auto_connect = true)
+    static function &getInstance($database_specifications = AK_DEFAULT_DATABASE_PROFILE, $auto_connect = true)
     {
         $settings_hash = is_string($database_specifications) ? $database_specifications : AkDbAdapter::hash($database_specifications);
         $static_var_name = 'AkDbAdapter_getInstance_'.$settings_hash;
@@ -138,7 +138,7 @@ class AkDbAdapter extends AkObject
      * @param array $settings
      * @return string
      */
-    static public function hash($settings)
+    static function hash($settings)
     {
         if(!is_array($settings)){
             return AK_ENVIRONMENT;
@@ -168,7 +168,7 @@ class AkDbAdapter extends AkObject
      * @param array $database_settings
      * @return string
      */
-    static public function constructDsn($database_settings)
+    static function constructDsn($database_settings)
     {
         if(is_string($database_settings)){
             return $database_settings;
@@ -183,7 +183,7 @@ class AkDbAdapter extends AkObject
 
     }
 
-    static public function getDbSettingsFromDsn($dsn)
+    static function getDbSettingsFromDsn($dsn)
     {
         $settings = $result = parse_url($dsn);
         $result['type'] = $settings['scheme'];

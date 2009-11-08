@@ -143,12 +143,12 @@ class PEAR_Exception extends Exception
      * @param string $label    The name of the observer. Use this if you want
      *                         to remove it later with removeObserver()
      */
-    public static function addObserver($callback, $label = 'default')
+    static function addObserver($callback, $label = 'default')
     {
         self::$_observers[$label] = $callback;
     }
 
-    public static function removeObserver($label = 'default')
+    static function removeObserver($label = 'default')
     {
         unset(self::$_observers[$label]);
     }
@@ -156,7 +156,7 @@ class PEAR_Exception extends Exception
     /**
      * @return int unique identifier for an observer
      */
-    public static function getUniqueId()
+    static function getUniqueId()
     {
         return self::$_uniqueid++;
     }

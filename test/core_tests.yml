@@ -5,5 +5,5 @@ Active Support:
 Action Controller: 
     - AkDbSession
     #- 'AkActionController/*'
-    - AkRequest
+    #- AkRequest
 

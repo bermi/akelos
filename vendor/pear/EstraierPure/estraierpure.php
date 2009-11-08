@@ -2174,7 +2174,7 @@ class EstraierPure_Utility
      * @access  public
      * @static
      */
-    public static function check_types()
+    static function check_types()
     {
         $i = 0;
         foreach (func_get_args() as $types) {
@@ -2213,7 +2213,7 @@ class EstraierPure_Utility
      * @uses    PEAR
      * @uses    HTTP_Request
      */
-    public static function shuttle_url($url, $pxhost = null, $pxport = null, $outsec = -1,
+    static function shuttle_url($url, $pxhost = null, $pxport = null, $outsec = -1,
                                        $reqheads = null, $reqbody = null, $res = null)
     {
         // HTTPS checking disabled.
@@ -2368,7 +2368,7 @@ class EstraierPure_Utility
      * @access  public
      * @static
      */
-    public static function cond_to_query(EstraierPure_Condition $cond,
+    static function cond_to_query(EstraierPure_Condition $cond,
                                          $depth, $wwidth, $hwidth, $awidth)
     {
         $_pre_arg_separator = ini_set('arg_separator.output', '&');
@@ -2407,7 +2407,7 @@ class EstraierPure_Utility
      * @access  public
      * @static
      */
-    public static function sanitize($str)
+    static function sanitize($str)
     {
         return trim(preg_replace('/[ \\t\\r\\n\\x0B\\f]+/', ' ', $str), ' ');
     }
@@ -2419,7 +2419,7 @@ class EstraierPure_Utility
      * @access  public
      * @static
      */
-    public static function errorstack() 
+    static function errorstack() 
     {
         return PEAR_ErrorStack::singleton('EstraierPure');
     }

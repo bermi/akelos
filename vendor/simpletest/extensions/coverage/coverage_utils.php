@@ -58,7 +58,7 @@ class CoverageUtils {
      * @param supportMutliValue - will store 2nd copy of value in an array with key "foo[]"
      * @return unknown
      */
-    static public function parseArguments($argv, $mutliValueMode = False) {
+    static function parseArguments($argv, $mutliValueMode = False) {
         $args = array();
         $args['extraArguments'] = array();
         array_shift($argv); // scriptname
@@ -106,7 +106,7 @@ class CoverageUtils {
      * @param unknown_type $default
      * @return first value unless value is not set then returns 2nd arg or null if no 2nd arg
      */
-    static public function issetOr(&$val, $default = null)
+    static function issetOr(&$val, $default = null)
     {
         return isset($val) ? $val : $default;
     }

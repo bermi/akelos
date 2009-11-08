@@ -40,7 +40,7 @@ class AkInflector
     // ---- Public methods ---- //
 
     // {{{ pluralize()
-    public static function loadConfig($dictionary)
+    static function loadConfig($dictionary)
     {
         static $_loaded = array();
         if (!($return=Ak::getStaticVar('AkInflectorConfig::'.$dictionary))) {
@@ -135,7 +135,7 @@ class AkInflector
     * @param    string    $word    English noun to pluralize
     * @return string Plural noun
     */
-    public static function pluralize($word, $new_plural = null, $dictionary = null)
+    static function pluralize($word, $new_plural = null, $dictionary = null)
     {
         return AkInflector::inflect($word,$new_plural,'pluralize',$dictionary);
     }
@@ -151,7 +151,7 @@ class AkInflector
     * @param    string    $word    English noun to singularize
     * @return string Singular noun.
     */
-    public static function singularize($word, $new_singular = null, $dictionary = null)
+    static function singularize($word, $new_singular = null, $dictionary = null)
     {
         return AkInflector::inflect($word,$new_singular,'singularize',$dictionary);
     }
@@ -166,7 +166,7 @@ class AkInflector
      * @param string $word
      * @return string Pluralized string when number of items is greater than 1
      */
-    public static function conditionalPlural($numer_of_records, $word)
+    static function conditionalPlural($numer_of_records, $word)
     {
         return $numer_of_records > 1 ? AkInflector::pluralize($word) : $word;
     }
@@ -192,7 +192,7 @@ class AkInflector
     * the words in the title.
     * @return string Text formatted as title
     */
-    public static function titleize($word, $uppercase = '')
+    static function titleize($word, $uppercase = '')
     {
         $uppercase = $uppercase == 'first' ? 'ucfirst' : 'ucwords';
         return $uppercase(AkInflector::humanize(AkInflector::underscore($word)));
@@ -214,7 +214,7 @@ class AkInflector
     * @param    string    $word    Word to convert to camel case
     * @return string UpperCamelCasedWord
     */
-    public static function camelize($word)
+    static function camelize($word)
     {
         static $_cached;
         if(!isset($_cached[$word])){
@@ -245,7 +245,7 @@ class AkInflector
     * @param    string    $word    Word to underscore
     * @return string Underscored word
     */
-    public static function underscore($word)
+    static function underscore($word)
     {
         static $_cached;
         if(!isset($_cached[$word])){
@@ -277,7 +277,7 @@ class AkInflector
     * instead of just the first one.
     * @return string Human-readable word
     */
-    public static function humanize($word, $uppercase = '')
+    static function humanize($word, $uppercase = '')
     {
         $uppercase = $uppercase == 'all' ? 'ucwords' : 'ucfirst';
         return $uppercase(str_replace('_',' ',preg_replace('/_id$/', '',$word)));
@@ -299,7 +299,7 @@ class AkInflector
     * @param    string    $word    Word to lowerCamelCase
     * @return string Returns a lowerCamelCasedWord
     */
-    public static function variablize($word)
+    static function variablize($word)
     {
         $word = AkInflector::camelize($word);
         return strtolower($word[0]).substr($word,1);
@@ -320,7 +320,7 @@ class AkInflector
     * @param    string    $class_name    Class name for getting related table_name.
     * @return string plural_table_name
     */
-    public static function tableize($class_name)
+    static function tableize($class_name)
     {
         return AkInflector::pluralize(AkInflector::underscore($class_name));
     }
@@ -340,7 +340,7 @@ class AkInflector
     * @param    string    $table_name    Table name for getting related ClassName.
     * @return string SingularClassName
     */
-    public static function classify($table_name)
+    static function classify($table_name)
     {
         return AkInflector::camelize(AkInflector::singularize($table_name));
     }
@@ -358,7 +358,7 @@ class AkInflector
     * @param    integer    $number    Number to get its ordinal value
     * @return string Ordinal representation of given string.
     */
-    public static function ordinalize($number)
+    static function ordinalize($number)
     {
         if (in_array(($number % 100),range(11,13))){
             return $number.'th';
@@ -388,7 +388,7 @@ class AkInflector
     *               AkInflector::demodulize('Admin_DashboardController');  //=> DashboardController
     *               AkInflector::demodulize('Admin::Dashboard');  //=> Dashboard
     */
-    public static function demodulize($module_name)
+    static function demodulize($module_name)
     {
         $module_name = str_replace('::', '/', $module_name);
         return (strstr($module_name, '/') ? preg_replace('/^.*\//', '', $module_name) : (strstr($module_name, '_') ? substr($module_name, 1+strrpos($module_name,'_')) : $module_name));
@@ -398,7 +398,7 @@ class AkInflector
      * Transforms a string to its unaccented version.
      * This might be useful for generating "friendly" URLs
      */
-    public static function unaccent($text)
+    static function unaccent($text)
     {
         $map = array(
         'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C',
@@ -413,13 +413,13 @@ class AkInflector
     }
 
 
-    public static function urlize($text)
+    static function urlize($text)
     {
         return trim(AkInflector::underscore(AkInflector::unaccent($text)),'_');
     }
 
 
-    public static function slugize($text)
+    static function slugize($text)
     {
         return str_replace('_','-', AkInflector::urlize($text));
     }
@@ -431,28 +431,28 @@ class AkInflector
     * @param string $class_name
     * @return string
     */
-    public static function foreignKey($class_name, $separate_class_name_and_id_with_underscore = true)
+    static function foreignKey($class_name, $separate_class_name_and_id_with_underscore = true)
     {
         return AkInflector::underscore(AkInflector::humanize(AkInflector::underscore($class_name))).($separate_class_name_and_id_with_underscore ? "_id" : "id");
     }
 
-    public static function toControllerFilename($name)
+    static function toControllerFilename($name)
     {
         $name = str_replace('::', '/', $name);
         return AK_CONTROLLERS_DIR.DS.join(DS, array_map(array('AkInflector','underscore'), strstr($name, '/') ? explode('/', $name) : array($name))).'_controller.php';
     }
 
-    public static function toModelFilename($name)
+    static function toModelFilename($name)
     {
         return AK_MODELS_DIR.DS.AkInflector::underscore($name).'.php';
     }
 
-    public static function toHelperFilename($name)
+    static function toHelperFilename($name)
     {
         return AK_APP_DIR.DS.'helpers'.DS.AkInflector::underscore($name).'_helper.php';
     }
 
-    public static function toFullName($name, $correct)
+    static function toFullName($name, $correct)
     {
         if (strstr($name, '_') && (strtolower($name) == $name)){
             return AkInflector::camelize($name);
@@ -469,12 +469,12 @@ class AkInflector
         }
     }
 
-    public static function is_singular($singular)
+    static function is_singular($singular)
     {
         return AkInflector::singularize(AkInflector::pluralize($singular)) == $singular;
     }
 
-    public static function is_plural($plural)
+    static function is_plural($plural)
     {
         return AkInflector::pluralize(AkInflector::singularize($plural)) == $plural;
     }

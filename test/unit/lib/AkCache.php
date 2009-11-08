@@ -15,7 +15,10 @@ class AkCache_TestCase extends  AkUnitTest
 
     public function test_install_db_tables()
     {
-        $this->resetFrameworkDatabaseTables();
+        require_once(dirname(__FILE__).'/../../fixtures/app/installers/framework_installer.php');
+        $installer = new FrameworkInstaller();
+        $installer->uninstall();
+        $installer->install();
     }
 
     public function test_all_caches()

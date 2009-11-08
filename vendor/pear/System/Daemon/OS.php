@@ -307,7 +307,7 @@ class System_Daemon_OS
      * 
      * @return boolean
      */
-    public static function isWritable($path)
+    static function isWritable($path)
     {
         if ($path{strlen($path)-1}=='/') {
             //// recursively return a temporary file path

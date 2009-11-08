@@ -19,21 +19,18 @@ require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'reporter.php');
 require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'web_tester.php');
 //require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'code_coverage.php');
 
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-require_once(AK_LIB_DIR.DS.'AkInstaller.php');
-require_once(AK_APP_DIR.DS.'shared_model.php');
 
 class AkUnitTest extends UnitTestCase
 {
     public $module = '';
     public $insert_models_data = false;
     public $instantiate_models = false;
-    
+
     public function AkUnitTest($label = false) {
         parent::__construct($label);
         $this->_configure();
     }
-    
+
     /**
      *    Gets a list of test names. Normally that will
      *    be all internal methods that start with the
@@ -54,13 +51,13 @@ class AkUnitTest extends UnitTestCase
         }
         return $methods;
     }
-    
+
     public function _configure()
     {
         $this->skip = !$this->_checkIfEnabled();
         $this->_loadFixtures();
     }
-    
+
     public function _checkIfEnabled($file = null)
     {
         if ($file == null) {
@@ -74,8 +71,8 @@ class AkUnitTest extends UnitTestCase
         }
         return true;
     }
-    
-    
+
+
     public function _loadFixtures($loadFixture = null)
     {
         if (isset($this->fixtures)) {
@@ -83,7 +80,7 @@ class AkUnitTest extends UnitTestCase
         } else {
             $this->fixtures = array();
         }
-        
+
         foreach ($this->fixtures as $fixture) {
             $file = AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.$fixture.'.yaml';
             if(!file_exists($file)){
@@ -102,7 +99,7 @@ class AkUnitTest extends UnitTestCase
             }
             $class_name = AkInflector::classify($fixture);
             if($this->instantiateModel($class_name)){
-                $contents = &Ak::getStaticVar('yaml_fixture_'.$file);
+                $contents = Ak::getStaticVar('yaml_fixture_'.$file);
                 if (!$contents) {
                     ob_start();
                     require_once($file);
@@ -111,30 +108,22 @@ class AkUnitTest extends UnitTestCase
                 }
                 $items = Ak::convert('yaml','array',$contents);
                 foreach ($items as $alias=>$item){
-                    $obj=&$this->{$class_name}->create($item);
+                    $obj=$this->{$class_name}->create($item);
                     if (isset($item['created_at'])) {
                         $obj->updateAttribute('created_at',$item['created_at']);
                     } else if (isset($item['created_on'])) {
                         $obj->updateAttribute('created_on',$item['created_on']);
                     }
                     if ($setAlias) {
-                        $array=&$this->$fixture;
-                        $array[$alias] = &$obj;
-                        $this->$fixture = &$array;
+                        $array=$this->$fixture;
+                        $array[$alias] = $obj;
+                        $this->$fixture = $array;
                     }
                 }
             }
         }
     }
-    
-    public function resetFrameworkDatabaseTables()
-    {
-        require_once(AK_APP_DIR.DS.'installers'.DS.'framework_installer.php');
-        $installer = new FrameworkInstaller();
-        $installer->uninstall();
-        $installer->install();
-        AkDbSchemaCache::clearAll();
-    }
+
 
     /**
      * Re-installs the table for a given Modelname and includes or even instantiates the Model.
@@ -179,7 +168,7 @@ class AkUnitTest extends UnitTestCase
         if (AK_LOG_EVENTS){
             static $logger;
             if(empty($logger)) {
-                $logger = &Ak::getLogger();
+                $logger = Ak::getLogger();
             }
             $logger->log('unit-test',$message);
         }
@@ -196,7 +185,7 @@ class AkUnitTest extends UnitTestCase
             $installer = new AkInstaller();
             $installer->dropTable($table_name,array('sequence'=>true));
             $installer->createTable($table_name,$table_definition,array('timestamp'=>false));
-            
+
         } else {
             $table_name = AkInflector::tableize($model);
         }
@@ -251,7 +240,7 @@ class AkUnitTest extends UnitTestCase
 
     public function populateTables()
     {
-        
+
         $args = func_get_args();
         $tables = !empty($args) ? (is_array($args[0]) ? $args[0] : (count($args) > 1 ? $args : Ak::toArray($args))) : array();
         foreach ($tables as $table){
@@ -261,7 +250,7 @@ class AkUnitTest extends UnitTestCase
             }
             $class_name = AkInflector::classify($table);
             if($this->instantiateModel($class_name)){
-                $contents = &Ak::getStaticVar('yaml_fixture_'.$file);
+                $contents = Ak::getStaticVar('yaml_fixture_'.$file);
                 if (!$contents) {
                     ob_start();
                     require_once($file);
@@ -270,8 +259,8 @@ class AkUnitTest extends UnitTestCase
                 }
                 $items = Ak::convert('yaml','array',$contents);
                 foreach ($items as $item){
-                    
-                    $obj=&$this->{$class_name}->create($item);
+
+                    $obj=$this->{$class_name}->create($item);
                     if (isset($item['created_at'])) {
                         $obj->updateAttribute('created_at',$item['created_at']);
                     } else if (isset($item['created_on'])) {
@@ -291,7 +280,7 @@ class AkUnitTest extends UnitTestCase
         }
         return !empty($this->$model_name) && is_object($this->$model_name) && strtolower(get_class($this->$model_name)) == strtolower($model_name);
     }
-    
+
     public function instantiateModels()
     {
         $args = func_get_args();
@@ -319,7 +308,7 @@ class AkUnitTest extends UnitTestCase
 * This tester will copy your application views from the app/views to test/fixtures/app/views 
 * unless you implicitly set AkMailerTest::avoid_copying_views to true.
 */
-class AkMailerTest extends AkUnitTest 
+class AkMailerTest extends AkUnitTest
 {
     public function __construct()
     {
@@ -343,4 +332,3 @@ class AkWebTestCase extends WebTestCase
     }
 }
 
-?>

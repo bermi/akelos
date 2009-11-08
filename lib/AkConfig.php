@@ -97,12 +97,12 @@ class AkConfig
 {
     const CONFIG_DIR = AK_CONFIG_DIR;
 
-    public static function getConstant($name)
+    static function getConstant($name)
     {
         return defined($name[1]) ? constant($name[1]) : '';
     }
 
-    public static function parseSettingsConstants($settingsStr)
+    static function parseSettingsConstants($settingsStr)
     {
         return preg_replace_callback('/\$\{(AK_.*?)\}/',array('AkConfig','getConstant'),$settingsStr);
     }
@@ -161,7 +161,7 @@ class AkConfig
         return isset($configs[$environment]) ? $configs[$environment] : (in_array($environments, $environments) ? $default : false);
     }
 
-    public static function generateCacheFileName($namespace, $environment = AK_ENVIRONMENT)
+    static function generateCacheFileName($namespace, $environment = AK_ENVIRONMENT)
     {
         $namespace = Ak::sanitize_include($namespace, 'high');
         $cacheDir  = AK_TMP_DIR.DS.'ak_config';
