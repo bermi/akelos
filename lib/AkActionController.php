@@ -2805,7 +2805,7 @@ class AkActionController extends AkObject
     function _getUserNameAndPassword()
     {
         $credentials = $this->_decodeCredentials();
-        return !is_array($credentials) ? split('/:/', $credentials , 2) : $credentials;
+        return !is_array($credentials) ? preg_split('/:/', $credentials , 2) : $credentials;
     }
 
     function _authorization()
@@ -2829,7 +2829,7 @@ class AkActionController extends AkObject
         if(is_array($authorization)){
             return $authorization;
         }
-        $credentials = (array)split(' ', $authorization);
+        $credentials = (array)explode(' ', $authorization);
         return base64_decode(array_pop($credentials));
     }
 

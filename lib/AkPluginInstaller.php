@@ -262,7 +262,7 @@ $methodString
                     $methodAlias = $method->getName();
                 } else {
                     $installAs = $method->getTag('ExtensionPoint');
-                    $parts=split('::',$installAs);
+                    $parts = explode('::',$installAs);
                     $class = $parts[0];
                     if (!isset($parts[1])) {
                         $methodAlias = $method->getName();

@@ -139,7 +139,7 @@ class XmlHelper extends AkObject
         }
         if (strstr($identifier,'->')) {
             while(strstr($identifier,'->')) {
-                list($getter,$identifier) = split('->',$identifier,2);
+                list($getter,$identifier) = explode('->', $identifier, 2);
                 $args = array();
                 if (preg_match('/^([\w_]+)\((.*?)\)$/',$getter,$matches)) {
                     $args = $matches[2];
@@ -208,7 +208,7 @@ class XmlHelper extends AkObject
         if(preg_match('/^xml_([\w_]+?)_(open|close)$/',$name,$matches)) {
             $tagName = str_replace('-',':',$matches[1]);
             $name_space = false;
-            $tagNames = split('__',$tagName);
+            $tagNames = explode('__', $tagName);
             if (count($tagNames)>1) {
                 $name_space = array_shift($tagNames);
                 $tagName = join('__',$tagNames);
@@ -232,7 +232,7 @@ class XmlHelper extends AkObject
         } else if (preg_match('/^xml_([\w]+)$/',$name,$matches)) {
             $tagName =$matches[1];
             $name_space = false;
-            $tagNames = split('__',$tagName);
+            $tagNames = explode('__', $tagName);
             if (count($tagNames)>1) {
                 $name_space = array_shift($tagNames);
                 $tagName = join('__',$tagNames);

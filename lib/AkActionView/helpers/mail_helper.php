@@ -29,7 +29,7 @@ class MailHelper
     function block_format($text)
     {
         $formatted = '';
-        $paragraphs = split("(\n|\r){2,}",$text);
+        $paragraphs = preg_split("/(\n|\r){2,}/", $text);
         foreach ((array)$paragraphs as $paragraph){
             $formatted .= TextHelper::format($paragraph, array('columns' => 72, 'first_indent' => 2, 'body_indent' => 2));
         }

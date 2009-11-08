@@ -49,7 +49,7 @@ class AkReflection
                     }
                     $indent='';
                     if(!empty($docBlock)) {
-                        $doclines = split("\n",$docBlock);
+                        $doclines = explode("\n", $docBlock);
                         $lastLine = $doclines[count($doclines)-1];
                         if (preg_match('/(\s*)?\*/',$lastLine,$matches)) {
                             
@@ -158,7 +158,7 @@ class AkReflection
             $docPart = trim($docPart);
             $commentLines = array();
             $tags = array('_unmatched_'=>array());
-            $docLines = split("\n",$docPart);
+            $docLines = explode("\n",$docPart);
             $inComment = true;
             $tempTag=array();
             foreach ($docLines as $line) {
@@ -247,7 +247,7 @@ class AkReflection
         $this->definitions[count($this->definitions)-1]['toString'] = $string;
         $this->definitions[count($this->definitions)-1]['default_options'] = $default_options;
         $this->definitions[count($this->definitions)-1]['available_options'] = $available_options;
-        $strlines = split("\n",$string);
+        $strlines = explode("\n",$string);
         foreach ($strlines as $idx=>$line) {
             $first = substr($line,0,strlen($indent));
             if ($first == $indent) {
@@ -255,7 +255,7 @@ class AkReflection
                 $strlines[$idx] = $line;
             }
         }
-        $doclines = split("\n",$docBlock);
+        $doclines = explode("\n", $docBlock);
         foreach ($doclines as $idx=>$line) {
             $first = substr($line,0,strlen($indent));
             if ($first == $indent) {

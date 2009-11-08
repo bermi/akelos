@@ -36,7 +36,7 @@ class AkTestApplication extends AkUnitTest
     {
         if (is_array($this->_cacheHeaders)) {
             foreach ($this->_cacheHeaders as $ch) {
-                $parts = split(': ', $ch);
+                $parts = explode(': ', $ch);
                 if ($parts[0] == $header) {
                     if ($content != null) {
                         $this->assertEqual($content, $parts[1],'1 Header content does not match: '.$parts[1].'!='.$content.':'.var_export($this->_cacheHeaders,true)."\n".var_export($this->Dispatcher->Request->_format,true));
@@ -190,7 +190,7 @@ class AkTestApplication extends AkUnitTest
         if (!$sentHeader) {
             if (is_array($this->_cacheHeaders)) {
                 foreach ($this->_cacheHeaders as $ch) {
-                    $parts = split(': ', $ch);
+                    $parts = explode(': ', $ch);
                     if ($parts[0] == $name) {
                         $return=@$parts[1];
                         return $return;

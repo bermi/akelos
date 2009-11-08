@@ -657,7 +657,7 @@ class AkActionMailer extends AkBaseModel
     {
 
         $file_name = basename($method_name);
-        $fparts=split('\.',$file_name);
+        $fparts = explode('.', $file_name);
         $extension=array_pop($fparts);
         array_shift($fparts);
         $content_type = join('.',$fparts);
@@ -693,7 +693,7 @@ class AkActionMailer extends AkBaseModel
              * choose the partial for this content-type
              */
             $partialExtension = $this->current_template_extension;
-            $partialParts=split('\.',basename($options['partial']));
+            $partialParts = explode('.', basename($options['partial']));
             $partialDir=dirname($options['partial']);
             $contentTypePartialFilename=join('.',$partialParts).'.'.
                                         str_replace('/','.',$this->current_content_type).'.'.

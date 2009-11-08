@@ -372,7 +372,7 @@ class AkRequest extends AkObject
             return $this->env['HTTP_CLIENT_IP'];
         }
         if(!empty($this->env['HTTP_X_FORWARDED_FOR'])){
-            foreach ((strstr($this->env['HTTP_X_FORWARDED_FOR'],',') ? split(',',$this->env['HTTP_X_FORWARDED_FOR']) : array($this->env['HTTP_X_FORWARDED_FOR'])) as $remote_ip){
+            foreach ((strstr($this->env['HTTP_X_FORWARDED_FOR'],',') ? explode(',',$this->env['HTTP_X_FORWARDED_FOR']) : array($this->env['HTTP_X_FORWARDED_FOR'])) as $remote_ip){
                 if($remote_ip == 'unknown' ||
                 preg_match('/^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/', $remote_ip) ||
                 preg_match('/^([0-9a-fA-F]{4}|0)(\:([0-9a-fA-F]{4}|0)){7}$/', $remote_ip)

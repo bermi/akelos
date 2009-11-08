@@ -205,7 +205,7 @@ class AssetTagHelper extends AkActionViewHelper
     function image_tag($source, $options = array())
     {
         if(!empty($options['size'])){
-            list($options['width'], $options['height']) = split('x|X| ',trim(str_replace(' ','',$options['size'])));
+            list($options['width'], $options['height']) = preg_split('/x|X| /',trim(str_replace(' ','',$options['size'])));
             unset($options['size']);
         }
         $options['src'] = $this->image_path($source);

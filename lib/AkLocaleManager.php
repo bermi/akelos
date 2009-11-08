@@ -85,7 +85,7 @@ class AkLocaleManager extends AkObject
     static function getBrowserLanguages()
     {
         $browser_accepted_languages = str_replace('-','_', strtolower(preg_replace('/q=[0-9\.]+,*/','',@$_SERVER['HTTP_ACCEPT_LANGUAGE'])));
-        $browser_languages = (array_diff(split(';|,',$browser_accepted_languages.','), array('')));
+        $browser_languages = (array_diff(preg_split('/;|,/',$browser_accepted_languages.','), array('')));
         if(empty($browser_languages)){
             return array($this->_getDefaultLocale());
         }

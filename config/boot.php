@@ -30,5 +30,6 @@ defined('AK_LIB_DIR') ? null : define('AK_LIB_DIR',AK_FRAMEWORK_DIR.DS.'lib');
  */
 defined('AK_SET_UTF8_ON_MYSQL_CONNECT') ? null : define('AK_SET_UTF8_ON_MYSQL_CONNECT', true);
 
+require_once(AK_LIB_DIR.DS.'Ak.php');
 require_once(AK_LIB_DIR.DS.'constants.php');
 

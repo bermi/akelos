@@ -145,7 +145,7 @@ class FormTagHelper  extends AkActionViewHelper
     function text_area_tag($name, $content = null, $options = array())
     {
         if(!empty($options['size'])){
-            list($options['cols'], $options['rows']) = split('x|X| ',trim(str_replace(' ','',$options['size'])));
+            list($options['cols'], $options['rows']) = preg_split('/x|X| /', trim(str_replace(' ','',$options['size'])));
             unset($options['size']);
         }
         return TagHelper::content_tag('textarea', $content, array_merge(array('name'=>$name,'id'=>$name),$options));

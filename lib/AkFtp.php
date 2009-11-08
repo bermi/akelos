@@ -158,7 +158,7 @@ class AkFtp
             if(!strstr($path,'/')){
                 $dir = array(trim($path,'.'));
             }else{
-                $dir = (array)@split('/', trim($path,'/.'));
+                $dir = (array)@explode('/', trim($path,'/.'));
             }
             $path = ftp_pwd($ftp_conn).'/';
             $ret = true;

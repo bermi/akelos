@@ -61,7 +61,7 @@ class AkReflectionDocBlock
             $docPart = trim($docPart);
             $commentLines = array();
             $tags = array('_unmatched_'=>array());
-            $docLines = split("\n",$docPart);
+            $docLines = explode("\n",$docPart);
             $inComment = true;
             $tempTag=array();
             foreach ($docLines as $line) {

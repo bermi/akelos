@@ -193,7 +193,7 @@ class Image_Tools
      * @var array
      * @access protected
      */
-    var $options = array();
+    public $options = array();
 
     /**
      * Has to contain all available options of a subclass. The index of
@@ -212,7 +212,7 @@ class Image_Tools
      * @var array
      * @access protected
      */
-    var $availableOptions = array();
+    public $availableOptions = array();
 
     /**
      * Has to contain all available methods (as the keys of the array)
@@ -232,7 +232,7 @@ class Image_Tools
      * @var array
      * @access protected
      */
-    var $availableMethods = array();
+    public $availableMethods = array();
 
     /**
      * Contains the version of the specific subclass. A version has to follow the PEAR
@@ -242,7 +242,7 @@ class Image_Tools
      * @var string
      * @access protected
      */
-    var $version = '';
+    public $version = '';
 
     /**
      * Contains the api-version of the baseclass. The API version has to follow the
@@ -251,7 +251,7 @@ class Image_Tools
      * @var string
      * @access protected
      */
-    var $apiVersion = '1.0';
+    public $apiVersion = '1.0';
 
     /**
      * Result rendered image.
@@ -259,7 +259,7 @@ class Image_Tools
      * @var resource
      * @access protected
      */
-    var $resultImage = null;
+    public $resultImage = null;
 
     // }}}
     // {{{ Constructor
@@ -275,7 +275,7 @@ class Image_Tools
      * @access  protected
      * @see     IMAGE_TOOLS_BASE_ERR_INSTANCIATION_FORBIDEN
      */
-    function Image_Tools($options = array())
+    public function __construct($options = array())
     {
         PEAR::setErrorHandling(PEAR_ERROR_TRIGGER);
         if ((__CLASS__ == 'Image_Tools') && !is_subclass_of($this, 'Image_Tools')) {
@@ -308,7 +308,7 @@ class Image_Tools
      *          IMAGE_TOOLS_BASE_ERR_WRONGOPTIONTYPE,
      *          IMAGE_TOOLS_BASE_ERR_OPTION_UNSUPPORTED
      */
-    function &factory($tool, $options = array())
+    static function &factory($tool, $options = array())
     {
         if (isset($this) && strtolower(get_class($this)) == 'image_tools') {
             return PEAR::raiseError('This method may only be called statically',
@@ -337,7 +337,7 @@ class Image_Tools
                                     IMAGE_TOOLS_BASE_ERR_CLASS_INVALID);
         }
 
-        @$obj =& new $className($options);
+        @$obj = new $className($options);
         if (!is_object($obj) || !($obj instanceof $className)) {
             return PEAR::raiseError('Could not instanciate image tool '.$className,
                                     IMAGE_TOOLS_BASE_ERR_INSTANCIATION_FAILED);
@@ -367,7 +367,7 @@ class Image_Tools
      * @see     IMAGE_TOOLS_BASE_ERR_WRONGOPTIONTYPE,
      *          IMAGE_TOOLS_BASE_ERR_OPTION_UNSUPPORTED
      */
-    function set($option, $value = null)
+    public function set($option, $value = null)
     {
         if (!isset($this)) {
             return PEAR::raiseError('This method may only be called non statically',
@@ -405,7 +405,7 @@ class Image_Tools
      * @see     IMAGE_TOOLS_BASE_ERR_WRONGOPTIONTYPE,
      *          IMAGE_TOOLS_BASE_ERR_OPTION_UNSUPPORTED
      */
-    function isValidOption($name, $value)
+    public function isValidOption($name, $value)
     {
         $res = $this->supportsOption($name);
         if (PEAR::isError($res)) {
@@ -464,7 +464,7 @@ class Image_Tools
      *          IMAGE_TOOLS_BASE_ERR_OPTION_NOTSET,
      *          IMAGE_TOOLS_BASE_ERR_STATIC_FAILED
      */
-    function get($option)
+    public function get($option)
     {
         if (!isset($this)) {
             return PEAR::raiseError('This method may only be called non statically',
@@ -493,7 +493,7 @@ class Image_Tools
      * @access public
      * @static
      */
-    function createImageFromFile($filename)
+    public function createImageFromFile($filename)
     {
         if (!is_file($filename) || !is_readable($filename)) {
             return PEAR::raiseError('Unable to open file "' . $filename . '"');
@@ -535,7 +535,7 @@ class Image_Tools
      * @access public
      * @static
      */
-    function createImageFromString($data)
+    public function createImageFromString($data)
     {
         if (!is_string($data) || empty($data)) {
             PEAR::raiseError('Invalid data value.');
@@ -567,15 +567,15 @@ class Image_Tools
      * @see     createImageFromFile()
      * @see     createImageFromString()
      */
-    function createImage($input)
+    public function createImage($input)
     {
-        if (is_file($input)) {
+        if (Image_Tools::isGDImageResource($input)) {
+            return $input;
+        }else if (is_file($input)) {
             return Image_Tools::createImageFromFile($input);
         } else if (is_string($input)) {
             return Image_Tools::createImageFromString($input);
-        } else if (Image_Tools::isGDImageResource($input)) {
-            return $input;
-        }
+        } 
         return PEAR::raiseError('Invalid source image given, valid to create image resource.');
     }
 
@@ -591,7 +591,7 @@ class Image_Tools
      * @access public
      * @static
      */
-    function isGDImageResource($value)
+    public function isGDImageResource($value)
     {
         if (is_resource($value) && get_resource_type($value) == 'gd') {
             return true;
@@ -613,7 +613,7 @@ class Image_Tools
      * @see getResultImage()
      * @since Method available since Release 1.0.0RC1
      */
-    function preRender()
+    public function preRender()
     {
         return true;
     }
@@ -632,7 +632,7 @@ class Image_Tools
      * @see getResultImage()
      * @since Method available since Release 1.0.0RC1
      */
-    function postRender()
+    public function postRender()
     {
         return true;
     }
@@ -650,7 +650,7 @@ class Image_Tools
      * @access  protected
      * @see     IMAGE_TOOLS_BASE_ERR_STATIC_FAILED
      */
-    function render()
+    public function render()
     {
         if (!isset($this)) {
             return PEAR::raiseError('This method may only be called non statically',
@@ -673,7 +673,7 @@ class Image_Tools
      * @see getImageResult()
      * @since Method available since Release 1.0.0RC1
      */
-    function _render()
+    public function _render()
     {
         if (!isset($this)) {
             return PEAR::raiseError('This method may only be called non statically',
@@ -713,7 +713,7 @@ class Image_Tools
      * @return resource The GD image resource of rendered result.
      * @access public
      */
-    function getResultImage($force = false)
+    public function getResultImage($force = false)
     {
         if (!Image_Tools::isGDImageResource($this->resultImage) || $force) {
             $res = $this->_render();
@@ -743,7 +743,7 @@ class Image_Tools
      * @see     IMAGE_TOOLS_BASE_ERR_HEADERSEND_FAILED,
      *          IMAGE_TOOLS_BASE_ERR_IMAGETYPE_UNSUPPORTED
      */
-    function display($type = IMAGETYPE_PNG, $force = false)
+    public function display($type = IMAGETYPE_PNG, $force = false)
     {
         $res = $this->getResultImage($force);
         if (PEAR::isError($res)) {
@@ -804,7 +804,7 @@ class Image_Tools
      * @see     IMAGE_TOOLS_BASE_ERR_HEADERSEND_FAILED,
                 IMAGE_TOOLS_BASE_ERR_IMAGETYPE_UNSUPPORTED
      */
-    function save($path, $type = IMAGETYPE_PNG, $force = false)
+    public function save($path, $type = IMAGETYPE_PNG, $force = false)
     {
         $res = $this->getResultImage($force);
         if (PEAR::isError($res)) {
@@ -860,7 +860,7 @@ class Image_Tools
      * @see     IMAGE_TOOLS_BASE_ERR_OPTION_UNSUPPORTED,
      *          IMAGE_TOOLS_BASE_ERR_STATIC_FAILED
      */
-    function supportsOption($option)
+    public function supportsOption($option)
     {
         if (!isset($this)) {
             return PEAR::raiseError('This method may only be called non statically',
@@ -883,7 +883,7 @@ class Image_Tools
      * @access  protected
      * @see     IMAGE_TOOLS_BASE_ERR_STATIC_FAILED
      */
-    function availableOptions()
+    public function availableOptions()
     {
         if (!isset($this)) {
             return PEAR::raiseError('This method may only be called non statically',
@@ -905,7 +905,7 @@ class Image_Tools
      * @access  protected
      * @see     IMAGE_TOOLS_BASE_ERR_STATIC_FAILED
      */
-    function supportsMethod($methodName)
+    public function supportsMethod($methodName)
     {
         if (!isset($this)) {
             return PEAR::raiseError('This method may only be called non statically',
@@ -932,7 +932,7 @@ class Image_Tools
      * @access  protected
      * @see     IMAGE_TOOLS_BASE_ERR_STATIC_FAILED
      */
-    function availableMethods()
+    public function availableMethods()
     {
         if (!isset($this)) {
             return PEAR::raiseError('This method may only be called non statically',
@@ -954,7 +954,7 @@ class Image_Tools
      * @return string Image_Tools base class api-version
      * @access protected
      */
-    function getAPIVersion()
+    public function getAPIVersion()
     {
         if (isset($this)) {
             return $this->apiVersion;
@@ -973,7 +973,7 @@ class Image_Tools
      * @returns string Version.
      * @access protected
      */
-    function getVersion()
+    public function getVersion()
     {
         return $this->version;
     }

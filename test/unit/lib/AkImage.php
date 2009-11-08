@@ -2,9 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
-require_once(AK_LIB_DIR.DS.'AkImage.php');
-
-class Test_of_AkImage extends  AkUnitTest
+class AkImage_TestCase extends  AkUnitTest
 {
     public function setUp()
     {
@@ -176,6 +174,4 @@ class Test_of_AkImage extends  AkUnitTest
     }
 }
 
-ak_test('Test_of_AkImage');
-
-?>
+ak_test_run_case_if_executed('AkImage_TestCase');

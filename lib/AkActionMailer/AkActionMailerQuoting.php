@@ -34,7 +34,7 @@ class AkActionMailerQuoting
          * Splitting string into characters with /u modifier,
          * to handle multibyte strings in utf-8
          */
-        $chars=preg_split('//u',$text);
+        $chars = preg_split('//u',$text);
         $parts=array();
         /**
          * slicing them into chunks of 10 characters and encoding them with qp

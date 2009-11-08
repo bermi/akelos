@@ -82,12 +82,12 @@ class AkMongoDbCache extends AkObject
             return false;
         }
         
-        @list($type,$data) = @split('@#!',$return,2);
+        @list($type,$data) = @preg_split('/@#!/',$return,2);
         if (isset($data)) {
             settype($data,$type);
         } else {
             if (is_string($return) && substr($return,0,15) == '@____join____@:') {
-                @list($start,$parts) = @split(':',$return,2);
+                @list($start,$parts) = @explode(':', $return, 2);
                 $return = '';
                 for($i=0;$i<(int)$parts;$i++) {
                     $return.=$this->MongoDb->get($key.'_'.$i);

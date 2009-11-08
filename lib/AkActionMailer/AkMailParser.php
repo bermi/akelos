@@ -548,11 +548,11 @@ class AkMailParser
     
     
     public function _uniqueStyle($stylestring, $fullElement = '') {
-        $styles=split(';',$stylestring);
+        $styles = explode(';', $stylestring);
         $newstyles=array();
         $styleArray=array();
         foreach($styles as $style) {
-            $parts = @split(':',$style,2);
+            $parts = @explode(':', $style, 2);
             
             if(!empty($parts[1])) {
                 $styleArray[trim($parts[0])]=trim($parts[1]);

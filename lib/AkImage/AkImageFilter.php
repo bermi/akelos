@@ -51,7 +51,7 @@ class AkImageFilter
     function _setWidthAndHeight_(&$options)
     {
         if(!empty($options['size'])){
-            list($options['width'], $options['height']) = split('x|X| ',trim(str_replace(' ','',$options['size'])).'x');
+            list($options['width'], $options['height']) = preg_split('/x|X| /',trim(str_replace(' ','',$options['size'])).'x');
             unset($options['size']);
         }
 

@@ -37,7 +37,7 @@ class AkPgsqlDbAdapter extends AkDbAdapter
     public function availableTables($force_lookup = false)
     {
         $schema_path = $this->selectValue('SHOW search_path');
-        $schemas = "'".join("', '",split(',',$schema_path))."'";
+        $schemas = "'".join("', '", explode(',',$schema_path))."'";
         return $this->selectValues("SELECT tablename FROM pg_tables WHERE schemaname IN ($schemas)");
     }
 

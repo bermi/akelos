@@ -277,11 +277,11 @@ class AkMailBase extends Mail
         }
         $attributes = array();
         if(strstr($content_type,';')){
-            list($content_type, $attrs) = split(";\\s*",$content_type);
+            list($content_type, $attrs) = preg_split("/;\\s*/",$content_type);
             if(!empty($attrs)){
                 foreach ((array)$attrs as $s){
                     if(strstr($s,'=')){
-                        list($k,$v) = array_map('trim',split("=", $s, 2));
+                        list($k,$v) = array_map('trim', explode("=", $s, 2));
                         if(!empty($v)){
                             $attributes[$k] = $v;
                         }

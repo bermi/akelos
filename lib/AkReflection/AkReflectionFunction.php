@@ -82,7 +82,7 @@ class AkReflectionFunction extends AkReflection
             $string=isset($this->_definition['toString'])?$this->_definition['toString']:null;
         }
         if ($indent>0) {
-            $lines = split("\n",$string);
+            $lines = explode("\n", $string);
             foreach ($lines as $idx=>$line) {
                 $lines[$idx] = str_repeat(' ',$indent).$line;
             }
