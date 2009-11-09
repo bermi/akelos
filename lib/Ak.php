@@ -2322,8 +2322,9 @@ function ak_autoload($name, $path = null)
         'AkDbSchemaCache'           =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php',
         'AkDbSession'               =>  AK_LIB_DIR.DS.'AkDbSession.php',
         'AkHttpClient'              =>  AK_LIB_DIR.DS.'AkHttpClient.php',
+        'AkLocaleManager'           =>  AK_LIB_DIR.DS.'AkLocaleManager.php',
         'AkImage'                   =>  AK_LIB_DIR.DS.'AkImage.php',
-        'AkImageColorScheme'             =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageColorScheme.php',
+        'AkImageColorScheme'        =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageColorScheme.php',
         'AkImageFilter'             =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageFilter.php',
         'AkInflector'               =>  AK_LIB_DIR.DS.'AkInflector.php',
         'AkInstaller'               =>  AK_LIB_DIR.DS.'AkInstaller.php',
@@ -2353,4 +2354,3 @@ spl_autoload_register('ak_autoload');
 !defined('AK_ENABLE_PROFILER') && define('AK_ENABLE_PROFILER', false);
 AK_ENABLE_PROFILER &&  Ak::profile();
 
-?>

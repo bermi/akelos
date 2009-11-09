@@ -154,4 +154,9 @@ $dictionary=array (
    Los generadores disponibles son:',
   '[%installer_name] Downgrading to version %version' => '[%installer_name] Downgrading to version %version',
   '[%installer_name] Upgrading to version %version' => '[%installer_name] Upgrading to version %version',
+  'iYaoUADT' => 'iYaoUADT',
+  'LuTa8PgP' => 'LuTa8PgP',
+  '1QOkGNPA' => '1QOkGNPA',
+  'ksDiJkm7' => 'ksDiJkm7',
+  'OZafxJkk' => 'OZafxJkk',
 );

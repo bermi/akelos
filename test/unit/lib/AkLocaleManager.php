@@ -1,13 +1,9 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
-require_once(AK_LIB_DIR.DS.'AkLocaleManager.php');
-
-class Test_of_AkLocaleManager_Class extends  AkUnitTest
+class AkLocaleManager_TestCase extends  AkUnitTest
 {
-
     public $LocaleManager;
 
     public function setUp()
@@ -20,48 +16,48 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
         unset ($this->LocaleManager);
     }
 
-    public function Test_of__getAvailableLocales()
+    public function test_should_get_available_locales()
     {
-        $available_locales = $this->LocaleManager->_getAvailableLocales();
+        $available_locales = $this->LocaleManager->getAvailableLocales();
         $this->assertTrue(is_array($available_locales['en']) && count($available_locales) > 0 ,'Locale en was not found on config/locales folder.');
     }
 
-    public function Test_of__parseLocaleConfigString()
+    public function test_should_parse_locale_strings()
     {
 
         $config_string = 'en';
         $expected = array('en'=>array('en'));
-        $result = $this->LocaleManager->_parseLocaleConfigString($config_string);
+        $result = $this->LocaleManager->parseLocaleConfigString($config_string);
         $this->assertEqual($expected, $result);
 
         $config_string = 'en,es ';
         $expected = array('en'=>array('en'),'es'=>array('es'));
-        $result = $this->LocaleManager->_parseLocaleConfigString($config_string);
+        $result = $this->LocaleManager->parseLocaleConfigString($config_string);
         $this->assertEqual($expected, $result);
 
         $config_string = 'en; es';
         $expected = array('en'=>array('en'),'es'=>array('es'));
-        $result = $this->LocaleManager->_parseLocaleConfigString($config_string);
+        $result = $this->LocaleManager->parseLocaleConfigString($config_string);
         $this->assertEqual($expected, $result);
 
         $config_string = 'en; es (spain)';
         $expected = array('en'=>array('en'),'es'=>array('es','spain'));
-        $result = $this->LocaleManager->_parseLocaleConfigString($config_string);
+        $result = $this->LocaleManager->parseLocaleConfigString($config_string);
         $this->assertEqual($expected, $result);
 
         $config_string = 'en; es (spain|espana)';
         $expected = array('en'=>array('en'),'es'=>array('es','spain', 'espana'));
-        $result = $this->LocaleManager->_parseLocaleConfigString($config_string);
+        $result = $this->LocaleManager->parseLocaleConfigString($config_string);
         $this->assertEqual($expected, $result);
 
         $config_string = 'es (spain)';
         $expected = array('es'=>array('es','spain'));
-        $result = $this->LocaleManager->_parseLocaleConfigString($config_string);
+        $result = $this->LocaleManager->parseLocaleConfigString($config_string);
         $this->assertEqual($expected, $result);
 
         $config_string = 'es (spain|espana)';
         $expected = array('es'=>array('es','spain', 'espana'));
-        $result = $this->LocaleManager->_parseLocaleConfigString($config_string);
+        $result = $this->LocaleManager->parseLocaleConfigString($config_string);
         $this->assertEqual($expected, $result);
 
 
@@ -69,7 +65,7 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
 
 
 
-    public function Test_of_getBrowserLanguages()
+    public function test_should_get_browser_language()
     {
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = $this->LocaleManager->_browser_language = 'en-us,en,es-es;q=0.5;';
         
@@ -92,7 +88,7 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
     }
 
 
-    public function Test_of_getDefaultLanguageForUser()
+    public function test_should_get_default_language_for_user()
     {
         unset($_SERVER['HTTP_ACCEPT_LANGUAGE']);
         $this->LocaleManager->available_locales = array('en_us'=>array('en_us'),'en'=>array('en'),'es_es'=>array('es_es'));
@@ -117,28 +113,28 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
 
     }
 
-    public function Test_of__getDefaultLocale()
+    public function Test_of_getDefaultLocale()
     {
         $this->LocaleManager->available_locales = array('es_es'=>array('es_es'));
-        $result = $this->LocaleManager->_getDefaultLocale();
+        $result = $this->LocaleManager->getDefaultLocale();
         $expected = 'es_es';
         $this->assertEqual($expected, $result);
 
         $this->LocaleManager->available_locales = array('es_es'=>'es_es');
-        $result = $this->LocaleManager->_getDefaultLocale();
+        $result = $this->LocaleManager->getDefaultLocale();
         $expected = 'es_es';
         $this->assertEqual($expected, $result);
 
         $this->LocaleManager->available_locales = array('es_es');
-        $result = $this->LocaleManager->_getDefaultLocale();
+        $result = $this->LocaleManager->getDefaultLocale();
         $expected = 'es_es';
         $this->assertEqual($expected, $result);
 
         $this->LocaleManager->available_locales = array('en'=>array('en'),'es_es'=>array('es_es'));
-        $result = $this->LocaleManager->_getDefaultLocale();
+        $result = $this->LocaleManager->getDefaultLocale();
         $expected = 'en';
         $this->assertEqual($expected, $result);
-        $result = $this->LocaleManager->_getDefaultLocale();
+        $result = $this->LocaleManager->getDefaultLocale();
         $expected = 'en';
         $this->assertEqual($expected, $result);
 
@@ -225,7 +221,7 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
 
     public function Test_of_getLocaleFromAlias()
     {
-        $this->LocaleManager->available_locales = $this->LocaleManager->_parseLocaleConfigString('es, en, fr (france)');
+        $this->LocaleManager->available_locales = $this->LocaleManager->parseLocaleConfigString('es, en, fr (france)');
         $result = $this->LocaleManager->getLocaleFromAlias('france');
         $expected = 'fr';
         $this->assertEqual($result,$expected);
@@ -276,9 +272,8 @@ class Test_of_AkLocaleManager_Class extends  AkUnitTest
         }
     }
 
+    /**/
 }
 
-ak_test('Test_of_AkLocaleManager_Class');
+ak_test_run_case_if_executed('AkLocaleManager_TestCase');
 
-
-?>

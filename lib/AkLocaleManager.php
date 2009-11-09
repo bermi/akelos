@@ -28,13 +28,13 @@ class AkLocaleManager extends AkObject
     public function init()
     {
         if(AK_AVAILABLE_LOCALES == 'auto'){
-            $this->available_locales = $this->_getAvailableLocales();
+            $this->available_locales = $this->getAvailableLocales();
         }elseif(AK_AVAILABLE_LOCALES != 'en'){
-            $this->available_locales = $this->_parseLocaleConfigString(AK_AVAILABLE_LOCALES);
+            $this->available_locales = $this->parseLocaleConfigString(AK_AVAILABLE_LOCALES);
         }
     }
 
-    protected function _getAvailableLocales()
+    public function getAvailableLocales()
     {
         static $available_locales;
 
@@ -53,7 +53,7 @@ class AkLocaleManager extends AkObject
         return $available_locales;
     }
 
-    protected function _parseLocaleConfigString($locale_settings)
+    public function parseLocaleConfigString($locale_settings)
     {
         $locale_settings = trim(str_replace(' ','',$locale_settings));
         $locale_settings = str_replace(array(';','(',')'), array(',','~','',''),$locale_settings);
@@ -80,12 +80,12 @@ class AkLocaleManager extends AkObject
         return $locales;
     }
 
-    static function getBrowserLanguages()
+    public function getBrowserLanguages()
     {
         $browser_accepted_languages = str_replace('-','_', strtolower(preg_replace('/q=[0-9\.]+,*/','',@$_SERVER['HTTP_ACCEPT_LANGUAGE'])));
         $browser_languages = (array_diff(preg_split('/;|,/',$browser_accepted_languages.','), array('')));
         if(empty($browser_languages)){
-            return array($this->_getDefaultLocale());
+            return array($this->getDefaultLocale());
         }
         return array_unique($browser_languages);
     }
@@ -111,10 +111,10 @@ class AkLocaleManager extends AkObject
                 }
             }
         }
-        return $this->_getDefaultLocale();
+        return $this->getDefaultLocale();
     }
 
-    protected function _getDefaultLocale()
+    public function getDefaultLocale()
     {
         $available_locales = $this->available_locales;
         $default_locale = array_shift($available_locales);
@@ -236,7 +236,7 @@ class AkLocaleManager extends AkObject
      */
 
 
-    static function initApplicationInternationalization(&$Request)
+    public function initApplicationInternationalization(&$Request)
     {
         if(!defined('AK_APP_LOCALES')){
             define('AK_APP_LOCALES',join(',',array_keys($this->available_locales)));
@@ -370,7 +370,7 @@ class AkLocaleManager extends AkObject
     }
 
 
-    static function getLangFromUrl(&$Request)
+    public function getLangFromUrl(&$Request)
     {
         $lang = false;
 

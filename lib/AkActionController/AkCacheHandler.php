@@ -314,12 +314,12 @@ class AkCacheHandler extends AkObject
         if(empty($public_locales)){
             $public_locales = defined('AK_PUBLIC_LOCALES') ?
             Ak::toArray(AK_PUBLIC_LOCALES) :
-            array_keys($this->_getAvailableLocales());
+            array_keys($this->getAvailableLocales());
         }
         return $public_locales;
     }
 
-    public function _getAvailableLocales()
+    public function getAvailableLocales()
     {
         static $available_locales;
 
@@ -373,7 +373,7 @@ class AkCacheHandler extends AkObject
             return Ak::lang();
         }
     }
-    public function _getDefaultLocale()
+    public function getDefaultLocale()
     {
         return Ak::lang();
     }
@@ -382,7 +382,7 @@ class AkCacheHandler extends AkObject
         $browser_accepted_languages = str_replace('-','_', strtolower(preg_replace('/q=[0-9\.]+,*/','',@$_SERVER['HTTP_ACCEPT_LANGUAGE'])));
         $browser_languages = (array_diff(preg_split('/;|,/',$browser_accepted_languages.','), array('')));
         if(empty($browser_languages)){
-            return array($this->_getDefaultLocale());
+            return array($this->getDefaultLocale());
         }
         return array_unique($browser_languages);
     }

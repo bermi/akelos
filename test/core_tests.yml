@@ -6,6 +6,7 @@ Active Support:
     - AkImage
     - AkInflector
     - AkInstaller
+    - AkLocaleManager
 Action Controller: 
     - AkDbSession
     #- 'AkActionController/*'
