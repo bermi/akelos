@@ -36,9 +36,13 @@ class AkAssociatedActiveRecord extends AkBaseModel
     private
     $__activeRecordObject = false;
 
-    protected
+    /**
+     * @todo enable getters and setters in order to protect these attributes
+     */
+    public
     $_AssociationHandler,
     $_associationId = false,
+
     // Holds different association IDs related to this model
     $_associationIds = array(),
     $_associations = array();

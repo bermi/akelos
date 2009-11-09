@@ -17,8 +17,6 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
-
 /**
 * Adds the following methods for retrieval and query for a single associated object that this object holds an id to.
 * * <tt>belongsTo->assign($association_id, $Associate);</tt> - assigns the associate object, extracts the primary key, and sets it as the foreign key.
@@ -61,7 +59,6 @@ class AkBelongsTo extends AkAssociation
 
     public function &addAssociated($association_id, $options = array())
     {
-
         $default_options = array(
         'class_name' => empty($options['class_name']) ? AkInflector::camelize($association_id) : $options['class_name'],
         'primary_key_name',
@@ -90,9 +87,8 @@ class AkBelongsTo extends AkAssociation
         $this->_saveLoadedHandler($association_id, $associated);
 
         if($options['instantiate']){
-            $associated =& $this->assign($association_id,  new $options['class_name']($this->Owner->get($options['primary_key_name'])));
+            $associated = $this->assign($association_id,  new $options['class_name']($this->Owner->get($options['primary_key_name'])));
         }
-
         return $associated;
     }
 
@@ -101,7 +97,6 @@ class AkBelongsTo extends AkAssociation
     {
         return 'belongsTo';
     }
-
 
     public function &findAssociated($association_id)
     {
@@ -115,7 +110,7 @@ class AkBelongsTo extends AkAssociation
             $this->build($association_id, array(), false);
         }
 
-        $result =& $this->Owner->$association_id->find($primary_key_name_value);
+        $result = $this->Owner->$association_id->find($primary_key_name_value);
 
         return $result;
     }
@@ -126,7 +121,7 @@ class AkBelongsTo extends AkAssociation
         if($Associated->save()){
             $this->Owner->set($primary_key_name, $Associated->getId());
         }
-        $Associated =& $this->_build($association_id, &$Associated);
+        $Associated = $this->_build($association_id, $Associated);
         return $Associated;
     }
 
@@ -135,7 +130,7 @@ class AkBelongsTo extends AkAssociation
         $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
         Ak::import($class_name);
         $record = new $class_name($attributes);
-        $record =& $this->Owner->$association_id->replace($record, !$replace);
+        $record = $this->Owner->$association_id->replace($record, !$replace);
         return $record;
     }
 
@@ -152,12 +147,11 @@ class AkBelongsTo extends AkAssociation
         return $this->Owner->$association_id;
     }
 
-
     public function &load($association_id)
     {
         if (!$this->Owner->isNewRecord()){
             if(empty($this->Owner->$association_id->_loaded)){
-                if($Associated =& $this->findAssociated($association_id)){
+                if($Associated = $this->findAssociated($association_id)){
                     $Associated->_loaded = true;
                     $this->_build($association_id, $Associated, false);
                 }
@@ -174,7 +168,7 @@ class AkBelongsTo extends AkAssociation
             if($counter_cache_name && isset($this->Owner->$association_id->$counter_cache_name) && !$this->Owner->isNewRecord()){
                 $this->Owner->$association_id->decrementCounter($counter_cache_name, $this->Owner->get($primary_key));
             }
-            $this->Owner->$association_id =& $this->_getLoadedHandler($association_id);
+            $this->Owner->$association_id = $this->_getLoadedHandler($association_id);
             $this->Owner->set($primary_key, null);
         }else{
             $primary_key = $this->Owner->belongsTo->getOption($association_id, 'primary_key_name');
@@ -232,16 +226,13 @@ class AkBelongsTo extends AkAssociation
                     $finder_options[$option] = $value;
                 }
             }
-
         }
-
 
         $finder_options['joins'] = $this->Owner->$association_id->constructSqlForInclusionChain($handler_name, $parent_handler_name);
 
         $finder_options['selection'] = '';
         $selection_parenthesis = $this->_getColumnParenthesis();//$this->Owner->_db->type()=='mysql'?"'":'"';
         foreach (array_keys($this->Owner->$association_id->getColumns()) as $column_name){
-
             $finder_options['selection'] .= $parent_handler_name.'__'.$handler_name.'.'.$column_name.' AS '.$selection_parenthesis.$prefix.'['.$handler_name.']'.($pluralize?'[@'.$pk.']':'').'['.$column_name.']'.$selection_parenthesis.', ';
         }
         $finder_options['selection'] = trim($finder_options['selection'], ', ');
@@ -295,7 +286,7 @@ class AkBelongsTo extends AkAssociation
         '_'.$association_id.'.'.$this->Owner->$association_id->getPrimaryKey().' ';
     }
 
-    public function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name)
+    public function constructSqlForInclusionChain($association_id, $handler_name, $parent_handler_name)
     {
         //$handler_name = $association_id;
         return ' LEFT OUTER JOIN '.
@@ -384,5 +375,3 @@ class AkBelongsTo extends AkAssociation
     }
 }
 
-
-?>

@@ -16,7 +16,7 @@ class AkInstaller_TestCase extends  AkUnitTest
         $ADODB_FETCH_MODE = $this->_original_ADODB_FETCH_MODE;
     }
 
-    public function Test_setup_expected_returns()
+    public function test_should_parse_expected_table_settings()
     {
         $db_type = $this->Installer->db->type();
 
@@ -103,8 +103,7 @@ class AkInstaller_TestCase extends  AkUnitTest
         }
     }
 
-
-    public function Test_for_creating_table()
+    public function test_should_create_tables()
     {
         $this->Installer->createTable('test_pages', "
     id integer not null auto_increment primary_key,
@@ -149,7 +148,7 @@ class AkInstaller_TestCase extends  AkUnitTest
     }
 
 
-    public function Test_of_createTable()
+    public function test_should_create_tables_using_simple_declarations()
     {
         $this->Installer = new AkInstaller();
 
@@ -193,7 +192,7 @@ class AkInstaller_TestCase extends  AkUnitTest
 
     }
 
-    public function Test_of_add_and_remove_Indices()
+    public function test_should_add_and_remove_indices()
     {
         $this->Installer = new AkInstaller();
 
@@ -228,7 +227,7 @@ class AkInstaller_TestCase extends  AkUnitTest
 
     }
 
-    public function Test_of_default_types()
+    public function test_should_set_default_types()
     {
         $this->Installer = new AkInstaller();
         $this->Installer->createTable('test_defaults','id,name,screen_name string,description,*url,owner_id,modified_at,created_on,is_featured,position,lock_version,edit_count');
@@ -241,8 +240,28 @@ class AkInstaller_TestCase extends  AkUnitTest
         }
     }
 
+    public function test_should_create_default_values_correctly()
+    {
+        $original_app_dir = $this->app_dir;
+        $this->app_dir = AK_FIXTURES_DIR.DS.'app';
+        $this->installAndIncludeModels(array('Thumbnail'));
+        $Thumbnail = new Thumbnail();
+        $this->assertEqual($Thumbnail->get('owner'), 'Picture');
+        $this->app_dir = $original_app_dir;
+    }
 
-    public function _hasIndexes($meta_details, $search = false)
+    // see AkDbAdapter_schema for the tests; this is only a wrapper
+    public function test_should_rename_columns()
+    {
+        $this->Installer->renameColumn('test_defaults','screen_name','real_name');
+        if ($this->Installer->db->type()=='sqlite') {
+            $this->assertError();
+        }
+        $this->Installer->dropTable('test_defaults');
+    }
+    
+    
+    private function _hasIndexes($meta_details, $search = false)
     {
         $result = false;
         if(!empty($meta_details) && is_array($meta_details)){
@@ -255,24 +274,6 @@ class AkInstaller_TestCase extends  AkUnitTest
             }
         }
         return $result;
-    }
-
-
-    public function test_should_create_default_values_correctly()
-    {
-        $this->installAndIncludeModels(array('Thumbnail'));
-        $Thumbnail = new Thumbnail();
-        $this->assertEqual($Thumbnail->get('owner'), 'Picture');
-    }
-
-    // see AkDbAdapter_schema for the tests; this is only a wrapper
-    public function test_should_rename_columns()
-    {
-        $this->Installer->renameColumn('test_defaults','screen_name','real_name');
-        if ($this->Installer->db->type()=='sqlite') {
-            $this->assertError();
-        }
-        $this->Installer->dropTable('test_defaults');
     }
 
 }

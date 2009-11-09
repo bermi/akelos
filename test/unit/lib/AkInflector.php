@@ -1,11 +1,8 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
-require_once(AK_LIB_DIR.DS.'AkInflector.php');
-
-class Test_of_AkInflector extends  UnitTestCase
+class AkInflector_TestCase extends  UnitTestCase
 {
     public $SingularToPlural = array(
     "search"      => "searches",
@@ -330,6 +327,4 @@ class Test_of_AkInflector extends  UnitTestCase
     }
 }
 
-ak_test('Test_of_AkInflector');
-
-?>
+ak_test_run_case_if_executed('AkInflector_TestCase');

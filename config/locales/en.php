@@ -160,4 +160,6 @@ $dictionary=array (
    Available generator are:',
   'Connection to the database failed. %dsn' => 'Connection to the database failed. %dsn',
   'Could not find the database configuration file in %dbconfig.' => 'Could not find the database configuration file in %dbconfig.',
+  '[%installer_name] Downgrading to version %version' => '[%installer_name] Downgrading to version %version',
+  '[%installer_name] Upgrading to version %version' => '[%installer_name] Upgrading to version %version',
 );

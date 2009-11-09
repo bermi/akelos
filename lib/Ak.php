@@ -2263,7 +2263,7 @@ function ak_test_run_case_if_executed($test_case_name, $show_enviroment_flags = 
 {
     if (count(debug_backtrace()) == 1) {
         if($show_enviroment_flags){
-            echo "(".AK_ENVIRONMENT." mode) Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n";
+            echo "(".AK_ENVIRONMENT." environment) Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n";
         }
         ak_test($test_case_name);
     }
@@ -2311,6 +2311,8 @@ function ak_autoload($name, $path = null)
         'ActiveRecord'              =>  AK_APP_DIR.DS.'shared_model.php',
         'AkActiveRecord'            =>  AK_LIB_DIR.DS.'AkActiveRecord.php',
         'AkActiveRecordMock'        =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php',
+        'AkAssociation'             =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php',
+        'AkBelongsTo'               =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociations'.DS.'AkBelongsTo.php',
         'AkAdodbCache'              =>  AK_LIB_DIR.DS.'AkCache'.DS.'AkAdodbCache.php',
         'AkAssociatedActiveRecord'  =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php',
         'AkBaseModel'               =>  AK_LIB_DIR.DS.'AkBaseModel.php',
@@ -2327,6 +2329,7 @@ function ak_autoload($name, $path = null)
         'AkInstaller'               =>  AK_LIB_DIR.DS.'AkInstaller.php',
         'AkMemcache'                =>  AK_LIB_DIR.DS.'AkCache'.DS.'AkMemcache.php',
         'AkObject'                  =>  AK_LIB_DIR.DS.'AkObject.php',
+        'AkObserver'                =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php',
         'AkRequestMimeType'         =>  AK_LIB_DIR.DS.'AkRequestMimeType.php',
         'AkUnitTest'                =>  AK_LIB_DIR.DS.'AkUnitTest.php',
 

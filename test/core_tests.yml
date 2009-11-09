@@ -4,6 +4,8 @@ Active Support:
     - AkConfig
     - AkHttpClient
     - AkImage
+    - AkInflector
+    - AkInstaller
 Action Controller: 
     - AkDbSession
     #- 'AkActionController/*'

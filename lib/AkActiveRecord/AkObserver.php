@@ -13,10 +13,6 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-require_once(AK_LIB_DIR.DS.'Ak.php');
-require_once(AK_LIB_DIR.DS.'AkInflector.php');
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-
 /**
 * Observer classes respond to life-cycle callbacks to implement trigger-like 
 * behavior outside the original class. This is a great way to reduce the clutter
@@ -77,7 +73,7 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 * of for example: 
 * 
 *     $ComentObserverInstance = new CommentObserver();
-*     $Model->addObserver(&$ComentObserverInstance);
+*     $Model->addObserver($ComentObserverInstance);
 *
 */
 class AkObserver extends AkObject
@@ -103,29 +99,27 @@ class AkObserver extends AkObject
         for ($i = 0; $i < $num_args; $i++){
             $target = func_get_arg($i);
             if(is_object($target)){
-                $this->observe(&$target);
+                $this->observe($target);
             }else{
                 $this->setObservedModels($target);
             }
         }
         $this->_initModelObserver();
     }
-    
+
     /**
      * adds itself to the models which are listed
      * in var $observe = array(...)
      *
      */
-    public function _initModelObserver()
+    protected function _initModelObserver()
     {
-        
         $this->observe = Ak::toArray($this->observe);
         if (count($this->observe)>0) {
             $this->setObservedModels($this->observe);
         }
-        
     }
-    
+
     /**
     * Constructs the Observer
     * @param $subject the name or names of the Models to observe
@@ -138,38 +132,26 @@ class AkObserver extends AkObject
         if(empty($memo[$class_name]) || !in_array($model_name, $memo[$class_name])){
             $memo[$class_name][] = $model_name;
             $this->_observing[] = $model_name;
-            $target->addObserver(&$this);
+            $target->addObserver($this);
         }
     }
-    
+
     /**
     * Constructs the Observer
     * @param $subject the name or names of the Models to observe
     */
-    public function setObservedModels ()
-    {        
+    public function setObservedModels()
+    {
         $args = func_get_args();
         $models = func_num_args() == 1 ? ( is_array($args[0]) ? $args[0] : array($args[0]) ) : $args;
 
-        foreach ($models as $class_name)
-        {   
-            /**
-            * @todo use Ak::import() instead.
-            */
-            $class_name = AkInflector::camelize($class_name);
-            if (!class_exists($class_name)){
-                require_once(AkInflector::toModelFilename($class_name));
-            }
-            $model = new $class_name();
-            $this->observe(&$model);
+        foreach ($models as $class_name){
+            $this->observe(Ak::get($class_name));
         }
     }
-    
 
     public function update($state = '')
     {
     }
 
 }
-
-?>

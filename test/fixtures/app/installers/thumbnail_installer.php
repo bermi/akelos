@@ -2,7 +2,7 @@
 
 class ThumbnailInstaller extends AkInstaller
 {
-    function up_1()
+    public function up_1()
     {
         $this->createTable('thumbnails', '
         id integer(11) auto increment primary key,
@@ -13,10 +13,8 @@ class ThumbnailInstaller extends AkInstaller
         );
     }
 
-    function down_1()
+    public function down_1()
     {
         $this->dropTable('thumbnails', array('sequence'=>true));
     }
 }
-
-?>

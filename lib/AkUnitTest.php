@@ -23,6 +23,7 @@ require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'web_tester.php');
 class AkUnitTest extends UnitTestCase
 {
     public
+    $app_dir = AK_APP_DIR,
     $module = '',
     $insert_models_data = false,
     $instantiate_models = false;
@@ -200,10 +201,10 @@ class AkUnitTest extends UnitTestCase
 
     public function uninstallAndInstallMigration($installer_name)
     {
-        $this->log('Looking for installer:'.AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php');
-        if (file_exists(AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php')){
-            $this->log('found installer:'.AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php');
-            require_once(AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php');
+        $this->log('Looking for installer:'.$this->app_dir.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php');
+        if (file_exists($this->app_dir.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php')){
+            $this->log('found installer:'.$this->app_dir.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php');
+            require_once($this->app_dir.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php');
             $installer_class_name = $installer_name.'Installer';
             $Installer = new $installer_class_name();
             $Installer->uninstall();

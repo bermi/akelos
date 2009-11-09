@@ -182,7 +182,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     $_dataDictionary,
     $_primaryKey,
     $_inheritanceColumn,
-    $_associations,
     $_internationalize,
     $_errors = array(),
     $_attributes = array(),
