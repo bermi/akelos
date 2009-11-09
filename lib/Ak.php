@@ -2332,10 +2332,22 @@ function ak_autoload($name, $path = null)
         'AkObject'                  =>  AK_LIB_DIR.DS.'AkObject.php',
         'AkObserver'                =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php',
         'AkRequestMimeType'         =>  AK_LIB_DIR.DS.'AkRequestMimeType.php',
+        'AkPluginInstaller'         =>  AK_LIB_DIR.DS.'AkPluginInstaller.php',
         'AkUnitTest'                =>  AK_LIB_DIR.DS.'AkUnitTest.php',
+        'AkReflection'              =>  AK_LIB_DIR.DS.'AkReflection.php',
+        'AkReflectionMethod'        =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionMethod.php',
+        'AkReflectionClass'         =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionClass.php',
+        'AkReflectionDocBlock'      =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionDocBlock.php',
+        'AkReflectionFile'          =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFile.php',
+        'AkReflectionFunction'      =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFunction.php',
+        'AkType'                    =>  AK_LIB_DIR.DS.'AkType.php',
+        'AkNumber'                  =>  AK_LIB_DIR.DS.'AkType'.DS.'AkNumber.php',
+        'AkString'                  =>  AK_LIB_DIR.DS.'AkType'.DS.'AkString.php',
+        'AkTime'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkTime.php',
+        'AkArray'                   =>  AK_LIB_DIR.DS.'AkType'.DS.'AkArray.php',
+        'AkDate'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkDate.php',
 
         );
-
 
     }elseif (!empty($path)){
         $paths[$name] = $path;

@@ -1,7 +1,12 @@
 <?php
+
+/**
+ * @todo Implement all methods
+ */
+
 class AkTime extends AkType
 {
-    function toString($date_format = '')
+    public function toString($date_format = '')
     {
         if (!empty($date_format)) {
             $format = $date_format.'_';
@@ -14,41 +19,44 @@ class AkTime extends AkType
         }
         return date($format, $this->value);
     }
-    
-    function ago($val)
+
+    public function ago($val)
     {
-        
+
     }
-    function atBeginningOfDay()
+
+    public function atBeginningOfDay()
     {
-        
+
     }
-    function atBeginningOfWeek()
+
+    public function atBeginningOfWeek()
     {
-        
+
     }
-    function atBeginningOfQuarter()
+
+    public function atBeginningOfQuarter()
     {
-        
+
     }
-    function atBeginningOfMonth()
+    public function atBeginningOfMonth()
     {
-        
+
     }
-    
-    function atBeginningOfYear()
+
+    public function atBeginningOfYear()
     {
-        
+
     }
-    
-    function atMidnight()
+
+    public function atMidnight()
     {
-        
+
     }
-    
-    function strftime($format)
+
+    public function strftime($format)
     {
         return strftime($format, $this->value);
     }
 }
-?>
+

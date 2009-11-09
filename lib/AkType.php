@@ -1,52 +1,50 @@
 <?php
-require_once(AK_LIB_DIR.DS.'AkObject.php');
 
 class AkType extends AkObject
 {
-    var $value;
-    function __construct($value)
+    public 
+    $value;
+    
+    public function __construct($value)
     {
         $this->value = $value;
         require_once('AkInflector.php');
     }
-    function toString()
+    
+    public function toString()
     {
         return $this->value.'';
     }
-    function getValue()
+    
+    public function getValue()
     {
         return $this->value;
     }
-    function inspect()
+    
+    public function inspect()
     {
         return var_export($this->value, true);
     }
     
-    function blank()
+    public function blank()
     {
         return empty($this->value);
     }
 }
-require_once(AK_LIB_DIR.DS.'AkType'.DS.'AkNumber.php');
-require_once(AK_LIB_DIR.DS.'AkType'.DS.'AkString.php');
-require_once(AK_LIB_DIR.DS.'AkType'.DS.'AkTime.php');
-require_once(AK_LIB_DIR.DS.'AkType'.DS.'AkArray.php');
-/**require_once(AK_LIB_DIR.DS.'AkType'.DS.'AkDate.php');
-*/
 
 function &AkT($param,$command=null)
 {
     $type = gettype($param);
     switch ($type) {
         case 'array':
-            $obj = &new AkArray($param);
+            $obj = new AkArray($param);
             break;
         case 'integer':
-            $obj = &new AkNumber($param);
+            $obj = new AkNumber($param);
             break;
         case 'string':
         default:
-            $obj = &new AkString($param);
+            $obj = new AkString($param);
             break;
     }
     if ($command!=null) {
@@ -80,7 +78,3 @@ function &AkT($param,$command=null)
     }
     return $obj;
 }
-
-
-
-?>

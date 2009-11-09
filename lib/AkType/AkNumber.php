@@ -1,176 +1,202 @@
 <?php
+
 class AkNumber extends AkType
 {
+    public $_default_date_format = 'Y-m-d H:i:s';
 
-    var $_default_date_format = 'Y-m-d H:i:s';
-
-    
-    function years()
+    public function years()
     {
         return $this->year();
     }
-    function year()
+    
+    public function year()
     {
         return new AkNumber(365*24*60*60*$this->value);
     }
-    function months()
+    
+    public function months()
     {
         return $this->month();
     }
-    function month()
+    
+    public function month()
     {
         return new AkNumber(30*24*60*60*$this->value);
     }
-    function weeks()
+    
+    public function weeks()
     {
         return $this->week();
     }
     
-    function fortnights()
+    public function fortnights()
     {
         return $this->fortnight();
     }
     
-    function fortnight()
+    public function fortnight()
     {
         return new AkNumber(14*24*60*60*$this->value);
     }
     
-    function week()
+    public function week()
     {
         return new AkNumber(7*24*60*60*$this->value);
     }
-    function second()
+    
+    public function second()
     {
         return new AkNumber($this->value);
     }
-    function ordinalize()
+    
+    public function ordinalize()
     {
         return AkInflector::ordinalize($this->value);
     }
-    function seconds()
+    
+    public function seconds()
     {
         return $this->second();
     }
-    function minutes()
+    
+    public function minutes()
     {
         return $this->minute();
     }
-    function minute()
+    
+    public function minute()
     {
         return new AkNumber(60*$this->value);
     }
-    function hours()
+    
+    public function hours()
     {
         return $this->hour();
     }
-    function hour()
+    
+    public function hour()
     {
         return new AkNumber(60*60*$this->value);
     }
-    function days()
+    
+    public function days()
     {
         return $this->day();
     }
-    function day()
+    
+    public function day()
     {
         return new AkNumber(24*60*60*$this->value);
     }
-    function ago()
+    
+    public function ago()
     {
         return new AkTime(time()-$this->value);
     }
-    function fromNow()
+    
+    public function fromNow()
     {
         return new AkTime(time()+$this->value);
     }
-    function until($date_string)
+    
+    public function until($date_string)
     {
         $val = strtotime($date_string)-$this->value;
         return new AkTime($val);
     }
-    function since($date_string)
+    
+    public function since($date_string)
     {
         return new AkTime(strtotime($date_string)+$this->value);
     }
-    function toDate()
+    
+    public function toDate()
     {
         return date($this->_default_date_format,$this->value);
     }
-    
-    
-    function bytes()
+        
+    public function bytes()
     {
         return $this->byte();
     }
-    function byte()
+    
+    public function byte()
     {
         return new AkNumber($this->value);
     }
-    function kilobytes()
+    
+    public function kilobytes()
     {
         return $this->kilobyte();
     }
-    function kilobyte()
+    public function kilobyte()
     {
         return new AkNumber(1024*$this->value);
     }
-    function megabytes()
+    public function megabytes()
     {
         return $this->megabyte();
     }
-    function megabyte()
+    
+    public function megabyte()
     {
         $val = $this->kilobyte();
         $val = $val->getValue();
         return new AkNumber(1024*$val);
     }
-    function gigabytes()
+    
+    public function gigabytes()
     {
         return $this->gigabyte();
     }
-    function gigabyte()
+    
+    public function gigabyte()
     {
         $val = $this->megabyte();
         $val = $val->getValue();
         return new AkNumber(1024*$val);
     }
-    function terabytes()
+    public function terabytes()
     {
         return $this->terabyte();
     }
-    function terabyte()
+    
+    public function terabyte()
     {
         $val = $this->gigabyte();
         $val = $val->getValue();
         return new AkNumber(1024*$val);
     }
-    function petabytes()
+    
+    public function petabytes()
     {
         return $this->petabyte();
     }
-    function petabyte()
+    public function petabyte()
     {
         $val = $this->terabyte();
         $val = $val->getValue();
         return new AkNumber(1024*$val);
     }
-    function exabytes()
+    
+    public function exabytes()
     {
         return $this->exabyte();
     }
-    function exabyte()
+    
+    public function exabyte()
     {
         $val = $this->exabyte();
         $val = $val->getValue();
         return new AkNumber(1024*$val);
     }
-    function now()
+    
+    public function now()
     {
         return new AkNumber(time());
     }
     
-    function quantify($item)
+    public function quantify($item)
     {
         if ($this->value==1) {
             return $this->value.' '.Ak::t(AkInflector::singularize($item));
@@ -178,6 +204,5 @@ class AkNumber extends AkType
             return $this->value.' '.Ak::t(AkInflector::pluralize($item));
         }
     }
-    
 }
-?>
+

@@ -75,6 +75,7 @@ defined('AK_TEST_DIR') ? null : define('AK_TEST_DIR', AK_BASE_DIR.DS.'test');
 defined('AK_SCRIPT_DIR') ? null : define('AK_SCRIPT_DIR',AK_BASE_DIR.DS.'script');
 defined('AK_APP_VENDOR_DIR') ? null : define('AK_APP_VENDOR_DIR',AK_APP_DIR.DS.'vendor');
 defined('AK_APP_PLUGINS_DIR') ? null : define('AK_APP_PLUGINS_DIR',AK_APP_VENDOR_DIR.DS.'plugins');
+defined('AK_APP_INSTALLERS_DIR') ? null : define('AK_APP_INSTALLERS_DIR', AK_APP_DIR.DS.'installers');
 
 defined('AK_TMP_DIR') ? null : define('AK_TMP_DIR', Ak::get_tmp_dir_name());
 defined('AK_COMPILED_VIEWS_DIR') ? null : define('AK_COMPILED_VIEWS_DIR', AK_TMP_DIR.DS.'views');
@@ -226,6 +227,9 @@ defined('AK_BEEP_ON_ERRORS_WHEN_TESTING') ? null : define('AK_BEEP_ON_ERRORS_WHE
 defined('AK_FRAMEWORK_LANGUAGE') ? null : define('AK_FRAMEWORK_LANGUAGE', 'en');
 defined('AK_DEV_MODE') ? null : define('AK_DEV_MODE', false);
 defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION') ? null : define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
+
+defined('AK_VERBOSE_INSTALLER') ? null : define('AK_VERBOSE_INSTALLER', AK_DEV_MODE);
+
 
 //AK_CLI || AK_PRODUCTION_MODE ? null : 
 require_once(AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php');

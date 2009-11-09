@@ -1,68 +1,68 @@
 <?php
+
 class AkString extends AkType
 {
-
-    function at($pos)
+    public function at($pos)
     {
         return @$this->value{$pos};
     }
     
-    function from($pos)
+    public function from($pos)
     {
         return @substr($this->value,$pos);
     }
     
-    function to($pos)
+    public function to($pos)
     {
         return @substr($this->value,0,$pos);
     }
     
-    function first($number = 1)
+    public function first($number = 1)
     {
         return @substr($this->value,0,$number);
     }
     
-    function last($number = 1)
+    public function last($number = 1)
     {
         return @substr($this->value,$number>$this->length()?-$this->length():-$number);
     }
     
-    function startsWith($string)
+    public function startsWith($string)
     {
         return $this->first(strlen($string))==$string;
     }
     
-    function endsWith($string)
+    public function endsWith($string)
     {
         return $this->last(strlen($string))==$string;
     }
     
-    function pluralize($dictionary = null)
+    public function pluralize($dictionary = null)
     {
         return AkInflector::pluralize($this->value,null,$dictionary);
     }
     
-    function singularize($dictionary = null)
+    public function singularize($dictionary = null)
     {
         return AkInflector::singularize($this->value,null,$dictionary);
     }
     
-    function humanize()
+    public function humanize()
     {
         return AkInflector::humanize($this->value);
     }
     
-    function titleize()
+    public function titleize()
     {
         return AkInflector::titleize($this->value);
     }
     
-    function tableize()
+    public function tableize()
     {
         return AkInflector::tableize($this->value);
     }
     
-    function length()
+    public function length()
     {
         if (function_exists('mb_strlen')) {
             return mb_strlen($this->value);
@@ -72,4 +72,3 @@ class AkString extends AkType
     }
 }
 
-?>

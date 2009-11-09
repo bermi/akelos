@@ -1,65 +1,64 @@
 <?php
+
 /**
  * see http://dev.rubyonrails.org/browser/branches/2-1-caching/activesupport/lib/active_support/core_ext/date/calculations.rb
- * and
  * 
- *
+ * @todo Implement all methods
  */
 class AkDate extends AkType
 {
-    function yesterday()
+    public function yesterday()
     {
-        
+
     }
-    
-    function tomorrow()
+
+    public function tomorrow()
     {
-        
+
     }
-    
-    function ago($seconds = 0)
+
+    public function ago($seconds = 0)
     {
-        
+
     }
-    
-    function since($seconds = 0)
+
+    public function since($seconds = 0)
     {
-        
+
     }
-    
-    function beginningOfday()
+
+    public function beginningOfday()
     {
-        
+
     }
-    
-    function endOfDay()
+
+    public function endOfDay()
     {
-        
+
     }
-    
-    function plusWithDuration($duration)
+
+    public function plusWithDuration($duration)
     {
-        
+
     }
-    
-    function minusWithDuration($duration)
+
+    public function minusWithDuration($duration)
     {
-        
+
     }
-    
-    function advance($options = array())
+
+    public function advance($options = array())
     {
         $available_options = array('day','days',
-                                   'week','weeks',
-                                   'fortnight','fortnights',
-                                   'month','months',
-                                   'year','years'
-                                   );
+        'week','weeks',
+        'fortnight','fortnights',
+        'month','months',
+        'year','years'
+        );
     }
-    
-    function change($options = array())
+
+    public function change($options = array())
     {
         $available_options = array('year','month','day');
     }
 }
-?>

@@ -2,25 +2,28 @@
 
 class AkReflectionDocBlock
 {
-    
-    var $_structure = array();
-    var $changed = false;
-    var $original='';
-    function AkReflectionDocBlock($string)
+    protected
+    $_structure = array();
+
+    public
+    $changed  = false,
+    $original = '';
+
+    public function __construct($string)
     {
         $this->original = $string;
         $this->_structure = $this->_parseDocBlock($string);
     }
-    
-    function getComment()
+
+    public function getComment()
     {
         return isset($this->_structure['comment'])?$this->_structure['comment']:false;
     }
-    function getParams()
+    public function getParams()
     {
         return isset($this->_structure['tags']['params'])?$this->_structure['tags']['params']:false;
     }
-    function toString()
+    public function toString()
     {
         $string = '/**';
         isset($this->_structure['comment'])?$string.="\n * ".$this->_structure['comment']."\n *":null;
@@ -41,19 +44,21 @@ class AkReflectionDocBlock
         $string.="\n */";
         return $string;
     }
-    
-    function setTag($tag, $value) {
+
+    public function setTag($tag, $value) {
         $this->_structure['tags'][$tag] = $value;
         $this->changed = true;
     }
-    
-    function getTag($tag)
+
+    public function getTag($tag)
     {
-        return isset($this->_structure['tags'][$tag])?$this->_structure['tags'][$tag]:false;
+        return isset($this->_structure['tags'][$tag]) ? $this->_structure['tags'][$tag] : false;
     }
-    function _parseDocBlock($string)
+
+    protected function _parseDocBlock($string)
     {
-        preg_match_all('/\/\*\*\n(\s*\*([^\n]+?\n)+)+.*?\*\//',$string,$matches);
+        preg_match_all('/\/\*\*\n(\s*\*([^\n]+?\n)+)+.*?\*\//', $string, $matches);
+
         $docBlockStructure = array('comment'=>null);
         if (isset($matches[1][0])) {
             $docPart = $matches[1][0];
@@ -62,12 +67,13 @@ class AkReflectionDocBlock
             $commentLines = array();
             $tags = array('_unmatched_'=>array());
             $docLines = explode("\n",$docPart);
+
             $inComment = true;
-            $tempTag=array();
+            $tempTag = array();
             foreach ($docLines as $line) {
-                 if (preg_match('/^@([a-zA-Z0-9_]+)\s+(.+)$/',$line, $matches)) {
+                if (preg_match('/^@([a-zA-Z0-9_]+)\s+(.+)$/',$line, $matches)) {
                     if (!empty($tempTag)) {
-                        $this->_parseTag(&$tags, $tempTag);
+                        $this->_parseTag($tags, $tempTag);
                     }
                     $inComment = false;
                     $tempTag = array($matches[1],$matches[2]);
@@ -78,36 +84,37 @@ class AkReflectionDocBlock
                 }
             }
             if (!empty($tempTag)) {
-                $this->_parseTag(&$tags, $tempTag);
+                $this->_parseTag($tags, $tempTag);
             }
+
             $docBlockStructure['comment'] = trim(implode("\n",$commentLines));
             $docBlockStructure['tags'] = $tags;
         }
         return $docBlockStructure;
     }
-    
-function _parseTag(&$tags, $tempTag)
+
+    protected function _parseTag(&$tags, $tempTag)
     {
         switch($tempTag[0]) {
             case 'param':
                 if (preg_match('/\$([a-zA-Z0-9_]+)\s*(.*?)/s',$tempTag[1],$pmatches)) {
 
                     if (!isset($tags['params'])) {
-                        $tags['params'] = array(); 
+                        $tags['params'] = array();
                     } else if (!is_array($tags['params'])) {
                         $currentValue = $tags['params'];
-                        $tags['params'] = array($currentValue); 
+                        $tags['params'] = array($currentValue);
                     }
                     $tags['params'][$pmatches[1]] = trim($pmatches[2]);
                 } else {
-                    
+
                     $tags['_unmatched_'][] = array($tempTag[0],$tempTag[1]);
                 }
                 break;
             default:
                 if(!empty($tags[$tempTag[0]])) {
                     if(!is_array($tags[$tempTag[0]])) {
-                        
+
                         $currentValue = $tags[$tempTag[0]];
                         $tags[$tempTag[0]] = array($currentValue);
                     }
@@ -115,8 +122,6 @@ function _parseTag(&$tags, $tempTag)
                 } else {
                     $tags[$tempTag[0]]=trim($tempTag[1]);
                 }
-                
         }
     }
 }
-?>

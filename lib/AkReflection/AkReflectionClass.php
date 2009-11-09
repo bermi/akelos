@@ -1,17 +1,16 @@
 <?php
-require_once(AK_LIB_DIR.DS.'AkReflection.php');
-require_once(AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionMethod.php');
-require_once(AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionDocBlock.php');
+
 class AkReflectionClass extends AkReflection
 {
-    var $_definition;
-    var $_docBlock;
-    var $methods = array();
-    var $properties = array();
+    public 
+    $methods = array(),
+    $properties = array();
+
+    protected 
+    $_definition,
+    $_docBlock;
     
-    
-    
-    function AkReflectionClass($class_definition)
+    public function __construct($class_definition)
     {
         if (is_array($class_definition)) {
             if (@$class_definition['type'] == 'class') {
@@ -32,12 +31,12 @@ class AkReflectionClass extends AkReflection
         } else {
             return;
         }
-        $this->_docBlock = &new AkReflectionDocBlock($this->_definition['docBlock']);
+        $this->_docBlock = new AkReflectionDocBlock($this->_definition['docBlock']);
         $this->_parse($this->_definition['code']);
         $this->_parseDefinitions();
-        
+
     }
-    function toString()
+    public function toString()
     {
         $docBlock = $this->_docBlock;
         if ($docBlock->changed) {
@@ -49,32 +48,32 @@ class AkReflectionClass extends AkReflection
             return isset($this->_definition['toString'])?$this->_definition['toString']:null;
         }
     }
-    function setTag($tag,$value)
+    public function setTag($tag,$value)
     {
         $this->_docBlock->setTag($tag,$value);
     }
-    function getTag($tag)
+    public function getTag($tag)
     {
         return $this->_docBlock->getTag($tag);
     }
-    function getName()
+    public function getName()
     {
         return isset($this->_definition['name'])?$this->_definition['name']:false;
     }
-    function getVisibility()
+    public function getVisibility()
     {
         return isset($this->_definition['visibility'])?$this->_definition['visibility']:false;
     }
-    
-    function isStatic()
+
+    public function isStatic()
     {
         return isset($this->_definition['static'])?$this->_definition['static']:false;
     }
-    function &getDocBlock()
+    public function &getDocBlock()
     {
         return $this->_docBlock;
     }
-    function _parseDefinitions()
+    public function _parseDefinitions()
     {
         foreach($this->definitions as $definition) {
             switch ($definition['type']) {
@@ -84,15 +83,17 @@ class AkReflectionClass extends AkReflection
             }
         }
     }
-    function &getMethod($name)
+    public function &getMethod($name)
     {
         $false = false;
         foreach($this->methods as $method) {
-            if ($method->getName()==$name) return $method;
+            if ($method->getName()==$name){
+                return $method;
+            }
         }
         return $false;
     }
-    function getMethods($options = null)
+    public function getMethods($options = null)
     {
         if ($options == null) {
             return $this->methods;
@@ -100,7 +101,7 @@ class AkReflectionClass extends AkReflection
             $default_options = array();
             $available_options = array('visibility','static','tags','returnByReference');
             $parameters = array('available_options'=>$available_options);
-            Ak::parseOptions(&$options,$default_options,$parameters);
+            Ak::parseOptions($options,$default_options,$parameters);
             $returnMethods = array();
             foreach ($this->methods as $method) {
                 if (isset($options['visibility']) && $method->getVisibility()!=$options['visibility']) {
@@ -129,13 +130,10 @@ class AkReflectionClass extends AkReflection
                     }
                 }
                 $returnMethods[] = $method;
-                
+
             }
-            //echo "Return methods:\n";
-            //var_dump($returnMethods);
             return $returnMethods;
         }
-        
     }
 }
-?>
+

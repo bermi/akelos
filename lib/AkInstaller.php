@@ -12,13 +12,6 @@
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
-require_once(AK_LIB_DIR.DS.'Ak.php');
-require_once(AK_LIB_DIR.DS.'AkObject.php');
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-file_exists(AK_APP_DIR.DS.'shared_model.php') ? require_once(AK_APP_DIR.DS.'shared_model.php') : null;
-defined('AK_APP_INSTALLERS_DIR') ? null : define('AK_APP_INSTALLERS_DIR', AK_APP_DIR.DS.'installers');
-
-defined('AK_VERBOSE_INSTALLER') ? null : define('AK_VERBOSE_INSTALLER', AK_DEV_MODE);
 
 /**
  * == Column Types ==
@@ -66,15 +59,23 @@ defined('AK_VERBOSE_INSTALLER') ? null : define('AK_VERBOSE_INSTALLER', AK_DEV_M
 class AkInstaller extends AkObject
 {
     public
+    // Public paths, so they can be modified for testing purposes
+    $app_plugins_dir            = AK_APP_PLUGINS_DIR,
+    $app_app_dir                = AK_APP_DIR,
+    $app_base_dir               = AK_BASE_DIR,
+    $app_installers_dir         = AK_APP_INSTALLERS_DIR,
+    $app_tmp_dir                = AK_TMP_DIR,
+    $app_vendor_dir             = AK_APP_VENDOR_DIR,
+    
     $data_dictionary,
-    $available_tables = array(),
-    $vervose = AK_VERBOSE_INSTALLER,
+    $available_tables           = array(),
+    $vervose                    = AK_VERBOSE_INSTALLER,
     $module,
-    $warn_if_same_version = true,
-    $use_transactions = true;
+    $warn_if_same_version       = true,
+    $use_transactions           = true;
 
     protected
-    $_inited = false;
+    $_inited                    = false;
 
     public function __construct($db_connection = null)
     {
@@ -175,18 +176,13 @@ Example:
 
     public function dropTable($table_name, $options = array())
     {
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
-
         AkDbSchemaCache::clear($table_name);
-
         $result = $this->tableExists($table_name) ? $this->db->execute('DROP TABLE '.$table_name) : 1;
-
         if($result){
             unset($this->available_tables[array_search($table_name, $this->available_tables)]);
             if(!empty($options['sequence'])){
                 $this->dropSequence($table_name);
             }
-
         }
     }
 
@@ -216,7 +212,6 @@ Example:
 
     public function removeIndex($table_name, $columns_or_index_name)
     {
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
         AkDbSchemaCache::clear($table_name);
         if(!$this->tableExists($table_name)){
             return false;
@@ -387,7 +382,6 @@ Example:
 
     public function clearSchemaCacheForTable($table_name)
     {
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php');
         AkDbSchemaCache::clear($table_name);
     }
 
@@ -688,7 +682,7 @@ Example:
 
     protected function _getDbDesignerFilePath()
     {
-        $path = AK_APP_INSTALLERS_DIR.DS.$this->getInstallerName().'.xml';
+        $path = $this->app_installers_dir.DS.$this->getInstallerName().'.xml';
         return file_exists($path) ? $path : false;
     }
 
@@ -708,7 +702,6 @@ Example:
         if(in_array($column_name, $invalid_columns)){
 
             $method_name_part = AkInflector::camelize($column_name);
-            require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
             $method_name = (method_exists(new AkActiveRecord(), 'set'.$method_name_part)?'set':'get').$method_name_part;
 
             trigger_error(Ak::t('A method named %method_name exists in the AkActiveRecord class'.
@@ -795,7 +788,7 @@ Example:
     private function _versionPath($options = array())
     {
         $mode = empty($options['mode']) ? AK_ENVIRONMENT : $options['mode'];
-        return AK_TMP_DIR.DS.'installer_versions'.DS.(empty($this->module)?'':$this->module.DS).$mode.'_'.$this->getInstallerName().'_version.txt';
+        return $this->app_tmp_dir.DS.'installer_versions'.DS.(empty($this->module)?'':$this->module.DS).$mode.'_'.$this->getInstallerName().'_version.txt';
     }
 
     private function _createMigrationsTableIfNeeded()

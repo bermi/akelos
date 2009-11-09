@@ -29,3 +29,8 @@ test/fixtures/public/images/cristobal.jpgtop_crop.jpg
 test/fixtures/public/images/watermark.png
 test/tmp/
 test/report/
+test/fixtures/app/locales/
+test/fixtures/app/plugin_installer_target_class.php
+app/plugin_installer_target_class.php
+app/locales/
+private/

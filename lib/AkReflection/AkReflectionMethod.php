@@ -1,33 +1,27 @@
 <?php
-require_once(AK_LIB_DIR.DS.'AkReflection.php');
-require_once(AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionDocBlock.php');
-require_once(AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFunction.php');
 
 class AkReflectionMethod extends AkReflectionFunction
 {
-    var $_definition;
-    var $_docBlock;
-    var $properties = array();
-    
-    
-    
-    function AkReflectionMethod($method_definition)
-    {
-        parent::AkReflectionFunction($method_definition);
-        
-    }
-    
+    protected
+    $_definition,
+    $_docBlock;
 
-    function getVisibility()
+    public
+    $properties = array();
+
+    public function __construct($method_definition)
     {
-        return isset($this->_definition['visibility'])?$this->_definition['visibility']:false;
+        parent::__construct($method_definition);
     }
-    
-    function isStatic()
+
+    public function getVisibility()
     {
-        return isset($this->_definition['static'])?$this->_definition['static']:false;
+        return isset($this->_definition['visibility']) ? $this->_definition['visibility'] : false;
     }
-    
-   
+
+    public function isStatic()
+    {
+        return isset($this->_definition['static']) ? $this->_definition['static'] : false;
+    }
 }
-?>
+
