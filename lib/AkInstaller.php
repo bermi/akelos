@@ -65,13 +65,16 @@ defined('AK_VERBOSE_INSTALLER') ? null : define('AK_VERBOSE_INSTALLER', AK_DEV_M
  */
 class AkInstaller extends AkObject
 {
-    public $data_dictionary;
-    public $available_tables = array();
-    public $vervose = AK_VERBOSE_INSTALLER;
-    public $module;
-    public $warn_if_same_version = true;
-    public $use_transactions = true;
-    protected $_inited = false;
+    public
+    $data_dictionary,
+    $available_tables = array(),
+    $vervose = AK_VERBOSE_INSTALLER,
+    $module,
+    $warn_if_same_version = true,
+    $use_transactions = true;
+
+    protected
+    $_inited = false;
 
     public function __construct($db_connection = null)
     {
@@ -93,6 +96,8 @@ class AkInstaller extends AkObject
                 $this->db = $db_connection;
             }
 
+            $this->ensureAkelosMigrationsModelIsAvailable();
+
             AkDbSchemaCache::clearAll();
 
             $this->data_dictionary = $this->db->getDictionary();
@@ -105,6 +110,8 @@ class AkInstaller extends AkObject
     {
         if($name == 'db'){
             $this->init();
+        }elseif($name == 'AkelosMigration'){
+            $this->ensureAkelosMigrationsModelIsAvailable();
         }
         return isset($this->$name) ? $this->$name : null;
     }
@@ -173,6 +180,7 @@ Example:
         AkDbSchemaCache::clear($table_name);
 
         $result = $this->tableExists($table_name) ? $this->db->execute('DROP TABLE '.$table_name) : 1;
+
         if($result){
             unset($this->available_tables[array_search($table_name, $this->available_tables)]);
             if(!empty($options['sequence'])){
@@ -329,57 +337,6 @@ Example:
         return $this->_runInstallerMethod('down', $version, $options);
     }
 
-    public function getInstallerName()
-    {
-        return str_replace('installer','',strtolower(get_class($this)));
-    }
-
-
-    public function getInstalledVersion($options = array())
-    {
-        $this->_createMigrationsTable();
-        $version = $this->db->selectValue(array('SELECT version FROM akelos_migrations WHERE name=?',$this->getInstallerName()));
-
-        if($version==NULL) {
-
-            $version_file = $this->_versionPath($options);
-
-            if(!is_file($version_file)){
-                $version = 0;
-                $this->setInstalledVersion($version, $options);
-            } else {
-                $this->_removeOldVersionsFileAndUseMigrationsTable($options);
-            }
-
-        }
-        $this->log('Installed version of '.$this->getInstallerName().':'.$version);
-        return $version;
-    }
-
-    protected function _removeOldVersionsFileAndUseMigrationsTable($options)
-    {
-        $oldfile = $this->_versionPath($options);
-        $version = Ak::file_get_contents($oldfile);
-        Ak::copy($oldfile, $oldfile.'.backup');
-        Ak::file_delete($oldfile);
-        $this->log('message','got old version from file:'.$oldfile.'='.$version.' moved to backup-file:'.$oldfile.'.backup');
-        $this->setInstalledVersion($version, $options);
-        $this->db->execute(array('INSERT INTO akelos_migrations (name,version,created_at) VALUES (?,?,?)',$this->getInstallerName(), $version, Ak::getDate()));
-
-    }
-
-    public function getAvailableVersions()
-    {
-        $versions = array();
-        foreach(get_class_methods($this) as $method_name){
-            if(preg_match('/^up_([0-9]*)$/',$method_name, $match)){
-                $versions[] = intval($match[1]);
-            }
-        }
-        sort($versions);
-        return $versions;
-    }
-
     public function modifyTable($table_name, $column_options = null, $table_options = array())
     {
         return $this->_createOrModifyTable($table_name, $column_options, $table_options);
@@ -526,40 +483,6 @@ Example:
             $this->setInstalledVersion($version_number, $options);
         }
         return $success;
-    }
-
-    protected function _versionPath($options = array())
-    {
-        $mode = empty($options['mode']) ? AK_ENVIRONMENT : $options['mode'];
-        return AK_TMP_DIR.DS.'installer_versions'.DS.(empty($this->module)?'':$this->module.DS).$mode.'_'.$this->getInstallerName().'_version.txt';
-    }
-
-    protected function _createMigrationsTable()
-    {
-        if(!$this->tableExists('akelos_migrations')) {
-            AkDbSchemaCache::clearAll();
-            $this->data_dictionary =& $this->db->getDictionary();
-            $this->available_tables = $this->getAvailableTables();
-            $this->createTable('akelos_migrations','id, name, version int');
-            $this->addIndex('akelos_migrations','UNIQUE name','unq_name');
-        }
-    }
-
-    public function setInstalledVersion($version, $options = array())
-    {
-        if(!$this->tableExists('akelos_migrations')) {
-            $this->_createMigrationsTable();
-        }
-        /**
-         * this will produce an error if the unique index on name is violated, then we update
-         */
-        $this->log('Setting version of '.$this->getInstallerName().' to '.$version);
-        $old_version=$this->db->selectValue(array('SELECT version from akelos_migrations WHERE name = ?', $this->getInstallerName()));
-        if($old_version !== null || !@$this->db->execute(array('INSERT INTO akelos_migrations (version,created_at,name) VALUES (?,?,?)',$version,Ak::getDate(),$this->getInstallerName()))) {
-            return @$this->db->execute(array('UPDATE akelos_migrations SET version=?, updated_at=? WHERE name=?',$version,Ak::getDate(),$this->getInstallerName()));
-        }
-
-        return true;
     }
 
     protected function _createOrModifyTable($table_name, $column_options = null, $table_options = array())
@@ -817,5 +740,97 @@ Example:
         'association_option','association_id','associated_ids','associated_handler_name','associated_type','association_type',
         'collection_handler_name','model_name','model_name','parent_model_name','parent_model_name');
     }
+
+
+    /**
+     * Migration version management functions
+     */
+
+    public function getInstalledVersion($options = array())
+    {
+        if(!$Migration = $this->AkelosMigration->findFirstBy('name', $this->getInstallerName())) {
+            $version_file = $this->_versionPath($options);
+            if(!is_file($version_file)){
+                $version = 0;
+                $this->setInstalledVersion($version, $options);
+            } else {
+                $this->_removeOldVersionsFileAndUseMigrationsTable($options);
+            }
+
+        }else{
+            $version = $Migration->version;
+        }
+        $this->log('Installed version of '.$this->getInstallerName().':'.$version);
+        return $version;
+    }
+
+    public function setInstalledVersion($version, $options = array())
+    {
+        $this->log('Setting version of '.$this->getInstallerName().' to '.$version);
+        if($Migration = $this->AkelosMigration->findFirstBy('name', $this->getInstallerName())){
+            $Migration->version = $version;
+            return $Migration->save();
+        }else{
+            return false != $this->AkelosMigration->create(array('name' => $this->getInstallerName(), 'version' => $version));
+        }
+    }
+
+    public function getInstallerName()
+    {
+        return str_replace('installer','',strtolower(get_class($this)));
+    }
+
+    public function ensureAkelosMigrationsModelIsAvailable()
+    {
+        if(!class_exists('AkelosMigration')){
+            eval('class AkelosMigration extends AkActiveRecord {}');
+        }
+        if(!isset($this->AkelosMigration) || !($this->AkelosMigration instanceof AkActiveRecord)){
+            $this->AkelosMigration = new AkelosMigration();
+        }
+
+        $this->_createMigrationsTableIfNeeded();
+    }
+
+    private function _versionPath($options = array())
+    {
+        $mode = empty($options['mode']) ? AK_ENVIRONMENT : $options['mode'];
+        return AK_TMP_DIR.DS.'installer_versions'.DS.(empty($this->module)?'':$this->module.DS).$mode.'_'.$this->getInstallerName().'_version.txt';
+    }
+
+    private function _createMigrationsTableIfNeeded()
+    {
+        if(!$this->tableExists('akelos_migrations')) {
+            AkDbSchemaCache::clearAll();
+            $this->data_dictionary = $this->db->getDictionary();
+            $this->available_tables = $this->getAvailableTables();
+            $this->createTable('akelos_migrations','id, name, version int');
+            $this->addIndex('akelos_migrations','UNIQUE name','unq_name');
+        }
+    }
+
+    protected function _removeOldVersionsFileAndUseMigrationsTable($options)
+    {
+        $oldfile = $this->_versionPath($options);
+        $version = Ak::file_get_contents($oldfile);
+        Ak::copy($oldfile, $oldfile.'.backup');
+        Ak::file_delete($oldfile);
+        $this->log('message','got old version from file:'.$oldfile.'='.$version.' moved to backup-file:'.$oldfile.'.backup');
+        $this->setInstalledVersion($version, $options);
+        $this->AkelosMigration->create(array('name' => $this->getInstallerName(), 'version' => $version));
+    }
+
+    public function getAvailableVersions()
+    {
+        $versions = array();
+        foreach(get_class_methods($this) as $method_name){
+            if(preg_match('/^up_([0-9]*)$/',$method_name, $match)){
+                $versions[] = intval($match[1]);
+            }
+        }
+        sort($versions);
+        return $versions;
+    }
+
 }
 

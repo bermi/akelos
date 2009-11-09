@@ -226,7 +226,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     public function init($attributes = array())
     {
-        AK_LOG_EVENTS ? ($this->Logger =& Ak::getLogger()) : null;
+        AK_LOG_EVENTS ? ($this->Logger = Ak::getLogger()) : null;
         $this->_internationalize = is_null($this->_internationalize) && AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT ? count($this->getAvailableLocales()) > 1 : $this->_internationalize;
 
         @$this->_instantiateDefaultObserver();
@@ -383,7 +383,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     public function &findOrCreateBy()
     {
         $args = func_get_args();
-        $Item =& call_user_func_array(array($this,'findFirstBy'), $args);
+        $Item = call_user_func_array(array($this,'findFirstBy'), $args);
         if(!$Item){
             $attributes = array();
 
@@ -1105,14 +1105,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     public function &findFirst()
     {
         $args = func_get_args();
-        $result =& call_user_func_array(array($this,'find'), array_merge(array('first'),$args));
+        $result = call_user_func_array(array($this,'find'), array_merge(array('first'),$args));
         return $result;
     }
 
     public function &findAll()
     {
         $args = func_get_args();
-        $result =& call_user_func_array(array($this,'find'), array_merge(array('all'),$args));
+        $result = call_user_func_array(array($this,'find'), array_merge(array('all'),$args));
         return $result;
     }
 
@@ -1156,7 +1156,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         $args = func_get_args();
         array_unshift($args,'first');
-        $result =& call_user_func_array(array($this,'findBy'), $args);
+        $result = call_user_func_array(array($this,'findBy'), $args);
         return $result;
     }
 
@@ -1166,7 +1166,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $options = $this->_extractOptionsFromArgs($args);
         $options['order'] = $this->getPrimaryKey().' DESC';
         array_push($args, $options);
-        $result =& call_user_func_array(array($this,'findFirstBy'), $args);
+        $result = call_user_func_array(array($this,'findFirstBy'), $args);
         return $result;
     }
 
@@ -1174,7 +1174,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         $args = func_get_args();
         array_unshift($args,'all');
-        $result =& call_user_func_array(array($this,'findBy'), $args);
+        $result = call_user_func_array(array($this,'findBy'), $args);
         return $result;
     }
 
@@ -1237,7 +1237,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         */
         $options['conditions'] = $conditions;
 
-        $result =& call_user_func_array(array($this,'find'), array($fetch,$options));
+        $result = call_user_func_array(array($this,'find'), array($fetch,$options));
         return $result;
     }
 
@@ -2320,7 +2320,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     public function &establishConnection($specification_or_profile = AK_DEFAULT_DATABASE_PROFILE)
     {
-        $adapter =& AkDbAdapter::getInstance($specification_or_profile);
+        $adapter = AkDbAdapter::getInstance($specification_or_profile);
         return $this->setConnection($adapter);
     }
 
@@ -2348,7 +2348,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     public function &setConnection($db_adapter = null)
     {
         if (is_null($db_adapter)){
-            $db_adapter =& AkDbAdapter::getInstance();
+            $db_adapter = AkDbAdapter::getInstance();
         }
         return $this->_db = $db_adapter;
     }
@@ -4135,7 +4135,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         /**
          * get the statically stored observers for the namespace
          */
-        $observers = &Ak::getStaticVar($staticVarNs);
+        $observers = Ak::getStaticVar($staticVarNs);
         if (!is_array($observers)) {
             $observers = array('classes'=>array(),'objects'=>array());
         }
@@ -4160,7 +4160,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $key = 'objects';
 
         $array = array();
-        $observers_arr =& Ak::getStaticVar($staticVarNs);
+        $observers_arr = Ak::getStaticVar($staticVarNs);
         if (isset($observers_arr[$key])) {
             $observers = $observers_arr[$key];
         } else {
@@ -5405,7 +5405,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         static $cache;
         $false = false;
-        $args =& func_get_args();
+        $args = func_get_args();
         if(count($args) == 2){
             if(!isset($cache[$args[0]])){
                 $cache[$args[0]] = $args[1];

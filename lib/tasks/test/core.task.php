@@ -8,6 +8,11 @@ if($files = empty($options['files']) ? false :  $options['files']){
     $core_tests = Ak::convert('yaml', 'array', file_get_contents(AK_TEST_DIR.DS.'core_tests.yml'));
 }
 
+if($db_type = empty($options['db']) ? false :  $options['db']){
+    define('AK_DATABASE_SETTINGS_NAMESPACE', $db_type);
+    unset($options['db']);
+}
+
 if($component = empty($options['component']) ? false :  $options['component']){
     $component_title = AkInflector::titleize($component);
     if(empty($core_tests[$component_title])){
@@ -62,7 +67,12 @@ $files = array_diff($files, array(''));
 
 include_once(AK_LIB_DIR.DS.'AkUnitTest.php');
 
-$TestSuite = new TestSuite('Unit tests for Akelos ('.(empty($component_title)?'all components':$component_title).").\nError reporting set to: ".AkConfig::getErrorReportingLevelDescription());
+$TestSuite = new TestSuite(
+"PHP ".phpversion().", Environment: ".AK_ENVIRONMENT.", Database: ".Ak::getSetting((defined('AK_DATABASE_SETTINGS_NAMESPACE')?AK_DATABASE_SETTINGS_NAMESPACE:'database'), 'type')."\n".
+"Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n".
+'Running unit tests for Akelos ('.(empty($component_title)?'all components':$component_title).")."
+);
+
 $Reporter = new TextReporter();
 
 foreach ($files as $file_path){

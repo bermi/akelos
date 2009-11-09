@@ -2,19 +2,11 @@
 
 class AkMongoDbAdapter extends AkDbAdapter
 {
-    public function _constructDsn($database_settings)
+    static function constructDsn($database_settings)
     {
-        print_r($database_settings);
-        
+               
         die();
-        $dsn  = 'mysqlt://';
-        $dsn .= $database_settings['user'].':'.$database_settings['password'];
-        $dsn .= !empty($database_settings['host']) ? '@'.$database_settings['host'] : '@localhost';
-        $dsn .= !empty($database_settings['port']) ? ':'.$database_settings['port'] : '';
-        $dsn .= '/'.$database_settings['database_name'];
-        if (empty($database_settings['options']) && !empty($database_settings['socket'])) $database_settings['options'] = 'socket='.urlencode($database_settings['socket']);
-        $dsn .= !empty($database_settings['options']) ? '?'.$database_settings['options'] : '';
-        return $dsn;
+
     }
 
     public function getDictionary()

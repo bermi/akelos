@@ -3,7 +3,6 @@
 // +----------------------------------------------------------------------+
 // | Akelos PHP Framework - http://www.akelos.org                         |
 // +----------------------------------------------------------------------+
-// |               2008-2009, Bermi Ferrer Martinez                       |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
@@ -31,7 +30,7 @@
  */
 class AkImageCropFilter extends AkImageFilter
 {
-    function setOptions($options = array())
+    public function setOptions($options = array())
     {
         $default_options = array(
         'width'=> $this->Image->getWidth(),
@@ -39,22 +38,20 @@ class AkImageCropFilter extends AkImageFilter
         'x' => 0,
         'y' => 0
         );
-        
+
         $this->options = array_merge($default_options, $options);
         $this->_setWidthAndHeight_($this->options);
         $this->_variablizeOptions_($this->options);
     }
 
-    function apply()
+    public function apply()
     {
         $this->Image->Transform->crop($this->options['width'], $this->options['height'], $this->options['x'], $this->options['y']);
     }
 
-    function getName()
+    public function getName()
     {
         return 'crop';
     }
-
 }
 
-?>

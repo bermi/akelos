@@ -227,6 +227,7 @@ defined('AK_FRAMEWORK_LANGUAGE') ? null : define('AK_FRAMEWORK_LANGUAGE', 'en');
 defined('AK_DEV_MODE') ? null : define('AK_DEV_MODE', false);
 defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION') ? null : define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
 
-AK_CLI || AK_PRODUCTION_MODE ? null : require_once(AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php');
+//AK_CLI || AK_PRODUCTION_MODE ? null : 
+require_once(AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php');
 
 ?>

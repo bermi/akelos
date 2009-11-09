@@ -63,13 +63,14 @@ function rs2tabout(&$rs,$addtitles=true)
 function _adodb_export(&$rs,$sep,$sepreplace,$fp=false,$addtitles=true,$quote = '"',$escquote = '"',$replaceNewLine = ' ')
 {
 	if (!$rs) return '';
+	
 	//----------
 	// CONSTANTS
 	$NEWLINE = "\r\n";
 	$BUFLINES = 100;
 	$escquotequote = $escquote.$quote;
 	$s = '';
-	
+	$elements = array();
 	if ($addtitles) {
 		$fieldTypes = $rs->FieldTypesArray();
 		reset($fieldTypes);

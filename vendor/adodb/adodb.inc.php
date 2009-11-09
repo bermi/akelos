@@ -995,7 +995,6 @@ if (!defined('_ADODB_LAYER')) {
                             if ($i+1 != sizeof($sqlarr)) $this->outp_throw( "Input Array does not match ?: ".htmlspecialchars($sql),'Execute');
                         } else if ($i != sizeof($sqlarr))
                         $this->outp_throw( "Input array does not match ?: ".htmlspecialchars($sql),'Execute');
-
                         $ret = $this->_Execute($sql);
                         if (!$ret) return $ret;
                     }

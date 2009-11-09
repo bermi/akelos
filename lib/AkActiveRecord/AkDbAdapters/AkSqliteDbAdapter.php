@@ -23,11 +23,12 @@ class AkSqliteDbAdapter extends AkDbAdapter
      * @param array $database_settings
      * @return string
      */
-    public function _constructDsn($database_settings)
+    static function constructDsn($database_settings)
     {
         $dsn  = $database_settings['type'].'://';
         $dsn .= urlencode($database_settings['database_file']).'/?persist';
         $dsn .= !empty($database_settings['options']) ? $database_settings['options'] : '';
+
         return $dsn;
     }
 

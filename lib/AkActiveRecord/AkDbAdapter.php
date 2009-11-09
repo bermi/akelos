@@ -37,7 +37,7 @@ class AkDbAdapter extends AkObject
             $this->connect();
         }
         if (AK_LOG_EVENTS){
-            $this->logger =& Ak::getLogger();
+            $this->logger = Ak::getLogger();
         }
     }
 
@@ -48,6 +48,7 @@ class AkDbAdapter extends AkObject
     public function connect($die_on_error = true)
     {
         $dsn = $this->constructDsn($this->settings);
+        
         require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb.inc.php');
         $this->connection = AK_DEBUG ? NewADOConnection($dsn) : @NewADOConnection($dsn);
 
@@ -233,7 +234,9 @@ class AkDbAdapter extends AkObject
         if (is_array($sql)) {
             $sql_string = array_shift($sql);
             $bindings = $sql;
-        } else $sql_string = $sql;
+        } else {
+            $sql_string = $sql;
+        }
 
         $this->_log($message.': '.$sql_string);
         $result = isset($bindings) ? $this->connection->Execute($sql_string, $bindings) : $this->connection->Execute($sql_string);
@@ -278,7 +281,7 @@ class AkDbAdapter extends AkObject
 
     public function delete($sql,$message = '')
     {
-        $result = $this->execute($sql,$message);
+        $result = $this->execute($sql, $message);
         return ($result) ? $this->getAffectedRows() : false;
     }
 
@@ -463,6 +466,5 @@ class AkDbAdapter extends AkObject
     {
         return $this->connection->BlobDecode($value);
     }
-
 }
 

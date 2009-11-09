@@ -13,33 +13,34 @@
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
 */
 
-require_once(AK_LIB_DIR.DS.'AkImage.php');
-
 class AkImageColorScheme extends AkObject
 {
-    var $number_of_colors = 12;
-    var $calculate_negatives = true;
-    var $minimum_hits_for_negative = 50;
-    var $Image;
-    var $_tmp_file;
-    var $_frequentColors = array();
+    public 
+    $number_of_colors = 12,
+    $calculate_negatives = true,
+    $minimum_hits_for_negative = 50,
+    $Image;
+    
+    protected 
+    $_tmp_file,
+    $_frequentColors = array();
 
-    function setImage($image_path)
+    public function setImage($image_path)
     {
-        $this->Image =& new AkImage($image_path);
+        $this->Image = new AkImage($image_path);
         $this->Image->transform('resize',array('size'=>'24x24'));
         $this->_tmp_file = AK_TMP_DIR.DS.'__AkImageColorScheme_'.Ak::randomString(32).'.jpg';
         $this->Image->save($this->_tmp_file);
     }
 
-    function __destruct()
+    public function __destruct()
     {
         if(file_exists($this->_tmp_file)){
             @Ak::file_delete($this->_tmp_file);
         }
     }
 
-    function getColorScheme($number_of_colors = null)
+    public function getColorScheme($number_of_colors = null)
     {
         $colors = array();
         if($image = @imagecreatefromjpeg($this->_tmp_file)){
@@ -73,7 +74,7 @@ class AkImageColorScheme extends AkObject
         return $this->_getColorsFromCounterColorArray($colors, $number_of_colors);
     }
 
-    function _getColorsFromCounterColorArray($colors_array, $number_of_colors = null)
+    protected function _getColorsFromCounterColorArray($colors_array, $number_of_colors = null)
     {
         $number_of_colors = empty($number_of_colors) ? $this->number_of_colors : $number_of_colors;
         asort($colors_array);
@@ -82,28 +83,28 @@ class AkImageColorScheme extends AkObject
         return $colors_array;
     }
 
-    function _getNegativeAsHex($red, $green, $blue)
+    protected function _getNegativeAsHex($red, $green, $blue)
     {
         $rgb = $red*0.15 + $green*0.5 + $blue * 0.35;
         return $this->_rgbToHex(array(255-$rgb, 255-$rgb, 255-$rgb));
     }
 
-    function _addToFrequentColors($hex_color)
+    protected function _addToFrequentColors($hex_color)
     {
         $this->_frequentColors[$hex_color] = empty($this->_frequentColors[$hex_color]) ? 1 : $this->_frequentColors[$hex_color]+1;
     }
 
-    function resetFrequentColors()
+    public function resetFrequentColors()
     {
         $this->_frequentColors = array();
     }
 
-    function getFrequentColors($number_of_colors = null)
+    public function getFrequentColors($number_of_colors = null)
     {
         return $this->_getColorsFromCounterColorArray($this->_frequentColors, $number_of_colors);
     }
 
-    function _rgbToHex($rgb)
+    protected function _rgbToHex($rgb)
     {
         $r = str_pad(dechex($rgb[0]), 2, '0', STR_PAD_LEFT);
         $g = str_pad(dechex($rgb[1]), 2, '0', STR_PAD_LEFT);
@@ -111,5 +112,3 @@ class AkImageColorScheme extends AkObject
         return $r.$g.$b;
     }
 }
-
-?>

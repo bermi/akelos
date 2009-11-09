@@ -2320,6 +2320,7 @@ function ak_autoload($name, $path = null)
         'AkDbSession'               =>  AK_LIB_DIR.DS.'AkDbSession.php',
         'AkHttpClient'              =>  AK_LIB_DIR.DS.'AkHttpClient.php',
         'AkImage'                   =>  AK_LIB_DIR.DS.'AkImage.php',
+        'AkImageColorScheme'             =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageColorScheme.php',
         'AkImageFilter'             =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageFilter.php',
         'AkInflector'               =>  AK_LIB_DIR.DS.'AkInflector.php',
         'AkInstaller'               =>  AK_LIB_DIR.DS.'AkInstaller.php',

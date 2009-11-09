@@ -23,7 +23,7 @@ class AkMysqlDbAdapter extends AkDbAdapter
      * @param array $database_settings
      * @return string
      */
-    public function _constructDsn($database_settings)
+    static function constructDsn($database_settings)
     {
         $dsn  = 'mysqlt://';
         $dsn .= $database_settings['user'].':'.$database_settings['password'];

@@ -1,13 +1,9 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
-require_once(AK_LIB_DIR.DS.'AkInstaller.php');
-
-class Test_of_AkInstaller extends  AkUnitTest
+class AkInstaller_TestCase extends  AkUnitTest
 {
-    /**/
 
     public function setup()
     {
@@ -111,13 +107,13 @@ class Test_of_AkInstaller extends  AkUnitTest
     public function Test_for_creating_table()
     {
         $this->Installer->createTable('test_pages', "
-            id integer not null auto_increment primary_key,
-            title string(255),
-            body text,
-            parent_id integer not null default '0',
-            created_at datetime,
-            updated_at datetime
-        ");
+    id integer not null auto_increment primary_key,
+    title string(255),
+    body text,
+    parent_id integer not null default '0',
+    created_at datetime,
+    updated_at datetime
+    ");
 
         $from_datadict = $this->Installer->db->getColumnDetails('test_pages');
 
@@ -128,24 +124,24 @@ class Test_of_AkInstaller extends  AkUnitTest
         }
 
         $this->Installer->createTable('test_categories', "
-            id integer not null auto_increment primary_key,
-            name string(255),
-            description text,
-            parent_id integer not null default '0'
-        ", array('timestamp'=>false));
+    id integer not null auto_increment primary_key,
+    name string(255),
+    description text,
+    parent_id integer not null default '0'
+    ", array('timestamp'=>false));
 
 
         $this->Installer->createTable('test_categories_pages', "
-            category_id integer not null,
-            page_id integer not null
-        ", array('timestamp'=>false));
+    category_id integer not null,
+    page_id integer not null
+    ", array('timestamp'=>false));
 
         $this->Installer->createTable('test_nice_urls', "
-            id integer not null auto_increment primary_key,
-            url string(255),
-            context_id integer not null,
-            context string(255) not null default 'page'
-        ", array('timestamp'=>false));
+    id integer not null auto_increment primary_key,
+    url string(255),
+    context_id integer not null,
+    context string(255) not null default 'page'
+    ", array('timestamp'=>false));
 
 
         $this->Installer->dropTables('test_pages','test_categories');
@@ -281,6 +277,5 @@ class Test_of_AkInstaller extends  AkUnitTest
 
 }
 
-ak_test('Test_of_AkInstaller', true);
+ak_test_run_case_if_executed('AkInstaller_TestCase');
 
-?>

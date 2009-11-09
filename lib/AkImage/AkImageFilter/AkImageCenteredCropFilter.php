@@ -3,7 +3,6 @@
 // +----------------------------------------------------------------------+
 // | Akelos PHP Framework - http://www.akelos.org                         |
 // +----------------------------------------------------------------------+
-// |               2008-2009, Bermi Ferrer Martinez                       |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
@@ -29,7 +28,7 @@
  */
 class AkImageCenteredCropFilter extends AkImageFilter
 {
-    function setOptions($options = array())
+    public function setOptions($options = array())
     {
         $default_options = array(
         'width'=> $this->Image->getWidth(),
@@ -41,11 +40,11 @@ class AkImageCenteredCropFilter extends AkImageFilter
         $this->_variablizeOptions_($this->options);
     }
 
-    function apply()
+    public function apply()
     {
         $height_ratio  = $this->Image->getHeight()/$this->options['height'];
         $width_ratio  = $this->Image->getWidth()/$this->options['width'];
-        
+
         //width bigger
         if($this->Image->getWidth() > $this->Image->getHeight()){
             if($width_ratio>1){
@@ -53,27 +52,27 @@ class AkImageCenteredCropFilter extends AkImageFilter
                 $height = $this->options['height'];
                 $x      = ($width-$this->options['width'])/2;
                 $y      = 0;
-                
+
                 $this->_resizeAndCrop($width, $height, $x, $y);
             }
-        // height bigger
+            // height bigger
         }else{
             if($height_ratio>1){
                 $height = $this->Image->getHeight()/$width_ratio;
                 $width  = $this->options['width'];
                 $x      = 0;
                 $y      = ($height-$this->options['height'])/2;
-                
+
                 $this->_resizeAndCrop($width, $height, $x, $y);
             }
         }
     }
 
-    function getName()
+    public function getName()
     {
         return 'centered_crop';
     }
-    
+
     private function _resizeAndCrop($width, $height, $x, $y)
     {
         $this->Image->Transform->resize($width, $height);
@@ -81,4 +80,3 @@ class AkImageCenteredCropFilter extends AkImageFilter
     }
 }
 
-?>

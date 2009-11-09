@@ -3,7 +3,6 @@
 // +----------------------------------------------------------------------+
 // | Akelos PHP Framework - http://www.akelos.org                         |
 // +----------------------------------------------------------------------+
-// |               2008-2009, Bermi Ferrer Martinez                       |
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
@@ -41,7 +40,7 @@
  */
 class AkImageWatermarkFilter extends AkImageFilter
 {
-    function setOptions($options = array())
+    public function setOptions($options = array())
     {
         require_once(AK_VENDOR_DIR.DS.'pear'.DS.'Image'.DS.'Tools.php');
         $this->Image->Transform =& Image_Tools::factory('Watermark');
@@ -60,17 +59,14 @@ class AkImageWatermarkFilter extends AkImageFilter
         $this->Image->Transform->set($this->options);
     }
 
-    function apply()
+    public function apply()
     {
         $this->Image->Transform->preRender();
         $this->Image->Transform->render();
     }
 
-    function getName()
+    public function getName()
     {
         return 'watermark';
     }
-
 }
-
-?>

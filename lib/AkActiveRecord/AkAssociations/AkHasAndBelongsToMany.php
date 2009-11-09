@@ -919,8 +919,8 @@ class AkHasAndBelongsToMany extends AkAssociation
                 $args = empty($args) ? array('all') : $args;
                 array_push($args, $finder_options);
             }
-            $Associated =& $this->getAssociatedModelInstance();
-            $result =& call_user_func_array(array(&$Associated,'find'), $args);
+            $Associated = $this->getAssociatedModelInstance();
+            $result = call_user_func_array(array(&$Associated,'find'), $args);
 
         }
         return $result;
@@ -931,7 +931,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         if(!$this->Owner->isNewRecord()){
             $this->constructSql();
             $has_and_belongs_to_many_options = $this->getOptions($this->association_id);
-            $Associated =& $this->getAssociatedModelInstance();
+            $Associated = $this->getAssociatedModelInstance();
 
             $args = func_get_args();
             $num_args = func_num_args();
@@ -1000,7 +1000,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                 $args = empty($args) ? array('all') : $args;
                 array_push($args, $options);
             }
-            $result =& call_user_func_array(array(&$Associated,'find'), $args);
+            $result = call_user_func_array(array(&$Associated,'find'), $args);
         }
 
         return $result;

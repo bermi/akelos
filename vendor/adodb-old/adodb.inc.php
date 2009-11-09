@@ -860,7 +860,6 @@
 	
 	public function _Execute($sql,$inputarr=false)
 	{
-
 		if ($this->debug) {
 			global $ADODB_INCLUDED_LIB;
 			if (empty($ADODB_INCLUDED_LIB)) include_once(ADODB_DIR.'/adodb-lib.inc.php');

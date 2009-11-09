@@ -27,6 +27,6 @@ class FrameworkInstaller extends AkInstaller
     {
         $this->dropTable('cache');
         $this->dropTable('sessions');
-        $this->dropTable('var');
+        $this->dropTable('var');        
     }
 }

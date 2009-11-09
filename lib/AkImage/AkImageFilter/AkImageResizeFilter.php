@@ -28,7 +28,7 @@ class AkImageResizeFilter extends AkImageFilter
 {
     // Image->path
     // Image->filter_backup->path
-    function setOptions($options = array())
+    public function setOptions($options = array())
     {
         $default_options = array(
         'width'=> $this->Image->getWidth(),
@@ -43,17 +43,17 @@ class AkImageResizeFilter extends AkImageFilter
         $this->_variablizeOptions_($this->options);
     }
 
-    function apply()
+    public function apply()
     {
         $this->Image->Transform->resize($this->options['width'], $this->options['height'], $this->options);
     }
 
-    function getName()
+    public function getName()
     {
         return 'resize';
     }
 
-    function _recalculateTargetDimenssions()
+    protected function _recalculateTargetDimenssions()
     {
         $original_width = $this->Image->getWidth();
         $original_height = $this->Image->getHeight();
@@ -92,15 +92,14 @@ class AkImageResizeFilter extends AkImageFilter
         $this->options['height'] = $target_height;
     }
 
-    function _getProportionalWidth($proportion = '100%')
+    protected function _getProportionalWidth($proportion = '100%')
     {
         return intval($proportion)/100*$this->Image->getWidth();
     }
 
-    function _getProportionalHeight($proportion = '100%')
+    protected function _getProportionalHeight($proportion = '100%')
     {
         return intval($proportion)/100*$this->Image->getHeight();
     }
 }
 
-?>
