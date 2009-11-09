@@ -25,5 +25,6 @@
 // ak_define('ACTIVE_RECORD_ENABLE_PERSISTENCE', true);
 // ak_define('ACTIVE_RECORD_CACHE_DATABASE_SCHEMA', true);
 // ak_define('ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE', 86400);
+error_reporting(-1);
 
 ?>

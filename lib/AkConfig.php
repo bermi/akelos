@@ -163,15 +163,17 @@ class AkConfig
 
     static function generateCacheFileName($namespace, $environment = AK_ENVIRONMENT)
     {
-        $namespace = Ak::sanitize_include($namespace, 'high');
-        $cacheDir  = AK_TMP_DIR.DS.'ak_config';
-        $cacheFile = $cacheDir.DS.'cache'.DS.$environment.DS.$namespace.'.php';
-        return $cacheFile;
+        return AkConfig::getCacheBasePath($environment).DS.'ak_config'.DS.'cache'.DS.$environment.DS.Ak::sanitize_include($namespace, 'high').'.php';
+    }
+    
+    static function getCacheBasePath()
+    {
+        return AK_TMP_DIR;
     }
 
     public function readCache($namespace, $environment = AK_ENVIRONMENT, $force = false)
     {
-        if ((AK_CLI && AK_ENVIRONMENT!='testing') || (!$force && !$this->_useReadCache($environment))){
+        if (!$force && !$this->_useReadCache($environment)){
             return false;
         }
         $cacheFileName = $this->generateCacheFileName($namespace,$environment);
@@ -185,7 +187,7 @@ class AkConfig
 
     public function writeCache($config, $namespace, $environment = AK_ENVIRONMENT, $force = false)
     {
-        if ((AK_CLI && AK_ENVIRONMENT != 'testing') || AK_ENVIRONMENT == 'setup' || (!$force &&!$this->_useWriteCache($environment))){
+        if (!$force &&!$this->_useWriteCache($environment)){
             return false;
         }
 
@@ -199,7 +201,16 @@ class AkConfig
 return \$config;
 ?>
 CACHE;
-        $cacheFileName = $this->generateCacheFileName($namespace,$environment);
+        $cache_file_name = $this->generateCacheFileName($namespace, $environment);
+        
+        if(!Ak::file_put_contents($cache_file_name, $cache, array('base_path' => AkConfig::getCacheBasePath()))){
+            trigger_error(Ak::t('Could not create config cache file %file', array('%file'=>$cache_file_name)), E_USER_ERROR);
+            return false;
+        }else{
+            $this->_setCacheValidity($namespace,$environment);
+            return true;
+        }
+        
         $cacheDir = dirname($cacheFileName);
 
         if (!file_exists($cacheDir)) {
@@ -249,7 +260,9 @@ CACHE;
 
     protected function _useReadCache($environment = AK_ENVIRONMENT)
     {
-        if(AK_CLI && AK_ENVIRONMENT != 'testing') return false;
+        if(AK_CLI && AK_ENVIRONMENT != 'testing'){
+            return false;
+        }
         switch ($environment) {
             case 'development':
             case 'testing':
@@ -263,14 +276,12 @@ CACHE;
 
     protected function _useWriteCache($environment = AK_ENVIRONMENT)
     {
-        if(AK_CLI && AK_ENVIRONMENT != 'testing') return false;
+        if(AK_CLI && AK_ENVIRONMENT != 'testing'){
+            return false;
+        }
         switch ($environment) {
             case 'setup':
                 return false;
-                break;
-            case 'development':
-            case 'testing':
-                return true;
                 break;
             default:
                 return true;

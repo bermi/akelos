@@ -459,9 +459,10 @@ class Ak
             require_once(AK_LIB_DIR.DS.'AkFtp.php');
             $file_name = trim(str_replace(array(DS,'//'),array('/','/'),$file_name),'/');
             return AkFtp::delete($file_name, true);
-        }else{
+        }elseif (file_exists($options['base_path'].DS.$file_name)){
             return unlink($options['base_path'].DS.$file_name);
         }
+        return false;
     }
 
     static function directory_delete($dir_name, $options = array())

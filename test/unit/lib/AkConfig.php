@@ -20,15 +20,15 @@ class AkConfig_TestCase extends  AkUnitTest
 
     public function tearDown()
     {
-        @unlink($this->_base_config_path.DS.'testing'.DS.'testconfig1.php');
-        @unlink($this->_base_config_path.DS.'development'.DS.'testconfig1.php');
-        @unlink($this->_base_config_path.DS.'production'.DS.'testconfig1.php');
-        @rmdir($this->_base_config_path.DS.'testing');
-        @rmdir($this->_base_config_path.DS.'development');
-        @rmdir($this->_base_config_path.DS.'production');
-        @unlink(AK_CONFIG_DIR.DS.'testconfig1.yml');
-        @rmdir($this->_base_config_path);
-        @rmdir(AK_TMP_DIR.DS.'ak_config');
+        Ak::file_delete($this->_base_config_path.DS.'testing'.DS.'testconfig1.php', array('base_path' => $this->_base_config_path));
+        Ak::file_delete($this->_base_config_path.DS.'development'.DS.'testconfig1.php', array('base_path' => $this->_base_config_path));
+        Ak::file_delete($this->_base_config_path.DS.'production'.DS.'testconfig1.php', array('base_path' => $this->_base_config_path));
+        Ak::rmdir_tree($this->_base_config_path.DS.'testing');
+        Ak::rmdir_tree($this->_base_config_path.DS.'development');
+        Ak::rmdir_tree($this->_base_config_path.DS.'production');
+        Ak::file_delete(AK_CONFIG_DIR.DS.'testconfig1.yml', array('base_path' => $this->_base_config_path));
+        Ak::rmdir_tree($this->_base_config_path);
+        Ak::rmdir_tree(AK_TMP_DIR.DS.'ak_config');
     }
 
     public function test_generate_cache_filename()
@@ -40,38 +40,33 @@ class AkConfig_TestCase extends  AkUnitTest
 
     public function test_write_cache()
     {
-        $expectedFileName = $this->_base_config_path.DS.'testing'.DS.'testconfig1.php';
+        $expectedFileName = $this->_base_config_path.DS.AK_ENVIRONMENT.DS.'testconfig1.php';
         $config = array('test1' => 1, 'test2' => array('test3' => 3));
-        $this->Config->writeCache($config, 'testconfig1', 'testing');
+        $this->Config->writeCache($config, 'testconfig1', AK_ENVIRONMENT, true);
         $cachedConfig = include $expectedFileName;
         $this->assertEqual($config, $cachedConfig);
     }
 
-
     public function test_read_cache()
     {
         $config = array('test1'=>1,'test2'=>array('test3'=>3));
-        $this->Config->writeCache($config,'testconfig1','testing');
-        $cachedConfig = $this->Config->readCache('testconfig1','testing',true);
+        $this->Config->writeCache($config, 'testconfig1', AK_ENVIRONMENT, true);
+        $cachedConfig = $this->Config->readCache('testconfig1', AK_ENVIRONMENT, true);
         $this->assertEqual($config, $cachedConfig);
     }
-
 
     public function test_read_config()
     {
         $expectedConfig =array('value1'=>1,'value2'=>2,'value3'=>array('subvalue1'=>1,'subvalue2'=>2,'subvalue3'=>5,'subvalue4'=>array('subsubvalue1'=>2)));
-        $config = $this->Config->readConfig('testconfig1','testing');
+        $config = $this->Config->readConfig('testconfig1','testing', true);
 
         $this->assertEqual($expectedConfig, $config);
 
-        $expectedFileNameTesting = $this->_base_config_path.DS.'testing'.DS.'testconfig1.php';
-        $this->assertTrue(file_exists($expectedFileNameTesting));
-
-        $expectedFileNameDev = $this->_base_config_path.DS.'development'.DS.'testconfig1.php';
-        $this->assertTrue(file_exists($expectedFileNameDev));
-
-        $expectedFileNameProd = $this->_base_config_path.DS.'production'.DS.'testconfig1.php';
-        $this->assertTrue(file_exists($expectedFileNameProd));
+        foreach (array('testing', 'development', 'production') as $environment){
+            $this->Config->writeCache($expectedConfig, 'testconfig1', $environment, true);
+            $expected_file = $this->Config->generateCacheFileName('testconfig1', $environment);
+            $this->assertTrue(file_exists($expected_file), "Could not read configuration cache file for $environment");
+        }
 
     }
 
