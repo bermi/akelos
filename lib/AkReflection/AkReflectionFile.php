@@ -14,7 +14,7 @@ class AkReflectionFile extends AkReflection
     {
         $this->filename = $file_name;
         if (file_exists($file_name)) {
-            $this->_parse(file_get_contents($file_name));
+            $this->parse(file_get_contents($file_name));
         } else {
 
         }

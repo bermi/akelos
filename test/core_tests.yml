@@ -8,6 +8,7 @@ Active Support:
     - AkInstaller
     - AkLocaleManager
     - AkPluginInstaller
+    - AkReflection
 Action Controller: 
     - AkDbSession
     #- 'AkActionController/*'

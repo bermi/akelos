@@ -19,7 +19,7 @@ class AkReflectionClass extends AkReflection
                 return;
             }
         } else if (is_string($class_definition)) {
-            $this->_parse($class_definition);
+            $this->parse($class_definition);
             foreach ($this->definitions as $def) {
                 if ($def['type'] == 'class') {
                     $this->_definition = $def;
@@ -32,7 +32,7 @@ class AkReflectionClass extends AkReflection
             return;
         }
         $this->_docBlock = new AkReflectionDocBlock($this->_definition['docBlock']);
-        $this->_parse($this->_definition['code']);
+        $this->parse($this->_definition['code']);
         $this->_parseDefinitions();
 
     }

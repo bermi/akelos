@@ -7,8 +7,8 @@ class AkReflection
     $requires = array(),
     $tokens,
     $symbols;
-
-    protected function _parse($source)
+    
+    public function parse($source)
     {
         if (!function_exists('token_get_all')) {
             trigger_error('Function "token_get_all" is not defined');

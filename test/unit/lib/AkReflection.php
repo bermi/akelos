@@ -1,32 +1,28 @@
 <?php
 
+require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
-require_once(AK_LIB_DIR.DS.'AkReflection.php');
-
-if (!class_exists('AkReflection_TestCase')) {
-class AkReflection_TestCase extends  UnitTestCase
+class AkReflection_TestCase extends  AkUnitTest 
 {
     public function setUp()
     {
         /**
          * AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'reflection_test_class.php'
          */
-        $this->reflection = new AkReflection();
+        $this->Reflection = new AkReflection();
     }
-    
-    
-    
+
     public function test_parse_function()
     {
         $function = '   function testFunction($param) { testbody(); }';
-        $this->reflection->_parse($function);
-        $functionStructure = $this->reflection->getDefinitions();
+        $this->Reflection->parse($function);
+        $functionStructure = $this->Reflection->getDefinitions();
         $this->assertEqual('function',$functionStructure[0]['type']);
         $this->assertEqual(false,$functionStructure[0]['returnByReference']);
         $this->assertEqual('testFunction',$functionStructure[0]['name']);
         $this->assertEqual(array('$param'),$functionStructure[0]['params']);
         $this->assertEqual(trim($function),$functionStructure[0]['toString']);
-        
+
         $function = '
         /**
          * comment
@@ -45,11 +41,11 @@ class AkReflection_TestCase extends  UnitTestCase
             }
             return $this->_priorized_plugins;
         }';
-        
-        $this->reflection->_parse($function);
-        $functionStructure = $this->reflection->getDefinitions();
+
+        $this->Reflection->parse($function);
+        $functionStructure = $this->Reflection->getDefinitions();
         $this->assertEqual(
-'/**
+        '/**
  * comment
  *
  * @return boolean
@@ -66,13 +62,13 @@ class AkReflection_TestCase extends  UnitTestCase
         require(AK_APP_DIR.DS.\'require.php\');
         include_once(AK_APP_DIR.DS.\'include_once.php\');
         include(AK_APP_DIR.DS.\'include.php\');';
-        $this->reflection->_parse($function);
-        $structure = $this->reflection->getDefinitions();
+        $this->Reflection->parse($function);
+        $structure = $this->Reflection->getDefinitions();
         $this->assertEqual(array("AK_APP_DIR.DS.'require_once.php'"),$structure['require_once']);
         $this->assertEqual(array("AK_APP_DIR.DS.'require.php'"),$structure['require']);
         $this->assertEqual(array("AK_APP_DIR.DS.'include_once.php'"),$structure['include_once']);
         $this->assertEqual(array("AK_APP_DIR.DS.'include.php'"),$structure['include']);
-        
+
     }
     public function test_parse_class()
     {
@@ -84,25 +80,24 @@ class AkReflection_TestCase extends  UnitTestCase
          class testClass extends base {}
          
          class secondClass {}';
-        $this->reflection->_parse($function);
-        $classStructure = $this->reflection->getDefinitions();
+        $this->Reflection->parse($function);
+        $classStructure = $this->Reflection->getDefinitions();
         $this->assertTrue(isset($classStructure[1]));
         $this->assertEqual('class',$classStructure[0]['type']);
         $this->assertEqual(false,$classStructure[0]['returnByReference']);
         $this->assertEqual('testClass',$classStructure[0]['name']);
         $this->assertEqual('secondClass',$classStructure[1]['name']);
         $this->assertEqual(
-trim('
+        trim('
 /**
  * comment
  */
 class testClass extends base {}'),trim($classStructure[0]['toString']));
         $this->assertEqual(array("AK_APP_DIR.DS.'test.php'"),$classStructure['require_once']);
-       
-        
+
+
     }
 }
 
-ak_test('AkReflection_TestCase',true);
-}
-?>
+ak_test_run_case_if_executed('AkReflection_TestCase');
+
