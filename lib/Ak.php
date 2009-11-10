@@ -2217,6 +2217,73 @@ class Ak
         }
         return AK_TMP_DIR;
     }
+
+    static function registerAutoloader($autoloader)
+    {
+        spl_autoload_unregister(array('Ak','autoload'));
+        spl_autoload_register($autoloader);
+        spl_autoload_register(array('Ak','autoload'));
+    }
+
+    static function autoload($name, $path = null)
+    {
+        static $paths = array();
+
+        if(empty($paths)){
+            $paths = array(
+
+            'ActiveRecord'              =>  AK_APP_DIR.DS.'shared_model.php',
+            'AkActiveRecord'            =>  AK_LIB_DIR.DS.'AkActiveRecord.php',
+            'AkActiveRecordMock'        =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php',
+            'AkAssociation'             =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php',
+            'AkBelongsTo'               =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociations'.DS.'AkBelongsTo.php',
+            'AkAdodbCache'              =>  AK_LIB_DIR.DS.'AkCache'.DS.'AkAdodbCache.php',
+            'AkAssociatedActiveRecord'  =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php',
+            'AkBaseModel'               =>  AK_LIB_DIR.DS.'AkBaseModel.php',
+            'AkCache'                   =>  AK_LIB_DIR.DS.'AkCache.php',
+            'AkConfig'                  =>  AK_LIB_DIR.DS.'AkConfig.php',
+            'AkDbAdapter'               =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbAdapter.php',
+            'AkDbSchemaCache'           =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php',
+            'AkDbSession'               =>  AK_LIB_DIR.DS.'AkDbSession.php',
+            'AkHttpClient'              =>  AK_LIB_DIR.DS.'AkHttpClient.php',
+            'AkLocaleManager'           =>  AK_LIB_DIR.DS.'AkLocaleManager.php',
+            'AkImage'                   =>  AK_LIB_DIR.DS.'AkImage.php',
+            'AkImageColorScheme'        =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageColorScheme.php',
+            'AkImageFilter'             =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageFilter.php',
+            'AkInflector'               =>  AK_LIB_DIR.DS.'AkInflector.php',
+            'AkInstaller'               =>  AK_LIB_DIR.DS.'AkInstaller.php',
+            'AkMemcache'                =>  AK_LIB_DIR.DS.'AkCache'.DS.'AkMemcache.php',
+            'AkObject'                  =>  AK_LIB_DIR.DS.'AkObject.php',
+            'AkObserver'                =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php',
+            'AkRequest'                 =>  AK_LIB_DIR.DS.'AkRequest.php',
+            'AkRequestMimeType'         =>  AK_LIB_DIR.DS.'AkRequestMimeType.php',
+            'AkPluginInstaller'         =>  AK_LIB_DIR.DS.'AkPluginInstaller.php',
+            'AkUnitTest'                =>  AK_LIB_DIR.DS.'AkUnitTest.php',
+            'AkReflection'              =>  AK_LIB_DIR.DS.'AkReflection.php',
+            'AkReflectionMethod'        =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionMethod.php',
+            'AkReflectionClass'         =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionClass.php',
+            'AkReflectionDocBlock'      =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionDocBlock.php',
+            'AkReflectionFile'          =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFile.php',
+            'AkReflectionFunction'      =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFunction.php',
+            'AkType'                    =>  AK_LIB_DIR.DS.'AkType.php',
+            'AkNumber'                  =>  AK_LIB_DIR.DS.'AkType'.DS.'AkNumber.php',
+            'AkString'                  =>  AK_LIB_DIR.DS.'AkType'.DS.'AkString.php',
+            'AkTime'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkTime.php',
+            'AkArray'                   =>  AK_LIB_DIR.DS.'AkType'.DS.'AkArray.php',
+            'AkDate'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkDate.php',
+
+            );
+
+        }elseif (!empty($path)){
+            $paths[$name] = $path;
+        }
+
+        if(isset($paths[$name])){
+            include $paths[$name];
+        }elseif(file_exists(DS.$name.'.php')){
+            include DS.$name.'.php';
+        }
+    }
 }
 
 
@@ -2301,66 +2368,9 @@ function ak_define($name, $value = null)
     return  defined($name) ? constant($name) : (is_null($value) ? null : (define($name, $value) ? $value : null));
 }
 
-function ak_autoload($name, $path = null)
-{
-    static $paths = array();
 
-    if(empty($paths)){
-        $paths = array(
 
-        'ActiveRecord'              =>  AK_APP_DIR.DS.'shared_model.php',
-        'AkActiveRecord'            =>  AK_LIB_DIR.DS.'AkActiveRecord.php',
-        'AkActiveRecordMock'        =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php',
-        'AkAssociation'             =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php',
-        'AkBelongsTo'               =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociations'.DS.'AkBelongsTo.php',
-        'AkAdodbCache'              =>  AK_LIB_DIR.DS.'AkCache'.DS.'AkAdodbCache.php',
-        'AkAssociatedActiveRecord'  =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php',
-        'AkBaseModel'               =>  AK_LIB_DIR.DS.'AkBaseModel.php',
-        'AkCache'                   =>  AK_LIB_DIR.DS.'AkCache.php',
-        'AkConfig'                  =>  AK_LIB_DIR.DS.'AkConfig.php',
-        'AkDbAdapter'               =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbAdapter.php',
-        'AkDbSchemaCache'           =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php',
-        'AkDbSession'               =>  AK_LIB_DIR.DS.'AkDbSession.php',
-        'AkHttpClient'              =>  AK_LIB_DIR.DS.'AkHttpClient.php',
-        'AkLocaleManager'           =>  AK_LIB_DIR.DS.'AkLocaleManager.php',
-        'AkImage'                   =>  AK_LIB_DIR.DS.'AkImage.php',
-        'AkImageColorScheme'        =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageColorScheme.php',
-        'AkImageFilter'             =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageFilter.php',
-        'AkInflector'               =>  AK_LIB_DIR.DS.'AkInflector.php',
-        'AkInstaller'               =>  AK_LIB_DIR.DS.'AkInstaller.php',
-        'AkMemcache'                =>  AK_LIB_DIR.DS.'AkCache'.DS.'AkMemcache.php',
-        'AkObject'                  =>  AK_LIB_DIR.DS.'AkObject.php',
-        'AkObserver'                =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php',
-        'AkRequestMimeType'         =>  AK_LIB_DIR.DS.'AkRequestMimeType.php',
-        'AkPluginInstaller'         =>  AK_LIB_DIR.DS.'AkPluginInstaller.php',
-        'AkUnitTest'                =>  AK_LIB_DIR.DS.'AkUnitTest.php',
-        'AkReflection'              =>  AK_LIB_DIR.DS.'AkReflection.php',
-        'AkReflectionMethod'        =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionMethod.php',
-        'AkReflectionClass'         =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionClass.php',
-        'AkReflectionDocBlock'      =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionDocBlock.php',
-        'AkReflectionFile'          =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFile.php',
-        'AkReflectionFunction'      =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFunction.php',
-        'AkType'                    =>  AK_LIB_DIR.DS.'AkType.php',
-        'AkNumber'                  =>  AK_LIB_DIR.DS.'AkType'.DS.'AkNumber.php',
-        'AkString'                  =>  AK_LIB_DIR.DS.'AkType'.DS.'AkString.php',
-        'AkTime'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkTime.php',
-        'AkArray'                   =>  AK_LIB_DIR.DS.'AkType'.DS.'AkArray.php',
-        'AkDate'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkDate.php',
-
-        );
-
-    }elseif (!empty($path)){
-        $paths[$name] = $path;
-    }
-
-    if(isset($paths[$name])){
-        include $paths[$name];
-    }elseif(file_exists(DS.$name.'.php')){
-        include DS.$name.'.php';
-    }
-}
-
-spl_autoload_register('ak_autoload');
+spl_autoload_register(array('Ak', 'autoload'));
 
 
 !defined('AK_ENABLE_PROFILER') && define('AK_ENABLE_PROFILER', false);

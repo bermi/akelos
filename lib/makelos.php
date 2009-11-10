@@ -29,6 +29,7 @@ class MakelosRequest
     public function parse($arguments)
     {
         $task_set = false;
+
         while(!empty($arguments)){
             $argument = array_shift($arguments);
             /**
@@ -80,17 +81,17 @@ class MakelosRequest
             }
         }
     }
-    
+
     public function flag($name)
     {
         return $this->get($name, __FUNCTION__);
     }
-    
+
     public function constant($name)
     {
         return $this->get($name, __FUNCTION__);
     }
-    
+
     public function attribute($name)
     {
         return $this->get($name, __FUNCTION__);
@@ -157,7 +158,7 @@ class Makelos
         $this->Installer = new AkInstaller();
         !defined('AK_TASKS_DIR') && define('AK_TASKS_DIR', AK_BASE_DIR.DS.'lib'.DS.'tasks');
         $this->makefiles = array_merge(array_merge(array_merge(array_merge(array_merge(glob(AK_TASKS_DIR.DS.'makefile.php'), glob(AK_TASKS_DIR.DS.'*/makefile.php')), glob(AK_TASKS_DIR.DS.'*/*/makefile.php')), array(AK_BASE_DIR.DS.'*/*/*/makefile.php')),  array(AK_BASE_DIR.DS.'*/*/*/*/makefile.php')), array(AK_BASE_DIR.DS.'makefile.php'));
-    }    
+    }
 
     public function loadMakefiles()
     {
@@ -170,6 +171,10 @@ class Makelos
 
     public function runTasks()
     {
+        if(isset($this->Request->tasks['makelos:autocomplete'])){
+            $this->runTask('makelos:autocomplete', $this->Request->tasks['makelos:autocomplete'], false);
+            return;
+        }
         $this->message('(in '.MAKELOS_BASE_DIR.')');
         if(!empty($this->Request->tasks)){
             foreach ($this->Request->tasks as $task => $arguments){
@@ -180,8 +185,9 @@ class Makelos
         }
     }
 
-    public function runTask($task_name, $options = array())
+    public function runTask($task_name, $options = array(), $only_registered_tasks = true)
     {
+        $this->removeAutocompletionOptions($task_name);
         if(!empty($this->tasks[$task_name]['with_defaults'])){
             $options['attributes'] = array_merge((array)$this->tasks[$task_name]['with_defaults'], (array)@$options['attributes']);
             unset($this->tasks[$task_name]['with_defaults']);
@@ -196,7 +202,7 @@ class Makelos
             return;
         }
         $this->current_task = $task_name;
-        if(!isset($this->tasks[$task_name])){
+        if($only_registered_tasks && !isset($this->tasks[$task_name])){
             if(!$this->showBaseTaskDocumentation($task_name)){
                 $this->error("\nInvalid task $task_name, use \n\n   $ ./makelos -T\n\nto show available tasks.\n");
             }
@@ -207,6 +213,8 @@ class Makelos
             $this->runTaskCode(@$this->tasks[$task_name]['run'], $parameters);
         }
     }
+
+
 
     public function showBaseTaskDocumentation($task_name)
     {
@@ -306,7 +314,7 @@ class Makelos
         $task_names = strstr($task_name, ',') ? array_map('trim', explode(',', $task_name)) : array($task_name);
         foreach ($task_names as $task_name) {
             $task_files = glob(AK_TASKS_DIR.DS.str_replace(':',DS, $task_name.'.task*.*'));
- 
+
             if(empty($options['run']) && empty($task_files)){
                 $this->error("No task file found for $task_name in ".AK_TASKS_DIR, true);
             }
@@ -332,6 +340,7 @@ class Makelos
             $this->showTaskDocumentation($task);
         }
     }
+
 
     public function error($message, $fatal = false)
     {
@@ -363,6 +372,7 @@ class Makelos
         }
     }
 
+    
     public function runTaskAsDaemon($task_name, $options = array())
     {
         $this->_ensurePosixAndPcntlAreAvailable();
@@ -422,6 +432,57 @@ class Makelos
         die();
     }
 
+    
+    
+    // Autocompletion handling
+
+    public function getAvailableTasksForAutocompletion()
+    {
+        return array_keys($this->tasks);
+    }
+
+    public function getAutocompletionOptionsForTask($task, $options = array(), $level = 1)
+    {
+        $task_name = str_replace(':', DS, $task);
+        $Makelos = $this;
+        $autocompletion_options = array();
+        $autocomplete_accessor = 'autocompletion'.($level === 1 ? '' : '_'.$level);
+        $autocompletion_executables = glob(AK_TASKS_DIR.DS.$task_name.'*.'.$autocomplete_accessor.'.*');
+        if(!empty($autocompletion_executables)){
+            ob_start();
+            foreach ($autocompletion_executables as $file){
+                $pathinfo = @pathinfo($file);
+                if(@$pathinfo['extension'] == 'php'){
+                    include($file);
+                }else{
+                    echo `$file`;
+                }
+            }
+            echo "\n";
+            $autocompletion_options = array_diff(explode("\n", ob_get_clean()), array(''));
+        }
+        $autocomplete_accessor = 'autocompletion'.($level === 1 ? '' : '_'.$level);
+        if(isset($this->tasks[$task][$autocomplete_accessor])){
+            $autocompletion_options = array_merge(Ak::toArray($this->tasks[$task][$autocomplete_accessor]), $autocompletion_options);
+        }
+        array_unique($autocompletion_options);
+        $autocompletion_options = array_diff($autocompletion_options, array_merge(array($task), $options));
+        return $autocompletion_options;
+    }
+
+    public function removeAutocompletionOptions($task_name)
+    {
+        if (!empty($this->tasks[$task_name])) {
+            foreach ($this->tasks[$task_name] as $k => $v){
+                if(preg_match('/^autocompletion/', $k)){
+                    unset($this->tasks[$task_name][$k]);
+                }
+            }
+        }
+    }
+    
+    
+    
 
     private function _ensurePosixAndPcntlAreAvailable()
     {

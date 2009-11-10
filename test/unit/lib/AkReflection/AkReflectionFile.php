@@ -1,7 +1,6 @@
 <?php
 
-
-require_once(AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFile.php');
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class AkReflectionFile_TestCase extends  UnitTestCase
 {
@@ -39,5 +38,4 @@ class AkReflectionFile_TestCase extends  UnitTestCase
     }
 }
 
-ak_test('AkReflectionFile_TestCase',true);
-?>
+ak_test_run_case_if_executed('AkReflectionFile_TestCase');

@@ -53,9 +53,6 @@ defined('AK_AVAILABLE_ENVIRONMENTS') ? null : define('AK_AVAILABLE_ENVIRONMENTS'
 
 defined('AK_TIME_DIFFERENCE') ? null : define('AK_TIME_DIFFERENCE', 0); // Time difference from the webserver
 
-// COMMENT THIS LINE IF YOU DONT WANT THE FRAMEWORK TO CONNECT TO THE DATABASE ON EACH REQUEST AUTOMATICALLY
-defined('AK_WEB_REQUEST_CONNECT_TO_DATABASE_ON_INSTANTIATE') ? null : define('AK_WEB_REQUEST_CONNECT_TO_DATABASE_ON_INSTANTIATE', true);
-
 defined('AK_CLI') ? null : define('AK_CLI', php_sapi_name() == 'cli');
 defined('AK_WEB_REQUEST') ? null : define('AK_WEB_REQUEST', !empty($_SERVER['REQUEST_URI']));
 defined('AK_REQUEST_URI') ? null : define('AK_REQUEST_URI', isset($_SERVER['REQUEST_URI']) ?
@@ -229,9 +226,9 @@ defined('AK_DEV_MODE') ? null : define('AK_DEV_MODE', false);
 defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION') ? null : define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
 
 defined('AK_VERBOSE_INSTALLER') ? null : define('AK_VERBOSE_INSTALLER', AK_DEV_MODE);
+defined('AK_HIGH_LOAD_MODE') ? null : define('AK_HIGH_LOAD_MODE', false);
+defined('AK_AUTOMATIC_SESSION_START') ? null : define('AK_AUTOMATIC_SESSION_START', !AK_HIGH_LOAD_MODE);
+defined('AK_APP_NAME') ? null : define('AK_APP_NAME', 'Application');
 
 
-//AK_CLI || AK_PRODUCTION_MODE ? null : 
-require_once(AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php');
-
-?>
+AK_CLI || AK_PRODUCTION_MODE ? null : require_once(AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php');

@@ -51,6 +51,11 @@ class AkReflectionFunction extends AkReflection
         return isset($this->_definition['name']) ? $this->_definition['name'] : false;
     }
 
+    public function getDefinition()
+    {
+        return $this->_definition;
+    }
+    
     public function setTag($tag,$value)
     {
         if (!is_object($this->_docBlock)) {

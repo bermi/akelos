@@ -14,8 +14,6 @@
  * @deprecated Please use AkDispatcher on your public/index.php instead
  */
 
-defined('AK_WEB_REQUEST_CONNECT_TO_DATABASE_ON_INSTANTIATE') ?  null :
-define('AK_WEB_REQUEST_CONNECT_TO_DATABASE_ON_INSTANTIATE', true);
 
 defined('AK_WEB_REQUEST_START_SESSION_ON_INSTANTIATE') ?  null :
 define('AK_WEB_REQUEST_START_SESSION_ON_INSTANTIATE', true);
@@ -39,10 +37,6 @@ class AkWebRequest extends AkActionController
 
         if($this->__ParentController->_autoIncludePaginator){
             require_once(AK_LIB_DIR.DS.'AkActionController'.DS.'AkPaginator.php');
-        }
-
-        if(AK_WEB_REQUEST_CONNECT_TO_DATABASE_ON_INSTANTIATE){
-            $this->__ParentController->__connectToDatabase();
         }
 
         if(AK_WEB_REQUEST_START_SESSION_ON_INSTANTIATE){

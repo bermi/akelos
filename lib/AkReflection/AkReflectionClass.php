@@ -2,14 +2,14 @@
 
 class AkReflectionClass extends AkReflection
 {
-    public 
+    public
     $methods = array(),
     $properties = array();
 
-    protected 
+    protected
     $_definition,
     $_docBlock;
-    
+
     public function __construct($class_definition)
     {
         if (is_array($class_definition)) {
@@ -36,6 +36,12 @@ class AkReflectionClass extends AkReflection
         $this->_parseDefinitions();
 
     }
+
+    public function getDefinition()
+    {
+        return $this->_definition;
+    }
+
     public function toString()
     {
         $docBlock = $this->_docBlock;
@@ -48,18 +54,22 @@ class AkReflectionClass extends AkReflection
             return isset($this->_definition['toString'])?$this->_definition['toString']:null;
         }
     }
+
     public function setTag($tag,$value)
     {
         $this->_docBlock->setTag($tag,$value);
     }
+
     public function getTag($tag)
     {
         return $this->_docBlock->getTag($tag);
     }
+
     public function getName()
     {
         return isset($this->_definition['name'])?$this->_definition['name']:false;
     }
+
     public function getVisibility()
     {
         return isset($this->_definition['visibility'])?$this->_definition['visibility']:false;
@@ -69,10 +79,12 @@ class AkReflectionClass extends AkReflection
     {
         return isset($this->_definition['static'])?$this->_definition['static']:false;
     }
+
     public function &getDocBlock()
     {
         return $this->_docBlock;
     }
+
     public function _parseDefinitions()
     {
         foreach($this->definitions as $definition) {
@@ -83,6 +95,7 @@ class AkReflectionClass extends AkReflection
             }
         }
     }
+
     public function &getMethod($name)
     {
         $false = false;
@@ -93,6 +106,7 @@ class AkReflectionClass extends AkReflection
         }
         return $false;
     }
+
     public function getMethods($options = null)
     {
         if ($options == null) {

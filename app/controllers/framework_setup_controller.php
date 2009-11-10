@@ -4,10 +4,7 @@ if(!defined('AK_ENVIRONMENT') || AK_ENVIRONMENT != 'setup'){
     die();
 }
 
-error_reporting(E_ALL);
-
-define('AK_WEB_REQUEST_CONNECT_TO_DATABASE_ON_INSTANTIATE', false);
-
+error_reporting(-1);
 
 define('AK_AVAILABLE_LOCALES','en,ja,es');
 define('AK_APP_LOCALES','en,ja,es');

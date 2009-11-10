@@ -10,11 +10,12 @@ PHP
 ));
 
 makelos_task('test:units', array(
-    'description' => 'Run all unit tests.',
+    'description' => 'Run all unit tests.'
 ));
 
 makelos_task('test:case', array(
-    'description' => 'Runs a single test case file'
+    'description' => 'Runs a single test case file',
+    'autocompletion' => 'ENVIRONMENT=production'
 ));
 
 

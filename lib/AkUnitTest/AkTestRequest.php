@@ -1,11 +1,9 @@
 <?php
-require_once(AK_LIB_DIR.DS.'AkRequest.php');
+
 class AkTestRequest extends AkRequest
 {
-
     public function &recognize($Map = null)
     {
-        AK_ENVIRONMENT != 'setup' ? $this->_connectToDatabase() : null;
         $this->_startSession();
         $this->_enableInternationalizationSupport();
         $this->_mapRoutes($Map);
@@ -82,6 +80,6 @@ class AkTestRequest extends AkRequest
 function &AkTestRequest()
 {
     $null = null;
-    $AkRequest =& Ak::singleton('AkTestRequest', $null);
+    $AkRequest = Ak::singleton('AkTestRequest', $null);
     return $AkRequest;
 }

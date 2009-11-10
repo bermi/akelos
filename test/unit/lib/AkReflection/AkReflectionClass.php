@@ -1,7 +1,6 @@
 <?php
 
-
-require_once(AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionClass.php');
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class AkReflectionClass_TestCase extends  UnitTestCase
 {
@@ -57,7 +56,7 @@ class AkReflectionClass_TestCase extends  UnitTestCase
             }
         }';
         $class = new AkReflectionClass($string);
-        $array = $class->_definition;
+        $array = $class->getDefinition();
         $class = new AkReflectionClass($array);
         $this->assertEqual('Test',$class->getName());
         $methods = $class->getMethods();
@@ -91,5 +90,5 @@ class AkReflectionClass_TestCase extends  UnitTestCase
     }
 }
 
-ak_test('AkReflectionClass_TestCase',true);
-?>
+
+ak_test_run_case_if_executed('AkReflectionClass_TestCase');

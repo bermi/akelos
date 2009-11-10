@@ -2,9 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-require_once(AK_LIB_DIR.DS.'AkRequest.php');
-
-class AkRequestTestCase extends  AkUnitTest
+class AkRequest_TestCase extends  AkUnitTest
 {
     public $test_request;
     public $test_request2;
@@ -215,5 +213,5 @@ class AkRequestTestCase extends  AkUnitTest
 
 }
 
+ak_test_run_case_if_executed('AkRequest_TestCase');
 
-?>

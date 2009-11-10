@@ -1,7 +1,6 @@
 <?php
 
-
-require_once(AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFunction.php');
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class AkReflectionFunction_TestCase extends  UnitTestCase
 {
@@ -20,9 +19,9 @@ class AkReflectionFunction_TestCase extends  UnitTestCase
         }';
         $func = new AkReflectionFunction($string);
         $this->assertEqual('method2',$func->getName());
-       
+
     }
-    
+
     public function test_array_constructor()
     {
         $string ='
@@ -42,13 +41,13 @@ class AkReflectionFunction_TestCase extends  UnitTestCase
             }
         }';
         $func = new AkReflectionFunction($string);
-        $func = new AkReflectionFunction($func->_definition);
+        $func = new AkReflectionFunction($func->getDefinition());
         $this->assertEqual('method2',$func->getName());
         $this->assertEqual(array('test'=>1,'test2'=>3,'test3'=>'$this->value'),$func->getDefaultOptions());
         $this->assertEqual(array('test','test2','test3','test4'),$func->getAvailableOptions());
 
     }
-    
+
     public function test_add_doc_block_tag()
     {
         $string ='
@@ -68,12 +67,12 @@ class AkReflectionFunction_TestCase extends  UnitTestCase
             }
         }';
         $func = new AkReflectionFunction($string);
-        
+
         $func->setTag('WingsPluginInstaller','test');
         //var_dump($func->toString());
 
     }
 }
 
-ak_test('AkReflectionFunction_TestCase',true);
-?>
+ak_test_run_case_if_executed('AkReflectionFunction_TestCase');
+

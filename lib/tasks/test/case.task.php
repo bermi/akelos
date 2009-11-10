@@ -22,29 +22,40 @@ if(empty($options['hide_enviroment_flags'])){
     unset($options['hide_enviroment_flags']);
 }
 
-foreach ($options as $_test_file){
+foreach ($options as $k => $_test_file){
+    if(strstr($_test_file, '*')){
+        $_test_file = $k.$_test_file;
+    }
     if(preg_match('/^Ak/i', $_test_file)){
         $_test_file = 'unit'.DS.'lib'.DS.$_test_file;
-    }elseif(!strstr($test_name, DS)){
+    }elseif(!strstr($_test_file, DS)){
         $_test_file = 'unit/app/models/'.AkInflector::underscore($_test_file);
     }
-
 
     $_test_file = strstr($_test_file,'.php') ? trim($_test_file, '/') : $_test_file.'.php';
     $_test_file = substr($_test_file,0,5) == 'test/' ? substr($_test_file,5) : $_test_file;
     $_test_file = AK_TEST_DIR.DIRECTORY_SEPARATOR.$_test_file;
 
-    if(!file_exists($_test_file)){
-        echo "\nCould not load $_test_file test file\n";
+    if(strstr($_test_file, '*')){
+        $_test_files = glob($_test_file);
     }else{
-        include $_test_file;
-        foreach(get_declared_classes() as $____class){
-            if(preg_match('/(.+)TestCase$/i', $____class, $match)){
-                if(!preg_match('/^('.join('|',$____skip_tests).')$/i',$match[1])){
-                    $____skip_tests[] = $match[1];
-                    ak_test($match[1].'TestCase', false, true, $reporter);
+        $_test_files = array($_test_file);
+    }
+    foreach ($_test_files as $_test_file){
+
+        if(!file_exists($_test_file)){
+            echo "\nCould not load $_test_file test file\n";
+        }else{
+            include $_test_file;
+            foreach(get_declared_classes() as $____class){
+                if(preg_match('/(.+)TestCase$/i', $____class, $match)){
+                    if(!preg_match('/^('.join('|',$____skip_tests).')$/i',$match[1])){
+                        $____skip_tests[] = $match[1];
+                        ak_test($match[1].'TestCase', false, true, $reporter);
+                    }
                 }
             }
         }
     }
 }
+

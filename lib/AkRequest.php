@@ -16,18 +16,16 @@
 if(!defined('AK_DEFAULT_CONTROLLER')){
     define('AK_DEFAULT_CONTROLLER', 'page');
 }
+
 if(!defined('AK_DEFAULT_ACTION')){
     define('AK_DEFAULT_ACTION', 'index');
 }
 
-defined('AK_HIGH_LOAD_MODE') ? null : define('AK_HIGH_LOAD_MODE', false);
-defined('AK_AUTOMATIC_DB_CONNECTION') ? null : define('AK_AUTOMATIC_DB_CONNECTION', !AK_HIGH_LOAD_MODE);
 defined('AK_AUTOMATIC_SESSION_START') ? null : define('AK_AUTOMATIC_SESSION_START', !AK_HIGH_LOAD_MODE);
 
 // IIS does not provide a valid REQUEST_URI so we need to guess it from the script name + query string
 $_SERVER['REQUEST_URI'] = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_NAME'].(( isset($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '')));
 
-require_once(AK_LIB_DIR.DS.'AkRequestMimeType.php');
 /**
 * Class that handles incoming request.
 *
@@ -52,7 +50,7 @@ class AkRequest extends AkObject
     * @access private
     * @var array $_request
     */
-    var $_request = array();
+    public $_request = array();
 
     /**
      * Keeps the original routing params received via the url,
@@ -60,41 +58,41 @@ class AkRequest extends AkObject
      *
      * @var array
      */
-    var $_route_params = array();
+    public $_route_params = array();
 
-    var $_init_check = false;
-    var $__internationalization_support_enabled = false;
+    public $_init_check = false;
+    public $__internationalization_support_enabled = false;
 
-    var $action = AK_DEFAULT_ACTION;
-    var $controller = AK_DEFAULT_CONTROLLER;
-    var $view;
+    public $action = AK_DEFAULT_ACTION;
+    public $controller = AK_DEFAULT_CONTROLLER;
+    public $view;
 
     /**
     * Holds information about current environment. Initially a reference to $_SERVER
     *
     * @var array
     */
-    var $env = array();
+    public $env = array();
 
-    var $mime_types = array(
-                'text/html'                => 'html',
-                'application/xhtml+xml'    => 'html',
-                'application/xml'          => 'xml',
-                'text/xml'                 => 'xml',
-                'text/javascript'          => 'js',
-                'application/javascript'   => 'js',
-                'application/x-javascript' => 'js',
-                'application/json'         => 'json',
-                'text/x-json'              => 'json',
-                'application/rss+xml'      => 'rss',
-                'application/atom+xml'     => 'atom',
-                '*/*'                      => 'html',
-                //'application/x-www-form-urlencoded' => 'www-form',
-                //'application/x-www-form-urlencoded' => 'www-form',
-                'default'                  => 'html',
-            );
+    public $mime_types = array(
+    'text/html'                => 'html',
+    'application/xhtml+xml'    => 'html',
+    'application/xml'          => 'xml',
+    'text/xml'                 => 'xml',
+    'text/javascript'          => 'js',
+    'application/javascript'   => 'js',
+    'application/x-javascript' => 'js',
+    'application/json'         => 'json',
+    'text/x-json'              => 'json',
+    'application/rss+xml'      => 'rss',
+    'application/atom+xml'     => 'atom',
+    '*/*'                      => 'html',
+    //'application/x-www-form-urlencoded' => 'www-form',
+    //'application/x-www-form-urlencoded' => 'www-form',
+    'default'                  => 'html',
+    );
 
-    var $_format;
+    public $_format;
     /**
     * String parse method.
     *
@@ -112,7 +110,7 @@ class AkRequest extends AkObject
     * @access public
     * @return array
     */
-    function _parseAkRequestString($ak_request_string, $pattern = '/')
+    public function _parseAkRequestString($ak_request_string, $pattern = '/')
     {
         $result = array();
         $ak_request = trim($ak_request_string,$pattern);
@@ -123,7 +121,7 @@ class AkRequest extends AkObject
     }
 
 
-    function __construct ()
+    public function __construct ()
     {
         $this->init();
         $this->getFormat();
@@ -139,7 +137,7 @@ class AkRequest extends AkObject
     * @uses parseRequest
     * @return void
     */
-    function init()
+    public function init()
     {
         if(!$this->_init_check){
             $this->env =& $_SERVER;
@@ -157,39 +155,39 @@ class AkRequest extends AkObject
         }
     }
 
-    function get($var_name)
+    public function get($var_name)
     {
         return isset($this->_request[$var_name]) ? $this->_request[$var_name] : null;
     }
 
-    function getParams()
+    public function getParams()
     {
         return array_merge(array('controller'=>$this->controller,'action'=>$this->action),$this->_request);
     }
 
-    function getAction()
+    public function getAction()
     {
         return $this->action;
     }
 
-    function getController()
+    public function getController()
     {
         return $this->controller;
     }
 
-    function reset()
+    public function reset()
     {
         $this->_request = array();
         $this->_init_check = false;
     }
 
-    function set($variable, $value)
+    public function set($variable, $value)
     {
         $this->_addParam($variable, $value);
     }
 
 
-    function checkForRoutedRequests(&$Router)
+    public function checkForRoutedRequests(&$Router)
     {
         $ak_request = isset($this->_request['ak']) ? str_replace('//','/', '/'.trim($this->_request['ak'],'/').'/') : '/';
 
@@ -230,22 +228,22 @@ class AkRequest extends AkObject
         }
     }
 
-    function getRouteParams()
+    public function getRouteParams()
     {
         return $this->_route_params;
     }
 
-    function isValidControllerName($controller_name)
+    public function isValidControllerName($controller_name)
     {
         return $this->_validateTechName($controller_name);
     }
 
-    function isValidActionName($action_name)
+    public function isValidActionName($action_name)
     {
         return $this->_validateTechName($action_name);
     }
 
-    function isValidModuleName($module_name)
+    public function isValidModuleName($module_name)
     {
         return preg_match('/^[A-Za-z]{1,}[A-Za-z0-9_\/]*$/', $module_name);
     }
@@ -255,7 +253,7 @@ class AkRequest extends AkObject
     /**
     * Returns both GET and POST parameters in a single array.
     */
-    function getParameters()
+    public function getParameters()
     {
         if(empty($this->parameters)){
             $this->parameters = $this->getParams();
@@ -263,17 +261,17 @@ class AkRequest extends AkObject
         return $this->parameters;
     }
 
-    function setPathParameters($parameters)
+    public function setPathParameters($parameters)
     {
         $this->_path_parameters = $parameters;
     }
 
-    function getPathParameters()
+    public function getPathParameters()
     {
         return empty($this->_path_parameters) ? array() : $this->_path_parameters;
     }
 
-    function getUrlParams()
+    public function getUrlParams()
     {
         return $_GET;
     }
@@ -281,17 +279,17 @@ class AkRequest extends AkObject
     /**
     * Must be implemented in the concrete request
     */
-    function getQueryParameters ()
+    public function getQueryParameters ()
     {
     }
-    function getRequestParameters ()
+    public function getRequestParameters ()
     {
     }
 
     /**
      * Returns the path minus the web server relative installation directory. This method returns null unless the web server is apache.
      */
-    function getRelativeUrlRoot()
+    public function getRelativeUrlRoot()
     {
         return str_replace('/index.php','', @$this->env['PHP_SELF']);
     }
@@ -299,7 +297,7 @@ class AkRequest extends AkObject
     /**
      * Returns the locale identifier of current URL
      */
-    function getLocaleFromUrl()
+    public function getLocaleFromUrl()
     {
         $locale = Ak::get_url_locale();
         if(strstr(AK_CURRENT_URL,AK_SITE_URL.$locale)){
@@ -311,7 +309,7 @@ class AkRequest extends AkObject
     /**
     * Returns the HTTP request method as a lowercase symbol ('get, for example)
     */
-    function getMethod()
+    public function getMethod()
     {
         return strtolower(isset($this->env['REQUEST_METHOD'])?$this->env['REQUEST_METHOD']:'get');
     }
@@ -319,7 +317,7 @@ class AkRequest extends AkObject
     /**
     * Is this a GET request?  Equivalent to $Request->getMethod() == 'get'
     */
-    function isGet()
+    public function isGet()
     {
         return $this->getMethod() == 'get';
     }
@@ -327,7 +325,7 @@ class AkRequest extends AkObject
     /**
     * Is this a POST request?  Equivalent to $Request->getMethod() == 'post'
     */
-    function isPost()
+    public function isPost()
     {
         return $this->getMethod() == 'post';
     }
@@ -335,7 +333,7 @@ class AkRequest extends AkObject
     /**
     * Is this a PUT request?  Equivalent to $Request->getMethod() == 'put'
     */
-    function isPut()
+    public function isPut()
     {
         return isset($this->env['REQUEST_METHOD']) ? $this->getMethod() == 'put' : false;
     }
@@ -343,7 +341,7 @@ class AkRequest extends AkObject
     /**
     * Is this a DELETE request?  Equivalent to $Request->getMethod() == 'delete'
     */
-    function isDelete()
+    public function isDelete()
     {
         return $this->getMethod() == 'delete';
     }
@@ -351,7 +349,7 @@ class AkRequest extends AkObject
     /**
     * Is this a HEAD request?  Equivalent to $Request->getMethod() == 'head'
     */
-    function isHead()
+    public function isHead()
     {
         return $this->getMethod() == 'head';
     }
@@ -366,7 +364,7 @@ class AkRequest extends AkObject
     * delimited list in the case of multiple chained proxies; the first is
     * the originating IP.
     */
-    function getRemoteIp()
+    public function getRemoteIp()
     {
         if(!empty($this->env['HTTP_CLIENT_IP'])){
             return $this->env['HTTP_CLIENT_IP'];
@@ -389,7 +387,7 @@ class AkRequest extends AkObject
     * Returns the domain part of a host, such as bermilabs.com in 'www.bermilabs.com'. You can specify
     * a different <tt>tld_length</tt>, such as 2 to catch akelos.co.uk in 'www.akelos.co.uk'.
     */
-    function getDomain($tld_length = 1)
+    public function getDomain($tld_length = 1)
     {
         return preg_match('/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/',$this->getHost()) ?
         null :
@@ -401,7 +399,7 @@ class AkRequest extends AkObject
     * You can specify a different <tt>tld_length</tt>, such as 2 to catch ['www'] instead of ['www', 'akelos']
     * in 'www.akelos.co.uk'.
     */
-    function getSubdomains($tld_length = 1)
+    public function getSubdomains($tld_length = 1)
     {
         return preg_match('/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/',$this->getHost()) ||
         !strstr($this->getHost(),'.') ? array() : (array)array_slice(explode('.',$this->getHost()),0,(1 + $tld_length)*-1);
@@ -411,7 +409,7 @@ class AkRequest extends AkObject
     /**
     * Returns the request URI correctly
     */
-    function getRequestUri()
+    public function getRequestUri()
     {
         return $this->getProtocol().$this->getHostWithPort();
     }
@@ -419,7 +417,7 @@ class AkRequest extends AkObject
     /**
     * Return 'https://' if( this is an SSL request and 'http://' otherwise.
     */
-    function getProtocol()
+    public function getProtocol()
     {
         return $this->isSsl() ? 'https://' : 'http://';
     }
@@ -427,7 +425,7 @@ class AkRequest extends AkObject
     /**
     * Is this an SSL request?
     */
-    function isSsl()
+    public function isSsl()
     {
         return isset($this->env['HTTPS']) && ($this->env['HTTPS'] === true || $this->env['HTTPS'] == 'on');
     }
@@ -435,7 +433,7 @@ class AkRequest extends AkObject
     /**
     * Returns the interpreted path to requested resource
     */
-    function getPath()
+    public function getPath()
     {
         return strstr($this->env['REQUEST_URI'],'?') ? substr($this->env['REQUEST_URI'],0,strpos($this->env['REQUEST_URI'],'?')) : $this->env['REQUEST_URI'];
     }
@@ -443,7 +441,7 @@ class AkRequest extends AkObject
     /**
     * Returns the port number of this request as an integer.
     */
-    function getPort()
+    public function getPort()
     {
         $this->port_as_int = AK_WEB_REQUEST ? AK_SERVER_PORT : 80;
         return $this->port_as_int;
@@ -452,7 +450,7 @@ class AkRequest extends AkObject
     /**
     * Returns the standard port number for this request's protocol
     */
-    function getStandardPort()
+    public function getStandardPort()
     {
         return $this->isSsl() ? 443 : 80;
     }
@@ -461,7 +459,7 @@ class AkRequest extends AkObject
     * Returns a port suffix like ':8080' if( the port number of this request
     * is not the default HTTP port 80 or HTTPS port 443.
     */
-    function getPortString()
+    public function getPortString()
     {
         $port = $this->getPort();
         return $port == $this->getStandardPort() ? '' : ($port ? ':'.$this->getPort() : '');
@@ -471,13 +469,13 @@ class AkRequest extends AkObject
     * Returns a host:port string for this request, such as example.com or
     * example.com:8080.
     */
-    function getHostWithPort()
+    public function getHostWithPort()
     {
         return $this->getHost() . $this->getPortString();
     }
 
 
-    function getHost()
+    public function getHost()
     {
         if(!empty($this->_host)){
             return $this->_host;
@@ -485,29 +483,29 @@ class AkRequest extends AkObject
         return AK_WEB_REQUEST ? $this->env['SERVER_NAME'] : 'localhost';
     }
 
-    function &getSession()
+    public function &getSession()
     {
         return $_SESSION;
     }
 
-    function resetSession()
+    public function resetSession()
     {
         $_SESSION = array();
     }
 
-    function &getCookies()
+    public function &getCookies()
     {
         return $_COOKIE;
     }
 
 
-    function &getEnv()
+    public function &getEnv()
     {
         return $this->env;
     }
 
 
-    function getServerSoftware()
+    public function getServerSoftware()
     {
         if(!empty($this->env['SERVER_SOFTWARE'])){
             if(preg_match('/^([a-zA-Z]+)/', $this->env['SERVER_SOFTWARE'],$match)){
@@ -523,16 +521,16 @@ class AkRequest extends AkObject
     * 'XMLHttpRequest'. (The Prototype Javascript library sends this header with
     * every Ajax request.)
     */
-    function isXmlHttpRequest()
+    public function isXmlHttpRequest()
     {
         return !empty($this->env['HTTP_X_REQUESTED_WITH']) && strstr(strtolower($this->env['HTTP_X_REQUESTED_WITH']),'xmlhttprequest');
     }
-    function xhr()
+    public function xhr()
     {
         return $this->isXmlHttpRequest();
     }
 
-    function isAjax()
+    public function isAjax()
     {
         return $this->isXmlHttpRequest();
     }
@@ -543,13 +541,13 @@ class AkRequest extends AkObject
      * This is useful for services such as REST, XMLRPC and SOAP
      * which communicate over HTTP POST but don't use the traditional parameter format.
      */
-    function getRawPost()
+    public function getRawPost()
     {
         return empty($_ENV['RAW_POST_DATA']) ? '' : $_ENV['RAW_POST_DATA'];
     }
 
 
-    function _validateTechName($name)
+    public function _validateTechName($name)
     {
         return preg_match('/^[A-Za-z]{1,}[A-Za-z0-9_]*$/',$name);
     }
@@ -570,7 +568,7 @@ class AkRequest extends AkObject
     * @access public
     * @return void Void returned. Modifies the private property "
     */
-    function _mergeRequest()
+    public function _mergeRequest()
     {
         $this->_request = array();
 
@@ -587,7 +585,7 @@ class AkRequest extends AkObject
 
     // }}}
 
-    function _getNormalizedFilesArray($params = null, $first_call = true)
+    public function _getNormalizedFilesArray($params = null, $first_call = true)
     {
         $params = $first_call ? $_FILES : $params;
         $result = array();
@@ -655,7 +653,7 @@ class AkRequest extends AkObject
     * @access private
     * @return void
     */
-    function _addParam($variable, $value)
+    public function _addParam($variable, $value)
     {
         if($variable[0] != '_'){
             if( ( $variable == 'action' && !$this->isValidActionName($value)) ||
@@ -673,7 +671,7 @@ class AkRequest extends AkObject
     // }}}
 
 
-    function _urlDecode()
+    public function _urlDecode()
     {
         if(!defined('AK_URL_DECODED')){
             array_walk($_GET, array('AkRequest', '_performUrlDecode'));
@@ -681,7 +679,7 @@ class AkRequest extends AkObject
         }
     }
 
-    function _performUrlDecode(&$item)
+    public function _performUrlDecode(&$item)
     {
         if (is_array($item)) {
             array_walk($item, array('AkRequest', '_performUrlDecode'));
@@ -689,34 +687,34 @@ class AkRequest extends AkObject
             $item = urldecode($item);
         }
     }
-    function getAccepts()
+    public function getAccepts()
     {
         $accept_header = isset($this->env['HTTP_ACCEPT'])?$this->env['HTTP_ACCEPT']:'';
         $accepts = array();
         foreach (explode(',',$accept_header) as $index=>$acceptable){
-                 $mime_struct = $this->_parseMimeType($acceptable);
-                 if (empty($mime_struct['q'])) $mime_struct['q'] = '1.0';
+            $mime_struct = $this->_parseMimeType($acceptable);
+            if (empty($mime_struct['q'])) $mime_struct['q'] = '1.0';
 
-                 //we need the original index inside this structure
-                 //because usort happily rearranges the array on equality
-                 //therefore we first compare the 'q' and then 'i'
-                 $mime_struct['i'] = $index;
-                 $accepts[] = $mime_struct;
-             }
-             usort($accepts,array(&$this,'_sortAcceptHeader'));
+            //we need the original index inside this structure
+            //because usort happily rearranges the array on equality
+            //therefore we first compare the 'q' and then 'i'
+            $mime_struct['i'] = $index;
+            $accepts[] = $mime_struct;
+        }
+        usort($accepts,array(&$this,'_sortAcceptHeader'));
 
-             //we throw away the old index
-             foreach ($accepts as $array){
-                 unset($array['i']);
-             }
-             return $accepts;
+        //we throw away the old index
+        foreach ($accepts as $array){
+            unset($array['i']);
+        }
+        return $accepts;
     }
-    function setFormat($format)
+    public function setFormat($format)
     {
         $this->_format = $format;
     }
 
-    function getFormat()
+    public function getFormat()
     {
 
 
@@ -744,9 +742,8 @@ class AkRequest extends AkObject
     *
     * @return AkActionController
     */
-    function &recognize($Map = null)
+    public function &recognize($Map = null)
     {
-        AK_ENVIRONMENT != 'setup' ? $this->_connectToDatabase() : null;
         $this->_startSession();
         $this->_enableInternationalizationSupport();
         $this->_mapRoutes($Map);
@@ -795,7 +792,7 @@ class AkRequest extends AkObject
                 die('405 Method Not Allowed');
             }
         }
-        $Controller =& new $controller_class_name(array('controller'=>true));
+        $Controller = new $controller_class_name(array('controller'=>true));
         $Controller->_module_path = $module_path;
 
         if(isset($_SESSION)){
@@ -808,7 +805,7 @@ class AkRequest extends AkObject
 
     // }}}
 
-    function _enableInternationalizationSupport()
+    public function _enableInternationalizationSupport()
     {
         if(AK_AVAILABLE_LOCALES != 'en'){
             require_once(AK_LIB_DIR.DS.'AkLocaleManager.php');
@@ -820,7 +817,7 @@ class AkRequest extends AkObject
         }
     }
 
-    function _mapRoutes($Map = null)
+    public function _mapRoutes($Map = null)
     {
         require_once(AK_LIB_DIR.DS.'AkRouter.php');
 
@@ -835,15 +832,7 @@ class AkRequest extends AkObject
         }
     }
 
-
-    function _connectToDatabase()
-    {
-        if(AK_AUTOMATIC_DB_CONNECTION){
-            Ak::db(AK_DEFAULT_DATABASE_PROFILE);
-        }
-    }
-
-    function _startSession()
+    public function _startSession()
     {
         if(AK_AUTOMATIC_SESSION_START){
             if(!isset($_SESSION)){
@@ -854,7 +843,7 @@ class AkRequest extends AkObject
         }
     }
 
-    function getPutParams()
+    public function getPutParams()
     {
         if(!isset($this->put) && $this->isPut() && $data = $this->getPutRequestData()){
             $this->put = array();
@@ -863,7 +852,7 @@ class AkRequest extends AkObject
         return isset($this->put) ? $this->put : array();
     }
 
-    function getPutRequestData()
+    public function getPutRequestData()
     {
         if(!empty($_SERVER['CONTENT_LENGTH'])){
             $putdata = fopen('php://input', 'r');
@@ -875,7 +864,7 @@ class AkRequest extends AkObject
         }
     }
 
-    function getReferer()
+    public function getReferer()
     {
         $referer = AK_HOST;
         if(isset($_SESSION['_ak_referer']) && preg_match('/^\w+:\/\/.*/', $_SESSION['_ak_referer'])){
@@ -886,7 +875,7 @@ class AkRequest extends AkObject
         return $referer;
     }
 
-    function _saveRefererIfNotRedirected()
+    public function _saveRefererIfNotRedirected()
     {
         if(isset($_SESSION) && !$this->isAjax()){
             $_SESSION['_ak_referer'] = $this->getRequestUri().$this->getPath();
