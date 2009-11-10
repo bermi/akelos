@@ -2234,6 +2234,7 @@ class Ak
 
             'ActiveRecord'              =>  AK_APP_DIR.DS.'shared_model.php',
             'AkActiveRecord'            =>  AK_LIB_DIR.DS.'AkActiveRecord.php',
+            'AkRouter'                  =>  AK_LIB_DIR.DS.'AkRouter.php',
             'AkActiveRecordMock'        =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php',
             'AkAssociation'             =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php',
             'AkBelongsTo'               =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociations'.DS.'AkBelongsTo.php',
@@ -2328,7 +2329,8 @@ function ak_test($test_case_name, $use_sessions = false, $prevent_double_test_ru
 
 function ak_test_run_case_if_executed($test_case_name, $show_enviroment_flags = true)
 {
-    if (count(debug_backtrace()) == 1) {
+    $levels = count(debug_backtrace());
+    if ($levels == 1 || ($levels == 2 && isset($_ENV['SCRIPT_NAME']) && $_ENV['SCRIPT_NAME'] == 'dummy.php')) {
         if($show_enviroment_flags){
             echo "(".AK_ENVIRONMENT." environment) Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n";
         }

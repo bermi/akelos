@@ -3,8 +3,6 @@
 !defined('MAKELOS_BASE_DIR') && define('MAKELOS_BASE_DIR', dirname(__FILE__));
 !defined('MAKELOS_RUN') && define('MAKELOS_RUN', preg_match('/makelos$/', $_SERVER['PHP_SELF']));
 
-error_reporting(E_STRICT);
-
 class MakelosRequest
 {
     public

@@ -6,8 +6,6 @@
 // | Released under the GNU Lesser General Public License, see LICENSE.txt|
 // +----------------------------------------------------------------------+
 
-ak_compat('http_build_query');
-
 /**
  * Native PHP URL rewriting for the Akelos Framework.
  * 
@@ -32,7 +30,6 @@ if(!defined('COMPULSORY_REGEX')){
 
 
 
-
 /**
 * Native PHP URL rewriting for the Akelos Framework
 *
@@ -50,15 +47,12 @@ class AkRouter extends AkObject
 
     /**
     * Routes setting container
-    *
-    * @see getRoutes
-    * @access private
-    * @var array $_loaded_routes
     */
-    var $_loaded_routes = array();
+    protected
+    $_loaded_routes = array();
 
 
-    function __construct()
+    public function __construct()
     {
         /**
         * We will try to guess if mod_rewrite is enabled.
@@ -66,7 +60,7 @@ class AkRouter extends AkObject
         * to avoid the overhead this function causes
         */
         if(!defined('AK_ENABLE_URL_REWRITE') || (defined('AK_ENABLE_URL_REWRITE') && AK_ENABLE_URL_REWRITE !== false)){
-            $this->_loadUrlRewriteSettings();
+            $this->loadUrlRewriteSettings();
         }
     }
 
@@ -78,7 +72,7 @@ class AkRouter extends AkObject
     * @access public
     * @return array Returns Loaded Routes array.
     */
-    function getRoutes()
+    public function getRoutes()
     {
         return $this->_loaded_routes;
     }
@@ -95,7 +89,7 @@ class AkRouter extends AkObject
     * - <code>array('controller'=>'page','action'=>'view_page','webpage'=>'contact_us')</code>
     * @return string Having the following rewrite rules:
     * <code>
-    * $Router =& new AkRouter();
+    * $Router = new AkRouter();
     *
     * $Router->map('/setup/*config_settings',array('controller'=>'setup'));
     * $Router->map('/customize/*options/:action',array('controller'=>'themes','options'=>3));
@@ -141,7 +135,7 @@ class AkRouter extends AkObject
     * <code>$Router->toUrl(array('controller' => 'themes','options' => array('blue','css','sans_serif'), 'action'=>'clone'));</code>
     * Produces: /customize/blue/css/sans_serif/clone/
     */
-    function toUrl($params=array())
+    public function toUrl($params=array())
     {
         static $_cache;
         $_cache_key = md5(serialize($params));
@@ -168,32 +162,32 @@ class AkRouter extends AkObject
                 if(isset($_route['options'])){
                     foreach ($_route['options'] as $_option=>$_value){
                         if(
-                        !empty($_route['url_pieces']) &&
-                        isset($_route['options'][$_option]) &&
-                        array_search(':'.$_option, $_route['url_pieces']) === false &&
-                        array_search('*'.$_option, $_route['url_pieces']) === false &&
-                        (
-                        is_string($_value) ||
-                        is_integer($_value)) &&
-                        (
-                        !isset($params_copy[$_option]
-                        ) ||
-                        $params_copy[$_option] != $_value
-                        )
-                        )
-                        {
+                            !empty($_route['url_pieces']) &&
+                            isset($_route['options'][$_option]) &&
+                            array_search(':'.$_option, $_route['url_pieces']) === false &&
+                            array_search('*'.$_option, $_route['url_pieces']) === false &&
+                            (
+                                is_string($_value) ||
+                                is_integer($_value)
+                            ) && (
+                                !isset($params_copy[$_option]
+                            ) ||
+                                $params_copy[$_option] != $_value
+                            )
+                        ){
                             continue 2;
                         }
-                        if(isset($params_copy[$_option]) &&
-                        $_value == $params_copy[$_option] &&
-                        $_value !== OPTIONAL &&
-                        $_value !== COMPULSORY)
-                        {
-                            if($_option == 'controller'){
-                                $_controller = $_value;
-                            }
-                            unset($params_copy[$_option]);
-                            unset($$_option);
+                        if(
+                            isset($params_copy[$_option]) &&
+                            $_value == $params_copy[$_option] &&
+                            $_value !== OPTIONAL &&
+                            $_value !== COMPULSORY){
+                                
+                                if($_option == 'controller'){
+                                    $_controller = $_value;
+                                }
+                                unset($params_copy[$_option]);
+                                unset($$_option);
                         }
                     }
                 }
@@ -237,8 +231,8 @@ class AkRouter extends AkObject
                         }
 
                         if( isset($_parsed_arr['controller']) &&
-                        ((isset($controller) && $_parsed_arr['controller'] == $controller) ||
-                        (isset($_controller) && $_parsed_arr['controller'] == $_controller))){
+                            ((isset($controller) && $_parsed_arr['controller'] == $controller) ||
+                            (isset($_controller) && $_parsed_arr['controller'] == $_controller))){
 
 
                             if( isset($_route['options']['controller']) &&
@@ -333,7 +327,7 @@ class AkRouter extends AkObject
     * @param    string    $url    URL to get params from.
     * @return mixed Having the following rewrite rules:
     * <code>
-    * $Router =& new AkRouter();
+    * $Router = new AkRouter();
     *
     * $Router->map('/setup/*config_settings',array('controller'=>'setup'));
     * $Router->map('/customize/*options/:action',array('controller'=>'themes','options'=>3));
@@ -384,7 +378,7 @@ class AkRouter extends AkObject
     *
     * This function returns false in case no rule is found for selected URL
     */
-    function toParams($url)
+    public function toParams($url)
     {
         $url = $url == '/' || $url == '' ? '/' : '/'.trim($url,'/').'/';
         $nurl = $url;
@@ -475,7 +469,7 @@ class AkRouter extends AkObject
     * NOTE:If option <b>'id'=>OPTIONAL</b> this requirement will be used in case 'id' is set to something
     * @return void
     */
-    function connect($url_pattern, $options = array(), $requirements = null)
+    public function connect($url_pattern, $options = array(), $requirements = null)
     {
 
         if(!empty($options['requirements'])){
@@ -506,7 +500,8 @@ class AkRouter extends AkObject
             }
 
             if(($is_arr || $is_var) && $piece == 'this'){
-                trigger_error(Ak::t('You can\'t use the reserved word this for mapping URLs'), E_USER_ERROR);
+                trigger_error(Ak::t('You can\'t use the reserved word this for mapping URLs'), E_USER_NOTICE);
+                return;
             }
 
             //COMPULSORY
@@ -598,7 +593,7 @@ class AkRouter extends AkObject
     * 
     * @see map
     */
-    function map($url_pattern, $options = array(), $requirements = null)
+    public function map($url_pattern, $options = array(), $requirements = null)
     {
         return $this->connect($url_pattern, $options, $requirements);
     }
@@ -606,13 +601,13 @@ class AkRouter extends AkObject
     /**
     * Url decode a string or an array of strings
     */
-    function _urlDecode($input)
+    protected function _urlDecode($input)
     {
         if(!empty($input)){
             if (is_scalar($input)){
                 return urldecode($input);
             }elseif (is_array($input)){
-                return array_map(array(&$this,'_urlDecode'),$input);
+                return array_map(array($this,'_urlDecode'),$input);
             }
         }
         return '';
@@ -621,13 +616,13 @@ class AkRouter extends AkObject
     /**
     * Url encodes a string or an array of strings
     */
-    function _urlEncode($input)
+    protected function _urlEncode($input)
     {
         if(!empty($input)){
             if (is_scalar($input)){
                 return urlencode($input);
             }elseif (is_array($input)){
-                return array_map(array(&$this,'_urlEncode'),$input);
+                return array_map(array($this,'_urlEncode'),$input);
             }
         }
         return '';
@@ -640,7 +635,7 @@ class AkRouter extends AkObject
     * AK_URL_REWRITE_ENABLED on your config file to the avoid overload
     * this function causes and to prevent from missfunctioning
     */
-    function _loadUrlRewriteSettings()
+    public function loadUrlRewriteSettings()
     {
         static $result;
         if(isset($result)){
@@ -744,8 +739,6 @@ class AkRouter extends AkObject
 function &AkRouter()
 {
     $null = null;
-    $AkRouter =& Ak::singleton('AkRouter', $null);
+    $AkRouter = Ak::singleton('AkRouter', $null);
     return $AkRouter;
 }
-
-?>

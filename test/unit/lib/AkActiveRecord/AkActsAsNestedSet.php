@@ -28,7 +28,8 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
 
         $Categories = new NestedCategory();
 
-        $this->assertErrorPattern('/columns are required/',$Categories->actsAs('nested_set', array('parent_column'=>'not_available')));
+        $this->expectError(new PatternExpectation('/columns are required/'));
+        $Categories->actsAs('nested_set', array('parent_column'=>'not_available'));
 
         $this->assertEqual($Categories->actsLike(), 'active record');
 
@@ -48,7 +49,8 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
     {
         $Categories = new NestedCategory();
         $Object = new AkObject();
-        $this->assertErrorPattern('/is not an active record/',$Categories->nested_set->_ensureIsActiveRecordInstance($Object));
+        $this->expectError(new PatternExpectation('/is not an active record/'));
+        $Categories->nested_set->_ensureIsActiveRecordInstance($Object);
     }
 
     public function Test_of_getType()

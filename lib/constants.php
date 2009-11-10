@@ -231,4 +231,4 @@ defined('AK_AUTOMATIC_SESSION_START') ? null : define('AK_AUTOMATIC_SESSION_STAR
 defined('AK_APP_NAME') ? null : define('AK_APP_NAME', 'Application');
 
 
-AK_CLI || AK_PRODUCTION_MODE ? null : require_once(AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php');
+//AK_CLI || AK_PRODUCTION_MODE ? null : require_once(AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php');

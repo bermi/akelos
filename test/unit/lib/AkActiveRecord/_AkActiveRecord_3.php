@@ -344,8 +344,10 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $this->assertTrue($FoundUsers[0]->first_name=='Tim');
         $this->assertTrue($FoundUsers[1]->first_name=='Alicia');
 
-        $this->assertErrorPattern('/Argument list did not match expected set/',$Users->findBy("username",'tim_oreilly'));
-        $this->assertErrorPattern('/Argument list did not match expected set/',$Users->findBy("user_name AND password",'tim_oreilly'));
+        $this->expectError(new PatternExpectation('/Argument list did not match expected set/'));
+        $Users->findBy("username",'tim_oreilly');
+        $this->expectError(new PatternExpectation('/Argument list did not match expected set/'));
+        $Users->findBy("user_name AND password",'tim_oreilly');
 
         //$Users->findBy("user_name AND password",'tim_oreilly','1234');
 
@@ -387,8 +389,11 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $this->assertTrue($FoundUsers[0]->first_name=='Tim');
         $this->assertTrue($FoundUsers[1]->first_name=='Alicia');
 
-        $this->assertErrorPattern('/Argument list did not match expected set/',$Users->findAllBy("username",'tim_oreilly'));
-        $this->assertErrorPattern('/Argument list did not match expected set/',$Users->findAllBy("user_name AND password",'tim_oreilly'));
+        $this->expectError(new PatternExpectation('/Argument list did not match expected set/'));
+        $Users->findAllBy("username",'tim_oreilly');
+
+        $this->expectError(new PatternExpectation('/Argument list did not match expected set/'));
+        $Users->findAllBy("user_name AND password",'tim_oreilly');
 
         $AkTestFields = new AkTestField();
 
@@ -427,8 +432,11 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $FoundUser = $Users->findFirstBy("first_name OR first_name:begins",'Tim','Al',array('order'=>'last_name ASC'));
         $this->assertTrue($FoundUser->first_name=='Tim');
 
-        $this->assertErrorPattern('/Argument list did not match expected set/',$Users->findFirstBy("username",'tim_oreilly'));
-        $this->assertErrorPattern('/Argument list did not match expected set/',$Users->findFirstBy("user_name AND password",'tim_oreilly'));
+        $this->expectError(new PatternExpectation('/Argument list did not match expected set/'));
+        $Users->findFirstBy("username",'tim_oreilly');
+
+        $this->expectError(new PatternExpectation('/Argument list did not match expected set/'));
+        $Users->findFirstBy("user_name AND password",'tim_oreilly');
 
         $AkTestFields = new AkTestField();
 
@@ -450,8 +458,11 @@ class test_AkActiveRecord_3 extends  AkUnitTest
     {
         $Users = new AkTestUser();
 
-        $this->assertErrorPattern('/Argument list did not match expected set/',$Users->findLastBy("username",'tim_oreilly'));
-        $this->assertErrorPattern('/Argument list did not match expected set/',$Users->findLastBy("user_name AND password",'tim_oreilly'));
+        $this->expectError(new PatternExpectation('/Argument list did not match expected set/'));
+        $Users->findLastBy("username",'tim_oreilly');
+
+        $this->expectError(new PatternExpectation('/Argument list did not match expected set/'));
+        $Users->findLastBy("user_name AND password",'tim_oreilly');
 
         $AkTestFields = new AkTestField();
 
@@ -484,8 +495,11 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $AkTestUser = new AkTestUser();
 
         $this->assertTrue($AkTestUser->setInheritanceColumn('first_name'));
-        $this->assertErrorPattern('/instead/',$AkTestUser->setInheritanceColumn('country'));
-        $this->assertErrorPattern('/available/',$AkTestUser->setInheritanceColumn('type'));
+
+        $this->expectError(new PatternExpectation('/instead/'));
+        $AkTestUser->setInheritanceColumn('country');
+        $this->expectError(new PatternExpectation('/available/'));
+        $AkTestUser->setInheritanceColumn('type');
     }
 
 

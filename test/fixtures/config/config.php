@@ -19,8 +19,12 @@ define('AK_PUBLIC_DIR', AK_FIXTURES_DIR.DIRECTORY_SEPARATOR.'public');
 defined('AK_TEST_HELPERS_DIR') ? null :
 define('AK_TEST_HELPERS_DIR', AK_FIXTURES_DIR.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.'helpers');
 
-defined('AK_SITE_URL_SUFFIX')?null:define('AK_SITE_URL_SUFFIX', str_replace(array(join(DIRECTORY_SEPARATOR,array_diff((array)@explode(DIRECTORY_SEPARATOR,AK_TEST_DIR),
-(array)@explode('/',@$_SERVER['REQUEST_URI']))),DIRECTORY_SEPARATOR),array('','/'),AK_TEST_DIR));
+if(isset($_SERVER['REQUEST_URI'])){
+    defined('AK_SITE_URL_SUFFIX')?null:define('AK_SITE_URL_SUFFIX', str_replace(array(join(DIRECTORY_SEPARATOR,array_diff((array)@explode(DIRECTORY_SEPARATOR,AK_TEST_DIR),
+(array)@explode('/',$_SERVER['REQUEST_URI']))),DIRECTORY_SEPARATOR),array('','/'),AK_TEST_DIR));
+}else{
+    defined('AK_SITE_URL_SUFFIX') || define('AK_SITE_URL_SUFFIX', '/');
+}
 
 defined('AK_ENABLE_AKELOS_ARGS') ? null : define('AK_ENABLE_AKELOS_ARGS', true);
 //define('AK_SKIP_DB_CONNECTION',isset($db) && $db === false);

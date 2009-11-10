@@ -2,11 +2,8 @@
 
 require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
-require_once(AK_LIB_DIR.DS.'AkRouter.php');
-
-class AkRouterTestCase extends  AkUnitTest 
+class AkRouter_TestCase extends  AkUnitTest
 {
-
     public $Router;
     public $url_prefix = '';
 
@@ -14,7 +11,7 @@ class AkRouterTestCase extends  AkUnitTest
     {
         $this->Router = new AkRouter();
 
-        $this->Router->_loadUrlRewriteSettings();
+        $this->Router->loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
 
         $this->Router->connect('/topic/:id', array('controller' => 'topic', 'action'=>'view', 'id'=>COMPULSORY), array('id'=>'[0-9]+'));
@@ -193,7 +190,11 @@ class AkRouterTestCase extends  AkUnitTest
     }
 }
 
-class DefaultRoutesTestCase extends  AkUnitTest 
+ak_test_run_case_if_executed('AkRouter_TestCase');
+
+
+
+class DefaultRoutes_TestCase extends  AkUnitTest
 {
 
     public $Router;
@@ -203,7 +204,7 @@ class DefaultRoutesTestCase extends  AkUnitTest
     {
         $this->Router = new AkRouter();
 
-        $this->Router->_loadUrlRewriteSettings();
+        $this->Router->loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
 
         $this->Router->connect('/:controller/:action/:id', array('controller' => 'page', 'action' => 'index'));
@@ -224,8 +225,11 @@ class DefaultRoutesTestCase extends  AkUnitTest
 
 }
 
+ak_test_run_case_if_executed('DefaultRoutes_TestCase');
+
+
 # Fixes issue 27 reported by Jacek Jedrzejewski
-class UrlConstantsNamedAsUrlVariablesTestCase extends  AkUnitTest 
+class UrlConstantsNamedAsUrlVariables_TestCase extends  AkUnitTest
 {
 
     public $Router;
@@ -234,7 +238,7 @@ class UrlConstantsNamedAsUrlVariablesTestCase extends  AkUnitTest
     public function setup()
     {
         $this->Router = new AkRouter();
-        $this->Router->_loadUrlRewriteSettings();
+        $this->Router->loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
     }
 
@@ -271,8 +275,10 @@ class UrlConstantsNamedAsUrlVariablesTestCase extends  AkUnitTest
     }
 }
 
+ak_test_run_case_if_executed('UrlConstantsNamedAsUrlVariables_TestCase');
 
-class MiddleOptionalValuesWhenGeneratingUrlsTestCase extends  AkUnitTest 
+
+class MiddleOptionalValuesWhenGeneratingUrls_TestCase extends  AkUnitTest
 {
     public $Router;
     public $url_prefix = '';
@@ -280,7 +286,7 @@ class MiddleOptionalValuesWhenGeneratingUrlsTestCase extends  AkUnitTest
     public function setup()
     {
         $this->Router = new AkRouter();
-        $this->Router->_loadUrlRewriteSettings();
+        $this->Router->loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
     }
 
@@ -300,9 +306,10 @@ class MiddleOptionalValuesWhenGeneratingUrlsTestCase extends  AkUnitTest
     }
 }
 
+ak_test_run_case_if_executed('MiddleOptionalValuesWhenGeneratingUrls_TestCase');
 
 
-class RouterConflictsTestCase extends  AkUnitTest 
+class RouterModules_TestCase extends  AkUnitTest
 {
 
     public $Router;
@@ -311,36 +318,7 @@ class RouterConflictsTestCase extends  AkUnitTest
     public function __construct()
     {
         $this->Router = new AkRouter();
-        $this->Router->_loadUrlRewriteSettings();
-        $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
-        $this->Router->connect('/:controller/:action/:value');
-    }
-
-    public function test_should_allow_variables_with_slashes()
-    {
-        $params = array('controller'=>'page','action'=>'redirect', 'value'=>'http://akelos.org/download/');
-        $url = '/page/redirect/http%3A%2F%2Fakelos.org%2Fdownload%2F/';
-        $this->assertEqual($this->Router->toUrl($params), $url);
-        $this->assertEqual($this->Router->toParams($this->url_prefix.$url), $params);
-    }
-
-    public function test_should_trigger_error_on_forbidden_router_variable()
-    {
-        $this->Router->connect('/:this');
-        $this->assertErrorPattern('/reserved word this/');
-    }
-}
-
-class RouterModulesTestCase extends  AkUnitTest 
-{
-
-    public $Router;
-    public $url_prefix = '';
-
-    public function __construct()
-    {
-        $this->Router = new AkRouter();
-        $this->Router->_loadUrlRewriteSettings();
+        $this->Router->loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
         $this->Router->connect('/module_alias/:controller/:action/:id', array('controller' => 'test', 'action' => 'index', 'module'=>'testing_module'));
     }
@@ -359,4 +337,37 @@ class RouterModulesTestCase extends  AkUnitTest
     }
 }
 
-?>
+ak_test_run_case_if_executed('RouterModules_TestCase');
+
+
+
+class RouterConflicts_TestCase extends  AkUnitTest
+{
+    public $Router;
+    public $url_prefix = '';
+
+    public function __construct()
+    {
+        $this->Router = new AkRouter();
+        $this->Router->loadUrlRewriteSettings();
+        $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
+        $this->Router->connect('/:controller/:action/:value');
+    }
+
+    public function test_should_allow_variables_with_slashes()
+    {
+        $params = array('controller'=>'page','action'=>'redirect', 'value'=>'http://akelos.org/download/');
+        $url = '/page/redirect/http%3A%2F%2Fakelos.org%2Fdownload%2F/';
+        $this->assertEqual($this->Router->toUrl($params), $url);
+        $this->assertEqual($this->Router->toParams($this->url_prefix.$url), $params);
+    }
+
+    public function test_should_trigger_error_on_forbidden_router_variable()
+    {
+        $this->expectError(new PatternExpectation('/reserved word this/'));
+        $this->Router->connect('/:this');
+    }
+}
+
+ak_test_run_case_if_executed('RouterConflicts_TestCase');
+

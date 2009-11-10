@@ -41,6 +41,7 @@ foreach ($options as $k => $_test_file){
     }else{
         $_test_files = array($_test_file);
     }
+
     foreach ($_test_files as $_test_file){
 
         if(!file_exists($_test_file)){

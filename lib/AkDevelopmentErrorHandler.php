@@ -77,10 +77,10 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         static $_sent_errors = array(), $_errors_shown = false;
 
         $error_number = $error_number & error_reporting();
+
         if($error_number == 0){
             return;
         }
-
         /**
          * resetting content-encoding header to nil,
          * if it was set to gzip before, otherwise we get an encoding error
@@ -117,11 +117,11 @@ if(defined('AK_DEBUG') && AK_DEBUG){
 
 
         if(isset($_sent_errors[$error_type.$error_message])){
+            
             return;
         }else{
             $_sent_errors[$error_type.$error_message] = true;
         }
-
 
         AK_DEBUG_OUTPUT_AS_HTML ? print('<pre>') : null;
 

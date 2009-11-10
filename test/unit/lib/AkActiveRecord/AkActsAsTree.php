@@ -26,8 +26,8 @@ class test_AkActiveRecord_actAsTree extends  AkUnitTest
         $this->assertEqual($Categories->tree->_parent_column_name,'parent_id');
 
         $Categories = new Category();
-
-        $this->assertErrorPattern('/columns are required/',$Categories->actsAs('tree', array('parent_column'=>'not_available')));
+        $this->expectError(new PatternExpectation('/columns are required/'));
+        $Categories->actsAs('tree', array('parent_column'=>'not_available'));
 
         $this->assertEqual($Categories->actsLike(), 'active record');
 
@@ -47,7 +47,8 @@ class test_AkActiveRecord_actAsTree extends  AkUnitTest
     {
         $Categories = new Category();
         $Object = new AkObject();
-        $this->assertErrorPattern('/is not an active record/',$Categories->tree->_ensureIsActiveRecordInstance($Object));
+        $this->expectError(new PatternExpectation('/is not an active record/'));
+        $Categories->tree->_ensureIsActiveRecordInstance($Object);
     }
 
     public function Test_of_getType()
@@ -118,7 +119,8 @@ class test_AkActiveRecord_actAsTree extends  AkUnitTest
         $this->assertEqual($CategoryAa->getId(), $children[0]->getId());
         $this->assertEqual($CategoryAb->getId(), $children[1]->getId());
 
-        $this->assertErrorPattern('/Cannot add myself as a child to myself/', $CategoryA->tree->addChild($CategoryA));
+        $this->expectError(new PatternExpectation('/Cannot add myself as a child to myself/'));
+        $CategoryA->tree->addChild($CategoryA);
     }
 
     public function Test_of_childrenCount()

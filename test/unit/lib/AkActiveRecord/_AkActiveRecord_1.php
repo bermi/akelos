@@ -54,14 +54,9 @@ class test_AkActiveRecord extends  AkUnitTest
         $AkTestUser = new AkTestUser();
 
         $this->assertEqual($AkTestUser->getModelName(), 'AkTestUser');
+        $this->expectError(new PatternExpectation('/ak_test_user/'));
+        $AkTestUser->setTableName('ak_test_user');
         $this->assertEqual($AkTestUser->getTableName(), 'ak_test_users');
-        $this->assertErrorPattern('/ak_test_user/', $AkTestUser->setTableName('ak_test_user'));
-
-        //$this->_createNewTestingModel('AkTestUnavailableDatabase');
-        //$AkTestUnavailableDatabase = new AkTestUnavailableDatabase();
-        //$this->assertEqual($AkTestUnavailableDatabase->getModelName(), 'AkTestUnavailableDatabase');
-        //ak_define('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES', true);
-        //$this->assertErrorPattern('/Ooops! Could not fetch details for the table ak_test_unavailable_database./',$AkTestUnavailableDatabase->getTableName());
     }
 
 
@@ -93,8 +88,9 @@ class test_AkActiveRecord extends  AkUnitTest
         $AkTestMember = new AkTestMember();
         $this->assertEqual($AkTestMember->getParentModelName(), 'AkTestUser');
 
+        $this->expectError(new PatternExpectation('/YourParentModelName/'));
         $AkTestUser = new AkTestUser();
-        $this->assertErrorPattern('/YourParentModelName/',$AkTestUser->getParentModelName());
+        $AkTestUser->getParentModelName();
 
         $AkTestUser = new AkTestUser();
         $AkTestUser->setParentModelName('FakeClass');

@@ -63,8 +63,9 @@ class FormOptionsHelperTests extends HelpersUnitTester
         '<option selected="selected" value="3">Visitor</option>'.
         '</select>');
 
+        $this->expectError(new PatternExpectation('/private methods/'));
         ob_start();
-        $this->assertErrorPattern('/private methods/',$AkFormHelperOptionsInstanceTag->to_collection_select_tag($collection, '_id', 'role'));
+        $AkFormHelperOptionsInstanceTag->to_collection_select_tag($collection, '_id', 'role');
         ob_end_clean();
 
 

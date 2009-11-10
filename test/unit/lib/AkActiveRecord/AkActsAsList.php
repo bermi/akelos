@@ -25,7 +25,8 @@ class AkActiveRecord_actsAsListTestCase extends  AkUnitTest
         $this->assertTrue(empty($TodoItems->list->scope));
 
         $TodoItems = new TodoItem();
-        $this->assertErrorPattern('/not_available/',$TodoItems->actsAs('list', array('column'=>'not_available')));
+        $this->expectError(new PatternExpectation('/not_available/'));
+        $TodoItems->actsAs('list', array('column'=>'not_available'));
 
         $this->assertEqual($TodoItems->actsLike(), 'active record');
 
@@ -48,7 +49,8 @@ class AkActiveRecord_actsAsListTestCase extends  AkUnitTest
     {
         $TodoItems = new TodoItem();
         $Object = new AkObject();
-        $this->assertErrorPattern('/is not an active record/',$TodoItems->list->_ensureIsActiveRecordInstance($Object));
+        $this->expectError(new PatternExpectation('/is not an active record/'));
+        $TodoItems->list->_ensureIsActiveRecordInstance($Object);
     }
 
     public function Test_of_getType()

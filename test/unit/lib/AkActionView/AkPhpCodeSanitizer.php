@@ -51,8 +51,9 @@ class AkPhpCodeSanitizer_TestCase extends  AkUnitTest
     {
         $this->CodeSanitizer = new AkPhpCodeSanitizer();
         $this->CodeSanitizer->setOptions(array('code'=>$code));
+        
+        $this->expectError(new PatternExpectation('/You can\'t use/'));
         $this->assertFalse($this->CodeSanitizer->isCodeSecure(), 'Unsecure code not detected: '.$code);
-        $this->assertErrorPattern('/You can\'t use/');
     }
 }
 

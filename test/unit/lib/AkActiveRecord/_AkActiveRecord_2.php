@@ -454,12 +454,12 @@ class test_AkActiveRecord_2 extends  AkUnitTest
         $this->assertTrue($FoundUsers[0]->first_name == 'Bermi');
 
         $FoundUsers = $Users->findBySql("SELECT * FROM ak_test_users",6);
+        $this->expectError(new PatternExpectation('/DEPRECATED WARNING.*findBySql.*/'));
         $this->assertEqual(count($FoundUsers), 6);
-        $this->assertErrorPattern("/DEPRECATED WARNING.*findBySql.*/");
 
+        $this->expectError(new PatternExpectation('/DEPRECATED WARNING.*findBySql.*/'));
         $FoundUsers = $Users->findBySql("SELECT * FROM ak_test_users",6,6);
         $this->assertEqual(count($FoundUsers), 3);
-        $this->assertErrorPattern("/DEPRECATED WARNING.*findBySql.*/");
 
         $FoundUsers = $Users->findBySql("SELECT * FROM ak_test_users WHERE iad=123");
         $this->assertEqual(count($FoundUsers), 0);
