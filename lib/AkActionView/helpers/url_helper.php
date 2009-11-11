@@ -10,16 +10,13 @@
  * @package ActionView
  * @subpackage Helpers
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
-
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_helper.php');
 
 class UrlHelper extends AkObject
 {
-    function setController(&$controller)
+    public function setController(&$controller)
     {
-        $this->_controller =& $controller;
+        $this->_controller = $controller;
     }
 
     /**
@@ -28,7 +25,7 @@ class UrlHelper extends AkObject
     * Note that it'll set ('only_path' => true) so you'll get /controller/action instead of the 
     * http://example.com/controller/action part (makes it harder to parse httpd log files)
     */
-    function url_for($options = array(), $parameters_for_method_reference = null)
+    public function url_for($options = array(), $parameters_for_method_reference = null)
     {
         $default_options = array(
         'only_path' => true
@@ -38,7 +35,7 @@ class UrlHelper extends AkObject
     }
 
 
-    function modify_current_url($options_to_add = array(), $options_to_exclude = array(), $remove_unnecesary_options = true)
+    public function modify_current_url($options_to_add = array(), $options_to_exclude = array(), $remove_unnecesary_options = true)
     {
         $options_to_exclude = $remove_unnecesary_options ? array_merge(array('ak','lang',AK_SESSION_NAME,'AK_SESSID','PHPSESSID'), $options_to_exclude) : $options_to_exclude;
         $options_to_add = array_merge($this->_controller->Request->getRouteParams(),$options_to_add);
@@ -73,11 +70,11 @@ class UrlHelper extends AkObject
     *   $url_helper->link_to('Busy loop', array('action' => 'busy'), array('popup' => array('new_window', 'height=300,width=600')));
     *   $url_helper->link_to('Destroy account', array('action' => 'destroy'), array('confirm' => 'Are you sure?'), array('post' => true));
     */
-    function link_to($name = null, $options = array(), $html_options = array(), $parameters_for_method_reference = null)
+    public function link_to($name = null, $options = array(), $html_options = array(), $parameters_for_method_reference = null)
     {
         if (!empty($html_options)) {
             $this->convert_options_to_javascript($html_options);
-            $tag_options = TagHelper::_tag_options($html_options);            
+            $tag_options = TagHelper::_tag_options($html_options);
         }
         else{
             $tag_options = null;
@@ -133,7 +130,7 @@ class UrlHelper extends AkObject
     * a run of text, nor can you place a form within another form.
     * (Bottom line: Always validate your HTML before going public.)
     */
-    function button_to($name, $options = array(), $html_options = array())
+    public function button_to($name, $options = array(), $html_options = array())
     {
         $html_options = $this->_convert_boolean_attributes($html_options, 'disabled');
 
@@ -158,7 +155,7 @@ class UrlHelper extends AkObject
     * This is useful for creating link bars where you don't want to link
     * to the page currently being viewed.
     */
-    function link_to_unless_current($name, $options = array(), $html_options = array(), $parameters_for_method_reference = null)
+    public function link_to_unless_current($name, $options = array(), $html_options = array(), $parameters_for_method_reference = null)
     {
         return !$this->current_page($options) ? $this->link_to_unless($options, $name, $options, $html_options, $parameters_for_method_reference) : $name;
     }
@@ -167,7 +164,7 @@ class UrlHelper extends AkObject
     * Create a link tag of the given +$name+ using an URL created by the set of +options+, unless +condition+
     * is true, in which case only the name is returned. 
     */
-    function link_to_unless($condition, $name, $options = array(), $html_options = array(), $parameters_for_method_reference = null)
+    public function link_to_unless($condition, $name, $options = array(), $html_options = array(), $parameters_for_method_reference = null)
     {
         if ($condition !== true) {
             return $this->link_to($name, $options, $html_options, $parameters_for_method_reference);
@@ -179,7 +176,7 @@ class UrlHelper extends AkObject
     * Create a link tag of the given +name+ using an URL created by the set of +$options+, if +$condition+
     * is true, in which case only the name is returned. 
     */      
-    function link_to_if($condition, $name, $options = array(), $html_options = array(), $parameters_for_method_reference = null)
+    public function link_to_if($condition, $name, $options = array(), $html_options = array(), $parameters_for_method_reference = null)
     {
         return $this->link_to_unless(!$condition, $name, $options, $html_options, $parameters_for_method_reference);
     }
@@ -187,7 +184,7 @@ class UrlHelper extends AkObject
     /**
     * Returns true if the current page uri is generated by the options passed (in url_for format).
     */
-    function current_page($options)
+    public function current_page($options)
     {
         return ($this->url_for($options) == $this->_controller->Request->getPath());
     }
@@ -214,7 +211,7 @@ class UrlHelper extends AkObject
     *   $url_helper->mail_to("me@domain.com", "My email", array('cc' => "ccaddress@domain.com", 'bcc' => "bccaddress@domain.com", 'subject' => "This is an example email", 'body' => "This is the body of the message."))   # =>
     *     <a href="mailto:me@domain.com?cc="ccaddress@domain.com"&bcc="bccaddress@domain.com"&body="This%20is%20the%20body%20of%20the%20message."&subject="This%20is%20an%20example%20email">My email</a>
     */
-    function mail_to($email_address, $name = null, $html_options = array())
+    public function mail_to($email_address, $name = null, $html_options = array())
     {
         $name = empty($name) ? $email_address : $name;
 
@@ -253,9 +250,9 @@ class UrlHelper extends AkObject
             for ($i=0;$i<strlen($email_address);$i++){
                 if(preg_match('/\w/',$email_address[$i])){
                     $encoded_email_address .= sprintf('%%%x',ord($email_address[$i]));
-                }else{                    
+                }else{
                     if ($email_address[$i] == '@') {
-                    	$encoded_email_address .= '%40';
+                        $encoded_email_address .= '%40';
                     }
                     elseif ($email_address[$i] == '.'){
                         $encoded_email_address .= '%2e';
@@ -278,7 +275,7 @@ class UrlHelper extends AkObject
 
 
 
-    function convert_options_to_javascript(&$html_options)
+    public function convert_options_to_javascript(&$html_options)
     {
         foreach (array('confirm', 'popup', 'post') as $option){
             $$option = isset($html_options[$option]) ? $html_options[$option] : false;
@@ -288,39 +285,39 @@ class UrlHelper extends AkObject
         $onclick = '';
         if ($popup && $post){
             trigger_error(Ak::t("You can't use popup and post in the same link"), E_USER_ERROR);
-            
+
         }elseif($confirm && $popup){
             $onclick = 'if ('.$this->_confirm_javascript_function($confirm).') { '.$this->_popup_javascript_function($popup).' };return false;';
-            
+
         }elseif ($confirm && $post) {
             $onclick = 'if ('.$this->_confirm_javascript_function($confirm).') { '.$this->_post_javascript_function().' };return false;';
-            
+
         }elseif ($confirm) {
             $onclick = 'return '.$this->_confirm_javascript_function($confirm).';';
-            
+
         }elseif ($post) {
             $onclick = $this->_post_javascript_function().'return false;';
-            
+
         }elseif ($popup) {
             $onclick = $this->_popup_javascript_function($popup).'return false;';
-            
+
         }
         $html_options['onclick'] = empty($html_options['onclick']) ? $onclick : $html_options['onclick'].$onclick;
     }
 
-    function _confirm_javascript_function($confirm)
+    public function _confirm_javascript_function($confirm)
     {
         return "confirm('".JavaScriptHelper::escape_javascript($confirm)."')";
     }
 
 
 
-    function _popup_javascript_function($popup)
+    public function _popup_javascript_function($popup)
     {
         return is_array($popup) ? "window.open(this.href,'".array_shift($popup)."','".array_pop($popup)."');" : "window.open(this.href);";
     }
 
-    function _post_javascript_function()
+    public function _post_javascript_function()
     {
         return "var f = document.createElement('form'); document.body.appendChild(f); f.method = 'POST'; f.action = this.href; f.submit();";
     }
@@ -350,7 +347,7 @@ class UrlHelper extends AkObject
     *   $url_helper->convert_boolean_attributes( $html_options,
     *                                array('checked','disabled','readonly' ) );
     */
-    function _convert_boolean_attributes(&$html_options, $boolean_attributes)
+    public function _convert_boolean_attributes(&$html_options, $boolean_attributes)
     {
         $boolean_attributes = (array)$boolean_attributes;
         foreach ($boolean_attributes as $boolean_attribute){
@@ -364,5 +361,3 @@ class UrlHelper extends AkObject
     }
 }
 
-
-?>

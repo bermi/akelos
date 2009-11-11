@@ -17,7 +17,7 @@ require_once(AK_VENDOR_DIR.DS.'pear'.DS.'Image'.DS.'Color.php');
 
 class AkColor extends Image_Color
 {
-    function rgbToHex()
+    static function rgbToHex()
     {
         $rgb = func_get_args();
         $hex = '';
@@ -28,13 +28,13 @@ class AkColor extends Image_Color
         return $hex;
     }
 
-    function hexToRgb($hex_color)
+    static function hexToRgb($hex_color)
     {
         $hex_color = strtolower(trim($hex_color,'#;&Hh'));
         return array_map('hexdec',explode('.',wordwrap($hex_color, ceil(strlen($hex_color)/3),'.',1)));
     }
 
-    function getOpositeHex($hex_color)
+    static function getOpositeHex($hex_color)
     {
         $rgb = AkColor::hexToRgb($hex_color);
         foreach ($rgb as $k=>$color){
@@ -43,7 +43,7 @@ class AkColor extends Image_Color
         return AkColor::rgbToHex($rgb);
     }
 
-    function getRandomHex()
+    static function getRandomHex()
     {
         return AkColor::rgbToHex(rand(0,255),rand(0,255),rand(0,255));
     }

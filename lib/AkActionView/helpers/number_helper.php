@@ -10,7 +10,6 @@
  * @package ActionView
  * @subpackage Helpers
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 
@@ -18,7 +17,7 @@
 * Provides methods for converting a number into a formatted string that currently represents
 * one of the following forms: phone number, percentage, money, or precision level.
 */
-class NumberHelper extends AkObject 
+class NumberHelper extends AkObject
 {
     /**
       * Formats a +number+ into a US phone number string. The +options+ can be a array used to customize the 
@@ -31,7 +30,7 @@ class NumberHelper extends AkObject
       *   $number_helper->number_to_phone(1235551234, array('delimiter' => " "))    => 123 555 1234
       *   $number_helper->number_to_phone(1235551234, array('area_code' => true, 'extension' => 555))  => (123) 555-1234 x 555
       */
-    function number_to_phone($number, $options = array())
+    public function number_to_phone($number, $options = array())
     {
         $default_options = array(
         'area_code'=>false,
@@ -66,7 +65,7 @@ class NumberHelper extends AkObject
       * 			'unit_position' => 'right')) => 1.234.567.890,50 &euro;
       */
 
-    function number_to_currency($number, $options = array())
+    public function number_to_currency($number, $options = array())
     {
         $default_options = Ak::locale('currency');
 
@@ -90,7 +89,7 @@ class NumberHelper extends AkObject
       *   $number_helper->number_to_percentage(100, array('precision' => 0)) => 100%
       *   $number_helper->number_to_percentage(302.0576, array('precision' => 3))  => 302.058%
       */
-    function number_to_percentage($number, $options = array())
+    public function number_to_percentage($number, $options = array())
     {
 
         $default_options = array(
@@ -108,7 +107,7 @@ class NumberHelper extends AkObject
       * Example:
       *    $number_helper->number_with_delimiter(12345678) => 12,345,678
       */
-    function number_with_delimiter($number, $delimiter=',')
+    public function number_with_delimiter($number, $delimiter=',')
     {
         return preg_replace('/(\d)(?=(\d\d\d)+(?!\d))/', "\\1{$delimiter}", $number);
     }
@@ -124,7 +123,7 @@ class NumberHelper extends AkObject
     *   $number_helper->human_size(1234567890)   => 1.1 GB
     */
 
-    function number_to_human_size($size, $decimal = 1)
+    public function number_to_human_size($size, $decimal = 1)
     {
         if(is_numeric($size )){
             $position = 0;
@@ -138,12 +137,12 @@ class NumberHelper extends AkObject
             return '0 Bytes';
         }
     }
-    function human_size($size)
+    public function human_size($size)
     {
         return NumberHelper::number_to_human_size($size);
     }
 
-    function human_size_to_bytes($size)
+    public function human_size_to_bytes($size)
     {
         $units = array('BYTE','KB','MB','GB','TB');
         $size = str_replace(array('BYTE','KILOBYTE','MEGABYTE','GIGABYTE','TERABYTE'), $units, rtrim(strtoupper($size),'S'));
@@ -160,7 +159,7 @@ class NumberHelper extends AkObject
       *    $number_helper->number_with_precision(111.2345) => 111.235
       */
 
-    function number_with_precision($number, $precision=3)
+    public function number_with_precision($number, $precision=3)
     {
         /**
          * @todo fix number rounding. Precision on linux boxes rounds to the lower (Mac and Windows work as the example)
@@ -181,11 +180,9 @@ class NumberHelper extends AkObject
     * Example:
     *   $number_helper->zeropad(123, 6) => 000123
     */
-    function zeropad($number, $length)
+    public function zeropad($number, $length)
     {
         return str_pad($number, $length*-1, '0');
     }
 
 }
-
-?>

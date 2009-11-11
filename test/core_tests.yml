@@ -10,9 +10,11 @@ Active Support:
     - AkPluginInstaller
     - AkReflection
     - 'AkReflection/*'
+    - AkTestApplication
 Action Controller: 
     - AkDbSession
     - AkRouter
+    - AkSession
     #- 'AkActionController/*'
     #- AkRequest
 

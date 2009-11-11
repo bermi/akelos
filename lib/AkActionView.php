@@ -205,7 +205,7 @@ class AkActionView extends AkObject
     {
         $____result = '';
         $____controller_extras = isset($this->_controllerInstance) ? array('controller_name' => $this->_controllerInstance->getControllerName(), 'controller' => &$this->_controllerInstance) : array();
-        $____local_assigns = array_merge(array_merge($this->_getGlobals(),(array)@$this->assigns,array_merge((array)@$this->_local_assigns,
+        $____local_assigns = array_merge(array_merge($this->getGlobals(),(array)@$this->assigns,array_merge((array)@$this->_local_assigns,
         array_merge((array)$____local_assigns, $____controller_extras))));
 
         if(strstr($____template_extension,'.')){
@@ -461,7 +461,7 @@ class AkActionView extends AkObject
      *
      * @static
      */
-    function _addGlobalVar($var_name, $value, $_retrieve = false)
+    function addGlobalVar($var_name, $value, $_retrieve = false)
     {
         static $_global_vars = array();
         if($_retrieve){
@@ -478,9 +478,9 @@ class AkActionView extends AkObject
     /**
      * @static
      */
-    function _getGlobals()
+    function getGlobals()
     {
-        return AkActionView::_addGlobalVar(null,null,true);
+        return AkActionView::addGlobalVar(null,null,true);
     }
 
 }

@@ -38,7 +38,7 @@ define('AK_AUTO_LINK_REGEX','/
         ([[:punct:]]|\s|<|$)       # trailing text
         /x');
 
-defined('AK_DEFAULT_LOCALE_NAMESPACE') ? null : define('AK_DEFAULT_LOCALE_NAMESPACE', null);
+
 
 
 /**
@@ -53,12 +53,12 @@ defined('AK_DEFAULT_LOCALE_NAMESPACE') ? null : define('AK_DEFAULT_LOCALE_NAMESP
 class TextHelper extends AkObject
 {
 
-    function setController(&$controller)
+    public function setController(&$controller)
     {
-        $this->_controller =& $controller;
+        $this->_controller = $controller;
     }
 
-    function TextHelper()
+    public function __construct()
     {
         TextHelper::cycle(array('reset'=>'all'));
     }
@@ -72,7 +72,7 @@ class TextHelper extends AkObject
     * lesser than +length+, then the truncated +text+ will be limited to +break+.
     *
     */
-    function truncate($text, $length = 30, $truncate_string = '...', $break = false)
+    static function truncate($text, $length = 30, $truncate_string = '...', $break = false)
     {
         if(utf8_strlen($text) <= $length){
             return $text;
@@ -109,7 +109,7 @@ class TextHelper extends AkObject
 	*  //outputs: I am <strong class="highlight">highlighting</strong> <strong class="highlight">the</strong> phrase
 	*
 	*/
-    function highlight($text, $phrase, $highlighter = '<strong class="highlight">\1</strong>')
+    static function highlight($text, $phrase, $highlighter = '<strong class="highlight">\1</strong>')
     {
         $phrase = is_array($phrase) ? join('|',array_map('preg_quote',$phrase)) : preg_quote($phrase);
         return !empty($phrase) ? preg_replace('/('.$phrase.')/iu', $highlighter, $text) : $text;
@@ -126,7 +126,7 @@ class TextHelper extends AkObject
 	 *  //outputs:  ...lo my wo...
 	 *
 	 */
-    function excerpt($text, $phrase, $radius = 100, $excerpt_string = '...')
+    static function excerpt($text, $phrase, $radius = 100, $excerpt_string = '...')
     {
         if(empty($text)){
             return $text;
@@ -149,7 +149,7 @@ class TextHelper extends AkObject
     /**
 	 * Attempts to pluralize the "$singular" word unless "$count" is 1.
 	 */
-    function pluralize($count, $singular, $plural = null)
+    static function pluralize($count, $singular, $plural = null)
     {
         if ($count==1) {
             return $singular;
@@ -163,7 +163,7 @@ class TextHelper extends AkObject
     /**
      * Word wrap long lines to line_width.
      */
-    function word_wrap($text, $line_width = 80, $break = "\n")
+    static function word_wrap($text, $line_width = 80, $break = "\n")
     {
         // No need to use an UTF-8 wordwrap function as we are using the default cut character.
         return trim(wordwrap($text, $line_width, $break));
@@ -172,7 +172,7 @@ class TextHelper extends AkObject
     /**
      * Like word wrap but allows defining text indenting  and boby indenting
      */
-    function format($text, $options = array())
+    static function format($text, $options = array())
     {
         $default_options = array(
         'columns' => 72,
@@ -208,7 +208,7 @@ class TextHelper extends AkObject
     /**
      * Returns the "$text" with all the Textile codes turned into HTML-tags.
      */
-    function textilize($text, $options = array())
+    static function textilize($text, $options = array())
     {
         $default_options = array(
         'extended_mode' => true,
@@ -228,7 +228,7 @@ class TextHelper extends AkObject
      * Returns the "$text" with all the Textile codes turned into HTML-tags, but
      * without the regular bounding <p> tag.
      */
-    function textilize_without_paragraph($text, $options = array())
+    static function textilize_without_paragraph($text, $options = array())
     {
         return preg_replace('/^<p([A-Za-z0-9& ;\-=",\/:\.\']+)?>(.+)<\/p>$/u','\2', TextHelper::textilize($text, $options));
     }
@@ -240,7 +240,7 @@ class TextHelper extends AkObject
 	* are considered as a paragraph, one newline (<tt>\n</tt>) is considered a
 	* linebreak, three or more consecutive newlines are turned into two newlines
 	*/
-    function simple_format($text)
+    static function simple_format($text)
     {
         $rules = array(
         '/(\\r\\n|\\r)/'=> "\n",
@@ -266,7 +266,7 @@ class TextHelper extends AkObject
     *     say hello to <a href="mailto:example.com">bermi@example.com</a>
     *
     */
-    function auto_link($text, $link = 'all', $href_options = array(), $email_link_options = array())
+    static function auto_link($text, $link = 'all', $href_options = array(), $email_link_options = array())
     {
         if (empty($text)){
             return '';
@@ -274,22 +274,22 @@ class TextHelper extends AkObject
 
         switch ($link) {
             case 'all':
-            return TextHelper::auto_link_urls(
-            TextHelper::auto_link_email_addresses($text, $email_link_options),
-            $href_options);
-            break;
+                return TextHelper::auto_link_urls(
+                TextHelper::auto_link_email_addresses($text, $email_link_options),
+                $href_options);
+                break;
 
             case 'email_addresses':
-            return TextHelper::auto_link_email_addresses($text, $email_link_options);
-            break;
+                return TextHelper::auto_link_email_addresses($text, $email_link_options);
+                break;
 
             case 'urls':
-            return TextHelper::auto_link_urls($text, $href_options);
-            break;
+                return TextHelper::auto_link_urls($text, $href_options);
+                break;
 
             default:
-            return TextHelper::auto_link($text, 'all', $href_options);
-            break;
+                return TextHelper::auto_link($text, 'all', $href_options);
+                break;
         }
     }
 
@@ -299,7 +299,7 @@ class TextHelper extends AkObject
     *
     * Returns the tag free text.
     */
-    function strip_tags($html)
+    static function strip_tags($html)
     {
         return strip_tags($html);
     }
@@ -307,7 +307,7 @@ class TextHelper extends AkObject
     /**
 	* Turns all links into words, like "<a href="something">else</a>" to "else".
 	*/
-    function strip_links($text)
+    static function strip_links($text)
     {
         return TextHelper::strip_selected_tags($text, 'a');
     }
@@ -319,7 +319,7 @@ class TextHelper extends AkObject
 	 * Example:
 	 *   $text_helper->auto_link_email_addresses($post->body);
 	 */
-    function auto_link_email_addresses($text, $email_options = array())
+    static function auto_link_email_addresses($text, $email_options = array())
     {
         if(empty($email_options)){
             return preg_replace('/([\w\.!#\$%\-+.]+@[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)+)/',
@@ -341,7 +341,7 @@ class TextHelper extends AkObject
 	 *      '<b>Person:</b> <strong>Salavert</strong>', 'strong');?>
 	 *  //outputs: <b>Person:</b> Salavert
 	 */
-    function strip_selected_tags($text, $tags = array())
+    static function strip_selected_tags($text, $tags = array())
     {
         $args = func_get_args();
         $text = array_shift($args);
@@ -362,7 +362,7 @@ class TextHelper extends AkObject
      * Example:
      *  <?=$text_helper->auto_link_urls($post->body, array('all', 'target' => '_blank'));?>
      */
-    function auto_link_urls($text, $href_options = array())
+    static function auto_link_urls($text, $href_options = array())
     {
         $extra_options = TagHelper::_tag_options($href_options);
         $extra_options_array = var_export($extra_options,true);
@@ -372,7 +372,7 @@ class TextHelper extends AkObject
         ), $text);
     }
 
-    function _replace_url_with_link_callback($matched, $extra_options)
+    static function _replace_url_with_link_callback($matched, $extra_options)
     {
         list($all, $a, $b, $c, $d) = $matched;
         if (preg_match('/<a\s/i',$a)){ // don't replace URL's that are already linked
@@ -390,7 +390,7 @@ class TextHelper extends AkObject
      *  $text_helper->get_urls_from_text('www.bermilabs.com');
      *  //returns: array('www.bermilabs.com'=>'http://www.bermilabs.com');
      */
-    function get_urls_from_text($text)
+    static function get_urls_from_text($text)
     {
         $urls = array();
         if(preg_match_all(AK_AUTO_LINK_REGEX, $text, $found_urls)){
@@ -408,7 +408,7 @@ class TextHelper extends AkObject
      * $text_helper->get_linked_urls_from_text('<a href="http://bermilabs.com">Akelos.com</a>');
      * //returns: array('http://bermilabs.com');
      */
-    function get_linked_urls_from_text($text)
+    static function get_linked_urls_from_text($text)
     {
         $linked_urls = array();
         if(preg_match_all('/<a [^>]*href[ ]?=[ \'"]?(['.AK_VALID_URL_CHARS_REGEX.']+)[ \'"]?[^>]*>/i', $text, $linked_urls_pieces)){
@@ -425,7 +425,7 @@ class TextHelper extends AkObject
      * $text_helper->get_linked_urls_from_text('<a href="http://bermilabs.com">Akelos.com</a>');
      * //returns: array('http://bermilabs.com/images/logo.gif');
      */
-    function get_image_urls_from_html($text)
+    static function get_image_urls_from_html($text)
     {
         $linked_urls = array();
         if(preg_match_all('/<img[^>]+src[ ]?=[ \'"]?(['.AK_VALID_URL_CHARS_REGEX.']+)[ \'"]?[^>]*>/is', $text, $linked_urls_pieces)){
@@ -434,14 +434,14 @@ class TextHelper extends AkObject
         return $linked_urls;
     }
 
-/**
+    /**
      * Returns an array with the image urls found on a text
      *
      *  Example:
      * $text_helper->get_linked_urls_from_text('<a href="http://bermilabs.com">Akelos.com</a>');
      * //returns: array('http://bermilabs.com/images/logo.gif');
      */
-    function get_image_urls_and_element_from_html($text)
+    static function get_image_urls_and_element_from_html($text)
     {
         $linked_urls = array();
         if(preg_match_all('/<img[^>]+src[ ]?=[ \'"]?(['.AK_VALID_URL_CHARS_REGEX.']+)[ \'"]?[^>]*>/is', $text, $linked_urls_pieces)){
@@ -475,7 +475,7 @@ class TextHelper extends AkObject
      *   </tr>
      * {end}
      */
-    function cycle($first_value, $values = null)
+    static function cycle($first_value, $values = null)
     {
         static $cycle_position;
         $params = func_get_args();
@@ -500,7 +500,7 @@ class TextHelper extends AkObject
         return $params[$current_param];
     }
 
-    function reset_cycle($name)
+    static function reset_cycle($name)
     {
         TextHelper::cycle(array('reset'=>$name));
     }
@@ -509,7 +509,7 @@ class TextHelper extends AkObject
     /**
     * Returns the text with all the Markdown codes turned into HTML-tags.
     */
-    function markdown($text)
+    static function markdown($text)
     {
         if (!empty($text)) {
             require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'markdown.php');
@@ -522,7 +522,7 @@ class TextHelper extends AkObject
     /**
     * Gets a localized setting (date format,...).
     */
-    function locale($locale_setting, $locale = null)
+    static function locale($locale_setting, $locale = null)
     {
         return Ak::locale($locale_setting, $locale);
     }
@@ -530,7 +530,7 @@ class TextHelper extends AkObject
     /**
     * Translate strings to the current locale.
     */
-    function translate($string, $args = null, $locale_namespace = AK_DEFAULT_LOCALE_NAMESPACE)
+    static function translate($string, $args = null, $locale_namespace = AK_DEFAULT_LOCALE_NAMESPACE)
     {
         return Ak::t($string, $args, empty($locale_namespace) ?
         AkInflector::underscore($this->_controller->getControllerName()) : $locale_namespace);
@@ -539,13 +539,13 @@ class TextHelper extends AkObject
     /**
     * Alias for translate
     */
-    function t($string, $args = null, $locale_namespace = AK_DEFAULT_LOCALE_NAMESPACE)
+    static function t($string, $args = null, $locale_namespace = AK_DEFAULT_LOCALE_NAMESPACE)
     {
         return TextHelper::translate($string, $args, $locale_namespace);
     }
 
 
-    function humanize($text)
+    static function humanize($text)
     {
         return AkInflector::humanize($text);
     }
@@ -568,7 +568,7 @@ class TextHelper extends AkObject
     * the words in the title.
     * @return string Text formatted as title
     */
-    function titleize($text, $uppercase = '')
+    static function titleize($text, $uppercase = '')
     {
         return AkInflector::titleize($text, $uppercase);
     }
@@ -585,7 +585,7 @@ class TextHelper extends AkObject
      *   //will handle all flash messages automatically and will close in 5 secconds. NOTE. you need to include javascript dependencies for using interactive options
      *
      */
-    function flash($message = null, $options = array(), $html_options = array())
+    static function flash($message = null, $options = array(), $html_options = array())
     {
         if(empty($message) && empty($this->_controller->flash)){
             return '';
@@ -663,7 +663,7 @@ class TextHelper extends AkObject
     /**
      * Recodes "$text" into utf-8 from "$input_string_encoding"
      */
-    function utf8($text, $input_string_encoding = null)
+    static function utf8($text, $input_string_encoding = null)
     {
         return Ak::utf8($text, $input_string_encoding);
     }
@@ -673,7 +673,7 @@ class TextHelper extends AkObject
      * Will atempt to close unmatched tags. This is useful for truncating messages
      * and not breaking the layout.
      */
-    function close_unmatched_html($html)
+    static function close_unmatched_html($html)
     {
         preg_match_all('/<(\w+)[^>\/]*?(?!\/)>/', $html, $start_tags);
         preg_match_all('/<\/(\w+)[^>\/]*?>/', $html, $end_tags);
@@ -694,7 +694,7 @@ class TextHelper extends AkObject
         return $html;
     }
 
-    function html_escape($html)
+    static function html_escape($html)
     {
         static $charset;
         if(empty($charset)){
@@ -703,10 +703,9 @@ class TextHelper extends AkObject
         return htmlentities($html, ENT_COMPAT, $charset);
     }
 
-    function h($html)
+    static function h($html)
     {
         return TextHelper::html_escape($html);
     }
 }
 
-?>

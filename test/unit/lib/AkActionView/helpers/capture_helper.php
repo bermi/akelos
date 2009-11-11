@@ -27,7 +27,7 @@ class CaptureHelperTests extends HelpersUnitTester
         $this->capture_helper->begin();
         echo $str;
         $this->assertEqual($this->capture_helper->end(), $str);
-        $globals = AkActionView::_getGlobals();
+        $globals = AkActionView::getGlobals();
         $this->assertEqual(isset($globals['content_for_']) ? $globals['content_for_'] : null, null);
     }
 
@@ -37,7 +37,7 @@ class CaptureHelperTests extends HelpersUnitTester
         $this->capture_helper->begin('test_2');
         echo $str;
         $this->assertEqual($this->capture_helper->end(), $str);
-        $globals = AkActionView::_getGlobals();
+        $globals = AkActionView::getGlobals();
         $this->assertEqual($globals['content_for_test_2'], $str);
     }
 
@@ -47,7 +47,7 @@ class CaptureHelperTests extends HelpersUnitTester
         $this->capture_helper->content_for('content_for');
         echo $str;
         $this->assertEqual($this->capture_helper->end(), $str);
-        $globals = AkActionView::_getGlobals();
+        $globals = AkActionView::getGlobals();
         $this->assertEqual($globals['content_for_content_for'], $str);
     }
 
@@ -61,7 +61,7 @@ class CaptureHelperTests extends HelpersUnitTester
         echo 'B';
         $this->assertEqual($this->capture_helper->end(), 'B');
 
-        $globals = AkActionView::_getGlobals();
+        $globals = AkActionView::getGlobals();
         $this->assertEqual($globals['content_for_concatenation'], 'AB');
     }
 }

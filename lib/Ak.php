@@ -61,12 +61,17 @@ class Ak
             return;
         }
         if (is_array($message)){
-            trigger_error(Ak::t("DEPRECATED WARNING: ".array_shift($message),$message), E_USER_NOTICE);
+            trigger_error(Ak::t("DEPRECATED WARNING: ".array_shift($message), $message), E_USER_NOTICE);
         } else {
             trigger_error(Ak::t("DEPRECATED WARNING: ".$message), E_USER_NOTICE);
         }
     }
 
+    static function deprecateMethod($method, $new_method)
+    {
+        Ak::deprecateWarning("Method $method is deprecated and will be removed on future versions. Please use $new_method instead.");   
+    }
+            
     /**
     * Gets a cache object singleton instance
     */
@@ -2260,18 +2265,41 @@ class Ak
             'AkRequestMimeType'         =>  AK_LIB_DIR.DS.'AkRequestMimeType.php',
             'AkPluginInstaller'         =>  AK_LIB_DIR.DS.'AkPluginInstaller.php',
             'AkUnitTest'                =>  AK_LIB_DIR.DS.'AkUnitTest.php',
+            'AkTestApplication'         =>  AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestApplication.php',
             'AkReflection'              =>  AK_LIB_DIR.DS.'AkReflection.php',
             'AkReflectionMethod'        =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionMethod.php',
             'AkReflectionClass'         =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionClass.php',
             'AkReflectionDocBlock'      =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionDocBlock.php',
             'AkReflectionFile'          =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFile.php',
             'AkReflectionFunction'      =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFunction.php',
+            'AkSession'                 =>  AK_LIB_DIR.DS.'AkSession.php',
             'AkType'                    =>  AK_LIB_DIR.DS.'AkType.php',
             'AkNumber'                  =>  AK_LIB_DIR.DS.'AkType'.DS.'AkNumber.php',
             'AkString'                  =>  AK_LIB_DIR.DS.'AkType'.DS.'AkString.php',
             'AkTime'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkTime.php',
             'AkArray'                   =>  AK_LIB_DIR.DS.'AkType'.DS.'AkArray.php',
             'AkDate'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkDate.php',
+            
+            
+            'AkActionViewHelper'        =>  AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php',
+            'ActiveRecordHelper'        =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'active_record_helper.php',
+            'AssetTagHelper'            =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'asset_tag_helper.php',
+            'UrlHelper'                 =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'url_helper.php',
+            'FormHelper'                =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php',
+            'AkFormHelperInstanceTag'   =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php',
+            'AkFormHelperBuilder'       =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php',
+            'FormTagHelper'             =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_tag_helper.php',
+            'AkFormHelperOptionsInstanceTag'    =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_options_helper.php',
+            'JavascriptHelper'          =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_helper.php',
+            'JavascriptMacrosHelper'    =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_macros_helper.php',
+            'MailHelper'                =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'mail_helper.php',
+            'MenuHelper'                =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'menu_helper.php',
+            'NumberHelper'              =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'number_helper.php',
+            'PaginationHelper'          =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'pagination_helper.php',
+            'PrototypeHelper'           =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'prototype_helper.php',
+            'ScriptaculousHelper'       =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'scriptaculous_helper.php',
+            'TextHelper'                =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'text_helper.php',
+            'XmlHelper'                 =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'xml_helper.php',
 
             );
 

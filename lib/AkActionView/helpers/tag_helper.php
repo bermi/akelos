@@ -36,7 +36,7 @@ class TagHelper extends AkObject
     *   <%= tag 'input', { :type => 'text', :disabled => true } %>
     *    # => <input type="text" disabled="disabled" />
     */
-    function tag($name, $options = null, $open = false)
+    public function tag($name, $options = null, $open = false)
     {
         return '<'.$name.(!empty($options) ? TagHelper::_tag_options($options) : '').($open ? '>' : ' />');
     }
@@ -54,7 +54,7 @@ class TagHelper extends AkObject
     *   <%= content_tag("select", options, :multiple => true) %>
     *    # => <select multiple="multiple">...options...</select>
     */
-    function content_tag($name, $content, $options = null)
+    public function content_tag($name, $content, $options = null)
     {
         return '<'.$name.(!empty($options) ? TagHelper::_tag_options($options) : '').'>'.$content.'</'.$name.'>';
     }
@@ -66,7 +66,7 @@ class TagHelper extends AkObject
     * <tt>&lt;![CDATA[</tt> and } with (and may not contain) the string
     * <tt>]]></tt>.
     */
-    function cdata_section($content)
+    public function cdata_section($content)
     {
         return '<![CDATA['.$content.']]>';
     }
@@ -78,7 +78,7 @@ class TagHelper extends AkObject
     *  <%= escape_once "1 > 2 &amp; 3" %>
     *    # => "1 &gt; 2 &amp; 3"
     */
-    function escape_once($html)
+    public function escape_once($html)
     {
         static $charset;
         if(empty($charset)){
@@ -90,12 +90,12 @@ class TagHelper extends AkObject
     /**
     * Fix double-escaped entities, such as &amp;amp;, &amp;#123;, etc.
     */
-    function _fix_double_escape($escaped)
+    public function _fix_double_escape($escaped)
     {
         return preg_replace('/&amp;([a-z]+|(#\d+));/i', '&$1;', $escaped);
     }
 
-    function _tag_options($options)
+    public function _tag_options($options)
     {
         $formated_options = array();
         foreach ($options as $key=>$value){
@@ -111,4 +111,3 @@ class TagHelper extends AkObject
     }
 }
 
-?>

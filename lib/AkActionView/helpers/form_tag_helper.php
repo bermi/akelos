@@ -14,10 +14,6 @@
  */
 
 
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'tag_helper.php');
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'asset_tag_helper.php');
-
 /**
 * Provides a number of methods for creating form tags that doesn't rely on conventions with an object assigned to the template like
 * FormHelper does. With the FormTagHelper, you provide the names and values yourself.
@@ -37,7 +33,7 @@ class FormTagHelper  extends AkActionViewHelper
       * * <tt>'multipart'</tt> - If set to true, the enctype is set to "multipart/form-data".
       * * <tt>'method'</tt> - The method to use when submitting the form, usually either "get" or "post".
       */
-    function form_tag($url_for_options = array(), $options = array())
+    public function form_tag($url_for_options = array(), $options = array())
     {
         $html_options = array_merge(array('method'=>'post'), $options);
         if(!empty($html_options['multipart'])){
@@ -52,7 +48,7 @@ class FormTagHelper  extends AkActionViewHelper
         return TagHelper::tag('form', $html_options, true);
     }
 
-    function start_form_tag($url_for_options = array(), $options = array())
+    public function start_form_tag($url_for_options = array(), $options = array())
     {
         return $this->form_tag($url_for_options, $options);
     }
@@ -61,7 +57,7 @@ class FormTagHelper  extends AkActionViewHelper
     /**
       * Outputs '</form>'
       */
-    function end_form_tag()
+    public function end_form_tag()
     {
         return '</form>';
     }
@@ -80,7 +76,7 @@ class FormTagHelper  extends AkActionViewHelper
       * Options:
       * * <tt>'multiple'</tt> - If set to true the selection will allow multiple choices.
       */
-    function select_tag($name, $option_tags = null, $options = array())
+    public function select_tag($name, $option_tags = null, $options = array())
     {
         return TagHelper::content_tag('select', $option_tags, array_merge(array('name'=> $name, 'id' => trim(AkInflector::underscore($name),'_')), $options));
     }
@@ -95,7 +91,7 @@ class FormTagHelper  extends AkActionViewHelper
       *
       * An array of standard HTML options for the tag.
       */
-    function text_field_tag($name, $value = null, $options = array())
+    public function text_field_tag($name, $value = null, $options = array())
     {
         return TagHelper::tag('input', array_merge(array('type'=>'text','name'=>$name,'id'=>trim(AkInflector::underscore($name),'_'),'value'=>$value), $options));
     }
@@ -105,7 +101,7 @@ class FormTagHelper  extends AkActionViewHelper
       *
       * Takes the same options as text_field_tag
       */
-    function hidden_field_tag($name, $value = null, $options = array())
+    public function hidden_field_tag($name, $value = null, $options = array())
     {
         return $this->text_field_tag($name, $value, array_merge($options,array('type'=>'hidden')));
     }
@@ -119,7 +115,7 @@ class FormTagHelper  extends AkActionViewHelper
       *     <?= $form_tag_helper->submit_tag(); ?>
       *   <?= $form_tag_helper->end_form_tag(); ?>
       */
-    function file_field_tag($name, $options = array())
+    public function file_field_tag($name, $options = array())
     {
         return $this->text_field_tag($name, null, array_merge($options,array('type'=>'file')));
     }
@@ -129,7 +125,7 @@ class FormTagHelper  extends AkActionViewHelper
       *
       * Takes the same options as text_field_tag
       */
-    function password_field_tag($name = 'password', $value = null, $options = array())
+    public function password_field_tag($name = 'password', $value = null, $options = array())
     {
         return $this->text_field_tag($name, $value, array_merge($options,array('type'=>'password')));
     }
@@ -142,7 +138,7 @@ class FormTagHelper  extends AkActionViewHelper
       *     # Outputs <textarea name="body" id="body" cols="25" rows="10"></textarea>
       *     <?= $form_tag_helper->text_area_tag('body', null, array('size'=>'25x10')); ?>
       */
-    function text_area_tag($name, $content = null, $options = array())
+    public function text_area_tag($name, $content = null, $options = array())
     {
         if(!empty($options['size'])){
             list($options['cols'], $options['rows']) = preg_split('/x|X| /', trim(str_replace(' ','',$options['size'])));
@@ -154,7 +150,7 @@ class FormTagHelper  extends AkActionViewHelper
     /**
       * Creates a check box.
       */
-    function check_box_tag($name, $value = '1', $checked = false, $options = array())
+    public function check_box_tag($name, $value = '1', $checked = false, $options = array())
     {
         $html_options = array_merge(array('type'=>'checkbox','name'=>$name,'id'=>$name,'value'=>$value),$options);
         if(!empty($html_options['checked']) || !empty($checked)){
@@ -166,7 +162,7 @@ class FormTagHelper  extends AkActionViewHelper
     /**
       * Creates a radio button.
       */
-    function radio_button_tag($name, $value, $checked = false, $options = array())
+    public function radio_button_tag($name, $value, $checked = false, $options = array())
     {
         $html_options = array_merge(array('type'=>'radio','name'=>$name,'id'=>$name,'value'=>$value),$options);
         if(!empty($html_options['checked']) || !empty($checked)){
@@ -179,7 +175,7 @@ class FormTagHelper  extends AkActionViewHelper
       * Creates a submit button with the text <tt>value</tt> as the caption. If options contains a pair with the key of "disable_with",
       * then the value will be used to rename a disabled version of the submit button.
       */
-    function submit_tag($value = null, $options = array())
+    public function submit_tag($value = null, $options = array())
     {
         $value = empty($value) ? Ak::t('Save changes',array(),'helpers/form') : $value;
         if(!empty($options['disable_with'])){
@@ -195,10 +191,9 @@ class FormTagHelper  extends AkActionViewHelper
       *
       * <tt>source</tt> is passed to AssetTagHelper#image_path
       */
-    function image_submit_tag($source, $options = array())
+    public function image_submit_tag($source, $options = array())
     {
         return TagHelper::tag('input',array_merge(array('type'=>'image','src'=>$this->_controller->asset_tag_helper->image_path($source)),$options));
     }
 }
 
-?>

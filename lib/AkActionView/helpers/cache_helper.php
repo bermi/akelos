@@ -10,7 +10,6 @@
  * @package ActionView
  * @subpackage Helpers
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 
@@ -29,21 +28,16 @@
 *
 *   Normal view text
 */
-
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
-
 class CacheHelper extends AkActionViewHelper 
 {
     
-    function begin($key = array(), $options = array())
+    public function begin($key = array(), $options = array())
     {
         return $this->_controller->cacheTplFragmentStart($key, $options);
     }
 
-    function end($key = array(), $options = array())
+    public function end($key = array(), $options = array())
     {
         return $this->_controller->cacheTplFragmentEnd($key, $options);
     }
 }
-
-?>

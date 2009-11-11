@@ -14,11 +14,6 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'tag_helper.php');
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php');
-
-
 /**
 * Provides a set of helpers for creating JavaScript macros that rely on and often bundle methods from JavaScriptHelper into
 * larger units. These macros are deprecated and will be removed on Akelos 0.9
@@ -59,7 +54,7 @@ class JavascriptMacrosHelper extends AkActionViewHelper
     *                               in the AJAX call, +form+ is an implicit parameter
     * @deprecated 
     */
-    function in_place_editor($field_id, $options = array())
+    public function in_place_editor($field_id, $options = array())
     {
         $function =  "new Ajax.InPlaceEditor(";
         $function .= "'{$field_id}', ";
@@ -143,7 +138,7 @@ class JavascriptMacrosHelper extends AkActionViewHelper
       *                       the entire element is used.
       * @deprecated 
       */
-    function auto_complete_field($field_id, $options = array())
+    public function auto_complete_field($field_id, $options = array())
     {
         $function =  "var {$field_id}_auto_completer = new Ajax.Autocompleter(";
         $function .= "'{$field_id}', ";
@@ -152,7 +147,7 @@ class JavascriptMacrosHelper extends AkActionViewHelper
 
         $js_options = array();
         if (!empty($options['tokens'])){
-            $js_options['tokens'] = JavaScriptHelper::_array_or_string_for_javascript($options['tokens']) ;
+            $js_options['tokens'] = JavaScriptHelper::array_or_string_for_javascript($options['tokens']) ;
         }
         if (!empty($options['with'])) {
             $js_options['callback'] = "function(element, value) { return {$options['with']} }";
@@ -195,7 +190,7 @@ class JavascriptMacrosHelper extends AkActionViewHelper
       *
       * @deprecated 
       */
-    function auto_complete_result($entries, $field, $phrase = null)
+    public function auto_complete_result($entries, $field, $phrase = null)
     {
         if (empty($entries)) {
             return '';
@@ -215,7 +210,7 @@ class JavascriptMacrosHelper extends AkActionViewHelper
       * 
       * @deprecated 
       */
-    function text_field_with_auto_complete($object, $method, $tag_options = array(), $completion_options = array())
+    public function text_field_with_auto_complete($object, $method, $tag_options = array(), $completion_options = array())
     {
         if (!isset($tag_options['autocomplete'])) $tag_options['autocomplete'] = "off";
 
@@ -231,7 +226,7 @@ class JavascriptMacrosHelper extends AkActionViewHelper
     /**
        * @deprecated 
        */
-    function _auto_complete_stylesheet()
+    public function _auto_complete_stylesheet()
     {
         return TagHelper::content_tag('style',
         <<<EOT
@@ -259,8 +254,6 @@ class JavascriptMacrosHelper extends AkActionViewHelper
               padding:0;
             }
 EOT
-);
+        );
     }
-
 }
-?>

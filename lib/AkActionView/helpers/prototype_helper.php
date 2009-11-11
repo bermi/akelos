@@ -11,11 +11,7 @@
  * @subpackage Helpers
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  * @author Jerome Loyet
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
-
-
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_helper.php');
 
 /**
 * Provides a set of helpers for calling Prototype JavaScript functions, 
@@ -42,7 +38,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_helper.php
 */
 class PrototypeHelper extends AkActionViewHelper
 {
-    function getCallbacks()
+    public function getCallbacks()
     {
         if(empty($this->callbacks)){
             $callbacks = array_merge(array('uninitialized', 'loading', 'loaded',
@@ -56,7 +52,7 @@ class PrototypeHelper extends AkActionViewHelper
         return $this->callbacks;
     }
 
-    function getAjaxOptions()
+    public function getAjaxOptions()
     {
         if(empty($this->ajax_options)){
             $ajax_options = array_merge(array('before', 'after', 'condition', 'url',
@@ -155,7 +151,7 @@ class PrototypeHelper extends AkActionViewHelper
     *                          it could just as well be the ID of a
     *                          table row or any other DOM element.
     */
-    function link_to_remote($name, $options = array(), $html_options = array())
+    public function link_to_remote($name, $options = array(), $html_options = array())
     {
         return $this->_controller->javascript_helper->link_to_function($name, $this->remote_function($options), $html_options);
 
@@ -169,7 +165,7 @@ class PrototypeHelper extends AkActionViewHelper
     * of the remote call. The options for specifying the target with 'url' 
     * and defining callbacks is the same as link_to_remote.
     */
-    function periodically_call_remote($options = array())
+    public function periodically_call_remote($options = array())
     {
         $frequency = !empty($options['frequency']) ? $options['frequency'] : 10; // every ten seconds by default
         $code = "new PeriodicalExecuter(function() {".$this->remote_function($options)."}, {$frequency})";
@@ -198,11 +194,11 @@ class PrototypeHelper extends AkActionViewHelper
     * By default the fall-through action is the same as the one specified in 
     * the 'url' (and the default method is 'post').
     */
-    function form_remote_tag($options = array())
+    public function form_remote_tag($options = array())
     {
-        
+
         $options['url'] = empty($options['url']) ? array() : $options['url'];
-        
+
         $options['form'] = true;
         $options['html'] = empty($options['html']) ? array() : $options['html'];
         $options['html']['onsubmit'] = $this->remote_function($options).'; return false;';
@@ -216,7 +212,7 @@ class PrototypeHelper extends AkActionViewHelper
     /**
     * Works like form_remote_tag, but uses form_for semantics.
     */
-    function remote_form_for($object_name, $object, $options = array(), $proc)
+    public function remote_form_for($object_name, $object, $options = array(), $proc)
     {
         //$this->_controller->text_helper->concat($this->_controller->form_remote_tag($options),proc.binding);
         return $this->_controller->form_helper->fields_for($object_name,$object,$proc);
@@ -224,7 +220,7 @@ class PrototypeHelper extends AkActionViewHelper
     }
 
     /* Alias: remote_form_for */
-    function form_remote_for($object_name, $object, $options = array(), $proc)
+    public function form_remote_for($object_name, $object, $options = array(), $proc)
     {
         return $this->remote_form_for($object_name, $object, $options, $proc);
     }
@@ -234,7 +230,7 @@ class PrototypeHelper extends AkActionViewHelper
     * in the background instead of regular reloading POST arrangement. 
     * <tt>options</tt> argument is the same as in <tt>form_remote_tag</tt>.
     */
-    function submit_to_remote($name, $value, $options = array())
+    public function submit_to_remote($name, $value, $options = array())
     {
         $options['with'] = !empty($options['with']) ? $options['with'] : 'Form.serialize(this.form)';
 
@@ -292,7 +288,7 @@ class PrototypeHelper extends AkActionViewHelper
     *
     * See also JavaScriptGenerator and update_page.
     */
-    function update_element_function($element_id, $options = array())
+    public function update_element_function($element_id, $options = array())
     {
         $content = !empty($options['content']) ? $this->_controller->javascript_helper->escape_javascript($options['content']) : '';
         $content = empty($content) && func_num_args() == 3 ? func_get_arg(2) : (is_string($options) ? $options : $content);
@@ -301,24 +297,24 @@ class PrototypeHelper extends AkActionViewHelper
         switch ($action) {
 
             case 'update':
-            if (!empty($options['position'])){
-                $javascript_function = "new Insertion.".AkInflector::camelize($options['position'])."('{$element_id}','{$content}')";
-            }else{
-                $javascript_function = "$('{$element_id}').innerHTML = '{$content}'";
-            }
-            break;
+                if (!empty($options['position'])){
+                    $javascript_function = "new Insertion.".AkInflector::camelize($options['position'])."('{$element_id}','{$content}')";
+                }else{
+                    $javascript_function = "$('{$element_id}').innerHTML = '{$content}'";
+                }
+                break;
 
             case 'empty':
-            $javascript_function =  "$('{$element_id}').innerHTML = ''";
-            break;
+                $javascript_function =  "$('{$element_id}').innerHTML = ''";
+                break;
 
             case 'remove':
-            $javascript_function = "Element.remove('{$element_id}')";
-            break;
+                $javascript_function = "Element.remove('{$element_id}')";
+                break;
 
             default:
-            trigger_error(Ak::t('Invalid action, choose one of update, remove, empty'), E_USER_WARNING);
-            break;
+                trigger_error(Ak::t('Invalid action, choose one of update, remove, empty'), E_USER_WARNING);
+                break;
         }
 
         $javascript_function .= ";\n";
@@ -330,7 +326,7 @@ class PrototypeHelper extends AkActionViewHelper
     * that form_remote_tag can call in 'complete' to evaluate a multiple
     * update return document using update_element_function calls.
     */
-    function evaluate_remote_response()
+    public function evaluate_remote_response()
     {
         return "eval(request.responseText)";
     }
@@ -345,7 +341,7 @@ class PrototypeHelper extends AkActionViewHelper
     *     <option value="1">World</option>
     *   </select>
     */
-    function remote_function($options = array())
+    public function remote_function($options = array())
     {
 
         $javascript_options = $this->_optionsForAjax($options);
@@ -416,7 +412,7 @@ class PrototypeHelper extends AkActionViewHelper
     * Additionally, you may specify any of the options documented in
     * link_to_remote.
     */
-    function observe_field($field_id, $options = array())
+    public function observe_field($field_id, $options = array())
     {
         if (!empty($options['frequency']) && $options['frequency']>0) {
             return $this->_buildObserver('Form.Element.Observer', $field_id, $options);
@@ -431,7 +427,7 @@ class PrototypeHelper extends AkActionViewHelper
     * the default value of the <tt>with</tt> option evaluates to the
     * serialized (request string) value of the form.
     */
-    function observe_form($form_id, $options = array())
+    public function observe_form($form_id, $options = array())
     {
         if (!empty($options['frequency']) && $options['frequency']>0) {
             return $this->_buildObserver('Form.Observer', $form_id, $options);
@@ -441,7 +437,7 @@ class PrototypeHelper extends AkActionViewHelper
     }
 
 
-    function _buildObserver($class, $name, $options = array())
+    public function _buildObserver($class, $name, $options = array())
     {
         if(!empty($options['with']) && !strstr($options['with'],'=')){
             $options['with'] = "'{$options['with']}=' + value";
@@ -459,7 +455,7 @@ class PrototypeHelper extends AkActionViewHelper
         return $this->_controller->javascript_helper->javascript_tag($javascript);
     }
 
-    function _buildCallbacks($options)
+    public function _buildCallbacks($options)
     {
         $callbacks = array();
         $this->callbacks = $this->getCallbacks();
@@ -472,7 +468,7 @@ class PrototypeHelper extends AkActionViewHelper
         return $callbacks;
     }
 
-    function _optionsForAjax($options)
+    public function _optionsForAjax($options)
     {
         $js_options = $this->_buildCallbacks($options);
 
@@ -492,10 +488,9 @@ class PrototypeHelper extends AkActionViewHelper
         return $this->_controller->javascript_helper->_options_for_javascript($js_options);
     }
 
-    function _methodOptionToString($method)
+    public function _methodOptionToString($method)
     {
         return is_string($method) && substr($method,0,1) == "'" ? $method : "'$method'";
     }
 }
 
-?>

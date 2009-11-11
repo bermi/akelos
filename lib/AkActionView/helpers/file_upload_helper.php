@@ -14,19 +14,8 @@
  */
 
 
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
-
 class FileUploadHelper extends AkActionViewHelper
 {
-    function _instantiateCacheHandler()
-    {
-        if(empty($this->Cache)){
-            require_once(AK_LIB_DIR.DS.'AkCache.php');
-            $this->Cache =& new AkCache();
-            $this->Cache->init(array('lifeTime'=>3600*2), 1);
-        }
-    }
-
     /**
      * Handles a gmail-like file upload.
      *
@@ -47,7 +36,7 @@ class FileUploadHelper extends AkActionViewHelper
      *
      * @param bool $send_json_response
      */
-    function handle_partial_upload($temporary_directory = AK_TMP_DIR, $send_json_response = true)
+    public function handle_partial_upload($temporary_directory = AK_TMP_DIR, $send_json_response = true)
     {
         $this->_instantiateCacheHandler();
 
@@ -72,15 +61,15 @@ class FileUploadHelper extends AkActionViewHelper
             if(!empty($this->_controller->params['persisted_files'])){
                 $files = $_FILES = $this->_get_persisted_files_params($this->_controller->params['persisted_files']);
                 $this->_controller->params = array_merge_recursive($this->_controller->params, $files);
-                $this->_clean_up_persisted_on_shutdown($this->_controller->params['persisted_keys']);
+                $this->cleanUpPersistedOnShutdown($this->_controller->params['persisted_keys']);
                 unset($this->_controller->params['persisted_keys']);
                 unset($this->_controller->params['persisted_files']);
             }
             return false;
 
-        // We are requesting the file for downloading
+            // We are requesting the file for downloading
         }elseif (!$this->_controller->Request->isPost() && !empty($this->_controller->params['persistence_key'])){
-            $this->_send_file($this->_controller->params['persistence_key']);
+            $this->_sendFile($this->_controller->params['persistence_key']);
             return true;
 
         }else{
@@ -89,7 +78,7 @@ class FileUploadHelper extends AkActionViewHelper
         return true;
     }
 
-    function _get_persisted_files_params($params)
+    public function _get_persisted_files_params($params)
     {
         $result = array();
         foreach ($params as $name=>$details){
@@ -105,7 +94,7 @@ class FileUploadHelper extends AkActionViewHelper
         return $result;
     }
 
-    function _get_file_details($key)
+    public function _get_file_details($key)
     {
         $key = preg_replace('/[^A-Z^a-z^0-9]/','',$key);
         $file = $this->get_persisted_file($key);
@@ -117,12 +106,12 @@ class FileUploadHelper extends AkActionViewHelper
         }
     }
 
-    function _getTempDir()
+    public function _getTempDir()
     {
         return $this->temp_dir;
     }
 
-    function _setTempDir($temp_dir)
+    public function _setTempDir($temp_dir)
     {
         $temp_dir = rtrim($temp_dir,'/\\');
         $tmp_file = @tempnam($temp_dir,'testing');
@@ -133,7 +122,7 @@ class FileUploadHelper extends AkActionViewHelper
         }
     }
 
-    function _handle_partial_files($params)
+    public function _handle_partial_files($params)
     {
         $result = array();
         foreach ($params as $name=>$details){
@@ -155,7 +144,7 @@ class FileUploadHelper extends AkActionViewHelper
         return $result;
     }
 
-    function get_persisted_file($persistence_key)
+    public function get_persisted_file($persistence_key)
     {
         $file = $this->Cache->get($persistence_key, 'persistent_files');
         if (empty($file)) {
@@ -164,18 +153,35 @@ class FileUploadHelper extends AkActionViewHelper
         return unserialize($file);
     }
 
-    function delete_persisted_file($key)
+    public function delete_persisted_file($key)
     {
         $key = preg_replace('/[^A-Z^a-z^0-9]/','',$key);
         $this->Cache->remove($key, 'persistent_files');
     }
 
-    function clean_persisted_files()
+    public function clean_persisted_files()
     {
         $this->Cache->clean('persistent_files', 'old');
     }
 
-    function _send_file($key)
+    public function cleanUpPersistedOnShutdown($keys = false)
+    {
+        static $key_cache = array();
+        if($keys === false){
+            foreach ($key_cache as $key){
+                @unlink($this->_getTempDir().DS.'_file_uploader_file_'.$key);
+                $this->delete_persisted_file($key);
+            }
+            return;
+        }
+        if(empty($key_cache)){
+            register_shutdown_function(array($this, 'cleanUpPersistedOnShutdown'));
+        }
+        $key_cache = array_merge($key_cache, $keys);
+    }
+
+
+    private function _sendFile($key)
     {
         $key = preg_replace('/[^A-Z^a-z^0-9]/','',$key);
         $file = $this->get_persisted_file($key);
@@ -187,22 +193,16 @@ class FileUploadHelper extends AkActionViewHelper
         }
 
     }
-
-    function _clean_up_persisted_on_shutdown($keys = false)
+    
+    private function _instantiateCacheHandler()
     {
-        static $key_cache = array();
-        if($keys === false){
-            foreach ($key_cache as $key){
-                @unlink($this->_getTempDir().DS.'_file_uploader_file_'.$key);
-                $this->delete_persisted_file($key);
-            }
-            return;
+        if(empty($this->Cache)){
+            require_once(AK_LIB_DIR.DS.'AkCache.php');
+            $this->Cache = new AkCache();
+            $this->Cache->init(array('lifeTime'=>3600*2), 1);
         }
-        if(empty($key_cache)){
-            register_shutdown_function(array(&$this,'_clean_up_persisted_on_shutdown'));
-        }
-        $key_cache = array_merge($key_cache, $keys);
     }
+
 }
 
 ?>

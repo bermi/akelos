@@ -10,27 +10,8 @@
  * @package ActionView
  * @subpackage Helpers
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-
-/**
- * Cache Helpers lets you cache fragments of templates
-*
-* == Caching a block into a fragment
-*
-*   <b>Hello {name}</b>
-*   <?php if (!$cache_helper->begin()) { ?>
-*     All the topics in the system:
-*     <?= $controller->renderPartial("topic", $Topic->findAll()); ?>
-*   <?= $cache_helper->end();} ?>
-*  
-*
-*
-*   Normal view text
-*/
-
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
 /**
  * <%= xml_instruct 'xml', :version => "1.0" %> 
 <%= xml_rss_open :version => "2.0" %>
@@ -55,9 +36,9 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
  */
 class XmlHelper extends AkObject 
 {
-    var $dynamic_helpers = array('xml_.*?');
+    public $dynamic_helpers = array('xml_.*?');
     
-    function rss2_builder($items = array(), $channel_options = array(), $item_options = array())
+    public function rss2_builder($items = array(), $channel_options = array(), $item_options = array())
     {
         $return = array();
         
@@ -127,7 +108,7 @@ class XmlHelper extends AkObject
         return implode("\n",$return);
     }
     
-    function _getValue($obj, $identifier)
+    public function _getValue($obj, $identifier)
     {
         $value = false;
         if(is_array($identifier)) {
@@ -182,7 +163,7 @@ class XmlHelper extends AkObject
         return $value;
     }
     
-    function _generate_date($db_date)
+    public function _generate_date($db_date)
     {
         //1998-05-12T14:15:00
         if (!is_int($db_date)) {
@@ -191,19 +172,20 @@ class XmlHelper extends AkObject
         return Ak::getDate($db_date,'Y-m-d\Th:i:sP');
 
     }
-    function setController(&$controller)
+    
+    public function setController(&$controller)
     {
-        $this->_controller =& $controller;
+        $this->_controller = $controller;
     }
     
-    function xml_instruct($type, $options = array()) 
+    public function xml_instruct($type, $options = array()) 
     {
         $default_options = array('version'=>'1.0');
         $config = array('available_options'=>array('version'));
         Ak::parseOptions($options,$default_options,$config);
         return $this->_renderTag(false,$type,'',$options,'<?','?>','?>');
     }
-    function __call($name,$args)
+    public function __call($name,$args)
     {
         if(preg_match('/^xml_([\w_]+?)_(open|close)$/',$name,$matches)) {
             $tagName = str_replace('-',':',$matches[1]);
@@ -249,7 +231,7 @@ class XmlHelper extends AkObject
             return $this->_renderTag($name_space,$tagName,$content,$options,'<','>','/>');
         }
     }
-    function _renderTag($name_space, $tagName, $content = null, $attributes = array(), $open = '<', $close = '>', $closeTag='/>')
+    public function _renderTag($name_space, $tagName, $content = null, $attributes = array(), $open = '<', $close = '>', $closeTag='/>')
     {
         $attribute_array = array();
         if (is_array($attributes) && count($attributes)>0) {
@@ -271,4 +253,3 @@ class XmlHelper extends AkObject
     }
 }
 
-?>

@@ -13,20 +13,18 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'text_helper.php');
-
 class MailHelper
 {
-    function setController(&$controller)
+    public function setController(&$controller)
     {
-        $this->_controller =& $controller;
+        $this->_controller = $controller;
     }
 
    /**
    * Uses TextHelper::format to take the text and format it, indented two spaces for
    * each line, and wrapped at 72 columns.
    */
-    function block_format($text)
+    public function block_format($text)
     {
         $formatted = '';
         $paragraphs = preg_split("/(\n|\r){2,}/", $text);
@@ -36,7 +34,4 @@ class MailHelper
         // Make list points stand on their own line
         return preg_replace("/[ ]*([*]+) ([^*]*)/"," $1 $2\n", preg_replace("/[ ]*([#]+) ([^#]*)/"," $1 $2\n",$formatted));
     }
-    
 }
-
-?>

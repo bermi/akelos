@@ -10,7 +10,6 @@
  * @package ActionView
  * @subpackage Helpers
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 
@@ -56,7 +55,9 @@
 */
 class CaptureHelper extends AkObject 
 {
-    var $_stack = array();
+    protected 
+    $_stack = array();
+    
     /**
      * Capture allows you to extract a part of the template into an 
      * instance variable. You can use this instance variable anywhere
@@ -68,13 +69,13 @@ class CaptureHelper extends AkObject
      *     Welcome To my shiny new web page!
      *   <% $greeting = $capture_helper->end(); ?>      
      */
-    function begin ($var_name = '')
+    public function begin ($var_name = '')
     {
         ob_start();
         $this->_stack[] = $var_name;
     }
 
-    function end($add_to_view = true)
+    public function end($add_to_view = true)
     {
         $var_name = array_pop($this->_stack);
         $result = ob_get_clean();
@@ -84,9 +85,9 @@ class CaptureHelper extends AkObject
         return $result;
     }
 
-    function _addVarToView($var_name, $content)
+    protected function _addVarToView($var_name, $content)
     {
-        AkActionView::_addGlobalVar($var_name, $content);
+        AkActionView::addGlobalVar($var_name, $content);
     }
 
     /**
@@ -109,10 +110,9 @@ class CaptureHelper extends AkObject
     * NOTE: Beware that content_for is ignored in caches. So you shouldn't use it
     * for elements that are going to be fragment cached. 
     */
-    function content_for($name)
+    public function content_for($name)
     {
         $this->begin($name);
     }
 }
 
-?>

@@ -6,7 +6,7 @@ class AkTestApplication extends AkUnitTest
     public $Dispatcher;
     public $_response;
     public $_cacheHeaders = array();
-    
+
     public function assertWantedText($text, $message = '%s')
     {
         $this->assertWantedPattern('/'.preg_quote($text).'/', $message);
@@ -19,18 +19,18 @@ class AkTestApplication extends AkUnitTest
     {
         $this->assertWantedPattern('|^'.$text.'$|', $message);
     }
-    
+
     public function assertText($text, $message = '%s') {
-            return $this->assert(
-                    new TextExpectation($text),
-                    strip_tags($this->_response),
-                    $message);
+        return $this->assert(
+        new TextExpectation($text),
+        strip_tags($this->_response),
+        $message);
     }
     public function assertNoText($text, $message = '%s') {
         return $this->assert(
-                new NoTextExpectation($text),
-                strip_tags($this->_response),
-                $message);
+        new NoTextExpectation($text),
+        strip_tags($this->_response),
+        $message);
     }
     public function assertHeader($header, $content = null)
     {
@@ -58,7 +58,7 @@ class AkTestApplication extends AkUnitTest
             $this->assertTrue(false,'Header "'.$header.'" not found');
         }
     }
-    
+
     public function _testXPath($xpath_expression)
     {
         if (!class_exists('DOMDocument') || !class_exists('DOMXPath')) {
@@ -71,7 +71,7 @@ class AkTestApplication extends AkUnitTest
                 var_dump($dom);
                 $xpath = $dom->xpath_init();
                 var_dump($xpath);
-                $ctx = $dom->xpath_new_context(); 
+                $ctx = $dom->xpath_new_context();
                 var_dump($xpath_expression);
                 $result = $ctx->xpath_eval($xpath_expression);
                 var_dump($result);
@@ -85,7 +85,7 @@ class AkTestApplication extends AkUnitTest
             $this->fail('Please disable the domxml extension. Only php5 builtin domxml is supported');
             return false;
         }
-       
+
         $dom = new DOMDocument();
         $response = preg_replace('/(<!DOCTYPE.*?>)/is','',$this->_response);
 
@@ -94,7 +94,7 @@ class AkTestApplication extends AkUnitTest
         $node = $xpath->query($xpath_expression);
         return $node;
     }
-    
+
     public function assertXPath($xpath_expression, $message = null)
     {
         $node = $this->_testXPath($xpath_expression);
@@ -136,7 +136,7 @@ class AkTestApplication extends AkUnitTest
             $this->pass($message);
         }
     }
-    
+
     public function &getController()
     {
         if (isset($this->Dispatcher)) {
@@ -158,7 +158,7 @@ class AkTestApplication extends AkUnitTest
         $_SERVER['HTTP_CLIENT_IP'] = $ip;
         $_SERVER['REMOTE_ADDR'] = $ip;
     }
-    
+
     public function assertResponse($code)
     {
         $this->assertHeader('Status',$code);
@@ -209,7 +209,7 @@ class AkTestApplication extends AkUnitTest
         $_GET = array();
         $_POST = array();
     }
-    
+
     public function _init($url, $constants = array(), $controllerVars = array())
     {
         $this->_reset();
@@ -221,18 +221,18 @@ class AkTestApplication extends AkUnitTest
         $_SERVER['AK_HOST']= isset($parts['host'])?$parts['host']:'localhost';
         $cache_settings = Ak::getSettings('caching', false);
         if ($cache_settings['enabled']) {
-    
+
             require_once(AK_LIB_DIR . DS . 'AkActionController'.DS.'AkCacheHandler.php');
             $null = null;
             $pageCache = &Ak::singleton('AkCacheHandler',$null);
-            
+
             $pageCache->init($null, $cache_settings);
             if ($cachedPage = $pageCache->getCachedPage()) {
                 static $_cachedHeaders = array();
                 ob_start();
                 global $sendHeaders, $returnHeaders, $exit;
                 $sendHeaders = false;
-                $returnHeaders = true; 
+                $returnHeaders = true;
                 $exit = false;
                 $headers = include $cachedPage;
                 //$headers = $cachedPage->render(false,false,true);
@@ -246,8 +246,8 @@ class AkTestApplication extends AkUnitTest
         require_once(AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestDispatcher.php');
         $this->Dispatcher = new AkTestDispatcher($controllerVars);
     }
-    
-    
+
+
     public function get($url,$data = array(), $constants = array(), $controllerVars = array())
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
@@ -272,7 +272,7 @@ class AkTestApplication extends AkUnitTest
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         ob_start();
-        
+
         $rendered = $this->_init($url, $constants, $controllerVars);
         if (!$rendered) {
             $res = $this->Dispatcher->post($url, $data);
@@ -282,7 +282,7 @@ class AkTestApplication extends AkUnitTest
         }
         return $res;
     }
-    
+
     public function put($url,$data = null, $constants = array(), $controllerVars = array())
     {
         $_SERVER['REQUEST_METHOD'] = 'PUT';
@@ -296,15 +296,20 @@ class AkTestApplication extends AkUnitTest
         }
         return $res;
     }
-    public function assertWantedPattern($pattern, $message = '%s') {
+
+    public function assertWantedPattern($pattern, $message = '%s')
+    {
         return $this->assertPattern($pattern, $message);
     }
-    public function assertPattern($pattern, $message = '%s') {
+
+    public function assertPattern($pattern, $subject = null, $message = '%s')
+    {
         return $this->assert(
-                new PatternExpectation($pattern),
-                $this->_response,
-                $message);
+            new PatternExpectation($pattern),
+            $this->_response,
+            $message);
     }
+
     public function delete($url, $constants = array(), $controllerVars = array())
     {
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
@@ -318,5 +323,5 @@ class AkTestApplication extends AkUnitTest
         }
         return $res;
     }
-    
+
 }

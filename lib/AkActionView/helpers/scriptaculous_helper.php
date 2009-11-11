@@ -14,7 +14,6 @@
  */
 
 
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_helper.php');
 
 /**
 * Provides a set of helpers for calling Scriptaculous JavaScript 
@@ -32,7 +31,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_helper.php
 
 class ScriptaculousHelper extends AkActionViewHelper
 {
-    var $_toggle_effects = array('toggle_appear','toggle_slide','toggle_blind');
+    public $_toggle_effects = array('toggle_appear','toggle_slide','toggle_blind');
 
     /**
     * Returns a JavaScript snippet to be used on the Ajax callbacks for
@@ -61,7 +60,7 @@ class ScriptaculousHelper extends AkActionViewHelper
     * You can change the behaviour with various options, see
     * http://script.aculo.us for more documentation.
     */
-    function visual_effect($name, $element_id = false, $js_options = array())
+    public function visual_effect($name, $element_id = false, $js_options = array())
     {
         $element = $element_id ? Ak::toJson($element_id) : "element";
 
@@ -101,7 +100,7 @@ class ScriptaculousHelper extends AkActionViewHelper
     * You can change the behaviour with various options, see
     * http://script.aculo.us for more documentation.
     */
-    function sortable_element($element_id, $options = array())
+    public function sortable_element($element_id, $options = array())
     {
         $options['with'] = !empty($options['with']) ? $options['with'] : "Sortable.serialize('{$element_id}')";
         $options['onUpdate'] = !empty($options['onUpdate']) ? $options['onUpdate'] : "function(){".PrototypeHelper::remote_function($options)."}";
@@ -128,11 +127,11 @@ class ScriptaculousHelper extends AkActionViewHelper
         }
 
         if (in_array($options['containment'])){
-            $options['containment'] = JavascriptHelper::_array_or_string_for_javascript($options['containment']);
+            $options['containment'] = JavascriptHelper::array_or_string_for_javascript($options['containment']);
         }
 
         if (in_array($options['only'])){
-            $options['only'] = JavascriptHelper::_array_or_string_for_javascript($options['only']);
+            $options['only'] = JavascriptHelper::array_or_string_for_javascript($options['only']);
         }
 
         return JavascriptHelper::javascript_tag("Sortable.create('{$element_id}', ".JavascriptHelper::_options_for_javascript($options).")");
@@ -148,12 +147,12 @@ class ScriptaculousHelper extends AkActionViewHelper
     * You can change the behaviour with various options, see
     * http://script.aculo.us for more documentation. 
     */
-    function draggable_element($element_id, $options = array())
+    public function draggable_element($element_id, $options = array())
     {
         return JavascriptHelper::javascript_tag(ScriptaculousHelper::draggable_element_js($element_id, $options));
     }
 
-    function draggable_element_js($element_id, $options = array())
+    public function draggable_element_js($element_id, $options = array())
     {
         return "new Draggable('{$element_id}', ".JavascriptHelper::_options_for_javascript($options).")";
     }
@@ -172,7 +171,7 @@ class ScriptaculousHelper extends AkActionViewHelper
     * You can change the behaviour with various options, see
     * http://script.aculo.us for more documentation.
     */
-    function drop_receiving_element($element_id, $options = array())
+    public function drop_receiving_element($element_id, $options = array())
     {
         $options['with'] = !empty($options['with']) ? $options['with'] : "'id='".urlencode(element.id);
         $options['onDrop'] = !empty($options['onDrop']) ? $options['onDrop'] : "function(element){". PrototypeHelper::remote_function($options) . "}";
@@ -188,7 +187,7 @@ class ScriptaculousHelper extends AkActionViewHelper
         }
 
         if (in_array($options['accept'])){
-            $options['accept'] = JavascriptHelper::_array_or_string_for_javascript($options['accept']);
+            $options['accept'] = JavascriptHelper::array_or_string_for_javascript($options['accept']);
         }
 
         if (in_array($options['hoverclass'])){
@@ -197,7 +196,5 @@ class ScriptaculousHelper extends AkActionViewHelper
 
         return JavascriptHelper::javascript_tag("Droppables.add('{$element_id}', ".JavascriptHelper::_options_for_javascript($options).")");
     }
-
 }
 
-?>

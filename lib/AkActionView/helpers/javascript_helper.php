@@ -10,12 +10,8 @@
  * @package ActionView
  * @subpackage Helpers
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'tag_helper.php');
 
 /**
 * Provides functionality for working with JavaScript in your views.
@@ -49,9 +45,6 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'tag_helper.php');
 * For documentation on +javascript_include_tag+ see 
 * AkActionView/helpers/asset_tag_helpers.php
 */
-
-defined('AK_JAVASCRIPT_PATH') ? null : define('AK_JAVASCRIPT_PATH', AK_PUBLIC_DIR.DS.'javascripts');
-
 class JavascriptHelper extends AkActionViewHelper 
 {
 
@@ -63,7 +56,7 @@ class JavascriptHelper extends AkActionViewHelper
     *   $javascript_helper->link_to_function("Greeting", "alert('Hello world!')");
     *   $javascript_helper->link_to_function($tag->image_tag("delete"), "if confirm('Really?'){ do_delete(); }");
     */
-    function link_to_function($name, $function, $html_options = array())
+    public function link_to_function($name, $function, $html_options = array())
     {
         $default_html_options = array(
         'href'    => '#',
@@ -83,7 +76,7 @@ class JavascriptHelper extends AkActionViewHelper
     *   $javascript_helper->button_to_function("Greeting", "alert('Hello world!')");
     *   $javascript_helper->button_to_function("Delete", "if confirm('Really?'){ do_delete(); }"));
     */
-    function button_to_function($name, $function, $html_options = array())
+    public function button_to_function($name, $function, $html_options = array())
     {
         $default_html_options = array(
         'type'  => 'button',
@@ -99,7 +92,7 @@ class JavascriptHelper extends AkActionViewHelper
     /**
     * Escape carrier returns and single and double quotes for JavaScript segments.
     */
-    function escape_javascript($javascript)
+    public function escape_javascript($javascript)
     {
         return preg_replace(array('/\r\n|\n|\r/',"/[\"']/"), array('\\n','\\\${0}'), $javascript);
     }
@@ -108,17 +101,17 @@ class JavascriptHelper extends AkActionViewHelper
     * Returns a JavaScript tag with the +content+ inside. Example:
     *   javascript_tag("alert('All is good')") => <script type="text/javascript">alert('All is good')</script>
     */
-    function javascript_tag($content)
+    public function javascript_tag($content)
     {
         return TagHelper::content_tag("script", JavascriptHelper::javascript_cdata_section($content), array('type' => 'text/javascript'));
     }
 
-    function javascript_cdata_section($content)
+    public function javascript_cdata_section($content)
     {
         return "\n//<![CDATA[\n".$content."\n//]]>\n";
     }
 
-    function _options_for_javascript($options)
+    public function _options_for_javascript($options)
     {
         $_js_options = array();
         foreach ($options as $k=>$v){
@@ -129,30 +122,14 @@ class JavascriptHelper extends AkActionViewHelper
 
     }
 
-    function _array_or_string_for_javascript($option)
+    static function array_or_string_for_javascript($option)
     {
         return is_array($option) ? "['".join("', '",$option)."']" : "'".$option."'";
     }
-
-
-    /**
-    * Includes the Action Pack JavaScript libraries inside a single <script> 
-    * tag. The function first includes prototype.js and then its core extensions,
-    * (determined by filenames starting with "prototype").
-    * Afterwards, any additional scripts will be included in undefined order.
-    *
-    * Note: The recommended approach is to copy the contents of
-    * lib/action_view/helpers/javascripts/ into your application's
-    * public/javascripts/ directory, and use +javascript_include_tag+ to 
-    * create 
-    * remote <script> links.
-    */
-    function define_javascript_functions()
+    
+    public function _array_or_string_for_javascript($option)
     {
-        die('This function is not recomended. Please use $asset->javascript_include_tag() instead');
+        Ak::deprecateMethod(__CLASS__.'::'.__METHOD__, __CLASS__.'::'.'array_or_string_for_javascript');
+        return JavascriptHelper::array_or_string_for_javascript($option);
     }
-
-
-
 }
-?>

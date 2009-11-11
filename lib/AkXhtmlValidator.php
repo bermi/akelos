@@ -9,12 +9,11 @@
  * @package ActionView
  * @subpackage Utils
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 class AkXhtmlValidator
 {
-    var $_attributes = array(
+    protected $_attributes = array(
     'core' => array(
     'except' => array(
     'base',
@@ -60,7 +59,7 @@ class AkXhtmlValidator
     ) ,
     ) ,
     );
-    var $_events = array(
+    protected $_events = array(
     'window' => array(
     'only' => array(
     'body'
@@ -135,7 +134,7 @@ class AkXhtmlValidator
     ) ,
     ) ,
     );
-    var $_tags = array(
+    protected $_tags = array(
     'a' => array(
     'attributes' => array(
     'charset',
@@ -525,7 +524,7 @@ class AkXhtmlValidator
     'var',
     );
 
-    var $_entities = array(
+    protected $_entities = array(
     '&nbsp;' => '&#160;',
     '&iexcl;' => '&#161;',
     '&cent;' => '&#162;',
@@ -780,21 +779,22 @@ class AkXhtmlValidator
     '&euro;' => '&#8364;'
     );
 
-    var $_parser;
-    var $_stack = array();
-    var $_errors = array();
+    protected
+    $_parser,
+    $_stack = array(),
+    $_errors = array();
 
-    function AkXhtmlValidator()
+    public function AkXhtmlValidator()
     {
         $this->_parser = xml_parser_create('');
-        xml_set_object($this->_parser, &$this);
+        xml_set_object($this->_parser, $this);
         xml_set_element_handler($this->_parser, 'tagOpen', 'tagClose');
         xml_set_character_data_handler($this->_parser, 'cdata');
         xml_parser_set_option($this->_parser, XML_OPTION_CASE_FOLDING, false);
         xml_parser_set_option($this->_parser, XML_OPTION_TARGET_ENCODING, 'UTF-8');
     }
 
-    function validateTagAttributes($tag, $attributes = array())
+    public function validateTagAttributes($tag, $attributes = array())
     {
         $possible_attributes = $this->getPossibleTagAttributes($tag);
         foreach($attributes as $attribute => $value) {
@@ -814,12 +814,12 @@ class AkXhtmlValidator
         }
     }
 
-    function doesAttributeNeedsValidation($tag, $attribute)
+    public function doesAttributeNeedsValidation($tag, $attribute)
     {
         return isset($this->_tags[$tag]['attributes'][$attribute]) || isset($this->_tags[$tag]['required']) && in_array($attribute, $this->_tags[$tag]['required']);
     }
 
-    function validateAttribute($tag, $attribute, $value = null)
+    public function validateAttribute($tag, $attribute, $value = null)
     {
         if (isset($this->_tags[$tag]['attributes'][$attribute]) && (strlen($value) > 0)) {
             if (!preg_match($this->_tags[$tag]['attributes'][$attribute], $value)) {
@@ -849,12 +849,12 @@ class AkXhtmlValidator
         }
     }
 
-    function addError($error, $highlight_text = array())
+    public function addError($error, $highlight_text = array())
     {
         $this->_errors[] = $this->highlightError($error, $highlight_text) .' on line '.$this->getCurrentLine();
     }
 
-    function highlightError($error, $highlight_text = array())
+    public function highlightError($error, $highlight_text = array())
     {
         if (empty($highlight_text)) {
             return $error;
@@ -886,7 +886,7 @@ class AkXhtmlValidator
         return $highlighted_error;
     }
 
-    function highlightErrors($xhtml)
+    public function highlightErrors($xhtml)
     {
         $highlighted_xhtml = array();
         if (!empty($this->_linesToHighlight)) {
@@ -908,12 +908,12 @@ class AkXhtmlValidator
         return empty($highlighted_xhtml) ? $xhtml : join($highlighted_xhtml);
     }
 
-    function getCurrentLine()
+    public function getCurrentLine()
     {
         return xml_get_current_line_number($this->_parser) +$this->_startLine;
     }
 
-    function hasErrors(&$xhtml)
+    public function hasErrors(&$xhtml)
     {
         $this->validateUniquenessOfIds();
         if (count($this->getErrors()) > 0) {
@@ -924,17 +924,17 @@ class AkXhtmlValidator
         }
     }
 
-    function getErrors()
+    public function getErrors()
     {
         return array_unique($this->_errors);
     }
 
-    function showErrors()
+    public function showErrors()
     {
         echo '<ul><li>'.join("</li>\n<li>", $this->getErrors()) .'</li></ul>';
     }
 
-    function getPossibleTagAttributes($tag)
+    public function getPossibleTagAttributes($tag)
     {
         static $cache;
         if (!isset($cache[$tag])) {
@@ -944,7 +944,7 @@ class AkXhtmlValidator
         return $cache[$tag];
     }
 
-    function validateRequiredAttributes($tag, $attributes)
+    public function validateRequiredAttributes($tag, $attributes)
     {
         $compulsory = $this->getCompulsoryTagAttributes($tag);
         $errors = array_diff($compulsory, array_keys($attributes));
@@ -958,7 +958,7 @@ class AkXhtmlValidator
         }
     }
 
-    function protectFromDuplicatedIds($tag, $attributes)
+    public function protectFromDuplicatedIds($tag, $attributes)
     {
         if (isset($attributes['id'])) {
             if (isset($this->_idTagXref[$attributes['id']])) {
@@ -973,7 +973,7 @@ class AkXhtmlValidator
         }
     }
 
-    function validateUniquenessOfIds()
+    public function validateUniquenessOfIds()
     {
         if (isset($this->_tagIdCounter) && max(array_values($this->_tagIdCounter)) > 1) {
             foreach($this->_tagIdCounter as $id => $count) {
@@ -988,12 +988,12 @@ class AkXhtmlValidator
         }
     }
 
-    function getCompulsoryTagAttributes($tag)
+    public function getCompulsoryTagAttributes($tag)
     {
         return !empty($this->_tags[$tag]['required']) ? (array)$this->_tags[$tag]['required'] : array();
     }
 
-    function getUniqueAttributesAndEventsForTag($tag)
+    public function getUniqueAttributesAndEventsForTag($tag)
     {
         $result = array();
         if (isset($this->_tags[$tag]['attributes']) && is_array($this->_tags[$tag]['attributes'])) {
@@ -1004,7 +1004,7 @@ class AkXhtmlValidator
         return $result;
     }
 
-    function getDefaultAttributesAndEventsForTag($tag)
+    public function getDefaultAttributesAndEventsForTag($tag)
     {
         $default = array();
         if (isset($this->_tags[$tag]) || in_array($tag, $this->_tags)) {
@@ -1020,7 +1020,7 @@ class AkXhtmlValidator
         return $default;
     }
 
-    function getDefaultAttributesAndEventsForTags()
+    public function getDefaultAttributesAndEventsForTags()
     {
         if (!isset($this->default_values_for_tags)) {
             $this->default_values_for_tags = array_merge($this->_attributes, $this->_events);
@@ -1028,7 +1028,7 @@ class AkXhtmlValidator
         return $this->default_values_for_tags;
     }
 
-    function getAvailableTags()
+    public function getAvailableTags()
     {
         $tags = array();
         foreach(array_keys($this->_tags) as $k) {
@@ -1038,7 +1038,7 @@ class AkXhtmlValidator
         return $tags;
     }
 
-    function validate(&$xhtml)
+    public function validate(&$xhtml)
     {
         $this->_startLine = 1;
         $xhtml_copy = $this->removeDoctypeHeader($xhtml);
@@ -1051,7 +1051,7 @@ class AkXhtmlValidator
         return !$this->hasErrors($xhtml);
     }
 
-    function removeDoctypeHeader($xhtml)
+    public function removeDoctypeHeader($xhtml)
     {
         if (substr($xhtml, 0, 9) == '<!DOCTYPE') {
             $replacement = substr($xhtml, 0, strpos($xhtml, '>'));
@@ -1060,19 +1060,19 @@ class AkXhtmlValidator
         return (isset($replacement)) ? substr($xhtml, strlen($replacement)) : $xhtml;
     }
 
-    function removeCdata($xhtml)
+    public function removeCdata($xhtml)
     {
         $xhtml = preg_replace('(<\!\[CDATA\[(.|\n)*\]\]>)', '', $xhtml);
         return str_replace(array('<![CDATA[',']]>') , '', $xhtml);
     }
-    
 
-    function convertLiteralEntitiesToNumericalEntities($xhtml)
+
+    public function convertLiteralEntitiesToNumericalEntities($xhtml)
     {
         return str_replace(array_keys($this->_entities), array_values($this->_entities), $xhtml);
     }
 
-    function tagOpen($parser, $tag, $attributes)
+    public function tagOpen($parser, $tag, $attributes)
     {
         $this->_start_byte = xml_get_current_byte_index($parser);
         if ($tag == 'all') {
@@ -1113,7 +1113,7 @@ class AkXhtmlValidator
         $this->_stack[] = $tag;
     }
 
-    function isTagAlowedOnCurrentContext($tag, $previous)
+    public function isTagAlowedOnCurrentContext($tag, $previous)
     {
         $rules = $this->getRules();
         $result = isset($rules[$previous]) ? in_array($tag, $rules[$previous]) : true;
@@ -1122,7 +1122,7 @@ class AkXhtmlValidator
         return $result;
     }
 
-    function getRules()
+    public function getRules()
     {
         static $rules;
         if (!isset($rules)) {
@@ -1357,7 +1357,7 @@ class AkXhtmlValidator
         return $rules;
     }
 
-    function getInverseRulesForTag($tag)
+    public function getInverseRulesForTag($tag)
     {
         static $inverse_rules;
         if (!isset($inverse_rules[$tag])) {
@@ -1372,7 +1372,7 @@ class AkXhtmlValidator
         return $inverse_rules[$tag];
     }
 
-    function cdata($parser, $cdata)
+    public function cdata($parser, $cdata)
     {
         // Simply check that the 'previous' tag allows CDATA
         $previous = $this->_stack[count($this->_stack) -1];
@@ -1410,7 +1410,7 @@ class AkXhtmlValidator
         }
     }
 
-    function tagClose($parser, $tag)
+    public function tagClose($parser, $tag)
     {
         if (in_array($tag, array(
         'base',
@@ -1436,7 +1436,5 @@ class AkXhtmlValidator
         }
         array_pop($this->_stack);
     }
-
 }
 
-?>
