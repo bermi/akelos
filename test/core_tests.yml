@@ -9,6 +9,7 @@ Active Support:
     - AkLocaleManager
     - AkPluginInstaller
     - AkReflection
+    - 'AkReflection/*'
 Action Controller: 
     - AkDbSession
     - AkRouter

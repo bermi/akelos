@@ -166,4 +166,6 @@ $dictionary=array (
   'IHgdKVAG' => 'IHgdKVAG',
   'UPs6k5WZ' => 'UPs6k5WZ',
   'K2eZZsWY' => 'K2eZZsWY',
+  '61oOKU8b' => '61oOKU8b',
+  'uOE7Phqg' => 'uOE7Phqg',
 );

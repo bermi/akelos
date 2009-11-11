@@ -50,20 +50,20 @@ if($db_type = empty($options['db']) ? false :  $options['db']){
 
 $____skip_tests = array('Simple','Unit','Web','AkWeb');
 
+$test_files = array();
 foreach ($files as $k =>$file_path){
     if(!strstr($file_path, '.php')){
-        unset($files[$k]);
-        $files = array_merge(glob($base_path.DS.$file_path.'.php'), $files);
+        $test_files = array_merge(glob($base_path.DS.$file_path.'.php'), $test_files);
     } elseif (strstr($file_path, '*')){
-        unset($files[$k]);
-        $files = array_merge(glob($base_path.DS.$file_path), $files);
+        $test_files = array_merge(glob($base_path.DS.$file_path), $test_files);
     } else {
-        $files[$k] = $base_path.DS.ltrim($file_path, DS).(!preg_match('/\.php$/', $file_path)?'.php':'');
+        $test_files[] = $base_path.DS.ltrim($file_path, DS).(!preg_match('/\.php$/', $file_path)?'.php':'');
     }
 }
-$files = array_unique($files);
-$files = array_reverse($files);
-$files = array_diff($files, array(''));
+
+$test_files = array_unique($test_files);
+$test_files = array_reverse($test_files);
+$test_files = array_diff($test_files, array(''));
 
 include_once(AK_LIB_DIR.DS.'AkUnitTest.php');
 
@@ -75,7 +75,7 @@ $TestSuite = new TestSuite(
 
 $Reporter = new TextReporter();
 
-foreach ($files as $file_path){
+foreach ($test_files as $file_path){
 
     if(!file_exists($file_path)){
         $Logger->message('Could not load test file '.$file_path);
