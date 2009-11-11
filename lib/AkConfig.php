@@ -97,16 +97,6 @@ class AkConfig
 {
     const CONFIG_DIR = AK_CONFIG_DIR;
 
-    static function getConstant($name)
-    {
-        return defined($name[1]) ? constant($name[1]) : '';
-    }
-
-    static function parseSettingsConstants($settingsStr)
-    {
-        return preg_replace_callback('/\$\{(AK_.*?)\}/',array('AkConfig','getConstant'),$settingsStr);
-    }
-
     public function &get($namespace, $environment = AK_ENVIRONMENT, $raise_error_if_config_file_not_found = true, $uncached = false)
     {
         static $_configs = array();
@@ -122,6 +112,39 @@ class AkConfig
             $_configs[$namespace][$environment] = $config;
         }
         return $_configs[$namespace][$environment];
+    }
+
+    static function getConstant($name)
+    {
+        return defined($name[1]) ? constant($name[1]) : '';
+    }
+
+    static function getDir($type, $_set_value = false)
+    {
+        static $dir_names = array();
+        if($_set_value){
+            $dir_names[$type] = $_set_value;
+        }
+        if(!isset($dir_names[$type])){
+            $contstant_name = 'AK_'.strtoupper(AkInflector::underscore($type)).'_DIR';
+            if(defined($contstant_name)){
+                $dir_names[$type] = constant($contstant_name);
+            }
+        }
+        if(!isset($dir_names[$type])){
+            trigger_error(Ak::t('Can\'t find path for directory %dir', array('%dir'=>$type)), E_USER_ERROR);
+        }
+        return $dir_names[$type];
+    }
+    
+    static function setDir($type, $value)
+    {
+        AkConfig::getDir($type, $value);
+    }
+
+    static function parseSettingsConstants($settingsStr)
+    {
+        return preg_replace_callback('/\$\{(AK_.*?)\}/',array('AkConfig','getConstant'),$settingsStr);
     }
 
     public function readConfig($namespace, $environment = AK_ENVIRONMENT, $raise_error_if_config_file_not_found = true)
@@ -165,7 +188,7 @@ class AkConfig
     {
         return AkConfig::getCacheBasePath($environment).DS.'ak_config'.DS.'cache'.DS.$environment.DS.Ak::sanitize_include($namespace, 'high').'.php';
     }
-    
+
     static function getCacheBasePath()
     {
         return AK_TMP_DIR;
@@ -202,7 +225,7 @@ return \$config;
 ?>
 CACHE;
         $cache_file_name = $this->generateCacheFileName($namespace, $environment);
-        
+
         if(!Ak::file_put_contents($cache_file_name, $cache, array('base_path' => AkConfig::getCacheBasePath()))){
             trigger_error(Ak::t('Could not create config cache file %file', array('%file'=>$cache_file_name)), E_USER_ERROR);
             return false;
@@ -210,7 +233,7 @@ CACHE;
             $this->_setCacheValidity($namespace,$environment);
             return true;
         }
-        
+
         $cacheDir = dirname($cacheFileName);
 
         if (!file_exists($cacheDir)) {
@@ -242,7 +265,7 @@ CACHE;
         $_constants = get_defined_constants(true);
         $internal_constants = !empty($_constants['internal']) ? $_constants['internal'] : (array)@$_constants['mhash'];
         unset($_constants);
-        
+
         $result = array();
         if(($error_reporting_level & E_ALL) == E_ALL){
             $result[] = 'E_ALL';

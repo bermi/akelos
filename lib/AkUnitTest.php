@@ -28,7 +28,7 @@ class AkUnitTest extends UnitTestCase
     $insert_models_data = false,
     $instantiate_models = false;
 
-    public function AkUnitTest($label = false)
+    public function __construct($label = false)
     {
         parent::__construct($label);
         $this->_configure();

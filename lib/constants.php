@@ -201,6 +201,30 @@ defined('AK_DATE_HELPER_DEFAULT_PREFIX')                || define('AK_DATE_HELPE
 defined('AK_JAVASCRIPT_PATH')                           || define('AK_JAVASCRIPT_PATH', AK_PUBLIC_DIR.DS.'javascripts');
 defined('AK_DEFAULT_LOCALE_NAMESPACE')                  || define('AK_DEFAULT_LOCALE_NAMESPACE', null);
 
+
+
+// Akelos args is a short way to call functions that is only intended for fast prototyping
+defined('AK_ENABLE_AKELOS_ARGS') || define('AK_ENABLE_AKELOS_ARGS', false);
+// Use setColumnName if available when using set('column_name', $value);
+defined('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT')  || define('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT', true);
+defined('AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS')|| define('AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS', false);
+defined('AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS')             || define('AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS', AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS);
+defined('AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS')             || define('AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS', AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS);
+
+defined('AK_ACTIVE_RECORD_ENABLE_PERSISTENCE')                  || define('AK_ACTIVE_RECORD_ENABLE_PERSISTENCE', AK_ENVIRONMENT != 'testing');
+defined('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA')               || define('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA', AK_ACTIVE_RECORD_ENABLE_PERSISTENCE && AK_ENVIRONMENT != 'development');
+defined('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE')          || define('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE', 300);
+defined('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES')                || define('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES', true);
+defined('AK_ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS') || define('AK_ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS', false);
+defined('AK_NOT_EMPTY_REGULAR_EXPRESSION')                      || define('AK_NOT_EMPTY_REGULAR_EXPRESSION','/.+/');
+defined('AK_EMAIL_REGULAR_EXPRESSION')                          || define('AK_EMAIL_REGULAR_EXPRESSION',"/^([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)$/i");
+defined('AK_NUMBER_REGULAR_EXPRESSION')                         || define('AK_NUMBER_REGULAR_EXPRESSION',"/^[0-9]+$/");
+defined('AK_PHONE_REGULAR_EXPRESSION')                          || define('AK_PHONE_REGULAR_EXPRESSION',"/^([\+]?[(]?[\+]?[ ]?[0-9]{2,3}[)]?[ ]?)?[0-9 ()\-]{4,25}$/");
+defined('AK_DATE_REGULAR_EXPRESSION')                           || define('AK_DATE_REGULAR_EXPRESSION',"/^(([0-9]{1,2}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{2,4})|([0-9]{2,4}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{1,2})){1}$/");
+defined('AK_IP4_REGULAR_EXPRESSION')                            || define('AK_IP4_REGULAR_EXPRESSION',"/^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/");
+defined('AK_POST_CODE_REGULAR_EXPRESSION')                      || define('AK_POST_CODE_REGULAR_EXPRESSION',"/^[0-9A-Za-z  -]{2,9}$/");
+
+
 @ini_set("arg_separator.output","&");
 @ini_set("include_path",(AK_LIB_DIR.PATH_SEPARATOR.AK_MODELS_DIR.PATH_SEPARATOR.AK_CONTRIB_DIR.DS.'pear'.PATH_SEPARATOR.ini_get("include_path")));
 @ini_set("session.name", AK_SESSION_NAME);

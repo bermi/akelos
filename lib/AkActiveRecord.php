@@ -17,31 +17,6 @@
  */
 
 
-/**#@+
-* Constants
-*/
-// Akelos args is a short way to call functions that is only intended for fast prototyping
-defined('AK_ENABLE_AKELOS_ARGS') ? null : define('AK_ENABLE_AKELOS_ARGS', false);
-// Use setColumnName if available when using set('column_name', $value);
-defined('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT') ? null : define('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT', true);
-defined('AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS') ? null : define('AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS', false);
-defined('AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS') ? null : define('AK_ACTIVE_RECORD_ENABLE_CALLBACK_SETTERS', AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS);
-defined('AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS') ? null : define('AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS', AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS);
-
-defined('AK_ACTIVE_RECORD_ENABLE_PERSISTENCE') ? null : define('AK_ACTIVE_RECORD_ENABLE_PERSISTENCE', AK_ENVIRONMENT != 'testing');
-defined('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA') ? null : define('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA', AK_ACTIVE_RECORD_ENABLE_PERSISTENCE && AK_ENVIRONMENT != 'development');
-defined('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE') ? null : define('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE', 300);
-defined('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES') ? null : define('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES', true);
-defined('AK_ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS') ? null : define('AK_ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS', false);
-defined('AK_NOT_EMPTY_REGULAR_EXPRESSION') ? null : define('AK_NOT_EMPTY_REGULAR_EXPRESSION','/.+/');
-defined('AK_EMAIL_REGULAR_EXPRESSION') ? null : define('AK_EMAIL_REGULAR_EXPRESSION',"/^([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)$/i");
-defined('AK_NUMBER_REGULAR_EXPRESSION') ? null : define('AK_NUMBER_REGULAR_EXPRESSION',"/^[0-9]+$/");
-defined('AK_PHONE_REGULAR_EXPRESSION') ? null : define('AK_PHONE_REGULAR_EXPRESSION',"/^([\+]?[(]?[\+]?[ ]?[0-9]{2,3}[)]?[ ]?)?[0-9 ()\-]{4,25}$/");
-defined('AK_DATE_REGULAR_EXPRESSION') ? null : define('AK_DATE_REGULAR_EXPRESSION',"/^(([0-9]{1,2}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{2,4})|([0-9]{2,4}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{1,2})){1}$/");
-defined('AK_IP4_REGULAR_EXPRESSION') ? null : define('AK_IP4_REGULAR_EXPRESSION',"/^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/");
-defined('AK_POST_CODE_REGULAR_EXPRESSION') ? null : define('AK_POST_CODE_REGULAR_EXPRESSION',"/^[0-9A-Za-z  -]{2,9}$/");
-/**#@-*/
-
 /**
 * Active Record objects doesn't specify their attributes directly, but rather infer them from the table definition with
 * which they're linked. Adding, removing, and changing attributes and their type is done directly in the database. Any change

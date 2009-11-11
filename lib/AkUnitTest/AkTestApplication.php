@@ -20,18 +20,22 @@ class AkTestApplication extends AkUnitTest
         $this->assertWantedPattern('|^'.$text.'$|', $message);
     }
 
-    public function assertText($text, $message = '%s') {
+    public function assertText($text, $message = '%s') 
+    {
         return $this->assert(
         new TextExpectation($text),
         strip_tags($this->_response),
         $message);
     }
-    public function assertNoText($text, $message = '%s') {
+    
+    public function assertNoText($text, $message = '%s') 
+    {
         return $this->assert(
         new NoTextExpectation($text),
         strip_tags($this->_response),
         $message);
     }
+    
     public function assertHeader($header, $content = null)
     {
         if (is_array($this->_cacheHeaders)) {
@@ -59,6 +63,20 @@ class AkTestApplication extends AkUnitTest
         }
     }
 
+
+    public function assertWantedPattern($pattern, $message = '%s')
+    {
+        return $this->assertPattern($pattern, $message);
+    }
+
+    public function assertPattern($pattern, $subject = null, $message = '%s')
+    {
+        return $this->assert(
+            new PatternExpectation($pattern),
+            $this->_response,
+            $message);
+    }
+    
     public function _testXPath($xpath_expression)
     {
         if (!class_exists('DOMDocument') || !class_exists('DOMXPath')) {
@@ -295,19 +313,6 @@ class AkTestApplication extends AkUnitTest
             $res = true;
         }
         return $res;
-    }
-
-    public function assertWantedPattern($pattern, $message = '%s')
-    {
-        return $this->assertPattern($pattern, $message);
-    }
-
-    public function assertPattern($pattern, $subject = null, $message = '%s')
-    {
-        return $this->assert(
-            new PatternExpectation($pattern),
-            $this->_response,
-            $message);
     }
 
     public function delete($url, $constants = array(), $controllerVars = array())
