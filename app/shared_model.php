@@ -1,7 +1,5 @@
 <?php
 
-require_once(AK_APP_DIR.DS.'base_active_record.php');
-
 /**
 * This file is application-wide model file. You can put all 
 * application-wide model-related methods here.
@@ -15,5 +13,3 @@ require_once(AK_APP_DIR.DS.'base_active_record.php');
 class ActiveRecord extends BaseActiveRecord 
 {
 }
-
-?>

@@ -21,7 +21,7 @@ require_once(AK_LIB_DIR.DS.'AkPlugin.php');
 require_once(AK_LIB_DIR.DS.'AkPlugin/AkPluginManager.php');
 defined('AK_SKIP_DB_CONNECTION') && AK_SKIP_DB_CONNECTION ? ($dsn='') : Ak::db(&$dsn);
 
-$ak_app_dir = AK_APP_DIR;
+$ak_app_dir = AkConfig::getDir('app');
 $script_name = array_shift($argv);
 $command = strtolower(array_shift($argv));
 array_unshift($argv, $script_name);

@@ -10,7 +10,7 @@ require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATO
 
 require_once(AK_LIB_DIR.DS.'AkInstaller.php');
 require_once(AK_VENDOR_DIR.DS.'simpletest-tools'.DS.'xmlreporter.php');
-require_once(AK_APP_DIR.DS.'installers'.DS.'framework_installer.php');
+require_once(AkConfig::getDir('app').DS.'installers'.DS.'framework_installer.php');
 $installer = new FrameworkInstaller();
 $installer->uninstall();
 $installer->install();

@@ -17,21 +17,64 @@ require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'unit_tester.php');
 require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'mock_objects.php');
 require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'reporter.php');
 require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'web_tester.php');
+require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'extensions'.DS.'junit_xml_reporter.php');
 //require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'code_coverage.php');
 
 
 class AkUnitTest extends UnitTestCase
 {
     public
-    $app_dir = AK_APP_DIR,
+    $app_dir,
     $module = '',
     $insert_models_data = false,
-    $instantiate_models = false;
+    $instantiate_models = false,
+    $rebase = false;
+
+    private
+    $_original_paths = array(),
+    $_path_rebased = false;
 
     public function __construct($label = false)
     {
+        $this->_logOriginalPaths();
+        $this->app_dir = AkConfig::getDir('app');
         parent::__construct($label);
         $this->_configure();
+        if($this->rebase){
+            $this->rebaseAppPaths($this->rebase);
+        }
+    }
+
+    public function __destruct()
+    {
+        if($this->_path_rebased){
+            $this->restoreAppPaths();
+        }
+    }
+
+    public function rebaseAppPaths($base_path = null)
+    {
+        $base_path = !is_dir($base_path) ? AkConfig::getDir('fixtures') : $base_path;
+        AkConfig::setDir('app', $base_path.DS.'app'.DS.'installers');
+        AkConfig::setDir('app_installers', $base_path.DS.'app'.DS.'installers');
+        AkConfig::setDir('models', $base_path.DS.'app'.DS.'models');
+        $this->_path_rebased = true;
+    }
+
+    public function restoreAppPaths()
+    {
+        foreach ($this->_original_paths as $type => $original_path){
+            AkConfig::setDir($type, $original_path);
+        }
+    }
+
+    private function _logOriginalPaths()
+    {
+        $this->_original_paths = array(
+        'app'               => AkConfig::getDir('app'),
+        'models'            => AkConfig::getDir('models'),
+        'app_installers'    => AkConfig::getDir('app_installers'),
+        );
     }
 
     /**
@@ -86,7 +129,7 @@ class AkUnitTest extends UnitTestCase
         }
 
         foreach ($this->fixtures as $fixture) {
-            $file = AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.$fixture.'.yaml';
+            $file = AkConfig::getDir('fixtures').DS.'data'.DS.$fixture.'.yaml';
             if(!file_exists($file)){
                 continue;
             }
@@ -201,10 +244,11 @@ class AkUnitTest extends UnitTestCase
 
     public function uninstallAndInstallMigration($installer_name)
     {
-        $this->log('Looking for installer:'.$this->app_dir.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php');
-        if (file_exists($this->app_dir.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php')){
-            $this->log('found installer:'.$this->app_dir.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php');
-            require_once($this->app_dir.DS.'installers'.DS.AkInflector::underscore($installer_name).'_installer.php');
+        $installer_path = AkConfig::getDir('app_installers').DS.AkInflector::underscore($installer_name).'_installer.php';
+        $this->log('Looking for installer:'.$installer_path);
+        if (file_exists($installer_path)){
+            $this->log('found installer:'.$installer_path);
+            require_once($installer_path);
             $installer_class_name = $installer_name.'Installer';
             $Installer = new $installer_class_name();
             $Installer->uninstall();
@@ -216,8 +260,9 @@ class AkUnitTest extends UnitTestCase
 
     protected function _includeOrGenerateModel($model_name)
     {
-        if (file_exists(AK_MODELS_DIR.DS.AkInflector::underscore($model_name).'.php')){
-            require_once(AK_MODELS_DIR.DS.AkInflector::underscore($model_name).'.php');
+        $model_file_name = AkInflector::toModelFilename($model_name);
+        if (file_exists($model_file_name)){
+            require_once($model_file_name);
         } else {
             if (class_exists($model_name)){
                 return true;
@@ -233,7 +278,7 @@ class AkUnitTest extends UnitTestCase
         $args = func_get_args();
         $tables = !empty($args) ? (is_array($args[0]) ? $args[0] : (count($args) > 1 ? $args : Ak::toArray($args))) : array();
         foreach ($tables as $table){
-            $file = AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.(empty($this->module)?'':$this->module.DS).Ak::sanitize_include($table).'.yaml';
+            $file = AkConfig::getDir('fixtures').DS.'data'.DS.(empty($this->module)?'':$this->module.DS).Ak::sanitize_include($table).'.yaml';
             if(!file_exists($file)){
                 continue;
             }
@@ -301,7 +346,7 @@ class AkMailerTest extends AkUnitTest
 {
     public function __construct()
     {
-        empty($this->avoid_copying_views) && Ak::copy(AK_BASE_DIR.DS.'app'.DS.'views',AK_VIEWS_DIR);
+        empty($this->avoid_copying_views) && Ak::copy(AkConfig::getDir('fixtures').DS.'app'.DS.'views', AkConfig::getDir('views'));
     }
 }
 

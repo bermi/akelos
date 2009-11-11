@@ -1,5 +1,10 @@
 <?php
 
+if(isset($options['ci'])){
+    unset($options['ci']);
+    $options['reporter'] = 'JUnitXMLReporter';
+}
+
 if($reporter = empty($options['reporter']) ? false :  $options['reporter']){
     unset($options['reporter']);
 }

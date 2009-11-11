@@ -294,7 +294,7 @@ class AkLocaleManager extends AkObject
     static function getDictionary($language,$namespace=false,$set=false,$set_data=null)
     {
         static $dictionaries=array();
-        $path = AK_APP_DIR.DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
+        $path = AkConfig::getDir('app').DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
 
         if($set===true && is_array($set_data)) {
             $dictionaries[$path]=$set_data;
@@ -321,7 +321,7 @@ class AkLocaleManager extends AkObject
 
     static function deleteDictionary($language, $namespace)
     {
-        $path = AK_APP_DIR.DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
+        $path = AkConfig::getDir('app').DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
         AkLocaleManager::getDictionary($language,$namespace,true,array());
         clearstatcache();
         return (file_exists($path)?@unlink($path):false);
@@ -337,7 +337,7 @@ class AkLocaleManager extends AkObject
 
     static function setDictionary($dictionary,$language,$namespace=false,$comment=null)
     {
-        $path = AK_APP_DIR.DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
+        $path = AkConfig::getDir('app').DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
         AkLocaleManager::getDictionary($language,$namespace,true,$dictionary);
         return Ak::file_put_contents($path,"<?php\n/** $comment */\n\n\$dictionary=".var_export((array)$dictionary,true).";\n");
     }

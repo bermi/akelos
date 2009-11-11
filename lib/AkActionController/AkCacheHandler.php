@@ -720,7 +720,7 @@ EOF;
         $sweeper_class = AkInflector::classify($sweeper);
 
         if (!class_exists($sweeper_class)) {
-            $filePath = AK_APP_DIR . DS . 'sweepers' . DS . $sweeper.'.php';
+            $filePath = AkConfig::getDir('app') . DS . 'sweepers' . DS . $sweeper.'.php';
             if (file_exists($filePath)) {
                 require_once($filePath);
                 if (!class_exists($sweeper_class)) {

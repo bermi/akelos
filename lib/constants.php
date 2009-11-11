@@ -224,6 +224,9 @@ defined('AK_DATE_REGULAR_EXPRESSION')                           || define('AK_DA
 defined('AK_IP4_REGULAR_EXPRESSION')                            || define('AK_IP4_REGULAR_EXPRESSION',"/^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/");
 defined('AK_POST_CODE_REGULAR_EXPRESSION')                      || define('AK_POST_CODE_REGULAR_EXPRESSION',"/^[0-9A-Za-z  -]{2,9}$/");
 
+defined('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES') || define('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES' ,true);
+defined('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS')        || define('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS' , 'ActiveRecord');
+
 
 @ini_set("arg_separator.output","&");
 @ini_set("include_path",(AK_LIB_DIR.PATH_SEPARATOR.AK_MODELS_DIR.PATH_SEPARATOR.AK_CONTRIB_DIR.DS.'pear'.PATH_SEPARATOR.ini_get("include_path")));

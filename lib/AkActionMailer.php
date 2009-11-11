@@ -735,7 +735,7 @@ class AkActionMailer extends AkBaseModel
             $this->Message->$method(empty($this->$attribute) ? array() : $this->$attribute);
         }
 
-        $this->templateRoot = empty($this->templateRoot) ? AK_APP_DIR.DS.'views' : $this->templateRoot;
+        $this->templateRoot = empty($this->templateRoot) ? AkConfig::getDir('app').DS.'views' : $this->templateRoot;
         $this->template = empty($this->template) ? $method_name : $this->template;
         $this->mailerName = empty($this->mailerName) ? AkInflector::underscore($this->getModelName()) : $this->mailerName;
     }

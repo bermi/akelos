@@ -4,7 +4,8 @@ require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
 class AkInstaller_TestCase extends  AkUnitTest
 {
-
+    public $rebase = true;
+    
     public function setup()
     {
         $this->Installer = new AkInstaller();
@@ -259,8 +260,7 @@ class AkInstaller_TestCase extends  AkUnitTest
         }
         $this->Installer->dropTable('test_defaults');
     }
-    
-    
+
     private function _hasIndexes($meta_details, $search = false)
     {
         $result = false;
@@ -275,7 +275,6 @@ class AkInstaller_TestCase extends  AkUnitTest
         }
         return $result;
     }
-
 }
 
 ak_test_run_case_if_executed('AkInstaller_TestCase');

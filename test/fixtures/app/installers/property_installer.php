@@ -2,7 +2,7 @@
 
 class PropertyInstaller extends AkInstaller
 {
-    function install()
+    public function install($version = null, $options = array())
     {
         $this->createTable('properties', 
         '
@@ -14,7 +14,7 @@ class PropertyInstaller extends AkInstaller
         array('timestamp'=>false));
     }
 
-    function uninstall()
+    public function uninstall($version = null, $options = array())
     {
         $this->dropTable('properties', array('sequence'=>true));
         $this->dropTable('properties_property_types', array('sequence'=>true));

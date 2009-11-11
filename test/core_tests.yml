@@ -11,6 +11,7 @@ Active Support:
     - AkReflection
     - 'AkReflection/*'
     - AkTestApplication
+    - AkUnitTest
 Action Controller: 
     - AkDbSession
     - AkRouter

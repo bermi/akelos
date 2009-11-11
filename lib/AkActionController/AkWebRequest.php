@@ -115,7 +115,7 @@ class AkWebRequest extends AkActionController
         if(empty($Controller->Template)){
             require_once(AK_LIB_DIR.DS.'AkActionView.php');
             require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkPhpTemplateHandler.php');
-            $Controller->Template =& new AkActionView(AK_APP_DIR.DS.'views'.DS.$Controller->Request->getController(),
+            $Controller->Template =& new AkActionView(AkConfig::getDir('app').DS.'views'.DS.$Controller->Request->getController(),
             $Controller->Request->getParameters(),$Controller->Request->getController());
             
             $Controller->Template->_controllerInstance =& $Controller;
@@ -157,7 +157,7 @@ class AkWebRequest extends AkActionController
                 array('%controller_file_name'=>$this->_file_name, 
                     '%controller_class_name'=>$this->_class_name)));
         }
-        require_once(AK_APP_DIR.DS.'application_controller.php');
+        require_once(AkConfig::getDir('app').DS.'application_controller.php');
         require_once($controller_path);
         if(!class_exists($this->_class_name)){
             $this->_raiseError(Ak::t('Controller <i>%controller_name</i> does not exist', 

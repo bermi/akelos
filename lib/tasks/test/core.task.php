@@ -30,9 +30,14 @@ if(empty($files)){
     }
 }
 
-
+if(isset($options['ci'])){
+    unset($options['ci']);
+    $options['reporter'] = 'JUnitXMLReporter';
+}
 if($reporter = empty($options['reporter']) ? false :  $options['reporter']){
     unset($options['reporter']);
+}else{
+    $reporter = 'TextReporter';
 }
 
 if($base_path = empty($options['base_path']) ? false :  $options['base_path']){
@@ -73,7 +78,6 @@ $TestSuite = new TestSuite(
 'Running unit tests for Akelos ('.(empty($component_title)?'all components':$component_title).")."
 );
 
-$Reporter = new TextReporter();
 
 foreach ($test_files as $file_path){
 
@@ -94,4 +98,4 @@ foreach ($test_files as $file_path){
 
 }
 
-$TestSuite->run($Reporter);
+exit ($TestSuite->run(new $reporter()) ? 0 : 1);

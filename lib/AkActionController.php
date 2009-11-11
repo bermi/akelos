@@ -405,7 +405,7 @@ class AkActionController extends AkObject
     function instantiateIncludedModelClasses($models = array())
     {
         require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-        require_once(AK_APP_DIR.DS.'shared_model.php');
+        require_once(AkConfig::getDir('app').DS.'shared_model.php');
 
         empty($this->model) ? ($this->model = $this->params['controller']) : null;
         empty($this->models) ? ($this->models = array()) : null;
@@ -915,7 +915,7 @@ class AkActionController extends AkObject
 
     function _getTemplateBasePath()
     {
-        return AK_APP_DIR.DS.'views'.DS.(empty($this->_module_path)?'':$this->_module_path).$this->Request->getController();
+        return AkConfig::getDir('app').DS.'views'.DS.(empty($this->_module_path)?'':$this->_module_path).$this->Request->getController();
     }
 
     function _getIncludedControllerNames()

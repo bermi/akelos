@@ -2,7 +2,7 @@
 
 class FileInstaller extends AkInstaller
 {
-    function install()
+    public function install($version = null, $options = array())
     {
         $this->createTable('files', '
         id integer max=10 auto increment primary,
@@ -10,7 +10,7 @@ class FileInstaller extends AkInstaller
         );
     }
 
-    function uninstall()
+    public function uninstall($version = null, $options = array())
     {
         $this->dropTable('files', array('sequence'=>true));
     }

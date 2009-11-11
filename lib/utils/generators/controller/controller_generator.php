@@ -55,7 +55,7 @@ class ControllerGenerator extends  AkelosGenerator
         $this->actions = empty($this->actions) ? array() : (array)$this->actions;
 
         $files = array(
-        AK_APP_DIR.DS.$this->controller_path,
+        AkConfig::getDir('app').DS.$this->controller_path,
         AK_TEST_DIR.DS.'functional'.DS.'app'.DS.$this->controller_path,
         AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.$this->controller_path,
         AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'helpers'.DS.$this->underscored_controller_name."_helper.php",
@@ -78,7 +78,7 @@ class ControllerGenerator extends  AkelosGenerator
     {
         $this->_preloadPaths();
 
-        $this->save(AK_APP_DIR.DS.$this->controller_path, $this->render('controller'));
+        $this->save(AkConfig::getDir('app').DS.$this->controller_path, $this->render('controller'));
         $this->save(AK_HELPERS_DIR.DS.$this->underscored_controller_name."_helper.php", $this->render('helper'));
         $this->save(AK_TEST_DIR.DS.'functional'.DS.$this->controller_path, $this->render('functional_test'));
         $this->save(AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.$this->controller_path, $this->render('fixture'));

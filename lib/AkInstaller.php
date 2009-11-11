@@ -60,13 +60,13 @@ class AkInstaller extends AkObject
 {
     public
     // Public paths, so they can be modified for testing purposes
-    $app_plugins_dir            = AK_APP_PLUGINS_DIR,
-    $app_app_dir                = AK_APP_DIR,
-    $app_base_dir               = AK_BASE_DIR,
-    $app_installers_dir         = AK_APP_INSTALLERS_DIR,
-    $app_tmp_dir                = AK_TMP_DIR,
-    $app_vendor_dir             = AK_APP_VENDOR_DIR,
-    
+    $app_plugins_dir,
+    $app_app_dir,
+    $app_base_dir,
+    $app_installers_dir,
+    $app_tmp_dir,
+    $app_vendor_dir,
+
     $data_dictionary,
     $available_tables           = array(),
     $vervose                    = AK_VERBOSE_INSTALLER,
@@ -79,6 +79,13 @@ class AkInstaller extends AkObject
 
     public function __construct($db_connection = null)
     {
+        $this->app_plugins_dir            = AkConfig::getDir('app_plugins');
+        $this->app_app_dir                = AkConfig::getDir('app');
+        $this->app_base_dir               = AkConfig::getDir('base');
+        $this->app_installers_dir         = AkConfig::getDir('app_installers');
+        $this->app_tmp_dir                = AkConfig::getDir('tmp');
+        $this->app_vendor_dir             = AkConfig::getDir('app_vendor');
+
         if(!empty($db_connection)){
             $this->init($db_connection);
         }

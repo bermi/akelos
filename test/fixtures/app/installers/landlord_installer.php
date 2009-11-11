@@ -2,7 +2,7 @@
 
 class LandlordInstaller extends AkInstaller
 {
-    function install()
+    public function install($version = null, $options = array())
     {
         $this->createTable('landlords', '
         id,
@@ -10,10 +10,8 @@ class LandlordInstaller extends AkInstaller
         );
     }
 
-    function uninstall()
+    public function uninstall($version = null, $options = array())
     {
         $this->dropTable('landlords', array('sequence'=>true));
     }
 }
-
-?>

@@ -1491,7 +1491,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                            Table inheritance
      ====================================================================
      */
-    public function descendsFromActiveRecord(&$object)
+    static function descendsFromActiveRecord(&$object)
     {
         if(substr(strtolower(get_parent_class($object)),-12) == 'activerecord'){
             return true;
@@ -2507,7 +2507,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if(!defined('AK_AVOID_AUTOMATIC_ACTIVE_RECORD_INSTALLERS') && !in_array($this->getModelName(), $installed_models)){
             $installed_models[] = $this->getModelName();
             $installer_name = $this->getModelName().'Installer';
-            $installer_file = AK_APP_DIR.DS.'installers'.DS.AkInflector::underscore($installer_name).'.php';
+            $installer_file = AkConfig::getDir('app_installers').DS.AkInflector::underscore($installer_name).'.php';
             if(file_exists($installer_file)){
                 require_once($installer_file);
                 if(class_exists($installer_name)){
@@ -2561,7 +2561,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             if( !isset($this->_avoidTableNameValidation) &&
             !is_array($column_objects) &&
             !$this->_runCurrentModelInstallerIfExists($column_objects)){
-                trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())), E_USER_ERROR);
+                // akelos_migrations is the first active record to be installed, therefore the table will be created after the first run.
+                if($this->getTableName() != 'akelos_migrations'){ 
+                    trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())), E_USER_ERROR);
+                }
                 return false;
             }elseif (empty($column_objects)){
                 $this->_runCurrentModelInstallerIfExists($column_objects);

@@ -238,7 +238,7 @@ class AkelosGenerator
     function _getPluginGenerators()
     {
         $generators = array();
-        defined('AK_PLUGINS_DIR') ? null : define('AK_PLUGINS_DIR', AK_APP_DIR.DS.'vendor'.DS.'plugins');
+        defined('AK_PLUGINS_DIR') ? null : define('AK_PLUGINS_DIR', AkConfig::getDir('app').DS.'vendor'.DS.'plugins');
         foreach (Ak::dir(AK_PLUGINS_DIR,array('files'=>false,'dirs'=>true)) as $folder){
             $plugin_name = array_shift(array_keys($folder));
             $generators = array_merge($generators, $this->_getGeneratorsInsidePath(AK_PLUGINS_DIR.DS.$plugin_name.DS.'generators'));

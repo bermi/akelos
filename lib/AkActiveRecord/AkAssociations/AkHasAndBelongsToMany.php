@@ -3,8 +3,6 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActiveRecord
@@ -12,14 +10,8 @@
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  * @author Kaste
  * @author Arno Schneider <arno a.t bermilabs c.om>
- * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-defined('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES') ? null : define('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES' ,true);
-defined('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS') ? null : define('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS' , 'ActiveRecord');
-
-require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 
 /**
 * Associates two classes via an intermediate join table.  Unless the join table is explicitly specified as
@@ -109,10 +101,13 @@ class AkHasAndBelongsToMany extends AkAssociation
     /**
      * Join object place holder
      */
-    public $JoinObject;
-    public $associated_ids = array();
-    public $association_id;
-    public $_automatically_create_join_model_files = AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES;
+    public 
+    $JoinObject,
+    $associated_ids = array(),
+    $association_id;
+    
+    protected 
+    $_automatically_create_join_model_files = AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES;
 
     public function &addAssociated($association_id, $options = array())
     {
@@ -161,13 +156,13 @@ class AkHasAndBelongsToMany extends AkAssociation
         $options['foreign_key'] = empty($options['foreign_key']) ? AkInflector::underscore($owner_name).'_id' : $options['foreign_key'];
         $options['association_foreign_key'] = empty($options['association_foreign_key']) ? AkInflector::underscore($associated_name).'_id' : $options['association_foreign_key'];
 
-        $Collection =& $this->_setCollectionHandler($association_id, $options['handler_name']);
+        $Collection = $this->_setCollectionHandler($association_id, $options['handler_name']);
         $Collection->setOptions($association_id, $options);
 
         $this->addModel($association_id,  $Collection);
 
         if($options['instantiate']){
-            $associated =& $Collection->load();
+            $associated = $Collection->load();
         }
 
         $this->setAssociatedId($association_id, $options['handler_name']);
@@ -190,10 +185,10 @@ class AkHasAndBelongsToMany extends AkAssociation
             if(!is_array($this->Owner->$association_id)){
                 trigger_error(Ak::t('%model_name::%association_id is not a collection array on current %association_id hasAndBelongsToMany association',array('%model_name'=>$this->Owner->getModelName(), '%association_id'=>$association_id)), E_USER_NOTICE);
             }
-            $associated =& $this->Owner->$association_id;
+            $associated = $this->Owner->$association_id;
         }else{
             $associated = array();
-            $this->Owner->$association_id =& $associated;
+            $this->Owner->$association_id = $associated;
         }
 
         if(isset($this->Owner->$handler_name)){
@@ -291,10 +286,10 @@ class AkHasAndBelongsToMany extends AkAssociation
             if(!$this->Owner->isNewRecord()){
                 $this->constructSql();
                 $options = $this->getOptions($this->association_id);
-                $Associated =& $this->getAssociatedModelInstance();
+                $Associated = $this->getAssociatedModelInstance();
                 if($FoundAssociates = $Associated->findBySql($options['finder_sql'])){
-                    array_map(array(&$this,'_setAssociatedMemberId'),$FoundAssociates);
-                    $this->Owner->{$this->association_id} =& $FoundAssociates;
+                    array_map(array( $this,'_setAssociatedMemberId'),$FoundAssociates);
+                    $this->Owner->{$this->association_id} = $FoundAssociates;
                 }
             }
             if(empty($this->Owner->{$this->association_id})){
@@ -325,7 +320,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                     }else{
                         if(method_exists($Associated[$k], 'isNewRecord')){
                             $Associated[$k]->$external_key = $Associated[$k]->isNewRecord();
-                            $this->Owner->{$this->association_id}[] =& $Associated[$k];
+                            $this->Owner->{$this->association_id}[] = $Associated[$k];
                             $this->_setAssociatedMemberId($Associated[$k]);
                             if($this->_relateAssociatedWithOwner($Associated[$k])){
                                 if($succes && !empty($options['after_add']) && method_exists($this->Owner, $options['after_add']) && $this->Owner->{$options['after_add']}($Associated[$k]) === false ){
@@ -345,7 +340,7 @@ class AkHasAndBelongsToMany extends AkAssociation
             return $succes;
         }else{
             $associates = array();
-            $associates[] =& $Associated;
+            $associates[] = $Associated;
             return $this->add($associates);
         }
     }
@@ -386,9 +381,9 @@ class AkHasAndBelongsToMany extends AkAssociation
     {
         $ids = func_get_args();
         $ids = is_array($ids[0]) ? $ids[0] : $ids;
-        $AssociatedModel =& $this->getAssociatedModelInstance();
+        $AssociatedModel = $this->getAssociatedModelInstance();
         if(!empty($ids)){
-            $NewAssociates =& $AssociatedModel->find($ids);
+            $NewAssociates = $AssociatedModel->find($ids);
             $this->set($NewAssociates);
         }
     }
@@ -401,8 +396,8 @@ class AkHasAndBelongsToMany extends AkAssociation
 
     public function addId($id)
     {
-        $AssociatedModel =& $this->getAssociatedModelInstance();
-        if($NewAssociated =& $AssociatedModel->find($id)){
+        $AssociatedModel = $this->getAssociatedModelInstance();
+        if($NewAssociated = $AssociatedModel->find($id)){
             return $this->add($NewAssociated);
         }
         return false;
@@ -414,7 +409,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         $success = true;
         if(!is_array($Associated)){
             $associated_elements = array();
-            $associated_elements[] =& $Associated;
+            $associated_elements[] = $Associated;
             return $this->delete($associated_elements);
         }else{
             $options = $this->getOptions($this->association_id);
@@ -427,7 +422,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
             foreach (array_keys($Associated) as $k){
                 $id = $Associated[$k]->getId();
-                if($JoinObjectsToDelete =& $this->JoinObject->findAllBy($options['foreign_key'].' AND '.$options['association_foreign_key'], $this->Owner->getId(), $id)){
+                if($JoinObjectsToDelete = $this->JoinObject->findAllBy($options['foreign_key'].' AND '.$options['association_foreign_key'], $this->Owner->getId(), $id)){
                     foreach (array_keys($JoinObjectsToDelete) as $k) {
                         if($JoinObjectsToDelete[$k]->destroy()){
                             $this->_deleted_join_object_values[$this->Owner->getId()][$id]=$JoinObjectsToDelete[$k]->getAttributes();
@@ -456,7 +451,7 @@ class AkHasAndBelongsToMany extends AkAssociation
     {
         if(!is_array($records)){
             $records_array = array();
-            $records_array[] =& $records;
+            $records_array[] = $records;
             $this->delete($records_array);
         }else{
             $this->Owner->notifyObservers('beforeRemove');
@@ -573,7 +568,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                     }
                     $attributes = array($options['foreign_key']=> $foreign_key, $options['association_foreign_key']=> $association_foreign_key);
                     $attributes = array_merge($attributes,$addValues);
-                    $this->JoinObject =& $this->JoinObject->create($attributes);
+                    $this->JoinObject = $this->JoinObject->create($attributes);
                     $success = !$this->JoinObject->isNewRecord();
                 }
             }
@@ -588,14 +583,14 @@ class AkHasAndBelongsToMany extends AkAssociation
     public function &_build($association_id, &$AssociatedObject, $reference_associated = true)
     {
         if($reference_associated){
-            $this->Owner->$association_id =& $AssociatedObject;
+            $this->Owner->$association_id = $AssociatedObject;
         }else{
             $this->Owner->$association_id = $AssociatedObject;
         }
-        $this->Owner->$association_id->_AssociationHandler =& $this;
+        $this->Owner->$association_id->_AssociationHandler = $this;
         $this->Owner->$association_id->_associatedAs = $this->getType();
         $this->Owner->$association_id->_associationId = $association_id;
-        $this->Owner->_associations[$association_id] =& $this->Owner->$association_id;
+        $this->Owner->_associations[$association_id] = $this->Owner->$association_id;
         return $this->Owner->$association_id;
     }
 
@@ -638,7 +633,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
     public function associationJoin()
     {
-        $Associated =& $this->getAssociatedModelInstance();
+        $Associated = $this->getAssociatedModelInstance();
         $options = $this->getOptions($this->association_id);
 
         return "LEFT OUTER JOIN {$options['join_table']} ON ".
@@ -649,7 +644,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
     public function associationJoin2()
     {
-        $Associated =& $this->getAssociatedModelInstance();
+        $Associated = $this->getAssociatedModelInstance();
         $options = $this->getOptions($this->association_id);
 
         return "LEFT OUTER JOIN {$options['join_table']} AS _{$options['join_class_name']} ON ".
@@ -665,7 +660,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         if(empty($this->Owner->{$options['handler_name']}->_loaded) && !$this->Owner->isNewRecord()){
             $this->constructSql();
             $options = $this->getOptions($this->association_id);
-            $Associated =& $this->getAssociatedModelInstance();
+            $Associated = $this->getAssociatedModelInstance();
 
             if($this->_hasCachedCounter()){
                 $count = $Associated->getAttribute($this->_getCachedCounterAttributeName());
@@ -695,7 +690,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         Ak::import($options['class_name']);
         $record = new $options['class_name']($attributes);
         $record->_newRecord = $set_as_new_record;
-        $this->Owner->{$this->association_id}[] =& $record;
+        $this->Owner->{$this->association_id}[] = $record;
         $this->_setAssociatedMemberId($record);
         $set_as_new_record ? $this->_relateAssociatedWithOwner($record) : null;
         return $record;
@@ -703,7 +698,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
     public function &create($attributes = array())
     {
-        $record =& $this->build($attributes);
+        $record = $this->build($attributes);
         if(!$this->Owner->isNewRecord()){
             $record->save();
         }
@@ -715,7 +710,7 @@ class AkHasAndBelongsToMany extends AkAssociation
     {
         $options = $this->getOptions($this->association_id);
 
-        $Associated =& $this->getAssociatedModelInstance();
+        $Associated = $this->getAssociatedModelInstance();
         $table_name = $Associated->getTableName();
         $owner_id = $this->Owner->quotedId();
 
@@ -752,7 +747,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         $association_options = $this->getOptions($this->association_id);
         $options = array_merge($association_options,$options);
         $handler_name = $options['handler_name'];
-        $Associated =& $this->getAssociatedModelInstance();
+        $Associated = $this->getAssociatedModelInstance();
         $pk=$Associated->getPrimaryKey();
         $finder_options = array();
 
@@ -803,7 +798,7 @@ class AkHasAndBelongsToMany extends AkAssociation
     }
     public function constructSqlForInclusion()
     {
-        $Associated =& $this->getAssociatedModelInstance();
+        $Associated = $this->getAssociatedModelInstance();
         $options = $this->getOptions($this->association_id);
         return
         ' LEFT OUTER JOIN '.
@@ -823,7 +818,7 @@ class AkHasAndBelongsToMany extends AkAssociation
     }
     function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name)
     {
-        $Associated =& $this->getAssociatedModelInstance();
+        $Associated = $this->getAssociatedModelInstance();
         $options = $this->getOptions($this->association_id);
         return
         ' LEFT OUTER JOIN '.
@@ -844,7 +839,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
     public function _hasCachedCounter()
     {
-        $Associated =& $this->getAssociatedModelInstance();
+        $Associated = $this->getAssociatedModelInstance();
         return $Associated->isAttributePresent($this->_getCachedCounterAttributeName());
     }
 
@@ -920,7 +915,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                 array_push($args, $finder_options);
             }
             $Associated = $this->getAssociatedModelInstance();
-            $result = call_user_func_array(array(&$Associated,'find'), $args);
+            $result = call_user_func_array(array( $Associated,'find'), $args);
 
         }
         return $result;
@@ -1000,7 +995,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                 $args = empty($args) ? array('all') : $args;
                 array_push($args, $options);
             }
-            $result = call_user_func_array(array(&$Associated,'find'), $args);
+            $result = call_user_func_array(array( $Associated,'find'), $args);
         }
 
         return $result;
@@ -1057,7 +1052,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
         $object_id = $object->getId();
         foreach (array_keys($object->hasAndBelongsToMany->models) as $association_id){
-            $CollectionHandler =& $object->hasAndBelongsToMany->models[$association_id];
+            $CollectionHandler = $object->hasAndBelongsToMany->models[$association_id];
             $options = $CollectionHandler->getOptions($association_id);
             $class_name = strtolower($CollectionHandler->getOption($association_id, 'class_name'));
 
@@ -1066,7 +1061,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                 foreach (array_keys($object->$association_id) as $k){
 
                     if(!empty($object->{$association_id}[$k]) && strtolower(get_class($object->{$association_id}[$k])) == $class_name){
-                        $AssociatedItem =& $object->{$association_id}[$k];
+                        $AssociatedItem = $object->{$association_id}[$k];
                         // This helps avoiding double realation on first time savings
 
 
@@ -1075,7 +1070,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
                             if(empty($AssociatedItem->hasAndBelongsToMany->__joined) && ($AssociatedItem->isNewRecord()? $AssociatedItem->save() : true)){
                                 $AssociatedItem->hasAndBelongsToMany->__joined = true;
-                                $CollectionHandler->JoinObject =& $CollectionHandler->JoinObject->create(array($options['foreign_key'] => $object_id ,$options['association_foreign_key'] => $AssociatedItem->getId()));
+                                $CollectionHandler->JoinObject = $CollectionHandler->JoinObject->create(array($options['foreign_key'] => $object_id ,$options['association_foreign_key'] => $AssociatedItem->getId()));
 
 
                                 $success = !$CollectionHandler->JoinObject->isNewRecord() ? $success : false;
@@ -1097,7 +1092,7 @@ class AkHasAndBelongsToMany extends AkAssociation
     public function _removeDuplicates(&$object, $association_id)
     {
         if(!empty($object->{$association_id})){
-            $CollectionHandler =& $object->hasAndBelongsToMany->models[$association_id];
+            $CollectionHandler = $object->hasAndBelongsToMany->models[$association_id];
             $options = $CollectionHandler->getOptions($association_id);
             if(empty($options['unique'])){
                 return ;
@@ -1114,7 +1109,7 @@ class AkHasAndBelongsToMany extends AkAssociation
             $class_name = strtolower($CollectionHandler->getOption($association_id, 'class_name'));
             foreach (array_keys($object->$association_id) as $k){
                 if(!empty($object->{$association_id}[$k]) && strtolower(get_class($object->{$association_id}[$k])) == $class_name && !$object->{$association_id}[$k]->isNewRecord()){
-                    $AssociatedItem =& $object->{$association_id}[$k];
+                    $AssociatedItem = $object->{$association_id}[$k];
                     if(isset($ids[$AssociatedItem->getId()])){
                         unset($object->{$association_id}[$k]);
                         continue;
@@ -1126,5 +1121,3 @@ class AkHasAndBelongsToMany extends AkAssociation
     }
 }
 
-
-?>

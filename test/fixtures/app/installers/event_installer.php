@@ -2,7 +2,7 @@
 
 class EventInstaller extends AkInstaller
 {
-    function install()
+    public function install($version = null, $options = array())
     {
         $this->createTable('events', '
         id integer max=10 auto increment primary,
@@ -11,7 +11,7 @@ class EventInstaller extends AkInstaller
         );
     }
 
-    function uninstall()
+    public function uninstall($version = null, $options = array())
     {
         $this->dropTable('events', array('sequence'=>true));
     }

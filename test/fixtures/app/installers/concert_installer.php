@@ -2,11 +2,11 @@
 
 class ConcertInstaller extends AkInstaller
 {
-    function install()
+    public function install($version = null, $options = array())
     {
     }
 
-    function uninstall()
+    public function uninstall($version = null, $options = array())
     {
     }
 }

@@ -94,7 +94,7 @@ class ScaffoldGenerator extends  AkelosGenerator
         //Generate models if they don't exist
         $model_files = array(
         'model'=>$this->model_file_path,
-        'installer'=>AK_APP_DIR.DS.'installers'.DS.$this->singular_name.'_installer.php',
+        'installer'=>AkConfig::getDir('app').DS.'installers'.DS.$this->singular_name.'_installer.php',
         'model_unit_test'=>AK_TEST_DIR.DS.'unit'.DS.'app'.DS.'models'.DS.$this->singular_name.'.php',
         'model_fixture'=>    AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'models'.DS.$this->singular_name.'.php',
         'installer_fixture'=>AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'installers'.DS.$this->singular_name.'_installer.php'
@@ -120,7 +120,7 @@ class ScaffoldGenerator extends  AkelosGenerator
         }
 
         if(file_exists($this->model_file_path)){
-            require_once(AK_APP_DIR.DS.'shared_model.php');
+            require_once(AkConfig::getDir('app').DS.'shared_model.php');
             require_once($this->model_file_path);
             if(class_exists($this->model_name)){
                 $ModelInstance =& new $this->model_name;

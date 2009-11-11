@@ -59,8 +59,8 @@ class CloneGenerator extends  AkelosGenerator
 
         $this->files_to_clone[AK_VIEWS_DIR.DS.'layouts'.DS.$this->class_to_clone.'.tpl'] = AK_VIEWS_DIR.DS.'layouts'.DS.$this->class_name.'.tpl';
         
-        foreach (Ak::dir(AK_APP_DIR.DS.'locales'.DS.$this->class_to_clone, array('dirs'=>false)) as $locale_file) {
-            $this->files_to_clone[AK_APP_DIR.DS.'locales'.DS.$this->class_to_clone.DS.$locale_file] = AK_APP_DIR.DS.'locales'.DS.$this->class_name.DS.$locale_file;	
+        foreach (Ak::dir(AkConfig::getDir('app').DS.'locales'.DS.$this->class_to_clone, array('dirs'=>false)) as $locale_file) {
+            $this->files_to_clone[AkConfig::getDir('app').DS.'locales'.DS.$this->class_to_clone.DS.$locale_file] = AkConfig::getDir('app').DS.'locales'.DS.$this->class_name.DS.$locale_file;	
         }
     }
 

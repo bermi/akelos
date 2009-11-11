@@ -438,17 +438,17 @@ class AkInflector
     static function toControllerFilename($name)
     {
         $name = str_replace('::', '/', $name);
-        return AK_CONTROLLERS_DIR.DS.join(DS, array_map(array('AkInflector','underscore'), strstr($name, '/') ? explode('/', $name) : array($name))).'_controller.php';
+        return AkConfig::getDir('controllers').DS.join(DS, array_map(array('AkInflector','underscore'), strstr($name, '/') ? explode('/', $name) : array($name))).'_controller.php';
     }
 
     static function toModelFilename($name)
     {
-        return AK_MODELS_DIR.DS.AkInflector::underscore($name).'.php';
+        return AkConfig::getDir('models').DS.AkInflector::underscore($name).'.php';
     }
 
     static function toHelperFilename($name)
     {
-        return AK_APP_DIR.DS.'helpers'.DS.AkInflector::underscore($name).'_helper.php';
+        return AkConfig::getDir('app').DS.'helpers'.DS.AkInflector::underscore($name).'_helper.php';
     }
 
     static function toFullName($name, $correct)

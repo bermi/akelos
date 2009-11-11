@@ -34,7 +34,7 @@ if(preg_match('/:{2}|\//', $installer)){
 $command = count($options) > 0 ? array_shift($options) : 'usage';
 
 $installer = str_replace('::','/',$installer);
-$file = AK_APP_DIR.DS.'installers'.DS.rtrim(join('/',array_map(array('AkInflector','underscore'), explode('/',$installer.'/'))),'/').'_installer.php';
+$file = AkConfig::getDir('app').DS.'installers'.DS.rtrim(join('/',array_map(array('AkInflector','underscore'), explode('/',$installer.'/'))),'/').'_installer.php';
 
 
 function ak_print_available_installers($files, $preffix = '')
@@ -52,9 +52,9 @@ function ak_print_available_installers($files, $preffix = '')
 }
 
 if($installer_class_name == 'Installer'){
-    $files = Ak::dir(AK_APP_DIR.DS.'installers', array('recurse' => true));
+    $files = Ak::dir(AkConfig::getDir('app').DS.'installers', array('recurse' => true));
     if(empty($files)){
-        echo Ak::t("\n  Could not find installers at %dir  \n", array('%dir'=>AK_APP_DIR.DS.'installers'));
+        echo Ak::t("\n  Could not find installers at %dir  \n", array('%dir'=>AkConfig::getDir('app').DS.'installers'));
     }else{
         echo Ak::t("\n  You must supply a valid installer name like : \n");
         echo Ak::t("\n  > ./script/migrate my_installer_name install\n\n");

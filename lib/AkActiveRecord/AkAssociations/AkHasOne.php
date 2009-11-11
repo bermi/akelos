@@ -3,8 +3,6 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActiveRecord
@@ -12,11 +10,7 @@
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  * @author Kaste
  * @author Arno Schneider <arno a.t bermilabs c.om>
- * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
-
-require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 
 /**
 * Adds the following methods for retrieval and query of a single associated object.
@@ -54,7 +48,8 @@ require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php');
 */
 class AkHasOne extends AkAssociation
 {
-    public $associated_ids = array();
+    public
+    $associated_ids = array();
 
     public function &addAssociated($association_id, $options = array())
     {
@@ -79,15 +74,15 @@ class AkHasOne extends AkAssociation
 
         $this->addModel($association_id,  new AkAssociatedActiveRecord());
 
-        $associated =& $this->getModel($association_id);
+        $associated = $this->getModel($association_id);
         $this->setAssociatedId($association_id, $associated->getId());
 
-        $associated =& $this->_build($association_id, &$associated, false);
+        $associated = $this->_build($association_id, $associated, false);
 
         $this->_saveLoadedHandler($association_id, $associated);
 
         if($options['instantiate']){
-            $associated =& $this->addModel($association_id,  new $options['class_name']($options['foreign_key'].' = '.$this->Owner->quotedId()));
+            $associated = $this->addModel($association_id,  new $options['class_name']($options['foreign_key'].' = '.$this->Owner->quotedId()));
         }
 
         return $associated;
@@ -103,7 +98,7 @@ class AkHasOne extends AkAssociation
             $Associated->save();
         }
 
-        $this->_build($association_id, &$Associated);
+        $this->_build($association_id, $Associated);
         $this->Owner->$association_id->_loaded = true;
         return $Associated;
     }
@@ -240,13 +235,13 @@ class AkHasOne extends AkAssociation
         Ak::import($class_name);
         $record = new $class_name($attributes);
         if ($replace_existing){
-            $record =& $this->replace($association_id, $record, true);
+            $record = $this->replace($association_id, $record, true);
         }
         if(!$this->Owner->isNewRecord()){
             $record->set($foreign_key, $this->Owner->getId());
         }
 
-        $record =& $this->_build($association_id, &$record);
+        $record = $this->_build($association_id, $record);
 
         return $record;
     }
@@ -266,7 +261,7 @@ class AkHasOne extends AkAssociation
 
     public function &replace($association_id, &$NewAssociated, $dont_save = false)
     {
-        $Associated =& $this->loadAssociated($association_id);
+        $Associated = $this->loadAssociated($association_id);
         if(!empty($Associated->__activeRecordObject) && !empty($NewAssociated->__activeRecordObject) && $Associated->getId() == $NewAssociated->getId()){
             return $NewAssociated;
         }
@@ -291,7 +286,7 @@ class AkHasOne extends AkAssociation
                 $NewAssociated->set($Associated->getAssociationOption('foreign_key'), $this->Owner->getId());
             }
 
-            $NewAssociated =& $this->_build($association_id, &$NewAssociated);
+            $NewAssociated = $this->_build($association_id, $NewAssociated);
 
             $NewAssociated->_loaded = true;
             if(!$NewAssociated->isNewRecord() || !$dont_save){
@@ -328,7 +323,7 @@ class AkHasOne extends AkAssociation
         * todo we will use a select statement later
         */
         $sql = $this->Owner->constructFinderSqlWithAssociations($finder_options, false);//.' LIMIT 1';
-        if($results =& $this->Owner->$association_id->findBySql($sql)){
+        if($results = $this->Owner->$association_id->findBySql($sql)){
             return $results[0];
         }
 
@@ -391,7 +386,6 @@ class AkHasOne extends AkAssociation
         return $success;
     }
 
-
     public function afterDestroy(&$object)
     {
         $success = true;
@@ -430,4 +424,3 @@ class AkHasOne extends AkAssociation
     }
 }
 
-?>

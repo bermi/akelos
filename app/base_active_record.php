@@ -1,7 +1,5 @@
 <?php
 
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-
 /**
  * DO NOT MODIFY manually
  * 

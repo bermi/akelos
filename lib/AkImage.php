@@ -211,7 +211,7 @@ class AkImage extends Image_Transform
 
     function _getFilterChainPath($name, $path)
     {
-        return (empty($path) ? AK_APP_DIR.DS.'image_filters' : rtrim($path,DS.'/')).DS.$name.'_filter.php';
+        return (empty($path) ? AkConfig::getDir('app').DS.'image_filters' : rtrim($path,DS.'/')).DS.$name.'_filter.php';
     }
 
     function applyFilters()

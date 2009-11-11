@@ -206,7 +206,7 @@ class Ak
             }
         }
 
-        if(isset($controller) && !isset($framework_dictionary[$controller.'_dictionary'])) { // && is_file(AK_APP_DIR.DS.'locales'.DS.$controller.DS.$lang.'.php')){
+        if(isset($controller) && !isset($framework_dictionary[$controller.'_dictionary'])) { // && is_file(AkConfig::getDir('app').DS.'locales'.DS.$controller.DS.$lang.'.php')){
             $framework_dictionary[$controller.'_dictionary'] = call_user_func_array(array($locale_manager_class,'getDictionary'),array($lang,$controller));
         }
 
@@ -740,7 +740,7 @@ class Ak
         }else{
             for($i = 0; $i <= count($backtrace) - 1; $i++){
                 if(isset($backtrace[$i]["line"])){
-                    if(strstr($backtrace[$i]["file"], AK_COMPILED_VIEWS_DIR) || strstr($backtrace[$i]["file"], AK_APP_DIR)){
+                    if(strstr($backtrace[$i]["file"], AK_COMPILED_VIEWS_DIR) || strstr($backtrace[$i]["file"], AkConfig::getDir('app'))){
                         return array($backtrace[$i]["file"], $backtrace[$i]["line"], $backtrace[$i]["function"]);
                     }
                 }
@@ -1490,7 +1490,6 @@ class Ak
 
     static function import_mailer()
     {
-        require_once(AK_LIB_DIR.DS.'AkActionMailer.php');
         $args = func_get_args();
         return call_user_func_array(array('Ak','import'),$args);
     }
@@ -2235,10 +2234,13 @@ class Ak
         static $paths = array();
 
         if(empty($paths)){
+            
             $paths = array(
 
             'ActiveRecord'              =>  AK_APP_DIR.DS.'shared_model.php',
+            'BaseActiveRecord'          =>  AK_APP_DIR.DS.'base_active_record.php',
             'AkActiveRecord'            =>  AK_LIB_DIR.DS.'AkActiveRecord.php',
+            'AkActionMailer'            =>  AK_LIB_DIR.DS.'AkActionMailer.php',
             'AkRouter'                  =>  AK_LIB_DIR.DS.'AkRouter.php',
             'AkActiveRecordMock'        =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php',
             'AkAssociation'             =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php',

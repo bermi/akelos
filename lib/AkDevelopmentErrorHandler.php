@@ -33,7 +33,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         {
             if($bt[$i]["function"]!='ak_backtrace' && $bt[$i]["function"]!='ak_development_error_handler'){
                 if(isset($bt[$i]["line"])){
-                    if(strstr($bt[$i]["file"], AK_COMPILED_VIEWS_DIR) || strstr($bt[$i]["file"], AK_APP_DIR)){
+                    if(strstr($bt[$i]["file"], AK_COMPILED_VIEWS_DIR) || strstr($bt[$i]["file"], AkConfig::getDir('app'))){
                         $result .= '<div style="background-color:#ededed;padding:10px;border:1px solid #ccc;">'.ak_show_source_line($bt[$i]["file"],$bt[$i]["line"], $bt[$i]["function"], (array)@$bt[$i]['args']).'</div>';
                     }elseif(!$only_app){
                         $result .= '<div style="margin:20px 0;padding:10px;border:1px solid #ccc;">'.ak_show_source_line($bt[$i]["file"],$bt[$i]["line"], $bt[$i]["function"], (array)@$bt[$i]['args']).'</div>';

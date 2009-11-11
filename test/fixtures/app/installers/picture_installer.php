@@ -2,7 +2,7 @@
 
 class PictureInstaller extends AkInstaller
 {
-    function install()
+    public function install($version = null, $options = array())
     {
         $this->createTable('pictures', '
         id,
@@ -12,7 +12,7 @@ class PictureInstaller extends AkInstaller
         );
     }
 
-    function uninstall()
+    public function uninstall($version = null, $options = array())
     {
         $this->dropTable('pictures', array('sequence'=>true));
     }

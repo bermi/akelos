@@ -760,7 +760,7 @@ class AkRequest extends AkObject
         $controller_file_name = AkInflector::underscore($params['controller']).'_controller.php';
         $controller_class_name = $module_class_peffix.AkInflector::camelize($params['controller']).'Controller';
         $controller_path = AK_CONTROLLERS_DIR.DS.$module_path.$controller_file_name;
-        include_once(AK_APP_DIR.DS.'application_controller.php');
+        include_once(AkConfig::getDir('app').DS.'application_controller.php');
 
         if(!empty($module_path) && file_exists($module_shared_model)){
             include_once($module_shared_model);
