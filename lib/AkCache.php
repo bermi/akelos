@@ -116,7 +116,7 @@ class AkCache extends AkObject
      * @param mixed $options
      * @return mixed   false if no cache could be configured or AkCache instance
      */
-    public function &lookupStore($options = null)
+    static function &lookupStore($options = null)
     {
         static $cache_store;
         $false = false;
@@ -142,7 +142,7 @@ class AkCache extends AkObject
         return $false;
     }
     
-    public function expandCacheKey($key, $namespace = null)
+    static function expandCacheKey($key, $namespace = null)
     {
         $expanded_cache_key = $namespace != null? $namespace : '';
         if (isset($_ENV['AK_CACHE_ID'])) {

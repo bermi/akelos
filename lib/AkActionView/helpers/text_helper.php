@@ -530,7 +530,7 @@ class TextHelper extends AkObject
     /**
     * Translate strings to the current locale.
     */
-    static function translate($string, $args = null, $locale_namespace = AK_DEFAULT_LOCALE_NAMESPACE)
+    public function translate($string, $args = null, $locale_namespace = AK_DEFAULT_LOCALE_NAMESPACE)
     {
         return Ak::t($string, $args, empty($locale_namespace) ?
         AkInflector::underscore($this->_controller->getControllerName()) : $locale_namespace);

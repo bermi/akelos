@@ -1,28 +1,21 @@
 <?php
-require_once(AK_LIB_DIR . DS . 'AkDispatcher.php');
-require_once(AK_LIB_DIR . DS .'AkUnitTest'. DS . 'AkTestRequest.php');
-require_once(AK_LIB_DIR . DS .'AkUnitTest'. DS . 'AkTestResponse.php');
+
 class AkTestDispatcher extends AkDispatcher
 {
     public $_controllerVars;
-    
-    public function AkTestDispatcher($controllerVars = array())
-    {
-        $this->_controllerVars = $controllerVars;
-        
-    }
-    
-    public function __construct($controllerVars = array()) 
+
+    public function __construct($controllerVars = array())
     {
         $this->_controllerVars = $controllerVars;
     }
+
     public function get($url,$params = array())
     {
         $_GET = $params;
         $_SERVER['REQUEST_METHOD'] = 'GET';
         return $this->process($url);
     }
-    
+
     public function post($url, $postParams)
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
@@ -33,7 +26,7 @@ class AkTestDispatcher extends AkDispatcher
         }
         return $this->process($url);
     }
-    
+
     public function put($url, $data)
     {
         $_SERVER['REQUEST_METHOD'] = 'PUT';
@@ -47,7 +40,7 @@ class AkTestDispatcher extends AkDispatcher
             return false;
         }
     }
-    
+
     public function delete($url)
     {
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
@@ -58,12 +51,12 @@ class AkTestDispatcher extends AkDispatcher
         $_SERVER['PHP_SELF'] = '/index.php';
         $parts = parse_url($url);
         if (isset($parts['scheme'])) {
-            $_SERVER['HTTPS']=$parts['scheme']=='https'; 
-            
+            $_SERVER['HTTPS']=$parts['scheme']=='https';
+
         }
         if (isset($parts['query'])) {
             $parts = preg_split('&', $parts['query']);
-            
+
             foreach ($parts as $p) {
                 $gets = explode('=', $p);
                 $_GET[$gets[0]]=isset($gets[1])?$gets[1]:null;
@@ -72,8 +65,8 @@ class AkTestDispatcher extends AkDispatcher
         $_REQUEST['ak'] = isset($parts['path']) ? $parts['path'] : '/';
         $_SERVER['REQUEST_URI'] = isset($parts['path'])?$parts['path']:'/';
         $_SERVER['SERVER_NAME'] =  isset($parts['host'])?$parts['host']:null;
-        
-        
+
+
         return $this->dispatch();
     }
 
@@ -81,18 +74,18 @@ class AkTestDispatcher extends AkDispatcher
     {
         $this->Request = new AkTestRequest();
         $this->Response = new AkTestResponse();
-        $controller = & $this->Request->recognize();
+        $controller = $this->Request->recognize();
         if ($controller === false) {
             return false;
         } else {
-            $this->Controller = &$controller;
+            $this->Controller = $controller;
             if (is_array($this->_controllerVars)) {
                 foreach ($this->_controllerVars as $key=>$value) {
                     $this->Controller->$key = $value;
                 }
             }
-            
-            $this->Controller->process(&$this->Request, &$this->Response);
+
+            $this->Controller->process($this->Request, $this->Response);
         }
         return true;
     }

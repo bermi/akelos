@@ -69,9 +69,9 @@ class Ak
 
     static function deprecateMethod($method, $new_method)
     {
-        Ak::deprecateWarning("Method $method is deprecated and will be removed on future versions. Please use $new_method instead.");   
+        Ak::deprecateWarning("Method $method is deprecated and will be removed on future versions. Please use $new_method instead.");
     }
-            
+
     /**
     * Gets a cache object singleton instance
     */
@@ -235,7 +235,7 @@ class Ak
     * @access public
     * @static
     * @param    string    $string    The string to be translated.
-    * @param    string/array    $target_language    A string containing the 
+    * @param    string/array    $target_language    A string containing the
     *           target language or an array containing 0 => from, 1 => to.
     * @return string The untranslated string.
     */
@@ -1982,7 +1982,6 @@ class Ak
     */
     static function &loadPlugins()
     {
-        require_once(AK_LIB_DIR.DS.'AkPlugin.php');
         $PluginManager = new AkPluginLoader();
         $PluginManager->loadPlugins();
         return $PluginManager;
@@ -2157,9 +2156,9 @@ class Ak
     }
 
     /**
-    * PHP modulo % returns the dividend which is not the expected result on 
+    * PHP modulo % returns the dividend which is not the expected result on
     * Math operations where the divisor is expected.
-    * 
+    *
     * For example PHP will return -5%7 = -5 when expected was 2
     */
     static function modulo($a, $n)
@@ -2170,11 +2169,11 @@ class Ak
 
     /**
      * Akelos version of pcntl_fork wich prevents forked processes from killing the database connection.
-     * 
+     *
      * See http://dev.mysql.com/doc/refman/5.0/en/gone-away.html
-     * 
+     *
      * This is done by closing the connection before forking and reconnecting on the child & parent process.
-     * 
+     *
      * @return Same as pcntl_fork (PID of the children to the parent, 0 to the children process and -1 if fails).
      */
     static function pcntl_fork()
@@ -2234,75 +2233,81 @@ class Ak
         static $paths = array();
 
         if(empty($paths)){
-            
+
             $paths = array(
-
-            'ActiveRecord'              =>  AK_APP_DIR.DS.'shared_model.php',
-            'BaseActiveRecord'          =>  AK_APP_DIR.DS.'base_active_record.php',
-            'AkActiveRecord'            =>  AK_LIB_DIR.DS.'AkActiveRecord.php',
-            'AkActionMailer'            =>  AK_LIB_DIR.DS.'AkActionMailer.php',
-            'AkRouter'                  =>  AK_LIB_DIR.DS.'AkRouter.php',
-            'AkActiveRecordMock'        =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php',
-            'AkAssociation'             =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php',
-            'AkBelongsTo'               =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociations'.DS.'AkBelongsTo.php',
-            'AkAdodbCache'              =>  AK_LIB_DIR.DS.'AkCache'.DS.'AkAdodbCache.php',
-            'AkAssociatedActiveRecord'  =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php',
-            'AkBaseModel'               =>  AK_LIB_DIR.DS.'AkBaseModel.php',
-            'AkCache'                   =>  AK_LIB_DIR.DS.'AkCache.php',
-            'AkConfig'                  =>  AK_LIB_DIR.DS.'AkConfig.php',
-            'AkDbAdapter'               =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbAdapter.php',
-            'AkDbSchemaCache'           =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php',
-            'AkDbSession'               =>  AK_LIB_DIR.DS.'AkDbSession.php',
-            'AkHttpClient'              =>  AK_LIB_DIR.DS.'AkHttpClient.php',
-            'AkLocaleManager'           =>  AK_LIB_DIR.DS.'AkLocaleManager.php',
-            'AkImage'                   =>  AK_LIB_DIR.DS.'AkImage.php',
-            'AkImageColorScheme'        =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageColorScheme.php',
-            'AkImageFilter'             =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageFilter.php',
-            'AkInflector'               =>  AK_LIB_DIR.DS.'AkInflector.php',
-            'AkInstaller'               =>  AK_LIB_DIR.DS.'AkInstaller.php',
-            'AkMemcache'                =>  AK_LIB_DIR.DS.'AkCache'.DS.'AkMemcache.php',
-            'AkObject'                  =>  AK_LIB_DIR.DS.'AkObject.php',
-            'AkObserver'                =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php',
-            'AkRequest'                 =>  AK_LIB_DIR.DS.'AkRequest.php',
-            'AkRequestMimeType'         =>  AK_LIB_DIR.DS.'AkRequestMimeType.php',
-            'AkPluginInstaller'         =>  AK_LIB_DIR.DS.'AkPluginInstaller.php',
-            'AkUnitTest'                =>  AK_LIB_DIR.DS.'AkUnitTest.php',
-            'AkTestApplication'         =>  AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestApplication.php',
-            'AkReflection'              =>  AK_LIB_DIR.DS.'AkReflection.php',
-            'AkReflectionMethod'        =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionMethod.php',
-            'AkReflectionClass'         =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionClass.php',
-            'AkReflectionDocBlock'      =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionDocBlock.php',
-            'AkReflectionFile'          =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFile.php',
-            'AkReflectionFunction'      =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFunction.php',
-            'AkSession'                 =>  AK_LIB_DIR.DS.'AkSession.php',
-            'AkType'                    =>  AK_LIB_DIR.DS.'AkType.php',
-            'AkNumber'                  =>  AK_LIB_DIR.DS.'AkType'.DS.'AkNumber.php',
-            'AkString'                  =>  AK_LIB_DIR.DS.'AkType'.DS.'AkString.php',
-            'AkTime'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkTime.php',
-            'AkArray'                   =>  AK_LIB_DIR.DS.'AkType'.DS.'AkArray.php',
-            'AkDate'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkDate.php',
-            
-            
-            'AkActionViewHelper'        =>  AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php',
-            'ActiveRecordHelper'        =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'active_record_helper.php',
-            'AssetTagHelper'            =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'asset_tag_helper.php',
-            'UrlHelper'                 =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'url_helper.php',
-            'FormHelper'                =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php',
-            'AkFormHelperInstanceTag'   =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php',
-            'AkFormHelperBuilder'       =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php',
-            'FormTagHelper'             =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_tag_helper.php',
-            'AkFormHelperOptionsInstanceTag'    =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_options_helper.php',
-            'JavascriptHelper'          =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_helper.php',
-            'JavascriptMacrosHelper'    =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_macros_helper.php',
-            'MailHelper'                =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'mail_helper.php',
-            'MenuHelper'                =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'menu_helper.php',
-            'NumberHelper'              =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'number_helper.php',
-            'PaginationHelper'          =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'pagination_helper.php',
-            'PrototypeHelper'           =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'prototype_helper.php',
-            'ScriptaculousHelper'       =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'scriptaculous_helper.php',
-            'TextHelper'                =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'text_helper.php',
-            'XmlHelper'                 =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'xml_helper.php',
-
+                'ActiveRecord'              =>  AK_APP_DIR.DS.'shared_model.php',
+                'ActiveRecordHelper'        =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'active_record_helper.php',
+                'AkActionMailer'            =>  AK_LIB_DIR.DS.'AkActionMailer.php',
+                'AkActionController'        =>  AK_LIB_DIR.DS.'AkActionController.php',
+                'AkActionViewHelper'        =>  AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php',
+                'AkActiveRecord'            =>  AK_LIB_DIR.DS.'AkActiveRecord.php',
+                'AkActiveRecordMock'        =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php',
+                'AkAdodbCache'              =>  AK_LIB_DIR.DS.'AkCache'.DS.'AkAdodbCache.php',
+                'AkArray'                   =>  AK_LIB_DIR.DS.'AkType'.DS.'AkArray.php',
+                'AkAssociatedActiveRecord'  =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php',
+                'AkAssociation'             =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php',
+                'AkBaseModel'               =>  AK_LIB_DIR.DS.'AkBaseModel.php',
+                'AkBelongsTo'               =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociations'.DS.'AkBelongsTo.php',
+                'AkCache'                   =>  AK_LIB_DIR.DS.'AkCache.php',
+                'AkCacheSweeper'            =>  AK_LIB_DIR.DS.'AkActionController'.DS.'AkCacheSweeper.php',
+                'AkClassExtender'           =>  AK_LIB_DIR.DS.'AkClassExtender.php',
+                'AkConfig'                  =>  AK_LIB_DIR.DS.'AkConfig.php',
+                'AkDate'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkDate.php',
+                'AkDispatcher'              =>  AK_LIB_DIR.DS.'AkDispatcher.php',
+                'AkDbAdapter'               =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbAdapter.php',
+                'AkDbSchemaCache'           =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php',
+                'AkDbSession'               =>  AK_LIB_DIR.DS.'AkDbSession.php',
+                'AkFormHelperBuilder'       =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php',
+                'AkFormHelperInstanceTag'   =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php',
+                'AkFormHelperOptionsInstanceTag'    =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_options_helper.php',
+                'AkHelperLoader'            =>  AK_LIB_DIR.DS.'AkActionView'.DS.'AkHelperLoader.php',
+                'AkHttpClient'              =>  AK_LIB_DIR.DS.'AkHttpClient.php',
+                'AkImage'                   =>  AK_LIB_DIR.DS.'AkImage.php',
+                'AkImageColorScheme'        =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageColorScheme.php',
+                'AkImageFilter'             =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageFilter.php',
+                'AkInflector'               =>  AK_LIB_DIR.DS.'AkInflector.php',
+                'AkInstaller'               =>  AK_LIB_DIR.DS.'AkInstaller.php',
+                'AkLocaleManager'           =>  AK_LIB_DIR.DS.'AkLocaleManager.php',
+                'AkMemcache'                =>  AK_LIB_DIR.DS.'AkCache'.DS.'AkMemcache.php',
+                'AkNumber'                  =>  AK_LIB_DIR.DS.'AkType'.DS.'AkNumber.php',
+                'AkObject'                  =>  AK_LIB_DIR.DS.'AkObject.php',
+                'AkObserver'                =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php',
+                'AkPlugin'                  =>  AK_LIB_DIR.DS.'AkPlugin.php',
+                'AkPluginInstaller'         =>  AK_LIB_DIR.DS.'AkPluginInstaller.php',
+                'AkPluginLoader'            =>  AK_LIB_DIR.DS.'AkPlugin.php',
+                'AkReflection'              =>  AK_LIB_DIR.DS.'AkReflection.php',
+                'AkReflectionClass'         =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionClass.php',
+                'AkReflectionDocBlock'      =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionDocBlock.php',
+                'AkReflectionFile'          =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFile.php',
+                'AkReflectionFunction'      =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionFunction.php',
+                'AkReflectionMethod'        =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionMethod.php',
+                'AkRequest'                 =>  AK_LIB_DIR.DS.'AkRequest.php',
+                'AkRequestMimeType'         =>  AK_LIB_DIR.DS.'AkRequestMimeType.php',
+                'AkRouter'                  =>  AK_LIB_DIR.DS.'AkRouter.php',
+                'AkSession'                 =>  AK_LIB_DIR.DS.'AkSession.php',
+                'AkString'                  =>  AK_LIB_DIR.DS.'AkType'.DS.'AkString.php',
+                'AkTestApplication'         =>  AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestApplication.php',
+                'AkTestDispatcher'          =>  AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestDispatcher.php',
+                'AkTestRequest'             =>  AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestRequest.php',
+                'AkTestResponse'            =>  AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestResponse.php',
+                'AkTime'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkTime.php',
+                'AkType'                    =>  AK_LIB_DIR.DS.'AkType.php',
+                'AkUnitTest'                =>  AK_LIB_DIR.DS.'AkUnitTest.php',
+                'AssetTagHelper'            =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'asset_tag_helper.php',
+                'BaseActiveRecord'          =>  AK_APP_DIR.DS.'base_active_record.php',
+                'FormHelper'                =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php',
+                'FormTagHelper'             =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_tag_helper.php',
+                'JavascriptHelper'          =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_helper.php',
+                'JavascriptMacrosHelper'    =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_macros_helper.php',
+                'MailHelper'                =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'mail_helper.php',
+                'MenuHelper'                =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'menu_helper.php',
+                'NumberHelper'              =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'number_helper.php',
+                'PaginationHelper'          =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'pagination_helper.php',
+                'PrototypeHelper'           =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'prototype_helper.php',
+                'ScriptaculousHelper'       =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'scriptaculous_helper.php',
+                'TextHelper'                =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'text_helper.php',
+                'UrlHelper'                 =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'url_helper.php',
+                'XmlHelper'                 =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'xml_helper.php',
             );
 
         }elseif (!empty($path)){
@@ -2327,7 +2332,7 @@ function translate($string, $args = null, $controller = null)
 
 
 /**
- * @deprecated 
+ * @deprecated
  */
 function ak_get_tmp_dir_name()
 {

@@ -258,7 +258,7 @@ class AkLocaleManager extends AkObject
      *
      * @return array
      */
-    static function getPublicLocales()
+    public function getPublicLocales()
     {
         static $public_locales;
         if(empty($public_locales)){

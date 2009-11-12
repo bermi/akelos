@@ -296,7 +296,7 @@ class AkCacheHandler extends AkObject
         $this->_action_cache_path = null;
         $this->_action_cache_host = null;
         if ($parent != null) {
-            $this->_controller = &$parent;
+            $this->_controller = $parent;
 
             $this->_configure($settings);
 
@@ -325,7 +325,7 @@ class AkCacheHandler extends AkObject
 
         if(empty($available_locales)){
             $available_locales = array();
-            $d = dir(AK_CONFIG_DIR.DS.'locales');
+            $d = dir(AkConfig::dir('config').DS.'locales');
             while (false !== ($entry = $d->read())) {
                 if (preg_match('/\\.php$/', $entry)){
                     $locale = str_replace('.php','',$entry);
@@ -339,9 +339,8 @@ class AkCacheHandler extends AkObject
     }
     public function _startSession()
     {
-        if(isset($_COOKIE[AK_SESSION_NAME])&& !isset($_SESSION)){
-            require_once(AK_LIB_DIR.DS.'AkSession.php');
-            $SessionHandler = &AkSession::initHandler();
+        if(isset($_COOKIE[AK_SESSION_NAME]) && !isset($_SESSION)){
+            $SessionHandler = AkSession::initHandler();
             @session_start();
         }
     }
@@ -400,14 +399,14 @@ class AkCacheHandler extends AkObject
     }
     public function _configure($settings)
     {
-        $configuration_object = &$this->_controller;
+        $configuration_object = $this->_controller;
         $configuration_options = array('caches_page'=>'_setCachesPage',
-                                       'cachesPage'=>'_setCachesPage',
-                                       'caches_action'=>'_setCachesAction',
-                                       'cachesAction'=>'_setCachesAction',
-                                       'cache_sweeper'=>'_setCacheSweeper',
-                                       'cacheSweeper'=>'_setCacheSweeper',
-                                       'page_cache_extension'=>'_setPageCacheExtension');
+        'cachesPage'=>'_setCachesPage',
+        'caches_action'=>'_setCachesAction',
+        'cachesAction'=>'_setCachesAction',
+        'cache_sweeper'=>'_setCacheSweeper',
+        'cacheSweeper'=>'_setCacheSweeper',
+        'page_cache_extension'=>'_setPageCacheExtension');
         /**
          * Load the configured cache store,
          */
@@ -445,7 +444,7 @@ class AkCacheHandler extends AkObject
     }
     public function &getController()
     {
-        $return=&$this->_controller;
+        $return = $this->_controller;
         return $return;
     }
 
@@ -689,7 +688,6 @@ EOF;
     }
     public function _setCacheSweeper($options)
     {
-        require_once(AK_LIB_DIR.DS.'AkActionController'.DS.'AkCacheSweeper.php');
         $default_options = array('only'=>array(),
         'except'=>array());
         if (is_string($options)) {
@@ -730,13 +728,13 @@ EOF;
                 trigger_error('Cache Sweeper file does not exist: ' . $filePath, E_USER_ERROR);
             }
         }
-        $this->_Sweepers[] = new $sweeper_class(&$this);
+        $this->_Sweepers[] = new $sweeper_class($this);
     }
     public function _enableGzippedOutput()
     {
         if(!$this->_gzipped_output_enabled && isset($this->_controller) && isset($this->_controller->Request) && $this->_controller->Request->getFormat()=='html') {
-            $this->_controller->prependBeforeFilter(array(&$this,'beforeNoCache'));
-            $this->_controller->appendAfterFilter(array(&$this,'afterNoCache'));
+            $this->_controller->prependBeforeFilter(array($this,'beforeNoCache'));
+            $this->_controller->appendAfterFilter(array($this,'afterNoCache'));
             $this->_gzipped_output_enabled = true;
         }
     }
@@ -764,7 +762,7 @@ EOF;
         $default_options = array('include_get_parameters'=>array(),
         'headers'=> array('X-Cached-By'=>'Akelos'));
         Ak::parseOptions($options, $default_options,array(),true);
-        $this->_caches_page = &$options;
+        $this->_caches_page = $options;
 
         $actionName = $this->_controller->getActionName();
         $format = $this->_controller->Request->getFormat();
@@ -776,8 +774,8 @@ EOF;
             $this->_caching_type = 'page';
             $this->_include_get_parameters = $this->_caches_page[$actionName]['include_get_parameters'];
             $this->_additional_headers = $this->_caches_page[$actionName]['headers'];
-            $this->_controller->prependBeforeFilter(array(&$this,'beforePageCache'));
-            $this->_controller->appendAfterFilter(array(&$this,'afterPageCache'));
+            $this->_controller->prependBeforeFilter(array($this,'beforePageCache'));
+            $this->_controller->appendAfterFilter(array($this,'afterPageCache'));
         } else {
             $this->_enableGzippedOutput();
         }
@@ -800,7 +798,7 @@ EOF;
         if (($gzip=in_array('gzip',$encodings)) || ($xgzip=in_array('x-gzip',$encodings))) {
             $this->_controller->Response->addHeader('Content-Encoding',$xgzip?'x-gzip':'gzip');
             header('Content-Encoding: '.($xgzip?'x-gzip':'gzip'));
-            ob_start(array(&$this,'_gzipCache'));
+            ob_start(array($this,'_gzipCache'));
         } else {
             ob_start();
         }
@@ -973,9 +971,12 @@ EOF;
         }
     }
 
-    public function _buildCacheGroup()
+    public function _buildCacheGroup($options = array())
     {
-        $this->_lastCacheGroup = $this->_convertGroup(isset($_SERVER['AK_HOST'])?$_SERVER['AK_HOST']:AK_HOST);
+        if(isset($options['host'])){
+            return $options['host'];
+        }
+        $this->_lastCacheGroup = $this->_convertGroup(isset($_SERVER['AK_HOST']) ? $_SERVER['AK_HOST'] : AK_HOST);
         return $this->_lastCacheGroup;
     }
 
@@ -1063,25 +1064,24 @@ EOF;
         if (!$this->cacheConfigured()) return;
         $key = $this->fragmentCachekey($key, $options);
 
-        return $this->_cache_store->save($content, $key, isset($options['host'])?
-        $options['host']:$this->_buildCacheGroup());
+        return $this->_cache_store->save($content, $key, $this->_buildCacheGroup($options));
     }
 
     public function readFragment($key, $options = array())
     {
-        if (!$this->cacheConfigured()) return false;
-
+        if (!$this->cacheConfigured()){
+            return false;
+        }
         $orgkey = $key;
-
         $key = $this->fragmentCachekey($key, $options);
-
-        return $this->_cache_store->get($key, isset($options['host'])?
-        $options['host']:$this->_buildCacheGroup());
+        return $this->_cache_store->get($key, $this->_buildCacheGroup($options));
     }
 
     public function expireFragment($key, $options = array())
     {
-        if (!$this->cacheConfigured()) return;
+        if (!$this->cacheConfigured()){
+            return;
+        }
 
         if (is_array($key) && isset($key['lang']) && $key['lang'] == '*') {
             $langs = AkLocaleManager::getPublicLocales();
@@ -1094,8 +1094,7 @@ EOF;
         }
         $key = $this->fragmentCachekey($key, $options);
 
-        return $this->_cache_store->remove($key, isset($options['host'])?
-        $options['host']:$this->_buildCacheGroup());
+        return $this->_cache_store->remove($key, $this->_buildCacheGroup($options));
     }
     /*
     * ########################################################################
@@ -1201,8 +1200,8 @@ EOF;
             }
             $this->_action_cache_path = $this->_actionPath($this->_action_cache_path);
 
-            $this->_controller->beforeFilter(array(&$this,'beforeActionCache'));
-            $this->_controller->appendAfterFilter(array(&$this,'afterActionCache'));
+            $this->_controller->beforeFilter(array($this,'beforeActionCache'));
+            $this->_controller->appendAfterFilter(array($this,'afterActionCache'));
         } else {
             $this->_enableGzippedOutput();
         }
@@ -1257,8 +1256,8 @@ EOF;
         $this->_controller->params['controller']:null):
         $options['controller'];
         $options['action'] = !isset($options['action']) ?
-            (isset($this->_controller->params['action']) ? $this->_controller->params['action'] : null ) :
-            $options['action'];
+        (isset($this->_controller->params['action']) ? $this->_controller->params['action'] : null ) :
+        $options['action'];
         $options['id'] = isset($options['id']) ? $options['id']: false;
 
         $options['skip_relative_url_root']=true;

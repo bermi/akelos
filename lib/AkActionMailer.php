@@ -815,9 +815,8 @@ class AkActionMailer extends AkBaseModel
      */
     public function getHelpers()
     {
-        require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkHelperLoader.php');
         $HelperLoader = new AkHelperLoader();
-        $HelperLoader->setHandler(&$this);
+        $HelperLoader->setHandler($this);
         return $HelperLoader->getHelpersForMailer();
     }
 

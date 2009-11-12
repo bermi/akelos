@@ -700,7 +700,6 @@ class AkSintagsParser
             if(defined('AK_SINTAGS_AVALABLE_HELPERS')){
                 $helpers = unserialize(AK_SINTAGS_AVALABLE_HELPERS);
             }else{
-                require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkHelperLoader.php');
                 if($underscored_helper_names = AkHelperLoader::getInstantiatedHelperNames()){
                     foreach ($underscored_helper_names as $underscored_helper_name){
                         $helper_class_name = AkInflector::camelize($underscored_helper_name);
@@ -764,4 +763,3 @@ class AkSintagsParser
 
 }
 
-?>

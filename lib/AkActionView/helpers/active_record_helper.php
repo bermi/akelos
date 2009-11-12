@@ -214,22 +214,22 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
         }
     }
 
-    public function tag($name, $options)
+    public function tag($name, $options = null, $open = false)
     {
         if($this->object->hasErrors()){
-            return $this->error_wrapping($this->tag_without_error_wrapping($name, $options), $this->object->getErrorsOn($this->method_name));
+            return $this->error_wrapping($this->tag_without_error_wrapping($name, $options, $open), $this->object->getErrorsOn($this->method_name));
         }else{
             return $this->tag_without_error_wrapping($name, $options);
         }
     }
 
-    public function tag_without_error_wrapping($name, $options)
+    public function tag_without_error_wrapping($name, $options, $open = false)
     {
-        return parent::tag($name, $options);
+        return parent::tag($name, $options, $open);
     }
 
 
-    public function content_tag($name, $value, $options)
+    public function content_tag($name, $content, $options = null)
     {
         if($this->object->hasErrors()){
             return $this->error_wrapping($this->content_tag_without_error_wrapping($name, $value, $options), $this->object->getErrorsOn($this->method_name));
@@ -271,7 +271,7 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
         return parent::to_datetime_select_tag($options);
     }
 
-    public function to_check_box_tag($options = array())
+    public function to_check_box_tag($options = array(), $checked_value = '1', $unchecked_value = '0')
     {
         if($this->object->hasErrors()){
             return $this->error_wrapping($this->to_check_box_tag_without_error_wrapping($options), $this->object->getErrorsOn($this->method_name));

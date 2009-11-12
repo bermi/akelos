@@ -1,7 +1,5 @@
 <?php
 
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
-
 /**
  * Helpers are normally loaded in the context of a controller call, but some
  * times they might be useful in Mailers, Comand line tools or for unit testing
@@ -11,18 +9,18 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
  */
 class AkHelperLoader extends AkObject
 {
-    var $_Controller;
-    var $_HelperInstances;
-    var $_Handler;
+    public $_Controller;
+    public $_HelperInstances;
+    public $_Handler;
 
-    function __construct()
+    public function __construct()
     {
         $this->_Handler = new stdClass();
     }
 
-    function setController(&$ControllerInstance)
+    public function setController(&$ControllerInstance)
     {
-        $this->_Controller =& $ControllerInstance;
+        $this->_Controller = $ControllerInstance;
         $this->setHandler($this->_Controller);
     }
 
@@ -31,9 +29,9 @@ class AkHelperLoader extends AkObject
      * 
      * Like setController but for Mailers and Testing
      */
-    function setHandler(&$HandlerInstance)
+    public function setHandler(&$HandlerInstance)
     {
-        $this->_Handler =& $HandlerInstance;
+        $this->_Handler = $HandlerInstance;
     }
 
     /**
@@ -47,14 +45,14 @@ class AkHelperLoader extends AkObject
      * 
      * Retuns an array with helper_name => HerlperInstace
      */
-    function &instantiateHelpers()
+    public function &instantiateHelpers()
     {
         $this->instantiateHelpersAsHandlerAttributes($this->getHelperNames());
         $this->_storeInstantiatedHelperNames(array_keys($this->_HelperInstances));
         return $this->_HelperInstances;
     }
 
-    function instantiateHelpersAsHandlerAttributes($helpers = array())
+    public function instantiateHelpersAsHandlerAttributes($helpers = array())
     {
         foreach ($helpers as $file=>$helper){
             $helper_class_name = AkInflector::camelize(AkInflector::demodulize(strstr($helper, 'Helper') ? $helper : $helper.'Helper'));
@@ -68,19 +66,19 @@ class AkHelperLoader extends AkObject
             if(is_file($file_path)){
                 include_once($file_path);
             }
-            
+
             if(class_exists($helper_class_name)){
                 $attribute_name = $full_path ? $helper_file_name : substr($file,0,-4);
-                $this->_Handler->$attribute_name =& new $helper_class_name(&$this->_Handler);
+                $this->_Handler->$attribute_name = new $helper_class_name($this->_Handler);
                 if(method_exists($this->_Handler->$attribute_name,'setController')){
-                    $this->_Handler->$attribute_name->setController(&$this->_Handler);
+                    $this->_Handler->$attribute_name->setController($this->_Handler);
                 }elseif(method_exists($this->_Handler->$attribute_name,'setMailer')){
-                    $this->_Handler->$attribute_name->setMailer(&$this->_Handler);
+                    $this->_Handler->$attribute_name->setMailer($this->_Handler);
                 }
                 if(method_exists($this->_Handler->$attribute_name,'init')){
                     $this->_Handler->$attribute_name->init();
                 }
-                $this->_HelperInstances[$attribute_name] =& $this->_Handler->$attribute_name;
+                $this->_HelperInstances[$attribute_name] = $this->_Handler->$attribute_name;
             }
         }
     }
@@ -90,7 +88,7 @@ class AkHelperLoader extends AkObject
      * 
      * Mailer helpers work as Controller helpers but without the Request context
      */
-    function getHelpersForMailer()
+    public function getHelpersForMailer()
     {
         $helper_names = $this->getHelperNames();
         $this->instantiateHelpersAsHandlerAttributes($helper_names);
@@ -102,7 +100,7 @@ class AkHelperLoader extends AkObject
      * In order to help rendering engines to know which helpers are available
      * we need to persit them as a static var.
      */
-    function _storeInstantiatedHelperNames($helpers)
+    public function _storeInstantiatedHelperNames($helpers)
     {
         Ak::setStaticVar('AkActionView::instantiated_helper_names', $helpers);
     }
@@ -112,13 +110,13 @@ class AkHelperLoader extends AkObject
      * 
      *  array('url_helper', 'prototype_helper')
      */
-    function getInstantiatedHelperNames()
+    static function getInstantiatedHelperNames()
     {
         return Ak::getStaticVar('AkActionView::instantiated_helper_names');
     }
 
 
-    function getHelperNames()
+    public function getHelperNames()
     {
         //$helpers = $this->getDefaultHandlerHelperNames();
         $helpers = array_merge($this->getDefaultHandlerHelperNames(), $this->getApplicationHelperNames(), $this->getPluginHelperNames());
@@ -133,9 +131,9 @@ class AkHelperLoader extends AkObject
     }
 
 
-    function getDefaultHandlerHelperNames()
+    public function getDefaultHandlerHelperNames()
     {
-        $handler =& $this->_Handler;
+        $handler = $this->_Handler;
         $handler->helpers = !isset($handler->helpers) ? 'default' : $handler->helpers;
 
         if($handler->helpers == 'default'){
@@ -152,9 +150,9 @@ class AkHelperLoader extends AkObject
         return $handler->helpers;
     }
 
-    function getApplicationHelperNames()
+    public function getApplicationHelperNames()
     {
-        $handler =& $this->_Handler;
+        $handler = $this->_Handler;
         $handler->app_helpers = !isset($handler->app_helpers) ? null : $handler->app_helpers;
 
         $helper_names = array();
@@ -173,9 +171,9 @@ class AkHelperLoader extends AkObject
         return $helper_names;
     }
 
-    function getPluginHelperNames()
+    public function getPluginHelperNames()
     {
-        $handler =& $this->_Handler;
+        $handler = $this->_Handler;
         $handler->plugin_helpers = !isset($handler->plugin_helpers) ? 'all' : $handler->plugin_helpers;
 
         $helper_names = AkHelperLoader::addPluginHelper(false); // Trick for getting helper names set by AkPlugin::addHelper
@@ -201,7 +199,7 @@ class AkHelperLoader extends AkObject
      * @param string $helper_name Helper class name like CalendarHelper
      * @param array $options - path: Path to the helper class, defaults to AK_PLUGINS_DIR/helper_name/lib/helper_name.php
      */
-    function addPluginHelper($helper_name, $options = array())
+    public function addPluginHelper($helper_name, $options = array())
     {
         static $helpers = array();
         if($helper_name === false){
@@ -216,4 +214,4 @@ class AkHelperLoader extends AkObject
     }
 }
 
-?>
+

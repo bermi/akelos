@@ -10,29 +10,24 @@
  * @package ActionView
  * @subpackage TemplateEngines
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
-
-defined('AK_DEFAULT_TEMPLATE_ENGINE') ? null : define('AK_DEFAULT_TEMPLATE_ENGINE', 'AkSintags');
-defined('AK_TEMPLATE_SECURITY_CHECK') ? null : define('AK_TEMPLATE_SECURITY_CHECK', true);
-defined('AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER')? null : define('AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER', 'AkPhpCodeSanitizer');
 
 class AkPhpTemplateHandler
 {
-    var $_options = array();
-    var $_AkActionView;
-    var $_templateEngine = AK_DEFAULT_TEMPLATE_ENGINE;
-    var $_codeSanitizerClass = AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER;
+    public $_options = array();
+    public $_AkActionView;
+    public $_templateEngine = AK_DEFAULT_TEMPLATE_ENGINE;
+    public $_codeSanitizerClass = AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER;
 
-    function AkPhpTemplateHandler(&$AkActionView)
+    public function AkPhpTemplateHandler(&$AkActionView)
     {
-        $this->_AkActionView =& $AkActionView;
+        $this->_AkActionView = $AkActionView;
     }
 
-    function render(&$____code, $____local_assigns, $____file_path)
+    public function render(&$____code, $____local_assigns, $____file_path)
     {
         $this->_options['variables'] = $____local_assigns;
-        $this->_options['code'] =& $____code;
+        $this->_options['code'] = $____code;
         $this->_options['functions'] = array('');
         $this->_options['file_path'] = $____file_path;
 
@@ -42,7 +37,7 @@ class AkPhpTemplateHandler
             }
             $____template_engine_name = $this->_templateEngine;
 
-            $TemplateEngine =& new $____template_engine_name();
+            $TemplateEngine = new $____template_engine_name();
 
             $TemplateEngine->init(array(
             'code' => $____code
@@ -53,7 +48,7 @@ class AkPhpTemplateHandler
             if($____code === false){
                 if(AK_PRODUCTION_MODE){
                     trigger_error(join("\n",$TemplateEngine->getErrors()), E_USER_ERROR);
-                    return false;                    
+                    return false;
                 }else{
                     trigger_error("Could not compile ".$this->_options['file_path']."\n\n".join("\n",$TemplateEngine->getErrors()), E_USER_ERROR);
                     echo highlight_string($TemplateEngine->getParsedCode(), true);
@@ -79,7 +74,7 @@ class AkPhpTemplateHandler
     }
 
 
-    function _assertForValidTemplate()
+    public function _assertForValidTemplate()
     {
         static $CodeSanitizer;
         if(empty($CodeSanitizer)){
@@ -93,7 +88,7 @@ class AkPhpTemplateHandler
         return $CodeSanitizer->isCodeSecure();
     }
 
-    function _templateNeedsCompilation()
+    public function _templateNeedsCompilation()
     {
         if(!file_exists($this->_getCompiledTemplatePath())){
             return true;
@@ -107,12 +102,12 @@ class AkPhpTemplateHandler
         return false;
     }
 
-    function _templateNeedsValidation()
+    public function _templateNeedsValidation()
     {
         return true;
     }
 
-    function _getTemplateBasePath()
+    public function _getTemplateBasePath()
     {
         if(empty($this->_options['template_base_path'])){
             $template_file_name = $this->_getTemplateFilename();
@@ -129,18 +124,18 @@ class AkPhpTemplateHandler
     }
 
 
-    function _getTemplatePath()
+    public function _getTemplatePath()
     {
         return $this->_options['file_path'];
     }
 
-    function _getTemplateFilename()
+    public function _getTemplateFilename()
     {
         $this->_options['template_filename'] = empty($this->_options['template_filename']) && preg_match('/[^\/^\\\]+$/',$this->_options['file_path'],$match) ? $match[0] : @$this->_options['template_filename'];
         return $this->_options['template_filename'];
     }
 
-    function _getCompiledTemplateBasePath()
+    public function _getCompiledTemplateBasePath()
     {
         if(empty($this->_options['compiled_template_base_path'])){
             $this->_options['compiled_template_base_path'] = $this->_getTemplateBasePath().DS.'compiled';
@@ -148,7 +143,7 @@ class AkPhpTemplateHandler
         return $this->_options['compiled_template_base_path'];
     }
 
-    function _getCompiledTemplatePath()
+    public function _getCompiledTemplatePath()
     {
         if(empty($this->_options['compiled_file_name'])){
             $template_filename = $this->_getTemplateFilename();
@@ -159,7 +154,7 @@ class AkPhpTemplateHandler
         return $this->_options['compiled_file_name'];
     }
 
-    function _saveCompiledTemplate()
+    public function _saveCompiledTemplate()
     {
         $options = array('base_path' => (AK_COMPILED_VIEWS_DIR ? AK_TMP_DIR : AK_BASE_DIR));
         if(defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP && !strstr($options['base_path'], AK_BASE_DIR)){
@@ -167,17 +162,14 @@ class AkPhpTemplateHandler
         }
         Ak::file_put_contents($this->_getCompiledTemplatePath(), $this->_options['code'], $options);
     }
-    
 
-    function _getHelpersChecksum()
+
+    public function _getHelpersChecksum()
     {
         if(!isset($this->_helpers_checksum)){
-            require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkHelperLoader.php');
-            $this->_helpers_checksum = md5(serialize(AkHelperLoader::getInstantiatedHelperNames()));            
+            $this->_helpers_checksum = md5(serialize(AkHelperLoader::getInstantiatedHelperNames()));
         }
         return $this->_helpers_checksum;
     }
 }
 
-
-?>

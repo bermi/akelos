@@ -71,6 +71,9 @@ defined('AK_APP_VENDOR_DIR')        || define('AK_APP_VENDOR_DIR',AK_APP_DIR.DS.
 defined('AK_APP_PLUGINS_DIR')       || define('AK_APP_PLUGINS_DIR',AK_APP_VENDOR_DIR.DS.'plugins');
 defined('AK_APP_INSTALLERS_DIR')    || define('AK_APP_INSTALLERS_DIR', AK_APP_DIR.DS.'installers');
 
+defined('AK_PLUGINS_DIR')           || define('AK_PLUGINS_DIR', AkConfig::getDir('app').DS.'vendor'.DS.'plugins');
+defined('AK_PLUGINS')               || define('AK_PLUGINS', 'auto');
+
 defined('AK_TMP_DIR')               || define('AK_TMP_DIR', Ak::get_tmp_dir_name());
 defined('AK_COMPILED_VIEWS_DIR')    || define('AK_COMPILED_VIEWS_DIR', AK_TMP_DIR.DS.'views');
 defined('AK_CACHE_DIR')             || define('AK_CACHE_DIR', AK_TMP_DIR.DS.'cache');
@@ -227,6 +230,9 @@ defined('AK_POST_CODE_REGULAR_EXPRESSION')                      || define('AK_PO
 defined('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES') || define('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES' ,true);
 defined('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS')        || define('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS' , 'ActiveRecord');
 
+defined('AK_DEFAULT_TEMPLATE_ENGINE')                           || define('AK_DEFAULT_TEMPLATE_ENGINE', 'AkSintags');
+defined('AK_TEMPLATE_SECURITY_CHECK')                           || define('AK_TEMPLATE_SECURITY_CHECK', true);
+defined('AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER')           || define('AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER', 'AkPhpCodeSanitizer');
 
 @ini_set("arg_separator.output","&");
 @ini_set("include_path",(AK_LIB_DIR.PATH_SEPARATOR.AK_MODELS_DIR.PATH_SEPARATOR.AK_CONTRIB_DIR.DS.'pear'.PATH_SEPARATOR.ini_get("include_path")));

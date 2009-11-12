@@ -1,5 +1,4 @@
 <?php
-require_once(AK_LIB_DIR.DS.'AkUnitTest.php');
 
 class AkTestApplication extends AkUnitTest
 {
@@ -20,22 +19,22 @@ class AkTestApplication extends AkUnitTest
         $this->assertWantedPattern('|^'.$text.'$|', $message);
     }
 
-    public function assertText($text, $message = '%s') 
+    public function assertText($text, $message = '%s')
     {
         return $this->assert(
         new TextExpectation($text),
         strip_tags($this->_response),
         $message);
     }
-    
-    public function assertNoText($text, $message = '%s') 
+
+    public function assertNoText($text, $message = '%s')
     {
         return $this->assert(
         new NoTextExpectation($text),
         strip_tags($this->_response),
         $message);
     }
-    
+
     public function assertHeader($header, $content = null)
     {
         if (is_array($this->_cacheHeaders)) {
@@ -76,7 +75,7 @@ class AkTestApplication extends AkUnitTest
             $this->_response,
             $message);
     }
-    
+
     public function _testXPath($xpath_expression)
     {
         if (!class_exists('DOMDocument') || !class_exists('DOMXPath')) {
@@ -158,7 +157,7 @@ class AkTestApplication extends AkUnitTest
     public function &getController()
     {
         if (isset($this->Dispatcher)) {
-            $controller = &$this->Dispatcher->Controller;
+            $controller = $this->Dispatcher->Controller;
             return $controller;
         } else {
             $false = false;
@@ -261,7 +260,7 @@ class AkTestApplication extends AkUnitTest
                 return true;
             }
         }
-        require_once(AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestDispatcher.php');
+
         $this->Dispatcher = new AkTestDispatcher($controllerVars);
     }
 
@@ -275,7 +274,7 @@ class AkTestApplication extends AkUnitTest
             $res = $this->Dispatcher->get($url, $data);
             $this->_response = ob_get_clean();
         } else {
-            $res=true;
+            $res = true;
         }
         $this->_cleanUp();
         return $res;

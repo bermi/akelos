@@ -1,16 +1,11 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
-
-require_once(AK_LIB_DIR.DS.'AkActionController.php');
-
-defined('AK_SESSION_HANDLER') ? null : define('AK_SESSION_HANDLER', 1);
 
 $testing_object = '';
 for ($i = 65; $i <= 90; $i++){
     $char = chr($i);
-    $testing_object .= "\n    public function $char(){
+    $testing_object .= "\n    public function $char(\$a = null, \$b = null, \$c = null){
         \$this->message .= '$char';
     }";
 }
@@ -25,25 +20,26 @@ $testing_object = "class TestingFiltersUtitlityClass extends AkActionController
 eval($testing_object);
 unset($testing_object);
 
+
 class TestingFiltersUtitlityClassWithFilterMethod extends TestingFiltersUtitlityClass
 {
     public $_char = '';
-    public function TestingFiltersUtitlityClassWithFilterMethod($char = ''){
+    public function __construct($char = ''){
         $this->_char = $char;
     }
-    public function filter($target){
+    public function filter(&$target){
         $target->message = 'filtered:'.$target->message;
     }
-    public function before($target){
+    public function before(&$target){
         $target->message = 'before-'.$this->_char.':'.$target->message;
     }
-    public function after($target){
+    public function after(&$target){
         $target->message = $target->message.':'.$this->_char.'-after';
     }
 }
 
 
-class Test_of_AkActionControllerFilters extends  UnitTestCase
+class AkActionControllerFilters_TestCase extends  AkUnitTest
 {
 
     public function setUp()
@@ -331,11 +327,5 @@ class Test_of_AkActionControllerFilters extends  UnitTestCase
 
 }
 
-if(!defined('ALL_TESTS_CALL')){
-    ob_start();
-    ak_test('Test_of_AkActionControllerFilters');
-    ob_end_flush();
-}
+ak_test_run_case_if_executed('AkActionControllerFilters_TestCase');
 
-
-?>

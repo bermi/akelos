@@ -2,7 +2,7 @@
 
 class AkRequestMimeType extends AkObject
 {
-    public function _lookupMimeType($type = null)
+    static function lookupMimeType($type = null)
     {
         static $mime_types = array(
         'text/html'                => 'html',
@@ -27,12 +27,12 @@ class AkRequestMimeType extends AkObject
         }
     }
 
-    public function getAccepts()
+    static function getAccepts()
     {
         $accept_header = isset($_SERVER['HTTP_ACCEPT'])?$_SERVER['HTTP_ACCEPT']:'';
         $accepts = array();
         foreach (explode(',',$accept_header) as $index=>$acceptable){
-            $mime_struct = AkRequestMimeType::_parseMimeType($acceptable);
+            $mime_struct = AkRequestMimeType::parseMimeType($acceptable);
             if (empty($mime_struct['q'])) $mime_struct['q'] = '1.0';
 
             //we need the original index inside this structure
@@ -41,7 +41,7 @@ class AkRequestMimeType extends AkObject
             $mime_struct['i'] = $index;
             $accepts[] = $mime_struct;
         }
-        usort($accepts,array('AkRequestMimeType','_sortAcceptHeader'));
+        usort($accepts,array('AkRequestMimeType','sortAcceptHeader'));
 
         //we throw away the old index
         foreach ($accepts as $array){
@@ -50,17 +50,17 @@ class AkRequestMimeType extends AkObject
         return $accepts;
     }
 
-    public function getMethod()
+    static function getMethod()
     {
-        return strtolower(isset($_SERVER['REQUEST_METHOD'])?$_SERVER['REQUEST_METHOD']:'get');
+        return strtolower(isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'get');
     }
 
-    public function getFormat($requestPath)
+    static function getFormat($requestPath)
     {
         $method = AkRequestMimeType::getMethod();
-        $format = AkRequestMimeType::_lookupMimeType('default');
+        $format = AkRequestMimeType::lookupMimeType('default');
 
-        if (preg_match('/^([^\.]+)\.([a-zA-z0-9\.]+)$/', $requestPath, $matches)) {
+        if (!empty($format) && preg_match('/^([^\.]+)\.([a-zA-z0-9\.]+)$/', $requestPath, $matches)) {
             $format = isset($matches[2])?strtolower($matches[2]):null;
             $orgformat = $format;
             if ($format == 'htm') {
@@ -68,25 +68,25 @@ class AkRequestMimeType extends AkObject
             }
             $requestPath = preg_replace('/^(.*)\.'.$orgformat.'$/','\1',$requestPath);
         } else if ($method=='get' || $method == 'delete') {
-            $format = AkRequestMimeType::_bestMimeType();
+            $format = AkRequestMimeType::bestMimeType();
         } else if ($method=='post' || $method == 'put') {
-            $format = AkRequestMimeType::_lookupMimeType(AkRequestMimeType::getContentType());
+            $format = AkRequestMimeType::lookupMimeType(AkRequestMimeType::getContentType());
         }
 
         if (empty($format)) {
-            $format = AkRequestMimeType::_lookupMimeType('default');
+            $format = AkRequestMimeType::lookupMimeType('default');
 
         }
         return array($format, $requestPath);
     }
 
-    public function _sortAcceptHeader($a,$b)
+    static function sortAcceptHeader($a, $b)
     {
         //preserve the original order if q is equal
         return $a['q'] == $b['q'] ? ($a['i'] > $b['i']) : ($a['q'] < $b['q']);
     }
 
-    public function _parseMimeType($mime_type)
+    static function parseMimeType($mime_type)
     {
         @list($type,$parameter_string) = explode(';',$mime_type);
         $mime_type_struct = array();
@@ -97,7 +97,7 @@ class AkRequestMimeType extends AkObject
         return $mime_type_struct;
     }
 
-    public function _getMimeType($acceptables)
+    static function getMimeType($acceptables)
     {
         // we group by 'quality'
         $grouped_acceptables = array();
@@ -106,7 +106,7 @@ class AkRequestMimeType extends AkObject
         }
 
         foreach ($grouped_acceptables as $q=>$array_with_acceptables_of_same_quality){
-            foreach (AkRequestMimeType::_lookupMimeType() as $mime_type=>$our_mime_type){
+            foreach (AkRequestMimeType::lookupMimeType() as $mime_type=>$our_mime_type){
                 foreach ($array_with_acceptables_of_same_quality as $acceptable){
                     if ($mime_type == $acceptable){
                         return $our_mime_type;
@@ -114,19 +114,19 @@ class AkRequestMimeType extends AkObject
                 }
             }
         }
-        return AkRequestMimeType::_lookupMimeType('default');
+        return AkRequestMimeType::lookupMimeType('default');
     }
 
-    public function getContentType()
+    static function getContentType()
     {
         if (empty($_SERVER['CONTENT_TYPE'])) return false;
-        $mime_type_struct = AkRequestMimeType::_parseMimeType($_SERVER['CONTENT_TYPE']);
+        $mime_type_struct = AkRequestMimeType::parseMimeType($_SERVER['CONTENT_TYPE']);
         return $mime_type_struct['type'];
     }
 
-    public function _bestMimeType()
+    static function bestMimeType()
     {
-        return AkRequestMimeType::_getMimeType(AkRequestMimeType::getAccepts());
+        return AkRequestMimeType::getMimeType(AkRequestMimeType::getAccepts());
     }
 }
 

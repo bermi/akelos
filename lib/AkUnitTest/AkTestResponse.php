@@ -1,5 +1,5 @@
 <?php
-require_once(AK_LIB_DIR.DS.'AkResponse.php');
+
 class AkTestResponse extends AkResponse
 {
     public function __construct()
@@ -11,10 +11,10 @@ class AkTestResponse extends AkResponse
     {
         /**
          * Fix a problem with IE 6.0 on opening downloaded files:
-         * If Cache-Control: IE removes the file it just downloaded from 
-         * its cache immediately 
-         * after it displays the "open/save" dialog, which means that if you 
-         * hit "open" the file isn't there anymore when the application that 
+         * If Cache-Control: IE removes the file it just downloaded from
+         * its cache immediately
+         * after it displays the "open/save" dialog, which means that if you
+         * hit "open" the file isn't there anymore when the application that
          * is called for handling the download is run, so let's workaround that
          */
         if(isset($this->_headers['Cache-Control']) && $this->_headers['Cache-Control'] == 'no-cache'){
@@ -27,7 +27,7 @@ class AkTestResponse extends AkResponse
         } else {
             $this->_headers['Status'] = $this->_default_status;
         }
-        
+
         if(!empty($this->_headers) && is_array($this->_headers)){
             $this->addHeader('Connection: close');
             foreach ($this->_headers as $k=>$v){
@@ -48,16 +48,16 @@ class AkTestResponse extends AkResponse
                 //header($header);
             }
         }
-        
+
         if(empty($_has_content_type) && defined('AK_CHARSET') && (empty($_redirected) || (!empty($_redirected) && !empty($javascript_redirection)))){
             //header('Content-Type: text/html; charset='.AK_CHARSET);
             $this->_headers_sent[] = 'Content-Type: text/html; charset='.AK_CHARSET;
         }
-        
+
         if(!empty($javascript_redirection)){
             echo $javascript_redirection;
         }
-        
+
         $terminate_if_redirected ? (!empty($_redirected) ? $this->isRedirected(true) : null) : null;
     }
     public function _parseHeaders()
@@ -65,7 +65,7 @@ class AkTestResponse extends AkResponse
         $headers = array();
         foreach($this->_headers_sent as $header) {
             $parts = preg_split('/:\s+/',$header);
-            
+
             $headers[strtolower($parts[0])] = isset($parts[1])?trim($parts[1]):trim($parts[0]);
         }
         return $headers;
@@ -88,12 +88,12 @@ class AkTestResponse extends AkResponse
         }
         return $isRedirected;
     }
-    
+
     public function redirect ($url)
     {
         $this->autoRender = false;
         if(substr(@$this->_headers['Status'],0,3) != '301'){
-            $this->_headers['Status'] = 302;    
+            $this->_headers['Status'] = 302;
         }
         $this->addHeader('Location', $url);
         $this->sendHeaders();
@@ -103,6 +103,6 @@ class AkTestResponse extends AkResponse
 function &AkTestResponse()
 {
     $null = null;
-    $AkResponse =& Ak::singleton('AkTestResponse', $null);
+    $AkResponse = Ak::singleton('AkTestResponse', $null);
     return $AkResponse;
 }

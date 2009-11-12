@@ -390,37 +390,6 @@ class AkFormHelperOptionsInstanceTag extends AkFormHelperInstanceTag
     }
 }
 
-class AkFormOptionsHelperBuilder extends FormOptionsHelper
-{
 
-    public function AkFormOptionsHelperBuilder($object_name, $object, &$template)
-    {
-        $this->object_name = $object_name;
-        $this->object = $object;
-        $this->template =& $template;
-        $this->proccessing = $object_name;
-        $this->template->_remove_object_from_options = true;
-    }
-
-    public function select($column_name, $choices, $options = array(), $html_options = array())
-    {
-        return $this->template->select($this->object_name, $column_name, $choices, array_merge($options, array('object' => $this->object)), $html_options);
-    }
-
-    public function collection_select($column_name, $collection, $value_column_name, $text_column_name, $options = array(), $html_options = array())
-    {
-        return $this->template->collection_select($this->object_name, $column_name, $collection, $value_column_name, $text_column_name, array_merge($options, array('object' => $this->object)), $html_options);
-    }
-
-    public function country_select($column_name, $priority_countries = null, $options = array(), $html_options = array())
-    {
-        return $this->template->country_select($this->object_name, $column_name, $priority_countries, array_merge($options, array('object' => $this->object)), $html_options);
-    }
-
-    public function time_zone_select($column_name, $priority_zones = null, $options = array(), $html_options = array())
-    {
-        return $this->template->time_zone_select($this->object_name, $column_name, $priority_zones, array_merge($options, array('object' => $this->object)), $html_options);
-    }
-}
 
 

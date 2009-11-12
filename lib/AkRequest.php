@@ -692,7 +692,7 @@ class AkRequest extends AkObject
         $accept_header = isset($this->env['HTTP_ACCEPT'])?$this->env['HTTP_ACCEPT']:'';
         $accepts = array();
         foreach (explode(',',$accept_header) as $index=>$acceptable){
-            $mime_struct = $this->_parseMimeType($acceptable);
+            $mime_struct = AkRequestMimeType::parseMimeType($acceptable);
             if (empty($mime_struct['q'])) $mime_struct['q'] = '1.0';
 
             //we need the original index inside this structure
@@ -701,7 +701,7 @@ class AkRequest extends AkObject
             $mime_struct['i'] = $index;
             $accepts[] = $mime_struct;
         }
-        usort($accepts,array(&$this,'_sortAcceptHeader'));
+        usort($accepts, array('AkRequestMimeType','sortAcceptHeader'));
 
         //we throw away the old index
         foreach ($accepts as $array){
@@ -716,14 +716,12 @@ class AkRequest extends AkObject
 
     public function getFormat()
     {
-
-
         if (isset($this->_format)) {
             return $this->_format;
         } else if (isset($this->_request['format'])) {
             $this->_format = $this->_request['format'];
         } else {
-            list($format, $requestPath) = AkRequestMimeType::getFormat(@$this->_request['ak']);
+            list($format, $requestPath) = AkRequestMimeType::getFormat(isset($this->_request['ak']) ? $this->_request['ak'] : null);
 
             $this->_format = $format;
             $this->_request['format'] = $format;
