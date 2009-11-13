@@ -75,6 +75,9 @@ class AkLazyObject
         $class_name = get_class($ClassToExtend);
         if(!array_key_exists($class_name, $this->__extenssionPoints) || !empty($options['force'])){
             $this->__extenssionPoints[$class_name] = $ClassToExtend;
+            if(method_exists($this->__extenssionPoints[$class_name], 'setExtendedBy')){
+                $this->__extenssionPoints[$class_name]->setExtendedBy($this);
+            }
             $this->setExtenssionPointOptions($class_name, $options);
             AkLazyObject::registerExtenssion($class_name);
         }
@@ -107,6 +110,17 @@ class AkLazyObject
         $class_name = get_class($ExtendedClass);
         $this->__extendedPoints[$class_name] = $ExtendedClass;
         AkLazyObject::extenssionRegistry($ExtendedClass, $class_name, true);
+    }
+
+    public function &getInstanceBeingExtended($class_name)
+    {
+        if(isset($this->__extendedPoints[$class_name])){
+            return $this->__extendedPoints[$class_name];
+        }else{
+            $backtrace = debug_backtrace();
+            trigger_error('Warning: '.get_class($this).'::getInstanceBeingExtended could not find any parent instance in '.$backtrace[0]['file'].' on line '.$backtrace[0]['line'] , E_USER_ERROR);
+
+        }
     }
 
     public function &getExtendedClassInstance($extended_class_name)
@@ -145,7 +159,7 @@ class AkLazyObject
             }
         }
 
-        if(method_exists($this->__extenssionPoints[$class_name], 'extendsClass')){
+        if(method_exists($this->__extenssionPoints[$class_name], 'setExtendedBy')){
             $this->__extenssionPoints[$class_name]->setExtendedBy($this);
         }
         if(method_exists($this->__extenssionPoints[$class_name], 'afterExtending')){

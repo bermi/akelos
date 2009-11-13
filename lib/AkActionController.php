@@ -126,7 +126,7 @@ class AkActionController extends AkLazyObject// AkObject
 
     public function __construct()
     {
-        $this->extendClassByName('AkControllerFilter', array('methods_match' => '/(((after|before|perform)Action)|.+Filter.*)/', 'autoload_path' => AK_LIB_DIR.DS.'AkActionController'.DS.'AkControllerFilters.php'));
+        $this->extendClassByName('AkControllerFilter', array('methods_match' => '/(((after|before|perform)Action)|(.+Filter.*))/', 'autoload_path' => AK_LIB_DIR.DS.'AkActionController'.DS.'AkControllerFilters.php'));
     }
 
     /**

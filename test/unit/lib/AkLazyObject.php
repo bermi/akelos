@@ -3,7 +3,7 @@
 require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
 
-class TestClassUsedViaProxyByALazyObject
+class TestClassUsedViaProxyByALazyObject extends AkLazyObject
 {
     public $allowed = 'yes';
     public $not_allowed = 'no';
@@ -176,7 +176,28 @@ class AkLazyObject_TestCase extends  AkUnitTest
 
         $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject(), array('force' => true));
         $this->assertEqual($Lazy->explicit(), 'French');
+        $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
     }
+
+    public function test_should_return_instance_being_extended_by_name()
+    {
+        $Lazy = new TestLazyObject();
+        $Lazy->extendClassByName('TestClassUsedViaProxyByALazyObject');
+        $Proxy = $Lazy->getExtendedClassInstance('TestClassUsedViaProxyByALazyObject');
+        $Proxy->getInstanceBeingExtended('TestLazyObject');
+        $this->assertReference($Proxy->getInstanceBeingExtended('TestLazyObject'), $Lazy);
+        $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
+
+    }
+
+    public function test_should_return_instance_being_extended()
+    {
+        $Lazy = new TestLazyObject();
+        $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject());
+        $Proxy = $Lazy->getExtendedClassInstance('TestClassUsedViaProxyByALazyObject');
+        $this->assertReference($Proxy->getInstanceBeingExtended('TestLazyObject'), $Lazy);
+    }
+
 
 }
 
