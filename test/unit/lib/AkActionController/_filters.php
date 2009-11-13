@@ -139,8 +139,8 @@ class AkActionControllerFilters_TestCase extends  AkUnitTest
     {
         $this->Object->beforeFilter(array('A'=>array('only'=>array('edit','delete'))));
         $this->Object->beforeFilter(array('B'=>array('except'=>array('edit'))));
-        $this->assertEqual($this->Object->includedActions(), array('A'=>array('edit','delete')));
-        $this->assertEqual($this->Object->excludedActions(), array('B'=>array('edit')));
+        $this->assertEqual($this->Object->getFilterIncludedActions(), array('A'=>array('edit','delete')));
+        $this->assertEqual($this->Object->getFilterExcludedActions(), array('B'=>array('edit')));
 
         $this->Object->beforeAction('edit');
         $this->assertEqual($this->Object->message, 'A');
@@ -257,8 +257,8 @@ class AkActionControllerFilters_TestCase extends  AkUnitTest
     {
         $this->Object->afterFilter(array('A'=>array('only'=>array('edit','delete'))));
         $this->Object->afterFilter(array('B'=>array('except'=>array('edit'))));
-        $this->assertEqual($this->Object->includedActions(), array('A'=>array('edit','delete')));
-        $this->assertEqual($this->Object->excludedActions(), array('B'=>array('edit')));
+        $this->assertEqual($this->Object->getFilterIncludedActions(), array('A'=>array('edit','delete')));
+        $this->assertEqual($this->Object->getFilterExcludedActions(), array('B'=>array('edit')));
 
         $this->Object->afterAction('edit');
         $this->assertEqual($this->Object->message, 'A');

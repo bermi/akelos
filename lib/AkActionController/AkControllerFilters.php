@@ -190,7 +190,7 @@
 *       }
 *   }
 */
-class AkActionControllerFilter extends AkLazyObject
+class AkControllerFilter
 {
     protected
     $_includedActions = array(),
@@ -291,7 +291,7 @@ class AkActionControllerFilter extends AkLazyObject
     {
         $filters = func_get_args();
         foreach (array_keys($filters) as $k){
-            $this->_ensureFilterRespondsToBeforeAndAfter($filters[$k]);
+            $this->_ensureRespondsToBeforeAndAfter($filters[$k]);
             $this->appendBeforeFilter(array($filters[$k],'before'));
         }
         $filters = array_reverse($filters);
@@ -314,7 +314,7 @@ class AkActionControllerFilter extends AkLazyObject
     {
         $filters = func_get_args();
         foreach (array_keys($filters) as $k){
-            $this->_ensureFilterRespondsToBeforeAndAfter($filters[$k]);
+            $this->_ensureRespondsToBeforeAndAfter($filters[$k]);
             $this->prependBeforeFilter(array($filters[$k],'before'));
         }
         $filters = array_reverse($filters);
@@ -354,30 +354,6 @@ class AkActionControllerFilter extends AkLazyObject
         $this->_skipFilter($filters, 'after');
     }
 
-    public function _skipFilter(&$filters, $type)
-    {
-        $_filters =& $this->{'_'.$type.'Filters'};
-        // array_diff doesn't play nice with some PHP5 releases when it comes to
-        // Objects as it only diff equal references, not object types
-        foreach (array_keys($filters) as $k){
-            if(AK_PHP5){
-                if(is_object($filters[$k])){
-                    foreach (array_keys($_filters) as $k2){
-                        if(is_object($_filters[$k2]) && get_class($_filters[$k2]) == get_class($filters[$k])){
-                            $pos = $k2;
-                            break;
-                        }
-                    }
-                }else{
-                    $pos = array_search($filters[$k], $_filters);
-                }
-
-                array_splice($_filters, $pos, 1, null);
-                return ;
-            }
-            $_filters = array_diff($_filters,array($filters[$k]));
-        }
-    }
 
     /**
     * Returns all the before filters for this class.
@@ -395,72 +371,6 @@ class AkActionControllerFilter extends AkLazyObject
         return $this->_afterFilters;
     }
 
-    /**
-    * Returns a mapping between filters and the actions that may run them.
-    */
-    public function includedActions()
-    {
-        return $this->_includedActions;
-    }
-
-    /**
-    * Returns a mapping between filters and actions that may not run them.
-    */
-    public function excludedActions()
-    {
-        return $this->_excludedActions;
-    }
-
-
-    public function _appendFilterToChain($condition, $filters)
-    {
-        $this->{"_{$condition}Filters"}[] = $filters;
-    }
-
-    public function _prependFilterToChain($condition, $filters)
-    {
-        array_unshift($this->{"_{$condition}Filters"}, $filters);
-    }
-
-    public function _ensureFilterRespondsToBeforeAndAfter(&$filter_object)
-    {
-        if(!method_exists($filter_object, 'before') && !method_exists($filter_object, 'after')){
-            trigger_error(Ak::t('Filter object must respond to both before and after'), E_USER_ERROR);
-        }
-    }
-
-    public function _extractConditions(&$filters)
-    {
-        if(is_array($filters) && !isset($filters[0])){
-            $keys = array_keys($filters);
-            $conditions = $filters[$keys[0]];
-            $filters = $keys[0];
-            return $conditions;
-        }
-    }
-
-    public function _addActionConditions($filters, $conditions)
-    {
-        if(!empty($conditions['only'])){
-            $this->_includedActions[$this->_filterId($filters)] =  $this->_conditionArray($this->_includedActions, $conditions['only']);
-        }
-        if(!empty($conditions['except'])){
-            $this->_excludedActions[$this->_filterId($filters)] =  $this->_conditionArray($this->_excludedActions, $conditions['except']);
-        }
-    }
-
-    public function _conditionArray($actions, $filter_actions)
-    {
-        $filter_actions = is_array($filter_actions) ? $filter_actions : array($filter_actions);
-        $filter_actions = array_map(array($this,'_filterId'),$filter_actions);
-        return array_unique(array_merge($actions, $filter_actions));
-    }
-
-
-    public function _filterId($filters)
-    {
-        return is_string($filters) ? $filters : md5(serialize($filters));
-    }
 
     public function performActionWithoutFilters($action)
     {
@@ -504,6 +414,99 @@ class AkActionControllerFilter extends AkLazyObject
     public function afterAction($method = '')
     {
         return $this->_callFilters($this->_afterFilters, $method);
+    }
+
+
+    /**
+    * Returns a mapping between filters and the actions that may run them.
+    */
+    public function getFilterIncludedActions()
+    {
+        return $this->_includedActions;
+    }
+
+    /**
+    * Returns a mapping between filters and actions that may not run them.
+    */
+    public function getFilterExcludedActions()
+    {
+        return $this->_excludedActions;
+    }
+
+    private function _skipFilter(&$filters, $type)
+    {
+        $_filters =& $this->{'_'.$type.'Filters'};
+        // array_diff doesn't play nice with some PHP5 releases when it comes to
+        // Objects as it only diff equal references, not object types
+        foreach (array_keys($filters) as $k){
+            if(AK_PHP5){
+                if(is_object($filters[$k])){
+                    foreach (array_keys($_filters) as $k2){
+                        if(is_object($_filters[$k2]) && get_class($_filters[$k2]) == get_class($filters[$k])){
+                            $pos = $k2;
+                            break;
+                        }
+                    }
+                }else{
+                    $pos = array_search($filters[$k], $_filters);
+                }
+
+                array_splice($_filters, $pos, 1, null);
+                return ;
+            }
+            $_filters = array_diff($_filters,array($filters[$k]));
+        }
+    }
+
+
+    private function _appendFilterToChain($condition, $filters)
+    {
+        $this->{"_{$condition}Filters"}[] = $filters;
+    }
+
+    private function _prependFilterToChain($condition, $filters)
+    {
+        array_unshift($this->{"_{$condition}Filters"}, $filters);
+    }
+
+    private function _ensureRespondsToBeforeAndAfter(&$filter_object)
+    {
+        if(!method_exists($filter_object, 'before') && !method_exists($filter_object, 'after')){
+            trigger_error(Ak::t('Filter object must respond to both before and after'), E_USER_ERROR);
+        }
+    }
+
+    private function _extractConditions(&$filters)
+    {
+        if(is_array($filters) && !isset($filters[0])){
+            $keys = array_keys($filters);
+            $conditions = $filters[$keys[0]];
+            $filters = $keys[0];
+            return $conditions;
+        }
+    }
+
+    private function _addActionConditions($filters, $conditions)
+    {
+        if(!empty($conditions['only'])){
+            $this->_includedActions[$this->_filterId($filters)] =  $this->_conditionArray($this->_includedActions, $conditions['only']);
+        }
+        if(!empty($conditions['except'])){
+            $this->_excludedActions[$this->_filterId($filters)] =  $this->_conditionArray($this->_excludedActions, $conditions['except']);
+        }
+    }
+
+    public function _conditionArray($actions, $filter_actions)
+    {
+        $filter_actions = is_array($filter_actions) ? $filter_actions : array($filter_actions);
+        $filter_actions = array_map(array($this,'_filterId'),$filter_actions);
+        return array_unique(array_merge($actions, $filter_actions));
+    }
+
+
+    static function _filterId($filters)
+    {
+        return is_string($filters) ? $filters : md5(serialize($filters));
     }
 
 

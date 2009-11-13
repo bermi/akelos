@@ -2251,6 +2251,7 @@ class Ak
                 'AkCache'                   =>  AK_LIB_DIR.DS.'AkCache.php',
                 'AkCacheSweeper'            =>  AK_LIB_DIR.DS.'AkActionController'.DS.'AkCacheSweeper.php',
                 'AkClassExtender'           =>  AK_LIB_DIR.DS.'AkClassExtender.php',
+                'AkControllerFilter'        =>  AK_LIB_DIR.DS.'AkActionController'.DS.'AkControllerFilter.php',
                 'AkConfig'                  =>  AK_LIB_DIR.DS.'AkConfig.php',
                 'AkDate'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkDate.php',
                 'AkDispatcher'              =>  AK_LIB_DIR.DS.'AkDispatcher.php',

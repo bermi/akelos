@@ -14,7 +14,7 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-class AkActionController extends AkObject
+class AkActionController extends AkLazyObject// AkObject
 {
     public $_high_load_mode = AK_HIGH_LOAD_MODE;
     public $_enable_plugins = true;
@@ -126,7 +126,7 @@ class AkActionController extends AkObject
 
     public function __construct()
     {
-        $Lazy->extendClassByName('TestClassUsedViaProxyByALazyObject', array('methods_match' => '/find.+/'));
+        $this->extendClassByName('AkControllerFilter', array('methods_match' => '/(((after|before|perform)Action)|.+Filter.*)/', 'autoload_path' => AK_LIB_DIR.DS.'AkActionController'.DS.'AkControllerFilters.php'));
     }
 
     /**

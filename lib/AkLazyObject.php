@@ -95,6 +95,11 @@ class AkLazyObject
     public function setExtenssionPointOptions($extenssion_point, $options = array())
     {
         $this->__extenssionPointOptions[$extenssion_point] = $options;
+
+        if(isset($options['autoload_path'])){
+            Ak::autoload($extenssion_point, $options['autoload_path']);
+        }
+
     }
 
     public function setExtendedBy(&$ExtendedClass)
