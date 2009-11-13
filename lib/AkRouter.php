@@ -8,7 +8,7 @@
 
 /**
  * Native PHP URL rewriting for the Akelos Framework.
- * 
+ *
  * @package ActionController
  * @subpackage Request
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
@@ -56,7 +56,7 @@ class AkRouter extends AkObject
     {
         /**
         * We will try to guess if mod_rewrite is enabled.
-        * Set AK_ENABLE_URL_REWRITE in your config 
+        * Set AK_ENABLE_URL_REWRITE in your config
         * to avoid the overhead this function causes
         */
         if(!defined('AK_ENABLE_URL_REWRITE') || (defined('AK_ENABLE_URL_REWRITE') && AK_ENABLE_URL_REWRITE !== false)){
@@ -162,32 +162,32 @@ class AkRouter extends AkObject
                 if(isset($_route['options'])){
                     foreach ($_route['options'] as $_option=>$_value){
                         if(
-                            !empty($_route['url_pieces']) &&
-                            isset($_route['options'][$_option]) &&
-                            array_search(':'.$_option, $_route['url_pieces']) === false &&
-                            array_search('*'.$_option, $_route['url_pieces']) === false &&
-                            (
-                                is_string($_value) ||
-                                is_integer($_value)
-                            ) && (
-                                !isset($params_copy[$_option]
-                            ) ||
-                                $params_copy[$_option] != $_value
-                            )
+                        !empty($_route['url_pieces']) &&
+                        isset($_route['options'][$_option]) &&
+                        array_search(':'.$_option, $_route['url_pieces']) === false &&
+                        array_search('*'.$_option, $_route['url_pieces']) === false &&
+                        (
+                        is_string($_value) ||
+                        is_integer($_value)
+                        ) && (
+                        !isset($params_copy[$_option]
+                        ) ||
+                        $params_copy[$_option] != $_value
+                        )
                         ){
                             continue 2;
                         }
                         if(
-                            isset($params_copy[$_option]) &&
-                            $_value == $params_copy[$_option] &&
-                            $_value !== OPTIONAL &&
-                            $_value !== COMPULSORY){
-                                
-                                if($_option == 'controller'){
-                                    $_controller = $_value;
-                                }
-                                unset($params_copy[$_option]);
-                                unset($$_option);
+                        isset($params_copy[$_option]) &&
+                        $_value == $params_copy[$_option] &&
+                        $_value !== OPTIONAL &&
+                        $_value !== COMPULSORY){
+
+                            if($_option == 'controller'){
+                                $_controller = $_value;
+                            }
+                            unset($params_copy[$_option]);
+                            unset($$_option);
                         }
                     }
                 }
@@ -231,8 +231,8 @@ class AkRouter extends AkObject
                         }
 
                         if( isset($_parsed_arr['controller']) &&
-                            ((isset($controller) && $_parsed_arr['controller'] == $controller) ||
-                            (isset($_controller) && $_parsed_arr['controller'] == $_controller))){
+                        ((isset($controller) && $_parsed_arr['controller'] == $controller) ||
+                        (isset($_controller) && $_parsed_arr['controller'] == $_controller))){
 
 
                             if( isset($_route['options']['controller']) &&
@@ -590,7 +590,7 @@ class AkRouter extends AkObject
 
     /**
     * Alias for map
-    * 
+    *
     * @see map
     */
     public function map($url_pattern, $options = array(), $requirements = null)
@@ -631,7 +631,7 @@ class AkRouter extends AkObject
     /**
     * This method tries to determine if url rewrite is enabled on this server.
     * It has only been tested on apache.
-    * It is strongly recomended that you manually define the constant 
+    * It is strongly recomended that you manually define the constant
     * AK_URL_REWRITE_ENABLED on your config file to the avoid overload
     * this function causes and to prevent from missfunctioning
     */
@@ -733,12 +733,15 @@ class AkRouter extends AkObject
         $result = AK_URL_REWRITE_ENABLED;
         return AK_URL_REWRITE_ENABLED;
     }
+
+    public function mapRules($rules_file = AK_ROUTES_MAPPING_FILE)
+    {
+        if(!@include($rules_file)){
+            $this->connect('/:controller/:action/:id', array('controller' => 'page', 'action' => 'index'));
+            $this->connect('/', array('controller' => 'page', 'action' => 'index'));
+        }
+        // Set this routes for being used via Ak::toUrl
+        Ak::toUrl($this, true);
+    }
 }
 
-
-function &AkRouter()
-{
-    $null = null;
-    $AkRouter = Ak::singleton('AkRouter', $null);
-    return $AkRouter;
-}

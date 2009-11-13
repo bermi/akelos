@@ -760,7 +760,7 @@ class AkRequest extends AkObject
         $controller_path = AK_CONTROLLERS_DIR.DS.$module_path.$controller_file_name;
         include_once(AkConfig::getDir('app').DS.'application_controller.php');
 
-        if(!empty($module_path) && file_exists($module_shared_model)){
+        if(!empty($module_path) && isset($module_shared_model) && file_exists($module_shared_model)){
             include_once($module_shared_model);
         }
 
@@ -795,7 +795,7 @@ class AkRequest extends AkObject
 
         if(isset($_SESSION)){
             $Controller->session =& $_SESSION;
-            $Controller->appendAfterFilter(array(&$this,'_saveRefererIfNotRedirected'));
+            $this->saveRefererIfNotRedirected();
         }
         return $Controller;
 
@@ -806,8 +806,6 @@ class AkRequest extends AkObject
     public function _enableInternationalizationSupport()
     {
         if(AK_AVAILABLE_LOCALES != 'en'){
-            require_once(AK_LIB_DIR.DS.'AkLocaleManager.php');
-
             $LocaleManager = new AkLocaleManager();
             $LocaleManager->init();
             $LocaleManager->initApplicationInternationalization($this);
@@ -815,27 +813,20 @@ class AkRequest extends AkObject
         }
     }
 
-    public function _mapRoutes($Map = null)
+    public function _mapRoutes($Router = null)
     {
-        require_once(AK_LIB_DIR.DS.'AkRouter.php');
-
-        if(AK_ENVIRONMENT != 'setup' && is_file(AK_ROUTES_MAPPING_FILE)){
-            if(empty($Map)){
-                $Map =& AkRouter();
-            }
-            include(AK_ROUTES_MAPPING_FILE);
-            // Set this routes for being used via Ak::toUrl
-            Ak::toUrl($Map,true);
-            $this->checkForRoutedRequests($Map);
+        if(empty($Router)){
+            $Router = new AkRouter();
+            $Router->mapRules();
         }
+        $this->checkForRoutedRequests($Router);
     }
 
     public function _startSession()
     {
         if(AK_AUTOMATIC_SESSION_START){
             if(!isset($_SESSION)){
-                require_once(AK_LIB_DIR.DS.'AkSession.php');
-                $SessionHandler = &AkSession::initHandler();
+                $SessionHandler = AkSession::initHandler();
                 @session_start();
             }
         }
@@ -873,7 +864,7 @@ class AkRequest extends AkObject
         return $referer;
     }
 
-    public function _saveRefererIfNotRedirected()
+    public function saveRefererIfNotRedirected()
     {
         if(isset($_SESSION) && !$this->isAjax()){
             $_SESSION['_ak_referer'] = $this->getRequestUri().$this->getPath();
@@ -882,11 +873,3 @@ class AkRequest extends AkObject
     }
 }
 
-function &AkRequest()
-{
-    $null = null;
-    $AkRequest =& Ak::singleton('AkRequest', $null);
-    return $AkRequest;
-}
-
-?>

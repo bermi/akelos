@@ -15,14 +15,15 @@
  * internationalization options, edit the files at config/environments/*
  */
 
-defined('AK_PHP5')                      || define('AK_PHP5', version_compare(PHP_VERSION, '5', '>=') == 1 ? true : false);
-defined('AK_PHP53')                     || define('AK_PHP53', version_compare(PHP_VERSION, '5.3', '>=') == 1 ? true : false);
-defined('AK_PHP6')                      || define('AK_PHP6', version_compare(PHP_VERSION, '6', '>=') == 1 ? true : false);
+
+defined('AK_PHP5')                      || define('AK_PHP5',  version_compare(PHP_VERSION, '5',  '>=') == 1 ? true : false);
+defined('AK_PHP53')                     || define('AK_PHP53', version_compare(PHP_VERSION, '5.3','>=') == 1 ? true : false);
+defined('AK_PHP6')                      || define('AK_PHP6',  version_compare(PHP_VERSION, '6',  '>=') == 1 ? true : false);
 
 defined('AK_CONFIG_DIR')                || define('AK_CONFIG_DIR', AK_BASE_DIR.DS.'config');
 
-defined('AK_CACHE_HANDLER_PEAR')        || define('AK_CACHE_HANDLER_PEAR',1);
-defined('AK_CACHE_HANDLER_ADODB')       || define('AK_CACHE_HANDLER_ADODB',2);
+defined('AK_CACHE_HANDLER_PEAR')        || define('AK_CACHE_HANDLER_PEAR',    1);
+defined('AK_CACHE_HANDLER_ADODB')       || define('AK_CACHE_HANDLER_ADODB',   2);
 defined('AK_CACHE_HANDLER_MEMCACHE')    || define('AK_CACHE_HANDLER_MEMCACHE',3);
 
 // If you need to customize the framework default settings or specify internationalization options,
@@ -41,7 +42,7 @@ if (!defined('AK_TEST_DATABASE_ON')) {
 // Please be aware that your charset needs to be UTF-8 in order to edit the locales files
 // auto will enable all the locales at config/locales/ dir
 defined('AK_AVAILABLE_LOCALES')         || define('AK_AVAILABLE_LOCALES', 'auto');
-defined('AK_AVAILABLE_ENVIRONMENTS')    || define('AK_AVAILABLE_ENVIRONMENTS',"setup,testing,development,production,staging");
+defined('AK_AVAILABLE_ENVIRONMENTS')    || define('AK_AVAILABLE_ENVIRONMENTS','setup,testing,development,production,staging');
 // Set these constants in order to allow only these locales on web requests
 // defined('AK_ACTIVE_RECORD_DEFAULT_LOCALES') || define('AK_ACTIVE_RECORD_DEFAULT_LOCALES','en,es');
 // defined('AK_APP_LOCALES') || define('AK_APP_LOCALES','en,es');
@@ -58,18 +59,20 @@ $_SERVER['PHP_SELF'] .'?'.(isset($_SERVER['argv']) ? $_SERVER['argv'][0] : $_SER
 
 defined('AK_DEBUG')                 || define('AK_DEBUG', AK_ENVIRONMENT == 'production' ? 0 : 1);
 
-defined('AK_APP_DIR')               || define('AK_APP_DIR', AK_BASE_DIR.DS.'app');
-defined('AK_APIS_DIR')              || define('AK_APIS_DIR', AK_APP_DIR.DS.'apis');
-defined('AK_MODELS_DIR')            || define('AK_MODELS_DIR', AK_APP_DIR.DS.'models');
-defined('AK_CONTROLLERS_DIR')       || define('AK_CONTROLLERS_DIR', AK_APP_DIR.DS.'controllers');
-defined('AK_VIEWS_DIR')             || define('AK_VIEWS_DIR', AK_APP_DIR.DS.'views');
-defined('AK_HELPERS_DIR')           || define('AK_HELPERS_DIR', AK_APP_DIR.DS.'helpers');
-defined('AK_PUBLIC_DIR')            || define('AK_PUBLIC_DIR', AK_BASE_DIR.DS.'public');
-defined('AK_TEST_DIR')              || define('AK_TEST_DIR', AK_BASE_DIR.DS.'test');
-defined('AK_SCRIPT_DIR')            || define('AK_SCRIPT_DIR',AK_BASE_DIR.DS.'script');
-defined('AK_APP_VENDOR_DIR')        || define('AK_APP_VENDOR_DIR',AK_APP_DIR.DS.'vendor');
-defined('AK_APP_PLUGINS_DIR')       || define('AK_APP_PLUGINS_DIR',AK_APP_VENDOR_DIR.DS.'plugins');
-defined('AK_APP_INSTALLERS_DIR')    || define('AK_APP_INSTALLERS_DIR', AK_APP_DIR.DS.'installers');
+defined('AK_APP_DIR')               || define('AK_APP_DIR',             AK_BASE_DIR.DS.'app');
+defined('AK_PUBLIC_DIR')            || define('AK_PUBLIC_DIR',          AK_BASE_DIR.DS.'public');
+defined('AK_TEST_DIR')              || define('AK_TEST_DIR',            AK_BASE_DIR.DS.'test');
+defined('AK_SCRIPT_DIR')            || define('AK_SCRIPT_DIR',          AK_BASE_DIR.DS.'script');
+
+defined('AK_APIS_DIR')              || define('AK_APIS_DIR',            AK_APP_DIR.DS.'apis');
+defined('AK_MODELS_DIR')            || define('AK_MODELS_DIR',          AK_APP_DIR.DS.'models');
+defined('AK_CONTROLLERS_DIR')       || define('AK_CONTROLLERS_DIR',     AK_APP_DIR.DS.'controllers');
+defined('AK_VIEWS_DIR')             || define('AK_VIEWS_DIR',           AK_APP_DIR.DS.'views');
+defined('AK_HELPERS_DIR')           || define('AK_HELPERS_DIR',         AK_APP_DIR.DS.'helpers');
+defined('AK_APP_VENDOR_DIR')        || define('AK_APP_VENDOR_DIR',      AK_APP_DIR.DS.'vendor');
+
+defined('AK_APP_PLUGINS_DIR')       || define('AK_APP_PLUGINS_DIR',     AK_APP_VENDOR_DIR.DS.'plugins');
+defined('AK_APP_INSTALLERS_DIR')    || define('AK_APP_INSTALLERS_DIR',  AK_APP_DIR.DS.'installers');
 
 defined('AK_PLUGINS_DIR')           || define('AK_PLUGINS_DIR', AkConfig::getDir('app').DS.'vendor'.DS.'plugins');
 defined('AK_PLUGINS')               || define('AK_PLUGINS', 'auto');
@@ -172,8 +175,9 @@ defined('AK_SESSION_EXPIRE')                            || define('AK_SESSION_EX
 defined('AK_SESSION_NAME')                              || define('AK_SESSION_NAME', 'AK_'.substr(md5(AK_HOST.AK_APP_DIR),0,6));
 defined('AK_DESKTOP')                                   || define('AK_DESKTOP', AK_SITE_URL == 'http://akelos');
 defined('AK_ASSET_HOST')                                || define('AK_ASSET_HOST','');
-defined('AK_DEV_MODE')                                  || define('AK_DEV_MODE', AK_ENVIRONMENT == 'development');
-defined('AK_TEST_MODE')                                 || define('AK_TEST_MODE', AK_ENVIRONMENT == 'testing');
+defined('AK_DEV_MODE')                                  || define('AK_DEV_MODE',        AK_ENVIRONMENT == 'development');
+defined('AK_TEST_MODE')                                 || define('AK_TEST_MODE',       AK_ENVIRONMENT == 'testing');
+defined('AK_STAGING_MODE')                              || define('AK_STAGING_MODE',    AK_ENVIRONMENT == 'staging');
 defined('AK_PRODUCTION_MODE')                           || define('AK_PRODUCTION_MODE', AK_ENVIRONMENT == 'production');
 defined('AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES')       || define('AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES', AK_DEV_MODE);
 defined('AK_ENABLE_PROFILER')                           || define('AK_ENABLE_PROFILER', false);
@@ -193,7 +197,6 @@ defined('AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE')    || define('AK_ACTION_CON
 defined('AK_ACTION_CONTROLLER_DEFAULT_ACTION')          || define('AK_ACTION_CONTROLLER_DEFAULT_ACTION', 'index');
 defined('AK_BEEP_ON_ERRORS_WHEN_TESTING')               || define('AK_BEEP_ON_ERRORS_WHEN_TESTING', false);
 defined('AK_FRAMEWORK_LANGUAGE')                        || define('AK_FRAMEWORK_LANGUAGE', 'en');
-defined('AK_DEV_MODE')                                  || define('AK_DEV_MODE', false);
 defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION')          || define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
 defined('AK_VERBOSE_INSTALLER')                         || define('AK_VERBOSE_INSTALLER', AK_DEV_MODE);
 defined('AK_HIGH_LOAD_MODE')                            || define('AK_HIGH_LOAD_MODE', false);
@@ -203,7 +206,6 @@ defined('JAVASCRIPT_DEFAULT_SOURCES')                   || define('JAVASCRIPT_DE
 defined('AK_DATE_HELPER_DEFAULT_PREFIX')                || define('AK_DATE_HELPER_DEFAULT_PREFIX', 'date');
 defined('AK_JAVASCRIPT_PATH')                           || define('AK_JAVASCRIPT_PATH', AK_PUBLIC_DIR.DS.'javascripts');
 defined('AK_DEFAULT_LOCALE_NAMESPACE')                  || define('AK_DEFAULT_LOCALE_NAMESPACE', null);
-
 
 
 // Akelos args is a short way to call functions that is only intended for fast prototyping
@@ -231,12 +233,27 @@ defined('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES') || define('AK_HA
 defined('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS')        || define('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS' , 'ActiveRecord');
 
 defined('AK_DEFAULT_TEMPLATE_ENGINE')                           || define('AK_DEFAULT_TEMPLATE_ENGINE', 'AkSintags');
-defined('AK_TEMPLATE_SECURITY_CHECK')                           || define('AK_TEMPLATE_SECURITY_CHECK', true);
+defined('AK_TEMPLATE_SECURITY_CHECK')                           || define('AK_TEMPLATE_SECURITY_CHECK', false);
 defined('AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER')           || define('AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER', 'AkPhpCodeSanitizer');
 
-@ini_set("arg_separator.output","&");
-@ini_set("include_path",(AK_LIB_DIR.PATH_SEPARATOR.AK_MODELS_DIR.PATH_SEPARATOR.AK_CONTRIB_DIR.DS.'pear'.PATH_SEPARATOR.ini_get("include_path")));
-@ini_set("session.name", AK_SESSION_NAME);
+
+defined('AK_URL_DEBUG_REQUEST')                                 || define('AK_URL_DEBUG_REQUEST', !empty($_GET['debug']));
+defined('AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS')                  || define('AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS', AK_DEBUG && AK_URL_DEBUG_REQUEST);
+defined('AK_FORCE_TEMPLATE_COMPILATION')                        || define('AK_FORCE_TEMPLATE_COMPILATION', AK_DEBUG && !empty($_GET['recompile']));
+
+/**
+ *  Before rev.1232 MySQL on some setups, connections where opened using PHP's default
+ *  encoding latin1 this caused that UTF8 data written by Akelos could not be edited using other DB tools.
+ *
+ *  We can't automatically fix this for older applications as you might need to backup your database and follow the steps at
+ *  http://codesnippets.joyent.com/posts/show/84 before defining AK_SET_UTF8_ON_MYSQL_CONNECT on your configuration file
+ *  to fix this issue
+ */
+defined('AK_SET_UTF8_ON_MYSQL_CONNECT') || define('AK_SET_UTF8_ON_MYSQL_CONNECT', true);
+
 $ADODB_CACHE_DIR = AK_CACHE_DIR;
 
-//AK_CLI || AK_PRODUCTION_MODE || require_once(AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php');
+ini_set('arg_separator.output', '&');
+ini_set('include_path', (AK_LIB_DIR.PATH_SEPARATOR.AK_MODELS_DIR.PATH_SEPARATOR.AK_CONTRIB_DIR.DS.'pear'.PATH_SEPARATOR.ini_get('include_path')));
+ini_set('session.name', AK_SESSION_NAME);
+

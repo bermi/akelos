@@ -24,6 +24,7 @@
 *   {
 *       public function __construct()
 *       {
+*           parent:__construct();
 *           $this->beforeFilter('_audit');
 *       }
 *
@@ -37,6 +38,7 @@
 *   {
 *       public function __construct()
 *       {
+*           parent:__construct();
 *           $this->beforeFilter('_verifyCredentials');
 *       }
 *
@@ -71,6 +73,7 @@
 *   {
 *       public function __construct()
 *       {
+*           parent:__construct();
 *           $this->afterFilter(new OutputCompressionFilter());
 *       }
 *   }
@@ -90,6 +93,7 @@
 *   {
 *       public function __construct()
 *       {
+*           parent:__construct();
 *           $this->beforeFilter('verifyOpenShop');
 *       }
 *   }
@@ -119,6 +123,7 @@
 *   {
 *       public function __construct()
 *       {
+*           parent:__construct();
 *           $this->aroundFilter(new BenchmarkingFilter());
 *       }
 *
@@ -153,6 +158,7 @@
 *   {
 *       public function __construct()
 *       {
+*           parent:__construct();
 *           $this->beforeFilter('authenticate');
 *       }
 *   }
@@ -166,6 +172,7 @@
 *   {
 *       public function __construct()
 *       {
+*           parent:__construct();
 *           $this->skipBeforeFilter('authenticate');
 *       }
 *       // will not run the authenticate filter
@@ -181,6 +188,7 @@
 *   {
 *       public function __construct()
 *       {   // only require authentication if the current action is edit or delete
+*           parent:__construct();
 *           $this->beforeFilter(array('_authorize'=>array('only'=>array('edit','delete')));
 *       }
 *
@@ -200,6 +208,7 @@ class AkControllerFilter
 
     private
     $_FilteredObject;
+
 
     /**
     * The passed <tt>filters</tt> will be appended to the array of filters that's run _before_ actions
@@ -375,18 +384,11 @@ class AkControllerFilter
     }
 
 
-    public function performActionWithoutFilters($action)
-    {
-        if(method_exists($this, $action)){
-            call_user_func_array(array($this, $action), @(array)$this->passed_args);
-        }
-    }
-
     public function performActionWithFilters($method = '')
     {
         if ($this->beforeAction($method) !== false && !empty($this->_FilteredObject) && method_exists($this->_FilteredObject, 'hasPerformed') && !$this->_FilteredObject->hasPerformed()){
             AK_ENABLE_PROFILER &&  Ak::profile("Called $method  before filters");
-            $this->performActionWithoutFilters($method);
+            $this->_FilteredObject->performActionWithoutFilters($method);
             AK_ENABLE_PROFILER &&  Ak::profile("Performed $method  action");
             $this->afterAction($method);
             AK_ENABLE_PROFILER &&  Ak::profile("Called $method  after filters");

@@ -42,8 +42,8 @@ class AkInflector
     static function loadConfig($dictionary)
     {
         static $_loaded = array();
-        if (!($return=Ak::getStaticVar('AkInflectorConfig::'.$dictionary))) {
-            $return = Ak::getSettings($dictionary,false);
+        if (!($return = Ak::getStaticVar('AkInflectorConfig::'.$dictionary))) {
+            $return = Ak::getSettings($dictionary, false);
 
             if ($return !== false) {
                 Ak::setStaticVar('AkInflectorConfig::'.$dictionary,$return);
@@ -124,7 +124,7 @@ class AkInflector
         }
         return $_cached[$dictionary][$type][$_original_word];
     }
-    
+
 
     /**
     * Pluralizes English nouns.

@@ -3,18 +3,13 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActionView
  * @subpackage Helpers
  * @author Jose Salavert <salavert a.t akelos c.om>
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
-
-require_once(AK_VENDOR_DIR.DS.'phputf8'.DS.'utf8.php');
 
 defined('AK_VALID_URL_CHARS_REGEX') ? null : define('AK_VALID_URL_CHARS_REGEX','A-Z-a-z0-9:=?&\/\.\-\\%~#_;,+');
 define('AK_AUTO_LINK_REGEX','/
@@ -74,6 +69,7 @@ class TextHelper extends AkObject
     */
     static function truncate($text, $length = 30, $truncate_string = '...', $break = false)
     {
+        require_once(AK_VENDOR_DIR.DS.'phputf8'.DS.'utf8.php');
         if(utf8_strlen($text) <= $length){
             return $text;
         }
@@ -128,6 +124,7 @@ class TextHelper extends AkObject
 	 */
     static function excerpt($text, $phrase, $radius = 100, $excerpt_string = '...')
     {
+        require_once(AK_VENDOR_DIR.DS.'phputf8'.DS.'utf8.php');
         if(empty($text)){
             return $text;
         }
@@ -585,7 +582,7 @@ class TextHelper extends AkObject
      *   //will handle all flash messages automatically and will close in 5 secconds. NOTE. you need to include javascript dependencies for using interactive options
      *
      */
-    static function flash($message = null, $options = array(), $html_options = array())
+    public function flash($message = null, $options = array(), $html_options = array())
     {
         if(empty($message) && empty($this->_controller->flash)){
             return '';

@@ -87,6 +87,7 @@ class AkActionView extends AkObject
 {
     public
     $first_render,
+    $app_views_dir,
     $base_path,
     $assigns,
     $template_extension,
@@ -105,7 +106,8 @@ class AkActionView extends AkObject
 
     public function __construct($base_path = null, $assigns_for_first_render = array(), $controller = null)
     {
-        $this->base_path = empty($base_path) ? AkConfig::getDir('views') : $base_path;
+        $this->app_views_dir = AkConfig::getDir('views');
+        $this->base_path = empty($base_path) ? $this->app_views_dir : $base_path;
         $this->assigns = $assigns_for_first_render;
         $this->assigns_added = null;
         $this->controller = $controller;
@@ -174,7 +176,7 @@ class AkActionView extends AkObject
             $template_extension = $format.'.'.$template_extension;
         }
 
-        if(AK_DEBUG && AK_CALLED_FROM_LOCALHOST && defined('AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS') && AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS && empty($format)){
+        if(AK_DEBUG && AK_CALLED_FROM_LOCALHOST && AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS && empty($format)){
             $files_name = trim((str_replace(AK_BASE_DIR,'',realpath($template_file_name))), '/');
             return "\n\n<span title='file: $files_name'>".$this->renderTemplate($template_extension, null, $template_file_name, $local_assigns)."\n\n</span>";
         }
@@ -282,13 +284,13 @@ class AkActionView extends AkObject
     public function getFullTemplatePath($template_path, $extension)
     {
         $template_path = substr($template_path,-1*strlen($extension)) == $extension ? $template_path : $template_path.'.'.$extension;
-        return substr($template_path, 0, strlen($this->base_path)) == $this->base_path ? $template_path : $this->base_path.DS.$template_path;
+        $result = substr($template_path, 0, strlen($this->app_views_dir)) == $this->app_views_dir ? $template_path : $this->base_path.DS.$template_path;
+        return substr($template_path, 0, strlen($this->app_views_dir)) == $this->app_views_dir ? $template_path : $this->base_path.DS.$template_path;
     }
 
     public function _templateExists($template_path, $extension)
     {
         $file_path = $this->getFullTemplatePath($template_path, $extension);
-
         return !empty($this->_method_names[$file_path]) || file_exists($file_path);
     }
 

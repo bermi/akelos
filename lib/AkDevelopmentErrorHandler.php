@@ -3,13 +3,9 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2009 Bermi Ferrer                                      |
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @author Bermi Ferrer <bermi at bermilabs com>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  * @package ActiveSupport
  */
 
@@ -91,6 +87,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
                 header('Content-Encoding: none');
             }
         }
+
         while (ob_get_level()) {
             ob_end_clean();
         }
@@ -117,7 +114,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
 
 
         if(isset($_sent_errors[$error_type.$error_message])){
-            
+
             return;
         }else{
             $_sent_errors[$error_type.$error_message] = true;
@@ -126,7 +123,8 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         AK_DEBUG_OUTPUT_AS_HTML ? print('<pre>') : null;
 
         //$result = ": <h3>$error_message</h3> in  $file on line $line\n";
-        $result = "<div style='text-align:left;'><h3 style='padding:5px; background-color:#f00;color:#fff'>($error_type) $error_message</h3>";
+        $result = "<div style='text-align:left;'><h3 style='padding:5px; background-color:#f00;color:#fff;margin-bottom:0px;'>($error_type) $error_message</h3>";
+        $result .= "<p style='padding:5px;background-color:#ffc;color:#666;margin-top:0px;'>in <b>$file</b> on line <b>$line</b></p>";
         //$result .= ak_show_source_line($file, $line);
         //ak_show_app_backtrace();
         if(AK_DEBUG_OUTPUT_AS_HTML){
@@ -225,27 +223,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         }
         $active_line_number=$line_number-1;
 
-        $result = "<html><head><style media='screen'>
-        tr#ak_code_line_$active_line_number{
-        border:1px solid red;
-        background-color:yellow;
-        }
-.ak_code_list {
-float:left;
-color:#000;
-background-color:#fff;
-width:700px;
-text-align:left;
-}
-.ak_line_numbers{
-border-right:1px solid #ccc;
-color:#000;
-background-color:#fff;
-width:30px;
-float:left;
-}
-        </style></head><body>";
-
+        $result = "<html><head><style media='screen'>tr#ak_code_line_$active_line_number{ border:1px solid red;background-color:yellow;} .ak_code_list {float:left;color:#000;background-color:#fff;width:700px;text-align:left;} .ak_line_numbers{border-right:1px solid #ccc;color:#000;background-color:#fff;width:30px;float:left;}</style></head><body>";
         $result .= "<div class='ak_line_numbers'><div>".join('</div><div>', range(1, count($lines)))."</div></div>";
         $result .= '<div class="ak_code_list" onclick="this.select()">';
         foreach ($lines as $i=>$line){
@@ -270,7 +248,7 @@ float:left;
                 if($file == $source_for)
                 $app_files['Models'][$k]['original_path'] = ($file);
             }elseif(strstr($file, AK_COMPILED_VIEWS_DIR)){
-                $app_files['Views'][$k]['path'] = array_shift(explode('.tpl.', str_replace(array(AK_COMPILED_VIEWS_DIR,'/compiled'),'', $file))).'.tpl';
+                $app_files['Views'][$k]['path'] = Ak::first(explode('.tpl.', str_replace(array(AK_COMPILED_VIEWS_DIR,'/compiled'),'', $file))).'.tpl';
                 if($file == $source_for)
                 $app_files['Views'][$k]['original_path'] = ($file);
             }elseif(strstr($file, AK_CONTROLLERS_DIR)){

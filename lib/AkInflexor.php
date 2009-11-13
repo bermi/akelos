@@ -9,17 +9,15 @@
 /**
  * @package ActiveSupport
  * @subpackage Inflector
+ * @author Carles Sadurní Anguita <isard puntnet or.g>
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
- * @deprecated use AkInflector::pluralize('país',null,'es') to use spanish dictionary in (config/inflector/es.yml)
+ * @deprecated use AkInflector::pluralize('país', null,'es') to use spanish dictionary in (config/inflector/es.yml)
  */
-
-require_once(AK_LIB_DIR.DS.'AkInflector.php');
 
 /**
 * Spanish Inflector
 */
-class AkInflexor extends AkInflector 
+class AkInflexor extends AkInflector
 {
 
     public function pluralize($word)
@@ -105,7 +103,6 @@ class AkInflexor extends AkInflector
         '/es$/i'=>'', // ELSE remove _es_  monitores->monitor
         );
 
-
         $uncountable = array('paraguas','tijeras','gafas', 'vacaciones','víveres','lunes','martes','miércoles','jueves','viernes','cumpleaños','virus','atlas','sms');
         $irregular = array(
         'jersey'=>'jerséis',
@@ -154,4 +151,3 @@ class AkInflexor extends AkInflector
     }
 }
 
-?>

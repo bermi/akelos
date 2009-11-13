@@ -16,7 +16,6 @@ class Ak_TestCase extends AkUnitTest
         $this->assertTrue(Ak::file_put_contents($tmp_file2, 'abce'), 'Can\'t write on the temporary file '.$tmp_file2);
         $this->assertTrue(Ak::file_get_contents($tmp_file2) == 'abce', 'Can\'t write on the temporary file '.$tmp_file2);
         $this->assertEqual($tmp_dir, AK_TMP_DIR);
-
     }
 
     public function test_static_var_set_value_null()

@@ -19,7 +19,7 @@ class AkPhpTemplateHandler
     public $_templateEngine = AK_DEFAULT_TEMPLATE_ENGINE;
     public $_codeSanitizerClass = AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER;
 
-    public function AkPhpTemplateHandler(&$AkActionView)
+    public function __construct(&$AkActionView)
     {
         $this->_AkActionView = $AkActionView;
     }
@@ -27,7 +27,7 @@ class AkPhpTemplateHandler
     public function render(&$____code, $____local_assigns, $____file_path)
     {
         $this->_options['variables'] = $____local_assigns;
-        $this->_options['code'] = $____code;
+        $this->_options['code'] =& $____code;
         $this->_options['functions'] = array('');
         $this->_options['file_path'] = $____file_path;
 
@@ -66,7 +66,8 @@ class AkPhpTemplateHandler
         (array)$____local_assigns;
         extract($____local_assigns, EXTR_SKIP);
         ob_start();
-        include($this->_getCompiledTemplatePath());
+
+        include $this->_getCompiledTemplatePath();
 
         !empty($shared) ? $this->_AkActionView->addSharedAttributes($shared) : null;
 
@@ -78,9 +79,6 @@ class AkPhpTemplateHandler
     {
         static $CodeSanitizer;
         if(empty($CodeSanitizer)){
-            if($this->_codeSanitizerClass == 'AkPhpCodeSanitizer'){
-                require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkPhpCodeSanitizer.php');
-            }
             $class = $this->_codeSanitizerClass;
             $CodeSanitizer = new $class();
         }
@@ -90,7 +88,7 @@ class AkPhpTemplateHandler
 
     public function _templateNeedsCompilation()
     {
-        if(!file_exists($this->_getCompiledTemplatePath())){
+        if(!file_exists($this->_getCompiledTemplatePath()) || AK_FORCE_TEMPLATE_COMPILATION){
             return true;
         }
         $tpl_time = @filemtime($this->_getTemplatePath());
@@ -98,7 +96,6 @@ class AkPhpTemplateHandler
         if($tpl_time > $compiled_tpl_time){
             return true;
         }
-
         return false;
     }
 

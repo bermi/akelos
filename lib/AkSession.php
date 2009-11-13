@@ -16,10 +16,6 @@
 if(!defined('AK_SESSION_CLASS_INCLUDED')){ define('AK_SESSION_CLASS_INCLUDED',true); // Class overriding trick
 
 
-require_once(AK_LIB_DIR.DS.'Ak.php');
-require_once(AK_LIB_DIR.DS.'AkObject.php');
-
-
 /**
 * Memcache based session.
 *
@@ -32,8 +28,7 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 *
 * <code>
 *
-* require_once(AK_LIB_DIR.DS.'AkSession.php');
-* $SessionHandler = &AkSession::initHandler();
+* $SessionHandler = AkSession::initHandler();
 *
 * </code>
 *
@@ -45,7 +40,6 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 */
 class AkSession extends AkObject
 {
-
     /**
     * Session driver
     *
@@ -54,25 +48,25 @@ class AkSession extends AkObject
     * @access protected
     * @var object $_driverInstance
     */
-    var $_driverInstance;
+    public $_driverInstance;
 
-    var $sessions_enabled;
+    public $sessions_enabled;
     /**
     * Original session value for avoiding hitting the cache system in case nothing has changed
     *
     * @access private
     * @var string $_db
     */
-    var $_original_sess_value = '';
+    public $_original_sess_value = '';
 
-    function initHandler()
+    static function &initHandler()
     {
         $settings = Ak::getSettings('sessions', false);
-        $SessionHandler = &AkSession::lookupStore($settings);
+        $SessionHandler = AkSession::lookupStore($settings);
         return $SessionHandler;
     }
 
-    function &lookupStore($options = null)
+    static function &lookupStore($options = null)
     {
         static $session_store;
         $false = false;
@@ -98,7 +92,7 @@ class AkSession extends AkObject
         return $false;
     }
 
-    function init($options = array(),$type = null)
+    public function init($options = array(),$type = null)
     {
         $options = is_int($options) ? array('lifeTime'=>$options) : (is_array($options) ? $options : array());
 
@@ -111,13 +105,13 @@ class AkSession extends AkObject
                 break;
             case 2:
                 require_once(AK_LIB_DIR.'/AkCache/AkAdodbCache.php');
-                $this->_driverInstance =& new AkAdodbCache();
+                $this->_driverInstance = new AkAdodbCache();
                 $res = $this->_driverInstance->init($options);
                 $this->sessions_enabled = $res;
                 break;
             case 3:
                 require_once(AK_LIB_DIR.'/AkCache/AkMemcache.php');
-                $this->_driverInstance =& new AkMemcache();
+                $this->_driverInstance = new AkMemcache();
                 $res = $this->_driverInstance->init($options);
                 $this->sessions_enabled = $res;
                 break;
@@ -128,12 +122,12 @@ class AkSession extends AkObject
         if ($this->sessions_enabled) {
              $this->sessionLife = $options['lifeTime'];
              session_set_save_handler (
-             array(&$this, '_open'),
-             array(&$this, '_close'),
-             array(&$this, '_read'),
-             array(&$this, '_write'),
-             array(&$this, '_destroy'),
-             array(&$this, '_gc')
+             array($this, '_open'),
+             array($this, '_close'),
+             array($this, '_read'),
+             array($this, '_write'),
+             array($this, '_destroy'),
+             array($this, '_gc')
              );
 
         }
@@ -149,7 +143,7 @@ class AkSession extends AkObject
     * @return bool Returns true if $this->sessionLife has been set
     * correctly.
     */
-    function setSessionLife($sessionLife)
+    public function setSessionLife($sessionLife)
     {
         $this->sessionLife = $sessionLife;
 
@@ -163,7 +157,7 @@ class AkSession extends AkObject
     * @access protected
     * @return boolean
     */
-    function _open()
+    public function _open()
     {
         return true;
     }
@@ -174,7 +168,7 @@ class AkSession extends AkObject
     * @access protected
     * @return boolean
     */
-    function _close()
+    public function _close()
     {
         /**
         * @todo Get from cached vars last time garbage collection was made to avoid hitting db
@@ -191,7 +185,7 @@ class AkSession extends AkObject
     * @param    string    $id    Session Id
     * @return string
     */
-    function _read($id)
+    public function _read($id)
     {
         $result = $this->_driverInstance->get($id,'AK_SESSIONS');
         return is_null($result) ? '' : (string)$result;
@@ -205,7 +199,7 @@ class AkSession extends AkObject
     * @param    string    $data
     * @return boolean
     */
-    function _write($id, $data)
+    public function _write($id, $data)
     {
         // We don't want to hit the cache handler if nothing has changed
         if($this->_original_sess_value != $data){
@@ -227,7 +221,7 @@ class AkSession extends AkObject
     * @param    string    $id
     * @return boolean
     */
-    function _destroy($id)
+    public function _destroy($id)
     {
         return (bool)$this->_driverInstance->remove($id,'AK_SESSIONS');
     }
@@ -238,7 +232,7 @@ class AkSession extends AkObject
     * @access protected
     * @return boolean
     */
-    function _gc()
+    public function _gc()
     {
         return (bool)$this->_driverInstance->clean('AK_SESSIONS','old');
     }

@@ -325,7 +325,7 @@ class AkCacheHandler extends AkObject
 
         if(empty($available_locales)){
             $available_locales = array();
-            $d = dir(AkConfig::dir('config').DS.'locales');
+            $d = dir(AkConfig::getDir('config').DS.'locales');
             while (false !== ($entry = $d->read())) {
                 if (preg_match('/\\.php$/', $entry)){
                     $locale = str_replace('.php','',$entry);
@@ -963,7 +963,6 @@ EOF;
             if (file_exists($cache)) {
                 return $cache;
             } else {
-
                 return $false;
             }
         } else {

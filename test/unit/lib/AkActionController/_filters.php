@@ -12,6 +12,7 @@ for ($i = 65; $i <= 90; $i++){
 $testing_object = "class TestingFiltersUtitlityClass extends AkActionController
 {
     public \$message = '';
+    public function __construct(){\$this->_enableLazyLoadingExtenssions();}
     public function returnFalse(){return false;}
     $testing_object
 }

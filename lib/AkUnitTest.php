@@ -176,7 +176,7 @@ class AkUnitTest extends UnitTestCase
      * Looks in test/fixtures/app/models for the models and in test/fixtures/app/installers for the appropriate installers.
      * If no class-file for Model is found, it generates a dumb one temporarily.
      * For quick and dirty guys, the table can be generated on the fly. see below.
-     *  
+     *
      * examples:
      * installAndIncludeModels('Article');
      * installAndIncludeModels(array('Article','Comment'=>'id,body'));
@@ -339,7 +339,7 @@ class AkUnitTest extends UnitTestCase
 /**
 * Unit tester for your mailers.
 *
-* This tester will copy your application views from the app/views to test/fixtures/app/views 
+* This tester will copy your application views from the app/views to test/fixtures/app/views
 * unless you implicitly set AkMailerTest::avoid_copying_views to true.
 */
 class AkMailerTest extends AkUnitTest
@@ -354,7 +354,7 @@ class AkWebTestCase extends WebTestCase
 {
     public function assertWantedText($text, $message = '%s')
     {
-        $this->assertWantedPattern('/'.preg_quote($text).'/', $message);
+        $this->assertPattern('/'.preg_quote($text).'/', $message);
     }
 
     /**
@@ -362,7 +362,7 @@ class AkWebTestCase extends WebTestCase
      */
     public function assertTextMatch($text, $message = '%s')
     {
-        $this->assertWantedPattern('/^'.preg_quote($text).'$/', $message);
+        $this->assertPattern('/^'.preg_quote($text).'$/', $message);
     }
 }
 

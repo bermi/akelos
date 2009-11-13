@@ -2,6 +2,9 @@
 
 class AkLazyObject
 {
+    protected
+    $_report_undefined_attributes = true;
+
     private
     $__extenssionPoints = array(),
     $__extenssionPointOptions = array(),
@@ -83,11 +86,11 @@ class AkLazyObject
         }
     }
 
-    public function extendClassByName($extended_class_name, $options = array())
+    public function extendClassLazily($extended_class_name, $options = array())
     {
         if(!is_string($extended_class_name)){
             $backtrace = debug_backtrace();
-            trigger_error('Fatal error: '.get_class($this).'::extendClassByName expects a string, '.gettype($extended_class_name).' given in '.$backtrace[0]['file'].' on line '.$backtrace[0]['line'] , E_USER_ERROR);
+            trigger_error('Fatal error: '.get_class($this).'::extendClassLazily expects a string, '.gettype($extended_class_name).' given in '.$backtrace[0]['file'].' on line '.$backtrace[0]['line'] , E_USER_ERROR);
             return false;
         }
         $this->__extenssionPoints[$extended_class_name] = null;
@@ -118,26 +121,33 @@ class AkLazyObject
         }else{
             $backtrace = debug_backtrace();
             trigger_error('Warning: '.get_class($this).'::getInstanceBeingExtended could not find any parent instance in '.$backtrace[0]['file'].' on line '.$backtrace[0]['line'] , E_USER_ERROR);
-
         }
     }
 
     public function &getExtendedClassInstance($extended_class_name)
     {
         $class_name = !is_string($extended_class_name) ? get_class($extended_class_name) : $extended_class_name;
-        if(array_key_exists($class_name, $this->__extenssionPoints)){
-            if(is_null($this->__extenssionPoints[$class_name])){
-                $this->instantiateExtendedClass($class_name);
-            }
-            if(isset($this->__extenssionPoints[$class_name])){
-                return $this->__extenssionPoints[$class_name];
-            }
+        if(!$this->hasInstantiatedClass($class_name)){
+            $this->instantiateExtendedClass($class_name);
+        }
+        if(isset($this->__extenssionPoints[$class_name])){
+            return $this->__extenssionPoints[$class_name];
         }
         trigger_error('Class '.get_class($this).' has not been extended with '.$extended_class_name, E_USER_ERROR);
     }
 
+    public function hasInstantiatedClass($class_name)
+    {
+        return  array_key_exists($class_name, $this->__extenssionPoints) &&
+        !is_null($this->__extenssionPoints[$class_name]);
+    }
+
     public function &instantiateExtendedClass($class_name)
     {
+        if(!array_key_exists($class_name, $this->__extenssionPoints)){
+            $backtrace = debug_backtrace();
+            trigger_error('Fatal error: '.get_class($this).'::instantiateExtendedClass() cant instantiate '.$class_name.' because it has not been extended yet in '.$backtrace[0]['file'].' on line '.$backtrace[0]['line'], E_USER_ERROR);
+        }
         $this->__extenssionPoints[$class_name] = new $class_name();
 
         if(
@@ -214,8 +224,10 @@ class AkLazyObject
                 return $this->$name;
             }
         }
-        $backtrace = debug_backtrace();
-        trigger_error("Notice: Call to undefined attribute ".get_class($this)."::".$name.' in '.$backtrace[0]['file'].' on line '.$backtrace[0]['line'], E_USER_NOTICE);
+        if($this->_report_undefined_attributes){
+            $backtrace = debug_backtrace();
+            trigger_error("Notice: Call to undefined attribute ".get_class($this)."::".$name.' in '.$backtrace[1]['file'].' on line '.$backtrace[1]['line'], E_USER_NOTICE);
+        }
     }
 
     public function __call($name, $attributes = array())

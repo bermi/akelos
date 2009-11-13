@@ -3,25 +3,12 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActionController
  * @subpackage Dispatcher
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
-  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
- * @deprecated Please use AkDispatcher on your public/index.php instead
  */
-
-
-require_once(AK_LIB_DIR.DS.'Ak.php');
-require_once(AK_LIB_DIR.DS.'AkObject.php');
-require_once(AK_LIB_DIR.DS.'AkActionController.php');
-require_once(AK_LIB_DIR.DS.'AkInflector.php');
-require_once(AK_LIB_DIR.DS.'AkRequest.php');
-require_once(AK_LIB_DIR.DS.'AkResponse.php');
-require_once(AK_LIB_DIR.DS.'AkRouter.php');
 
 
 /**
@@ -30,30 +17,49 @@ require_once(AK_LIB_DIR.DS.'AkRouter.php');
  */
 class AkDispatcher
 {
-    var $Request;
-    var $Response;
-    var $Controller;
+    public $Request;
+    public $Response;
+    public $Controller;
 
-    function dispatch()
+    public function dispatch()
     {
-        AK_ENABLE_PROFILER &&  Ak::profile(__CLASS__.'::'.__FUNCTION__.'() call');
-        $this->Request = AkRequest();
-        $this->Response = AkResponse();
-        $this->Controller = $this->Request->recognize();
-        AK_ENABLE_PROFILER && Ak::profile('Request::recognize() completed');
-        $this->Controller->process($this->Request, $this->Response);
+        if(!$this->dispatchCached()){
+            AK_ENABLE_PROFILER &&  Ak::profile(__CLASS__.'::'.__FUNCTION__.'() call');
+            $this->Request = new AkRequest();
+            $this->Response = new AkResponse();
+            $this->Controller = $this->Request->recognize();
+            AK_ENABLE_PROFILER && Ak::profile('Request::recognize() completed');
+            $this->Controller->process($this->Request, $this->Response);
+        }
     }
 
-
+    public function dispatchCached()
+    {
+        $cache_settings = Ak::getSettings('caching', false);
+        if ($cache_settings['enabled']) {
+            $null = null;
+            $pageCache = new AkCacheHandler();;
+            $pageCache->init($null, $cache_settings);
+            if (isset($_GET['allow_get'])) {
+                $options['include_get_parameters'] = split(',',$_GET['allow_get']);
+            }
+            if (isset($_GET['use_if_modified_since'])) {
+                $options['use_if_modified_since'] = true;
+            }
+            if (($cachedPage = $pageCache->getCachedPage())!==false) {
+                return $cachedPage->render();
+            }
+        }
+        return false;
+    }
     /**
      * @todo Implement a mechanism for enabling multiple requests on the same dispatcher
      * this will allow using Akelos as an Application Server using the
      * approach described at http://blog.milkfarmsoft.com/?p=51
      *
      */
-    function restoreRequest()
+    public function restoreRequest()
     {
     }
 }
 
-?>

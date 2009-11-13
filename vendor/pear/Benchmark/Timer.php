@@ -97,7 +97,7 @@ class Benchmark_Timer extends PEAR {
      * @var    array
      * @access private
      */
-    var $markers = array();
+    public $markers = array();
 
     /**
      * Auto-start and stop timer.
@@ -105,7 +105,7 @@ class Benchmark_Timer extends PEAR {
      * @var    boolean
      * @access private
      */
-    var $auto = FALSE;
+    public $auto = FALSE;
 
     /**
      * Max marker name length for non-html output.
@@ -113,7 +113,7 @@ class Benchmark_Timer extends PEAR {
      * @var    integer
      * @access private
      */
-    var $maxStringLength = 0;
+    public $maxStringLength = 0;
 
     /**
      * Constructor.
@@ -121,14 +121,14 @@ class Benchmark_Timer extends PEAR {
      * @param  boolean $auto
      * @access public
      */
-    function Benchmark_Timer($auto = FALSE) {
+    public function __construct($auto = FALSE) {
         $this->auto = $auto;
 
         if ($this->auto) {
             $this->start();
         }
 
-        $this->PEAR();
+        parent::__construct();
     }
 
     /**
@@ -136,7 +136,7 @@ class Benchmark_Timer extends PEAR {
      *
      * @access private
      */
-    function _Benchmark_Timer() {
+    public function _Benchmark_Timer() {
         if ($this->auto) {
             $this->stop();
             $this->display();
@@ -149,7 +149,7 @@ class Benchmark_Timer extends PEAR {
      * @see    setMarker(), stop()
      * @access public
      */
-    function start() {
+    public function start() {
         $this->setMarker('Start');
     }
 
@@ -159,7 +159,7 @@ class Benchmark_Timer extends PEAR {
      * @see    setMarker(), start()
      * @access public
      */
-    function stop() {
+    public function stop() {
         $this->setMarker('Stop');
     }
 
@@ -170,7 +170,7 @@ class Benchmark_Timer extends PEAR {
      * @see    start(), stop()
      * @access public
      */
-    function setMarker($name) {
+    public function setMarker($name) {
         $this->markers[$name] = $this->_getMicrotime();
         $this->_memory[$name] = memory_get_usage();
         $this->_files[$name] = count(get_included_files());
@@ -184,7 +184,7 @@ class Benchmark_Timer extends PEAR {
      * @return double  $time_elapsed time elapsed between $start and $end
      * @access public
      */
-    function timeElapsed($start = 'Start', $end = 'Stop') {
+    public function timeElapsed($start = 'Start', $end = 'Stop') {
         if ($end == 'Stop' && !isset($this->markers['Stop'])) {
             $this->markers['Stop'] = $this->_getMicrotime();
             $this->_memory['Stop'] = memory_get_usage();
@@ -209,7 +209,7 @@ class Benchmark_Timer extends PEAR {
      * @return array
      * @access public
      */
-    function getProfiling() {
+    public function getProfiling() {
         $i = $total = 0;
         $result = array();
         $temp = reset($this->markers);
@@ -262,7 +262,7 @@ class Benchmark_Timer extends PEAR {
      * @see    getProfiling()
      * @access public
      */
-    function getOutput($showTotal = FALSE)
+    public function getOutput($showTotal = FALSE)
     {
         if (function_exists('version_compare') &&
             version_compare(phpversion(), '4.1', 'ge'))
@@ -368,7 +368,7 @@ class Benchmark_Timer extends PEAR {
      * @see    getOutput()
      * @access public
      */
-    function display($showTotal = FALSE) {
+    public function display($showTotal = FALSE) {
         print $this->getOutput($showTotal);
     }
 
@@ -379,7 +379,7 @@ class Benchmark_Timer extends PEAR {
      * @access private
      * @since  1.3.0
      */
-    function _getMicrotime() {
+    public function _getMicrotime() {
         $microtime = explode(' ', microtime());
         return $microtime[1] . substr($microtime[0], 1);
     }

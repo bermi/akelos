@@ -16,79 +16,79 @@
 
 /**
  * Config Reader
- * 
+ *
  * Provides access to config files stored in:
- * 
+ *
  * AK_APP_DIR/config/*.yml
  *
  * = Structure of a config file
- * 
+ *
  * A config file contains configuration directives for all
  * configured environments (development,testing,production).
- * 
- * A config file can have a default configuration section, which will 
+ *
+ * A config file can have a default configuration section, which will
  * be the base for all other environments. That means if a default configuration
  * directive is not overwritten in an environment, the default directive is active.
- * 
+ *
  * Example:
- * 
+ *
  * <code>
  * default:
  *          log:
  *              file:   /tmp/debug.log
  *              level:  verbose
- * 
+ *
  * development:
  *          log:
  *              file:   /tmp/development.log
- * 
+ *
  * testing:
  *          log:
  *              file:   /tmp/testing.log
- * 
+ *
  * production:
  *          log:
  *              file:   /tmp/production.log
  *              level:  error
  * </code>
- * 
+ *
  * The above example sets a log level of "verbose" as the default.
  * The default log file is in "/tmp/debug.log".
- * 
+ *
  * The environments development and testing overwrite the default log file.
- * 
+ *
  * The production environment overwrites as well the log file and the log level.
- * 
+ *
  * The Log level for development will be "verbose" (inherited from default).
  * The log level for testing will be "verbose" (inherited from default).
  * The log level for production will be "error" (overwritten the default level).
- * 
- * 
+ *
+ *
  * = Accessing configuration files
- * 
+ *
  * The format of the config files is YAML.
  * The convention is that a yaml file in:
- * 
+ *
  * AK_APP_DIR/config/myconfig.yml
- * 
+ *
  * can be accessed via:
- * 
+ *
  *      $config = new AkConfig();
  *      $config->get('myconfig'); // loads myconfig.yml and section "AK_ENVIRONMENT"
- * 
+ *
  * By default the configuration for the environment defined in AK_ENVIRONMENT will be loaded.
- * 
+ *
  * By providing the desired environment in the get call you can change that:
- * 
+ *
  *      $config = new AkConfig();
  *      $config->get('myconfig','production'); // loads myconfig.yml and section production
  *
  * = Config caching
- * 
+ *
  * The AkConfig class caches php representations of the yaml files inside:
- * 
+ *
  *      AK_TMP_DIR/ak_config/cache/$environment/$config.yml
- * 
+ *
  * As soon as the modification time of a yaml-config file changes, the cache is invalidated
  * and will be regenerated.
  */
@@ -136,10 +136,16 @@ class AkConfig
         }
         return $dir_names[$type];
     }
-    
+
     static function setDir($type, $value)
     {
         AkConfig::getDir($type, $value);
+    }
+
+    static function getLocalesReady()
+    {
+        Ak::t('Akelos');
+        AK_ENABLE_PROFILER &&  Ak::profile('Got multilingual ');
     }
 
     static function parseSettingsConstants($settingsStr)
@@ -172,9 +178,8 @@ class AkConfig
 
         unset($config['default']);
         $environments = array_keys($config);
-        $default_environments = array('testing','development','production');
+        $default_environments = Ak::toArray(AK_AVAILABLE_ENVIRONMENTS);
         $environments = array_merge($default_environments, $environments);
-
         foreach($environments as $env) {
             $envConfig = $this->_merge($default, isset($config[$env])?$config[$env]:array());
             $this->writeCache($envConfig,$namespace,$env,$this->_useWriteCache($environment));
@@ -286,15 +291,7 @@ CACHE;
         if(AK_CLI && AK_ENVIRONMENT != 'testing'){
             return false;
         }
-        switch ($environment) {
-            case 'development':
-            case 'testing':
-                return false;
-                break;
-            default:
-                return true;
-
-        }
+        return $environment == 'production' || $environment == 'setup';
     }
 
     protected function _useWriteCache($environment = AK_ENVIRONMENT)
@@ -302,14 +299,7 @@ CACHE;
         if(AK_CLI && AK_ENVIRONMENT != 'testing'){
             return false;
         }
-        switch ($environment) {
-            case 'setup':
-                return false;
-                break;
-            default:
-                return true;
-
-        }
+        return $environment != 'setup';
     }
 
     protected function _checkCacheValidity($namespace,$environment)
@@ -330,8 +320,6 @@ CACHE;
             echo "Error touching file $cacheFilename, check your permissions!\n";
         }
     }
-
-
 
     protected function _generateConfigFileName($namespace)
     {

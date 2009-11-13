@@ -7,4 +7,3 @@ class PageController extends ApplicationController
     }
 }
 
-?>

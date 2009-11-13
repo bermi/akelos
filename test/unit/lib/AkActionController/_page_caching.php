@@ -29,7 +29,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->setIp('212.121.121.121');
         $this->get('http://www.example.com/page_caching/ok');
 
-        $this->assertWantedPattern('/^\s*$/');
+        $this->assertPattern('/^\s*$/');
         $this->assertResponse(200);
         $this->assertTrue($this->_assertPageCached('/page_caching/ok'));
 
@@ -306,7 +306,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
     public function test_expiry_of_locale_based_normalized_url()
     {
         $this->assertTrue(true, 'Need to test that expirePage(array("action"=>"index","controller"=>"page","lang"=>"es")) on expires cache http://mydomain.com/es/page and http://mydomain.com/es/page/index');
-        
+
         $this->get('http://www.example.com/es/page_caching');
         $this->_assertPageCached('/es/page_caching/index.html');
         $this->_assertPageCached('/es/page_caching/index');
@@ -315,22 +315,22 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->_assertPageNotCached('/es/page_caching/');
         $this->_assertPageNotCached('/es/page_caching/index');
         $this->_assertPageNotCached('/es/page_caching/index.html');
-        
+
     }
-    
+
     public function test_cache_skip()
     {
         $this->_flushCache('www.example.com');
         $this->get('http://www.example.com/page_caching/skip',array(),array(),array());
         $this->assertTextMatch('Hello<!--CACHE-SKIP-START-->
-        
+
         You wont see me after the cache is rendered.
-        
+
         <!--CACHE-SKIP-END-->');
         $this->get('http://www.example.com/page_caching/skip',array(),array(),array());
         $this->assertTextMatch('Hello');
     }
-    
+
     public function test_expiry_of_alllocale_based_normalized_urls()
     {
         $this->assertTrue(true, 'Need to test that expirePage(array("action"=>"index","controller"=>"page","lang"=>"*")) on expires cache http://mydomain.com/**/page and http://mydomain.com/**/page/index');
@@ -350,7 +350,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->_assertPageNotCached('/en/page_caching/index');
         $this->_assertPageNotCached('/en/page_caching/index.html');
     }
-    public function test_page_cache_priority_before_action_cache() 
+    public function test_page_cache_priority_before_action_cache()
     {
         $this->assertTrue(true,'Need to test that if actioncache and pagecache are configured, the page cache is getting the priority 1');
         $this->_flushCache('www.example.com');
@@ -381,60 +381,60 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->_assertPageNotCached('/page_caching/index');
         $this->_assertPageNotCached('/page_caching/index.html');
     }
-    
+
     public function test_clean_cache()
     {
         $this->_flushCache('www.example.com');
 
     }
-    
+
     public function test_format_caching()
     {
         $this->_flushCache('www.example.com');
         $this->get('http://www.example.com/page_caching/format');
         $this->assertHeader('Content-Type','text/html');
         $this->assertTextMatch('<h1>hello business</h1>');
-        
+
         $this->_assertPageCached('/page_caching/format');
         $this->_assertPageCached('/page_caching/format.html');
         $this->_assertPageNotCached('/page_caching/format.xml');
         $this->_assertPageNotCached('/page_caching/format.csv');
-        
+
         $this->get('http://www.example.com/page_caching/format');
         $this->assertHeader('Content-Type','text/html');
         $this->assertHeader('X-Cached-By','Akelos');
         $this->assertTextMatch('<h1>hello business</h1>');
-        
+
         $this->get('http://www.example.com/page_caching/format.xml');
         $this->assertHeader('Content-Type','application/xml');
         $this->assertTextMatch('<hello>business</hello>');
-        
+
         $this->_assertPageCached('/page_caching/format');
         $this->_assertPageCached('/page_caching/format.html');
         $this->_assertPageCached('/page_caching/format.xml');
         $this->_assertPageNotCached('/page_caching/format.csv');
-        
+
         $this->get('http://www.example.com/page_caching/format.xml');
         $this->assertHeader('Content-Type','application/xml');
         $this->assertTextMatch('<hello>business</hello>');
         $this->assertHeader('X-Cached-By','Akelos');
-        
+
         $this->get('http://www.example.com/page_caching/format.csv');
         $this->assertHeader('Content-Type','text/csv');
         $this->assertTextMatch('hello,business');
-        
+
         $this->_assertPageCached('/page_caching/format');
         $this->_assertPageCached('/page_caching/format.html');
         $this->_assertPageCached('/page_caching/format.xml');
         $this->_assertPageCached('/page_caching/format.csv');
-        
+
         $this->get('http://www.example.com/page_caching/format.csv');
         $this->assertHeader('Content-Type','text/csv');
         $this->assertTextMatch('hello,business');
         $this->assertHeader('X-Cached-By','Akelos');
 
     }
-    
+
     public function test_format_specific_caching()
     {
         $this->_flushCache('www.example.com');
@@ -442,18 +442,18 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->assertHeader('Content-Type','text/html');
         $this->assertTextMatch('html format');
         $this->_assertPageNotCached('/page_caching/formatspecific.html');
-        
+
         $this->get('http://www.example.com/page_caching/formatspecific.js');
         $this->assertHeader('Content-Type','application/x-javascript');
         $this->assertTextMatch('javascript format');
         $this->_assertPageCached('/page_caching/formatspecific.js');
         $this->_assertPageNotCached('/page_caching/formatspecific.html');
     }
-    
+
     public function test_caching_with_get_parameters()
     {
         $this->_flushCache('www.example.com');
-        
+
         $this->get('http://www.example.com/page_caching/get_parameters',array('version'=>1));
         $this->assertHeader('Content-Type','text/html');
         $this->assertTextMatch('version:1');
@@ -461,7 +461,7 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
         $this->_assertPageCached('/page_caching/get_parameters.html');
         $_GET=array();
         $this->_assertPageNotCached('/page_caching/get_parameters.html');
-        
+
         $this->get('http://www.example.com/page_caching/get_parameters');
         $this->assertHeader('Content-Type','text/html');
         $this->assertTextMatch('version:');
