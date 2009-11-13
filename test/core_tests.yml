@@ -1,4 +1,4 @@
-Active Support: 
+Active Support:
     - Ak
     - AkCache
     - AkConfig
@@ -12,7 +12,8 @@ Active Support:
     - 'AkReflection/*'
     - AkTestApplication
     - AkUnitTest
-Action Controller: 
+    - AkLazyObject
+Action Controller:
     - AkDbSession
     - AkRouter
     - AkSession

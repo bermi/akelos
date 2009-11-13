@@ -3,8 +3,7 @@
 require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
 
-
-class TestClassUsedViaProxyByALazyObject extends AkLazyObject
+class TestClassUsedViaProxyByALazyObject
 {
     public $allowed = 'yes';
     public $not_allowed = 'no';
@@ -23,6 +22,21 @@ class TestClassUsedViaProxyByALazyObject extends AkLazyObject
     {
         return 'French';
     }
+
+    public function _PrivateByConvention()
+    {
+        return '_PrivateByConvention';
+    }
+
+    public function findAll()
+    {
+        return 'findAll';
+    }
+
+    public function findOne()
+    {
+        return 'findOne';
+    }
 }
 
 class TestLazyObject extends AkLazyObject
@@ -39,7 +53,6 @@ class AkLazyObject_TestCase extends  AkUnitTest
         $Lazy->extendClassByName('TestClassUsedViaProxyByALazyObject');
 
         $Proxy = new TestClassUsedViaProxyByALazyObject();
-        $this->assertTrue($Proxy->isExtending($Lazy));
         $this->assertTrue($Lazy->isExtendedBy($Proxy));
     }
 
@@ -47,12 +60,10 @@ class AkLazyObject_TestCase extends  AkUnitTest
     {
         $Lazy = new TestLazyObject();
         $Proxy = new TestClassUsedViaProxyByALazyObject();
-        $this->assertTrue($Proxy->isExtending($Lazy));
         $this->assertTrue($Lazy->isExtendedBy($Proxy));
 
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
 
-        $this->assertFalse($Proxy->isExtending($Lazy));
         $this->assertFalse($Lazy->isExtendedBy($Proxy));
     }
 
@@ -127,6 +138,44 @@ class AkLazyObject_TestCase extends  AkUnitTest
         $this->assertNotEqual($Lazy->private_attribute, 'private');
         $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::_private_attribute.+unit\/lib\/AkLazyObject\.php .+'.(__LINE__+1).'/'));
         $this->assertNotEqual($Lazy->_private_attribute, 'private');
+        $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
+    }
+
+
+    public function test_should_add_methods_by_pattern()
+    {
+        $Lazy = new TestLazyObject();
+        $Lazy->extendClassByName('TestClassUsedViaProxyByALazyObject', array('methods_match' => '/find.+/'));
+
+        $this->expectError(new PatternExpectation('/undefined method TestLazyObject::explicit.+AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $Lazy->explicit();
+
+        $this->assertEqual($Lazy->findAll(), 'findAll');
+        $this->assertEqual($Lazy->findOne(), 'findOne');
+        $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
+    }
+
+
+
+    public function test_should_not_allow_extending_by_class_using_by_name()
+    {
+        $Lazy = new TestLazyObject();
+        $this->expectError(new PatternExpectation('/expects a string, object given.+AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $Lazy->extendClassByName(new TestClassUsedViaProxyByALazyObject());
+    }
+
+    public function test_should_not_register_twice_unless_forced()
+    {
+        $Lazy = new TestLazyObject();
+        $Lazy->extendClassByName('TestClassUsedViaProxyByALazyObject', array('methods_match' => '/find.+/'));
+
+        $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject());
+
+        $this->expectError(new PatternExpectation('/undefined method TestLazyObject::explicit.+AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $Lazy->explicit();
+
+        $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject(), array('force' => true));
+        $this->assertEqual($Lazy->explicit(), 'French');
     }
 
 }

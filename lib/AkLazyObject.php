@@ -73,13 +73,20 @@ class AkLazyObject
     public function extendClass(&$ClassToExtend, $options = array())
     {
         $class_name = get_class($ClassToExtend);
-        $this->__extenssionPoints[$class_name] = $ClassToExtend;
-        $this->setExtenssionPointOptions($class_name, $options);
-        AkLazyObject::registerExtenssion($class_name);
+        if(!array_key_exists($class_name, $this->__extenssionPoints) || !empty($options['force'])){
+            $this->__extenssionPoints[$class_name] = $ClassToExtend;
+            $this->setExtenssionPointOptions($class_name, $options);
+            AkLazyObject::registerExtenssion($class_name);
+        }
     }
 
     public function extendClassByName($extended_class_name, $options = array())
     {
+        if(!is_string($extended_class_name)){
+            $backtrace = debug_backtrace();
+            trigger_error('Fatal error: '.get_class($this).'::extendClassByName expects a string, '.gettype($extended_class_name).' given in '.$backtrace[0]['file'].' on line '.$backtrace[0]['line'] , E_USER_ERROR);
+            return false;
+        }
         $this->__extenssionPoints[$extended_class_name] = null;
         $this->setExtenssionPointOptions($extended_class_name, $options);
         AkLazyObject::registerExtenssion($extended_class_name);
@@ -116,11 +123,11 @@ class AkLazyObject
         $this->__extenssionPoints[$class_name] = new $class_name();
 
         if(
-            (method_exists($this, 'beforeBeingExtended') && !$this->beforeBeingExtended($this->__extenssionPoints[$class_name])) ||
-            (method_exists($this->__extenssionPoints[$class_name], 'beforeExtending') && !$this->__extenssionPoints[$class_name]->beforeExtending($this))
-            ){
-                unset($this->__extenssionPoints[$class_name]);
-                return false;
+        (method_exists($this, 'beforeBeingExtended') && !$this->beforeBeingExtended($this->__extenssionPoints[$class_name])) ||
+        (method_exists($this->__extenssionPoints[$class_name], 'beforeExtending') && !$this->__extenssionPoints[$class_name]->beforeExtending($this))
+        ){
+            unset($this->__extenssionPoints[$class_name]);
+            return false;
         }
 
         if(isset($this->__extenssionPointOptions[$class_name]['init_method'])){
@@ -145,9 +152,22 @@ class AkLazyObject
     public function extenssionImplements($class_name, $method)
     {
         return
-        (!empty($this->__extenssionPointOptions[$class_name]['methods'])) &&
-        in_array($method, $this->__extenssionPointOptions[$class_name]['methods']);
+        ((!empty($this->__extenssionPointOptions[$class_name]['methods'])) && in_array($method, $this->__extenssionPointOptions[$class_name]['methods'])) ||
+        (!empty($this->__extenssionPointOptions[$class_name]['methods_match']) && preg_match($this->__extenssionPointOptions[$class_name]['methods_match'], $method));
     }
+
+    public function canRunExtenssionMethod($extenssion_name, $method)
+    {
+        if(empty($this->__extenssionPoints[$extenssion_name])){
+            return false;
+        }
+        if(((empty($this->__extenssionPointOptions[$extenssion_name]['methods']) && empty($this->__extenssionPointOptions[$extenssion_name]['methods_match'])) ||
+        (!empty($this->__extenssionPointOptions[$extenssion_name]['methods']) || !empty($this->__extenssionPointOptions[$extenssion_name]['methods_match'])) && $this->extenssionImplements($extenssion_name, $method))){
+            return method_exists($this->__extenssionPoints[$extenssion_name], $method);
+        }
+        return false;
+    }
+
 
     public function __get($name)
     {
@@ -195,7 +215,7 @@ class AkLazyObject
                         if(is_null($this->__extenssionPoints[$extenssion_name]) && $this->extenssionImplements($extenssion_name, $name)){
                             $this->instantiateExtendedClass($extenssion_name);
                         }
-                        if(method_exists($this->__extenssionPoints[$extenssion_name], $name)){
+                        if($this->canRunExtenssionMethod($extenssion_name, $name)){
                             return call_user_func_array(array($this->__extenssionPoints[$extenssion_name], $name), $attributes);
                         }
                     }
@@ -205,7 +225,7 @@ class AkLazyObject
                 if(is_null($ExtenssionPoint) && $this->extenssionImplements($extenssion_name, $name)){
                     $ExtenssionPoint = $this->instantiateExtendedClass($extenssion_name);
                 }
-                if(method_exists($ExtenssionPoint, $name)){
+                if($this->canRunExtenssionMethod($extenssion_name, $name)){
                     $handlers[$name] = $extenssion_name;
                     return call_user_func_array(array($ExtenssionPoint, $name), $attributes);
                 }

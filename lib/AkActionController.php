@@ -123,6 +123,12 @@ class AkActionController extends AkObject
 
     public $_request_id = -1;
 
+
+    public function __construct()
+    {
+        $Lazy->extendClassByName('TestClassUsedViaProxyByALazyObject', array('methods_match' => '/find.+/'));
+    }
+
     /**
      * Old fashioned way of dispatching requests. Please use AkDispatcher or roll your own.
      *
