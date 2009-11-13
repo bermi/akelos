@@ -2230,6 +2230,7 @@ class Ak
 
     static function autoload($name, $path = null)
     {
+
         static $paths = array();
 
         if(empty($paths)){
@@ -2312,8 +2313,9 @@ class Ak
                 'XmlHelper'                 =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'xml_helper.php',
             );
 
-        }elseif (!empty($path)){
+        }elseif (!empty($path) && !empty($paths)){
             $paths[$name] = $path;
+            return ;
         }
 
         if(isset($paths[$name])){

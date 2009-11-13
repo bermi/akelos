@@ -126,7 +126,17 @@ class AkActionController extends AkLazyObject// AkObject
 
     public function __construct()
     {
-        $this->extendClassByName('AkControllerFilter', array('methods_match' => '/(((after|before|perform)Action)|(.+Filter.*))/', 'autoload_path' => AK_LIB_DIR.DS.'AkActionController'.DS.'AkControllerFilters.php'));
+        $this->extendClassByName('AkControllerFilter',
+        array(
+        'init_method' => 'setObjectBeenFiltered',
+        'methods_match' => '/(((after|before|perform)Action)|(.+Filter.*))/',
+        'autoload_path' => AK_LIB_DIR.DS.'AkActionController'.DS.'AkControllerFilters.php'
+        ));
+    }
+
+    public function __destruct()
+    {
+        $this->unregisterExtenssion('AkControllerFilter');
     }
 
     /**
@@ -298,7 +308,7 @@ class AkActionController extends AkLazyObject// AkObject
             $handled = array();
         }
         if (!isset($handled[$this->_request_id])) {
-            if (!$this->_hasPerformed()){
+            if (!$this->hasPerformed()){
                 $this->_enableLayoutOnRender ? $this->renderWithLayout() : $this->renderWithoutLayout();
             }
             if (!isset($this->Response->_headers['Content-Type'])) {
@@ -601,7 +611,7 @@ class AkActionController extends AkLazyObject// AkObject
     */
     public function render($options = null, $status = 200)
     {
-        if(empty($options['inline']) && empty($options['partial']) && $this->_hasPerformed()){
+        if(empty($options['inline']) && empty($options['partial']) && $this->hasPerformed()){
             $this->_doubleRenderError(Ak::t("Can only render or redirect once per action"));
             return false;
         }
@@ -822,7 +832,7 @@ class AkActionController extends AkLazyObject// AkObject
     {
         if(is_string($options)) {
             if(preg_match('/^\w+:\/\/.*/',$options)){
-                if($this->_hasPerformed()){
+                if($this->hasPerformed()){
                     $this->_doubleRenderError();
                 }
                 AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message('Redirected to '.$options) : null;
@@ -1065,15 +1075,14 @@ class AkActionController extends AkLazyObject// AkObject
         return $this->Request->getAction();
     }
 
+    public function hasPerformed()
+    {
+        return !empty($this->performed_render) || !empty($this->performed_redirect);
+    }
 
     public function _doubleRenderError($message = null)
     {
         trigger_error(!empty($message) ? $message : Ak::t("Render and/or redirect were called multiple times in this action. Please note that you may only call render OR redirect, and only once per action. Also note that neither redirect nor render terminate execution of the action, so if you want to exit an action after redirecting, you need to do something like \"redirectTo(...); return;\". Finally, note that to cause a before filter to halt execution of the rest of the filter chain, the filter must return false, explicitly, so \"render(...); return; false\"."),E_USER_ERROR);
-    }
-
-    public function _hasPerformed()
-    {
-        return !empty($this->performed_render) || !empty($this->performed_redirect);
     }
 
     public function _getRequestOrigin()

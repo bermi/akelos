@@ -22,7 +22,7 @@ class AkLazyObject
             return ;
         }
         if($register === false){
-            $_extenssion_registry[$extended_name] = array_diff($_extenssion_registry[$extended_name], array($proxied_name));
+            $_extenssion_registry[$extended_name] = array_diff($_extenssion_registry, array($proxied_name));
             return ;
         }
         if($proxied_name === false){ // unregisterExtenssion
@@ -102,7 +102,6 @@ class AkLazyObject
         if(isset($options['autoload_path'])){
             Ak::autoload($extenssion_point, $options['autoload_path']);
         }
-
     }
 
     public function setExtendedBy(&$ExtendedClass)

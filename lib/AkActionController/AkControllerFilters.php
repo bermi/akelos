@@ -198,6 +198,9 @@ class AkControllerFilter
     $_afterFilters = array(),
     $_excludedActions = array();
 
+    private
+    $_FilteredObject;
+
     /**
     * The passed <tt>filters</tt> will be appended to the array of filters that's run _before_ actions
     * on this controller are performed.
@@ -381,7 +384,7 @@ class AkControllerFilter
 
     public function performActionWithFilters($method = '')
     {
-        if ($this->beforeAction($method) !== false && !$this->_hasPerformed()){
+        if ($this->beforeAction($method) !== false && !empty($this->_FilteredObject) && method_exists($this->_FilteredObject, 'hasPerformed') && !$this->_FilteredObject->hasPerformed()){
             AK_ENABLE_PROFILER &&  Ak::profile("Called $method  before filters");
             $this->performActionWithoutFilters($method);
             AK_ENABLE_PROFILER &&  Ak::profile("Performed $method  action");
@@ -517,11 +520,11 @@ class AkControllerFilter
             $filter =& $filters[$k];
             if(!$this->_actionIsExempted($filter, $method)){
                 if(is_array($filter) && is_object($filter[0]) && method_exists($filter[0], $filter[1])){
-                    $filter_result = $filter[0]->$filter[1]($this);
-                }elseif(!is_object($filter) && method_exists($this, $filter)){
-                    $filter_result = $this->$filter($this);
+                    $filter_result = $filter[0]->$filter[1]($this->_FilteredObject);
+                }elseif(!is_object($filter) && $this->_FilteredObject && method_exists($this->_FilteredObject, $filter)){
+                    $filter_result = $this->_FilteredObject->$filter($this->_FilteredObject);
                 }elseif(is_object($filter) && method_exists($filter, 'filter')){
-                    $filter_result = $filter->filter($this);
+                    $filter_result = $filter->filter($this->_FilteredObject);
                 }else{
                     trigger_error(Ak::t('Invalid filter %filter. Filters need to be a method name or a class implementing a static filter method', array('%filter'=>$filter)), E_USER_WARNING);
                 }
@@ -533,6 +536,12 @@ class AkControllerFilter
             }
         }
         return $filter_result;
+    }
+
+
+    public function setObjectBeenFiltered(&$FilteredObject)
+    {
+        $this->_FilteredObject = $FilteredObject;
     }
 
 

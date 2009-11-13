@@ -11,7 +11,7 @@ for ($i = 65; $i <= 90; $i++){
 }
 $testing_object = "class TestingFiltersUtitlityClass extends AkActionController
 {
-    var \$message = '';
+    public \$message = '';
     public function returnFalse(){return false;}
     $testing_object
 }
@@ -59,7 +59,7 @@ class AkActionControllerFilters_TestCase extends  AkUnitTest
         $this->Object->beforeFilter('C');
 
         $this->Object->beforeAction();
-                return ;
+
         $this->assertEqual($this->Object->message, 'ABC');
 
         $this->Object->message = '';
@@ -68,7 +68,7 @@ class AkActionControllerFilters_TestCase extends  AkUnitTest
         $this->Object->beforeAction();
         $this->assertEqual($this->Object->message, 'ABC');
     }
-/*
+
     public function test_of_before_filter_mixed_filter_types()
     {
         $this->Object->beforeFilter('A');
@@ -90,6 +90,7 @@ class AkActionControllerFilters_TestCase extends  AkUnitTest
         $this->Object->beforeFilter('A');
         $this->Object->beforeFilter('B');
         $this->Object->beforeFilter(new TestingFiltersUtitlityClassWithFilterMethod());
+
         $this->Object->beforeAction();
         $this->assertEqual($this->Object->message, 'filtered:AB');
     }
@@ -135,7 +136,6 @@ class AkActionControllerFilters_TestCase extends  AkUnitTest
 
     }
 
-
     public function test_of_before_filter_with_conditions()
     {
         $this->Object->beforeFilter(array('A'=>array('only'=>array('edit','delete'))));
@@ -155,7 +155,6 @@ class AkActionControllerFilters_TestCase extends  AkUnitTest
         $this->assertEqual($this->Object->message, 'B');
     }
 
-
     public function test_of_before_filter_with_conditions_skiping_filters()
     {
         $this->Object->beforeFilter('A');
@@ -170,8 +169,6 @@ class AkActionControllerFilters_TestCase extends  AkUnitTest
         $this->Object->beforeAction(new TestingFiltersUtitlityClassWithFilterMethod());
         $this->assertEqual($this->Object->message, 'filtered:AB');
     }
-
-
 
     public function test_of_after_filter()
     {
@@ -253,7 +250,6 @@ class AkActionControllerFilters_TestCase extends  AkUnitTest
 
     }
 
-
     public function test_of_after_filter_with_conditions()
     {
         $this->Object->afterFilter(array('A'=>array('only'=>array('edit','delete'))));
@@ -275,7 +271,6 @@ class AkActionControllerFilters_TestCase extends  AkUnitTest
 
     }
 
-
     public function test_of_after_filter_with_conditions_skiping_filters()
     {
         $this->Object->afterFilter('A');
@@ -290,7 +285,6 @@ class AkActionControllerFilters_TestCase extends  AkUnitTest
         $this->Object->afterAction(new TestingFiltersUtitlityClassWithFilterMethod());
         $this->assertEqual($this->Object->message, 'filtered:AB');
     }
-
 
     public function test_of_around_filters()
     {
@@ -325,7 +319,6 @@ class AkActionControllerFilters_TestCase extends  AkUnitTest
         $this->Object->performAction();
         $this->assertEqual($this->Object->message, 'before-A:before-B:X:B-after:A-afterZ');
     }
-*/
 }
 
 ak_test_run_case_if_executed('AkActionControllerFilters_TestCase');

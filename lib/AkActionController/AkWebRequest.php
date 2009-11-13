@@ -28,11 +28,11 @@ class AkWebRequest extends AkActionController
 {
     var $__ParentController;
     var $AppController;
-    
+
     function init(&$ParentController)
     {
         $this->__ParentController =& $ParentController;
-        
+
         $this->__ParentController->_ssl_requirement ? $this->__ParentController->beforeFilter('_ensureProperProtocol') : false;
 
         if($this->__ParentController->_autoIncludePaginator){
@@ -51,17 +51,17 @@ class AkWebRequest extends AkActionController
         }
 
         $this->__ParentController->__mapRoutes();
-        
+
     }
 
-    
+
     function handle()
     {
         $this->__ParentController->params = $this->__ParentController->Request->getParams();
-        
+
         $this->_file_name = AkInflector::underscore($this->__ParentController->params['controller']).'_controller.php';
         $this->_class_name = AkInflector::camelize($this->__ParentController->params['controller']).'Controller';
-        
+
         $this->_includeController();
 
         Ak::t('Akelos'); // We need to get locales ready
@@ -80,7 +80,7 @@ class AkWebRequest extends AkActionController
             }
         }
 
-        empty($this->__ParentController->params) ? 
+        empty($this->__ParentController->params) ?
         ($this->__ParentController->params = $this->__ParentController->Request->getParams()) : null;
 
         $action_name = $this->_getActionName();
@@ -95,14 +95,14 @@ class AkWebRequest extends AkActionController
 
     }
 
-    
+
     function _before(&$Controller)
     {
         empty($Controller->model) ? ($Controller->model = $Controller->params['controller']) : null;
         empty($Controller->models) ? ($Controller->models = array()) : null;
         empty($Controller->_assigns) ? ($Controller->_assigns = array()) : null;
         empty($Controller->_default_render_status_code) ? ($Controller->_default_render_status_code = 200) : null;
-        $Controller->_enableLayoutOnRender = 
+        $Controller->_enableLayoutOnRender =
             !isset($Controller->_enableLayoutOnRender) ? true : $Controller->_enableLayoutOnRender;
 
         empty($Controller->cookies) && isset($_COOKIE) ? ($Controller->cookies =& $_COOKIE) : null;
@@ -111,13 +111,13 @@ class AkWebRequest extends AkActionController
             require_once(AK_LIB_DIR.DS.'AkResponse.php');
             $Controller->Response =& AkResponse();
         }
-                
+
         if(empty($Controller->Template)){
             require_once(AK_LIB_DIR.DS.'AkActionView.php');
             require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkPhpTemplateHandler.php');
             $Controller->Template =& new AkActionView(AkConfig::getDir('app').DS.'views'.DS.$Controller->Request->getController(),
             $Controller->Request->getParameters(),$Controller->Request->getController());
-            
+
             $Controller->Template->_controllerInstance =& $Controller;
             $Controller->Template->_registerTemplateHandler('tpl','AkPhpTemplateHandler');
         }
@@ -125,9 +125,9 @@ class AkWebRequest extends AkActionController
         $Controller->passed_args = !isset($Controller->Request->pass)? array() : $Controller->Request->pass;
 
         Ak::loadPlugins();
-        
+
         $Controller->instantiateIncludedModelClasses();
-        
+
         if(isset($Controller->api)){
             require_once(AK_LIB_DIR.DS.'AkActionWebService.php');
             $Controller->aroundFilter(new AkActionWebService($Controller));
@@ -137,16 +137,16 @@ class AkWebRequest extends AkActionController
     function _after(&$Controller)
     {
         $Controller->_handleFlashAttribute();
-        if (!$Controller->_hasPerformed()){
+        if (!$Controller->hasPerformed()){
             $Controller->_enableLayoutOnRender ? $Controller->renderWithLayout() : $Controller->renderWithoutLayout();
         }
         if(!AK_DESKTOP && defined('AK_ENABLE_STRICT_XHTML_VALIDATION') && AK_ENABLE_STRICT_XHTML_VALIDATION || !empty($Controller->validate_output)){
             $Controller->_validateGeneratedXhtml();
         }
     }
-    
-    
-    
+
+
+
     function _includeController()
     {
         $controller_path = AK_CONTROLLERS_DIR.DS.$this->_file_name;
@@ -154,32 +154,32 @@ class AkWebRequest extends AkActionController
             $this->_raiseError(
                 Ak::t('Could not find the file /app/controllers/<i>%controller_file_name</i> for '.
                         'the controller %controller_class_name',
-                array('%controller_file_name'=>$this->_file_name, 
+                array('%controller_file_name'=>$this->_file_name,
                     '%controller_class_name'=>$this->_class_name)));
         }
         require_once(AkConfig::getDir('app').DS.'application_controller.php');
         require_once($controller_path);
         if(!class_exists($this->_class_name)){
-            $this->_raiseError(Ak::t('Controller <i>%controller_name</i> does not exist', 
+            $this->_raiseError(Ak::t('Controller <i>%controller_name</i> does not exist',
             array('%controller_name' => $this->_class_name)));
         }
     }
-    
+
     function _getActionName()
     {
-        $this->AppController->_action_name = 
-            empty($this->AppController->_action_name) ? 
-            (AkInflector::underscore($this->AppController->params['action'])) : 
+        $this->AppController->_action_name =
+            empty($this->AppController->_action_name) ?
+            (AkInflector::underscore($this->AppController->params['action'])) :
             $this->AppController->_action_name;
-        
-        if ($this->AppController->_action_name[0] == '_' || 
+
+        if ($this->AppController->_action_name[0] == '_' ||
             !method_exists($this->AppController, $this->AppController->_action_name)){
             $this->_raiseError(Ak::t('Action <i>%action</i> does not exist for controller <i>%controller_name</i>',
             array('%controller_name'=>$this->_class_name,'%action'=>$this->AppController->_action_name)));
         }
         return $this->AppController->_action_name;
     }
-    
+
     function _raiseError($error)
     {
         if(AK_LOG_EVENTS){
