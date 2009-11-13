@@ -6,8 +6,12 @@ require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
 class TestClassUsedViaProxyByALazyObject extends AkLazyObject
 {
-    public $on_filter = 'on_lazy';
+    public $allowed = 'yes';
+    public $not_allowed = 'no';
     public $concatenated_string;
+
+    public $_private_attribute = 'private';
+    private $private_attribute = 'private';
 
     public function concatenate($value = null)
     {
@@ -26,32 +30,9 @@ class TestLazyObject extends AkLazyObject
     public $on_controller = 'on_proxy';
 }
 
-/*
-$Lazy = new TestLazyObject();
-$Lazy->extendClassByName('TestClassUsedViaProxyByALazyObject', array('methods' => array('remember')));
-
-echo $Lazy->on_filter;
-
-echo $Lazy->remember(':) ');
-
-echo "\n";
-echo $Lazy->on_filter;
-echo "\n";
-
-$Proxy = $Lazy->getExtendedClassInstance('TestClassUsedViaProxyByALazyObject');
-
-echo $Proxy->remember('a');
-echo $Lazy->remember('b');
-echo $Proxy->remember('c');
-*/
 
 class AkLazyObject_TestCase extends  AkUnitTest
 {
-    public function tearDown()
-    {
-
-    }
-
     public function test_should_extend_a_class_given_its_name()
     {
         $Lazy = new TestLazyObject();
@@ -97,7 +78,7 @@ class AkLazyObject_TestCase extends  AkUnitTest
         $this->expectError(new PatternExpectation('/undefined method TestLazyObject::invalid.+AkLazyObject\.php .+'.(__LINE__+1).'/'));
         $Lazy->invalid();
 
-        $this->expectError(new PatternExpectation('/undefined method TestLazyObject::explicit.+AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $this->expectError(new PatternExpectation('/undefined method TestLazyObject::explicit.+unit\/lib\/AkLazyObject\.php .+'.(__LINE__+1).'/'));
         $Lazy->explicit();
 
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
@@ -107,14 +88,45 @@ class AkLazyObject_TestCase extends  AkUnitTest
     {
         $Lazy = new TestLazyObject();
         $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject());
-        $Proxy = $Lazy->getExtendedClassInstance('TestClassUsedViaProxyByALazyObject');
+
         $this->assertEqual($Lazy->explicit(), 'French');
 
+        $Proxy = $Lazy->getExtendedClassInstance('TestClassUsedViaProxyByALazyObject');
         $this->assertEqual( $Lazy->concatenate('a'), 'a');
         $this->assertEqual($Proxy->concatenate('b'), 'ab');
         $this->assertEqual( $Lazy->concatenate('c'), 'abc');
 
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
+    }
+
+    public function test_should_allow_using_proxy_attributes_if_set_implicitly_only()
+    {
+        $Lazy = new TestLazyObject();
+        $Lazy->extendClassByName('TestClassUsedViaProxyByALazyObject', array('attributes' => array('allowed')));
+        $this->assertEqual($Lazy->allowed, 'yes');
+
+        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::not_allowed.+unit\/lib\/AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $this->assertNotEqual($Lazy->not_allowed, 'no');
+        $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
+    }
+
+    public function test_should_allow_using_proxy_attributes_when_using_instance()
+    {
+        $Lazy = new TestLazyObject();
+        $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject());
+        $this->assertEqual($Lazy->allowed, 'yes');
+        $this->assertEqual($Lazy->not_allowed, 'no');
+        $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
+    }
+
+    public function test_should_respect_attribute_visibility()
+    {
+        $Lazy = new TestLazyObject();
+        $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject());
+        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::private_attribute.+unit\/lib\/AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $this->assertNotEqual($Lazy->private_attribute, 'private');
+        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::_private_attribute.+unit\/lib\/AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $this->assertNotEqual($Lazy->_private_attribute, 'private');
     }
 
 }

@@ -115,6 +115,14 @@ class AkLazyObject
     {
         $this->__extenssionPoints[$class_name] = new $class_name();
 
+        if(
+            (method_exists($this, 'beforeBeingExtended') && !$this->beforeBeingExtended($this->__extenssionPoints[$class_name])) ||
+            (method_exists($this->__extenssionPoints[$class_name], 'beforeExtending') && !$this->__extenssionPoints[$class_name]->beforeExtending($this))
+            ){
+                unset($this->__extenssionPoints[$class_name]);
+                return false;
+        }
+
         if(isset($this->__extenssionPointOptions[$class_name]['init_method'])){
             $init_method = $this->__extenssionPointOptions[$class_name]['init_method'];
             if(method_exists($this->__extenssionPoints[$class_name], $init_method)){
@@ -128,6 +136,9 @@ class AkLazyObject
         if(method_exists($this->__extenssionPoints[$class_name], 'extendsClass')){
             $this->__extenssionPoints[$class_name]->setExtendedBy($this);
         }
+        if(method_exists($this->__extenssionPoints[$class_name], 'afterExtending')){
+            $this->__extenssionPoints[$class_name]->afterExtending($this);
+        }
         return $this->__extenssionPoints[$class_name];
     }
 
@@ -140,44 +151,64 @@ class AkLazyObject
 
     public function __get($name)
     {
-        foreach ($this->__extenssionPoints as $ExtenssionPoint){
-            if(isset($ExtenssionPoint->$name)){
-                $this->$name =& $ExtenssionPoint->$name;
+        if($name[0] != '_'){
+            foreach ($this->__extenssionPoints as $extenssion_name => $ExtenssionPoint){
+                $has_implicit_attributes = !empty($this->__extenssionPointOptions[$extenssion_name]['attributes']);
+                if(!$has_implicit_attributes && isset($ExtenssionPoint->$name)){
+                    $this->$name =& $ExtenssionPoint->$name;
+                    break;
+                }else{
+                    if($has_implicit_attributes){
+                        if(in_array($name, $this->__extenssionPointOptions[$extenssion_name]['attributes'])){
+
+                            if(is_null($ExtenssionPoint)){
+                                $ExtenssionPoint = $this->instantiateExtendedClass($extenssion_name);
+                            }
+                            if(isset($ExtenssionPoint->$name)){
+                                $this->$name =& $ExtenssionPoint->$name;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if(isset($this->$name)){
+                return $this->$name;
             }
         }
-        if(isset($this->$name)){
-            return $this->$name;
-        }
-        trigger_error("Call to undefined attribute ".get_class($this)."::".$name, E_USER_NOTICE);
+        $backtrace = debug_backtrace();
+        trigger_error("Notice: Call to undefined attribute ".get_class($this)."::".$name.' in '.$backtrace[0]['file'].' on line '.$backtrace[0]['line'], E_USER_NOTICE);
     }
 
     public function __call($name, $attributes = array())
     {
-        static $handlers = array();
+        if($name[0] != '_'){
+            static $handlers = array();
 
-        if(isset($handlers[$name])){
+            if(isset($handlers[$name])){
 
-            if(!$this->isExtendedBy($handlers[$name])){
-                unset($handlers[$name]);
-            }else{
-                $extenssion_name = $handlers[$name];
-                if(array_key_exists($extenssion_name, $this->__extenssionPoints)){
-                    if(is_null($this->__extenssionPoints[$extenssion_name]) && $this->extenssionImplements($extenssion_name, $name)){
-                        $this->instantiateExtendedClass($extenssion_name);
-                    }
-                    if(method_exists($this->__extenssionPoints[$extenssion_name], $name)){
-                        return call_user_func_array(array($this->__extenssionPoints[$extenssion_name], $name), $attributes);
+                if(!$this->isExtendedBy($handlers[$name])){
+                    unset($handlers[$name]);
+                }else{
+                    $extenssion_name = $handlers[$name];
+                    if(array_key_exists($extenssion_name, $this->__extenssionPoints)){
+                        if(is_null($this->__extenssionPoints[$extenssion_name]) && $this->extenssionImplements($extenssion_name, $name)){
+                            $this->instantiateExtendedClass($extenssion_name);
+                        }
+                        if(method_exists($this->__extenssionPoints[$extenssion_name], $name)){
+                            return call_user_func_array(array($this->__extenssionPoints[$extenssion_name], $name), $attributes);
+                        }
                     }
                 }
             }
-        }
-        foreach ($this->__extenssionPoints as $extenssion_name => $ExtenssionPoint){
-            if(is_null($ExtenssionPoint) && $this->extenssionImplements($extenssion_name, $name)){
-                $ExtenssionPoint = $this->instantiateExtendedClass($extenssion_name);
-            }
-            if(method_exists($ExtenssionPoint, $name)){
-                $handlers[$name] = $extenssion_name;
-                return call_user_func_array(array($ExtenssionPoint, $name), $attributes);
+            foreach ($this->__extenssionPoints as $extenssion_name => $ExtenssionPoint){
+                if(is_null($ExtenssionPoint) && $this->extenssionImplements($extenssion_name, $name)){
+                    $ExtenssionPoint = $this->instantiateExtendedClass($extenssion_name);
+                }
+                if(method_exists($ExtenssionPoint, $name)){
+                    $handlers[$name] = $extenssion_name;
+                    return call_user_func_array(array($ExtenssionPoint, $name), $attributes);
+                }
             }
         }
         $backtrace = debug_backtrace();
