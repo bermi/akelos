@@ -2267,6 +2267,7 @@ class Ak
                 'AkImageFilter'             =>  AK_LIB_DIR.DS.'AkImage'.DS.'AkImageFilter.php',
                 'AkInflector'               =>  AK_LIB_DIR.DS.'AkInflector.php',
                 'AkInstaller'               =>  AK_LIB_DIR.DS.'AkInstaller.php',
+                'AkLazyObject'              =>  AK_LIB_DIR.DS.'AkLazyObject.php',
                 'AkLocaleManager'           =>  AK_LIB_DIR.DS.'AkLocaleManager.php',
                 'AkMemcache'                =>  AK_LIB_DIR.DS.'AkCache'.DS.'AkMemcache.php',
                 'AkNumber'                  =>  AK_LIB_DIR.DS.'AkType'.DS.'AkNumber.php',

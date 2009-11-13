@@ -55,7 +55,7 @@ if(!class_exists('AkObject')){
 
         public function __call($name, $args)
         {
-            throw new Exception('Undefined method ' . $name . '() called');
+            trigger_error("Call to undefined method ".get_class($this)."::".$name."()", E_USER_ERROR);
         }
 
         public function log($message, $type = '', $identifyer = '')
