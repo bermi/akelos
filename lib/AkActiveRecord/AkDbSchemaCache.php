@@ -93,7 +93,10 @@ class AkDbSchemaCache
                 if(AK_LOG_EVENTS){
                     $Logger->message('Updating database settings on '.$file_name);
                 }
-                Ak::file_put_contents($file_name, serialize($config));
+
+                Ak::file_put_contents($file_name, serialize($config), array('base_path'=> AK_TMP_DIR));
+                //file_put_contents($file_name, serialize($config));
+
             } else if(AK_LOG_EVENTS){
                 $Logger->message('Skipping writing of cache file: '.$file_name);
             }
@@ -108,7 +111,7 @@ class AkDbSchemaCache
         static $config;
         if(!isset($config[$environment])){
             $file_name = AkDbSchemaCache::getCacheFileName($environment);
-            $config[$environment] = file_exists($file_name) ? unserialize(Ak::file_get_contents($file_name)) : array();
+            $config[$environment] = file_exists($file_name) ? unserialize(file_get_contents($file_name)) : array();
             if(AK_LOG_EVENTS){
                 $Logger = Ak::getLogger();
                 $Logger->message('Loading cached database settings');

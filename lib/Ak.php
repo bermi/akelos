@@ -393,11 +393,6 @@ class Ak
         );
         $options = array_merge($default_options, $options);
 
-        if(!function_exists('file_put_contents')){
-            include_once(AK_CONTRIB_DIR.DS.'pear'.DS.'PHP'.DS.'Compat.php');
-            PHP_Compat::loadFunction(array('file_put_contents'));
-        }
-
         $file_name = trim(str_replace($options['base_path'], '',$file_name),DS);
 
         if($options['ftp']){
@@ -512,6 +507,7 @@ class Ak
 
     static function make_dir($path, $options = array())
     {
+
         $default_options = array(
         'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
         'base_path' => AK_BASE_DIR
@@ -519,13 +515,19 @@ class Ak
 
         $options = array_merge($default_options, $options);
 
+        if(!is_dir($options['base_path'])){
+            trigger_error(Ak::t('Base path %path must exist in order to use it as base_path in Ak::make_dir()', array('%path' => $options['base_path'])), E_USER_ERROR);
+        }
+
         $path = trim(str_replace($options['base_path'], '',$path),DS);
+
         if($options['ftp']){
             require_once(AK_LIB_DIR.DS.'AkFtp.php');
             $path = trim(str_replace(array(DS,'//'),array('/','/'),$path),'/');
             return AkFtp::make_dir($path);
         }else{
-            $path = $options['base_path'].DS.$path;
+            $path = rtrim($options['base_path'].DS.$path, DS);
+
             if (!file_exists($path)){
                 Ak::make_dir(dirname($path), $options);
                 return mkdir($path);
@@ -2239,6 +2241,8 @@ class Ak
         if(empty($paths)){
 
             $paths = array(
+            'ApplicationController'     =>  AK_APP_DIR.DS.'application_controller.php',
+            'BaseActionController'      =>  AK_APP_DIR.DS.'base_action_controller.php',
             'ActiveRecord'              =>  AK_APP_DIR.DS.'shared_model.php',
             'ActiveRecordHelper'        =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'active_record_helper.php',
             'AkActionMailer'            =>  AK_LIB_DIR.DS.'AkActionMailer.php',

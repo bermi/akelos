@@ -55,12 +55,13 @@ class AkUnitTest extends UnitTestCase
     public function rebaseAppPaths($base_path = null)
     {
         $base_path = !is_dir($base_path) ? AkConfig::getDir('fixtures') : $base_path;
-        AkConfig::setDir('app', $base_path.DS.'app'.DS.'installers');
-        AkConfig::setDir('app_installers', $base_path.DS.'app'.DS.'installers');
-        AkConfig::setDir('models', $base_path.DS.'app'.DS.'models');
+        AkConfig::setDir('app',             $base_path.DS.'app');
+        AkConfig::setDir('app_installers',  $base_path.DS.'app'.DS.'installers');
+        AkConfig::setDir('models',          $base_path.DS.'app'.DS.'models');
+        AkConfig::setDir('controllers',     $base_path.DS.'app'.DS.'controllers');
+        AkConfig::setDir('views',           $base_path.DS.'app'.DS.'views');
         $this->_path_rebased = true;
     }
-
     public function restoreAppPaths()
     {
         foreach ($this->_original_paths as $type => $original_path){
@@ -74,6 +75,8 @@ class AkUnitTest extends UnitTestCase
         'app'               => AkConfig::getDir('app'),
         'models'            => AkConfig::getDir('models'),
         'app_installers'    => AkConfig::getDir('app_installers'),
+        'controllers'       => AkConfig::getDir('controllers'),
+        'views'             => AkConfig::getDir('views'),
         );
     }
 
@@ -233,7 +236,6 @@ class AkUnitTest extends UnitTestCase
             $installer = new AkInstaller();
             $installer->dropTable($table_name,array('sequence'=>true));
             $installer->createTable($table_name,$table_definition,array('timestamp'=>false));
-
         } else {
             $table_name = AkInflector::tableize($model);
         }
@@ -255,6 +257,7 @@ class AkUnitTest extends UnitTestCase
             $Installer->install();
             return true;
         }
+
         return false;
     }
 

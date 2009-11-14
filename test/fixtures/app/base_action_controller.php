@@ -1,5 +1,13 @@
 <?php
 
-require_once(AK_BASE_DIR.DS.'app'.DS.substr(strrchr(__FILE__, DS), 1));
+/**
+ * DO NOT MODIFY manually
+ *
+ * This class is only for plugins to extend the functionality
+ * of the ActionController
+ *
+ */
+class BaseActionController extends AkActionController
+{
 
-?>
+}

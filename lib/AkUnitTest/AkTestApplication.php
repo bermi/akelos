@@ -141,6 +141,7 @@ class AkTestApplication extends AkUnitTest
     {
         require_once(AK_LIB_DIR.DS.'AkXhtmlValidator.php');
         $response = $this->_response;
+
         $validator = new AkXhtmlValidator();
         $valid = $validator->validate($response);
 
@@ -264,7 +265,6 @@ class AkTestApplication extends AkUnitTest
         $this->Dispatcher = new AkTestDispatcher($controllerVars);
     }
 
-
     public function get($url,$data = array(), $constants = array(), $controllerVars = array())
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
@@ -279,6 +279,7 @@ class AkTestApplication extends AkUnitTest
         $this->_cleanUp();
         return $res;
     }
+
     public function _cleanUp()
     {
         unset($_SERVER['HTTP_IF_MODIFIED_SINCE']);

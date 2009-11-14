@@ -18,5 +18,3 @@ class PersonInstaller extends AkInstaller
         $this->dropTable('people');
     }
 }
-
-?>

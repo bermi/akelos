@@ -323,18 +323,7 @@ class AkActionController extends AkLazyObject// AkObject
 
     public function _identifyRequest()
     {
-        if (AK_ENVIRONMENT != 'testing') {
-            /**
-             * for AkTestApplication we need to identify if handleResponse rendered
-             * the output already.
-             * Since AkTestApplication performs multiple requests
-             * on one instance of AkActionController, each Request needs
-             * to be identified separately
-             */
-            $this->_request_id++;
-        } else {
-            $this->_request_id = md5(time().microtime(true).rand(0,10000));
-        }
+        $this->_request_id = Ak::uuid();
     }
 
     public function handleResponse()

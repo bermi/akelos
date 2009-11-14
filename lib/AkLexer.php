@@ -32,10 +32,10 @@ define("AK_LEXER_SPECIAL", 5);
  *    when one does it's label is returned.
  */
 class AkLexerParallelRegex {
-    var $_patterns;
-    var $_labels;
-    var $_regex;
-    var $_case;
+    public $_patterns;
+    public $_labels;
+    public $_regex;
+    public $_case;
 
     /**
      *    Constructor. Starts with no patterns.
@@ -43,7 +43,7 @@ class AkLexerParallelRegex {
      *                            for insensitive.
      *    @access public
      */
-    function AkLexerParallelRegex($case) {
+    public function AkLexerParallelRegex($case) {
         $this->_case = $case;
         $this->_patterns = array();
         $this->_labels = array();
@@ -61,7 +61,7 @@ class AkLexerParallelRegex {
      *                                on a match. Label must be ASCII
      *    @access public
      */
-    function addPattern($pattern, $label = true) {
+    public function addPattern($pattern, $label = true) {
         $count = count($this->_patterns);
         $this->_patterns[$count] = $pattern;
         $this->_labels[$count] = $label;
@@ -77,7 +77,7 @@ class AkLexerParallelRegex {
      *    @return boolean             True on success.
      *    @access public
      */
-    function match($subject, &$match) {
+    public function match($subject, &$match) {
         if (count($this->_patterns) == 0) {
             return false;
         }
@@ -106,7 +106,7 @@ class AkLexerParallelRegex {
      *
      *    @author Christopher Smith <chris@jalakai.co.uk>
      */
-    function split($subject, &$split) {
+    public function split($subject, &$split) {
         if (count($this->_patterns) == 0) {
             return false;
         }
@@ -132,7 +132,7 @@ class AkLexerParallelRegex {
      *    @param array $patterns    List of patterns in order.
      *    @access private
      */
-    function _getCompoundedRegex() {
+    public function _getCompoundedRegex() {
         if ($this->_regex == null) {
             $cnt = count($this->_patterns);
             for ($i = 0; $i < $cnt; $i++) {
@@ -202,7 +202,7 @@ class AkLexerParallelRegex {
      *    @return string       Perl regex flags.
      *    @access private
      */
-    function _getPerlMatchingFlags() {
+    public function _getPerlMatchingFlags() {
         return ($this->_case ? "msS" : "msSi");
     }
 }
@@ -211,14 +211,14 @@ class AkLexerParallelRegex {
  *    States for a stack machine.
  */
 class AkLexerStateStack {
-    var $_stack;
+    public $_stack;
 
     /**
      *    Constructor. Starts in named state.
      *    @param string $start        Starting state name.
      *    @access public
      */
-    function AkLexerStateStack($start) {
+    public function AkLexerStateStack($start) {
         $this->_stack = array($start);
     }
 
@@ -227,7 +227,7 @@ class AkLexerStateStack {
      *    @return string       State.
      *    @access public
      */
-    function getCurrent() {
+    public function getCurrent() {
         return $this->_stack[count($this->_stack) - 1];
     }
 
@@ -237,7 +237,7 @@ class AkLexerStateStack {
      *    @param string $state        New state.
      *    @access public
      */
-    function enter($state) {
+    public function enter($state) {
         array_push($this->_stack, $state);
     }
 
@@ -248,7 +248,7 @@ class AkLexerStateStack {
      *                       the bottom of the list.
      *    @access public
      */
-    function leave() {
+    public function leave() {
         if (count($this->_stack) == 1) {
             return false;
         }
@@ -265,11 +265,11 @@ class AkLexerStateStack {
  *    with leading underscores.
  */
 class AkLexer {
-    var $_regexes;
-    var $_parser;
-    var $_mode;
-    var $_mode_handlers;
-    var $_case;
+    public $_regexes;
+    public $_parser;
+    public $_mode;
+    public $_mode_handlers;
+    public $_case;
 
     /**
      *    Sets up the lexer in case insensitive matching
@@ -280,11 +280,11 @@ class AkLexer {
      *    @param boolean $case            True for case sensitive.
      *    @access public
      */
-    function AkLexer(&$parser, $start = 'accept', $case = false) {
+    public function AkLexer(&$parser, $start = 'accept', $case = false) {
         $this->_case = $case;
         $this->_regexes = array();
         $this->_parser = &$parser;
-        $this->_mode = &new AkLexerStateStack($start);
+        $this->_mode = new AkLexerStateStack($start);
         $this->_mode_handlers = array();
     }
 
@@ -299,7 +299,7 @@ class AkLexer {
      *                                this type of input.
      *    @access public
      */
-    function addPattern($pattern, $mode = "accept") {
+    public function addPattern($pattern, $mode = "accept") {
         if (! isset($this->_regexes[$mode])) {
             $this->_regexes[$mode] = new AkLexerParallelRegex($this->_case);
         }
@@ -319,7 +319,7 @@ class AkLexer {
      *                                nested mode.
      *    @access public
      */
-    function addEntryPattern($pattern, $mode, $new_mode) {
+    public function addEntryPattern($pattern, $mode, $new_mode) {
         if (! isset($this->_regexes[$mode])) {
             $this->_regexes[$mode] = new AkLexerParallelRegex($this->_case);
         }
@@ -334,7 +334,7 @@ class AkLexer {
      *    @param string $mode         Mode to leave.
      *    @access public
      */
-    function addExitPattern($pattern, $mode) {
+    public function addExitPattern($pattern, $mode) {
         if (! isset($this->_regexes[$mode])) {
             $this->_regexes[$mode] = new AkLexerParallelRegex($this->_case);
         }
@@ -353,7 +353,7 @@ class AkLexer {
      *    @param string $special      Use this mode for this one token.
      *    @access public
      */
-    function addSpecialPattern($pattern, $mode, $special) {
+    public function addSpecialPattern($pattern, $mode, $special) {
         if (! isset($this->_regexes[$mode])) {
             $this->_regexes[$mode] = new AkLexerParallelRegex($this->_case);
         }
@@ -366,7 +366,7 @@ class AkLexer {
      *    @param string $handler     New target handler.
      *    @access public
      */
-    function mapHandler($mode, $handler) {
+    public function mapHandler($mode, $handler) {
         $this->_mode_handlers[$mode] = $handler;
     }
 
@@ -380,7 +380,7 @@ class AkLexer {
      *    @return boolean           True on success, else false.
      *    @access public
      */
-    function parse($raw) {
+    public function parse($raw) {
         if (! isset($this->_parser)) {
             return false;
         }
@@ -421,7 +421,7 @@ class AkLexer {
      *                                from the parser.
      *    @access private
      */
-    function _dispatchTokens($unmatched, $matched, $mode = false, $initialPos, $matchPos) {
+    public function _dispatchTokens($unmatched, $matched, $mode = false, $initialPos, $matchPos) {
         if (! $this->_invokeParser($unmatched, AK_LEXER_UNMATCHED, $initialPos) ){
             return false;
         }
@@ -453,7 +453,7 @@ class AkLexer {
      *    @return boolean        True if this is the exit mode.
      *    @access private
      */
-    function _isModeEnd($mode) {
+    public function _isModeEnd($mode) {
         return ($mode === "__exit");
     }
 
@@ -465,7 +465,7 @@ class AkLexer {
      *    @return boolean        True if this is the exit mode.
      *    @access private
      */
-    function _isSpecialMode($mode) {
+    public function _isSpecialMode($mode) {
         return (strncmp($mode, "_", 1) == 0);
     }
 
@@ -476,7 +476,7 @@ class AkLexer {
      *    @return string         Underlying mode name.
      *    @access private
      */
-    function _decodeSpecial($mode) {
+    public function _decodeSpecial($mode) {
         return substr($mode, 1);
     }
 
@@ -491,7 +491,7 @@ class AkLexer {
      *                                thats being parsed
      *    @access private
      */
-    function _invokeParser($content, $is_match, $pos) {
+    public function _invokeParser($content, $is_match, $pos) {
         if (($content === '') || ($content === false)) {
             return true;
         }
@@ -516,7 +516,7 @@ class AkLexer {
      *                               is a parsing error.
      *    @access private
      */
-    function _reduce(&$raw) {
+    public function _reduce(&$raw) {
         if (! isset($this->_regexes[$this->_mode->getCurrent()])) {
             return false;
         }

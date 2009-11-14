@@ -78,13 +78,13 @@ class AkTestDispatcher extends AkDispatcher
         if ($controller === false) {
             return false;
         } else {
+
             $this->Controller = $controller;
             if (is_array($this->_controllerVars)) {
                 foreach ($this->_controllerVars as $key=>$value) {
                     $this->Controller->$key = $value;
                 }
             }
-
             $this->Controller->process($this->Request, $this->Response);
         }
         return true;

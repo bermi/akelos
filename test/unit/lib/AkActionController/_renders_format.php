@@ -1,8 +1,8 @@
 <?php
 
-require_once(AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestApplication.php');
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class Test_AkActionControllerRendersFormat extends AkWebTestCase
+class AkActionController_renders_format_TestCase extends AkWebTestCase
 {
     public function test_should_render_requested_format()
     {
@@ -30,4 +30,4 @@ class Test_AkActionControllerRendersFormat extends AkWebTestCase
     }
 }
 
-?>
+ak_test_run_case_if_executed('AkActionController_renders_format_TestCase');

@@ -13,14 +13,13 @@ class AkTestRequest extends AkRequest
         $module_path = $module_class_peffix = '';
         if(!empty($params['module'])){
             $module_path = trim(str_replace(array('/','\\'), DS, Ak::sanitize_include($params['module'], 'high')), DS).DS;
-            $module_shared_model = AK_CONTROLLERS_DIR.DS.trim($module_path,DS).'_controller.php';
+            $module_shared_model = AkConfig::getDir('controllers').DS.trim($module_path,DS).'_controller.php';
             $module_class_peffix = str_replace(' ','_',AkInflector::titleize(str_replace(DS,' ', trim($module_path, DS)))).'_';
         }
 
         $controller_file_name = AkInflector::underscore($params['controller']).'_controller.php';
         $controller_class_name = $module_class_peffix.AkInflector::camelize($params['controller']).'Controller';
-        $controller_path = AK_CONTROLLERS_DIR.DS.$module_path.$controller_file_name;
-        include_once(AkConfig::getDir('app').DS.'application_controller.php');
+        $controller_path = AkConfig::getDir('controllers').DS.$module_path.$controller_file_name;
 
         if(!empty($module_path) && file_exists($module_shared_model)){
             include_once($module_shared_model);
@@ -33,7 +32,7 @@ class AkTestRequest extends AkRequest
                 'the controller %controller_class_name',
                 array('%controller_file_name'=> $controller_file_name,
                 '%controller_class_name' => $controller_class_name)), E_USER_ERROR);
-            }elseif(@include(AK_PUBLIC_DIR.DS.'404.php')){
+            }elseif(@include(AkConfig::getDir('public').DS.'404.php')){
                 $response = new AkTestResponse();
                 $response->addHeader('Status',404);
                 return false;
@@ -51,7 +50,7 @@ class AkTestRequest extends AkRequest
             if(AK_ENVIRONMENT == 'development'){
                 trigger_error(Ak::t('Controller <i>%controller_name</i> does not exist',
                 array('%controller_name' => $controller_class_name)), E_USER_ERROR);
-            }elseif(@include(AK_PUBLIC_DIR.DS.'405.php')){
+            }elseif(@include(AkConfig::getDir('public').DS.'405.php')){
                 exit;
             }else{
                 $response = new AkResponse();
@@ -75,11 +74,4 @@ class AkTestRequest extends AkRequest
         }
         return isset($this->env['SERVER_NAME']) ? $this->env['SERVER_NAME'] : 'localhost';
     }
-}
-
-function &AkTestRequest()
-{
-    $null = null;
-    $AkRequest = Ak::singleton('AkTestRequest', $null);
-    return $AkRequest;
 }
