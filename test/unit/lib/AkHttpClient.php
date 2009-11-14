@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
-class AkHttpClientTestCase extends  AkUnitTest
+class AkHttpClient_TestCase extends  AkUnitTest
 {
     public $url = '';
     public $verbs = array('get', 'post', 'put', 'delete');
@@ -108,4 +108,4 @@ class AkHttpClientTestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkHttpClientTestCase');
+ak_test_run_case_if_executed('AkHttpClient_TestCase');

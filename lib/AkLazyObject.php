@@ -226,7 +226,7 @@ class AkLazyObject
         }
         if($this->_report_undefined_attributes){
             $backtrace = debug_backtrace();
-            trigger_error("Notice: Call to undefined attribute ".get_class($this)."::".$name.' in '.$backtrace[1]['file'].' on line '.$backtrace[1]['line'], E_USER_NOTICE);
+            trigger_error("Notice: Call to undefined attribute ".get_class($this)."::".$name.' in '.$backtrace[0]['file'].' on line '.$backtrace[0]['line'], E_USER_NOTICE);
         }
     }
 

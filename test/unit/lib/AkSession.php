@@ -4,7 +4,7 @@ require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
 defined('AK_TEST_MEMCACHED_CHECKFILE') ? null: define('AK_TEST_MEMCACHED_CHECKFILE',AK_TEST_DIR.DS.DS.'unit'.DS.'config'.DS.'memcached');
 
-class AkSession_TestCase extends  WebTestCase
+class AkSession_TestCase extends  AkWebTestCase
 {
     public $sessionLife = NULL;
 
@@ -36,7 +36,7 @@ class AkSession_TestCase extends  WebTestCase
         $this->_test_script = str_replace('/fixtures/public','',trim(AK_TESTING_URL,'/')).
         '/mocks/test_script_AkSession.php';
     }
-    
+
     public function test_all_session_handlers()
     {
         $cacheHandlers = array('cache_lite'=>1,'akadodbcache'=>2);
@@ -53,7 +53,7 @@ class AkSession_TestCase extends  WebTestCase
             }
         }
     }
-    
+
     public function _Test_open($type, $class)
     {
         $browser = $this->getBrowser();

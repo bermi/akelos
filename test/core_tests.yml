@@ -17,6 +17,8 @@ Action Controller:
     - AkDbSession
     - AkRouter
     - AkSession
+    - 'AkActionController/_f*'
+    - 'AkActionController/_h*'
     #- 'AkActionController/*'
     #- AkRequest
 

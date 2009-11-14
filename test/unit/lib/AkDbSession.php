@@ -6,7 +6,7 @@ require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 * In order to test sessions we have created a helper script for checking and setting session params
 */
 
-class AkDbSession_TestCase extends  WebTestCase
+class AkDbSession_TestCase extends  AkWebTestCase
 {
     public $sessionLife = NULL;
 
