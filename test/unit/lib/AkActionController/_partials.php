@@ -2,23 +2,23 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class Test_of_AkActionController_partials extends  AkWebTestCase
+class AkContionController_partials_TestCase extends  AkWebTestCase
 {
     public function test_check_if_tests_can_be_accesed()
     {
         $this->setMaximumRedirects(0);
         $this->get(AK_TESTING_URL.'/render_tests');
-        
+
         $this->assertResponse(200);
         $this->assertTextMatch('RenderTestsController is available on tests');
     }
-    
+
     public function test_render_partial()
     {
         $this->get(AK_TESTING_URL.'/render_tests/hello_partial');
         $this->assertTextMatch('Hello World From Partial');
     }
-    
+
     public function test_render_partial_inside_template()
     {
         $this->get(AK_TESTING_URL.'/advertiser/partial_in_template');
@@ -53,7 +53,7 @@ class Test_of_AkActionController_partials extends  AkWebTestCase
         $this->get(AK_TESTING_URL.'/render_tests/shared_partial');
         $this->assertTextMatch('First ad');
     }
-    
+
     public function test_render_partial_from_different_template()
     {
         $this->get(AK_TESTING_URL.'/render_tests/ad');
@@ -61,7 +61,4 @@ class Test_of_AkActionController_partials extends  AkWebTestCase
     }
 }
 
-ak_test('Test_of_AkActionController_partials');
-
-
-?>
+ak_test_run_case_if_executed('AkContionController_partials_TestCase');

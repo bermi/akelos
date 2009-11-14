@@ -378,8 +378,6 @@ class AkActionView extends AkObject
     {
         $path = $this->_partialPathPiece($partial_path);
         $partial_name = $this->_partialPathName($partial_path);
-
-        $object = $this->_extractingObject($partial_name, $local_assigns);
         $local_assigns = array_merge((array)@$this->_controllerInstance->_assigns, (array)$local_assigns);
         $this->_addObjectToLocalAssigns_($partial_name, $local_assigns, $object);
         return $this->renderFile((empty($path) ? '' : $path.DS).'_'.$partial_name, true, $local_assigns);
@@ -424,7 +422,7 @@ class AkActionView extends AkObject
             if(strstr($dir_name,'/')){
                 return $dir_name;
             }else{
-                return $this->base_path.DS.$dir_name;
+                return $this->app_views_dir.DS.$dir_name;
             }
         }else{
             return '';
@@ -438,13 +436,16 @@ class AkActionView extends AkObject
 
     public function _partialCounterName($partial_name)
     {
-        return array_pop(explode('/',$partial_name)).'_counter';
+        return Ak::last(explode('/',$partial_name)).'_counter';
     }
 
     public function &_extractingObject($partial_name, &$deprecated_local_assigns)
     {
         if(is_array($deprecated_local_assigns)){
-            return $this->controller->$partial_name;
+            if(!isset($this->_controllerInstance->$partial_name)){
+                return $partial_name;
+            }
+            return $this->_controllerInstance->$partial_name;
         }else{
             return $deprecated_local_assigns;
         }
@@ -452,17 +453,16 @@ class AkActionView extends AkObject
 
     public function _addObjectToLocalAssigns($partial_name, $local_assigns, &$object)
     {
-        $local_assigns[$partial_name] = empty($object) ? $this->controller->$partial_name : $object;
+        $local_assigns[$partial_name] = empty($object) ? $this->_controllerInstance->$partial_name : $object;
     }
 
     public function _addObjectToLocalAssigns_($partial_name, &$local_assigns, $object)
     {
         if(!empty($object)){
             $local_assigns[$partial_name] = $object;
-        }elseif(!empty($this->controller->$partial_name)){
-            $local_assigns[$partial_name] = $this->controller->$partial_name;
+        }elseif(!empty($this->_controllerInstance->$partial_name)){
+            $local_assigns[$partial_name] = $this->_controllerInstance->$partial_name;
         }
-
     }
 
     /**

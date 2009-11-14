@@ -21,6 +21,7 @@ Action Controller:
     - 'AkActionController/_h*'
     - 'AkActionController/_l*'
     - 'AkActionController/_m*'
+    - 'AkActionController/_part*'
     #- 'AkActionController/*'
     #- AkRequest
 

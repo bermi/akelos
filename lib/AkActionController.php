@@ -2326,6 +2326,7 @@ class AkActionController extends AkLazyObject// AkObject
         if (!isset($this->_CacheHandler)) return false;
         return $this->_CacheHandler->expireAction($options);
     }
+
     /**
      * ########################################################################
      * #

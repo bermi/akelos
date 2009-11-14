@@ -720,8 +720,7 @@ class Ak
         }
         ob_start();
         if(is_object($var)){
-            $object_text = @(string)$var;
-            empty($object_text) ? $method($var) : print($var);
+            !method_exists($var, '__toString') ? $method($var) : print($var);
         }else{
             $method($var);
         }
