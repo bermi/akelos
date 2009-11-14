@@ -13,6 +13,7 @@ Active Support:
     - AkTestApplication
     - AkUnitTest
     - AkLazyObject
+    - AkPhpCodeSanitizer
 Action Controller:
     - AkDbSession
     - AkRouter
@@ -22,7 +23,7 @@ Action Controller:
     - 'AkActionController/_l*'
     - 'AkActionController/_m*'
     - 'AkActionController/_part*'
-    - 'AkActionController/_ren*'
-    #- 'AkActionController/*'
+    - 'AkActionController/_r*'
+    #- 'AkActionController/*' todo: cache tests
     #- AkRequest
 

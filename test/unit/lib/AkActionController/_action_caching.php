@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @todo Pass cache tests
+ */
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class ActionCaching_TestCase extends AkTestApplication
@@ -8,6 +11,8 @@ class ActionCaching_TestCase extends AkTestApplication
 
     public function test_init()
     {
+        $this->rebaseAppPaths();
+
         $settings = Ak::getSettings('caching', false);
         if (!isset($settings['handler']['options']['cacheDir'])) {
             $cacheDir = AK_CACHE_DIR.DS;
@@ -28,9 +33,7 @@ class ActionCaching_TestCase extends AkTestApplication
 
         $this->setIp('212.121.121.121');
         $this->get('http://www.example.com/action_caching/index', array(), array(), array('cache_this'=>$cache_this));
-        var_dump($cache_this);
         $this->assertTextMatch($cache_this);
-        return ;
         $this->assertResponse(200);
         $this->_assertCacheExists('/'.Ak::lang().'/action_caching/index', array('host'=>'www.example.com'));
     }

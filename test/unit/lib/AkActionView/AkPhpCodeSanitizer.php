@@ -1,13 +1,12 @@
 <?php
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkPhpCodeSanitizer.php');
 
 class AkPhpCodeSanitizer_TestCase extends  AkUnitTest
-{    
+{
     public function test_should_avoid_private_variables()
     {
-        $this->assertInvalidCode('<?php $_private; ?>');
+        $this->assertInvalidCode('<?php $_private; ? >');
         $this->assertInvalidCode('<?=$_private?>');
     }
 
@@ -51,10 +50,10 @@ class AkPhpCodeSanitizer_TestCase extends  AkUnitTest
     {
         $this->CodeSanitizer = new AkPhpCodeSanitizer();
         $this->CodeSanitizer->setOptions(array('code'=>$code));
-        
+
         $this->expectError(new PatternExpectation('/You can\'t use/'));
         $this->assertFalse($this->CodeSanitizer->isCodeSecure(), 'Unsecure code not detected: '.$code);
     }
 }
 
-?>
+ak_test_run_case_if_executed('AkPhpCodeSanitizer_TestCase');

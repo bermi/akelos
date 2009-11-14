@@ -15,37 +15,40 @@
 
 /**
  * The AkPhpCodeSanitizer ensures that Action View templates do not contain illegal function/variable calls
- * it is used by the AkPhpTemplateHander by default. If you want to stablish your own 
- * set of forbidden functionalities extend this class and set AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER 
+ * it is used by the AkPhpTemplateHander by default. If you want to stablish your own
+ * set of forbidden functionalities extend this class and set AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER
  * with the name of your newly created class.
  */
 class AkPhpCodeSanitizer
 {
-    var $Analyzer;
-    var $_invalid = array();
-    var $secure_active_record_method_calls = false;
-    var $_errors = array();
-    var $_options = array();
-    var $_protedted_types = array('constructs','variables','member variables','functions','classes','methods');
+    public $Analyzer;
+    public $_invalid = array();
+    public $secure_active_record_method_calls = false;
+    public $_errors = array();
+    public $_options = array();
+    public $_protedted_types = array('constructs','variables','member variables','functions','classes','methods');
 
-    function clearErrors()
+    public function clearErrors()
     {
         $this->_errors = array();
         $this->_invalid = array();
     }
 
-    function setOptions($options)
+    public function setOptions($options)
     {
         $this->_options = $options;
     }
 
-    function isCodeSecure($code =null, $raise_if_insecure = true)
+    public function isCodeSecure($code =null, $raise_if_insecure = true)
     {
         $this->clearErrors();
         if(empty($code) && isset($this->_options['code'])){
-            $code =& $this->_options['code'];
+            $code = $this->_options['code'];
         }
+        $code = str_replace('<?=', '<?php echo ', $code);
+
         $this->AnalyzeCode($code);
+
         if(!defined('AK_PHP_CODE_SANITIZER_SKIP_VARIABLES') || !AK_PHP_CODE_SANITIZER_SKIP_VARIABLES){
             $this->secureVariables($code);
         }
@@ -72,7 +75,7 @@ class AkPhpCodeSanitizer
         return true;
     }
 
-    function raiseError($code = null)
+    public function raiseError($code = null)
     {
         $code = empty($code) ? @$this->_options['code'] : $code;
         if(AK_DEBUG){
@@ -94,19 +97,19 @@ class AkPhpCodeSanitizer
         }
     }
 
-    function getErrors()
+    public function getErrors()
     {
         return $this->_errors;
     }
 
-    function _addDollarSymbol_(&$var)
+    public function _addDollarSymbol_(&$var)
     {
-        if($var[0] != "$") {
-            $var = "$".$var;
+        if($var[0] != '$') {
+            $var = '$'.$var;
         }
     }
 
-    function secureVariables($code)
+    public function secureVariables($code)
     {
         $_forbidden['variables'] = empty($this->_options['forbidden_variables']) ?
         array_unique(array_merge(array_keys($GLOBALS), array_keys(get_defined_vars()))) :
@@ -123,7 +126,7 @@ class AkPhpCodeSanitizer
         $this->_invalid['variables'] = array_diff($_used_vars, array_diff($_used_vars,array_merge($_forbidden['variables'], array_filter($_used_vars, array(&$this, 'isPrivateVar')))));
     }
 
-    function secureFunctions($code = null)
+    public function secureFunctions($code = null)
     {
         if(!empty($this->Analyzer->createdFunctions)){
             $this->_errors[] = Ak::t('You can\'t create functions within templates');
@@ -134,7 +137,7 @@ class AkPhpCodeSanitizer
         $this->_invalid['functions'] = array_diff($_used_functions, array_diff($_used_functions,$_forbidden['functions']));
     }
 
-    function secureClasses($code = null)
+    public function secureClasses($code = null)
     {
         if(!empty($this->Analyzer->createdClasses)){
             $this->_errors[] = Ak::t('You can\'t create classes within templates');
@@ -159,7 +162,7 @@ class AkPhpCodeSanitizer
         }
     }
 
-    function secureConstructs($code = null)
+    public function secureConstructs($code = null)
     {
         if(!empty($this->Analyzer->filesIncluded)){
             $this->_errors[] = Ak::t('You can\'t include files within templates using PHP include or require please use $this->render() instead');
@@ -170,7 +173,7 @@ class AkPhpCodeSanitizer
     }
 
 
-    function secureProtectedTypes()
+    public function secureProtectedTypes()
     {
         foreach ($this->_protedted_types as $_type){
             if(!empty($this->_invalid[$_type])){
@@ -184,12 +187,12 @@ class AkPhpCodeSanitizer
         }
     }
 
-    function isPrivateVar($var)
+    public function isPrivateVar($var)
     {
         return preg_match('/^["\'${\.]*_/', $var);
     }
 
-    function isPrivateDynamicVar($var)
+    public function isPrivateDynamicVar($var)
     {
         if(preg_match('/^["\'{\.]*\$/', $var)){
             $var_name = trim($var, '{"\'.$');
@@ -201,7 +204,7 @@ class AkPhpCodeSanitizer
         return false;
     }
 
-    function lookForPrivateMemberVariables($var, $nested = false)
+    public function lookForPrivateMemberVariables($var, $nested = false)
     {
         if(is_string($var) && $this->isPrivateVar($var)){
             $this->_invalid['member variables'][$var] = $var;
@@ -221,24 +224,24 @@ class AkPhpCodeSanitizer
         return false;
     }
 
-    function &getCodeAnalyzerInstance()
+    public function &getCodeAnalyzerInstance()
     {
         if(empty($this->Analyzer)){
             require_once(AK_CONTRIB_DIR.DS.'PHPCodeAnalyzer'.DS.'PHPCodeAnalyzer.php');
-            $this->Analyzer =& new PHPCodeAnalyzer();
+            $this->Analyzer = new PHPCodeAnalyzer();
         }
         return $this->Analyzer;
     }
 
-    function AnalyzeCode($code)
+    public function AnalyzeCode($code)
     {
-        $this->Analyzer =& $this->getCodeAnalyzerInstance();
+        $this->Analyzer = $this->getCodeAnalyzerInstance();
         $this->Analyzer->source = '?>'.$code.'<?php';
         $this->Analyzer->analyze();
         return $this->Analyzer;
     }
 
-    function _getFuntionsAsVariables($functions_array)
+    public function _getFuntionsAsVariables($functions_array)
     {
         $result = array();
         foreach ((array)$functions_array as $function){
@@ -249,16 +252,16 @@ class AkPhpCodeSanitizer
         return $result;
     }
 
-    function getForbiddenMethods()
+    public function getForbiddenMethods()
     {
         return !$this->secure_active_record_method_calls ? array() : array('init','setAccessibleAttributes','setProtectedAttributes','getConnection','setConnection','create','update','updateAttribute','updateAttributes','updateAll','delete','deleteAll','destroy','destroyAll','establishConnection','freeze','isFrozen','setInheritanceColumn','getColumnsWithRegexBoundaries','instantiate','getSubclasses','setAttribute','set','setAttributes','removeAttributesProtectedFromMassAssignment','cloneRecord','decrementAttribute','decrementAndSaveAttribute','incrementAttribute','incrementAndSaveAttribute','hasAttributesDefined','reload','save','createOrUpdate','toggleAttribute','toggleAttributeAndSave','setId','getAttributesBeforeTypeCast','getAttributeBeforeTypeCast','setPrimaryKey','resetColumnInformation','setSerializeAttribute','getSerializedAttributes','getAvailableCombinedAttributes','getAvailableAttributes','loadColumnsSettings','setColumnSettings','setAttributeByLocale','setAttributeLocales','initiateAttributeToNull','initiateColumnsToNull','getAkelosDataType','getClassForDatabaseTableMapping','setTableName','setDisplayField','debug','castAttributeForDatabase','castAttributeFromDatabase','isLockingEnabled','beforeCreate','beforeValidation','beforeValidationOnCreate','beforeValidationOnUpdate','beforeSave','beforeUpdate','afterUpdate','afterValidation','afterValidationOnCreate','afterValidationOnUpdate','afterCreate','afterDestroy','beforeDestroy','afterSave','transactionStart','transactionComplete','transactionFail','transactionHasFailed','validatesConfirmationOf','validatesAcceptanceOf','validatesAssociated','validatesPresenceOf','validatesLengthOf','validatesSizeOf','validatesUniquenessOf','validatesFormatOf','validatesInclusionOf','validatesExclusionOf','validatesNumericalityOf','validate','validateOnCreate','validateOnUpdate','notifyObservers','setObservableState','getObservableState','addObserver','getObservers','addErrorToBase','addError','addErrorOnEmpty','addErrorOnBlank','addErrorOnBoundaryBreaking','addErrorOnBoundryBreaking','clearErrors','actsAs','actsLike','dbug','sqlSelectOne','sqlSelectValue','sqlSelectValues','sqlSelectAll','sqlSelect');
     }
 
-    function getForbiddenFunctions()
+    public function getForbiddenFunctions()
     {
         return array('__halt_compiler','aggregate','aggregate_methods','aggregate_methods_by_list','aggregate_methods_by_regexp','aggregate_properties','aggregate_properties_by_list','aggregate_properties_by_regexp','aggregation_info','apache_child_terminate','apache_get_modules','apache_get_version','apache_getenv','apache_lookup_uri','apache_note','apache_request_headers','apache_reset_timeout','apache_response_headers','apache_setenv','ascii2ebcdic','basename','call_user_func','call_user_func_array','call_user_method','call_user_method_array','chdir','chgrp','chmod','chown','chroot','class_exists','clearstatcache','closedir','closelog','com_addref','com_event_sink','com_get','com_invoke','com_invoke_ex','com_isenum','com_load','com_load_typelib','com_message_pump','com_print_typeinfo','com_propget','com_propput','com_propset','com_release','com_set','compact','connection_aborted','connection_status','connection_timeout','constant','copy','crc32','create_function','deaggregate','debug_backtrace','debug_zval_dump','define','define_syslog_variables','defined','delete','dio_close','dio_fcntl','dio_open','dio_read','dio_seek','dio_stat','dio_tcsetattr','dio_truncate','dio_write','dir','dirname','disk_free_space','disk_total_space','diskfreespace','dl','ebcdic2ascii','error_log','error_reporting','escapeshellarg','escapeshellcmd','eval','exec','extension_loaded','extract','fclose','feof','fflush','fgetc','fgetcsv','fgets','fgetss','file','file_exists','file_get_contents','file_put_contents','fileatime','filectime','filegroup','fileinode','filemtime','fileowner','fileperms','filesize','filetype','flock','flush','fmod','fnmatch','fopen','fpassthru','fputcsv','fputs','fread','fscanf','fseek','fsockopen','fstat','ftell','ftruncate','func_get_arg','func_get_args','func_num_args','function_exists','fwrite','gd_info','get_browser','get_cfg_var','get_class','get_class_methods','get_class_vars','get_current_user','get_declared_classes','get_defined_constants','get_defined_functions','get_defined_vars','get_extension_funcs','get_include_path','get_included_files','get_loaded_extensions','get_meta_tags','get_object_vars','get_parent_class','get_required_files','get_resource_type','getallheaders','getcwd','getenv','getmygid','getmyinode','getmypid','getmyuid','glob','gzclose','gzcompress','gzdeflate','gzencode','gzeof','gzfile','gzgetc','gzgets','gzgetss','gzinflate','gzopen','gzpassthru','gzputs','gzread','gzrewind','gzseek','gztell','gzuncompress','gzwrite','header','headers_sent','highlight_file','html_doc','html_doc_file','ignore_user_abort','import_request_variables','ini_alter','ini_get','ini_get_all','ini_restore','ini_set','is_dir','is_executable','is_file','is_link','is_readable','is_uploaded_file','is_writable','is_writeable','link','linkinfo','log','log10','lstat','mail','md5_file','mkdir','move_uploaded_file','ob_clean','ob_end_clean','ob_end_flush','ob_flush','ob_get_clean','ob_get_contents','ob_get_flush','ob_get_length','ob_get_level','ob_get_status','ob_gzhandler','ob_implicit_flush','ob_list_handlers','ob_start','opendir','openlog','output_add_rewrite_var','output_reset_rewrite_vars','overload','pack','parse_ini_file','parse_str','parse_url','passthru','pathinfo','pclose','pfsockopen','php_check_syntax','php_ini_scanned_files','php_logo_guid','php_sapi_name','php_strip_whitespace','php_uname','phpcredits','phpinfo','phpversion','png2wbmp','popen','preg_replace_callback','proc_close','proc_get_status','proc_nice','proc_open','proc_terminate','putenv','readdir','readfile','readgzfile','readlink','realpath','register_shutdown_function','register_tick_function','rename','restore_error_handler','restore_include_path','rewind','rewinddir','rmdir','scandir','session_cache_expire','session_cache_limiter','session_commit','session_decode','session_destroy','session_encode','session_get_cookie_params','session_id','session_is_registered','session_module_name','session_name','session_regenerate_id','session_register','session_save_path','session_set_cookie_params','session_set_save_handler','session_start','session_unregister','session_unset','session_write_close','set_error_handler','set_file_buffer','set_include_path','set_socket_blocking','set_time_limit','setcookie','setlocale','settype','shell_exec','shmop_close','shmop_delete','shmop_open','shmop_read','shmop_size','shmop_write','show_source','similar_text','sleep','socket_accept','socket_bind','socket_clear_error','socket_close','socket_connect','socket_create','socket_create_listen','socket_create_pair','socket_get_option','socket_get_status','socket_getopt','socket_getpeername','socket_getsockname','socket_iovec_add','socket_iovec_alloc','socket_iovec_delete','socket_iovec_fetch','socket_iovec_free','socket_iovec_set','socket_last_error','socket_listen','socket_read','socket_readv','socket_recv','socket_recvfrom','socket_select','socket_send','socket_sendmsg','socket_sendto','socket_set_block','socket_set_blocking','socket_set_nonblock','socket_set_option','socket_set_timeout','socket_setopt','socket_shutdown','socket_strerror','socket_write','socket_writev','stat','stream_context_create','stream_context_get_options','stream_context_set_option','stream_context_set_params','stream_filter_append','stream_filter_prepend','stream_get_meta_data','stream_register_wrapper','stream_select','stream_set_blocking','stream_set_timeout','stream_set_write_buffer','stream_wrapper_register','symlink','syslog','system','tempnam','time_nanosleep','time_sleep_until','tmpfile','token_get_all','token_name','touch','trigger_error','umask','uniqid','unlink','unpack','unregister_tick_function','user_error','usleep','virtual','zend_get_cfg_var','zend_loader_current_file','zend_loader_enabled','zend_loader_file_encoded','zend_loader_file_licensed','zend_loader_install_license','zend_logo_guid','zend_version');
     }
 }
 
 
-?>
+

@@ -1,11 +1,18 @@
 <?php
-require_once(AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestApplication.php');
-require_once(AK_LIB_DIR.DS.'AkCache.php');
 
-class Test_AkActionControllerCachingPages extends AkTestApplication
+/**
+ * @todo Pass cache tests
+ */
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
+
+class AkActionController_page_caching_TestCase extends AkTestApplication
 {
-
     public $lastModified;
+
+    public function setUp()
+    {
+        $this->rebaseAppPaths();
+    }
 
     public function testRequest()
     {
@@ -472,3 +479,5 @@ class Test_AkActionControllerCachingPages extends AkTestApplication
 
     }
 }
+
+ak_test_run_case_if_executed('AkActionController_page_caching_TestCase');

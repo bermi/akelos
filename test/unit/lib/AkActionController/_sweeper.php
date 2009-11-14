@@ -1,21 +1,27 @@
 <?php
-require_once(AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestApplication.php');
-require_once(AK_LIB_DIR.DS.'AkCache.php');
 
-class Test_AkActionControllerSweeper extends AkTestApplication
+/**
+ * @todo Pass cache tests
+ */
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
+
+class AkActionController_sweepers_TestCase extends AkTestApplication
 {
 
     public $lastModified;
-    
+
     public function setUp()
     {
-        
+        $this->rebaseAppPaths();
         $this->instantiateModel('Person');
     }
+
     public function test_init()
     {
         $this->installAndIncludeModels(array('Person'));
     }
+
+
     public function test_request()
     {
         $this->_flushCache('www.example.com');
@@ -24,7 +30,7 @@ class Test_AkActionControllerSweeper extends AkTestApplication
         $this->assertText('No such user');
         $this->assertResponse(404);
     }
-    
+
     public function _create_user()
     {
         $this->post('http://www.example.com/cache_sweeper/create',
@@ -32,9 +38,9 @@ class Test_AkActionControllerSweeper extends AkTestApplication
         $url = $this->getHeader('Location');
         $parts  = parse_url($url);
         return 'http://www.example.com'.$parts['path'];
-        
+
     }
-    
+
     public function test_create()
     {
         $this->_flushCache('www.example.com');
@@ -44,7 +50,7 @@ class Test_AkActionControllerSweeper extends AkTestApplication
         $this->userId=$params[count($params)-1];
         $this->assertResponse(302);
     }
-    
+
     public function test_show_cached()
     {
         $this->_flushCache('www.example.com');
@@ -55,7 +61,7 @@ class Test_AkActionControllerSweeper extends AkTestApplication
         $this->assertResponse(200);
         $this->assertHeader('X-Cached-By','Akelos-Action-Cache');
         $this->_assertCacheExists('/'.Ak::lang().'/cache_sweeper/show/'.$this->userId,array('host'=>'www.example.com'));
-        
+
     }
     public function test_sweeper_update_handled()
     {
@@ -71,12 +77,12 @@ class Test_AkActionControllerSweeper extends AkTestApplication
          */
         $this->post('http://www.example.com/cache_sweeper/update/'.$this->userId,array('first_name'=>'Max Schmidt'));
         $this->assertResponse(200);
-        
+
         /**
          * cache should have been removed for $this->userId
          */
         $this->_assertCacheNotExists('/'.Ak::lang().'/cache_sweeper/show/'.$this->userId,array('host'=>'www.example.com'));
-        
+
     }
     public function test_sweeper_delete_unhandled()
     {
@@ -94,9 +100,9 @@ class Test_AkActionControllerSweeper extends AkTestApplication
         $this->assertResponse(200);
         $this->get('http://www.example.com/page_caching/');
         $this->_assertCacheExists('/'.Ak::lang().'/cache_sweeper/show/'.$this->userId,array('host'=>'www.example.com'));
-        
+
     }
-    
+
     public function test_update_sweeper_except()
     {
         $this->post('http://www.example.com/cache_sweeper2/create',
@@ -107,11 +113,11 @@ class Test_AkActionControllerSweeper extends AkTestApplication
         $this->showUrl = 'http://www.example.com'.$parts['path'];
         $params = preg_split('/\//', rtrim($this->showUrl,'/'));
         $this->userId = $params[count($params)-1];
-        
+
         $this->_assertCacheNotExists('/'.Ak::lang().'/cache_sweeper2/show/'.$this->userId,array('host'=>'www.example.com'));
         $this->get($this->showUrl);
         $this->_assertCacheExists('/'.Ak::lang().'/cache_sweeper2/show/'.$this->userId,array('host'=>'www.example.com'));
-        
+
         /**
          * delete does not call the sweeper, so cache should still exist
          */
@@ -131,13 +137,13 @@ class Test_AkActionControllerSweeper extends AkTestApplication
         $fragment = $controller->readFragment($path, $options);
         return $fragment;
     }
-    
+
     public function _assertCacheExists($path, $options = array())
     {
         $fragment = $this->_getActionCache($path, $options);
         $this->assertTrue($fragment!==false);
     }
-    
+
     public function _assertCacheNotExists($path, $options = array())
     {
         $fragment = $this->_getActionCache($path, $options);
@@ -151,3 +157,5 @@ class Test_AkActionControllerSweeper extends AkTestApplication
         }
     }
 }
+
+ak_test_run_case_if_executed('AkActionController_sweepers_TestCase');
