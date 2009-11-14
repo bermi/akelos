@@ -587,7 +587,7 @@ class AkHasMany extends AkAssociation
 
         foreach ($options as $option=>$value) {
             if(!empty($value)){
-                $finder_options[$option] = trim($Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $value));
+                $finder_options[$option] = trim($Associated->addTableAliasesToAssociatedSql('_'.$this->association_id, $value));
             }
         }
 
@@ -602,7 +602,7 @@ class AkHasMany extends AkAssociation
 
         $finder_options['conditions'] = empty($options['conditions']) ? '' :
 
-        $Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ';
+        $Associated->addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ';
 
         return $finder_options;
     }
@@ -621,11 +621,11 @@ class AkHasMany extends AkAssociation
         foreach ($options as $option=>$value) {
             if(!empty($value) && !is_bool($value)){
                 if(is_string($value)) {
-                    $finder_options[$option] = trim($Associated->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $value));
+                    $finder_options[$option] = trim($Associated->addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $value));
                 } else if(is_array($value)) {
 
                     foreach($value as $idx=>$v) {
-                        $value[$idx]=trim($Associated->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $v));
+                        $value[$idx]=trim($Associated->addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $v));
                     }
                     $finder_options[$option] = $value;
                 }else {
@@ -646,7 +646,7 @@ class AkHasMany extends AkAssociation
 
         $finder_options['conditions'] = empty($finder_options['conditions']) ? '' :
 
-        $Associated->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $options['conditions']).' ';
+        $Associated->addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $options['conditions']).' ';
 
         return $finder_options;
     }

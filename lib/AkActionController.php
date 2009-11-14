@@ -441,6 +441,11 @@ class AkActionController extends AkLazyObject// AkObject
 
 
     /**
+                        Automatic model loading
+    ====================================================================
+    */
+
+    /**
      * Methods for loading desired models into this controller
      */
     public function setModel($model)
@@ -455,57 +460,66 @@ class AkActionController extends AkLazyObject// AkObject
 
     public function instantiateIncludedModelClasses($models = array())
     {
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-        require_once(AkConfig::getDir('app').DS.'shared_model.php');
-
-        empty($this->model) ? ($this->model = $this->params['controller']) : null;
-        empty($this->models) ? ($this->models = array()) : null;
-
-        $models = array_unique(array_merge(Ak::import($this->model), Ak::import($this->models), Ak::import($models), (empty($this->app_models)?array(): Ak::import($this->app_models))));
-
+        $models = $this->getIncludedModelClassNames($models);
         unset($this->model, $this->models);
-        $getFinderOptionsExists=method_exists($this,'_getFinderOptions');
         foreach ($models as $model){
-            $custom_find = false;
-            if (empty($this->finder_options[$model]) && $getFinderOptionsExists) {
-                $this->finder_options[$model] = $this->_getFinderOptions($model);
-                $custom_find=true;
-            }
-            $this->instantiateModelClass($model, (empty($this->finder_options[$model])?array():$this->finder_options[$model]),$custom_find);
+            $this->instantiateModelClass($model);
         }
+    }
+
+    public function getIncludedModelClassNames($extra_models = array())
+    {
+        empty($this->model)         && ($this->model        = $this->params['controller']);
+        empty($this->models)        && ($this->models       = array());
+        empty($this->app_models)    && ($this->app_models   = array());
+        return (array)array_unique(array_diff(array_merge_recursive(Ak::toArray($extra_models), Ak::toArray($this->app_models), Ak::toArray($this->models), Ak::toArray($this->model)), array('')));
+    }
+
+    function getFinderOptionsForClassName($model_class_name)
+    {
+        if(!empty($this->finder_options[$model_class_name])){
+            return $this->finder_options[$model_class_name];
+        }elseif (method_exists($this, '_getFinderOptions') && empty($this->finder_options[$model_class_name])) {
+            return $this->_getFinderOptions($model_class_name);
+        }
+        return array();
     }
 
     public function instantiateModelClass($model_class_name, $finder_options = array(), $custom_find = false)
     {
+
+        if(!$model_class_name = Ak::import($model_class_name)){
+            return false;
+        }
+
+        $model_class_name = Ak::first($model_class_name);
+        $finder_options = empty($finder_options) ? $this->getFinderOptionsForClassName($model_class_name) : $finder_options;
+
         $underscored_model_class_name = AkInflector::underscore($model_class_name);
-        $controller_name = isset($this->controller_name)?$this->controller_name:$this->getControllerName();
-        $id = empty($this->params[$underscored_model_class_name]['id']) ?
-        (empty($this->params['id']) ? false :
-        (($model_class_name == $controller_name || $model_class_name == $this->singularized_controller_name) ? $this->params['id'] : false)) :
-        $this->params[$underscored_model_class_name]['id'];
+        $controller_name = isset($this->controller_name) ? $this->controller_name : $this->getControllerName();
+        $id = empty($this->params[$underscored_model_class_name]['id']) ?(empty($this->params['id']) ? false : (($model_class_name == $controller_name || $model_class_name == $this->singularized_controller_name) ? $this->params['id'] : false)) : $this->params[$underscored_model_class_name]['id'];
 
-        if(class_exists($model_class_name)){
-            $underscored_model_class_name = AkInflector::underscore($model_class_name);
+        $underscored_model_class_name = AkInflector::underscore($model_class_name);
 
-            if(!isset($this->$model_class_name) || !isset($this->$underscored_model_class_name)){
-                if($finder_options !== false && is_numeric($id)){
-                    $model = new $model_class_name();
-                    if(empty($finder_options)){
-                        $model = $model->find($id);
-                    }else if ($custom_find) {
-                        $model = $model->find('first',$finder_options);
-                    }else{
-                        $model = $model->find($id, $finder_options);
-                    }
+        if(!isset($this->$model_class_name) || !isset($this->$underscored_model_class_name)){
+
+            if($finder_options !== false && is_numeric($id)){
+                $model = new $model_class_name();
+                if(empty($finder_options)){
+                    $model = $model->find($id);
+                }elseif ($custom_find) {
+                    $model = $model->find('first', $finder_options);
                 }else{
-                    $model = new $model_class_name();
+                    $model = $model->find($id, $finder_options);
                 }
-                if(!isset($this->$model_class_name)){
-                    $this->$model_class_name = $model;
-                }
-                if(!isset($this->$underscored_model_class_name)){
-                    $this->$underscored_model_class_name = $model;
-                }
+            }else{
+                $model = new $model_class_name();
+            }
+            if(!isset($this->$model_class_name)){
+                $this->$model_class_name = $model;
+            }
+            if(!isset($this->$underscored_model_class_name)){
+                $this->$underscored_model_class_name = $model;
             }
         }
     }

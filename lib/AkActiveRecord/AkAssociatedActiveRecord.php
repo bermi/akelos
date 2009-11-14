@@ -3,14 +3,12 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActiveRecord
  * @subpackage Base
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
+ * @author Arno Schneider <arno a.t bermilabs c.om>
  */
 
 /**
@@ -26,6 +24,7 @@ Example: An Account class declares has_one :beneficiary, which will add:
 
 * Account#beneficiary (similar to Beneficiary.find(:first, :conditions => "account_id = #{id}"))
 * Account#beneficiary=(beneficiary) (similar to beneficiary.account_id = account.id; beneficiary.save)
+* Account#beneficiary.nil?
 * Account#build_beneficiary (similar to Beneficiary.new("account_id" => id))
 * Account#create_beneficiary (similar to b = Beneficiary.new("account_id" => id); b.save; b)
 */
@@ -33,21 +32,18 @@ Example: An Account class declares has_one :beneficiary, which will add:
 
 class AkAssociatedActiveRecord extends AkBaseModel
 {
-    private
-    $__activeRecordObject = false;
-
-    /**
-     * @todo enable getters and setters in order to protect these attributes
-     */
     public
     $_AssociationHandler,
     $_associationId = false,
-
     // Holds different association IDs related to this model
     $_associationIds = array(),
     $_associations = array();
 
-    protected function _loadAssociationHandler($association_type)
+    private
+    $__activeRecordObject = false;
+
+
+    public function _loadAssociationHandler($association_type)
     {
         if(empty($this->$association_type) && in_array($association_type, array('hasOne','belongsTo','hasMany','hasAndBelongsToMany'))){
             $association_handler_class_name = 'Ak'.ucfirst($association_type);
@@ -59,7 +55,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
     public function setAssociationHandler(&$AssociationHandler, $association_id)
     {
-        $this->_AssociationHandler = $AssociationHandler;
+        $this->_AssociationHandler =& $AssociationHandler;
     }
 
     public function loadAssociations()
@@ -82,7 +78,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
             if(!empty($association_details) && $this->_loadAssociationHandler($association_type)){
                 $this->$association_type->initializeAssociated($association_details);
 
-                $this->_associations[$association_type] = $this->$association_type;
+                $this->_associations[$association_type] =& $this->$association_type;
 
             }
         }
@@ -95,7 +91,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
     {
         $result = array();
         if(!empty($this->$association_type) && in_array($association_type, array('hasOne','belongsTo','hasMany','hasAndBelongsToMany'))){
-            $result = $this->$association_type->getModels();
+            $result =& $this->$association_type->getModels();
         }
         return $result;
     }
@@ -105,11 +101,12 @@ class AkAssociatedActiveRecord extends AkBaseModel
         return false;
     }
 
+
     public function &assign(&$Associated)
     {
         $result = false;
         if(is_object($this->_AssociationHandler)){
-            $result = $this->_AssociationHandler->assign($this->getAssociationId(), $Associated);
+            $result =& $this->_AssociationHandler->assign($this->getAssociationId(), $Associated);
         }
         return $result;
     }
@@ -122,7 +119,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
     {
         $result = false;
         if(!empty($this->_AssociationHandler)){
-            $result = $this->_AssociationHandler->build($this->getAssociationId(), $attributes, $replace_existing);
+            $result =& $this->_AssociationHandler->build($this->getAssociationId(), $attributes, $replace_existing);
         }
         return $result;
     }
@@ -132,7 +129,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
     {
         $result = false;
         if(!empty($this->_AssociationHandler)){
-            $result = $this->_AssociationHandler->create($this->getAssociationId(), $attributes, $replace_existing);
+            $result =& $this->_AssociationHandler->create($this->getAssociationId(), $attributes, $replace_existing);
         }
         return $result;
     }
@@ -141,7 +138,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
     {
         $result = false;
         if(!empty($this->_AssociationHandler)){
-            $result = $this->_AssociationHandler->replace($this->getAssociationId(), $NewAssociated, $dont_save = false);
+            $result =& $this->_AssociationHandler->replace($this->getAssociationId(), $NewAssociated, $dont_save = false);
         }
         return $result;
     }
@@ -150,7 +147,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
     {
         $result = false;
         if(!empty($this->_AssociationHandler)){
-            $result = $this->_AssociationHandler->findAssociated($this->getAssociationId());
+            $result =& $this->_AssociationHandler->findAssociated($this->getAssociationId());
         }
         return $result;
     }
@@ -160,9 +157,9 @@ class AkAssociatedActiveRecord extends AkBaseModel
         $result = false;
         $association_id = $this->getAssociationId();
         if(!empty($this->_AssociationHandler) && (empty($this->_loaded))){
-            $result = $this->_AssociationHandler->loadAssociated($association_id, true);
+            $result =& $this->_AssociationHandler->loadAssociated($association_id, true);
         } else if (!empty($this->_AssociationHandler->Owner->$association_id)) {
-            $result = $this->_AssociationHandler->Owner->$association_id;
+            $result = &$this->_AssociationHandler->Owner->$association_id;
         }
         return $result;
     }
@@ -176,22 +173,18 @@ class AkAssociatedActiveRecord extends AkBaseModel
     {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->constructSqlForInclusion($this->getAssociationId()) : false;
     }
-
     public function constructSqlForInclusionChain($handler_name,$parent_handler_name)
     {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->constructSqlForInclusionChain($this->getAssociationId(),$handler_name,$parent_handler_name) : false;
     }
-
     public function getAssociatedFinderSqlOptions($options = array())
     {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->getAssociatedFinderSqlOptions($this->getAssociationId(), $options) : false;
     }
-
     public function getAssociatedFinderSqlOptionsForInclusionChain($prefix, $parent_handler_name,$options = array(),$pluralize=false)
     {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->getAssociatedFinderSqlOptionsForInclusionChain($this->getAssociationId(), $prefix, $parent_handler_name, $options,$pluralize) : false;
     }
-
     public function getAssociationOption($option)
     {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->getOption($this->getAssociationId(), $option) : false;
@@ -327,13 +320,13 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
             $associated_options = $this->$handler_name->getAssociatedFinderSqlOptionsForInclusionChain('owner[@'.$parent_pk.']','__owner',$association_options,$multi);
 
-            $options ['order'] = empty($options ['order']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options ['order']);
+            $options ['order'] = empty($options ['order']) ? '' : $this->addTableAliasesToAssociatedSql('__owner', $options ['order']);
 
-            $options ['group'] = empty($options ['group']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options ['group']);
+            $options ['group'] = empty($options ['group']) ? '' : $this->addTableAliasesToAssociatedSql('__owner', $options ['group']);
 
 
 
-            $options ['conditions'] = empty($options ['conditions']) ? '' : $this->_addTableAliasesToAssociatedSql('__owner', $options ['conditions']);
+            $options ['conditions'] = empty($options ['conditions']) ? '' : $this->addTableAliasesToAssociatedSql('__owner', $options ['conditions']);
 
 
             foreach(array_keys($associated_options) as $option) {
@@ -372,7 +365,14 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 }
             }
 
-            if (!empty($values) && $option!='include') {
+            if (! empty($values) && $option!='include') {
+                if(!empty($true)) {
+                    //echo "<pre>";
+                    //var_dump($option);
+                    //var_dump($values);
+                    //var_dump($associated_options);
+                    //die;
+                }
                 $separator = $option == 'joins' ? ' ' : (in_array($option, array ('selection', 'order' )) ? ', ' : ' AND ');
                 $values = array_map('trim', $values);
 
@@ -419,7 +419,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $sql = array_merge(array ($sql ), $options ['bind']);
         }
 
-        $result = $this->_findBySqlWithAssociations($sql, empty($options ['virtual_limit']) ? false : $options ['virtual_limit'], $load_acts, $returns,$simulation_class, $config);
+        $result = & $this->_findBySqlWithAssociations($sql, empty($options ['virtual_limit']) ? false : $options ['virtual_limit'], $load_acts, $returns,$simulation_class, $config);
         if (empty($result)) {
             $result = false;
         }
@@ -427,7 +427,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
     }
 
 
-    protected function _prepareIncludes($prefix,$parent_is_plural, &$parent,&$available_associated_options,$handler_name,$parent_association_id,$association_id,&$options,&$association_options, &$replacements, &$config)
+    public function _prepareIncludes($prefix,$parent_is_plural, &$parent,&$available_associated_options,$handler_name,$parent_association_id,$association_id,&$options,&$association_options, &$replacements, &$config)
     {
         if (isset($association_options['include'])) {
             $association_options['include'] = Ak::toArray($association_options['include']);
@@ -436,9 +436,9 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 Ak::import($main_association_class_name);
                 $sub_association_object = new $main_association_class_name;
             } else if (isset($parent->$handler_name) && method_exists($parent->$handler_name,'getAssociatedModelInstance')){
-                $sub_association_object = $parent->$handler_name->getAssociatedModelInstance();
+                $sub_association_object = &$parent->$handler_name->getAssociatedModelInstance();
             } else {
-                $sub_association_object = $parent;
+                $sub_association_object = &$parent;
             }
 
         } else {
@@ -467,7 +467,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
             if ($type == 'hasMany' || $type ==
             'hasAndBelongsToMany') {
-                $instance = $sub_association_object->$sub_handler_name->getAssociatedModelInstance();
+                $instance=&$sub_association_object->$sub_handler_name->getAssociatedModelInstance();
                 $class_name = $instance->getType();
                 $table_name = $instance->getTableName();
                 $pk = $instance->getPrimaryKey();
@@ -484,7 +484,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 $pluralize = false;
             } else {
                 $pk = $sub_association_object->$sub_handler_name->getPrimaryKey();
-                $instance = $sub_association_object;
+                $instance = &$sub_association_object;
                 $class_name =$instance->getType();
                 $pluralize = false;
                 $table_name = $instance->getTableName();
@@ -493,9 +493,11 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $sub_associated_options = $sub_association_object->$sub_handler_name->getAssociatedFinderSqlOptionsForInclusionChain($prefix.'['.$handler_name.']'.($parent_is_plural?'[@'.$pk.']':''),'__owner__'.$parent_association_id,
             $sub_options, $pluralize);
 
-            // Adding replacements for base options like order,conditions,group.
-            // The table-aliases of the included associations will be replaced
-            // with their respective __owner_$handler_name.$column_name representative.
+            /**
+                     * Adding replacements for base options like order,conditions,group.
+                     * The table-aliases of the included associations will be replaced
+                     * with their respective __owner_$handler_name.$column_name representative.
+                     */
             $replacements['/([,\s])_('.$sub_association_id.')\./']='\\1__owner__'.$parent_association_id.'__'.$sub_handler_name.'.';
             $replacements['/([,\s])('.$sub_association_id.')\./']='\\1__owner__'.$parent_association_id.'__'.$sub_handler_name.'.';
             $replacements['/([,\s])_('.$table_name.')\./']='\\1__owner__'.$parent_association_id.'__'.$sub_handler_name.'.';
@@ -558,10 +560,10 @@ class AkAssociatedActiveRecord extends AkBaseModel
             return $objects;
         }
 
-        $result = $this->_generateObjectGraphFromResultSet($results,$virtual_limit, $load_acts, $returns, $simulation_class, $config);
+        $result =& $this->_generateObjectGraphFromResultSet($results,$virtual_limit, $load_acts, $returns, $simulation_class, $config);
         return $result;
-    }
 
+    }
     /**
      * Generates objects from special sql:
      * SELECT id as owner[id]...
@@ -644,7 +646,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                     $available['load_associations'] = false;
                     $available['load_acts'] = $load_acts;
 
-                    $obj = $this->instantiate($available,false,false);
+                    $obj=&$this->instantiate($available,false,false);
 
                     foreach(array_values($diff) as $rel) {
                         $this->_setAssociations($rel,$data[$rel],$obj, $load_acts);
@@ -652,7 +654,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
                     $obj->afterInstantiate();
                     $obj->notifyObservers('afterInstantiate');
-                    $return[] = $obj;
+                    $return[]=&$obj;
                 }
             } else {
                 $return = false;
@@ -664,12 +666,11 @@ class AkAssociatedActiveRecord extends AkBaseModel
         } else if ($returns == 'simulated') {
             include_once AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php';
             $false = false;
-            $return = $this->_generateStdClasses($simulation_class,$owner, $this->getType(), $false, $false, $config);
+            $return = &$this->_generateStdClasses($simulation_class,$owner, $this->getType(), $false, $false, $config);
         }
         return $return;
     }
-
-    protected function _reindexArray(&$array)
+    public function _reindexArray(&$array)
     {
         if (is_numeric(key($array))) {
             $array = array_values($array);
@@ -680,8 +681,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
             }
         }
     }
-
-    protected function _generateStdClasses($simulation_class,$owner, $class, $handler_name, &$parent, $config = array(), $config_key = '__owner')
+    public function _generateStdClasses($simulation_class,$owner, $class, $handler_name, &$parent, $config = array(), $config_key = '__owner')
     {
         $return = array();
         $singularize=false;
@@ -705,38 +705,39 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 } else if (is_array($value)) {
                     $assoc = isset($config[$config_key][$key]['association_id'])?$config[$config_key][$key]['association_id']:false;
                     if ($assoc) {
-                        $obj->$assoc = $this->_generateStdClasses($simulation_class,$value, @$config[$config_key][$key]['class'], $key,$obj, @$config[$config_key], $key);
+                        $obj->$assoc = &$this->_generateStdClasses($simulation_class,$value, @$config[$config_key][$key]['class'], $key,$obj, @$config[$config_key], $key);
                         $obj->_addAssociation($assoc, $key);
+                    } else {
                     }
                 }
             }
-            $return[] = $obj;
+            $return[]=&$obj;
         }
         return $singularize?$return[0]:$return;
     }
+
 
     public function org_addToOwner(&$owner, $key, $value) {
 
         if(preg_match_all('/\[(.*?)\]/',$key,$matches)) {
             $count = count($matches[1]);
-            $last = $owner;
+            $last = &$owner;
             for($idx=0;$idx<$count;$idx++) {
 
                 if (!isset($last[$matches[1][$idx]])) {
                     $last[$matches[1][$idx]] = array();
                 }
-                $last = $last[$matches[1][$idx]];
+                $last = &$last[$matches[1][$idx]];
 
             }
             $last = $value;
         }
     }
+    public function _addToOwner(&$owner, $key, $value, $returns, $config) {
 
-    protected function _addToOwner(&$owner, $key, $value, $returns, $config)
-    {
         if(preg_match_all('/\[(.*?)\]/',$key,$matches)) {
             $count = count($matches[1]);
-            $last = $owner;
+            $last = &$owner;
             for($idx=0;$idx<$count;$idx++) {
                 $key = $matches[1][$idx];
                 $association = $key;
@@ -751,7 +752,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 if (!isset($last[$association])) {
                     $last[$association] = array();
                 }
-                $last = $last[$association];
+                $last = &$last[$association];
 
             }
             if($returns=='array') {
@@ -762,8 +763,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
         //$this->log('owner:'.var_export($owner,true));
     }
 
-    protected function _setAssociations($assoc_name, $val, &$parent, $load_acts = true)
-    {
+    public function _setAssociations($assoc_name, $val, &$parent, $load_acts = true) {
         static $instances = array();
         static $instance_attributes = array();
         if ($assoc_name{0}=='_') return;
@@ -776,16 +776,16 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 $class = $instance->$assoc_name->getAssociationOption('class_name');
                 if (!isset($instances[$class])) {
                     $instance = new $class;
-                    $instances[$class] = $instance;
+                    $instances[$class] = &$instance;
                 } else {
-                    $instance = $instances[$class];
+                    $instance = &$instances[$class];
                 }
             } else if (isset($parent->$assoc_name) && method_exists($parent->$assoc_name,'getAssociatedModelInstance')){
                 if (!isset($instances[$parent->getType().'-'.$assoc_name])) {
                     $instance = $parent->$assoc_name->getAssociatedModelInstance();
-                    $instances[$parent->getType().'-'.$assoc_name] = $instance;
+                    $instances[$parent->getType().'-'.$assoc_name] = &$instance;
                 } else {
-                    $instance = $instances[$parent->getType().'-'.$assoc_name];
+                    $instance=&$instances[$parent->getType().'-'.$assoc_name];
                 }
             } else if (isset($parent->$assoc_name) && method_exists($parent->$assoc_name,'getType') && !in_array($parent->$assoc_name->getType(),array('belongsTo','hasOne','hasOne','hasMany','hasAndBelongsToMany'))) {
 
@@ -793,9 +793,9 @@ class AkAssociatedActiveRecord extends AkBaseModel
             } else if (isset($instance->$assoc_name)) {
                 if (!isset($instances[$instance->getType().'-'.$assoc_name])) {
                     $instance = $instance->$assoc_name->getAssociatedModelInstance();
-                    $instances[$instance->getType().'-'.$assoc_name] = $instance;
+                    $instances[$instance->getType().'-'.$assoc_name] = &$instance;
                 } else {
-                    $instance = $instances[$instance->getType().'-'.$assoc_name];
+                    $instance=&$instances[$instance->getType().'-'.$assoc_name];
                 }
             } else {
                 $this->log('Cannot find association:'.$assoc_name.' on '.$parent->getType());
@@ -809,9 +809,9 @@ class AkAssociatedActiveRecord extends AkBaseModel
             }
             if (!isset($instances[$parent->getType().'-'.$assoc_name])) {
                 $instance = $parent->$assoc_name->getAssociatedModelInstance();
-                $instances[$parent->getType().'-'.$assoc_name] = $instance;
+                $instances[$parent->getType().'-'.$assoc_name]=&$instance;
             } else {
-                $instance = $instances[$parent->getType().'-'.$assoc_name];
+                $instance=&$instances[$parent->getType().'-'.$assoc_name];
             }
         }
 
@@ -850,7 +850,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $available['load_acts'] = $load_acts;
 
             $available = $this->_castAttributesFromDatabase($available,$instance);
-            $obj = $parent->$assoc_name->build($available,false);
+            $obj=&$parent->$assoc_name->build($available,false);
 
             $obj->_newRecord = false;
             $parent->$assoc_name->_loaded=true;
@@ -863,16 +863,14 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
         }
     }
-
-    protected function _castAttributesFromDatabase($attributes = array(),$record = null)
+    public function _castAttributesFromDatabase($attributes = array(),$record = null)
     {
         foreach($attributes as $key => $value) {
             $attributes[$key] = $this->_castAttributeFromDatabase($key,$value,$record);
         }
         return $attributes;
     }
-
-    protected function _castAttributeFromDatabase($column_name,$value, $record)
+    public function _castAttributeFromDatabase($column_name,$value, $record)
     {
         $column_type = $record->getColumnType($column_name);
 
@@ -902,7 +900,6 @@ class AkAssociatedActiveRecord extends AkBaseModel
         }
         return $value;
     }
-
     public function getCollectionHandlerName($association_id)
     {
         if(isset($this->$association_id) && is_object($this->$association_id) && method_exists($this->$association_id,'getAssociatedFinderSqlOptions')){
@@ -957,14 +954,17 @@ class AkAssociatedActiveRecord extends AkBaseModel
         return $sql;
     }
 
-    protected function _addTableAliasesToAssociatedSqlWithAlias($add_alias, $alias,$sql)
+
+
+    public function addTableAliasesToAssociatedSqlWithAlias($add_alias, $alias,$sql)
     {
         return preg_replace($this->getColumnsWithRegexBoundariesAndAlias($alias),'\1'.$add_alias.'.\3',' '.$sql.' ');
     }
 
-    protected function _addTableAliasesToAssociatedSql($table_alias, $sql)
+    public function addTableAliasesToAssociatedSql($table_alias, $sql)
     {
         return preg_replace($this->getColumnsWithRegexBoundaries(),'\1'.$table_alias.'.\2',' '.$sql.' ');
     }
 
 }
+

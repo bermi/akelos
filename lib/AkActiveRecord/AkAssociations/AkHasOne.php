@@ -140,7 +140,7 @@ class AkHasOne extends AkAssociation
             }
             if (!empty($value)) {
                 if (is_string($value)) {
-                    $finder_options[$option] = trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql('_'.$association_id, $value));
+                    $finder_options[$option] = trim($this->Owner->$association_id->addTableAliasesToAssociatedSql('_'.$association_id, $value));
                 } else {
                     $finder_options[$option] = $value;
                 }
@@ -184,7 +184,7 @@ class AkHasOne extends AkAssociation
             }
             if (!empty($value) && !is_bool($value)) {
                 if (is_string($value)) {
-                    $finder_options[$option] = trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $value));
+                    $finder_options[$option] = trim($this->Owner->$association_id->addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $value));
                 } else {
                     $finder_options[$option] = $value;
                 }
@@ -313,10 +313,10 @@ class AkHasOne extends AkAssociation
         $table_name = $this->Owner->$association_id->getAssociationOption('table_name');
 
         $finder_options =         array(
-        'conditions' => trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($table_name, $this->constructSqlConditions($association_id))),
+        'conditions' => trim($this->Owner->$association_id->addTableAliasesToAssociatedSql($table_name, $this->constructSqlConditions($association_id))),
         'selection' => $table_name,
-        'joins' => trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($table_name, $this->constructSql($association_id))),
-        'order' => trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($table_name, $this->Owner->$association_id->getAssociationOption('order')))
+        'joins' => trim($this->Owner->$association_id->addTableAliasesToAssociatedSql($table_name, $this->constructSql($association_id))),
+        'order' => trim($this->Owner->$association_id->addTableAliasesToAssociatedSql($table_name, $this->Owner->$association_id->getAssociationOption('order')))
         );
 
         /**

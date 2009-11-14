@@ -351,9 +351,9 @@ class AkLocaleManager extends AkObject
         }
 
         if(!$this->_canUseLocaleOnCurrentRequest($lang, $Request)){
-            $lang = array_shift($this->getPublicLocales());
+            $lang = Ak::first($this->getPublicLocales());
         }elseif (empty($lang)){
-            $lang = array_shift($this->getPublicLocales());
+            $lang = Ak::first($this->getPublicLocales());
         }
 
         // This way we store on get_url_locale and on lang the value of $lang on

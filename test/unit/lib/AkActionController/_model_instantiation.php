@@ -1,15 +1,15 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class _AkActionController_model_instantiation extends AkWebTestCase
+class AkContionController_model_instantiation_TestCase extends AkWebTestCase
 {
     public function test_setup()
     {
         $TestSetup = new AkUnitTest();
+        $TestSetup->rebaseAppPaths();
         $TestSetup->installAndIncludeModels(array('Post','Comment','Tag'));
-        $Post =& $TestSetup->Post->create(array('title'=>'One','body'=>'First post'));
+        $Post = $TestSetup->Post->create(array('title'=>'One','body'=>'First post'));
         foreach (range(1,5) as $n){
             $Post->comment->add(new Comment(array('body' => AkInflector::ordinalize($n).' post')));
         }
@@ -19,7 +19,7 @@ class _AkActionController_model_instantiation extends AkWebTestCase
         $this->assertEqual($Post->comment->count(), 5);
         $this->post_id = $Post->id;
     }
-    
+
     public function test_should_access_public_action()
     {
         $this->setMaximumRedirects(0);
@@ -29,6 +29,5 @@ class _AkActionController_model_instantiation extends AkWebTestCase
     }
 }
 
-ak_test('_AkActionController_model_instantiation', true);
+ak_test_run_case_if_executed('AkContionController_model_instantiation_TestCase');
 
-?>

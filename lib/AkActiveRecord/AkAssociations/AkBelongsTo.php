@@ -215,11 +215,11 @@ class AkBelongsTo extends AkAssociation
             }
             if (!empty($value) && !is_bool($value)) {
                 if (is_string($value)) {
-                    $finder_options[$option] = trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $value));
+                    $finder_options[$option] = trim($this->Owner->$association_id->addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $value));
                 } else if(is_array($value)) {
 
                     foreach($value as $idx=>$v) {
-                        $value[$idx]=trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $v));
+                        $value[$idx]=trim($this->Owner->$association_id->addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $v));
                     }
                     $finder_options[$option] = $value;
                 }else {
@@ -261,7 +261,7 @@ class AkBelongsTo extends AkAssociation
         foreach ($options as $option=>$available) {
             if($available){
                 $value = $this->Owner->$association_id->getAssociationOption($option);
-                empty($value) ? null : ($finder_options[$option] = trim($this->Owner->$association_id->_addTableAliasesToAssociatedSql('_'.$association_id, $value)));
+                empty($value) ? null : ($finder_options[$option] = trim($this->Owner->$association_id->addTableAliasesToAssociatedSql('_'.$association_id, $value)));
             }
         }
 

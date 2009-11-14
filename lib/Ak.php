@@ -672,7 +672,7 @@ class Ak
         $method = empty($method) ? $default_method : $method;
 
         if(AK_CLI){
-            $text = Ak::dump($text, $default_method);
+            $text = Ak::dump($text, 'print_r');
         }elseif (!empty($text) && !is_scalar($text)){
             $rand = Ak::randomString();
             $formatted = '';

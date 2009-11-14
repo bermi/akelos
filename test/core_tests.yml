@@ -19,6 +19,8 @@ Action Controller:
     - AkSession
     - 'AkActionController/_f*'
     - 'AkActionController/_h*'
+    - 'AkActionController/_l*'
+    - 'AkActionController/_m*'
     #- 'AkActionController/*'
     #- AkRequest
 

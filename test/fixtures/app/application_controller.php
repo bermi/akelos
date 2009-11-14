@@ -2,10 +2,8 @@
 
 require_once(AkConfig::getDir('app').DS.'base_action_controller.php');
 
-class ApplicationController extends BaseActionController 
+class ApplicationController extends BaseActionController
 {
-    var $layout = false;
-
+    public $layout = false;
 }
 
-?>

@@ -594,7 +594,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         return $this->Owner->$association_id;
     }
 
-    public function _addTableAliasesToAssociatedSql($table_alias, $sql)
+    public function addTableAliasesToAssociatedSql($table_alias, $sql)
     {
         return preg_replace($this->Owner->getColumnsWithRegexBoundaries(),'\1'.$table_alias.'.\2',' '.$sql.' ');
     }
@@ -718,7 +718,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
         foreach ($options as $option=>$value) {
             if(!empty($value)){
-                $finder_options[$option] = trim($Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $value));
+                $finder_options[$option] = trim($Associated->addTableAliasesToAssociatedSql('_'.$this->association_id, $value));
             }
         }
 
@@ -737,7 +737,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         $finder_options['conditions'] =
         // We add previous conditions
         (!empty($finder_options['conditions']) ?
-        ''.$Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ' : '');
+        ''.$Associated->addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ' : '');
 
         return $finder_options;
     }
@@ -754,11 +754,11 @@ class AkHasAndBelongsToMany extends AkAssociation
         foreach ($options as $option=>$value) {
             if(!empty($value)  && !is_bool($value)){
                 if(is_string($value)) {
-                    $finder_options[$option] = trim($Associated->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $value));
+                    $finder_options[$option] = trim($Associated->addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $value));
                 } else if(is_array($value)) {
 
                     foreach($value as $idx=>$v) {
-                        $value[$idx]=trim($Associated->_addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $v));
+                        $value[$idx]=trim($Associated->addTableAliasesToAssociatedSql($parent_handler_name.'__'.$handler_name, $v));
                     }
                     $finder_options[$option] = $value;
                 }else {
@@ -792,7 +792,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         /**$finder_options['conditions'] =
         // We add previous conditions
         (!empty($finder_options['conditions']) ?
-        ''.$Associated->_addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ' : '');*/
+        ''.$Associated->addTableAliasesToAssociatedSql('_'.$this->association_id, $options['conditions']).' ' : '');*/
 
         return $finder_options;
     }
@@ -956,7 +956,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                         $bind = array();
                     }
 
-                    $newConditions = $this->Owner->_addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$newConditions);
+                    $newConditions = $this->Owner->addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$newConditions);
                     $options['conditions'] = trim(substr($has_and_belongs_to_many_options['finder_sql'],0, $wherePos)).' WHERE ('.trim($newConditions).') AND ('.trim($oldConditions).')';
                     if (!empty($bind)) {
                         $options['conditions'] = array_merge(array($options['conditions']),$bind);
@@ -980,13 +980,13 @@ class AkHasAndBelongsToMany extends AkAssociation
                 unset($options['bind']);
             }
             if (is_array($options['conditions'])) {
-                $options['conditions'][0]=trim($Associated->_addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$options['conditions'][0]));
+                $options['conditions'][0]=trim($Associated->addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$options['conditions'][0]));
             } else {
-                empty($options['conditions']) ?null:$options['conditions']=trim($Associated->_addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$options['conditions']));
+                empty($options['conditions']) ?null:$options['conditions']=trim($Associated->addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$options['conditions']));
 
             }
-            empty($options['order']) ?null:$options['order']=trim($Associated->_addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$options['order']));
-            empty($options['group']) ?null:$options['group']=trim($Associated->_addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$options['group']));
+            empty($options['order']) ?null:$options['order']=trim($Associated->addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$options['order']));
+            empty($options['group']) ?null:$options['group']=trim($Associated->addTableAliasesToAssociatedSql($has_and_belongs_to_many_options['table_name'],$options['group']));
 
 
             if($options_in_args){

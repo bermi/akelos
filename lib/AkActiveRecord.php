@@ -3,8 +3,6 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActiveRecord
@@ -149,9 +147,12 @@
 */
 class AkActiveRecord extends AkAssociatedActiveRecord
 {
-    protected
+
+    public
+    $_db;
+
+    public
     $_tableName,
-    $_db,
     $_newRecord,
     $_freeze,
     $_dataDictionary,
@@ -851,7 +852,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         $args = func_get_args();
         $options = $this->_extractOptionsFromArgs($args);
-        list($fetch,$options) = $this->_extractConditionsFromArgs($args,$options);
+        list($fetch, $options) = $this->_extractConditionsFromArgs($args, $options);
         $this->_sanitizeConditionsVariables($options);
         switch ($fetch) {
             case 'first':
@@ -2324,7 +2325,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if (is_null($db_adapter)){
             $db_adapter = AkDbAdapter::getInstance();
         }
-        return $this->_db = $db_adapter;
+        $this->_db = $db_adapter;
+        return $db_adapter;
     }
 
     protected function _getDatabaseType()
@@ -2562,7 +2564,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             !is_array($column_objects) &&
             !$this->_runCurrentModelInstallerIfExists($column_objects)){
                 // akelos_migrations is the first active record to be installed, therefore the table will be created after the first run.
-                if($this->getTableName() != 'akelos_migrations'){ 
+                if($this->getTableName() != 'akelos_migrations'){
                     trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())), E_USER_ERROR);
                 }
                 return false;

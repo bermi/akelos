@@ -27,6 +27,8 @@ test/fixtures/public/images/cristobal.jpg_smooth.jpg
 test/fixtures/public/images/cristobal.jpg_watermarked.jpg
 test/fixtures/public/images/cristobal.jpgtop_crop.jpg
 test/fixtures/public/images/watermark.png
+test/fixtures/app/models/post_tag.php
+test/fixtures/app/models/post_user.php
 test/tmp/
 test/report/
 test/fixtures/app/locales/
