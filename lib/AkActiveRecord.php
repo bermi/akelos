@@ -173,7 +173,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     $_automated_validators_enabled = false,
     $_automated_not_null_validator = false,
     $_set_default_attribute_values_automatically = true,
-    $_activeRecordHasBeenInstantiated = true, // This is needed for enabling support for static active record instantation under php
+    $_activeRecordHasBeenInstantiated = true, // This is needed for enabling support for static active record instantiation under php
     $_defaultErrorMessages = array( // Holds a hash with all the default error messages, such that they can be replaced by your own copy or localizations.
     'inclusion' =>  "is not included in the list",
     'exclusion' => "is reserved",

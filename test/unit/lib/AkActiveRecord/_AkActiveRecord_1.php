@@ -49,7 +49,7 @@ class test_AkActiveRecord extends  AkUnitTest
         $this->assertTrue($User->isConnected());
     }
 
-    public function Test_of_new_object_instantation()
+    public function Test_of_new_object_instantiation()
     {
         $AkTestUser = new AkTestUser();
 
