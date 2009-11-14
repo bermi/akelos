@@ -127,9 +127,12 @@ class AkActionController extends AkLazyObject// AkObject
 
     public function init($options = array())
     {
+        if(isset($this->_inited)){
+            return ;
+        }
+        $this->_inited = true;
         $this->_enableLazyLoadingExtenssions($options);
         //$this->_initCacheHandler();
-
         //$this->_registerModule('caching','AkActionControllerCaching','AkActionController/Caching.php');
     }
 
@@ -202,10 +205,10 @@ class AkActionController extends AkLazyObject// AkObject
         $this->handleResponse();
     }
 
-
     protected function _enableLazyLoadingExtenssions($options = array())
     {
         empty($options['skip_filters']) && $this->_enableFilters();
+        empty($options['skip_authentication']) && $this->_enableAuthentication();
     }
 
     protected function _disbaleLazyLoadingExtenssions()
@@ -213,8 +216,18 @@ class AkActionController extends AkLazyObject// AkObject
         $this->_disableFilters();
     }
 
+    // Authentication
+    protected function _enableAuthentication()
+    {
+        $this->extendClassLazily('AkControllerAuthentication',
+        array(
+        'methods' => array('authenticateOrRequestWithHttpBasic','authenticateWithHttpBasic','requestHttpBasicAuthentication'),
+        'autoload_path' => AK_LIB_DIR.DS.'AkActionController'.DS.'AkControllerAuthentication.php'
+        ));
+    }
+
     // Action Filtering
-    private function _enableFilters()
+    protected function _enableFilters()
     {
         $this->extendClassLazily('AkControllerFilter',
         array(
@@ -224,12 +237,12 @@ class AkActionController extends AkLazyObject// AkObject
         ));
     }
 
-    private function _disableFilters()
+    protected function _disableFilters()
     {
         $this->unregisterExtenssion('AkControllerFilter');
     }
 
-    private function isFilteringActive()
+    public function isFilteringActive()
     {
         return $this->hasInstantiatedClass('AkControllerFilter');
     }

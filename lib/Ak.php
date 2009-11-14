@@ -2307,6 +2307,7 @@ class Ak
             'AkTime'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkTime.php',
             'AkType'                    =>  AK_LIB_DIR.DS.'AkType.php',
             'AkUnitTest'                =>  AK_LIB_DIR.DS.'AkUnitTest.php',
+            'AkWebTestCase'             =>  AK_LIB_DIR.DS.'AkUnitTest.php',
             'AssetTagHelper'            =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'asset_tag_helper.php',
             'BaseActiveRecord'          =>  AK_APP_DIR.DS.'base_active_record.php',
             'FormHelper'                =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php',

@@ -4,7 +4,6 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class AkContionController_http_authentication_TestCase extends AkWebTestCase
 {
-
     public function test_should_access_public_action()
     {
         $this->setMaximumRedirects(0);
@@ -33,7 +32,6 @@ class AkContionController_http_authentication_TestCase extends AkWebTestCase
     public function test_should_login()
     {
         $this->setMaximumRedirects(0);
-        die(AK_TESTING_URL.'/authentication/edit');
         $this->get(AK_TESTING_URL.'/authentication/edit');
         $this->authenticate('bermi', 'secret');
         $this->assertResponse(200);

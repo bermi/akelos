@@ -5,7 +5,7 @@ class AuthenticationController extends ApplicationController
     private $_authorized_users = array('bermi' => 'secret');
 
     public function __construct(){
-        parent::__construct();
+        parent::init();
         $this->beforeFilter(array('authenticate' => array('except' => array('index'))));
     }
 
@@ -17,7 +17,8 @@ class AuthenticationController extends ApplicationController
         $this->renderText("I'm only accessible if you know the password");
     }
 
-    public function authenticate(){
-        return $this->_authenticateOrRequestWithHttpBasic('App name', $this->_authorized_users);
+    public function authenticate()
+    {
+        return $this->authenticateOrRequestWithHttpBasic('App name', $this->_authorized_users);
     }
 }

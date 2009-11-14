@@ -11,7 +11,7 @@
 *       public $_authorized_users = array('bermi' => 'secret');
 *
 *       public function __construct(){
-*           parent::__construct();
+*           parent::init();
 *           $this->beforeFilter(array('authenticate' => array('except' => array('index'))));
 *       }
 *
@@ -36,20 +36,20 @@
 *       public $models = 'account';
 *
 *       public function __construct() {
-*         parent::__construct();
+*         parent::init();
 *         $this->beforeFilter(array('_setAccount', 'authenticate'));
 *       }
 *
 *       public function _setAccount() {
-*         $this->Account = $this->account->findFirstBy('url_name', array_pop($this->Request->getSubdomains()));
+*         $this->Account = $this->account->findFirstBy('url_name', array_pop($this->_Controller->Request->getSubdomains()));
 *       }
 *
 *       public function authenticate() {
-*           if($this->Request->isFormat('XML', 'ATOM')){
-*               if($User = $this->_authenticateWithHttpBasic($Account)){
+*           if($this->_Controller->Request->isFormat('XML', 'ATOM')){
+*               if($User = $this->authenticateWithHttpBasic($Account)){
 *                   $this->CurrentUser = $User;
 *               }else{
-*                   $this->_requestHttpBasicAuthentication();
+*                   $this->_Controller->requestHttpBasicAuthentication();
 *               }
 *           }else{
 *               if($this->isSessionAuthenticated()){
@@ -71,21 +71,22 @@
 
 class AkControllerAuthentication
 {
+    private $_Controller;
 
     public function authenticateOrRequestWithHttpBasic($realm = AK_APP_NAME, $login_procedure)
     {
-        if($Result = $this->_authenticateWithHttpBasic($login_procedure)){
+        if($Result = $this->authenticateWithHttpBasic($login_procedure)){
             return $Result;
         }
-        return $this->_requestHttpBasicAuthentication($realm);
+        return $this->requestHttpBasicAuthentication($realm);
     }
 
-    public function _authenticateWithHttpBasic($login_procedure)
+    public function authenticateWithHttpBasic($login_procedure)
     {
         return $this->_authenticate($login_procedure);
     }
 
-    public function _requestHttpBasicAuthentication($realm = AK_APP_NAME)
+    public function requestHttpBasicAuthentication($realm = AK_APP_NAME)
     {
         return $this->_authenticationRequest($realm);
     }
@@ -137,16 +138,16 @@ class AkControllerAuthentication
     public function _authorization()
     {
         return
-        empty($this->Request->env['PHP_AUTH_USER']) ? (
-        empty($this->Request->env['HTTP_AUTHORIZATION']) ? (
-        empty($this->Request->env['X-HTTP_AUTHORIZATION']) ? (
-        empty($this->Request->env['X_HTTP_AUTHORIZATION']) ? (
-        isset($this->Request->env['REDIRECT_X_HTTP_AUTHORIZATION']) ?
-        $this->Request->env['REDIRECT_X_HTTP_AUTHORIZATION'] : null
-        ) : $this->Request->env['X_HTTP_AUTHORIZATION']
-        ) : $this->Request->env['X-HTTP_AUTHORIZATION']
-        ) : $this->Request->env['HTTP_AUTHORIZATION']
-        ) : array($this->Request->env['PHP_AUTH_USER'], $this->Request->env['PHP_AUTH_PW']);
+        empty($this->_Controller->Request->env['PHP_AUTH_USER']) ? (
+        empty($this->_Controller->Request->env['HTTP_AUTHORIZATION']) ? (
+        empty($this->_Controller->Request->env['X-HTTP_AUTHORIZATION']) ? (
+        empty($this->_Controller->Request->env['X_HTTP_AUTHORIZATION']) ? (
+        isset($this->_Controller->Request->env['REDIRECT_X_HTTP_AUTHORIZATION']) ?
+        $this->_Controller->Request->env['REDIRECT_X_HTTP_AUTHORIZATION'] : null
+        ) : $this->_Controller->Request->env['X_HTTP_AUTHORIZATION']
+        ) : $this->_Controller->Request->env['X-HTTP_AUTHORIZATION']
+        ) : $this->_Controller->Request->env['HTTP_AUTHORIZATION']
+        ) : array($this->_Controller->Request->env['PHP_AUTH_USER'], $this->_Controller->Request->env['PHP_AUTH_PW']);
     }
 
     public function _decodeCredentials()
@@ -169,12 +170,16 @@ class AkControllerAuthentication
         header('WWW-Authenticate: Basic realm="' . str_replace('"','',$realm) . '"');
 
         if(method_exists($this, 'access_denied')){
-            $this->access_denied();
+            $this->_Controller->access_denied();
         }else{
             header('HTTP/1.0 401 Unauthorized');
             echo "HTTP Basic: Access denied.\n";
             exit;
         }
     }
-}
 
+    public function setExtendedBy(&$Controller)
+    {
+        $this->_Controller = $Controller;
+    }
+}
