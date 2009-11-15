@@ -2239,7 +2239,6 @@ class Ak
         static $paths = array();
 
         if(empty($paths)){
-
             $paths = array(
             'ApplicationController'     =>  AK_APP_DIR.DS.'application_controller.php',
             'BaseActionController'      =>  AK_APP_DIR.DS.'base_action_controller.php',
@@ -2302,6 +2301,9 @@ class Ak
             'AkRequestMimeType'         =>  AK_LIB_DIR.DS.'AkRequestMimeType.php',
             'AkRouter'                  =>  AK_LIB_DIR.DS.'AkRouter.php',
             'AkSession'                 =>  AK_LIB_DIR.DS.'AkSession.php',
+            'AkSintags'                 =>  AK_LIB_DIR.DS.'AkActionView'.DS.'TemplateEngines'.DS.'AkSintags.php',
+            'AkSintagsLexer'            =>  AK_LIB_DIR.DS.'AkActionView'.DS.'TemplateEngines'.DS.'AkSintags'.DS.'AkSintagsLexer.php',
+            'AkSintagsParser'           =>  AK_LIB_DIR.DS.'AkActionView'.DS.'TemplateEngines'.DS.'AkSintags'.DS.'AkSintagsParser.php',
             'AkString'                  =>  AK_LIB_DIR.DS.'AkType'.DS.'AkString.php',
             'AkTestApplication'         =>  AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestApplication.php',
             'AkTestDispatcher'          =>  AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestDispatcher.php',

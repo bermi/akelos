@@ -3,25 +3,22 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActionView
  * @subpackage Sintags
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 class AkSintagsLexer extends AkLexer
 {
-    var $_SINTAGS_REMOVE_PHP_SILENTLY = AK_SINTAGS_REMOVE_PHP_SILENTLY;
-    var $_SINTAGS_HIDDEN_COMMENTS_TAG = AK_SINTAGS_HIDDEN_COMMENTS_TAG;
+    public $_SINTAGS_REMOVE_PHP_SILENTLY = AK_SINTAGS_REMOVE_PHP_SILENTLY;
+    public $_SINTAGS_HIDDEN_COMMENTS_TAG = AK_SINTAGS_HIDDEN_COMMENTS_TAG;
 
-    var $_SINTAGS_OPEN_HELPER_TAG = AK_SINTAGS_OPEN_HELPER_TAG;
-    var $_SINTAGS_CLOSE_HELPER_TAG = AK_SINTAGS_CLOSE_HELPER_TAG;
+    public $_SINTAGS_OPEN_HELPER_TAG = AK_SINTAGS_OPEN_HELPER_TAG;
+    public $_SINTAGS_CLOSE_HELPER_TAG = AK_SINTAGS_CLOSE_HELPER_TAG;
 
-    var $_modes = array(
+    public $_modes = array(
     'Xml',
     'Php',
     'Comment',
@@ -42,7 +39,7 @@ class AkSintagsLexer extends AkLexer
     'InlineHelper',
     );
 
-    function AkSintagsLexer(&$parser)
+    public function __construct(&$parser)
     {
         $this->AkLexer($parser, 'Text');
         $this->mapHandler('Text', 'Text');
@@ -51,12 +48,12 @@ class AkSintagsLexer extends AkLexer
         }
     }
 
-    function _addXmlTokens()
+    public function _addXmlTokens()
     {
         $this->addSpecialPattern('<\?xml','Text','XmlOpening');
     }
 
-    function _addPhpTokens()
+    public function _addPhpTokens()
     {
         if(!$this->_SINTAGS_REMOVE_PHP_SILENTLY){
             $this->addEntryPattern('<\?','Text','PhpCode');
@@ -68,7 +65,7 @@ class AkSintagsLexer extends AkLexer
         }
     }
 
-    function _addCommentTokens()
+    public function _addCommentTokens()
     {
         if(!empty($this->_SINTAGS_HIDDEN_COMMENTS_TAG)){
             $this->mapHandler('comment', 'ignore');
@@ -77,12 +74,12 @@ class AkSintagsLexer extends AkLexer
         }
     }
 
-    function _addEscapedTextTokens()
+    public function _addEscapedTextTokens()
     {
         $this->addSpecialPattern('\x5C_(?={)','Text','EscapedText');
     }
 
-    function _addTranslationTokens()
+    public function _addTranslationTokens()
     {
         $this->addEntryPattern('_{','Text','Translation');
         $this->addExitPattern('}','Translation');
@@ -90,7 +87,7 @@ class AkSintagsLexer extends AkLexer
         $this->addSpecialPattern('\x5C?\x25\x5C?[A-Za-z][\.A-Za-z0-9_-]*','Translation','TranslationToken');
     }
 
-    function _addHelperTranslationTokens()
+    public function _addHelperTranslationTokens()
     {
         $this->addEntryPattern('_\'','Hash','HelperTranslation');
         $this->addEntryPattern('_\'','Helper','HelperTranslation');
@@ -99,47 +96,47 @@ class AkSintagsLexer extends AkLexer
         $this->addSpecialPattern('\x5C?\x25\x5C?[A-Za-z][\.A-Za-z0-9_-]*','HelperTranslation','TranslationToken');
     }
 
-    function _addVariableTranslationTokens()
+    public function _addVariableTranslationTokens()
     {
         $this->addSpecialPattern('{_[A-Za-z][\.A-Za-z0-9_-]*}','Text','VariableTranslation');
     }
 
-    function _addVariableTokens()
+    public function _addVariableTokens()
     {
         $this->addSpecialPattern('{\\\?[A-Za-z][\.A-Za-z0-9_-]*}','Text','Variable');
     }
 
-    function _addConditionalVariableTokens()
+    public function _addConditionalVariableTokens()
     {
         $this->addSpecialPattern('{\\\?[A-Za-z][\.A-Za-z0-9_-]*\?}','Text','ConditionalVariable');
     }
 
-    function _addConditionStartTokens()
+    public function _addConditionStartTokens()
     {
         $this->addSpecialPattern('{[\?!][A-Za-z][\.A-Za-z0-9_-]*}','Text','ConditionStart');
     }
 
-    function _addEndTagTokens()
+    public function _addEndTagTokens()
     {
         $this->addSpecialPattern('{end}','Text','EndTag');
     }
 
-    function _addElseTagTokens()
+    public function _addElseTagTokens()
     {
         $this->addSpecialPattern('{else}','Text','ElseTag');
     }
 
-    function _addLoopTokens()
+    public function _addLoopTokens()
     {
         $this->addSpecialPattern('{loop[ \n\t]+[A-Za-z][\.A-Za-z0-9_-]*\??}','Text','Loop');
     }
 
-    function _addLoopAsTokens()
+    public function _addLoopAsTokens()
     {
         $this->addSpecialPattern('{loop[ \n\t]+[A-Za-z][\.A-Za-z0-9_-]+[ \n\t]+as[ \n\t]+[A-Za-z][\.A-Za-z0-9_-]*\??}','Text','Loop');
     }
 
-    function _addBlockTokens()
+    public function _addBlockTokens()
     {
         if(!$this->_SINTAGS_REMOVE_PHP_SILENTLY){
             $this->addEntryPattern($this->_SINTAGS_OPEN_HELPER_TAG.'[ \n\t]*[A-Za-z][\.A-Za-z0-9_ ,=-]*[ \n\t]*\x7B[ \n\t]*\x7c','Text', 'Block');
@@ -153,7 +150,7 @@ class AkSintagsLexer extends AkLexer
         }
     }
 
-    function _addHelperTokens()
+    public function _addHelperTokens()
     {
         $this->addEntryPattern($this->_SINTAGS_OPEN_HELPER_TAG.'\x3D?[ \n\t]*[A-Za-z0-9_]+[ \n\t\x3D]*\x28?[ \n\t]*'.
         '(?=.*'.$this->_SINTAGS_CLOSE_HELPER_TAG.')','Text','Helper');
@@ -172,7 +169,7 @@ class AkSintagsLexer extends AkLexer
     }
 
 
-    function _addInlineHelperTokens()
+    public function _addInlineHelperTokens()
     {
         $this->addSpecialPattern('#{[A-Za-z][\.A-Za-z0-9_-]*}','DoubleQuote','InlineVariable');
 
@@ -181,7 +178,7 @@ class AkSintagsLexer extends AkLexer
         $this->_addSintagsHelperParametersForScope('InlineHelper');
     }
 
-    function _addSintagsHelperParametersForScope($scope = 'Helper')
+    public function _addSintagsHelperParametersForScope($scope = 'Helper')
     {
         $this->addEntryPattern('[A-Za-z][A-Za-z0-9_]*[ \n\t]*\x28(?=.*\x29)',$scope,'HelperFunction');
         $this->addExitPattern('\x29', 'HelperFunction');
@@ -215,4 +212,3 @@ class AkSintagsLexer extends AkLexer
     }
 }
 
-?>

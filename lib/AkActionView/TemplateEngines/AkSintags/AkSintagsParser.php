@@ -3,51 +3,46 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2008-2009,  Bermi Ferrer Martinez                      |
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActionView
  * @subpackage Sintags
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 class AkSintagsParser
 {
+    public $_SINTAGS_OPEN_HELPER_TAG = AK_SINTAGS_OPEN_HELPER_TAG;
+    public $_SINTAGS_CLOSE_HELPER_TAG = AK_SINTAGS_CLOSE_HELPER_TAG;
+    public $_SINTAGS_HASH_KEY_VALUE_DELIMITER = AK_SINTAGS_HASH_KEY_VALUE_DELIMITER;
 
-    var $_SINTAGS_OPEN_HELPER_TAG = AK_SINTAGS_OPEN_HELPER_TAG;
-    var $_SINTAGS_CLOSE_HELPER_TAG = AK_SINTAGS_CLOSE_HELPER_TAG;
-    var $_SINTAGS_HASH_KEY_VALUE_DELIMITER = AK_SINTAGS_HASH_KEY_VALUE_DELIMITER;
-
-    var $_Lexer;
-    var $_lexer_name = 'AkSintagsLexer';
-    var $_mode;
-    var $_last_match;
-    var $_matches;
-    var $_current_match;
-    var $_block_vars = array();
-    var $_errors = array();
-    var $parsed_code = null;
-    var $output;
-    var $escape_chars = array(
+    public $_Lexer;
+    public $_lexer_name = 'AkSintagsLexer';
+    public $_mode;
+    public $_last_match;
+    public $_matches;
+    public $_current_match;
+    public $_block_vars = array();
+    public $_errors = array();
+    public $parsed_code = null;
+    public $output;
+    public $escape_chars = array(
     '\{' => '____AKST_OT____',
     '\}' => '____AKST_CT____',
     '\"' => '____AKST_DQ____',
     "\'" => '____AKST_SQ____'
     );
 
-    function AkSintagsParser($mode = 'Text')
+    public function __construct($mode = 'Text')
     {
-        $this->_Lexer =& new $this->_lexer_name($this);
+        $this->_Lexer = new $this->_lexer_name($this);
         $this->_mode = $mode;
         $this->_matches = array();
         $this->_last_match = '';
         $this->_current_match = '';
     }
 
-    function parse($raw)
+    public function parse($raw)
     {
         if(empty($this->parsed_code)){
             $this->_Lexer->parse($this->beforeParsing($this->_escapeChars($raw)));
@@ -57,17 +52,17 @@ class AkSintagsParser
         return $this->parsed_code;
     }
 
-    function beforeParsing($raw)
+    public function beforeParsing($raw)
     {
         return $raw;
     }
 
-    function afterParsing($parsed)
+    public function afterParsing($parsed)
     {
         return $parsed;
     }
 
-    function ignore($match, $state)
+    public function ignore($match, $state)
     {
         return true;
     }
@@ -75,7 +70,7 @@ class AkSintagsParser
     //------------------------------------
     //  PHP CODE
     //------------------------------------
-    function PhpCode($match, $state)
+    public function PhpCode($match, $state)
     {
         if(!AK_SINTAGS_REPLACE_SHORTHAND_PHP_TAGS){
             $this->output .= $match;
@@ -105,7 +100,7 @@ class AkSintagsParser
     //----------------------------------------------------
     //  XML OPENING COMPATIBILITY WHITH SHORTAGS SETTINGS
     //----------------------------------------------------
-    function XmlOpening($match, $state)
+    public function XmlOpening($match, $state)
     {
         if(AK_LEXER_SPECIAL === $state){
             $this->output .= '<?php echo \'<?xml\'; ?>';
@@ -117,22 +112,22 @@ class AkSintagsParser
     //  PLAIN TEXT
     //------------------------------------
 
-    function Text($text)
+    public function Text($text)
     {
         $this->output .= $text;
         return true;
     }
 
     // UTILS
-    function getResults()
+    public function getResults()
     {
         return $this->_unescapeChars($this->output);
     }
-    function _escapeChars($string)
+    public function _escapeChars($string)
     {
         return str_replace(array_keys($this->escape_chars),array_values($this->escape_chars),$string);
     }
-    function _unescapeChars($string, $strip_slashes_from_tokens = false)
+    public function _unescapeChars($string, $strip_slashes_from_tokens = false)
     {
         $escape_chars = array_merge(array('{' => '____AKST_OT____','}' => '____AKST_CT____'), $this->escape_chars);
         $replacements = $strip_slashes_from_tokens ? array_map('stripcslashes',array_keys($escape_chars)) : array_keys($escape_chars);
@@ -143,7 +138,7 @@ class AkSintagsParser
     //  ESCAPED TEXT
     //------------------------------------
 
-    function EscapedText($match, $state)
+    public function EscapedText($match, $state)
     {
         $this->output .= ltrim($match,'\\');
         return true;
@@ -153,7 +148,7 @@ class AkSintagsParser
     //  TRANSLATIONS
     //------------------------------------
 
-    function Translation($match, $state)
+    public function Translation($match, $state)
     {
         switch ($state){
             case AK_LEXER_ENTER:
@@ -173,8 +168,8 @@ class AkSintagsParser
     //------------------------------------
     //  HELPER TRANSLATION TOKEN
     //------------------------------------
-    
-    function HelperTranslation($match, $state)
+
+    public function HelperTranslation($match, $state)
     {
         switch ($state){
             case AK_LEXER_ENTER:
@@ -198,7 +193,7 @@ class AkSintagsParser
     //  TRANSLATIONS TOKEN
     //------------------------------------
 
-    function TranslationToken($match)
+    public function TranslationToken($match)
     {
         $this->output.= ltrim($match,'\\');
         $php_variable = $this->_convertSintagsVarToPhp(ltrim($match,'\%'));
@@ -216,7 +211,7 @@ class AkSintagsParser
     //  VARIABLE TRANSLATIONS
     //------------------------------------
 
-    function VariableTranslation($match, $state)
+    public function VariableTranslation($match, $state)
     {
         $php_variable = $this->_convertSintagsVarToPhp(trim($match,'{_}?'));
         if($php_variable){
@@ -232,7 +227,7 @@ class AkSintagsParser
     //  SINTAGS CONDITIONAL VARIABLES
     //------------------------------------
 
-    function ConditionalVariable($match, $state)
+    public function ConditionalVariable($match, $state)
     {
         $_skip_sanitizing = ($match[1] != '\\');
         $php_variable = $this->_convertSintagsVarToPhp(trim($match,'{}?'));
@@ -252,7 +247,7 @@ class AkSintagsParser
     //  SINTAGS VARIABLES
     //------------------------------------
 
-    function Variable($match, $state)
+    public function Variable($match, $state)
     {
         $_skip_sanitizing = ($match[1] != '\\');
         $php_variable = $this->_convertSintagsVarToPhp($match);
@@ -265,7 +260,7 @@ class AkSintagsParser
     }
 
 
-    function _convertSintagsVarToPhp($var)
+    public function _convertSintagsVarToPhp($var)
     {
         if(preg_match('/[\.-]_/',$var)){
             return false;
@@ -289,7 +284,7 @@ class AkSintagsParser
     //  SINTAGS CONDITIONS
     //------------------------------------
 
-    function ConditionStart($match, $state)
+    public function ConditionStart($match, $state)
     {
         if(AK_LEXER_SPECIAL === $state){
             $match = trim($match,'{}');
@@ -308,7 +303,7 @@ class AkSintagsParser
     //  SINTAGS END TAG
     //------------------------------------
 
-    function EndTag($match, $state)
+    public function EndTag($match, $state)
     {
         if(AK_LEXER_SPECIAL === $state){
             $this->output .= '<?php } ?>';
@@ -320,7 +315,7 @@ class AkSintagsParser
     //  SINTAGS ELSE TAG
     //------------------------------------
 
-    function ElseTag($match, $state)
+    public function ElseTag($match, $state)
     {
         if(AK_LEXER_SPECIAL === $state){
             $this->output .= '<?php } else { ?>';
@@ -333,7 +328,7 @@ class AkSintagsParser
     //  SINTAGS LOOP
     //------------------------------------
 
-    function Loop($match, $state)
+    public function Loop($match, $state)
     {
         if(AK_LEXER_SPECIAL === $state){
             $sintags_var = trim(preg_replace('/[\s|?]+/',' ', substr($match, 6,-1)));
@@ -367,7 +362,7 @@ class AkSintagsParser
         return true;
     }
 
-    function _getTerminationName($plural)
+    public function _getTerminationName($plural)
     {
         $plural = str_replace('-','.', $plural);
         $pos = strrpos($plural, '.');
@@ -379,7 +374,7 @@ class AkSintagsParser
     //  SINTAGS HELPER MODE
     //------------------------------------
 
-    function Helper($match, $state, $position = null, $is_inline_function = false)
+    public function Helper($match, $state, $position = null, $is_inline_function = false)
     {
         switch ($state){
             case AK_LEXER_ENTER:
@@ -441,7 +436,7 @@ class AkSintagsParser
     //  SINTAGS HELPER FUNCTION MODE
     //------------------------------------
 
-    function HelperFunction($match, $state, $position = null)
+    public function HelperFunction($match, $state, $position = null)
     {
         return $this->Helper($match, $state, $position, true);
     }
@@ -450,7 +445,7 @@ class AkSintagsParser
     //  SINTAGS INLINE HELPER MODE
     //------------------------------------
 
-    function InlineHelper($match, $state, $position = null)
+    public function InlineHelper($match, $state, $position = null)
     {
         $success = true;
         if(AK_LEXER_ENTER === $state){
@@ -469,7 +464,7 @@ class AkSintagsParser
     //  SINTAGS INLINE VARIABLE MODE
     //------------------------------------
 
-    function InlineVariable($match, $state, $position = null)
+    public function InlineVariable($match, $state, $position = null)
     {
         $php_variable = $this->_convertSintagsVarToPhp(trim($match,'#{}'));
         if($php_variable){
@@ -482,7 +477,7 @@ class AkSintagsParser
     //  SINTAGS VARIABLES
     //------------------------------------
 
-    function HelperVariable($match, $state, $position = null, $inline = false)
+    public function HelperVariable($match, $state, $position = null, $inline = false)
     {
         $php_variable = $this->_convertSintagsVarToPhp(trim($match));
         if($php_variable){
@@ -496,7 +491,7 @@ class AkSintagsParser
     //-----------------------------------------
     //  SINTAGS HELPER SINGLE QUOTES PARAMETER
     //-----------------------------------------
-    function SingleQuote($match, $state)
+    public function SingleQuote($match, $state)
     {
         return $this->_handleQuotedParam($match, $state, "'");
     }
@@ -504,12 +499,12 @@ class AkSintagsParser
     //-----------------------------------------
     //  SINTAGS HELPER DOUBLE QUOTES PARAMETER
     //-----------------------------------------
-    function DoubleQuote($match, $state)
+    public function DoubleQuote($match, $state)
     {
         return $this->_handleQuotedParam($match, $state, '"');
     }
 
-    function _handleQuotedParam($match, $state, $quote_using)
+    public function _handleQuotedParam($match, $state, $quote_using)
     {
         if(AK_LEXER_ENTER === $state){
             $this->output .= $quote_using;
@@ -526,7 +521,7 @@ class AkSintagsParser
     //-----------------------------------------
     //  SINTAGS HELPER NUMBER PARAMETER
     //-----------------------------------------
-    function Numbers($match, $state)
+    public function Numbers($match, $state)
     {
         if(AK_LEXER_SPECIAL === $state){
             $this->output .= $match;
@@ -537,7 +532,7 @@ class AkSintagsParser
     //-----------------------------------------
     //  SINTAGS HELPER RUBY STYLE SYMBOLS
     //-----------------------------------------
-    function Symbol($match, $state)
+    public function Symbol($match, $state)
     {
         if(AK_LEXER_SPECIAL === $state){
             $this->output .= "'".ltrim($match,': ')."'";
@@ -548,7 +543,7 @@ class AkSintagsParser
     //-----------------------------------------
     //  SINTAGS HELPER RUBY STYLE STRUCTS
     //-----------------------------------------
-    function Struct($match, $state)
+    public function Struct($match, $state)
     {
         if(AK_LEXER_SPECIAL === $state){
             $this->output .= $match == '[' ? 'array(' : ')';
@@ -560,7 +555,7 @@ class AkSintagsParser
     //-----------------------------------------
     //  SINTAGS HELPER RUBY HASHES
     //-----------------------------------------
-    function Hash($match, $state)
+    public function Hash($match, $state)
     {
         switch ($state){
             case AK_LEXER_ENTER:
@@ -587,7 +582,7 @@ class AkSintagsParser
     //-----------------------------------------
     //  SINTAGS BLOCKS
     //-----------------------------------------
-    function Block($match, $state)
+    public function Block($match, $state)
     {
         switch ($state){
             case AK_LEXER_ENTER:
@@ -669,12 +664,12 @@ class AkSintagsParser
     }
 
 
-    function addError($error)
+    public function addError($error)
     {
         $this->_errors[] = $error;
     }
 
-    function _tokenizeHelperStructures($raw_structures)
+    public function _tokenizeHelperStructures($raw_structures)
     {
         $i = 1;
         $arrays = array();
@@ -693,7 +688,7 @@ class AkSintagsParser
     }
 
 
-    function _getAvailableHelpers()
+    public function _getAvailableHelpers()
     {
         $helpers = array();
         if(empty($this->available_helpers)){
@@ -729,7 +724,7 @@ class AkSintagsParser
 
     }
 
-    function _getHelperNameForMethod(&$method_name)
+    public function _getHelperNameForMethod(&$method_name)
     {
         if($method_name == '_'){
             $method_name = 'translate';
@@ -751,12 +746,12 @@ class AkSintagsParser
         }
     }
 
-    function hasErrors()
+    public function hasErrors()
     {
         return !empty($this->_errors);
     }
 
-    function getErrors()
+    public function getErrors()
     {
         return $this->_errors;
     }

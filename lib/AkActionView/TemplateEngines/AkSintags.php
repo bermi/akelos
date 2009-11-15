@@ -10,15 +10,13 @@
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'TemplateEngines'.DS.'AkSintags'.DS.'AkSintagsLexer.php');
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'TemplateEngines'.DS.'AkSintags'.DS.'AkSintagsParser.php');
-
 defined('AK_SINTAGS_REMOVE_PHP_SILENTLY')           || define('AK_SINTAGS_REMOVE_PHP_SILENTLY', false);
 defined('AK_SINTAGS_REPLACE_SHORTHAND_PHP_TAGS')    || define('AK_SINTAGS_REPLACE_SHORTHAND_PHP_TAGS', true);
 defined('AK_SINTAGS_HIDDEN_COMMENTS_TAG')           || define('AK_SINTAGS_HIDDEN_COMMENTS_TAG', 'hidden');
 defined('AK_SINTAGS_OPEN_HELPER_TAG')               || define('AK_SINTAGS_OPEN_HELPER_TAG', '<%');
 defined('AK_SINTAGS_CLOSE_HELPER_TAG')              || define('AK_SINTAGS_CLOSE_HELPER_TAG', '%>');
 defined('AK_SINTAGS_HASH_KEY_VALUE_DELIMITER')      || define('AK_SINTAGS_HASH_KEY_VALUE_DELIMITER', '=>');
+
 
 /**
  * Sintags, The Akelos Framework special syntax for view Templates

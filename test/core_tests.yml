@@ -18,6 +18,7 @@ Action Controller:
     - AkDbSession
     - AkRouter
     - AkSession
+    - AkSintags
     - 'AkActionController/_f*'
     - 'AkActionController/_h*'
     - 'AkActionController/_l*'
