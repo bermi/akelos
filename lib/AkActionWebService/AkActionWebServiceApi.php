@@ -3,14 +3,11 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActionWebservice
  * @subpackage Api
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 /**
@@ -28,27 +25,27 @@
  * See AkActionWebService/AkDirectContainer.php class methods for an example
  * of use.
  */
-class AkActionWebserviceApi extends AkObject 
-{   
+class AkActionWebserviceApi extends AkObject
+{
     /**
-     * Whether to transform the public API method names into camel-cased names 
+     * Whether to transform the public API method names into camel-cased names
      */
-    var $inflect_names = true;
-    
+    public $inflect_names = true;
+
     /**
      * Whether to localize the API documentation automatically.
      */
-    var $localize_documentation = true;
+    public $localize_documentation = true;
 
     /**
     * If present, the name of a method to call when the remote caller
-    * tried to call a nonexistent method. 
+    * tried to call a nonexistent method.
     */
-    var $default_api_method;
-    
-    var $_api_methods = array();
-    var $_api_public_method_names = array();
-    
+    public $default_api_method;
+
+    public $_api_methods = array();
+    public $_api_public_method_names = array();
+
     /**
     * API methods have a +name+, which must be the PHP method name to use when
     * performing the invocation on the web service object.
@@ -56,7 +53,7 @@ class AkActionWebserviceApi extends AkObject
     * The signatures for the method input parameters and return value can
     * by specified in +options+.
     *
-    * A signature is an array of one or more parameter specifiers. 
+    * A signature is an array of one or more parameter specifiers.
     * A parameter specifier can be one of the following:
     *
     * * A string representing one of the Action Web Service base types.
@@ -67,7 +64,7 @@ class AkActionWebserviceApi extends AkObject
     *   as an array containing only values of the given type.
     * * An Array containing as key the name of the parameter, and as value
     *   one of the three preceding items
-    * 
+    *
     * If no method input parameter or method return value signatures are given,
     * the method is assumed to take no parameters and/or return no values of
     * interest, and any values that are received by the server will be
@@ -78,7 +75,7 @@ class AkActionWebserviceApi extends AkObject
     * <tt>returns</tt>             Signature for the method return value
     * <tt>expects_and_returns</tt> Signature for both input parameters and return value
     */
-    function addApiMethod($name, $options = array())
+    public function addApiMethod($name, $options = array())
     {
         $this->_validateOptions(array('expects', 'returns', 'expects_and_returns', 'documentation'), array_keys($options));
         if (!empty($options['expects_and_returns'])){
@@ -89,15 +86,15 @@ class AkActionWebserviceApi extends AkObject
         }
 
         $public_name = $this->getPublicApiMethodName($name);
-        $method =& new AkActionWebServiceMethod($name, $public_name, $expects, $returns, @$options['documentation'], $this->localize_documentation);
-        $this->_api_methods[$name] =& $method;
+        $method = new AkActionWebServiceMethod($name, $public_name, $expects, $returns, @$options['documentation'], $this->localize_documentation);
+        $this->_api_methods[$name] = $method;
         $this->_api_public_method_names[$public_name] = $name;
     }
 
     /**
     * Whether the given method name is a service method on this API
     */
-    function hasApiMethod($name)
+    public function hasApiMethod($name)
     {
         return !empty($this->_api_methods[$name]);
     }
@@ -106,7 +103,7 @@ class AkActionWebserviceApi extends AkObject
     * Whether the given public method name has a corresponding service method
     * on this API
     */
-    function hasPublicApiMethod($public_name)
+    public function hasPublicApiMethod($public_name)
     {
         return !empty($this->_api_public_method_names[$public_name]);
     }
@@ -114,7 +111,7 @@ class AkActionWebserviceApi extends AkObject
     /**
     * The corresponding public method name for the given service method name
     */
-    function getPublicApiMethodName($name)
+    public function getPublicApiMethodName($name)
     {
         return $this->inflect_names ? AkInflector::camelize($name) : $name;
     }
@@ -122,16 +119,16 @@ class AkActionWebserviceApi extends AkObject
     /**
     * The corresponding service method name for the given public method name
     */
-    function getApiMethodName($public_name)
+    public function getApiMethodName($public_name)
     {
         return $this->_api_public_method_names[$public_name];
-    } 
-    
+    }
+
     /**
     * An array containing all service methods on this API, and their
     * associated metadata.
     */
-    function &getApiMethods()
+    public function &getApiMethods()
     {
         return $this->_api_methods;
     }
@@ -139,7 +136,7 @@ class AkActionWebserviceApi extends AkObject
     /**
     * The Method instance for the given public API method name, if any
     */
-    function &getPublicApiMethodInstance($public_method_name)
+    public function &getPublicApiMethodInstance($public_method_name)
     {
         return $this->getApiMethodInstance($this->getApiMethodName($public_method_name));
     }
@@ -147,7 +144,7 @@ class AkActionWebserviceApi extends AkObject
     /**
     * The Method instance for the given API method name, if any
     */
-    function &getApiMethodInstance($method_name)
+    public function &getApiMethodInstance($method_name)
     {
         return $this->_api_methods[$method_name];
     }
@@ -155,7 +152,7 @@ class AkActionWebserviceApi extends AkObject
     /**
     * The Method instance for the default API method, if any
     */
-    function &getDefaultApiMethodInstance()
+    public function &getDefaultApiMethodInstance()
     {
         if(empty($this->default_api_method)){
             $false = false;
@@ -167,16 +164,16 @@ class AkActionWebserviceApi extends AkObject
             return $this->default_api_method_instance;
         }
 
-        $this->default_api_method_instance =& new AkActionWebServiceMethod($name, $this->getPublicApiMethodName($name), null, null, null);
+        $this->default_api_method_instance = new AkActionWebServiceMethod($name, $this->getPublicApiMethodName($name), null, null, null);
         return $this->default_api_method_instance;
     }
 
-    function _getApiPublicMethodNames()
+    public function _getApiPublicMethodNames()
     {
         return array_keys($this->_api_public_method_names);
     }
 
-    function _validateOptions($valid_option_keys, $supplied_option_keys)
+    public function _validateOptions($valid_option_keys, $supplied_option_keys)
     {
         $unknown_option_keys = array_diff($supplied_option_keys, $valid_option_keys);
         if(!empty($unknown_option_keys)){
@@ -192,15 +189,15 @@ class AkActionWebserviceApi extends AkObject
 */
 class AkActionWebServiceMethod
 {
-    var $name;
-    var $public_name;
-    var $expects;
-    var $returns;
-    var $documentation;
-    var $expects_documentation = array();
-    var $returns_documentation = array();
+    public $name;
+    public $public_name;
+    public $expects;
+    public $returns;
+    public $documentation;
+    public $expects_documentation = array();
+    public $returns_documentation = array();
 
-    function AkActionWebServiceMethod($name, $public_name, $expects, $returns, $documentation, $localize_documentation = true)
+    public function AkActionWebServiceMethod($name, $public_name, $expects, $returns, $documentation, $localize_documentation = true)
     {
         $this->name = $name;
         $this->public_name = $public_name;
@@ -208,22 +205,22 @@ class AkActionWebServiceMethod
         $this->returns = $returns;
         $this->documentation = $documentation;
         $this->localize_documentation = $localize_documentation;
-       
+
         $this->_extractDocumentationFromExpects();
         $this->_extractDocumentationFromReturns();
     }
-    
-    function _extractDocumentationFromExpects()
+
+    public function _extractDocumentationFromExpects()
     {
         return $this->_extractDocumentationFromMethod('expects');
     }
-    
-    function _extractDocumentationFromReturns()
+
+    public function _extractDocumentationFromReturns()
     {
         return $this->_extractDocumentationFromMethod('returns');
     }
-    
-    function _extractDocumentationFromMethod($expects_or_returns)
+
+    public function _extractDocumentationFromMethod($expects_or_returns)
     {
         if(!in_array($expects_or_returns, array('expects', 'returns'))){
             trigger_error(Ak::t('Only expects and returns options are valid'), E_USER_ERROR);
@@ -232,7 +229,7 @@ class AkActionWebServiceMethod
         $parameters = array();
         $i = 0;
         foreach ((array)$this->{$expects_or_returns} as $parameter=>$documentation){
-            
+
             if(is_numeric($parameter)){
                 $parameters[] = $documentation;
             }else{
@@ -243,7 +240,5 @@ class AkActionWebServiceMethod
         }
         $this->{$expects_or_returns} = $parameters;
     }
-    
 }
 
-?>

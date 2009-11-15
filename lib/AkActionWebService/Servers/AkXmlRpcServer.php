@@ -3,27 +3,25 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
+
 
 /**
  * @package ActionWebservice
  * @subpackage Server
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 class AkXmlRpcServer extends AkObject
 {
-    var $_ActionWebServiceServer;
-    var $options = array();
+    public $_ActionWebServiceServer;
+    public $options = array();
 
-    function AkXmlRpcServer(&$ActionWebServiceServer)
+    public function AkXmlRpcServer(&$ActionWebServiceServer)
     {
-        $this->_ActionWebServiceServer =& $ActionWebServiceServer;
+        $this->_ActionWebServiceServer = $ActionWebServiceServer;
     }
 
-    function init($options = array())
+    public function init($options = array())
     {
         $default_options = array(
         'dynamic_server_class_name' => 'AkDynamicXmlRpcServer'
@@ -38,20 +36,20 @@ class AkXmlRpcServer extends AkObject
         }
     }
 
-    function _addWebService($service_name, &$WebService)
+    public function _addWebService($service_name, &$WebService)
     {
-        $Apis =& $WebService->getApis();
+        $Apis = $WebService->getApis();
 
         foreach (array_keys($Apis) as $k){
-            $api_methods =& $Apis[$k]->getApiMethods();
+            $api_methods = $Apis[$k]->getApiMethods();
             foreach (array_keys($api_methods) as $k){
-                $api_method =& $api_methods[$k];
+                $api_method = $api_methods[$k];
                 $public_name = AkInflector::variablize($api_method->public_name);
                 $signatures = var_export(array_merge($api_method->returns, $api_method->expects),  true);
                 $documentation = var_export($this->_getDocumentationForMethod($api_method), true);
 
                 $this->_callbacks[] = "
-                
+
         \$this->addCallback(
         '$service_name.$public_name',
         'this:_{$service_name}_{$api_method->name}_call',
@@ -61,11 +59,11 @@ class AkXmlRpcServer extends AkObject
             ";
 
                 $this->_methods[] = "
-                
-    function _{$service_name}_{$api_method->name}_call()
+
+    public function _{$service_name}_{$api_method->name}_call()
     {
         \$args = func_get_args();
-        return call_user_func_array(array(&\$this->_{$service_name}, '".$api_method->name."'), (array)\$args[0]); 
+        return call_user_func_array(array(\$this->_{$service_name}, '".$api_method->name."'), (array)\$args[0]);
     }
                     ";
 
@@ -73,7 +71,7 @@ class AkXmlRpcServer extends AkObject
         }
     }
 
-    function _getDocumentationForMethod($ApiMethod)
+    public function _getDocumentationForMethod($ApiMethod)
     {
 
         $doc = !empty($ApiMethod->documentation)? $ApiMethod->documentation."\n" : '';
@@ -95,12 +93,12 @@ class AkXmlRpcServer extends AkObject
     }
 
 
-    function _generateServerClassCode()
+    public function _generateServerClassCode()
     {
         $this->_serverClassCode = "<?php
-class {$this->options['dynamic_server_class_name']} extends AkIxrInstrospectionServer 
+class {$this->options['dynamic_server_class_name']} extends AkIxrInstrospectionServer
 {
-    function {$this->options['dynamic_server_class_name']}() 
+    public function {$this->options['dynamic_server_class_name']}()
     {
         \$this->IXR_IntrospectionServer();
     }
@@ -109,13 +107,13 @@ class {$this->options['dynamic_server_class_name']} extends AkIxrInstrospectionS
         $this->_serverClassCode .= join("\n", $this->_methods);
 
         $this->_serverClassCode .= '
-    function init()
+    public function init()
     {
     '. join("\n", $this->_callbacks).'
-    
+
         $this->serve();
     }
-        
+
 }
 
 ?>';
@@ -123,20 +121,20 @@ class {$this->options['dynamic_server_class_name']} extends AkIxrInstrospectionS
 
     }
 
-    function serve()
+    public function serve()
     {
         $this->_generateServerClassCode();
         eval('?>'.$this->_serverClassCode.'<?php ');
-        $Server =& new $this->options['dynamic_server_class_name'];
+        $Server = new $this->options['dynamic_server_class_name'];
         $this->_linkWebServicesToServer($Server);
         $Server->init();
     }
 
-    function _linkWebServicesToServer(&$Server)
+    public function _linkWebServicesToServer(&$Server)
     {
         if(!empty($this->_ActionWebServiceServer->_services)){
             foreach (array_keys($this->_ActionWebServiceServer->_services) as $name_space){
-                $Server->{'_'.$name_space} =& $this->_ActionWebServiceServer->_services[$name_space];
+                $Server->{'_'.$name_space} = $this->_ActionWebServiceServer->_services[$name_space];
             }
         }
     }
@@ -147,9 +145,9 @@ require_once(AK_VENDOR_DIR.DS.'incutio'.DS.'IXR_Library.inc.php');
 
 class AkIxrInstrospectionServer extends IXR_IntrospectionServer
 {
-    var $_services = array();
+    public $_services = array();
 
-    function output($xml)
+    public function output($xml)
     {
         $xml = '<?xml version="1.0"?>'."\n".$xml;
         $length = strlen($xml);
@@ -161,11 +159,9 @@ class AkIxrInstrospectionServer extends IXR_IntrospectionServer
         exit;
     }
 
-    function _addService($service_name, &$ServiceInstance)
+    public function _addService($service_name, &$ServiceInstance)
     {
-        $this->_services[$service_name] =& $ServiceInstance;
+        $this->_services[$service_name] = $ServiceInstance;
     }
 }
 
-
-?>

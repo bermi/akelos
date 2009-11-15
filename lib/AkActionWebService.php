@@ -15,14 +15,14 @@
 
 class AkActionWebService extends AkObject
 {
-    var $_apis = array();
-    
-    function __construct()
+    public $_apis = array();
+
+    public function __construct()
     {
         $this->_linkWebServiceApis();
     }
 
-    function _linkWebServiceApis()
+    public function _linkWebServiceApis()
     {
         if(!empty($this->web_service_api)){
             $this->web_service_api = Ak::toArray($this->web_service_api);
@@ -31,8 +31,8 @@ class AkActionWebService extends AkObject
             }
         }
     }
-    
-    function _linkWebServiceApi($api)
+
+    public function _linkWebServiceApi($api)
     {
         $api_path = AkInflector::underscore($api);
         if(substr($api_path,-4) != '_api'){
@@ -42,18 +42,15 @@ class AkActionWebService extends AkObject
             $api_name_space = substr($api_path,0,-4);
         }
         $api_class_name = AkInflector::camelize($api_path);
-        
-        require_once(AK_LIB_DIR.DS.'AkActionWebService'.DS.'AkActionWebServiceApi.php');
-        require_once(AK_APIS_DIR.DS.$api_path.'.php');
-        
-        $this->_apis[$api_name_space] =& new $api_class_name;
+
+        require_once(AkConfig::getDir('apis').DS.$api_path.'.php');
+
+        $this->_apis[$api_name_space] = new $api_class_name;
     }
-    
-    function &getApis()
+
+    public function &getApis()
     {
         return $this->_apis;
     }
 }
 
-
-?>

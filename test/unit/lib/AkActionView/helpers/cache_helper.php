@@ -6,7 +6,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView.php');
 require_once(AK_LIB_DIR.DS.'AkActionController.php');
 require_once(AK_LIB_DIR.DS.'AkRequest.php');
 
-ak_generate_mock('AkRequest');
+Mock::generate('AkRequest');
 
 defined('AK_TEST_MEMCACHED_CHECKFILE')? null: define('AK_TEST_MEMCACHED_CHECKFILE',AK_TEST_DIR.DS.DS.'unit'.DS.'config'.DS.'memcached');
 class CacheHelperTests extends HelpersUnitTester 

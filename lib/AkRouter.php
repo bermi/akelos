@@ -736,6 +736,7 @@ class AkRouter extends AkObject
 
     public function mapRules($rules_file = AK_ROUTES_MAPPING_FILE)
     {
+        $Map =& $this;
         if(!@include($rules_file)){
             $this->connect('/:controller/:action/:id', array('controller' => 'page', 'action' => 'index'));
             $this->connect('/', array('controller' => 'page', 'action' => 'index'));

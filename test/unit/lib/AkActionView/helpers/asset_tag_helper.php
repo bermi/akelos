@@ -4,7 +4,7 @@ require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'asset_tag_helper.php'
 require_once(AK_LIB_DIR.DS.'AkActionController.php');
 require_once(AK_LIB_DIR.DS.'AkRequest.php');
 
-ak_generate_mock('AkRequest');
+Mock::generate('AkRequest');
 
 class AssetTagHelperTests extends HelpersUnitTester
 {
@@ -138,7 +138,7 @@ class AssetTagHelperTests extends HelpersUnitTester
         $controller->setReturnValue('urlFor','/url/for/test');
         $controller->setReturnValue('getControllerName','valid_controller');
         $controller->setReturnValue('urlFor','/url/for/test');
-        
+
         $asset_tag_helper = new AssetTagHelper();
         $asset_tag_helper->setController($controller);
 
@@ -189,4 +189,3 @@ class AssetTagHelperTests extends HelpersUnitTester
 
 ak_test('AssetTagHelperTests');
 
-?>

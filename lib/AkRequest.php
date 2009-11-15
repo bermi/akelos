@@ -35,7 +35,6 @@ $_SERVER['REQUEST_URI'] = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_UR
 * flow.
 *
 * @author Bermi Ferrer <bermi a.t bermilabs dot co.m>
-* @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
 */
 class AkRequest extends AkObject
 {

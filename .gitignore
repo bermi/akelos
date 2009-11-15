@@ -36,3 +36,4 @@ test/fixtures/app/plugin_installer_target_class.php
 app/plugin_installer_target_class.php
 app/locales/
 private/
+test/fixtures/app/models/property_property_type.php

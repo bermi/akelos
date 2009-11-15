@@ -175,7 +175,7 @@ class FormTagHelper  extends AkActionViewHelper
       * Creates a submit button with the text <tt>value</tt> as the caption. If options contains a pair with the key of "disable_with",
       * then the value will be used to rename a disabled version of the submit button.
       */
-    public function submit_tag($value = null, $options = array())
+    public static function submit_tag($value = null, $options = array())
     {
         $value = empty($value) ? Ak::t('Save changes',array(),'helpers/form') : $value;
         if(!empty($options['disable_with'])){

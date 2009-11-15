@@ -13,12 +13,12 @@
  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'unit_tester.php');
-require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'mock_objects.php');
-require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'reporter.php');
-require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'web_tester.php');
-require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'extensions'.DS.'junit_xml_reporter.php');
-//require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'code_coverage.php');
+require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'unit_tester.php');
+require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'mock_objects.php');
+require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'reporter.php');
+require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'web_tester.php');
+require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'extensions'.DS.'junit_xml_reporter.php');
+//require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'code_coverage.php');
 
 
 class AkUnitTest extends UnitTestCase
@@ -60,6 +60,7 @@ class AkUnitTest extends UnitTestCase
         AkConfig::setDir('models',          $base_path.DS.'app'.DS.'models');
         AkConfig::setDir('controllers',     $base_path.DS.'app'.DS.'controllers');
         AkConfig::setDir('views',           $base_path.DS.'app'.DS.'views');
+        AkConfig::setDir('apis',            $base_path.DS.'app'.DS.'apis');
         $this->_path_rebased = true;
     }
     public function restoreAppPaths()
@@ -77,6 +78,7 @@ class AkUnitTest extends UnitTestCase
         'app_installers'    => AkConfig::getDir('app_installers'),
         'controllers'       => AkConfig::getDir('controllers'),
         'views'             => AkConfig::getDir('views'),
+        'apis'              => AkConfig::getDir('apis'),
         );
     }
 

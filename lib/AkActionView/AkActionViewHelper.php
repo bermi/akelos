@@ -3,22 +3,18 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActionView
  * @subpackage Helpers
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
-!defined('AK_DEFAULT_LOCALE_NAMESPACE') && define('AK_DEFAULT_LOCALE_NAMESPACE', null);
 
 class AkActionViewHelper extends AkObject
 {
-    var $locales_namespace = 'helpers';
+    public $locales_namespace = 'helpers';
 
-    function AkActionViewHelper()
+    public function __construct()
     {
         $args = func_get_args();
         if(!empty($args[0]) && is_array($args[0])){
@@ -28,30 +24,28 @@ class AkActionViewHelper extends AkObject
         }
     }
 
-    function addObject($object_name, &$object)
+    public function addObject($object_name, &$Object)
     {
-        $this->_object[$object_name] =& $object;
+        $this->_object[$object_name] = $Object;
         if(!isset($this->_controller->$object_name)){
-            $this->_controller->$object_name =& $object;
+            $this->_controller->$object_name = $Object;
         }
     }
 
-    function &getObject($object_name)
+    public function &getObject($object_name)
     {
         return $this->_object[$object_name];
     }
 
-    function setController(&$controller)
+    public function setController(&$Controller)
     {
-        $this->_controller =& $controller;
+        $this->_controller = $Controller;
     }
 
-    function t($string, $array = null, $name_space = AK_DEFAULT_LOCALE_NAMESPACE)
+    public function t($string, $array = null, $name_space = AK_DEFAULT_LOCALE_NAMESPACE)
     {
         $name_space = empty($name_space) ? $this->locales_namespace : $name_space;
         return Ak::t($string, $array, $name_space);
     }
 }
 
-
-?>

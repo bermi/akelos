@@ -76,6 +76,7 @@ defined('AK_APP_INSTALLERS_DIR')    || define('AK_APP_INSTALLERS_DIR',  AK_APP_D
 
 defined('AK_PLUGINS_DIR')           || define('AK_PLUGINS_DIR', AkConfig::getDir('app').DS.'vendor'.DS.'plugins');
 defined('AK_PLUGINS')               || define('AK_PLUGINS', 'auto');
+defined('AK_GENERATORS_DIR')        || define('AK_GENERATORS_DIR', AK_LIB_DIR.DS.'utils'.DS.'generators');
 
 defined('AK_TMP_DIR')               || define('AK_TMP_DIR', Ak::get_tmp_dir_name());
 defined('AK_COMPILED_VIEWS_DIR')    || define('AK_COMPILED_VIEWS_DIR', AK_TMP_DIR.DS.'views');
@@ -241,6 +242,8 @@ defined('AK_URL_DEBUG_REQUEST')                                 || define('AK_UR
 defined('AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS')                  || define('AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS', AK_DEBUG && AK_URL_DEBUG_REQUEST);
 defined('AK_FORCE_TEMPLATE_COMPILATION')                        || define('AK_FORCE_TEMPLATE_COMPILATION', AK_DEBUG && !empty($_GET['recompile']));
 
+
+defined('AK_DEFAULT_LOCALE_NAMESPACE')                          || define('AK_DEFAULT_LOCALE_NAMESPACE', null);
 /**
  *  Before rev.1232 MySQL on some setups, connections where opened using PHP's default
  *  encoding latin1 this caused that UTF8 data written by Akelos could not be edited using other DB tools.

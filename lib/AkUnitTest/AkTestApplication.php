@@ -68,7 +68,7 @@ class AkTestApplication extends AkUnitTest
         return $this->assertPattern($pattern, $message);
     }
 
-    public function assertPattern($pattern, $subject = null, $message = '%s')
+    public function assertPattern($pattern, $subject, $message = '%s')
     {
         return $this->assert(
             new PatternExpectation($pattern),

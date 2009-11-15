@@ -74,7 +74,7 @@ class UrlHelper extends AkObject
     {
         if (!empty($html_options)) {
             $this->convert_options_to_javascript($html_options);
-            $tag_options = TagHelper::_tag_options($html_options);
+            $tag_options = TagHelper::tag_options($html_options);
         }
         else{
             $tag_options = null;

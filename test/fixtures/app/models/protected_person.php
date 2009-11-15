@@ -2,7 +2,6 @@
 
 class ProtectedPerson extends ActiveRecord
 {
-    var $_accessibleAttributes = array('name','birthday');
+    public $_accessibleAttributes = array('name','birthday');
 }
 
-?>

@@ -111,7 +111,7 @@ class DateHelper extends AkActionViewHelper
       *
       * The selects are prepared for multi-parameter assignment to an Active Record object.
       */
-    static function date_select($object_name, $column_name, $options = array())
+    public function date_select($object_name, $column_name, $options = array())
     {
         $defaults = array('discard_type' => true);
         $options  = array_merge($defaults, $options);
@@ -177,7 +177,7 @@ class DateHelper extends AkActionViewHelper
       *
       * The selects are prepared for multi-parameter assignment to an Active Record object.
       */
-    static function datetime_select($object_name, $column_name, $options = array())
+    public function datetime_select($object_name, $column_name, $options = array())
     {
         $defaults = array('discard_type' => true, 'order'=>explode(',',Ak::t('year,month,day,hour,minute',array(),'localize/date')));
         $options  = array_merge($defaults, $options);

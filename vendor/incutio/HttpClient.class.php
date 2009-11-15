@@ -6,44 +6,44 @@ Manual: http://scripts.incutio.com/httpclient/
 
 class HttpClient {
     // Request vars
-    var $host;
-    var $port;
-    var $path;
-    var $method;
-    var $postdata = '';
-    var $cookies = array();
-    var $referer;
-    var $accept = 'text/xml,application/xml,application/xhtml+xml,text/html,text/plain,image/png,image/jpeg,image/gif,*/*';
-    var $accept_encoding = 'gzip';
-    var $accept_language = 'en-us';
-    var $user_agent = 'Incutio HttpClient v0.9';
+    public $host;
+    public $port;
+    public $path;
+    public $method;
+    public $postdata = '';
+    public $cookies = array();
+    public $referer;
+    public $accept = 'text/xml,application/xml,application/xhtml+xml,text/html,text/plain,image/png,image/jpeg,image/gif,*/*';
+    public $accept_encoding = 'gzip';
+    public $accept_language = 'en-us';
+    public $user_agent = 'Incutio HttpClient v0.9';
     // Options
-    var $timeout = 20;
-    var $use_gzip = true;
-    var $persist_cookies = true;  // If true, received cookies are placed in the $this->cookies array ready for the next request
+    public $timeout = 20;
+    public $use_gzip = true;
+    public $persist_cookies = true;  // If true, received cookies are placed in the $this->cookies array ready for the next request
     // Note: This currently ignores the cookie path (and time) completely. Time is not important,
     //       but path could possibly lead to security problems.
-    var $persist_referers = true; // For each request, sends path of last request as referer
-    var $debug = false;
-    var $handle_redirects = true; // Auaomtically redirect if Location or URI header is found
-    var $max_redirects = 5;
-    var $headers_only = false;    // If true, stops receiving once headers have been read.
+    public $persist_referers = true; // For each request, sends path of last request as referer
+    public $debug = false;
+    public $handle_redirects = true; // Auaomtically redirect if Location or URI header is found
+    public $max_redirects = 5;
+    public $headers_only = false;    // If true, stops receiving once headers have been read.
     // Basic authorization variables
-    var $username;
-    var $password;
+    public $username;
+    public $password;
     // Response vars
-    var $status;
-    var $headers = array();
-    var $content = '';
-    var $errormsg;
+    public $status;
+    public $headers = array();
+    public $content = '';
+    public $errormsg;
     // Tracker variables
-    var $redirect_count = 0;
-    var $cookie_host = '';
-    function HttpClient($host, $port=80) {
+    public $redirect_count = 0;
+    public $cookie_host = '';
+    public function HttpClient($host, $port=80) {
         $this->host = $host;
         $this->port = $port;
     }
-    function get($path, $data = false) {
+    public function get($path, $data = false) {
         $this->path = $path;
         $this->method = 'GET';
         if ($data) {
@@ -51,13 +51,13 @@ class HttpClient {
         }
         return $this->doRequest();
     }
-    function post($path, $data) {
+    public function post($path, $data) {
         $this->path = $path;
         $this->method = 'POST';
         $this->postdata = $this->buildQueryString($data);
         return $this->doRequest();
     }
-    function buildQueryString($data) {
+    public function buildQueryString($data) {
         $querystring = '';
         if (is_array($data)) {
             // Change data in to postable data
@@ -76,7 +76,7 @@ class HttpClient {
         }
         return $querystring;
     }
-    function doRequest() {
+    public function doRequest() {
         // Performs the actual HTTP request, returning true or false depending on outcome
         if (!$fp = @fsockopen($this->host, $this->port, $errno, $errstr, $this->timeout)) {
             // Set error message
@@ -196,7 +196,7 @@ class HttpClient {
         }
         return true;
     }
-    function buildRequest() {
+    public function buildRequest() {
         $headers = array();
         $headers[] = "{$this->method} {$this->path} HTTP/1.0"; // Using 1.1 leads to all manner of problems, such as "chunked" encoding
         $headers[] = "Host: {$this->host}";
@@ -229,16 +229,16 @@ class HttpClient {
         $request = implode("\r\n", $headers)."\r\n\r\n".$this->postdata;
         return $request;
     }
-    function getStatus() {
+    public function getStatus() {
         return $this->status;
     }
-    function getContent() {
+    public function getContent() {
         return $this->content;
     }
-    function getHeaders() {
+    public function getHeaders() {
         return $this->headers;
     }
-    function getHeader($header) {
+    public function getHeader($header) {
         $header = strtolower($header);
         if (isset($this->headers[$header])) {
             return $this->headers[$header];
@@ -246,13 +246,13 @@ class HttpClient {
             return false;
         }
     }
-    function getError() {
+    public function getError() {
         return $this->errormsg;
     }
-    function getCookies() {
+    public function getCookies() {
         return $this->cookies;
     }
-    function getRequestURL() {
+    public function getRequestURL() {
         $url = 'http://'.$this->host;
         if ($this->port != 80) {
             $url .= ':'.$this->port;
@@ -261,40 +261,40 @@ class HttpClient {
         return $url;
     }
     // Setter methods
-    function setUserAgent($string) {
+    public function setUserAgent($string) {
         $this->user_agent = $string;
     }
-    function setAuthorization($username, $password) {
+    public function setAuthorization($username, $password) {
         $this->username = $username;
         $this->password = $password;
     }
-    function setCookies($array) {
+    public function setCookies($array) {
         $this->cookies = $array;
     }
     // Option setting methods
-    function useGzip($boolean) {
+    public function useGzip($boolean) {
         $this->use_gzip = $boolean;
     }
-    function setPersistCookies($boolean) {
+    public function setPersistCookies($boolean) {
         $this->persist_cookies = $boolean;
     }
-    function setPersistReferers($boolean) {
+    public function setPersistReferers($boolean) {
         $this->persist_referers = $boolean;
     }
-    function setHandleRedirects($boolean) {
+    public function setHandleRedirects($boolean) {
         $this->handle_redirects = $boolean;
     }
-    function setMaxRedirects($num) {
+    public function setMaxRedirects($num) {
         $this->max_redirects = $num;
     }
-    function setHeadersOnly($boolean) {
+    public function setHeadersOnly($boolean) {
         $this->headers_only = $boolean;
     }
-    function setDebug($boolean) {
+    public function setDebug($boolean) {
         $this->debug = $boolean;
     }
     // "Quick" static methods
-    function quickGet($url) {
+    public function quickGet($url) {
         $bits = parse_url($url);
         $host = $bits['host'];
         $port = isset($bits['port']) ? $bits['port'] : 80;
@@ -309,7 +309,7 @@ class HttpClient {
             return $client->getContent();
         }
     }
-    function quickPost($url, $data) {
+    public function quickPost($url, $data) {
         $bits = parse_url($url);
         $host = $bits['host'];
         $port = isset($bits['port']) ? $bits['port'] : 80;
@@ -321,7 +321,7 @@ class HttpClient {
             return $client->getContent();
         }
     }
-    function debug($msg, $object = false) {
+    public function debug($msg, $object = false) {
         if ($this->debug) {
             print '<div style="border: 1px solid red; padding: 0.5em; margin: 0.5em;"><strong>HttpClient Debug:</strong> '.$msg;
             if ($object) {

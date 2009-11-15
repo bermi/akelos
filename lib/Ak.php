@@ -91,23 +91,20 @@ class Ak
      */
     static function toUrl($options, $set_routes = false)
     {
-        static $Map;
-        if(empty($Map)){
+        static $Router;
+        if(empty($Router)){
             if($set_routes){
-                $Map = $options;
+                $Router = $options;
                 return;
             }else{
-                require_once(AK_LIB_DIR.DS.'AkRouter.php');
-                $Map = new AkRouter();
-                if(is_file(AK_ROUTES_MAPPING_FILE)){
-                    include(AK_ROUTES_MAPPING_FILE);
-                }
+                $Router = new AkRouter();
+                $Router->mapRules();
             }
         } else if (($options instanceof AkRouter) && $set_routes) {
-            $Map = $options;
+            $Router = $options;
             return;
         }
-        return $Map->toUrl($options);
+        return $Router->toUrl($options);
     }
 
 
@@ -2247,7 +2244,6 @@ class Ak
             'AkActionMailer'            =>  AK_LIB_DIR.DS.'AkActionMailer.php',
             'AkActionController'        =>  AK_LIB_DIR.DS.'AkActionController.php',
             'AkActionViewHelper'        =>  AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php',
-            'AkActionViewHelper'        =>  AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php',
             'AkActionWebService'        =>  AK_LIB_DIR.DS.'AkActionWebService.php',
             'AkActionWebServiceClient'  =>  AK_LIB_DIR.DS.'AkActionWebService'.DS.'AkActionWebServiceClient.php',
             'AkActiveRecord'            =>  AK_LIB_DIR.DS.'AkActiveRecord.php',
@@ -2256,6 +2252,8 @@ class Ak
             'AkArray'                   =>  AK_LIB_DIR.DS.'AkType'.DS.'AkArray.php',
             'AkAssociatedActiveRecord'  =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociatedActiveRecord.php',
             'AkAssociation'             =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociation.php',
+            'AkActionWebserviceApi'     =>  AK_LIB_DIR.DS.'AkActionWebService'.DS.'AkActionWebServiceApi.php',
+            'AkActionWebService'        =>  AK_LIB_DIR.DS.'AkActionWebService.php',
             'AkBaseModel'               =>  AK_LIB_DIR.DS.'AkBaseModel.php',
             'AkBelongsTo'               =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociations'.DS.'AkBelongsTo.php',
             'AkCache'                   =>  AK_LIB_DIR.DS.'AkCache.php',
@@ -2401,14 +2399,6 @@ function ak_compat($function_name)
     }
 }
 
-function ak_generate_mock($name)
-{
-    static $Mock;
-    if(empty($Mock)){
-        $Mock = new Mock();
-    }
-    $Mock->generate($name);
-}
 
 /**
  * This function sets a constant and returns it's value. If constant has been already defined it

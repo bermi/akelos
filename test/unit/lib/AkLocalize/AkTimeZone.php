@@ -3,7 +3,7 @@
 include_once(AK_LIB_DIR.DS.'AkLocalize'.DS.'AkTimeZone.php');
 
 class AkTestTime { function now(){} }
-ak_generate_mock('AkTestTime');
+Mock::generate('AkTestTime');
 
 
 class TimeZoneTestCase extends AkUnitTest

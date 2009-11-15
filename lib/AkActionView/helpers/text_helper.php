@@ -361,7 +361,7 @@ class TextHelper extends AkObject
      */
     static function auto_link_urls($text, $href_options = array())
     {
-        $extra_options = TagHelper::_tag_options($href_options);
+        $extra_options = TagHelper::tag_options($href_options);
         $extra_options_array = var_export($extra_options,true);
         return preg_replace_callback(AK_AUTO_LINK_REGEX, create_function(
         '$matched',

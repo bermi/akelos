@@ -285,7 +285,7 @@ class FormHelper extends AkActionViewHelper
     }
 }
 
-class AkFormHelperInstanceTag extends TagHelper
+class AkFormHelperInstanceTag
 {
     public $default_field_options = array('size'=>30);
     public $default_radio_options = array();
@@ -298,7 +298,7 @@ class AkFormHelperInstanceTag extends TagHelper
 
     //AkFormHelperInstanceTag
 
-    public function AkFormHelperInstanceTag($object_name, $column_name, &$template_object, $local_binding = null, $object = null)
+    public function __construct($object_name, $column_name, &$template_object, $local_binding = null, $object = null)
     {
         $this->object_name = $object_name;
         $this->_column_name = $column_name;
@@ -416,7 +416,7 @@ class AkFormHelperInstanceTag extends TagHelper
     {
         $this->add_default_name_and_id($options);
         return '<select'.
-        TagHelper::_tag_options($options).
+        TagHelper::tag_options($options).
         '><option value="false"'.
         ($this->getValue() == false ? ' selected' : '').
         '>'.Ak::t('False',array(),'helpers/form').'</option><option value="true"'.

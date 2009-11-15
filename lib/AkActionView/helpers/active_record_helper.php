@@ -160,7 +160,7 @@ class ActiveRecordHelper extends AkActionViewHelper
 
     public function default_input_block()
     {
-        return '<p><label for="<?=$record_name?>_<?=$column?>"><?=AkInflector::humanize($column)?></label><br /><?=$this->input($record_name, $column)?></p>';
+        return '<p><label for="<?php echo $record_name; ?>_<?php echo $column; ?>"><?php echo AkInflector::humanize($column); ?></label><br /><?php echo $this->input($record_name, $column); ?></p>';
     }
 }
 
@@ -168,10 +168,10 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
 {
     public $method_name;
 
-    public function ActiveRecordInstanceTag($object_name, $column_name, &$template_object)
+    public function __construct($object_name, $column_name, &$template_object)
     {
         $column_name = $this->method_name = $this->_getColumnName($column_name, $object_name,  $template_object);
-        $this->AkFormHelperInstanceTag($object_name, $column_name, $template_object);
+        parent::__construct($object_name, $column_name, $template_object);
     }
 
     public function to_tag($options = array())

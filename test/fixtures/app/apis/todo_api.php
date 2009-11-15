@@ -2,7 +2,7 @@
 
 class TodoApi extends AkActionWebserviceApi
 {
-    function __construct()
+    public function __construct()
     {
         $this->addApiMethod('complete_item', array(
         'expects'=> array('int' => 'Item Id'),
@@ -93,4 +93,3 @@ class TodoApi extends AkActionWebserviceApi
 }
 
 
-?>

@@ -15,28 +15,28 @@
 
 class ServiceGenerator extends  AkelosGenerator
 {
-    var $command_values = array('api_name');
-    
-    var $api_methods;
-    var $api_method_doc;
+    public
+    $command_values = array('api_name'),
+    $api_methods,
+    $api_method_doc;
 
-    function _preloadPaths()
+    public function _preloadPaths()
     {
         $this->api_name = AkInflector::camelize($this->api_name);
         $this->api_class_name = $this->api_name.'Api';
-        
+
         $this->assignVarToTemplate('api_class_name', $this->api_class_name);
-        
+
         $this->service_class_name = $this->api_name.'Service';
         $this->assignVarToTemplate('service_class_name', $this->service_class_name);
 
-        $this->api_path = AK_APIS_DIR.DS.AkInflector::underscore($this->api_class_name).'.php';
+        $this->api_path = AkConfig::getDir('apis').DS.AkInflector::underscore($this->api_class_name).'.php';
 
         $this->underscored_service_name = AkInflector::underscore($this->api_name);
-        $this->service_path = AK_MODELS_DIR.DS.$this->underscored_service_name.'_service.php';
+        $this->service_path = AkConfig::getDir('models').DS.$this->underscored_service_name.'_service.php';
     }
 
-    function hasCollisions()
+    public function hasCollisions()
     {
         $this->_preloadPaths();
 
@@ -53,23 +53,22 @@ class ServiceGenerator extends  AkelosGenerator
         return count($this->collisions) > 0;
     }
 
-    function _loadServiceStructureFromApi()
-    {	
-		require_once(AK_LIB_DIR.DS.'AkActionWebService'.DS.'AkActionWebServiceApi.php');
+    public function _loadServiceStructureFromApi()
+    {
         require_once($this->api_path);
-        $Api =& new $this->api_class_name;
-        $api_methods =& $Api->getApiMethods();
+        $Api = new $this->api_class_name;
+        $api_methods = $Api->getApiMethods();
         $methods = array_keys($api_methods);
         foreach ($methods as $method_name){
             $this->api_methods[$method_name] = $this->_getFunctionParamsAsText($api_methods[$method_name]);
             $this->_addDocBlock($api_methods[$method_name]);
         }
-        
+
         $this->assignVarToTemplate('api_methods', $this->api_methods);
         $this->assignVarToTemplate('api_method_doc', $this->api_method_doc);
     }
 
-    function _getFunctionParamsAsText($ApiMethod)
+    public function _getFunctionParamsAsText($ApiMethod)
     {
         $params = array();
         foreach ($ApiMethod->expects as $k=>$param){
@@ -78,7 +77,7 @@ class ServiceGenerator extends  AkelosGenerator
         return join(", ", $params);
     }
 
-    function _addDocBlock($ApiMethod)
+    public function _addDocBlock($ApiMethod)
     {
         $this->api_method_doc[$ApiMethod->name] = !empty($ApiMethod->documentation)? "\n\t* ".$ApiMethod->documentation."\n\t*" : '';
         foreach (array('expects', 'returns') as $expects_or_returns){
@@ -86,7 +85,7 @@ class ServiceGenerator extends  AkelosGenerator
                 //$this->api_method_doc[$ApiMethod->name] .= "\n\t* ".ucfirst($expects_or_returns).":";
                 foreach ($ApiMethod->{$expects_or_returns} as $k=>$type){
                     $this->api_method_doc[$ApiMethod->name] .= "\n\t*  ".(
-                        $expects_or_returns == 'expects' ? 
+                        $expects_or_returns == 'expects' ?
                         '@param param'.($k+1) : '@return '
                         )." $type";
                     if(!empty($ApiMethod->{$expects_or_returns.'_documentation'}[$k])){
@@ -99,12 +98,12 @@ class ServiceGenerator extends  AkelosGenerator
     }
 
 
-    function generate()
+    public function generate()
     {
         $this->_preloadPaths();
-        
+
         $this->_loadServiceStructureFromApi();
-        
+
         $files = array(
         'service'=> $this->service_path
         );
@@ -113,7 +112,4 @@ class ServiceGenerator extends  AkelosGenerator
             $this->save($file_path, $this->render($template));
         }
     }
-
 }
-
-?>

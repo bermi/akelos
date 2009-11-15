@@ -202,6 +202,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     public function init($attributes = array())
     {
         AK_LOG_EVENTS ? ($this->Logger = Ak::getLogger()) : null;
+                
         $this->_internationalize = is_null($this->_internationalize) && AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT ? count($this->getAvailableLocales()) > 1 : $this->_internationalize;
 
         @$this->_instantiateDefaultObserver();
@@ -213,7 +214,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         $load_acts = isset($attributes[1]['load_acts']) ? $attributes[1]['load_acts'] : (isset($attributes[0]['load_acts']) ? $attributes[0]['load_acts'] : true);
         $this->act_as = !empty($this->acts_as) ? $this->acts_as : (empty($this->act_as) ? false : $this->act_as);
-        if (!empty($this->act_as) && $load_acts) {
+        if (!empty($this->act_as) && $load_acts) {;
             $this->_loadActAsBehaviours();
         }
 
@@ -1972,10 +1973,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         $inheritance_column = $this->getInheritanceColumn();
         $columns = $this->getColumns();
-        foreach ($columns as $name=>$details){
-            if((substr($name,-3) == '_id' || substr($name,-6) == '_count') ||
-            !empty($details['primaryKey']) || ($inheritance_column !== false && $inheritance_column == $name)){
-                unset($columns[$name]);
+
+        foreach ($columns as $name => $details){
+            if(
+                (substr($name,-3) == '_id' || substr($name,-6) == '_count') ||
+                !empty($details['primaryKey']) || 
+                ($inheritance_column !== false && $inheritance_column == $name)
+            ){
+                    unset($columns[$name]);
             }
         }
         return $columns;

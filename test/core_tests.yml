@@ -27,4 +27,10 @@ Action Controller:
     - 'AkActionController/_r*'
     #- 'AkActionController/*' todo: cache tests
     #- AkRequest
+Action Web Service:
+    - 'AkActionWebService/AkActionWebServiceApi.php'
+    # Action View:
+    #- AkActionView/helpers/active_record_helper
+    #- AkActionView/helpers/_url_helper_modify_current_url
+
 

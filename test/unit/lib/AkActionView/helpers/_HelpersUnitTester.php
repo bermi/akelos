@@ -2,11 +2,6 @@
 
 require_once(dirname(__FILE__).'/../../../../fixtures/config/config.php');
 
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-require_once(AK_LIB_DIR.DS.'AkActionController.php');
-
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php');
-
 class AkTestContinent{
     public function AkTestContinent($p_name, $p_countries){ $this->continent_name = $p_name; $this->countries = $p_countries;}
     public function getContinentName(){ return $this->continent_name; }
@@ -18,18 +13,15 @@ class AkTestCountry {
     public function getCountryName(){ return $this->name;}
 }
 
-
-Stub::generate('AkActiveRecord');
-Stub::generate('AkActionController');
-
-class HelpersUnitTester extends AkUnitTest 
+class HelpersUnitTester extends AkUnitTest
 {
-    
-    public function HelpersUnitTester()
+    public function __construct()
     {
+        parent::__construct();
+        $this->rebaseAppPaths();
         $this->testing_url_path = AK_ASSET_URL_PREFIX;
     }
 }
 
-
-?>
+Mock::generate('AkActiveRecord');
+Mock::generate('AkActionController');

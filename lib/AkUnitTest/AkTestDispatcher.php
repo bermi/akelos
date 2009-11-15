@@ -46,6 +46,7 @@ class AkTestDispatcher extends AkDispatcher
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
         return $this->process($url);
     }
+
     public function process($url)
     {
         $_SERVER['PHP_SELF'] = '/index.php';
@@ -75,6 +76,7 @@ class AkTestDispatcher extends AkDispatcher
         $this->Request = new AkTestRequest();
         $this->Response = new AkTestResponse();
         $controller = $this->Request->recognize();
+
         if ($controller === false) {
             return false;
         } else {
