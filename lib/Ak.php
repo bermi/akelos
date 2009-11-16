@@ -2302,6 +2302,7 @@ class Ak
             'AkTimeZone'                =>  AK_LIB_DIR.DS.'AkLocalize'.DS.'AkTimeZone.php',
             'AkType'                    =>  AK_LIB_DIR.DS.'AkType.php',
             'AkUnitTest'                =>  AK_LIB_DIR.DS.'AkUnitTest.php',
+            'AkUnitTestSuite'           =>  AK_LIB_DIR.DS.'AkUnitTestSuite.php',
             'AkWebTestCase'             =>  AK_LIB_DIR.DS.'AkUnitTest.php',
             'AssetTagHelper'            =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'asset_tag_helper.php',
             'BaseActiveRecord'          =>  AK_APP_DIR.DS.'base_active_record.php',

@@ -1,34 +1,19 @@
-Active Support:
+ActiveSupport:
     - Ak
-    - AkCache
-    - AkConfig
-    - AkHttpClient
-    - AkImage
     - AkInflector
-    - AkInstaller
-    - AkLocaleManager
-    - AkPluginInstaller
-    - 'AkPlugin/AkPluginManager'
-    - AkReflection
-    - 'AkReflection/*'
-    - AkTestApplication
-    - AkUnitTest
     - AkLazyObject
+
+ActionView:
     - AkPhpCodeSanitizer
-    - 'utils/_Ak_convert'
-    - 'utils/_Ak_file_functions'
-    - 'utils/_Ak_object_inspection'
-    - 'utils/_Ak_support_functions'
-    - 'utils/_Ak_var_manipulation'
-    - 'AkType/AkNumber'
-    - 'AkType/AkString'
-    - 'AkLocalize/AkTimeZone'
-    # - 'utils/_Ak_file_functions_over_ftp' test in standalone mode
-Action Controller:
+    # Action View:
+    #- AkActionView/helpers/active_record_helper
+    #- AkActionView/helpers/_url_helper_modify_current_url
+    - AkSintags
+
+ActionController:
     - AkDbSession
     - AkRouter
     - AkSession
-    - AkSintags
     - 'AkRequest/*'
     - 'AkActionController/_f*'
     - 'AkActionController/_h*'
@@ -37,10 +22,46 @@ Action Controller:
     - 'AkActionController/_part*'
     - 'AkActionController/_r*'
     #- 'AkActionController/*' todo: cache tests
-Action Web Service:
-    - 'AkActionWebService/AkActionWebServiceApi.php'
-    # Action View:
-    #- AkActionView/helpers/active_record_helper
-    #- AkActionView/helpers/_url_helper_modify_current_url
 
+ActionWebService:
+    - 'AkActionWebService/AkActionWebServiceApi.php'
+
+Cache:
+    - AkCache
+
+Configuration:
+    - AkConfig
+
+Internationalization:
+    - AkLocaleManager
+    - 'AkLocalize/AkTimeZone'
+
+Migrations:
+    - AkInstaller
+
+Plugins:
+    - AkPluginInstaller
+    - 'AkPlugin/AkPluginManager'
+
+Reflection:
+    - AkReflection
+    - 'AkReflection/*'
+
+Testing:
+    - AkTestApplication
+    - AkUnitTest
+
+Types:
+    - 'AkType/AkNumber'
+    - 'AkType/AkString'
+
+Utilities:
+    - AkHttpClient
+    - AkImage
+    - 'utils/_Ak_convert'
+    - 'utils/_Ak_file_functions'
+    - 'utils/_Ak_object_inspection'
+    - 'utils/_Ak_support_functions'
+    - 'utils/_Ak_var_manipulation'
+    # - 'utils/_Ak_file_functions_over_ftp' test in standalone mode
 

@@ -48,10 +48,6 @@ if($base_path = empty($options['base_path']) ? false :  $options['base_path']){
 
 $base_path = rtrim($base_path, DS);
 
-if($db_type = empty($options['db']) ? false :  $options['db']){
-    define('AK_DATABASE_SETTINGS_NAMESPACE', $db_type);
-    unset($options['db']);
-}
 
 $____skip_tests = array('Simple','Unit','Web','AkWeb');
 

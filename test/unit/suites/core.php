@@ -2,7 +2,7 @@
 require_once(AK_LIB_DIR.DS.'AkUnitTestSuite.php');
     
 class CoreTestSuite extends AkUnitTestSuite {
-    var $partial_tests = array(
+    public $partial_tests = array(
         'Ak',
         'AkConfig',
         'AkUnitTest',
@@ -19,7 +19,7 @@ class CoreTestSuite extends AkUnitTestSuite {
         'AkReflection'
         
         );
-    var $baseDir = '';
-    var $title = 'Core Tests';
+    public $baseDir = '';
+    public $title = 'Core Tests';
 }
 ?>

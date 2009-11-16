@@ -368,3 +368,100 @@ class AkWebTestCase extends WebTestCase
     }
 }
 
+
+
+
+class AkelosTextReporter extends TextReporter {
+    public $time_log = array();
+    public $log_time = true;
+    public $verbose = false;
+
+    public function __destruct(){
+        if($this->log_time) {
+            $this->logTestRunime();
+        }
+    }
+
+    public function paintHeader($test_name) {
+        $this->timeStart = time();
+        $this->testsStart = microtime(true);
+        $this->memoryStart = memory_get_usage();
+        $this->time_log['total'] = 0;
+        $this->time_log['stats'] = array();
+        $this->time_log['cases'] = array();
+        parent::paintHeader($test_name);
+    }
+
+    public function paintFooter($test_name) {
+        $duration   = microtime(true) - $this->testsStart;
+        $memory     = memory_get_usage() - $this->memoryStart;
+        if ($this->getFailCount() + $this->getExceptionCount() == 0) {
+            print "OK\n";
+        } else {
+            $this->log_time = false;
+            print "FAILURES!!!\n";
+        }
+        $this->time_log['total'] = array($duration, $memory);
+        print "Test cases completed in ".$duration."/s using ".NumberHelper::human_size($memory).":\n ". $this->getTestCaseProgress() .
+        "/" . $this->getTestCaseCount() .
+        ", Passes: " . $this->getPassCount() .
+        ", Failures: " . $this->getFailCount() .
+        ", Exceptions: " . $this->getExceptionCount() . "\n";
+    }
+
+    public function paintCaseStart($case) {
+        $this->caseStart = microtime(true);
+        $this->caseMemoryStart = memory_get_usage();
+        if($this->verbose) echo "$case case:\n\n";
+        $this->currentCaseName = $case;
+        parent::paintCaseStart($case);
+    }
+
+    public function paintCaseEnd($case) {
+        $duration = microtime(true) - $this->caseStart;
+        $memory     = memory_get_usage() - $this->caseMemoryStart;
+        if($this->verbose) print "\n    $duration/s and $memory bytes required to complete $this->currentCaseName\n\n";
+        $this->time_log['cases'][$case] = array($duration, $memory);
+        parent::paintCaseEnd($case);
+    }
+
+    public function paintMethodStart($test) {
+        $this->methodStart = microtime(true);
+        $this->methodMemoryStart = memory_get_usage();
+        if($this->verbose) print " $test ";
+    }
+
+    public function paintMethodEnd($test) {
+        $duration = microtime(true) - $this->methodStart;
+        $memory     = memory_get_usage() - $this->methodMemoryStart;
+        $this->time_log['methods'][$test] = array($duration, $memory);
+        if($this->verbose) print " completed in $duration using $memory bytes/s\n";
+    }
+
+    public function logTestRunime()
+    {
+        $log_path = AK_LOG_DIR.DS.'unit_test_runtime'.DS.$this->timeStart.'.php';
+        $slow_methods = array();
+        $memory_hungry_methods = array();
+        $stats = array();
+        foreach ($this->time_log['methods'] as $method => $details){
+            $stats['slow_methods'][$method] = $details[0];
+            $stats['memory_hungry_methods'][$method] = $details[1];
+        }
+        foreach ($this->time_log['cases'] as $case => $details){
+            $stats['slow_cases'][$case] = $details[0];
+            $stats['memory_hungry_cases'][$case] = $details[1];
+        }
+        foreach ($stats as $stat_type => $v){
+            arsort($stats[$stat_type]);
+            $stats[$stat_type] = array_slice($stats[$stat_type], 0, 10, true);
+        }
+        $this->time_log['stats'] = $stats;
+
+        Ak::file_put_contents($log_path, '<?php $runtime['.$this->timeStart.'] = '.var_export($this->time_log, true).'; return $runtime['.$this->timeStart.'];');
+    }
+}
+
+class AkelosVerboseTextReporter extends AkelosTextReporter {
+    public $verbose = true;
+}

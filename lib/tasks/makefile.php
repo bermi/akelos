@@ -23,3 +23,9 @@ makelos_task('test:core', array(
     'description' => 'Runs Akelos core test suite'
 ));
 
+
+makelos_task('test:suite', array(
+    'description' => 'Runs a test suite',
+    'autocompletion' => 'ENVIRONMENT=production --verbose'
+));
+
