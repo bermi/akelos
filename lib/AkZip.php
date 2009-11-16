@@ -57,7 +57,6 @@ define('AK_ZIP_PARAM_EXTRACT_AS_STRING', 'extract_as_string');
 define('AK_ZIP_PARAM_NO_COMPRESSION', 'no_compression');
 define('AK_ZIP_PARAM_BY_NAME', 'by_name');
 define('AK_ZIP_PARAM_BY_INDEX', 'by_index');
-define('AK_ZIP_PARAM_BY_EREG', 'by_ereg');
 define('AK_ZIP_PARAM_BY_PREG', 'by_preg');
 define('AK_ZIP_PARAM_PRE_EXTRACT', 'callback_pre_extract');
 define('AK_ZIP_PARAM_POST_EXTRACT', 'callback_post_extract');
@@ -82,23 +81,23 @@ class AkZip
      *
      * @var string Name of the Zip file
      */
-    var $_zipname = '';
+    public $_zipname = '';
     /**
      * File descriptor of the opened Zip file.
      *
      * @var int Internal zip file descriptor
      */
-    var $_zip_fd = 0;
+    public $_zip_fd = 0;
     /**
      * @var int last error code
      */
-    var $_error_code = 1;
+    public $_error_code = 1;
     /**
      * @var string Last error description
      */
-    var $_error_string = '';
+    public $_error_string = '';
     // {{{ constructor
-    
+
     /**
      * AkZip Class constructor. This flavour of the constructor only
      * declare a new AkZip object, identifying it by the name of the
@@ -107,8 +106,8 @@ class AkZip
      * @param    string  $p_zipname  The name of the zip archive to create
      * @access public
      */
-    
-    function AkZip($p_zipname) 
+
+    public function __construct($p_zipname)
     {
         // ----- Check the zlib
         if (!extension_loaded('zlib')) {
@@ -125,7 +124,7 @@ class AkZip
     }
     // }}}
     // {{{ create()
-    
+
     /**
      * This method creates a Zip Archive with the filename set with
      * the constructor.
@@ -148,8 +147,8 @@ class AkZip
      * @return mixed An array of file description on success,
      *               an error code on error
      */
-    
-    function create($p_filelist, $p_params = 0) 
+
+    public function create($p_filelist, $p_params = 0)
     {
         $this->_errorReset();
         // ----- Set default values
@@ -157,10 +156,10 @@ class AkZip
             $p_params = array();
         }
         if ($this->_check_parameters($p_params, array(
-            'no_compression' => false,
-            'add_path' => "",
-            'remove_path' => "",
-            'remove_all_path' => false
+        'no_compression' => false,
+        'add_path' => "",
+        'remove_path' => "",
+        'remove_all_path' => false
         )) != 1) {
             return 0;
         }
@@ -187,7 +186,7 @@ class AkZip
     }
     // }}}
     // {{{ add()
-    
+
     /**
      * This method add files or directory in an existing Zip Archive.
      * If the Zip Archive does not exist it is created.
@@ -213,8 +212,8 @@ class AkZip
      * @return mixed An array of file description on success,
      *               0 on an unrecoverable failure, an error code is logged.
      */
-    
-    function add($p_filelist, $p_params = 0) 
+
+    public function add($p_filelist, $p_params = 0)
     {
         $this->_errorReset();
         // ----- Set default values
@@ -222,12 +221,12 @@ class AkZip
             $p_params = array();
         }
         if ($this->_check_parameters($p_params, array(
-            'no_compression' => false,
-            'add_path' => '',
-            'remove_path' => '',
-            'remove_all_path' => false,
-            'callback_pre_add' => '',
-            'callback_post_add' => ''
+        'no_compression' => false,
+        'add_path' => '',
+        'remove_path' => '',
+        'remove_all_path' => false,
+        'callback_pre_add' => '',
+        'callback_post_add' => ''
         )) != 1) {
             return 0;
         }
@@ -257,7 +256,7 @@ class AkZip
     }
     // }}}
     // {{{ listContent()
-    
+
     /**
      * This method gives the names and properties of the files and directories
      * which are present in the zip archive.
@@ -301,8 +300,8 @@ class AkZip
      * @return mixed An array of file description on success,
      *               0 on an unrecoverable failure, an error code is logged.
      */
-    
-    function listContent() 
+
+    public function listContent()
     {
         $this->_errorReset();
         // ----- Check archive
@@ -318,11 +317,11 @@ class AkZip
     }
     // }}}
     // {{{ extract()
-    
+
     /**
      * This method extract the files and folders which are in the zip archive.
      * It can extract all the archive or a part of the archive by using filter
-     * feature (extract by name, by index, by ereg, by preg). The extraction
+     * feature (extract by name, by index, by preg). The extraction
      * can occur in the current path or an other path.
      * All the advanced features are activated by the use of variable
      * parameters.
@@ -342,8 +341,6 @@ class AkZip
      *               or an array of file/dir names to extract from the archive.
      *   'by_index' : A string with range of indexes separated by ',',
      *                (sample "1,3-5,12").
-     *   'by_ereg' : A regular expression (ereg) that must match the extracted
-     *               filename.
      *   'by_preg' : A regular expression (preg) that must match the extracted
      *               filename.
      *   'callback_pre_extract' : A callback function that will be called before
@@ -356,8 +353,8 @@ class AkZip
      * @return mixed An array of file description on success,
      *               0 on an unrecoverable failure, an error code is logged.
      */
-    
-    function extract($p_params = 0) 
+
+    public function extract($p_params = 0)
     {
         $this->_errorReset();
         // ----- Check archive
@@ -369,17 +366,16 @@ class AkZip
             $p_params = array();
         }
         if ($this->_check_parameters($p_params, array(
-            'extract_as_string' => false,
-            'add_path' => '',
-            'remove_path' => '',
-            'remove_all_path' => false,
-            'callback_pre_extract' => '',
-            'callback_post_extract' => '',
-            'set_chmod' => 0,
-            'by_name' => '',
-            'by_index' => '',
-            'by_ereg' => '',
-            'by_preg' => ''
+        'extract_as_string' => false,
+        'add_path' => '',
+        'remove_path' => '',
+        'remove_all_path' => false,
+        'callback_pre_extract' => '',
+        'callback_post_extract' => '',
+        'set_chmod' => 0,
+        'by_name' => '',
+        'by_index' => '',
+        'by_preg' => ''
         )) != 1) {
             return 0;
         }
@@ -393,7 +389,7 @@ class AkZip
     }
     // }}}
     // {{{ delete()
-    
+
     /**
      * This methods delete archive entries in the zip archive.
      * Notice that at least one filtering rule (set by the variable parameter
@@ -405,8 +401,6 @@ class AkZip
      *               or an array of file/dir names to delete from the archive.
      *   'by_index' : A string with range of indexes separated by ',',
      *                (sample "1,3-5,12").
-     *   'by_ereg' : A regular expression (ereg) that must match the extracted
-     *               filename.
      *   'by_preg' : A regular expression (preg) that must match the extracted
      *               filename.
      *
@@ -415,8 +409,8 @@ class AkZip
      * @return mixed An array of file description on success,
      *               0 on an unrecoverable failure, an error code is logged.
      */
-    
-    function delete($p_params) 
+
+    public function delete($p_params)
     {
         $this->_errorReset();
         // ----- Check archive
@@ -425,15 +419,14 @@ class AkZip
         }
         // ----- Set default values
         if ($this->_check_parameters($p_params, array(
-            'by_name' => '',
-            'by_index' => '',
-            'by_ereg' => '',
-            'by_preg' => ''
+        'by_name' => '',
+        'by_index' => '',
+        'by_preg' => ''
         )) != 1) {
             return 0;
         }
         // ----- Check that at least one rule is set
-        if (($p_params['by_name'] == '') && ($p_params['by_index'] == '') && ($p_params['by_ereg'] == '') && ($p_params['by_preg'] == '')) {
+        if (($p_params['by_name'] == '') && ($p_params['by_index'] == '')  && ($p_params['by_preg'] == '')) {
             $this->_errorLog(AK_ZIP_ERR_INVALID_PARAMETER, 'At least one filtering rule must'.' be set as parameter');
             return 0;
         }
@@ -447,7 +440,7 @@ class AkZip
     }
     // }}}
     // {{{ properties()
-    
+
     /**
      * This method gives the global properties of the archive.
      *  The properties are :
@@ -459,8 +452,8 @@ class AkZip
      * @param    mixed  $p_params  {Description}
      * @return mixed An array with the global properties or 0 on error.
      */
-    
-    function properties() 
+
+    public function properties()
     {
         $this->_errorReset();
         // ----- Check archive
@@ -494,7 +487,7 @@ class AkZip
     }
     // }}}
     // {{{ duplicate()
-    
+
     /**
      * This method creates an archive by copying the content of an other one.
      * If the archive already exist, it is replaced by the new one without
@@ -505,8 +498,8 @@ class AkZip
      *                            the filename of a valid zip archive.
      * @return integer 1 on success, 0 on failure.
      */
-    
-    function duplicate($p_archive) 
+
+    public function duplicate($p_archive)
     {
         $this->_errorReset();
         // ----- Look if the $p_archive is a AkZip object
@@ -533,7 +526,7 @@ class AkZip
     }
     // }}}
     // {{{ merge()
-    
+
     /**
      *  This method merge a valid zip archive at the end of the
      *  archive identified by the AkZip object.
@@ -545,8 +538,8 @@ class AkZip
      *                                 the filename of a valid zip archive.
      * @return integer 1 on success, 0 on failure.
      */
-    
-    function merge($p_archive_to_add) 
+
+    public function merge($p_archive_to_add)
     {
         $v_result = 1;
         $this->_errorReset();
@@ -574,21 +567,21 @@ class AkZip
     }
     // }}}
     // {{{ errorCode()
-    
+
     /**
      * Method that gives the lastest error code.
      *
      * @access public
      * @return integer The error code value.
      */
-    
-    function errorCode() 
+
+    public function errorCode()
     {
         return ($this->_error_code);
     }
     // }}}
     // {{{ errorName()
-    
+
     /**
      * This method gives the latest error code name.
      *
@@ -596,8 +589,8 @@ class AkZip
      * @param  boolean $p_with_code  If true, gives the name and the int value.
      * @return string The error name.
      */
-    
-    function errorName($p_with_code = false) 
+
+    public function errorName($p_with_code = false)
     {
         $v_const_list = get_defined_constants();
         // ----- Extract error constants from all const.
@@ -621,7 +614,7 @@ class AkZip
     }
     // }}}
     // {{{ errorInfo()
-    
+
     /**
      * This method returns the description associated with the latest error.
      *
@@ -632,8 +625,8 @@ class AkZip
      *                         and the error code.
      * @return string The error description.
      */
-    
-    function errorInfo($p_full = false) 
+
+    public function errorInfo($p_full = false)
     {
         if ($p_full) {
             return ($this->errorName(true) ." : ".$this->_error_string);
@@ -661,7 +654,7 @@ class AkZip
     //   true on success,
     //   false on error, the error code is set.
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_checkFormat()
      *
@@ -669,8 +662,8 @@ class AkZip
      *
      * @param integer $p_level
      */
-    
-    function _checkFormat($p_level = 0) 
+
+    public function _checkFormat($p_level = 0)
     {
         $v_result = true;
         // ----- Reset the error handler
@@ -703,15 +696,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_create()
      *
      * { Description }
      *
      */
-    
-    function _create($p_list, &$p_result_list, &$p_params) 
+
+    public function _create($p_list, &$p_result_list, &$p_params)
     {
         $v_result = 1;
         $v_list_detail = array();
@@ -737,15 +730,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_add()
      *
      * { Description }
      *
      */
-    
-    function _add($p_list, &$p_result_list, &$p_params) 
+
+    public function _add($p_list, &$p_result_list, &$p_params)
     {
         $v_result = 1;
         $v_list_detail = array();
@@ -863,15 +856,15 @@ class AkZip
     // Description :
     // Parameters :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_openFd()
      *
      * { Description }
      *
      */
-    
-    function _openFd($p_mode) 
+
+    public function _openFd($p_mode)
     {
         $v_result = 1;
         // ----- Look if already open
@@ -893,15 +886,15 @@ class AkZip
     // Description :
     // Parameters :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_closeFd()
      *
      * { Description }
      *
      */
-    
-    function _closeFd() 
+
+    public function _closeFd()
     {
         $v_result = 1;
         if ($this->_zip_fd != 0) @fclose($this->_zip_fd);
@@ -923,15 +916,15 @@ class AkZip
     //   $p_remove_dir : Path to remove in the filename path archived
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_addList()
      *
      * { Description }
      *
      */
-    
-    function _addList($p_list, &$p_result_list, $p_add_dir, $p_remove_dir, $p_remove_all_dir, &$p_params) 
+
+    public function _addList($p_list, &$p_result_list, $p_add_dir, $p_remove_dir, $p_remove_all_dir, &$p_params)
     {
         $v_result = 1;
         // ----- Add the files
@@ -981,15 +974,15 @@ class AkZip
     //   $p_remove_dir : Path to remove in the filename path archived
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_addFileList()
      *
      * { Description }
      *
      */
-    
-    function _addFileList($p_list, &$p_result_list, $p_add_dir, $p_remove_dir, $p_remove_all_dir, &$p_params) 
+
+    public function _addFileList($p_list, &$p_result_list, $p_add_dir, $p_remove_dir, $p_remove_all_dir, &$p_params)
     {
         $v_result = 1;
         $v_header = array();
@@ -1062,15 +1055,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_addFile()
      *
      * { Description }
      *
      */
-    
-    function _addFile($p_filename, &$p_header, $p_add_dir, $p_remove_dir, $p_remove_all_dir, &$p_params) 
+
+    public function _addFile($p_filename, &$p_header, $p_add_dir, $p_remove_dir, $p_remove_all_dir, &$p_params)
     {
         $v_result = 1;
         if ($p_filename == "") {
@@ -1116,7 +1109,7 @@ class AkZip
         {
         // ----- Error log
         $this->_errorLog(-5, "Stored file name is too long (max. 255) : '$v_stored_filename'");
-        
+
         // ----- Return
         return AkZip::errorCode();
         }
@@ -1236,7 +1229,7 @@ class AkZip
             }
             // ----- Update the informations
             // Nothing can be modified
-            
+
         }
         // ----- Return
         return $v_result;
@@ -1248,15 +1241,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_writeFileHeader()
      *
      * { Description }
      *
      */
-    
-    function _writeFileHeader(&$p_header) 
+
+    public function _writeFileHeader(&$p_header)
     {
         $v_result = 1;
         // TBC
@@ -1289,15 +1282,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_writeCentralFileHeader()
      *
      * { Description }
      *
      */
-    
-    function _writeCentralFileHeader(&$p_header) 
+
+    public function _writeCentralFileHeader(&$p_header)
     {
         $v_result = 1;
         // TBC
@@ -1331,15 +1324,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_writeCentralHeader()
      *
      * { Description }
      *
      */
-    
-    function _writeCentralHeader($p_nb_entries, $p_size, $p_offset, $p_comment) 
+
+    public function _writeCentralHeader($p_nb_entries, $p_size, $p_offset, $p_comment)
     {
         $v_result = 1;
         // ----- Packed data
@@ -1360,15 +1353,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_list()
      *
      * { Description }
      *
      */
-    
-    function _list(&$p_list) 
+
+    public function _list(&$p_list)
     {
         $v_result = 1;
         // ----- Open the zip file
@@ -1426,15 +1419,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_convertHeader2FileInfo()
      *
      * { Description }
      *
      */
-    
-    function _convertHeader2FileInfo($p_header, &$p_info) 
+
+    public function _convertHeader2FileInfo($p_header, &$p_info)
     {
         $v_result = 1;
         // ----- Get the interesting attributes
@@ -1467,15 +1460,15 @@ class AkZip
     // Return Values :
     //   1 on success,0 or less on error (see error code list)
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_extractByRule()
      *
      * { Description }
      *
      */
-    
-    function _extractByRule(&$p_file_list, &$p_params) 
+
+    public function _extractByRule(&$p_file_list, &$p_params)
     {
         $v_result = 1;
         $p_path = $p_params['add_path'];
@@ -1545,12 +1538,6 @@ class AkZip
                     elseif ($v_header['stored_filename'] == $p_params[AK_ZIP_PARAM_BY_NAME][$j]) {
                         $v_extract = true;
                     }
-                }
-            }
-            // ----- Look for extract by ereg rule
-            else if ((isset($p_params[AK_ZIP_PARAM_BY_EREG])) && ($p_params[AK_ZIP_PARAM_BY_EREG] != "")) {
-                if (ereg($p_params[AK_ZIP_PARAM_BY_EREG], $v_header['stored_filename'])) {
-                    $v_extract = true;
                 }
             }
             // ----- Look for extract by preg rule
@@ -1636,15 +1623,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_extractFile()
      *
      * { Description }
      *
      */
-    
-    function _extractFile(&$p_entry, $p_path, $p_remove_path, $p_remove_all_path, &$p_params) 
+
+    public function _extractFile(&$p_entry, $p_path, $p_remove_path, $p_remove_all_path, &$p_params)
     {
         $v_result = 1;
         // ----- Read the file header
@@ -1707,7 +1694,7 @@ class AkZip
                     $p_entry['status'] = "already_a_directory";
                     // ----- Return
                     //return $v_result;
-                    
+
                 }
                 // ----- Look if file is write protected
                 else if (!is_writeable($p_entry['filename'])) {
@@ -1715,7 +1702,7 @@ class AkZip
                     $p_entry['status'] = "write_protected";
                     // ----- Return
                     //return $v_result;
-                    
+
                 }
                 // ----- Look if the extracted file is older
                 else if (filemtime($p_entry['filename']) > $p_entry['mtime']) {
@@ -1723,7 +1710,7 @@ class AkZip
                     $p_entry['status'] = "newer_exist";
                     // ----- Return
                     //return $v_result;
-                    
+
                 }
             }
             // ----- Check the directory availability and create it if necessary
@@ -1814,15 +1801,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_extractFileAsString()
      *
      * { Description }
      *
      */
-    
-    function _extractFileAsString(&$p_entry, &$p_string) 
+
+    public function _extractFileAsString(&$p_entry, &$p_string)
     {
         $v_result = 1;
         // ----- Read the file header
@@ -1849,10 +1836,10 @@ class AkZip
                 $p_string = gzinflate($v_data);
             }
             // ----- Trace
-            
+
         } else {
             // TBC : error : can not extract a folder in a string
-            
+
         }
         // ----- Return
         return $v_result;
@@ -1864,15 +1851,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_readFileHeader()
      *
      * { Description }
      *
      */
-    
-    function _readFileHeader(&$p_header) 
+
+    public function _readFileHeader(&$p_header)
     {
         $v_result = 1;
         // ----- Read the 4 bytes signature
@@ -1947,15 +1934,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_readCentralFileHeader()
      *
      * { Description }
      *
      */
-    
-    function _readCentralFileHeader(&$p_header) 
+
+    public function _readCentralFileHeader(&$p_header)
     {
         $v_result = 1;
         // ----- Read the 4 bytes signature
@@ -2024,15 +2011,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_readEndCentralDir()
      *
      * { Description }
      *
      */
-    
-    function _readEndCentralDir(&$p_central_dir) 
+
+    public function _readEndCentralDir(&$p_central_dir)
     {
         $v_result = 1;
         // ----- Go to the end of the zip file
@@ -2124,15 +2111,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_deleteByRule()
      *
      * { Description }
      *
      */
-    
-    function _deleteByRule(&$p_result_list, &$p_params) 
+
+    public function _deleteByRule(&$p_result_list, &$p_params)
     {
         $v_result = 1;
         $v_list_detail = array();
@@ -2192,12 +2179,6 @@ class AkZip
                     elseif ($v_header_list[$v_nb_extracted]['stored_filename'] == $p_params[AK_ZIP_PARAM_BY_NAME][$j]) {
                         $v_found = true;
                     }
-                }
-            }
-            // ----- Look for extract by ereg rule
-            else if ((isset($p_params[AK_ZIP_PARAM_BY_EREG])) && ($p_params[AK_ZIP_PARAM_BY_EREG] != "")) {
-                if (ereg($p_params[AK_ZIP_PARAM_BY_EREG], $v_header_list[$v_nb_extracted]['stored_filename'])) {
-                    $v_found = true;
                 }
             }
             // ----- Look for extract by preg rule
@@ -2337,7 +2318,7 @@ class AkZip
     //    1 : OK
     //   -1 : Unable to create directory
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_dirCheck()
      *
@@ -2345,8 +2326,8 @@ class AkZip
      *
      * @param [type] $p_is_dir
      */
-    
-    function _dirCheck($p_dir, $p_is_dir = false) 
+
+    public function _dirCheck($p_dir, $p_is_dir = false)
     {
         $v_result = 1;
         // ----- Remove the final '/'
@@ -2384,15 +2365,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_merge()
      *
      * { Description }
      *
      */
-    
-    function _merge(&$p_archive_to_add) 
+
+    public function _merge(&$p_archive_to_add)
     {
         $v_result = 1;
         // ----- Look if the archive_to_add exists
@@ -2526,15 +2507,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_duplicate()
      *
      * { Description }
      *
      */
-    
-    function _duplicate($p_archive_filename) 
+
+    public function _duplicate($p_archive_filename)
     {
         $v_result = 1;
         // ----- Look if the $p_archive_filename exists
@@ -2572,7 +2553,7 @@ class AkZip
         return $v_result;
     }
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_check_parameters()
      *
@@ -2581,8 +2562,8 @@ class AkZip
      * @param integer $p_error_code
      * @param string $p_error_string
      */
-    
-    function _check_parameters(&$p_params, $p_default) 
+
+    public function _check_parameters(&$p_params, $p_default)
     {
         // ----- Check that param is an array
         if (!is_array($p_params)) {
@@ -2604,10 +2585,10 @@ class AkZip
         }
         // ----- Check specific parameters
         $v_callback_list = array(
-            'callback_pre_add',
-            'callback_post_add',
-            'callback_pre_extract',
-            'callback_post_extract'
+        'callback_pre_add',
+        'callback_post_add',
+        'callback_pre_extract',
+        'callback_post_extract'
         );
         for ($i = 0 ; $i < sizeof($v_callback_list) ; $i++) {
             $v_key = $v_callback_list[$i];
@@ -2626,7 +2607,7 @@ class AkZip
     // Description :
     // Parameters :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_errorLog()
      *
@@ -2635,8 +2616,8 @@ class AkZip
      * @param integer $p_error_code
      * @param string $p_error_string
      */
-    
-    function _errorLog($p_error_code = 0, $p_error_string = '') 
+
+    public function _errorLog($p_error_code = 0, $p_error_string = '')
     {
         $this->_error_code = $p_error_code;
         $this->_error_string = $p_error_string;
@@ -2647,15 +2628,15 @@ class AkZip
     // Description :
     // Parameters :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * AkZip::_errorReset()
      *
      * { Description }
      *
      */
-    
-    function _errorReset() 
+
+    public function _errorReset()
     {
         $this->_error_code = 1;
         $this->_error_string = '';
@@ -2667,15 +2648,15 @@ class AkZip
     // Parameters :
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * _tool_PathReduction()
      *
      * { Description }
      *
      */
-    
-    function _tool_PathReduction($p_dir) 
+
+    public function _tool_PathReduction($p_dir)
     {
         $v_result = "";
         // ----- Look for not empty path
@@ -2688,14 +2669,14 @@ class AkZip
                 if ($v_list[$i] == ".") {
                     // ----- Ignore this directory
                     // Should be the first $i=0, but no check is done
-                    
+
                 } else if ($v_list[$i] == "..") {
                     // ----- Ignore it and ignore the $i-1
                     $i--;
                 } else if (($v_list[$i] == "") && ($i != (sizeof($v_list) -1)) && ($i != 0)) {
                     // ----- Ignore only the double '//' in path,
                     // but not the first and last '/'
-                    
+
                 } else {
                     $v_result = $v_list[$i].($i != (sizeof($v_list) -1) ? "/".$v_result : "");
                 }
@@ -2720,15 +2701,15 @@ class AkZip
     //   1 if $p_path is inside directory $p_dir
     //   2 if $p_path is exactly the same as $p_dir
     // ---------------------------------------------------------------------------
-    
+
     /**
      * _tool_PathInclusion()
      *
      * { Description }
      *
      */
-    
-    function _tool_PathInclusion($p_dir, $p_path) 
+
+    public function _tool_PathInclusion($p_dir, $p_path)
     {
         $v_result = 1;
         // ----- Explode dir and path by directory separator
@@ -2785,7 +2766,7 @@ class AkZip
     //             3 : src & dest gzip
     // Return Values :
     // ---------------------------------------------------------------------------
-    
+
     /**
      * _tool_CopyBlock()
      *
@@ -2793,8 +2774,8 @@ class AkZip
      *
      * @param integer $p_mode
      */
-    
-    function _tool_CopyBlock($p_src, $p_dest, $p_size, $p_mode = 0) 
+
+    public function _tool_CopyBlock($p_src, $p_dest, $p_size, $p_mode = 0)
     {
         $v_result = 1;
         if ($p_mode == 0) {
@@ -2842,15 +2823,15 @@ class AkZip
     // Return Values :
     //   1 on success, 0 on failure.
     // ---------------------------------------------------------------------------
-    
+
     /**
      * _tool_Rename()
      *
      * { Description }
      *
      */
-    
-    function _tool_Rename($p_src, $p_dest) 
+
+    public function _tool_Rename($p_src, $p_dest)
     {
         $v_result = 1;
         // ----- Try to rename the files
@@ -2877,7 +2858,7 @@ class AkZip
     // Return Values :
     //   The path translated.
     // ---------------------------------------------------------------------------
-    
+
     /**
      * _tool_TranslateWinPath()
      *
@@ -2885,8 +2866,8 @@ class AkZip
      *
      * @param [type] $p_remove_disk_letter
      */
-    
-    function _tool_TranslateWinPath($p_path, $p_remove_disk_letter = true) 
+
+    public function _tool_TranslateWinPath($p_path, $p_remove_disk_letter = true)
     {
         if (stristr(php_uname() , 'windows')) {
             // ----- Look for potential disk letter
@@ -2901,7 +2882,7 @@ class AkZip
         return $p_path;
     }
     // ---------------------------------------------------------------------------
-    
+
 }
 // End of class
 

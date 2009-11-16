@@ -532,7 +532,7 @@ class PEAR_Common extends PEAR
                 switch ($this->prev_element) {
                     case 'package':
                         // XXX should we check the package name here?
-                        $this->pkginfo['package'] = ereg_replace('[^a-zA-Z0-9._]', '_', $data);
+                        $this->pkginfo['package'] = preg_replace('/[^a-zA-Z0-9._]/', '_', $data);
                         break;
                     case 'maintainer':
                         $this->current_maintainer['name'] = $data;
@@ -556,7 +556,7 @@ class PEAR_Common extends PEAR
                 $this->current_maintainer['role'] = $data;
                 break;
             case 'version':
-                $data = ereg_replace ('[^a-zA-Z0-9._\-]', '_', $data);
+                $data = preg_replace ('/[^a-zA-Z0-9._\-]/', '_', $data);
                 if ($this->in_changelog) {
                     $this->current_release['version'] = $data;
                 } else {
@@ -718,7 +718,7 @@ class PEAR_Common extends PEAR
             if ($name == 'package.xml') {
                 $xml = $name;
                 break;
-            } elseif (ereg('package.xml$', $name, $match)) {
+            } elseif (preg_match('/package.xml$/', $name, $match)) {
                 $xml = $match[0];
                 break;
             }

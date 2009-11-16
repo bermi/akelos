@@ -18,7 +18,7 @@ class AkObjectToArray
     }
     public function _convertNumeric($value)
     {
-        if (is_string($value) && !ereg('\d',$value{0})) {
+        if (is_string($value) && !preg_match('/\d/', $value{0})) {
             return $value;
         } else if (is_null($value)) {
             return null;

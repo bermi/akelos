@@ -201,7 +201,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     public function init($attributes = array())
     {
         AK_LOG_EVENTS ? ($this->Logger = Ak::getLogger()) : null;
-                
+
         $this->_internationalize = is_null($this->_internationalize) && AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT ? count($this->getAvailableLocales()) > 1 : $this->_internationalize;
 
         @$this->_instantiateDefaultObserver();
@@ -1976,7 +1976,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         foreach ($columns as $name => $details){
             if(
                 (substr($name,-3) == '_id' || substr($name,-6) == '_count') ||
-                !empty($details['primaryKey']) || 
+                !empty($details['primaryKey']) ||
                 ($inheritance_column !== false && $inheritance_column == $name)
             ){
                     unset($columns[$name]);
@@ -3282,7 +3282,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *       public function beforeValidationOnCreate
     *       {
     *           if(!empty($this->number)){
-    *               $this->number = ereg_replace('[^0-9]*','',$this->number);
+    *               $this->number = preg_replace('/([^0-9]*)/','',$this->number);
     *           }
     *       }
     *   }
@@ -4580,7 +4580,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                                     echo "\t".$line."\n";
                                 }
                             }
-                        }elseif (eregi ("function", $type)) {
+                        }elseif (stristr($type, "function")) {
                             if ($sf) {
                                 AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key, $value) :
                                 printf ("<li>(%s) <b>%s</b> </li>\n",$type, $key, $value);

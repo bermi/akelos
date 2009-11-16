@@ -784,7 +784,7 @@ class Ak
                             foreach ($lines as $line){
                                 echo "\t".$line."\n";
                             }
-                        } elseif (eregi ("function", $type)) {
+                        } elseif (stristr($type, "function")) {
                             if ($sf) {
                                 AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key, $value) :
                                 printf ("<li>(%s) <b>%s</b> </li>\n",$type, $key, $value);

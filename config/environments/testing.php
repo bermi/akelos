@@ -4,6 +4,7 @@
 // See file boot.php for more info
 
 date_default_timezone_set('Europe/Madrid');
+define('AK_DIE_ON_PHP4_ERROR', true);
 
 ini_set('display_errors', 1);
 ini_set('memory_limit', -1);
