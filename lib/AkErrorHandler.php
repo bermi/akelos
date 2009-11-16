@@ -3,8 +3,6 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * This class will handle errors on production mode
@@ -14,7 +12,6 @@
  * @package ActiveSupport
  * @subpackage Reporting
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 class AkErrorHandler {
 

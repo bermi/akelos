@@ -1,8 +1,8 @@
 <?php
 
-require_once(AK_LIB_DIR.DS.'AkPlugin'.DS.'AkPluginManager.php');
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class AkPluginManagerTestCase extends AkUnitTest
+class AkPluginManager_TestCase extends AkUnitTest
 {
     public function test_remove_repositories_config()
     {
@@ -78,11 +78,12 @@ class AkPluginManagerTestCase extends AkUnitTest
         $repositories = $this->PluginManager->_getRepositoriesFromRemotePage();
         $this->assertEqual($repositories[0], $this->PluginManager->main_repository);
     }
-    
+
     public function test_remove_plugin()
     {
         Ak::directory_delete(AK_PLUGINS_DIR.DS.'acts_as_versioned');
     }
 }
 
-?>
+ak_test_run_case_if_executed('AkPluginManager_TestCase');
+

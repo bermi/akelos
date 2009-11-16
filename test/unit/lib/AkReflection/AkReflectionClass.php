@@ -2,14 +2,14 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class AkReflectionClass_TestCase extends  UnitTestCase
+class AkReflectionClass_TestCase extends AkUnitTest
 {
     public function test_string_constructor()
     {
         $string ='class Test {
-        
+
             public function method1($param1) {
-            
+
             }
             /**
              * comment
@@ -18,14 +18,14 @@ class AkReflectionClass_TestCase extends  UnitTestCase
              * @param $param2
              */
             public function &method2($param1,$param2) {
-            
+
             }
         }';
         $class = new AkReflectionClass($string);
         $this->assertEqual('Test',$class->getName());
         $methods = $class->getMethods();
         $this->assertEqual(2,count($methods));
-        
+
         $this->assertEqual('method1',$methods[0]->getName());
         $this->assertFalse($methods[0]->returnByReference());
         $this->assertEqual('method2',$methods[1]->getName());
@@ -37,13 +37,13 @@ class AkReflectionClass_TestCase extends  UnitTestCase
         $this->assertEqual(2,count($params));
         $this->assertEqual('void',$docBlock->getTag('return'));
     }
-    
+
     public function test_array_constructor()
     {
         $string ='class Test {
-        
+
             public function method1($param1) {
-            
+
             }
             /**
              * comment
@@ -52,7 +52,7 @@ class AkReflectionClass_TestCase extends  UnitTestCase
              * @param $param2
              */
             public function &method2($param1,$param2) {
-            
+
             }
         }';
         $class = new AkReflectionClass($string);
@@ -61,7 +61,7 @@ class AkReflectionClass_TestCase extends  UnitTestCase
         $this->assertEqual('Test',$class->getName());
         $methods = $class->getMethods();
         $this->assertEqual(2,count($methods));
-        
+
         $this->assertEqual('method1',$methods[0]->getName());
         $this->assertFalse($methods[0]->returnByReference());
         $this->assertEqual('method2',$methods[1]->getName());
@@ -72,13 +72,13 @@ class AkReflectionClass_TestCase extends  UnitTestCase
         $params =$docBlock->getParams();
         $this->assertEqual(2,count($params));
         $this->assertEqual('void',$docBlock->getTag('return'));
-        
-        
+
+
         $voidMethods = $class->getMethods(array('tags'=>array('return'=>'void')));
 
         $this->assertEqual(1,count($voidMethods));
     }
-    
+
     public function test_get_methods_filtered()
     {
         $file = AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'reflection_test_class.php';
@@ -86,9 +86,9 @@ class AkReflectionClass_TestCase extends  UnitTestCase
         $filteredMethods = $class->getMethods(array('tags'=>array('WingsPluginInstallAs'=>'.*')));
         $this->assertEqual(1,count($filteredMethods));
         $this->assertEqual('testFunction2',$filteredMethods[0]->getName());
-        
+
     }
 }
 
-
 ak_test_run_case_if_executed('AkReflectionClass_TestCase');
+

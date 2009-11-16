@@ -3,14 +3,11 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActiveSupport
  * @subpackage Converters
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 class AkHtmlToText
@@ -25,10 +22,8 @@ class AkHtmlToText
         $Smartypants = new SmartyPantsTypographer_Parser();
         $markdown = Ak::html_entity_decode(strip_tags($Smartypants->transform($markdown)));
 
-        return trim($this->_simplifyMarkdown($markdown));
+        return str_replace(" \n", "\n",trim($this->_simplifyMarkdown($markdown)));
     }
-
-
 
     public function _simplifyMarkdown($markdown)
     {
@@ -53,4 +48,3 @@ class AkHtmlToText
     }
 }
 
-?>

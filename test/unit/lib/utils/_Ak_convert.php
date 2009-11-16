@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_Ak_convert extends  AkUnitTest
+class Ak_convert_TestCase extends  AkUnitTest
 {
     public function test_html_to_text()
     {
@@ -35,25 +35,24 @@ Creating a simple application using the Akelos Framework
 Introduction
 ------------
 
-This tutorial teaches you how to create an application using the Akelos Framework. 
+This tutorial teaches you how to create an application using the Akelos Framework.
 
 The application will be used for managing books and their authors and will be named **booklink**
 
 Requisites for this tutorial
 ----------------------------
 
-*  A MySQL or SQLite Database 
-*  Apache web server 
-*  Shell access to your server 
+*  A MySQL or SQLite Database
+*  Apache web server
+*  Shell access to your server
 
 You can checkout a working copy of the Akelos source code with the command:
 
     svn co http://akelosframework.googlecode.com/svn/trunk/ akelos
 EOF;
-
-        $this->assertEqual(Ak::convert('html','text',$html), $markdown);
+        $this->assertEqual(Ak::convert('html','text', $html), $markdown);
     }
-    
+
     public function test_html_to_text_with_entities()
     {
         $html = <<<EOF
@@ -66,7 +65,7 @@ EOF;
         $converted = Ak::convert('html','text',$html);
         $this->assertEqual($converted, $markdown);
     }
-    
+
     public function test_html_to_text_custom_tags()
     {
         $html = <<<EOF
@@ -77,7 +76,7 @@ EOF;
 EOF;
         $this->assertEqual(Ak::convert('html','text',$html), $markdown);
     }
-    
+
     public function test_html_to_text_removing_js()
     {
         $html = <<<EOF
@@ -88,7 +87,7 @@ _Hola_
 EOF;
         $this->assertEqual(Ak::convert('html','text',$html), $markdown);
     }
-    
+
     public function test_html_to_with_text_using_quotes()
     {
         $html = <<<EOF
@@ -99,7 +98,7 @@ EOF;
 EOF;
         $this->assertEqual(Ak::convert('html','text',$html), $markdown);
     }
-    
+
     public function test_html_to_text_using_smartipants()
     {
         $html = <<<EOF
@@ -112,6 +111,5 @@ EOF;
     }
 }
 
-ak_test('test_Ak_convert',true);
+ak_test_run_case_if_executed('Ak_convert_TestCase');
 
-?>

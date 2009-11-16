@@ -3,8 +3,6 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 // | Acts as Tree                                                         |
 // +----------------------------------------------------------------------+
 // | Copyright (c) 2006, Raw Ideas Pty Ltd & Niels Ganser                 |
@@ -19,7 +17,6 @@
  * @subpackage Behaviours
  * @author Niels Ganser <ng a.t depoll d.e>
  * @copyright Copyright (c) 2006, Raw Ideas Pty Ltd
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');

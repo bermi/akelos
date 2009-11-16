@@ -3,14 +3,11 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActiveSupport
  * @subpackage Converters
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 class AkXdocToText
@@ -18,7 +15,7 @@ class AkXdocToText
     public function convert()
     {
         $xdoc2txt_bin = AK_VENDOR_DIR.DS.'hyperestraier'.DS.'xdoc2txt.exe';
-        
+
         if(AK_OS != 'WINDOWS'){
             trigger_error(Ak::t('Xdoc2Text is a windows only application. Please use wvWare instead'), E_USER_WARNING);
             return false;
@@ -55,7 +52,5 @@ class AkXdocToText
         $this->destination_file_name = empty($this->destination_file_name) ? $this->tmp_name.'.'.$this->convert_to : $this->destination_file_name.(strstr($this->destination_file_name,'.') ? '' : '.'.$this->convert_to);
         $this->destination_file = empty($this->destination_file) ? AK_TMP_DIR.DS.$this->destination_file_name : $this->destination_file;
     }
-
 }
 
-?>

@@ -8,12 +8,21 @@ Active Support:
     - AkInstaller
     - AkLocaleManager
     - AkPluginInstaller
+    - 'AkPlugin/AkPluginManager'
     - AkReflection
     - 'AkReflection/*'
     - AkTestApplication
     - AkUnitTest
     - AkLazyObject
     - AkPhpCodeSanitizer
+    - 'utils/_Ak_convert'
+    - 'utils/_Ak_file_functions'
+    - 'utils/_Ak_object_inspection'
+    - 'utils/_Ak_support_functions'
+    - 'utils/_Ak_var_manipulation'
+    - 'AkType/AkNumber'
+    - 'AkType/AkString'
+    # - 'utils/_Ak_file_functions_over_ftp' test in standalone mode
 Action Controller:
     - AkDbSession
     - AkRouter

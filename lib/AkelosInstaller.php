@@ -8,7 +8,6 @@
  * @package AkelosFramework
  * @subpackage Installer
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 class AkelosInstaller

@@ -3,14 +3,11 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActiveSupport
  * @subpackage Converters
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 class AkDBDesignerToAkelosDatabaseDesign
 {
@@ -59,11 +56,11 @@ class AkDBDesignerToAkelosDatabaseDesign
         if (!xml_parse($this->_parser, $this->source)) {
             $this->addError(Ak::t('DBDesigner file is not well-formed.').' '.xml_error_string(xml_get_error_code($this->_parser)));
         }
-        
+
         foreach ($this->db_schema as $table=>$create_text){
             $this->db_schema[$table] = rtrim($create_text,", \n");
         }
-        
+
         return $this->db_schema;
     }
 
@@ -75,7 +72,7 @@ class AkDBDesignerToAkelosDatabaseDesign
         }
         if(!empty($attributes['ColName']) && !empty($this->current_table)){
             $this->db_schema[$this->current_table] = empty($this->db_schema[$this->current_table]) ? '' : $this->db_schema[$this->current_table];
-            $this->db_schema[$this->current_table] .= 
+            $this->db_schema[$this->current_table] .=
             $attributes['ColName'].' '.
             $this->getDataType($attributes['idDatatype']).$attributes['DatatypeParams'].
             (empty($attributes['PrimaryKey']) ? '' : ' primary').
@@ -124,7 +121,7 @@ class AkDBDesignerToAkelosDatabaseDesign
         28 => 'text',
         29 => 'text',
         30 => 'text');
-        
+
         return empty($dbdesigner_data_types[$type]) ? 'string' : $dbdesigner_data_types[$type];
 
     }
@@ -134,5 +131,3 @@ class AkDBDesignerToAkelosDatabaseDesign
     }
 }
 
-
-?>

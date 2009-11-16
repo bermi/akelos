@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class AkReflectionFunction_TestCase extends  UnitTestCase
+class AkReflectionFunction_TestCase extends AkUnitTest
 {
     public function test_string_constructor()
     {
@@ -14,7 +14,7 @@ class AkReflectionFunction_TestCase extends  UnitTestCase
              * @param $param2
              */
             public function &method2($param1,$param2) {
-            
+
             }
         }';
         $func = new AkReflectionFunction($string);

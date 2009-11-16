@@ -3,15 +3,12 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
 * @package ActiveRecord
 * @subpackage Behaviours
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  * @author Jean-Christophe Michel, Symétrie
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');

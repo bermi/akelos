@@ -1,9 +1,6 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
-
-require_once(AK_LIB_DIR.DS.'Ak.php');
 
 //This class is used to check class inspection functions
 class AkTestingObjectInspectionParent
@@ -20,6 +17,7 @@ class AkTestingObjectInspectionParent
     public function &parent_method(){
     }
 }
+
 class AkTestingObjectInspectionChild extends AkTestingObjectInspectionParent
 {
     public $child_var;
@@ -38,7 +36,7 @@ class AkTestingObjectInspectionChild extends AkTestingObjectInspectionParent
 
 
 
-class test_of_Ak_object_inspection extends  UnitTestCase
+class Ak_object_inspection_TestCase extends AkUnitTest
 {
 
     public $AkTestingObjectInspectionChildInstance;
@@ -56,9 +54,9 @@ class test_of_Ak_object_inspection extends  UnitTestCase
 
     public function Test_db()
     {
-        require_once(AK_CONTRIB_DIR.'/adodb/adodb.inc.php');
+        include_once AK_CONTRIB_DIR.'/adodb/adodb.inc.php';
 
-        $db =& Ak::db();
+        $db = Ak::db();
         $this->assertFalse(!$db,'Connecting to the database. Please check your test_config.php file in order to set up a copy of $dns into $GLOBALS["ak_test_db_dns"]');
         $this->assertReference($db,Ak::db(),'Checking db connection singleton');
     }
@@ -80,9 +78,7 @@ class test_of_Ak_object_inspection extends  UnitTestCase
         Ak::debug($this->AkTestingObjectInspectionChildInstance);
         $debug_str = ob_get_contents();
         ob_end_clean();
-
         $this->assertFalse($debug_str == '','Ak::debug not working properly');
-
     }
 
     public function Test_get_object_info()
@@ -137,7 +133,7 @@ class test_of_Ak_object_inspection extends  UnitTestCase
 
 
     /**/
-    
+
     public function Test_of_compress_decompress()
     {
         $original = Ak::file_get_contents(__FILE__);
@@ -158,23 +154,22 @@ class test_of_Ak_object_inspection extends  UnitTestCase
     public function Test_for_StatusKeys()
     {
         $Object = new Ak();
-        
+
         $this->assertFalse(Ak::objectHasBeenModified($Object));
 
         $this->assertEqual(Ak::getStatusKey($Object), Ak::getStatusKey($Object));
-        
+
         $Object->name = 'Bermi';
         $this->assertTrue(Ak::objectHasBeenModified($Object));
         $this->assertTrue(Ak::objectHasBeenModified($Object));
-        
+
         Ak::resetObjectModificationsWacther($Object);
-        
-        $this->assertFalse(Ak::objectHasBeenModified($Object));    
+
+        $this->assertFalse(Ak::objectHasBeenModified($Object));
     }
 
 }
 
 
-ak_test('test_of_Ak_object_inspection',true);
+ak_test_run_case_if_executed('Ak_object_inspection_TestCase',true);
 
-?>

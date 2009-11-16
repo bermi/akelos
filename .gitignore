@@ -37,3 +37,7 @@ app/plugin_installer_target_class.php
 app/locales/
 private/
 test/fixtures/app/models/property_property_type.php
+cache/
+config/plugin_repositories.txt
+tmp1
+tmp2

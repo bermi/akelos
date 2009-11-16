@@ -41,8 +41,7 @@ class AkReflectionDocBlock
                 $string .= "\n * @param \$$key $value";
             }
         }
-        $string.="\n */";
-        return $string;
+        return trim($string)."\n */";
     }
 
     public function setTag($tag, $value) {

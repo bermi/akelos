@@ -3,14 +3,11 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActiveSupport
  * @subpackage Converters
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 class AkHtmlToRtf
 {
@@ -61,7 +58,7 @@ class AkHtmlToRtf
         $this->source
         );
         $this->source = $this->specialCharacters($this->source);
-        
+
         $rules = array(
         "/<LI>(.*?)<\/LI>/mi"=> "\\f3\\'B7\\tab\\f{$this->font_face} \\1\\par",
         "/<P>(.*?)<\/P>/mi" => "\\1\\par ",
@@ -80,11 +77,10 @@ class AkHtmlToRtf
         "/<TAB(.*?)>/i" => "\\tab ",
         "/\\n/" => "\\par "
         );
-        
+
         return preg_replace(array_keys($rules),array_values($rules), $this->source);
 
     }
 
 }
 
-?>

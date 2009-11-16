@@ -206,4 +206,12 @@ $dictionary=array (
   '52S3TGUH' => '52S3TGUH',
   'fqxF5ddi' => 'fqxF5ddi',
   'sbQtBp7K' => 'sbQtBp7K',
+  'MFLqvv4X' => 'MFLqvv4X',
+  'YrOucIVR' => 'YrOucIVR',
+  'MRGT6sFX' => 'MRGT6sFX',
+  'OuTYIXHq' => 'OuTYIXHq',
+  '8UAYkuuP' => '8UAYkuuP',
+  'xpaN0C7n' => 'xpaN0C7n',
+  'ho6VmtDo' => 'ho6VmtDo',
+  'qjcHwDik' => 'qjcHwDik',
 );

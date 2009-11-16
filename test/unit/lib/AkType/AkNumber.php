@@ -1,7 +1,8 @@
 <?php
-require_once(AK_LIB_DIR.DS.'AkType.php');
 
-class Test_AkNumber extends AkUnitTest
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
+
+class AkNumber_TestCase extends AkUnitTest
 {
     public function test_constructor_default()
     {
@@ -13,7 +14,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now+4>=$val);
         $this->assertTrue($now-1<=$val);
     }
-    
+
     public function test_constructor_magic_string()
     {
         $now = time();
@@ -22,8 +23,8 @@ class Test_AkNumber extends AkUnitTest
         $this->assertTrue($now+1+$oneyear>=$number);
         $this->assertTrue($now-1+$oneyear<=$number);
     }
-    
-    
+
+
     public function test_time_units()
     {
         $this->assertEqual(20,AkT(20,'seconds'));
@@ -52,20 +53,20 @@ class Test_AkNumber extends AkUnitTest
         $oneyear = 365*24*60*60;
         $this->assertTrue($now+1+$oneyear>=$number);
         $this->assertTrue($now-1+$oneyear<=$number);
-        
+
         $now = time();
         $number = AkT(1,'years.from.now');
         $oneyear = 365*24*60*60;
         $this->assertTrue($now+1+$oneyear>=$number);
         $this->assertTrue($now-1+$oneyear<=$number);
-        
+
         $now = time();
         $number = AkT(2,'years.from.now');
         $oneyear = 365*24*60*60;
         $this->assertTrue($now+1+$oneyear*2>=$number);
         $this->assertTrue($now-1+$oneyear*2<=$number);
     }
-    
+
     public function test_years_ago()
     {
         $now = time();
@@ -73,18 +74,18 @@ class Test_AkNumber extends AkUnitTest
         $oneyear = 365*24*60*60;
         $this->assertTrue($now+1-$oneyear>=$number);
         $this->assertTrue($now-1-$oneyear<=$number);
-        
+
         $now = time();
         $number = AkT(1,'years.ago');
         $this->assertTrue($now+1-$oneyear>=$number);
         $this->assertTrue($now-1-$oneyear<=$number);
-        
+
         $now = time();
         $number = AkT(2,'years.ago');
         $this->assertTrue($now+1-$oneyear*2>=$number);
         $this->assertTrue($now-1-$oneyear*2<=$number);
     }
-    
+
     public function test_months_from_now()
     {
         $now = time();
@@ -92,18 +93,18 @@ class Test_AkNumber extends AkUnitTest
         $onemonth = 30*24*60*60;
         $this->assertTrue($now+1+$onemonth>=$number);
         $this->assertTrue($now-1+$onemonth<=$number);
-        
+
         $now = time();
         $number = AkT(1,'months.from.now');
         $this->assertTrue($now+1+$onemonth>=$number);
         $this->assertTrue($now-1+$onemonth<=$number);
-        
+
         $now = time();
         $number = AkT(2,'months.from.now');
         $this->assertTrue($now+1+$onemonth*2>=$number);
         $this->assertTrue($now-1+$onemonth*2<=$number);
     }
-    
+
     public function test_months_ago()
     {
         $now = time();
@@ -111,18 +112,18 @@ class Test_AkNumber extends AkUnitTest
         $onemonth = 30*24*60*60;
         $this->assertTrue($now+1-$onemonth>=$number);
         $this->assertTrue($now-1-$onemonth<=$number);
-        
+
         $now = time();
         $number = AkT(1,'months.ago');
         $this->assertTrue($now+1-$onemonth>=$number);
         $this->assertTrue($now-1-$onemonth<=$number);
-        
+
         $now = time();
         $number = AkT(2,'months.ago');
         $this->assertTrue($now+1-$onemonth*2>=$number);
         $this->assertTrue($now-1-$onemonth*2<=$number);
     }
-    
+
     public function test_weeks_from_now()
     {
         $now = time();
@@ -130,18 +131,18 @@ class Test_AkNumber extends AkUnitTest
         $oneweek = 7*24*60*60;
         $this->assertTrue($now+1+$oneweek>=$number);
         $this->assertTrue($now-1+$oneweek<=$number);
-        
+
         $now = time();
         $number = AkT(1,'weeks.from.now');
         $this->assertTrue($now+1+$oneweek>=$number);
         $this->assertTrue($now-1+$oneweek<=$number);
-        
+
         $now = time();
         $number = AkT(2,'weeks.from.now');
         $this->assertTrue($now+1+$oneweek*2>=$number);
         $this->assertTrue($now-1+$oneweek*2<=$number);
     }
-    
+
     public function test_weeks_ago()
     {
         $now = time();
@@ -149,18 +150,18 @@ class Test_AkNumber extends AkUnitTest
         $oneweek = 7*24*60*60;
         $this->assertTrue($now+1-$oneweek>=$number);
         $this->assertTrue($now-1-$oneweek<=$number);
-        
+
         $now = time();
         $number = AkT(1,'weeks.ago');
         $this->assertTrue($now+1-$oneweek>=$number);
         $this->assertTrue($now-1-$oneweek<=$number);
-        
+
         $now = time();
         $number = AkT(2,'weeks.ago');
         $this->assertTrue($now+1-$oneweek*2>=$number);
         $this->assertTrue($now-1-$oneweek*2<=$number);
     }
-    
+
     public function test_days_from_now()
     {
         $now = time();
@@ -168,18 +169,18 @@ class Test_AkNumber extends AkUnitTest
         $oneday = 1*24*60*60;
         $this->assertTrue($now+1+$oneday>=$number);
         $this->assertTrue($now-1+$oneday<=$number);
-        
+
         $now = time();
         $number = AkT(1,'days.from.now');
         $this->assertTrue($now+1+$oneday>=$number);
         $this->assertTrue($now-1+$oneday<=$number);
-        
+
         $now = time();
         $number = AkT(2,'days.from.now');
         $this->assertTrue($now+1+$oneday*2>=$number);
         $this->assertTrue($now-1+$oneday*2<=$number);
     }
-    
+
     public function test_days_ago()
     {
         $now = time();
@@ -187,18 +188,18 @@ class Test_AkNumber extends AkUnitTest
         $oneday = 1*24*60*60;
         $this->assertTrue($now+1-$oneday>=$number);
         $this->assertTrue($now-1-$oneday<=$number);
-        
+
         $now = time();
         $number = AkT(1,'days.ago');
         $this->assertTrue($now+1-$oneday>=$number);
         $this->assertTrue($now-1-$oneday<=$number);
-        
+
         $now = time();
         $number = AkT(2,'days.ago');
         $this->assertTrue($now+1-$oneday*2>=$number);
         $this->assertTrue($now-1-$oneday*2<=$number);
     }
-    
+
     public function test_hours_from_now()
     {
         $now = time();
@@ -206,18 +207,18 @@ class Test_AkNumber extends AkUnitTest
         $onehour = 1*60*60;
         $this->assertTrue($now+1+$onehour>=$number);
         $this->assertTrue($now-1+$onehour<=$number);
-        
+
         $now = time();
         $number = AkT(1,'hours.from.now');
         $this->assertTrue($now+1+$onehour>=$number);
         $this->assertTrue($now-1+$onehour<=$number);
-        
+
         $now = time();
         $number = AkT(2,'hours.from.now');
         $this->assertTrue($now+1+$onehour*2>=$number);
         $this->assertTrue($now-1+$onehour*2<=$number);
     }
-    
+
     public function test_hours_ago()
     {
         $now = time();
@@ -225,18 +226,18 @@ class Test_AkNumber extends AkUnitTest
         $onehour = 1*60*60;
         $this->assertTrue($now+1-$onehour>=$number);
         $this->assertTrue($now-1-$onehour<=$number);
-        
+
         $now = time();
         $number = AkT(1,'hours.ago');
         $this->assertTrue($now+1-$onehour>=$number);
         $this->assertTrue($now-1-$onehour<=$number);
-        
+
         $now = time();
         $number = AkT(2,'hours.ago');
         $this->assertTrue($now+1-$onehour*2>=$number);
         $this->assertTrue($now-1-$onehour*2<=$number);
     }
-    
+
     public function test_minutes_from_now()
     {
         $now = time();
@@ -244,18 +245,18 @@ class Test_AkNumber extends AkUnitTest
         $oneminute = 1*60;
         $this->assertTrue($now+1+$oneminute>=$number);
         $this->assertTrue($now-1+$oneminute<=$number);
-        
+
         $now = time();
         $number = AkT(1,'minutes.from.now');
         $this->assertTrue($now+1+$oneminute>=$number);
         $this->assertTrue($now-1+$oneminute<=$number);
-        
+
         $now = time();
         $number = AkT(2,'minutes.from.now');
         $this->assertTrue($now+1+$oneminute*2>=$number);
         $this->assertTrue($now-1+$oneminute*2<=$number);
     }
-    
+
     public function test_minutes_ago()
     {
         $now = time();
@@ -263,18 +264,18 @@ class Test_AkNumber extends AkUnitTest
         $oneminute = 1*60;
         $this->assertTrue($now+1-$oneminute>=$number);
         $this->assertTrue($now-1-$oneminute<=$number);
-        
+
         $now = time();
         $number = AkT(1,'minutes.ago');
         $this->assertTrue($now+1-$oneminute>=$number);
         $this->assertTrue($now-1-$oneminute<=$number);
-        
+
         $now = time();
         $number = AkT(2,'minutes.ago');
         $this->assertTrue($now+1-$oneminute*2>=$number);
         $this->assertTrue($now-1-$oneminute*2<=$number);
     }
-    
+
     public function test_seconds_from_now()
     {
         $now = time();
@@ -282,18 +283,18 @@ class Test_AkNumber extends AkUnitTest
         $onesecond = 1;
         $this->assertTrue($now+1+$onesecond>=$number);
         $this->assertTrue($now-1+$onesecond<=$number);
-        
+
         $now = time();
         $number = AkT(1,'seconds.from.now');
         $this->assertTrue($now+1+$onesecond>=$number);
         $this->assertTrue($now-1+$onesecond<=$number);
-        
+
         $now = time();
         $number = AkT(2,'seconds.from.now');
         $this->assertTrue($now+1+$onesecond*2>=$number);
         $this->assertTrue($now-1+$onesecond*2<=$number);
     }
-    
+
     public function test_seconds_ago()
     {
         $now = time();
@@ -301,25 +302,25 @@ class Test_AkNumber extends AkUnitTest
         $onesecond = 1;
         $this->assertTrue($now+1-$onesecond>=$number);
         $this->assertTrue($now-1-$onesecond<=$number);
-        
+
         $now = time();
         $number = AkT(1,'seconds.ago');
         $this->assertTrue($now+1-$onesecond>=$number);
         $this->assertTrue($now-$onesecond<=$number);
-        
+
         $now = time();
         $number = AkT(2,'seconds.ago');
         $this->assertTrue($now+1-$onesecond*2>=$number);
         $this->assertTrue($now-1-$onesecond*2<=$number);
     }
-    
+
     public function test_to_date()
     {
         $now = date('Y-m-d H:i:s');
         $date = AkT(0,'now.toDate');
         $this->assertEqual($now,$date);
     }
-    
+
     public function test_ordinalize()
     {
         $number = AkT(1);
@@ -327,40 +328,40 @@ class Test_AkNumber extends AkUnitTest
         $this->assertEqual($expect,$number->ordinalize());
         $number = AkT(1,'ordinalize');
         $this->assertEqual($expect,$number);
-        
+
         $number = AkT(2);
         $expect = '2nd';
         $this->assertEqual($expect,$number->ordinalize());
         $number = AkT(2,'ordinalize');
         $this->assertEqual($expect,$number);
-        
+
         $number = AkT(3);
         $expect = '3rd';
         $this->assertEqual($expect,$number->ordinalize());
         $number = AkT(3,'ordinalize');
         $this->assertEqual($expect,$number);
-        
+
         $number = AkT(4);
         $expect = '4th';
         $this->assertEqual($expect,$number->ordinalize());
         $number = AkT(4,'ordinalize');
         $this->assertEqual($expect,$number);
     }
-    
+
     public function test_quantify()
     {
         $number = AkT(1);
         $expected = '1 Comment';
         $this->assertEqual($expected, $number->quantify('Comment'));
-        
+
         $number = AkT(0);
         $expected = '0 Comments';
         $this->assertEqual($expected, $number->quantify('Comment'));
-        
+
         $number = AkT(10);
         $expected = '10 Comments';
         $this->assertEqual($expected, $number->quantify('Comment'));
-        
+
         $quantity = AkT(10,'quantify(Comment)');
         /**
          * //TODO: add sintags for templates:
@@ -369,7 +370,7 @@ class Test_AkNumber extends AkUnitTest
         $expected = '10 Comments';
         $this->assertEqual($expected, $quantity);
     }
-    
+
     public function test_until()
     {
         $now = time();
@@ -379,7 +380,7 @@ class Test_AkNumber extends AkUnitTest
         $this->assertEqual($now,$result_timestamp);
         $result_date = date('Y-m-d H:i:s', $result_timestamp);
     }
-    
+
     public function test_since()
     {
         $now = time();
@@ -390,4 +391,6 @@ class Test_AkNumber extends AkUnitTest
         $result_date = date('Y-m-d H:i:s', $result_timestamp);
     }
 }
-ak_test('Test_AkNumber');
+
+ak_test_run_case_if_executed('AkNumber_TestCase');
+

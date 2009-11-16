@@ -3,8 +3,6 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActiveRecord
@@ -13,7 +11,6 @@
  * @author Arno Schneider <arno a.t bermilabs c.om>
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 class AkDbSchemaCache

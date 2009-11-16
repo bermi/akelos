@@ -3,8 +3,6 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActiveSupport
@@ -12,7 +10,6 @@
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  * @author Arno Schneider <arno a.t bermilabs c.om>
  * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 
@@ -393,7 +390,6 @@ class Ak
         $file_name = trim(str_replace($options['base_path'], '',$file_name),DS);
 
         if($options['ftp']){
-            require_once(AK_LIB_DIR.DS.'AkFtp.php');
             $file_name = trim(str_replace(array(DS,'//'),array('/','/'),$file_name),'/');
             if(!AkFtp::is_dir(dirname($file_name))){
                 AkFtp::make_dir(dirname($file_name));
@@ -426,7 +422,6 @@ class Ak
 
         $file_name = trim(str_replace($options['base_path'], '',$file_name),DS);
         if($options['ftp']){
-            require_once(AK_LIB_DIR.DS.'AkFtp.php');
             $file_name = trim(str_replace(array(DS,'//'),array('/','/'),$file_name),'/');
             return AkFtp::get_contents($file_name);
         }else{
@@ -453,7 +448,6 @@ class Ak
 
         $file_name = trim(str_replace($options['base_path'], '',$file_name),DS);
         if($options['ftp']){
-            require_once(AK_LIB_DIR.DS.'AkFtp.php');
             $file_name = trim(str_replace(array(DS,'//'),array('/','/'),$file_name),'/');
             return AkFtp::delete($file_name, true);
         }elseif (file_exists($options['base_path'].DS.$file_name)){
@@ -478,7 +472,6 @@ class Ak
         }
 
         if($options['ftp']){
-            require_once(AK_LIB_DIR.DS.'AkFtp.php');
             return AkFtp::delete($dir_name);
         }else{
             $items = glob($options['base_path'].DS.$dir_name."/*");
@@ -519,7 +512,6 @@ class Ak
         $path = trim(str_replace($options['base_path'], '',$path),DS);
 
         if($options['ftp']){
-            require_once(AK_LIB_DIR.DS.'AkFtp.php');
             $path = trim(str_replace(array(DS,'//'),array('/','/'),$path),'/');
             return AkFtp::make_dir($path);
         }else{
@@ -573,9 +565,6 @@ class Ak
             return false;
         }
 
-        if($options['ftp']){
-            require_once(AK_LIB_DIR.DS.'AkFtp.php');
-        }
         $destination = str_replace($origin, $target, $origin);
         if(is_file($options['base_path'].DS.$origin)){
             return Ak::file_put_contents($options['base_path'].DS.$destination, Ak::file_get_contents($options['base_path'].DS.$origin, $options), $options);
@@ -2268,6 +2257,7 @@ class Ak
             'AkDbSchemaCache'           =>  AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbSchemaCache.php',
             'AkDbSession'               =>  AK_LIB_DIR.DS.'AkDbSession.php',
             'AkFormHelperBuilder'       =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php',
+            'AkFtp'                     =>  AK_LIB_DIR.DS.'AkFtp.php',
             'AkFormHelperInstanceTag'   =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_helper.php',
             'AkFormHelperOptionsInstanceTag'    =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'form_options_helper.php',
             'AkHelperLoader'            =>  AK_LIB_DIR.DS.'AkActionView'.DS.'AkHelperLoader.php',
@@ -2288,6 +2278,7 @@ class Ak
             'AkPlugin'                  =>  AK_LIB_DIR.DS.'AkPlugin.php',
             'AkPluginInstaller'         =>  AK_LIB_DIR.DS.'AkPluginInstaller.php',
             'AkPluginLoader'            =>  AK_LIB_DIR.DS.'AkPlugin.php',
+            'AkPluginManager'           =>  AK_LIB_DIR.DS.'AkPlugin'.DS.'AkPluginManager.php',
             'AkReflection'              =>  AK_LIB_DIR.DS.'AkReflection.php',
             'AkReflectionClass'         =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionClass.php',
             'AkReflectionDocBlock'      =>  AK_LIB_DIR.DS.'AkReflection'.DS.'AkReflectionDocBlock.php',

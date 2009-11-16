@@ -3,26 +3,19 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActiveSupport
  * @subpackage Compatibility
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
-if(!defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION')){
-    define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
-}
-if(!defined('AK_FTP_SHOW_ERRORS')){
-    define('AK_FTP_SHOW_ERRORS', true);
-}
+defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION') || define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
+defined('AK_FTP_SHOW_ERRORS') || define('AK_FTP_SHOW_ERRORS', true);
 
 class AkFtp
 {
-    function put_contents ($file, $contents)
+    static function put_contents ($file, $contents)
     {
         $result = false;
 
@@ -54,7 +47,7 @@ class AkFtp
     }
 
 
-    function get_contents ($file)
+    static function get_contents ($file)
     {
         if($ftp = AkFtp::connect()){
 
@@ -73,10 +66,10 @@ class AkFtp
         }
     }
 
-    function connect($base_dir = null)
+    static function connect($base_dir = null)
     {
         static $ftp_conn, $_base_dir, $disconnected = false;
-        
+
         if(!isset($ftp_conn) || $disconnected){
             if(!defined('AK_FTP_PATH')){
                 trigger_error(Ak::t('You must set a valid FTP connection on AK_FTP_PATH in your config/config.php file'),E_USER_ERROR);
@@ -84,7 +77,7 @@ class AkFtp
                 if(AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION && substr(AK_FTP_PATH,0,10) == 'PROTECTED:'){
                     // You should change the key bellow and encode this file if you are going to distribute applications
                     // The ideal protection would be to encode user configuration file.
-                    $AK_FTP_PATH = Ak::decrypt(base64_decode(substr(AK_FTP_PATH,10)),'HR23JHR93JZ0ALi1UvTZ0ALi1UvTk7MD70'); 
+                    $AK_FTP_PATH = Ak::decrypt(base64_decode(substr(AK_FTP_PATH,10)),'HR23JHR93JZ0ALi1UvTZ0ALi1UvTk7MD70');
                     $_pass_encoded = true;
                 }else{
                     $AK_FTP_PATH = AK_FTP_PATH;
@@ -110,7 +103,7 @@ class AkFtp
                     register_shutdown_function(array('AkFtp', 'disconnect'));
                 }
                 if(AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION && empty($_pass_encoded)){
-                    
+
                     @register_shutdown_function(create_function('',
                     "@Ak::file_put_contents(AK_CONFIG_DIR.DS.'config.php',
                 str_replace(AK_FTP_PATH,'PROTECTED:'.base64_encode(Ak::encrypt(AK_FTP_PATH,'HR23JHR93JZ0ALi1UvTZ0ALi1UvTk7MD70')),
@@ -140,7 +133,7 @@ class AkFtp
         return $ftp_conn;
     }
 
-    function disconnect()
+    static function disconnect()
     {
         static $disconnected = false;
         if(!$disconnected && $ftp_conn = AkFtp::connect('AK_DISCONNECT_FTP')){
@@ -150,7 +143,7 @@ class AkFtp
         return false;
     }
 
-    function make_dir($path)
+    static function make_dir($path)
     {
         if($ftp_conn = AkFtp::connect()){
             $path = AkFtp::unrelativizePath($path);
@@ -162,7 +155,7 @@ class AkFtp
             }
             $path = ftp_pwd($ftp_conn).'/';
             $ret = true;
-            
+
             for ($i=0; $i<count($dir); $i++){
                 $path .= $i === 0 ? $dir[$i] : '/'.$dir[$i];
                 if(!@ftp_chdir($ftp_conn, $path)){
@@ -184,7 +177,7 @@ class AkFtp
         return false;
     }
 
-    function delete($path, $only_files = false)
+    static function delete($path, $only_files = false)
     {
         $result = false;
         if($ftp_conn = AkFtp::connect()){
@@ -197,7 +190,7 @@ class AkFtp
             $dirs = $keep_parent_dir ? array($path) : array();
             $files = array($path);
             $current_dir = $path.'/';
-            if(count($list) === 1){
+            if(count($list) === 1 && !AkFtp::is_dir($path)){
                 $dirs = array();
                 $files[] = $path;
             }else{
@@ -205,7 +198,7 @@ class AkFtp
                     if(substr($line,-1) == ':'){
                         $current_dir = substr($line,0,strlen($line)-1).'/';
                     }
-                    if (ereg ("([-d][rwxst-]+).* ([0-9]) ([a-zA-Z0-9]+).* ([a-zA-Z0-9]+).* ([0-9]*) ([a-zA-Z]+[0-9: ]*[0-9]) ([0-9]{2}:[0-9]{2}) (.+)", $line, $regs)){
+                    if (preg_match("/([-d][rwxst-]+).* ([0-9]) ([a-zA-Z0-9]+).* ([a-zA-Z0-9]+).* ([0-9]*) ([a-zA-Z]+[0-9: ]*[0-9]) ([0-9]{2}:[0-9]{2}) (.+)/", $line, $regs)){
                         if((substr ($regs[1],0,1) == "d")){
                             if($regs[8] != '.' && $regs[8] != '..'){
                                 $dirs[] = $current_dir.$regs[8];
@@ -221,7 +214,7 @@ class AkFtp
             }
             rsort($dirs);
             foreach ($files as $file){
-                if(!$result = @ftp_delete($ftp_conn,$file)){
+                if(!($result = @ftp_delete($ftp_conn, $file))){
                     trigger_error(Ak::t('Could not delete FTP file %file_path',array('%file_path'=>$file)), E_USER_NOTICE);
                     return false;
                 }
@@ -239,7 +232,7 @@ class AkFtp
     }
 
 
-    function is_dir($path)
+    static function is_dir($path)
     {
         if($ftp_conn = AkFtp::connect()){
             $path = AkFtp::unrelativizePath($path);
@@ -251,13 +244,13 @@ class AkFtp
         return false;
     }
 
-    function unrelativizePath($path)
+    static function unrelativizePath($path)
     {
-        
+
         if(!strstr($path,'..')){
             return $path;
         }
-        
+
         $path_parts = explode(DS, $path);
         if(!empty($path_parts)){
             $new_parts = array();
@@ -277,5 +270,3 @@ class AkFtp
     }
 }
 
-
-?>

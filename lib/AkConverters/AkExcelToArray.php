@@ -3,14 +3,11 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package ActiveSupport
  * @subpackage Converters
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
  */
 
 class AkExcelToArray
@@ -18,7 +15,7 @@ class AkExcelToArray
     public function convert()
     {
         $this->handler->read($this->source_file);
-        
+
         $result = array();
         for ($i = 1; $i <= $this->handler->sheets[0]['numRows']; $i++) {
             if($i === 1){
@@ -44,7 +41,7 @@ class AkExcelToArray
             $this->handler = new Spreadsheet_Excel_Reader();
             $this->handler->setRowColOffset((empty($this->first_column) ? 0 : $this->first_column));
         }
-        
+
         $this->tmp_name = Ak::randomString();
         if(empty($this->source_file)){
             $this->source_file = AK_TMP_DIR.DS.$this->tmp_name.'.xls';
@@ -58,4 +55,3 @@ class AkExcelToArray
     }
 }
 
-?>

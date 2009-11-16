@@ -3,15 +3,12 @@
 // +----------------------------------------------------------------------+
 // | Akelos Framework - http://www.akelos.org                             |
 // +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// +----------------------------------------------------------------------+
 
 /**
  * @package AkelosFramework
  * @subpackage AkActionMailer
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
-  * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
- */
+  */
 
 
 defined('AK_ACTION_MAILER_CHARS_NEEDING_QUOTING_REGEX') ? null :

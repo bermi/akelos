@@ -2,16 +2,16 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class AkReflectionDocBlock_TestCase extends  UnitTestCase
+class AkReflectionDocBlock_TestCase extends AkUnitTest
 {
     public function test_set_tag()
     {
         $string ='/**
-                   * test comment
-                   *
-                   * @param $test value
-                   * @tag value
-                   */';
+ * test comment
+ *
+ * @param $test value
+ * @tag value
+ */';
         $docblock = new AkReflectionDocBlock($string);
         $docblock->setTag('test','testtag');
         $this->assertEqual('/**
@@ -19,11 +19,16 @@ class AkReflectionDocBlock_TestCase extends  UnitTestCase
  *
  * @tag value
  * @test testtag
- * @param $test 
+ * @param $test
  */',$docblock->toString());
+        $a = explode("\n", '/**
+ * test comment
+ *
+ * @tag value
+ * @test testtag
+ * @param $test
+ */');
     }
-
-
 }
 
 ak_test_run_case_if_executed('AkReflectionDocBlock_TestCase');

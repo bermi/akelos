@@ -238,12 +238,15 @@ defined('AK_TEMPLATE_SECURITY_CHECK')                           || define('AK_TE
 defined('AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER')           || define('AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER', 'AkPhpCodeSanitizer');
 
 
-defined('AK_URL_DEBUG_REQUEST')                                 || define('AK_URL_DEBUG_REQUEST', !empty($_GET['debug']));
-defined('AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS')                  || define('AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS', AK_DEBUG && AK_URL_DEBUG_REQUEST);
-defined('AK_FORCE_TEMPLATE_COMPILATION')                        || define('AK_FORCE_TEMPLATE_COMPILATION', AK_DEBUG && !empty($_GET['recompile']));
+defined('AK_URL_DEBUG_REQUEST')                 || define('AK_URL_DEBUG_REQUEST', !empty($_GET['debug']));
+defined('AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS')  || define('AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS', AK_DEBUG && AK_URL_DEBUG_REQUEST);
+defined('AK_FORCE_TEMPLATE_COMPILATION')        || define('AK_FORCE_TEMPLATE_COMPILATION', AK_DEBUG && !empty($_GET['recompile']));
 
+defined('AK_DEFAULT_LOCALE_NAMESPACE')          || define('AK_DEFAULT_LOCALE_NAMESPACE', null);
 
-defined('AK_DEFAULT_LOCALE_NAMESPACE')                          || define('AK_DEFAULT_LOCALE_NAMESPACE', null);
+defined('AK_PLUGINS_MAIN_REPOSITORY')           || define('AK_PLUGINS_MAIN_REPOSITORY', 'http://svn.akelos.org/plugins');
+defined('AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE') || define('AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE', 'http://www.akelos.org/wiki/plugins');
+
 /**
  *  Before rev.1232 MySQL on some setups, connections where opened using PHP's default
  *  encoding latin1 this caused that UTF8 data written by Akelos could not be edited using other DB tools.
