@@ -12,12 +12,12 @@
 
 class ADODB2_firebird extends ADODB_DataDict {
 	
-	var $databaseType = 'firebird';
+	public $databaseType = 'firebird';
 	var $seqField = false;
 	var $seqPrefix = 'gen_';
 	var $blobSize = 40000;	
  	
- 	function ActualType($meta)
+ 	public function ActualType($meta)
 	{
 		switch($meta) {
 		case 'C': return 'VARCHAR';
@@ -47,7 +47,7 @@ class ADODB2_firebird extends ADODB_DataDict {
 		}
 	}
 	
-	function NameQuote($name = NULL)
+	public function NameQuote($name = NULL)
 	{
 		if (!is_string($name)) {
 			return FALSE;
@@ -84,7 +84,7 @@ class ADODB2_firebird extends ADODB_DataDict {
 		return $sql;
 	}
 	
-	function _DropAutoIncrement($t)
+	public function _DropAutoIncrement($t)
 	{
 		if (strpos($t,'.') !== false) {
 			$tarr = explode('.',$t);
@@ -94,7 +94,7 @@ class ADODB2_firebird extends ADODB_DataDict {
 	}
 	
 
-	function _CreateSuffix($fname,&$ftype,$fnotnull,$fdefault,$fautoinc,$fconstraint,$funsigned)
+	public function _CreateSuffix($fname,&$ftype,$fnotnull,$fdefault,$fautoinc,$fconstraint,$funsigned)
 	{
 		$suffix = '';
 		

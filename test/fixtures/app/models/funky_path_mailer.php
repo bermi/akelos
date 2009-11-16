@@ -4,9 +4,9 @@ define('AK_FUNKY_MAILER_PATH', AK_TEST_DIR.DS."/fixtures/data/path.with.dots");
 
 class FunkyPathMailer extends AkActionMailer
 {
-    var $templateRoot = AK_FUNKY_MAILER_PATH;
+    public $templateRoot = AK_FUNKY_MAILER_PATH;
 
-    function multipart_with_template_path_with_dots()
+    public function multipart_with_template_path_with_dots()
     {
         $this->setRecipients($recipient);
         $this->setSubject("Have a lovely picture");

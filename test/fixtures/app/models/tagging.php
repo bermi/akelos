@@ -2,7 +2,7 @@
 
 class Tagging extends AkActiveRecord  
 {
-    var $belongs_to = array('file', 'tag');
+    public $belongs_to = array('file', 'tag');
     
 }
 

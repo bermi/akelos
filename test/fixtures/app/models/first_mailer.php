@@ -2,7 +2,7 @@
 
 class FirstMailer extends AkActionMailer
 {
-    function share($recipient)
+    public function share($recipient)
     {
         $this->recipients = $recipient;
         $this->subject = "using helpers";

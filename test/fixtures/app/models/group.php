@@ -2,8 +2,8 @@
 
 class Group extends ActiveRecord
 {
-    var $habtm = 'users';
-    var $has_many = 'locations';
+    public $habtm = 'users';
+    public $has_many = 'locations';
 }
 
 ?>

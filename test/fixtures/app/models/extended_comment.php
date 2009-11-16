@@ -2,7 +2,7 @@
 
 class ExtendedComment extends ActiveRecord 
 {
-    var $belongs_to = 'extended_post';
+    public $belongs_to = 'extended_post';
 }
 
 ?>

@@ -3,9 +3,9 @@
 class Landlord extends ActiveRecord
 {
     // var $hasMany = 'properties';
-    var $hasOne = 'picture';
+    public $hasOne = 'picture';
 
-    function validateOnCreate()
+    public function validateOnCreate()
     {
         if(!empty($this->test_validators)){
             foreach ($this->test_validators as $validator=>$args) {

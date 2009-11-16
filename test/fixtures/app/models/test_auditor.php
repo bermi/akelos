@@ -1,7 +1,7 @@
 <?php
     class TestAuditor extends AkObserver 
     { 
-        function update($state)
+        public function update($state)
         {
             switch ($state)
             {
@@ -13,7 +13,7 @@
             }
         }
         
-        function afterCreate(&$record)
+        public function afterCreate(&$record)
         {
             $record->audited = true;
         }

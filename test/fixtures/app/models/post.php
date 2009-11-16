@@ -2,10 +2,10 @@
 
 class Post extends ActiveRecord
 {
-    var $has_many = 'comments';
-    var $habtm = 'tags,users';
+    public $has_many = 'comments';
+    public $habtm = 'tags,users';
     
-    function validate()
+    public function validate()
     {
         if ($this->comments_count<0){
             $this->addError('comments_count','can\'t be negative');

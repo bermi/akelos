@@ -15,7 +15,7 @@ if (!defined('ADODB_DIR')) die();
 
 class ADODB2_postgres extends ADODB_DataDict {
 	
-	var $databaseType = 'postgres';
+	public $databaseType = 'postgres';
 	var $seqField = false;
 	var $seqPrefix = 'SEQ_';
 	var $addCol = ' ADD COLUMN';
@@ -23,7 +23,7 @@ class ADODB2_postgres extends ADODB_DataDict {
 	var $renameTable = 'ALTER TABLE %s RENAME TO %s'; // at least since 7.1
 	var $dropTable = 'DROP TABLE %s CASCADE';
 	
-	function MetaType($t,$len=-1,$fieldobj=false)
+	public function MetaType($t,$len=-1,$fieldobj=false)
 	{
 		if (is_object($t)) {
 			$fieldobj = $t;
@@ -87,7 +87,7 @@ class ADODB2_postgres extends ADODB_DataDict {
 		}
 	}
  	
- 	function ActualType($meta)
+ 	public function ActualType($meta)
 	{
 		switch($meta) {
 		case 'C': return 'VARCHAR';
@@ -153,7 +153,7 @@ class ADODB2_postgres extends ADODB_DataDict {
 	}
 
 
-	function DropIndexSQL ($idxname, $tabname = NULL)
+	public function DropIndexSQL ($idxname, $tabname = NULL)
 	{
 	   return array(sprintf($this->dropIndex, $this->TableName($idxname), $this->TableName($tabname)));
 	}
@@ -179,7 +179,7 @@ class ADODB2_postgres extends ADODB_DataDict {
 		return $this->_recreate_copy_table($tabname,False,$tableflds,$tableoptions);
 	}*/
 	
-	function AlterColumnSQL($tabname, $flds, $tableflds='',$tableoptions='')
+	public function AlterColumnSQL($tabname, $flds, $tableflds='',$tableoptions='')
 	{
 	   // Check if alter single column datatype available - works with 8.0+
 	   $has_alter_column = 8.0 <= (float) @$this->serverInfo['version'];
@@ -316,7 +316,7 @@ class ADODB2_postgres extends ADODB_DataDict {
 		return $aSql;
 	}
 	
-	function DropTableSQL($tabname)
+	public function DropTableSQL($tabname)
 	{
 		$sql = ADODB_DataDict::DropTableSQL($tabname);
 		
@@ -356,7 +356,7 @@ class ADODB2_postgres extends ADODB_DataDict {
 		return "DROP SEQUENCE ".$seq;
 	}
 	
-	function RenameTableSQL($tabname,$newname)
+	public function RenameTableSQL($tabname,$newname)
 	{
 		if (!empty($this->schema)) {
 			$rename_from = $this->TableName($tabname);
@@ -435,7 +435,7 @@ CREATE [ UNIQUE ] INDEX index_name ON table
 		return $sql;
 	}
 	
-	function _GetSize($ftype, $ty, $fsize, $fprec)
+	public function _GetSize($ftype, $ty, $fsize, $fprec)
 	{
 		if (strlen($fsize) && $ty != 'X' && $ty != 'B' && $ty  != 'I' && strpos($ftype,'(') === false) {
 			$ftype .= "(".$fsize;

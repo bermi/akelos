@@ -214,7 +214,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $load_acts = isset($attributes[1]['load_acts']) ? $attributes[1]['load_acts'] : (isset($attributes[0]['load_acts']) ? $attributes[0]['load_acts'] : true);
         $this->act_as = !empty($this->acts_as) ? $this->acts_as : (empty($this->act_as) ? false : $this->act_as);
         if (!empty($this->act_as) && $load_acts) {;
-            $this->_loadActAsBehaviours();
+        $this->_loadActAsBehaviours();
         }
 
         if(!empty($this->combined_attributes)){
@@ -1630,15 +1630,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * specify which attributes can be accessed in with the $this->setAccessibleAttributes method.
     * Then all the attributes not included in that won?t be allowed to be mass-assigned.
     */
-    public function setAttributes($attributes, $override_attribute_protection = false)
+    public function setAttributes($attributes, $override_attribute_protection = false, $inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS)
     {
-        $this->parseAkelosArgs($attributes);
         if(!$override_attribute_protection){
             $attributes = $this->removeAttributesProtectedFromMassAssignment($attributes);
         }
         if(!empty($attributes) && is_array($attributes)){
             foreach ($attributes as $k=>$v){
-                $this->setAttribute($k, $v);
+                $this->setAttribute($k, $v, $inspect_for_callback_child_method);
             }
         }
     }
@@ -1708,13 +1707,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Returns an array of all the attributes with their names as keys and clones of their objects as values in case they are objects.
     */
-    public function getAttributes()
+    public function getAttributes($inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS)
     {
         $attributes = array();
         $available_attributes = $this->getAvailableAttributes();
         foreach ($available_attributes as $available_attribute){
-            $attribute = $this->getAttribute($available_attribute['name']);
-            $attributes[$available_attribute['name']] = AK_PHP5 && is_object($attribute) ? clone($attribute) : $attribute;
+            $attribute = $this->getAttribute($available_attribute['name'], $inspect_for_callback_child_method);
+            $attributes[$available_attribute['name']] = is_object($attribute) ? clone($attribute) : $attribute;
         }
 
         if($this->_internationalize){
@@ -2599,6 +2598,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
 
         $this->_columnsSettings[$column_name]['type'] = $this->getAkelosDataType($column_object);
+
         if(!empty($column_object->primary_key)){
             $this->_primaryKey = empty($this->_primaryKey) ? $column_object->name : $this->_primaryKey;
             $this->_columnsSettings[$column_name]['primaryKey'] = true;
@@ -2739,7 +2739,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         (is_array($adodb_data_types[$meta_type]) ? $adodb_data_types[$meta_type][0] : $adodb_data_types[$meta_type]);
 
         if($result == 'text'){
-            if(stristr($adodb_column_object->type, 'CHAR') | (isset($adodb_column_object->max_length) && $adodb_column_object->max_length > 0 &&$adodb_column_object->max_length < 256 )){
+            if((strstr($adodb_column_object->type, 'CHAR')) || (isset($adodb_column_object->max_length) && $adodb_column_object->max_length > 0 && $adodb_column_object->max_length < 256 )){
                 return 'string';
             }
         }
@@ -2980,9 +2980,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return null;
     }
 
-    public function getAvailableAttributesQuoted()
+    public function getAvailableAttributesQuoted($inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS)
     {
-        return $this->getAttributesQuoted($this->getAttributes());
+        return $this->getAttributesQuoted($this->getAttributes($inspect_for_callback_child_method));
     }
 
 
@@ -4541,7 +4541,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             return;
         }
 
-        $data = $data == 'active_record_class' ?  (AK_PHP5 ? clone($this) : $this) : $data;
+        $data = $data == 'active_record_class' ?  clone($this) : $data;
 
         if($_functions!=0) {
             $sf=1;
@@ -5025,63 +5025,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    /**
-    * Parses an special formated array as a list of keys and values
-    *
-    * This function generates an array with values and keys from an array with numeric keys.
-    *
-    * This allows to parse an array to a function in the following manner.
-    * create('first_name->', 'Bermi', 'last_name->', 'Ferrer');
-    * //Previous code will be the same that
-    * create(array('first_name'=>'Bermi', 'last_name'=> 'Ferrer'));
-    *
-    * Use this syntax only for quick testings, not for production environments. If the number of arguments varies, the result might be unpredictable.
-    *
-    * This function syntax is disabled by default. You need to define('AK_ENABLE_AKELOS_ARGS', true)
-    * if you need this functionality.
-    *
-    * @deprecated
-    */
-    public function parseAkelosArgs(&$args)
-    {
-        if(!AK_ENABLE_AKELOS_ARGS){
-            $this->_castDateParametersFromDateHelper_($args);
-            return ;
-        }
-        $k = array_keys($args);
-        if(isset($k[1]) && substr($args[$k[0]],-1) == '>'){
-            $size = sizeOf($k);
-            $params = array();
-            for($i = 0; $i < $size; $i++ ) {
-                $v = $args[$k[$i]];
-                if(!isset($key) && is_string($args[$k[$i]]) && substr($v,-1) == '>'){
-                    $key = rtrim($v, '=-> ');
-                }elseif(isset($key)) {
-                    $params[$key] = $v;
-                    unset($key);
-                }else{
-                    $params[$k[$i]] = $v;
-                }
-            }
-            if(!empty($params)){
-                $args = $params;
-            }
-        }
-        $this->_castDateParametersFromDateHelper_($args);
-    }
-    /**
-    * Gets an array from a string.
-    *
-    * Acts like Php explode() function but uses any of this as valid separators ' AND ',' and ',' + ',' ',',',';'
-    */
-    public function getArrayFromAkString($string)
-    {
-        if(is_array($string)){
-            return $string;
-        }
-        $string = str_replace(array(' AND ',' and ',' + ',' ',',',';'),array('|','|','|','','|','|'),trim($string));
-        return strstr($string,'|') ? explode('|', $string) : array($string);
-    }
     /*/Utilities*/
 
 

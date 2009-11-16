@@ -2,7 +2,7 @@
 
 class Tag extends AkActiveRecord 
 {
-    var $habtm = array(
+    public $habtm = array(
         'files' => array(
             'join_table' => 'taggings',
             'join_class_name' => 'Tagging'
@@ -10,7 +10,7 @@ class Tag extends AkActiveRecord
         'posts'
     );
     
-    var $has_many = 'taggings';
+    public $has_many = 'taggings';
 }
 
 ?>

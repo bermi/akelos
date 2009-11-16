@@ -2,7 +2,7 @@
 
 class Account extends ActiveRecord
 {
-    var $belongs_to = 'person';
+    public $belongs_to = 'person';
 }
 
 ?>

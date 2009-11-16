@@ -2,9 +2,9 @@
 
 class Bb extends ActiveRecord
 {
-    var $belongsTo = array('aa');
-    var $habtm = array('ccs');
-    var $serialize = array('languages','other');
+    public $belongsTo = array('aa');
+    public $habtm = array('ccs');
+    public $serialize = array('languages','other');
 }
 
 ?>

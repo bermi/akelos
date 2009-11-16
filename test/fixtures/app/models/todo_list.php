@@ -2,8 +2,8 @@
 
 class TodoList extends ActiveRecord
 {
-    var $acts_as = 'list';
-    var $has_many = array(
+    public $acts_as = 'list';
+    public $has_many = array(
     'tasks'=>array(
         'dependent' => 'destroy',
         'order'=>'position ASC',

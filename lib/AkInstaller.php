@@ -502,8 +502,7 @@ Example:
         $column_options = array_merge($default_column_options, $column_options);
 
         $default_table_options = array(
-        'mysql' => 'TYPE=InnoDB',
-        //'REPLACE'
+        'mysql' => 'ENGINE=InnoDB DEFAULT CHARSET='.str_replace('-', '', strtolower(AK_CHARSET)),
         );
         $table_options = array_merge($default_table_options, $table_options);
 

@@ -2,7 +2,7 @@
 
 class Comment extends ActiveRecord 
 {
-    var $belongs_to = 'post';
+    public $belongs_to = 'post';
 }
 
 ?>

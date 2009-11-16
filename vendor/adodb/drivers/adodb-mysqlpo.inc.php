@@ -25,12 +25,12 @@ class ADODB_mysqlt extends ADODB_mysql {
 	var $hasTransactions = true;
 	var $autoRollback = true; // apparently mysql does not autorollback properly 
 	
-	function ADODB_mysqlt() 
+	public function ADODB_mysqlt() 
 	{			
 	global $ADODB_EXTENSION; if ($ADODB_EXTENSION) $this->rsPrefix .= 'ext_';
 	}
 	
-	function BeginTrans()
+	public function BeginTrans()
 	{	  
 		if ($this->transOff) return true;
 		$this->transCnt += 1;
@@ -39,7 +39,7 @@ class ADODB_mysqlt extends ADODB_mysql {
 		return true;
 	}
 	
-	function CommitTrans($ok=true) 
+	public function CommitTrans($ok=true) 
 	{
 		if ($this->transOff) return true; 
 		if (!$ok) return $this->RollbackTrans();
@@ -50,7 +50,7 @@ class ADODB_mysqlt extends ADODB_mysql {
 		return true;
 	}
 	
-	function RollbackTrans()
+	public function RollbackTrans()
 	{
 		if ($this->transOff) return true;
 		if ($this->transCnt) $this->transCnt -= 1;
@@ -59,7 +59,7 @@ class ADODB_mysqlt extends ADODB_mysql {
 		return true;
 	}
 	
-	function RowLock($tables,$where='',$flds='1 as adodb_ignore') 
+	public function RowLock($tables,$where='',$flds='1 as adodb_ignore') 
 	{
 		if ($this->transCnt==0) $this->BeginTrans();
 		if ($where) $where = ' where '.$where;
@@ -72,7 +72,7 @@ class ADODB_mysqlt extends ADODB_mysql {
 class ADORecordSet_mysqlt extends ADORecordSet_mysql{	
 	var $databaseType = "mysqlt";
 	
-	function ADORecordSet_mysqlt($queryID,$mode=false) 
+	public function ADORecordSet_mysqlt($queryID,$mode=false) 
 	{
 		if ($mode === false) { 
 			global $ADODB_FETCH_MODE;
@@ -93,7 +93,7 @@ class ADORecordSet_mysqlt extends ADORecordSet_mysql{
 		$this->ADORecordSet($queryID);	
 	}
 	
-	function MoveNext()
+	public function MoveNext()
 	{
 		if (@$this->fields = mysql_fetch_array($this->_queryID,$this->fetchMode)) {
 			$this->_currentRow += 1;
@@ -109,7 +109,7 @@ class ADORecordSet_mysqlt extends ADORecordSet_mysql{
 
 class ADORecordSet_ext_mysqlt extends ADORecordSet_mysqlt {	
 
-	function ADORecordSet_ext_mysqlt($queryID,$mode=false) 
+	public function ADORecordSet_ext_mysqlt($queryID,$mode=false) 
 	{
 		if ($mode === false) { 
 			global $ADODB_FETCH_MODE;
@@ -129,7 +129,7 @@ class ADORecordSet_ext_mysqlt extends ADORecordSet_mysqlt {
 		$this->ADORecordSet($queryID);	
 	}
 	
-	function MoveNext()
+	public function MoveNext()
 	{
 		return adodb_movenext($this);
 	}

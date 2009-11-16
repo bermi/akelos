@@ -2,7 +2,7 @@
 
 class RenderMailer extends AkActionMailer
 {
-    function inline_template($recipient)
+    public function inline_template($recipient)
     {
         $this->setRecipients($recipient);
         $this->setSubject("using helpers");
@@ -10,7 +10,7 @@ class RenderMailer extends AkActionMailer
         $this->setBody($this->render(array('inline' => 'Hello, <?=$who?>', 'body' => array('who' => "World"))));
     }
 
-    function file_template($recipient)
+    public function file_template($recipient)
     {
         $this->set(array(
         'recipients'    =>  $recipient,
@@ -21,7 +21,7 @@ class RenderMailer extends AkActionMailer
     }
 
 
-    function initializeDefaults($method_name)
+    public function initializeDefaults($method_name)
     {
         parent::initializeDefaults($method_name);
         $this->setMailerName("test_mailer");

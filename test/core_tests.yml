@@ -23,8 +23,11 @@ ActionController:
     - 'AkActionController/_r*'
     #- 'AkActionController/*' todo: cache tests
 
+ActiveRecord:
+    - 'AkActiveRecord/_AkActiveRecord_1'
+
 ActionWebService:
-    - 'AkActionWebService/AkActionWebServiceApi.php'
+    - 'AkActionWebService/AkActionWebServiceApi'
 
 Cache:
     - AkCache

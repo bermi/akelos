@@ -26,6 +26,6 @@ makelos_task('test:core', array(
 
 makelos_task('test:suite', array(
     'description' => 'Runs a test suite',
-    'autocompletion' => 'ENVIRONMENT=production --verbose'
+    'autocompletion' => 'ENVIRONMENT=production'
 ));
 

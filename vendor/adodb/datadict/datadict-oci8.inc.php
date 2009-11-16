@@ -15,7 +15,7 @@ if (!defined('ADODB_DIR')) die();
 
 class ADODB2_oci8 extends ADODB_DataDict {
 	
-	var $databaseType = 'oci8';
+	public $databaseType = 'oci8';
 	var $seqField = false;
 	var $seqPrefix = 'SEQ_';
 	var $dropTable = "DROP TABLE %s CASCADE CONSTRAINTS";
@@ -24,7 +24,7 @@ class ADODB2_oci8 extends ADODB_DataDict {
 	var $typeX = 'VARCHAR(4000)';
 	var $typeXL = 'CLOB';
 	
-	function MetaType($t,$len=-1)
+	public function MetaType($t,$len=-1)
 	{
 		if (is_object($t)) {
 			$fieldobj = $t;
@@ -71,7 +71,7 @@ class ADODB2_oci8 extends ADODB_DataDict {
 		}
 	}
 	
- 	function ActualType($meta)
+ 	public function ActualType($meta)
 	{
 		switch($meta) {
 		case 'C': return 'VARCHAR';
@@ -103,7 +103,7 @@ class ADODB2_oci8 extends ADODB_DataDict {
 		}	
 	}
 	
-	function CreateDatabase($dbname, $options=false)
+	public function CreateDatabase($dbname, $options=false)
 	{
 		$options = $this->_Options($options);
 		$password = isset($options['PASSWORD']) ? $options['PASSWORD'] : 'tiger';
@@ -114,7 +114,7 @@ class ADODB2_oci8 extends ADODB_DataDict {
 		return $sql;
 	}
 	
-	function AddColumnSQL($tabname, $flds)
+	public function AddColumnSQL($tabname, $flds)
 	{
 		$f = array();
 		list($lines,$pkey) = $this->_GenFields($flds);
@@ -128,7 +128,7 @@ class ADODB2_oci8 extends ADODB_DataDict {
 		return $sql;
 	}
 	
-	function AlterColumnSQL($tabname, $flds)
+	public function AlterColumnSQL($tabname, $flds)
 	{
 		$f = array();
 		list($lines,$pkey) = $this->_GenFields($flds);
@@ -141,7 +141,7 @@ class ADODB2_oci8 extends ADODB_DataDict {
 		return $sql;
 	}
 	
-	function DropColumnSQL($tabname, $flds)
+	public function DropColumnSQL($tabname, $flds)
 	{
 		if (!is_array($flds)) $flds = explode(',',$flds);
 		foreach ($flds as $k => $v) $flds[$k] = $this->NameQuote($v);
@@ -153,7 +153,7 @@ class ADODB2_oci8 extends ADODB_DataDict {
 		return $sql;
 	}
 	
-	function _DropAutoIncrement($t)
+	public function _DropAutoIncrement($t)
 	{
 		if (strpos($t,'.') !== false) {
 			$tarr = explode('.',$t);
@@ -243,7 +243,7 @@ end;
 	
 
 	
-	function _IndexSQL($idxname, $tabname, $flds,$idxoptions)
+	public function _IndexSQL($idxname, $tabname, $flds,$idxoptions)
 	{
 		$sql = array();
 		
@@ -281,14 +281,14 @@ end;
 		return $sql;
 	}
 	
-	function GetCommentSQL($table,$col)
+	public function GetCommentSQL($table,$col)
 	{
 		$table = $this->connection->qstr($table);
 		$col = $this->connection->qstr($col);	
 		return "select comments from USER_COL_COMMENTS where TABLE_NAME=$table and COLUMN_NAME=$col";
 	}
 	
-	function SetCommentSQL($table,$col,$cmt)
+	public function SetCommentSQL($table,$col,$cmt)
 	{
 		$cmt = $this->connection->qstr($cmt);
 		return  "COMMENT ON COLUMN $table.$col IS $cmt";

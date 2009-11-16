@@ -2,7 +2,7 @@
 
 class PropertyType extends ActiveRecord
 {
-    var $hasAndBelongsToMany = array('properties' => array('unique'=>true));
+    public $hasAndBelongsToMany = array('properties' => array('unique'=>true));
 }
 
 ?>

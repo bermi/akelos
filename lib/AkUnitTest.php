@@ -233,8 +233,8 @@ class AkUnitTest extends UnitTestCase
                 return false;
             }
             $installer = new AkInstaller();
-            $installer->dropTable($table_name,array('sequence'=>true));
-            $installer->createTable($table_name,$table_definition,array('timestamp'=>false));
+            $installer->dropTable($table_name, array('sequence'=>true));
+            $installer->createTable($table_name,$table_definition, array('timestamp'=>false));
         } else {
             $table_name = AkInflector::tableize($model);
         }
@@ -336,6 +336,15 @@ class AkUnitTest extends UnitTestCase
             $this->instantiateModel($model);
         }
     }
+
+    /**
+     * In order to provide compatibility with the defunct assertError method, use this method befor trhowing the error
+     */
+    public function assertUpcomingError($pattern)
+    {
+        $this->expectError(new PatternExpectation('/'.str_replace("'", "\'", preg_quote($pattern)).'/'));
+    }
+
 }
 
 /**
@@ -383,9 +392,13 @@ class AkelosTextReporter extends TextReporter {
     }
 
     public function paintHeader($test_name) {
+        $this->testTag = $test_name;
+        $this->testChecksum = md5($test_name);
         $this->timeStart = time();
         $this->testsStart = microtime(true);
         $this->memoryStart = memory_get_usage();
+        $this->time_log['group'] = $this->testChecksum;
+        $this->time_log['description'] = $this->testTag;
         $this->time_log['total'] = 0;
         $this->time_log['stats'] = array();
         $this->time_log['cases'] = array();
@@ -440,7 +453,10 @@ class AkelosTextReporter extends TextReporter {
 
     public function logTestRunime()
     {
-        $log_path = AK_LOG_DIR.DS.'unit_test_runtime'.DS.$this->timeStart.'.php';
+        if(empty($this->time_log['methods'])){
+            return ;
+        }
+        $log_path = AK_LOG_DIR.DS.'unit_test_runtime'.DS.$this->testChecksum.DS.$this->timeStart.'.php';
         $slow_methods = array();
         $memory_hungry_methods = array();
         $stats = array();
@@ -459,6 +475,9 @@ class AkelosTextReporter extends TextReporter {
         $this->time_log['stats'] = $stats;
 
         Ak::file_put_contents($log_path, '<?php $runtime['.$this->timeStart.'] = '.var_export($this->time_log, true).'; return $runtime['.$this->timeStart.'];');
+
+        @unlink(AK_LOG_DIR.DS.'unit_test_runtime'.DS.'last_run.php');
+        link($log_path, AK_LOG_DIR.DS.'unit_test_runtime'.DS.'last_run.php');
     }
 }
 

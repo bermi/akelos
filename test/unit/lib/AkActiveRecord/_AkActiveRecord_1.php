@@ -1,11 +1,15 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiveRecord extends  AkUnitTest
+class AkActiveRecord_base1_TestCase extends  AkUnitTest
 {
-    public function test_AkActiveRecord()
+    public function __construct(){
+        parent::__construct();
+        $this->rebaseAppPaths();
+    }
+
+    public function test_setup()
     {
         $this->installAndIncludeModels(array(
         'AkTestUser'=>'id I AUTO KEY, user_name C(32), first_name C(200), last_name C(200), email C(150), country I, password C(32), created_at T, updated_at T, expires_on T',
@@ -19,37 +23,17 @@ class test_AkActiveRecord extends  AkUnitTest
                     decimal1_field L,'.//*decimal3_field I1,
                     'decimal5_field I2,decimal10_field I4,decimal20_field I8,decimal_field N(10.5),
                     created_at T,updated_at T,expires_on T'));
+
     }
 
-    public function Test_of_getArrayFromAkString()
-    {
-        $User = new AkTestUser();
-        $expected = array('name', 'last_name','options','date');
-        $this->assertEqual($User->getArrayFromAkString('name,last_name,options,date'),$expected);
-        $this->assertEqual($User->getArrayFromAkString(' name AND last_name ; options | date '),$expected);
-        $this->assertEqual($User->getArrayFromAkString(' name and last_name + options , date '),$expected);
-    }
-    /**/
-    public function Test_of_parseAkelosArgs()
-    {
-        $User = new AkTestUser();
-
-        $expected = array('name'=>'Bermi', 'last_name'=>'Ferrer','options'=>array('admin'=>true,'expire'=>'never'),'date'=>'1978-06-16');
-        $akelos_args = array('name->','Bermi', 'last_name->','Ferrer','options'=>array('admin'=>true,'expire'=>'never'),'date->','1978-06-16');
-        $User->parseAkelosArgs($akelos_args);
-        $this->assertEqual($akelos_args,$expected);
-        $User->parseAkelosArgs($expected);
-        $this->assertEqual($akelos_args,$expected);
-    }
-    /**/
-    public function Test_of_isConnected()
+    public function test_should_connect()
     {
         $User = new AkTestUser();
         $User->setConnection();
         $this->assertTrue($User->isConnected());
     }
 
-    public function Test_of_new_object_instantiation()
+    public function test_should_instantiate()
     {
         $AkTestUser = new AkTestUser();
 
@@ -60,9 +44,7 @@ class test_AkActiveRecord extends  AkUnitTest
     }
 
 
-    // Test_of_setConnection(){} //This will not be tested due its simplicity
-
-    public function Test_of_descendsFromActiveRecord()
+    public function test_should_detect_if_descends_from_active_record()
     {
         $User = new AkTestUser();
         $TestField = new AkTestField();
@@ -73,7 +55,7 @@ class test_AkActiveRecord extends  AkUnitTest
         $this->assertFalse($User->descendsFromActiveRecord($Object));
     }
 
-    public function Test_of_getModelName()
+    public function test_should_get_model_name()
     {
         $AkTestUser = new AkTestUser();
         $this->assertEqual($AkTestUser->getModelName(), 'AkTestUser');
@@ -83,7 +65,7 @@ class test_AkActiveRecord extends  AkUnitTest
     }
 
 
-    public function Test_of_set_and_getParentModelName()
+    public function test_should_set_and_get_parent_model_name()
     {
         $AkTestMember = new AkTestMember();
         $this->assertEqual($AkTestMember->getParentModelName(), 'AkTestUser');
@@ -99,7 +81,7 @@ class test_AkActiveRecord extends  AkUnitTest
     }
 
     // More db type inspection on Test_of_db_inspection method of this test
-    public function Test_of_getAkelosDataType()
+    public function test_should_get_akelos_database_type()
     {
         $AkTestField = new AkTestField();
 
@@ -122,7 +104,7 @@ class test_AkActiveRecord extends  AkUnitTest
     // }
 
     // More of this testing in Test_of_db_inspection
-    public function Test_of_loadColumnsSettings()
+    public function test_should_load_column_settings()
     {
         AkDbSchemaCache::shouldRefresh(false);
         $AkTestField = new AkTestField();
@@ -132,7 +114,7 @@ class test_AkActiveRecord extends  AkUnitTest
         AkDbSchemaCache::shouldRefresh(true);
     }
 
-    public function Test_of_initiateColumnsToNull()
+    public function test_should_init_columns_to_null()
     {
         $AkTestField = new AkTestField();
         $AkTestField->loadColumnsSettings();
@@ -155,7 +137,7 @@ class test_AkActiveRecord extends  AkUnitTest
     }
 
 
-    public function Test_of_getColumnSettings()
+    public function test_should_get_Column_settings()
     {
         $AkTestField = new AkTestField();
 
@@ -174,7 +156,7 @@ class test_AkActiveRecord extends  AkUnitTest
     }
 
 
-    public function Test_of_get_and_get_PrimaryKey()
+    public function test_should_get_columns_and_primary_key()
     {
         $AkTestField = new AkTestField();
         $this->assertEqual($AkTestField->getPrimaryKey(), 'id');
@@ -182,21 +164,23 @@ class test_AkActiveRecord extends  AkUnitTest
         $AkTestField->setPrimaryKey('text_field');
         $this->assertEqual($AkTestField->getPrimaryKey(), 'text_field');
 
-        $this->assertError($AkTestField->setPrimaryKey('unavailable_field'),'unavailable_field');
+        $this->assertUpcomingError('unavailable_field');
+        $AkTestField->setPrimaryKey('unavailable_field');
     }
 
-    public function Test_of_get_and_get_TableName()
+    public function test_should_get_table_name()
     {
         $AkTestField = new AkTestField();
         $this->assertEqual($AkTestField->getTableName(), 'ak_test_fields');
 
-        $this->assertError($AkTestField->setTableName('table_not_available_on_database'),'AK_ACTIVE_CONTROLLER_VALIDATE_TABLE_NAMES');
+        $this->assertUpcomingError('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES');
+        $AkTestField->setTableName('table_not_available_on_database');
 
         $this->assertTrue($AkTestField->setTableName('ak_test_users'));
         $this->assertEqual($AkTestField->getTableName(), 'ak_test_users');
     }
 
-    public function Test_of_hasColumn()
+    public function test_should_detect_if_Column_exists()
     {
         $AkTestUser = new AkTestUser();
         $this->assertTrue($AkTestUser->hasColumn('first_name'));
@@ -205,7 +189,7 @@ class test_AkActiveRecord extends  AkUnitTest
         $this->assertFalse($AkTestUser->hasColumn('name'));
     }
 
-    public function Test_of_getColumnNames()
+    public function test_should_get_column_name()
     {
         $AkTestField = new AkTestField();
         $expected = array ( 'id' => 'Id', 'varchar_field' => 'Varchar field', 'longtext_field' => 'Longtext field', 'text_field' => 'Text field', 'logblob_field' => 'Logblob field', 'date_field' => 'Date field', 'datetime_field' => 'Datetime field', 'tinyint_field' => 'Tinyint field', 'integer_field' => 'Integer field', 'smallint_field' => 'Smallint field', 'bigint_field' => 'Bigint field', 'double_field' => 'Double field', 'numeric_field' => 'Numeric field', 'bytea_field' => 'Bytea field', 'timestamp_field' => 'Timestamp field', 'boolean_field' => 'Boolean field', 'int2_field' => 'Int2 field', 'int4_field' => 'Int4 field', 'int8_field' => 'Int8 field', 'foat_field' => 'Foat field', 'varchar4000_field' => 'Varchar4000 field', 'clob_field' => 'Clob field', 'nvarchar2000_field' => 'Nvarchar2000 field', 'blob_field' => 'Blob field', 'nvarchar_field' => 'Nvarchar field', 'decimal1_field' => 'Decimal1 field', /*'decimal3_field' => 'Decimal3 field',*/ 'decimal5_field' => 'Decimal5 field', 'decimal10_field' => 'Decimal10 field', 'decimal20_field' => 'Decimal20 field', 'decimal_field' => 'Decimal field', 'created_at' => 'Created at', 'updated_at' => 'Updated at', 'expires_on' => 'Expires on' );
@@ -216,7 +200,7 @@ class test_AkActiveRecord extends  AkUnitTest
     // function Test_of_getColumns(){}
 
 
-    public function Test_of_db_inspection()
+    public function test_should_get_the_correct_data_types()
     {
         $AkTestUser = new AkTestUser();
 
@@ -247,6 +231,9 @@ class test_AkActiveRecord extends  AkUnitTest
         //---------------------
 
         $AkTestField = new AkTestField();
+        if(Ak::db()->type() == 'sqlite'){
+            return ;
+        }
         $AkTestField->getColumns();
         //$AkTestField->debug();
 
@@ -298,7 +285,7 @@ class test_AkActiveRecord extends  AkUnitTest
 
     /////// COMBINED ATTRIBUTES TESTS
 
-    public function Test_of_addCombinedAttributeConfiguration()
+    public function test_should_add_combined_attribute_configuration()
     {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
@@ -311,7 +298,7 @@ class test_AkActiveRecord extends  AkUnitTest
         $this->assertEqual($User->_combinedAttributes, $expected);
     }
 
-    public function Test_of_composeCombinedAttribute()
+    public function test_should_compose_combined_attributes()
     {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
@@ -347,7 +334,7 @@ class test_AkActiveRecord extends  AkUnitTest
 
     }
 
-    public function Test_of_decomposeCombinedAttribute()
+    public function test_should_decompose_combined_attributes()
     {
 
         $User = new AkTestUser();
@@ -372,7 +359,7 @@ class test_AkActiveRecord extends  AkUnitTest
         $this->assertEqual($User->get('email_header_from'), '<nospam@example.com>Bermi Ferrer');
     }
 
-    public function Test_of_decomposeCombinedAttributes()
+    public function test_should_decompose_combined_attributes_2()
     {
 
         $User = new AkTestUser();
@@ -404,7 +391,7 @@ class test_AkActiveRecord extends  AkUnitTest
     }
 
 
-    public function Test_of_getAttribute()
+    public function test_should_get_attribute()
     {
         $User = new AkTestUser();
 
@@ -448,7 +435,7 @@ class test_AkActiveRecord extends  AkUnitTest
         $User->email = "bermi@example.com";
         $User->set('password','nada');
         $User->decomposeCombinedAttributes();
-        $this->assertEqual($User->getAttributes(),array ( 'id' => NULL, 'user_name' => NULL, 'first_name' => 'Bermi', 'last_name' => 'Ferrer', 'email' => 'bermi@example.com', 'country' => NULL, 'password' => '*********', 'created_at' => NULL, 'updated_at' => NULL, 'expires_on' => NULL, 'name' => 'Bermi Ferrer' ));
+        $this->assertEqual($User->getAttributes(true), array ( 'id' => NULL, 'user_name' => NULL, 'first_name' => 'Bermi', 'last_name' => 'Ferrer', 'email' => 'bermi@example.com', 'country' => NULL, 'password' => '*********', 'created_at' => NULL, 'updated_at' => NULL, 'expires_on' => NULL, 'name' => 'Bermi Ferrer' ));
 
     }
 
@@ -539,7 +526,7 @@ class test_AkActiveRecord extends  AkUnitTest
         'expires_on' => "expires_on='2089-06-16'"
         );
 
-        $got = $User->getAvailableAttributesQuoted();
+        $got = $User->getAvailableAttributesQuoted(true);
         $this->assertTrue($expected['last_name'] == $got['last_name'] || str_replace("\\","'",$expected['last_name']) == $got['last_name']);
         $this->assertTrue($expected['user_name'] == $got['user_name'] || str_replace("\\","'",$expected['user_name']) == $got['user_name']);
         unset($expected['user_name'], $got['user_name'], $expected['last_name'], $got['last_name']);
@@ -584,7 +571,7 @@ class test_AkActiveRecord extends  AkUnitTest
         $attributes = array(
         'first_name'=> 'Bermi', 'password'=> 'bermi', '_columns'=>array(), '_test_private_var'=>true
         );
-        $User->setAttributes($attributes);
+        $User->setAttributes($attributes, false, true);
         $this->assertFalse(empty($User->_columns));
         $this->assertEqual($User->first_name, 'Bermi');
         $this->assertEqual($User->get('password'),'*********');
@@ -638,9 +625,7 @@ class test_AkActiveRecord extends  AkUnitTest
     }
     /**/
 
-
 }
 
-ak_test('test_AkActiveRecord',true);
+ak_test_run_case_if_executed('AkActiveRecord_base1_TestCase');
 
-?>

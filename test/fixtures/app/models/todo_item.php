@@ -1,6 +1,6 @@
 <?php
 class TodoItem extends ActiveRecord
 {
-    var $act_as = "list";
+    public $act_as = "list";
 }
 ?>

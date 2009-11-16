@@ -2,9 +2,9 @@
 
 class TestMailer extends AkActionMailer
 {
-    var $delivery_method = 'test';
+    public $delivery_method = 'test';
 
-    function signed_up($recipient)
+    public function signed_up($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -15,7 +15,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    function cancelled_account($recipient)
+    public function cancelled_account($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -26,7 +26,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    function cc_bcc($recipient)
+    public function cc_bcc($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -39,7 +39,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    function iso_charset($recipient)
+    public function iso_charset($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -53,7 +53,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    function unencoded_subject($recipient)
+    public function unencoded_subject($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -67,7 +67,7 @@ class TestMailer extends AkActionMailer
     }
 
 
-    function extended_headers($recipient)
+    public function extended_headers($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -81,7 +81,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    function utf8_body($recipient)
+    public function utf8_body($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -95,7 +95,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    function multipart_with_mime_version($recipient)
+    public function multipart_with_mime_version($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -112,7 +112,7 @@ class TestMailer extends AkActionMailer
 
     }
 
-    function multipart_with_utf8_subject($recipient)
+    public function multipart_with_utf8_subject($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -126,7 +126,7 @@ class TestMailer extends AkActionMailer
         ));
 
     }
-    function multipart_with_long_russian_utf8_subject($recipient)
+    public function multipart_with_long_russian_utf8_subject($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -141,7 +141,7 @@ class TestMailer extends AkActionMailer
 
     }
     
-function multipart_with_long_russian_utf8_sender($recipient)
+public function multipart_with_long_russian_utf8_sender($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -155,7 +155,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
         ));
 
     }
-    function explicitly_multipart_example($recipient, $content_type = null)
+    public function explicitly_multipart_example($recipient, $content_type = null)
     {
         empty($content_type) ? null : $this->setContentType($content_type);
         $this->set(array(
@@ -169,7 +169,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
 
     }
 
-    function implicitly_multipart_example($recipient, $charset = null, $order = null)
+    public function implicitly_multipart_example($recipient, $charset = null, $order = null)
     {
         empty($charset) ? null : $this->setCharset($charset);
         empty($order) ? null : $this->setImplicitPartsOrder($order);
@@ -182,7 +182,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
         ));
     }
 
-    function implicitly_multipart_with_utf8()
+    public function implicitly_multipart_with_utf8()
     {
         empty($charset) ? null : $this->setCharset($charset);
         empty($order) ? null : $this->setImplicitPartsOrder($order);
@@ -196,7 +196,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
         ));
     }
 
-    function html_mail($recipient)
+    public function html_mail($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -208,7 +208,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
     }
 
 
-    function html_mail_with_underscores()
+    public function html_mail_with_underscores()
     {
         $this->set(array(
         'subject' => "html mail with underscores",
@@ -217,7 +217,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
     }
 
 
-    function custom_template($recipient)
+    public function custom_template($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -228,7 +228,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
         ));
     }
 
-    function various_newlines($recipient)
+    public function various_newlines($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -239,7 +239,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
         ));
     }
 
-    function various_newlines_multipart($recipient)
+    public function various_newlines_multipart($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -252,7 +252,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
         ));
     }
 
-    function nested_multipart($recipient)
+    public function nested_multipart($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -278,7 +278,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
         ));
     }
 
-    function attachment_with_custom_header($recipient)
+    public function attachment_with_custom_header($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -294,7 +294,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
         ));
     }
 
-    function unnamed_attachment($recipient)
+    public function unnamed_attachment($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -310,7 +310,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
         ));
     }
 
-    function headers_with_nonalpha_chars($recipient)
+    public function headers_with_nonalpha_chars($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -322,7 +322,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
     }
 
 
-    function custom_content_type_attributes()
+    public function custom_content_type_attributes()
     {
         $this->set(array(
         'recipients' => "no.one@example.com",
@@ -335,7 +335,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
 
 
 
-    function alternative_message_from_templates($recipient, $include_logo = false, $include_external_image = false, $add_attachment = false)
+    public function alternative_message_from_templates($recipient, $include_logo = false, $include_external_image = false, $add_attachment = false)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -360,7 +360,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
         }
     }
     
-    function message_with_helpers($recipient)
+    public function message_with_helpers($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -370,7 +370,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
     }
     
     
-    function message_from_first_name($recipient)
+    public function message_from_first_name($recipient)
     {
         $this->set(array(
         'recipients' => $recipient,
@@ -382,7 +382,7 @@ function multipart_with_long_russian_utf8_sender($recipient)
 
 
 
-    function &receive($raw_email)
+    public function &receive($raw_email)
     {
         $Mail =& parent::receive($raw_email);
         $this->received_body = $Mail->body;

@@ -2301,6 +2301,8 @@ class Ak
             'AkTime'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkTime.php',
             'AkTimeZone'                =>  AK_LIB_DIR.DS.'AkLocalize'.DS.'AkTimeZone.php',
             'AkType'                    =>  AK_LIB_DIR.DS.'AkType.php',
+            'AkelosTextReporter'        =>  AK_LIB_DIR.DS.'AkUnitTest.php',
+            'AkelosVerboseTextReporter' =>  AK_LIB_DIR.DS.'AkUnitTest.php',
             'AkUnitTest'                =>  AK_LIB_DIR.DS.'AkUnitTest.php',
             'AkUnitTestSuite'           =>  AK_LIB_DIR.DS.'AkUnitTestSuite.php',
             'AkWebTestCase'             =>  AK_LIB_DIR.DS.'AkUnitTest.php',

@@ -2,7 +2,7 @@
 
 class TestOtherConnection extends ActiveRecord
 {
-    function &establishConnection()
+    public function &establishConnection()
     {
         return parent::establishConnection('sqlite_databases');
     }

@@ -2,10 +2,10 @@
 
 class Panorama extends ActiveRecord
 {
-    var $has_one = array('thumbnail' => array('dependent' => true,'class_name' => 'Thumbnail', 'foreign_key'=>'photo_id','condition'=>"owner = 'Panorama'"));
-    var $belongsTo = 'property';
+    public $has_one = array('thumbnail' => array('dependent' => true,'class_name' => 'Thumbnail', 'foreign_key'=>'photo_id','condition'=>"owner = 'Panorama'"));
+    public $belongsTo = 'property';
 
-    function beforeSave()
+    public function beforeSave()
     {
         if($this->thumbnail->getType() == 'Thumbnail'){
             $this->thumbnail->owner = 'Panorama';

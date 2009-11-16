@@ -2,7 +2,7 @@
 
 class Person extends ActiveRecord
 {
-    var $has_one = 'account';
+    public $has_one = 'account';
 }
 
 ?>
