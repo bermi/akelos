@@ -12,7 +12,7 @@
 
 class AkCountries
 {
-    function getCountriesDescriptions()
+    public function getCountriesDescriptions()
     {
         return explode("\n", Ak::t("ALA|Åland Islands
 AFG|Afghanistan
@@ -247,7 +247,7 @@ ZMB|Zambia
 ZWE|Zimbabwe",array(),'localize/countries'));
     }
 
-    function all()
+    public function all()
     {
         $countries_array = array();
         foreach (AkCountries::getCountriesDescriptions() as $country_string){
@@ -258,4 +258,3 @@ ZWE|Zimbabwe",array(),'localize/countries'));
     }
 }
 
-?>

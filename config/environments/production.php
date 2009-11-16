@@ -2,7 +2,7 @@
 
 // Define constants that are used only on a production environment
 // See file boot.php for more info
-date_default_timezone_set('Europe/Madrid');
+ini_set('date.timezone', 'UTC');
 /**
  * Performance tricks for production environments.
  *

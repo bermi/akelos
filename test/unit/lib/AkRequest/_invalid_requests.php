@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class AkRequestInvalidRequestsIntegrationTest extends AkWebTestCase
+class AkRequestInvalidRequestsIntegration_TestCase extends AkWebTestCase
 {
     public function test_should_show_public_dot_404_dot_php()
     {
@@ -13,7 +13,5 @@ class AkRequestInvalidRequestsIntegrationTest extends AkWebTestCase
     }
 }
 
-ak_test('AkRequestInvalidRequestsIntegrationTest');
+ak_test_run_case_if_executed('AkRequestInvalidRequestsIntegration_TestCase');
 
-
-?>

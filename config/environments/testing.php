@@ -3,7 +3,7 @@
 // Define constants that are used only on a testing environment
 // See file boot.php for more info
 
-date_default_timezone_set('Europe/Madrid');
+ini_set('date.timezone', 'UTC');
 define('AK_DIE_ON_PHP4_ERROR', true);
 
 ini_set('display_errors', 1);

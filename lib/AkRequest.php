@@ -133,9 +133,9 @@ class AkRequest extends AkObject
     * @uses parseRequest
     * @return void
     */
-    public function init()
+    public function init($force = false)
     {
-        if(!$this->_init_check){
+        if(!$this->_init_check || $force){
             $this->env =& $_SERVER;
             $this->_urlDecode();
 

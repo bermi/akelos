@@ -28,6 +28,7 @@ Action Controller:
     - AkRouter
     - AkSession
     - AkSintags
+    - 'AkRequest/*'
     - 'AkActionController/_f*'
     - 'AkActionController/_h*'
     - 'AkActionController/_l*'
@@ -35,7 +36,6 @@ Action Controller:
     - 'AkActionController/_part*'
     - 'AkActionController/_r*'
     #- 'AkActionController/*' todo: cache tests
-    #- AkRequest
 Action Web Service:
     - 'AkActionWebService/AkActionWebServiceApi.php'
     # Action View:

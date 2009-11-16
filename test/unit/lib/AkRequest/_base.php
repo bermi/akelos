@@ -58,7 +58,7 @@ class AkRequest_TestCase extends  AkUnitTest
 
 
         $this->_testRequestInstance = new AkRequest();
-        $this->_testRequestInstance->init();
+        $this->_testRequestInstance->init(true);
 
     }
 
@@ -89,7 +89,10 @@ class AkRequest_TestCase extends  AkUnitTest
 
         $this->_testRequestInstance->_mergeRequest();
 
-        $this->assertEqual($this->_testRequestInstance->_request,$expected,'Comparing request precedence');
+        if(!isset($this->_testRequestInstance->_request['cmd_param'])){
+            unset($expected['cmd_param']); // If ran as part of a suite we need to unset it
+        }
+        $this->assertEqual($this->_testRequestInstance->_request, $expected, 'Comparing request precedence');
     }
 
 
@@ -170,18 +173,17 @@ class AkRequest_TestCase extends  AkUnitTest
         $Request->env = $env_backup;
     }
 
-    
     public function test_should_normalize_single_level_file_uploads()
     {
         $Request = new AkRequest();
-        $_FILES = array ( 
-            'image0' => array ( 'name' => 'mod_rewrite_cheat_sheet.pdf', 'type' => 'application/pdf', 'tmp_name' => '/tmp/php0JvZ0p', 'error' => 0, 'size' => 332133 ), 
-            'image1' => array ( 'name' => 'microformats_cheat_sheet.pdf', 'type' => 'application/pdf', 'tmp_name' => '/tmp/phpKry1xs', 'error' => 0, 'size' => 427735 ), 
+        $_FILES = array (
+            'image0' => array ( 'name' => 'mod_rewrite_cheat_sheet.pdf', 'type' => 'application/pdf', 'tmp_name' => '/tmp/php0JvZ0p', 'error' => 0, 'size' => 332133 ),
+            'image1' => array ( 'name' => 'microformats_cheat_sheet.pdf', 'type' => 'application/pdf', 'tmp_name' => '/tmp/phpKry1xs', 'error' => 0, 'size' => 427735 ),
             'image2' => array ( 'name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0 ) );
-        $normalized = array ( 
-            'image0' => array ( 'name' => 'mod_rewrite_cheat_sheet.pdf', 'type' => 'application/pdf', 'tmp_name' => '/tmp/php0JvZ0p', 'error' => 0, 'size' => 332133 ), 
+        $normalized = array (
+            'image0' => array ( 'name' => 'mod_rewrite_cheat_sheet.pdf', 'type' => 'application/pdf', 'tmp_name' => '/tmp/php0JvZ0p', 'error' => 0, 'size' => 332133 ),
             'image1' => array ( 'name' => 'microformats_cheat_sheet.pdf', 'type' => 'application/pdf', 'tmp_name' => '/tmp/phpKry1xs', 'error' => 0, 'size' => 427735 ));
-        
+
         $this->assertEqual($Request->_getNormalizedFilesArray(), $normalized);
     }
 
@@ -190,7 +192,7 @@ class AkRequest_TestCase extends  AkUnitTest
         $Request = new AkRequest();
         $_FILES = array ( 'image' => array ( 'name' => array ( 'file' => array ( 'a' => 'mod_rewrite_cheat_sheet.pdf', 'b' => 'microformats_cheat_sheet.pdf', 'c' => '', ), ), 'type' => array ( 'file' => array ( 'a' => 'application/pdf', 'b' => 'application/pdf', 'c' => '', ), ), 'tmp_name' => array ( 'file' => array ( 'a' => '/tmp/phporGMwx', 'b' => '/tmp/phpGycyd6', 'c' => '', ), ), 'error' => array ( 'file' => array ( 'a' => 0, 'b' => 0, 'c' => 4, ), ), 'size' => array ( 'file' => array ( 'a' => 332133, 'b' => 427735, 'c' => 0, ), ), ), );
         $normalized = array ( 'image' => array ( 'file' => array ( 'a' => array ( 'name' => 'mod_rewrite_cheat_sheet.pdf', 'tmp_name' => '/tmp/phporGMwx', 'size' => 332133, 'type' => 'application/pdf', 'error' => 0, ), 'b' => array ( 'name' => 'microformats_cheat_sheet.pdf', 'tmp_name' => '/tmp/phpGycyd6', 'size' => 427735, 'type' => 'application/pdf', 'error' => 0, ), ), ), );
-        
+
         $this->assertEqual($Request->_getNormalizedFilesArray(), $normalized);
     }
 
@@ -199,7 +201,7 @@ class AkRequest_TestCase extends  AkUnitTest
         $Request = new AkRequest();
         $_FILES = array ( 'image' => array ( 'name' => array ( 'file' => array ( 0 => 'mod_rewrite_cheat_sheet.pdf', 1 => 'microformats_cheat_sheet.pdf', 2 => '', ), ), 'type' => array ( 'file' => array ( 0 => 'application/pdf', 1 => 'application/pdf', 2 => '', ), ), 'tmp_name' => array ( 'file' => array ( 0 => '/tmp/phpoOcNXs', 1 => '/tmp/php4xVEbv', 2 => '', ), ), 'error' => array ( 'file' => array ( 0 => 0, 1 => 0, 2 => 4, ), ), 'size' => array ( 'file' => array ( 0 => 332133, 1 => 427735, 2 => 0, ), ), ), );
         $normalized = array ( 'image' => array ( 'file' => array ( 0 => array ( 'name' => 'mod_rewrite_cheat_sheet.pdf', 'tmp_name' => '/tmp/phpoOcNXs', 'size' => 332133, 'type' => 'application/pdf', 'error' => 0, ), 1 => array ( 'name' => 'microformats_cheat_sheet.pdf', 'tmp_name' => '/tmp/php4xVEbv', 'size' => 427735, 'type' => 'application/pdf', 'error' => 0, ), ), ), );
-        
+
         $this->assertEqual($Request->_getNormalizedFilesArray(), $normalized);
     }
 

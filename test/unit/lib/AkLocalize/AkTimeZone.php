@@ -1,13 +1,17 @@
 <?php
 
-include_once(AK_LIB_DIR.DS.'AkLocalize'.DS.'AkTimeZone.php');
+require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class AkTestTime { function now(){} }
-Mock::generate('AkTestTime');
 
-
-class TimeZoneTestCase extends AkUnitTest
+class TimeZone_TestCase extends AkUnitTest
 {
+    function __construct()
+    {
+        parent::__construct();
+        Mock::generate('AkTestTime');
+    }
+
     public function setup()
     {
         $this->MockTime = new MockAkTestTime($this);
@@ -144,13 +148,15 @@ class TimeZoneTestCase extends AkUnitTest
             $this->assertTrue($Zones[$i-1]->compare($Zones[$i]) == -1);
         }
     }
-    
+
     public function _createTimeZone()
     {
         $args = func_get_args();
         $TimeZone = new AkTimeZone();
         return call_user_func_array(array($TimeZone,'create'), $args);
     }
+
 }
 
-?>
+ak_test_run_case_if_executed('TimeZone_TestCase');
+

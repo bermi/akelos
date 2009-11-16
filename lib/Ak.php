@@ -2299,6 +2299,7 @@ class Ak
             'AkTestRequest'             =>  AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestRequest.php',
             'AkTestResponse'            =>  AK_LIB_DIR.DS.'AkUnitTest'.DS.'AkTestResponse.php',
             'AkTime'                    =>  AK_LIB_DIR.DS.'AkType'.DS.'AkTime.php',
+            'AkTimeZone'                =>  AK_LIB_DIR.DS.'AkLocalize'.DS.'AkTimeZone.php',
             'AkType'                    =>  AK_LIB_DIR.DS.'AkType.php',
             'AkUnitTest'                =>  AK_LIB_DIR.DS.'AkUnitTest.php',
             'AkWebTestCase'             =>  AK_LIB_DIR.DS.'AkUnitTest.php',
