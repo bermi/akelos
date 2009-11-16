@@ -22,6 +22,7 @@ Active Support:
     - 'utils/_Ak_var_manipulation'
     - 'AkType/AkNumber'
     - 'AkType/AkString'
+    - 'AkLocalize/AkTimeZone'
     # - 'utils/_Ak_file_functions_over_ftp' test in standalone mode
 Action Controller:
     - AkDbSession
