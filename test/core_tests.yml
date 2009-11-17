@@ -26,6 +26,7 @@ ActionController:
 ActiveRecord:
     - 'AkActiveRecord/_AkActiveRecord_1'
     - 'AkActiveRecord/_AkActiveRecord_2'
+    - 'AkActiveRecord/_AkActiveRecord_3'
 
 ActionWebService:
     - 'AkActionWebService/AkActionWebServiceApi'

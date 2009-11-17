@@ -98,7 +98,7 @@ class ADODB_sqlite extends ADOConnection {
             $fld = new ADOFieldObject();
             $fld->name = $rs->fields[1];
             $type = $rs->fields[2];
-            $debug_field = 'longtext_field';//false; //'created_at';
+            //$debug_field = 'boolean_field';//false; //'created_at';
 
             // split type into type(length):
             $fld->scale = null;
@@ -110,6 +110,9 @@ class ADODB_sqlite extends ADOConnection {
             } elseif (preg_match("/^(.+)\((\d+)/", $type, $query_array)) {
                 $fld->type = $query_array[1] == 'DECIMAL' ? 'INTEGER' : $query_array[1];
                 $fld->max_length = is_numeric($query_array[2]) ? $query_array[2] : -1;
+                if($fld->max_length == '1'){
+                    $fld->type = 'BOOLEAN';
+                }
                 //if($debug_field && $fld->name == $debug_field) Ak::trace(__LINE__);
             } elseif (preg_match("/^(enum)\((.*)\)$/i", $type, $query_array)) {
                 $fld->type = $query_array[1];

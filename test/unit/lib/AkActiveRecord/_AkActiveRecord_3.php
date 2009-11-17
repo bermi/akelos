@@ -1,11 +1,12 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiveRecord_3 extends  AkUnitTest
+class AkActiveRecord_base3_TestCase extends  AkUnitTest
 {
-    public function _test_AkActiveRecord()  // dont reinstall, this test relies on _AkActiveRecord_1.php
+    public $rebase = true;
+
+    public function test_AkActiveRecord()
     {
         $this->installAndIncludeModels(array(
         'AkTestUser'=>'id I AUTO KEY, user_name C(32), first_name C(200), last_name C(200), email C(150), country I, password C(32), created_at T, updated_at T, expires_on T',
@@ -23,6 +24,8 @@ class test_AkActiveRecord_3 extends  AkUnitTest
     public function Test_of_toggleAttributeAndSave()
     {
         $AkTestFields = new AkTestField();
+
+        $this->assertEqual($AkTestFields->getColumnType('boolean_field'), 'boolean');
 
         $AkTestFields->transactionStart();
         //$AkTestFields->_db->debug();
@@ -50,7 +53,6 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $this->assertFalse($AkTestField->boolean_field);
     }
 
-
     public function Test_of_delete()
     {
         $AkTestFields = new AkTestField();
@@ -63,6 +65,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
 
         $this->assertFalse($AkTestFields->find(2, 3, 4, 5, 6));
     }
+
 
     public function Test_of_deleteAll()
     {
@@ -190,8 +193,11 @@ class test_AkActiveRecord_3 extends  AkUnitTest
     public function Test_of_find2()
     {
 
-        $Users = new AkTestUser('first_name' =>'Tim',"last_name" => "O'Reilly",'user_name'=>'tim_oreilly');
-        $Users->_create();
+        $Users = new AkTestUser(array('first_name' =>'Tim',"last_name" => "O'Reilly",'user_name'=>'tim_oreilly'));
+        $this->assertTrue($Users->save());
+
+        $Users = new AkTestUser(array('first_name' =>'Alicia',"last_name" => "Sadurní",'user_name'=>'alicia_sadurni'));
+        $this->assertTrue($Users->save());
 
         $User = $Users->find('first', array('conditions' => array("last_name = :last_name", ':last_name' => "O'Reilly")));
         $this->assertTrue($User->first_name=='Tim' && $User->last_name == "O'Reilly" && $User->user_name == 'tim_oreilly');
@@ -255,7 +261,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         'numeric_field'=>$i,
         'bytea_field'=>$binary_data,
         'timestamp_field'=>"2005/05/$i $i:$i:$i",
-        'boolean_field'=>!($i%2),
+        'boolean_field'=> !($i%2),
         'int2_field'=>"$i",
         'int4_field'=>$i,
         'int8_field'=>$i,
@@ -286,9 +292,39 @@ class test_AkActiveRecord_3 extends  AkUnitTest
         $this->assertEqual($AkTestField->blob_field, $binary_data);
         $this->assertEqual($AkTestField->logblob_field, $binary_data);
 
+    }
+
+    public function Test_of_findBy()
+    {
+        $Users = new AkTestUser();
+
+        $User = $Users->findBy('first',"first_name AND last_name",'Tim', "O'Reilly");
+        $this->assertTrue($User->first_name=='Tim' && $User->last_name == "O'Reilly" && $User->user_name == 'tim_oreilly');
+
+
+        $User_arr = $Users->findBy("first_name AND last_name",'Tim', "O'Reilly");
+        $this->assertTrue($User_arr[0]->first_name=='Tim' && $User_arr[0]->last_name == "O'Reilly" && $User_arr[0]->user_name == 'tim_oreilly');
+
+        $User_arr = $Users->findBy('all', "first_name AND last_name",'Tim', "O'Reilly");
+        $this->assertTrue($User_arr[0]->first_name=='Tim' && $User_arr[0]->last_name == "O'Reilly" && $User_arr[0]->user_name == 'tim_oreilly');
+
+        $FoundUsers = $Users->findBy("first_name OR first_name:begins",'Tim','Al',array('order'=>'last_name ASC'));
+        $this->assertTrue($FoundUsers[0]->first_name=='Tim');
+        $this->assertTrue($FoundUsers[1]->first_name=='Alicia');
+
+        $this->expectError(new PatternExpectation('/Argument list did not match expected set/'));
+        $Users->findBy("username",'tim_oreilly');
+        $this->expectError(new PatternExpectation('/Argument list did not match expected set/'));
+        $Users->findBy("user_name AND password",'tim_oreilly');
+
+        //$Users->findBy("user_name AND password",'tim_oreilly','1234');
+
+        $AkTestField = new AkTestField();
+        foreach ($AkTestField->find() as $Field){
+            $Field->destroy();
+        }
 
         //Now we add some more records for next tests
-
         foreach (range(2,10) as $i)
         {
             $details = array(
@@ -323,33 +359,6 @@ class test_AkActiveRecord_3 extends  AkUnitTest
             $AkTestField = new AkTestField($details);
             $this->assertTrue($AkTestField->save());
         }
-
-    }
-
-    public function Test_of_findBy()
-    {
-        $Users = new AkTestUser();
-
-        $User = $Users->findBy('first',"first_name AND last_name",'Tim', "O'Reilly");
-        $this->assertTrue($User->first_name=='Tim' && $User->last_name == "O'Reilly" && $User->user_name == 'tim_oreilly');
-
-
-        $User_arr = $Users->findBy("first_name AND last_name",'Tim', "O'Reilly");
-        $this->assertTrue($User_arr[0]->first_name=='Tim' && $User_arr[0]->last_name == "O'Reilly" && $User_arr[0]->user_name == 'tim_oreilly');
-
-        $User_arr = $Users->findBy('all', "first_name AND last_name",'Tim', "O'Reilly");
-        $this->assertTrue($User_arr[0]->first_name=='Tim' && $User_arr[0]->last_name == "O'Reilly" && $User_arr[0]->user_name == 'tim_oreilly');
-
-        $FoundUsers = $Users->findBy("first_name OR first_name:begins",'Tim','Al',array('order'=>'last_name ASC'));
-        $this->assertTrue($FoundUsers[0]->first_name=='Tim');
-        $this->assertTrue($FoundUsers[1]->first_name=='Alicia');
-
-        $this->expectError(new PatternExpectation('/Argument list did not match expected set/'));
-        $Users->findBy("username",'tim_oreilly');
-        $this->expectError(new PatternExpectation('/Argument list did not match expected set/'));
-        $Users->findBy("user_name AND password",'tim_oreilly');
-
-        //$Users->findBy("user_name AND password",'tim_oreilly','1234');
 
         $AkTestFields = new AkTestField();
 
@@ -563,31 +572,6 @@ class test_AkActiveRecord_3 extends  AkUnitTest
 
         $this->assertEqual($AkTestUser->countBySql("SELECT COUNT(*) FROM ak_test_users WHERE first_name = 'Tim'"), count($AkTestUser->findAll("first_name = 'Tim'")));
     }
-
-    // Test_of_getConditions(){}
-
-    // Test_of_constructFinderSql(){}
-    // Test_of_findWithAssociations(){}
-
-    // Test_of_establishConnection(){}
-    // Test_of_getConnection(){}
-
-    // Test_of_init(){}
-    // Test_of_initCrud(){}
-
-
-    // Test_of_objectCache(){}
-    // Test_of_removeAttributesProtectedFromMassAssignment(){}
-    // Test_of_resetColumnInformation(){}
-
-    // Test_of_t(){}
-
-
-
 }
 
-require_once('_AkActiveRecord_1.php');
-require_once('_AkActiveRecord_2.php');
-ak_test('test_AkActiveRecord_3',true);
-
-?>
+ak_test_run_case_if_executed('AkActiveRecord_base3_TestCase');
