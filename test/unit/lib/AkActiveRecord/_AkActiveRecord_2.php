@@ -1,11 +1,12 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiveRecord_2 extends  AkUnitTest
+class AkActiveRecord_base2_TestCase extends  AkUnitTest
 {
-    public function _test_AkActiveRecord()
+    public $rebase = true;
+
+    public function test_AkActiveRecord()
     {
         $this->installAndIncludeModels(array(
         'AkTestUser'=>'id I AUTO KEY, user_name C(32), first_name C(200), last_name C(200), email C(150), country I, password C(32), created_at T, updated_at T, expires_on T',
@@ -23,18 +24,17 @@ class test_AkActiveRecord_2 extends  AkUnitTest
     public function Test_of_newRecord()
     {
         $User = new AkTestUser();
-        $User->newRecord('last_name->','Ferrer','date->','1978-06-16','expires_on->','2120-06-16');
+        $User->newRecord(array('last_name' =>'Ferrer','date' =>'1978-06-16','expires_on' =>'2120-06-16'));
         $User->set('first_name','Bermi');
         $User->set('last_name',$User->get('last_name').' Martínez');
-        $this->assertEqual($User->getAttributes(), array('id'=>null,'user_name'=>null,'first_name'=>'Bermi','last_name'=>'Ferrer Martínez','email'=>null,'country'=>null,'password'=>'*********','created_at'=>null,'updated_at'=>null,'expires_on'=>'2120-06-16'));
+        $this->assertEqual($User->getAttributes(true), array('id'=>null,'user_name'=>null,'first_name'=>'Bermi','last_name'=>'Ferrer Martínez','email'=>null,'country'=>null,'password'=>'*********','created_at'=>null,'updated_at'=>null,'expires_on'=>'2120-06-16'));
         $this->assertTrue($User->isNewRecord());
 
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $User->newRecord(array('first_name'=>'Bermi','last_name'=>'Ferrer','date'=>'1978-06-16','expires_on'=>'2120-06-16'));
-        $this->assertEqual($User->getAttributes(), array('id'=>null,'user_name'=>null,'first_name'=>'Bermi','last_name'=>'Ferrer','email'=>null,'country'=>null,'password'=>'*********','created_at'=>null,'updated_at'=>null,'expires_on'=>'2120-06-16','name'=>'Bermi Ferrer'));
-        $this->assertFalse(empty($User->_newRecord));
-
+        $this->assertEqual($User->getAttributes(true), array('id'=>null,'user_name'=>null,'first_name'=>'Bermi','last_name'=>'Ferrer','email'=>null,'country'=>null,'password'=>'*********','created_at'=>null,'updated_at'=>null,'expires_on'=>'2120-06-16','name'=>'Bermi Ferrer'));
+        $this->assertTrue($User->isNewRecord());
     }
 
     public function Test_of_isNewRecord()
@@ -42,22 +42,22 @@ class test_AkActiveRecord_2 extends  AkUnitTest
         $User = new AkTestUser();
         $this->assertTrue($User->isNewRecord());
 
-        $User->newRecord('last_name->','Gimeno');
+        $User->newRecord(array('last_name' =>'Gimeno'));
 
         $this->assertTrue($User->save() !== false);
         $this->assertFalse($User->isNewRecord());
         $User->destroy();
 
-        $User->newRecord('last_name->','Ferrer','date->','1978-06-16','expires_on->','2120-06-16');
+        $User->newRecord(array('last_name' =>'Ferrer','date' =>'1978-06-16','expires_on' =>'2120-06-16'));
         $this->assertTrue($User->isNewRecord());
     }
 
-    public function Test_of__getCombinedAttributesWhereThisAttributeIsUsed()
+    public function Test_of_getCombinedAttributesWhereThisAttributeIsUsed()
     {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $User->addCombinedAttributeConfiguration('another_name', "Ms/Mr. %s", 'last_name');
-        $this->assertEqual($User->_getCombinedAttributesWhereThisAttributeIsUsed('last_name'),array('name','another_name'));
+        $this->assertEqual($User->getCombinedAttributesWhereThisAttributeIsUsed('last_name'),array('name','another_name'));
     }
 
     public function Test_of_requiredForCombination()
@@ -70,11 +70,10 @@ class test_AkActiveRecord_2 extends  AkUnitTest
     }
 
 
-
-    public function Test_of__create()
+    public function test_should_save_record()
     {
-        $Users = new AkTestUser('first_name=>','Tim','last_name->','Horton','user_name->','tim','email->','tim@example.com', 'expires_on->','+2 years');
-        $Users->_create();
+        $Users = new AkTestUser(array('first_name' =>'Tim','last_name' =>'Horton','user_name' =>'tim','email' =>'tim@example.com', 'expires_on' =>'+2 years'));
+        $Users->save();
         $User = new AkTestUser($Users->getId());
         $this->assertTrue($User->first_name=='Tim' && $User->last_name == 'Horton' && $User->user_name == 'tim' && $User->email == 'tim@example.com');
         $this->assertFalse(empty($User->created_at) && empty($User->expires_on));
@@ -83,13 +82,12 @@ class test_AkActiveRecord_2 extends  AkUnitTest
     }
 
 
-
-    public function Test_of_find()
+    public function test_should_find_records()
     {
-        $User = new AkTestUser('first_name=>','Bermi','last_name->','Ferrer Martínez','user_name->','bermi','email->','bermi@example.com');
-        $User->_create();
-        $User = new AkTestUser('first_name=>','Hilario','last_name->','Hervás Añó','user_name->','hilario','email->','hilario@example.com');
-        $User->_create();
+        $User = new AkTestUser(array('first_name' =>'Bermi','last_name' =>'Ferrer Martínez','user_name' =>'bermi','email' =>'bermi@example.com'));
+        $User->save();
+        $User = new AkTestUser(array('first_name' =>'Hilario','last_name' =>'Hervás Añó','user_name' =>'hilario','email' =>'hilario@example.com'));
+        $User->save();
 
         $Users = new AkTestUser();
         $User = $Users->find(3);
@@ -133,10 +131,10 @@ class test_AkActiveRecord_2 extends  AkUnitTest
         $User = $Users->find('first', array('conditions' => array("user_name = :user_name", ':user_name' => 'hilario')));
         $this->assertTrue($User->first_name=='Hilario' && $User->last_name == 'Hervás Añó' && $User->user_name == 'hilario' && $User->email == 'hilario@example.com');
 
-        $User = new AkTestUser('first_name=>','test_name','last_name->','A');
-        $User->_create();
-        $User = new AkTestUser('first_name=>','test_name','last_name->','Z');
-        $User->_create();
+        $User = new AkTestUser(array('first_name' =>'test_name','last_name' =>'A'));
+        $User->save();
+        $User = new AkTestUser(array('first_name' =>'test_name','last_name' =>'Z'));
+        $User->save();
 
         $Users = new AkTestUser();
         $User = $Users->find('first', array('order' => "last_name DESC"));
@@ -168,8 +166,8 @@ class test_AkActiveRecord_2 extends  AkUnitTest
             $this->assertFalse(empty($User->last_name));
         }
 
-        $User = new AkTestUser('first_name=>','test_name','last_name->','B');
-        $User->_create();
+        $User = new AkTestUser(array('first_name' =>'test_name','last_name' =>'B'));
+        $User->save();
 
         $Users = new AkTestUser();
         $FoundUsers = $Users->find('all', array('conditions' => array("first_name = :first_name", ':first_name' => 'test_name'), 'limit' => 2, 'order' => "last_name DESC"));
@@ -198,9 +196,7 @@ class test_AkActiveRecord_2 extends  AkUnitTest
             $this->assertFalse(empty($User->last_name));
             $this->assertTrue(in_array($User->last_name, $expected));
         }
-
     }
-
 
     public function Test_of_getContentColumns()
     {
@@ -453,23 +449,18 @@ class test_AkActiveRecord_2 extends  AkUnitTest
         $FoundUsers = $Users->findBySql(array("SELECT * FROM ak_test_users WHERE last_name = ? AND first_name = ?",array('Ferrer Martínez','Bermi')));
         $this->assertTrue($FoundUsers[0]->first_name == 'Bermi');
 
-        $FoundUsers = $Users->findBySql("SELECT * FROM ak_test_users",6);
         $this->expectError(new PatternExpectation('/DEPRECATED WARNING.*findBySql.*/'));
+        $FoundUsers = $Users->findBySql("SELECT * FROM ak_test_users",6);
         $this->assertEqual(count($FoundUsers), 6);
 
         $this->expectError(new PatternExpectation('/DEPRECATED WARNING.*findBySql.*/'));
         $FoundUsers = $Users->findBySql("SELECT * FROM ak_test_users",6,6);
         $this->assertEqual(count($FoundUsers), 3);
 
+        $this->expectError(new PatternExpectation('/error|unknown/i'));
         $FoundUsers = $Users->findBySql("SELECT * FROM ak_test_users WHERE iad=123");
         $this->assertEqual(count($FoundUsers), 0);
-        $this->assertError();
-
     }
-
 }
 
-require_once('_AkActiveRecord_1.php');
-ak_test('test_AkActiveRecord_2',true);
-
-?>
+ak_test_run_case_if_executed('AkActiveRecord_base2_TestCase');

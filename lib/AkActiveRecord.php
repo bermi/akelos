@@ -382,7 +382,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * Creates a new record with values matching those of the instance attributes.
     * Must be called as a result of a call to createOrUpdate.
     */
-    protected function _create()
+    private function _create()
     {
         if (!$this->beforeCreate() || !$this->notifyObservers('beforeCreate')){
             return $this->transactionFail();
@@ -1590,7 +1590,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $this->{$attribute.'_before_type_cast'} = $value;
             $this->$attribute = $value;
             if($compose_after_set && !empty($this->_combinedAttributes) && !$this->requiredForCombination($attribute)){
-                $combined_attributes = $this->_getCombinedAttributesWhereThisAttributeIsUsed($attribute);
+                $combined_attributes = $this->getCombinedAttributesWhereThisAttributeIsUsed($attribute);
                 foreach ($combined_attributes as $combined_attribute){
                     $this->composeCombinedAttribute($combined_attribute);
                 }
@@ -2162,7 +2162,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
     }
 
-    protected function _getCombinedAttributesWhereThisAttributeIsUsed($attribute)
+    public function getCombinedAttributesWhereThisAttributeIsUsed($attribute)
     {
         $result = array();
         foreach ($this->_combinedAttributes as $combined_attribute=>$settings){

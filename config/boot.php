@@ -25,4 +25,5 @@ include AK_LIB_DIR.DS.'constants.php';
 
 
 
-//AK_PRODUCTION_MODE || include AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php';
+//AK_PRODUCTION_MODE ||
+include AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php';

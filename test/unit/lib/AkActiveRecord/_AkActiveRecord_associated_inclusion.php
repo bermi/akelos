@@ -14,8 +14,8 @@ class test_AkActiveRecord_associated_inclusion extends  AkUnitTest
 
     public function test_belongs_to_inclusion_on_find()
     {
-        $Apartment = $this->Property->create('description->','Docklands riverside apartment');
-        $Picture = $this->Picture->create('title->','Views from the living room');
+        $Apartment = $this->Property->create('description' =>'Docklands riverside apartment');
+        $Picture = $this->Picture->create('title' =>'Views from the living room');
 
         $Picture->property->assign($Apartment);
         $Picture->save();
@@ -27,7 +27,7 @@ class test_AkActiveRecord_associated_inclusion extends  AkUnitTest
     public function test_collection_inclusion_on_find()
     {
         $Apartment = $this->Property->findFirstBy('description','Docklands riverside apartment');
-        $Picture = $this->Picture->create('title->','Living room');
+        $Picture = $this->Picture->create('title' =>'Living room');
 
         $Picture->property->assign($Apartment);
         $Picture->save();

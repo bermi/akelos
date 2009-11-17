@@ -4,10 +4,7 @@ require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class AkActiveRecord_base1_TestCase extends  AkUnitTest
 {
-    public function __construct(){
-        parent::__construct();
-        $this->rebaseAppPaths();
-    }
+    public $rebase = true;
 
     public function test_setup()
     {

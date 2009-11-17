@@ -36,10 +36,10 @@ class AkUnitTest extends UnitTestCase
         $this->_logOriginalPaths();
         $this->app_dir = AkConfig::getDir('app');
         parent::__construct($label);
-        $this->_configure();
         if($this->rebase){
             $this->rebaseAppPaths($this->rebase);
         }
+        $this->_configure();
     }
 
     public function __destruct()
@@ -347,19 +347,6 @@ class AkUnitTest extends UnitTestCase
 
 }
 
-/**
-* Unit tester for your mailers.
-*
-* This tester will copy your application views from the app/views to test/fixtures/app/views
-* unless you implicitly set AkMailerTest::avoid_copying_views to true.
-*/
-class AkMailerTest extends AkUnitTest
-{
-    public function __construct()
-    {
-        empty($this->avoid_copying_views) && Ak::copy(AkConfig::getDir('fixtures').DS.'app'.DS.'views', AkConfig::getDir('views'));
-    }
-}
 
 class AkWebTestCase extends WebTestCase
 {

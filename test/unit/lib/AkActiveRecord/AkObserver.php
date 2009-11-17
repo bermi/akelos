@@ -89,7 +89,7 @@ class test_AkActiveRecord_observer extends  AkUnitTest
 
     public function Test_of_default_Active_record_observer_triggers()
     {
-        $ObservedPerson = new ObservedPerson('first_name->','Bermi');
+        $ObservedPerson = new ObservedPerson('first_name' =>'Bermi');
 
         $this->assertTrue(empty($ObservedPerson->audited));
         ob_start();

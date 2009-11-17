@@ -45,7 +45,7 @@ class AkDbAdapter extends AkObject
     public function connect($die_on_error = true)
     {
         $dsn = $this->constructDsn($this->settings);
-        
+
         require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb.inc.php');
         $this->connection = AK_DEBUG ? NewADOConnection($dsn) : @NewADOConnection($dsn);
 
@@ -241,7 +241,9 @@ class AkDbAdapter extends AkObject
         if (!$result){
             $error_message = '['.$this->connection->ErrorNo().'] '.$this->connection->ErrorMsg();
             $this->_log('SQL Error: '.$error_message);
-            if ($this->debug || AK_DEBUG) trigger_error("Tried '$sql_string'. Got: $error_message", E_USER_NOTICE);
+            if ($this->debug || AK_DEBUG) {
+                trigger_error("Tried '$sql_string'. Got: $error_message", E_USER_NOTICE);
+            }
         }
         return $result;
     }

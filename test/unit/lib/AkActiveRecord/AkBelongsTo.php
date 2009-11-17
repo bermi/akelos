@@ -147,7 +147,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
         $this->assertEqual($Thumbnail->picture->getType(), 'Picture');
         $this->assertEqual($Thumbnail->picture->title, 'The Bermi Labs Team at Carlet');
 
-        $Alicia = $Thumbnail->create('caption->','Alicia');
+        $Alicia = $Thumbnail->create('caption' =>'Alicia');
         $this->assertTrue(!$Alicia->isNewRecord());
 
         $this->assertEqual($Alicia->picture->getType(), 'belongsTo');
@@ -244,26 +244,26 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
 
     public function test_primary_key_setting()
     {
-        $Hilario = new Person('first_name->','Hilario','last_name->','Hervás','email->','hilario@example.com');
-        $Jose = new Person('first_name->','Jose','last_name->','Salavert','email->','salavert@example.com');
-        $Vero = new Person('first_name->','Vero','last_name->','Machí','email->','vero@example.com');
-        $Bermi = new Person('first_name->','Bermi','last_name->','Ferrer','email->','bermi@example.com');
+        $Hilario = new Person('first_name' =>'Hilario','last_name' =>'Hervás','email' =>'hilario@example.com');
+        $Jose = new Person('first_name' =>'Jose','last_name' =>'Salavert','email' =>'salavert@example.com');
+        $Vero = new Person('first_name' =>'Vero','last_name' =>'Machí','email' =>'vero@example.com');
+        $Bermi = new Person('first_name' =>'Bermi','last_name' =>'Ferrer','email' =>'bermi@example.com');
 
         $this->assertTrue($Hilario->save() && $Bermi->save());
 
-        $BermisAccount = new Account('username->','bermi','password->','pass');
+        $BermisAccount = new Account('username' =>'bermi','password' =>'pass');
         $Bermi->account->assign($BermisAccount);
 
         $this->assertEqual($BermisAccount->person_id,$Bermi->id);
 
-        $SalavertsAccount = new Account('username->','salavert','password->','pass');
+        $SalavertsAccount = new Account('username' =>'salavert','password' =>'pass');
         $Jose->account->assign($SalavertsAccount);
 
         $Jose->save();
 
         $this->assertEqual($SalavertsAccount->person_id,$Jose->id);
 
-        $VerosAccount = new Account('username->','vero','password->','pass');
+        $VerosAccount = new Account('username' =>'vero','password' =>'pass');
 
         $this->assertTrue($VerosAccount->save());
 
@@ -272,7 +272,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
         $VerosAccount->save();
         $this->assertEqual($VerosAccount->person_id, $Vero->id);
 
-        $HilariosAccount = new Account('username->','hilario','password->','pass');
+        $HilariosAccount = new Account('username' =>'hilario','password' =>'pass');
         $Hilario->account->assign($HilariosAccount);
         $Hilario->save();
 

@@ -219,7 +219,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
 
     public function test_find_on_unsaved_models_including_associations()
     {
-        $Property = new Property('description->','Chalet by the sea');
+        $Property = new Property('description' =>'Chalet by the sea');
 
         $PropertyType = new PropertyType();
         $this->assertTrue($PropertyTypes = $PropertyType->findAll());
@@ -243,7 +243,7 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
 
     public function test_clean_up_dependencies()
     {
-        $Property = new Property('description->','Luxury Estate');
+        $Property = new Property('description' =>'Luxury Estate');
         $PropertyType = new PropertyType();
         $this->assertTrue($PropertyType =& $PropertyType->create(array('description'=>'Mansion')));
         $Property->property_type->add($PropertyType);
@@ -286,11 +286,11 @@ class HasAndBelongsToManyTestCase extends  AkUnitTest
 
     public function test_scope_for_multiple_member_deletion()
     {
-        $PisoJose = new Property('description->','Piso Jose');
-        $PisoBermi = new Property('description->','Piso Bermi');
+        $PisoJose = new Property('description' =>'Piso Jose');
+        $PisoBermi = new Property('description' =>'Piso Bermi');
 
-        $Atico = new PropertyType('description->','Ático');
-        $Apartamento = new PropertyType('description->','Apartamento');
+        $Atico = new PropertyType('description' =>'Ático');
+        $Apartamento = new PropertyType('description' =>'Apartamento');
 
         $this->assertTrue($PisoJose->save() && $PisoBermi->save() && $Atico->save() && $Apartamento->save());
 

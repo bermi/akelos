@@ -57,10 +57,13 @@ class Ak
         if (!$fatal && AK_ENVIRONMENT == 'production'){
             return;
         }
+        $backtrace = debug_backtrace();
+        $file = $backtrace[1]['file'];
+        $line = $backtrace[1]['line'];
         if (is_array($message)){
-            trigger_error(Ak::t("DEPRECATED WARNING: ".array_shift($message), $message), E_USER_NOTICE);
+            trigger_error(Ak::t("DEPRECATED WARNING: ".array_shift($message), $message).' '.Ak::t('Called in %file line %line', array('%file' => $file, '%line' => $line)), E_USER_NOTICE);
         } else {
-            trigger_error(Ak::t("DEPRECATED WARNING: ".$message), E_USER_NOTICE);
+            trigger_error(Ak::t("DEPRECATED WARNING: ".$message).' '.Ak::t('Called in %file line %line', array('%file' => $file, '%line' => $line)), E_USER_NOTICE);
         }
     }
 

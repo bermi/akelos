@@ -190,7 +190,7 @@ class test_AkActiveRecord_3 extends  AkUnitTest
     public function Test_of_find2()
     {
 
-        $Users = new AkTestUser('first_name=>','Tim','last_name->',"O'Reilly",'user_name->','tim_oreilly');
+        $Users = new AkTestUser('first_name' =>'Tim',"last_name" => "O'Reilly",'user_name'=>'tim_oreilly');
         $Users->_create();
 
         $User = $Users->find('first', array('conditions' => array("last_name = :last_name", ':last_name' => "O'Reilly")));
