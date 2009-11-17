@@ -1,8 +1,5 @@
 <?php
 
-defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class Schedule extends ActiveRecord
@@ -10,10 +7,11 @@ class Schedule extends ActiveRecord
     public $belongs_to = 'event';
 }
 
-class test_AkActiveRecord_table_inheritance extends  AkUnitTest
+class ActiveRecord_table_inheritance_TestCase extends  AkUnitTest
 {
     public function test_start()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Event', 'Concert','OpenHouseMeeting'));
     }
 
@@ -64,6 +62,4 @@ class test_AkActiveRecord_table_inheritance extends  AkUnitTest
     }
 }
 
-ak_test('test_AkActiveRecord_table_inheritance',true);
-
-?>
+ak_test_run_case_if_executed('ActiveRecord_table_inheritance_TestCase');

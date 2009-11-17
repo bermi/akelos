@@ -1,19 +1,17 @@
 <?php
 
-defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class AkActiveRecord_finders_TestCase extends  AkUnitTest
+class ActiveRecord_finders_TestCase extends  AkUnitTest
 {
 
     public function setup()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Post', 'Tag', 'Comment'));
         $Installer = new AkInstaller();
         @$Installer->dropTable('posts_tags');
-        @Ak::file_delete(AK_MODELS_DIR.DS.'post_tag.php');
+        @Ak::file_delete(AkConfig::getDir('models').DS.'post_tag.php');
     }
 
     public function test_should_find_using_id_and_options()
@@ -114,6 +112,5 @@ class AkActiveRecord_finders_TestCase extends  AkUnitTest
 
 }
 
-ak_test('AkActiveRecord_finders_TestCase',true);
+ak_test_run_case_if_executed('ActiveRecord_finders_TestCase');
 
-?>

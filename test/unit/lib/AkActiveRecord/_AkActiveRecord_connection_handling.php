@@ -1,19 +1,20 @@
 <?php
 
-defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class AkActiveRecord_connection_handling_TestCase extends  AkUnitTest
+class ActiveRecord_connection_handling_TestCase extends  AkUnitTest
 {
+    public function setup()
+    {
+        $this->rebaseAppPaths();
+    }
 
     public function test_should_establish_a_connection()
     {
         $this->installAndIncludeModels(array('DummyModel'=>'id'));
 
         $Model = $this->DummyModel;
-        $default_connection =& AkDbAdapter::getInstance();
+        $default_connection = AkDbAdapter::getInstance();
         $available_tables_on_default = $default_connection->availableTables();
         unset ($Model->_db);
 
@@ -23,10 +24,10 @@ class AkActiveRecord_connection_handling_TestCase extends  AkUnitTest
         $available_tables_on_development = $development_connection->availableTables();
         $this->assertFalse($development_connection===$default_connection);
 
+        $this->assertUpcomingError("Could not find the database profile");
         $this->assertFalse($Model->establishConnection('not_specified_profile'));
-        $this->assertError("Could not find the database profile 'not_specified_profile' in config/database.yml.");
 
-        $check_default_connection =& AkDbAdapter::getInstance();
+        $check_default_connection = AkDbAdapter::getInstance();
         $this->assertReference($default_connection,$check_default_connection);
         $this->assertReference($default_connection->connection,$check_default_connection->connection);
 
@@ -70,6 +71,5 @@ class AkActiveRecord_connection_handling_TestCase extends  AkUnitTest
 
 }
 
-ak_test('AkActiveRecord_connection_handling_TestCase',true);
+ak_test('ActiveRecord_connection_handling_TestCase',true);
 
-?>

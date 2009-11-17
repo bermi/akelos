@@ -3,7 +3,7 @@
 defined('ALL_TESTS_CALL') ? null : define("ALL_TESTS_CALL",true);
 defined('AK_ENABLE_PROFILER') ? null : define('AK_ENABLE_PROFILER',true);
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
+
 require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
 
 if(!defined('ALL_TESTS_RUNNER') && empty($test)){

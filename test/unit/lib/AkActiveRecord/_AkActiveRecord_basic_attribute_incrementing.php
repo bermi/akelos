@@ -1,12 +1,12 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiveRecord_attribute_incrementing extends  AkUnitTest
+class ActiveRecord_attribute_incrementing_TestCase extends  AkUnitTest
 {
     public function setUp()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Post'));
     }
 
@@ -74,5 +74,4 @@ class test_AkActiveRecord_attribute_incrementing extends  AkUnitTest
 
 }
 
-ak_test('test_AkActiveRecord_attribute_incrementing',true);
-?>
+ak_test_run_case_if_executed('ActiveRecord_attribute_incrementing_TestCase');

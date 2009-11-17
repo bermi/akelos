@@ -1,9 +1,8 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiceRecord_datatypes extends  AkUnitTest
+class ActiceRecord_datatypes_TestCase extends  AkUnitTest
 {
     /**
      * @var ActiveRecord
@@ -11,6 +10,7 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
     public $Hybrid;
     public function test_installer_should_handle_integers()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Hybrid'=>'id,title,price integer'));
         $columns = $this->Hybrid->getColumnSettings();
         $this->assertEqual($columns['price']['type'],'integer');
@@ -217,6 +217,5 @@ class test_AkActiceRecord_datatypes extends  AkUnitTest
 
 }
 
-ak_test('test_AkActiceRecord_datatypes',true);
+ak_test_run_case_if_executed('ActiceRecord_datatypes_TestCase');
 
-?>

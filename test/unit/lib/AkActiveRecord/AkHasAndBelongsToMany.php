@@ -363,7 +363,7 @@ class HasAndBelongsToMany_TestCase extends  AkUnitTest
     {
         $Installer = new AkInstaller();
         @$Installer->dropTable('groups_users');
-        @Ak::file_delete(AK_MODELS_DIR.DS.'group_user.php');
+        @Ak::file_delete(AkConfig::getDir('models').DS.'group_user.php');
 
 
         $this->installAndIncludeModels('User', 'Group', array('instantiate' => true));

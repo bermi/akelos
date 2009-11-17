@@ -41,6 +41,7 @@ ActiveRecord:
     - 'AkActiveRecord/ActsAsList'
     - 'AkActiveRecord/ActsAsNestedSet'
     - 'AkActiveRecord/ActsAsTree'
+    - 'AkActiveRecord/AkValidation'
 
 ActionWebService:
     - 'AkActionWebService/AkActionWebServiceApi'

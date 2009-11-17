@@ -1,18 +1,16 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiveRecord_counters extends  AkUnitTest
+class ActiveRecord_counters_TestCase extends  AkUnitTest
 {
-
     public function setUp()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Post','Comment'));
         $Post = $this->Post->create(array('title'=>'A Title','body'=>'and a body'));
         $this->PostId = $Post->getId();
     }
-
 
     public function test_counter_should_be_default_zero()
     {
@@ -87,11 +85,6 @@ class test_AkActiveRecord_counters extends  AkUnitTest
         $this->assertEqual($counter,-3);
     }
 
-
-
-
-
 }
-ak_test('test_AkActiveRecord_counters', true);
 
-?>
+ak_test_run_case_if_executed('ActiveRecord_counters_TestCase');

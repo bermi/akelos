@@ -7,7 +7,15 @@ class ActiveRecord_association_finders_TestCase extends  AkUnitTest
 
     public function setup()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Aa', 'Bb', 'Cc','Dd', 'Ee'));
+    }
+
+    public function tearDown()
+    {
+        foreach (explode(',', 'aa_ee,bb_cc,dd_ee') as $file){
+            @Ak::file_delete(AkConfig::getDir('models').DS.$file.'.php');
+        }
     }
 
     public function test_find_on_first_level_has_many_finder_with_conditions()

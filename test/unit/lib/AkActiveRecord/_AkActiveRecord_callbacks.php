@@ -1,29 +1,30 @@
 <?php
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
+
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
-
-/* Create Mocks */
-$callbacks_during_save = array('beforeCreate','beforeValidation','beforeValidationOnUpdate','beforeValidationOnCreate','beforeSave','beforeUpdate','beforeDestroy',
-'afterCreate','afterValidation','afterValidationOnUpdate','afterValidationOnCreate','afterSave','afterUpdate','afterDestroy');
-
-function createClass ($classname, $parent, $functions, $function_body){
-    $class_code = "class $classname extends $parent {";
-    foreach ($functions as $function){
-        $class_code .= "public function $function(){".$function_body."}";
-    }
-    $class_code .= "}";
-    eval($class_code);
-}
-
-createClass('TestCallback','ActiveRecord',$callbacks_during_save,'$this->__called[]=__FUNCTION__;return true;');
-createClass('TestObserver','AkObserver',$callbacks_during_save,'$this->__called[]=__FUNCTION__;return true;');
-
-/* Test */
-class TestCase_AkActiveRecord_callbacks extends  AkUnitTest
+class ActiveRecord_callbacks_TestCase extends  AkUnitTest
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->rebaseAppPaths();
+        /* Create Mocks */
+        $callbacks_during_save = array('beforeCreate','beforeValidation','beforeValidationOnUpdate','beforeValidationOnCreate','beforeSave','beforeUpdate','beforeDestroy',
+        'afterCreate','afterValidation','afterValidationOnUpdate','afterValidationOnCreate','afterSave','afterUpdate','afterDestroy');
+
+        function ActiveRecord_callbacks_TestCase_createClass ($classname, $parent, $functions, $function_body){
+            $class_code = "class $classname extends $parent {";
+            foreach ($functions as $function){
+                $class_code .= "public function $function(){".$function_body."}";
+            }
+            $class_code .= "}";
+            eval($class_code);
+        }
+
+        ActiveRecord_callbacks_TestCase_createClass('TestCallback','ActiveRecord',$callbacks_during_save,'$this->__called[]=__FUNCTION__;return true;');
+        ActiveRecord_callbacks_TestCase_createClass('TestObserver','AkObserver',$callbacks_during_save,'$this->__called[]=__FUNCTION__;return true;');
+    }
+
     public function test_start()
     {
         $this->installAndIncludeModels(array('TestCallback'=>'id,name'));
@@ -98,5 +99,5 @@ class TestCase_AkActiveRecord_callbacks extends  AkUnitTest
     }
 }
 
-ak_test('TestCase_AkActiveRecord_callbacks', true);
-?>
+ak_test_run_case_if_executed('ActiveRecord_callbacks_TestCase');
+

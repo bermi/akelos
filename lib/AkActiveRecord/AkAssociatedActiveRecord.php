@@ -698,9 +698,8 @@ class AkAssociatedActiveRecord extends AkBaseModel
                 } else if (is_array($value)) {
                     $assoc = isset($config[$config_key][$key]['association_id'])?$config[$config_key][$key]['association_id']:false;
                     if ($assoc) {
-                        $obj->$assoc = &$this->_generateStdClasses($simulation_class,$value, @$config[$config_key][$key]['class'], $key,$obj, @$config[$config_key], $key);
+                        $obj->$assoc = $this->_generateStdClasses($simulation_class, $value, @$config[$config_key][$key]['class'], $key, $obj, @$config[$config_key], $key);
                         $obj->_addAssociation($assoc, $key);
-                    } else {
                     }
                 }
             }

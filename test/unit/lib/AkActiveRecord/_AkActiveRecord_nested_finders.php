@@ -1,22 +1,18 @@
 <?php
 
-defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class AkActiveRecord_nested_finders_TestCase extends  AkUnitTest
+class ActiveRecord_nested_finders_TestCase extends  AkUnitTest
 {
-
     public function setup()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Aa', 'Bb', 'Cc','Dd', 'Ee'));
-
     }
 
     public function test_find_aa()
     {
-        $aa = &$this->Aa->create(array('name'=>'first aa'));
+        $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         /**
          * assert that it has the custom handler name for bb's
@@ -26,10 +22,10 @@ class AkActiveRecord_nested_finders_TestCase extends  AkUnitTest
 
     public function test_find_aa_include_bbs()
     {
-        $aa = &$this->Aa->create(array('name'=>'first aa'));
+        $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
-        $bb1 = &$this->Bb->create(array('name'=>'first bb','languages'=>array('es','de'),'other'=>array(1,2,3)));
-        $bb2 = &$this->Bb->create(array('name'=>'second bb','languages'=>array('en','fr'),'other'=>array(4,5,6)));
+        $bb1 = $this->Bb->create(array('name'=>'first bb','languages'=>array('es','de'),'other'=>array(1,2,3)));
+        $bb2 = $this->Bb->create(array('name'=>'second bb','languages'=>array('en','fr'),'other'=>array(4,5,6)));
         $babies = array($bb1,$bb2);
         $aa->babies->set($babies);
         $this->assertEqual(2,count($aa->bbs));
@@ -80,7 +76,7 @@ class AkActiveRecord_nested_finders_TestCase extends  AkUnitTest
         $this->assertEqual(array(4,5,6),$found_first_aa['bbs'][1]['other']);
         $this->assertEqual(array('es','de'),$found_first_aa['bbs'][0]['languages']);
         $this->assertEqual(array(1,2,3),$found_first_aa['bbs'][0]['other']);
-        
+
         /**
          * and now as simulated activerecords, this serialization is not working properly yet, expecting failures here
          */
@@ -96,13 +92,13 @@ class AkActiveRecord_nested_finders_TestCase extends  AkUnitTest
 
     public function test_find_aa_include_bbs_and_ccs()
     {
-        $aa = &$this->Aa->create(array('name'=>'first aa'));
+        $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
-        $bb1 = &$this->Bb->create(array('name'=>'first bb'));
-        $bb2 = &$this->Bb->create(array('name'=>'second bb'));
-        $cc1 = &$this->Cc->create(array('name'=>'first cc'));
-        $cc2 = &$this->Cc->create(array('name'=>'second cc'));
-        $cc3 = &$this->Cc->create(array('name'=>'third cc'));
+        $bb1 = $this->Bb->create(array('name'=>'first bb'));
+        $bb2 = $this->Bb->create(array('name'=>'second bb'));
+        $cc1 = $this->Cc->create(array('name'=>'first cc'));
+        $cc2 = $this->Cc->create(array('name'=>'second cc'));
+        $cc3 = $this->Cc->create(array('name'=>'third cc'));
         $first_cc_group = array($cc1,$cc2);
         $bb1->cc->set($first_cc_group);
         $bb2->cc->set($cc3);
@@ -158,17 +154,17 @@ class AkActiveRecord_nested_finders_TestCase extends  AkUnitTest
 
     public function test_find_aa_include_bbs_and_ccs_and_dds()
     {
-        $aa = &$this->Aa->create(array('name'=>'first aa'));
+        $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
-        $bb1 = &$this->Bb->create(array('name'=>'first bb'));
-        $bb2 = &$this->Bb->create(array('name'=>'second bb'));
-        $cc1 = &$this->Cc->create(array('name'=>'first cc'));
-        $cc2 = &$this->Cc->create(array('name'=>'second cc'));
-        $cc3 = &$this->Cc->create(array('name'=>'third cc'));
+        $bb1 = $this->Bb->create(array('name'=>'first bb'));
+        $bb2 = $this->Bb->create(array('name'=>'second bb'));
+        $cc1 = $this->Cc->create(array('name'=>'first cc'));
+        $cc2 = $this->Cc->create(array('name'=>'second cc'));
+        $cc3 = $this->Cc->create(array('name'=>'third cc'));
 
-        $dd1 = &$this->Dd->create(array('name'=>'first dd'));
-        $dd2 = &$this->Dd->create(array('name'=>'second dd'));
-        $dd3 = &$this->Dd->create(array('name'=>'third dd'));
+        $dd1 = $this->Dd->create(array('name'=>'first dd'));
+        $dd2 = $this->Dd->create(array('name'=>'second dd'));
+        $dd3 = $this->Dd->create(array('name'=>'third dd'));
 
         $cc1->dd->assign($dd1);
         $cc2->dd->assign($dd2);
@@ -239,17 +235,17 @@ class AkActiveRecord_nested_finders_TestCase extends  AkUnitTest
 
     public function test_find_aa_include_bbs_and_ccs_and_dds_and_ees()
     {
-        $aa = &$this->Aa->create(array('name'=>'first aa'));
+        $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
-        $bb1 = &$this->Bb->create(array('name'=>'first bb'));
-        $bb2 = &$this->Bb->create(array('name'=>'second bb'));
-        $cc1 = &$this->Cc->create(array('name'=>'first cc'));
-        $cc2 = &$this->Cc->create(array('name'=>'second cc'));
-        $cc3 = &$this->Cc->create(array('name'=>'third cc'));
+        $bb1 = $this->Bb->create(array('name'=>'first bb'));
+        $bb2 = $this->Bb->create(array('name'=>'second bb'));
+        $cc1 = $this->Cc->create(array('name'=>'first cc'));
+        $cc2 = $this->Cc->create(array('name'=>'second cc'));
+        $cc3 = $this->Cc->create(array('name'=>'third cc'));
 
-        $dd1 = &$this->Dd->create(array('name'=>'first dd'));
-        $dd2 = &$this->Dd->create(array('name'=>'second dd'));
-        $dd3 = &$this->Dd->create(array('name'=>'third dd'));
+        $dd1 = $this->Dd->create(array('name'=>'first dd'));
+        $dd2 = $this->Dd->create(array('name'=>'second dd'));
+        $dd3 = $this->Dd->create(array('name'=>'third dd'));
         //Ak::debug($dd1);
         //Ak::debug($cc1->dd);
         $cc1->dd->assign($dd1);
@@ -259,12 +255,12 @@ class AkActiveRecord_nested_finders_TestCase extends  AkUnitTest
         //Ak::debug($dd1->easy);
         //die;
 
-        $ee1 = &$this->Ee->create(array('name'=>'first ee'));
-        $ee2 = &$this->Ee->create(array('name'=>'second ee'));
-        $ee3 = &$this->Ee->create(array('name'=>'third ee'));
-        $ee4 = &$this->Ee->create(array('name'=>'fourth ee'));
-        $ee5 = &$this->Ee->create(array('name'=>'fifth ee'));
-        $ee6 = &$this->Ee->create(array('name'=>'sixth ee'));
+        $ee1 = $this->Ee->create(array('name'=>'first ee'));
+        $ee2 = $this->Ee->create(array('name'=>'second ee'));
+        $ee3 = $this->Ee->create(array('name'=>'third ee'));
+        $ee4 = $this->Ee->create(array('name'=>'fourth ee'));
+        $ee5 = $this->Ee->create(array('name'=>'fifth ee'));
+        $ee6 = $this->Ee->create(array('name'=>'sixth ee'));
 
         $first_ee_group = array($ee1,$ee2);
         $second_ee_group = array($ee3,$ee4,$ee5);
@@ -329,33 +325,33 @@ class AkActiveRecord_nested_finders_TestCase extends  AkUnitTest
 
     public function test_find_aa_include_bbs_and_ccs_and_dds_and_ees_and_back_to_aa()
     {
-        $aa = &$this->Aa->create(array('name'=>'first aa'));
+        $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
-        $bb1 = &$this->Bb->create(array('name'=>'first bb'));
-        $bb2 = &$this->Bb->create(array('name'=>'second bb'));
-        $cc1 = &$this->Cc->create(array('name'=>'first cc'));
-        $cc2 = &$this->Cc->create(array('name'=>'second cc'));
-        $cc3 = &$this->Cc->create(array('name'=>'third cc'));
+        $bb1 = $this->Bb->create(array('name'=>'first bb'));
+        $bb2 = $this->Bb->create(array('name'=>'second bb'));
+        $cc1 = $this->Cc->create(array('name'=>'first cc'));
+        $cc2 = $this->Cc->create(array('name'=>'second cc'));
+        $cc3 = $this->Cc->create(array('name'=>'third cc'));
 
-        $dd1 = &$this->Dd->create(array('name'=>'first dd'));
-        $dd2 = &$this->Dd->create(array('name'=>'second dd'));
-        $dd3 = &$this->Dd->create(array('name'=>'third dd'));
+        $dd1 = $this->Dd->create(array('name'=>'first dd'));
+        $dd2 = $this->Dd->create(array('name'=>'second dd'));
+        $dd3 = $this->Dd->create(array('name'=>'third dd'));
 
         $cc1->dd->assign($dd1);
         $cc2->dd->assign($dd2);
         $cc3->dd->assign($dd3);
 
-        $ee1 = &$this->Ee->create(array('name'=>'first ee'));
+        $ee1 = $this->Ee->create(array('name'=>'first ee'));
         $ee1->something->set($aa);
-        $ee2 = &$this->Ee->create(array('name'=>'second ee'));
+        $ee2 = $this->Ee->create(array('name'=>'second ee'));
         $ee2->something->set($aa);
-        $ee3 = &$this->Ee->create(array('name'=>'third ee'));
+        $ee3 = $this->Ee->create(array('name'=>'third ee'));
         $ee3->something->set($aa);
-        $ee4 = &$this->Ee->create(array('name'=>'fourth ee'));
+        $ee4 = $this->Ee->create(array('name'=>'fourth ee'));
         $ee4->something->set($aa);
-        $ee5 = &$this->Ee->create(array('name'=>'fifth ee'));
+        $ee5 = $this->Ee->create(array('name'=>'fifth ee'));
         $ee5->something->set($aa);
-        $ee6 = &$this->Ee->create(array('name'=>'sixth ee'));
+        $ee6 = $this->Ee->create(array('name'=>'sixth ee'));
         $ee6->something->set($aa);
 
         $first_ee_group = array($ee1,$ee2);
@@ -457,6 +453,5 @@ class AkActiveRecord_nested_finders_TestCase extends  AkUnitTest
 
 }
 
-ak_test('AkActiveRecord_nested_finders_TestCase',true);
+ak_test_run_case_if_executed('ActiveRecord_nested_finders_TestCase');
 
-?>

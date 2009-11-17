@@ -1,13 +1,12 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiveRecord_i18n extends  AkUnitTest
+class ActiveRecord_i18n_TestCase extends  AkUnitTest
 {
     public function test_start()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Article'));
     }
 
@@ -51,7 +50,7 @@ class test_AkActiveRecord_i18n extends  AkUnitTest
 
         $this->assertTrue($Article->save());
 
-        $Article =& $Article->find($Article->getId());
+        $Article = $Article->find($Article->getId());
         $this->assertEqual($Article->get('en_headline'), 'New PHP Framework re-released');
         $this->assertEqual($Article->get('es_body'), 'Un equipo de programadores españoles ha re-lanzado un entorno de desarrollo para PHP...');
         $this->assertEqual($Article->get('en_excerpt_limit'), 7);
@@ -61,7 +60,7 @@ class test_AkActiveRecord_i18n extends  AkUnitTest
     public function test_multilingual_getting_an_specific_locale()
     {
         $Article = new Article();
-        $this->assertTrue($Article =& $Article->findFirstBy('en_headline', 'New PHP Framework released'));
+        $this->assertTrue($Article = $Article->findFirstBy('en_headline', 'New PHP Framework released'));
 
         $this->assertEqual($Article->get('excerpt_limit', 'en'), 7);
         $this->assertEqual($Article->get('excerpt_limit', 'es'), 3);
@@ -93,6 +92,5 @@ class test_AkActiveRecord_i18n extends  AkUnitTest
     }
 }
 
-ak_test('test_AkActiveRecord_i18n',true);
+ak_test_run_case_if_executed('ActiveRecord_i18n_TestCase');
 
-?>

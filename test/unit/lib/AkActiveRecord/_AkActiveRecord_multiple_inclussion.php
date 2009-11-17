@@ -1,14 +1,12 @@
 <?php
 
-defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
+class ActiveRecord_multiple_inclussion_TestCase extends  AkUnitTest
 {
     public function test_start()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('File', 'Tag','Tagging'));
     }
 
@@ -18,7 +16,7 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
         $AkelosLogFile = new File(array('name'=>'akelos.log'));
         $this->assertTrue($AkelosLogFile->save());
 
-        $LogTag =& $AkelosLogFile->tag->create(array('name'=>'logs'));
+        $LogTag = $AkelosLogFile->tag->create(array('name'=>'logs'));
 
         $KasteLogFile = new File(array('name'=>'kaste.log'));
         $this->assertTrue($KasteLogFile->save());
@@ -35,7 +33,7 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
         $ids = array($AkelosLogFile->getId(), $KasteLogFile->getId(), $BermiLogFile->getId());
 
         $File = new File();
-        $Files =& $File->find($ids, array(
+        $Files = $File->find($ids, array(
         'include'=>array('tags', 'taggings')
         ));
 
@@ -49,7 +47,7 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
         }
 
         $File = new File();
-        $this->assertTrue($Files =& $File->find($ids, array(
+        $this->assertTrue($Files = $File->find($ids, array(
         'conditions'=>"name = 'kaste.log'"
         )));
         $this->assertEqual($Files[0]->name, 'kaste.log');
@@ -58,14 +56,14 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
          * @todo Implement eager loading for second-level associations
          */
         $File = new File();
-        $Files =& $File->find('all', array(
+        $Files = $File->find('all', array(
         'include'=>array('taggings')
         ));
 
         foreach (array_keys($Files) as $k){
-            $File =& $Files[$k];
+            $File = $Files[$k];
             foreach (array_keys($File->taggings) as $l){
-                $Tagging =& $File->taggings[$l];
+                $Tagging = $File->taggings[$l];
                 $Tagging->tag->load();
                 $this->assertEqual($Tagging->tag->name, $LogTag->name);
                 $this->assertEqual($Tagging->tag_id, $LogTag->id);
@@ -75,7 +73,7 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
         /**
          * @todo Implement eager loading for second-level associations
          */
-        $Files =& $File->find('all', array(
+        $Files = $File->find('all', array(
         'include'=>array('tags')
         ));
 
@@ -90,7 +88,7 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
         }
 
         $File = new File();
-        $Files =& $File->find('all', array('include'=>array('tags')));
+        $Files = $File->find('all', array('include'=>array('tags')));
 
         $tag_ids = array();
         foreach ($Files as $File){
@@ -100,13 +98,13 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
         }
 
         $Tag = new Tag();
-        $Tags =& $Tag->find($tag_ids, array('include'=>'taggings'));
+        $Tags = $Tag->find($tag_ids, array('include'=>'taggings'));
 
         foreach (array_keys($Files) as $k){
             foreach (array_keys($Files[$k]->tags) as $m){
                 foreach (array_keys($Tags) as $n){
                     if($Tags[$n]->id == $Files[$k]->tags[$m]->id){
-                        $Files[$k]->tags[$m]->taggings =& $Tags[$n]->taggings;
+                        $Files[$k]->tags[$m]->taggings = $Tags[$n]->taggings;
                     }
                 }
             }
@@ -115,6 +113,5 @@ class test_AkActiveRecord_multiple_inclussion extends  AkUnitTest
     }
 }
 
-ak_test('test_AkActiveRecord_multiple_inclussion',true);
+ak_test_run_case_if_executed('ActiveRecord_multiple_inclussion_TestCase');
 
-?>

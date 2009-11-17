@@ -1,15 +1,14 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_PostgreSQL_datatype_migration extends AkUnitTest
+class ActiveRecord_postgre_sql_datatype_migration_TestCase extends AkUnitTest
 {
     public $WeHaveAPostgreSqlEnvironment;
 
     public function test_init()
     {
-        $this->db =& Ak::db();
+        $this->db = Ak::db();
         $this->WeHaveAPostgreSqlEnvironment = $this->db->type() === 'postgre';
     }
 
@@ -104,5 +103,4 @@ class test_PostgreSQL_datatype_migration extends AkUnitTest
 
 }
 
-ak_test('test_PostgreSQL_datatype_migration',true);
-?>
+ak_test_run_case_if_executed('ActiveRecord_postgre_sql_datatype_migration_TestCase');

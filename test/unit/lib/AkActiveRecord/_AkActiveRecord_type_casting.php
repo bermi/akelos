@@ -1,14 +1,12 @@
 <?php
 
-defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiveRecord_type_casting extends  AkUnitTest
+class ActiveRecord_type_casting_TestCase extends  AkUnitTest
 {
     public function test_start()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Tag','Post'));
     }
 
@@ -22,7 +20,7 @@ class test_AkActiveRecord_type_casting extends  AkUnitTest
         $Tag->setAttributes(array('score' => '0'));
         $this->assertTrue($Tag->save());
 
-        $Tag =& $Tag->find($Tag->id);
+        $Tag = $Tag->find($Tag->id);
         $this->assertIdentical($Tag->get('score'), 0);
 
     }
@@ -68,7 +66,7 @@ class test_AkActiveRecord_type_casting extends  AkUnitTest
         $this->installAndIncludeModels(array('Post'));
 
         $params = array('title'=>'An empty date is a null date','posted_on(1i)'=>'','posted_on(2i)'=>'','posted_on(3i)'=>'');
-        $MyPost =& $this->Post->create($params);
+        $MyPost = $this->Post->create($params);
 
         $MyPost->reload();
         $this->assertNull($MyPost->posted_on);
@@ -98,6 +96,4 @@ class test_AkActiveRecord_type_casting extends  AkUnitTest
     }
 }
 
-ak_test('test_AkActiveRecord_type_casting',true);
-
-?>
+ak_test_run_case_if_executed('ActiveRecord_type_casting_TestCase');

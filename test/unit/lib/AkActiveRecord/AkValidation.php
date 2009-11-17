@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiveRecord_validators extends  AkUnitTest
+class ActiveRecord_validations_TestCase extends  AkUnitTest
 {
     public function test_start()
     {
@@ -375,10 +375,10 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
     public function Test_of_validatesUniquenessOf()
     {
-        $Person = new TestPerson('user_name' =>'bermi','first_name' =>'Bermi','last_name' =>'Ferrer','country' =>'ES','tos->',1);
+        $Person = new TestPerson(array('user_name' =>'bermi','first_name' =>'Bermi','last_name' =>'Ferrer','country' =>'ES','tos' => 1));
         $this->assertTrue($Person->save());
 
-        $Person = new TestPerson('user_name' =>'bermi','first_name' =>'Bermi','last_name' =>'Ferrer');
+        $Person = new TestPerson(array('user_name' =>'bermi','first_name' =>'Bermi','last_name' =>'Ferrer'));
         $Person->validatesUniquenessOf("user_name");
         $this->assertTrue($Person->hasErrors());
 
@@ -392,11 +392,11 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $Person->validatesUniquenessOf("user_name",array('scope'=>'country'));
         $this->assertFalse($Person->hasErrors());
 
-        $Person = new TestPerson('user_name' =>'bermi','first_name' =>'Bermi','last_name' =>'Ferrer','country' =>'US');
+        $Person = new TestPerson(array('user_name' =>'bermi','first_name' =>'Bermi','last_name' =>'Ferrer','country' =>'US'));
         $Person->validatesUniquenessOf("user_name",array('scope'=>'country'));
         $this->assertFalse($Person->hasErrors());
 
-        $Person = new TestPerson('user_name' =>'bermi','first_name' =>'Bermi','last_name' =>'Ferrer','country' =>'ES');
+        $Person = new TestPerson(array('user_name' =>'bermi','first_name' =>'Bermi','last_name' =>'Ferrer','country' =>'ES'));
         $Person->validatesUniquenessOf("user_name",array('scope'=>'country'));
         $this->assertTrue($Person->hasErrors());
 
@@ -404,14 +404,14 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
     public function Test_of_validatesUniquenessOfUsingMultipleScopes()
     {
-        $Person = new TestPerson('user_name' =>'admin','first_name' =>'Sam','last_name->','','country' =>'ES','tos->',1);
+        $Person = new TestPerson(array('user_name' =>'admin','first_name' =>'Sam','last_name->','','country' =>'ES','tos' => 1));
         $this->assertTrue($Person->save());
 
-        $Person = new TestPerson('user_name' =>'admin','first_name' =>'Sam','last_name->','','country' =>'FR','tos->',1);
+        $Person = new TestPerson(array('user_name' =>'admin','first_name' =>'Sam','last_name->','','country' =>'FR','tos' => 1));
         $Person->validatesUniquenessOf("user_name",array('scope'=>'first_name'));
         $this->assertTrue($Person->hasErrors());
 
-        $Person = new TestPerson('user_name' =>'admin','first_name' =>'Sam','last_name->','','country' =>'FR','tos->',1);
+        $Person = new TestPerson(array('user_name' =>'admin','first_name' =>'Sam','last_name->','','country' =>'FR','tos' => 1));
         $Person->validatesUniquenessOf("user_name",array('scope'=>array('first_name','country')));
         $this->assertFalse($Person->hasErrors());
 
@@ -419,14 +419,14 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
     public function Test_of_validatesUniquenessOfConditionally()
     {
-        $Person = new TestPerson('user_name' =>'james','first_name' =>'James','last_name->','','country' =>'ES','tos->',1);
+        $Person = new TestPerson(array('user_name' =>'james','first_name' =>'James','last_name->','','country' =>'ES','tos' => 1));
         $this->assertTrue($Person->save());
 
-        $Person = new TestPerson('user_name' =>'james','first_name' =>'James','last_name->','','country' =>'ES','tos->',1);
+        $Person = new TestPerson(array('user_name' =>'james','first_name' =>'James','last_name->','','country' =>'ES','tos' => 1));
         $Person->validatesUniquenessOf("user_name");
         $this->assertTrue($Person->hasErrors());
 
-        $Person = new TestPerson('user_name' =>'james','first_name' =>'James','last_name->','','country' =>'ES','tos->',1);
+        $Person = new TestPerson(array('user_name' =>'james','first_name' =>'James','last_name->','','country' =>'ES','tos' => 1));
         $Person->force_validation = false;
         $Person->validatesUniquenessOf("user_name", array('if'=>'$this->force_validation'));
         $this->assertFalse($Person->hasErrors());
@@ -684,11 +684,11 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
     public function Test_of_validateOnCreate()
     {
-        $Person = new TestPerson('user_name' =>'hilario','first_name' =>'Hilario','last_name' =>'Hervás','country' =>'ES','tos->',1);
+        $Person = new TestPerson(array('user_name' =>'hilario','first_name' =>'Hilario','last_name' =>'Hervás','country' =>'ES','tos'=>1));
         $Person->validateOnCreate();
         $this->assertFalse($Person->hasErrors());
 
-        $Person = new TestPerson('user_name' =>'hilario','first_name' =>'Hilario','last_name' =>'Hervás','country' =>'ES');
+        $Person = new TestPerson(array('user_name' =>'hilario','first_name' =>'Hilario','last_name' =>'Hervás','country' =>'ES'));
         $Person->validateOnCreate();
         $this->assertEqual($Person->getErrorsOn('tos'),$Person->_defaultErrorMessages['accepted']);
         $this->assertFalse($Person->save());
@@ -696,11 +696,11 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
     public function Test_of_validateOnUpdate()
     {
-        $Person = new TestPerson('email' =>'email@example.com');
+        $Person = new TestPerson(array('email' =>'email@example.com'));
         $Person->validateOnUpdate();
         $this->assertFalse($Person->hasErrors());
 
-        $Person = new TestPerson('user_name' =>'hilario','first_name' =>'Hilario','last_name' =>'Hervás','country' =>'ES');
+        $Person = new TestPerson(array('user_name' =>'hilario','first_name' =>'Hilario','last_name' =>'Hervás','country' =>'ES'));
         $Person->validateOnUpdate();
         $this->assertEqual($Person->getErrorsOn('email'),$Person->_defaultErrorMessages['blank']);
     }
@@ -708,18 +708,18 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
     public function Test_of_validate()
     {
-        $Person = new TestPerson('first_name' =>'Alicia');
+        $Person = new TestPerson(array('first_name' =>'Alicia'));
         $Person->validate();
         $this->assertFalse($Person->hasErrors());
 
-        $Person = new TestPerson('last_name' =>'Sadurní','country' =>'ES');
+        $Person = new TestPerson(array('last_name' =>'Sadurní','country' =>'ES'));
         $Person->validate();
         $this->assertEqual($Person->getErrorsOn('first_name'),$Person->_defaultErrorMessages['blank']);
     }
 
     public function Test_of_isValid()
     {
-        $Person = new TestPerson('country' =>'ES');
+        $Person = new TestPerson(array('country' =>'ES'));
         $this->assertFalse($Person->isValid());
         $this->assertEqual($Person->getErrors(), array('first_name' => array("can't be blank"),'tos' =>array("must be accepted")));
 
@@ -733,7 +733,7 @@ class test_AkActiveRecord_validators extends  AkUnitTest
 
     public function Test_of_validatesAssociated()
     {
-        $Picture = new Picture('title' =>'Carlet');
+        $Picture = new Picture(array('title' =>'Carlet'));
 
         $Landlord = new Landlord();
         $Landlord->test_validators = array('validatesPresenceOf'=>array('name'));
@@ -744,11 +744,6 @@ class test_AkActiveRecord_validators extends  AkUnitTest
         $this->assertEqual($Picture->getErrorsOn('landlord'),$Picture->_defaultErrorMessages['invalid']);
     }
 
-
-
 }
 
-ak_test('test_AkActiveRecord_validators',true);
-
-
-?>
+ak_test_run_case_if_executed('ActiveRecord_validations_TestCase');

@@ -1,25 +1,19 @@
 <?php
 
-defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class AkActiveRecord_find_TestCase extends AkUnitTest
+class ActiveRecord_find_TestCase extends AkUnitTest
 {
-
-    /**
-     * @var ActiveRecord
-     */
     public $Hybrid;
 
     public function setUp()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Hybrid'=>'id,name'));
         Mock::generate('AkDbAdapter');
         $Db = new MockAkDbAdapter();
         $Db->setReturnValue('select',array());
-        $this->Db =& $Db;
+        $this->Db = $Db;
         $this->Hybrid->setConnection($Db);
     }
 
@@ -37,7 +31,5 @@ class AkActiveRecord_find_TestCase extends AkUnitTest
 
 }
 
-ak_test('AkActiveRecord_find_TestCase',true);
+ak_test_run_case_if_executed('ActiveRecord_find_TestCase');
 
-
-?>

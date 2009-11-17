@@ -1,13 +1,12 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiveRecord_to_formats extends  AkUnitTest
+class ActiveRecord_to_formats_TestCase extends  AkUnitTest
 {
-
     public function setup()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Person','Account'));
     }
     public function test_simple_xml()
@@ -32,7 +31,7 @@ EOX;
     }
     public function test_with_relations_xml()
     {
-        $person = &$this->Person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
+        $person = $this->Person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
         $person_created_at = $person->created_at;
         $person->account->create(array('username'=>'hansi','password'=>'wilma'));
         $account_created_at = $person->account->created_at;
@@ -67,10 +66,10 @@ EOX;
     public function test_collection_and_back_xml()
     {
         $person = new Person();
-        $p1=&$person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
+        $p1=$person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
         $p1->account->create(array('username'=>'hansi','password'=>'wilma'));
         $person2 = new Person();
-        $p2=&$person2->create(array('first_name'=>'Friedrich','last_name'=>'Holz','email'=>'friedel@holz.de'));
+        $p2=$person2->create(array('first_name'=>'Friedrich','last_name'=>'Holz','email'=>'friedel@holz.de'));
         $p2->account->create(array('username'=>'friedrich','password'=>'wilma'));
 
         $xml = $person->toXml(array('collection'=>array($p1,$p2),'include'=>'account'));
@@ -121,9 +120,9 @@ EOX;
     public function test_collection_and_back_json()
     {
         $person = new Person();
-        $p1=&$person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
+        $p1=$person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
         $p1->account->create(array('username'=>'hansi','password'=>'wilma'));
-        $p2=&$person->create(array('first_name'=>'Friedrich','last_name'=>'Holz','email'=>'friedel@holz.de'));
+        $p2=$person->create(array('first_name'=>'Friedrich','last_name'=>'Holz','email'=>'friedel@holz.de'));
         $p2->account->create(array('username'=>'hansi','password'=>'wilma'));
 
 
@@ -139,7 +138,7 @@ EOX;
     }
     public function test_with_relations_json()
     {
-        $person = &$this->Person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
+        $person = $this->Person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
         $person_created_at = $person->created_at;
         $person->account->create(array('username'=>'hansi','password'=>'wilma'));
         $account_created_at = $person->account->created_at;
@@ -153,9 +152,8 @@ EOX;
         $this->assertEqual($person->first_name,$person_reloaded->first_name);
         $this->assertEqual($person->last_name,$person_reloaded->last_name);
         $this->assertEqual($person->account->id,$person_reloaded->account->id);
-}
+    }
 }
 
-ak_test('test_AkActiveRecord_to_formats',true);
+ak_test_run_case_if_executed('ActiveRecord_to_formats_TestCase');
 
-?>

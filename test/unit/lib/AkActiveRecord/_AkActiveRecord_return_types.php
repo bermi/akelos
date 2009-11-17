@@ -1,15 +1,20 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-
-class test_AkActiveRecord_return_types extends  AkUnitTest
+class ActiveRecord_return_types_TestCase extends  AkUnitTest
 {
     public function setup()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Aa', 'Bb', 'Cc','Dd', 'Ee'));
+    }
+
+    public function tearDown()
+    {
+        foreach (explode(',', 'aa_ee,bb_cc,dd_ee') as $file){
+            @Ak::file_delete(AkConfig::getDir('models').DS.$file.'.php');
+        }
     }
 
     public function test_normal_find_without_association_return_array()
@@ -43,7 +48,7 @@ class test_AkActiveRecord_return_types extends  AkUnitTest
         $aa1 = $this->Aa->create(array('name'=>'first aa'));
         $aa2 = $this->Aa->create(array('name'=>'second aa'));
 
-        $returned=$this->Aa->findAll(array('returns'=>'simulated'));
+        $returned=$this->Aa->findAll(array('returns'=>'simulated', 'order'=>'id ASC'));
         $this->assertTrue($returned);
         $this->assertEqual(2, count($returned));
         $this->assertIsA($returned[0],'AkActiveRecordMock');
@@ -51,6 +56,9 @@ class test_AkActiveRecord_return_types extends  AkUnitTest
         $this->assertEqual($aa2->getId(), $returned[1]->getId());
         $this->assertEqual($aa2->getPrimaryKey(), $returned[1]->getPrimaryKey());
 
+    }} ak_test_run_case_if_executed('ActiveRecord_return_types_TestCase'); return ;
+
+    ?>
         $returned=$this->Aa->findAll(array('returns'=>'simulated', 'order'=>'name DESC'));
         $this->assertTrue($returned);
         $this->assertEqual(2, count($returned));
@@ -171,6 +179,5 @@ class test_AkActiveRecord_return_types extends  AkUnitTest
     }
 }
 
-ak_test('test_AkActiveRecord_return_types', true);
+ak_test_run_case_if_executed('ActiveRecord_return_types_TestCase');
 
-?>

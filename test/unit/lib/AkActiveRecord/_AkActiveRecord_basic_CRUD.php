@@ -1,12 +1,12 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_ActiveRecord_basic_CRUD_Operation extends AkUnitTest
+class ActiveRecord_basic_CRUD_Operations_TestCase extends AkUnitTest
 {
     public function _test_should_return_false_when_destroy_fails()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels('Post');
 
         $Post = new Post(array('title'=>'A Title'));
@@ -42,6 +42,4 @@ class test_ActiveRecord_basic_CRUD_Operation extends AkUnitTest
     }
 }
 
-ak_test('test_ActiveRecord_basic_CRUD_Operation',true);
-
-?>
+ak_test_run_case_if_executed('ActiveRecord_basic_CRUD_Operations_TestCase');

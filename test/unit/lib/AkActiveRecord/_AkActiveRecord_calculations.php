@@ -1,11 +1,8 @@
 <?php
 
-defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiveRecord_calculations extends  AkUnitTest
+class ActiveRecord_calculations_TestCase extends  AkUnitTest
 {
     public function test_start()
     {
@@ -121,6 +118,5 @@ class test_AkActiveRecord_calculations extends  AkUnitTest
 
 }
 
-ak_test('test_AkActiveRecord_calculations',true);
+ak_test_run_case_if_executed('ActiveRecord_calculations_TestCase');
 
-?>
