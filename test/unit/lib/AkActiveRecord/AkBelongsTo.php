@@ -1,21 +1,15 @@
 <?php
 
-if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
-    define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION',false);
-}
-
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
+class BelongsTo_TestCase extends  AkUnitTest
 {
-    /**/
     public function test_start()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'Person', 'Account'));
     }
 
-    /**/
     public function test_for_single_has_one_association()
     {
         $Picture = new Picture(array('title'=>'The Bermi Labs Team at SIMO'));
@@ -147,7 +141,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
         $this->assertEqual($Thumbnail->picture->getType(), 'Picture');
         $this->assertEqual($Thumbnail->picture->title, 'The Bermi Labs Team at Carlet');
 
-        $Alicia = $Thumbnail->create('caption' =>'Alicia');
+        $Alicia = $Thumbnail->create(array('caption' =>'Alicia'));
         $this->assertTrue(!$Alicia->isNewRecord());
 
         $this->assertEqual($Alicia->picture->getType(), 'belongsTo');
@@ -244,26 +238,26 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
 
     public function test_primary_key_setting()
     {
-        $Hilario = new Person('first_name' =>'Hilario','last_name' =>'Hervás','email' =>'hilario@example.com');
-        $Jose = new Person('first_name' =>'Jose','last_name' =>'Salavert','email' =>'salavert@example.com');
-        $Vero = new Person('first_name' =>'Vero','last_name' =>'Machí','email' =>'vero@example.com');
-        $Bermi = new Person('first_name' =>'Bermi','last_name' =>'Ferrer','email' =>'bermi@example.com');
+        $Hilario = new Person(array('first_name' =>'Hilario','last_name' =>'Hervás','email' =>'hilario@example.com'));
+        $Jose = new Person(array('first_name' =>'Jose','last_name' =>'Salavert','email' =>'salavert@example.com'));
+        $Vero = new Person(array('first_name' =>'Vero','last_name' =>'Machí','email' =>'vero@example.com'));
+        $Bermi = new Person(array('first_name' =>'Bermi','last_name' =>'Ferrer','email' =>'bermi@example.com'));
 
         $this->assertTrue($Hilario->save() && $Bermi->save());
 
-        $BermisAccount = new Account('username' =>'bermi','password' =>'pass');
+        $BermisAccount = new Account(array('username' =>'bermi','password' =>'pass'));
         $Bermi->account->assign($BermisAccount);
 
         $this->assertEqual($BermisAccount->person_id,$Bermi->id);
 
-        $SalavertsAccount = new Account('username' =>'salavert','password' =>'pass');
+        $SalavertsAccount = new Account(array('username' =>'salavert','password' =>'pass'));
         $Jose->account->assign($SalavertsAccount);
 
         $Jose->save();
 
         $this->assertEqual($SalavertsAccount->person_id,$Jose->id);
 
-        $VerosAccount = new Account('username' =>'vero','password' =>'pass');
+        $VerosAccount = new Account(array('username' =>'vero','password' =>'pass'));
 
         $this->assertTrue($VerosAccount->save());
 
@@ -272,7 +266,7 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
         $VerosAccount->save();
         $this->assertEqual($VerosAccount->person_id, $Vero->id);
 
-        $HilariosAccount = new Account('username' =>'hilario','password' =>'pass');
+        $HilariosAccount = new Account(array('username' =>'hilario','password' =>'pass'));
         $Hilario->account->assign($HilariosAccount);
         $Hilario->save();
 
@@ -322,12 +316,12 @@ class test_AkActiveRecord_belongsTo_Associations extends  AkUnitTest
 
     }
 
+    public function test_cleanup()
+    {
+        @Ak::file_delete(AkConfig::getDir('models').DS.'group_user.php');
+    }
 
-    /**/
 }
 
+ak_test_run_case_if_executed('BelongsTo_TestCase');
 
-ak_test('test_AkActiveRecord_belongsTo_Associations', true);
-
-
-?>

@@ -1,17 +1,12 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
-
-
-class test_AkActiveRecord_observer extends  AkUnitTest
+class ActiveRecord_observer_TestCase extends  AkUnitTest
 {
-
     public function test_start()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array(
         'ObservedAccount'=>'id, balance, created_at, updated_at',
         'ObservedPerson'=>'id, user_name, first_name, last_name, city, state'));
@@ -89,7 +84,7 @@ class test_AkActiveRecord_observer extends  AkUnitTest
 
     public function Test_of_default_Active_record_observer_triggers()
     {
-        $ObservedPerson = new ObservedPerson('first_name' =>'Bermi');
+        $ObservedPerson = new ObservedPerson(array('first_name' =>'Bermi'));
 
         $this->assertTrue(empty($ObservedPerson->audited));
         ob_start();
@@ -135,6 +130,5 @@ class test_AkActiveRecord_observer extends  AkUnitTest
 
 }
 
-ak_test('test_AkActiveRecord_observer', true);
+ak_test_run_case_if_executed('ActiveRecord_observer_TestCase');
 
-?>

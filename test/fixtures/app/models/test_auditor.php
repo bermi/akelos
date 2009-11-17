@@ -1,7 +1,7 @@
 <?php
-    class TestAuditor extends AkObserver 
-    { 
-        public function update($state)
+    class TestAuditor extends AkObserver
+    {
+        public function update($state = '')
         {
             switch ($state)
             {
@@ -12,7 +12,7 @@
                 break;
             }
         }
-        
+
         public function afterCreate(&$record)
         {
             $record->audited = true;

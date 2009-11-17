@@ -8,10 +8,7 @@
 * @package ActiveRecord
 * @subpackage Behaviours
 * @author Bermi Ferrer <bermi a.t bermilabs c.om>
-* @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
 */
-
-require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
 
 /**
 * This act provides the capabilities for sorting and reordering a number of objects in list.
@@ -57,7 +54,7 @@ class AkActsAsList extends AkObserver
     public $_ActiveRecordInstance;
     public function AkActsAsList(&$ActiveRecordInstance)
     {
-        $this->_ActiveRecordInstance =& $ActiveRecordInstance;
+        $this->_ActiveRecordInstance = $ActiveRecordInstance;
     }
 
     public function init($options = array())
@@ -70,13 +67,13 @@ class AkActsAsList extends AkObserver
     public function _ensureIsActiveRecordInstance(&$ActiveRecordInstance)
     {
         if(is_object($ActiveRecordInstance) && method_exists($ActiveRecordInstance,'actsLike')){
-            $this->_ActiveRecordInstance =& $ActiveRecordInstance;
+            $this->_ActiveRecordInstance = $ActiveRecordInstance;
             if(!$this->_ActiveRecordInstance->hasColumn($this->column)){
                 trigger_error(Ak::t('Could not find the column "%column" into the table "%table". This column is needed in order to make "%model" act as a list.',array('%column'=>$this->column,'%table'=>$this->_ActiveRecordInstance->getTableName(),'%model'=>$this->_ActiveRecordInstance->getModelName())),E_USER_ERROR);
                 unset($this->_ActiveRecordInstance->list);
                 return false;
             }else {
-                $this->observe(&$ActiveRecordInstance);
+                $this->observe($ActiveRecordInstance);
             }
         }else{
             trigger_error(Ak::t('You are trying to set an object that is not an active record.'), E_USER_ERROR);
@@ -358,13 +355,13 @@ class AkActsAsList extends AkObserver
     public function getScopeCondition()
     {
         if (!empty($this->variable_scope_condition)){
-            return $this->_ActiveRecordInstance->_getVariableSqlCondition($this->variable_scope_condition);
+            return $this->_ActiveRecordInstance->getVariableSqlCondition($this->variable_scope_condition);
 
             // True condition in case we don't have a scope
         }elseif(empty($this->scope_condition) && empty($this->scope)){
             $this->scope_condition = ($this->_ActiveRecordInstance->_db->type() == 'postgre') ? 'true' : '1';
         }elseif (!empty($this->scope)){
-            $this->setScopeCondition(join(' AND ',array_map(array(&$this,'getScopedColumn'),(array)$this->scope)));
+            $this->setScopeCondition(join(' AND ',array_map(array($this,'getScopedColumn'),(array)$this->scope)));
         }
         return  $this->scope_condition;
     }
@@ -391,4 +388,3 @@ class AkActsAsList extends AkObserver
     }
 }
 
-?>

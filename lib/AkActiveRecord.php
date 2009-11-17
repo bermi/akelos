@@ -1303,7 +1303,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      *
      * @return string
      */
-    protected function _getVariableSqlCondition($variable_condition)
+    public function getVariableSqlCondition($variable_condition)
     {
         $query_values = array();
         list($sql, $requested_columns) = $this->_getFindBySqlAndColumns($variable_condition, $query_values);

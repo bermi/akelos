@@ -1,7 +1,7 @@
 <?php
-    class ObservedPersonObserver extends AkObserver 
+    class ObservedPersonObserver extends AkObserver
     {
-        public function update($state)
+        public function update($state = '')
         {
             switch ($state)
             {
@@ -12,13 +12,13 @@
                 break;
             }
         }
-        
+
         public function afterCreate(&$record)
         {
             echo $record->get("first_name")." has been email with account details";
             $this->logNotified($record,__FUNCTION__);
         }
-        
+
         public function afterSave(&$record){$this->logNotified($record,__FUNCTION__);}
         public function afterValidationOnCreate(&$record){$this->logNotified($record,__FUNCTION__);}
         public function afterValidationOnUpdate(&$record){$this->logNotified($record,__FUNCTION__);}

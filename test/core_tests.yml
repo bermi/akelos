@@ -28,6 +28,10 @@ ActiveRecord:
     - 'AkActiveRecord/_AkActiveRecord_2'
     - 'AkActiveRecord/_AkActiveRecord_3'
     - 'AkActiveRecord/AkHasAndBelongsToMany'
+    - 'AkActiveRecord/AkHasMany'
+    - 'AkActiveRecord/BelongsTo'
+    - 'AkActiveRecord/AkHasOne_specifications'
+    - 'AkActiveRecord/AkObserver'
 
 ActionWebService:
     - 'AkActionWebService/AkActionWebServiceApi'

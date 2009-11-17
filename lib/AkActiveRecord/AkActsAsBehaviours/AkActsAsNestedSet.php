@@ -11,8 +11,6 @@
  * @author Jean-Christophe Michel, Symétrie
  */
 
-require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
-
 class AkActsAsNestedSet extends AkObserver
 {
 
@@ -101,7 +99,7 @@ class AkActsAsNestedSet extends AkObserver
 
     public function AkActsAsNestedSet(&$ActiveRecordInstance)
     {
-        $this->_ActiveRecordInstance =& $ActiveRecordInstance;
+        $this->_ActiveRecordInstance = $ActiveRecordInstance;
     }
 
     public function init($options = array())
@@ -117,7 +115,7 @@ class AkActsAsNestedSet extends AkObserver
     public function _ensureIsActiveRecordInstance(&$ActiveRecordInstance)
     {
         if(is_object($ActiveRecordInstance) && method_exists($ActiveRecordInstance,'actsLike')){
-            $this->_ActiveRecordInstance =& $ActiveRecordInstance;
+            $this->_ActiveRecordInstance = $ActiveRecordInstance;
             if(!$this->_ActiveRecordInstance->hasColumn($this->_parent_column_name) || !$this->_ActiveRecordInstance->hasColumn($this->_left_column_name) || !$this->_ActiveRecordInstance->hasColumn($this->_right_column_name)){
                 trigger_error(Ak::t(
                 'The following columns are required in the table "%table" for the model "%model" to act as a Nested Set: "%columns".',array(
@@ -125,7 +123,7 @@ class AkActsAsNestedSet extends AkObserver
                 unset($this->_ActiveRecordInstance->nested_set);
                 return false;
             }else{
-                $this->observe(&$ActiveRecordInstance);
+                $this->observe($ActiveRecordInstance);
             }
         }else{
             trigger_error(Ak::t('You are trying to set an object that is not an active record.'), E_USER_ERROR);
@@ -142,13 +140,13 @@ class AkActsAsNestedSet extends AkObserver
     public function getScopeCondition()
     {
         if (!empty($this->variable_scope_condition)){
-            return $this->_ActiveRecordInstance->_getVariableSqlCondition($this->variable_scope_condition);
+            return $this->_ActiveRecordInstance->getVariableSqlCondition($this->variable_scope_condition);
 
             // True condition in case we don't have a scope
         }elseif(empty($this->scope_condition) && empty($this->scope)){
             $this->scope_condition = ($this->_ActiveRecordInstance->_db->type() == 'postgre') ? 'true' : '1';
         }elseif (!empty($this->scope)){
-            $this->setScopeCondition(join(' AND ',array_map(array(&$this,'getScopedColumn'),(array)$this->scope)));
+            $this->setScopeCondition(join(' AND ',array_map(array($this,'getScopedColumn'),(array)$this->scope)));
         }
         return  $this->scope_condition;
     }
@@ -236,9 +234,9 @@ class AkActsAsNestedSet extends AkObserver
     * other elements in the tree and shift them to the right. Keeping everything
     * balanced.
     */
-    public function addChild( &$child )
+    public function addChild(&$child)
     {
-        $self =& $this->_ActiveRecordInstance;
+        $self = $this->_ActiveRecordInstance;
         $self->reload();
         $child->reload();
         $left_column = $this->getLeftColumnName();
@@ -298,7 +296,7 @@ class AkActsAsNestedSet extends AkObserver
         if(!$this->isChild()){
             $result = false;
         }else{
-            $result =& $this->_ActiveRecordInstance->find(
+            $result = $this->_ActiveRecordInstance->find(
             // str_replace(array_keys($options['conditions']), array_values($this->getSanitizedConditionsArray($options['conditions'])),$pattern);
             'first', array('conditions' => " ".$this->getScopeCondition()." AND ".$this->_ActiveRecordInstance->getPrimaryKey()." = ".$this->_ActiveRecordInstance->{$this->getParentColumnName()})
             );
@@ -311,7 +309,7 @@ class AkActsAsNestedSet extends AkObserver
     */
     public function &getParents()
     {
-        $Ancestors =& $this->getAncestors();
+        $Ancestors = $this->getAncestors();
         return $Ancestors;
     }
 
@@ -336,7 +334,7 @@ class AkActsAsNestedSet extends AkObserver
 
         if(!empty($ObjectsToDelete)){
             foreach (array_keys($ObjectsToDelete) as $k){
-                $Child =& $ObjectsToDelete[$k];
+                $Child = $ObjectsToDelete[$k];
                 $Child->__avoid_nested_set_before_destroy_recursion = true;
                 if($Child->beforeDestroy()){
                     if($Child->notifyObservers('beforeDestroy') === false){
@@ -361,7 +359,7 @@ class AkActsAsNestedSet extends AkObserver
 
         if(!empty($ObjectsToDelete)){
             foreach (array_keys($ObjectsToDelete) as $k){
-                $Child =& $ObjectsToDelete[$k];
+                $Child = $ObjectsToDelete[$k];
                 $Child->__avoid_nested_set_before_destroy_recursion = true;
                 if(!$Child->afterDestroy() || $Child->notifyObservers('afterDestroy') === false){
                     $Child->transactionFail();
@@ -421,7 +419,7 @@ class AkActsAsNestedSet extends AkObserver
      */
     public function &getAncestors()
     {
-        $Ancestors =& $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
+        $Ancestors = $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
         $this->getLeftColumnName().' < '.$this->_ActiveRecordInstance->get($this->getLeftColumnName()).' AND '.
         $this->getRightColumnName().' > '.$this->_ActiveRecordInstance->get($this->getRightColumnName())
         ,'order' => $this->getLeftColumnName()));
@@ -433,10 +431,10 @@ class AkActsAsNestedSet extends AkObserver
      */
     public function &getSelfAndAncestors()
     {
-        if($result =& $this->getAncestors()){
+        if($result = $this->getAncestors()){
             array_push($result, $this->_ActiveRecordInstance);
         }else{
-            $result = array(&$this->_ActiveRecordInstance);
+            $result = array($this->_ActiveRecordInstance);
         }
         return $result;
     }
@@ -450,7 +448,7 @@ class AkActsAsNestedSet extends AkObserver
         return $this->_ActiveRecordInstance->find('all', array('conditions' => ' (('.$this->getScopeCondition().' AND '.
         $this->getParentColumnName().' = '.$this->_ActiveRecordInstance->get($this->getParentColumnName()).' AND '.
         $this->_ActiveRecordInstance->getPrimaryKey().' <> '.$this->_ActiveRecordInstance->getId().
-        ($search_for_self&&!$this->_ActiveRecordInstance->isNewRecord()?') OR ('.$this->_ActiveRecordInstance->getPrimaryKey().' = '.$this->_ActiveRecordInstance->quotedId().'))':'))')
+        ($search_for_self && !$this->_ActiveRecordInstance->isNewRecord()?') OR ('.$this->_ActiveRecordInstance->getPrimaryKey().' = '.$this->_ActiveRecordInstance->quotedId().'))':'))')
         ,'order' => $this->getLeftColumnName()));
     }
 
@@ -515,11 +513,11 @@ class AkActsAsNestedSet extends AkObserver
             if(!empty($exclude)){
                 $parent_class_name = get_class($this->_ActiveRecordInstance);
                 foreach (array_keys($exclude) as $k){
-                    $Item =& $exclude[$k];
+                    $Item = $exclude[$k];
                     if($Item instanceof $parent_class_name){
-                        $ItemToExclude =& $Item;
+                        $ItemToExclude = $Item;
                     }else{
-                        $ItemToExclude =& $this->_ActiveRecordInstance->find($Item);
+                        $ItemToExclude = $this->_ActiveRecordInstance->find($Item);
                     }
                     if($ItemSet = $ItemToExclude->nested_set->getFullSet()){
                         foreach (array_keys($ItemSet) as $l){
@@ -588,7 +586,7 @@ class AkActsAsNestedSet extends AkObserver
 
         // load object if node is not an object
         if (is_numeric($target)){
-            $target =& $this->_ActiveRecordInstance->find($target);
+            $target = $this->_ActiveRecordInstance->find($target);
         }
         $_klass = get_class($this->_ActiveRecordInstance);
         if(!$target || !($target instanceof $_klass)){
@@ -678,8 +676,4 @@ class AkActsAsNestedSet extends AkObserver
 
         return true;
     }
-
 }
-
-
-?>

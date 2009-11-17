@@ -1,13 +1,13 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class HasManyTestCase extends AkUnitTest
+class HasMany_TestCase extends AkUnitTest
 {
 
     public function test_start()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType'));
     }
 
@@ -104,16 +104,16 @@ class HasManyTestCase extends AkUnitTest
 
         $this->assertIdentical($Property->picture->count(), 0);
 
-        $Property =& $Property->find('first');
+        $Property = $Property->find('first');
         $this->assertIdentical($Property->picture->count(), 0);
 
-        //$this->assertTrue($Property =& $Property->find('first', array('include'=>'pictures')));
+        //$this->assertTrue($Property = $Property->find('first', array('include'=>'pictures')));
         //$this->assertIdentical($Property->picture->count(), 0);
 
         $Picture = new Picture();
-        $Alicia =& $Picture->create(array('title'=>'Alicia'));
-        $Bermi =& $Picture->create(array('title'=>'Bermi'));
-        $Hilario =& $Picture->create(array('title'=>'Hilario'));
+        $Alicia = $Picture->create(array('title'=>'Alicia'));
+        $Bermi = $Picture->create(array('title'=>'Bermi'));
+        $Hilario = $Picture->create(array('title'=>'Hilario'));
 
         $Property->picture->setByIds(array($Alicia->getId(),$Bermi->getId(),$Hilario->getId()));
 
@@ -121,7 +121,7 @@ class HasManyTestCase extends AkUnitTest
 
         $this->assertTrue($Property->save());
 
-        $this->assertTrue($Property =& $Property->findFirstBy('description', 'Cool house'));
+        $this->assertTrue($Property = $Property->findFirstBy('description', 'Cool house'));
 
         $Property->picture->load();
 
@@ -155,7 +155,7 @@ class HasManyTestCase extends AkUnitTest
 
         $Property = new Property();
 
-        $PoolPicture =& $Property->picture->build(array('title'=>'Pool'));
+        $PoolPicture = $Property->picture->build(array('title'=>'Pool'));
 
         $this->assertReference($PoolPicture, $Property->pictures[0]);
 
@@ -173,13 +173,13 @@ class HasManyTestCase extends AkUnitTest
         $this->assertEqual($MauiEstate->pictures[0]->get('title'), 'Pool');
 
         $Property = new Property(array('description'=>'Villa Altea'));
-        $GardenPicture =& $Property->picture->create(array('title'=>'Garden'));
+        $GardenPicture = $Property->picture->create(array('title'=>'Garden'));
         $this->assertReference($GardenPicture, $Property->pictures[0]);
         $this->assertTrue($GardenPicture->isNewRecord());
 
         $Property = new Property(array('description'=>'Villa Altea'));
         $this->assertTrue($Property->save());
-        $GardenPicture =& $Property->picture->create(array('title'=>'Garden'));
+        $GardenPicture = $Property->picture->create(array('title'=>'Garden'));
         $this->assertReference($GardenPicture, $Property->pictures[0]);
         $this->assertFalse($GardenPicture->isNewRecord());
 
@@ -191,7 +191,7 @@ class HasManyTestCase extends AkUnitTest
     {
         $Property = new Property(array('description'=>'Hollywood Mansion'));
         $this->assertTrue($Property->save());
-        $Pool =& $Property->picture->create(array('title'=>'Pool views'));
+        $Pool = $Property->picture->create(array('title'=>'Pool views'));
         $this->assertReference($Pool, $Property->pictures[0]);
         $this->assertReference($Property, $Property->pictures[0]->property);
     }
@@ -200,7 +200,7 @@ class HasManyTestCase extends AkUnitTest
         $Property = new Property(array('description'=>'Ruins in Matamon'));
         $this->assertTrue($Property->save());
 
-        $South =& $Property->picture->create(array('title'=>'South views'));
+        $South = $Property->picture->create(array('title'=>'South views'));
         $this->assertReference($South, $Property->pictures[0]);
         $this->assertFalse($South->isNewRecord());
 
@@ -234,7 +234,7 @@ class HasManyTestCase extends AkUnitTest
 
         $expected_id = $Post->getId();
 
-        $this->assertTrue($Result =& $Post->find($expected_id, array('include' => array('comments'))));
+        $this->assertTrue($Result = $Post->find($expected_id, array('include' => array('comments'))));
         $this->assertEqual($Result->getId(), $expected_id);
     }
 
@@ -249,7 +249,7 @@ class HasManyTestCase extends AkUnitTest
 
         $expected_id = $Post->getId();
 
-        $this->assertTrue($Result =& $Post->find($expected_id, array('include' => array('comments'), 'conditions' => "name = 'Aditya'")));
+        $this->assertTrue($Result = $Post->find($expected_id, array('include' => array('comments'), 'conditions' => "name = 'Aditya'")));
 
         $this->assertEqual($Result->comments[0]->get('name'), 'Aditya');
     }
@@ -270,7 +270,7 @@ class HasManyTestCase extends AkUnitTest
 
         $Post->comment->setByIds(1,2,3,4,5);
 
-        $this->assertTrue($Post =& $Post->find(10, array('include' => 'comments')));
+        $this->assertTrue($Post = $Post->find(10, array('include' => 'comments')));
 
         // order cannot be guaranteed!
         $expected_ids = array(1,2,3,4,5);              // on my postgreSQL $Post->comment->associated_ids = array(5,4,3,2,1);
@@ -281,31 +281,31 @@ class HasManyTestCase extends AkUnitTest
         $this->assertTrue(empty($expected_ids));
 
         // Comment 10 should exist but unrelated to a post
-        $this->assertTrue($Comment =& $Post->comments[$k]->find(10));
+        $this->assertTrue($Comment = $Post->comments[$k]->find(10));
         $this->assertNull($Comment->get('post_id'));
 
         $Post11->comment->setByIds(array(10,1));
 
-        $this->assertTrue($Comment =& $Comment->find(10));
+        $this->assertTrue($Comment = $Comment->find(10));
         $this->assertEqual($Comment->get('post_id'), 11);
     }
 
     public function test_find_with_include_on_associated_record()
     {
         $this->installAndIncludeModels('Property','Picture','Landlord');
-        $Property =& $this->Property->create(array('description'=>'A Property'));
-        $Picture =& $this->Picture->create(array('title'=>'With a picture'));
-        $Landlord =& $this->Landlord->create(array('name'=>'and a landlord'));
+        $Property = $this->Property->create(array('description'=>'A Property'));
+        $Picture = $this->Picture->create(array('title'=>'With a picture'));
+        $Landlord = $this->Landlord->create(array('name'=>'and a landlord'));
 
         $Picture->landlord->assign($Landlord);
         $Property->picture->add($Picture);
 
-        $Property =& $this->Property->find('first',array('description'=>'A Property'));
-        $Loaded =& $Property->picture->find('all');
+        $Property = $this->Property->find('first',array('description'=>'A Property'));
+        $Loaded = $Property->picture->find('all');
         $this->assertEqual('With a picture',$Loaded[0]->title);
 
-        $Property =& $this->Property->find('first',array('description'=>'A Property'));
-        $Loaded =& $Property->picture->find('all',array('include'=>'landlord'));
+        $Property = $this->Property->find('first',array('description'=>'A Property'));
+        $Loaded = $Property->picture->find('all',array('include'=>'landlord'));
         $this->assertEqual('and a landlord',$Loaded[0]->landlord->name);
     }
     public function xtest_has_many_finder_sql_with_foreign_key_value_replacement()
@@ -334,6 +334,5 @@ class HasManyTestCase extends AkUnitTest
     }
 }
 
-ak_test('HasManyTestCase',true);
+ak_test_run_case_if_executed('HasMany_TestCase');
 
-?>

@@ -19,9 +19,6 @@
  * @copyright Copyright (c) 2006, Raw Ideas Pty Ltd
  */
 
-require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
-
-
 /**
  * acts_as_tree
  *
@@ -110,7 +107,7 @@ class AkActsAsTree extends AkObserver
 
     public function AkActsAsTree(&$ActiveRecordInstance)
     {
-        $this->_ActiveRecordInstance =& $ActiveRecordInstance;
+        $this->_ActiveRecordInstance = $ActiveRecordInstance;
     }
 
     public function init($options = array())
@@ -126,7 +123,7 @@ class AkActsAsTree extends AkObserver
     public function _ensureIsActiveRecordInstance(&$ActiveRecordInstance)
     {
         if(is_object($ActiveRecordInstance) && method_exists($ActiveRecordInstance,'actsLike')){
-            $this->_ActiveRecordInstance =& $ActiveRecordInstance;
+            $this->_ActiveRecordInstance = $ActiveRecordInstance;
             if(!$this->_ActiveRecordInstance->hasColumn($this->_parent_column_name)){
                 trigger_error(Ak::t(
                 'The following columns are required in the table "%table" for the model "%model" to act as a Tree: "%columns".',array(
@@ -134,7 +131,7 @@ class AkActsAsTree extends AkObserver
                 unset($this->_ActiveRecordInstance->tree);
                 return false;
             }else{
-                $this->observe(&$ActiveRecordInstance);
+                $this->observe($ActiveRecordInstance);
             }
         }else{
             trigger_error(Ak::t('You are trying to set an object that is not an active record.'), E_USER_ERROR);
@@ -151,13 +148,13 @@ class AkActsAsTree extends AkObserver
     public function getScopeCondition()
     {
         if (!empty($this->variable_scope_condition)){
-            return $this->_ActiveRecordInstance->_getVariableSqlCondition($this->variable_scope_condition);
+            return $this->_ActiveRecordInstance->getVariableSqlCondition($this->variable_scope_condition);
 
         // True condition in case we don't have a scope
         }elseif(empty($this->scope_condition) && empty($this->scope)){
             $this->scope_condition = ($this->_ActiveRecordInstance->_db->type() == 'postgre') ? 'true' : '1';
         }elseif (!empty($this->scope)){
-            $this->setScopeCondition(join(' AND ',array_diff(array_map(array(&$this,'getScopedColumn'),(array)$this->scope),array(''))));
+            $this->setScopeCondition(join(' AND ',array_diff(array_map(array($this,'getScopedColumn'),(array)$this->scope),array(''))));
         }
         return  $this->scope_condition;
     }
@@ -215,7 +212,7 @@ class AkActsAsTree extends AkObserver
         return !empty($parent_id);
     }
 
-    public function addChild( &$child )
+    public function addChild($child)
     {
         $this->_ActiveRecordInstance->transactionStart();
 
@@ -361,5 +358,3 @@ class AkActsAsTree extends AkObserver
 
 }
 
-
-?>

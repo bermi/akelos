@@ -1,9 +1,8 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkHasMany_Specs_TestCase extends AkUnitTest
+class HasMany_specifications_TestCase extends AkUnitTest
 {
     /**
      * @hasMany    pictures, :dependent => 'destroy'
@@ -18,6 +17,7 @@ class test_AkHasMany_Specs_TestCase extends AkUnitTest
     public $Picture;
     public function setUp()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Property','Picture'));
     }
 
