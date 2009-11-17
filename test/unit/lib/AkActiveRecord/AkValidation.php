@@ -1,17 +1,12 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
-
-require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
-require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
-
 
 class test_AkActiveRecord_validators extends  AkUnitTest
 {
-
     public function test_start()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(
         array('TestPerson'=>
         'id,

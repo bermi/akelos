@@ -1,17 +1,12 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
-    define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-}
-
-class test_AkActiveRecord_actAsTree extends  AkUnitTest
+class ActsAsTree_TestCase extends  AkUnitTest
 {
-
     public function test_start()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array(
         'Category'=>'id, parent_id, description, department string(25)'
         ));
@@ -193,6 +188,5 @@ class test_AkActiveRecord_actAsTree extends  AkUnitTest
 
 }
 
-ak_test('test_AkActiveRecord_actAsTree',true);
+ak_test_run_case_if_executed('ActsAsTree_TestCase');
 
-?>

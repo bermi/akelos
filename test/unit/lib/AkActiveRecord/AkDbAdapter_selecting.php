@@ -1,8 +1,5 @@
 <?php
 
-defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
 class AkDbAdapter_Select_TestCase extends AkUnitTest
@@ -11,7 +8,11 @@ class AkDbAdapter_Select_TestCase extends AkUnitTest
     public function setUp()
     {
         $this->db = new AkDbAdapter(array());  // no conection details, we're using a Mock
+
+        require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb.inc.php');
+
         Mock::generate('ADOConnection');
+
         $connection = new MockADOConnection();
         Mock::generate('ADORecordSet');
         $RecordSet = new MockADORecordSet();
@@ -21,7 +22,7 @@ class AkDbAdapter_Select_TestCase extends AkUnitTest
         $RecordSet->setReturnValueAt(2, 'FetchRow', array('id'=>3,'name'=>'Three'));
         $RecordSet->setReturnValueAt(3, 'FetchRow', array('id'=>4,'name'=>'Four'));
         $connection->setReturnValue('Execute',$RecordSet);
-        $this->db->connection =& $connection;
+        $this->db->connection = $connection;
 
     }
 
@@ -56,6 +57,5 @@ class AkDbAdapter_Select_TestCase extends AkUnitTest
 
 }
 
-ak_test('AkDbAdapter_Select_TestCase',true);
+ak_test_run_case_if_executed('AkDbAdapter_Select_TestCase');
 
-?>

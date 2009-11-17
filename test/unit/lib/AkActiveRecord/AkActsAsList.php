@@ -1,17 +1,12 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
-    define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-}
-
-class AkActiveRecord_actsAsListTestCase extends  AkUnitTest
+class ActsAsList_TestCase extends  AkUnitTest
 {
-
     public function test_AkActiveRecord_actsAsList()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array(
         'TodoItem'=>'id, position int, task text, due_time datetime, created_at, expires datetime, updated_at,new_position int'
         ));
@@ -98,7 +93,7 @@ class AkActiveRecord_actsAsListTestCase extends  AkUnitTest
 
     public function Test_of_getBottomItem_2()
     {
-        $TodoItems = new TodoItem('task' =>'Email Hilario with new product specs','due_time->',Ak::getDate(Ak::time()+(60*60*24*7)));
+        $TodoItems = new TodoItem(array('task' =>'Email Hilario with new product specs','due_time' => Ak::getDate(Ak::time()+(60*60*24*7))));
         $this->assertPattern('/list/',$TodoItems->actsLike());
         $this->assertTrue($TodoItems->isNewRecord());
 
@@ -107,7 +102,7 @@ class AkActiveRecord_actsAsListTestCase extends  AkUnitTest
         $this->assertTrue($getBottomItem = $TodoItems->List->getBottomItem());
         $this->assertEqual($getBottomItem->toString(), $TodoItems->toString());
 
-        $TodoItems = new TodoItem('task' =>'Book COMDEX trip','due_time->',Ak::getDate(Ak::time()+(60*60*24*3)));
+        $TodoItems = new TodoItem(array('task' =>'Book COMDEX trip','due_time' => Ak::getDate(Ak::time()+(60*60*24*3))));
         $this->assertTrue($TodoItems->isNewRecord());
         $this->assertTrue($TodoItems->save());
         $this->assertTrue($getBottomItem = $TodoItems->List->getBottomItem());
@@ -514,10 +509,10 @@ class AkActiveRecord_actsAsListTestCase extends  AkUnitTest
         $this->assertEqual($todo_list[1] , 'Task number 10');
 
 
-        $TodoItems = new TodoItem('task' =>'ship new InmoEasy version');
+        $TodoItems = new TodoItem(array('task' =>'ship new Editam version'));
         $TodoItems->list->insertAtPosition(1);
         $todo_list = $this->_getTodoList();
-        $this->assertEqual($todo_list[1] , 'ship new InmoEasy version');
+        $this->assertEqual($todo_list[1] , 'ship new Editam version');
 
         $TodoItems = new TodoItem(10);
         $TodoItems->list->insertAtPosition(10);
@@ -611,10 +606,8 @@ class AkActiveRecord_actsAsListTestCase extends  AkUnitTest
             $this->assertEqual($ListB->tasks[$k]->get('position'), $k+1);
         }
     }
-    /**//**//**/
 
 }
 
-ak_test('AkActiveRecord_actsAsListTestCase',true);
+ak_test_run_case_if_executed('ActsAsList_TestCase');
 
-?>

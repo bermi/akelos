@@ -1,13 +1,8 @@
 <?php
 
-if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
-    define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION',false);
-}
-
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnitTest
+class BelongsTo_find_include_owner_belongsTo_TestCase extends  AkUnitTest
 {
     /**/
     public function test_start()
@@ -113,7 +108,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         $Child->save();
         $Activity->save();
 
-        $Test = &$Activity->findFirstBy('name','Test',array('conditions'=>'id='.$Activity->getId(),'include'=>array('kid'=>array('conditions'=>'id='.$Child->getId(),'include'=>array('father'=>array('conditions'=>'id='.$Father->getId()))))));
+        $Test = $Activity->findFirstBy('name','Test',array('conditions'=>'id='.$Activity->getId(),'include'=>array('kid'=>array('conditions'=>'id='.$Child->getId(),'include'=>array('father'=>array('conditions'=>'id='.$Father->getId()))))));
         $this->assertEqual($Test->name,'Test');
         $this->assertEqual($Test->kid->name,'Johanna');
         $this->assertEqual($Test->kid->father->name,'Daddy');
@@ -121,7 +116,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         /**
          * binds not working properly
          */
-        $Test = &$Activity->findFirstBy('name','Test',array('conditions'=>'id=?','bind'=>$Test->getId(),'include'=>array('kid'=>array('conditions'=>'id=?','bind'=>$Child->getId(),'include'=>array('father'=>array('conditions'=>'id=?','bind'=>array($Father->getId())))))));
+        $Test = $Activity->findFirstBy('name','Test',array('conditions'=>'id=?','bind'=>$Test->getId(),'include'=>array('kid'=>array('conditions'=>'id=?','bind'=>$Child->getId(),'include'=>array('father'=>array('conditions'=>'id=?','bind'=>array($Father->getId())))))));
         $this->assertEqual($Test->name,'Test');
         $this->assertEqual($Test->kid->name,'Johanna');
         $this->assertEqual($Test->kid->father->name,'Daddy');
@@ -147,7 +142,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         $Child2->save();
         $Activity1->save();
         $Activity2->save();
-        $Test = &$Father->findFirstBy('name','Daddy',array('include'=>array('kid'=>array('order'=>'id ASC','include'=>array('activities'=>array('order'=>'id ASC'))))));
+        $Test = $Father->findFirstBy('name','Daddy',array('include'=>array('kid'=>array('order'=>'id ASC','include'=>array('activities'=>array('order'=>'id ASC'))))));
         $this->assertEqual($Test->name,'Daddy');
         $this->assertEqual($Test->kids[0]->name,'Johanna');
         $this->assertEqual($Test->kids[1]->name,'John');
@@ -196,7 +191,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         $Comment2_1->save();
         $Comment2_2->save();
 
-        $Test = &$User->findFirstBy('name','Arno',array('include'=>array('posts'=>array('order'=>'id ASC','include'=>array('comments'=>array('order'=>'id ASC'))))));
+        $Test = $User->findFirstBy('name','Arno',array('include'=>array('posts'=>array('order'=>'id ASC','include'=>array('comments'=>array('order'=>'id ASC'))))));
 
         $this->assertEqual($Test->name,'Arno');
         $this->assertEqual($Test->posts[0]->title,'Test1');
@@ -209,7 +204,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         /**
          * singular in "post", plural in "comments"
          */
-        $Test = &$User->findFirstBy('name','Arno',array('include'=>array('post'=>array('order'=>'id ASC','include'=>array('comments'=>array('order'=>'id ASC'))))));
+        $Test = $User->findFirstBy('name','Arno',array('include'=>array('post'=>array('order'=>'id ASC','include'=>array('comments'=>array('order'=>'id ASC'))))));
 
         $this->assertEqual($Test->name,'Arno');
         $this->assertEqual($Test->posts[0]->title,'Test1');
@@ -222,7 +217,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         /**
          * plural in "posts", singular in "comment"
          */
-        $Test = &$User->findFirstBy('name','Arno',array('include'=>array('posts'=>array('order'=>'id ASC','include'=>array('comments'=>array('order'=>'id ASC'))))));
+        $Test = $User->findFirstBy('name','Arno',array('include'=>array('posts'=>array('order'=>'id ASC','include'=>array('comments'=>array('order'=>'id ASC'))))));
 
         $this->assertEqual($Test->name,'Arno');
         $this->assertEqual($Test->posts[0]->title,'Test1');
@@ -235,7 +230,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         /**
          * singular in "post", singular in "comment"
          */
-        $Test = &$User->findFirstBy('name','Arno',array('order'=>'id ASC','include'=>array('post'=>array('order'=>'id ASC','include'=>array('comment'=>array('order'=>'id ASC'))))));
+        $Test = $User->findFirstBy('name','Arno',array('order'=>'id ASC','include'=>array('post'=>array('order'=>'id ASC','include'=>array('comment'=>array('order'=>'id ASC'))))));
 
         $this->assertEqual($Test->name,'Arno');
         $this->assertEqual($Test->posts[0]->title,'Test1');
@@ -248,7 +243,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         /**
          * singular in "post", singular in "comment" + test order_statements in parent condition
          */
-        $Test = &$User->findFirstBy('name','Arno',array('order'=>'id , _posts.id, _comments.id ASC','include'=>array('post'=>array('include'=>array('comment')))));
+        $Test = $User->findFirstBy('name','Arno',array('order'=>'id , _posts.id, _comments.id ASC','include'=>array('post'=>array('include'=>array('comment')))));
         //die;
         $this->assertEqual($Test->name,'Arno');
         $this->assertEqual($Test->posts[0]->title,'Test1');
@@ -261,7 +256,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         /**
          * singular in "post", singular in "comment" + test order_statements in parent condition using the handlername
          */
-        $Test = &$User->findFirstBy('name','Arno',array('order'=>'id , _post.id, _comment.id ASC','include'=>array('post'=>array('include'=>array('comment')))));
+        $Test = $User->findFirstBy('name','Arno',array('order'=>'id , _post.id, _comment.id ASC','include'=>array('post'=>array('include'=>array('comment')))));
 
         $this->assertEqual($Test->name,'Arno');
         $this->assertEqual($Test->posts[0]->title,'Test1');
@@ -322,7 +317,7 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
         $Comment2_2->save();
         $Comment3_1->save();
         $Comment3_2->save();
-        $Test = &$User1->findAllBy('name','Arno',array('order'=>'id ASC','include'=>array('posts'=>array('order'=>'id ASC','include'=>array('comments'=>array('order'=>'id ASC'))))));
+        $Test = $User1->findAllBy('name','Arno',array('order'=>'id ASC','include'=>array('posts'=>array('order'=>'id ASC','include'=>array('comments'=>array('order'=>'id ASC'))))));
         //Ak::debug($Test);
         //die;
         $this->assertEqual($Test[0]->email,'no-spam@bermilabs.com');
@@ -360,7 +355,6 @@ class test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo extends  AkUnit
 }
 
 
-ak_test('test_AkActiveRecord_belongsTo_Find_Include_Owner_belongsTo', true);
+ak_test_run_case_if_executed('BelongsTo_find_include_owner_belongsTo_TestCase');
 
 
-?>

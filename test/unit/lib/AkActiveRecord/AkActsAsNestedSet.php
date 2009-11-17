@@ -1,17 +1,12 @@
 <?php
 
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-if(!defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION')){
-    define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-}
-
-class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
+class ActsAsNestedSet_TestCase extends  AkUnitTest
 {
-
     public function test_start()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array(
         'NestedCategory'=>'id,lft int,rgt int,parent_id,description,department string(25)'
         ));
@@ -105,12 +100,12 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
 
     public function test_getRoot()
     {
-        $this->Europe =& $this->Location->create('name' =>'Europe');
+        $this->Europe = $this->Location->create(array('name' =>'Europe'));
 
         $this->assertEqual('Europe',$this->getLocation($this->Location->nested_set->getRoot()));
         $this->assertTrue($this->Europe->nested_set->isRoot());
 
-        $this->Spain =& $this->Location->create('name' =>'Spain');
+        $this->Spain = $this->Location->create(array('name' =>'Spain'));
 
         $this->Europe->nested_set->addChild($this->Spain);
 
@@ -121,13 +116,13 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
 
     public function test_getRoots()
     {
-        $this->Oceania =& $this->Location->create('name' =>'Oceania');
+        $this->Oceania = $this->Location->create(array('name' =>'Oceania'));
         $Roots = $this->Oceania->nested_set->getRoots();
 
         $this->assertEqual('Europe',$Roots[0]->name);
         $this->assertEqual('Oceania',$Roots[1]->name);
 
-        $this->Australia =& $this->Location->create('name' =>'Australia');
+        $this->Australia = $this->Location->create(array('name' =>'Australia'));
         $this->Oceania->nested_set->addChild($this->Australia);
 
         $Roots = $this->Oceania->nested_set->getRoots();
@@ -139,10 +134,10 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
 
     public function test_getAncestors()
     {
-        $this->Valencia =& $this->Location->create('name' =>'Valencia');
+        $this->Valencia = $this->Location->create(array('name' =>'Valencia'));
         $this->Spain->nested_set->addChild($this->Valencia);
 
-        $this->Carlet =& $this->Location->create('name' =>'Carlet');
+        $this->Carlet = $this->Location->create(array('name' =>'Carlet'));
         $this->Valencia->nested_set->addChild($this->Carlet);
 
 
@@ -161,21 +156,22 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
 
     public function test_getSiblings()
     {
-        $this->Gandia =& $this->Location->create('name' =>'Gandia');
-        $this->Alcudia =& $this->Location->create('name' =>'Alcudia');
-        $this->Daimus =& $this->Location->create('name' =>'Daimus');
+        $this->Gandia = $this->Location->create(array('name' =>'Gandia'));
+        $this->Alcudia = $this->Location->create(array('name' =>'Alcudia'));
+        $this->Daimus = $this->Location->create(array('name' =>'Daimus'));
 
         $this->Valencia->nested_set->addChild($this->Gandia);
         $this->Valencia->nested_set->addChild($this->Alcudia);
         $this->Valencia->nested_set->addChild($this->Daimus);
 
-        $this->assertEqual(array('Gandia','Alcudia','Daimus'), array_values($this->Location->collect($this->Carlet->nested_set->getSiblings(),'id','name')));
+        $Siblings = $this->Carlet->nested_set->getSiblings();
+        $this->assertEqual(array('Gandia','Alcudia','Daimus'), array_values($this->Location->collect($Siblings,'id','name')));
 
-        $this->Barcelona =& $this->Location->create('name' =>'Barcelona');
+        $this->Barcelona = $this->Location->create(array('name' =>'Barcelona'));
         $this->Spain->nested_set->addChild($this->Barcelona);
 
-        $this->assertEqual(array('Valencia'), array_values($this->Location->collect($this->Barcelona->nested_set->getSiblings(),'id','name')));
-
+        $Siblings = $this->Barcelona->nested_set->getSiblings();
+        $this->assertEqual(array('Valencia'), array_values($this->Location->collect($Siblings,'id','name')));
     }
 
 
@@ -293,7 +289,7 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
 
         $this->Europe->reload();
         $this->Oceania->reload();
-        $this->World =& $this->Location->create('name' =>'World');
+        $this->World = $this->Location->create(array('name' =>'World'));
         $this->Oceania->nested_set->moveToChildOf($this->World);
         $this->World->reload();
         $this->Europe->nested_set->moveToChildOf($this->World);
@@ -394,6 +390,4 @@ class test_AkActiveRecord_actsAsNestedSet extends  AkUnitTest
 }
 
 
-ak_test('test_AkActiveRecord_actsAsNestedSet',true);
-
-?>
+ak_test_run_case_if_executed('ActsAsNestedSet_TestCase');

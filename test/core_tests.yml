@@ -29,9 +29,18 @@ ActiveRecord:
     - 'AkActiveRecord/_AkActiveRecord_3'
     - 'AkActiveRecord/AkHasAndBelongsToMany'
     - 'AkActiveRecord/AkHasMany'
+    - 'AkActiveRecord/AkHasMany_specifications'
+    - 'AkActiveRecord/AkHasMany_table_inheritance'
+    - 'AkActiveRecord/AkDbAdapter'
+    - 'AkActiveRecord/AkDbAdapter_schema'
+    - 'AkActiveRecord/AkDbAdapter_selecting'
     - 'AkActiveRecord/BelongsTo'
+    - 'AkActiveRecord/AkBelongsTo_Find_Include_Owner_belongsTo'
     - 'AkActiveRecord/AkHasOne_specifications'
     - 'AkActiveRecord/AkObserver'
+    - 'AkActiveRecord/ActsAsList'
+    - 'AkActiveRecord/ActsAsNestedSet'
+    - 'AkActiveRecord/ActsAsTree'
 
 ActionWebService:
     - 'AkActionWebService/AkActionWebServiceApi'

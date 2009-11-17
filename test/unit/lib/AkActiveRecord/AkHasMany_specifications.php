@@ -24,7 +24,7 @@ class HasMany_specifications_TestCase extends AkUnitTest
     public function test_deletion_from_collection_should_destroy_the_active_record()
     {
         $Property = new Property(array('description'=>'This is a Property'));
-        $Picture =& $Property->picture->create(array('title'=>'Front'));
+        $Picture = $Property->picture->create(array('title'=>'Front'));
         $this->assertTrue($Property->save());
 
         $this->assertTrue($Picture instanceof AkActiveRecord);
@@ -39,7 +39,7 @@ class HasMany_specifications_TestCase extends AkUnitTest
     public function test_destroying_should_cascade()
     {
         $Property = new Property(array('description'=>'This is a Property'));
-        $Picture =& $Property->picture->create(array('title'=>'Front'));
+        $Picture = $Property->picture->create(array('title'=>'Front'));
 
         $Property->destroy();
 
@@ -48,6 +48,5 @@ class HasMany_specifications_TestCase extends AkUnitTest
     }
 }
 
-ak_test('test_AkHasMany_Specs_TestCase',true);
+ak_test_run_case_if_executed('HasMany_specifications_TestCase');
 
-?>
