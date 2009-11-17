@@ -39,15 +39,10 @@ class AkAssociatedActiveRecord extends AkBaseModel
     $_associationIds = array(),
     $_associations = array();
 
-    private
-    $__activeRecordObject = false;
-
-
     public function _loadAssociationHandler($association_type)
     {
         if(empty($this->$association_type) && in_array($association_type, array('hasOne','belongsTo','hasMany','hasAndBelongsToMany'))){
             $association_handler_class_name = 'Ak'.ucfirst($association_type);
-            require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkAssociations'.DS.$association_handler_class_name.'.php');
             $this->$association_type = new $association_handler_class_name($this);
         }
         return !empty($this->$association_type);
@@ -664,7 +659,6 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $this->_reindexArray($owner);
             $return = $owner;
         } else if ($returns == 'simulated') {
-            include_once AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php';
             $false = false;
             $return = &$this->_generateStdClasses($simulation_class,$owner, $this->getType(), $false, $false, $config);
         }
@@ -694,7 +688,6 @@ class AkAssociatedActiveRecord extends AkBaseModel
         }
         if(is_array($owner))
         foreach($owner as $id=>$data) {
-            require_once AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkActiveRecordMock.php';
             $id = isset($data[$pk])?$data[$pk]:$id;
             $obj = new $simulation_class($id,$class, $handler_name, $parent);
             if(is_array($data))

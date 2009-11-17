@@ -169,7 +169,7 @@ class AkAssociation extends AkObserver
 
     public function isOwnerAnActiveRecord()
     {
-        return $this->__activeRecordObject;
+        return $this->Owner instanceof AkActiveRecord;
     }
 
 

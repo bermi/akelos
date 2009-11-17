@@ -122,7 +122,7 @@ class AkHasOne extends AkAssociation
         'order' => $this->Owner->$association_id->getAssociationOption('include_order_when_included')
         );
 
-        if(empty($this->Owner->$association_id->__activeRecordObject)){
+        if(!($this->Owner->$association_id instanceof AkActiveRecord)){
             $this->build($association_id, array(), false);
         }
 
@@ -167,7 +167,7 @@ class AkHasOne extends AkAssociation
         'order' => $this->Owner->$association_id->getAssociationOption('include_order_when_included')
         );
         $handler_name = $association_id;
-        if(empty($this->Owner->$association_id->__activeRecordObject)){
+        if(!($this->Owner->$association_id instanceof AkActiveRecord)){
             $this->build($association_id, array(), false);
         }
         $options = array_merge($default_options, $options);
@@ -262,11 +262,11 @@ class AkHasOne extends AkAssociation
     public function &replace($association_id, &$NewAssociated, $dont_save = false)
     {
         $Associated = $this->loadAssociated($association_id);
-        if(!empty($Associated->__activeRecordObject) && !empty($NewAssociated->__activeRecordObject) && $Associated->getId() == $NewAssociated->getId()){
+        if(($Associated instanceof AkActiveRecord) && ($NewAssociated instanceof AkActiveRecord) && $Associated->getId() == $NewAssociated->getId()){
             return $NewAssociated;
         }
 
-        if(!empty($Associated->__activeRecordObject)){
+        if($Associated instanceof AkActiveRecord){
             if ($Associated->getAssociationOption('dependent') && !$dont_save){
                 if(!$Associated->isNewRecord()){
                     $Associated->destroy();
@@ -281,7 +281,7 @@ class AkHasOne extends AkAssociation
 
         $result = false;
 
-        if (!empty($NewAssociated->__activeRecordObject)){
+        if ($NewAssociated instanceof AkActiveRecord){
             if(!$this->Owner->isNewRecord()){
                 $NewAssociated->set($Associated->getAssociationOption('foreign_key'), $this->Owner->getId());
             }
@@ -306,7 +306,7 @@ class AkHasOne extends AkAssociation
         if(!$this->Owner->getId()){
             return $false;
         }
-        if(empty($this->Owner->$association_id->__activeRecordObject)){
+        if(!($this->Owner->$association_id instanceof AkActiveRecord)){
             $this->build($association_id, array(), false);
         }
 
@@ -364,7 +364,7 @@ class AkHasOne extends AkAssociation
         $associated_ids = $object->getAssociatedIds();
 
         foreach ($associated_ids as $associated_id){
-            if(!empty($object->$associated_id->__activeRecordObject)){
+            if($object->$associated_id instanceof AkActiveRecord){
 
                 if(strtolower($object->hasOne->getOption($associated_id, 'class_name')) == strtolower($object->$associated_id->getType())){
                     $object->hasOne->replace($associated_id, $object->$associated_id, false);

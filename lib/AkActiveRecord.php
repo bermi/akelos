@@ -189,8 +189,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     );
 
     private
-    $__ActsLikeAttributes = array(),
-    $__activeRecordObject = true;
+    $__ActsLikeAttributes = array();
 
     public function __construct()
     {

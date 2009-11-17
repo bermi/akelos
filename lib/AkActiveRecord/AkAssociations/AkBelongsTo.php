@@ -103,7 +103,7 @@ class AkBelongsTo extends AkAssociation
         if(!$primary_key_name_value){
             return $result;
         }
-        if(empty($this->Owner->$association_id->__activeRecordObject)){
+        if(!($this->Owner->$association_id instanceof AkActiveRecord)){
             $this->build($association_id, array(), false);
         }
 
@@ -195,7 +195,7 @@ class AkBelongsTo extends AkAssociation
         'order' => $this->Owner->$association_id->getAssociationOption('include_order_when_included')
         );
         $handler_name = $association_id;
-        if(empty($this->Owner->$association_id->__activeRecordObject)){
+        if(!($this->Owner->$association_id instanceof AkActiveRecord)){
             $this->build($association_id, array(), false);
         }
         $pk=$this->Owner->$association_id->getPrimaryKey();
@@ -245,7 +245,7 @@ class AkBelongsTo extends AkAssociation
         'order' => $this->Owner->$association_id->getAssociationOption('include_order_when_included')
         );
 
-        if(empty($this->Owner->$association_id->__activeRecordObject)){
+        if(!($this->Owner->$association_id instanceof AkActiveRecord)){
             $this->build($association_id, array(), false);
         }
 
@@ -302,7 +302,7 @@ class AkBelongsTo extends AkAssociation
     {
         $association_ids = $object->getAssociatedIds();
         foreach ($association_ids as $association_id){
-            if( !empty($object->$association_id->__activeRecordObject) &&
+            if($object->$association_id instanceof AkActiveRecord &&
             strtolower($object->belongsTo->getOption($association_id, 'class_name')) == strtolower($object->$association_id->getType())){
                 $primary_key_name = $this->Owner->belongsTo->getOption($association_id, 'primary_key_name');
                 if($object->$association_id->isNewRecord() && !$object->$association_id->hasAttributesDefined()){

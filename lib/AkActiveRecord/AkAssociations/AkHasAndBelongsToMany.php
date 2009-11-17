@@ -101,12 +101,12 @@ class AkHasAndBelongsToMany extends AkAssociation
     /**
      * Join object place holder
      */
-    public 
+    public
     $JoinObject,
     $associated_ids = array(),
     $association_id;
-    
-    protected 
+
+    protected
     $_automatically_create_join_model_files = AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES;
 
     public function &addAssociated($association_id, $options = array())
@@ -273,7 +273,6 @@ class AkHasAndBelongsToMany extends AkAssociation
     public function _createJoinTable()
     {
         $options = $this->getOptions($this->association_id);
-        require_once(AK_LIB_DIR.DS.'AkInstaller.php');
         $Installer = new AkInstaller();
         $Installer->createTable($options['join_table'],"id,{$options['foreign_key']},{$options['association_foreign_key']}",array('timestamp'=>false));
         return $this->JoinObject->setTableName($options['join_table'],false);
@@ -461,12 +460,11 @@ class AkHasAndBelongsToMany extends AkAssociation
                     continue;
                 }
 
-                if(isset($records[$k]->__activeRecordObject)){
+                if($records[$k] instanceof AkActiveRecord){
                     $record_id = $records[$k]->getId();
                 }else{
                     $record_id = $records[$k];
                 }
-
                 foreach (array_keys($this->Owner->{$this->association_id}) as $kk){
                     if(
                     (
@@ -474,7 +472,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                     !empty($records[$k]->__hasAndBelongsToManyMemberId) &&
                     $records[$k]->__hasAndBelongsToManyMemberId == $this->Owner->{$this->association_id}[$kk]->__hasAndBelongsToManyMemberId
                     ) || (
-                    !empty($this->Owner->{$this->association_id}[$kk]->__activeRecordObject) &&
+                    $this->Owner->{$this->association_id}[$kk] instanceof AkActiveRecord &&
                     $record_id == $this->Owner->{$this->association_id}[$kk]->getId()
                     )
                     ){
@@ -482,7 +480,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                     }
                 }
                 unset($this->associated_ids[$record_id]);
-                $this->_unsetAssociatedMemberId($records[$k]);
+
                 if(!empty($options['after_remove']) && method_exists($this->Owner, $options['after_remove'])){
                     $this->Owner->{$options['after_remove']}($records[$k]);
                 }
@@ -573,7 +571,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                 }
             }
             if($success){
-                $Associated->hasAndBelongsToMany->__joined = true;
+                //$Associated->hasAndBelongsToMany->__joined = true;
             }
             return $success;
         }
@@ -679,7 +677,6 @@ class AkHasAndBelongsToMany extends AkAssociation
             $this->Owner->{$this->association_id} = array();
             $this->Owner->{$options['handler_name']}->_loaded = true;
         }
-
         return $count;
     }
 
@@ -1069,7 +1066,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                             $joined_items[] = $AssociatedItem->__hasAndBelongsToManyMemberId;
 
                             if(empty($AssociatedItem->hasAndBelongsToMany->__joined) && ($AssociatedItem->isNewRecord()? $AssociatedItem->save() : true)){
-                                $AssociatedItem->hasAndBelongsToMany->__joined = true;
+                                //$AssociatedItem->hasAndBelongsToMany->__joined = true;
                                 $CollectionHandler->JoinObject = $CollectionHandler->JoinObject->create(array($options['foreign_key'] => $object_id ,$options['association_foreign_key'] => $AssociatedItem->getId()));
 
 

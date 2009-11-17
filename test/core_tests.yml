@@ -27,6 +27,7 @@ ActiveRecord:
     - 'AkActiveRecord/_AkActiveRecord_1'
     - 'AkActiveRecord/_AkActiveRecord_2'
     - 'AkActiveRecord/_AkActiveRecord_3'
+    - 'AkActiveRecord/AkHasAndBelongsToMany'
 
 ActionWebService:
     - 'AkActionWebService/AkActionWebServiceApi'

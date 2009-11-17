@@ -74,7 +74,7 @@
  */
 class AkHasMany extends AkAssociation
 {
-    public 
+    public
     $associated_ids = array(),
     $association_id;
 
@@ -376,7 +376,7 @@ class AkHasMany extends AkAssociation
                     !empty($records[$k]->__hasManyMemberId) &&
                     $records[$k]->__hasManyMemberId == $this->Owner->{$this->association_id}[$kk]->__hasManyMemberId
                     ) || (
-                    !empty($this->Owner->{$this->association_id}[$kk]->__activeRecordObject) &&
+                    ($this->Owner->{$this->association_id}[$kk] instanceof AkActiveRecord) &&
                     $record_id == $this->Owner->{$this->association_id}[$kk]->getId()
                     )
                     ){
@@ -746,7 +746,7 @@ class AkHasMany extends AkAssociation
                 array_push($args, $options);
             }
 
-            $result =& Ak::call_user_func_array(array($Associated,'find'), $args);
+            $result = call_user_func_array(array($Associated,'find'), $args);
         }
 
         return $result;

@@ -25,7 +25,8 @@ class AkUnitTest extends UnitTestCase
     $module = '',
     $insert_models_data = false,
     $instantiate_models = false,
-    $rebase = false;
+    $rebase = false,
+    $skip_fixtures = false;
 
     private
     $_original_paths = array(),
@@ -39,7 +40,9 @@ class AkUnitTest extends UnitTestCase
         if($this->rebase){
             $this->rebaseAppPaths($this->rebase);
         }
-        $this->_configure();
+        if(!$this->skip_fixtures){
+            $this->_configure();
+        }
     }
 
     public function __destruct()

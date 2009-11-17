@@ -1,17 +1,13 @@
 <?php
 
-defined('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION') ? null : define('AK_ACTIVE_RECORD_PROTECT_GET_RECURSION', false);
-defined('AK_TEST_DATABASE_ON') ? null : define('AK_TEST_DATABASE_ON', true);
-
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class AkActiveRecord_association_finders_TestCase extends  AkUnitTest
+class ActiveRecord_association_finders_TestCase extends  AkUnitTest
 {
 
     public function setup()
     {
         $this->installAndIncludeModels(array('Aa', 'Bb', 'Cc','Dd', 'Ee'));
-
     }
 
     public function test_find_on_first_level_has_many_finder_with_conditions()
@@ -29,6 +25,7 @@ class AkActiveRecord_association_finders_TestCase extends  AkUnitTest
         $this->assertTrue($firstbb);
         $this->assertEqual('first bb',$firstbb->name);
     }
+
     public function test_find_on_first_level_has_many_finder_with_conditions_as_array()
     {
         $aa = $this->Aa->create(array('name'=>'first aa'));
@@ -44,6 +41,7 @@ class AkActiveRecord_association_finders_TestCase extends  AkUnitTest
         $this->assertTrue($firstbb);
         $this->assertEqual('first bb',$firstbb->name);
     }
+
     public function test_find_on_first_level_has_many_finder_with_conditions_and_bind()
     {
         $aa = $this->Aa->create(array('name'=>'first aa'));
@@ -59,6 +57,7 @@ class AkActiveRecord_association_finders_TestCase extends  AkUnitTest
         $this->assertTrue($firstbb);
         $this->assertEqual('first bb',$firstbb->name);
     }
+
     public function test_find_on_first_level_has_many_finder_with_order()
     {
         $aa = $this->Aa->create(array('name'=>'first aa'));
@@ -289,6 +288,4 @@ class AkActiveRecord_association_finders_TestCase extends  AkUnitTest
 
 }
 
-ak_test('AkActiveRecord_association_finders_TestCase',true);
-
-?>
+ak_test_run_case_if_executed('ActiveRecord_association_finders_TestCase');
