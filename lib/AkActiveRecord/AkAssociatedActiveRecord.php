@@ -660,7 +660,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $return = $owner;
         } else if ($returns == 'simulated') {
             $false = false;
-            $return = &$this->_generateStdClasses($simulation_class,$owner, $this->getType(), $false, $false, $config);
+            $return = $this->_generateStdClasses($simulation_class, $owner, $this->getType(), $false, $false, $config);
         }
         return $return;
     }
@@ -675,7 +675,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
             }
         }
     }
-    public function _generateStdClasses($simulation_class,$owner, $class, $handler_name, &$parent, $config = array(), $config_key = '__owner')
+    public function &_generateStdClasses($simulation_class,$owner, $class, $handler_name, &$parent, $config = array(), $config_key = '__owner')
     {
         $return = array();
         $singularize=false;
@@ -686,26 +686,29 @@ class AkAssociatedActiveRecord extends AkBaseModel
             $key = isset($owner[$pk])?$owner[$pk]:0;
             $owner = array($key=>$owner);
         }
-        if(is_array($owner))
-        foreach($owner as $id=>$data) {
-            $id = isset($data[$pk])?$data[$pk]:$id;
-            $obj = new $simulation_class($id,$class, $handler_name, $parent);
-            if(is_array($data))
-            foreach($data as $key => $value) {
-                if ($key{0}=='_') continue;
-                if ( is_scalar($value)) {
-                    $obj->$key = $value;
-                } else if (is_array($value)) {
-                    $assoc = isset($config[$config_key][$key]['association_id'])?$config[$config_key][$key]['association_id']:false;
-                    if ($assoc) {
-                        $obj->$assoc = $this->_generateStdClasses($simulation_class, $value, @$config[$config_key][$key]['class'], $key, $obj, @$config[$config_key], $key);
-                        $obj->_addAssociation($assoc, $key);
+        if(is_array($owner)){
+            foreach($owner as $id=>$data) {
+                $id = isset($data[$pk])?$data[$pk]:$id;
+                $obj = new $simulation_class($id, $class, $handler_name, $parent);
+                if(is_array($data)){
+                    foreach($data as $key => $value) {
+                        if ($key{0}=='_') continue;
+                        if ( is_scalar($value)) {
+                            $obj->$key = $value;
+                        } else if (is_array($value)) {
+                            $assoc = isset($config[$config_key][$key]['association_id'])?$config[$config_key][$key]['association_id']:false;
+                            if ($assoc) {
+                                $obj->$assoc = $this->_generateStdClasses($simulation_class, $value, @$config[$config_key][$key]['class'], $key, $obj, @$config[$config_key], $key);
+                                $obj->addAssociated($assoc, $key);
+                            }
+                        }
                     }
                 }
+                $return[] = $obj;
             }
-            $return[]=&$obj;
         }
-        return $singularize?$return[0]:$return;
+        $result = $singularize ? $return[0]: $return;
+        return $result;
     }
 
 

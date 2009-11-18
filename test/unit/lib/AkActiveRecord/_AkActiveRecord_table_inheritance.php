@@ -2,16 +2,12 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class Schedule extends ActiveRecord
-{
-    public $belongs_to = 'event';
-}
-
 class ActiveRecord_table_inheritance_TestCase extends  AkUnitTest
 {
     public function test_start()
     {
         $this->rebaseAppPaths();
+        eval("class Schedule extends ActiveRecord { public \$belongs_to = 'event'; }");
         $this->installAndIncludeModels(array('Event', 'Concert','OpenHouseMeeting'));
     }
 
@@ -21,10 +17,9 @@ class ActiveRecord_table_inheritance_TestCase extends  AkUnitTest
         $Event = new Event(array('description'=>'Uncategorized Event'));
         $this->assertTrue($Event->save());
 
-        $Concert = new Concert('description->', 'Madonna at Barcelona');
+        $Concert = new Concert(array('description' => 'Madonna at Barcelona'));
         $this->assertTrue($Concert->save());
-
-        $OpenHouseMeeting = new OpenHouseMeeting('description->', 'Networking event at Akelos');
+        $OpenHouseMeeting = new OpenHouseMeeting(array('description' => 'Networking event at Akelos'));
         $this->assertTrue($OpenHouseMeeting->save());
         $this->assertEqual($OpenHouseMeeting->get('type'), 'Open house meeting');
 

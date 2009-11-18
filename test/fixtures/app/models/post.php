@@ -4,7 +4,7 @@ class Post extends ActiveRecord
 {
     public $has_many = 'comments';
     public $habtm = 'tags,users';
-    
+
     public function validate()
     {
         if ($this->comments_count<0){
@@ -13,4 +13,3 @@ class Post extends ActiveRecord
     }
 }
 
-?>

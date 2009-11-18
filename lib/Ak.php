@@ -1262,49 +1262,6 @@ class Ak
     }
 
 
-    static function xml_to_array ($xml_data)
-    {
-        $xml_parser = xml_parser_create ();
-        xml_parser_set_option($xml_parser, XML_OPTION_CASE_FOLDING, 0);
-        xml_parser_set_option($xml_parser, XML_OPTION_SKIP_WHITE, 1);
-        xml_parse_into_struct ($xml_parser, $xml_data, $vals, $index);
-        xml_parser_free ($xml_parser);
-        $params = array();
-        $ptrs[0] = $params;
-        foreach ($vals as $xml_elem) {
-            $level = $xml_elem['level'] - 1;
-            switch ($xml_elem['type']) {
-                case 'open':
-                    $tag_or_id = (array_key_exists ('attributes', $xml_elem)) ? @$xml_elem['attributes']['ID'] : $xml_elem['tag'];
-                    $ptrs[$level][$tag_or_id][] = array ();
-                    $ptrs[$level+1] = $ptrs[$level][$tag_or_id][count($ptrs[$level][$tag_or_id])-1];
-                    break;
-                case 'complete':
-                    $ptrs[$level][$xml_elem['tag']] = (isset ($xml_elem['value'])) ? $xml_elem['value'] : '';
-                    break;
-            }
-        }
-        return ($params);
-    }
-
-    static function array_to_xml($array, $header = "<?xml version=\"1.0\"?>\r\n", $parent = 'EMPTY_TAG')
-    {
-        static $_tags = array();
-        $xml = $header;
-        foreach ($array as $key => $value) {
-            $key = is_numeric($key) ? $parent : $key;
-            $value = is_array($value) ? "\r\n".Ak::array_to_xml($value, '', $key) : $value;
-            $_tags[$key] = $key;
-            $xml .= sprintf("<%s>%s</%s>\r\n", $key, $value, $key);
-            $parent = $key;
-        }
-        foreach ($_tags as $_tag){
-            $xml = str_replace(array("<$_tag>\r\n<$_tag>","</$_tag>\r\n</$_tag>"),array("<$_tag>","</$_tag>"),$xml);
-        }
-        return $xml;
-    }
-
-
     static function encrypt($data, $key = null)
     {
         $key = empty($key) ? md5(AK_SESSION_NAME) : $key;
@@ -1636,7 +1593,7 @@ class Ak
         if(method_exists($converter, 'init')){
             $converter->init();
         }
-        return $converter->convert();
+        return $converter->convert((array)$options);
     }
 
 

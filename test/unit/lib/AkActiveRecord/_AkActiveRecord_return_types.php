@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class ActiveRecord_return_types_TestCase extends  AkUnitTest
+class ActiveRecord_finder_return_types_TestCase extends  AkUnitTest
 {
     public function setup()
     {
@@ -41,6 +41,7 @@ class ActiveRecord_return_types_TestCase extends  AkUnitTest
         $returned=$this->Aa->findFirst(array('returns'=>'array','select_prefix'=>'SELECT name FROM aas', 'order'=>'name DESC'));
         $this->assertTrue($returned);
         $this->assertEqual(array('name'=>'second aa'), $returned);
+
     }
 
     public function test_normal_find_without_association_return_simulated()
@@ -48,17 +49,14 @@ class ActiveRecord_return_types_TestCase extends  AkUnitTest
         $aa1 = $this->Aa->create(array('name'=>'first aa'));
         $aa2 = $this->Aa->create(array('name'=>'second aa'));
 
-        $returned=$this->Aa->findAll(array('returns'=>'simulated', 'order'=>'id ASC'));
+        $returned = $this->Aa->findAll(array('returns'=>'simulated'));
         $this->assertTrue($returned);
         $this->assertEqual(2, count($returned));
-        $this->assertIsA($returned[0],'AkActiveRecordMock');
+        $this->assertIsA($returned[0], 'AkActiveRecordMock');
         $this->assertEqual($aa1->getId(), $returned[0]->getId());
         $this->assertEqual($aa2->getId(), $returned[1]->getId());
         $this->assertEqual($aa2->getPrimaryKey(), $returned[1]->getPrimaryKey());
 
-    }} ak_test_run_case_if_executed('ActiveRecord_return_types_TestCase'); return ;
-
-    ?>
         $returned=$this->Aa->findAll(array('returns'=>'simulated', 'order'=>'name DESC'));
         $this->assertTrue($returned);
         $this->assertEqual(2, count($returned));
@@ -91,14 +89,14 @@ class ActiveRecord_return_types_TestCase extends  AkUnitTest
 
     public function test_find_on_first_level_has_many_finder_with_conditions_return_as_array()
     {
-        $aa = &$this->Aa->create(array('name'=>'first aa'));
+        $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
-        $bb1 = &$this->Bb->create(array('name'=>'first bb'));
-        $bb2 = &$this->Bb->create(array('name'=>'second bb'));
+        $bb1 = $this->Bb->create(array('name'=>'first bb'));
+        $bb2 = $this->Bb->create(array('name'=>'second bb'));
         $babies = array($bb1,$bb2);
         $aa->babies->set($babies);
 
-        $aa = &$this->Aa->findFirstBy('name','first aa');
+        $aa = $this->Aa->findFirstBy('name','first aa');
         $this->assertTrue($aa);
         $firstbb = $aa->babies->find('first',array('conditions'=>"name LIKE '%first%'",'order'=>'id ASC','returns'=>'array'));
         $this->assertTrue($firstbb);
@@ -106,13 +104,12 @@ class ActiveRecord_return_types_TestCase extends  AkUnitTest
         $this->assertEqual('first bb',$firstbb['name']);
     }
 
-
     public function test_find_aa_include_bbs_with_custom_handler_name_return_simulated()
     {
-        $aa = &$this->Aa->create(array('name'=>'first aa'));
+        $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
-        $bb1 = &$this->Bb->create(array('name'=>'first bb'));
-        $bb2 = &$this->Bb->create(array('name'=>'second bb'));
+        $bb1 = $this->Bb->create(array('name'=>'first bb'));
+        $bb2 = $this->Bb->create(array('name'=>'second bb'));
         $babies = array($bb1,$bb2);
 
         $aa->babies->set($babies);
@@ -126,9 +123,15 @@ class ActiveRecord_return_types_TestCase extends  AkUnitTest
         $found_first_aa = $this->Aa->findFirstBy('name','first aa',array('returns'=>'simulated','include'=>array('bbs'=>array('order' => 'id ASC'))));
         $this->assertTrue($found_first_aa);
         $this->assertTrue($found_first_aa->bbs);
-        $this->assertEqual(2,$found_first_aa->babies->count());
+
         $this->assertEqual('first bb',$found_first_aa->bbs[0]->name);
         $this->assertEqual('second bb',$found_first_aa->bbs[1]->name);
+
+        $this->assertTrue($found_first_aa instanceof AkActiveRecordMock);
+        $this->assertTrue($found_first_aa->bbs[0] instanceof AkActiveRecordMock);
+        $this->assertTrue($found_first_aa->bbs[1] instanceof AkActiveRecordMock);
+
+        $this->assertEqual(2, $found_first_aa->babies->count());
 
         /**
          * now find them back in order and add a condition for the bbs
@@ -137,17 +140,17 @@ class ActiveRecord_return_types_TestCase extends  AkUnitTest
         $found_first_aa = $this->Aa->findFirstBy('name','first aa',array('returns'=>'simulated','include'=>array('bbs'=>array('order' => 'id ASC','conditions'=>'name LIKE ?','bind'=>'%second%'))));
         $this->assertTrue($found_first_aa);
         $this->assertTrue($found_first_aa->bbs);
-        $this->assertEqual(1,$found_first_aa->babies->count());
+        $this->assertEqual(1, $found_first_aa->babies->count());
         $this->assertEqual('second bb',$found_first_aa->bbs[0]->name);
 
     }
 
     public function test_find_aa_include_bbs_with_custom_handler_name_return_array()
     {
-        $aa = &$this->Aa->create(array('name'=>'first aa'));
+        $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
-        $bb1 = &$this->Bb->create(array('name'=>'first bb'));
-        $bb2 = &$this->Bb->create(array('name'=>'second bb'));
+        $bb1 = $this->Bb->create(array('name'=>'first bb'));
+        $bb2 = $this->Bb->create(array('name'=>'second bb'));
         $babies = array($bb1,$bb2);
 
         $aa->babies->set($babies);
@@ -179,5 +182,5 @@ class ActiveRecord_return_types_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('ActiveRecord_return_types_TestCase');
+ak_test_run_case_if_executed('ActiveRecord_finder_return_types_TestCase');
 

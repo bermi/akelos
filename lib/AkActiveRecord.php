@@ -1493,6 +1493,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      */
     static function descendsFromActiveRecord(&$object)
     {
+        //return ($object instanceof AkActiveRecord) && $object->getInheritanceColumn() != false;
+        //Ak::trace($this->getInheritanceColumn());
         if(substr(strtolower(get_parent_class($object)),-12) == 'activerecord'){
             return true;
         }
@@ -1585,6 +1587,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
             }
         }
+
         if($this->hasAttribute($attribute)){
             $this->{$attribute.'_before_type_cast'} = $value;
             $this->$attribute = $value;
@@ -1631,6 +1634,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     public function setAttributes($attributes, $override_attribute_protection = false, $inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS)
     {
+        $this->_castDateParametersFromDateHelper($attributes);
         if(!$override_attribute_protection){
             $attributes = $this->removeAttributesProtectedFromMassAssignment($attributes);
         }
@@ -1666,12 +1670,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if($attribute[0] == '_'){
             return false;
         }
-
+        if($attribute == $this->getInheritanceColumn()){
+            return AkInflector::humanize(AkInflector::underscore($this->getType()));
+        }
         if($inspect_for_callback_child_method === true){
             $_getter_method = 'get'.AkInflector::camelize($attribute);
             if(method_exists($this, $_getter_method)){
-                $value = $this->$_getter_method();
-                return $this->getInheritanceColumn() === $attribute ? AkInflector::humanize(AkInflector::underscore($value)) : $value;
+                return $this->$_getter_method();
             }
         }
         if(isset($this->$attribute) || (!isset($this->$attribute) && $this->isCombinedAttribute($attribute))){
@@ -3140,7 +3145,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * array('published_on(1i)' => 2002, 'published_on(2i)' => 'January', 'published_on(3i)' => 24)
     * Will be converted to array('published_on'=>'2002-01-24')
     */
-    protected function _castDateParametersFromDateHelper_(&$params)
+    protected function _castDateParametersFromDateHelper(&$params)
     {
         if(empty($params)){
             return;
@@ -4822,7 +4827,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         foreach ($data as $key => $value) {
             if (is_array($value)){
-                $values[] = $this->_generateModelFromArray($modelName,$value);
+                $values[] = $this->_generateModelFromArray($modelName, $value);
             }
         }
         return count($values)==1?$values[0]:$values;
@@ -4848,7 +4853,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      */
     public function fromXml($xml)
     {
-        $array = Ak::xml_to_array($xml);
+        $array = Ak::convert('xml','array', $xml);
         $array = $this->_fromXmlCleanup($array);
         return $this->_fromArray($array);
     }

@@ -1,4 +1,5 @@
 <?php
+
 class AkActiveRecordMockHandler
 {
     protected
@@ -25,6 +26,7 @@ class AkActiveRecordMockHandler
         return call_user_func_array(array($handler, $name),$args);
     }
 }
+
 class AkActiveRecordMock
 {
     public
@@ -42,7 +44,7 @@ class AkActiveRecordMock
     $__associations = array(),
     $__handlers = array();
 
-    public function __construct($pk,$class, $handler, &$parent)
+    public function __construct($pk, $class, $handler, &$parent)
     {
         $this->_class = $class;
         $this->_pkValue = $pk;
@@ -75,7 +77,7 @@ class AkActiveRecordMock
         $false = false;
         if (isset($this->__handlers[$association_id])) {
             $class = $this->_class;
-            $obj=$this->_getObject();
+            $obj = $this->_getObject();
             $handler_name = $this->__handlers[$association_id];
             $myobj  = new $class();
             if (isset($myobj->$handler_name)) {
@@ -87,7 +89,7 @@ class AkActiveRecordMock
             }
         } else {
             $class = $this->_class;
-            $obj=$this->_getObject();
+            $obj = $this->_getObject();
             $handler_name = $obj->getCollectionHandlerName($association_id);
             if(!$handler_name) {
                 $handler_name = $association_id;
@@ -117,14 +119,13 @@ class AkActiveRecordMock
         return false;
     }
 
-    protected function _addAssociation($association_id, $handler_name)
+    protected function addAssociated($association_id, $handler_name)
     {
-        //Ak::getLogger()->message('addAssociation on '.$this->_getClass().' with association_id:'.$association_id.' handler_name:'.$handler_name);
         if ($association_id != $handler_name) {
             $this->$handler_name = new AkActiveRecordMockHandler($this,$association_id);
         }
         if(is_object($this->$handler_name)) {
-            $this->$handler_name->_loaded=true;
+            $this->$handler_name->_loaded = true;
             $this->__associations[$handler_name] = $association_id;
             $this->__handlers[$association_id] = $handler_name;
         }
@@ -132,18 +133,15 @@ class AkActiveRecordMock
 
     public function &_getObject()
     {
-        static $obj;
-
-        if (!empty($obj)) return $obj;
         $class = $this->_class;
         $object_vars = get_object_vars($this);
         $attributes = array();
         $associations = array();
         foreach($object_vars as $key => $value) {
-            if (!($is_association=in_array($key, $this->__associations)) && is_scalar($value)) {
-                $attributes[$key]=$value;
+            if (!($is_association = in_array($key, $this->__associations)) && is_scalar($value)) {
+                $attributes[$key] = $value;
             } else if ($is_association) {
-                $associations[]=$key;
+                $associations[] = $key;
             }
         }
 
@@ -151,7 +149,6 @@ class AkActiveRecordMock
 
         $obj->_newRecord = false;
         foreach($associations as $assoc) {
-
             $handler_name = $this->__handlers[$assoc];
             $obj->$handler_name = new AkActiveRecordMockHandler($this, $assoc);
             $obj->$assoc = $this->$assoc;
@@ -166,11 +163,14 @@ class AkActiveRecordMock
 
     public function __call($name, $args = array())
     {
+        if(method_exists($this, $name)){
+            return call_user_func_array(array($this, $name),$args);
+        }
+
         $obj = $this->_getObject();
         if($obj) {
-            //Ak::getLogger()->message('calling '.$name.' on '.$this->_getClass());
-            if (method_exists($obj,$name)) {
-                return call_user_func_array(array($obj,$name),$args);
+            if (method_exists($obj, $name)) {
+                return call_user_func_array(array($obj, $name),$args);
             }
         }
     }

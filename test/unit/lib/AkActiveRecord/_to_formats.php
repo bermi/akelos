@@ -2,13 +2,15 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class ActiveRecord_to_formats_TestCase extends  AkUnitTest
+class ActiveRecord_conversion_between_formats_TestCase extends  AkUnitTest
 {
+    public $skip_fixtures = true;
     public function setup()
     {
         $this->rebaseAppPaths();
-        $this->installAndIncludeModels(array('Person','Account'));
+        $this->installAndIncludeModels(array('Person'));//,'Account'));
     }
+
     public function test_simple_xml()
     {
         $person = new Person();
@@ -23,12 +25,14 @@ class ActiveRecord_to_formats_TestCase extends  AkUnitTest
 </person>
 EOX;
         $xml = $person->toXml();
+
         $this->assertEqual(trim($expected),$xml);
 
         $person_reloaded = $person->fromXml($xml);
         $this->assertEqual($person->first_name,$person_reloaded->first_name);
         $this->assertEqual($person->last_name,$person_reloaded->last_name);
     }
+
     public function test_with_relations_xml()
     {
         $person = $this->Person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
@@ -155,5 +159,5 @@ EOX;
     }
 }
 
-ak_test_run_case_if_executed('ActiveRecord_to_formats_TestCase');
+ak_test_run_case_if_executed('ActiveRecord_conversion_between_formats_TestCase');
 

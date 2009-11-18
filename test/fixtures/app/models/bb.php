@@ -7,4 +7,3 @@ class Bb extends ActiveRecord
     public $serialize = array('languages','other');
 }
 
-?>

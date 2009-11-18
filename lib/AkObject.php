@@ -52,7 +52,10 @@ if(!class_exists('AkObject')){
 
         public function __call($name, $args)
         {
-            trigger_error("Call to undefined method ".get_class($this)."::".$name."()", E_USER_ERROR);
+            $backtrace = debug_backtrace();
+            $file = $backtrace[1]['file'];
+            $line = $backtrace[1]['line'];
+            trigger_error(Ak::t('Call to undefined method %class::%method()', array('%method' => $name, '%class'=>get_class($this))).' '.Ak::t('Called in %file line %line', array('%file' => $file, '%line' => $line)), E_USER_ERROR);
         }
 
         public function log($message, $type = '', $identifyer = '')
