@@ -65,14 +65,14 @@ class ADODB2_sqlite extends ADODB_DataDict {
         return parent::MetaType($t,$len,$fieldobj);
 	}
 
-	function AlterColumnSQL($tabname, $flds)
+	public function AlterColumnSQL($tabname, $flds, $tableflds='',$tableoptions='')
 	{
 		if ($this->debug) ADOConnection::outp("AlterColumnSQL not supported");
 		return array();
 	}
 
 
-	public function DropColumnSQL($tabname, $flds)
+	public function DropColumnSQL($tabname, $flds, $tableflds='',$tableoptions='')
 	{
 		if ($this->debug) ADOConnection::outp("DropColumnSQL not supported");
 		return array();

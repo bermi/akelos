@@ -6,6 +6,7 @@ class ActiveRecord_accessible_attributes_TestCase extends  AkUnitTest
 {
     public function test_start()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('ProtectedPerson'));
     }
 

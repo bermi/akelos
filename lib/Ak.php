@@ -726,13 +726,13 @@ class Ak
         return $result;
     }
 
-    static function getLastFileAndLineAndMethod($only_app = false)
+    static function getLastFileAndLineAndMethod($only_app = false, $start_level = 1)
     {
         $backtrace = debug_backtrace();
         if(!$only_app){
-            return array($backtrace[1]['file'], $backtrace[1]['line'], @$backtrace[1]['function']);
+            return array($backtrace[$start_level]['file'], $backtrace[$start_level]['line'], @$backtrace[$start_level]['function']);
         }else{
-            for($i = 0; $i <= count($backtrace) - 1; $i++){
+            for($i = $start_level-1; $i <= count($backtrace) - 1; $i++){
                 if(isset($backtrace[$i]["line"])){
                     if(strstr($backtrace[$i]["file"], AK_COMPILED_VIEWS_DIR) || strstr($backtrace[$i]["file"], AkConfig::getDir('app'))){
                         return array($backtrace[$i]["file"], $backtrace[$i]["line"], $backtrace[$i]["function"]);
@@ -740,6 +740,12 @@ class Ak
                 }
             }
         }
+    }
+
+    static function getFileAndNumberTextForError($levels = 0)
+    {
+        list($file,$line,$method) = Ak::getLastFileAndLineAndMethod(false, $levels+1);
+        return Ak::t('In %file line %line', array('%file' => $file, '%line' => $line));
     }
 
     /**

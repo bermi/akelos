@@ -59,6 +59,7 @@ class ActiveRecord_nested_finders_TestCase extends  AkUnitTest
         $this->assertTrue($found_first_aa);
         $this->assertTrue($found_first_aa->bbs);
         $this->assertEqual(2,$found_first_aa->babies->count());
+
         $this->assertEqual(array('en','fr'),$found_first_aa->bbs[1]->languages);
         $this->assertEqual(array(4,5,6),$found_first_aa->bbs[1]->other);
         $this->assertEqual(array('es','de'),$found_first_aa->bbs[0]->languages);

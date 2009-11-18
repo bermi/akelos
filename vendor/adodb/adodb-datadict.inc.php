@@ -318,7 +318,7 @@ class ADODB_DataDict {
 		"SQLNCHAR" => 'C',
 		"SQLNVCHAR" => 'C',
 		"SQLLVARCHAR" => 'X',
-		"SQLBOOL" => 'L'
+		"SQLBOOL" => 'L',
 		);
 
 		if (!$this->connection->IsConnected()) {
@@ -511,7 +511,7 @@ class ADODB_DataDict {
 	 * @param string $flds='' complete column-defintion-string like for AddColumnSQL, only used by mysql atm., default=''
 	 * @return array with SQL strings
 	 */
-	function RenameColumnSQL($tabname,$oldcolumn,$newcolumn,$flds='')
+	public function RenameColumnSQL($tabname,$oldcolumn,$newcolumn,$flds='')
 	{
 		$tabname = $this->TableName ($tabname);
 		if ($flds) {
@@ -535,7 +535,7 @@ class ADODB_DataDict {
 	 * @param array/string $tableoptions='' options for the new table see CreateTableSQL, default ''
 	 * @return array with SQL strings
 	 */
-	function DropColumnSQL($tabname, $flds, $tableflds='',$tableoptions='')
+	public function DropColumnSQL($tabname, $flds, $tableflds='',$tableoptions='')
 	{
 		$tabname = $this->TableName ($tabname);
 		if (!is_array($flds)) $flds = explode(',',$flds);
@@ -696,7 +696,6 @@ class ADODB_DataDict {
 				} //switch
 			} // foreach $fld
 
-			//--------------------
 			// VALIDATE FIELD INFO
 			if (!strlen($fname)) {
 				if ($this->debug) ADOConnection::outp("Undefined NAME");

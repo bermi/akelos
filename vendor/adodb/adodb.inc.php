@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
 * Set tabs to 4 for best viewing.
 *
@@ -13,14 +13,14 @@
 
 /**
 	\mainpage
-	
+
 	 @version V5.09 25 June 2009   (c) 2000-2009 John Lim (jlim#natsoft.com). All rights reserved.
 
 	Released under both BSD license and Lesser GPL library license. You can choose which license
 	you prefer.
-	
-	PHP's database access functions are not standardised. This creates a need for a database 
-	class library to hide the differences between the different database API's (encapsulate 
+
+	PHP's database access functions are not standardised. This creates a need for a database
+	class library to hide the differences between the different database API's (encapsulate
 	the differences) so we can easily switch databases.
 
 	We currently support MySQL, Oracle, Microsoft SQL Server, Sybase, Sybase SQL Anywhere, DB2,
@@ -29,7 +29,7 @@
 	other databases via ODBC.
 
 	Latest Download at http://adodb.sourceforge.net/
-	  
+
  */
 
 if (!defined('_ADODB_LAYER')) {
@@ -180,7 +180,7 @@ if (!defined('_ADODB_LAYER')) {
         $ADODB_vers = 'V5.09 25 June 2009  (c) 2000-2009 John Lim (jlim#natsoft.com). All rights reserved. Released BSD & LGPL.';
 
         /**
-		 * Determines whether recordset->RecordCount() is used. 
+		 * Determines whether recordset->RecordCount() is used.
 		 * Set to false for highest performance -- RecordCount() will always return -1 then
 		 * for databases that provide "virtual" recordcounts...
 		 */
@@ -323,7 +323,7 @@ if (!defined('_ADODB_LAYER')) {
 
     /**
 	 * Connection object. For connecting to databases, and executing queries.
-	 */ 
+	 */
     class ADOConnection {
         //
         // PUBLIC VARS
@@ -440,8 +440,8 @@ if (!defined('_ADODB_LAYER')) {
 
         /**
 		Get server version info...
-		
-		@returns An array with 2 elements: $arr['string'] is the description string, 
+
+		@returns An array with 2 elements: $arr['string'] is the description string,
 			and $arr[version] is the version (also a string).
 	*/
         function ServerInfo()
@@ -506,7 +506,7 @@ if (!defined('_ADODB_LAYER')) {
 	 * @param [forceNew]		force new connection
 	 *
 	 * @return true or false
-	 */	  
+	 */
         function Connect($argHostname = "", $argUsername = "", $argPassword = "", $argDatabaseName = "", $forceNew = false)
         {
             if ($argHostname != "") $this->host = $argHostname;
@@ -556,7 +556,7 @@ if (!defined('_ADODB_LAYER')) {
 	 * @param [argDatabaseName]	database
 	 *
 	 * @return true or false
-	 */	  
+	 */
         function NConnect($argHostname = "", $argUsername = "", $argPassword = "", $argDatabaseName = "")
         {
             return $this->Connect($argHostname, $argUsername, $argPassword, $argDatabaseName, true);
@@ -571,7 +571,7 @@ if (!defined('_ADODB_LAYER')) {
 	 * @param [argDatabaseName]	database
 	 *
 	 * @return return true or false
-	 */	
+	 */
         function PConnect($argHostname = "", $argUsername = "", $argPassword = "", $argDatabaseName = "")
         {
 
@@ -651,7 +651,7 @@ if (!defined('_ADODB_LAYER')) {
 	 * @return return FALSE, or the prepared statement, or the original sql if
 	 * 			if the database does not support prepare.
 	 *
-	 */	
+	 */
         function Prepare($sql)
         {
             return $sql;
@@ -670,7 +670,7 @@ if (!defined('_ADODB_LAYER')) {
 	 * @return return FALSE, or the prepared statement, or the original sql if
 	 * 			if the database does not support prepare.
 	 *
-	 */	
+	 */
         function PrepareSP($sql,$param=true)
         {
             return $this->Prepare($sql,$param);
@@ -699,7 +699,7 @@ if (!defined('_ADODB_LAYER')) {
         }
 
         /**
-	* PEAR DB Compat - do not use internally. 
+	* PEAR DB Compat - do not use internally.
 	*/
         function ErrorNative()
         {
@@ -708,7 +708,7 @@ if (!defined('_ADODB_LAYER')) {
 
 
         /**
-	* PEAR DB Compat - do not use internally. 
+	* PEAR DB Compat - do not use internally.
 	*/
         function nextId($seq_name)
         {
@@ -738,7 +738,7 @@ if (!defined('_ADODB_LAYER')) {
         }
 
         /**
-	* PEAR DB Compat - do not use internally. 
+	* PEAR DB Compat - do not use internally.
 	*
 	* The fetch modes for NUMERIC and ASSOC for PEAR DB and ADODB are identical
 	* 	for easy porting :-)
@@ -760,7 +760,7 @@ if (!defined('_ADODB_LAYER')) {
 
 
         /**
-	* PEAR DB Compat - do not use internally. 
+	* PEAR DB Compat - do not use internally.
 	*/
         function Query($sql, $inputarr=false)
         {
@@ -856,7 +856,7 @@ if (!defined('_ADODB_LAYER')) {
         /**
 		Improved method of initiating a transaction. Used together with CompleteTrans().
 		Advantages include:
-		
+
 		a. StartTrans/CompleteTrans is nestable, unlike BeginTrans/CommitTrans/RollbackTrans.
 		   Only the outermost block is treated as a transaction.<br>
 		b. CompleteTrans auto-detects SQL errors, and will rollback on errors, commit otherwise.<br>
@@ -884,8 +884,8 @@ if (!defined('_ADODB_LAYER')) {
         /**
 		Used together with StartTrans() to end a transaction. Monitors connection
 		for sql errors, and will commit or rollback as appropriate.
-		
-		@autoComplete if true, monitor sql errors and commit and rollback as appropriate, 
+
+		@autoComplete if true, monitor sql errors and commit and rollback as appropriate,
 		and if set to false force rollback even if no SQL error detected.
 		@returns true on commit, false on rollback.
 	*/
@@ -938,7 +938,7 @@ if (!defined('_ADODB_LAYER')) {
         }
 
         /**
-	 * Execute SQL 
+	 * Execute SQL
 	 *
 	 * @param sql		SQL statement to execute, or possibly an array holding prepared statement ($sql[0] will hold sql text)
 	 * @param [inputarr]	holds the input data to bind to. Null elements will be set to null.
@@ -1124,7 +1124,7 @@ if (!defined('_ADODB_LAYER')) {
 	 * @param $table string name of the table, not needed by all databases (eg. mysql), default ''
 	 * @param $column string name of the column, not needed by all databases (eg. mysql), default ''
 	 * @return  the last inserted ID. Not all databases support this.
-	 */ 
+	 */
         function Insert_ID($table='',$column='')
         {
             if ($this->_logsql && $this->lastInsID) return $this->lastInsID;
@@ -1142,7 +1142,7 @@ if (!defined('_ADODB_LAYER')) {
 	 *
 	 * @return  the last inserted ID. All databases support this. But aware possible
 	 * problems in multiuser environments. Heavy test this before deploying.
-	 */ 
+	 */
         function PO_Insert_ID($table="", $id="")
         {
             if ($this->hasInsertID){
@@ -1154,7 +1154,7 @@ if (!defined('_ADODB_LAYER')) {
 
         /**
 	* @return # rows affected by UPDATE/DELETE
-	*/ 
+	*/
         function Affected_Rows()
         {
             if ($this->hasAffectedRows) {
@@ -1239,11 +1239,11 @@ if (!defined('_ADODB_LAYER')) {
 
 
         /**
-	* Will select, getting rows from $offset (1-based), for $nrows. 
+	* Will select, getting rows from $offset (1-based), for $nrows.
 	* This simulates the MySQL "select * from table limit $offset,$nrows" , and
 	* the PostgreSQL "select * from table limit $nrows offset $offset". Note that
 	* MySQL and PostgreSQL parameter ordering is the opposite of the other.
-	* eg. 
+	* eg.
 	*  SelectLimit('select * from table',3); will return rows 1 to 3 (1-based)
 	*  SelectLimit('select * from table',3,2); will return rows 3 to 5 (1-based)
 	*
@@ -1636,7 +1636,7 @@ if (!defined('_ADODB_LAYER')) {
         }
 
         /**
-	* Insert or replace a single record. Note: this is not the same as MySQL's replace. 
+	* Insert or replace a single record. Note: this is not the same as MySQL's replace.
 	* ADOdb's Replace() uses update-insert semantics, not insert-delete-duplicates of MySQL.
 	* Also note that no table locking is done currently, so it is possible that the
 	* record be inserted twice by two programs...
@@ -1652,7 +1652,7 @@ if (!defined('_ADODB_LAYER')) {
 	*
 	* Currently blob replace not supported
 	*
-	* returns 0 = fail, 1 = update, 2 = insert 
+	* returns 0 = fail, 1 = update, 2 = insert
 	*/
 
         function Replace($table, $fieldArray, $keyCol, $autoQuote=false, $has_autoinc=false)
@@ -1665,11 +1665,11 @@ if (!defined('_ADODB_LAYER')) {
 
 
         /**
-	* Will select, getting rows from $offset (1-based), for $nrows. 
+	* Will select, getting rows from $offset (1-based), for $nrows.
 	* This simulates the MySQL "select * from table limit $offset,$nrows" , and
 	* the PostgreSQL "select * from table limit $nrows offset $offset". Note that
 	* MySQL and PostgreSQL parameter ordering is the opposite of the other.
-	* eg. 
+	* eg.
 	*  CacheSelectLimit(15,'select * from table',3); will return rows 1 to 3 (1-based)
 	*  CacheSelectLimit(15,'select * from table',3,2); will return rows 3 to 5 (1-based)
 	*
@@ -1698,12 +1698,12 @@ if (!defined('_ADODB_LAYER')) {
 
 
         /**
-	* Flush cached recordsets that match a particular $sql statement. 
+	* Flush cached recordsets that match a particular $sql statement.
 	* If $sql == false, then we purge all files in the cache.
  	*/
 
         /**
-   * Flush cached recordsets that match a particular $sql statement. 
+   * Flush cached recordsets that match a particular $sql statement.
    * If $sql == false, then we purge all files in the cache.
     */
         function CacheFlush($sql=false,$inputarr=false)
@@ -1730,8 +1730,8 @@ if (!defined('_ADODB_LAYER')) {
 	*  - userid
 	*  - setFetchMode (adodb 4.23)
 	*
-	* When not in safe mode, we create 256 sub-directories in the cache directory ($ADODB_CACHE_DIR). 
-	* Assuming that we can have 50,000 files per directory with good performance, 
+	* When not in safe mode, we create 256 sub-directories in the cache directory ($ADODB_CACHE_DIR).
+	* Assuming that we can have 50,000 files per directory with good performance,
 	* then we can scale to 12.8 million unique cached recordsets. Wow!
  	*/
         function _gencachename($sql,$createdir)
@@ -1756,7 +1756,7 @@ if (!defined('_ADODB_LAYER')) {
         /**
 	 * Execute SQL, caching recordsets.
 	 *
-	 * @param [secs2cache]	seconds to cache data, set to 0 to force query. 
+	 * @param [secs2cache]	seconds to cache data, set to 0 to force query.
 	 *					  This is an optional parameter.
 	 * @param sql		SQL statement to execute
 	 * @param [inputarr]	holds the input data  to bind to
@@ -1902,7 +1902,7 @@ if (!defined('_ADODB_LAYER')) {
 	 * that should be assigned.
 	 *
 	 * Note: This function should only be used on a recordset
-	 *	   that is run against a single table and sql should only 
+	 *	   that is run against a single table and sql should only
 	 *		 be a simple select stmt with no groupby/orderby/limit
 	 *
 	 * "Jonathan Younger" <jyounger@unilab.com>
@@ -1949,11 +1949,11 @@ if (!defined('_ADODB_LAYER')) {
 	* Update a blob column, given a where clause. There are more sophisticated
 	* blob handling functions that we could have implemented, but all require
 	* a very complex API. Instead we have chosen something that is extremely
-	* simple to understand and use. 
+	* simple to understand and use.
 	*
 	* Note: $blobtype supports 'BLOB' and 'CLOB', default is BLOB of course.
 	*
-	* Usage to update a $blobvalue which has a primary key blob_id=1 into a 
+	* Usage to update a $blobvalue which has a primary key blob_id=1 into a
 	* field blobtable.blobcolumn:
 	*
 	*	UpdateBlob('blobtable', 'blobcolumn', $blobvalue, 'blob_id=1');
@@ -1972,7 +1972,7 @@ if (!defined('_ADODB_LAYER')) {
         /**
 	* Usage:
 	*	UpdateBlob('TABLE', 'COLUMN', '/path/to/file', 'ID=1');
-	*	
+	*
 	*	$blobtype supports 'BLOB' and 'CLOB'
 	*
 	*	$conn->Execute('INSERT INTO blobtable (id, blobcol) VALUES (1, null)');
@@ -2092,13 +2092,13 @@ if (!defined('_ADODB_LAYER')) {
         }
 
         /**
-	 * GetActiveRecordsClass Performs an 'ALL' query 
-	 * 
+	 * GetActiveRecordsClass Performs an 'ALL' query
+	 *
 	 * @param mixed $class This string represents the class of the current active record
 	 * @param mixed $table Table used by the active record object
 	 * @param mixed $whereOrderBy Where, order, by clauses
-	 * @param mixed $bindarr 
-	 * @param mixed $primkeyArr 
+	 * @param mixed $bindarr
+	 * @param mixed $primkeyArr
 	 * @param array $extra Query extras: limit, offset...
 	 * @param mixed $relations Associative array: table's foreign name, "hasMany", "belongsTo"
 	 * @access public
@@ -2216,7 +2216,7 @@ if (!defined('_ADODB_LAYER')) {
 
 
         /**
-	 * return the databases that the driver can connect to. 
+	 * return the databases that the driver can connect to.
 	 * Some databases will return an empty array.
 	 *
 	 * @return an array of database names.
@@ -2243,7 +2243,7 @@ if (!defined('_ADODB_LAYER')) {
 
 
         /**
-	 * @param ttype can either be 'VIEW' or 'TABLE' or false. 
+	 * @param ttype can either be 'VIEW' or 'TABLE' or false.
 	 * 		If false, both views and tables are returned.
 	 *		"VIEW" returns only views
 	 *		"TABLE" returns only tables
@@ -2251,7 +2251,7 @@ if (!defined('_ADODB_LAYER')) {
 	 * @param mask  is the input mask - only supported by oci8 and postgresql
 	 *
 	 * @return  array of tables for current database.
-	 */ 
+	 */
         function MetaTables($ttype=false,$showSchema=false,$mask=false)
         {
             global $ADODB_FETCH_MODE;
@@ -2305,7 +2305,7 @@ if (!defined('_ADODB_LAYER')) {
         }
 
         /**
-	 * List columns in a database as an array of ADOFieldObjects. 
+	 * List columns in a database as an array of ADOFieldObjects.
 	 * See top of file for definition of object.
 	 *
 	 * @param $table	table name to query
@@ -2361,7 +2361,7 @@ if (!defined('_ADODB_LAYER')) {
           * @param primary true to only show primary keys. Not actually used for most databases
     	  *
           * @return array of indexes on current table. Each element represents an index, and is itself an associative array.
-    	  
+
     		 Array (
     		    [name_of_index] => Array
     		      (
@@ -2371,7 +2371,7 @@ if (!defined('_ADODB_LAYER')) {
     	          	[0] => firstname
     		      	[1] => lastname
     	          )
-    		)		
+    		)
           */
         function MetaIndexes($table, $primary = false, $owner = false)
         {
@@ -2380,11 +2380,11 @@ if (!defined('_ADODB_LAYER')) {
         }
 
         /**
-	 * List columns names in a table as an array. 
+	 * List columns names in a table as an array.
 	 * @param table	table name to query
 	 *
 	 * @return  array of column names for current table.
-	 */ 
+	 */
         function MetaColumnNames($table, $numIndexes=false,$useattnum=false /* only for postgres */)
         {
             $objarr = $this->MetaColumns($table);
@@ -2409,14 +2409,14 @@ if (!defined('_ADODB_LAYER')) {
 
         /**
 	 * Different SQL databases used different methods to combine strings together.
-	 * This function provides a wrapper. 
-	 * 
+	 * This function provides a wrapper.
+	 *
 	 * param s	variable number of string parameters
 	 *
 	 * Usage: $db->Concat($str1,$str2);
-	 * 
+	 *
 	 * @return concatenated string
-	 */ 	 
+	 */
         function Concat()
         {
             $arr = func_get_args();
@@ -2588,7 +2588,7 @@ if (!defined('_ADODB_LAYER')) {
         }
 
         /**
-    	* Quotes a string, without prefixing nor appending quotes. 
+    	* Quotes a string, without prefixing nor appending quotes.
     	*/
         function addq($s,$magic_quotes=false)
         {
@@ -2617,7 +2617,7 @@ if (!defined('_ADODB_LAYER')) {
     	 * Correctly quotes a string so that all strings are escaped. We prefix and append
     	 * to the string single-quotes.
     	 * An example is  $db->qstr("Don't bother");
-    	 * 
+    	 *
     	 * @param s			the string to quote
     	 *
     	 * @return  quoted string to be sent back to database
@@ -2635,8 +2635,8 @@ if (!defined('_ADODB_LAYER')) {
 
 
         /**
-    	* Will select the supplied $page number from a recordset, given that it is paginated in pages of 
-    	* $nrows rows per page. It also saves two boolean values saying if the given page is the first 
+    	* Will select the supplied $page number from a recordset, given that it is paginated in pages of
+    	* $nrows rows per page. It also saves two boolean values saying if the given page is the first
     	* and/or last one of the recordset. Added by Iv�n Oliva to provide recordset pagination.
     	*
     	* See readme.htm#ex8 for an example of usage.
@@ -2662,8 +2662,8 @@ if (!defined('_ADODB_LAYER')) {
 
 
         /**
-    	* Will select the supplied $page number from a recordset, given that it is paginated in pages of 
-    	* $nrows rows per page. It also saves two boolean values saying if the given page is the first 
+    	* Will select the supplied $page number from a recordset, given that it is paginated in pages of
+    	* $nrows rows per page. It also saves two boolean values saying if the given page is the first
     	* and/or last one of the recordset. Added by Iv�n Oliva to provide recordset pagination.
     	*
     	* @param secs2cache	seconds to cache data, set to 0 to force query
@@ -2917,7 +2917,7 @@ if (!defined('_ADODB_LAYER')) {
 
         /**
 	 * Generate a SELECT tag string from a recordset, and return the string.
-	 * If the recordset has 2 cols, we treat the 1st col as the containing 
+	 * If the recordset has 2 cols, we treat the 1st col as the containing
 	 * the text to display to the user, and 2nd col as the return value. Default
 	 * strings are compared with the FIRST column.
 	 *
@@ -2928,7 +2928,7 @@ if (!defined('_ADODB_LAYER')) {
 	 * @param [size]		#rows to show for listbox. not used by popup
 	 * @param [selectAttr]		additional attributes to defined for SELECT tag.
 	 *				useful for holding javascript onChange='...' handlers.
-	 & @param [compareFields0]	when we have 2 cols in recordset, we compare the defstr with 
+	 & @param [compareFields0]	when we have 2 cols in recordset, we compare the defstr with
 	 *				column 0 (1st col) if this is true. This is not documented.
 	 *
 	 * @return HTML
@@ -2948,7 +2948,7 @@ if (!defined('_ADODB_LAYER')) {
 
         /**
 	 * Generate a SELECT tag string from a recordset, and return the string.
-	 * If the recordset has 2 cols, we treat the 1st col as the containing 
+	 * If the recordset has 2 cols, we treat the 1st col as the containing
 	 * the text to display to the user, and 2nd col as the return value. Default
 	 * strings are compared with the SECOND column.
 	 *
@@ -3010,7 +3010,7 @@ if (!defined('_ADODB_LAYER')) {
         }
 
         /**
-	 * return recordset as a 2-dimensional array. 
+	 * return recordset as a 2-dimensional array.
 	 * Helper function for ADOConnection->SelectLimit()
 	 *
 	 * @param offset	is the row to start calculations from (1-based)
@@ -3052,8 +3052,8 @@ if (!defined('_ADODB_LAYER')) {
         }
 
         /**
-	 * return whole recordset as a 2-dimensional associative array if there are more than 2 columns. 
-	 * The first column is treated as the key and is not included in the array. 
+	 * return whole recordset as a 2-dimensional associative array if there are more than 2 columns.
+	 * The first column is treated as the key and is not included in the array.
 	 * If there is only 2 columns, it will return a 1 dimensional array of key-value pairs unless
 	 * $force_array == true.
 	 *
@@ -3061,10 +3061,10 @@ if (!defined('_ADODB_LAYER')) {
 	 * 	array is returned, otherwise a 2 dimensional array is returned. If this sounds confusing,
 	 * 	read the source.
 	 *
-	 * @param [first2cols] means if there are more than 2 cols, ignore the remaining cols and 
+	 * @param [first2cols] means if there are more than 2 cols, ignore the remaining cols and
 	 * instead of returning array[col0] => array(remaining cols), return array[col0] => col1
 	 *
-	 * @return an associative array indexed by the first column of the array, 
+	 * @return an associative array indexed by the first column of the array,
 	 * 	or false if the  data has less than 2 cols.
 	 */
         function GetAssoc($force_array = false, $first2cols = false)
@@ -3248,7 +3248,7 @@ if (!defined('_ADODB_LAYER')) {
         }
 
         /**
-	* Fetch a row, returning false if no more rows. 
+	* Fetch a row, returning false if no more rows.
 	* This is PEAR DB compat mode.
 	*
 	* @return false or array containing the current record
@@ -3267,7 +3267,7 @@ if (!defined('_ADODB_LAYER')) {
 
 
         /**
-	* Fetch a row, returning PEAR_Error if no more rows. 
+	* Fetch a row, returning PEAR_Error if no more rows.
 	* This is PEAR DB compat mode.
 	*
 	* @return DB_OK or error object
@@ -3294,7 +3294,7 @@ if (!defined('_ADODB_LAYER')) {
 
 
         /**
-	 * Move to the last row in the recordset. 
+	 * Move to the last row in the recordset.
 	 *
 	 * @return true or false
 	 */
@@ -3388,7 +3388,7 @@ if (!defined('_ADODB_LAYER')) {
         /**
 	 * Get the value of a field in the current row by column name.
 	 * Will not work if ADODB_FETCH_MODE is set to ADODB_FETCH_NUM.
-	 * 
+	 *
 	 * @param colname  is the field to access
 	 *
 	 * @return the value of $colname column
@@ -3452,7 +3452,7 @@ if (!defined('_ADODB_LAYER')) {
         }
 
         /**
-	 * synonyms RecordCount and RowCount	
+	 * synonyms RecordCount and RowCount
 	 *
 	 * @return the number of rows or -1 if this is not supported
 	 */
@@ -3469,7 +3469,7 @@ if (!defined('_ADODB_LAYER')) {
         }
 
         /**
-	 * synonyms RecordCount and RowCount	
+	 * synonyms RecordCount and RowCount
 	 *
 	 * @return the number of rows or -1 if this is not supported
 	 */
@@ -3483,7 +3483,7 @@ if (!defined('_ADODB_LAYER')) {
 	 *
 	 * But aware possible problems in multiuser environments. For better speed the table
 	 * must be indexed by the condition. Heavy test this before deploying.
-	 */ 
+	 */
         function PO_RecordCount($table="", $condition="") {
 
             $lnumrows = $this->_numOfRows;
@@ -3560,7 +3560,7 @@ if (!defined('_ADODB_LAYER')) {
         /**
 	* Return the fields array of the current row as an object for convenience.
 	* The default case is uppercase.
-	* 
+	*
 	* @param $isupper to set the object property names to uppercase
 	*
 	* @return the object with the properties set to the fields of the current row
@@ -3592,7 +3592,7 @@ if (!defined('_ADODB_LAYER')) {
         /**
 	* Return the fields array of the current row as an object for convenience.
 	* The default is lower-case field names.
-	* 
+	*
 	* @return the object with the properties set to the fields of the current row,
 	* 	or false if EOF
 	*
@@ -3606,9 +3606,9 @@ if (!defined('_ADODB_LAYER')) {
 
 
         /**
-	* Return the fields array of the current row as an object for convenience. 
+	* Return the fields array of the current row as an object for convenience.
 	* The default is upper case field names.
-	* 
+	*
 	* @param $isupper to set the object property names to uppercase
 	*
 	* @return the object with the properties set to the fields of the current row,
@@ -3638,8 +3638,8 @@ if (!defined('_ADODB_LAYER')) {
 	 * 	fields bigger than a certain size as a 'B' (blob).
 	 * @param fieldobj is the field object returned by the database driver. Can hold
 	 *	additional info (eg. primary_key for mysql).
-	 * 
-	 * @return the general type of the data: 
+	 *
+	 * @return the general type of the data:
 	 *	C for character < 250 chars
 	 *	X for teXt (>= 250 chars)
 	 *	B for Binary
@@ -3649,7 +3649,7 @@ if (!defined('_ADODB_LAYER')) {
 	 * 	L for logical/Boolean
 	 *	I for integer
 	 *	R for autoincrement counter/integer
-	 * 
+	 *
 	 *
 	*/
         function MetaType($t,$len=-1,$fieldobj=false)
@@ -3845,7 +3845,7 @@ if (!defined('_ADODB_LAYER')) {
     /**
 	 * This class encapsulates the concept of a recordset created in memory
 	 * as an array. This is useful for the creation of cached recordsets.
-	 * 
+	 *
 	 * Note that the constructor is different from the standard ADORecordSet
 	 */
 
@@ -3913,9 +3913,9 @@ if (!defined('_ADODB_LAYER')) {
 		 * Setup the array.
 		 *
 		 * @param array		is a 2-dimensional array holding the data.
-		 *			The first row should hold the column names 
+		 *			The first row should hold the column names
 		 *			unless paramter $colnames is used.
-		 * @param typearr	holds an array of types. These are the same types 
+		 * @param typearr	holds an array of types. These are the same types
 		 *			used in MetaTypes (C,B,L,I,N).
 		 * @param [colnames]	array of column names. If set, then the first row of
 		 *			$array should not hold the column names.
@@ -3937,7 +3937,7 @@ if (!defined('_ADODB_LAYER')) {
 		 * Setup the Array and datatype file objects
 		 *
 		 * @param array		is a 2-dimensional array holding the data.
-		 *			The first row should hold the column names 
+		 *			The first row should hold the column names
 		 *			unless paramter $colnames is used.
 		 * @param fieldarr	holds an array of ADOFieldObject's.
 		 */
@@ -4287,6 +4287,9 @@ if (!defined('_ADODB_LAYER')) {
             case 'mysqli':
                 $drivername='mysql';
                 break;
+    		case 'sqlite':
+    		      $drivername = 'sqlite';
+    		      break;
             case 'postgres7':
             case 'postgres8':
                 $drivername = 'postgres';

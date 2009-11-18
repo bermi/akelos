@@ -76,21 +76,22 @@ class AkDbAdapter extends AkObject
      * @param array $database_settings
      * @return AkDbAdapter
      */
-    static function &getInstance($database_specifications = AK_DEFAULT_DATABASE_PROFILE, $auto_connect = true)
+    static function &getInstance($database_specifications = AK_DEFAULT_DATABASE_PROFILE, $auto_connect = true, $namespace = null)
     {
         $settings_hash = is_string($database_specifications) ? $database_specifications : AkDbAdapter::hash($database_specifications);
         $static_var_name = 'AkDbAdapter_getInstance_'.$settings_hash;
 
         if (!$Connection = Ak::getStaticVar($static_var_name)){
 
-            defined('AK_DATABASE_SETTINGS_NAMESPACE') ? null : define('AK_DATABASE_SETTINGS_NAMESPACE', 'database');
+            defined('AK_DATABASE_SETTINGS_NAMESPACE') || define('AK_DATABASE_SETTINGS_NAMESPACE', 'database');
+            $namespace = empty($namespace) ? AK_DATABASE_SETTINGS_NAMESPACE : $namespace;
 
             if (empty($database_specifications)) {
                 $settings_hash = AK_ENVIRONMENT;
-                $database_specifications = Ak::getSettings(AK_DATABASE_SETTINGS_NAMESPACE, false, $settings_hash);
+                $database_specifications = Ak::getSettings($namespace, false, $settings_hash);
             } else if (is_string($database_specifications)){
 
-                $environment_settings = Ak::getSettings(AK_DATABASE_SETTINGS_NAMESPACE, false, $database_specifications);
+                $environment_settings = Ak::getSettings($namespace, false, $database_specifications);
 
                 if (!empty($environment_settings)){
                     $database_specifications = $environment_settings;
@@ -99,13 +100,13 @@ class AkDbAdapter extends AkObject
                     $settings_hash = AK_ENVIRONMENT;
                 } else {
                     global $database_settings;
-                    if (isset($database_settings) && !file_exists(AK_CONFIG_DIR.DS.'database.yml')) {
+                    if (isset($database_settings) && !file_exists(AK_CONFIG_DIR.DS.$namespace.'.yml')) {
                         trigger_error(Ak::t("You are still using the old config/config.php database configuration. Please upgrade to use the config/database.yml configuration."), E_USER_NOTICE);
                     }
-                    if (!file_exists(AK_CONFIG_DIR.DS.'database.yml')) {
-                        trigger_error(Ak::t("Could not find the database configuration file in %dbconfig.",array('%dbconfig'=>AK_CONFIG_DIR.DS.'database.yml')), E_USER_ERROR);
+                    if (!file_exists(AK_CONFIG_DIR.DS.$namespace.'.yml')) {
+                        trigger_error(Ak::t("Could not find the database configuration file in %dbconfig.",array('%dbconfig'=>AK_CONFIG_DIR.DS.$namespace.'.yml')), E_USER_ERROR);
                     } else {
-                        trigger_error(Ak::t("Could not find the database profile '%profile_name' in config/database.yml.",array('%profile_name'=>$database_specifications)),E_USER_ERROR);
+                        trigger_error(Ak::t("Could not find the database profile '%profile_name' in config/%dbfile.yml.",array('%profile_name'=>$database_specifications, '%dbfile' => $namespace)),E_USER_ERROR);
                     }
 
                     $return = false;

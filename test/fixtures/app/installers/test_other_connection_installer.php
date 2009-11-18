@@ -4,7 +4,7 @@ class TestOtherConnectionInstaller extends AkInstaller
 {
     public function __construct()
     {
-        $adapter = AkDbAdapter::getInstance('sqlite_databases');
+        $adapter = AkDbAdapter::getInstance('sqlite_databases', true, 'database');
         parent::__construct($adapter);
     }
 

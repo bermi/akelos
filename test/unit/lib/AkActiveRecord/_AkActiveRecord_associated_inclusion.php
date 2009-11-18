@@ -6,6 +6,7 @@ class AkActiveRecord_associated_inclusion_TestCase extends  AkUnitTest
 {
     public function test_start()
     {
+        $this->rebaseAppPaths();
         $this->installAndIncludeModels('Property','Picture', array('instantiate'=>true));
     }
 
