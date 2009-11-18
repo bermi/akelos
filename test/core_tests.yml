@@ -1,5 +1,4 @@
 ActiveSupport:
-    - Ak
     - AkInflector
     - AkLazyObject
 
@@ -22,50 +21,6 @@ ActionController:
     -'AkActionController/_part*'
     -'AkActionController/_r*'
     #-'AkActionController/*' todo: cache tests
-
-ActiveRecord:
-    -'AkActiveRecord/_AkActiveRecord_1'
-	-'AkActiveRecord/_AkActiveRecord_2'
-	-'AkActiveRecord/_AkActiveRecord_3'
-	-'AkActiveRecord/_AkActiveRecord_accessible_attributes'
-	-'AkActiveRecord/_AkActiveRecord_associated_inclusion'
-	-'AkActiveRecord/_AkActiveRecord_association_finders'
-	-'AkActiveRecord/_AkActiveRecord_basic_attribute_incrementing'
-	-'AkActiveRecord/_AkActiveRecord_basic_CRUD'
-	-'AkActiveRecord/_AkActiveRecord_calculations'
-	-'AkActiveRecord/_AkActiveRecord_callbacks'
-	-'AkActiveRecord/_AkActiveRecord_connection_handling'
-	-'AkActiveRecord/_AkActiveRecord_counters'
-	-'AkActiveRecord/_AkActiveRecord_datatypes'
-	-'AkActiveRecord/_AkActiveRecord_find'
-	-'AkActiveRecord/_AkActiveRecord_finders'
-	-'AkActiveRecord/_AkActiveRecord_findOrCreateBy'
-	-'AkActiveRecord/_AkActiveRecord_i18n'
-	-'AkActiveRecord/_AkActiveRecord_locking'
-	-'AkActiveRecord/_AkActiveRecord_multiple_inclussion'
-	-'AkActiveRecord/_AkActiveRecord_nested_finders'
-	-'AkActiveRecord/_AkActiveRecord_return_types'
-	-'AkActiveRecord/_AkActiveRecord_serialize'
-	-'AkActiveRecord/_AkActiveRecord_table_inheritance'
-	-'AkActiveRecord/_AkActiveRecord_type_casting'
-	-'AkActiveRecord/_PostgreSQL_datatype_migration'
-	-'AkActiveRecord/_to_formats'
-	-'AkActiveRecord/AkActsAsList'
-	-'AkActiveRecord/AkActsAsNestedSet'
-	-'AkActiveRecord/AkActsAsTree'
-	-'AkActiveRecord/AkBelongsTo'
-	-'AkActiveRecord/AkBelongsTo_Find_Include_Owner_belongsTo'
-	-'AkActiveRecord/AkDbAdapter'
-	-'AkActiveRecord/AkDbAdapter_schema'
-	-'AkActiveRecord/AkDbAdapter_selecting'
-	-'AkActiveRecord/AkHasAndBelongsToMany'
-	-'AkActiveRecord/AkHasMany'
-	-'AkActiveRecord/AkHasMany_specifications'
-	-'AkActiveRecord/AkHasMany_table_inheritance'
-	-'AkActiveRecord/AkHasOne_specifications'
-	-'AkActiveRecord/AkObserver'
-	-'AkActiveRecord/AkValidation'
-
 
 ActionWebService:
     -'AkActionWebService/AkActionWebServiceApi'
