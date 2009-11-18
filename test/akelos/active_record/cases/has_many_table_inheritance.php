@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class HasHanyTableInheritance_TestCase extends AkUnitTest
+class HasManyTableInheritance_TestCase extends AkUnitTest
 {
     public function test_start()
     {
@@ -52,5 +52,5 @@ class HasHanyTableInheritance_TestCase extends AkUnitTest
     }
 }
 
-ak_test_case('HasHanyTableInheritance_TestCase');
+ak_test_case('HasManyTableInheritance_TestCase');
 

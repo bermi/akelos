@@ -71,5 +71,5 @@ class ConnectionHandling_TestCase extends  AkUnitTest
 
 }
 
-ak_test('ConnectionHandling_TestCase',true);
+ak_test_case('ConnectionHandling_TestCase',true);
 

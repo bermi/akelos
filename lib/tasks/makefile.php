@@ -34,3 +34,12 @@ makelos_task('test:refactor_suite', array(
     'description' => 'Refactors a test suite',
 ));
 
+
+//////
+
+makelos_task('newtest:case', array(
+    'description' => 'Runs a single test case file',
+    //'autocompletion' => 'ENVIRONMENT=production'
+));
+
+

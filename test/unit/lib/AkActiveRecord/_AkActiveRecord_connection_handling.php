@@ -71,5 +71,5 @@ class ActiveRecord_connection_handling_TestCase extends  AkUnitTest
 
 }
 
-ak_test('ActiveRecord_connection_handling_TestCase',true);
+ak_test_case('ActiveRecord_connection_handling_TestCase');
 

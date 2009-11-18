@@ -246,6 +246,7 @@ defined('AK_DEFAULT_LOCALE_NAMESPACE')          || define('AK_DEFAULT_LOCALE_NAM
 
 defined('AK_PLUGINS_MAIN_REPOSITORY')           || define('AK_PLUGINS_MAIN_REPOSITORY', 'http://svn.akelos.org/plugins');
 defined('AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE') || define('AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE', 'http://www.akelos.org/wiki/plugins');
+defined('AK_TESTING_NAMESPACE')                 || define('AK_TESTING_NAMESPACE', AK_APP_NAME);
 
 /**
  *  Before rev.1232 MySQL on some setups, connections where opened using PHP's default

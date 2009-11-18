@@ -27,6 +27,52 @@ class AkUnitTestSuite extends TestSuite
         }
     }
 
+
+    static function runFromOptions($options = array())
+    {
+        $default_options = array(
+        'base_path' => AK_LIB_TESTS_DIRECTORY,
+        'TestSuite' => null,
+        'reporter'  => AK_TEST_DEFAULT_REPORTER,
+        'files'  => array(),
+        );
+        $options = array_merge($default_options, $options);
+        $descriptions = array();
+        if(!empty($options['files'])){
+            $full_paths = array();
+            foreach ($options['files'] as $file){
+                list($suite, $case) = explode('/', $file.'/');
+                $case = str_replace('.php', '', $case);
+                $full_paths[] = $options['base_path'].DS.$suite.DS.'cases'.DS.$case.'.php';
+                $descriptions[AkInflector::titleize($suite)][] = AkInflector::titleize($case);
+            }
+            $options['files'] = $full_paths;
+        }
+        $options['description'] = '';
+        foreach ($descriptions as $suite => $cases){
+            $options['description'] .= "$suite (cases): ".$options['description'].rtrim(join(', ', $cases), ', ')."\n";
+        }
+        if(empty($options['description'])){
+            $options['description'] =  AkInflector::titleize($options['suite']).' (suite)';
+            $options['files'] = array_diff(glob($options['base_path'].DS.$options['suite'].DS.'cases'.DS.'*.php'), array(''));
+        }
+        if(empty($options['title'])){
+            $options['title'] =  "PHP ".phpversion().", Environment: ".AK_ENVIRONMENT.", Database: ".Ak::getSetting((defined('AK_DATABASE_SETTINGS_NAMESPACE')?AK_DATABASE_SETTINGS_NAMESPACE:'database'), 'type')."\n"."Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n".trim($options['description']).'';
+        }
+
+        $options['TestSuite'] = new AkUnitTestSuite($options['title']);
+        $options['TestSuite']->running_from_config = true;
+
+        if(empty($options['files'])){
+            trigger_error('Could not find test cases to run.', E_USER_ERROR);
+        }
+        foreach ($options['files'] as $file){
+            $options['TestSuite']->addFile($file);
+        }
+
+        exit ($options['TestSuite']->run(new $options['reporter']()) ? 0 : 1);
+    }
+
     static function runFromConfig($options = array())
     {
         $default_options = array(
