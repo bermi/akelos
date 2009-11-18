@@ -2,13 +2,13 @@
 
 //This code was generated automatically by the active record hasAndBelongsToMany Method
 
-class PostTag extends ActiveRecord {
+class PropertyPropertyType extends ActiveRecord {
     public $_avoidTableNameValidation = true;
-    public function PostTag()
+    public function PropertyPropertyType()
     {
-        $this->setModelName("PostTag");
+        $this->setModelName("PropertyPropertyType");
         $attributes = (array)func_get_args();
-        $this->setTableName('posts_tags', true, true);
+        $this->setTableName('properties_property_types', true, true);
         $this->init($attributes);
     }
 }

@@ -4,7 +4,7 @@ class PropertyInstaller extends AkInstaller
 {
     public function install($version = null, $options = array())
     {
-        $this->createTable('properties', 
+        $this->createTable('properties',
         '
         id,
         description string(255),
@@ -21,5 +21,3 @@ class PropertyInstaller extends AkInstaller
         @Ak::file_delete(AK_MODELS_DIR.DS.'property_property_type.php');
     }
 }
-
-?>

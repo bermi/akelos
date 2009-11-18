@@ -11,5 +11,4 @@ class TodoList extends ActiveRecord
         'handler_name' => 'task')
     );
 
-}  
-?>
+}

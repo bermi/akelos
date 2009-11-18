@@ -6,4 +6,3 @@ class User extends ActiveRecord
     public $serialize = array('preferences');
 }
 
-?>

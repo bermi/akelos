@@ -54,13 +54,18 @@ class AkUnitTest extends UnitTestCase
 
     public function rebaseAppPaths($base_path = null)
     {
-        $base_path = !is_dir($base_path) ? AkConfig::getDir('fixtures') : $base_path;
-        AkConfig::setDir('app',             $base_path.DS.'app');
-        AkConfig::setDir('app_installers',  $base_path.DS.'app'.DS.'installers');
-        AkConfig::setDir('models',          $base_path.DS.'app'.DS.'models');
-        AkConfig::setDir('controllers',     $base_path.DS.'app'.DS.'controllers');
-        AkConfig::setDir('views',           $base_path.DS.'app'.DS.'views');
-        AkConfig::setDir('apis',            $base_path.DS.'app'.DS.'apis');
+        if(!is_dir($base_path) && $base_path_candidate = AkConfig::getDir('suite_path', false, false)){
+            $base_path = $base_path_candidate;
+        }else{
+            $base_path = (!is_dir($base_path) ? AkConfig::getDir('fixtures') : $base_path).DS.'app';
+        }
+
+        AkConfig::setDir('app',             $base_path);
+        AkConfig::setDir('app_installers',  $base_path.DS.'installers');
+        AkConfig::setDir('models',          $base_path.DS.'models');
+        AkConfig::setDir('controllers',     $base_path.DS.'controllers');
+        AkConfig::setDir('views',           $base_path.DS.'views');
+        AkConfig::setDir('apis',            $base_path.DS.'apis');
         $this->_path_rebased = true;
     }
     public function restoreAppPaths()

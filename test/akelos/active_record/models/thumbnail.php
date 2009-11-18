@@ -8,4 +8,3 @@ class Thumbnail extends ActiveRecord
     );
 }
 
-?>

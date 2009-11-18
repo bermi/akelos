@@ -16,4 +16,3 @@ class FileInstaller extends AkInstaller
     }
 }
 
-?>

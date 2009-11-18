@@ -2,7 +2,7 @@
 
 class FatherInstaller extends AkInstaller
 {
-    function up_1()
+    public function up_1()
     {
         $this->createTable('fathers', '
         id,
@@ -11,10 +11,9 @@ class FatherInstaller extends AkInstaller
         );
     }
 
-    function down_1()
+    public function down_1()
     {
         $this->dropTable('fathers');
     }
 }
 
-?>

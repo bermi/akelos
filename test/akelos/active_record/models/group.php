@@ -6,4 +6,3 @@ class Group extends ActiveRecord
     public $has_many = 'locations';
 }
 
-?>

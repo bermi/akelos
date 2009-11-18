@@ -18,4 +18,3 @@ class PictureInstaller extends AkInstaller
     }
 }
 
-?>

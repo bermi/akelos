@@ -4,7 +4,7 @@ class PropertyTypeInstaller extends AkInstaller
 {
     public function install($version = null, $options = array())
     {
-        $this->createTable('property_types', 
+        $this->createTable('property_types',
         '
         id integer max=10 auto increment primary,
         description string(255)
@@ -18,4 +18,3 @@ class PropertyTypeInstaller extends AkInstaller
     }
 }
 
-?>

@@ -1,6 +1,6 @@
 <?php
 
-class Tag extends AkActiveRecord 
+class Tag extends AkActiveRecord
 {
     public $habtm = array(
         'files' => array(
@@ -9,8 +9,7 @@ class Tag extends AkActiveRecord
         ),
         'posts'
     );
-    
+
     public $has_many = 'taggings';
 }
 
-?>

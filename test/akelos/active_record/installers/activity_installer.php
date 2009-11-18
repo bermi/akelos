@@ -2,7 +2,7 @@
 
 class ActivityInstaller extends AkInstaller
 {
-    function up_1()
+    public function up_1()
     {
         $this->createTable('activities', '
         id,
@@ -12,10 +12,9 @@ class ActivityInstaller extends AkInstaller
         );
     }
 
-    function down_1()
+    public function down_1()
     {
         $this->dropTable('activities');
     }
 }
 
-?>

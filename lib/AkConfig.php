@@ -116,7 +116,7 @@ class AkConfig
         return defined($name[1]) ? constant($name[1]) : '';
     }
 
-    static function getDir($type, $_set_value = false)
+    static function getDir($type, $_set_value = false, $fail_if_not_found = true)
     {
         static $dir_names = array();
         if($_set_value){
@@ -129,14 +129,18 @@ class AkConfig
             }
         }
         if(!isset($dir_names[$type])){
-            trigger_error(Ak::t('Can\'t find path for directory %dir', array('%dir'=>$type)), E_USER_ERROR);
+            if($fail_if_not_found){
+                trigger_error(Ak::t('Can\'t find path for directory %dir', array('%dir'=>$type)).' '.Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
+            }else{
+                return false;
+            }
         }
         return $dir_names[$type];
     }
 
     static function setDir($type, $value)
     {
-        AkConfig::getDir($type, $value);
+        AkConfig::getDir($type, $value, false);
     }
 
     static function getLocalesReady()

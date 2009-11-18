@@ -10,5 +10,3 @@ class ConcertInstaller extends AkInstaller
     {
     }
 }
-
-?>

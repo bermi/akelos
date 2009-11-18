@@ -11,4 +11,3 @@ class OpenHouseMeetingInstaller extends AkInstaller
     }
 }
 
-?>

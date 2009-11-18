@@ -2,7 +2,7 @@
 
 class TodoTaskInstaller extends AkInstaller
 {
-    function up_1()
+    public function up_1()
     {
         $this->createTable('todo_tasks',
            "id,
@@ -13,12 +13,10 @@ class TodoTaskInstaller extends AkInstaller
             created_at"
         );
     }
-    
-    function down_1()
+
+    public function down_1()
     {
         $this->dropTable('todo_tasks', array('sequence'=>true));
     }
-
 }
 
-?>

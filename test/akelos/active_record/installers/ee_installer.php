@@ -2,7 +2,7 @@
 
 class EeInstaller extends AkInstaller
 {
-    function up_1()
+    public function up_1()
     {
         $this->createTable('ees', '
         id,
@@ -10,10 +10,9 @@ class EeInstaller extends AkInstaller
         );
     }
 
-    function down_1()
+    public function down_1()
     {
         $this->dropTable('ees');
     }
 }
 
-?>

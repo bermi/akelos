@@ -1,6 +1,7 @@
 <?php
-    class Category extends ActiveRecord 
-    {
-        public $act_as = "tree";
-    } 
-?>
+
+class Category extends ActiveRecord
+{
+    public $act_as = "tree";
+}
+

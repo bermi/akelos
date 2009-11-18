@@ -1,6 +1,7 @@
 <?php
-    class NestedCategory extends ActiveRecord 
-    {
-        public $act_as = "nested_set";
-    } 
-?>
+
+class NestedCategory extends ActiveRecord
+{
+    public $act_as = "nested_set";
+}
+

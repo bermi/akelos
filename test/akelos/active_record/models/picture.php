@@ -10,4 +10,3 @@ class Picture extends ActiveRecord
     'landlord');
 }
 
-?>

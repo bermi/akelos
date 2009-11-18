@@ -21,4 +21,3 @@ class LocationInstaller extends AkInstaller
     }
 }
 
-?>

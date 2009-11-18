@@ -16,4 +16,3 @@ class ManyInstaller extends AkInstaller
     }
 }
 
-?>

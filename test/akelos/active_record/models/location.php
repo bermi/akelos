@@ -8,4 +8,3 @@ class Location extends ActiveRecord
         );
 }
 
-?>

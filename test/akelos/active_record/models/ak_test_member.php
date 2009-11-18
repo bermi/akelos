@@ -1,12 +1,11 @@
-<?php 
+<?php
 
-class AkTestMember extends AkTestUser 
-{ 
-    public function AkTestMember()
+class AkTestMember extends AkTestUser
+{
+    public function __construct()
     {
         $this->setTableName("ak_test_members");
-        $this->init(@(array)func_get_args());
+        parent::__construct(@(array)func_get_args());
     }
 }
 
-?>

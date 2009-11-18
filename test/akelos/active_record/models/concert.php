@@ -7,4 +7,3 @@ class Concert extends Event
 
 }
 
-?>

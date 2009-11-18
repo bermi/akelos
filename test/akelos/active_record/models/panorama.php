@@ -14,4 +14,3 @@ class Panorama extends ActiveRecord
     }
 }
 
-?>

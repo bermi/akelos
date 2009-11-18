@@ -19,4 +19,3 @@ class TaggingInstaller extends AkInstaller
     }
 }
 
-?>

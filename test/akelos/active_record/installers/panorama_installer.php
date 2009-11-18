@@ -17,4 +17,3 @@ class PanoramaInstaller extends AkInstaller
     }
 }
 
-?>

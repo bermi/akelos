@@ -13,4 +13,3 @@ class ExtendedPostInstaller extends AkInstaller
     }
 }
 
-?>

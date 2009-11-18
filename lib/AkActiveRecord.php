@@ -636,7 +636,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         if ($this->isLockingEnabled() && $affected_rows != 1){
             $this->setAttribute('lock_version', $previous_value);
-            trigger_error(Ak::t('Attempted to update a stale object'), E_USER_NOTICE);
+            trigger_error(Ak::t('Attempted to update a stale object').Ak::getFileAndNumberTextForError(1), E_USER_NOTICE);
             return $this->transactionFail();
         }
 
@@ -927,7 +927,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $conditions=!empty($options['conditions'])?$options['conditions']:'';
         switch ($num_ids){
             case 0 :
-                trigger_error($this->t('Couldn\'t find %object_name without an ID%conditions',array('%object_name'=>$this->getModelName(),'%conditions'=>$conditions)), E_USER_ERROR);
+                trigger_error($this->t('Couldn\'t find %object_name without an ID%conditions',array('%object_name'=>$this->getModelName(),'%conditions'=>$conditions)).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
                 break;
 
             case 1 :
@@ -1179,7 +1179,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         list($sql, $requested_args) = $this->_getFindBySqlAndColumns($find_by_sql, $query_values);
 
         if($query_arguments_count != count($requested_args)){
-            trigger_error(Ak::t('Argument list did not match expected set. Requested arguments are:').join(', ',$requested_args),E_USER_ERROR);
+            trigger_error(Ak::t('Argument list did not match expected set. Requested arguments are:').join(', ',$requested_args), E_USER_ERROR);
             $false = false;
             return $false;
         }
@@ -1465,7 +1465,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 "This error is raised because the column '%column' is reserved for storing the class in case of inheritance. ".
                 "Please rename this column if you didn't intend it to be used for storing the inheritance class ".
                 "or overwrite #{self.to_s}.inheritance_column to use another column for that information.",
-                array('%class_name'=>$inheritance_model_name, '%column'=>$this->getInheritanceColumn())),E_USER_ERROR);
+                array('%class_name'=>$inheritance_model_name, '%column'=>$this->getInheritanceColumn())).Ak::getFileAndNumberTextForError(1),E_USER_ERROR);
             }
         }
 
@@ -1519,10 +1519,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     public function setInheritanceColumn($column_name)
     {
         if(!$this->hasColumn($column_name)){
-            trigger_error(Ak::t('Could not set "%column_name" as the inheritance column as this column is not available on the database.',array('%column_name'=>$column_name)), E_USER_NOTICE);
+            trigger_error(Ak::t('Could not set "%column_name" as the inheritance column as this column is not available on the database.',array('%column_name'=>$column_name)).' '.Ak::getFileAndNumberTextForError(1), E_USER_NOTICE);
             return false;
         }elseif($this->getColumnType($column_name) != 'string'){
-            trigger_error(Ak::t('Could not set %column_name as the inheritance column as this column type is "%column_type" instead of "string".',array('%column_name'=>$column_name,'%column_type'=>$this->getColumnType($column_name))), E_USER_NOTICE);
+            trigger_error(Ak::t('Could not set %column_name as the inheritance column as this column type is "%column_type" instead of "string".',array('%column_name'=>$column_name,'%column_type'=>$this->getColumnType($column_name))).' '.Ak::getFileAndNumberTextForError(1), E_USER_NOTICE);
             return false;
         }else{
             $this->_inheritanceColumn = $column_name;
@@ -2127,7 +2127,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         if(!empty($invalid_columns)){
             trigger_error(Ak::t('There was an error while setting the composed field "%field_name", the following mapping column/s "%columns" do not exist',
-            array('%field_name'=>$args[0],'%columns'=>join(', ',$invalid_columns))), E_USER_ERROR);
+            array('%field_name'=>$args[0],'%columns'=>join(', ',$invalid_columns))).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
         }else{
             $attribute = array_shift($args);
             $this->_combinedAttributes[$attribute] = $args;
@@ -2355,7 +2355,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     public function setPrimaryKey($primary_key = 'id')
     {
         if(!$this->hasColumn($primary_key)){
-            trigger_error($this->t('Opps! We could not find primary key column %primary_key on the table %table, for the model %model',array('%primary_key'=>$primary_key,'%table'=>$this->getTableName(), '%model'=>$this->getModelName())),E_USER_ERROR);
+            trigger_error($this->t('Opps! We could not find primary key column %primary_key on the table %table, for the model %model',array('%primary_key'=>$primary_key,'%table'=>$this->getTableName(), '%model'=>$this->getModelName())).Ak::getFileAndNumberTextForError(1),E_USER_ERROR);
         }else {
             $this->_primaryKey = $primary_key;
         }
@@ -2391,7 +2391,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     trigger_error(Ak::t('Unable to set "%table_name" table for the model "%model".'.
                     '  There is no "%table_name" available into current database layout.'.
                     ' Set AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES constant to false in order to'.
-                    ' avoid table name validation',array('%table_name'=>$table_name,'%model'=>$this->getModelName())),E_USER_WARNING);
+                    ' avoid table name validation',array('%table_name'=>$table_name,'%model'=>$this->getModelName())).Ak::getFileAndNumberTextForError(1),E_USER_WARNING);
                 }
                 return false;
             }
@@ -2572,7 +2572,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             !$this->_runCurrentModelInstallerIfExists($column_objects)){
                 // akelos_migrations is the first active record to be installed, therefore the table will be created after the first run.
                 if($this->getTableName() != 'akelos_migrations'){
-                    trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())), E_USER_ERROR);
+                    trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
                 }
                 return false;
             }elseif (empty($column_objects)){
@@ -3631,14 +3631,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         // Ensure that one and only one range option is specified.
         switch (count($range_options)) {
             case 0:
-                trigger_error(Ak::t('Range unspecified.  Specify the "within", "maximum", "minimum, or "is" option.'), E_USER_ERROR);
+                trigger_error(Ak::t('Range unspecified.  Specify the "within", "maximum", "minimum, or "is" option.').Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
                 return false;
                 break;
             case 1:
                 $options = array_merge($default_options, $options);
                 break;
             default:
-                trigger_error(Ak::t('Too many range options specified.  Choose only one.'), E_USER_ERROR);
+                trigger_error(Ak::t('Too many range options specified.  Choose only one.').Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
                 return false;
                 break;
         }
@@ -3648,7 +3648,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             case 'within':
             case 'in':
                 if(empty($option_value) || !is_array($option_value) || count($option_value) != 2 || !is_numeric($option_value[0]) || !is_numeric($option_value[1])){
-                    trigger_error(Ak::t('%option must be a Range (array(min, max))',array('%option',$option)), E_USER_ERROR);
+                    trigger_error(Ak::t('%option must be a Range (array(min, max))',array('%option',$option)).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
                     return false;
                 }
                 $attribute_names = Ak::toArray($attribute_names);
@@ -3667,7 +3667,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             case 'maximum':
 
                 if(empty($option_value) || !is_numeric($option_value) || $option_value <= 0){
-                    trigger_error(Ak::t('%option must be a nonnegative Integer',array('%option',$option_value)), E_USER_ERROR);
+                    trigger_error(Ak::t('%option must be a nonnegative Integer',array('%option',$option_value)).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
                     return false;
                 }
 
@@ -4436,7 +4436,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             }
         }
         if(!class_exists($class_name)){
-            trigger_error(Ak::t('The class %class used for handling an "act_as %class" does not exist',array('%class'=>$class_name)), E_USER_ERROR);
+            trigger_error(Ak::t('The class %class used for handling an "act_as %class" does not exist',array('%class'=>$class_name)).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
             $false = false;
             return $false;
         }else{
@@ -5184,7 +5184,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         count($conditions=null, $joins=null)
         */
         if(count($args) > 2){
-            trigger_error(Ak::t("Unexpected parameters passed to count(\$options=array())", E_USER_ERROR));
+            trigger_error(Ak::t("Unexpected parameters passed to count(\$options=array())").Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
         }elseif(count($args) > 0){
             if(!empty($args[0]) && is_array($args[0])){
                 $options = $args[0];
@@ -5261,7 +5261,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         $invalid_options = array_diff(array_keys($options),$this->_calculation_options);
         if(!empty($invalid_options)){
-            trigger_error(Ak::t('%options are not valid calculation options.', array('%options'=>join(', ',$invalid_options))), E_USER_ERROR);
+            trigger_error(Ak::t('%options are not valid calculation options.', array('%options'=>join(', ',$invalid_options))).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
         }
     }
 

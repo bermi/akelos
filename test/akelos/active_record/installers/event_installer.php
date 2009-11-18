@@ -17,4 +17,3 @@ class EventInstaller extends AkInstaller
     }
 }
 
-?>

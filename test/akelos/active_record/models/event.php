@@ -1,8 +1,7 @@
 <?php
 
-class Event extends ActiveRecord 
+class Event extends ActiveRecord
 {
 
 }
 
-?>

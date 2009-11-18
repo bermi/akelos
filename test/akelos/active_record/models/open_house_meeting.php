@@ -7,4 +7,3 @@ class OpenHouseMeeting extends Event
 
 }
 
-?>

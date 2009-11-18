@@ -1,6 +1,6 @@
 <?php
 
-class File extends AkActiveRecord 
+class File extends AkActiveRecord
 {
     public $habtm = array(
         'tags' => array(
@@ -8,8 +8,7 @@ class File extends AkActiveRecord
             'join_class_name' => 'Tagging'
         )
     );
-    
+
     public $has_many = 'taggings';
 }
 
-?>

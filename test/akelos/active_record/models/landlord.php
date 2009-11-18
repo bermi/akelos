@@ -2,7 +2,6 @@
 
 class Landlord extends ActiveRecord
 {
-    // var $hasMany = 'properties';
     public $hasOne = 'picture';
 
     public function validateOnCreate()
@@ -15,4 +14,3 @@ class Landlord extends ActiveRecord
     }
 }
 
-?>
