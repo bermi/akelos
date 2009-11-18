@@ -29,3 +29,8 @@ makelos_task('test:suite', array(
     'autocompletion' => 'ENVIRONMENT=production'
 ));
 
+
+makelos_task('test:refactor_suite', array(
+    'description' => 'Refactors a test suite',
+));
+

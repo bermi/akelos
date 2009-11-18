@@ -174,4 +174,4 @@ class AkImage_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkImage_TestCase');
+ak_test_case('AkImage_TestCase');

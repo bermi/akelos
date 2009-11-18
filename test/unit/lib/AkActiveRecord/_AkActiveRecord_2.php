@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class AkActiveRecord_base2_TestCase extends  AkUnitTest
+class ActiveRecord_legacy_tests_2_TestCase extends  AkUnitTest
 {
     public $rebase = true;
 
@@ -463,4 +463,4 @@ class AkActiveRecord_base2_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkActiveRecord_base2_TestCase');
+ak_test_case('ActiveRecord_legacy_tests_2_TestCase');

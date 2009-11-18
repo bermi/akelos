@@ -118,5 +118,5 @@ class ActiveRecord_calculations_TestCase extends  AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('ActiveRecord_calculations_TestCase');
+ak_test_case('ActiveRecord_calculations_TestCase');
 

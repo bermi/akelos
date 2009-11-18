@@ -70,5 +70,5 @@ class AkTestApplication_TestCase extends  AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('AkTestApplication_TestCase');
+ak_test_case('AkTestApplication_TestCase');
 

@@ -118,5 +118,5 @@ class ActiveRecordHelper_TestCase extends HelpersUnitTester
     /**/
 }
 
-ak_test_run_case_if_executed('ActiveRecordHelper_TestCase');
+ak_test_case('ActiveRecordHelper_TestCase');
 

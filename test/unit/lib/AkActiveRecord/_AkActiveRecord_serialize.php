@@ -48,5 +48,5 @@ class ActiveRecord_serialize_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('ActiveRecord_serialize_TestCase');
+ak_test_case('ActiveRecord_serialize_TestCase');
 

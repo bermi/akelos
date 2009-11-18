@@ -44,5 +44,5 @@ class AkContionController_http_authentication_TestCase extends AkWebTestCase
     }
 }
 
-ak_test_run_case_if_executed('AkContionController_http_authentication_TestCase');
+ak_test_case('AkContionController_http_authentication_TestCase');
 

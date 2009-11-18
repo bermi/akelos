@@ -41,5 +41,5 @@ class ActiveRecord_find_or_create_by_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('ActiveRecord_find_or_create_by_TestCase');
+ak_test_case('ActiveRecord_find_or_create_by_TestCase');
 

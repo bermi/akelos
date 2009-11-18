@@ -29,5 +29,5 @@ class AkContionController_model_instantiation_TestCase extends AkWebTestCase
     }
 }
 
-ak_test_run_case_if_executed('AkContionController_model_instantiation_TestCase');
+ak_test_case('AkContionController_model_instantiation_TestCase');
 

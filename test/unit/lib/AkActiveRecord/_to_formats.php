@@ -159,5 +159,5 @@ EOX;
     }
 }
 
-ak_test_run_case_if_executed('ActiveRecord_conversion_between_formats_TestCase');
+ak_test_case('ActiveRecord_conversion_between_formats_TestCase');
 

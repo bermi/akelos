@@ -30,4 +30,4 @@ class AkActionController_renders_format_TestCase extends AkWebTestCase
     }
 }
 
-ak_test_run_case_if_executed('AkActionController_renders_format_TestCase');
+ak_test_case('AkActionController_renders_format_TestCase');

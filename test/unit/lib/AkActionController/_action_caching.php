@@ -215,5 +215,5 @@ class ActionCaching_TestCase extends AkTestApplication
 
 }
 
-ak_test_run_case_if_executed('ActionCaching_TestCase');
+ak_test_case('ActionCaching_TestCase');
 

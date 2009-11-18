@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class ActsAsTree_TestCase extends  AkUnitTest
+class ActiveRecord_acts_as_tree_TestCase extends  AkUnitTest
 {
     public function test_start()
     {
@@ -188,5 +188,5 @@ class ActsAsTree_TestCase extends  AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('ActsAsTree_TestCase');
+ak_test_case('ActiveRecord_acts_as_tree_TestCase');
 

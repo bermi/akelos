@@ -61,4 +61,4 @@ class AkContionController_partials_TestCase extends  AkWebTestCase
     }
 }
 
-ak_test_run_case_if_executed('AkContionController_partials_TestCase');
+ak_test_case('AkContionController_partials_TestCase');

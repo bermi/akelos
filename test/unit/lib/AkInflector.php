@@ -327,4 +327,4 @@ class AkInflector_TestCase extends  UnitTestCase
     }
 }
 
-ak_test_run_case_if_executed('AkInflector_TestCase');
+ak_test_case('AkInflector_TestCase');

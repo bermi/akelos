@@ -158,5 +158,5 @@ class TimeZone_TestCase extends AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('TimeZone_TestCase');
+ak_test_case('TimeZone_TestCase');
 

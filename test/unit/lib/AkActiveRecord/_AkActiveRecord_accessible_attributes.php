@@ -185,5 +185,5 @@ class ActiveRecord_accessible_attributes_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('ActiveRecord_accessible_attributes_TestCase');
+ak_test_case('ActiveRecord_accessible_attributes_TestCase');
 

@@ -296,4 +296,4 @@ class ActiveRecord_association_finders_TestCase extends  AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('ActiveRecord_association_finders_TestCase');
+ak_test_case('ActiveRecord_association_finders_TestCase');

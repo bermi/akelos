@@ -59,5 +59,5 @@ class ActiveRecord_locking_TestCase extends  AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('ActiveRecord_locking_TestCase');
+ak_test_case('ActiveRecord_locking_TestCase');
 

@@ -74,5 +74,5 @@ class AkReflectionFunction_TestCase extends AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkReflectionFunction_TestCase');
+ak_test_case('AkReflectionFunction_TestCase');
 

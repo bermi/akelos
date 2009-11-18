@@ -87,4 +87,4 @@ class ActiveRecord_counters_TestCase extends  AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('ActiveRecord_counters_TestCase');
+ak_test_case('ActiveRecord_counters_TestCase');

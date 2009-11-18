@@ -182,5 +182,5 @@ class ActiveRecord_finder_return_types_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('ActiveRecord_finder_return_types_TestCase');
+ak_test_case('ActiveRecord_finder_return_types_TestCase');
 

@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class AkDbAdapter_schema_TestCase extends  AkUnitTest
+class ActiveRecord_bb_adapter_schema_TestCase extends  AkUnitTest
 {
     public function test_should_return_available_tables_for_mysql()
     {
@@ -89,5 +89,5 @@ class AkDbAdapter_schema_TestCase extends  AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('AkDbAdapter_schema_TestCase');
+ak_test_case('ActiveRecord_bb_adapter_schema_TestCase');
 

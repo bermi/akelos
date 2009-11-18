@@ -97,4 +97,4 @@ class ActiveRecord_type_casting_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('ActiveRecord_type_casting_TestCase');
+ak_test_case('ActiveRecord_type_casting_TestCase');

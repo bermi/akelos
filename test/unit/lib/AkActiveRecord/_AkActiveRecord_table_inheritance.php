@@ -57,4 +57,4 @@ class ActiveRecord_table_inheritance_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('ActiveRecord_table_inheritance_TestCase');
+ak_test_case('ActiveRecord_table_inheritance_TestCase');

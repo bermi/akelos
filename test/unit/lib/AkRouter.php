@@ -190,7 +190,7 @@ class AkRouter_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkRouter_TestCase');
+ak_test_case('AkRouter_TestCase');
 
 
 
@@ -225,7 +225,7 @@ class DefaultRoutes_TestCase extends  AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('DefaultRoutes_TestCase');
+ak_test_case('DefaultRoutes_TestCase');
 
 
 # Fixes issue 27 reported by Jacek Jedrzejewski
@@ -275,7 +275,7 @@ class UrlConstantsNamedAsUrlVariables_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('UrlConstantsNamedAsUrlVariables_TestCase');
+ak_test_case('UrlConstantsNamedAsUrlVariables_TestCase');
 
 
 class MiddleOptionalValuesWhenGeneratingUrls_TestCase extends  AkUnitTest
@@ -306,7 +306,7 @@ class MiddleOptionalValuesWhenGeneratingUrls_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('MiddleOptionalValuesWhenGeneratingUrls_TestCase');
+ak_test_case('MiddleOptionalValuesWhenGeneratingUrls_TestCase');
 
 
 class RouterModules_TestCase extends  AkUnitTest
@@ -337,7 +337,7 @@ class RouterModules_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('RouterModules_TestCase');
+ak_test_case('RouterModules_TestCase');
 
 
 
@@ -369,5 +369,5 @@ class RouterConflicts_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('RouterConflicts_TestCase');
+ak_test_case('RouterConflicts_TestCase');
 

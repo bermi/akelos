@@ -74,4 +74,4 @@ class ActiveRecord_attribute_incrementing_TestCase extends  AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('ActiveRecord_attribute_incrementing_TestCase');
+ak_test_case('ActiveRecord_attribute_incrementing_TestCase');

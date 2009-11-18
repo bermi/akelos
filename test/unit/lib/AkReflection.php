@@ -99,5 +99,5 @@ class testClass extends base {}'),trim($classStructure[0]['toString']));
     }
 }
 
-ak_test_run_case_if_executed('AkReflection_TestCase');
+ak_test_case('AkReflection_TestCase');
 

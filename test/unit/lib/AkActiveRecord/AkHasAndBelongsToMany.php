@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class HasAndBelongsToMany_TestCase extends  AkUnitTest
+class ActiveRecord_has_and_belongs_to_many_TestCase extends  AkUnitTest
 {
     public function test_start()
     {
@@ -562,4 +562,4 @@ class HasAndBelongsToMany_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('HasAndBelongsToMany_TestCase');
+ak_test_case('ActiveRecord_has_and_belongs_to_many_TestCase');

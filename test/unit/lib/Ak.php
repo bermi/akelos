@@ -139,4 +139,4 @@ class Ak_TestCase extends AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('Ak_TestCase');
+ak_test_case('Ak_TestCase');

@@ -56,4 +56,4 @@ class AkPhpCodeSanitizer_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkPhpCodeSanitizer_TestCase');
+ak_test_case('AkPhpCodeSanitizer_TestCase');

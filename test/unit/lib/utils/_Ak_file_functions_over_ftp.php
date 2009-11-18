@@ -286,6 +286,6 @@ class Ak_file_static_functions_over_ftp_TestCase extends AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('Ak_file_functions_over_ftp_TestCase');
-ak_test_run_case_if_executed('Ak_file_static_functions_over_ftp_TestCase');
+ak_test_case('Ak_file_functions_over_ftp_TestCase');
+ak_test_case('Ak_file_static_functions_over_ftp_TestCase');
 

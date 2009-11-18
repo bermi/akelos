@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class AkDbAdapter_Select_TestCase extends AkUnitTest
+class ActiveRecord_db_adapter_select_TestCase extends AkUnitTest
 {
     public $db;
     public function setUp()
@@ -57,5 +57,5 @@ class AkDbAdapter_Select_TestCase extends AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('AkDbAdapter_Select_TestCase');
+ak_test_case('ActiveRecord_db_adapter_select_TestCase');
 

@@ -113,5 +113,5 @@ class ActiveRecord_multiple_inclussion_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('ActiveRecord_multiple_inclussion_TestCase');
+ak_test_case('ActiveRecord_multiple_inclussion_TestCase');
 

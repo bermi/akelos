@@ -31,5 +31,5 @@ class AkReflectionDocBlock_TestCase extends AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkReflectionDocBlock_TestCase');
+ak_test_case('AkReflectionDocBlock_TestCase');
 

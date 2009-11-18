@@ -64,5 +64,5 @@ class AkSintags_TestCase extends AkUnitTest
 }
 
 
-ak_test_run_case_if_executed('AkSintags_TestCase');
+ak_test_case('AkSintags_TestCase');
 

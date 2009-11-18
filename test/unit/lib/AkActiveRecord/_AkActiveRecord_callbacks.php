@@ -99,5 +99,5 @@ class ActiveRecord_callbacks_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('ActiveRecord_callbacks_TestCase');
+ak_test_case('ActiveRecord_callbacks_TestCase');
 

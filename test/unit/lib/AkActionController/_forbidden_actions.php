@@ -23,4 +23,4 @@ class AkContionController_forbidden_actions_TestCase extends AkWebTestCase
     }
 }
 
-ak_test_run_case_if_executed('AkContionController_forbidden_actions_TestCase');
+ak_test_case('AkContionController_forbidden_actions_TestCase');

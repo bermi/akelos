@@ -42,4 +42,4 @@ class ActiveRecord_basic_CRUD_Operations_TestCase extends AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('ActiveRecord_basic_CRUD_Operations_TestCase');
+ak_test_case('ActiveRecord_basic_CRUD_Operations_TestCase');

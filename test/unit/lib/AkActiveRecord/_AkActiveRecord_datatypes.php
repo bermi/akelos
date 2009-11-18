@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class ActiceRecord_datatypes_TestCase extends  AkUnitTest
+class ActiveRecord_datatypes_TestCase extends  AkUnitTest
 {
     /**
      * @var ActiveRecord
@@ -217,5 +217,5 @@ class ActiceRecord_datatypes_TestCase extends  AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('ActiceRecord_datatypes_TestCase');
+ak_test_case('ActiveRecord_datatypes_TestCase');
 

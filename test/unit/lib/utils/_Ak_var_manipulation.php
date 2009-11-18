@@ -17,5 +17,5 @@ class Ak_var_manipulation_TestCase extends AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('Ak_var_manipulation_TestCase');
+ak_test_case('Ak_var_manipulation_TestCase');
 

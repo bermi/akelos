@@ -85,5 +85,5 @@ class AkContionController_locale_detection_TestCase extends AkWebTestCase
     }
 }
 
-ak_test_run_case_if_executed('AkContionController_locale_detection_TestCase');
+ak_test_case('AkContionController_locale_detection_TestCase');
 

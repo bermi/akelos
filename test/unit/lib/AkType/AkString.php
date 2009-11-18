@@ -134,5 +134,5 @@ class AkString_TestCase extends AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkString_TestCase');
+ak_test_case('AkString_TestCase');
 

@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class ActsAsList_TestCase extends  AkUnitTest
+class ActiveRecord_acts_as_list_TestCase extends  AkUnitTest
 {
     public function test_AkActiveRecord_actsAsList()
     {
@@ -609,5 +609,5 @@ class ActsAsList_TestCase extends  AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('ActsAsList_TestCase');
+ak_test_case('ActiveRecord_acts_as_list_TestCase');
 

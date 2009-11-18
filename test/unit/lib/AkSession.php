@@ -97,5 +97,5 @@ class AkSession_TestCase extends  AkWebTestCase
     }
 }
 
-ak_test_run_case_if_executed('AkSession_TestCase');
+ak_test_case('AkSession_TestCase');
 

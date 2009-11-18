@@ -158,4 +158,4 @@ class AkActionController_sweepers_TestCase extends AkTestApplication
     }
 }
 
-ak_test_run_case_if_executed('AkActionController_sweepers_TestCase');
+ak_test_case('AkActionController_sweepers_TestCase');

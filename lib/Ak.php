@@ -2345,7 +2345,7 @@ function ak_test($test_case_name, $use_sessions = false, $prevent_double_test_ru
     }
 }
 
-function ak_test_run_case_if_executed($test_case_name, $show_enviroment_flags = true)
+function ak_test_case($test_case_name, $show_enviroment_flags = true)
 {
     $levels = count(debug_backtrace());
     if ($levels == 1 || ($levels == 2 && isset($_ENV['SCRIPT_NAME']) && $_ENV['SCRIPT_NAME'] == 'dummy.php')) {

@@ -322,5 +322,5 @@ class AkActionControllerFilters_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkActionControllerFilters_TestCase');
+ak_test_case('AkActionControllerFilters_TestCase');
 

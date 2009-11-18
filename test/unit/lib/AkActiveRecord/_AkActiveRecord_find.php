@@ -31,5 +31,5 @@ class ActiveRecord_find_TestCase extends AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('ActiveRecord_find_TestCase');
+ak_test_case('ActiveRecord_find_TestCase');
 

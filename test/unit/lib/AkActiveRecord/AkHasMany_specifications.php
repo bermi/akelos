@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class HasMany_specifications_TestCase extends AkUnitTest
+class ActiveRecord_has_many_specifications_TestCase extends AkUnitTest
 {
     /**
      * @hasMany    pictures, :dependent => 'destroy'
@@ -48,5 +48,5 @@ class HasMany_specifications_TestCase extends AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('HasMany_specifications_TestCase');
+ak_test_case('ActiveRecord_has_many_specifications_TestCase');
 

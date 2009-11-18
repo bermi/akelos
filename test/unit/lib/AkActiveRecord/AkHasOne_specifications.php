@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class HasOne_cascading_destroy_TestCase extends AkUnitTest
+class ActiveRecord_has_one_cascading_destroy_TestCase extends AkUnitTest
 {
     #thumbnail belongsTo picture
     /**
@@ -46,5 +46,5 @@ class HasOne_cascading_destroy_TestCase extends AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('HasOne_cascading_destroy_TestCase');
+ak_test_case('ActiveRecord_has_one_cascading_destroy_TestCase');
 

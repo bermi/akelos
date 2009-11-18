@@ -211,5 +211,5 @@ class AkLazyObject_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkLazyObject_TestCase');
+ak_test_case('AkLazyObject_TestCase');
 

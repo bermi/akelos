@@ -48,4 +48,4 @@ class AkPluginInstaller_TestCase extends  AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('AkPluginInstaller_TestCase');
+ak_test_case('AkPluginInstaller_TestCase');

@@ -103,4 +103,4 @@ class ActiveRecord_postgre_sql_datatype_migration_TestCase extends AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('ActiveRecord_postgre_sql_datatype_migration_TestCase');
+ak_test_case('ActiveRecord_postgre_sql_datatype_migration_TestCase');

@@ -277,5 +277,5 @@ class AkInstaller_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkInstaller_TestCase');
+ak_test_case('AkInstaller_TestCase');
 

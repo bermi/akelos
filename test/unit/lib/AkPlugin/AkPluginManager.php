@@ -85,5 +85,5 @@ class AkPluginManager_TestCase extends AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkPluginManager_TestCase');
+ak_test_case('AkPluginManager_TestCase');
 

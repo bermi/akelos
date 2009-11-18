@@ -13,5 +13,5 @@ class AkRequestInvalidRequestsIntegration_TestCase extends AkWebTestCase
     }
 }
 
-ak_test_run_case_if_executed('AkRequestInvalidRequestsIntegration_TestCase');
+ak_test_case('AkRequestInvalidRequestsIntegration_TestCase');
 

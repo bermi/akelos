@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class AkDbAdapter_TestCase extends  AkUnitTest
+class ActiveRecord_db_adapter_TestCase extends  AkUnitTest
 {
     public function test_should_generate_sequence_ids()
     {
@@ -114,4 +114,4 @@ class AkDbAdapter_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkDbAdapter_TestCase');
+ak_test_case('ActiveRecord_db_adapter_TestCase');

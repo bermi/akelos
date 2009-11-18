@@ -171,5 +171,5 @@ class Ak_object_inspection_TestCase extends AkUnitTest
 }
 
 
-ak_test_run_case_if_executed('Ak_object_inspection_TestCase',true);
+ak_test_case('Ak_object_inspection_TestCase',true);
 

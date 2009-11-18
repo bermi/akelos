@@ -33,4 +33,4 @@ class UrlHelper_modify_current_url_TestCase extends AkTestApplication
     }
 }
 
-ak_test_run_case_if_executed('UrlHelper_modify_current_url_TestCase');
+ak_test_case('UrlHelper_modify_current_url_TestCase');

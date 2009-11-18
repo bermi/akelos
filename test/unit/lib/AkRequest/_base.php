@@ -215,5 +215,5 @@ class AkRequest_TestCase extends  AkUnitTest
 
 }
 
-ak_test_run_case_if_executed('AkRequest_TestCase');
+ak_test_case('AkRequest_TestCase');
 

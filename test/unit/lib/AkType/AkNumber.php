@@ -392,5 +392,5 @@ class AkNumber_TestCase extends AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkNumber_TestCase');
+ak_test_case('AkNumber_TestCase');
 

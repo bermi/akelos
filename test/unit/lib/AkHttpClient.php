@@ -108,4 +108,4 @@ class AkHttpClient_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_run_case_if_executed('AkHttpClient_TestCase');
+ak_test_case('AkHttpClient_TestCase');

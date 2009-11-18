@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
 
-class ActsAsNestedSet_TestCase extends  AkUnitTest
+class ActiveRecord_acts_as_nested_set_TestCase extends  AkUnitTest
 {
     public function test_start()
     {
@@ -389,5 +389,4 @@ class ActsAsNestedSet_TestCase extends  AkUnitTest
     /**/
 }
 
-
-ak_test_run_case_if_executed('ActsAsNestedSet_TestCase');
+ak_test_case('ActiveRecord_acts_as_nested_set_TestCase');

@@ -111,5 +111,5 @@ EOF;
     }
 }
 
-ak_test_run_case_if_executed('Ak_convert_TestCase');
+ak_test_case('Ak_convert_TestCase');
 
