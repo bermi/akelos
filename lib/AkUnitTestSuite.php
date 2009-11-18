@@ -48,6 +48,7 @@ class AkUnitTestSuite extends TestSuite
             }
             $options['files'] = $full_paths;
         }
+
         $options['description'] = '';
         foreach ($descriptions as $suite => $cases){
             $options['description'] .= "$suite (cases): ".$options['description'].rtrim(join(', ', $cases), ', ')."\n";
@@ -56,8 +57,12 @@ class AkUnitTestSuite extends TestSuite
             $options['description'] =  AkInflector::titleize($options['suite']).' (suite)';
             $options['files'] = array_diff(glob($options['base_path'].DS.$options['suite'].DS.'cases'.DS.'*.php'), array(''));
         }
+
+        defined('AK_DATABASE_SETTINGS_NAMESPACE') || define('AK_DATABASE_SETTINGS_NAMESPACE', 'database');
+
         if(empty($options['title'])){
-            $options['title'] =  "PHP ".phpversion().", Environment: ".AK_ENVIRONMENT.", Database: ".Ak::getSetting((defined('AK_DATABASE_SETTINGS_NAMESPACE')?AK_DATABASE_SETTINGS_NAMESPACE:'database'), 'type')."\n"."Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n".trim($options['description']).'';
+            $dabase_settings = AK_DATABASE_SETTINGS_NAMESPACE == 'database' ? Ak::getSetting('database', 'type') : AK_DATABASE_SETTINGS_NAMESPACE;
+            $options['title'] =  "PHP ".phpversion().", Environment: ".AK_ENVIRONMENT.", Database: ".$dabase_settings."\n"."Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n".trim($options['description']).'';
         }
 
         $options['TestSuite'] = new AkUnitTestSuite($options['title']);
