@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class HasAndBelongsToMany_TestCase extends  AkUnitTest
+class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {
-        $this->rebaseAppPaths();
         $Installer = new AkInstaller();
         @$Installer->dropTable('posts_tags');
         @$Installer->dropTable('friends_friends');

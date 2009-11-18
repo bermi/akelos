@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class DbAdapter_TestCase extends  AkUnitTest
+class DbAdapter_TestCase extends ActiveRecordUnitTest
 {
     public function test_should_generate_sequence_ids()
     {

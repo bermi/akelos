@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class Calculations_TestCase extends  AkUnitTest
+class Calculations_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {

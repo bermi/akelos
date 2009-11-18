@@ -2,12 +2,11 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class Callbacks_TestCase extends  AkUnitTest
+class Callbacks_TestCase extends ActiveRecordUnitTest
 {
     public function __construct()
     {
         parent::__construct();
-        $this->rebaseAppPaths();
         /* Create Mocks */
         $callbacks_during_save = array('beforeCreate','beforeValidation','beforeValidationOnUpdate','beforeValidationOnCreate','beforeSave','beforeUpdate','beforeDestroy',
         'afterCreate','afterValidation','afterValidationOnUpdate','afterValidationOnCreate','afterSave','afterUpdate','afterDestroy');

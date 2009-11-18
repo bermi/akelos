@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class MultipleInclussion_TestCase extends  AkUnitTest
+class MultipleInclussion_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('File', 'Tag','Tagging'));
     }
 

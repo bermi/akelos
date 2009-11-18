@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class BelongsToFindIncludeOwner_TestCase extends  AkUnitTest
+class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
 {
     /**/
     public function test_start()

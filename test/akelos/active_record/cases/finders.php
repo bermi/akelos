@@ -2,12 +2,11 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class Finders_TestCase extends  AkUnitTest
+class Finders_TestCase extends ActiveRecordUnitTest
 {
 
     public function setup()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Post', 'Tag', 'Comment'));
         $Installer = new AkInstaller();
         @$Installer->dropTable('posts_tags');

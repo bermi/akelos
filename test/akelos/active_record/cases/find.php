@@ -2,13 +2,12 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class Find_TestCase extends AkUnitTest
+class Find_TestCase extends ActiveRecordUnitTest
 {
     public $Hybrid;
 
     public function setUp()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Hybrid'=>'id,name'));
         Mock::generate('AkDbAdapter');
         $Db = new MockAkDbAdapter();

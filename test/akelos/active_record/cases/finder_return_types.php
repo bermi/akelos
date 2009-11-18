@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class FinderReturnTypes_TestCase extends  AkUnitTest
+class FinderReturnTypes_TestCase extends ActiveRecordUnitTest
 {
     public function setup()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Aa', 'Bb', 'Cc','Dd', 'Ee'));
     }
 

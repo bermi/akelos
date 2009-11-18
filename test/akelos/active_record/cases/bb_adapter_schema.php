@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class BbAdapterSchema_TestCase extends  AkUnitTest
+class BbAdapterSchema_TestCase extends ActiveRecordUnitTest
 {
     public function test_should_return_available_tables_for_mysql()
     {

@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class Counters_TestCase extends  AkUnitTest
+class Counters_TestCase extends ActiveRecordUnitTest
 {
     public function setUp()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Post','Comment'));
         $Post = $this->Post->create(array('title'=>'A Title','body'=>'and a body'));
         $this->PostId = $Post->getId();

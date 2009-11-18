@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class TableInheritance_TestCase extends  AkUnitTest
+class TableInheritance_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {
-        $this->rebaseAppPaths();
         eval("class Schedule extends ActiveRecord { public \$belongs_to = 'event'; }");
         $this->installAndIncludeModels(array('Event', 'Concert','OpenHouseMeeting'));
     }

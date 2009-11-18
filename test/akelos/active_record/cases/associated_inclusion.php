@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class AssociatedInclusion_TestCase extends  AkUnitTest
+class AssociatedInclusion_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels('Property','Picture', array('instantiate'=>true));
     }
 

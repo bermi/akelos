@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class TypeCasting_TestCase extends  AkUnitTest
+class TypeCasting_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Tag','Post', 'User'));
     }
 

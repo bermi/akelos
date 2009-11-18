@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class HasOneCascadingDestroy_TestCase extends AkUnitTest
+class HasOneCascadingDestroy_TestCase extends ActiveRecordUnitTest
 {
     #thumbnail belongsTo picture
     /**
@@ -12,7 +12,6 @@ class HasOneCascadingDestroy_TestCase extends AkUnitTest
     public $Picture;
     public function setUp()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Picture','Thumbnail'));
         $Picture = $this->Picture->create(array('title'=>'This is not a picture'));
         $Picture->main_thumbnail->create(array('caption'=>'It cant have a thumbnail'));

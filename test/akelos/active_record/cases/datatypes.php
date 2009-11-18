@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class Datatypes_TestCase extends  AkUnitTest
+class Datatypes_TestCase extends ActiveRecordUnitTest
 {
     /**
      * @var ActiveRecord
@@ -10,7 +10,6 @@ class Datatypes_TestCase extends  AkUnitTest
     public $Hybrid;
     public function test_installer_should_handle_integers()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Hybrid'=>'id,title,price integer'));
         $columns = $this->Hybrid->getColumnSettings();
         $this->assertEqual($columns['price']['type'],'integer');

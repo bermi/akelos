@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class ActsAsTree_TestCase extends  AkUnitTest
+class ActsAsTree_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array(
         'Category'=>'id, parent_id, description, department string(25)'
         ));

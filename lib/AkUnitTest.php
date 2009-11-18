@@ -54,7 +54,7 @@ class AkUnitTest extends UnitTestCase
 
     public function rebaseAppPaths($base_path = null)
     {
-        if(!is_dir($base_path) && $base_path_candidate = AkConfig::getDir('suite_path', false, false)){
+        if(!is_dir($base_path) && $base_path_candidate = AkConfig::getDir('suite', false, false)){
             $base_path = $base_path_candidate;
         }else{
             $base_path = (!is_dir($base_path) ? AkConfig::getDir('fixtures') : $base_path).DS.'app';
@@ -75,7 +75,7 @@ class AkUnitTest extends UnitTestCase
         }
     }
 
-    private function _logOriginalPaths()
+    protected function _logOriginalPaths()
     {
         $this->_original_paths = array(
         'app'               => AkConfig::getDir('app'),

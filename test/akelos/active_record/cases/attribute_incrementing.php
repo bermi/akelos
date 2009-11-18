@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class AttributeIncrementing_TestCase extends  AkUnitTest
+class AttributeIncrementing_TestCase extends ActiveRecordUnitTest
 {
     public function setUp()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Post'));
     }
 

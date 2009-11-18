@@ -2,12 +2,11 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class ConversionBetweenFormats_TestCase extends  AkUnitTest
+class ConversionBetweenFormats_TestCase extends ActiveRecordUnitTest
 {
     public $skip_fixtures = true;
     public function setup()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Person'));//,'Account'));
     }
 

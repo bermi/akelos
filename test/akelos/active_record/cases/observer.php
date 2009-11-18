@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class Observer_TestCase extends  AkUnitTest
+class Observer_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array(
         'ObservedAccount'=>'id, balance, created_at, updated_at',
         'ObservedPerson'=>'id, user_name, first_name, last_name, city, state'));

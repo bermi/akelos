@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class BasicCrudOperations_TestCase extends AkUnitTest
+class BasicCrudOperations_TestCase extends ActiveRecordUnitTest
 {
     public function _test_should_return_false_when_destroy_fails()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels('Post');
 
         $Post = new Post(array('title'=>'A Title'));

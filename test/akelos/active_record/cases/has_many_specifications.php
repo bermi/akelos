@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class HasManySpecifications_TestCase extends AkUnitTest
+class HasManySpecifications_TestCase extends ActiveRecordUnitTest
 {
     /**
      * @hasMany    pictures, :dependent => 'destroy'
@@ -17,7 +17,6 @@ class HasManySpecifications_TestCase extends AkUnitTest
     public $Picture;
     public function setUp()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Property','Picture'));
     }
 

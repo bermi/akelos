@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class PostgreSqlDatatypeMigration_TestCase extends AkUnitTest
+class PostgreSqlDatatypeMigration_TestCase extends ActiveRecordUnitTest
 {
     public $WeHaveAPostgreSqlEnvironment;
 

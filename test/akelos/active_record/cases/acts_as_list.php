@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class ActsAsList_TestCase extends  AkUnitTest
+class ActsAsList_TestCase extends ActiveRecordUnitTest
 {
     public function test_AkActiveRecord_actsAsList()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array(
         'TodoItem'=>'id, position int, task text, due_time datetime, created_at, expires datetime, updated_at,new_position int'
         ));

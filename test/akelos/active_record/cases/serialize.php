@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class Serialize_TestCase extends  AkUnitTest
+class Serialize_TestCase extends ActiveRecordUnitTest
 {
     public function setUp()
     {
-        $this->rebaseAppPaths();
         $this->includeAndInstatiateModels('Bb,Cc');
     }
 

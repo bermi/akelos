@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class HasManyTableInheritance_TestCase extends AkUnitTest
+class HasManyTableInheritance_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('ExtendedPost','ExtendedComment','Comment','Tag','User'));
     }
 

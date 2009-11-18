@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class ActsAsNestedSet_TestCase extends  AkUnitTest
+class ActsAsNestedSet_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array(
         'NestedCategory'=>'id,lft int,rgt int,parent_id,description,department string(25)'
         ));

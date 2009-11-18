@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class DbAdapterSelect_TestCase extends AkUnitTest
+class DbAdapterSelect_TestCase extends ActiveRecordUnitTest
 {
     public $db;
     public function setUp()

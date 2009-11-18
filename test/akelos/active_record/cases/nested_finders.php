@@ -2,11 +2,10 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class NestedFinders_TestCase extends  AkUnitTest
+class NestedFinders_TestCase extends ActiveRecordUnitTest
 {
     public function setup()
     {
-        $this->rebaseAppPaths();
         $this->installAndIncludeModels(array('Aa', 'Bb', 'Cc','Dd', 'Ee'));
     }
 

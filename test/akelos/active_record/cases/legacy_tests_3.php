@@ -2,10 +2,8 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class LegacyTests3_TestCase extends  AkUnitTest
+class LegacyTests3_TestCase extends ActiveRecordUnitTest
 {
-    public $rebase = true;
-
     public function test_AkActiveRecord()
     {
         $this->installAndIncludeModels(array(

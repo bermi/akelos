@@ -2,11 +2,11 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class ConnectionHandling_TestCase extends  AkUnitTest
+class ConnectionHandling_TestCase extends ActiveRecordUnitTest
 {
     public function setup()
     {
-        $this->rebaseAppPaths();
+        
     }
 
     public function test_should_establish_a_connection()
