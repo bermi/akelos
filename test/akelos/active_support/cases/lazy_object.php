@@ -1,7 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
-
+require_once(dirname(__FILE__).'/../config.php');
 
 class TestClassUsedViaProxyByALazyObject extends AkLazyObject
 {
@@ -45,7 +44,7 @@ class TestLazyObject extends AkLazyObject
 }
 
 
-class AkLazyObject_TestCase extends  AkUnitTest
+class LazyObject_TestCase extends  ActiveSupportUnitTest
 {
     public function test_should_extend_a_class_given_its_name()
     {
@@ -86,10 +85,10 @@ class AkLazyObject_TestCase extends  AkUnitTest
         $Lazy = new TestLazyObject();
         $Lazy->extendClassLazily('TestClassUsedViaProxyByALazyObject', array('methods' => array('concatenate')));
 
-        $this->expectError(new PatternExpectation('/undefined method TestLazyObject::invalid.+AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $this->expectError(new PatternExpectation('/undefined method TestLazyObject::invalid.+lazy_object\.php .+'.(__LINE__+1).'/'));
         $Lazy->invalid();
 
-        $this->expectError(new PatternExpectation('/undefined method TestLazyObject::explicit.+unit\/lib\/AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $this->expectError(new PatternExpectation('/undefined method TestLazyObject::explicit.+\/lazy_object\.php .+'.(__LINE__+1).'/'));
         $Lazy->explicit();
 
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
@@ -116,7 +115,7 @@ class AkLazyObject_TestCase extends  AkUnitTest
         $Lazy->extendClassLazily('TestClassUsedViaProxyByALazyObject', array('attributes' => array('allowed')));
         $this->assertEqual($Lazy->allowed, 'yes');
 
-        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::not_allowed.+unit\/lib\/AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::not_allowed.+\/lazy_object\.php .+'.(__LINE__+1).'/'));
         $this->assertNotEqual($Lazy->not_allowed, 'no');
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
     }
@@ -134,9 +133,9 @@ class AkLazyObject_TestCase extends  AkUnitTest
     {
         $Lazy = new TestLazyObject();
         $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject());
-        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::private_attribute.+unit\/lib\/AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::private_attribute.+\/lazy_object\.php .+'.(__LINE__+1).'/'));
         $this->assertNotEqual($Lazy->private_attribute, 'private');
-        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::_private_attribute.+unit\/lib\/AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::_private_attribute.+\/lazy_object\.php .+'.(__LINE__+1).'/'));
         $this->assertNotEqual($Lazy->_private_attribute, 'private');
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
     }
@@ -147,7 +146,7 @@ class AkLazyObject_TestCase extends  AkUnitTest
         $Lazy = new TestLazyObject();
         $Lazy->extendClassLazily('TestClassUsedViaProxyByALazyObject', array('methods_match' => '/find.+/'));
 
-        $this->expectError(new PatternExpectation('/undefined method TestLazyObject::explicit.+AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $this->expectError(new PatternExpectation('/undefined method TestLazyObject::explicit.+lazy_object\.php .+'.(__LINE__+1).'/'));
         $Lazy->explicit();
 
         $this->assertEqual($Lazy->findAll(), 'findAll');
@@ -160,7 +159,7 @@ class AkLazyObject_TestCase extends  AkUnitTest
     public function test_should_not_allow_extending_by_class_using_by_name()
     {
         $Lazy = new TestLazyObject();
-        $this->expectError(new PatternExpectation('/expects a string, object given.+AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $this->expectError(new PatternExpectation('/expects a string, object given.+lazy_object\.php .+'.(__LINE__+1).'/'));
         $Lazy->extendClassLazily(new TestClassUsedViaProxyByALazyObject());
     }
 
@@ -171,7 +170,7 @@ class AkLazyObject_TestCase extends  AkUnitTest
 
         $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject());
 
-        $this->expectError(new PatternExpectation('/undefined method TestLazyObject::explicit.+AkLazyObject\.php .+'.(__LINE__+1).'/'));
+        $this->expectError(new PatternExpectation('/undefined method TestLazyObject::explicit.+lazy_object\.php .+'.(__LINE__+1).'/'));
         $Lazy->explicit();
 
         $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject(), array('force' => true));
@@ -211,5 +210,5 @@ class AkLazyObject_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_case('AkLazyObject_TestCase');
+ak_test_case('LazyObject_TestCase');
 
