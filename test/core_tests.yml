@@ -1,6 +1,3 @@
-ActiveSupport:
-    - AkLazyObject
-
 ActionView:
     - AkPhpCodeSanitizer
     # Action View:

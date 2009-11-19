@@ -66,6 +66,7 @@ class AkUnitTest extends UnitTestCase
         AkConfig::setDir('controllers',     $base_path.DS.'controllers');
         AkConfig::setDir('views',           $base_path.DS.'views');
         AkConfig::setDir('apis',            $base_path.DS.'apis');
+        AkConfig::setDir('fixtures',        $base_path.DS.'fixtures');
         $this->_path_rebased = true;
     }
     public function restoreAppPaths()
@@ -84,6 +85,7 @@ class AkUnitTest extends UnitTestCase
         'controllers'       => AkConfig::getDir('controllers'),
         'views'             => AkConfig::getDir('views'),
         'apis'              => AkConfig::getDir('apis'),
+        'fixtures'          => AkConfig::getDir('fixtures'),
         );
     }
 
@@ -288,7 +290,7 @@ class AkUnitTest extends UnitTestCase
         $args = func_get_args();
         $tables = !empty($args) ? (is_array($args[0]) ? $args[0] : (count($args) > 1 ? $args : Ak::toArray($args))) : array();
         foreach ($tables as $table){
-            $file = AkConfig::getDir('fixtures').DS.'data'.DS.(empty($this->module)?'':$this->module.DS).Ak::sanitize_include($table).'.yaml';
+            $file = AkConfig::getDir('fixtures').DS.(empty($this->module)?'':$this->module.DS).Ak::sanitize_include($table).'.yml';
             if(!file_exists($file)){
                 continue;
             }
