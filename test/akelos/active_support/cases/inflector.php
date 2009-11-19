@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class AkInflector_TestCase extends  ActiveSupportUnitTest
+class Inflector_TestCase extends  ActiveSupportUnitTest
 {
     public $SingularToPlural = array(
     "search"      => "searches",
@@ -327,4 +327,4 @@ class AkInflector_TestCase extends  ActiveSupportUnitTest
     }
 }
 
-ak_test_case('AkInflector_TestCase');
+ak_test_case('Inflector_TestCase');
