@@ -1,5 +1,4 @@
 ActiveSupport:
-    - AkInflector
     - AkLazyObject
 
 ActionView:

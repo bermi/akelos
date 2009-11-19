@@ -1,8 +1,8 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
-class AkInflector_TestCase extends  UnitTestCase
+class AkInflector_TestCase extends  ActiveSupportUnitTest
 {
     public $SingularToPlural = array(
     "search"      => "searches",
@@ -48,7 +48,7 @@ class AkInflector_TestCase extends  UnitTestCase
 
     "node_child"  => "node_children",
     "child"       => "children",
-    
+
     "database"    => "databases",
 
     "experience"  => "experiences",
@@ -224,7 +224,7 @@ class AkInflector_TestCase extends  UnitTestCase
             $this->assertEqual($underscore, AkInflector::underscore($camel));
         }
     }
-    
+
     public function Test_of_foreignKey()
     {
         foreach ($this->ClassNameToForeignKeyWithUnderscore as $class=>$foreign_key){
@@ -263,10 +263,10 @@ class AkInflector_TestCase extends  UnitTestCase
             $this->assertEqual($ordinalized, AkInflector::ordinalize($number));
         }
     }
-    
+
     public function Test_of_unnaccent()
     {
-        $this->assertEqual(   'AAAAAAACEEEEIIIIDNOOOOOOUUUUYTsaaaaaaaceeeeiiiienoooooouuuuyty', 
+        $this->assertEqual(   'AAAAAAACEEEEIIIIDNOOOOOOUUUUYTsaaaaaaaceeeeiiiienoooooouuuuyty',
         AkInflector::unaccent('ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ'));
     }
 
@@ -275,27 +275,27 @@ class AkInflector_TestCase extends  UnitTestCase
         AkInflector::pluralize('camión', 'camiones');
         $this->assertEqual(AkInflector::pluralize('camión'), 'camiones');
     }
-    
+
     public function Test_for_setting_custom_singulars()
     {
         AkInflector::singularize('camiones', 'camión');
         $this->assertEqual(AkInflector::singularize('camiones'), 'camión');
     }
-    
+
     public function test_should_detect_singulars()
     {
         foreach (array_keys($this->SingularToPlural) as $singular){
             $this->assertTrue(AkInflector::is_singular($singular), $singular.' is not detected as singular');
         }
     }
-    
+
     public function test_should_detect_plurals()
     {
         foreach (array_values($this->SingularToPlural) as $plural){
             $this->assertTrue(AkInflector::is_plural($plural), $plural.' is not detected as plural');
         }
     }
-    
+
     public function test_should_demodulize()
     {
         $this->assertEqual(AkInflector::demodulize('admin/dashboard_controller'), 'dashboard_controller');
@@ -306,9 +306,9 @@ class AkInflector_TestCase extends  UnitTestCase
 
     public function test_should_get_controller_file_name()
     {
-        $this->assertEqual(AkInflector::toControllerFilename('admin'), AK_CONTROLLERS_DIR.DS.'admin_controller.php');
-        $this->assertEqual(AkInflector::toControllerFilename('user_authentication'), AK_CONTROLLERS_DIR.DS.'user_authentication_controller.php');
-        $this->assertEqual(AkInflector::toControllerFilename('admin/users'), AK_CONTROLLERS_DIR.DS.'admin'.DS.'users_controller.php');
+        $this->assertEqual(AkInflector::toControllerFilename('admin'), AkConfig::getDir('controllers').DS.'admin_controller.php');
+        $this->assertEqual(AkInflector::toControllerFilename('user_authentication'), AkConfig::getDir('controllers').DS.'user_authentication_controller.php');
+        $this->assertEqual(AkInflector::toControllerFilename('admin/users'), AkConfig::getDir('controllers').DS.'admin'.DS.'users_controller.php');
     }
     public function test_singularize_singular()
     {
