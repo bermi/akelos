@@ -38,10 +38,6 @@ Plugins:
     - AkPluginInstaller
     -'AkPlugin/AkPluginManager'
 
-Reflection:
-    - AkReflection
-    -'AkReflection/*'
-
 Testing:
     - AkTestApplication
     - AkUnitTest
