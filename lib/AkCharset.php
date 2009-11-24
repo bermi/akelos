@@ -54,7 +54,7 @@ class AkCharset
 	* @access public
 	* @var    bool    $enableCharsetRecoding
 	*/
-    var $enableCharsetRecoding = true;
+    public $enableCharsetRecoding = true;
 
     /**
 	* Allow or disallow PHP Based charset conversion.
@@ -62,7 +62,7 @@ class AkCharset
 	* @access public
 	* @var    boolean    $usePhpRecoding
 	*/
-    var $usePhpRecoding = true;
+    public $usePhpRecoding = true;
 
     /**
 	* Default charset
@@ -70,7 +70,7 @@ class AkCharset
 	* @access public
 	* @var    string    $defaultCharset
 	*/
-    var $defaultCharset = 'ISO-8859-1';
+    public $defaultCharset = 'ISO-8859-1';
 
     /**
 	* UTF-8 error character
@@ -81,7 +81,7 @@ class AkCharset
 	* @access public
 	* @var    string    $utf8ErrorChar
 	*/
-    var $utf8ErrorChar = '?';
+    public $utf8ErrorChar = '?';
 
 
     // ---- Private attributes ---- //
@@ -95,7 +95,7 @@ class AkCharset
 	* @access private
 	* @var    string    $_recodingEngine
 	*/
-    var $_recodingEngine = null;
+    public $_recodingEngine = null;
 
     /**
 	* Extra parameters for invoking the encoding engine (useful
@@ -106,7 +106,7 @@ class AkCharset
 	* @access private
 	* @var    string    $_recodingEngineExtraParams
 	*/
-    var $_recodingEngineExtraParams = '';
+    public $_recodingEngineExtraParams = '';
 
     /**
 	* Holds current procesing charset.
@@ -115,7 +115,7 @@ class AkCharset
 	* @access private
 	* @var    string    $_currentCharset
 	*/
-    var $_currentCharset = 'ISO-8859-1';
+    public $_currentCharset = 'ISO-8859-1';
 
 
 
@@ -139,7 +139,7 @@ class AkCharset
 	* @see set$recodingEngine
 	* @return    string    Returns Current encoding engine value.
 	*/
-    function GetRecodingEngine()
+    public function GetRecodingEngine()
     {
         return $this->_recodingEngine;
 
@@ -156,7 +156,7 @@ class AkCharset
 	* @return    string    Returns Extra parameters for invoking the encoding
 	* engine (useful for iconv) value.
 	*/
-    function GetRecodingEngineExtraParams()
+    public function GetRecodingEngineExtraParams()
     {
         return $this->_recodingEngineExtraParams;
 
@@ -171,7 +171,7 @@ class AkCharset
 	* @see set$currentCharset
 	* @return    string    Returns Holds current procesing charset. value.
 	*/
-    function GetCurrentCharset()
+    public function GetCurrentCharset()
     {
         return $this->_currentCharset;
 
@@ -194,7 +194,7 @@ class AkCharset
 	* (useful for iconv)
 	* @return    string    Name of current recoding engine
 	*/
-    function SetRecodingEngine($engine = null, $extra_params = null)
+    public function SetRecodingEngine($engine = null, $extra_params = null)
     {
         static $memory;
 
@@ -249,7 +249,7 @@ class AkCharset
 	* @return    bool    Returns true if $this->_recodingEngineExtraParams
 	* has been set correctly.
 	*/
-    function SetRecodingEngineExtraParams($recoding__engine__extra__params)
+    public function SetRecodingEngineExtraParams($recoding__engine__extra__params)
     {
         $this->_recodingEngineExtraParams = $recoding__engine__extra__params;
 
@@ -287,7 +287,7 @@ class AkCharset
 	* @return    void    Recoded string if possible, otherwise it will
 	* return the string without modifications.
 	*/
-    function RecodeString($string, $target_charset, $origin_charset = null, $engine = null, $engine_extra_params = null)
+    public function RecodeString($string, $target_charset, $origin_charset = null, $engine = null, $engine_extra_params = null)
     {
         static $memory;
         if(!is_string($string)){
@@ -329,7 +329,7 @@ class AkCharset
 	*
 	* False if mapping is not found.
 	*/
-    function GetMapping($charset)
+    public function GetMapping($charset)
     {
         $charset = $this->_GetCharset($charset,false);
         if($charset!=false){
@@ -359,7 +359,7 @@ class AkCharset
 	* @param    string    $extension    Extension name
 	* @return    boolean    Returns true on success false on failure.
 	*/
-    function _LoadExtension($extension)
+    protected function _LoadExtension($extension)
     {
         static $memory;
         if(!isset($memory[$extension])){
@@ -385,7 +385,7 @@ class AkCharset
 	* @return    string    Recoded string if possible, otherwise it will
 	* return the string without modifications.
 	*/
-    function _IconvStringRecode($string, $target_charset, $origin_charset, $engine_extra_params=null)
+    protected function _IconvStringRecode($string, $target_charset, $origin_charset, $engine_extra_params=null)
     {
         if(!$this->_ConversionIsNeeded($origin_charset, $target_charset) && !$this->isUtf8($string)){
             return $string;
@@ -413,7 +413,7 @@ class AkCharset
 	* @return    string    Recoded string if possible, otherwise it will
 	* return the string without modifications.
 	*/
-    function _RecodeStringRecode($string, $target_charset, $origin_charset)
+    protected function _RecodeStringRecode($string, $target_charset, $origin_charset)
     {
         return recode_string($target_charset, '..'.$origin_charset, $string);
     }// -- end of &_RecodeStringRecode -- //
@@ -426,7 +426,7 @@ class AkCharset
 	* @return    string    Recoded string if possible, otherwise it will
 	* return the string without modifications.
 	*/
-    function _MbstringStringRecode($string, $target_charset, $origin_charset=null)
+    protected function _MbstringStringRecode($string, $target_charset, $origin_charset=null)
     {
         if(is_null($origin_charset)){
             $origin_charset = $string;
@@ -456,7 +456,7 @@ class AkCharset
 	* @return    string    Recoded string if possible, otherwise it will
 	* return the string without modifications.
 	*/
-    function _PhpStringRecode($string, $target_charset, $origin_charset)
+    protected function _PhpStringRecode($string, $target_charset, $origin_charset)
     {
         $target_charset = $this->_GetCharset($target_charset, false);
         $origin_charset = $this->_GetCharset($origin_charset, false);
@@ -507,7 +507,7 @@ class AkCharset
 	* @param    string    $target_charset
 	* @return    boolean
 	*/
-    function _ConversionIsNeeded($origin_charset, $target_charset)
+    protected function _ConversionIsNeeded($origin_charset, $target_charset)
     {
         $target_charset = $this->_GetCharset($target_charset,false);
         $origin_charset = $this->_GetCharset($origin_charset,false);
@@ -540,7 +540,7 @@ class AkCharset
 	* @return    mixed    AkCharset internal name or FALSE if charset is not
 	* found.
 	*/
-    function _GetCharset($charset = null, $set_charset = true)
+    protected function _GetCharset($charset = null, $set_charset = true)
     {
         static $memory;
         if(isset($memory[$charset])){
@@ -622,7 +622,7 @@ class AkCharset
 	* @param    array    $mapping_array    Array containing the charset mapping.
 	* @return    string    UTF8 String
 	*/
-    function _Utf8StringEncode($string, $mapping_array)
+    protected function _Utf8StringEncode($string, $mapping_array = array())
     {
         $chars = unpack('C*', $string);
         $count = count($chars);
@@ -650,7 +650,7 @@ class AkCharset
 	* @param    array    $mapping_array    Mapping array
 	* @return    string    Decoded string
 	*/
-    function _Utf8StringDecode($utf_string, $mapping_array)
+    protected function _Utf8StringDecode($utf_string, $mapping_array = array())
     {
         $chars = unpack('C*', $utf_string);
         $count = count($chars);
@@ -670,7 +670,7 @@ class AkCharset
 	* @param    string    $char    Char to be converted
 	* @return    string    UTF8 char
 	*/
-    function _CharToUtf8($char)
+    protected function _CharToUtf8($char)
     {
         if ($char < 0x80){
             $utf8_char = chr($char);
@@ -700,7 +700,7 @@ class AkCharset
 	* @param    array    $mapping_array    Mapping Array
 	* @return    string    Decoded char
 	*/
-    function _Utf8ToChar($chars, &$id, $mapping_array)
+    protected function _Utf8ToChar($chars, &$id, $mapping_array)
     {
         if(($chars[$id]>=240)&&($chars[$id]<=255)){
             $utf=(intval($chars[$id]-240)<<18)+(intval($chars[++$id]-128)<<12)+(intval($chars[++$id]-128)<<6)+(intval($chars[++$id]-128)<<0);
@@ -719,13 +719,13 @@ class AkCharset
     }// -- end of &_Utf8ToChar -- //
 
 
-    function isUtf8($text = '')
+    public function isUtf8($text = '')
     {
         // From http://w3.org/International/questions/qa-forms-utf-8.html
         return preg_match('%^(?:[\x09\x0A\x0D\x20-\x7E]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})*$%xs', $text);
     }
 
-    function _charsetMapFileExists($charset)
+    protected function _charsetMapFileExists($charset)
     {
         if(!file_exists(AK_LIB_DIR.DS.'AkCharset'.DS.'utf8_mappings'.DS.$charset.'.php')){
             trigger_error(Ak::t('Charset %charset is not supported on your current setting. Please download aditional charset maps from http://svn.akelos.org/extras/utf8_mappings/ into lib/AkActionView/utf8_mappings', array('%charset'=>$charset)), E_USER_NOTICE);

@@ -3,14 +3,14 @@
 /**
  * Helpers are normally loaded in the context of a controller call, but some
  * times they might be useful in Mailers, Comand line tools or for unit testing
- * 
+ *
  * Some helpers might require information available only on a conroller context
  * such as current URL, Request and Response information among others.
  */
 class AkHelperLoader extends AkObject
 {
     public $_Controller;
-    public $_HelperInstances;
+    public $_HelperInstances = array();
     public $_Handler;
 
     public function __construct()
@@ -26,7 +26,7 @@ class AkHelperLoader extends AkObject
 
     /**
      * $HandlerInstance is the object where all the helpers will be instantiated as attributes.
-     * 
+     *
      * Like setController but for Mailers and Testing
      */
     public function setHandler(&$HandlerInstance)
@@ -36,13 +36,13 @@ class AkHelperLoader extends AkObject
 
     /**
      * Creates an instance of each available helper and links it into into current handler.
-     * 
-     * For example, if a helper TextHelper is located into the file text_helper.php. 
+     *
+     * For example, if a helper TextHelper is located into the file text_helper.php.
      * An instance is created on current controller
      * at $this->text_helper. This instance is also available on the view by calling $text_helper.
-     * 
+     *
      * Helpers can be found at lib/AkActionView/helpers (this might change in a future)
-     * 
+     *
      * Retuns an array with helper_name => HerlperInstace
      */
     public function &instantiateHelpers()
@@ -54,11 +54,12 @@ class AkHelperLoader extends AkObject
 
     public function instantiateHelpersAsHandlerAttributes($helpers = array())
     {
+        $helpers_dir = AkConfig::getDir('helpers');
         foreach ($helpers as $file=>$helper){
             $helper_class_name = AkInflector::camelize(AkInflector::demodulize(strstr($helper, 'Helper') ? $helper : $helper.'Helper'));
             $helper_file_name = AkInflector::underscore($helper_class_name);
             if(is_int($file)){
-                $file = AK_HELPERS_DIR.DS.$helper_file_name.'.php';
+                $file = $helpers_dir.DS.$helper_file_name.'.php';
             }
 
             $full_path = preg_match('/[\\\\\/]+/',$file);
@@ -85,7 +86,7 @@ class AkHelperLoader extends AkObject
 
     /**
      * Creates an instance of each available helper and links it into into current mailer.
-     * 
+     *
      * Mailer helpers work as Controller helpers but without the Request context
      */
     public function getHelpersForMailer()
@@ -107,7 +108,7 @@ class AkHelperLoader extends AkObject
 
     /**
      * Returns an array of helper names like:
-     * 
+     *
      *  array('url_helper', 'prototype_helper')
      */
     static function getInstantiatedHelperNames()
@@ -153,21 +154,22 @@ class AkHelperLoader extends AkObject
     public function getApplicationHelperNames()
     {
         $handler = $this->_Handler;
-        $handler->app_helpers = !isset($handler->app_helpers) ? null : $handler->app_helpers;
-
+        $handler->app_helpers = !isset($handler->app_helpers) ? 'all' : $handler->app_helpers;
+        $helpers_dir = AkConfig::getDir('helpers');
         $helper_names = array();
         if ($handler->app_helpers == 'all'){
-            $available_helpers = Ak::dir(AK_HELPERS_DIR,array('dirs'=>false));
+            $available_helpers = Ak::dir($helpers_dir, array('dirs'=>false));
             $helper_names = array();
             foreach ($available_helpers as $available_helper){
-                $helper_names[AK_HELPERS_DIR.DS.$available_helper] = AkInflector::classify(substr($available_helper,0,-10));
+                $helper_names[$helpers_dir.DS.$available_helper] = AkInflector::classify(substr($available_helper,0,-10));
             }
 
         } elseif (!empty($handler->app_helpers)){
             foreach (Ak::toArray($handler->app_helpers) as $helper_name){
-                $helper_names[AK_HELPERS_DIR.DS.AkInflector::underscore($helper_name).'_helper.php'] = AkInflector::camelize($helper_name);
+                $helper_names[$helpers_dir.DS.AkInflector::underscore($helper_name).'_helper.php'] = AkInflector::camelize($helper_name);
             }
         }
+
         return $helper_names;
     }
 
@@ -207,7 +209,7 @@ class AkHelperLoader extends AkObject
         }
         $underscored_helper_name = AkInflector::underscore($helper_name);
         $default_options = array(
-        'path' => AK_PLUGINS_DIR.DS.$underscored_helper_name.DS.'lib'.DS.$underscored_helper_name.'.php'
+        'path' => AkConfig::getDir('plugins').DS.$underscored_helper_name.DS.'lib'.DS.$underscored_helper_name.'.php'
         );
         $options = array_merge($default_options, $options);
         $helpers[$options['path']] = $helper_name;

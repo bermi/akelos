@@ -177,7 +177,7 @@ class AkActionView extends AkObject
         }
 
         if(AK_DEBUG && AK_CALLED_FROM_LOCALHOST && AK_ENCLOSE_RENDERS_WITH_DEBUG_SPANS && empty($format)){
-            $files_name = trim((str_replace(AK_BASE_DIR,'',realpath($template_file_name))), '/');
+            $files_name = trim((str_replace(AkConfig::getDir('base'), '', realpath($template_file_name))), '/');
             return "\n\n<span title='file: $files_name'>".$this->renderTemplate($template_extension, null, $template_file_name, $local_assigns)."\n\n</span>";
         }
 

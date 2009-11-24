@@ -10,17 +10,8 @@
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
-
-require_once(AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailBase.php');
-require_once(AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailPart.php');
-require_once(AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailParser.php');
-require_once(AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailComposer.php');
-require_once(AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailEncoding.php');
-
 class AkMailMessage extends AkMailBase
 {
-
-
     /**
      * Specify the from address for the message.
      */
@@ -133,5 +124,3 @@ class AkMailMessage extends AkMailBase
     }
 }
 
-
-?>

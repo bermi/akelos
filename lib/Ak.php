@@ -2197,8 +2197,17 @@ class Ak
             'ActiveRecord'              =>  AK_APP_DIR.DS.'shared_model.php',
             'ActiveRecordHelper'        =>  AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'active_record_helper.php',
             'AkActionMailer'            =>  AK_LIB_DIR.DS.'AkActionMailer.php',
+            'AkMailBase'                =>  AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailBase.php',
+            'AkMailMessage'             =>  AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailMessage.php',
+            'AkMailParser'              =>  AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailParser.php',
+            'AkActionMailerQuoting'     =>  AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkActionMailerQuoting.php',
+            'AkMailComposer'            =>  AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailComposer.php',
+            'AkMailPart'                =>  AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailPart.php',
+            'AkMailEncoding'            =>  AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailEncoding.php',
             'AkActionController'        =>  AK_LIB_DIR.DS.'AkActionController.php',
+            'AkActionView'              =>  AK_LIB_DIR.DS.'AkActionView.php',
             'AkActionViewHelper'        =>  AK_LIB_DIR.DS.'AkActionView'.DS.'AkActionViewHelper.php',
+            'AkPhpTemplateHandler'      =>  AK_LIB_DIR.DS.'AkActionView'.DS.'AkPhpTemplateHandler.php',
             'AkActionWebService'        =>  AK_LIB_DIR.DS.'AkActionWebService.php',
             'AkActionWebServiceClient'  =>  AK_LIB_DIR.DS.'AkActionWebService'.DS.'AkActionWebServiceClient.php',
             'AkActiveRecord'            =>  AK_LIB_DIR.DS.'AkActiveRecord.php',
@@ -2301,6 +2310,8 @@ class Ak
             include $paths[$name];
         }elseif(file_exists(DS.$name.'.php')){
             include DS.$name.'.php';
+        }else{
+            Ak::import($name);
         }
     }
 }

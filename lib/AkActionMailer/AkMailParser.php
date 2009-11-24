@@ -1,5 +1,15 @@
 <?php
 
+// +----------------------------------------------------------------------+
+// | Akelos Framework - http://www.akelos.org                             |
+// +----------------------------------------------------------------------+
+
+/**
+ * @package AkelosFramework
+ * @subpackage AkActionMailer
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
+ */
+
 class AkMailParser
 {
     public $decode_body = true;
@@ -31,7 +41,7 @@ class AkMailParser
         }
     }
 
-    public function parse($raw_message = '', $options = array(), $object_type = 'AkMailMessage')
+    static function parse($raw_message = '', $options = array(), $object_type = 'AkMailMessage')
     {
         $parser_class = empty($options['parser_class']) ? 'AkMailParser' : $options['parser_class'];
         $Parser = new $parser_class($options);
@@ -271,7 +281,7 @@ class AkMailParser
                         }else{
                             $Mail->$caption = array($Mail->$caption, $details['value']);
                         }
-                        $Mail->header[$caption] =& $Mail->$caption;
+                        $Mail->header[$caption] = $Mail->$caption;
                     }
                     if(!empty($details['attributes'])){
                         $Mail->{$caption.'_attributes'} = $details['attributes'];
@@ -281,8 +291,8 @@ class AkMailParser
         }
     }
 
-    
-    public function importStructure(&$MailOrPart, $structure = array())
+
+    static function importStructure(&$MailOrPart, $structure = array())
     {
         if(isset($structure['header'])){
             $structure['headers'] = $structure['header'];
@@ -345,6 +355,7 @@ class AkMailParser
         $cssRules=$this->_extractCssRulesFromContent($contents);
         return $cssRules;
     }
+
     /**
      * On HTML Email it searches for the <a> tags and adds (if not present) a
      * target="_blank" attribute to not annoy all those webmail users with a link
@@ -354,7 +365,7 @@ class AkMailParser
      */
     public function addBlankTargetToLinks(&$Mail)
     {
-        $html = &$Mail->body;
+        $html = $Mail->body;
         $links = array();
         $replace=array();
         if(preg_match_all('/<a[^>]+>/',$html,$matches)) {
@@ -370,53 +381,54 @@ class AkMailParser
             }
         }
     }
+
     /**
      * Extracts CSS rules from inline css and externally linked css-files, because
      * HTML Email does not really support CSS, especially Webmailers dont. (see http://www.campaignmonitor.com/css/)
      * Applys the #id,.class and element rules to the appropriate tags inside
      * the <element style=""/> attribute.
-     * 
+     *
      * Only simple css rules are supported like:
-     * 
+     *
      * <code>
      * <style>
      * #id {
      * font-size:11px;
      * color:black;
      * }
-     * 
+     *
      * .class {
      * color:orange;
      * }
-     * 
+     *
      * h1 {
      * margin-top:20px;
      * }
      * </style>
-     * 
+     *
      * <h1 id="id">Title</h1>
      * <p class="class">Paragraph</p>
      *
      *</code>
-     * 
+     *
      * Will be converted to:
-     * 
+     *
      * <code>
-     * 
+     *
      * <h1 id="id" style="margin-top:20px;color:orange;font-size:11px;color:black;">Title</h1>
      * <p class="class" style="color:orange;">Paragraph</p>
      *
      *</code>
-     * 
+     *
      * The order of the rules is:
-     * 
+     *
      * 1. Element (h1)
      * 2. Class (.class)
      * 3. ID (#id)
-     * 
+     *
      * Like that the #id values will have precedence over everything.
-     * 
-     * 
+     *
+     * @author Arno Schneider
      * @param AkMailBase $Mail
      */
     public function applyCssStylesToTags(&$Mail)
@@ -424,13 +436,13 @@ class AkMailParser
         $cssRules=$this->_extractCssRules($Mail);
         $this->_applyCssRules($Mail,$cssRules);
     }
-    
+
     public function _applyCssRules(&$Mail,$cssRules)
     {
         //Ak::getLogger()->log('message','detected css rules:'.var_export($cssRules,true));
-        $html = &$Mail->body;
-        
-        
+        $html = $Mail->body;
+
+
         if(!empty($cssRules['element']))
         foreach($cssRules['element'] as $name=>$style) {
             if(preg_match_all('/(<'.$name.'[^>]*?>)/s',$html,$matches)) {
@@ -544,16 +556,16 @@ class AkMailParser
                 return $name.'="'.$value.'"';
         }
     }
-    
-    
-    
+
+
+
     public function _uniqueStyle($stylestring, $fullElement = '') {
         $styles = explode(';', $stylestring);
         $newstyles=array();
         $styleArray=array();
         foreach($styles as $style) {
             $parts = @explode(':', $style, 2);
-            
+
             if(!empty($parts[1])) {
                 $styleArray[trim($parts[0])]=trim($parts[1]);
             }
@@ -577,16 +589,16 @@ class AkMailParser
             return array($stylestring,array(),$fullElement);
         }
     }
-    
+
     public function _extractCssRules(&$Mail)
     {
-        $html =& $Mail->body;
+        $html = $Mail->body;
         $cssRules=array();
         if(preg_match_all('/<link.*?rel=[\'"]stylesheet[\'"].*?href=[\'"](.*?)[\'"].*?\/>/',$html,$matches)) {
             foreach($matches[1] as $idx=>$cssfile) {
-                
+
                 $cssRules=$this->_extractCssRulesFromFile($cssfile,$cssRules);
-                
+
             }
         }
         /**
@@ -603,12 +615,13 @@ class AkMailParser
         }
         return $cssRules;
     }
-    
+
     public function extractImagesIntoInlineParts(&$Mail, $options = array())
     {
         $html =& $Mail->body;
         require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'text_helper.php');
         $images = TextHelper::get_image_urls_from_html($html);
+
         $html_images = array();
         if(!empty($images)){
             require_once(AK_LIB_DIR.DS.'AkImage.php');
@@ -618,9 +631,11 @@ class AkMailParser
 
             foreach ($images as $image){
                 $original_image_name = $image;
-                if(substr($image,0,4)=='cid:') continue;
+                if(substr($image,0,4)=='cid:'){
+                    continue;
+                }
                 $image = $this->_getImagePath($image);
-                
+
                 if(!empty($image)){
                     $extenssion = substr($image, strrpos('.'.$image,'.'));
                     $image_name = Ak::uuid().'.'.$extenssion;
@@ -641,6 +656,7 @@ class AkMailParser
             }
         }
     }
+
     public function _getStylesheetPath($path)
     {
         if(preg_match('/^http(s)?:\/\//', $path)){
@@ -666,36 +682,37 @@ class AkMailParser
         }
         return $path;
     }
+
     public function _getImagePath($path)
     {
+        $tmp_dir = AkConfig::getDir('tmp');
         if(preg_match('/^http(s)?:\/\//', $path)){
             $path_info = pathinfo($path);
             $base_file_name = Ak::sanitize_include($path_info['basename'], 'paranaoid');
             if(empty($path_info['extension'])){ // no extension, we don't do magic stuff
                 $path = '';
             }else{
-                $local_path = AK_TMP_DIR.DS.'mailer'.DS.'remote_images'.DS.md5($path).DS.$base_file_name.'.'.$path_info['extension'];
-                if(!file_exists($local_path) || (time() > @filemtime($local_path)+7200)){
-                    if(!Ak::file_put_contents($local_path, Ak::url_get_contents($path))){
+                $local_path = $tmp_dir.DS.'mailer'.DS.'remote_images'.DS.md5($path).DS.$base_file_name.'.'.$path_info['extension'];
+                if(!file_exists($local_path) || (time() > filemtime($local_path) + 7200)){
+                    if(!Ak::file_put_contents($local_path, Ak::url_get_contents($path), array('base_path' => $tmp_dir))){
                         return '';
                     }
-                    
                 }
-                if(@filesize($local_path)<1) {
+                if(!file_exists($local_path) || filesize($local_path)<1) {
                     return '';
                 }
                 return $local_path;
             }
         }
-        $org_path=$path;
-        $path = AK_PUBLIC_DIR.$path;
-        $path=realpath($path);
-        if(substr($path,0,strlen(AK_PUBLIC_DIR))!=AK_PUBLIC_DIR || !file_exists($path)){
+
+        $org_path = $path;
+        $public_dir = AkConfig::getDir('public');
+        $path = $public_dir.$path;
+        $path = realpath($path);
+        if(substr($path, 0, strlen($public_dir)) != $public_dir || !file_exists($path)){
             $path = '';
         }
         return $path;
     }
 
 }
-
-?>

@@ -248,6 +248,17 @@ defined('AK_PLUGINS_MAIN_REPOSITORY')           || define('AK_PLUGINS_MAIN_REPOS
 defined('AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE') || define('AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE', 'http://www.akelos.org/wiki/plugins');
 defined('AK_TESTING_NAMESPACE')                 || define('AK_TESTING_NAMESPACE', AK_APP_NAME);
 
+
+defined('AK_ACTION_MAILER_DEFAULT_CHARSET')                 || define('AK_ACTION_MAILER_DEFAULT_CHARSET', AK_CHARSET);
+defined('AK_ACTION_MAILER_EOL')                             || define('AK_ACTION_MAILER_EOL', "\r\n");
+defined('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION')        || define('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION', "([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)");
+defined('AK_ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION')|| define('AK_ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun), *)?(\d\d?) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d\d\d\d) (\d{2}:\d{2}(?::\d\d)) (UT|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|[A-Z]|(?:\+|\-)\d{4})");
+defined('AK_ACTION_MAILER_CHARS_NEEDING_QUOTING_REGEX')     || define('AK_ACTION_MAILER_CHARS_NEEDING_QUOTING_REGEX', "/[\\000-\\011\\013\\014\\016-\\037\\177-\\377]/");
+defined('AK_ACTION_MAILER_EMULATE_IMAP_8_BIT')              || define('AK_ACTION_MAILER_EMULATE_IMAP_8_BIT', true);
+defined('AK_ACTION_MAILER_DEFAULT_CHARSET')                 || define('AK_ACTION_MAILER_DEFAULT_CHARSET', AK_CHARSET);
+defined('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION')        || define('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION', '([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)');
+defined('AK_ACTION_MAILER_EMULATE_IMAP_8_BIT')              || define('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION', '([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)');
+
 /**
  *  Before rev.1232 MySQL on some setups, connections where opened using PHP's default
  *  encoding latin1 this caused that UTF8 data written by Akelos could not be edited using other DB tools.

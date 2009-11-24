@@ -10,18 +10,6 @@
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
-require_once(AK_LIB_DIR.DS.'AkBaseModel.php');
-require_once(AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailMessage.php');
-require_once(AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailParser.php');
-require_once(AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkActionMailerQuoting.php');
-require_once(AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailComposer.php');
-
-ak_define('MAIL_EMBED_IMAGES_AUTOMATICALLY_ON_EMAILS', false);
-ak_define('ACTION_MAILER_DEFAULT_CHARSET', AK_CHARSET);
-ak_define('ACTION_MAILER_EOL', "\r\n");
-ak_define('ACTION_MAILER_EMAIL_REGULAR_EXPRESSION', "([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)");
-ak_define('ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun), *)?(\d\d?) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d\d\d\d) (\d{2}:\d{2}(?::\d\d)) (UT|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|[A-Z]|(?:\+|\-)\d{4})");
-
 /**
 * AkActionMailer allows you to send email from your application using a mailer model and views.
 *
@@ -300,13 +288,13 @@ class AkActionMailer extends AkBaseModel
     public $Composer;
     public $_defaultMailDriverName = 'AkMailMessage';
 
-    public function __construct($Driver = null)
+    public function __construct(&$Driver = null)
     {
         $this->loadSettings();
         if(empty($Driver)){
             $this->Message = new $this->_defaultMailDriverName();
         }else{
-            $this->Message =& $Driver;
+            $this->Message = $Driver;
         }
     }
 
@@ -478,7 +466,7 @@ class AkActionMailer extends AkBaseModel
     public function addAttachment()
     {
         $args = func_get_args();
-        return call_user_func_array(array(&$this->Message, 'setAttachment'), $args);
+        return call_user_func_array(array($this->Message, 'setAttachment'), $args);
     }
 
     /**
@@ -539,7 +527,7 @@ class AkActionMailer extends AkBaseModel
      */
     public function &receive($raw_mail)
     {
-        $this->Message =& AkMailBase::parse($raw_mail);
+        $this->Message = AkMailBase::parse($raw_mail);
         return $this->Message;
     }
 
@@ -548,7 +536,7 @@ class AkActionMailer extends AkBaseModel
      * Deliver the given mail object directly. This can be used to deliver
      * a preconstructed mail object, like:
      *
-     *   $email =& $MyMailer->createSomeMail($parameters);
+     *   $email = $MyMailer->createSomeMail($parameters);
      *   $email->setHeader("frobnicate");
      *   MyMailer::deliver($email);
      */
@@ -564,7 +552,7 @@ class AkActionMailer extends AkBaseModel
             trigger_error(Ak::t('You need to create() a message before getting it as raw text.'),E_USER_ERROR);
             return false;
         }
-        $Composer =& $this->getComposer();
+        $Composer = $this->getComposer();
         return $Composer->getRawMessage();
     }
 
@@ -575,9 +563,9 @@ class AkActionMailer extends AkBaseModel
      */
     public function &create($method_name, $parameters, $content_type = '')
     {
-        $Composer =& $this->getComposer();
+        $Composer = $this->getComposer();
         $args = func_get_args();
-        call_user_func_array(array(&$Composer, 'build'), $args);
+        call_user_func_array(array($Composer, 'build'), $args);
         $this->Message->_has_been_created_by_mailer = true;
         return $this->Message;
     }
@@ -588,13 +576,13 @@ class AkActionMailer extends AkBaseModel
     * object (from the AkActionMailer::create method). If no cached mail object exists, and
     * no alternate has been given as the parameter, this will fail.
     */
-    public function deliver($method_name, $parameters = null, $Message = null)
+    public function deliver($method_name, $parameters = null, &$Message = null)
     {
         if(empty($Message) &&
         (empty($this->Message) || (!empty($this->Message) && get_class($this->Message) != get_class($this)))){
             $this->create($method_name, $parameters);
         }elseif(!empty($Message)){
-            $this->Message =& $Message;
+            $this->Message = $Message;
         }
 
         !empty($this->Message) or trigger_error(Ak::t('No mail object available for delivery!'), E_USER_ERROR);
@@ -629,7 +617,7 @@ class AkActionMailer extends AkBaseModel
 
     public function performTestDelivery(&$Message)
     {
-        return $this->_deliverUsingMailDeliveryMethod('Test', $Message, array('ActionMailer'=>&$this));
+        return $this->_deliverUsingMailDeliveryMethod('Test', $Message, array('ActionMailer'=>$this));
 
     }
 
@@ -680,9 +668,9 @@ class AkActionMailer extends AkBaseModel
         if(isset($options['body'])) {
             $body = $options['body'];
             unset($options['body']);
-            $Template =& $this->_initializeTemplateClass($body);
+            $Template = $this->_initializeTemplateClass($body);
         } else {
-            $Template =& $this->_initializeTemplateClass($body);
+            $Template = $this->_initializeTemplateClass($body);
         }
 
         if(isset($options['partial']) && !empty($this->current_content_type)) {
@@ -704,7 +692,7 @@ class AkActionMailer extends AkBaseModel
 
         }
         $options['locals'] = array_merge((array)@$options['locals'], $this->getHelpers());
-        $options['locals'] = array_merge($options['locals'], array('mailer'=>&$this,'controller'=>&$this));
+        $options['locals'] = array_merge($options['locals'], array('mailer'=>$this,'controller'=>$this));
         if(!empty($body)) {
             $options['locals']['body'] = $body;
         }
@@ -740,9 +728,7 @@ class AkActionMailer extends AkBaseModel
 
     public function &_initializeTemplateClass($assigns)
     {
-        require_once(AK_LIB_DIR.DS.'AkActionView.php');
         $TemplateInstance = new AkActionView($this->getTemplatePath(), $assigns, $this);
-        require_once (AK_LIB_DIR.DS.'AkActionView'.DS.'AkPhpTemplateHandler.php');
         $TemplateInstance->_registerTemplateHandler('tpl','AkPhpTemplateHandler');
         return $TemplateInstance;
     }
@@ -830,7 +816,7 @@ class AkActionMailer extends AkBaseModel
             return false;
         }
         $DeliveryHandler = new $handler_name();
-        $this->Message =& $Message;
+        $this->Message = $Message;
         return $DeliveryHandler->deliver($this, $options);
     }
 
@@ -852,12 +838,12 @@ class AkActionMailer extends AkBaseModel
         if(isset($options['body'])) {
             $body = $options['body'];
             unset($options['body']);
-            $Template =& $this->_initializeTemplateClass($body);
+            $Template = $this->_initializeTemplateClass($body);
         } else {
-            $Template =& $this->_initializeTemplateClass($body);
+            $Template = $this->_initializeTemplateClass($body);
         }
         $options['locals'] = array_merge((array)@$options['locals'], $this->getHelpers());
-        $options['locals'] = array_merge($options['locals'], array('mailer'=>&$this,'controller'=>&$this));
+        $options['locals'] = array_merge($options['locals'], array('mailer'=>$this,'controller'=>$this));
         if(!empty($body)) {
             $options['locals']['body'] = $body;
         } else {
@@ -867,10 +853,8 @@ class AkActionMailer extends AkBaseModel
 
         $layout_options=$options;
         $layout_options['file'] = $layout_file;
-        $LayoutTemplate =& $this->_initializeTemplateClass($options['locals']['body']);
+        $LayoutTemplate = $this->_initializeTemplateClass($options['locals']['body']);
         return $LayoutTemplate->render($layout_options);
     }
 }
 
-
-?>

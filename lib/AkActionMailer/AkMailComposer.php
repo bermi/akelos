@@ -1,6 +1,16 @@
 <?php
 
 
+// +----------------------------------------------------------------------+
+// | Akelos Framework - http://www.akelos.org                             |
+// +----------------------------------------------------------------------+
+
+/**
+ * @package AkelosFramework
+ * @subpackage AkActionMailer
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
+ */
+
 class AkMailComposer extends AkObject
 {
     public $Message;
@@ -14,8 +24,8 @@ class AkMailComposer extends AkObject
 
     public function init(&$ActionMailer)
     {
-        $this->ActionMailer =& $ActionMailer;
-        $this->Message =& $ActionMailer->Message;
+        $this->ActionMailer = $ActionMailer;
+        $this->Message = $ActionMailer->Message;
     }
 
     public function build()
@@ -131,7 +141,7 @@ class AkMailComposer extends AkObject
     public function _callActionMailerMethod($method_name, $params = array())
     {
         if(method_exists($this->ActionMailer, $method_name)){
-            call_user_func_array(array(&$this->ActionMailer, $method_name), $params);
+            call_user_func_array(array($this->ActionMailer, $method_name), $params);
         }else{
             trigger_error(Ak::t('Could not find the method %method on the model %model', array('%method'=>$method_name, '%model'=>$this->ActionMailer->getModelName())), E_USER_ERROR);
         }
@@ -254,10 +264,6 @@ class AkMailComposer extends AkObject
         }
         return $templates[$path];
     }
-    
-    
-
 
 }
 
-?>

@@ -109,7 +109,7 @@ class AkPhpTemplateHandler
             if(!empty($template_file_name)){
                 $this->_options['template_base_path'] = rtrim(str_replace($template_file_name,'',$this->_options['file_path']),'\/');
                 if(AK_COMPILED_VIEWS_DIR && !strstr($this->_options['template_base_path'], AK_TMP_DIR)){
-                    $this->_options['template_base_path'] = str_replace(AK_BASE_DIR, AK_COMPILED_VIEWS_DIR, $this->_options['template_base_path']);
+                    $this->_options['template_base_path'] = str_replace(AkConfig::getDir('base'), AK_COMPILED_VIEWS_DIR, $this->_options['template_base_path']);
                 }
             }else{
                 $this->_options['template_base_path'] = AK_COMPILED_VIEWS_DIR;
@@ -151,8 +151,8 @@ class AkPhpTemplateHandler
 
     public function _saveCompiledTemplate()
     {
-        $options = array('base_path' => (AK_COMPILED_VIEWS_DIR ? AK_TMP_DIR : AK_BASE_DIR));
-        if(defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP && !strstr($options['base_path'], AK_BASE_DIR)){
+        $options = array('base_path' => (AK_COMPILED_VIEWS_DIR ? AK_TMP_DIR : AkConfig::getDir('base')));
+        if(defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP && !strstr($options['base_path'], AkConfig::getDir('base'))){
             $options['ftp'] = false;
         }
         Ak::file_put_contents($this->_getCompiledTemplatePath(), $this->_options['code'], $options);

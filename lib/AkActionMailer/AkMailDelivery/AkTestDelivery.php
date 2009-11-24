@@ -14,4 +14,3 @@ class AkTestDelivery extends AkObject
 }
 
 
-?>

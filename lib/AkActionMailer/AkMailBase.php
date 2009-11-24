@@ -27,7 +27,7 @@ class AkMailBase extends Mail
         }
     }
 
-    public function &parse($raw_email = '')
+    static function &parse($raw_email = '')
     {
         if(empty($raw_email)){
             trigger_error(Ak::t('Cannot parse an empty message'), E_USER_ERROR);
@@ -84,7 +84,7 @@ class AkMailBase extends Mail
 
     public function _base64Body($content)
     {
-        $Cache =& Ak::cache();
+        $Cache = Ak::cache();
         $cache_id = md5($content);
         $Cache->init(3600);
         if (!$encoded_content = $Cache->get($cache_id)) {
@@ -442,7 +442,7 @@ class AkMailBase extends Mail
     {
         $this->_parts_order = array_map('strtolower', empty($order) ? $this->implicit_parts_order : $order);
         usort($parts, array($this,'_contentTypeComparison'));
-        return array_reverse(&$parts);
+        return array_reverse($parts);
     }
 
     public function sortParts()
@@ -672,5 +672,3 @@ class AkMailBase extends Mail
     }
 
 }
-
-?>

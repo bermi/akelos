@@ -15,7 +15,7 @@ include_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Mail'.DS.'mimeDecode.php');
 class AkMailEncoding extends Mail_mimeDecode
 {
     /**
-     * PEAR's header decoding function is buggy and is not enough tested, so we 
+     * PEAR's header decoding function is buggy and is not enough tested, so we
      * override it using the Akelos charset transcoding engine to get the result
      * as UTF-8
      */
@@ -48,8 +48,8 @@ class AkMailEncoding extends Mail_mimeDecode
 
         return $structure;
     }
-    
-    
+
+
     ////
 
     public function _encodeAddress($address_string, $header_name = '', $names = true)
@@ -84,7 +84,7 @@ class AkMailEncoding extends Mail_mimeDecode
         return preg_match(AK_EMAIL_REGULAR_EXPRESSION, $email);
     }
 
-    
+
 }
 
 

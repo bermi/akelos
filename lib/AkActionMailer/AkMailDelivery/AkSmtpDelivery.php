@@ -1,13 +1,12 @@
 <?php
 
-
 class AkSmtpDelivery extends AkObject
 {
     public function deliver(&$Mailer, $settings = array())
     {
-        $Message =& $Mailer->Message;
-        
-        $SmtpClient =& Mail::factory('smtp', $settings);
+        $Message = $Mailer->Message;
+
+        $SmtpClient = Mail::factory('smtp', $settings);
 
         include_once 'Net/SMTP.php';
 
@@ -39,7 +38,7 @@ class AkSmtpDelivery extends AkObject
         }
 
         $recipients = $SmtpClient->parseRecipients($Message->getRecipients());
-        
+
         if (PEAR::isError($recipients)) {
             return $recipients;
         }
@@ -59,5 +58,3 @@ class AkSmtpDelivery extends AkObject
     }
 }
 
-
-?>

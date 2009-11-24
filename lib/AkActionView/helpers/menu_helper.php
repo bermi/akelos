@@ -45,7 +45,7 @@ class MenuHelper extends AkActionViewHelper
     {
         $menu_options = empty($menu_options) ? $this->_get_default_full_menu() : $menu_options;
         $menu = '';
-        
+
         foreach ($menu_options as $controller => $actions){
             $controller_name = AkInflector::classify($controller);
             $current_controller_name = $this->_controller->getControllerName();
@@ -84,19 +84,20 @@ class MenuHelper extends AkActionViewHelper
 
     public function _get_default_full_menu()
     {
-        $controller_file_names = array_map('array_pop', (array)Ak::dir(AK_CONTROLLERS_DIR, array('files'=>false)));
+        $controllers_dir = AkConfig::getDir('controllers');
+        $controller_file_names = array_map('array_pop', (array)Ak::dir($controllers_dir, array('files'=>false)));
 
         sort($controller_file_names);
-        
+
         $menu_options = array();
         foreach ($controller_file_names as $controller_file_name){
             $controller_name = str_replace('.php','',$controller_file_name);
-            if(strstr($controller_file_name,'_controller.php') && file_exists(AK_CONTROLLERS_DIR.DS.$controller_file_name)){
-                include_once(AK_CONTROLLERS_DIR.DS.$controller_file_name);
+            if(strstr($controller_file_name,'_controller.php') && file_exists($controllers_dir.DS.$controller_file_name)){
+                include_once($controllers_dir.DS.$controller_file_name);
                 $controller_class_name = AkInflector::classify($controller_name);
                 $menu_options[str_replace('_controller','',$controller_name)] = $this->_get_this_class_methods($controller_class_name);
             }
-            
+
         }
         return $menu_options;
     }
@@ -110,7 +111,7 @@ class MenuHelper extends AkActionViewHelper
         }else{
             $array3 = $array1;
         }
-        
+
         $array3 = array_map('strtolower',(array)$array3);
         $array3 = array_diff($array3, array(strtolower($class), 'index', 'destroy', 'edit', 'show'));
         return($array3);

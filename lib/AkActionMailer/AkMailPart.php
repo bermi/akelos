@@ -1,9 +1,17 @@
 <?php
 
+// +----------------------------------------------------------------------+
+// | Akelos Framework - http://www.akelos.org                             |
+// +----------------------------------------------------------------------+
+
+/**
+ * @package AkelosFramework
+ * @subpackage AkActionMailer
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
+ */
+
 class AkMailPart extends AkMailBase
 {
-
-
     public function prepareHeadersForRendering($options = array())
     {
         if($this->isMultipart()){
@@ -45,5 +53,3 @@ class AkMailPart extends AkMailBase
         }
     }
 }
-
-?>

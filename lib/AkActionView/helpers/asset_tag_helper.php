@@ -14,7 +14,7 @@
 
 /**
  * Provides methods for linking a HTML page together with other assets, such as javascripts, stylesheets, and feeds.
- */ 
+ */
 class AssetTagHelper extends AkActionViewHelper
 {
 
@@ -76,7 +76,7 @@ class AssetTagHelper extends AkActionViewHelper
         *     <script type="text/javascript" src="/javascripts/effects.js"></script>
         *     ...
         *     <script type="text/javascript" src="/javascripts/application.js"></script> *see below
-        *   
+        *
         * If there's an <tt>application.js</tt> file in your <tt>public/javascripts</tt> directory,
         * <tt>$asset_tag_helper->javascript_include_tag('defaults')</tt> will automatically include it. This file
         * facilitates the inclusion of small snippets of JavaScript code, along the lines of
@@ -103,7 +103,7 @@ class AssetTagHelper extends AkActionViewHelper
         static $defaults, $plugin_defaults = array();
         if(empty($defaults)){
             $defaults = array_unique(array_diff(array_filter(explode(',',JAVASCRIPT_DEFAULT_SOURCES.
-            ','.(file_exists(AK_PUBLIC_DIR.DS.'javascript'.DS.'application.js') ? 'application' : '' )
+            ','.(file_exists(AkConfig::getDir('public').DS.'javascript'.DS.'application.js') ? 'application' : '' )
             ),'trim'),array('')));
         }
         if(func_num_args()){
@@ -114,7 +114,7 @@ class AssetTagHelper extends AkActionViewHelper
 
     /**
        * Register one or more additional JavaScript files to be included when
-       *   
+       *
        *   javascript_include_tag :defaults
        *
        * is called. This method is intended to be called only from plugin initialization
@@ -218,7 +218,7 @@ class AssetTagHelper extends AkActionViewHelper
     public function stylesheet_for_current_controller()
     {
         $stylesheet = AkInflector::underscore($this->_controller->getControllerName()).'.css';
-        if(file_exists(AK_PUBLIC_DIR.DS.'stylesheets'.DS.$stylesheet)){
+        if(file_exists(AkConfig::getDir('public').DS.'stylesheets'.DS.$stylesheet)){
             return $this->stylesheet_link_tag($stylesheet);
         }
         return '';
@@ -227,7 +227,7 @@ class AssetTagHelper extends AkActionViewHelper
     public function javascript_for_current_controller()
     {
         $js_file = AkInflector::underscore($this->_controller->getControllerName()).'.js';
-        if(file_exists(AK_PUBLIC_DIR.DS.'javascripts'.DS.$js_file)){
+        if(file_exists(AkConfig::getDir('public').DS.'javascripts'.DS.$js_file)){
             return $this->javascript_include_tag($js_file);
         }
         return '';
