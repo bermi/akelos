@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class ActionMailerTestCase extends ActionMailerUnitTest
+class ActionMailer_TestCase extends ActionMailerUnitTest
 {
     public function encode($text, $charset = 'utf-8')
     {
@@ -20,7 +20,6 @@ class ActionMailerTestCase extends ActionMailerUnitTest
 
     public function setup()
     {
-        Ak::import_mailer('render_mailer,first_mailer,second_mailer,helper_mailer,test_mailer');
         $this->Mailer = new AkActionMailer();
         $this->Mailer->delivery_method = 'test';
         $this->Mailer->perform_deliveries = true;
@@ -670,4 +669,5 @@ EOF;
 
 }
 
-ak_test_case('ActionMailerTestCase');
+ak_test_case('ActionMailer_TestCase');
+

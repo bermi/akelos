@@ -30,7 +30,7 @@
 *
 * - 0: No cache at all
 * - 1: File based cache using the folder defined at AK_CACHE_DIR or the system /tmp dir
-* - 2: Database based cache. This one has a performance penalty, but works on most servers
+* - 2: Database based cache. This one has a performance penalty, but works on most servers.
 *
 * Here is a small code spinet of how this works.
 * <code>
@@ -75,42 +75,42 @@ class AkCache extends AkObject
     * Enables / Disables caching
     */
     public $cache_enabled = true;
-    
+
     /**
     * Handles an instance of current Cache driver
     */
     public $DriverInstance = NULL;
 
-    
+
     /**
      * Instantiates and configures the AkCache store.
-     * 
+     *
      * If $options == NULL the configuration will be taken from the constants:
-     * 
+     *
      * AK_CACHE_HANDLER and AK_CACHE_OPTIONS
-     * 
+     *
      * if $options is of type string/int the $options parameter will be considered
      * as the AK_CACHE_HANDLER_* Type (AK_CACHE_HANDLER_PEAR,AK_CACHE_HANDLER_ADODB,AK_CACHE_HANDLER_MEMCACHE)
-     * 
+     *
      * if $options is an array of format:
-     * 
+     *
      *   array('file'=>array('cacheDir'=>'/tmp'))
-     *   
+     *
      *   or
-     * 
+     *
      *   array(AK_CACHE_HANDLER_PEAR=>array('cacheDir'=>'/tmp'))
-     * 
+     *
      *  the first key will be used as the AK_CACHE_HANDLER_* Type
      *  and the array as the config options
-     * 
+     *
      * Default behaviour is calling the method with the $options == null parameter:
-     * 
+     *
      * AkCache::lookupStore()
-     * 
+     *
      * Calling it with:
-     * 
+     *
      * AkCache::lookupStore(true)
-     * 
+     *
      * will return the configured $cache_store
      *
      * @param mixed $options
@@ -122,10 +122,10 @@ class AkCache extends AkObject
         $false = false;
         if ($options === true && !empty($cache_store)) {
             return $cache_store;
-        } else if (is_array($options) && 
-                   isset($options['enabled']) && $options['enabled']==true &&
-                   isset($options['handler']) &&
-                   isset($options['handler']['type'])) {
+        } else if (is_array($options) &&
+        isset($options['enabled']) && $options['enabled']==true &&
+        isset($options['handler']) &&
+        isset($options['handler']['type'])) {
             $type = $options['handler']['type'];
             $options = isset($options['handler']['options'])?$options['handler']['options']:array();
         } else if (is_string($options) || is_int($options)) {
@@ -135,13 +135,13 @@ class AkCache extends AkObject
             return $false;
         }
         $cache_store = new AkCache();
-        $cache_store->init($options,$type);
+        $cache_store->init($options, $type);
         if ($cache_store->cache_enabled) {
             return $cache_store;
         }
         return $false;
     }
-    
+
     static function expandCacheKey($key, $namespace = null)
     {
         $expanded_cache_key = $namespace != null? $namespace : '';
@@ -150,7 +150,7 @@ class AkCache extends AkObject
         } else if (isset($_ENV['AK_APP_VERSION'])) {
             $expanded_cache_key .= DS . $_ENV['AK_APP_VERSION'];
         }
-        
+
         if (is_object($key) && method_exists($key,'cacheKey')) {
             $expanded_cache_key .= DS . $key->cacheKey();
         } else if (is_array($key)) {
@@ -165,7 +165,7 @@ class AkCache extends AkObject
         $expanded_cache_key = rtrim($expanded_cache_key,DS);
         return $expanded_cache_key;
     }
-    
+
     /**
     * Class constructor (ALA Akelos Framework)
     *
@@ -230,7 +230,7 @@ class AkCache extends AkObject
                 } else {
                     $options['cacheDir'].=DS;
                 }
-                 if(!is_dir($options['cacheDir'])){
+                if(!is_dir($options['cacheDir'])){
                     Ak::make_dir($options['cacheDir'], array('base_path'=>dirname($options['cacheDir'])));
                 }
                 $this->DriverInstance = new Cache_Lite($options);
@@ -238,6 +238,7 @@ class AkCache extends AkObject
             case 2:
                 $this->DriverInstance = new AkAdodbCache();
                 $res = $this->DriverInstance->init($options);
+                $this->DriverInstance->install();
                 $this->cache_enabled = $res;
                 break;
             case 3:
@@ -317,6 +318,16 @@ class AkCache extends AkObject
     public function clean($group = false, $mode = 'ingroup')
     {
         return $this->cache_enabled ? $this->DriverInstance->clean($group, $mode) : true;
+    }
+
+    public function install()
+    {
+        return $this->cache_enabled ? $this->DriverInstance->install() : true;
+    }
+
+    public function uninstall()
+    {
+        return $this->cache_enabled ? $this->DriverInstance->uninstall() : true;
     }
 
 }

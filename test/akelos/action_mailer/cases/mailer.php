@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class MailerTestCase extends ActionMailerUnitTest
+class Mailer_TestCase extends ActionMailerUnitTest
 {
     public function setup()
     {
@@ -117,16 +117,16 @@ class MailerTestCase extends ActionMailerUnitTest
     // \n newlines.
     public function test_email_quoted_with_0d0a()
     {
-        $Mail = AkMailBase::parse(file_get_contents(AkCOnfig::getDir('fixtures').DS.'raw_email_quoted_with_0d0a'));
+        $Mail = AkMailBase::parse(file_get_contents(AkConfig::getDir('fixtures').DS.'raw_email_quoted_with_0d0a'));
         $this->assertPattern('/Elapsed time/', $Mail->body);
     }
 
     public function test_email_with_partially_quoted_subject()
     {
-        $Mail = AkMailBase::parse(file_get_contents(AkCOnfig::getDir('fixtures').DS.'raw_email_with_partially_quoted_subject'));
+        $Mail = AkMailBase::parse(file_get_contents(AkConfig::getDir('fixtures').DS.'raw_email_with_partially_quoted_subject'));
         $this->assertEqual("Re: Test: \"\346\274\242\345\255\227\" mid \"\346\274\242\345\255\227\" tail", $Mail->subject);
     }
 }
 
 
-ak_test_case('MailerTestCase');
+ak_test_case('Mailer_TestCase');

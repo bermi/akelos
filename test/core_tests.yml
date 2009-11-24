@@ -21,12 +21,6 @@ ActionController:
 ActionWebService:
     -'AkActionWebService/AkActionWebServiceApi'
 
-Cache:
-    - AkCache
-
-Configuration:
-    - AkConfig
-
 Internationalization:
     - AkLocaleManager
     -'AkLocalize/AkTimeZone'

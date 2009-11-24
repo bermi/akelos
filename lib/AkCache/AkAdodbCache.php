@@ -13,7 +13,7 @@
 
 /**
 * Dabase cache driver for the AkCache class
-* 
+*
 * @author Bermi Ferrer <bermi at akelos dot com>
 */
 class AkAdodbCache
@@ -89,7 +89,7 @@ class AkAdodbCache
     * using AdoBD
     * @return void
     */
-    public function setDb($db)
+    public function setDb(&$db)
     {
         $this->_db = $db;
 
@@ -165,7 +165,7 @@ class AkAdodbCache
     * Class constructor (ALA Akelos Framework)
     *
     * @access public
-    * @param    array    $options    
+    * @param    array    $options
     * <code>
     * $options = array(
     * //This options are valid for both cache contains (database and file based)
@@ -178,7 +178,7 @@ class AkAdodbCache
     */
     public function init($options = array())
     {
-        $this->_db =& Ak::db();
+        $this->_db = Ak::db();
 
         $available_options = array('memoryCaching', 'lifeTime', 'automaticSerialization');
         foreach($options as $key => $value) {
@@ -210,10 +210,10 @@ class AkAdodbCache
         }
 
         $query_result = $this->_db->selectValue('
-            SELECT cache_data 
-            FROM cache 
-            WHERE id = '.$this->_db->quote_string($cache_hash).' 
-            AND cache_group = '.$this->_db->quote_string($this->_group).' 
+            SELECT cache_data
+            FROM cache
+            WHERE id = '.$this->_db->quote_string($cache_hash).'
+            AND cache_group = '.$this->_db->quote_string($this->_group).'
             AND expire > '.$this->_db->quote_datetime($this->_refreshTime)
             );
             if (!$query_result) return false;
@@ -321,7 +321,24 @@ class AkAdodbCache
         }
     }
 
+    public function install()
+    {
+        if(!$this->_db->tableExists('cache')){
+            $Installer = new AkInstaller($this->_db);
+            $Installer->createTable('cache', '
+        id string(65) not null index primary key unique,
+        cache_group string(50) index,
+        cache_data binary,
+        expire datetime');
+        }
+    }
+
+    public function uninstall()
+    {
+        if($this->_db->tableExists('cache')){
+            $Installer = new AkInstaller($this->_db);
+            $Installer->dropTable('cache');
+        }
+    }
+
 }
-
-
-?>

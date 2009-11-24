@@ -143,6 +143,21 @@ class AkConfig
         AkConfig::getDir($type, $value, false);
     }
 
+    static function getOption($key, $default = null)
+    {
+        $option = Ak::getStaticVar('AkConfig_'.$key);
+        if(is_null($option) && !is_null($default)){
+            return $default;
+        }
+        return $option;
+    }
+
+    static function setOption($key, $value)
+    {
+        Ak::setStaticVar('AkConfig_'.$key, $value);
+        return $value;
+    }
+
     static function getLocalesReady()
     {
         Ak::t('Akelos');

@@ -122,7 +122,7 @@ class AkUnitTest extends UnitTestCase
     protected function _checkIfEnabled($file = null)
     {
         if ($file == null) {
-            $file = isset($this->check_file)?$this->check_file:null;
+            $file = isset($this->check_file) ? $this->check_file : null;
         }
         if ($file!=null && file_exists($file)) {
             $val = file_get_contents($file);
