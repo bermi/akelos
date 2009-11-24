@@ -69,16 +69,18 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
 
         $this->assertTrue($AllRecords = $TheModel->find());
         $yaml = $TheModel->toYaml($AllRecords);
-        $this->assertFalse(file_exists(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'the_models.yaml'));
-        Ak::file_put_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'the_models.yaml',$yaml);
+
+        $yaml_path = AkConfig::getDir('fixtures').DS.'the_models.yml';
+        $this->assertFalse(file_exists($yaml_path));
+        Ak::file_put_contents($yaml_path, $yaml);
 
         $unit_tester->installAndIncludeModels(array('TheModel'=>'id,name'));
         $this->assertFalse($TheModel->find());
         $this->assertEqual($TheModel->count(),0);
 
-        $unit_tester->installAndIncludeModels(array('TheModel'=>'id,name'),array('populate'=>true));
-        $this->assertEqual($TheModel->count(),4);
-        unlink(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'the_models.yaml');
+        $unit_tester->installAndIncludeModels(array('TheModel'=>'id,name'), array('populate'=>true));
+        $this->assertEqual($TheModel->count(), 4);
+        unlink($yaml_path);
 
     }
 
@@ -108,9 +110,8 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
         $unit_tester->includeAndInstatiateModels('Picture');
 
         $this->assertTrue($unit_tester->Picture->create(array('title'=>__FUNCTION__)));
-        $this->assertTrue($unit_tester->Picture->find('first',array('title'=>__FUNCTION__)));
+        $this->assertTrue($unit_tester->Picture->find('first', array('title'=>__FUNCTION__)));
 
-        //$this->expectError(false);
         $unit_tester->uninstallAndInstallMigration('Picture');
         $this->assertFalse($unit_tester->Picture->find('all'));
     }
