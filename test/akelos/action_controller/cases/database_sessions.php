@@ -1,27 +1,21 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
-/**
-* In order to test sessions we have created a helper script for checking and setting session params
-*/
-
-class AkDbSession_TestCase extends  AkWebTestCase
+class DatabaseSessions_TestCase extends WebTestCase
 {
     public $sessionLife = NULL;
 
-    public function test_install_db_tables()
-    {
-        require_once(dirname(__FILE__).'/../../fixtures/app/installers/framework_installer.php');
-        $installer = new FrameworkInstaller();
-        $installer->uninstall();
-        $installer->install();
-    }
-
     public function setUp()
     {
-        $this->_test_script = str_replace('/fixtures/public','',trim(AK_TESTING_URL,'/')).
-        '/mocks/test_script_AkDbSession.php';
+        AkDbSession::install();
+        $this->_test_script = AkConfig::getOption('testing_url', 'http://akelos.tests').
+        '/action_controller/public/database_sessions.php';
+    }
+
+    public function tearDown()
+    {
+        AkDbSession::uninstall();
     }
 
     public function test_open()
@@ -64,8 +58,6 @@ class AkDbSession_TestCase extends  AkWebTestCase
         $copy->get("$this->_test_script?key=test_key");
         $this->assertText($expected,'Session garbage collection is not working correctly');
     }
-    /**/
 }
 
-ak_test_case('AkDbSession_TestCase');
-
+ak_test_case('DatabaseSessions_TestCase');

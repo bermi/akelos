@@ -10,11 +10,6 @@
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
-if(!defined('AK_DBSESSION_CLASS_INCLUDED')){ define('AK_DBSESSION_CLASS_INCLUDED',true); // Class overriding trick
-
-
-require_once(AK_LIB_DIR.DS.'Ak.php');
-require_once(AK_LIB_DIR.DS.'AkObject.php');
 
 
 /**
@@ -24,6 +19,9 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 * be usefull for multiple server sites, and to have more
 * control over sessions.
 *
+* You'll have to run AkDbSession::install() in order to create the default
+* database scheme for strogin sessions.
+*
 * <code>
 *
 * require_once(AK_LIB_DIR.'/AkDbSession.php');
@@ -31,12 +29,12 @@ require_once(AK_LIB_DIR.DS.'AkObject.php');
 * $AkDbSession = new AkDbSession();
 * $AkDbSession->sessionLife = AK_SESSION_EXPIRE;
 * session_set_save_handler (
-* array(&$AkDbSession, '_open'),
-* array(&$AkDbSession, '_close'),
-* array(&$AkDbSession, '_read'),
-* array(&$AkDbSession, '_write'),
-* array(&$AkDbSession, '_destroy'),
-* array(&$AkDbSession, '_gc')
+* array($AkDbSession, '_open'),
+* array($AkDbSession, '_close'),
+* array($AkDbSession, '_read'),
+* array($AkDbSession, '_write'),
+* array($AkDbSession, '_destroy'),
+* array($AkDbSession, '_gc')
 * );
 *
 * </code>
@@ -56,7 +54,7 @@ class AkDbSession extends AkObject
     * @access public
     * @var integer $sessionLife
     */
-    var $sessionLife = AK_SESSION_EXPIRE;
+    public $sessionLife = AK_SESSION_EXPIRE;
 
     /**
     * Database instance handler
@@ -66,7 +64,7 @@ class AkDbSession extends AkObject
     * @access protected
     * @var object $_db
     */
-    var $_db;
+    public $_db;
 
     /**
     * Original session value for avoiding hitting the database in case nothing has changed
@@ -74,7 +72,7 @@ class AkDbSession extends AkObject
     * @access private
     * @var string $_db
     */
-    var $_original_sess_value = '';
+    public $_original_sess_value = '';
 
     /**
     * $this->sessionLife setter
@@ -87,7 +85,7 @@ class AkDbSession extends AkObject
     * @return bool Returns true if $this->sessionLife has been set
     * correctly.
     */
-    function setSessionLife($sessionLife)
+    public function setSessionLife($sessionLife)
     {
         $this->sessionLife = $sessionLife;
 
@@ -101,9 +99,9 @@ class AkDbSession extends AkObject
     * @access protected
     * @return boolean
     */
-    function _open()
+    public function _open()
     {
-        $this->_db =& Ak::db();
+        $this->_db = Ak::db();
         return true;
     }
 
@@ -113,10 +111,10 @@ class AkDbSession extends AkObject
     * @access protected
     * @return boolean
     */
-    function _close()
+    public function _close()
     {
         /**
-        * @todo Get from cached vars last time garbage collection was made to avoid hitting db 
+        * @todo Get from cached vars last time garbage collection was made to avoid hitting db
         * on every request
         */
         $this->_gc();
@@ -130,7 +128,7 @@ class AkDbSession extends AkObject
     * @param    string    $id    Session Id
     * @return string
     */
-    function _read($id)
+    public function _read($id)
     {
         $result = @$this->_db->selectValue("SELECT value FROM sessions WHERE id = ".$this->_db->quote_string($id));
         return is_null($result) ? '' : (string)$result;
@@ -140,11 +138,11 @@ class AkDbSession extends AkObject
     * Session write handler
     *
     * @access protected
-    * @param    string    $id    
-    * @param    string    $data    
+    * @param    string    $id
+    * @param    string    $data
     * @return boolean
     */
-    function _write($id, $data)
+    public function _write($id, $data)
     {
         // We don't want to hit the db if nothing has changed
         if($this->_original_sess_value != $data){
@@ -166,13 +164,13 @@ class AkDbSession extends AkObject
     * Session destroy handler
     *
     * @access protected
-    * @param    string    $id    
+    * @param    string    $id
     * @return boolean
     */
-    function _destroy($id)
+    public function _destroy($id)
     {
         return (bool)@$this->_db->delete('DELETE FROM sessions WHERE id = '.$this->_db->quote_string($id));
-        }
+    }
 
     /**
     * Session garbage collection handler
@@ -180,15 +178,33 @@ class AkDbSession extends AkObject
     * @access protected
     * @return boolean
     */
-    function _gc()
+    public function _gc()
     {
         return (bool)@$this->_db->delete('DELETE FROM sessions WHERE expire < '.$this->_db->quote_datetime(time()-$this->sessionLife));
 
     }
 
+    static function install()
+    {
+        $db = Ak::db();
+        if(!$db->tableExists('sessions')){
+            $Installer = new AkInstaller($db);
+            $Installer->createTable('sessions', '
+                                        id string(32) not null primary key,
+                                        expire datetime,
+                                        value text'
+            ,                           array('timestamp'=>false));
+        }
+    }
 
+    static function uninstall()
+    {
+        $db = Ak::db();
+        if($db->tableExists('sessions')){
+            $Installer = new AkInstaller($db);
+            $Installer->dropTable('sessions');
+        }
+    }
 }
 
-}// End of if(!defined('AK_DBSESSION_CLASS_INCLUDED')){
 
-?>

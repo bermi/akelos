@@ -6,7 +6,7 @@ if(isset($_GET['expire'])){
     define('AK_SESSION_EXPIRE', (int)$_GET['expire']);
 }
 
-require_once(dirname(__FILE__).'/../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
 Ak::db();
 

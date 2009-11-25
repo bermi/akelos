@@ -1,8 +1,8 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
-class AkRouter_TestCase extends  AkUnitTest
+class Router_TestCase extends ActionControllerUnitTest
 {
     public $Router;
     public $url_prefix = '';
@@ -190,46 +190,10 @@ class AkRouter_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_case('AkRouter_TestCase');
-
-
-
-class DefaultRoutes_TestCase extends  AkUnitTest
-{
-
-    public $Router;
-    public $url_prefix = '';
-
-    public function __construct()
-    {
-        $this->Router = new AkRouter();
-
-        $this->Router->loadUrlRewriteSettings();
-        $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
-
-        $this->Router->connect('/:controller/:action/:id', array('controller' => 'page', 'action' => 'index'));
-        $this->Router->connect('/', array('controller' => 'page', 'action' => 'index'));
-    }
-
-    public function Test_connect()
-    {
-        $this->assertEqual(count($this->Router->getRoutes()) , 2,'Wrong number of routes loaded. We expected 12');
-    }
-
-    public function Test_toUrl()
-    {
-        $input_value = array('controller'=>'page','action'=>'listing');
-        $expected = '/page/listing/';
-        $this->assertEqual($this->Router->toUrl($input_value),$expected);
-    }
-
-}
-
-ak_test_case('DefaultRoutes_TestCase');
 
 
 # Fixes issue 27 reported by Jacek Jedrzejewski
-class UrlConstantsNamedAsUrlVariables_TestCase extends  AkUnitTest
+class Router_UrlConstantsNamedAsUrlVariables_TestCase extends ActionControllerUnitTest
 {
 
     public $Router;
@@ -275,10 +239,8 @@ class UrlConstantsNamedAsUrlVariables_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_case('UrlConstantsNamedAsUrlVariables_TestCase');
 
-
-class MiddleOptionalValuesWhenGeneratingUrls_TestCase extends  AkUnitTest
+class Router_MiddleOptionalValuesWhenGeneratingUrls_TestCase extends ActionControllerUnitTest
 {
     public $Router;
     public $url_prefix = '';
@@ -306,10 +268,7 @@ class MiddleOptionalValuesWhenGeneratingUrls_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_case('MiddleOptionalValuesWhenGeneratingUrls_TestCase');
-
-
-class RouterModules_TestCase extends  AkUnitTest
+class Router_Modules_TestCase extends ActionControllerUnitTest
 {
 
     public $Router;
@@ -337,11 +296,8 @@ class RouterModules_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_case('RouterModules_TestCase');
 
-
-
-class RouterConflicts_TestCase extends  AkUnitTest
+class Router_Conflicts_TestCase extends ActionControllerUnitTest
 {
     public $Router;
     public $url_prefix = '';
@@ -369,5 +325,9 @@ class RouterConflicts_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_case('RouterConflicts_TestCase');
 
+ak_test_case('Router_TestCase');
+ak_test_case('Router_UrlConstantsNamedAsUrlVariables_TestCase');
+ak_test_case('Router_MiddleOptionalValuesWhenGeneratingUrls_TestCase');
+ak_test_case('Router_Modules_TestCase');
+ak_test_case('Router_Conflicts_TestCase');

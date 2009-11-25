@@ -7,7 +7,6 @@ ActionView:
 
 ActionController:
     - AkDbSession
-    - AkRouter
     - AkSession
     -'AkRequest/*'
     -'AkActionController/_f*'
