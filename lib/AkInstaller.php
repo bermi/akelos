@@ -257,7 +257,7 @@ Example:
 
     public function getAvailableTables()
     {
-        return $this->available_tables = $this->db->availableTables(true);
+        return $this->available_tables = $this->db->getAvailableTables(true);
     }
 
     public function tableExists($table_name)

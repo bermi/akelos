@@ -2572,7 +2572,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             !$this->_runCurrentModelInstallerIfExists($column_objects)){
                 // akelos_migrations is the first active record to be installed, therefore the table will be created after the first run.
                 if($this->getTableName() != 'akelos_migrations'){
-                    trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
+                    Ak::trace($this->getTableName());
+                    dddd();
+                     trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())).Ak::getFileAndNumberTextForError(1), E_USER_NOTICE);
                 }
                 return false;
             }elseif (empty($column_objects)){

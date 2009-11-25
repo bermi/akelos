@@ -9,7 +9,7 @@ class BbAdapterSchema_TestCase extends ActiveRecordUnitTest
         $db = AkDbAdapter::getInstance();
         if ($db->type() !== 'mysql') return;
         $old_adodb_style = $db->connection->MetaTables();
-        $new_implementation = $db->availableTables();
+        $new_implementation = $db->getAvailableTables();
         $this->assertEqual($old_adodb_style,$new_implementation);
     }
 
@@ -18,7 +18,7 @@ class BbAdapterSchema_TestCase extends ActiveRecordUnitTest
         $db = AkDbAdapter::getInstance();
         if ($db->type() !== 'postgre') return;
         $old = $db->connection->MetaTables();
-        $new = $db->availableTables();
+        $new = $db->getAvailableTables();
         sort($new);
         $this->assertEqual($old,$new);
     }

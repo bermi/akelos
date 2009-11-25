@@ -257,7 +257,46 @@ class AkUnitTest extends UnitTestCase
         }
     }
 
+    public function uninstallModels($models = array())
+    {
+        foreach ($models as $model){
+            $this->uninstallModel($model);
+        }
+    }
+
+    public function uninstallModel($model)
+    {
+        $this->log('Uninstalling model:'.$model);
+        if (!$this->uninstallMigration($model)){
+            $table_name = AkInflector::tableize($model);
+            $installer = new AkInstaller();
+            $installer->dropTable($table_name, array('sequence'=>true));
+        }
+    }
+
     public function uninstallAndInstallMigration($installer_name)
+    {
+        return $this->_uninstallAndInstallMigration($installer_name, true);
+    }
+
+    public function uninstallMigration($installer_name)
+    {
+        return $this->_uninstallAndInstallMigration($installer_name, false);
+    }
+
+    public function dropTables($tables = array())
+    {
+        $installer = new AkInstaller();
+        if(is_string($tables) && $tables == 'all'){
+            $tables = Ak::db()->getAvailableTables();
+        }
+        foreach ($tables as $table){
+            $installer->dropTable($table, array('sequence'=>true));
+        }
+
+    }
+
+    protected function _uninstallAndInstallMigration($installer_name, $reinstall = true)
     {
         $installer_path = AkConfig::getDir('app_installers').DS.AkInflector::underscore($installer_name).'_installer.php';
         $this->log('Looking for installer:'.$installer_path);
@@ -267,10 +306,11 @@ class AkUnitTest extends UnitTestCase
             $installer_class_name = $installer_name.'Installer';
             $Installer = new $installer_class_name();
             $Installer->uninstall();
-            $Installer->install();
+            if($reinstall){
+                $Installer->install();
+            }
             return true;
         }
-
         return false;
     }
 

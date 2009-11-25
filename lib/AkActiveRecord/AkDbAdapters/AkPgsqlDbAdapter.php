@@ -31,7 +31,7 @@ class AkPgsqlDbAdapter extends AkDbAdapter
 
     /* META */
 
-    public function availableTables($force_lookup = false)
+    public function getAvailableTables($force_lookup = false)
     {
         $schema_path = $this->selectValue('SHOW search_path');
         $schemas = "'".join("', '", explode(',',$schema_path))."'";

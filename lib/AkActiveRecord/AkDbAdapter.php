@@ -385,7 +385,7 @@ class AkDbAdapter extends AkObject
      *
      * @return unknown
      */
-    public function availableTables($force_lookup = false)
+    public function getAvailableTables($force_lookup = false)
     {
         $available_tables = array();
         !AK_TEST_MODE && $available_tables = Ak::getStaticVar('available_tables');
@@ -406,10 +406,10 @@ class AkDbAdapter extends AkObject
     public function tableExists($table_name)
     {
         // First try if cached
-        $available_tables = $this->availableTables();
+        $available_tables = $this->getAvailableTables();
         if(!in_array($table_name,(array)$available_tables)){
             // Force lookup and refresh cache
-            $available_tables = $this->availableTables(true);
+            $available_tables = $this->getAvailableTables(true);
             return in_array($table_name,(array)$available_tables);
         }
         return true;

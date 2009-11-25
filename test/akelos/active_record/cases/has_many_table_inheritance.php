@@ -6,7 +6,7 @@ class HasManyTableInheritance_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {
-        $this->installAndIncludeModels(array('ExtendedPost','ExtendedComment','Comment','Tag','User'));
+        $this->installAndIncludeModels(array('ExtendedPost', 'ExtendedComment', 'Comment', 'User', 'Tagging', 'Tag'));
     }
 
     public function test_normal_post_no_inheritance()

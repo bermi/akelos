@@ -6,7 +6,7 @@ class TypeCasting_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {
-        $this->installAndIncludeModels(array('Tag','Post', 'User'));
+        $this->installAndIncludeModels(array('Post', 'User', 'Tagging', 'Tag'));
     }
 
     // Ticket #21

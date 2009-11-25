@@ -7,7 +7,7 @@ class ConversionBetweenFormats_TestCase extends ActiveRecordUnitTest
     public $skip_fixtures = true;
     public function setup()
     {
-        $this->installAndIncludeModels(array('Person'));//,'Account'));
+        $this->installAndIncludeModels(array('Person','Account'));
     }
 
     public function test_simple_xml()

@@ -4,10 +4,6 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class Locking_TestCase extends ActiveRecordUnitTest
 {
-    public function setup()
-    {
-        
-    }
 
     public function test_should_give_a_deprecated_warning()
     {

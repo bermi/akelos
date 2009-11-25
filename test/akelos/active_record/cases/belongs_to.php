@@ -4,9 +4,10 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class BelongsTo_TestCase extends ActiveRecordUnitTest
 {
-    public function test_start()
+    public function __construct()
     {
-        $this->installAndIncludeModels(array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'Person', 'Account'));
+        parent::__construct();
+        $this->installAndIncludeModels(array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'Person', 'Account', 'Location'));
     }
 
     public function test_for_single_has_one_association()
@@ -309,7 +310,7 @@ class BelongsTo_TestCase extends ActiveRecordUnitTest
 
         $Location = $this->Location->findFirstBy('name', 'Palafolls', array('include'=>'group'));
         $Location->destroy();
-        //die;
+
         $this->assertFalse($this->Location->findFirstBy('name', 'Palafolls'));
         $this->assertFalse($this->Group->findFirstBy('name', 'Crafters'));
 

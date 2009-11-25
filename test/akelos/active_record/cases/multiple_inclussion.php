@@ -6,7 +6,7 @@ class MultipleInclussion_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {
-        $this->installAndIncludeModels(array('File', 'Tag','Tagging'));
+        $this->installAndIncludeModels(array('File', 'Tagging', 'Tag'));
     }
 
 

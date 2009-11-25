@@ -2,7 +2,7 @@
 
 class TaggingInstaller extends AkInstaller
 {
-    public function install($version = null, $options = array())
+    public function up_1($version = null, $options = array())
     {
         $this->createTable('taggings', '
         id integer max=10 auto increment primary,
@@ -13,7 +13,7 @@ class TaggingInstaller extends AkInstaller
         );
     }
 
-    public function uninstall($version = null, $options = array())
+    public function down_1($version = null, $options = array())
     {
         $this->dropTable('taggings', array('sequence'=>true));
     }

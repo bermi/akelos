@@ -335,16 +335,9 @@ class ADODB_sqlite extends ADOConnection {
                 'unique' => preg_match("/unique/i",$row[1]),
                 'columns' => array());
             }
-            /**
-			  * There must be a more elegant way of doing this,
-			  * the index elements appear in the SQL statement
-			  * in cols[1] between parentheses
-			  * e.g CREATE UNIQUE INDEX ware_0 ON warehouse (org,warehouse)
-			  */
-            $cols = explode("(",$row[1]);
-            $cols = explode(")",$cols[1]);
-            array_pop($cols);
-            $indexes[$row[0]]['columns'] = $cols;
+            if(preg_match('/\((.+)\)$/', $row[1], $matches)){
+                $indexes[$row[0]]['columns'] = Ak::toArray($matches[1]);
+            }
         }
         if (isset($savem)) {
             $this->SetFetchMode($savem);

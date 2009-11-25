@@ -17,7 +17,7 @@ class HasManySpecifications_TestCase extends ActiveRecordUnitTest
     public $Picture;
     public function setUp()
     {
-        $this->installAndIncludeModels(array('Property','Picture'));
+        $this->installAndIncludeModels(array('Property','Picture', 'Thumbnail'));
     }
 
     public function test_deletion_from_collection_should_destroy_the_active_record()

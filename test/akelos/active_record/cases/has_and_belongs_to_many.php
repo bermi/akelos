@@ -6,18 +6,12 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {
-        $Installer = new AkInstaller();
-        @$Installer->dropTable('posts_tags');
-        @$Installer->dropTable('friends_friends');
-        @$Installer->dropTable('posts_users');
-
         $this->_cleanUpAutomaticGeneratedFiles();
 
         $Installer = new AkInstaller();
-        $this->installAndIncludeModels(array('Post', 'Tag','Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'User'));
+        $this->installAndIncludeModels(array('Post','Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'User', 'Tagging', 'Tag'));
     }
 
-    /**/
     public function test_getAssociatedModelInstance_should_return_a_single_instance()  // bug-fix
     {
         $this->assertReference($this->Post->tag->getAssociatedModelInstance(),$this->Post->tag->getAssociatedModelInstance());
@@ -559,6 +553,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
             @Ak::file_delete(AkConfig::getDir('models').DS.$file.'.php');
         }
     }
+
 }
 
 ak_test_case('HasAndBelongsToMany_TestCase');

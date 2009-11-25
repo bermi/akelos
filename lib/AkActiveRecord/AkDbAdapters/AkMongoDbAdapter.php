@@ -145,7 +145,7 @@ class AkMongoDbAdapter extends AkDbAdapter
         return false;
     }
 
-    public function availableTables($force_lookup = false)
+    public function getAvailableTables($force_lookup = false)
     {
         return array();
     }
