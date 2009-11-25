@@ -1250,7 +1250,7 @@ class AkActionController extends AkLazyObject// AkObject
         foreach (array('anchor', 'params', 'only_path', 'host', 'protocol', 'trailing_slash', 'skip_relative_url_root') as $k){
             unset($options[$k]);
         }
-        
+
         $path = Ak::toUrl($options);
         return $path;
     }
@@ -2337,4 +2337,3 @@ function &AkActionController()
 }
 
 
-?>

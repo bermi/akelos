@@ -243,7 +243,7 @@ class AkConfig
  */
 \$config = $var_export;
 return \$config;
-?>
+
 CACHE;
         $cache_file_name = $this->generateCacheFileName($namespace, $environment);
 

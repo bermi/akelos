@@ -625,4 +625,3 @@ class SimpleHttpResponse extends SimpleStickyError {
         return ! $packet;
     }
 }
-?>

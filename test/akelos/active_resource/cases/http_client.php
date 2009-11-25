@@ -1,8 +1,8 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
-class AkHttpClient_TestCase extends  AkUnitTest
+class HttpClient_TestCase extends ActiveResourceUnitTest
 {
     public $url = '';
     public $verbs = array('get', 'post', 'put', 'delete');
@@ -11,24 +11,16 @@ class AkHttpClient_TestCase extends  AkUnitTest
 
     function __construct()
     {
-        $this->ht_access_path = AK_FIXTURES_DIR.DS.'public'.DS.'.htaccess';
-        $this->original_ht_access = file_get_contents($this->ht_access_path);
-        file_put_contents($this->ht_access_path, str_replace(
-        '# RewriteBase /test/fixtures/public',
-        'RewriteBase '.str_replace(AK_PROTOCOL.AK_HOST, '', AK_TESTING_URL),
-        $this->original_ht_access));
-
+        if(!$this->webserver_enabled = AkConfig::getOption('webserver_enabled', false)){
+            echo "Skipping HttpClient_TestCase: Webserver no accesible at ".AkConfig::getOption('testing_url')."\n";
+        }
+        $this->url = AkConfig::getOption('testing_url').
+        '/active_resource/public/index.php?ak=http_requests';
         parent::__construct();
-    }
-
-    function __destruct()
-    {
-        file_put_contents($this->ht_access_path, $this->original_ht_access);
     }
 
     public function setup()
     {
-        $this->url = AK_TESTING_URL.'/http_requests';
         $this->Client = new AkHttpClient();
     }
 
@@ -86,7 +78,7 @@ class AkHttpClient_TestCase extends  AkUnitTest
         $query = http_build_query($params);
 
         foreach ($this->verbs as $verb){
-            $this->assertEqual($this->Client->$verb($this->url.'/json/?'.$query), $expected, "$verb passing params via url");
+            $this->assertEqual($this->Client->$verb($this->url.'/json/&'.$query), $expected, "$verb passing params via url");
             $this->assertEqual($this->Client->$verb($this->url.'/json', array('params'=>$params)), $expected, "$verb passing params via params option");
         }
     }
@@ -108,4 +100,5 @@ class AkHttpClient_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_case('AkHttpClient_TestCase');
+ak_test_case('HttpClient_TestCase');
+

@@ -68,6 +68,7 @@ class AkUnitTest extends UnitTestCase
         AkConfig::setDir('apis',            $base_path.DS.'apis');
         AkConfig::setDir('fixtures',        $base_path.DS.'fixtures');
         AkConfig::setDir('helpers',         $base_path.DS.'helpers');
+        AkConfig::setDir('public',          $base_path.DS.'public');
         $this->_path_rebased = true;
     }
     public function restoreAppPaths()
@@ -88,6 +89,7 @@ class AkUnitTest extends UnitTestCase
         'apis'              => AkConfig::getDir('apis'),
         'fixtures'          => AkConfig::getDir('fixtures'),
         'helpers'           => AkConfig::getDir('helpers'),
+        'public'            => AkConfig::getDir('public'),
         );
     }
 

@@ -244,7 +244,6 @@ class AkHttpClient extends AkObject
     public function getUrlWithParams($url, $params)
     {
         $parts = parse_url($url);
-        Ak::compat('http_build_query');
         $parts['query'] = http_build_query($params);
         return $this->_httpRenderQuery($parts);
     }
@@ -252,11 +251,10 @@ class AkHttpClient extends AkObject
     protected function _setParamsForGet(&$url, &$params)
     {
         $url_params = $this->getParamsOnUrl($url);
-        if(!count($url_params) && !empty($params)){
-            $url = $this->getUrlWithParams($url, $params);
-        }else{
-            $params = $url_params;
+        if(!(!count($url_params) && !empty($params))){
+            $params = array_merge($url_params, $params);
         }
+        $url = $this->getUrlWithParams($url, $params);
     }
 
     protected function _setParamsForPost(&$url, &$params)
@@ -271,9 +269,7 @@ class AkHttpClient extends AkObject
 
     protected function _setParamsForDelete(&$url, &$params)
     {
-        if(!$this->getParamsOnUrl($url) && !empty($params)){
-            $url = $this->getUrlWithParams($url, $params);
-        }
+        $this->_setParamsForGet($url, $params);
     }
 
     protected function _httpRenderQuery($parts)
@@ -290,5 +286,3 @@ class AkHttpClient extends AkObject
     }
 }
 
-
-?>

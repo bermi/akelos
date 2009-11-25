@@ -5,12 +5,21 @@ require_once(dirname(__FILE__).'/../config.php');
 class DatabaseSessions_TestCase extends WebTestCase
 {
     public $sessionLife = NULL;
+    public $webserver_enabled;
+
+    public function __construct()
+    {
+        if(!$this->webserver_enabled = AkConfig::getOption('webserver_enabled', false)){
+            echo "Skipping DatabaseSessions_TestCase: Webserver no accesible at ".AkConfig::getOption('testing_url')."\n";
+        }
+        parent::__construct();
+    }
 
     public function setUp()
     {
         AkDbSession::install();
-        $this->_test_script = AkConfig::getOption('testing_url', 'http://akelos.tests').
-        '/action_controller/public/database_sessions.php';
+        $this->_test_script = AkConfig::getOption('testing_url').
+        '/action_pack/public/database_sessions.php';
     }
 
     public function tearDown()
@@ -20,6 +29,8 @@ class DatabaseSessions_TestCase extends WebTestCase
 
     public function test_open()
     {
+        if(!$this->webserver_enabled) return;
+
         $browser = $this->getBrowser();
         $this->get("$this->_test_script?open_check=1");
         $expected_session_id = $browser->getContentAsText();
@@ -30,6 +41,8 @@ class DatabaseSessions_TestCase extends WebTestCase
 
     public function test_read_write()
     {
+        if(!$this->webserver_enabled) return;
+
         $expected = 'test_value';
         $this->get("$this->_test_script?key=test_key&value=$expected");
         $this->get("$this->_test_script?key=test_key");
@@ -39,6 +52,8 @@ class DatabaseSessions_TestCase extends WebTestCase
 
     public function test_destroy()
     {
+        if(!$this->webserver_enabled) return;
+
         $expected = 'value not found';
         $this->get("$this->_test_script?key=test_key&value=test_value");
         $this->get("$this->_test_script?destroy_check=1");
@@ -48,6 +63,8 @@ class DatabaseSessions_TestCase extends WebTestCase
 
     public function test_gc()
     {
+        if(!$this->webserver_enabled) return;
+
         $expected = 'value not found';
         $copy = $this;
         $copy->get("$this->_test_script?key=test_key&value=test_value&expire=1");

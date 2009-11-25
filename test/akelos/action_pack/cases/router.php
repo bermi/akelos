@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class Router_TestCase extends ActionControllerUnitTest
+class Router_TestCase extends ActionPackUnitTest
 {
     public $Router;
     public $url_prefix = '';
@@ -193,7 +193,7 @@ class Router_TestCase extends ActionControllerUnitTest
 
 
 # Fixes issue 27 reported by Jacek Jedrzejewski
-class Router_UrlConstantsNamedAsUrlVariables_TestCase extends ActionControllerUnitTest
+class Router_UrlConstantsNamedAsUrlVariables_TestCase extends ActionPackUnitTest
 {
 
     public $Router;
@@ -240,7 +240,7 @@ class Router_UrlConstantsNamedAsUrlVariables_TestCase extends ActionControllerUn
 }
 
 
-class Router_MiddleOptionalValuesWhenGeneratingUrls_TestCase extends ActionControllerUnitTest
+class Router_MiddleOptionalValuesWhenGeneratingUrls_TestCase extends ActionPackUnitTest
 {
     public $Router;
     public $url_prefix = '';
@@ -268,7 +268,7 @@ class Router_MiddleOptionalValuesWhenGeneratingUrls_TestCase extends ActionContr
     }
 }
 
-class Router_Modules_TestCase extends ActionControllerUnitTest
+class Router_Modules_TestCase extends ActionPackUnitTest
 {
 
     public $Router;
@@ -297,7 +297,7 @@ class Router_Modules_TestCase extends ActionControllerUnitTest
 }
 
 
-class Router_Conflicts_TestCase extends ActionControllerUnitTest
+class Router_Conflicts_TestCase extends ActionPackUnitTest
 {
     public $Router;
     public $url_prefix = '';

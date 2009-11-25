@@ -644,4 +644,4 @@ class SimpleTestXmlParser {
     protected function defaultContent($expat, $default) {
     }
 }
-?>
+

@@ -10,19 +10,6 @@
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
-if(!defined('AK_DEFAULT_CONTROLLER')){
-    define('AK_DEFAULT_CONTROLLER', 'page');
-}
-
-if(!defined('AK_DEFAULT_ACTION')){
-    define('AK_DEFAULT_ACTION', 'index');
-}
-
-defined('AK_AUTOMATIC_SESSION_START') ? null : define('AK_AUTOMATIC_SESSION_START', !AK_HIGH_LOAD_MODE);
-
-// IIS does not provide a valid REQUEST_URI so we need to guess it from the script name + query string
-$_SERVER['REQUEST_URI'] = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_NAME'].(( isset($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '')));
-
 /**
 * Class that handles incoming request.
 *
@@ -747,14 +734,13 @@ class AkRequest extends AkObject
         $module_path = $module_class_peffix = '';
         if(!empty($params['module'])){
             $module_path = trim(str_replace(array('/','\\'), DS, Ak::sanitize_include($params['module'], 'high')), DS).DS;
-            $module_shared_model = AK_CONTROLLERS_DIR.DS.trim($module_path,DS).'_controller.php';
+            $module_shared_model = AkConfig::getDir('controllers').DS.trim($module_path,DS).'_controller.php';
             $module_class_peffix = AkInflector::camelize($params['module']).'_';
         }
 
         $controller_file_name = AkInflector::underscore($params['controller']).'_controller.php';
         $controller_class_name = $module_class_peffix.AkInflector::camelize($params['controller']).'Controller';
-        $controller_path = AK_CONTROLLERS_DIR.DS.$module_path.$controller_file_name;
-        include_once(AkConfig::getDir('app').DS.'application_controller.php');
+        $controller_path = AkConfig::getDir('controllers').DS.$module_path.$controller_file_name;
 
         if(!empty($module_path) && isset($module_shared_model) && file_exists($module_shared_model)){
             include_once($module_shared_model);
@@ -767,7 +753,7 @@ class AkRequest extends AkObject
                 'the controller %controller_class_name',
                 array('%controller_file_name'=> $controller_file_name,
                 '%controller_class_name' => $controller_class_name)), E_USER_ERROR);
-            }elseif(@include(AK_PUBLIC_DIR.DS.'404.php')){
+            }elseif(@include(AkConfig::getDir('public').DS.'404.php')){
                 exit;
             }else{
                 header("HTTP/1.1 404 Not Found");
@@ -779,7 +765,7 @@ class AkRequest extends AkObject
             if(AK_ENVIRONMENT == 'development'){
                 trigger_error(Ak::t('Controller <i>%controller_name</i> does not exist',
                 array('%controller_name' => $controller_class_name)), E_USER_ERROR);
-            }elseif(@include(AK_PUBLIC_DIR.DS.'405.php')){
+            }elseif(@include(AkConfig::getDir('public').DS.'405.php')){
                 exit;
             }else{
                 header("HTTP/1.1 405 Method Not Allowed");

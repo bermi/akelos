@@ -10,9 +10,6 @@
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
-if(!defined('AK_SESSION_CLASS_INCLUDED')){ define('AK_SESSION_CLASS_INCLUDED',true); // Class overriding trick
-
-
 /**
 * Memcache based session.
 *
@@ -233,10 +230,4 @@ class AkSession extends AkObject
     {
         return (bool)$this->_driverInstance->clean('AK_SESSIONS','old');
     }
-
-
 }
-
-}
-// END OF AK_SESSION_CLASS_INCLUDED
-?>

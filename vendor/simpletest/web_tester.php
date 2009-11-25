@@ -1529,4 +1529,3 @@ class WebTestCase extends SimpleTestCase {
         return $trace->traceMethod();
     }
 }
-?>

@@ -45,3 +45,4 @@ if(isset($_GET['open_check'])){
 if(isset($_GET['destroy_check'])){
     session_destroy();
 }
+

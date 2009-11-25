@@ -654,4 +654,5 @@ class BadTestSuite {
         return 0;
     }
 }
-?>
+
+

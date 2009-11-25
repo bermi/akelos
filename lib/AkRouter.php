@@ -13,20 +13,6 @@
  */
 
 
-if(!defined('OPTIONAL')){
-    define('OPTIONAL', false);
-}
-
-if(!defined('COMPULSORY')){
-    define('COMPULSORY', true);
-}
-
-if(!defined('COMPULSORY_REGEX')){
-    define('COMPULSORY_REGEX', '([^\/]+){1}');
-}
-
-
-
 /**
 * Native PHP URL rewriting for the Akelos Framework
 *
@@ -136,6 +122,7 @@ class AkRouter extends AkObject
     {
         static $_cache;
         $_cache_key = md5(serialize($params));
+
         if(!isset($_cache[$_cache_key])){
             $_parsed = '';
 
@@ -271,6 +258,7 @@ class AkRouter extends AkObject
                             }
 
                             if(defined('AK_URL_REWRITE_ENABLED') && AK_URL_REWRITE_ENABLED === true){
+                                                                echo "eing";
                                 if(isset($url_params['ak'])){
                                     unset($url_params['ak']);
                                 }
