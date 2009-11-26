@@ -2,15 +2,10 @@ config/database.yml
 config/sqlite.yml
 config/mysql.yml
 config/testconfig1.yml
-test/report/
-test/fixtures/app/locales/
-test/fixtures/app/plugin_installer_target_class.php
+config/plugin_repositories.txt
 app/plugin_installer_target_class.php
 app/locales/
 private/
 test/fixtures/app/models/property_property_type.php
 cache/
-config/plugin_repositories.txt
-tmp1
-tmp2
 test/_fixtures/
