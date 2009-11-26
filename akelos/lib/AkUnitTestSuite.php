@@ -50,6 +50,7 @@ class AkUnitTestSuite extends TestSuite
         }
 
         defined('AK_DATABASE_SETTINGS_NAMESPACE') || define('AK_DATABASE_SETTINGS_NAMESPACE', 'database');
+        AkUnitTestSuite::createTestingDatabaseIfNotAvailable();
 
         if(!empty($options['component'])){
             $components = Ak::toArray($options['component']);
@@ -62,7 +63,7 @@ class AkUnitTestSuite extends TestSuite
 
                 $options['base_path'] = $real_base_path.DS.$component;
                 if(empty($options['suites'])){
-                $options['suites'] = array_diff(glob($options['base_path'].DS.'*/'), array(''));
+                    $options['suites'] = array_diff(glob($options['base_path'].DS.'*/'), array(''));
                 }else{
                     $options['suites'] = Ak::toArray($options['suites']);
                 }
@@ -129,53 +130,21 @@ class AkUnitTestSuite extends TestSuite
         exit ($options['TestSuite']->run(new $options['reporter']()) ? 0 : 1);
     }
 
-    static function runFromConfig($options = array())
+    static function createTestingDatabaseIfNotAvailable()
     {
-        $default_options = array(
-        'config'    => AK_TEST_DIR.DS.(AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE == 'Akelos' ? 'core_tests' : AkInflector::underscore(AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE)).'.yml',
-        'base_path' => AK_LIB_TESTS_DIRECTORY,
-        'namespace' => AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE,
-        'TestSuite' => null,
-        'reporter'  => AK_TEST_DEFAULT_REPORTER,
-        'files'  => array(),
-        );
-
-        $options = array_merge($default_options, $options);
-
-        if(empty($options['title'])){
-            $options['title'] =  "PHP ".phpversion().", Environment: ".AK_ENVIRONMENT.", Database: ".Ak::getSetting((defined('AK_DATABASE_SETTINGS_NAMESPACE')?AK_DATABASE_SETTINGS_NAMESPACE:'database'), 'type')."\n"."Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n".AkInflector::titleize($options['namespace']).' test suite';
-        }
-
-        if(empty($options['TestSuite'])){
-            if(isset($this)){
-                $options['TestSuite'] = $this;
-            }else{
-                $options['TestSuite'] = new AkUnitTestSuite($options['title']);
+        if(!file_exists(AK_CONFIG_DIR.DS.'database.yml')){
+            file_put_contents(AK_CONFIG_DIR.DS.'database.yml', 'default:
+    type: sqlite
+    host:
+    database_name:
+    database_file: '.AK_TMP_DIR.DS.'akelos.sqlite
+    user:
+    password:
+    options: ');
+            function ak_remove_testing_db_settings(){
+                unlink(AK_CONFIG_DIR.DS.'database.yml');
             }
-        }
-
-        $options['TestSuite']->running_from_config = true;
-        $files = empty($options['files']) ? Ak::convert('yaml', 'array', file_get_contents($options['config'])) : $options['files'];
-        if($options['namespace'] == AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE){
-            foreach ($files as $namespace => $file_list){
-                $options['TestSuite']->runFromConfig(array_merge($options, array('namespace' => $namespace, 'dont_run' => true)));
-            }
-        }else{
-            $options['namespace'] = AkInflector::camelize($options['namespace']);
-            if(empty($files[$options['namespace']])){
-                trigger_error('Namespace "'.$options['namespace'].'" not found in "'.$options['config'].'"', E_USER_ERROR);
-            }else{
-                $files = $files[$options['namespace']];
-            }
-            foreach ($files as $v){
-                $partial_tests = array_diff(glob($options['base_path'].DS.$v.'.php'), array(''));
-                if(!empty($partial_tests)){
-                    call_user_func_array(array($options['TestSuite'], 'addFile'), $partial_tests);
-                }
-            }
-        }
-        if(empty($options['dont_run'])){
-            exit ($options['TestSuite']->run(new $options['reporter']()) ? 0 : 1);
+            register_shutdown_function('ak_remove_testing_db_settings');
         }
     }
 
