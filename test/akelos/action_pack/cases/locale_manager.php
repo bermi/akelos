@@ -5,6 +5,23 @@ require_once(dirname(__FILE__).'/../config.php');
 class LocaleManager_TestCase extends ActionPackUnitTest
 {
     public $LocaleManager;
+    public $original_locales = array();
+
+    public function __construct()
+    {
+        parent::__construct();
+        foreach (glob(AK_CONFIG_DIR.'/locales/*.php') as $file){
+            $this->original_locales[$file] = file_get_contents($file);
+        }
+    }
+
+    public function __destruct()
+    {
+        parent::__destruct();
+        foreach ($this->original_locales as $file => $content){
+            file_put_contents($file, $content);
+        }
+    }
 
     public function setUp()
     {
