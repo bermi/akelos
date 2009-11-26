@@ -2311,12 +2311,14 @@ class Ak
 
         if(isset($lib_paths[$name])){
             include AK_LIB_DIR.DS.$lib_paths[$name];
+            return ;
         }
 
         if(isset($app_paths[$name])){
             $file_path = AkConfig::getDir('app').DS.$app_paths[$name];
             if(file_exists($file_path)){
                 include $file_path;
+                return ;
             }
         }
 

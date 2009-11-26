@@ -84,7 +84,7 @@ defined('AK_CACHE_DIR')             || define('AK_CACHE_DIR', AK_TMP_DIR.DS.'cac
 
 defined('AK_DEFAULT_LAYOUT')        || define('AK_DEFAULT_LAYOUT', 'application');
 
-defined('AK_CONTRIB_DIR')           || define('AK_CONTRIB_DIR',AK_FRAMEWORK_DIR.DS.'vendor');
+defined('AK_CONTRIB_DIR')           || define('AK_CONTRIB_DIR',AK_FRAMEWORK_DIR.DS.'contrib');
 defined('AK_VENDOR_DIR')            || define('AK_VENDOR_DIR', AK_CONTRIB_DIR);
 defined('AK_DOCS_DIR')              || define('AK_DOCS_DIR',AK_FRAMEWORK_DIR.DS.'docs');
 

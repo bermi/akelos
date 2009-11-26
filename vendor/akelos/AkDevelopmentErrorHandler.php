@@ -160,6 +160,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
     function ak_show_source_line($file, $line, $highlight = '', $params = array())
     {
         $result = ("File: ".$file."\n");
+
         $file = explode("\n", file_get_contents($file));
         $code = (trim($file[$line-1]));
 

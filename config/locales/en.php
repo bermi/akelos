@@ -271,4 +271,6 @@ $dictionary=array (
   '4sGOgIOe' => '4sGOgIOe',
   'q0dfsLEn' => 'q0dfsLEn',
   '2o5iNFil' => '2o5iNFil',
+  '2shKInwN' => '2shKInwN',
+  'UMPHA1m0' => 'UMPHA1m0',
 );

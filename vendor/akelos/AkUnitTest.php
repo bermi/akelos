@@ -17,7 +17,6 @@ require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'web_tester.php');
 require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'extensions'.DS.'junit_xml_reporter.php');
 //require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'code_coverage.php');
 
-
 class AkUnitTest extends UnitTestCase
 {
     public
