@@ -530,14 +530,14 @@ class AkMailParser
                 switch(count($margins)) {
                     case 1:
                         return 'marginheight="'.intval($value).'" marginwidth="'.intval($value).'" leftmargin="'.intval($value).'" topmargin="'.intval($value).'"';
-                    break;
+                        break;
                     case 2:
                     case 3:
                         return 'marginheight="'.intval($margins[0]).'" marginwidth="'.intval($margins[1]).'" leftmargin="'.intval($margins[1]).'" topmargin="'.intval($margins[0]).'"';
-                    break;
+                        break;
                     case 4:
                         return 'marginheight="'.intval($margins[0]).'" marginwidth="'.intval($margins[3]).'" leftmargin="'.intval($margins[3]).'" topmargin="'.intval($margins[0]).'"';
-                     break;
+                        break;
                 }
                 break;
             case 'margin-left':
@@ -626,6 +626,8 @@ class AkMailParser
         if(!empty($images)){
             require_once(AK_LIB_DIR.DS.'AkImage.php');
             require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'asset_tag_helper.php');
+            $tmp_dir = AkConfig::getDir('tmp');
+            $app_dir = AkConfig::getDir('app');
 
             $images = array_diff(array_unique($images), array(''));
 
@@ -640,9 +642,8 @@ class AkMailParser
                     $extenssion = substr($image, strrpos('.'.$image,'.'));
                     $image_name = Ak::uuid().'.'.$extenssion;
                     $html_images[$original_image_name] = 'cid:'.$image_name;
-
                     $Mail->setAttachment('image/'.$extenssion, array(
-                    'body' => Ak::file_get_contents($image),
+                    'body' => Ak::file_get_contents($image, array('base_path' => strstr($image, $app_dir) ? null : $tmp_dir)),
                     'filename' => $image_name,
                     'content_disposition' => 'inline',
                     'content_id' => '<'.$image_name.'>',
@@ -697,6 +698,7 @@ class AkMailParser
                     if(!Ak::file_put_contents($local_path, Ak::url_get_contents($path), array('base_path' => $tmp_dir))){
                         return '';
                     }
+
                 }
                 if(!file_exists($local_path) || filesize($local_path)<1) {
                     return '';
@@ -714,5 +716,4 @@ class AkMailParser
         }
         return $path;
     }
-
 }
