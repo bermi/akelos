@@ -3,5 +3,5 @@
 
 define('MAKELOS_BASE_DIR', dirname(__FILE__));
 
-include('./vendor/akelos/makelos.php');
+include('./akelos/lib/makelos.php');
 
