@@ -66,7 +66,7 @@ class AkelosInstaller
             $this->_copyFrameworkFiles($this->source_tree, $this->options['source']);
 
             if(empty($this->options['dependencies'])){
-                $this->_setupApplicationTestingEnvironment();
+                //$this->_setupApplicationTestingEnvironment();
                 $this->_linkDependencies();
             }
 
@@ -171,6 +171,7 @@ class AkelosInstaller
 
     protected function _setupApplicationTestingEnvironment()
     {
+        return ;
         $source_test_dir = $this->options['source'].DS.'test';
         $test_dir = $this->options['directory'].DS.'test';
 
@@ -318,7 +319,7 @@ class AkelosInstaller
 
     /**
      * Computes the destination path
-     * 
+     *
      * Giving /path/to/the_framework/lib/Ak.php will rerturn /my/project/path/lib/Ak.php
      */
     protected function _getDestinationPath($path)

@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class Sessions_TestCase extends WebTestCase
+class Sessions_TestCase extends AkWebTestCase
 {
     public $sessionLife = null;
     public $webserver_enabled;
@@ -13,13 +13,19 @@ class Sessions_TestCase extends WebTestCase
             echo "Skipping DatabaseSessions_TestCase: Webserver no accesible at ".AkConfig::getOption('testing_url')."\n";
         }
         parent::__construct();
-    }
 
-    public function setUp()
-    {
+        AkAdodbCache::install();
         AkDbSession::install();
         $this->_test_script = AkConfig::getOption('testing_url').
         '/action_pack/public/sessions.php';
+    }
+
+    public function __destruct()
+    {
+        AkAdodbCache::uninstall();
+        AkDbSession::uninstall();
+        $Installer = new AkInstaller();
+        $Installer->dropTable('akelos_migrations');
     }
 
     public function test_all_session_handlers()
@@ -57,7 +63,7 @@ class Sessions_TestCase extends WebTestCase
         $expected = 'test_value';
         $this->get("$this->_test_script?key=test_key&value=$expected&handler=".$type);
         $this->get("$this->_test_script?key=test_key&handler=".$type);
-        $this->assertText($expected,'Session is not storing values on database correctly when calling '.
+        $this->assertText($expected,"($type) Session is not storing values on database correctly when calling ".
         $this->_test_script.'?key=test_key&handler='.$type);
     }
 

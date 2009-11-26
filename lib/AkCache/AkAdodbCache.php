@@ -321,10 +321,11 @@ class AkAdodbCache
         }
     }
 
-    public function install()
+    static function install()
     {
-        if(!$this->_db->tableExists('cache')){
-            $Installer = new AkInstaller($this->_db);
+        $db = Ak::db();
+        if(!$db->tableExists('cache')){
+            $Installer = new AkInstaller($db);
             $Installer->createTable('cache', '
         id string(65) not null index primary key unique,
         cache_group string(50) index,
@@ -333,10 +334,11 @@ class AkAdodbCache
         }
     }
 
-    public function uninstall()
+    static function uninstall()
     {
-        if($this->_db->tableExists('cache')){
-            $Installer = new AkInstaller($this->_db);
+        $db = Ak::db();
+        if($db->tableExists('cache')){
+            $Installer = new AkInstaller($db);
             $Installer->dropTable('cache');
         }
     }

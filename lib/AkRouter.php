@@ -258,7 +258,6 @@ class AkRouter extends AkObject
                             }
 
                             if(defined('AK_URL_REWRITE_ENABLED') && AK_URL_REWRITE_ENABLED === true){
-                                                                echo "eing";
                                 if(isset($url_params['ak'])){
                                     unset($url_params['ak']);
                                 }

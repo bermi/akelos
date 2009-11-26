@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class DatabaseSessions_TestCase extends WebTestCase
+class DatabaseSessions_TestCase extends AkWebTestCase
 {
     public $sessionLife = NULL;
     public $webserver_enabled;
