@@ -1,10 +1,10 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
 class AkTestTime { function now(){} }
 
-class TimeZone_TestCase extends AkUnitTest
+class TimeZone_TestCase extends ActiveSupportUnitTest
 {
     function __construct()
     {

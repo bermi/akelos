@@ -41,7 +41,7 @@ class AkMemcache extends AkObject
         if (!$ping) {
             if ($this->_memcache->errno==ERR_NO_SOCKET) {
                 if(empty($options['silent_mode'])){
-                    trigger_error("Could not connect to MemCache daemon", E_USER_WARNING);
+                    trigger_error("Could not connect to MemCache daemon. ".Ak::getFileAndNumberTextForError(1), E_USER_WARNING);
                 }
                 return false;
             }

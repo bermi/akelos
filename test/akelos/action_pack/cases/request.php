@@ -1,8 +1,8 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
-class AkRequest_TestCase extends  AkUnitTest
+class Request_TestCase extends ActionPackUnitTest
 {
     public $test_request;
     public $test_request2;
@@ -54,7 +54,6 @@ class AkRequest_TestCase extends  AkUnitTest
         'session_param'=>'cmd',
         'general_param'=>'cmd'
         );
-
 
 
         $this->_testRequestInstance = new AkRequest();
@@ -215,5 +214,5 @@ class AkRequest_TestCase extends  AkUnitTest
 
 }
 
-ak_test_case('AkRequest_TestCase');
+ak_test_case('Request_TestCase');
 

@@ -1,19 +1,19 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
-class AkPluginManager_TestCase extends AkUnitTest
+class PluginManager_TestCase extends ActiveSupportUnitTest
 {
     public function test_remove_repositories_config()
     {
-        Ak::directory_delete(AK_PLUGINS_DIR.DS.'acts_as_versioned');
-        @Ak::file_delete(AK_CONFIG_DIR.DS.'plugin_repositories.txt');
+        Ak::directory_delete(AkConfig::getDir('plugins').DS.'acts_as_versioned');
+        @Ak::file_delete(AkConfig::getDir('config').DS.'plugin_repositories.txt');
     }
 
     public function setup()
     {
         $this->PluginManager = new AkPluginManager();
-        @Ak::file_delete(AK_TMP_DIR.DS.'plugin_repositories.yaml');
+        @Ak::file_delete(AkConfig::getDir('tmp').DS.'plugin_repositories.yaml');
     }
 
     public function test_should_get_available_repositories()
@@ -60,17 +60,17 @@ class AkPluginManager_TestCase extends AkUnitTest
 
     public function test_should_update_plugin()
     {
-        Ak::directory_delete(AK_PLUGINS_DIR.DS.'acts_as_versioned'.DS.'lib');
-        $this->assertFalse(file_exists(AK_PLUGINS_DIR.DS.'acts_as_versioned'.DS.'lib'.DS.'ActsAsVersioned.php'));
+        Ak::directory_delete(AkConfig::getDir('plugins').DS.'acts_as_versioned'.DS.'lib');
+        $this->assertFalse(file_exists(AkConfig::getDir('plugins').DS.'acts_as_versioned'.DS.'lib'.DS.'ActsAsVersioned.php'));
         $this->PluginManager->updatePlugin('acts_as_versioned');
-        $this->assertTrue(file_exists(AK_PLUGINS_DIR.DS.'acts_as_versioned'.DS.'lib'.DS.'ActsAsVersioned.php'));
+        $this->assertTrue(file_exists(AkConfig::getDir('plugins').DS.'acts_as_versioned'.DS.'lib'.DS.'ActsAsVersioned.php'));
     }
 
     public function test_should_uninstall_plugin()
     {
         clearstatcache();
         $this->PluginManager->uninstallPlugin('acts_as_versioned');
-        $this->assertFalse(is_dir(AK_PLUGINS_DIR.DS.'acts_as_versioned'));
+        $this->assertFalse(is_dir(AkConfig::getDir('plugins').DS.'acts_as_versioned'));
     }
 
     public function test_should_get_remote_repositories_listing()
@@ -81,9 +81,9 @@ class AkPluginManager_TestCase extends AkUnitTest
 
     public function test_remove_plugin()
     {
-        Ak::directory_delete(AK_PLUGINS_DIR.DS.'acts_as_versioned');
+        Ak::directory_delete(AkConfig::getDir('plugins').DS.'acts_as_versioned');
     }
 }
 
-ak_test_case('AkPluginManager_TestCase');
+ak_test_case('PluginManager_TestCase');
 

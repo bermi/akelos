@@ -6,8 +6,9 @@ define('AK_URL_REWRITE_ENABLED',    false);
 require_once(dirname(__FILE__).'/../config.php');
 
 // We need first to rebase the application
-$UnitTest = new ActiveResourceUnitTest();
+$UnitTest = new ActionPackUnitTest();
 
 $Dispatcher = new AkDispatcher();
 $Dispatcher->dispatch();
+
 
