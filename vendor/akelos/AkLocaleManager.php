@@ -150,6 +150,7 @@ class AkLocaleManager extends AkObject
             return;
         }
 
+        $paths = array();
         $new_core_entries = array();
         $new_controller_entries = array();
         $new_controller_files = array();
@@ -180,11 +181,11 @@ class AkLocaleManager extends AkObject
         }
 
         foreach ($new_controller_files as $controller=>$true){
-            AkLocaleManager::setDictionary($controllers_dictionaries[$controller],AK_FRAMEWORK_LANGUAGE,$controller,"File created on: ".date("Y-m-d G:i:s",Ak::time()));
+            $paths[] = AkLocaleManager::setDictionary($controllers_dictionaries[$controller],AK_FRAMEWORK_LANGUAGE,$controller,"File created on: ".date("Y-m-d G:i:s",Ak::time()));
             foreach (Ak::langs() as $lang){
                 if($lang != AK_FRAMEWORK_LANGUAGE){
                     $dictionary  = AkLocaleManager::getDictionary($lang,$controller);
-                    AkLocaleManager::setDictionary(array_merge($controllers_dictionaries[$controller],$dictionary),$lang,$controller);
+                    $paths[] = AkLocaleManager::setDictionary(array_merge($controllers_dictionaries[$controller],$dictionary),$lang,$controller);
                 }
             }
             unset($controllers_dictionaries[$controller]);
@@ -195,11 +196,11 @@ class AkLocaleManager extends AkObject
             $controller_entries=AkLocaleManager::getNewEntries($controller_entries,(array)@$existing_controllers_dictionaries[$controller]);
             if(!empty($controller_entries)) {
                 $dictionary  = AkLocaleManager::getDictionary(AK_FRAMEWORK_LANGUAGE,$controller);
-                AkLocaleManager::setDictionary(array_merge($dictionary,$controller_entries),AK_FRAMEWORK_LANGUAGE,$controller);
+                $paths[] = AkLocaleManager::setDictionary(array_merge($dictionary,$controller_entries),AK_FRAMEWORK_LANGUAGE,$controller);
                 foreach (Ak::langs() as $lang){
                     if($lang != AK_FRAMEWORK_LANGUAGE){
                         $dictionary  = AkLocaleManager::getDictionary($lang,$controller);
-                        AkLocaleManager::setDictionary(array_merge($dictionary,$controller_entries),$lang,$controller);
+                        $paths[] = AkLocaleManager::setDictionary(array_merge($dictionary,$controller_entries),$lang,$controller);
                     }
                 }
             }
@@ -224,6 +225,7 @@ class AkLocaleManager extends AkObject
                 }
             }
         }
+        return $paths;
     }
 
 
@@ -336,7 +338,8 @@ class AkLocaleManager extends AkObject
     {
         $path = AkConfig::getDir('app').DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
         AkLocaleManager::getDictionary($language,$namespace,true,$dictionary);
-        return Ak::file_put_contents($path,"<?php\n/** $comment */\n\n\$dictionary=".var_export((array)$dictionary,true).";\n");
+        Ak::file_put_contents($path,"<?php\n/** $comment */\n\n\$dictionary=".var_export((array)$dictionary,true).";\n");
+        return $path;
     }
 
     protected function _getLocaleForRequest(&$Request)
