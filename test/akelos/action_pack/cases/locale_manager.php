@@ -1,8 +1,8 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
-class AkLocaleManager_TestCase extends  AkUnitTest
+class LocaleManager_TestCase extends ActionPackUnitTest
 {
     public $LocaleManager;
 
@@ -63,12 +63,10 @@ class AkLocaleManager_TestCase extends  AkUnitTest
 
     }
 
-
-
     public function test_should_get_browser_language()
     {
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = $this->LocaleManager->_browser_language = 'en-us,en,es-es;q=0.5;';
-        
+
         $this->LocaleManager->available_locales = array('en_us'=>'en_us','en'=>'en','es_es'=>'es_es');
         $expected = array_keys($this->LocaleManager->available_locales);
         $result = $this->LocaleManager->getBrowserLanguages();
@@ -113,7 +111,7 @@ class AkLocaleManager_TestCase extends  AkUnitTest
 
     }
 
-    public function Test_of_getDefaultLocale()
+    public function test_should_get_default_locale()
     {
         $this->LocaleManager->available_locales = array('es_es'=>array('es_es'));
         $result = $this->LocaleManager->getDefaultLocale();
@@ -141,7 +139,7 @@ class AkLocaleManager_TestCase extends  AkUnitTest
     }
 
 
-    public function Test_of_getLangFromUrl()
+    public function test_should_get_language_from_url()
     {
         $Request = new AkObject();
 
@@ -202,7 +200,7 @@ class AkLocaleManager_TestCase extends  AkUnitTest
 
         $this->assertEqual($Request->_request['ak'],'es/post');
         $this->assertEqual($Request->ak,'es/post');
-        
+
         $Request->ak = 'spain/people';
         $Request->_request['ak'] = 'spain/people';
         unset($Request->lang);
@@ -213,50 +211,50 @@ class AkLocaleManager_TestCase extends  AkUnitTest
 
         $this->assertEqual($Request->_request['ak'],'people');
         $this->assertEqual($Request->ak,'people');
-        
+
         //Falta devolver IDIOMA y no alias y cargar $request->lang
 
     }
 
 
-    public function Test_of_getLocaleFromAlias()
+    public function test_should_get_locale_from_alias()
     {
         $this->LocaleManager->available_locales = $this->LocaleManager->parseLocaleConfigString('es, en, fr (france)');
         $result = $this->LocaleManager->getLocaleFromAlias('france');
         $expected = 'fr';
         $this->assertEqual($result,$expected);
-        
+
         $result = $this->LocaleManager->getLocaleFromAlias('spain');
         $this->assertFalse($result);
-        
+
     }
-    
+
     public function test_locale_setting_getting_deleting_methods()
     {
-        !defined('AK_TEST_TRANSLATIONS')?define('AK_TEST_TRANSLATIONS',true):null;
-        $translation_key=Ak::randomString(8);
+        !defined('AK_TEST_TRANSLATIONS') ? define('AK_TEST_TRANSLATIONS',true):null;
+        $translation_key = Ak::randomString(8);
         $namespace = Ak::randomString(8);
         $translation=Ak::t($translation_key,null,$namespace);
         $this->assertEqual($translation_key,$translation);
         AkLocaleManager::updateLocaleFiles();
         $dictionary = AkLocaleManager::getDictionary(AK_FRAMEWORK_LANGUAGE,$namespace);
         $this->assertEqual(array($translation_key=>$translation_key),$dictionary);
-        
+
         $dictionary[$translation_key] = 'Spanish';
         AkLocaleManager::setDictionary($dictionary,'es',$namespace);
         $dictionary = AkLocaleManager::getDictionary('es',$namespace);
         $this->assertEqual(array($translation_key=>'Spanish'),$dictionary);
-        
+
         Ak::t('dummy',null,$namespace);
         AkLocaleManager::updateLocaleFiles();
         $dictionary = AkLocaleManager::getDictionary(AK_FRAMEWORK_LANGUAGE,$namespace);
         $this->assertEqual(array($translation_key=>$translation_key,'dummy'=>'dummy'),$dictionary);
-        
+
         $this->assertTrue(AkLocaleManager::deleteDictionary(AK_FRAMEWORK_LANGUAGE,$namespace));
         $this->assertEqual(array(),AkLocaleManager::getDictionary(AK_FRAMEWORK_LANGUAGE,$namespace));
-        
+
     }
-    
+
     public function test_framework_config_locale_update()
     {
         $langs=Ak::langs();
@@ -265,15 +263,13 @@ class AkLocaleManager_TestCase extends  AkUnitTest
         AkLocaleManager::updateLocaleFiles();
         list($locales,$core_dictionary) = AkLocaleManager::getCoreDictionary(AK_FRAMEWORK_LANGUAGE);
         $this->assertTrue(isset($core_dictionary[$translation_key]));
-        
+
         foreach($langs as $lang) {
             list($locales,$core_dictionary) = AkLocaleManager::getCoreDictionary($lang);
             $this->assertTrue(isset($core_dictionary[$translation_key]));
         }
     }
-
-    /**/
 }
 
-ak_test_case('AkLocaleManager_TestCase');
+ak_test_case('LocaleManager_TestCase');
 
