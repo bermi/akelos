@@ -4,6 +4,10 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class UnitTest_TestCase extends ActiveSupportUnitTest
 {
+    public function __destruct()
+    {
+        $this->dropTables('all');
+    }
     public function test_should_create_models_on_the_fly()
     {
         $unit_tester = new AkUnitTest();
