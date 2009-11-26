@@ -1,17 +1,28 @@
 <?php
 
+if(!isset($options['base_path'])){
+    $options['base_path'] = AK_TEST_DIR.DS.AK_TESTING_NAMESPACE;
+}
+
 if(isset($options['ci'])){
     unset($options['ci']);
     $options['reporter'] = 'JUnitXMLReporter';
 }
 
+if(isset($options['verbose'])){
+    unset($options['verbose']);
+    $options['reporter'] = 'AkelosVerboseTextReporter';
+}
+
 if($reporter = empty($options['reporter']) ? false :  $options['reporter']){
     unset($options['reporter']);
 }
+
 if($db_type = empty($options['db']) ? false :  $options['db']){
     define('AK_DATABASE_SETTINGS_NAMESPACE', $db_type);
     unset($options['db']);
 }
+
 
 if(empty($options)){
     $Logger->message('Invalid test name');
@@ -19,49 +30,28 @@ if(empty($options)){
     return false;
 }
 
-$____skip_tests = array('Simple','Unit','Web','AkWeb');
+$valid_options = array('config', 'base_path', 'namespace', 'TestSuite', 'reporter'  => 'TextReporter', 'files');
 
-if(empty($options['hide_enviroment_flags'])){
-    echo "(".AK_ENVIRONMENT." mode) Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n";
-}else{
-    unset($options['hide_enviroment_flags']);
-}
-
-foreach ($options as $k => $_test_file){
-    if(strstr($_test_file, '*')){
-        $_test_file = $k.$_test_file;
-    }
-    if(preg_match('/^Ak/i', $_test_file)){
-        $_test_file = 'unit'.DS.'lib'.DS.$_test_file;
-    }elseif(!strstr($_test_file, DS)){
-        $_test_file = 'unit/app/models/'.AkInflector::underscore($_test_file);
-    }
-
-    $_test_file = strstr($_test_file,'.php') ? trim($_test_file, '/') : $_test_file.'.php';
-    $_test_file = substr($_test_file,0,5) == 'test/' ? substr($_test_file,5) : $_test_file;
-    $_test_file = AK_TEST_DIR.DIRECTORY_SEPARATOR.$_test_file;
-
-    if(strstr($_test_file, '*')){
-        $_test_files = glob($_test_file);
-    }else{
-        $_test_files = array($_test_file);
-    }
-
-    foreach ($_test_files as $_test_file){
-
-        if(!file_exists($_test_file)){
-            echo "\nCould not load $_test_file test file\n";
-        }else{
-            include $_test_file;
-            foreach(get_declared_classes() as $____class){
-                if(preg_match('/(.+)TestCase$/i', $____class, $match)){
-                    if(!preg_match('/^('.join('|',$____skip_tests).')$/i',$match[1])){
-                        $____skip_tests[] = $match[1];
-                        ak_test($match[1].'TestCase', false, true, $reporter);
-                    }
-                }
+$options['files'] = array();
+$suite = '';
+foreach ($options as $k => $v){
+    if(!in_array($k, $valid_options)){
+        if(!is_bool($v)){
+            $v = rtrim($v, DS);
+            if(strstr($v, DS)){
+                $options['files'][] = $v.'.php';
+            }else{
+                $suite .= $v.' ';
             }
+            unset($options[$k]);
         }
     }
 }
 
+if(empty($options['suite']) && !empty($suite)){
+    $options['suite'] = trim($suite);
+}
+
+$options = array_diff($options, array(''));
+
+AkUnitTestSuite::runFromOptions($options);
