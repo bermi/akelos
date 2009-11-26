@@ -1,8 +1,8 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
-class Ak_convert_TestCase extends  AkUnitTest
+class Conversions_TestCase extends ActiveSupportUnitTest
 {
     public function test_html_to_text()
     {
@@ -111,5 +111,5 @@ EOF;
     }
 }
 
-ak_test_case('Ak_convert_TestCase');
+ak_test_case('Conversions_TestCase');
 

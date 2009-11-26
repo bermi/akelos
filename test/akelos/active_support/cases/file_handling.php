@@ -1,12 +1,12 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
-class Ak_file_functions_TestCase extends AkUnitTest
+class FileHandling_TestCase extends ActiveSupportUnitTest
 {
     public function Test_file_put_contents()
     {
-        $file_name = AK_TMP_DIR.DS.'test_file_1.txt';
+        $file_name = AkConfig::getDir('tmp').DS.'test_file_1.txt';
         $content = 'This is the content of file 1';
         $this->assertFalse(!Ak::file_put_contents($file_name, $content));
 
@@ -14,7 +14,7 @@ class Ak_file_functions_TestCase extends AkUnitTest
         $content = 'This is the NEW content for file 1';
         $this->assertFalse(!Ak::file_put_contents($file_name, $content));
 
-        $file_name = AK_TMP_DIR.DS.'test_file_2.txt';
+        $file_name = AkConfig::getDir('tmp').DS.'test_file_2.txt';
         $content = "\n\rThis is the content of file 2\n";
         $this->assertFalse(!Ak::file_put_contents($file_name, $content));
 
@@ -33,16 +33,15 @@ class Ak_file_functions_TestCase extends AkUnitTest
         $file_name = 'ak_test_folder/new_folder/test_file.txt';
         $content = "\rThis is the content of the test file";
         $this->assertFalse(!Ak::file_put_contents($file_name, $content));
-
     }
 
     public function Test_file_get_contents()
     {
-        $file_name = AK_TMP_DIR.DS.'test_file_1.txt';
+        $file_name = AkConfig::getDir('tmp').DS.'test_file_1.txt';
         $content = 'This is the NEW content for file 1';
         $this->assertFalse(!Ak::file_get_contents($file_name) === $content);
 
-        $file_name = AK_TMP_DIR.DS.'test_file_2.txt';
+        $file_name = AkConfig::getDir('tmp').DS.'test_file_2.txt';
         $content = "\n\rThis is the content of file 2\n";
         $this->assertFalse(!Ak::file_get_contents($file_name) === $content);
 
@@ -58,7 +57,7 @@ class Ak_file_functions_TestCase extends AkUnitTest
 
     public function Test_copy_files()
     {
-        $original_path = AK_TMP_DIR.DS.'test_file_1.txt';
+        $original_path = AkConfig::getDir('tmp').DS.'test_file_1.txt';
         $copy_path = $original_path.'.copy';
         $this->assertTrue(Ak::copy($original_path, $copy_path));
         $this->assertEqual(Ak::file_get_contents($original_path), Ak::file_get_contents($copy_path));
@@ -78,12 +77,11 @@ class Ak_file_functions_TestCase extends AkUnitTest
 
     public function Test_file_delete()
     {
-        $this->assertFalse(!Ak::file_delete(AK_TMP_DIR.DS.'test_file_1.txt'));
-        $this->assertFalse(!Ak::file_delete(AK_TMP_DIR.DS.'test_file_2.txt'));
+        $this->assertFalse(!Ak::file_delete(AkConfig::getDir('tmp').DS.'test_file_1.txt'));
+        $this->assertFalse(!Ak::file_delete(AkConfig::getDir('tmp').DS.'test_file_2.txt'));
         $this->assertFalse(!Ak::file_delete('cache/test_file_3.txt'));
         $this->assertFalse(!Ak::file_delete('cache/test_file_4.txt'));
         $this->assertFalse(!Ak::file_delete('ak_test_folder/new_folder/test_file.txt'));
-
     }
 
     public function Test_directory_delete()
@@ -125,16 +123,16 @@ class Ak_file_functions_TestCase extends AkUnitTest
 
     public function test_should_delete_nested_directories_when_include_hidden_files()
     {
-        $tmp_dir = AK_TMP_DIR.DS.Ak::randomString();
+        $tmp_dir = AkConfig::getDir('tmp').DS.Ak::randomString();
         $hidden_tmp_dir = $tmp_dir.DS.'.hidden';
-        Ak::make_dir($tmp_dir, array('base_path'=>AK_TMP_DIR));
-        Ak::make_dir($tmp_dir.DS.'.hidden', array('base_path'=>AK_TMP_DIR));
+        Ak::make_dir($tmp_dir, array('base_path'=>AkConfig::getDir('tmp')));
+        Ak::make_dir($tmp_dir.DS.'.hidden', array('base_path'=>AkConfig::getDir('tmp')));
         $this->assertTrue(is_dir($hidden_tmp_dir), 'Could not create test directory '.$hidden_tmp_dir);
-        $this->assertTrue(Ak::directory_delete($tmp_dir, array('base_path'=>AK_TMP_DIR)));
+        $this->assertTrue(Ak::directory_delete($tmp_dir, array('base_path'=>AkConfig::getDir('tmp'))));
         clearstatcache();
         $this->assertFalse(is_dir($tmp_dir));
     }
 }
 
-ak_test_case('Ak_file_functions_TestCase');
+ak_test_case('FileHandling_TestCase');
 

@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
 class MockTestApplication extends AkTestApplication
 {
@@ -18,12 +18,12 @@ class MockTestApplication extends AkTestApplication
     }
 }
 
-class AkTestApplication_TestCase extends  AkUnitTest
+class TestApplication_TestCase extends ActionPackUnitTest
 {
     public function test_assert_valid_xhtml()
     {
         $test_app = new MockTestApplication();
-        $test_app->_response = file_get_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'valid_xhtml.html');
+        $test_app->_response = file_get_contents(AkConfig::getDir('fixtures').DS.'valid_xhtml.html');
 
         $test_app->assertValidXhtml();
 
@@ -32,7 +32,7 @@ class AkTestApplication_TestCase extends  AkUnitTest
 
 
         $test_app = new MockTestApplication();
-        $test_app->_response = file_get_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'invalid_xhtml.html');
+        $test_app->_response = file_get_contents(AkConfig::getDir('fixtures').DS.'invalid_xhtml.html');
 
         $test_app->assertValidXhtml();
 
@@ -44,7 +44,7 @@ class AkTestApplication_TestCase extends  AkUnitTest
     public function test_assert_xpath()
     {
         $test_app = new MockTestApplication();
-        $test_app->_response = file_get_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'valid_xhtml.html');
+        $test_app->_response = file_get_contents(AkConfig::getDir('fixtures').DS.'valid_xhtml.html');
 
         $test_app->assertValidXhtml();
 
@@ -57,7 +57,7 @@ class AkTestApplication_TestCase extends  AkUnitTest
         $this->assertEqual(4,count($test_app->passes));
 
         $test_app = new MockTestApplication();
-        $test_app->_response = file_get_contents(AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'valid_xhtml.html');
+        $test_app->_response = file_get_contents(AkConfig::getDir('fixtures').DS.'valid_xhtml.html');
 
         $test_app->assertValidXhtml();
 
@@ -70,5 +70,5 @@ class AkTestApplication_TestCase extends  AkUnitTest
 
 }
 
-ak_test_case('AkTestApplication_TestCase');
+ak_test_case('TestApplication_TestCase');
 

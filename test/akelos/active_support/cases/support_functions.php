@@ -1,20 +1,12 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
-class Ak_support_functions_TestCase extends  AkUnitTest
+class SupportFunctions_TestCase extends ActiveSupportUnitTest
 {
-    public function test_setup()
-    {
-        $this->rebaseAppPaths();
-    }
-
     public function test_for_importing_models()
     {
         $models = 'ImportTestModelA, import_test_model_b';
-
-        $this->assertFalse(class_exists('ImportTestModelA'));
-        $this->assertFalse(class_exists('ImportTestModelB'));
 
         $this->assertEqual(Ak::import($models), array('ImportTestModelA','ImportTestModelB'));
 
@@ -60,5 +52,5 @@ class Ak_support_functions_TestCase extends  AkUnitTest
     }
 }
 
-ak_test_case('Ak_support_functions_TestCase');
+ak_test_case('SupportFunctions_TestCase');
 

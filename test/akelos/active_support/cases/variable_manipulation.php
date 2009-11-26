@@ -1,8 +1,8 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
-class Ak_var_manipulation_TestCase extends AkUnitTest
+class VariableManipulation_TestCase extends ActiveSupportUnitTest
 {
     public function test_for_to_array()
     {
@@ -17,5 +17,4 @@ class Ak_var_manipulation_TestCase extends AkUnitTest
 
 }
 
-ak_test_case('Ak_var_manipulation_TestCase');
-
+ak_test_case('VariableManipulation_TestCase');

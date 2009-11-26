@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../../fixtures/config/config.php');
+require_once(dirname(__FILE__).'/../config.php');
 
 //This class is used to check class inspection functions
 class AkTestingObjectInspectionParent
@@ -36,7 +36,7 @@ class AkTestingObjectInspectionChild extends AkTestingObjectInspectionParent
 
 
 
-class Ak_object_inspection_TestCase extends AkUnitTest
+class ObjectInspection_TestCase extends ActiveSupportUnitTest
 {
 
     public $AkTestingObjectInspectionChildInstance;
@@ -171,5 +171,5 @@ class Ak_object_inspection_TestCase extends AkUnitTest
 }
 
 
-ak_test_case('Ak_object_inspection_TestCase',true);
+ak_test_case('ObjectInspection_TestCase');
 
