@@ -61,8 +61,17 @@ class AkUnitTestSuite extends TestSuite
         defined('AK_DATABASE_SETTINGS_NAMESPACE') || define('AK_DATABASE_SETTINGS_NAMESPACE', 'database');
 
         if(empty($options['title'])){
+            $suite_name = empty($options['suite']) ? preg_replace('/.+\/([^\/]+)\/cases.+/', '$1', @$options['files'][0]) : $options['suite'];
+
+            AkConfig::setOption('testing_url', 'http://akelos.tests');
+            AkConfig::setOption('memcached_enabled', AkMemcache::isServerUp());
+            AkConfig::setOption('webserver_enabled', @file_get_contents(AkConfig::getOption('testing_url').'/'.$suite_name.'/public/ping.php') == 'pong');
+
             $dabase_settings = AK_DATABASE_SETTINGS_NAMESPACE == 'database' ? Ak::getSetting('database', 'type') : AK_DATABASE_SETTINGS_NAMESPACE;
-            $options['title'] =  "PHP ".phpversion().", Environment: ".AK_ENVIRONMENT.", Database: ".$dabase_settings."\n"."Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n".trim($options['description']).'';
+            $options['title'] =  "PHP ".phpversion().", Environment: ".AK_ENVIRONMENT.", Database: ".$dabase_settings.
+            (AkConfig::getOption('memcached_enabled', false)?', Memcached: enabled':'').
+            (AkConfig::getOption('webserver_enabled', false)?', Testing URL: '.AkConfig::getOption('testing_url'):'').
+            "\n"."Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n".trim($options['description']).'';
         }
 
         $options['TestSuite'] = new AkUnitTestSuite($options['title']);

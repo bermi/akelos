@@ -36,11 +36,13 @@ class AkMemcache extends AkObject
             trigger_error('Need to provide at least 1 server',E_USER_ERROR);
             return false;
         }
-        $this->_memcache = new MemCachedClient(is_array($options['servers'])?$options['servers']:array($options['servers']));
+        $this->_memcache = new MemCachedClient(is_array($options['servers']) ? $options['servers'] : array($options['servers']));
         $ping = $this->_memcache->get('ping');
         if (!$ping) {
             if ($this->_memcache->errno==ERR_NO_SOCKET) {
-                trigger_error("Could not connect to MemCache daemon", E_USER_WARNING);
+                if(empty($options['silent_mode'])){
+                    trigger_error("Could not connect to MemCache daemon", E_USER_WARNING);
+                }
                 return false;
             }
             $this->_memcache->set('ping',1);
@@ -157,6 +159,13 @@ class AkMemcache extends AkObject
             default:
                 return true;
         }
+    }
+
+    static function isServerUp($options = array())
+    {
+        $options['silent_mode'] = true;
+        $Memcached = new AkMemcache();
+        return $Memcached->init($options) != false;
     }
 
     public function install(){}
