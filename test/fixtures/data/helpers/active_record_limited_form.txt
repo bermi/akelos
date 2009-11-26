@@ -1,3 +1,0 @@
-<form action="/test/update/1/" method="post"><input id="ProtectedPerson_id" name="ProtectedPerson[id]" type="hidden" value="1" /><p><label for="ProtectedPerson_id">Id</label><br /></p>
-<p><label for="ProtectedPerson_name">Name</label><br /><input id="ProtectedPerson_name" name="ProtectedPerson[name]" size="30" type="text" value="Lucky Luke" /></p>
-<input name="commit" type="submit" value="UPDATE" /></form>

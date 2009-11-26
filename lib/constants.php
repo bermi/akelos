@@ -196,7 +196,6 @@ defined('AK_CAN_FORK')                                  || define('AK_CAN_FORK',
 defined('AK_CHARSET')                                   || define('AK_CHARSET', 'UTF-8');
 defined('AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE')    || define('AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE', 'web_request');
 defined('AK_ACTION_CONTROLLER_DEFAULT_ACTION')          || define('AK_ACTION_CONTROLLER_DEFAULT_ACTION', 'index');
-defined('AK_BEEP_ON_ERRORS_WHEN_TESTING')               || define('AK_BEEP_ON_ERRORS_WHEN_TESTING', false);
 defined('AK_FRAMEWORK_LANGUAGE')                        || define('AK_FRAMEWORK_LANGUAGE', 'en');
 defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION')          || define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
 defined('AK_VERBOSE_INSTALLER')                         || define('AK_VERBOSE_INSTALLER', AK_DEV_MODE);
@@ -208,9 +207,6 @@ defined('AK_DATE_HELPER_DEFAULT_PREFIX')                || define('AK_DATE_HELPE
 defined('AK_JAVASCRIPT_PATH')                           || define('AK_JAVASCRIPT_PATH', AK_PUBLIC_DIR.DS.'javascripts');
 defined('AK_DEFAULT_LOCALE_NAMESPACE')                  || define('AK_DEFAULT_LOCALE_NAMESPACE', null);
 
-
-// Akelos args is a short way to call functions that is only intended for fast prototyping
-defined('AK_ENABLE_AKELOS_ARGS') || define('AK_ENABLE_AKELOS_ARGS', false);
 // Use setColumnName if available when using set('column_name', $value);
 defined('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT')  || define('AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT', true);
 defined('AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS')|| define('AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS', false);
@@ -283,9 +279,11 @@ $_SERVER['REQUEST_URI'] = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_UR
  */
 defined('AK_SET_UTF8_ON_MYSQL_CONNECT') || define('AK_SET_UTF8_ON_MYSQL_CONNECT', true);
 
+if(AK_WEB_REQUEST && !AK_PRODUCTION_MODE) include AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php';
+
 $ADODB_CACHE_DIR = AK_CACHE_DIR;
 
 ini_set('arg_separator.output', '&');
-ini_set('include_path', (AK_LIB_DIR.PATH_SEPARATOR.AK_MODELS_DIR.PATH_SEPARATOR.AK_CONTRIB_DIR.DS.'pear'.PATH_SEPARATOR.ini_get('include_path')));
+ini_set('include_path', (AK_CONTRIB_DIR.DS.'pear'.PATH_SEPARATOR.ini_get('include_path')));
 ini_set('session.name', AK_SESSION_NAME);
 

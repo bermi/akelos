@@ -31,7 +31,7 @@ class AkUnitTestSuite extends TestSuite
     static function runFromOptions($options = array())
     {
         $default_options = array(
-        'base_path' => AK_LIB_TESTS_DIRECTORY,
+        'base_path' => empty($options['component']) ? AK_LIB_TESTS_DIRECTORY : AK_TEST_DIR,
         'TestSuite' => null,
         'reporter'  => AK_TEST_DEFAULT_REPORTER,
         'files'  => array(),
@@ -49,30 +49,72 @@ class AkUnitTestSuite extends TestSuite
             $options['files'] = $full_paths;
         }
 
-        $options['description'] = '';
-        foreach ($descriptions as $suite => $cases){
-            $options['description'] .= "$suite (cases): ".$options['description'].rtrim(join(', ', $cases), ', ')."\n";
-        }
-        if(empty($options['description'])){
-            $options['description'] =  AkInflector::titleize($options['suite']).' (suite)';
-            $options['files'] = array_diff(glob($options['base_path'].DS.$options['suite'].DS.'cases'.DS.'*.php'), array(''));
-        }
-
         defined('AK_DATABASE_SETTINGS_NAMESPACE') || define('AK_DATABASE_SETTINGS_NAMESPACE', 'database');
 
-        if(empty($options['title'])){
-            $suite_name = empty($options['suite']) ? preg_replace('/.+\/([^\/]+)\/cases.+/', '$1', @$options['files'][0]) : $options['suite'];
+        if(!empty($options['component'])){
+            $components = Ak::toArray($options['component']);
+            $real_base_path = $options['base_path'];
 
-            AkConfig::setOption('testing_url', 'http://akelos.tests');
-            AkConfig::setOption('memcached_enabled', AkMemcache::isServerUp());
-            AkConfig::setOption('webserver_enabled', @file_get_contents(AkConfig::getOption('testing_url').'/'.$suite_name.'/public/ping.php') == 'pong');
+            $options['description'] = '';
+            $options['files'] = array();
 
-            $dabase_settings = AK_DATABASE_SETTINGS_NAMESPACE == 'database' ? Ak::getSetting('database', 'type') : AK_DATABASE_SETTINGS_NAMESPACE;
-            $options['title'] =  "PHP ".phpversion().", Environment: ".AK_ENVIRONMENT.", Database: ".$dabase_settings.
-            (AkConfig::getOption('memcached_enabled', false)?', Memcached: enabled':'').
-            (AkConfig::getOption('webserver_enabled', false)?', Testing URL: '.AkConfig::getOption('testing_url'):'').
-            "\n"."Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n".trim($options['description']).'';
+            foreach ($components as $component) {
+
+                $options['base_path'] = $real_base_path.DS.$component;
+                if(empty($options['suites'])){
+                $options['suites'] = array_diff(glob($options['base_path'].DS.'*/'), array(''));
+                }else{
+                    $options['suites'] = Ak::toArray($options['suites']);
+                }
+
+                $options['description'] .= AkInflector::titleize($component)." unit tests: Suites(";
+                foreach ($options['suites'] as $k=>$suite){
+                    $suite_name = $options['suites'][$k] = trim(str_replace($options['base_path'].DS, '', $suite), DS);
+                    if(is_dir($options['base_path'].DS.$suite_name)){
+                        $options['description'] .= $suite_name.',';
+                        $options['files'] = array_merge($options['files'], array_diff(glob($options['base_path'].DS.$suite_name.DS.'cases'.DS.'*.php'), array('')));
+                    }
+                }
+                $options['description'] = trim($options['description'], ', ')."):\n";
+
+                if(empty($options['title'])){
+                    AkConfig::setOption('testing_url', 'http://akelos.tests');
+                    AkConfig::setOption('memcached_enabled', AkMemcache::isServerUp());
+                    AkConfig::setOption('webserver_enabled', @file_get_contents(AkConfig::getOption('testing_url').'/'.$component.'/ping.php') == 'pong');
+                    $dabase_settings = AK_DATABASE_SETTINGS_NAMESPACE == 'database' ? Ak::getSetting('database', 'type') : AK_DATABASE_SETTINGS_NAMESPACE;
+                    $options['title'] =  "PHP ".phpversion().", Environment: ".AK_ENVIRONMENT.", Database: ".$dabase_settings.
+                    (AkConfig::getOption('memcached_enabled', false)?', Memcached: enabled':'').
+                    (AkConfig::getOption('webserver_enabled', false)?', Testing URL: '.AkConfig::getOption('testing_url'):'').
+                    "\n"."Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n".trim($options['description']).'';
+                }
+
+            }
+        }else{
+
+            $options['description'] = '';
+            foreach ($descriptions as $suite => $cases){
+                $options['description'] .= "$suite (cases): ".$options['description'].rtrim(join(', ', $cases), ', ')."\n";
+            }
+            if(empty($options['description'])){
+                $options['description'] =  AkInflector::titleize($options['suite']).' (suite)';
+                $options['files'] = array_diff(glob($options['base_path'].DS.$options['suite'].DS.'cases'.DS.'*.php'), array(''));
+            }
+
+            if(empty($options['title'])){
+                $suite_name = empty($options['suite']) ? preg_replace('/.+\/([^\/]+)\/cases.+/', '$1', @$options['files'][0]) : $options['suite'];
+
+                AkConfig::setOption('testing_url', 'http://akelos.tests');
+                AkConfig::setOption('memcached_enabled', AkMemcache::isServerUp());
+                AkConfig::setOption('webserver_enabled', @file_get_contents(AkConfig::getOption('testing_url').'/'.$suite_name.'/public/ping.php') == 'pong');
+
+                $dabase_settings = AK_DATABASE_SETTINGS_NAMESPACE == 'database' ? Ak::getSetting('database', 'type') : AK_DATABASE_SETTINGS_NAMESPACE;
+                $options['title'] =  "PHP ".phpversion().", Environment: ".AK_ENVIRONMENT.", Database: ".$dabase_settings.
+                (AkConfig::getOption('memcached_enabled', false)?', Memcached: enabled':'').
+                (AkConfig::getOption('webserver_enabled', false)?', Testing URL: '.AkConfig::getOption('testing_url'):'').
+                "\n"."Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n".trim($options['description']).'';
+            }
         }
+
 
         $options['TestSuite'] = new AkUnitTestSuite($options['title']);
         $options['TestSuite']->running_from_config = true;

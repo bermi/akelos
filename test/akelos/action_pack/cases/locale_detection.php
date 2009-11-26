@@ -13,7 +13,7 @@ class LocaleDetection_TestCase extends AkWebTestCase
         $this->_test_script = AkConfig::getOption('testing_url').
         '/action_pack/public/index.php?ak=';
     }
-
+/*
     public function test_request_LocaleDetectionController()
     {
         if(!$this->webserver_enabled) return;
@@ -41,8 +41,8 @@ class LocaleDetection_TestCase extends AkWebTestCase
         $this->get($this->_test_script.'locale_detection/get_language');
         $this->assertTextMatch('es');
     }
-
-    public function test_session_are_working()
+*/
+    public function test_sessions_should_work()
     {
         if(!$this->webserver_enabled) return;
 
@@ -52,7 +52,7 @@ class LocaleDetection_TestCase extends AkWebTestCase
         $this->get($this->_test_script.'locale_detection/session/');
         $this->assertTextMatch('1234');
     }
-
+/*
     public function test_session_are_fresh_on_new_request()
     {
         if(!$this->webserver_enabled) return;
@@ -106,6 +106,7 @@ class LocaleDetection_TestCase extends AkWebTestCase
         $this->get($this->_test_script.'locale_detection/get_language');
         $this->assertTextMatch('en');
     }
+    */
 }
 
 ak_test_case('LocaleDetection_TestCase');

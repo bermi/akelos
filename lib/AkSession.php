@@ -79,7 +79,7 @@ class AkSession extends AkObject
             return $false;
         }
         $session_store = new AkSession();
-        $session_store->init($options,$type);
+        $session_store->init($options, $type);
         if ($session_store->sessions_enabled) {
             return $session_store;
         }
@@ -92,10 +92,8 @@ class AkSession extends AkObject
 
         switch ($type) {
             case 1:
-                $this->sessions_enabled = false;
-                if(isset($options['save_path'])) {
-                    session_save_path($options['save_path']);
-                }
+                $sessionpath = session_save_path();
+                $this->sessions_enabled = false; // Use PHP session handling
                 break;
             case 2:
                 require_once(AK_LIB_DIR.'/AkCache/AkAdodbCache.php');

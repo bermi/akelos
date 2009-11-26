@@ -41,3 +41,4 @@ cache/
 config/plugin_repositories.txt
 tmp1
 tmp2
+test/_fixtures/

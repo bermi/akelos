@@ -43,3 +43,9 @@ makelos_task('newtest:case', array(
 ));
 
 
+makelos_task('newtest:units', array(
+    'description' => 'Run all unit tests.'
+    //'autocompletion' => 'ENVIRONMENT=production'
+));
+
+

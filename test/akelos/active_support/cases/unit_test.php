@@ -25,18 +25,19 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
         $unit_tester->installAndIncludeModels(array('SomeSillyModel'=>'id,body'));
 
         $this->assertFalse($someModel->find('all'));
+
     }
 
 
     public function test_should_instantiate_model()
     {
         $unit_tester = new AkUnitTest();
-        $unit_tester->app_dir = AK_FIXTURES_DIR.DS.'app';
-        $this->assertFalse(isset($unit_tester->Account));
-        $unit_tester->instantiateModel('Account');
+        $unit_tester->app_dir = AkConfig::getDir('suite');
+        $this->assertFalse(isset($unit_tester->DummyAccount));
+        $unit_tester->instantiateModel('DummyAccount');
 
-        $this->assertTrue(isset($unit_tester->Account));
-        $this->assertTrue(AkActiveRecord::descendsFromActiveRecord($unit_tester->Account));
+        $this->assertTrue(isset($unit_tester->DummyAccount));
+        $this->assertTrue(AkActiveRecord::descendsFromActiveRecord($unit_tester->DummyAccount));
 
         $this->expectError('Could not instantiate AnotherModel');
         $this->assertFalse($unit_tester->instantiateModel('AnotherModel'));
@@ -90,7 +91,7 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
 
     public function test_should_instantiate_selected_models()
     {
-        $models = array('Picture', 'Landlord');
+        $models = array('DummyPicture', 'DummyLandlord');
 
         $unit_tester = new AkUnitTest();
         $unit_tester->includeAndInstatiateModels($models);
@@ -111,13 +112,13 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
     public function test_should_run_migration_up_and_down()
     {
         $unit_tester = new AkUnitTest();
-        $unit_tester->includeAndInstatiateModels('Picture');
+        $unit_tester->includeAndInstatiateModels('DummyPicture');
 
-        $this->assertTrue($unit_tester->Picture->create(array('title'=>__FUNCTION__)));
-        $this->assertTrue($unit_tester->Picture->find('first', array('title'=>__FUNCTION__)));
+        $this->assertTrue($unit_tester->DummyPicture->create(array('title'=>__FUNCTION__)));
+        $this->assertTrue($unit_tester->DummyPicture->find('first', array('title'=>__FUNCTION__)));
 
-        $unit_tester->uninstallAndInstallMigration('Picture');
-        $this->assertFalse($unit_tester->Picture->find('all'));
+        $unit_tester->uninstallAndInstallMigration('DummyPicture');
+        $this->assertFalse($unit_tester->DummyPicture->find('all'));
     }
 
 }

@@ -15,7 +15,7 @@ class AkMailBase extends Mail
 
     public $_attach_html_images = true;
 
-    public function AkMailBase()
+    public function __construct()
     {
         $args = func_get_args();
         if(isset($args[0])){

@@ -12,3 +12,22 @@ defined('AK_TESTING_NAMESPACE') || define('AK_TESTING_NAMESPACE', 'akelos');
 
 include_once AK_LIB_DIR.DS.'Ak.php';
 include_once AK_LIB_DIR.DS.'constants.php';
+
+try{
+    ob_start();
+    if(!class_exists('BaseActionController')){
+        class BaseActionController extends AkActionController{ }
+    }
+    if(!class_exists('ApplicationController')){
+        class ApplicationController extends BaseActionController { public $layout = false; }
+    }
+    if(!class_exists('BaseActiveRecord')){
+        class BaseActiveRecord extends AkActiveRecord { }
+    }
+    if(!class_exists('ActiveRecord')){
+        class ActiveRecord extends BaseActiveRecord { }
+    }
+    ob_get_clean();
+}catch(Exception $e){}
+
+

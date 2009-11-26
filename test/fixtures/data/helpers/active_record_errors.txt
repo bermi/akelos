@@ -1,1 +1,0 @@
-<div class="errorExplanation" id="errorExplanation"><h2>2 errors prohibited this ProtectedPerson from being saved</h2><p>There were problems with the following fields:</p><ul><li>Name is invalid</li><li>Birthday is invalid</li></ul></div>

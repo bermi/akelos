@@ -337,8 +337,8 @@ class AkCacheHandler extends AkObject
     public function _startSession()
     {
         if(isset($_COOKIE[AK_SESSION_NAME]) && !isset($_SESSION)){
-            $SessionHandler = AkSession::initHandler();
-            @session_start();
+            AkSession::initHandler();
+            session_start();
         }
     }
 

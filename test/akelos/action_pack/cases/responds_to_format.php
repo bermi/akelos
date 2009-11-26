@@ -7,7 +7,7 @@ class RespondsToFormat_TestCase extends AkTestApplication
     public function __construct()
     {
         parent::__construct();
-        $this->installAndIncludeModels(array('Person' => 'id,name'));
+        $this->installAndIncludeModels(array('DummyPerson' => 'id,name'));
     }
 
     public function __destruct()
@@ -19,20 +19,20 @@ class RespondsToFormat_TestCase extends AkTestApplication
 
     public function test_html_format()
     {
-        $this->get('http://www.example.com/people/listing');
+        $this->get('http://www.example.com/dummy_people/listing');
         $this->assertHeader('Content-Type','text/html');
     }
 
     public function test_xml_format_with_accept_header()
     {
         $_SERVER['HTTP_ACCEPT'] = 'application/xml';
-        $this->get('http://www.example.com/people/listing');
+        $this->get('http://www.example.com/dummy_people/listing');
         $this->assertHeader('Content-Type','application/xml');
 
     }
     public function test_xml_format()
     {
-        $this->get('http://www.example.com/people/listing.xml');
+        $this->get('http://www.example.com/dummy_people/listing.xml');
         $this->assertHeader('Content-Type','application/xml');
     }
 }

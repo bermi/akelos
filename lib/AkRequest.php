@@ -809,7 +809,7 @@ class AkRequest extends AkObject
         if(AK_AUTOMATIC_SESSION_START){
             if(!isset($_SESSION)){
                 $SessionHandler = AkSession::initHandler();
-                @session_start();
+                session_start();
             }
         }
     }

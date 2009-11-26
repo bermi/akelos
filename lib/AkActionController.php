@@ -230,7 +230,7 @@ class AkActionController extends AkLazyObject// AkObject
         array(
         'init_method' => 'setObjectBeenFiltered',
         'methods_match' => '/(((after|before|perform)Action)|(.+Filter.*))/',
-        'autoload_path' => AK_LIB_DIR.DS.'AkActionController'.DS.'AkControllerFilters.php'
+        'autoload_path' => AK_LIB_DIR.DS.'AkActionController'.DS.'AkControllerFilter.php'
         ));
     }
 

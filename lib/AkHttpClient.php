@@ -185,17 +185,18 @@ class AkHttpClient extends AkObject
 
     public function getPersistedCookie()
     {
-        if(file_exists(AK_TMP_DIR.DS.$this->_cookie_path)){
-            return Ak::file_get_contents($this->_cookie_path, array('base_path' => AK_TMP_DIR));
+        if(file_exists(AkConfig::getDir('tmp').DS.$this->_cookie_path)){
+            return Ak::file_get_contents($this->_cookie_path, array('base_path' => AkConfig::getDir('tmp')));
         }
         return false;
     }
 
     public function deletePersistedCookie()
     {
-        if(file_exists(AK_TMP_DIR.DS.$this->_cookie_path)){
-            Ak::file_delete($this->_cookie_path, array('base_path' => AK_TMP_DIR));
-            $this->_cookie_path = false;
+        $path = $this->_cookie_path;
+        $this->_cookie_path = false;
+        if(file_exists(AkConfig::getDir('tmp').DS.$path)){
+            Ak::file_delete($path, array('base_path' => AkConfig::getDir('tmp')));
             return;
         }
         return false;
@@ -219,7 +220,7 @@ class AkHttpClient extends AkObject
                     }
                 }
                 $cookie_string = trim(join($cookies, '; '));
-                Ak::file_put_contents($this->_cookie_path, $cookie_string, array('base_path' => AK_TMP_DIR));
+                Ak::file_put_contents($this->_cookie_path, $cookie_string, array('base_path' => AkConfig::getDir('tmp')));
             }
         }
     }
