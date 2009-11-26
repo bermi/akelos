@@ -44,7 +44,6 @@ class Ak
     */
     static function &db($dsn = null)
     {
-        require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbAdapter.php');
         return AkDbAdapter::getInstance($dsn);
     }
 

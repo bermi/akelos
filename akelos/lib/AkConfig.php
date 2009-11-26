@@ -172,9 +172,10 @@ class AkConfig
     public function readConfig($namespace, $environment = AK_ENVIRONMENT, $raise_error_if_config_file_not_found = true)
     {
         $yaml_file_name = $this->_generateConfigFileName($namespace);
-        if (!is_file($yaml_file_name)){
+
+        if (!file_exists($yaml_file_name)){
             if($raise_error_if_config_file_not_found){
-                die(Ak::t('Could not find %namespace settings file in %path.', array('%namespace'=>$namespace, '%path'=>$yaml_file_name))."\n");
+                trigger_error(Ak::t('Could not find %namespace settings file in %path.', array('%namespace'=>$namespace, '%path'=>$yaml_file_name)).Ak::getFileAndNumberTextForError(1)."\n", E_USER_ERROR);
             }
             return false;
         }
@@ -248,7 +249,7 @@ CACHE;
         $cache_file_name = $this->generateCacheFileName($namespace, $environment);
 
         if(!Ak::file_put_contents($cache_file_name, $cache, array('base_path' => AkConfig::getCacheBasePath()))){
-            trigger_error(Ak::t('Could not create config cache file %file', array('%file'=>$cache_file_name)), E_USER_ERROR);
+            trigger_error(Ak::t('Could not create config cache file %file', array('%file'=>$cache_file_name)).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
             return false;
         }else{
             $this->_setCacheValidity($namespace,$environment);
