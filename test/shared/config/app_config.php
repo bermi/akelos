@@ -13,6 +13,21 @@ defined('AK_TESTING_NAMESPACE') || define('AK_TESTING_NAMESPACE',   'akelos');
 include_once AK_LIB_DIR.DS.'Ak.php';
 include_once AK_LIB_DIR.DS.'constants.php';
 
+if(!file_exists(AK_CONFIG_DIR.DS.'database.yml')){
+    file_put_contents(AK_CONFIG_DIR.DS.'database.yml', 'default:
+    type: sqlite
+    host:
+    database_name:
+    database_file: '.AK_TMP_DIR.DS.'akelos.sqlite
+    user:
+    password:
+    options: ');
+    function ak_remove_testing_db_settings(){
+        unlink(AK_CONFIG_DIR.DS.'database.yml');
+    }
+    register_shutdown_function('ak_remove_testing_db_settings');
+}
+
 try{
     ob_start();
     if(!class_exists('BaseActionController')){
