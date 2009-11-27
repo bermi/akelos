@@ -157,7 +157,7 @@ class AkUnitTestSuite extends TestSuite
         if(!AK_WEB_REQUEST && file_exists($options['base_path'].DS.'ping.php')){
             $uuid = Ak::uuid();
             file_put_contents($options['base_path'].DS.'akelos_test_ping_uuid.txt', $uuid);
-            AkConfig::setOption('webserver_enabled', file_get_contents(AkConfig::getOption('testing_url').'/'.basename($options['base_path']).'/ping.php') == $uuid);
+            AkConfig::setOption('webserver_enabled', @file_get_contents(AkConfig::getOption('testing_url').'/'.basename($options['base_path']).'/ping.php') == $uuid);
             unlink($options['base_path'].DS.'akelos_test_ping_uuid.txt');
         }else{
             AkConfig::setOption('webserver_enabled', false);
