@@ -1,10 +1,5 @@
 <?php
 
-define('AK_URL_REWRITE_ENABLED', true);
-define('AK_SITE_URL_SUFFIX', '/');
-
-@ini_set("include_path",(AK_BASE_DIR.DS.'vendor'.DS.'pear'.PATH_SEPARATOR.ini_get("include_path")));
-
 class FrameworkSetup extends AkObject
 {
     public $available_databases = array(
@@ -223,36 +218,6 @@ class FrameworkSetup extends AkObject
         }
         return function_exists($function);
     }
-
-    public function runFrameworkInstaller()
-    {
-        static $unique_dsn = array();
-        require_once(AK_LIB_DIR.DS.'AkInstaller.php');
-        require_once(AK_APP_DIR.DS.'installers'.DS.'framework_installer.php');
-
-        foreach (array('production', 'development') as $mode){
-            $dsn = $this->_getDsn($mode);
-            if(!isset($unique_dsn[$dsn])){
-                $DbInstance =& AkDbAdapter::getInstance(array(
-                'type' => $this->getDatabaseType($mode),
-                'database_file' => AK_CONFIG_DIR.DS.$this->getDatabaseName($mode).'-'.$this->random.'.sqlite',
-                'user' => $this->getDatabaseUser($mode),
-                'password' => $this->getDatabasePassword($mode),
-                'host' => $this->getDatabaseHost($mode),
-                'database_name' => $this->getDatabaseName($mode)
-                ));
-
-                $Installer = new FrameworkInstaller($DbInstance);
-                $Installer->install(null, array('mode' => $mode));
-                $unique_dsn[$dsn] = true;
-            }
-        }
-
-        return true;
-    }
-
-
-
 
     public function getUrlSuffix()
     {
@@ -479,7 +444,7 @@ CONFIG;
 
     public function guessApplicationName()
     {
-        $application_name = array_pop(explode('/',AK_SITE_URL_SUFFIX));
+        $application_name = Ak::last(explode('/',AK_SITE_URL_SUFFIX));
         $application_name = empty($application_name) ? substr(AK_BASE_DIR, strrpos(AK_BASE_DIR, DS)+1) : $application_name;
         return empty($application_name) ? 'my_app' : $application_name;
     }
@@ -627,7 +592,8 @@ CONFIG;
     public function getFtpHost()
     {
         if(!isset($this->ftp_host)){
-            return array_shift(explode('/', str_replace(array('http://','https://','www.'),array('','','ftp.'), AK_SITE_URL).'/'));
+            $details = explode('/', str_replace(array('http://','https://','www.'),array('','','ftp.'), AK_SITE_URL).'/');
+            return array_shift($details);
         }
         return $this->ftp_host;
     }
@@ -859,7 +825,7 @@ $config =  array(
 );
 
 
-$args =& Console_Getargs::factory($config);
+$args = Console_Getargs::factory($config);
 
 if (PEAR::isError($args)) {
     if ($args->getCode() === CONSOLE_GETARGS_ERROR_USER) {
@@ -918,12 +884,10 @@ $configuration_file = $FrameworkSetup->getConfigurationFile();
 $db_configuration_file = $FrameworkSetup->getDatabaseConfigurationFile();
 
 
-if( $FrameworkSetup->canWriteConfigurationFile() &&
-$FrameworkSetup->canWriteDbConfigurationFile()){
+if( $FrameworkSetup->canWriteConfigurationFile() && $FrameworkSetup->canWriteDbConfigurationFile()){
     $FrameworkSetup->writeConfigurationFile($configuration_file) &&
     $FrameworkSetup->writeDatabaseConfigurationFile($db_configuration_file) &&
-    $FrameworkSetup->writeRoutesFile() &&
-    $FrameworkSetup->runFrameworkInstaller();
+    $FrameworkSetup->writeRoutesFile();
     echo "\nYour application has been confirured correctly\n";
     echo "\nSee config/config.php and config/database.yml\n";
 }

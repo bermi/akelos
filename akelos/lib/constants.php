@@ -160,14 +160,15 @@ if(!AK_CLI && AK_WEB_REQUEST){
     }
 
 }else{
-    defined('AK_PROTOCOL')          || define('AK_PROTOCOL','http://');
-    defined('AK_HOST')              || define('AK_HOST', 'localhost');
-    defined('AK_REMOTE_IP')         || define('AK_REMOTE_IP','127.0.0.1');
-    defined('AK_SITE_URL')          || define('AK_SITE_URL', 'http://localhost');
-    defined('AK_URL')               || define('AK_URL', 'http://localhost/');
-    defined('AK_CURRENT_URL')       || define('AK_CURRENT_URL', 'http://localhost/');
-    defined('AK_COOKIE_DOMAIN')     || define('AK_COOKIE_DOMAIN', AK_HOST);
-    defined('AK_ASSET_URL_PREFIX')  || define('AK_ASSET_URL_PREFIX', '');
+    defined('AK_PROTOCOL')          || define('AK_PROTOCOL',        'http://');
+    defined('AK_HOST')              || define('AK_HOST',            'localhost');
+    defined('AK_REMOTE_IP')         || define('AK_REMOTE_IP',       '127.0.0.1');
+    defined('AK_SITE_URL')          || define('AK_SITE_URL',        'http://localhost');
+    defined('AK_URL')               || define('AK_URL',             'http://localhost/');
+    defined('AK_CURRENT_URL')       || define('AK_CURRENT_URL',     'http://localhost/');
+    defined('AK_COOKIE_DOMAIN')     || define('AK_COOKIE_DOMAIN',   AK_HOST);
+    defined('AK_ASSET_URL_PREFIX')  || define('AK_ASSET_URL_PREFIX','');
+    defined('AK_SITE_URL_SUFFIX')   || define('AK_SITE_URL_SUFFIX', '/');
 }
 
 defined('AK_CALLED_FROM_LOCALHOST')                     || define('AK_CALLED_FROM_LOCALHOST', AK_REMOTE_IP == '127.0.0.1');

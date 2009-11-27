@@ -304,7 +304,7 @@ Example:
     /**
      * Promts for a variable on console scripts
      */
-    public function promptUserVar($message, $options = array())
+    static function promptUserVar($message, $options = array())
     {
         $f = fopen("php://stdin","r");
         $default_options = array(
@@ -613,7 +613,7 @@ Example:
     public function getDefaultColumnAttributesRules()
     {
         return array(
-        '/^\*(.*)$/i' => array(&$this,'_castToMultilingualColumn'),
+        '/^\*(.*)$/i' => array($this,'_castToMultilingualColumn'),
         '/^(description|content|body|details)$/i' => '\1 text',
         '/^(lock_version)$/i' => '\1 integer default \'1\'',
         '/^(.+_count)$/i' => '\1 integer default \'0\'',
