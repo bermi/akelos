@@ -12,7 +12,7 @@ class Sessions_TestCase extends AkWebTestCase
         parent::__construct();
 
         if(!$this->webserver_enabled = AkConfig::getOption('webserver_enabled', false)){
-            echo "Skipping DatabaseSessions_TestCase: Webserver no accesible at ".AkConfig::getOption('testing_url')."\n";
+            echo "Skipping DatabaseSessions_TestCase: Web server not accesible at ".AkConfig::getOption('testing_url')."\n";
         }
 
         AkAdodbCache::install();

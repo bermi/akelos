@@ -81,7 +81,7 @@ class AkUnitTestSuite extends TestSuite
                 if(empty($options['title'])){
                     AkConfig::setOption('testing_url', 'http://akelos.tests');
                     AkConfig::setOption('memcached_enabled', AkMemcache::isServerUp());
-                    AkConfig::setOption('webserver_enabled', @file_get_contents(AkConfig::getOption('testing_url').'/'.$component.'/ping.php') == 'pong');
+                    AkUnitTestSuite::checkIfTestingWebserverIsAccesible($options);
                     $dabase_settings = AK_DATABASE_SETTINGS_NAMESPACE == 'database' ? Ak::getSetting('database', 'type') : AK_DATABASE_SETTINGS_NAMESPACE;
                     $options['title'] =  "PHP ".phpversion().", Environment: ".AK_ENVIRONMENT.", Database: ".$dabase_settings.
                     (AkConfig::getOption('memcached_enabled', false)?', Memcached: enabled':'').
@@ -106,7 +106,8 @@ class AkUnitTestSuite extends TestSuite
 
                 AkConfig::setOption('testing_url', 'http://akelos.tests');
                 AkConfig::setOption('memcached_enabled', AkMemcache::isServerUp());
-                AkConfig::setOption('webserver_enabled', @file_get_contents(AkConfig::getOption('testing_url').'/'.$suite_name.'/public/ping.php') == 'pong');
+
+                AkUnitTestSuite::checkIfTestingWebserverIsAccesible($options);
 
                 $dabase_settings = AK_DATABASE_SETTINGS_NAMESPACE == 'database' ? Ak::getSetting('database', 'type') : AK_DATABASE_SETTINGS_NAMESPACE;
                 $options['title'] =  "PHP ".phpversion().", Environment: ".AK_ENVIRONMENT.", Database: ".$dabase_settings.
@@ -145,6 +146,21 @@ class AkUnitTestSuite extends TestSuite
                 unlink(AK_CONFIG_DIR.DS.'database.yml');
             }
             register_shutdown_function('ak_remove_testing_db_settings');
+        }
+    }
+
+    static function checkIfTestingWebserverIsAccesible($options = array())
+    {
+        if(AkConfig::getOption('webserver_enabled', false)){
+            return ;
+        }
+        if(!AK_WEB_REQUEST && file_exists($options['base_path'].DS.'ping.php')){
+            $uuid = Ak::uuid();
+            file_put_contents($options['base_path'].DS.'akelos_test_ping_uuid.txt', $uuid);
+            AkConfig::setOption('webserver_enabled', file_get_contents(AkConfig::getOption('testing_url').'/'.basename($options['base_path']).'/ping.php') == $uuid);
+            unlink($options['base_path'].DS.'akelos_test_ping_uuid.txt');
+        }else{
+            AkConfig::setOption('webserver_enabled', false);
         }
     }
 

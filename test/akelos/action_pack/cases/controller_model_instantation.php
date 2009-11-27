@@ -20,7 +20,7 @@ class Controller_model_instantiation_TestCase extends AkWebTestCase
         $this->dummy_post_id = $Post->id;
 
         if(!$this->webserver_enabled = AkConfig::getOption('webserver_enabled', false)){
-            echo "Skipping Controller_model_instantiation_TestCase: Webserver no accesible at ".AkConfig::getOption('testing_url')."\n";
+            echo "Skipping Controller_model_instantiation_TestCase: Web server not accesible at ".AkConfig::getOption('testing_url')."\n";
         }
         $this->_test_script = AkConfig::getOption('testing_url').
         '/action_pack/public/index.php?ak=';

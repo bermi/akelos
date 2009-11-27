@@ -9,7 +9,7 @@ class Controller_forbidden_actions_TestCase extends AkWebTestCase
     public function __construct()
     {
         if(!$this->webserver_enabled = AkConfig::getOption('webserver_enabled', false)){
-            echo "Skipping Controller_forbidden_actions_TestCase: Webserver no accesible at ".AkConfig::getOption('testing_url')."\n";
+            echo "Skipping Controller_forbidden_actions_TestCase: Web server not accesible at ".AkConfig::getOption('testing_url')."\n";
         }
         parent::__construct();
         $this->_test_script = AkConfig::getOption('testing_url').

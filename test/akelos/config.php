@@ -3,7 +3,7 @@
 require_once(dirname(__FILE__).'/../shared/config/config.php');
 
 AkConfig::setOption('testing_url', 'http://akelos.tests/akelos');
-AkConfig::setOption('webserver_enabled', @file_get_contents(AkConfig::getOption('testing_url').'/ping.php') == 'pong');
+AkUnitTestSuite::checkIfTestingWebserverIsAccesible(array('base_path' => dirname(__FILE__)));
 AkConfig::setOption('memcached_enabled', AkMemcache::isServerUp());
 
 

@@ -9,7 +9,7 @@ class RenderFormat_TestCase extends AkWebTestCase
     public function __construct()
     {
         if(!$this->webserver_enabled = AkConfig::getOption('webserver_enabled', false)){
-            echo "Skipping DatabaseSessions_TestCase: Webserver no accesible at ".AkConfig::getOption('testing_url')."\n";
+            echo "Skipping DatabaseSessions_TestCase: Web server not accesible at ".AkConfig::getOption('testing_url')."\n";
         }
         parent::__construct();
         $this->_test_script = AkConfig::getOption('testing_url').
