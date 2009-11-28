@@ -18,6 +18,7 @@ class RenderFormat_TestCase extends AkWebTestCase
 
     public function test_should_render_requested_format()
     {
+        if(!$this->webserver_enabled) return;
 
         $this->get($this->_test_script.'formats/index.xml');
         $this->assertTextMatch("index.xml.tpl");
