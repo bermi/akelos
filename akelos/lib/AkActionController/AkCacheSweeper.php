@@ -6,12 +6,10 @@
 
 
 /**
- * @package ActionController
- * @subpackage Caching
+ * @package ActionPack
+ * @subpackage CacheSweeping
  * @author Arno Schneider
  */
-require_once(AkConfig::getDir('app') . DS . 'shared_model.php');
-require_once(AK_LIB_DIR . DS . 'AkActiveRecord' . DS . 'AkObserver.php');
 
 /**
  * Cache Sweepers need to be stored under:
@@ -23,9 +21,9 @@ require_once(AK_LIB_DIR . DS . 'AkActiveRecord' . DS . 'AkObserver.php');
  *
  *   class ListSweeper extends AkCacheSweeper
  *   {
- *     var $observe = array("List", "Item");
+ *     public $observe = array("List", "Item");
  *
- *     function afterSave(&$record) {
+ *     public function afterSave(&$record) {
  *         $list = ($record instanceof List) ? $record : $record->list;
  *         $this->expirePage(array("controller" => "lists", "action" => "public", "id" => $list->id));
  *         $this->expireAction(array("controller" => "lists", "action" => "all"));
@@ -38,8 +36,8 @@ require_once(AK_LIB_DIR . DS . 'AkActiveRecord' . DS . 'AkObserver.php');
  * The sweeper is assigned in the controllers that wish to have its job performed using the <tt>$cache_sweeper</tt> class attribute:
  *
  *   class ListsController extends ApplicationController {
- *     var $caches_action = array("index", "show", "public", "feed");
- *     var $cache_sweeper = array("list_sweeper" => array("only" => array("edit", "destroy", "share")));
+ *     public $caches_action = array("index", "show", "public", "feed");
+ *     public $cache_sweeper = array("list_sweeper" => array("only" => array("edit", "destroy", "share")));
  *     ....
  *   }
  *
@@ -47,25 +45,23 @@ require_once(AK_LIB_DIR . DS . 'AkActiveRecord' . DS . 'AkObserver.php');
  */
 class AkCacheSweeper extends AkObserver
 {
-    var $_cache_handler;
+    public $_cache_handler;
 
-    function __construct(&$cache_handler)
+    public function __construct(&$cache_handler)
     {
         $this->_cache_handler = $cache_handler;
         parent::__construct();
     }
-    function expirePage($path = null, $language=null)
+    public function expirePage($path = null, $language=null)
     {
         return $this->_cache_handler->expirePage($path,$language);
     }
-    function expireAction($options, $params = array())
+    public function expireAction($options, $params = array())
     {
         return $this->_cache_handler->expireAction($options, $params);
     }
-    function expireFragment($key, $options = array())
+    public function expireFragment($key, $options = array())
     {
         return $this->_cache_handler->expireFragment($key, $options);
     }
-
-
 }

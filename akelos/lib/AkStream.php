@@ -5,28 +5,25 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActionController
- * @subpackage Base
+ * @package ActionPack
+ * @subpackage Stream
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
-require_once(AK_LIB_DIR.DS.'Ak.php');
-
 class AkStream
 {
-    var $buffer_size;
-    var $path;
+    public $buffer_size;
+    public $path;
     
-    function AkStream($path, $buffer_size = 4096)
+    public function __construct($path, $buffer_size = 4096)
     {
         $this->buffer_size = empty($buffer_size) ? 4096 : $buffer_size;
         $this->path = $path;
     }
 
-    function stream()
+    public function stream()
     {
         Ak::stream($this->path, $this->buffer_size);
     }    
 }
 
-?>

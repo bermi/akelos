@@ -5,7 +5,7 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActionController
+ * @package ActionPack
  * @subpackage Request
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */

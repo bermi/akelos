@@ -6,7 +6,7 @@
 
 
 /**
- * @package ActionController
+ * @package ActionPack
  * @subpackage Caching
  * @author Arno Schneider
  */
@@ -60,7 +60,7 @@
  *
  *   class WeblogController extends ActionController {
  *     public function update() {
- ....
+ *       ....
  *       $this->expirePage(array("action" => "show", "id" => $this->params["list"]["id"]));
  *       $this->redirectTo(array("action => "show", "id" => $this->params["list"]["id"]));
  *     }

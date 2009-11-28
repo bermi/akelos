@@ -7,8 +7,8 @@
 /**
  * Native PHP URL rewriting for the Akelos Framework.
  *
- * @package ActionController
- * @subpackage Request
+ * @package ActionPack
+ * @subpackage Router
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 

@@ -6,8 +6,8 @@
 
 
 /**
- * @package ActionController
- * @subpackage Base
+ * @package ActionPack
+ * @subpackage ActionController
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 

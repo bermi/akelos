@@ -5,12 +5,10 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActionController
+ * @package ActionPack
  * @subpackage Sessions
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
-
-
 
 /**
 * Database based session.
