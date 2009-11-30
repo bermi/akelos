@@ -1,7 +1,7 @@
 <?php
 
-!defined('MAKELOS_BASE_DIR') && define('MAKELOS_BASE_DIR', dirname(__FILE__));
-!defined('MAKELOS_RUN') && define('MAKELOS_RUN', preg_match('/makelos$/', $_SERVER['PHP_SELF']));
+defined('MAKELOS_BASE_DIR') || define('MAKELOS_BASE_DIR', dirname(__FILE__));
+defined('MAKELOS_RUN')      || define('MAKELOS_RUN', preg_match('/makelos$/', $_SERVER['PHP_SELF']));
 
 class MakelosRequest
 {
@@ -370,7 +370,7 @@ class Makelos
         }
     }
 
-    
+
     public function runTaskAsDaemon($task_name, $options = array())
     {
         $this->_ensurePosixAndPcntlAreAvailable();
@@ -430,8 +430,8 @@ class Makelos
         die();
     }
 
-    
-    
+
+
     // Autocompletion handling
 
     public function getAvailableTasksForAutocompletion()
@@ -478,9 +478,9 @@ class Makelos
             }
         }
     }
-    
-    
-    
+
+
+
 
     private function _ensurePosixAndPcntlAreAvailable()
     {
@@ -504,24 +504,24 @@ function makelos_setting($settings = array()){
 
 
 /**
- * @todo 
- *  
+ * @todo
+ *
  *  Task
  *      prequisites
  *      actions
  *      expected parameters
- * 
- *  
+ *
+ *
  *  Directory functions
  *  Parallel tasks
- * 
+ *
 
- ./makelos db:fixtures:load         # Load fixtures into the current environment&#8217;s database. 
+ ./makelos db:fixtures:load         # Load fixtures into the current environment&#8217;s database.
                                     # Load specific fixtures using FIXTURES=x,y
-./makelos db:migrate                # Migrate the database through scripts in db/migrate. Target 
+./makelos db:migrate                # Migrate the database through scripts in db/migrate. Target
                                     # specific version with VERSION=x
 ./makelos db:structure:dump         # Dump the database structure to a SQL file
-./makelos db:test:clone             # Recreate the test database from the current environment&#8217;s 
+./makelos db:test:clone             # Recreate the test database from the current environment&#8217;s
                                     # database schema
 ./makelos db:test:clone_structure   # Recreate the test databases from the development structure
 ./makelos db:test:prepare           # Prepare the test database and load the schema

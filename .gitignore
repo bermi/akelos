@@ -9,3 +9,4 @@ private/
 test/fixtures/app/models/property_property_type.php
 cache/
 test/_fixtures/
+nbproject/

@@ -17,8 +17,13 @@ makelos_task('test:case', array(
 
 
 makelos_task('test:units', array(
-    'description' => 'Run all unit tests.'
+    'description' => 'Run all unit tests'
     //'autocompletion' => 'ENVIRONMENT=production'
+));
+
+
+makelos_task('doc:akelos', array(
+    'description' => 'Build the akelos HTML Files'
 ));
 
 
