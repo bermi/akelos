@@ -22,7 +22,7 @@ defined('AK_RECODE_UTF8_ON_CONSOLE_TO') ? null : define('AK_RECODE_UTF8_ON_CONSO
 
 require_once(AK_LIB_DIR.DS.'AkActiveRecord.php');
 require_once(AK_LIB_DIR.DS.'AkActionMailer.php');
-require_once(AkConfig::getDir('app').DS.'shared_model.php');
+require_once(AkConfig::getDir('models').DS.'shared_model.php');
 require_once(AK_LIB_DIR.DS.'utils'.DS.'generators'.DS.'AkelosGenerator.php');
 require_once(AK_LIB_DIR.DS.'AkInstaller.php');
 

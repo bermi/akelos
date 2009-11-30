@@ -107,7 +107,7 @@ class ScaffoldGenerator extends  AkelosGenerator
         // We check for common testing files
         $common_testing_files = array(
         'fixtures'.DS.'config'.DS.'config.php',
-        'fixtures'.DS.'app'.DS.'shared_model.php'
+        'fixtures'.DS.'app'.DS.'models'.DS.'shared_model.php'
         );
         foreach ($common_testing_files as $common_testing_file){
             if(!file_exists(AK_TEST_DIR.DS.$common_testing_file)){
@@ -117,7 +117,7 @@ class ScaffoldGenerator extends  AkelosGenerator
         }
 
         if(file_exists($this->model_file_path)){
-            require_once(AkConfig::getDir('app').DS.'shared_model.php');
+            require_once(AkConfig::getDir('models').'shared_model.php');
             require_once($this->model_file_path);
             if(class_exists($this->model_name)){
                 $ModelInstance =& new $this->model_name;

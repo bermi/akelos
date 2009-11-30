@@ -8,8 +8,8 @@ class AkPluginInstaller extends AkInstaller
     $auto_remove_extensions     = true,
     $plugin_name,
     $extension_points           = array(
-    'BaseActiveRecord'=>'base_active_record.php',
-    'BaseActionController'=>'base_action_controller.php'
+    'BaseActiveRecord'      => 'models/base_active_record.php',
+    'BaseActionController'  => 'controllers/base_action_controller.php'
     );
 
     protected

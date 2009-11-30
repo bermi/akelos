@@ -2194,10 +2194,10 @@ class Ak
 
         if(empty($app_paths)){
             $app_paths = array(
-            'BaseActionController'      =>  'base_action_controller.php',
-            'BaseActiveRecord'          =>  'base_active_record.php',
-            'ApplicationController'     =>  'application_controller.php',
-            'ActiveRecord'              =>  'shared_model.php',
+            'BaseActionController'      =>  'controllers/base_action_controller.php',
+            'BaseActiveRecord'          =>  'models/base_active_record.php',
+            'ApplicationController'     =>  'controllers/application_controller.php',
+            'ActiveRecord'              =>  'models/shared_model.php',
             );
         }
 

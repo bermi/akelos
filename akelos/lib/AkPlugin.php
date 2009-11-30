@@ -50,7 +50,7 @@ class AkPlugin
      * }
      * 
      * This will create a new class named ExtensibleAkActiveRecord class you can use 
-     * as parent of your ActiveRecord class at app/shared_model.php
+     * as parent of your ActiveRecord class at app/models/shared_model.php
      * 
      * @param    string $class_name   Class name to extend
      * @param    string $path_to_code Path to the source code file relative to your plugin base path.

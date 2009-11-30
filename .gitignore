@@ -3,10 +3,7 @@ config/sqlite.yml
 config/mysql.yml
 config/testconfig1.yml
 config/plugin_repositories.txt
-app/plugin_installer_target_class.php
 app/locales/
-private/
-test/fixtures/app/models/property_property_type.php
 cache/
 test/_fixtures/
 nbproject/
