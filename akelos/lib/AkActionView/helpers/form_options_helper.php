@@ -5,7 +5,7 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActionView
+ * @package ActionPack
  * @subpackage Helpers
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
@@ -333,7 +333,7 @@ class FormOptionsHelper extends AkActionViewHelper
 
 class AkFormHelperOptionsInstanceTag extends AkFormHelperInstanceTag
 {
-    public function AkFormHelperOptionsInstanceTag($object_name, $column_name, &$template_object, $local_binding = null, &$object)
+    public function __construct($object_name, $column_name, &$template_object, $local_binding = null, &$object)
     {
         $this->AkFormHelperInstanceTag($object_name, $column_name, $template_object, $local_binding, $object);
     }

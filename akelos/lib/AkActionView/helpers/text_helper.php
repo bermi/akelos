@@ -5,14 +5,14 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActionView
+ * @package ActionPack
  * @subpackage Helpers
  * @author Jose Salavert <salavert a.t akelos c.om>
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
-defined('AK_VALID_URL_CHARS_REGEX') ? null : define('AK_VALID_URL_CHARS_REGEX','A-Z-a-z0-9:=?&\/\.\-\\%~#_;,+');
-define('AK_AUTO_LINK_REGEX','/
+defined('AK_VALID_URL_CHARS_REGEX') || define('AK_VALID_URL_CHARS_REGEX','A-Z-a-z0-9:=?&\/\.\-\\%~#_;,+');
+defined('AK_AUTO_LINK_REGEX')       || define('AK_AUTO_LINK_REGEX','/
         (                          # leading text
           <\w+.*?>|                # leading HTML tag, or
           [^=!:\'"\/]|               # leading punctuation, or

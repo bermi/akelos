@@ -5,7 +5,7 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActionView
+ * @package ActionPack
  * @subpackage Sintags
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
@@ -755,6 +755,5 @@ class AkSintagsParser
     {
         return $this->_errors;
     }
-
 }
 

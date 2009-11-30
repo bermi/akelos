@@ -5,7 +5,7 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActionView
+ * @package ActionPack
  * @subpackage TemplateEngines
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */

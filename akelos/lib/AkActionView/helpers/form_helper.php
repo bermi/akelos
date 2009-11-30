@@ -5,7 +5,7 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActionView
+ * @package ActionPack
  * @subpackage Helpers
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
@@ -503,7 +503,7 @@ class AkFormHelperInstanceTag
 
 class AkFormHelperBuilder extends FormHelper
 {
-    public function AkFormHelperBuilder($object_name, &$object, &$template)
+    public function __construct($object_name, &$object, &$template)
     {
         $this->object_name = $object_name;
         $this->object = $object;

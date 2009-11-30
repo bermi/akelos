@@ -5,7 +5,7 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActionView
+ * @package ActionPack
  * @subpackage Helpers
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */

@@ -7,26 +7,30 @@ class Image_TestCase extends ActiveSupportUnitTest
     public function __construct()
     {
         parent::__construct();
+        if(!($this->offline_mode = !(@file_get_contents('http://www.akelos.org/testing_resources/images/watermark.png')))){
+            $this->image_path = AkConfig::getDir('fixtures').'/Image_TestCase/akelos_framework_logo.png';
+            $this->photo_path = AkConfig::getDir('fixtures').'/Image_TestCase/cristobal.jpg';
+            $this->watermark = AkConfig::getDir('fixtures').'/Image_TestCase/watermark.png';
 
-        $this->image_path = AkConfig::getDir('fixtures').'/Image_TestCase/akelos_framework_logo.png';
-        $this->photo_path = AkConfig::getDir('fixtures').'/Image_TestCase/cristobal.jpg';
-        $this->watermark = AkConfig::getDir('fixtures').'/Image_TestCase/watermark.png';
-
-        Ak::copy(AkConfig::getDir('fixtures').'/old_logo.png', $this->image_path);
-        $cristobal = @Ak::url_get_contents('http://www.akelos.org/testing_resources/images/cristobal.jpg', array('cache'=>100000));
-        if(!empty($cristobal)) Ak::file_put_contents($this->photo_path, $cristobal);
-        $watermark = @Ak::url_get_contents('http://www.akelos.org/testing_resources/images/watermark.png', array('cache'=>100000));
-        if(!empty($watermark)) Ak::file_put_contents($this->watermark, $watermark);
-        $this->_run_extra_tests = file_exists($this->photo_path);
+            Ak::copy(AkConfig::getDir('fixtures').'/old_logo.png', $this->image_path);
+            $cristobal = @Ak::url_get_contents('http://www.akelos.org/testing_resources/images/cristobal.jpg', array('cache'=>100000));
+            if(!empty($cristobal)) Ak::file_put_contents($this->photo_path, $cristobal);
+            $watermark = @Ak::url_get_contents('http://www.akelos.org/testing_resources/images/watermark.png', array('cache'=>100000));
+            if(!empty($watermark)) Ak::file_put_contents($this->watermark, $watermark);
+            $this->_run_extra_tests = file_exists($this->photo_path);
+        }
     }
 
     public function __destruct()
     {
+        if($this->offline_mode) return;
         Ak::directory_delete(AkConfig::getDir('fixtures').'/Image_TestCase');
     }
 
     public function test_image_save_as()
     {
+        if($this->offline_mode) return;
+
         $PngImage = new AkImage($this->image_path);
         $this->assertEqual($PngImage->getExtension(), 'png');
 
@@ -42,12 +46,13 @@ class Image_TestCase extends ActiveSupportUnitTest
 
     public function test_image_resize()
     {
+        if($this->offline_mode) return;
+
         $Image = new AkImage();
         $Image->load($this->image_path);
 
         $this->assertEqual($Image->getWidth(), 170);
         $this->assertEqual($Image->getHeight(), 75);
-
 
 
         $Image->transform('resize',array('size'=>'50x'));
@@ -107,7 +112,8 @@ class Image_TestCase extends ActiveSupportUnitTest
 
     public function test_image_crop()
     {
-        if(!$this->_run_extra_tests) return;
+        if( $this->offline_mode ||
+            !$this->_run_extra_tests) return;
 
         $Image = new AkImage();
         $Image->load($this->photo_path);
@@ -142,7 +148,8 @@ class Image_TestCase extends ActiveSupportUnitTest
 
     public function test_image_watermark()
     {
-        if(!$this->_run_extra_tests) return;
+        if( $this->offline_mode ||
+            !$this->_run_extra_tests) return;
 
         $Image = new AkImage();
         $Image->load($this->photo_path);
@@ -153,6 +160,8 @@ class Image_TestCase extends ActiveSupportUnitTest
 
     public function test_should_apply_native_filters()
     {
+        if($this->offline_mode) return;
+
         $native_filters = array(
         'negate' =>         array('params' => array(), 'hash' => '8b44f26c9646ac69a1b48bbc66622184'),
         'grayscale' =>      array('params' => array(), 'hash' => 'd08a0ad61f4fd5b343c0a4af6d810ddf'),

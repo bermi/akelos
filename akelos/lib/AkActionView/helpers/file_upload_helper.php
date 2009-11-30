@@ -5,11 +5,10 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActionView
+ * @package ActionPack
  * @subpackage Helpers
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
-
 
 class FileUploadHelper extends AkActionViewHelper
 {
@@ -176,7 +175,6 @@ class FileUploadHelper extends AkActionViewHelper
         }
         $key_cache = array_merge($key_cache, $keys);
     }
-
 
     private function _sendFile($key)
     {

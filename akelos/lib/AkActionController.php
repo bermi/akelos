@@ -11,7 +11,7 @@
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
-class AkActionController extends AkLazyObject// AkObject
+class AkActionController extends AkLazyObject
 {
     public $_high_load_mode = AK_HIGH_LOAD_MODE;
     public $_enable_plugins = true;
@@ -2322,18 +2322,4 @@ class AkActionController extends AkLazyObject// AkObject
      * ########################################################################
      */
 }
-
-
-/**
- * Function for getting the singleton controller;
- *
- * @return AkActionController instance
- */
-function &AkActionController()
-{
-    $params = func_num_args() == 0 ? null : func_get_args();
-    $AkActionController = Ak::singleton('AkActionController', $params);
-    return $AkActionController;
-}
-
 

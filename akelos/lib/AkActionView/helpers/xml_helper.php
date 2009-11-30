@@ -5,9 +5,9 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActionView
+ * @package ActionPack
  * @subpackage Helpers
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
+ * @author Arno Schneider <arno a.t bermilabs c.om>
  */
 
 /**
@@ -183,6 +183,7 @@ class XmlHelper extends AkObject
         Ak::parseOptions($options,$default_options,$config);
         return $this->_renderTag(false,$type,'',$options,'<?','?>','?>');
     }
+    
     public function __call($name,$args)
     {
         if(preg_match('/^xml_([\w_]+?)_(open|close)$/',$name,$matches)) {
@@ -195,7 +196,7 @@ class XmlHelper extends AkObject
             }
             $open = $matches[2]=='open';
             $close = !$open;
-            $content=array_shift($args);
+            $content = array_shift($args);
             $options = array();
             if (!empty($args)) {
                 $options = array_shift($args);

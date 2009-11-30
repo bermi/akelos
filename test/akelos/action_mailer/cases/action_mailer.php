@@ -199,7 +199,6 @@ class ActionMailer_TestCase extends ActionMailerUnitTest
 
     }
 
-
     public function test_unquote_quoted_printable_subject()
     {
         $msg = <<<EOF
@@ -215,7 +214,6 @@ EOF;
         $this->assertEqual("=?UTF-8?Q?testing_t?=\r\n =?UTF-8?Q?esting_=D6=A4?=",$Mail->getSubject('UTF-8'));
 
     }
-
 
     public function test_unquote_7bit_subject()
     {
@@ -283,8 +281,6 @@ EOF;
         $this->assertEqual("The body", $Mail->body);
         $this->assertEqual("VGhlIGJvZHk=", $Mail->getBody());
     }
-
-
 
     public function test_extended_headers()
     {
@@ -504,7 +500,6 @@ EOF;
         $this->assertEqual('iso-8859-1', $Mail->parts[2]->content_type_attributes['charset']);
     }
 
-
     public function test_html_mail()
     {
         $TestMailer = new TestMailer();
@@ -572,7 +567,6 @@ EOF;
         $Mail = $TestMailer->receive(file_get_contents(AkConfig::getDir('fixtures').DS."raw_email11"));
         $this->assertTrue(!empty($Mail->from));
     }
-
 
     public function test_should_encode_alternative_message_from_templates()
     {
@@ -658,6 +652,7 @@ EOF;
 
     public function test_should_encode_alternative_message_from_templates_with_external_embeded_images()
     {
+        if(!@file_get_contents('http://www.bermilabs.com/images/bermilabs_logo.png')) return; // offline mode
         $TestMailer = new TestMailer();
         $Message = $TestMailer->create('alternative_message_from_templates', $this->recipient, true, true);
         //$TestMailer->delivery_method = 'php';
@@ -665,8 +660,6 @@ EOF;
         $rendered_message = $TestMailer->getRawMessage();
         $this->assertPattern('/==\r\n\r\n--[a-f0-9]{32}\r\nContent-Type: image\/png;/', $rendered_message, 'Two images embeded');
     }
-
-
 }
 
 ak_test_case('ActionMailer_TestCase');

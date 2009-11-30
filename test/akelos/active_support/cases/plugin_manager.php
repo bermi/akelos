@@ -4,26 +4,40 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class PluginManager_TestCase extends ActiveSupportUnitTest
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->offline_mode = !(@file_get_contents('http://svn.akelos.org/plugins'));
+    }
+
     public function test_remove_repositories_config()
     {
+        if($this->offline_mode) return;
+
         Ak::directory_delete(AkConfig::getDir('plugins').DS.'acts_as_versioned');
         @Ak::file_delete(AkConfig::getDir('config').DS.'plugin_repositories.txt');
     }
 
     public function setup()
     {
+        if($this->offline_mode) return;
+
         $this->PluginManager = new AkPluginManager();
         @Ak::file_delete(AkConfig::getDir('tmp').DS.'plugin_repositories.yaml');
     }
 
     public function test_should_get_available_repositories()
     {
+        if($this->offline_mode) return;
+
         $repositories = $this->PluginManager->getAvailableRepositories();
         $this->assertTrue(in_array('http://svn.akelos.org/plugins', $repositories));
     }
 
     public function test_should_add_new_repository()
     {
+        if($this->offline_mode) return;
+
         $this->PluginManager->addRepository('http://svn.editam.com/plugins');
         $this->PluginManager->addRepository('http://svn.example.com/plugins');
         $repositories = $this->PluginManager->getAvailableRepositories();
@@ -33,6 +47,8 @@ class PluginManager_TestCase extends ActiveSupportUnitTest
 
     public function test_should_remove_repository()
     {
+        if($this->offline_mode) return;
+
         $repositories = $this->PluginManager->getAvailableRepositories(true);
         $this->assertEqual(count($repositories), 3);
 
@@ -48,18 +64,24 @@ class PluginManager_TestCase extends ActiveSupportUnitTest
 
     public function test_should_get_remote_plugin_list()
     {
+        if($this->offline_mode) return;
+
         $plugins = $this->PluginManager->getPlugins();
         $this->assertEqual($plugins['acts_as_versioned'], 'http://svn.akelos.org/plugins');
     }
 
     public function test_should_install_plugin()
     {
+        if($this->offline_mode) return;
+
         $this->PluginManager->installPlugin('acts_as_versioned');
         $this->assertTrue(in_array('acts_as_versioned', $this->PluginManager->getInstalledPlugins()));
     }
 
     public function test_should_update_plugin()
     {
+        if($this->offline_mode) return;
+
         Ak::directory_delete(AkConfig::getDir('plugins').DS.'acts_as_versioned'.DS.'lib');
         $this->assertFalse(file_exists(AkConfig::getDir('plugins').DS.'acts_as_versioned'.DS.'lib'.DS.'ActsAsVersioned.php'));
         $this->PluginManager->updatePlugin('acts_as_versioned');
@@ -68,6 +90,8 @@ class PluginManager_TestCase extends ActiveSupportUnitTest
 
     public function test_should_uninstall_plugin()
     {
+        if($this->offline_mode) return;
+
         clearstatcache();
         $this->PluginManager->uninstallPlugin('acts_as_versioned');
         $this->assertFalse(is_dir(AkConfig::getDir('plugins').DS.'acts_as_versioned'));
@@ -75,12 +99,16 @@ class PluginManager_TestCase extends ActiveSupportUnitTest
 
     public function test_should_get_remote_repositories_listing()
     {
+        if($this->offline_mode) return;
+
         $repositories = $this->PluginManager->_getRepositoriesFromRemotePage();
         $this->assertEqual($repositories[0], $this->PluginManager->main_repository);
     }
 
     public function test_remove_plugin()
     {
+        if($this->offline_mode) return;
+
         Ak::directory_delete(AkConfig::getDir('plugins').DS.'acts_as_versioned');
     }
 }
