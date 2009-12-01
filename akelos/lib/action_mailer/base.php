@@ -5,8 +5,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
- * @subpackage AkActionMailer
+ * @package ActionMailer
+ * @subpackage Base
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
@@ -805,8 +805,9 @@ class AkActionMailer extends AkBaseModel
 
     public function _deliverUsingMailDeliveryMethod($method, &$Message, $options)
     {
-        $handler_name = 'Ak'.AkInflector::camelize(Ak::sanitize_include($method, 'paranoid')).'Delivery';
-        $handler_path = AK_LIB_DIR.DS.'AkActionMailer'.DS.'AkMailDelivery'.DS.$handler_name.'.php';
+        $file_name = AkInflector::underscore(Ak::sanitize_include($method, 'paranoid'));
+        $handler_name = 'Ak'.AkInflector::camelize($file_name).'Delivery';
+        $handler_path = AK_LIB_DIR.DS.'action_mailer'.DS.'delivery'.DS.$file_name.'.php';
         if(file_exists($handler_path)){
             require_once($handler_path);
         }

@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @package ActionMailer
+ * @subpackage Message
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
+ */
+ 
 include_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Mail.php');
 
 class AkMailBase extends Mail

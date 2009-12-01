@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @package ActionMailer
+ * @subpackage SmtpDelivery
+ * @author Bermi Ferrer <bermi a.t bermilabs c.om>
+ */
+ 
 class AkSmtpDelivery extends AkObject
 {
     public function deliver(&$Mailer, $settings = array())

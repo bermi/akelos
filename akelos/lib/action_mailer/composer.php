@@ -6,8 +6,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package AkelosFramework
- * @subpackage AkActionMailer
+ * @package ActionMailer
+ * @subpackage Composer
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 

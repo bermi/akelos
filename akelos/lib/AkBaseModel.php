@@ -5,8 +5,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActiveRecord
- * @subpackage Base
+ * @package ActiveSupport
+ * @subpackage BaseModel
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
