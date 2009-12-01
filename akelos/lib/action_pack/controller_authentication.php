@@ -1,6 +1,13 @@
 <?php
 
 /**
+ * @package ActionPack
+ * @subpackage HTTPAuthentication
+ * @author Bermi Ferrer
+ */
+
+
+/**
                         HTTP Authentication
 ====================================================================
 *
