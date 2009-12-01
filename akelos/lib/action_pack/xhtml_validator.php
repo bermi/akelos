@@ -857,8 +857,6 @@ class AkXhtmlValidator
         if (empty($highlight_text)) {
             return $error;
         }
-        require_once (AK_LIB_DIR.DS.'AkColor.php');
-        require_once (AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'text_helper.php');
         $line = $this->getCurrentLine();
         $highlighted_error = '';
         foreach($highlight_text as $phrases) {

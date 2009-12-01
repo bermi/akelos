@@ -1,9 +1,9 @@
 <?php
 
 require_once('_HelpersUnitTester.php');
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'asset_tag_helper.php');
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'text_helper.php');
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'tag_helper.php');
+require_once(AK_LIB_DIR.DS.'action_pack'.DS.'helpers'.DS.'asset_tag_helper.php');
+require_once(AK_LIB_DIR.DS.'action_pack'.DS.'helpers'.DS.'text_helper.php');
+require_once(AK_LIB_DIR.DS.'action_pack'.DS.'helpers'.DS.'tag_helper.php');
 
 
 class TextHelperTests extends HelpersUnitTester

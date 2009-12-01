@@ -139,7 +139,6 @@ class AkTestApplication extends AkUnitTest
     }
     public function assertValidXhtml($message = null)
     {
-        require_once(AK_LIB_DIR.DS.'AkXhtmlValidator.php');
         $response = $this->_response;
 
         $validator = new AkXhtmlValidator();
@@ -240,9 +239,8 @@ class AkTestApplication extends AkUnitTest
         $cache_settings = Ak::getSettings('caching', false);
         if ($cache_settings['enabled']) {
 
-            require_once(AK_LIB_DIR . DS . 'AkActionController'.DS.'AkCacheHandler.php');
             $null = null;
-            $pageCache = &Ak::singleton('AkCacheHandler',$null);
+            $pageCache = new AkCacheHandler();
 
             $pageCache->init($null, $cache_settings);
             if ($cachedPage = $pageCache->getCachedPage()) {

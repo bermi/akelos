@@ -619,13 +619,13 @@ class AkMailParser
     public function extractImagesIntoInlineParts(&$Mail, $options = array())
     {
         $html =& $Mail->body;
-        require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'text_helper.php');
+        require_once(AK_LIB_DIR.DS.'action_pack'.DS.'helpers'.DS.'text_helper.php');
         $images = TextHelper::get_image_urls_from_html($html);
 
         $html_images = array();
         if(!empty($images)){
             require_once(AK_LIB_DIR.DS.'AkImage.php');
-            require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'asset_tag_helper.php');
+            require_once(AK_LIB_DIR.DS.'action_pack'.DS.'helpers'.DS.'asset_tag_helper.php');
             $tmp_dir = AkConfig::getDir('tmp');
             $app_dir = AkConfig::getDir('app');
 

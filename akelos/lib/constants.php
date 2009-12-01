@@ -230,7 +230,7 @@ defined('AK_POST_CODE_REGULAR_EXPRESSION')                      || define('AK_PO
 defined('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES') || define('AK_HAS_AND_BELONGS_TO_MANY_CREATE_JOIN_MODEL_CLASSES' ,true);
 defined('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS')        || define('AK_HAS_AND_BELONGS_TO_MANY_JOIN_CLASS_EXTENDS' , 'ActiveRecord');
 
-defined('AK_DEFAULT_TEMPLATE_ENGINE')                           || define('AK_DEFAULT_TEMPLATE_ENGINE', 'AkSintags');
+defined('AK_DEFAULT_TEMPLATE_ENGINE')                           || define('AK_DEFAULT_TEMPLATE_ENGINE', 'sintags');
 defined('AK_TEMPLATE_SECURITY_CHECK')                           || define('AK_TEMPLATE_SECURITY_CHECK', false);
 defined('AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER')           || define('AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER', 'AkPhpCodeSanitizer');
 
@@ -280,7 +280,7 @@ $_SERVER['REQUEST_URI'] = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_UR
  */
 defined('AK_SET_UTF8_ON_MYSQL_CONNECT') || define('AK_SET_UTF8_ON_MYSQL_CONNECT', true);
 
-if(AK_WEB_REQUEST && !AK_PRODUCTION_MODE) include AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php';
+//if(AK_WEB_REQUEST && !AK_PRODUCTION_MODE) include AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php';
 
 $ADODB_CACHE_DIR = AK_CACHE_DIR;
 

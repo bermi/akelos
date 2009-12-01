@@ -69,7 +69,7 @@ class AkHelperLoader extends AkObject
             }
 
             $full_path = preg_match('/[\\\\\/]+/',$file);
-            $file_path = $full_path ? $file : AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.$file;
+            $file_path = $full_path ? $file : AK_LIB_DIR.DS.'action_pack'.DS.'helpers'.DS.$file;
             if(is_file($file_path)){
                 include_once($file_path);
             }
@@ -144,7 +144,7 @@ class AkHelperLoader extends AkObject
         $handler->helpers = !isset($handler->helpers) ? 'default' : $handler->helpers;
 
         if($handler->helpers == 'default'){
-            $available_helpers = Ak::dir(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers',array('dirs'=>false));
+            $available_helpers = Ak::dir(AK_LIB_DIR.DS.'action_pack'.DS.'helpers',array('dirs'=>false));
             $helper_names = array();
             foreach ($available_helpers as $available_helper){
                 $helper_names[$available_helper] = AkInflector::classify(substr($available_helper,0,-10));

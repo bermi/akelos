@@ -1,7 +1,7 @@
 <?php
 
 require_once('_HelpersUnitTester.php');
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'capture_helper.php');
+require_once(AK_LIB_DIR.DS.'action_pack'.DS.'helpers'.DS.'capture_helper.php');
 require_once(AK_LIB_DIR.DS.'AkActionView.php');
 require_once(AK_LIB_DIR.DS.'AkActionController.php');
 require_once(AK_LIB_DIR.DS.'AkRequest.php');

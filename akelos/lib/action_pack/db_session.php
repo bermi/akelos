@@ -22,8 +22,6 @@
 *
 * <code>
 *
-* require_once(AK_LIB_DIR.'/AkDbSession.php');
-*
 * $AkDbSession = new AkDbSession();
 * $AkDbSession->sessionLife = AK_SESSION_EXPIRE;
 * session_set_save_handler (

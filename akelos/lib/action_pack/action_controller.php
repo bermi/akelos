@@ -219,7 +219,7 @@ class AkActionController extends AkLazyObject
         $this->extendClassLazily('AkControllerAuthentication',
         array(
         'methods' => array('authenticateOrRequestWithHttpBasic','authenticateWithHttpBasic','requestHttpBasicAuthentication'),
-        'autoload_path' => AK_LIB_DIR.DS.'AkActionController'.DS.'AkControllerAuthentication.php'
+        'autoload_path' => AK_LIB_DIR.DS.'action_pack'.DS.'controller_authentication.php'
         ));
     }
 
@@ -230,7 +230,7 @@ class AkActionController extends AkLazyObject
         array(
         'init_method' => 'setObjectBeenFiltered',
         'methods_match' => '/(((after|before|perform)Action)|(.+Filter.*))/',
-        'autoload_path' => AK_LIB_DIR.DS.'AkActionController'.DS.'AkControllerFilter.php'
+        'autoload_path' => AK_LIB_DIR.DS.'action_pack'.DS.'controller_filter.php'
         ));
     }
 
@@ -355,8 +355,6 @@ class AkActionController extends AkLazyObject
         empty($this->cookies) && isset($_COOKIE) ? ($this->cookies = $_COOKIE) : null;
 
         if(empty($this->Template)){
-            require_once(AK_LIB_DIR.DS.'AkActionView.php');
-            require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'AkPhpTemplateHandler.php');
             $this->Template = new AkActionView($this->_getTemplateBasePath(),
             $this->Request->getParameters(),$this->Request->getController());
 
@@ -413,7 +411,6 @@ class AkActionController extends AkLazyObject
 
     public function _validateGeneratedXhtml()
     {
-        require_once(AK_LIB_DIR.DS.'AkXhtmlValidator.php');
         $XhtmlValidator = new AkXhtmlValidator();
         if($XhtmlValidator->validate($this->Response->body) === false){
             $this->Response->sendHeaders();
@@ -1861,7 +1858,6 @@ class AkActionController extends AkLazyObject
         $count = $this->_paginationCountCollection($klass, $options['conditions'],
         empty($options['join']) ? $options['join'] : $options['joins']);
 
-        require_once(AK_LIB_DIR.DS.'AkActionController'.DS.'AkPaginator.php');
         $paginator = new AkPaginator($this, $count, $options['per_page'], $page);
         $collection = $this->_paginationFindCollection($options['class_name'], $options, $paginator);
 
@@ -2081,7 +2077,6 @@ class AkActionController extends AkLazyObject
         $this->_sendFileHeaders($options);
 
         if(!empty($options['stream'])){
-            require_once(AK_LIB_DIR.DS.'AkStream.php');
             $this->render(array('text'=> new AkStream($path,$options['buffer_size'])));
         }else{
             $this->render(array('text'=> Ak::file_get_contents($path)));
@@ -2169,8 +2164,6 @@ class AkActionController extends AkLazyObject
         $web_services = array_merge(Ak::toArray($this->web_services), Ak::toArray($this->web_service));
         if(!empty($web_services)){
             $web_services = array_unique($web_services);
-            require_once(AK_LIB_DIR.DS.'AkActionWebService.php');
-            require_once(AK_LIB_DIR.DS.'AkActionWebService'.DS.'AkActionWebServiceServer.php');
             $Server = new AkActionWebServiceServer($protocol);
             foreach ($web_services as $web_service){
                 $Server->addService($web_service);
@@ -2233,7 +2226,6 @@ class AkActionController extends AkLazyObject
         $cache_settings = Ak::getSettings('caching', false);
         if ($cache_settings['enabled']) {
             $null = null;
-            require_once(AK_LIB_DIR . DS . 'AkActionController' . DS . 'AkCacheHandler.php');
             $this->_CacheHandler = Ak::singleton('AkCacheHandler', $null);
             $this->_CacheHandler->init($this);
         }

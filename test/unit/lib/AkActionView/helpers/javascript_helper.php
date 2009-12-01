@@ -1,14 +1,14 @@
 <?php
 
 require_once('_HelpersUnitTester.php');
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_helper.php');
+require_once(AK_LIB_DIR.DS.'action_pack'.DS.'helpers'.DS.'javascript_helper.php');
 
 
 class JavaScriptHelperTests extends HelpersUnitTester 
 {    
     public function test_for_JavascriptHelper()
     {
-        require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'javascript_helper.php');
+        require_once(AK_LIB_DIR.DS.'action_pack'.DS.'helpers'.DS.'javascript_helper.php');
         
         $javascript = new JavaScriptHelper();
         

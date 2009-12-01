@@ -1,7 +1,7 @@
 <?php
 
 require_once('_HelpersUnitTester.php');
-require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'helpers'.DS.'file_upload_helper.php');
+require_once(AK_LIB_DIR.DS.'action_pack'.DS.'helpers'.DS.'file_upload_helper.php');
 
 
 class FileUploadHelperTests extends HelpersUnitTester 

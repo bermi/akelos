@@ -31,9 +31,9 @@ class AkPhpTemplateHandler
 
         if($this->_templateNeedsCompilation()){
             if(!class_exists($this->_templateEngine)){
-                require_once(AK_LIB_DIR.DS.'AkActionView'.DS.'TemplateEngines'.DS.$this->_templateEngine.'.php');
+                require_once(AK_LIB_DIR.DS.'action_pack'.DS.'template_engines'.DS.$this->_templateEngine.'.php');
             }
-            $____template_engine_name = $this->_templateEngine;
+            $____template_engine_name = 'Ak'.AkInflector::camelize($this->_templateEngine);
 
             $TemplateEngine = new $____template_engine_name();
 
