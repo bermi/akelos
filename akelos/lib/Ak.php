@@ -78,7 +78,6 @@ class Ak
     {
         static $cache;
         if(!isset($cache)){
-            require_once(AK_LIB_DIR.DS.'AkCache.php');
             $cache = new AkCache();
         }
         return $cache;
@@ -129,16 +128,12 @@ class Ak
     */
     static function t($string, $args = null, $controller = null)
     {
-        static $framework_dictionary = array(),$required=false, $lang, $_dev_shutdown = true, $locale_manager_class = false, $_custom_dev_shutdown = false;
+        static $framework_dictionary = array(), $lang, $_dev_shutdown = true, $locale_manager_class = false, $_custom_dev_shutdown = false;
         $original_string = $string;
-        if(!$required) {
-            $required=true;
-            require_once(AK_LIB_DIR.DS.'AkLocaleManager.php');
-        }
         if(AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES && ($locale_manager_class == false || $locale_manager_class == 'AkLocaleManager')) {
             if(!$_custom_dev_shutdown && defined('AK_LOCALE_MANAGER') && class_exists(AK_LOCALE_MANAGER) && in_array('AkLocaleManager',class_parents(AK_LOCALE_MANAGER))) {
                 $locale_manager_class = AK_LOCALE_MANAGER;
-                $_custom_dev_shutdown=true;
+                $_custom_dev_shutdown = true;
                 register_shutdown_function(array($locale_manager_class,'updateLocaleFiles'));
             } else {
                 $locale_manager_class = 'AkLocaleManager';
@@ -911,7 +906,6 @@ class Ak
     {
         static $Logger = array();
         if(empty($Logger[$namespace])){
-            require_once(AK_LIB_DIR.DS.'AkLogger.php');
             $Logger[$namespace] = new AkLogger();
             if($namespace != 'default'){
                 $file_name = AK_LOG_DIR.DS.$namespace.'.log';
@@ -1401,7 +1395,6 @@ class Ak
 
     static function unzip($file_to_unzip, $destination_folder)
     {
-        require_once(AK_LIB_DIR.DS.'AkZip.php');
         $ArchiveZip = new AkZip($file_to_unzip);
         $ArchiveZip->extract(array('add_path'=>str_replace(DS,'/',$destination_folder)));
     }
@@ -1566,14 +1559,14 @@ class Ak
             return $options['source'];
         }
         $options['class_prefix'] = empty($options['class_prefix']) && empty($options['path']) ? 'Ak' : $options['class_prefix'];
-        $options['path'] = rtrim(empty($options['path']) ? AK_LIB_DIR.DS.'AkConverters' : $options['path'], DS."\t ");
+        $options['path'] = rtrim(empty($options['path']) ? AK_LIB_DIR.DS.'active_support'.DS.'converters' : $options['path'], DS."\t ");
 
-        $converter_class_name = $options['class_prefix'].AkInflector::camelize($options['from']).'To'.AkInflector::camelize($options['to']);
+        $converter_file_name = AkInflector::underscore($options['from']).'_to_'.AkInflector::underscore($options['to']);
+        $converter_class_name = $options['class_prefix'].AkInflector::camelize($converter_file_name);
         if(!class_exists($converter_class_name)){
-            $file_name = $options['path'].DS.$converter_class_name.'.php';
+            $file_name = $options['path'].DS.$converter_file_name.'.php';
             if(!file_exists($file_name)){
                 if(defined('AK_REMOTE_CONVERTER_URI')){
-                    require_once(AK_LIB_DIR.DS.'AkConverters'.DS.'AkRemoteConverter.php');
                     $result = AkRemoteConverter::convert($options['from'], $options['to'], $options['source']);
                     if($result !== false){
                         return $result;
@@ -1611,7 +1604,6 @@ class Ak
     static function utf8($text, $input_string_encoding = null)
     {
         $input_string_encoding = empty($input_string_encoding) ? Ak::encoding() : $input_string_encoding;
-        require_once(AK_LIB_DIR.DS.'AkCharset.php');
         $Charset = Ak::singleton('AkCharset',$text);
         return $Charset->RecodeString($text,'UTF-8',$input_string_encoding);
     }
@@ -1619,7 +1611,6 @@ class Ak
     static function recode($text, $output_string_encoding = null, $input_string_encoding = null, $recoding_engine = null)
     {
         $input_string_encoding = empty($input_string_encoding) ? Ak::encoding() : $input_string_encoding;
-        require_once(AK_LIB_DIR.DS.'AkCharset.php');
         $Charset = Ak::singleton('AkCharset',$text);
         return $Charset->RecodeString($text,$output_string_encoding,$input_string_encoding, $recoding_engine);
     }
@@ -1689,7 +1680,7 @@ class Ak
      */
     static function toJson($php_value)
     {
-        require_once(AK_VENDOR_DIR.DS.'pear'.DS.'Services'.DS.'JSON.php');
+        require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Services'.DS.'JSON.php');
         $use = 0;
         $json = Ak::singleton('Services_JSON', $use);
         return $json->encode($php_value);
@@ -1700,7 +1691,7 @@ class Ak
      */
     static function fromJson($json_string)
     {
-        require_once(AK_VENDOR_DIR.DS.'pear'.DS.'Services'.DS.'JSON.php');
+        require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Services'.DS.'JSON.php');
         $use = 0;
         $json = Ak::singleton('Services_JSON', $use);
         return $json->decode($json_string);
@@ -2202,6 +2193,7 @@ class Ak
         }
 
         if(empty($lib_paths)){
+            $lib_paths = array(
             // Action Mailer
             'AkActionMailer'        => 'action_mailer/base.php',
             'AkMailComposer'        => 'action_mailer/composer.php',
@@ -2211,7 +2203,7 @@ class Ak
             'AkMailParser'          => 'action_mailer/parser.php',
             'AkMailPart'            => 'action_mailer/part.php',
             'AkActionMailerQuoting' => 'action_mailer/quoting.php',
-            
+
             // Action Pack
             'AkActionController'            => 'action_pack/action_controller.php',
             'AkActionView'                  => 'action_pack/action_view.php',
@@ -2249,7 +2241,7 @@ class Ak
             'AkSintagsLexer'                => 'action_pack/template_engines/sintags/lexer.php',
             'AkSintagsParser'               => 'action_pack/template_engines/sintags/parser.php',
             'AkXhtmlValidator'              => 'action_pack/xhtml_validator.php',
-            
+
             // Active Record
             'AkActiveRecord'            => 'active_record/active_record.php',
             'AkDbAdapter'               => 'active_record/adapters/base.php',
@@ -2262,10 +2254,10 @@ class Ak
             'AkDbSchemaCache'           => 'active_record/database_schema_cache.php',
             'AkActiveRecordMock'        => 'active_record/mock.php',
             'AkObserver'                => 'active_record/observer.php',
-            
+
             // Active Resource
             'AkHttpClient' => 'active_resource/http_client.php',
-            
+
             // Active Support
             'AkAdodbCache'              => 'active_support/cache/adodb.php',
             'AkCache'                   => 'active_support/cache/base.php',
@@ -2283,6 +2275,7 @@ class Ak
             'AkNumber'                  => 'active_support/core/types/number.php',
             'AkString'                  => 'active_support/core/types/string.php',
             'AkTime'                    => 'active_support/core/types/time.php',
+            'AkCharset'                 => 'active_support/i18n/charset/base.php',
             'AkLocaleManager'           => 'active_support/i18n/locale_manager.php',
             'AkTimeZone'                => 'active_support/i18n/time_zone.php',
             'AkImage'                   => 'active_support/image/base.php',
@@ -2311,12 +2304,13 @@ class Ak
             'AkUnitTestSuite'           => 'active_support/testing/suite.php',
             'AkInflector'               => 'active_support/text/inflector.php',
             'AkLexer'                   => 'active_support/text/lexer.php',
-            
-            
+
+
             'AkActionWebService'        => 'AkActionWebService.php',
             'AkActionWebserviceApi'     => 'AkActionWebService/AkActionWebServiceApi.php',
             'AkActionWebServiceClient'  => 'AkActionWebService/AkActionWebServiceClient.php',
             'AkProfiler'                => 'AkProfiler.php',
+            'AkLogger'                  => 'AkLogger.php',
             );
         }
 
@@ -2336,7 +2330,7 @@ class Ak
         if(isset($paths[$name])){
             include $paths[$name];
         }elseif(file_exists(DS.$name.'.php')){
-                include DS.$name.'.php';
+            include DS.$name.'.php';
         }else{
             Ak::import($name);
         }
@@ -2400,7 +2394,7 @@ function ak_test_case($test_case_name, $show_enviroment_flags = true)
 function ak_compat($function_name)
 {
     if(!function_exists($function_name)){
-        require_once(AK_VENDOR_DIR.DS.'pear'.DS.'PHP'.DS.'Compat'.DS.'Function'.DS.$function_name.'.php');
+        require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'PHP'.DS.'Compat'.DS.'Function'.DS.$function_name.'.php');
     }
 }
 

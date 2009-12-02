@@ -31,12 +31,14 @@ class AkMemcache extends AkObject
     {
         $default_options = array('servers'=>array('localhost:11211'),'lifeTime'=>0);
         $options = array_merge($default_options, $options);
+
         $this->_lifeTime = $options['lifeTime'];
         if (empty($options['servers'])) {
             trigger_error('Need to provide at least 1 server',E_USER_ERROR);
             return false;
         }
         $this->_memcache = new MemCachedClient(is_array($options['servers']) ? $options['servers'] : array($options['servers']));
+
         $ping = $this->_memcache->get('ping');
         if (!$ping) {
             if ($this->_memcache->errno==ERR_NO_SOCKET) {

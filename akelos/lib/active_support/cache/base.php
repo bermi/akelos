@@ -134,6 +134,7 @@ class AkCache extends AkObject
         } else {
             return $false;
         }
+
         $cache_store = new AkCache();
         $cache_store->init($options, $type);
         if ($cache_store->cache_enabled) {

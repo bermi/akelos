@@ -10,10 +10,7 @@
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
-defined('AK_IMAGE_DRIVER') ? null : define('AK_IMAGE_DRIVER', 'GD');
-
-
-require_once(AK_VENDOR_DIR.DS.'pear'.DS.'Image'.DS.'Transform.php');
+require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Image'.DS.'Transform.php');
 
 /**
  * AkImage provides a simple interface for image manipulation within Akelos
@@ -94,11 +91,11 @@ require_once(AK_VENDOR_DIR.DS.'pear'.DS.'Image'.DS.'Transform.php');
 
 class AkImage extends Image_Transform
 {
-    var $image_path;
-    var $Transform;
-    var $filters = array();
+    public $image_path;
+    public $Transform;
+    public $filters = array();
 
-    function AkImage($image_path = null, $tranform_using = AK_IMAGE_DRIVER)
+    public function AkImage($image_path = null, $tranform_using = AK_IMAGE_DRIVER)
     {
         $this->Transform = Image_Transform::factory($tranform_using);
 
@@ -110,13 +107,13 @@ class AkImage extends Image_Transform
         }
     }
 
-    function load($image_path)
+    public function load($image_path)
     {
         $this->image_path = $image_path;
         $this->Transform->load($image_path);
     }
 
-    function save($path = null, $quality = 100, $options = array())
+    public function save($path = null, $quality = 100, $options = array())
     {
         if(!$tmp_image_name = tempnam(AK_TMP_DIR,'ak_image_')){
             trigger_error(Ak::t('Could not create the temporary file %tmp_image_name for apliying changes and saving', array('%tmp_image_name'=>$tmp_image_name)), E_USER_ERROR);
@@ -128,7 +125,7 @@ class AkImage extends Image_Transform
         @unlink($tmp_image_name);
     }
 
-    function transform($transformation, $options = array())
+    public function transform($transformation, $options = array())
     {
         if(!is_array($options)){
             $args = func_get_args();
@@ -141,22 +138,22 @@ class AkImage extends Image_Transform
         $this->applyFilters();
     }
 
-    function getWidth()
+    public function getWidth()
     {
         return $this->Transform->getImageWidth();
     }
 
-    function getHeight()
+    public function getHeight()
     {
         return $this->Transform->getImageHeight();
     }
 
-    function getExtension($path = null)
+    public function getExtension($path = null)
     {
         return substr(strrchr(empty($path) ? $this->image_path : $path, '.'), 1);
     }
 
-    function addFilter($filter_name, $options = array())
+    public function addFilter($filter_name, $options = array())
     {
         if($this->isNativeFiler($filter_name)){
             $this->addNativeFilter($filter_name, $options);
@@ -174,14 +171,14 @@ class AkImage extends Image_Transform
         return false;
     }
 
-    function _filterExists($filter_name)
+    public function _filterExists($filter_name)
     {
         if(class_exists($filter_name)){
             return true;
         }
 
+        $file_name = $this->_getFilterFileName($filter_name);
         $class_name = $this->_getFilterClassName($filter_name);
-        $file_name = AK_LIB_DIR.DS.'AkImage'.DS.'AkImageFilter'.DS.$class_name.'.php';
         $success = true;
         if(!file_exists($file_name)){
             $success = false;
@@ -196,7 +193,7 @@ class AkImage extends Image_Transform
         return $success;
     }
 
-    function _getFilterClassName($filter_name)
+    public function _getFilterClassName($filter_name)
     {
         // We might allow other classes to be created as filters in order to create image filter plugins from outside the framework
         if(!class_exists($filter_name)){
@@ -206,12 +203,17 @@ class AkImage extends Image_Transform
         }
     }
 
-    function _getFilterChainPath($name, $path)
+    public function _getFilterFileName($filter_name)
+    {
+        return AK_LIB_DIR.DS.'active_support'.DS.'image'.DS.'filters'.DS.AkInflector::underscore($filter_name).'.php';
+    }
+
+    public function _getFilterChainPath($name, $path)
     {
         return (empty($path) ? AkConfig::getDir('app').DS.'image_filters' : rtrim($path,DS.'/')).DS.$name.'_filter.php';
     }
 
-    function applyFilters()
+    public function applyFilters()
     {
         foreach (array_keys($this->filters) as $k){
             if(!empty($this->filters[$k]->native_filter_constant)){
@@ -222,14 +224,14 @@ class AkImage extends Image_Transform
         }
     }
 
-    function saveFilterChain($name, $filter_chain = null, $filters_directory = null, $options = array())
+    public function saveFilterChain($name, $filter_chain = null, $filters_directory = null, $options = array())
     {
         $path = $this->_getFilterChainPath($name, $filters_directory);
         $filter_chain = empty($filter_chain) ? $this->getFilterChain() : $filter_chain;
         return Ak::file_put_contents($path, '<?php $filter_chain = '.var_export($filter_chain, true).'; ?>', $options);
     }
 
-    function getFilterChain()
+    public function getFilterChain()
     {
         $filter_chain = array();
         foreach (array_keys($this->filters) as $k){
@@ -238,20 +240,20 @@ class AkImage extends Image_Transform
         return $filter_chain;
     }
 
-    function setFilterChain($filter_chain)
+    public function setFilterChain($filter_chain)
     {
         $this->filters = array();
         $this->appendFilterChain($filter_chain);
     }
 
-    function appendFilterChain($filter_chain)
+    public function appendFilterChain($filter_chain)
     {
         foreach ($filter_chain as $filter){
             $this->addFilter($filter['name'],$filter['options']);
         }
     }
 
-    function loadFilterChain($name, $filters_directory = null)
+    public function loadFilterChain($name, $filters_directory = null)
     {
         $path = $this->_getFilterChainPath($name, $filters_directory);
         $success = file_exists($path);
@@ -262,18 +264,18 @@ class AkImage extends Image_Transform
         $this->setFilterChain($filter_chain);
     }
 
-    function applyFilterChain($name, $filters_directory = null)
+    public function applyFilterChain($name, $filters_directory = null)
     {
         $this->loadFilterChain($name, $filters_directory);
         $this->applyFilters();
     }
 
-    function isNativeFiler($filter_name)
+    public function isNativeFiler($filter_name)
     {
         return $this->getNativeFilerConstant($filter_name) != false;
     }
 
-    function addNativeFilter($filter_name, $params = array())
+    public function addNativeFilter($filter_name, $params = array())
     {
         $filter = new stdClass();
         if($filter->native_filter_constant = $this->getNativeFilerConstant($filter_name)){
@@ -284,7 +286,7 @@ class AkImage extends Image_Transform
         }
     }
 
-    function getNativeFilerConstant($filter_name)
+    public function getNativeFilerConstant($filter_name)
     {
         $filter_name = AkInflector::underscore($filter_name);
         $native_filters = array(
@@ -310,5 +312,3 @@ class AkImage extends Image_Transform
         return isset($native_filters[$filter_name]) ? (defined($native_filters[$filter_name]) ? $native_filters[$filter_name] : false) : false;
     }
 }
-
-?>

@@ -465,7 +465,7 @@ class AkCharset
             return $string;
         }
         if($origin_charset=='utf8'){
-            include_once(AK_LIB_DIR.DS.'AkCharset'.DS.'utf8_mappings'.DS.$target_charset.'.php');
+            require_once(AK_LIB_DIR.DS.'active_support'.DS.'i18n'.DS.'charset'.DS.'utf8_mappings'.DS.$target_charset.'.php');
             if(class_exists($target_charset)){
 
                 $mappingObject =& Ak::singleton($target_charset, $target_charset);
@@ -479,7 +479,7 @@ class AkCharset
                 return $string;
             }
         }elseif($target_charset=='utf8'){
-            include_once(AK_LIB_DIR.DS.'AkCharset'.DS.'utf8_mappings'.DS.$origin_charset.'.php');
+            require_once(AK_LIB_DIR.DS.'active_support'.DS.'i18n'.DS.'charset'.DS.'utf8_mappings'.DS.$origin_charset.'.php');
             if(class_exists($origin_charset)){
                 $mappingObject =& Ak::singleton($origin_charset, $origin_charset);
                 if(method_exists($mappingObject,'_Utf8StringEncode')){

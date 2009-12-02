@@ -2,30 +2,29 @@
 
 class AkType extends AkObject
 {
-    public 
+    public
     $value;
-    
+
     public function __construct($value)
     {
         $this->value = $value;
-        require_once('AkInflector.php');
     }
-    
+
     public function toString()
     {
         return $this->value.'';
     }
-    
+
     public function getValue()
     {
         return $this->value;
     }
-    
+
     public function inspect()
     {
         return var_export($this->value, true);
     }
-    
+
     public function blank()
     {
         return empty($this->value);
@@ -59,8 +58,8 @@ function &AkT($param,$command=null)
                 $args = preg_split('/\s*,\s*/',trim($matches[2],'()'));
             }
             if (method_exists($obj,$item)) {
-                
-                
+
+
                 if (empty($args)) {
                     $obj = $obj->$item();
                 } else {
@@ -70,7 +69,7 @@ function &AkT($param,$command=null)
             } else {
                 $prepend = $item.$prepend;
             }
-            
+
         }
         if (is_object($obj) && method_exists($obj,'getValue')) {
             $obj = $obj->getValue();

@@ -96,13 +96,13 @@ class AkSession extends AkObject
                 $this->sessions_enabled = false; // Use PHP session handling
                 break;
             case 2:
-                require_once(AK_LIB_DIR.'/AkCache/AkAdodbCache.php');
+                require_once(AK_LIB_DIR.DS.'active_support'.DS.'cache'.DS.'adodb.php');
                 $this->_driverInstance = new AkAdodbCache();
                 $res = $this->_driverInstance->init($options);
                 $this->sessions_enabled = $res;
                 break;
             case 3:
-                require_once(AK_LIB_DIR.'/AkCache/AkMemcache.php');
+                require_once(AK_LIB_DIR.DS.'active_support'.DS.'cache'.DS.'memcache.php');
                 $this->_driverInstance = new AkMemcache();
                 $res = $this->_driverInstance->init($options);
                 $this->sessions_enabled = $res;

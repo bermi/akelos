@@ -16,7 +16,9 @@ $session_settings = Ak::getSettings('sessions',false);
 if ($session_handler !== null) {
     $session_settings['handler']['type'] = (int)$session_handler;
 }
+
 $SessionHandler = AkSession::lookupStore($session_settings);
+
 session_start();
 
 if(isset($_GET['key']) && isset($_GET['value'])){

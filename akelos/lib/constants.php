@@ -267,6 +267,7 @@ defined('AK_DEFAULT_CONTROLLER')        || define('AK_DEFAULT_CONTROLLER', 'page
 defined('AK_DEFAULT_ACTION')            || define('AK_DEFAULT_ACTION', 'index');
 defined('AK_AUTOMATIC_SESSION_START')   || define('AK_AUTOMATIC_SESSION_START', !AK_HIGH_LOAD_MODE);
 
+defined('AK_IMAGE_DRIVER')              || define('AK_IMAGE_DRIVER', 'GD');
 
 // IIS does not provide a valid REQUEST_URI so we need to guess it from the script name + query string
 $_SERVER['REQUEST_URI'] = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_NAME'].(( isset($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '')));
