@@ -196,4 +196,3 @@ class AkMongoDbAdapter extends AkDbAdapter
     }
 }
 
-?>

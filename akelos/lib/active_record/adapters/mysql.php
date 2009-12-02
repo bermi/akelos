@@ -84,4 +84,3 @@ class AkMysqlDbAdapter extends AkDbAdapter
     }
 }
 
-?>

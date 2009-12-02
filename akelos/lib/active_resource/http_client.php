@@ -5,8 +5,8 @@
 // +----------------------------------------------------------------------+
 
 /**
- * @package ActionWebservice
- * @subpackage WebClient
+ * @package ActiveResource
+ * @subpackage HttpClient
  * @author Bermi Ferrer
  */
 

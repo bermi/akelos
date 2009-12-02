@@ -43,6 +43,5 @@ class AkPgsqlDbAdapter extends AkDbAdapter
     {
         return "'".pg_escape_string($this->connection->_connectionID,$value)."'";
     }
-
 }
-?>
+
