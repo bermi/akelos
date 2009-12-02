@@ -255,6 +255,7 @@ defined('AK_ACTION_MAILER_EMULATE_IMAP_8_BIT')              || define('AK_ACTION
 defined('AK_ACTION_MAILER_DEFAULT_CHARSET')                 || define('AK_ACTION_MAILER_DEFAULT_CHARSET', AK_CHARSET);
 defined('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION')        || define('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION', '([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)');
 defined('AK_ACTION_MAILER_EMULATE_IMAP_8_BIT')              || define('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION', '([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)');
+defined('AK_CLASS_EXTENDER_ENABLE_CACHE')                   || define('AK_CLASS_EXTENDER_ENABLE_CACHE', !AK_DEV_MODE);
 
 
 defined('OPTIONAL')                     || define('OPTIONAL',   false);
@@ -265,6 +266,7 @@ defined('AK_URL_REWRITE_ENABLED')       || define('AK_URL_REWRITE_ENABLED',    t
 defined('AK_DEFAULT_CONTROLLER')        || define('AK_DEFAULT_CONTROLLER', 'page');
 defined('AK_DEFAULT_ACTION')            || define('AK_DEFAULT_ACTION', 'index');
 defined('AK_AUTOMATIC_SESSION_START')   || define('AK_AUTOMATIC_SESSION_START', !AK_HIGH_LOAD_MODE);
+
 
 // IIS does not provide a valid REQUEST_URI so we need to guess it from the script name + query string
 $_SERVER['REQUEST_URI'] = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_NAME'].(( isset($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '')));

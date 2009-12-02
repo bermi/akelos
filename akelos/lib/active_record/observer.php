@@ -6,7 +6,7 @@
 
 /**
  * @package ActiveRecord
- * @subpackage Base
+ * @subpackage ModelObserver
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 

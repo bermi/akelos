@@ -83,9 +83,6 @@
  */
 class AkActsAsTree extends AkObserver
 {
-
-
-
     /**
     * Configuration options are:
     *

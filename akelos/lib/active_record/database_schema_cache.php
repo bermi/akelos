@@ -6,8 +6,7 @@
 
 /**
  * @package ActiveRecord
- * @subpackage Base
- * @component DbSchemaCache
+ * @subpackage DatabaseReflection
  * @author Arno Schneider <arno a.t bermilabs c.om>
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org

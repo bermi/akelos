@@ -6,8 +6,7 @@
 
 /**
  * @package ActiveRecord
- * @subpackage Base
- * @component DbAdapter SQLite
+ * @subpackage DatabaseAdapters
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  * @author Kaste
  * @author Arno Schneider <arno a.t bermilabs c.om>

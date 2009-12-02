@@ -1,7 +1,5 @@
 <?php
 
-
-defined('AK_CLASS_EXTENDER_ENABLE_CACHE') ? null : define('AK_CLASS_EXTENDER_ENABLE_CACHE', !AK_DEV_MODE);
 /**
  * @ WARNING too experimental. This is a proof of concept. Do not use it for production.
  * 

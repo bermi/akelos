@@ -6,7 +6,7 @@
 
 /**
  * @package ActiveRecord
- * @subpackage Base
+ * @subpackage Associations
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  * @author Arno Schneider <arno a.t bermilabs c.om>
  */

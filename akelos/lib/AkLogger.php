@@ -12,95 +12,91 @@
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
-require_once(AK_LIB_DIR.DS.'Ak.php');
-
-defined('AK_LOG_DIR') ? null : define('AK_LOG_DIR', AK_BASE_DIR.DS.'log');
+defined('AK_LOG_DIR') || define('AK_LOG_DIR', AK_BASE_DIR.DS.'log');
 
 // Default mail logger settings
-defined('AK_LOGER_DEFAULT_MAIL_DESTINATION')    ? null : define('AK_LOGER_DEFAULT_MAIL_DESTINATION', false);
-defined('AK_LOGER_DEFAULT_MAIL_SENDER')         ? null : define('AK_LOGER_DEFAULT_MAIL_SENDER', AK_HOST);
-defined('AK_LOGER_DEFAULT_MAIL_SUBJECT')        ? null : define('AK_LOGER_DEFAULT_MAIL_SUBJECT', 'Log message');
-
-// Default file logger settings
-defined('AK_LOGER_DEFAULT_LOG_FILE')            ? null : define('AK_LOGER_DEFAULT_LOG_FILE', AK_LOG_DIR.DS.AK_ENVIRONMENT.'.log');
+defined('AK_LOGER_DEFAULT_MAIL_DESTINATION') || define('AK_LOGER_DEFAULT_MAIL_DESTINATION', false);
+defined('AK_LOGER_DEFAULT_MAIL_SENDER')      || define('AK_LOGER_DEFAULT_MAIL_SENDER', AK_HOST);
+defined('AK_LOGER_DEFAULT_MAIL_SUBJECT')     || define('AK_LOGER_DEFAULT_MAIL_SUBJECT', 'Log message');
+                                             
+// Default file logger settings              
+defined('AK_LOGER_DEFAULT_LOG_FILE')         || define('AK_LOGER_DEFAULT_LOG_FILE', AK_LOG_DIR.DS.AK_ENVIRONMENT.'.log');
 
 // Loggin events for log types
-defined('AK_LOGGER_DEBUG')      ? null : define('AK_LOGGER_DEBUG',      AK_MODE_FILE    | AK_MODE_DISPLAY);
-defined('AK_LOGGER_INFO')       ? null : define('AK_LOGGER_INFO',       AK_MODE_DISPLAY);
-defined('AK_LOGGER_MESSAGE')    ? null : define('AK_LOGGER_MESSAGE',    AK_MODE_FILE);
-defined('AK_LOGGER_NOTICE')     ? null : define('AK_LOGGER_NOTICE',     AK_MODE_DISPLAY | AK_MODE_FILE | AK_MODE_DIE);
-defined('AK_LOGGER_WARNING')    ? null : define('AK_LOGGER_WARNING',    AK_MODE_DISPLAY | AK_MODE_FILE | AK_MODE_DIE);
-defined('AK_LOGGER_ERROR')      ? null : define('AK_LOGGER_ERROR',      AK_MODE_DISPLAY | AK_MODE_FILE | AK_MODE_DIE);
-defined('AK_LOGGER_CRITICAL')   ? null : define('AK_LOGGER_CRITICAL',   AK_MODE_FILE    | AK_MODE_DIE);
-
+defined('AK_LOGGER_DEBUG')        || define('AK_LOGGER_DEBUG',      AK_MODE_FILE    | AK_MODE_DISPLAY);
+defined('AK_LOGGER_INFO')         || define('AK_LOGGER_INFO',       AK_MODE_DISPLAY);
+defined('AK_LOGGER_MESSAGE')      || define('AK_LOGGER_MESSAGE',    AK_MODE_FILE);
+defined('AK_LOGGER_NOTICE')       || define('AK_LOGGER_NOTICE',     AK_MODE_DISPLAY | AK_MODE_FILE | AK_MODE_DIE);
+defined('AK_LOGGER_WARNING')      || define('AK_LOGGER_WARNING',    AK_MODE_DISPLAY | AK_MODE_FILE | AK_MODE_DIE);
+defined('AK_LOGGER_ERROR')        || define('AK_LOGGER_ERROR',      AK_MODE_DISPLAY | AK_MODE_FILE | AK_MODE_DIE);
+defined('AK_LOGGER_CRITICAL')     || define('AK_LOGGER_CRITICAL',   AK_MODE_FILE    | AK_MODE_DIE);
 // Error loggin settings
-defined('AK_LOG_'.E_USER_ERROR)     ? null : define('AK_LOG_'.E_USER_ERROR, AK_MODE_FILE | AK_MODE_DIE);
-defined('AK_LOG_'.E_USER_WARNING)   ? null : define('AK_LOG_'.E_USER_WARNING, AK_MODE_DISPLAY | AK_MODE_FILE | AK_MODE_DIE);
-defined('AK_LOG_'.E_USER_NOTICE)    ? null : define('AK_LOG_'.E_USER_NOTICE, AK_MODE_DISPLAY | AK_MODE_FILE | AK_MODE_DIE);
-defined('AK_LOG_'.E_WARNING)        ? null : define('AK_LOG_'.E_WARNING, AK_MODE_FILE);
-defined('AK_LOG_'.E_NOTICE)         ? null : define('AK_LOG_'.E_NOTICE, AK_MODE_FILE);
-
-defined('AK_LOG_ENABLE_COLORING') ? null : define('AK_LOG_ENABLE_COLORING', true);
+defined('AK_LOG_'.E_USER_ERROR)   || define('AK_LOG_'.E_USER_ERROR, AK_MODE_FILE | AK_MODE_DIE);
+defined('AK_LOG_'.E_USER_WARNING) || define('AK_LOG_'.E_USER_WARNING, AK_MODE_DISPLAY | AK_MODE_FILE | AK_MODE_DIE);
+defined('AK_LOG_'.E_USER_NOTICE)  || define('AK_LOG_'.E_USER_NOTICE, AK_MODE_DISPLAY | AK_MODE_FILE | AK_MODE_DIE);
+defined('AK_LOG_'.E_WARNING)      || define('AK_LOG_'.E_WARNING, AK_MODE_FILE);
+defined('AK_LOG_'.E_NOTICE)       || define('AK_LOG_'.E_NOTICE, AK_MODE_FILE);
+defined('AK_LOG_ENABLE_COLORING') || define('AK_LOG_ENABLE_COLORING', true);
 
 class AkLogger
 {
-    var $_log_params                = array();
-    var $print_display_message      = true;
-    var $extended_details           = false;
-    var $default_mail_destination   = AK_LOGER_DEFAULT_MAIL_DESTINATION;
-    var $default_mail_sender        = AK_LOGER_DEFAULT_MAIL_SENDER;
-    var $default_mail_subject       = AK_LOGER_DEFAULT_MAIL_SUBJECT;
-    var $error_file                 = AK_LOGER_DEFAULT_LOG_FILE;
-    var $log_type;
+    public $_log_params                = array();
+    public $print_display_message      = true;
+    public $extended_details           = false;
+    public $default_mail_destination   = AK_LOGER_DEFAULT_MAIL_DESTINATION;
+    public $default_mail_sender        = AK_LOGER_DEFAULT_MAIL_SENDER;
+    public $default_mail_subject       = AK_LOGER_DEFAULT_MAIL_SUBJECT;
+    public $error_file                 = AK_LOGER_DEFAULT_LOG_FILE;
+    public $log_type;
 
-    function AkLogger($mode = AK_LOGGER_MESSAGE)
+    public function AkLogger($mode = AK_LOGGER_MESSAGE)
     {
         $this->default_log_settings = $mode;
     }
 
-    function log($type, $message, $vars = array(), $event_code = null)
+    public function log($type, $message, $vars = array(), $event_code = null)
     {
         $type = strtoupper($type);
         $event_code = empty ($event_code) ? (defined('AK_LOGGER_'.$type) ? 'AK_LOGGER_'.$type : AK_LOGGER_INFO) : $event_code;
         $this->_log($type, $message, $vars, $event_code);
     }
 
-    function debug($message, $vars = array(), $event_code = null)
+    public function debug($message, $vars = array(), $event_code = null)
     {
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    function info($message, $vars = array(), $event_code = null)
+    public function info($message, $vars = array(), $event_code = null)
     {
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    function message($message, $vars = array(), $event_code = null)
+    public function message($message, $vars = array(), $event_code = null)
     {
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    function notice($message, $vars = array(), $event_code = null)
+    public function notice($message, $vars = array(), $event_code = null)
     {
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    function warning($message, $vars = array(), $event_code = null)
+    public function warning($message, $vars = array(), $event_code = null)
     {
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    function error($message, $vars = array(), $event_code = null)
+    public function error($message, $vars = array(), $event_code = null)
     {
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    function critical($message, $vars = array(), $event_code = null)
+    public function critical($message, $vars = array(), $event_code = null)
     {
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    function _log($error_mode, $error_message, $vars=array(), $event_code = null)
+    public function _log($error_mode, $error_message, $vars=array(), $event_code = null)
     {
         $this->setLogParams($vars);
         $this->mode = defined('AK_LOG_'.$error_mode) ? constant('AK_LOG_'.$error_mode) : $this->default_log_settings;
@@ -112,7 +108,7 @@ class AkLogger
         $this->mode & AK_MODE_DIE ? exit : null;
     }
 
-    function _displayLog($type, $error_mode, $error_message)
+    public function _displayLog($type, $error_mode, $error_message)
     {
         $message = $this->_getLogFormatedAsHtml($type, $error_mode, $error_message);
         if($this->print_display_message){
@@ -120,7 +116,7 @@ class AkLogger
         }
         return $message;
     }
-    function _mailLog($type, $error_mode, $error_message)
+    public function _mailLog($type, $error_mode, $error_message)
     {
         if(!empty($this->default_mail_destination)){
             $message = $this->_getLogFormatedAsString($type, $error_mode, $error_message);
@@ -128,7 +124,7 @@ class AkLogger
             Ak::mail($this->default_mail_sender, $this->default_mail_destination, $this->default_mail_subject, $message);
         }
     }
-    function _appendLogToFile($type, $error_mode, $error_message)
+    public function _appendLogToFile($type, $error_mode, $error_message)
     {
         $filename = $this->error_file;
         if(!is_writable($filename)){
@@ -153,7 +149,7 @@ class AkLogger
         @fclose($fp);
     }
 
-    function _saveLogInDatabase($type, $error_mode, $error_message)
+    public function _saveLogInDatabase($type, $error_mode, $error_message)
     {
         $db =& Ak::db();
         $message = $this->_getLogFormatedAsRawText($type, $error_mode, $error_message);
@@ -165,7 +161,7 @@ class AkLogger
         }
     }
 
-    function _getLogFormatedAsHtml($type, $error_mode, $error_message)
+    public function _getLogFormatedAsHtml($type, $error_mode, $error_message)
     {
         $error_type = $error_mode ? 'error' : 'info';
         $message = "\n<div id='logger_$error_type'>\n<p>".$this->t(ucfirst($error_type)).": [$error_mode] - $error_message</p>\n";
@@ -176,7 +172,7 @@ class AkLogger
         }
         return empty($details) ? $message.'</div>' : $message."<ul>\n$details\n</ul>\n</div>";
     }
-    function _walkParams($params)
+    public function _walkParams($params)
     {
         $return = '';
         foreach ($params as $k=>$v){
@@ -188,7 +184,7 @@ class AkLogger
             }
             return $return;
     }
-    function _getLogFormatedAsString($type, $error_mode, $error_message, $serialized = false)
+    public function _getLogFormatedAsString($type, $error_mode, $error_message, $serialized = false)
     {
         $message = date('r')."\t[$error_mode]\t$error_message";
         $params = array_merge($this->_log_params, ($this->extended_details ? array('remote_address'=>$_SERVER['REMOTE_ADDR'], 'browser'=>$_SERVER['HTTP_USER_AGENT']) : array() ));
@@ -203,34 +199,34 @@ class AkLogger
         return $message;
     }
 
-    function _getLogFormatedAsRawText($type, $error_mode, $error_message)
+    public function _getLogFormatedAsRawText($type, $error_mode, $error_message)
     {
         return $this->_getLogFormatedAsString($type, $error_mode, $error_message, $filename, $line_number, true);
     }
 
 
-    function setLogParams($log_params)
+    public function setLogParams($log_params)
     {
         $this->_log_params = $log_params;
     }
 
-    function getLogParams()
+    public function getLogParams()
     {
         return is_array($this->_log_params) ? $this->_log_params : array();
     }
 
 
-    function internalError($message, $file, $line)
+    public function internalError($message, $file, $line)
     {
         return "<div id='internalError'><p><b>Error:</b> [internal] - $message<br /><b>File:</b> $file at line $line</p></div>";
     }
 
-    function t($string, $array = null)
+    public function t($string, $array = null)
     {
         return Ak::t($string, $array, 'error');
     }
 
-    function formatText($text, $color = 'normal')
+    public function formatText($text, $color = 'normal')
     {
         if(!AK_LOG_ENABLE_COLORING){
             return $text;
@@ -260,4 +256,3 @@ class AkLogger
     }
 }
 
-?>

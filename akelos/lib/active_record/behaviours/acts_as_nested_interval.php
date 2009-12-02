@@ -10,7 +10,6 @@
  * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 
-require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkObserver.php');
 
 class AkActsAsNestedInterval extends AkObserver
 {
