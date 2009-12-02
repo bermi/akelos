@@ -123,7 +123,7 @@ class AkDbAdapter extends AkObject
             $designated_database = strtolower($database_specifications['type']);
             if (in_array($designated_database, $available_adapters)) {
                 $class_name = 'Ak'.ucfirst($designated_database).'DbAdapter';
-                require_once(AK_LIB_DIR.DS.'AkActiveRecord'.DS.'AkDbAdapters'.DS.$class_name.'.php');
+                require_once(AK_LIB_DIR.DS.'active_record'.DS.'adapters'.DS.AkInflector::underscore($designated_database).'.php');
             }
             $Connection = new $class_name($database_specifications, $auto_connect);
 

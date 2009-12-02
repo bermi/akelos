@@ -108,12 +108,12 @@ class FileHandling_TestCase extends ActiveSupportUnitTest
 
     public function test_should_read_files_using_scoped_file_get_contents_function()
     {
-        $this->assertEqual(Ak::file_get_contents(AK_LIB_DIR.DS.'AkActiveRecord.php'), file_get_contents(AK_LIB_DIR.DS.'AkActiveRecord.php'));
+        $this->assertEqual(Ak::file_get_contents(AK_LIB_DIR.DS.'active_record'.DS.'active_record.php'), file_get_contents(AK_LIB_DIR.DS.'active_record'.DS.'active_record.php'));
     }
 
     public function test_dir_should_not_recurse_when_set_to_false()
     {
-        $files_and_dirs = Ak::dir(AK_LIB_DIR.DS.'AkActionView', array('dirs' => true, 'recurse' => false));
+        $files_and_dirs = Ak::dir(AK_LIB_DIR, array('dirs' => true, 'recurse' => false));
         foreach ($files_and_dirs as $k=>$file_or_dir){
             if(is_array($file_or_dir)){
                 $this->assertEqual(count($files_and_dirs[$k]), 1);

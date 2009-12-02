@@ -13,8 +13,6 @@
 
 class AkActsAsNestedInterval extends AkObserver
 {
-
-
     /**
       *  This act implements a nested-interval tree. You can find all descendants or all
       *  ancestors with just one select query. You can insert and delete records without

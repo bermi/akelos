@@ -237,10 +237,11 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
 
     public function Test_of_binary_data_on_database()
     {
-        $long_string = file_get_contents(AK_LIB_DIR.DS.'AkActiveRecord.php');
+        $ar_path = AK_LIB_DIR.DS.'active_record'.DS.'active_record.php';
+        $long_string = file_get_contents($ar_path);
 
-        $_tmp_file = fopen(AK_LIB_DIR.DS.'AkActiveRecord.php', "rb");
-        $binary_data = fread($_tmp_file, fileSize(AK_LIB_DIR.DS.'AkActiveRecord.php'));
+        $_tmp_file = fopen($ar_path, "rb");
+        $binary_data = fread($_tmp_file, fileSize($ar_path));
 
         $i = 1;
 
