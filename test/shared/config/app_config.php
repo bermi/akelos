@@ -7,11 +7,10 @@ defined('AK_LOG_EVENTS')    ||  define('AK_LOG_EVENTS',     true);
 
 defined('DS')                   || define('DS',                     DIRECTORY_SEPARATOR);
 defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       AK_BASE_DIR.DS.'akelos');
-defined('AK_LIB_DIR')           || define('AK_LIB_DIR',             AK_FRAMEWORK_DIR.DS.'lib');
 defined('AK_TESTING_NAMESPACE') || define('AK_TESTING_NAMESPACE',   'akelos');
 
-include_once AK_LIB_DIR.DS.'active_support'.DS.'base.php';
-include_once AK_LIB_DIR.DS.'active_support'.DS.'constants.php';
+include_once AK_FRAMEWORK_DIR.DS.'active_support'.DS.'base.php';
+include_once AK_FRAMEWORK_DIR.DS.'active_support'.DS.'constants.php';
 
 if(!file_exists(AK_CONFIG_DIR.DS.'database.yml')){
     file_put_contents(AK_CONFIG_DIR.DS.'database.yml', 'default:
