@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage ImageManipulation
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Image'.DS.'Transform.php');
 
 /**

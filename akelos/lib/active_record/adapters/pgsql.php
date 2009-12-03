@@ -1,18 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveRecord
- * @subpackage DatabaseAdapters
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @author Kaste
- * @author Arno Schneider <arno a.t bermilabs c.om>
- * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
- */
-
 class AkPgsqlDbAdapter extends AkDbAdapter
 {
 

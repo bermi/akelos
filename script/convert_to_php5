@@ -5,5 +5,5 @@
 
 defined('AK_LIB_DIR')   || define('AK_LIB_DIR', 'akelos/lib');
 defined('DS')           || define('DS', DIRECTORY_SEPARATOR);
-require_once(AK_LIB_DIR.DS.'utils'.DS.'scripts'.DS.'convert_to_php5.php');
+require_once(AK_LIB_DIR.DS.'active_support'.DS.'utils'.DS.'scripts'.DS.'convert_to_php5.php');
 

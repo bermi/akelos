@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Helpers
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
-
 
 /**
  * Provides methods for linking a HTML page together with other assets, such as javascripts, stylesheets, and feeds.

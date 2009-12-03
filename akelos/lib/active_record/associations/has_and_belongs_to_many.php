@@ -1,17 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveRecord
- * @subpackage Associations
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @author Kaste
- * @author Arno Schneider <arno a.t bermilabs c.om>
- */
-
 
 /**
 * Associates two classes via an intermediate join table.  Unless the join table is explicitly specified as

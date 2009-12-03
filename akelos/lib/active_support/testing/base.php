@@ -1,21 +1,10 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage Testing
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
-require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'unit_tester.php');
-require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'mock_objects.php');
-require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'reporter.php');
-require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'web_tester.php');
-require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'extensions'.DS.'junit_xml_reporter.php');
-//require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'code_coverage.php');
+require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'unit_tester.php');
+require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'mock_objects.php');
+require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'reporter.php');
+require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'web_tester.php');
+require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'extensions'.DS.'junit_xml_reporter.php');
 
 class AkUnitTest extends UnitTestCase
 {

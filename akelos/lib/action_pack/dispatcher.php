@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Dispatcher
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
-
 /**
  * This class provides an interface for dispatching a request
  * to the appropriate controller and action.

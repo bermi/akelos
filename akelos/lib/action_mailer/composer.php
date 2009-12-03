@@ -1,16 +1,6 @@
 <?php
 
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionMailer
- * @subpackage Composer
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 class AkMailComposer extends AkObject
 {
     public $Message;

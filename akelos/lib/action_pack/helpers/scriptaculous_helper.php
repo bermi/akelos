@@ -1,17 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Helpers
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
-
-
 /**
 * Provides a set of helpers for calling Scriptaculous JavaScript 
 * functions, including those which create Ajax controls and visual effects.

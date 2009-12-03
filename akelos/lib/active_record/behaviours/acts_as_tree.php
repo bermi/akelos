@@ -1,24 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-// | Acts as Tree                                                         |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 2006, Raw Ideas Pty Ltd & Niels Ganser                 |
-// | Released under the GNU Lesser General Public License, see LICENSE.txt|
-// | If the Akelos Framework License is changed to another one as or less |
-// | restrictive as the LGPL, permission is granted to also re-license    |
-// | this file.                                                           |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveRecord
- * @subpackage Behaviours
- * @author Niels Ganser <ng a.t depoll d.e>
- * @copyright Copyright (c) 2006, Raw Ideas Pty Ltd
- */
-
 /**
  * acts_as_tree
  *

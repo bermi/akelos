@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
-* @package ActiveRecord
-* @subpackage Behaviours
-* @author Bermi Ferrer <bermi a.t bermilabs c.om>
-*/
-
 /**
 * This act provides the capabilities for sorting and reordering a number of objects in list.
 * The class that has this specified needs to have a "position" column defined as an integer on

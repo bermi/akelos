@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
-* @package ActiveRecord
-* @subpackage Behaviours
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @author Jean-Christophe Michel, Symétrie
- */
-
 class AkActsAsNestedSet extends AkObserver
 {
 

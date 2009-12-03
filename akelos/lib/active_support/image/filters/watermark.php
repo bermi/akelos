@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos PHP Framework - http://www.akelos.org                         |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage ImageManipulation
- * @author Bermi Ferrer
- */
-
 /**
  * Crop filter
  *
@@ -39,7 +29,7 @@ class AkImageWatermarkFilter extends AkImageFilter
 {
     public function setOptions($options = array())
     {
-        require_once(AK_VENDOR_DIR.DS.'pear'.DS.'Image'.DS.'Tools.php');
+        require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Image'.DS.'Tools.php');
         $this->Image->Transform =& Image_Tools::factory('Watermark');
 
         $default_options = array(

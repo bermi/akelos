@@ -1,17 +1,7 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage Compatibility
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
-defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION') || define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
-defined('AK_FTP_SHOW_ERRORS') || define('AK_FTP_SHOW_ERRORS', true);
+defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION')  || define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
+defined('AK_FTP_SHOW_ERRORS')                   || define('AK_FTP_SHOW_ERRORS', true);
 
 class AkFtp
 {

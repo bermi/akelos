@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-
-/**
- * @package ActionPack
- * @subpackage CacheSweeping
- * @author Arno Schneider
- */
-
 /**
  * Cache Sweepers need to be stored under:
  * 

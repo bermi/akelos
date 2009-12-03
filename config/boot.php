@@ -21,8 +21,6 @@ defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       AK_BASE_DIR.
 defined('AK_LIB_DIR')           || define('AK_LIB_DIR',             AK_FRAMEWORK_DIR.DS.'lib');
 defined('AK_TESTING_NAMESPACE') || define('AK_TESTING_NAMESPACE',   'akelos');
 
-include AK_LIB_DIR.DS.'Ak.php';
-include AK_LIB_DIR.DS.'constants.php';
+include AK_LIB_DIR.DS.'active_support'.DS.'base.php';
+include AK_LIB_DIR.DS.'active_support'.DS.'constants.php';
 
-
-//AK_PRODUCTION_MODE || include AK_LIB_DIR.DS.'AkDevelopmentErrorHandler.php';

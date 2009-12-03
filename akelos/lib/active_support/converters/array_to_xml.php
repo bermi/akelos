@@ -1,14 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage Converters
- */
-
 class AkArrayToXml
 {
     public function convert($options)

@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionView
- * @subpackage ActionPack
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
-
 /**
 * Provides a number of methods for creating form tags that doesn't rely on conventions with an object assigned to the template like
 * FormHelper does. With the FormTagHelper, you provide the names and values yourself.

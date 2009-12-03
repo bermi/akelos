@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Helpers
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 /**
 * Provides a set of methods for working with forms and especially forms related to objects assigned to the template.
 * The following is an example of a complete form for a person object that works for both creates and updates built

@@ -1,8 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
 
 /**
 * Author Markus Baker: http://www.lastcraft.com
@@ -10,8 +7,6 @@
 * For an intro to the Lexer see:
 * http://www.phppatterns.com/index.php/article/articleview/106/1/2/
 * @author Marcus Baker
-* @package ActiveSupport
-* @subpackage GenericParser
 */
 
 /**#@+

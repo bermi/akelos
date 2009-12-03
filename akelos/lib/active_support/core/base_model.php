@@ -1,23 +1,10 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage BaseModel
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 /**
  * This is the base class for all sort of models (Mailers or Active records)
  * It handles the naming conventions for models.
  *
  * See also <AkActiveRecord> and <AkActionMailer> as those are the ones you will usually inherit from
-*
-* @author Bermi Ferrer <bermi a.t bermilabs c.om>
-* @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
 */
 class AkBaseModel extends AkObject
 {

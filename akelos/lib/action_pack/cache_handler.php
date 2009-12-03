@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-
-/**
- * @package ActionPack
- * @subpackage Caching
- * @author Arno Schneider
- */
-
 /**
  * Akelos supports three types of caching:
  *

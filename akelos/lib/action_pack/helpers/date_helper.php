@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Helpers
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
-
 /**
 * The Date Helper primarily creates select/option tags for different kinds of dates and date elements. All of the select-type methods
 * share a number of common options that are as follows:

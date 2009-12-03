@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Sintags
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 class AkSintagsLexer extends AkLexer
 {
     public $_SINTAGS_REMOVE_PHP_SILENTLY = AK_SINTAGS_REMOVE_PHP_SILENTLY;

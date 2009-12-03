@@ -1,16 +1,5 @@
 <?php
-
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Helpers
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
-            
+    
 class PaginationHelper extends AkActionViewHelper
 {
     public function sortable_link($column, $url_options = array(), $link_options = array())

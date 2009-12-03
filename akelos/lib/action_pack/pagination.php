@@ -1,14 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Paginator
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
 
 require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'HTML'.DS.'Pager'.DS.'Pager.php');
 require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'HTML'.DS.'Pager'.DS.'Common.php');

@@ -1,17 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * Native PHP URL rewriting for the Akelos Framework.
- *
- * @package ActionPack
- * @subpackage Router
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 
 /**
 * Native PHP URL rewriting for the Akelos Framework
@@ -629,13 +617,6 @@ class AkRouter extends AkObject
         if(defined('AK_URL_REWRITE_ENABLED')){
             $result = AK_URL_REWRITE_ENABLED;
             return AK_URL_REWRITE_ENABLED;
-        }
-        if(AK_DESKTOP){
-            if(!defined('AK_URL_REWRITE_ENABLED')){
-                define('AK_URL_REWRITE_ENABLED',false);
-                $result = AK_URL_REWRITE_ENABLED;
-                return false;
-            }
         }
         if(defined('AK_ENABLE_URL_REWRITE') && AK_ENABLE_URL_REWRITE == false){
             if(!defined('AK_URL_REWRITE_ENABLED')){

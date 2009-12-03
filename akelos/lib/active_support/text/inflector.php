@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage Inflector
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 /**
 * AkInflector for pluralize and singularize English nouns.
 *

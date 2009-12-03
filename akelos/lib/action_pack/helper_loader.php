@@ -1,12 +1,6 @@
 <?php
 
 /**
- * @package ActionPack
- * @subpackage HelperLoader
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
-/**
  * Helpers are normally loaded in the context of a controller call, but some
  * times they might be useful in Mailers, Comand line tools or for unit testing
  *

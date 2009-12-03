@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage Compatibility
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
- */
-
 if(!class_exists('AkObject')){
 
     class AkObject

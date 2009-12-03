@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Helpers
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @author Jerome Loyet
- */
-
 /**
 * Provides a set of helpers for calling Prototype JavaScript functions, 
 * including functionality to call remote methods using 

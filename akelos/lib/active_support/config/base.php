@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage Config
- * @author Arno Schneider
- * @author Bermi Ferrer
- */
-
 /**
  * Config Reader
  *
@@ -180,7 +169,7 @@ class AkConfig
             return false;
         }
 
-        require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'spyc.php');
+        require_once(AK_CONTRIB_DIR.DS.'TextParsers'.DS.'spyc.php');
         $content = file_get_contents($yaml_file_name);
         $content = self::parseSettingsConstants($content);
         $config = Spyc::YAMLLoad($content);

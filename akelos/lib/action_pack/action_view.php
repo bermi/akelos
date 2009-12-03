@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage ActionView
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 /**
 * Action View templates can be written in two ways. If the template file has a +.tpl+ extension then it uses PHP.
 *

@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Sintags
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 defined('AK_SINTAGS_REMOVE_PHP_SILENTLY')           || define('AK_SINTAGS_REMOVE_PHP_SILENTLY', false);
 defined('AK_SINTAGS_REPLACE_SHORTHAND_PHP_TAGS')    || define('AK_SINTAGS_REPLACE_SHORTHAND_PHP_TAGS', true);
 defined('AK_SINTAGS_HIDDEN_COMMENTS_TAG')           || define('AK_SINTAGS_HIDDEN_COMMENTS_TAG', 'hidden');

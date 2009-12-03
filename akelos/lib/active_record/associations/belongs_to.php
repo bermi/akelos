@@ -1,19 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveRecord
- * @subpackage Associations
- * @subpackage Belongs to
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @author Kaste
- * @author Arno Schneider <arno a.t bermilabs c.om>
- * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
- */
-
 /**
 * Adds the following methods for retrieval and query for a single associated object that this object holds an id to.
 * * <tt>belongsTo->assign($association_id, $Associate);</tt> - assigns the associate object, extracts the primary key, and sets it as the foreign key.

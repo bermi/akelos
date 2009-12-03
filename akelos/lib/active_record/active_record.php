@@ -1,18 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveRecord
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @author Kaste
- * @author Arno Schneider <arno a.t bermilabs c.om>
- * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
- */
-
-
 /**
 * Active Record objects doesn't specify their attributes directly, but rather infer them from the table definition with
 * which they're linked. Adding, removing, and changing attributes and their type is done directly in the database. Any change
@@ -3761,7 +3748,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 $condition_sql = $this->getTableName().'.'.$attribute_name.' '.$this->getAttributeCondition($value);
                 $condition_params = array($value);
             }else{
-                include_once(AK_VENDOR_DIR.DS.'phputf8'.DS.'utf8.php');
+                include_once(AK_CONTRIB_DIR.DS.'phputf8'.DS.'utf8.php');
                 $condition_sql = 'LOWER('.$this->getTableName().'.'.$attribute_name.') '.$this->getAttributeCondition($value);
                 $condition_params = array(is_array($value) ? array_map('utf8_strtolower',$value) : utf8_strtolower($value));
             }

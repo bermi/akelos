@@ -61,7 +61,6 @@ class XmlRpcWebServiceApi_TestCase extends ActionPackUnitTest
     {
         $TodoApi = new TodoApi();
         ob_start();
-        require_once(AK_LIB_DIR.DS.'utils'.DS.'generators'.DS.'AkelosGenerator.php');
         $Generator = new AkelosGenerator();
         $Generator->runCommand('service Todo');
         ob_end_clean();

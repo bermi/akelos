@@ -1,9 +1,5 @@
 <?php
 
-/**
- * @package ActiveSupport
- * @subpackage LazyLoading
- */
 class AkLazyObject
 {
     protected

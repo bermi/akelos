@@ -1,53 +1,14 @@
 <?php
 
 /**
-*@file ascii.php
-* ASCII Mapping and Charset implementation.
-*
-*/
-
-//
-// +----------------------------------------------------------------------+
-// | Akelos PHP Application Framework                                     |
-// +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License                 |
-// +----------------------------------------------------------------------+
-// | You should have received the following files along with this library |
-// | - COPYRIGHT (Additional copyright notice)                            |
-// | - DISCLAIMER (Disclaimer of warranty)                                |
-// | - README (Important information regarding this library)              |
-// +----------------------------------------------------------------------+
-//
-
-
-
-
-
-/**
 * ASCII  driver for Charset Class
 *
 * Charset::ascii provides functionality to convert
 * ASCII strings, to UTF-8 multibyte format and vice versa.
-*
-* @package AKELOS
-* @subpackage Localize
-* @author Bermi Ferrer Martinez <bermi@akelos.org>
-* @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
-* @link http://www.unicode.org/Public/MAPPINGS/ Original Mapping taken from Unicode.org
-* @since 0.1
-* @version $Revision 0.1 $
+
 */
 class ascii extends AkCharset
 {
-
-
-	// ------ CLASS ATTRIBUTES ------ //
-
-
-
-	// ---- Private attributes ---- //
-
-
 	/**
 	* ASCII to UTF-8 mapping array.
 	*
@@ -64,18 +25,6 @@ class ascii extends AkCharset
 	* @var    array    $_fromUtfMap
 	*/
 	protected $_fromUtfMap = null;
-
-
-	// ------------------------------
-
-
-
-	// ------ CLASS METHODS ------ //
-
-
-	// ---- Public methods ---- //
-
-
 	/**
 	* Encodes given ASCII string into UFT-8
 	*
@@ -88,7 +37,7 @@ class ascii extends AkCharset
 	{
 		return parent::_Utf8StringEncode($string, $this->_toUtfMap);
 	
-	}// -- end of &Utf8StringEncode -- //
+	}
 
 	/**
 	* Decodes given UFT-8 string into ASCII
@@ -102,11 +51,8 @@ class ascii extends AkCharset
 	{
 		$this->_LoadInverseMap();
 		return parent::_Utf8StringDecode($string, $this->_fromUtfMap);
-	}// -- end of &Utf8StringDecode -- //
-		
-		
-	// ---- Private methods ---- //
-		
+	}
+	
 	/**
 	* Flips $this->_toUtfMap to $this->_fromUtfMap
 	*
@@ -120,6 +66,6 @@ class ascii extends AkCharset
 			$loaded = true;
 			$this->_fromUtfMap = array_flip($this->_toUtfMap);
 		}
-	}// -- end of _LoadInverseMap -- //
+	}
 	
 }

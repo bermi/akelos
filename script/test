@@ -12,6 +12,6 @@ require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'tes
 $argv = array_map('trim',$argv);
 array_shift($argv);
 $tests_dir = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'test');
-require_once(AK_LIB_DIR.DS.'utils'.DS.'scripts'.DS.'test.php');
+require_once(AK_LIB_DIR.DS.'active_support'.DS.'utils'.DS.'scripts'.DS.'test.php');
 
 ?>

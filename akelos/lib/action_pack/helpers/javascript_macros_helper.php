@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionView
- * @subpackage ActionPack
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @author Jerome Loyet
- */
-
 /**
 * Provides a set of helpers for creating JavaScript macros that rely on and often bundle methods from JavaScriptHelper into
 * larger units. These macros are deprecated and will be removed on Akelos 0.9

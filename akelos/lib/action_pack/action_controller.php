@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-
-/**
- * @package ActionPack
- * @subpackage ActionController
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 class AkActionController extends AkLazyObject
 {
     public $_high_load_mode = AK_HIGH_LOAD_MODE;

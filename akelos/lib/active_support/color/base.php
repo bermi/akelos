@@ -1,16 +1,6 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage Utils
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
-require_once(AK_VENDOR_DIR.DS.'pear'.DS.'Image'.DS.'Color.php');
+require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Image'.DS.'Color.php');
 
 class AkColor extends Image_Color
 {
@@ -46,4 +36,3 @@ class AkColor extends Image_Color
     }
 }
 
-?>

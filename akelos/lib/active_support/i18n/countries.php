@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage I18n-L10n
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 class AkCountries
 {
     public function getCountriesDescriptions()

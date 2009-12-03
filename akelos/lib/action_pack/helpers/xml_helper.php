@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Helpers
- * @author Arno Schneider <arno a.t bermilabs c.om>
- */
-
 /**
  * <%= xml_instruct 'xml', :version => "1.0" %> 
 <%= xml_rss_open :version => "2.0" %>

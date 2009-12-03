@@ -1,53 +1,13 @@
 <?php
 
 /**
-*@file utf8.php
-* UTF-8 Mapping and Charset implementation.
-*
-*/
-
-//
-// +----------------------------------------------------------------------+
-// | Akelos PHP Application Framework                                     |
-// +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License                 |
-// +----------------------------------------------------------------------+
-// | You should have received the following files along with this library |
-// | - COPYRIGHT (Additional copyright notice)                            |
-// | - DISCLAIMER (Disclaimer of warranty)                                |
-// | - README (Important information regarding this library)              |
-// +----------------------------------------------------------------------+
-//
-
-
-
-
-
-/**
 * UTF-8  driver for Charset Class
 *
 * Charset::utf8 provides functionality to convert
 * UTF-8 strings, to UTF-8 multibyte format and vice versa.
-*
-* @package AKELOS
-* @subpackage Localize
-* @author Bermi Ferrer Martinez <bermi@akelos.org>
-* @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
-* @link http://www.unicode.org/Public/MAPPINGS/ Original Mapping taken from Unicode.org
-* @since 0.1
-* @version $Revision 0.1 $
 */
 class utf8 extends AkCharset
 {
-
-
-	// ------ CLASS ATTRIBUTES ------ //
-
-
-
-	// ---- Private attributes ---- //
-
-
 	/**
 	* UTF-8 to UTF-8 mapping array.
 	*
@@ -64,18 +24,6 @@ class utf8 extends AkCharset
 	* @var    array    $_fromUtfMap
 	*/
 	protected $_fromUtfMap = null;
-
-
-	// ------------------------------
-
-
-
-	// ------ CLASS METHODS ------ //
-
-
-	// ---- Public methods ---- //
-
-
 	/**
 	* Encodes given UTF-8 string into UFT-8
 	*
@@ -88,7 +36,7 @@ class utf8 extends AkCharset
 	{
 		return $string;
 	
-	}// -- end of &Utf8StringEncode -- //
+	}
 
 	/**
 	* Decodes given UFT-8 string into UTF-8
@@ -101,11 +49,8 @@ class utf8 extends AkCharset
 	protected function _Utf8StringDecode($string, $mapping_array = array())
 	{
 		return $string;
-	}// -- end of &Utf8StringDecode -- //
-		
-		
-	// ---- Private methods ---- //
-		
+	}
+	
 	/**
 	* Flips $this->_toUtfMap to $this->_fromUtfMap
 	*
@@ -119,6 +64,6 @@ class utf8 extends AkCharset
 			$loaded = true;
 			$this->_fromUtfMap = $this->_toUtfMap;
 		}
-	}// -- end of _LoadInverseMap -- //
+	}
 	
 }

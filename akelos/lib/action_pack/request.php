@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Request
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 /**
 * Class that handles incoming request.
 *

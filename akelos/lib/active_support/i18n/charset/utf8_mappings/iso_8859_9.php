@@ -1,51 +1,13 @@
 <?php
 
 /**
-*@file iso_8859_9.php
-* ISO-8859-9 Mapping and Charset implementation.
-*
-*/
-
-//
-// +----------------------------------------------------------------------+
-// | Akelos PHP Application Framework                                     |
-// +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License                 |
-// +----------------------------------------------------------------------+
-// | You should have received the following files along with this library |
-// | - COPYRIGHT (Additional copyright notice)                            |
-// | - DISCLAIMER (Disclaimer of warranty)                                |
-// | - README (Important information regarding this library)              |
-// +----------------------------------------------------------------------+
-//
-
-
-
-
-
-/**
 * ISO-8859-9  driver for Charset Class
 *
 * Charset::iso_8859_9 provides functionality to convert
 * ISO-8859-9 strings, to UTF-8 multibyte format and vice versa.
-*
-* @author Bermi Ferrer Martinez <bermi@akelos.org>
-* @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
-* @link http://www.unicode.org/Public/MAPPINGS/ Original Mapping taken from Unicode.org
-* @since 0.1
-* @version $Revision 0.1 $
 */
 class iso_8859_9 extends AkCharset
 {
-
-
-	// ------ CLASS ATTRIBUTES ------ //
-
-
-
-	// ---- Private attributes ---- //
-
-
 	/**
 	* ISO-8859-9 to UTF-8 mapping array.
 	*
@@ -62,18 +24,6 @@ class iso_8859_9 extends AkCharset
 	* @var    array    $_fromUtfMap
 	*/
 	protected $_fromUtfMap = null;
-
-
-	// ------------------------------
-
-
-
-	// ------ CLASS METHODS ------ //
-
-
-	// ---- Public methods ---- //
-
-
 	/**
 	* Encodes given ISO-8859-9 string into UFT-8
 	*
@@ -86,7 +36,7 @@ class iso_8859_9 extends AkCharset
 	{
 		return parent::_Utf8StringEncode($string, $this->_toUtfMap);
 	
-	}// -- end of &Utf8StringEncode -- //
+	}
 
 	/**
 	* Decodes given UFT-8 string into ISO-8859-9
@@ -100,11 +50,8 @@ class iso_8859_9 extends AkCharset
 	{
 		$this->_LoadInverseMap();
 		return parent::_Utf8StringDecode($string, $this->_fromUtfMap);
-	}// -- end of &Utf8StringDecode -- //
-		
-		
-	// ---- Private methods ---- //
-		
+	}
+	
 	/**
 	* Flips $this->_toUtfMap to $this->_fromUtfMap
 	*
@@ -118,6 +65,6 @@ class iso_8859_9 extends AkCharset
 			$loaded = true;
 			$this->_fromUtfMap = array_flip($this->_toUtfMap);
 		}
-	}// -- end of _LoadInverseMap -- //
+	}
 	
 }

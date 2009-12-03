@@ -1,13 +1,4 @@
 <?php
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage XhtmlValidator
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
 
 class AkXhtmlValidator
 {

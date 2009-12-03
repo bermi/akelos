@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage Installer
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
-
 /**
  * == Column Types ==
  *

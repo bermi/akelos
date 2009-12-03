@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveResource
- * @subpackage HttpClient
- * @author Bermi Ferrer
- */
-
-
 class AkHttpClient extends AkObject
 {
     public $HttpRequest;
@@ -79,7 +68,7 @@ class AkHttpClient extends AkObject
 
         list($user_name, $password) = $this->_extractUserNameAndPasswordFromUrl($url);
 
-        require_once(AK_VENDOR_DIR.DS.'pear'.DS.'HTTP'.DS.'Request.php');
+        require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'HTTP'.DS.'Request.php');
 
         $this->{'_setParamsFor'.ucfirst(strtolower($http_verb))}($url, $options['params']);
 

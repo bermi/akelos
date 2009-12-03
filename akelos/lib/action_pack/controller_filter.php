@@ -1,13 +1,6 @@
 <?php
 
 /**
- * @package ActionPack
- * @subpackage Filters
- * @author Bermi Ferrer
- */
-
-
-/**
                     Filters
 ====================================================================
 *

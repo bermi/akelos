@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @package ActiveRecord
- * @subpackage DatabaseAdapters
- */
-
 class AkMongoDbAdapter extends AkDbAdapter
 {
     static function constructDsn($database_settings)

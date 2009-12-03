@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveRecord
- * @subpackage ModelObserver
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 /**
 * Observer classes respond to life-cycle callbacks to implement trigger-like
 * behavior outside the original class. This is a great way to reduce the clutter

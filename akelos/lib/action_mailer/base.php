@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionMailer
- * @subpackage Base
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 /**
 * AkActionMailer allows you to send email from your application using a mailer model and views.
 *

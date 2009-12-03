@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage I18n-L10n
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
-
 /**
 * Charset conversion using UT8 mapping tables.
 *
@@ -31,11 +20,6 @@
 *
 * More information about charsets at
 * http://en.wikipedia.org/wiki/Character_encoding
-*
-* @author Bermi Ferrer <bermi@akelos.org>
-* @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
-* @since 0.1
-* @version $Revision 0.1 $
 */
 class AkCharset
 {

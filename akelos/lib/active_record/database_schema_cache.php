@@ -1,17 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveRecord
- * @subpackage DatabaseReflection
- * @author Arno Schneider <arno a.t bermilabs c.om>
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @copyright Copyright (c) 2002-2009, The Akelos Team http://www.akelos.org
- */
-
 class AkDbSchemaCache
 {
     static function shouldRefresh($set = null)

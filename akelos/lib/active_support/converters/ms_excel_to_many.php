@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage Converters
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 class AkMsExcelToMany
 {
     public $_file_type_codes = array('csv' => 6,'msdos' => 21,'xls'=>-4143,'rtf'=>6,'unicode'=>7,'doc'=>0,'html'=>8,'txt'=>4);

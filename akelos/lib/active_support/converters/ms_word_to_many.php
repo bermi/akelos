@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage Converters
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 class AkMsWordToMany
 {
     public $_file_type_codes = array('doc' => 0,'dot' => 1,'txt'=>2,'rtf'=>6,'unicode'=>7,'htm'=>8,'html'=>8,'asc'=>9,'wri'=>13,'wp.doc'=>24,'wps'=>28);

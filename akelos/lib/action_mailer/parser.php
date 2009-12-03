@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionMailer
- * @subpackage Parser
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 class AkMailParser
 {
     public $decode_body = true;

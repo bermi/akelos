@@ -1,53 +1,13 @@
 <?php
 
 /**
-*@file euc_kr.php
-* EUC-KR Mapping and Charset implementation.
-*
-*/
-
-//
-// +----------------------------------------------------------------------+
-// | Akelos PHP Application Framework                                     |
-// +----------------------------------------------------------------------+
-// | Released under the GNU Lesser General Public License                 |
-// +----------------------------------------------------------------------+
-// | You should have received the following files along with this library |
-// | - COPYRIGHT (Additional copyright notice)                            |
-// | - DISCLAIMER (Disclaimer of warranty)                                |
-// | - README (Important information regarding this library)              |
-// +----------------------------------------------------------------------+
-//
-
-
-
-
-
-/**
 * EUC-KR  driver for Charset Class
 *
 * Charset::euc_kr provides functionality to convert
 * EUC-KR strings, to UTF-8 multibyte format and vice versa.
-*
-* @package AKELOS
-* @subpackage Localize
-* @author Bermi Ferrer Martinez <bermi@akelos.org>
-* @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
-* @link http://www.unicode.org/Public/MAPPINGS/ Original Mapping taken from Unicode.org
-* @since 0.1
-* @version $Revision 0.1 $
 */
 class euc_kr extends AkCharset
 {
-
-
-	// ------ CLASS ATTRIBUTES ------ //
-
-
-
-	// ---- Private attributes ---- //
-
-
 	/**
 	* EUC-KR to UTF-8 mapping array.
 	*
@@ -64,18 +24,6 @@ class euc_kr extends AkCharset
 	* @var    array    $_fromUtfMap
 	*/
 	protected $_fromUtfMap = null;
-
-
-	// ------------------------------
-
-
-
-	// ------ CLASS METHODS ------ //
-
-
-	// ---- Public methods ---- //
-
-
 	/**
 	* Encodes given EUC-KR string into UFT-8
 	*
@@ -88,7 +36,7 @@ class euc_kr extends AkCharset
 	{
 		return parent::_Utf8StringEncode($string, $this->_toUtfMap);
 	
-	}// -- end of &Utf8StringEncode -- //
+	}
 
 	/**
 	* Decodes given UFT-8 string into EUC-KR
@@ -102,11 +50,8 @@ class euc_kr extends AkCharset
 	{
 		$this->_LoadInverseMap();
 		return parent::_Utf8StringDecode($string, $this->_fromUtfMap);
-	}// -- end of &Utf8StringDecode -- //
-		
-		
-	// ---- Private methods ---- //
-		
+	}
+	
 	/**
 	* Flips $this->_toUtfMap to $this->_fromUtfMap
 	*
@@ -120,6 +65,6 @@ class euc_kr extends AkCharset
 			$loaded = true;
 			$this->_fromUtfMap = array_flip($this->_toUtfMap);
 		}
-	}// -- end of _LoadInverseMap -- //
+	}
 	
 }

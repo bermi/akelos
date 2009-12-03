@@ -1,24 +1,14 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage Converters
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 class AkHtmlToText
 {
     public function convert()
     {
-        require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'html2text.php');
+        require_once(AK_CONTRIB_DIR.DS.'TextParsers'.DS.'html2text.php');
         $Converter = new html2text(true, 0, false);
         $markdown = str_replace('__AK:AMP__','&', $Converter->load_string(str_replace('&','__AK:AMP__', $this->source)));
 
-        require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'smartypants.php');
+        require_once(AK_CONTRIB_DIR.DS.'TextParsers'.DS.'smartypants.php');
         $Smartypants = new SmartyPantsTypographer_Parser();
         $markdown = Ak::html_entity_decode(strip_tags($Smartypants->transform($markdown)));
 

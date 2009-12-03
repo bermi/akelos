@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage TemplateEngines
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 /**
  * The AkPhpCodeSanitizer ensures that Action View templates do not contain illegal function/variable calls
  * it is used by the AkPhpTemplateHander by default. If you want to stablish your own

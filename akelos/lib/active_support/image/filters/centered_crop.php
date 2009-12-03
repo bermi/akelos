@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos PHP Framework - http://www.akelos.org                         |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage ImageManipulation
- * @author Bermi Ferrer
- */
-
 /**
  * CenteredCrop filter
  *

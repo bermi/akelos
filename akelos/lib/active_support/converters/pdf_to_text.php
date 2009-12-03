@@ -1,15 +1,8 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
 
 /**
  * Converts a PDF into text in order to index it for full text searching
- *
- * @package ActiveSupport
- * @subpackage Converters
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
  */
 class AkPdfToText
 {

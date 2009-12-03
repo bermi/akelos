@@ -1,14 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Response
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
 class AkResponse extends AkObject
 {
     public $_resutl_stack = array();
@@ -113,10 +104,6 @@ class AkResponse extends AkObject
                 if(strtolower(substr($header,0,9)) == 'location:'){
                     $header = str_replace(array("\n","\r"), '', $header);
                     $_redirected = true;
-                    if(AK_DESKTOP){
-                        $javascript_redirection = '<title>'.Ak::t('Loading...').'</title><script type="text/javascript">location = "'.substr($header,9).'";</script>';
-                        continue;
-                    }
                 }
                 $lowercase_header = strtolower($header);
                 if(!$_has_content_type && substr($lowercase_header,0,13) == 'content-type:'){

@@ -5,11 +5,11 @@ defined('AK_TEST_DEFAULT_REPORTER')             || define('AK_TEST_DEFAULT_REPOR
 defined('AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE')  || define('AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE', 'Akelos');
 defined('AK_LIB_TESTS_DIRECTORY')               || define('AK_LIB_TESTS_DIRECTORY', AK_TEST_DIR.DS.'unit'.DS.'lib');
 
-require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'unit_tester.php');
-require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'mock_objects.php');
-require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'reporter.php');
-require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'web_tester.php');
-require_once(AK_VENDOR_DIR.DS.'simpletest'.DS.'extensions'.DS.'junit_xml_reporter.php');
+require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'unit_tester.php');
+require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'mock_objects.php');
+require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'reporter.php');
+require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'web_tester.php');
+require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'extensions'.DS.'junit_xml_reporter.php');
 
 class AkUnitTestSuite extends TestSuite
 {

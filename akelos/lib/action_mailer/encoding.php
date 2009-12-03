@@ -1,24 +1,13 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionMailer
- * @subpackage Encoding
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
 
 include_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Mail'.DS.'mimeDecode.php');
 
 class AkMailEncoding extends Mail_mimeDecode
 {
-    /**
-     * PEAR's header decoding function is buggy and is not enough tested, so we
-     * override it using the Akelos charset transcoding engine to get the result
-     * as UTF-8
-     */
+    // PEAR's header decoding function is buggy and is not enough tested, so we
+    // override it using the Akelos charset transcoding engine to get the result
+    // as UTF-8
     public function _decodeHeader($encoded_header)
     {
         $encoded_header =  str_replace(array('_',"\r","\n =?"),array(' ',"\n","\n=?"),

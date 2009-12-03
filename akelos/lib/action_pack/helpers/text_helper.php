@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Helpers
- * @author Jose Salavert <salavert a.t akelos c.om>
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 defined('AK_VALID_URL_CHARS_REGEX') || define('AK_VALID_URL_CHARS_REGEX','A-Z-a-z0-9:=?&\/\.\-\\%~#_;,+');
 defined('AK_AUTO_LINK_REGEX')       || define('AK_AUTO_LINK_REGEX','/
         (                          # leading text
@@ -69,7 +58,7 @@ class TextHelper extends AkObject
     */
     static function truncate($text, $length = 30, $truncate_string = '...', $break = false)
     {
-        require_once(AK_VENDOR_DIR.DS.'phputf8'.DS.'utf8.php');
+        require_once(AK_CONTRIB_DIR.DS.'phputf8'.DS.'utf8.php');
         if(utf8_strlen($text) <= $length){
             return $text;
         }
@@ -124,7 +113,7 @@ class TextHelper extends AkObject
 	 */
     static function excerpt($text, $phrase, $radius = 100, $excerpt_string = '...')
     {
-        require_once(AK_VENDOR_DIR.DS.'phputf8'.DS.'utf8.php');
+        require_once(AK_CONTRIB_DIR.DS.'phputf8'.DS.'utf8.php');
         if(empty($text)){
             return $text;
         }
@@ -213,7 +202,7 @@ class TextHelper extends AkObject
         'rel' => '',
         );
         $options = array_merge($default_options, $options);
-        require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'Textile.php');
+        require_once(AK_CONTRIB_DIR.DS.'TextParsers'.DS.'Textile.php');
         if (!empty($text)) {
             $Textile = new Textile();
             $text = trim($Textile->TextileThis($text, !$options['extended_mode'], '', !$options['allow_images'], true, $options['rel']));
@@ -509,7 +498,7 @@ class TextHelper extends AkObject
     static function markdown($text)
     {
         if (!empty($text)) {
-            require_once(AK_VENDOR_DIR.DS.'TextParsers'.DS.'markdown.php');
+            require_once(AK_CONTRIB_DIR.DS.'TextParsers'.DS.'markdown.php');
             $text = trim(Markdown($text));
         }
         return $text;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @package ActiveRecord
- * @subpackage MockHandler
- */
-
 class AkActiveRecordMockHandler
 {
     protected

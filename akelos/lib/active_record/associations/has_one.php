@@ -1,17 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveRecord
- * @subpackage Associations
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- * @author Kaste
- * @author Arno Schneider <arno a.t bermilabs c.om>
- */
-
 /**
 * Adds the following methods for retrieval and query of a single associated object.
 * $association is replaced with the symbol passed as the first argument, so

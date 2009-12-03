@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage Converters
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 class AkExcelToArray
 {
     public function convert()
@@ -37,7 +27,7 @@ class AkExcelToArray
     public function init()
     {
         if(empty($this->handler)){
-            require_once(AK_VENDOR_DIR.DS.'Excel'.DS.'reader.php');
+            require_once(AK_CONTRIB_DIR.DS.'Excel'.DS.'reader.php');
             $this->handler = new Spreadsheet_Excel_Reader();
             $this->handler->setRowColOffset((empty($this->first_column) ? 0 : $this->first_column));
         }

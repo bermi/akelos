@@ -36,10 +36,6 @@ class AkTestResponse extends AkResponse
                 $this->_headers_sent[] = $header;
                 if(strtolower(substr($header,0,9)) == 'location:'){
                     $_redirected = true;
-                    if(AK_DESKTOP){
-                        $javascript_redirection = '<title>'.Ak::t('Loading...').'</title><script type="text/javascript">location = "'.substr($header,9).'";</script>';
-                        continue;
-                    }
                 }
                 if(strtolower(substr($header,0,13)) == 'content-type:'){
                     $_has_content_type = true;

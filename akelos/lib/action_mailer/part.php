@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionMailer
- * @subpackage Part
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 class AkMailPart extends AkMailBase
 {
     public function prepareHeadersForRendering($options = array())

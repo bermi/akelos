@@ -1,16 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
-* @package ActiveSupport
-* @subpackage ImageManipulation
-* @author Bermi Ferrer <bermi a.t bermilabs c.om>
-* @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
-*/
-
 class AkImageColorScheme extends AkObject
 {
     public 

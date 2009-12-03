@@ -1,15 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActionPack
- * @subpackage Stream
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 class AkStream
 {
     public $buffer_size;

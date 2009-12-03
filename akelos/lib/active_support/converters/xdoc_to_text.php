@@ -1,20 +1,10 @@
 <?php
 
-// +----------------------------------------------------------------------+
-// | Akelos Framework - http://www.akelos.org                             |
-// +----------------------------------------------------------------------+
-
-/**
- * @package ActiveSupport
- * @subpackage Converters
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
 class AkXdocToText
 {
     public function convert()
     {
-        $xdoc2txt_bin = AK_VENDOR_DIR.DS.'hyperestraier'.DS.'xdoc2txt.exe';
+        $xdoc2txt_bin = AK_CONTRIB_DIR.DS.'hyperestraier'.DS.'xdoc2txt.exe';
 
         if(AK_OS != 'WINDOWS'){
             trigger_error(Ak::t('Xdoc2Text is a windows only application. Please use wvWare instead'), E_USER_WARNING);
