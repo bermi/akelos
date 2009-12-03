@@ -15,8 +15,7 @@ class AkMailParser
     public $body;
     public $parts;
 
-
-    public function AkMailParser($options = array())
+    public function __construct($options = array())
     {
         $this->options = $options;
         $default_options = array(
@@ -50,6 +49,25 @@ class AkMailParser
         return $Mail;
     }
 
+    static function importStructure(&$MailOrPart, $structure = array())
+    {
+        if(isset($structure['header'])){
+            $structure['headers'] = $structure['header'];
+            unset($structure['header']);
+        }
+        foreach ($structure as $attribute=>$value){
+            if($attribute[0] != '_'){
+                $attribute_setter = 'set'.AkInflector::camelize($attribute);
+                if(method_exists($MailOrPart, $attribute_setter)){
+                    $MailOrPart->$attribute_setter($value);
+                }else{
+                    $MailOrPart->{AkInflector::underscore($attribute)} = $value;
+                }
+            }
+        }
+        return ;
+    }
+
     public function getContentTypeProcessorMethodName()
     {
         $content_type = $this->findHeaderValueOrDefaultTo('content-type', $this->content_type);
@@ -61,7 +79,6 @@ class AkMailParser
     {
         return $this->_findHeader('content-disposition');
     }
-
 
     public function getParsedTextBody($body)
     {
@@ -101,46 +118,10 @@ class AkMailParser
         $this->body = $Parser->parse($body);
     }
 
-    public function _getDecodedBody($body)
-    {
-        $encoding = trim(strtolower($this->_findHeaderValue('content-transfer-encoding')));
-        $charset = trim(strtolower($this->_findHeaderAttributeValue('content-type','charset')));
-
-        if($encoding == 'base64'){
-            $body = base64_decode($body);
-        }elseif($encoding == 'quoted-printable'){
-            $body = preg_replace('/=([a-f0-9]{2})/ie', "chr(hexdec('\\1'))", preg_replace("/=\r?\n/", '', $body));
-        }
-        return empty($charset) ? $body : ($charset && $this->recode_messages ? Ak::recode($body, $this->recode_to_charset, $charset, $this->html_charset_on_recoding_failure) : $body);
-    }
-
-    public function _findHeaderValue($name)
-    {
-        $header = $this->_findHeader($name);
-        return !empty($header['value']) ? $header['value'] : false;
-    }
-
-    public function _findHeaderAttributeValue($name, $attribute)
-    {
-        $header = $this->_findHeader($name);
-        return !empty($header['attributes'][$attribute]) ? $header['attributes'][$attribute] : false;
-    }
-
     public function findHeaderValueOrDefaultTo($name, $default)
     {
         $value = $this->_findHeaderValue($name);
         return !empty($value) ? $value : $default;
-    }
-
-    public function _findHeader($name)
-    {
-        $results = array();
-        foreach ($this->headers as $header) {
-            if(isset($header['name']) && strtolower($header['name']) == $name){
-                $results[] = $header;
-            }
-        }
-        return empty($results) ? false : (count($results) > 1 ? $results : array_shift($results));
     }
 
     public function getParsedRawHeaders($raw_headers)
@@ -154,196 +135,6 @@ class AkMailParser
         }
 
         return $headers;
-    }
-
-    public function _parseHeaderLine($header_line)
-    {
-        $header = array();
-        if(preg_match("/^([A-Za-z\-]+)\: *(.*)$/",$header_line,$match)){
-            $header['name'] = $match[1];
-            $header['value'] = $match[2];
-            $this->_decodeHeader_($header);
-            $this->_headerCanHaveAttributes($header) ? $this->_extractAttributesForHeader_($header) : null;
-            return $header;
-        }
-
-    }
-
-    public function _headerCanHaveAttributes($header)
-    {
-        return !in_array(strtolower($header['name']), array('subject','to','from','cc','bcc'));
-    }
-
-    public function _extractAttributesForHeader_(&$header)
-    {
-        $attributes = array();
-        if(preg_match_all("/([A-Z\-_ ]+)".
-        "(\*[0-9 ]*)?". // RFC 2231
-        "=([^;]*);?/i", $header['value'], $matches)){
-            $header['value'] = str_replace($matches[0],'', $header['value']);
-            foreach ($matches[0] as $k=>$match){
-                $attribute_name = trim($matches[1][$k]);
-                $value = trim($matches[3][$k],'; "\'');
-                if(!empty($matches[2][$k])){ // RFC 2231
-                    $value = (empty($attributes[$attribute_name]) ? '' : $attributes[$attribute_name])
-                    .$this->_decodeHeaderAttribute($value, $matches[2][$k]);
-                }
-                $attributes[$attribute_name] = $value;
-            }
-        }
-
-        $header['value'] = trim($header['value'],'; ');
-
-        if(strstr($header['value'],';') && strtolower($header['name']) != 'date' &&
-        preg_match("/([; ])*(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun),? *)?(\d\d?)".
-        " +(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) +(\d\d\d\d) ".
-        "+(\d{2}:\d{2}(?::\d\d)) +([\( ]*(UT|GMT|EST|EDT|CST|CDT|MST|MDT|".
-        "PST|PDT|[A-Z]|(?:\+|\-)\d{4})[\) ]*)+/",$header['value'],$match)){
-            $header['value'] = str_replace($match[0],'', $header['value']);
-            $attributes['Date'] = trim(str_replace('  ',' ',$match[0]),"; ");
-        }
-
-        $header['attributes'] = empty($attributes) ? false : $attributes;
-    }
-
-    public function _decodeHeader_(&$header)
-    {
-        if(!empty($header['value'])){
-            $encoded_header =  preg_replace('/\?\=([^=^\n^\r]+)?\=\?/', "?=$1\n=?",$header['value']);
-            $header_value = $header['value'];
-            if(preg_match_all('/(\=\?([^\?]+)\?([BQ]{1})\?([^\?]+)\?\=?)+/i', $encoded_header, $match)){
-                foreach (array_keys($match[0]) as $k){
-                    $charset = strtoupper($match[2][$k]);
-                    $decode_function = strtolower($match[3][$k]) == 'q' ? 'quoted_printable_decode' : 'base64_decode';
-                    $decoded_part = trim(
-                    Ak::recode($decode_function(str_replace('_',' ',$match[4][$k])), $this->recode_to_charset, $charset, $this->html_charset_on_recoding_failure)
-
-                    );
-
-                    $header_value = str_replace(trim($match[0][$k]), $decoded_part, $header_value);
-                }
-            }
-            $header_value = trim(preg_replace("/(%0A|%0D|\n+|\r+)/i",'',$header_value));
-            if($header_value != $header['value']){
-                $header['encoded'] = $header['value'];
-                $header['value'] = $header_value;
-                isset($charset) && $header['charset'] = $charset;
-            }
-        }
-    }
-
-    /**
-     * RFC 2231 Implementation
-     */
-    public function _decodeHeaderAttribute($header_attribute, $charset = '')
-    {
-        if(preg_match("/^([A-Z0-9\-]+)(\'[A-Z\-]{2,5}\')?/i",$header_attribute,$match)){
-            $charset = $match[1];
-            $header_attribute = urldecode(str_replace(array('_','='),array('%20','%'), substr($header_attribute,strlen($match[0]))));
-        }
-        return Ak::recode($header_attribute, 'UTF-8', $charset);
-    }
-
-    public function _getRawHeaderAndBody($raw_part)
-    {
-        return
-        array_map('trim',
-        preg_split("/\n\n/",
-        preg_replace("/(\n[\t ]+)/",'', // Join multiline headers
-        str_replace(array("\r\n","\n\r","\r"),"\n", $raw_part."\n") // Lets keep it simple and use only \n for decoding
-        )."\n\n",2));
-    }
-
-    public function _expandHeadersOnMailObject(&$Mail)
-    {
-        if(!empty($Mail->headers)){
-            foreach ($Mail->headers as $details){
-                if (empty($details['name'])) {
-                    continue;
-                }
-                $caption = AkInflector::underscore($details['name']);
-                if(!in_array($caption, array('headers','body','parts'))){
-                    if(!empty($details['value'])){
-                        if(empty($Mail->$caption)){
-                            $Mail->$caption = $details['value'];
-                        }elseif (!empty($Mail->$caption) && is_array($Mail->$caption)){
-                            $Mail->{$caption}[] = $details['value'];
-                        }else{
-                            $Mail->$caption = array($Mail->$caption, $details['value']);
-                        }
-                        $Mail->header[$caption] = $Mail->$caption;
-                    }
-                    if(!empty($details['attributes'])){
-                        $Mail->{$caption.'_attributes'} = $details['attributes'];
-                    }
-                }
-            }
-        }
-    }
-
-
-    static function importStructure(&$MailOrPart, $structure = array())
-    {
-        if(isset($structure['header'])){
-            $structure['headers'] = $structure['header'];
-            unset($structure['header']);
-        }
-        foreach ($structure as $attribute=>$value){
-            if($attribute[0] != '_'){
-                $attribute_setter = 'set'.AkInflector::camelize($attribute);
-                if(method_exists($MailOrPart, $attribute_setter)){
-                    $MailOrPart->$attribute_setter($value);
-                }else{
-                    $MailOrPart->{AkInflector::underscore($attribute)} = $value;
-                }
-            }
-        }
-        return ;
-    }
-    public function _extractCssRulesFromContent($contents,$cssRules=false)
-    {
-        if(empty($cssRules)) {
-            $cssRules=array('id'=>array(),'class'=>array(),'element'=>array());
-        }
-        if(preg_match_all('/(.*?)\{(.*?)\}/s',$contents,$rules)) {
-            //Ak::getLogger()->log('message','rules from '.$contents.':'.var_export($rules,true));
-            $ruleNames=$rules[1];
-            foreach($ruleNames as $idx=>$ruleName) {
-                $ruleName=trim($ruleName);
-                switch(substr($ruleName,0,1)) {
-                    case '#':
-                        $ruleName=substr($ruleName,1);
-                        if(!isset($cssRules['id'][$ruleName])) {
-                            $cssRules['id'][$ruleName] = '';
-                        }
-                        $cssRules['id'][$ruleName].=trim(str_replace(array('[',']'),array('{','}'),$rules[2][$idx]));
-                        break;
-                    case '.':
-                        $ruleName=substr($ruleName,1);
-                        if(!isset($cssRules['class'][$ruleName])) {
-                            $cssRules['class'][$ruleName] = '';
-                        }
-                        $cssRules['class'][$ruleName].=trim($rules[2][$idx]);
-                        break;
-                    default:
-                        if(!isset($cssRules['element'][$ruleName])) {
-                            $cssRules['element'][$ruleName] = '';
-                        }
-                        $cssRules['element'][$ruleName].=trim($rules[2][$idx]);
-                }
-            }
-        }
-        return $cssRules;
-    }
-    public function _extractCssRulesFromFile($path,$cssRules = false)
-    {
-        if(empty($cssRules)) {
-            $cssRules=array('id'=>array(),'class'=>array(),'element'=>array());
-        }
-        $path = $this->_getStylesheetPath($path);
-        $contents = Ak::file_get_contents($path);
-        $cssRules=$this->_extractCssRulesFromContent($contents);
-        return $cssRules;
     }
 
     /**
@@ -427,7 +218,254 @@ class AkMailParser
         $this->_applyCssRules($Mail,$cssRules);
     }
 
-    public function _applyCssRules(&$Mail,$cssRules)
+    public function extractImagesIntoInlineParts(&$Mail, $options = array())
+    {
+        $html =& $Mail->body;
+        $images = TextHelper::get_image_urls_from_html($html);
+
+        $html_images = array();
+        if(!empty($images)){
+            $tmp_dir = AkConfig::getDir('tmp');
+            $app_dir = AkConfig::getDir('app');
+
+            $images = array_diff(array_unique($images), array(''));
+
+            foreach ($images as $image){
+                $original_image_name = $image;
+                if(substr($image,0,4)=='cid:'){
+                    continue;
+                }
+                $image = $this->_getImagePath($image);
+
+                if(!empty($image)){
+                    $extenssion = substr($image, strrpos('.'.$image,'.'));
+                    $image_name = Ak::uuid().'.'.$extenssion;
+                    $html_images[$original_image_name] = 'cid:'.$image_name;
+                    $Mail->setAttachment('image/'.$extenssion, array(
+                    'body' => Ak::file_get_contents($image, array('base_path' => strstr($image, $app_dir) ? null : $tmp_dir)),
+                    'filename' => $image_name,
+                    'content_disposition' => 'inline',
+                    'content_id' => '<'.$image_name.'>',
+                    ));
+                }
+            }
+            $modified_html = str_replace(array_keys($html_images),array_values($html_images), $html);
+            if($modified_html != $html){
+                $html = $modified_html;
+                $Mail->moveBodyToInlinePart();
+            }
+        }
+    }
+
+    protected function _getDecodedBody($body)
+    {
+        $encoding = trim(strtolower($this->_findHeaderValue('content-transfer-encoding')));
+        $charset = trim(strtolower($this->_findHeaderAttributeValue('content-type','charset')));
+
+        if($encoding == 'base64'){
+            $body = base64_decode($body);
+        }elseif($encoding == 'quoted-printable'){
+            $body = preg_replace('/=([a-f0-9]{2})/ie', "chr(hexdec('\\1'))", preg_replace("/=\r?\n/", '', $body));
+        }
+        return empty($charset) ? $body : ($charset && $this->recode_messages ? Ak::recode($body, $this->recode_to_charset, $charset, $this->html_charset_on_recoding_failure) : $body);
+    }
+
+    protected function _findHeaderValue($name)
+    {
+        $header = $this->_findHeader($name);
+        return !empty($header['value']) ? $header['value'] : false;
+    }
+
+    protected function _findHeaderAttributeValue($name, $attribute)
+    {
+        $header = $this->_findHeader($name);
+        return !empty($header['attributes'][$attribute]) ? $header['attributes'][$attribute] : false;
+    }
+
+    protected function _findHeader($name)
+    {
+        $results = array();
+        foreach ($this->headers as $header) {
+            if(isset($header['name']) && strtolower($header['name']) == $name){
+                $results[] = $header;
+            }
+        }
+        return empty($results) ? false : (count($results) > 1 ? $results : array_shift($results));
+    }
+
+    protected function _parseHeaderLine($header_line)
+    {
+        $header = array();
+        if(preg_match("/^([A-Za-z\-]+)\: *(.*)$/",$header_line,$match)){
+            $header['name'] = $match[1];
+            $header['value'] = $match[2];
+            $this->_decodeHeader_($header);
+            $this->_headerCanHaveAttributes($header) ? $this->_extractAttributesForHeader_($header) : null;
+            return $header;
+        }
+
+    }
+
+    protected function _headerCanHaveAttributes($header)
+    {
+        return !in_array(strtolower($header['name']), array('subject','to','from','cc','bcc'));
+    }
+
+    protected function _extractAttributesForHeader_(&$header)
+    {
+        $attributes = array();
+        if(preg_match_all("/([A-Z\-_ ]+)".
+        "(\*[0-9 ]*)?". // RFC 2231
+        "=([^;]*);?/i", $header['value'], $matches)){
+            $header['value'] = str_replace($matches[0],'', $header['value']);
+            foreach ($matches[0] as $k=>$match){
+                $attribute_name = trim($matches[1][$k]);
+                $value = trim($matches[3][$k],'; "\'');
+                if(!empty($matches[2][$k])){ // RFC 2231
+                    $value = (empty($attributes[$attribute_name]) ? '' : $attributes[$attribute_name])
+                    .$this->_decodeHeaderAttribute($value, $matches[2][$k]);
+                }
+                $attributes[$attribute_name] = $value;
+            }
+        }
+
+        $header['value'] = trim($header['value'],'; ');
+
+        if(strstr($header['value'],';') && strtolower($header['name']) != 'date' &&
+        preg_match("/([; ])*(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun),? *)?(\d\d?)".
+        " +(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) +(\d\d\d\d) ".
+        "+(\d{2}:\d{2}(?::\d\d)) +([\( ]*(UT|GMT|EST|EDT|CST|CDT|MST|MDT|".
+        "PST|PDT|[A-Z]|(?:\+|\-)\d{4})[\) ]*)+/",$header['value'],$match)){
+            $header['value'] = str_replace($match[0],'', $header['value']);
+            $attributes['Date'] = trim(str_replace('  ',' ',$match[0]),"; ");
+        }
+
+        $header['attributes'] = empty($attributes) ? false : $attributes;
+    }
+
+    protected function _decodeHeader_(&$header)
+    {
+        if(!empty($header['value'])){
+            $encoded_header =  preg_replace('/\?\=([^=^\n^\r]+)?\=\?/', "?=$1\n=?",$header['value']);
+            $header_value = $header['value'];
+            if(preg_match_all('/(\=\?([^\?]+)\?([BQ]{1})\?([^\?]+)\?\=?)+/i', $encoded_header, $match)){
+                foreach (array_keys($match[0]) as $k){
+                    $charset = strtoupper($match[2][$k]);
+                    $decode_function = strtolower($match[3][$k]) == 'q' ? 'quoted_printable_decode' : 'base64_decode';
+                    $decoded_part = trim(
+                    Ak::recode($decode_function(str_replace('_',' ',$match[4][$k])), $this->recode_to_charset, $charset, $this->html_charset_on_recoding_failure)
+
+                    );
+
+                    $header_value = str_replace(trim($match[0][$k]), $decoded_part, $header_value);
+                }
+            }
+            $header_value = trim(preg_replace("/(%0A|%0D|\n+|\r+)/i",'',$header_value));
+            if($header_value != $header['value']){
+                $header['encoded'] = $header['value'];
+                $header['value'] = $header_value;
+                isset($charset) && $header['charset'] = $charset;
+            }
+        }
+    }
+
+    /**
+     * RFC 2231 Implementation
+     */
+    protected function _decodeHeaderAttribute($header_attribute, $charset = '')
+    {
+        if(preg_match("/^([A-Z0-9\-]+)(\'[A-Z\-]{2,5}\')?/i",$header_attribute,$match)){
+            $charset = $match[1];
+            $header_attribute = urldecode(str_replace(array('_','='),array('%20','%'), substr($header_attribute,strlen($match[0]))));
+        }
+        return Ak::recode($header_attribute, 'UTF-8', $charset);
+    }
+
+    protected function _getRawHeaderAndBody($raw_part)
+    {
+        return
+        array_map('trim',
+        preg_split("/\n\n/",
+        preg_replace("/(\n[\t ]+)/",'', // Join multiline headers
+        str_replace(array("\r\n","\n\r","\r"),"\n", $raw_part."\n") // Lets keep it simple and use only \n for decoding
+        )."\n\n",2));
+    }
+
+    protected function _expandHeadersOnMailObject(&$Mail)
+    {
+        if(!empty($Mail->headers)){
+            foreach ($Mail->headers as $details){
+                if (empty($details['name'])) {
+                    continue;
+                }
+                $caption = AkInflector::underscore($details['name']);
+                if(!in_array($caption, array('headers','body','parts'))){
+                    if(!empty($details['value'])){
+                        if(empty($Mail->$caption)){
+                            $Mail->$caption = $details['value'];
+                        }elseif (!empty($Mail->$caption) && is_array($Mail->$caption)){
+                            $Mail->{$caption}[] = $details['value'];
+                        }else{
+                            $Mail->$caption = array($Mail->$caption, $details['value']);
+                        }
+                        $Mail->header[$caption] = $Mail->$caption;
+                    }
+                    if(!empty($details['attributes'])){
+                        $Mail->{$caption.'_attributes'} = $details['attributes'];
+                    }
+                }
+            }
+        }
+    }
+
+    protected function _extractCssRulesFromContent($contents,$cssRules=false)
+    {
+        if(empty($cssRules)) {
+            $cssRules=array('id'=>array(),'class'=>array(),'element'=>array());
+        }
+        if(preg_match_all('/(.*?)\{(.*?)\}/s',$contents,$rules)) {
+            //Ak::getLogger()->log('message','rules from '.$contents.':'.var_export($rules,true));
+            $ruleNames=$rules[1];
+            foreach($ruleNames as $idx=>$ruleName) {
+                $ruleName=trim($ruleName);
+                switch(substr($ruleName,0,1)) {
+                    case '#':
+                        $ruleName=substr($ruleName,1);
+                        if(!isset($cssRules['id'][$ruleName])) {
+                            $cssRules['id'][$ruleName] = '';
+                        }
+                        $cssRules['id'][$ruleName].=trim(str_replace(array('[',']'),array('{','}'),$rules[2][$idx]));
+                        break;
+                    case '.':
+                        $ruleName=substr($ruleName,1);
+                        if(!isset($cssRules['class'][$ruleName])) {
+                            $cssRules['class'][$ruleName] = '';
+                        }
+                        $cssRules['class'][$ruleName].=trim($rules[2][$idx]);
+                        break;
+                    default:
+                        if(!isset($cssRules['element'][$ruleName])) {
+                            $cssRules['element'][$ruleName] = '';
+                        }
+                        $cssRules['element'][$ruleName].=trim($rules[2][$idx]);
+                }
+            }
+        }
+        return $cssRules;
+    }
+
+    protected function _extractCssRulesFromFile($path,$cssRules = false)
+    {
+        if(empty($cssRules)) {
+            $cssRules=array('id'=>array(),'class'=>array(),'element'=>array());
+        }
+        $path = $this->_getStylesheetPath($path);
+        $contents = Ak::file_get_contents($path);
+        $cssRules=$this->_extractCssRulesFromContent($contents);
+        return $cssRules;
+    }
+
+    protected function _applyCssRules(&$Mail,$cssRules)
     {
         //Ak::getLogger()->log('message','detected css rules:'.var_export($cssRules,true));
         $html = $Mail->body;
@@ -488,8 +526,8 @@ class AkMailParser
                         $fullMatch=str_replace($smatches[0],' ',$fullMatch);
                     }
                     /**
-                     * removing id
-                     */
+                         * removing id
+                         */
                     $fullMatch=str_replace($matches[1][$idx],'',$fullMatch);
                     list($style,$addAttributes,$fullMatch)=$this->_uniqueStyle($style, $fullMatch);
                     $newHtml=substr($fullMatch,0,-1).' style="'.str_replace('"',"'",$style).'"'.(!empty($addAttributes)?' '.implode(' ',$addAttributes):'').'>';
@@ -502,7 +540,8 @@ class AkMailParser
             }
         }
     }
-    public function _parseCssElementValue($name,$value)
+
+    protected function _parseCssElementValue($name,$value)
     {
         switch($name) {
             case 'width':
@@ -547,9 +586,7 @@ class AkMailParser
         }
     }
 
-
-
-    public function _uniqueStyle($stylestring, $fullElement = '') {
+    protected function _uniqueStyle($stylestring, $fullElement = '') {
         $styles = explode(';', $stylestring);
         $newstyles=array();
         $styleArray=array();
@@ -580,7 +617,7 @@ class AkMailParser
         }
     }
 
-    public function _extractCssRules(&$Mail)
+    protected function _extractCssRules(&$Mail)
     {
         $html = $Mail->body;
         $cssRules=array();
@@ -592,8 +629,8 @@ class AkMailParser
             }
         }
         /**
-         * get Inline Rules
-         */
+             * get Inline Rules
+             */
         if(preg_match_all('/<style[^>]*>(.*?)<\/style>/s',$html,$matches)) {
             foreach($matches[1] as $idx=>$css) {
                 $cssRules=$this->_extractCssRulesFromContent($css,$cssRules);
@@ -606,46 +643,7 @@ class AkMailParser
         return $cssRules;
     }
 
-    public function extractImagesIntoInlineParts(&$Mail, $options = array())
-    {
-        $html =& $Mail->body;
-        $images = TextHelper::get_image_urls_from_html($html);
-
-        $html_images = array();
-        if(!empty($images)){
-            $tmp_dir = AkConfig::getDir('tmp');
-            $app_dir = AkConfig::getDir('app');
-
-            $images = array_diff(array_unique($images), array(''));
-
-            foreach ($images as $image){
-                $original_image_name = $image;
-                if(substr($image,0,4)=='cid:'){
-                    continue;
-                }
-                $image = $this->_getImagePath($image);
-
-                if(!empty($image)){
-                    $extenssion = substr($image, strrpos('.'.$image,'.'));
-                    $image_name = Ak::uuid().'.'.$extenssion;
-                    $html_images[$original_image_name] = 'cid:'.$image_name;
-                    $Mail->setAttachment('image/'.$extenssion, array(
-                    'body' => Ak::file_get_contents($image, array('base_path' => strstr($image, $app_dir) ? null : $tmp_dir)),
-                    'filename' => $image_name,
-                    'content_disposition' => 'inline',
-                    'content_id' => '<'.$image_name.'>',
-                    ));
-                }
-            }
-            $modified_html = str_replace(array_keys($html_images),array_values($html_images), $html);
-            if($modified_html != $html){
-                $html = $modified_html;
-                $Mail->_moveBodyToInlinePart();
-            }
-        }
-    }
-
-    public function _getStylesheetPath($path)
+    protected function _getStylesheetPath($path)
     {
         if(preg_match('/^http(s)?:\/\//', $path)){
             $path_info = pathinfo($path);
@@ -671,7 +669,7 @@ class AkMailParser
         return $path;
     }
 
-    public function _getImagePath($path)
+    protected function _getImagePath($path)
     {
         $tmp_dir = AkConfig::getDir('tmp');
         if(preg_match('/^http(s)?:\/\//', $path)){
@@ -703,4 +701,5 @@ class AkMailParser
         }
         return $path;
     }
+
 }

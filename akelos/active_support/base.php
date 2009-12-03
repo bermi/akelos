@@ -345,7 +345,7 @@ class Ak
         }elseif(is_dir($path)){
             if ($id_dir = opendir($path)){
                 while (false !== ($file = readdir($id_dir))){
-                    if ($file != "." && $file != ".." && $file != '.svn'){
+                    if ($file != "." && $file != ".." && $file != '.svn' && $file != '.git'){
                         if(!empty($options['files']) && !is_dir($path.DS.$file)){
                             $result[] = $file;
                         }elseif(!empty($options['dirs'])){
@@ -2219,7 +2219,7 @@ class Ak
             'AkActionWebserviceApi'     => 'action_pack/action_web_service/api.php',
             'AkActionWebServiceClient'  => 'action_pack/action_web_service/client.php',
             'AkActionWebServiceServer'  => 'action_pack/action_web_service/server.php',
-            
+
             // Active Record
             'AkActiveRecord'            => 'active_record/active_record.php',
             'AkDbAdapter'               => 'active_record/adapters/base.php',
@@ -2255,7 +2255,7 @@ class Ak
             'AkTime'                    => 'active_support/core/types/time.php',
             'AkelosGenerator'           => 'active_support/generators/base.php',
             'AkCharset'                 => 'active_support/i18n/charset/base.php',
-            'AkCountries'               => 'active_support/i18n/countries.php',        
+            'AkCountries'               => 'active_support/i18n/countries.php',
             'AkLocaleManager'           => 'active_support/i18n/locale_manager.php',
             'AkTimeZone'                => 'active_support/i18n/time_zone.php',
             'AkImage'                   => 'active_support/image/base.php',

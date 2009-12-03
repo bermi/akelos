@@ -1,15 +1,26 @@
 <?php
 
-
 include_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Mail'.DS.'mimeDecode.php');
 
 class AkMailEncoding extends Mail_mimeDecode
 {
-    // PEAR's header decoding function is buggy and is not enough tested, so we
-    // override it using the Akelos charset transcoding engine to get the result
-    // as UTF-8
-    public function _decodeHeader($encoded_header)
+    public function decode()
     {
+        $this->_include_bodies = $this->_decode_bodies = $this->_decode_headers = true;
+
+        $structure = $this->_decode($this->_header, $this->_body);
+        if ($structure === false) {
+            $structure = $this->raiseError($this->_error);
+        }
+
+        return $structure;
+    }
+
+    protected function _decodeHeader($encoded_header)
+    {
+        // PEAR's header decoding function is buggy and is not enough tested, so we
+        // override it using the Akelos charset transcoding engine to get the result
+        // as UTF-8
         $encoded_header =  str_replace(array('_',"\r","\n =?"),array(' ',"\n","\n=?"),
         preg_replace('/\?\=([^=^\n^\r]+)?\=\?/', "?=$1\n=?",$encoded_header));
 
@@ -26,22 +37,7 @@ class AkMailEncoding extends Mail_mimeDecode
         return trim(preg_replace("/(%0A|%0D|\n+|\r+)/i",'',$decoded));
     }
 
-    public function decode()
-    {
-        $this->_include_bodies = $this->_decode_bodies = $this->_decode_headers = true;
-
-        $structure = $this->_decode($this->_header, $this->_body);
-        if ($structure === false) {
-            $structure = $this->raiseError($this->_error);
-        }
-
-        return $structure;
-    }
-
-
-    ////
-
-    public function _encodeAddress($address_string, $header_name = '', $names = true)
+    protected function _encodeAddress($address_string, $header_name = '', $names = true)
     {
         $headers = '';
         $addresses = Ak::toArray($address_string);
@@ -68,13 +64,9 @@ class AkMailEncoding extends Mail_mimeDecode
         return empty($headers) ? false : (!empty($header_name) ? $header_name.': '.$headers.AK_MAIL_HEADER_EOL : $headers);
     }
 
-    public function _isValidAddress($email)
+    protected function _isValidAddress($email)
     {
         return preg_match(AK_EMAIL_REGULAR_EXPRESSION, $email);
     }
-
-
 }
 
-
-?>

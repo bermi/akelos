@@ -7,3 +7,4 @@ app/locales/
 cache/
 test/_fixtures/
 nbproject/
+docs/akelos/doc.sqlite

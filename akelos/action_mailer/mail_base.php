@@ -15,6 +15,7 @@ class AkMailBase extends Mail
 
     public $_attach_html_images = true;
 
+
     public function __construct()
     {
         $args = func_get_args();
@@ -45,7 +46,6 @@ class AkMailBase extends Mail
         return $Mail;
     }
 
-
     public function setBody($body)
     {
         if(is_string($body)){
@@ -65,7 +65,6 @@ class AkMailBase extends Mail
         }
     }
 
-
     public function getBody()
     {
         if(!is_array($this->body)){
@@ -82,30 +81,17 @@ class AkMailBase extends Mail
         }
     }
 
-    public function _base64Body($content)
-    {
-        $Cache = Ak::cache();
-        $cache_id = md5($content);
-        $Cache->init(3600);
-        if (!$encoded_content = $Cache->get($cache_id)) {
-            $encoded_content = trim(chunk_split(base64_encode($content)));
-            unset($content);
-            $Cache->save($encoded_content);
-        }
-        return $encoded_content;
-    }
-
     /**
-    * Specify the CC addresses for the message.
-    */
+     * Specify the CC addresses for the message.
+     */
     public function setCc($cc)
     {
         $this->cc = $cc;
     }
 
     /**
-    * Specify the BCC addresses for the message.
-    */
+     * Specify the BCC addresses for the message.
+     */
     public function setBcc($bcc)
     {
         $this->bcc = $bcc;
@@ -136,7 +122,6 @@ class AkMailBase extends Mail
         list($this->content_type, $ctype_attrs) = $this->_getContentTypeAndAttributes($content_type);
         $this->setContenttypeAttributes($ctype_attrs);
     }
-
 
     public function getContentType()
     {
@@ -214,25 +199,6 @@ class AkMailBase extends Mail
         return strtolower(get_class($this)) == 'akmailpart';
     }
 
-    public function _getAttributesForHeader($header_index, $force_reload = false)
-    {
-        if(empty($this->_header_attributes_set_for[$header_index]) || $force_reload){
-            $header_index = strtolower(AkInflector::underscore($header_index)).'_attributes';
-            if(!empty($this->$header_index)){
-                $attributes = '';
-                if(!empty($this->$header_index)){
-                    foreach ((array)$this->$header_index as $key=>$value){
-                        $attributes .= ";$key=$value";
-                    }
-                }
-                $this->_header_attributes_set_for[$header_index] = $attributes;
-            }
-        }
-        if (!empty($this->_header_attributes_set_for[$header_index])){
-            return $this->_header_attributes_set_for[$header_index];
-        }
-    }
-
     /**
      * Specify the content disposition for the message.
      */
@@ -270,31 +236,6 @@ class AkMailBase extends Mail
         return $this->getTransferEncoding();
     }
 
-    public function _getContentTypeAndAttributes($content_type = null)
-    {
-        if(empty($content_type)){
-            return array($this->getDefault('content_type'), array());
-        }
-        $attributes = array();
-        if(strstr($content_type,';')){
-            list($content_type, $attrs) = preg_split("/;\\s*/",$content_type);
-            if(!empty($attrs)){
-                foreach ((array)$attrs as $s){
-                    if(strstr($s,'=')){
-                        list($k,$v) = array_map('trim', explode("=", $s, 2));
-                        if(!empty($v)){
-                            $attributes[$k] = $v;
-                        }
-                    }
-                }
-            }
-        }
-
-        $attributes = array_diff(array_merge(array('charset'=> (empty($this->_charset)?$this->getDefault('charset'):$this->_charset)),$attributes), array(''));
-        return array(trim($content_type), $attributes);
-    }
-
-
     public function getDefault($field)
     {
         $field = AkInflector::underscore($field);
@@ -303,14 +244,6 @@ class AkMailBase extends Mail
         'content_type' => 'text/plain',
         );
         return isset($defaults[$field]) ? $defaults[$field] : null;
-    }
-
-
-    public function _addHeaderAttributes()
-    {
-        foreach($this->getHeaders() as $k=>$v){
-            $this->headers[$k] .= $this->_getAttributesForHeader($k);
-        }
     }
 
     public function getRawHeaders($options = array())
@@ -369,28 +302,6 @@ class AkMailBase extends Mail
         $this->_sanitizeHeaders($this->headers);
     }
 
-    public function _moveMailInstanceAttributesToHeaders()
-    {
-        foreach ((array)$this as $k=>$v){
-            if($k[0] != '_' && $this->_belongsToHeaders($k)){
-                $attribute_getter = 'get'.ucfirst($k);
-                $attribute_name = AkInflector::underscore($k);
-                $header_value = method_exists($this,$attribute_getter) ? $this->$attribute_getter() : $v;
-                is_array($header_value) ? null : $this->setHeader($attribute_name, $header_value);
-            }
-        }
-    }
-
-    public function _belongsToHeaders($attribute)
-    {
-        return !in_array(strtolower($attribute),array('body','recipients','part','parts','raw_message','sep','implicit_parts_order','header','headers'));
-    }
-
-    public function _castHeaderKey($key)
-    {
-        return str_replace(' ','-',ucwords(str_replace('_',' ',AkInflector::underscore($key))));
-    }
-
     /**
      * Specify additional headers to be added to the message.
      */
@@ -401,7 +312,6 @@ class AkMailBase extends Mail
         }
     }
 
-
     public function setHeader($name, $value = null, $options = array())
     {
         if(is_array($value)){
@@ -410,8 +320,6 @@ class AkMailBase extends Mail
             $this->headers[$name] = $value;
         }
     }
-
-
 
     /**
      * Generic setter
@@ -437,7 +345,6 @@ class AkMailBase extends Mail
         }
     }
 
-
     public function getSortedParts($parts, $order = array())
     {
         $this->_parts_order = array_map('strtolower', empty($order) ? $this->implicit_parts_order : $order);
@@ -452,33 +359,6 @@ class AkMailBase extends Mail
         }
     }
 
-    public function _contentTypeComparison($a, $b)
-    {
-        if(!isset($a->content_type) || !isset($b->content_type)){
-            if (!isset($a->content_type) && !isset($b->content_type)) {
-                return 0;
-            } else if (!isset($a->content_type)) {
-                return -1;
-            } else {
-                return 1;
-            }
-        }
-
-        $a_ct = strtolower($a->content_type);
-        $b_ct = strtolower($b->content_type);
-        $a_in = in_array($a_ct, $this->_parts_order);
-        $b_in = in_array($b_ct, $this->_parts_order);
-        if($a_in && $b_in){
-            $a_pos = array_search($a_ct, $this->_parts_order);
-            $b_pos = array_search($b_ct, $this->_parts_order);
-            return (($a_pos == $b_pos) ? 0 : (($a_pos < $b_pos) ? -1 : 1));
-        }
-        return $a_in ? -1 : ($b_in ? 1 : (($a_ct == $b_ct) ? 0 : (($a_ct < $b_ct) ? -1 : 1)));
-    }
-
-
-
-
     public function setParts($parts, $position = 'append', $propagate_multipart_parts = false)
     {
         foreach ((array)$parts as $k=>$part){
@@ -490,7 +370,6 @@ class AkMailBase extends Mail
             }
         }
     }
-
 
     /**
      * Add a part to a multipart message, with an array of options like
@@ -514,53 +393,6 @@ class AkMailBase extends Mail
         empty($propagate_multipart_parts) ? $this->_propagateMultipartParts() : null;
     }
 
-    public function _propagateMultipartParts()
-    {
-        if(!empty($this->parts)){
-            foreach (array_keys($this->parts) as $k){
-                $Part =& $this->parts[$k];
-                if(empty($Part->_propagated)){
-                    $Part->_propagated = true;
-                    if(!empty($Part->content_disposition)){
-                        // Inline bodies
-                        if(isset($Part->content_type) && stristr($Part->content_type,'text/') && $Part->content_disposition == 'inline'){
-                            if((!empty($this->body) && is_string($this->body))
-                            ||  (!empty($this->body) && is_array($this->body) && ($this->isMultipart() || $this->content_type == 'text/plain'))
-                            ){
-                                $this->_moveBodyToInlinePart();
-                            }
-                            $type = strstr($Part->content_type, '/') ? substr($Part->content_type,strpos($Part->content_type,"/")+1) : $Part->content_type;
-                            $Part->_on_body_as = $type;
-                            $this->body[$type] = $Part->body;
-
-                        }
-
-                        // Attachments
-                        elseif ($Part->content_disposition == 'attachment' || ($Part->content_disposition == 'inline' && !preg_match('/^(text|multipart)\//i',$Part->content_type)) || !empty($Part->content_location)){
-                            $this->_addAttachment($Part);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public function _moveBodyToInlinePart()
-    {
-        $options = array(
-        'content_type' => @$this->content_type,
-        'body' => @$this->body,
-        'charset' => @$this->charset,
-        'content_disposition' => 'inline'
-        );
-        foreach (array_keys($options) as $k){
-            unset($this->$k);
-        }
-
-        $this->setAsMultipart();
-        $this->setPart($options, 'preppend');
-    }
-
     public function setAsMultipart()
     {
         $this->_multipart_message = true;
@@ -570,30 +402,10 @@ class AkMailBase extends Mail
     {
         return !empty($this->_multipart_message);
     }
+
     public function isAttachment()
     {
         return $this->content_disposition == 'attachment';
-    }
-
-    public function _addAttachment(&$Part)
-    {
-        $Part->original_filename = !empty($Part->content_type_attributes['name']) ? $Part->content_type_attributes['name'] :
-        (!empty($Part->content_disposition_attributes['filename']) ? $Part->content_disposition_attributes['filename'] :
-        (empty($Part->filename) ? @$Part->content_location : $Part->filename));
-
-        $Part->original_filename = preg_replace('/[^A-Z^a-z^0-9^\-^_^\.]*/','',$Part->original_filename);
-
-        if(!empty($Part->body)){
-            $Part->data =& $Part->body;
-        }
-        if(empty($Part->content_disposition_attributes['filename'])){
-            $Part->content_disposition_attributes['filename'] = $Part->original_filename;
-        }
-        if(empty($Part->content_type_attributes['name'])){
-            $Part->content_type_attributes['name'] = $Part->original_filename;
-        }
-        unset($Part->content_type_attributes['charset']);
-        $this->attachments[] =& $Part;
     }
 
     public function hasAttachments()
@@ -642,23 +454,19 @@ class AkMailBase extends Mail
         }
     }
 
-
     public function setMessageId($id)
     {
         $this->messageId = $id;
     }
 
-
     /**
-    * Specify the order in which parts should be sorted, based on content-type.
-    * This defaults to the value for the +default_implicit_parts_order+.
-    */
+     * Specify the order in which parts should be sorted, based on content-type.
+     * This defaults to the value for the +default_implicit_parts_order+.
+     */
     public function setImplicitPartsOrder($implicit_parts_order)
     {
         $this->implicit_parts_order = $implicit_parts_order;
     }
-
-
 
     public function getEncoded()
     {
@@ -671,4 +479,180 @@ class AkMailBase extends Mail
         return preg_match('/default.?|template.?|.?deliver.?|server_settings|base_url|mailerName/', $header_name) != true;
     }
 
+    public function moveBodyToInlinePart()
+    {
+        $options = array(
+        'content_type' => @$this->content_type,
+        'body' => @$this->body,
+        'charset' => @$this->charset,
+        'content_disposition' => 'inline'
+        );
+        foreach (array_keys($options) as $k){
+            unset($this->$k);
+        }
+
+        $this->setAsMultipart();
+        $this->setPart($options, 'preppend');
+    }
+
+    protected function _base64Body($content)
+    {
+        $Cache = Ak::cache();
+        $cache_id = md5($content);
+        $Cache->init(3600);
+        if (!$encoded_content = $Cache->get($cache_id)) {
+            $encoded_content = trim(chunk_split(base64_encode($content)));
+            unset($content);
+            $Cache->save($encoded_content);
+        }
+        return $encoded_content;
+    }
+
+    protected function _getAttributesForHeader($header_index, $force_reload = false)
+    {
+        if(empty($this->_header_attributes_set_for[$header_index]) || $force_reload){
+            $header_index = strtolower(AkInflector::underscore($header_index)).'_attributes';
+            if(!empty($this->$header_index)){
+                $attributes = '';
+                if(!empty($this->$header_index)){
+                    foreach ((array)$this->$header_index as $key=>$value){
+                        $attributes .= ";$key=$value";
+                    }
+                }
+                $this->_header_attributes_set_for[$header_index] = $attributes;
+            }
+        }
+        if (!empty($this->_header_attributes_set_for[$header_index])){
+            return $this->_header_attributes_set_for[$header_index];
+        }
+    }
+
+    protected function _getContentTypeAndAttributes($content_type = null)
+    {
+        if(empty($content_type)){
+            return array($this->getDefault('content_type'), array());
+        }
+        $attributes = array();
+        if(strstr($content_type,';')){
+            list($content_type, $attrs) = preg_split("/;\\s*/",$content_type);
+            if(!empty($attrs)){
+                foreach ((array)$attrs as $s){
+                    if(strstr($s,'=')){
+                        list($k,$v) = array_map('trim', explode("=", $s, 2));
+                        if(!empty($v)){
+                            $attributes[$k] = $v;
+                        }
+                    }
+                }
+            }
+        }
+
+        $attributes = array_diff(array_merge(array('charset'=> (empty($this->_charset)?$this->getDefault('charset'):$this->_charset)),$attributes), array(''));
+        return array(trim($content_type), $attributes);
+    }
+
+    protected function _addHeaderAttributes()
+    {
+        foreach($this->getHeaders() as $k=>$v){
+            $this->headers[$k] .= $this->_getAttributesForHeader($k);
+        }
+    }
+
+    protected function _moveMailInstanceAttributesToHeaders()
+    {
+        foreach ((array)$this as $k=>$v){
+            if($k[0] != '_' && $this->_belongsToHeaders($k)){
+                $attribute_getter = 'get'.ucfirst($k);
+                $attribute_name = AkInflector::underscore($k);
+                $header_value = method_exists($this,$attribute_getter) ? $this->$attribute_getter() : $v;
+                is_array($header_value) ? null : $this->setHeader($attribute_name, $header_value);
+            }
+        }
+    }
+
+    protected function _belongsToHeaders($attribute)
+    {
+        return !in_array(strtolower($attribute),array('body','recipients','part','parts','raw_message','sep','implicit_parts_order','header','headers'));
+    }
+
+    protected function _castHeaderKey($key)
+    {
+        return str_replace(' ','-',ucwords(str_replace('_',' ',AkInflector::underscore($key))));
+    }
+
+    protected function _contentTypeComparison($a, $b)
+    {
+        if(!isset($a->content_type) || !isset($b->content_type)){
+            if (!isset($a->content_type) && !isset($b->content_type)) {
+                return 0;
+            } else if (!isset($a->content_type)) {
+                return -1;
+            } else {
+                return 1;
+            }
+        }
+
+        $a_ct = strtolower($a->content_type);
+        $b_ct = strtolower($b->content_type);
+        $a_in = in_array($a_ct, $this->_parts_order);
+        $b_in = in_array($b_ct, $this->_parts_order);
+        if($a_in && $b_in){
+            $a_pos = array_search($a_ct, $this->_parts_order);
+            $b_pos = array_search($b_ct, $this->_parts_order);
+            return (($a_pos == $b_pos) ? 0 : (($a_pos < $b_pos) ? -1 : 1));
+        }
+        return $a_in ? -1 : ($b_in ? 1 : (($a_ct == $b_ct) ? 0 : (($a_ct < $b_ct) ? -1 : 1)));
+    }
+
+    protected function _propagateMultipartParts()
+    {
+        if(!empty($this->parts)){
+            foreach (array_keys($this->parts) as $k){
+                $Part =& $this->parts[$k];
+                if(empty($Part->_propagated)){
+                    $Part->_propagated = true;
+                    if(!empty($Part->content_disposition)){
+                        // Inline bodies
+                        if(isset($Part->content_type) && stristr($Part->content_type,'text/') && $Part->content_disposition == 'inline'){
+                            if((!empty($this->body) && is_string($this->body))
+                            ||  (!empty($this->body) && is_array($this->body) && ($this->isMultipart() || $this->content_type == 'text/plain'))
+                            ){
+                                $this->moveBodyToInlinePart();
+                            }
+                            $type = strstr($Part->content_type, '/') ? substr($Part->content_type,strpos($Part->content_type,"/")+1) : $Part->content_type;
+                            $Part->_on_body_as = $type;
+                            $this->body[$type] = $Part->body;
+
+                        }
+
+                        // Attachments
+                        elseif ($Part->content_disposition == 'attachment' || ($Part->content_disposition == 'inline' && !preg_match('/^(text|multipart)\//i',$Part->content_type)) || !empty($Part->content_location)){
+                            $this->_addAttachment($Part);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected function _addAttachment(&$Part)
+    {
+        $Part->original_filename = !empty($Part->content_type_attributes['name']) ? $Part->content_type_attributes['name'] :
+        (!empty($Part->content_disposition_attributes['filename']) ? $Part->content_disposition_attributes['filename'] :
+        (empty($Part->filename) ? @$Part->content_location : $Part->filename));
+
+        $Part->original_filename = preg_replace('/[^A-Z^a-z^0-9^\-^_^\.]*/','',$Part->original_filename);
+
+        if(!empty($Part->body)){
+            $Part->data =& $Part->body;
+        }
+        if(empty($Part->content_disposition_attributes['filename'])){
+            $Part->content_disposition_attributes['filename'] = $Part->original_filename;
+        }
+        if(empty($Part->content_type_attributes['name'])){
+            $Part->content_type_attributes['name'] = $Part->original_filename;
+        }
+        unset($Part->content_type_attributes['charset']);
+        $this->attachments[] =& $Part;
+    }
 }

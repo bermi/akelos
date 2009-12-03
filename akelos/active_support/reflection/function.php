@@ -55,7 +55,7 @@ class AkReflectionFunction extends AkReflection
     {
         return $this->_definition;
     }
-    
+
     public function setTag($tag,$value)
     {
         if (!is_object($this->_docBlock)) {
@@ -74,7 +74,7 @@ class AkReflectionFunction extends AkReflection
         return isset($this->_definition['params']) ? $this->_definition['params'] : false;
     }
 
-    public function toString($indent=0,$methodName = null)
+    public function toString($indent=0, $methodName = null, $options = array())
     {
         $docBlock = $this->_docBlock;
         if ($docBlock->changed) {
@@ -98,6 +98,10 @@ class AkReflectionFunction extends AkReflection
         if ($methodName!=null) {
             $string = preg_replace('/function(.*?)('.$this->getName().')(.*?)\(/','function\\1'.$methodName.'\\3(',$string);
         }
+        if(isset($options['visibility'])){
+            $string = preg_replace('/(private|public|protected) function(.*?)('.$this->getName().')(.*?)\(/', $options['visibility'].' function\\2'.$this->getName().'\\4(',$string);
+        }
+
         return $string;
     }
 
@@ -114,10 +118,12 @@ class AkReflectionFunction extends AkReflection
     public function _parseDefinitions()
     {
         foreach($this->definitions as $definition) {
-            switch ($definition['type']) {
-                case 'function':
-                    $this->methods[] = new AkReflectionMethod($definition);
-                    break;
+            if(isset($definition['type'])){
+                switch ($definition['type']) {
+                    case 'function':
+                        $this->methods[] = new AkReflectionMethod($definition);
+                        break;
+                }
             }
         }
     }

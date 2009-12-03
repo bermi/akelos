@@ -276,7 +276,7 @@ class AkActionMailer extends AkBaseModel
     public $default_implicit_parts_order = array('multipart/alternative', 'text/html', 'text/enriched', 'text/plain');
     public $Message;
     public $Composer;
-    public $_defaultMailDriverName = 'AkMailMessage';
+    protected $_defaultMailDriverName = 'AkMailMessage';
 
     public function __construct(&$Driver = null)
     {
@@ -298,33 +298,30 @@ class AkActionMailer extends AkBaseModel
     }
 
     /**
-    * Specify the template name to use for current message. This is the "base"
-    * template name, without the extension or directory, and may be used to
-    * have multiple mailer methods share the same template.
-    */
+     * Specify the template name to use for current message. This is the "base"
+     * template name, without the extension or directory, and may be used to
+     * have multiple mailer methods share the same template.
+     */
     public function setTemplate($template_name)
     {
         $this->template = $template_name;
     }
 
     /**
-    * Override the mailer name, which defaults to an inflected version of the
-    * mailer's class name. If you want to use a template in a non-standard
-    * location, you can use this to specify that location.
-    */
+     * Override the mailer name, which defaults to an inflected version of the
+     * mailer's class name. If you want to use a template in a non-standard
+     * location, you can use this to specify that location.
+     */
     public function setMailerName($mailerName)
     {
         $this->mailerName = $mailerName;
     }
 
-    // Mail object specific setters
-
-
     /**
-    * Define the body of the message. This is either an array (in which case it
-    * specifies the variables to pass to the template when it is rendered),
-    * or a string, in which case it specifies the actual text of the message.
-    */
+     * Define the body of the message. This is either an array (in which case it
+     * specifies the variables to pass to the template when it is rendered),
+     * or a string, in which case it specifies the actual text of the message.
+     */
     public function setBody($body)
     {
         if(is_array($body) && count($body) == 1 && array_key_exists(0,$body)){
@@ -334,20 +331,21 @@ class AkActionMailer extends AkBaseModel
     }
 
     /**
-    * Specify the CC addresses for the message.
-    */
+     * Specify the CC addresses for the message.
+     */
     public function setCc($cc)
     {
         $this->Message->setCc($cc);
     }
 
     /**
-    * Specify the BCC addresses for the message.
-    */
+     * Specify the BCC addresses for the message.
+     */
     public function setBcc($bcc)
     {
         $this->Message->setBcc($bcc);
     }
+
     /**
      * Specify the charset to use for the message. This defaults to the
      *  +default_charset+ specified for AkActionMailer.
@@ -383,14 +381,13 @@ class AkActionMailer extends AkBaseModel
     }
 
     /**
-    * Specify the order in which parts should be sorted, based on content-type.
-    * This defaults to the value for the +default_implicit_parts_order+.
-    */
+     * Specify the order in which parts should be sorted, based on content-type.
+     * This defaults to the value for the +default_implicit_parts_order+.
+     */
     public function setImplicitPartsOrder($implicit_parts_order)
     {
         $this->Message->setImplicitPartsOrder($implicit_parts_order);
     }
-
 
     /**
      * Defaults to "1.0", but may be explicitly given if needed.
@@ -410,14 +407,13 @@ class AkActionMailer extends AkBaseModel
     }
 
     /**
-    * The date on which the message was sent. If not set (the default), the
-    * header will be set by the delivery agent.
-    */
+     * The date on which the message was sent. If not set (the default), the
+     * header will be set by the delivery agent.
+     */
     public function setSentOn($date)
     {
         $this->Message->setSentOn($date);
     }
-
 
     /**
      * Specify the subject of the message.
@@ -428,30 +424,30 @@ class AkActionMailer extends AkBaseModel
     }
 
     /**
-    * Add an attachment to the message.
-    *
-    * Example:
-    *
-    *   class ApplicationMailer extends AkActionMailer
-    *   {
-    *       // attachments
-    *       public function signupNotification($Recipient)
-    *       {
-    *           $this->setAttributes(array(
-    *               'recipients' => $Recipient->getEmailAddressWithName(),
-    *               'from'       => "system@example.com",
-    *               'subject'    => "New account information"
-    *           ));
-    *
-    *           $this->addAttachment(array(
-    *               'content_type' => 'image/jpeg',
-    *               'body' => Ak::file_get_contents("an-image.jpg")));
-    *
-    *           $this->addAttachment('application/pdf', generate_your_pdf_here());
-    *       }
-    *   }
-    *
-    *
+     * Add an attachment to the message.
+     *
+     * Example:
+     *
+     *   class ApplicationMailer extends AkActionMailer
+     *   {
+     *       // attachments
+     *       public function signupNotification($Recipient)
+     *       {
+     *           $this->setAttributes(array(
+     *               'recipients' => $Recipient->getEmailAddressWithName(),
+     *               'from'       => "system@example.com",
+     *               'subject'    => "New account information"
+     *           ));
+     *
+     *           $this->addAttachment(array(
+     *               'content_type' => 'image/jpeg',
+     *               'body' => Ak::file_get_contents("an-image.jpg")));
+     *
+     *           $this->addAttachment('application/pdf', generate_your_pdf_here());
+     *       }
+     *   }
+     *
+     *
      */
     public function addAttachment()
     {
@@ -481,7 +477,6 @@ class AkActionMailer extends AkBaseModel
         $this->_setter_has_been_called = true;
     }
 
-
     /**
      * Gets a well formed mail in plain text
      */
@@ -497,7 +492,6 @@ class AkActionMailer extends AkBaseModel
     {
         return $this->Message;
     }
-
 
     /**
      * Receives a raw email, parses it into an email object, decodes it,
@@ -520,7 +514,6 @@ class AkActionMailer extends AkBaseModel
         $this->Message = AkMailBase::parse($raw_mail);
         return $this->Message;
     }
-
 
     /**
      * Deliver the given mail object directly. This can be used to deliver
@@ -546,7 +539,6 @@ class AkActionMailer extends AkBaseModel
         return $Composer->getRawMessage();
     }
 
-
     /**
      * Initialize the mailer via the given +method_name+. The body will be
      * rendered and a new AkMailMessage object created.
@@ -560,12 +552,11 @@ class AkActionMailer extends AkBaseModel
         return $this->Message;
     }
 
-
     /**
-    * Delivers an AkMailMessage object. By default, it delivers the cached mail
-    * object (from the AkActionMailer::create method). If no cached mail object exists, and
-    * no alternate has been given as the parameter, this will fail.
-    */
+     * Delivers an AkMailMessage object. By default, it delivers the cached mail
+     * object (from the AkActionMailer::create method). If no cached mail object exists, and
+     * no alternate has been given as the parameter, this will fail.
+     */
     public function deliver($method_name, $parameters = null, &$Message = null)
     {
         if(empty($Message) &&
@@ -647,7 +638,6 @@ class AkActionMailer extends AkBaseModel
         return $this->render(array_merge($options, array('file' => $method_name, 'body' => $body)));
     }
 
-
     public function render($options = array(),$set_body_only=false,$set_body=null)
     {
         static $body;
@@ -664,15 +654,13 @@ class AkActionMailer extends AkBaseModel
         }
 
         if(isset($options['partial']) && !empty($this->current_content_type)) {
-            /**
-             * choose the partial for this content-type
-             */
+            // choose the partial for this content-type
             $partialExtension = $this->current_template_extension;
             $partialParts = explode('.', basename($options['partial']));
             $partialDir=dirname($options['partial']);
             $contentTypePartialFilename=join('.',$partialParts).'.'.
-                                        str_replace('/','.',$this->current_content_type).'.'.
-                                        $partialExtension;
+            str_replace('/','.',$this->current_content_type).'.'.
+            $partialExtension;
 
             $testContentTypePartialPath=$this->getTemplatePath().DS.$partialDir.DS.'_'.$contentTypePartialFilename;
 
@@ -695,10 +683,10 @@ class AkActionMailer extends AkBaseModel
     }
 
     /**
-    * Set up the default values for the various instance variables of this
-    * mailer. Subclasses may override this method to provide different
-    * defaults.
-    */
+     * Set up the default values for the various instance variables of this
+     * mailer. Subclasses may override this method to provide different
+     * defaults.
+     */
     public function initializeDefaults($method_name)
     {
         foreach (array('charset','content_type','implicit_parts_order', 'mime_version') as $attribute) {
@@ -713,14 +701,6 @@ class AkActionMailer extends AkBaseModel
         $this->templateRoot = empty($this->templateRoot) ? AkConfig::getDir('app').DS.'views' : $this->templateRoot;
         $this->template = empty($this->template) ? $method_name : $this->template;
         $this->mailerName = empty($this->mailerName) ? AkInflector::underscore($this->getModelName()) : $this->mailerName;
-    }
-
-
-    public function &_initializeTemplateClass($assigns)
-    {
-        $TemplateInstance = new AkActionView($this->getTemplatePath(), $assigns, $this);
-        $TemplateInstance->_registerTemplateHandler('tpl','AkPhpTemplateHandler');
-        return $TemplateInstance;
     }
 
     public function &getComposer()
@@ -741,7 +721,6 @@ class AkActionMailer extends AkBaseModel
         }
     }
 
-
     /**
      * Alias for getModelName
      */
@@ -749,7 +728,6 @@ class AkActionMailer extends AkBaseModel
     {
         return $this->getModelName();
     }
-
 
     /**
      * Workarround for limited support of helpers on ActionMailer Views
@@ -793,7 +771,14 @@ class AkActionMailer extends AkBaseModel
         return $HelperLoader->getHelpersForMailer();
     }
 
-    public function _deliverUsingMailDeliveryMethod($method, &$Message, $options)
+    protected function &_initializeTemplateClass($assigns)
+    {
+        $TemplateInstance = new AkActionView($this->getTemplatePath(), $assigns, $this);
+        $TemplateInstance->_registerTemplateHandler('tpl','AkPhpTemplateHandler');
+        return $TemplateInstance;
+    }
+
+    protected function _deliverUsingMailDeliveryMethod($method, &$Message, $options)
     {
         $file_name = AkInflector::underscore(Ak::sanitize_include($method, 'paranoid'));
         $handler_name = 'Ak'.AkInflector::camelize($file_name).'Delivery';
@@ -811,8 +796,7 @@ class AkActionMailer extends AkBaseModel
         return $DeliveryHandler->deliver($this, $options);
     }
 
-
-    public function _getLayoutPath($method_name, $content_type = null, $extension = null)
+    protected function _getLayoutPath($method_name, $content_type = null, $extension = null)
     {
         $dirname = dirname($method_name);
         if(is_file($dirname.DS.'layout.'.$content_type.'.'.$extension)){
@@ -823,7 +807,7 @@ class AkActionMailer extends AkBaseModel
         return false;
     }
 
-    public function _renderWithALayout($options = array(), $layout_file)
+    protected function _renderWithALayout($options = array(), $layout_file)
     {
         static $body;
         if(isset($options['body'])) {
@@ -848,4 +832,3 @@ class AkActionMailer extends AkBaseModel
         return $LayoutTemplate->render($layout_options);
     }
 }
-

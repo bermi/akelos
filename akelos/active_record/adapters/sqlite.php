@@ -8,8 +8,9 @@ class AkSqliteDbAdapter extends AkDbAdapter
      */
     static function constructDsn($database_settings)
     {
+        $database_settings['database_file'] = isset($database_settings['database_file']) ? urlencode($database_settings['database_file']) : @$database_settings['host'];
         $dsn  = $database_settings['type'].'://';
-        $dsn .= urlencode($database_settings['database_file']).'/?persist';
+        $dsn .= $database_settings['database_file'].'/?persist';
         $dsn .= !empty($database_settings['options']) ? $database_settings['options'] : '';
 
         return $dsn;

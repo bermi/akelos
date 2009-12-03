@@ -7,7 +7,7 @@ class AkReflection
     $requires = array(),
     $tokens,
     $symbols;
-    
+
     public function parse($source)
     {
         if (!function_exists('token_get_all')) {

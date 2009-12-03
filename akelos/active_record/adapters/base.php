@@ -2,7 +2,6 @@
 
 class AkDbAdapter extends AkObject
 {
-
     public $connection;
     public $settings;
     public $dictionary;
@@ -74,10 +73,8 @@ class AkDbAdapter extends AkObject
             if (empty($database_specifications)) {
                 $settings_hash = AK_ENVIRONMENT;
                 $database_specifications = Ak::getSettings($namespace, false, $settings_hash);
-            } else if (is_string($database_specifications)){
-
+            } elseif (is_string($database_specifications)){
                 $environment_settings = Ak::getSettings($namespace, false, $database_specifications);
-
                 if (!empty($environment_settings)){
                     $database_specifications = $environment_settings;
                 } elseif(strstr($database_specifications, '://')) {
@@ -102,15 +99,10 @@ class AkDbAdapter extends AkObject
                 $database_specifications = $database_settings[$settings_hash];
             }
 
-            defined('AK_AVAILABLE_DATABASES') ? null : define('AK_AVAILABLE_DATABASES', 'mysql,pgsql,sqlite');
-
-            $available_adapters = Ak::toArray(AK_AVAILABLE_DATABASES);
             $class_name = 'AkDbAdapter';
-            $designated_database = strtolower($database_specifications['type']);
-            if (in_array($designated_database, $available_adapters)) {
-                $class_name = 'Ak'.ucfirst($designated_database).'DbAdapter';
-                require_once(AK_ACTIVE_RECORD_DIR.DS.'adapters'.DS.AkInflector::underscore($designated_database).'.php');
-            }
+            $class_name = 'Ak'.AkInflector::camelize($database_specifications['type']).'DbAdapter';
+            require_once(AK_ACTIVE_RECORD_DIR.DS.'adapters'.DS.AkInflector::underscore($database_specifications['type']).'.php');
+
             $Connection = new $class_name($database_specifications, $auto_connect);
 
             Ak::setStaticVar($static_var_name, $Connection);
@@ -171,7 +163,9 @@ class AkDbAdapter extends AkObject
     {
         $settings = $result = parse_url($dsn);
         $result['type'] = $settings['scheme'];
-        $result['password'] = $settings['pass'];
+        if(isset($settings['pass'])){
+            $result['password'] = $settings['pass'];
+        }
         $result['database_name'] = trim($settings['path'],'/');
         return $result;
     }

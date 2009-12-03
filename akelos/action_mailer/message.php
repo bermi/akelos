@@ -1,6 +1,5 @@
 <?php
 
-
 class AkMailMessage extends AkMailBase
 {
     /**
@@ -96,13 +95,6 @@ class AkMailMessage extends AkMailBase
         return AkActionMailerQuoting::quoteIfNecessary($this->subject, $charset);
     }
 
-    public function _getMessageHeaderFieldFormated($address_header_field)
-    {
-        $charset = empty($this->charset) ? AK_ACTION_MAILER_DEFAULT_CHARSET : $this->charset;
-        return AkActionMailerQuoting::quoteAddressIfNecessary($address_header_field, $charset);
-    }
-
-
     public function getRawMessage()
     {
         return AkMailComposer::getRawMessage($this);
@@ -112,6 +104,12 @@ class AkMailMessage extends AkMailBase
     {
         $Composer = new AkMailComposer();
         return $Composer->getRawHeadersAndBody($this);
+    }
+
+    protected function _getMessageHeaderFieldFormated($address_header_field)
+    {
+        $charset = empty($this->charset) ? AK_ACTION_MAILER_DEFAULT_CHARSET : $this->charset;
+        return AkActionMailerQuoting::quoteAddressIfNecessary($address_header_field, $charset);
     }
 }
 

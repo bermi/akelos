@@ -2,6 +2,7 @@
 
 class AkMailPart extends AkMailBase
 {
+
     public function prepareHeadersForRendering($options = array())
     {
         if($this->isMultipart()){

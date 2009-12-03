@@ -2,7 +2,6 @@
 
 class AkActionMailerQuoting
 {
-
     /**
      * Convert the given text into quoted printable format, with an instruction
      * that the text be eventually interpreted in the given charset.
@@ -33,6 +32,7 @@ class AkActionMailerQuoting
 
         return $return;
     }
+
     static function base64encode($text, $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
     {
         $pre="=?$charset?B?";
@@ -52,6 +52,7 @@ class AkActionMailerQuoting
 
         return $return;
     }
+
     /**
      * Convert the given character to quoted printable format, taking into
      * account multi-byte characters
@@ -81,18 +82,17 @@ class AkActionMailerQuoting
         return implode(AK_ACTION_MAILER_EOL,$lines);
     }
 
-
     /**
-    * Quote the given text if it contains any "illegal" characters
-    */
+     * Quote the given text if it contains any "illegal" characters
+     */
     static function quoteIfNecessary($text, $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
     {
         return preg_match(AK_ACTION_MAILER_CHARS_NEEDING_QUOTING_REGEX,$text) ? AkActionMailerQuoting::quotedPrintable($text,$charset) : $text;
     }
 
     /**
-    * Quote any of the given strings if they contain any "illegal" characters
-    */
+     * Quote any of the given strings if they contain any "illegal" characters
+     */
     static function quoteAnyIfNecessary($strings = array(), $charset = AK_ACTION_MAILER_DEFAULT_CHARSET)
     {
         foreach ($strings as $k=>$v){
