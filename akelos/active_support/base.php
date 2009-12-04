@@ -709,7 +709,7 @@ class Ak
     {
         $backtrace = debug_backtrace();
         if(!$only_app){
-            return array($backtrace[$start_level]['file'], $backtrace[$start_level]['line'], @$backtrace[$start_level]['function']);
+            return array(@$backtrace[$start_level]['file'], @$backtrace[$start_level]['line'], @$backtrace[$start_level]['function']);
         }else{
             for($i = $start_level-1; $i <= count($backtrace) - 1; $i++){
                 if(isset($backtrace[$i]["line"])){

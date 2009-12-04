@@ -95,27 +95,6 @@
 *   $User->preferences // array("background" => "black", "display" => 'large')
 * </code>
 *
-* == Single table inheritance ==
-*
-* Active Record allows inheritance by storing the name of the class in a column that by default is called "type" (can be changed
-* by overwriting <tt>AkActiveRecord->_inheritanceColumn</tt>). This means that an inheritance looking like this:
-*
-* <code>
-*   class Company extends ActiveRecord{}
-*   class Firm extends Company{}
-*   class Client extends Company{}
-*   class PriorityClient extends Client{}
-* </code>
-*
-* When you do $Firm->create('name =>', "akelos"), this record will be saved in the companies table with type = "Firm". You can then
-* fetch this row again using $Company->find('first', "name = '37signals'") and it will return a Firm object.
-*
-* If you don't have a type column defined in your table, single-table inheritance won't be triggered. In that case, it'll work just
-* like normal subclasses with no special magic for differentiating between them or reloading the right type with find.
-*
-* Note, all the attributes for all the cases are kept in the same table. Read more:
-* http://www.martinfowler.com/eaaCatalog/singleTableInheritance.html
-*
 * == Connection to multiple databases in different models ==
 *
 * Connections are usually created through AkActiveRecord->establishConnection and retrieved by AkActiveRecord->connection.
@@ -174,6 +153,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     'taken' => "has already been taken",
     'not_a_number' => "is not a number"
     );
+
+    protected $_options = array();
 
     private
     $__ActsLikeAttributes = array();
@@ -1355,7 +1336,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if (stristr($sql,' WHERE ')) $concat = ' AND ';
         if (empty($conditions) && $this->_getDatabaseType() == 'sqlite') $conditions = '1';  // sqlite HACK
 
-        if($this->getInheritanceColumn() !== false && $this->descendsFromActiveRecord($this)){
+        if($this->getInheritanceColumn() !== false){
             $type_condition = $this->typeCondition($table_alias);
             if (empty($sql)) {
                 $sql .= !empty($type_condition) ? $concat.$type_condition : '';
@@ -1481,85 +1462,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
     /*/Finding records*/
-
-
-
-    /**
-                           Table inheritance
-     ====================================================================
-     */
-    static function descendsFromActiveRecord(&$object)
-    {
-        //return ($object instanceof AkActiveRecord) && $object->getInheritanceColumn() != false;
-        //Ak::trace($this->getInheritanceColumn());
-        if(substr(strtolower(get_parent_class($object)),-12) == 'activerecord'){
-            return true;
-        }
-        if(!method_exists($object, 'getInheritanceColumn')){
-            return false;
-        }
-        $inheritance_column = $object->getInheritanceColumn();
-        return !empty($inheritance_column);
-    }
-
-    /**
-     * Gets the column name for use with single table inheritance. Can be overridden in subclasses.
-    */
-    public function getInheritanceColumn()
-    {
-        return empty($this->_inheritanceColumn) ? ($this->hasColumn('type') ? 'type' : false ) : $this->_inheritanceColumn;
-    }
-
-    /**
-     * Defines the column name for use with single table inheritance. Can be overridden in subclasses.
-     */
-    public function setInheritanceColumn($column_name)
-    {
-        if(!$this->hasColumn($column_name)){
-            trigger_error(Ak::t('Could not set "%column_name" as the inheritance column as this column is not available on the database.',array('%column_name'=>$column_name)).' '.Ak::getFileAndNumberTextForError(1), E_USER_NOTICE);
-            return false;
-        }elseif($this->getColumnType($column_name) != 'string'){
-            trigger_error(Ak::t('Could not set %column_name as the inheritance column as this column type is "%column_type" instead of "string".',array('%column_name'=>$column_name,'%column_type'=>$this->getColumnType($column_name))).' '.Ak::getFileAndNumberTextForError(1), E_USER_NOTICE);
-            return false;
-        }else{
-            $this->_inheritanceColumn = $column_name;
-            return true;
-        }
-    }
-
-
-    public function getSubclasses()
-    {
-        $current_class = get_class($this);
-        $subclasses = array();
-        $classes = get_declared_classes();
-
-        while ($class = array_shift($classes)) {
-            $parent_class = get_parent_class($class);
-            if($parent_class == $current_class || in_array($parent_class,$subclasses)){
-                $subclasses[] = $class;
-            }elseif(!empty($parent_class)){
-                $classes[] = $parent_class;
-            }
-        }
-        $subclasses = array_unique(array_map(array($this,'_getModelName'),$subclasses));
-        return $subclasses;
-    }
-
-
-    public function typeCondition($table_alias = null)
-    {
-        $inheritance_column = $this->getInheritanceColumn();
-        $type_condition = array();
-        $table_name = $this->getTableName();
-        $available_types = array_merge(array($this->getModelName()),$this->getSubclasses());
-        foreach ($available_types as $subclass){
-            $type_condition[] = ' '.($table_alias != null ? $table_alias : $table_name).'.'.$inheritance_column.' = \''.AkInflector::humanize(AkInflector::underscore($subclass)).'\' ';
-        }
-        return empty($type_condition) ? '' : '('.join('OR',$type_condition).') ';
-    }
-
-    /*/Table inheritance*/
 
 
 
@@ -5121,6 +5023,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     protected function _enableLazyLoadingExtenssions($options = array())
     {
         empty($options['skip_calculations']) && $this->_enableCalculations();
+        empty($options['skip_table_inheritance']) && $this->_enableTableInheritance();
     }
 
     protected function _enableCalculations()
@@ -5129,6 +5032,15 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         array(
         'methods' => array('count', 'average', 'minimum', 'maximum', 'sum', 'calculate'),
         'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'calculations.php'
+        ));
+    }
+
+    protected function _enableTableInheritance()
+    {
+        $this->extendClassLazily('AkActiveRecordTableInheritance',
+        array(
+        'methods' => array('getInheritanceColumn','setInheritanceColumn','typeCondition'),
+        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'table_inheritance.php'
         ));
     }
 

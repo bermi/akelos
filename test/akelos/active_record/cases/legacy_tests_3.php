@@ -4,7 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class LegacyTests3_TestCase extends ActiveRecordUnitTest
 {
-    public function test_AkActiveRecord()
+    public function test_setup()
     {
         $this->installAndIncludeModels(array(
         'AkTestUser'=>'id I AUTO KEY, user_name C(32), first_name C(200), last_name C(200), email C(150), country I, password C(32), created_at T, updated_at T, expires_on T',
@@ -18,7 +18,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
                     decimal1_field L(2),decimal3_field I1,decimal5_field I2,decimal10_field I4,decimal20_field I8,decimal_field N,
                     created_at T,updated_at T,expires_on T'));
     }
-
+/*
     public function Test_of_toggleAttributeAndSave()
     {
         $AkTestFields = new AkTestField();
@@ -88,9 +88,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
 
     public function Test_of_destroy()
     {
-        /**
-        * @todo check persistance of destroyed objects
-        */
+        // @todo check persistance of destroyed objects
         $AkTestFields = new AkTestField();
 
         $AkTestFields->transactionStart();
@@ -518,7 +516,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
 
         $this->assertEqual($AkTestMember->typeCondition(),"( ak_test_members.role = 'Ak test member' ) ");
     }
-
+*/
     public function Test_of_addConditions()
     {
         $AkTestUser = new AkTestUser();
@@ -533,10 +531,11 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
         $copy = $sql;
         $conditions = "ak_test_users.last_name = 'Ferrer' AND ak_test_users.country = 25";
         $AkTestMember->setInheritanceColumn('role');
+        $this->assertEqual($AkTestMember->getInheritanceColumn(), 'role');
         $AkTestMember->addConditions($sql, $conditions);
         $this->assertEqual($sql,$copy." WHERE ( ak_test_members.role = 'Ak test member' )  AND (".$conditions.")");
     }
-
+/*
     public function Test_of_resetColumnInformation()
     {
         $AkTestUser = new AkTestUser();
@@ -571,6 +570,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
 
         $this->assertEqual($AkTestUser->countBySql("SELECT COUNT(*) FROM ak_test_users WHERE first_name = 'Tim'"), count($AkTestUser->findAll("first_name = 'Tim'")));
     }
+    */
 }
 
 ak_test_case('LegacyTests3_TestCase');

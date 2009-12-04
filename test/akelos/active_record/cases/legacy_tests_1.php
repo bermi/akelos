@@ -44,10 +44,10 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $User = new AkTestUser();
         $TestField = new AkTestField();
 
-        $this->assertTrue($User->descendsFromActiveRecord($TestField));
+        $this->assertTrue($TestField instanceof AkActiveRecord);
 
         $Object = new AkObject();
-        $this->assertFalse($User->descendsFromActiveRecord($Object));
+        $this->assertFalse($Object instanceof AkActiveRecord);
     }
 
     public function test_should_get_model_name()

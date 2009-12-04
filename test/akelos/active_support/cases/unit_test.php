@@ -37,7 +37,7 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
         $unit_tester->instantiateModel('DummyAccount');
 
         $this->assertTrue(isset($unit_tester->DummyAccount));
-        $this->assertTrue(AkActiveRecord::descendsFromActiveRecord($unit_tester->DummyAccount));
+        $this->assertTrue($unit_tester->DummyAccount instanceof AkActiveRecord);
 
         $this->expectError('Could not instantiate AnotherModel');
         $this->assertFalse($unit_tester->instantiateModel('AnotherModel'));
@@ -97,14 +97,14 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
         $unit_tester->includeAndInstatiateModels($models);
         foreach ($models as $model){
             $this->assertTrue(isset($unit_tester->$model));
-            $this->assertTrue(AkActiveRecord::descendsFromActiveRecord($unit_tester->$model));
+            $this->assertTrue($unit_tester->$model instanceof AkActiveRecord);
         }
 
         $unit_tester = new AkUnitTest();
         $unit_tester->includeAndInstatiateModels(join(',',$models));
         foreach ($models as $model){
             $this->assertTrue(isset($unit_tester->$model));
-            $this->assertTrue(AkActiveRecord::descendsFromActiveRecord($unit_tester->$model));
+            $this->assertTrue($unit_tester->$model instanceof AkActiveRecord);
         }
 
     }
