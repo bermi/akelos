@@ -40,13 +40,13 @@ class Validations_TestCase extends ActiveRecordUnitTest
     {
         $Person = new TestPerson();
         $Person->addError('user_name');
-        $this->assertTrue(count($Person->_errors['user_name']) == 1);
+        $this->assertTrue(count($Person->getErrorsOn('user_name')) == 1);
         $Person->addError('user_name','has an error');
-        $this->assertTrue(count($Person->_errors['user_name']) == 2);
+        $this->assertTrue(count($Person->getErrorsOn('user_name')) == 2);
         $Person->addError('password');
-        $this->assertTrue(count($Person->_errors['password']) == 1);
-        $this->assertTrue(count($Person->_errors) == 2);
-        $this->assertTrue(count($Person->_errors['user_name']) == 2);
+        $this->assertTrue(count($Person->getErrorsOn('password')) == 1);
+        $this->assertTrue(count($Person->getErrors()) == 2);
+        $this->assertTrue(count($Person->getErrorsOn('user_name')) == 2);
     }
 
     public function Test_of_clearErrors()
@@ -56,7 +56,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $Person->addError('user_name','has an error');
         $Person->addError('password');
         $Person->clearErrors();
-        $this->assertTrue(count($Person->_errors) == 0);
+        $this->assertTrue(count($Person->getErrors()) == 0);
     }
 
     public function Test_of_hasErrors()
@@ -72,9 +72,9 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $Person = new TestPerson();
         $this->assertFalse($Person->getErrorsOn('user_name'));
         $Person->addError('user_name');
-        $this->assertEqual($Person->getErrorsOn('user_name'),$Person->_defaultErrorMessages['invalid']);
+        $this->assertEqual($Person->getErrorsOn('user_name'), $Person->getDefaultErrorMessageFor('invalid'));
         $Person->addError('user_name','not nice');
-        $this->assertEqual($Person->getErrorsOn('user_name'),array($Person->_defaultErrorMessages['invalid'],'not nice'));
+        $this->assertEqual($Person->getErrorsOn('user_name'),array($Person->getDefaultErrorMessageFor('invalid'),'not nice'));
     }
 
     public function Test_of_countErrors()
@@ -104,7 +104,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertEqual(count($Person->getErrors()), 0);
 
         $Person->addError('user_name');
-        $expected = array('user_name'=>array($Person->_defaultErrorMessages['invalid']));
+        $expected = array('user_name'=>array($Person->getDefaultErrorMessageFor('invalid')));
         $this->assertEqual($Person->getErrors(), $expected);
 
         $Person->addError('password','is not a valid password');
@@ -123,7 +123,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertEqual(count($Person->getFullErrorMessages()), 0);
 
         $Person->addError('user_name');
-        $expected = array('user_name'=>array('User name '.$Person->_defaultErrorMessages['invalid']));
+        $expected = array('user_name'=>array('User name '.$Person->getDefaultErrorMessageFor('invalid')));
         $this->assertEqual($Person->getFullErrorMessages(), $expected);
 
         $Person->addError('password','is not a valid password');
@@ -140,7 +140,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
     {
         $Person = new TestPerson();
         $Person->addErrorOnEmpty('user_name');
-        $expected = array('user_name'=>array($Person->_defaultErrorMessages['empty']));
+        $expected = array('user_name'=>array($Person->getDefaultErrorMessageFor('empty')));
         $this->assertEqual($Person->getErrors(), $expected);
 
         $Person->set('first_name','Bermi');
@@ -152,7 +152,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
     {
         $Person = new TestPerson();
         $Person->addErrorOnBlank('user_name');
-        $expected = array('user_name'=>array($Person->_defaultErrorMessages['blank']));
+        $expected = array('user_name'=>array($Person->getDefaultErrorMessageFor('blank')));
         $this->assertEqual($Person->getErrors(), $expected);
 
         $Person->set('first_name','Bermi');
@@ -236,18 +236,18 @@ class Validations_TestCase extends ActiveRecordUnitTest
 
         $Person->user_name_confirmation = '';
         $Person->validatesConfirmationOf('user_name');
-        $this->assertEqual($Person->getErrorsOn('user_name'),$Person->_defaultErrorMessages['confirmation']);
+        $this->assertEqual($Person->getErrorsOn('user_name'),$Person->getDefaultErrorMessageFor('confirmation'));
 
         $Person = new TestPerson();
         $Person->set('user_name', 'Bermi');
         $Person->user_name_confirmation = 'bermi';
         $Person->validatesConfirmationOf('user_name');
-        $this->assertEqual($Person->getErrorsOn('user_name'),$Person->_defaultErrorMessages['confirmation']);
+        $this->assertEqual($Person->getErrorsOn('user_name'),$Person->getDefaultErrorMessageFor('confirmation'));
 
         $Person = new TestPerson();
         $Person->setAttributes(array('password'=>'abc','password_confirmation'=>'ake'));
         $Person->validatesConfirmationOf('password');
-        $this->assertEqual($Person->getErrorsOn('password'), $Person->_defaultErrorMessages['confirmation']);
+        $this->assertEqual($Person->getErrorsOn('password'), $Person->getDefaultErrorMessageFor('confirmation'));
     }
 
 
@@ -255,7 +255,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
     {
         $Person = new TestPerson();
         $Person->validatesAcceptanceOf('tos');
-        $this->assertEqual($Person->getErrorsOn('tos'),$Person->_defaultErrorMessages['accepted']);
+        $this->assertEqual($Person->getErrorsOn('tos'),$Person->getDefaultErrorMessageFor('accepted'));
 
         $Person = new TestPerson();
         $Person->validatesAcceptanceOf('tos','You need to type down "I accept this terms and conditions"',"I accept this terms and conditions");
@@ -270,7 +270,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
     {
         $Person = new TestPerson();
         $Person->validatesPresenceOf('user_name');
-        $this->assertEqual($Person->getErrorsOn('user_name'),$Person->_defaultErrorMessages['blank']);
+        $this->assertEqual($Person->getErrorsOn('user_name'),$Person->getDefaultErrorMessageFor('blank'));
 
         $Person = new TestPerson();
         $Person->validatesPresenceOf('user_name','is a compulsory field');
@@ -303,12 +303,12 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $Person->clearErrors();
         $Person->score = 101;
         $Person->validatesLengthOf("score", array("within"=>array(1, 100)));
-        $this->assertEqual($Person->getErrorsOn('score'),sprintf($Person->_defaultErrorMessages['too_long'],100));
+        $this->assertEqual($Person->getErrorsOn('score'),sprintf($Person->getDefaultErrorMessageFor('too_long'),100));
 
         $Person->clearErrors();
         $Person->score = -5;
         $Person->validatesLengthOf("score", array("within"=>array(1, 100)));
-        $this->assertEqual($Person->getErrorsOn('score'),sprintf($Person->_defaultErrorMessages['too_short'],1));
+        $this->assertEqual($Person->getErrorsOn('score'),sprintf($Person->getDefaultErrorMessageFor('too_short'),1));
 
         $Person->clearErrors();
         $Person->score = 25;
@@ -438,12 +438,12 @@ class Validations_TestCase extends ActiveRecordUnitTest
     {
         $Person = new TestPerson();
         $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
-        $this->assertEqual($Person->getErrorsOn('email'),$Person->_defaultErrorMessages['invalid']);
+        $this->assertEqual($Person->getErrorsOn('email'),$Person->getDefaultErrorMessageFor('invalid'));
 
         $Person->clearErrors();
         $Person->email = 'bermi [at] example.com';
         $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
-        $this->assertEqual($Person->getErrorsOn('email'),$Person->_defaultErrorMessages['invalid']);
+        $this->assertEqual($Person->getErrorsOn('email'),$Person->getDefaultErrorMessageFor('invalid'));
 
         $Person->clearErrors();
         $Person->email = 'bermi@example.com';
@@ -458,7 +458,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $Person->clearErrors();
         $Person->email = 'bermi [at] example.com';
         $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
-        $this->assertEqual($Person->getErrorsOn('email'),$Person->_defaultErrorMessages['invalid']);
+        $this->assertEqual($Person->getErrorsOn('email'),$Person->getDefaultErrorMessageFor('invalid'));
 
         $Person->clearErrors();
         $Person->email = 'bermi@example.com';
@@ -484,7 +484,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $Person->clearErrors();
         $Person->number = 12.56;
         $Person->validatesFormatOf('number', AK_NUMBER_REGULAR_EXPRESSION);
-        $this->assertEqual($Person->getErrorsOn('number'),$Person->_defaultErrorMessages['invalid']);
+        $this->assertEqual($Person->getErrorsOn('number'),$Person->getDefaultErrorMessageFor('invalid'));
 
         $Person->clearErrors();
         $Person->number = 1256;
@@ -494,7 +494,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $Person->clearErrors();
         $Person->phone = 'blah';
         $Person->validatesFormatOf('phone', AK_PHONE_REGULAR_EXPRESSION);
-        $this->assertEqual($Person->getErrorsOn('phone'),$Person->_defaultErrorMessages['invalid']);
+        $this->assertEqual($Person->getErrorsOn('phone'),$Person->getDefaultErrorMessageFor('invalid'));
 
         $Person->clearErrors();
         $Person->phone = '+34 96 299 3000';
@@ -505,7 +505,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $Person->clearErrors();
         $Person->date = 'Monday';
         $Person->validatesFormatOf('date', AK_DATE_REGULAR_EXPRESSION);
-        $this->assertEqual($Person->getErrorsOn('date'),$Person->_defaultErrorMessages['invalid']);
+        $this->assertEqual($Person->getErrorsOn('date'),$Person->getDefaultErrorMessageFor('invalid'));
 
         $Person->clearErrors();
         $Person->date = '1978/06/16';
@@ -516,7 +516,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $Person->clearErrors();
         $Person->ip = '257.0.0.1';
         $Person->validatesFormatOf('ip', AK_IP4_REGULAR_EXPRESSION);
-        $this->assertEqual($Person->getErrorsOn('ip'),$Person->_defaultErrorMessages['invalid']);
+        $this->assertEqual($Person->getErrorsOn('ip'),$Person->getDefaultErrorMessageFor('invalid'));
 
         $Person->clearErrors();
         $Person->ip = '255.0.0.1';
@@ -527,12 +527,12 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $Person->clearErrors();
         $Person->post_code = 'a';
         $Person->validatesFormatOf('post_code', AK_POST_CODE_REGULAR_EXPRESSION);
-        $this->assertEqual($Person->getErrorsOn('post_code'),$Person->_defaultErrorMessages['invalid']);
+        $this->assertEqual($Person->getErrorsOn('post_code'),$Person->getDefaultErrorMessageFor('invalid'));
 
         $Person->clearErrors();
         $Person->post_code = 'san francisco';
         $Person->validatesFormatOf('post_code', AK_POST_CODE_REGULAR_EXPRESSION);
-        $this->assertEqual($Person->getErrorsOn('post_code'),$Person->_defaultErrorMessages['invalid']);
+        $this->assertEqual($Person->getErrorsOn('post_code'),$Person->getDefaultErrorMessageFor('invalid'));
 
         $Person->clearErrors();
         $Person->post_code = 'NSW 8376';
@@ -587,12 +587,12 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $Person->clearErrors();
         $Person->age = 17;
         $Person->validatesInclusionOf('age', range(18, 120));
-        $this->assertEqual($Person->getErrorsOn('age'),$Person->_defaultErrorMessages['inclusion']);
+        $this->assertEqual($Person->getErrorsOn('age'),$Person->getDefaultErrorMessageFor('inclusion'));
 
         $Person->clearErrors();
         $Person->age = 121;
         $Person->validatesInclusionOf('age', range(18, 120));
-        $this->assertEqual($Person->getErrorsOn('age'),$Person->_defaultErrorMessages['inclusion']);
+        $this->assertEqual($Person->getErrorsOn('age'),$Person->getDefaultErrorMessageFor('inclusion'));
 
         $Person->clearErrors();
         $Person->age = 18;
@@ -635,7 +635,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $Person->clearErrors();
         $Person->age = 18;
         $Person->validatesExclusionOf('age', range(18, 120));
-        $this->assertEqual($Person->getErrorsOn('age'),$Person->_defaultErrorMessages['exclusion']);
+        $this->assertEqual($Person->getErrorsOn('age'),$Person->getDefaultErrorMessageFor('exclusion'));
     }
 
     public function Test_of_validatesNumericalityOf()
@@ -643,12 +643,12 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $Person = new TestPerson();
 
         $Person->validatesNumericalityOf('age');
-        $this->assertEqual($Person->getErrorsOn('age'),$Person->_defaultErrorMessages['not_a_number']);
+        $this->assertEqual($Person->getErrorsOn('age'),$Person->getDefaultErrorMessageFor('not_a_number'));
 
         $Person->clearErrors();
         $Person->age = 'text';
         $Person->validatesNumericalityOf('age');
-        $this->assertEqual($Person->getErrorsOn('age'),$Person->_defaultErrorMessages['not_a_number']);
+        $this->assertEqual($Person->getErrorsOn('age'),$Person->getDefaultErrorMessageFor('not_a_number'));
 
         $Person->clearErrors();
         $Person->age = 15.98;
@@ -689,7 +689,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
 
         $Person = new TestPerson(array('user_name' =>'hilario','first_name' =>'Hilario','last_name' =>'Hervás','country' =>'ES'));
         $Person->validateOnCreate();
-        $this->assertEqual($Person->getErrorsOn('tos'),$Person->_defaultErrorMessages['accepted']);
+        $this->assertEqual($Person->getErrorsOn('tos'),$Person->getDefaultErrorMessageFor('accepted'));
         $this->assertFalse($Person->save());
     }
 
@@ -701,7 +701,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
 
         $Person = new TestPerson(array('user_name' =>'hilario','first_name' =>'Hilario','last_name' =>'Hervás','country' =>'ES'));
         $Person->validateOnUpdate();
-        $this->assertEqual($Person->getErrorsOn('email'),$Person->_defaultErrorMessages['blank']);
+        $this->assertEqual($Person->getErrorsOn('email'),$Person->getDefaultErrorMessageFor('blank'));
     }
 
 
@@ -713,7 +713,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
 
         $Person = new TestPerson(array('last_name' =>'Sadurní','country' =>'ES'));
         $Person->validate();
-        $this->assertEqual($Person->getErrorsOn('first_name'),$Person->_defaultErrorMessages['blank']);
+        $this->assertEqual($Person->getErrorsOn('first_name'),$Person->getDefaultErrorMessageFor('blank'));
     }
 
     public function Test_of_isValid()
@@ -740,7 +740,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
 
         $Picture->validatesAssociated('landlord');
 
-        $this->assertEqual($Picture->getErrorsOn('landlord'),$Picture->_defaultErrorMessages['invalid']);
+        $this->assertEqual($Picture->getErrorsOn('landlord'),$Picture->getDefaultErrorMessageFor('invalid'));
     }
 
 }

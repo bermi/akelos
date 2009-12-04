@@ -18,7 +18,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
                     decimal1_field L(2),decimal3_field I1,decimal5_field I2,decimal10_field I4,decimal20_field I8,decimal_field N,
                     created_at T,updated_at T,expires_on T'));
     }
-/*
+
     public function Test_of_toggleAttributeAndSave()
     {
         $AkTestFields = new AkTestField();
@@ -516,7 +516,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
 
         $this->assertEqual($AkTestMember->typeCondition(),"( ak_test_members.role = 'Ak test member' ) ");
     }
-*/
+
     public function Test_of_addConditions()
     {
         $AkTestUser = new AkTestUser();
@@ -535,7 +535,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
         $AkTestMember->addConditions($sql, $conditions);
         $this->assertEqual($sql,$copy." WHERE ( ak_test_members.role = 'Ak test member' )  AND (".$conditions.")");
     }
-/*
+
     public function Test_of_resetColumnInformation()
     {
         $AkTestUser = new AkTestUser();
@@ -570,7 +570,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
 
         $this->assertEqual($AkTestUser->countBySql("SELECT COUNT(*) FROM ak_test_users WHERE first_name = 'Tim'"), count($AkTestUser->findAll("first_name = 'Tim'")));
     }
-    */
+
 }
 
 ak_test_case('LegacyTests3_TestCase');

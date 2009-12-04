@@ -9,11 +9,6 @@ class AkActiveRecordLocalization
         $this->_ActiveRecord = $ActiveRecord;
     }
 
-    public function t($string, $array = null,$model=null)
-    {
-        return Ak::t($string, $array, empty($model)?AkInflector::underscore($this->_ActiveRecord->getModelName()):$model);
-    }
-
     public function getInternationalizedColumns()
     {
         static $cache;

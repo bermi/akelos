@@ -122,8 +122,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     $_dataDictionary,
     $_primaryKey,
     $_inheritanceColumn,
-    $_internationalize,
-    $_errors = array(),
+    $_internationalize = AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT,
     $_attributes = array(),
     $_protectedAttributes = array(),
     $_accessibleAttributes = array(),
@@ -139,22 +138,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     $_automated_not_null_validator = false,
     $_set_default_attribute_values_automatically = true,
     $_activeRecordHasBeenInstantiated = true, // This is needed for enabling support for static active record instantiation under php
-    $_defaultErrorMessages = array( // Holds a hash with all the default error messages, such that they can be replaced by your own copy or localizations.
-    'inclusion' =>  "is not included in the list",
-    'exclusion' => "is reserved",
-    'invalid' => "is invalid",
-    'confirmation' => "doesn't match confirmation",
-    'accepted' => "must be accepted",
-    'empty' => "can't be empty",
-    'blank' => "can't be blank",
-    'too_long' => "is too long (max is %d characters)",
-    'too_short' => "is too short (min is %d characters)",
-    'wrong_length' => "is the wrong length (should be %d characters)",
-    'taken' => "has already been taken",
-    'not_a_number' => "is not a number"
-    );
+    $_defaultErrorMessages = array();
 
-    protected $_options = array();
+    protected $_options = array(
+    );
 
     private
     $__ActsLikeAttributes = array();
@@ -172,7 +159,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         AK_LOG_EVENTS ? ($this->Logger = Ak::getLogger()) : null;
 
-        $this->_internationalize = is_null($this->_internationalize) && AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT ? count($this->getAvailableLocales()) > 1 : $this->_internationalize;
+        $this->_setInternationalizedColumnsStatus();
 
         @$this->_instantiateDefaultObserver();
 
@@ -228,6 +215,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
 
     }
+
 
     /**
     * New objects can be instantiated as either empty (pass no construction parameter) or pre-set with attributes but not yet saved
@@ -1504,13 +1492,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
 
         if($this->_internationalize){
-            if(is_array($value)){
-                $this->setAttributeLocales($attribute, $value);
-            }elseif(is_string($inspect_for_callback_child_method)){
-                $this->setAttributeByLocale($attribute, $value, $inspect_for_callback_child_method);
-            }else{
-                $this->_groupInternationalizedAttribute($attribute, $value);
-            }
+            $this->setInternationalizedAttribute($attribute, $value, $inspect_for_callback_child_method, $compose_after_set);
         }
         return true;
     }
@@ -1584,7 +1566,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     $this->composeCombinedAttribute($attribute);
                 }
                 return isset($this->$attribute) ? $this->$attribute : null;
-            }elseif($this->_internationalize && $this->_isInternationalizeCandidate($attribute)){
+            }elseif($this->_internationalize && $this->isInternationalizeCandidate($attribute)){
                 if(!empty($this->$attribute) && is_string($this->$attribute)){
                     return $this->$attribute;
                 }
@@ -2499,8 +2481,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $this->_columnsSettings[$column_name] = array();
         $this->_columnsSettings[$column_name]['name'] = $column_object->name;
 
-        if($this->_internationalize && $this->_isInternationalizeCandidate($column_object->name)){
-            $this->_addInternationalizedColumn($column_object->name);
+        if($this->_internationalize && $this->isInternationalizeCandidate($column_object->name)){
+            $this->addInternationalizedColumn($column_object->name);
         }
 
         $this->_columnsSettings[$column_name]['type'] = $this->getAkelosDataType($column_object);
@@ -2715,146 +2697,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-
-
     /*/Database Reflection*/
-
-    /**
-                               Localization
-    ====================================================================
-    */
-
-    public function t($string, $array = null,$model=null)
-    {
-        return Ak::t($string, $array, empty($model)?AkInflector::underscore($this->getModelName()):$model);
-    }
-
-    public function getInternationalizedColumns()
-    {
-        static $cache;
-        $model = $this->getModelName();
-        $available_locales = $this->getAvailableLocales();
-        if(empty($cache[$model])){
-            $cache[$model] = array();
-            foreach ($this->getColumnSettings() as $column_name=>$details){
-                if(!empty($details['i18n'])){
-                    $_tmp_pos = strpos($column_name,'_');
-                    $column = substr($column_name,$_tmp_pos+1);
-                    $lang = substr($column_name,0,$_tmp_pos);
-                    if(in_array($lang, $available_locales)){
-                        $cache[$model][$column] = empty($cache[$model][$column]) ? array($lang) :
-                        array_merge($cache[$model][$column] ,array($lang));
-                    }
-                }
-            }
-        }
-
-        return $cache[$model];
-    }
-
-    public function getAvailableLocales()
-    {
-        static $available_locales;
-        if(empty($available_locales)){
-            if(defined('AK_ACTIVE_RECORD_DEFAULT_LOCALES')){
-                $available_locales = Ak::stringToArray(AK_ACTIVE_RECORD_DEFAULT_LOCALES);
-            }else{
-                $available_locales =  Ak::langs();
-            }
-        }
-        return $available_locales;
-    }
-
-    public function getCurrentLocale()
-    {
-        static $current_locale;
-        if(empty($current_locale)){
-            $current_locale = Ak::lang();
-            $available_locales = $this->getAvailableLocales();
-            if(!in_array($current_locale, $available_locales)){
-                $current_locale = array_shift($available_locales);
-            }
-        }
-        return $current_locale;
-    }
-
-
-    public function getAttributeByLocale($attribute, $locale)
-    {
-        $internationalizable_columns = $this->getInternationalizedColumns();
-        if(!empty($internationalizable_columns[$attribute]) && is_array($internationalizable_columns[$attribute]) && in_array($locale, $internationalizable_columns[$attribute])){
-            return $this->getAttribute($locale.'_'.$attribute);
-        }
-    }
-
-    public function getAttributeLocales($attribute)
-    {
-        $attribute_locales = array();
-        foreach ($this->getAvailableLocales() as $locale){
-            if($this->hasColumn($locale.'_'.$attribute)){
-                $attribute_locales[$locale] = $this->getAttributeByLocale($attribute, $locale);
-            }
-        }
-        return $attribute_locales;
-    }
-
-    public function setAttributeByLocale($attribute, $value, $locale)
-    {
-        $internationalizable_columns = $this->getInternationalizedColumns();
-
-        if($this->_isInternationalizeCandidate($locale.'_'.$attribute) && !empty($internationalizable_columns[$attribute]) && is_array($internationalizable_columns[$attribute]) && in_array($locale, $internationalizable_columns[$attribute])){
-            $this->setAttribute($locale.'_'.$attribute, $value);
-        }
-
-    }
-
-    public function setAttributeLocales($attribute, $values = array())
-    {
-        foreach ($values as $locale=>$value){
-            $this->setAttributeByLocale($attribute, $value, $locale);
-        }
-    }
-
-    protected function _delocalizeAttribute($attribute)
-    {
-        return $this->_isInternationalizeCandidate($attribute) ? substr($attribute,3) : $attribute;
-    }
-
-    protected function _isInternationalizeCandidate($column_name)
-    {
-        $pos = strpos($column_name,'_');
-        return $pos === 2 && in_array(substr($column_name,0,$pos),$this->getAvailableLocales());
-    }
-
-    protected function _addInternationalizedColumn($column_name)
-    {
-        $this->_columnsSettings[$column_name]['i18n'] = true;
-    }
-
-
-    /**
-     * Adds an internationalized attribute to an array containing other locales for the same column name
-     *
-     * Example:
-     *  es_title and en_title will be available user title = array('es'=>'...', 'en' => '...')
-     */
-    protected function _groupInternationalizedAttribute($attribute, $value)
-    {
-        if($this->_internationalize && $this->_isInternationalizeCandidate($attribute)){
-            if(!empty($this->$attribute)){
-                $_tmp_pos = strpos($attribute,'_');
-                $column = substr($attribute,$_tmp_pos+1);
-                $lang = substr($attribute,0,$_tmp_pos);
-                $this->$column = empty($this->$column) ? array() : $this->$column;
-                if(empty($this->$column) || (!empty($this->$column) && is_array($this->$column))){
-                    $this->$column = empty($this->$column) ? array($lang=>$value) : array_merge($this->$column,array($lang=>$value));
-                }
-            }
-        }
-    }
-
-    /*/Localization*/
-
 
 
 
@@ -3345,7 +3188,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *   $Person->setAttributes(array("last_name" => "Heinemeier", "phone_number" => "555-555"));
     *   $Person->save(); // => true (and person is now saved in the database)
     *
-    * An "_errors" array is available for every Active Record.
+    * You can use "getErrors()" for getting and array of erros on Active Records.
     *
     */
 
@@ -3373,7 +3216,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       */
     public function validatesConfirmationOf($attribute_names, $message = 'confirmation')
     {
-        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
+        $message = $this->getDefaultErrorMessageFor($message, true);
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
             $attribute_accessor = $attribute_name.'_confirmation';
@@ -3404,7 +3247,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       */
     public function validatesAcceptanceOf($attribute_names, $message = 'accepted', $accept = 1)
     {
-        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
+        $message = $this->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
@@ -3445,7 +3288,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     public function validatesAssociated($attribute_names, $message = 'invalid')
     {
-        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
+        $message = $this->getDefaultErrorMessageFor($message, true);
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
             if(!empty($this->$attribute_name)){
@@ -3472,7 +3315,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
       */
     public function validatesPresenceOf($attribute_names, $message = 'blank')
     {
-        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
+        $message = $this->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
@@ -3515,9 +3358,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         // Merge given options with defaults.
         $default_options = array(
-        'too_long'     => $this->_defaultErrorMessages['too_long'],
-        'too_short'     => $this->_defaultErrorMessages['too_short'],
-        'wrong_length'     => $this->_defaultErrorMessages['wrong_length'],
+        'too_long'      => $this->getDefaultErrorMessageFor('too_long'),
+        'too_short'     => $this->getDefaultErrorMessageFor('too_short'),
+        'wrong_length'  => $this->getDefaultErrorMessageFor('wrong_length'),
         'allow_null' => false
         );
 
@@ -3654,7 +3497,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             }
         }
 
-        $message = isset($this->_defaultErrorMessages[$options['message']]) ? $this->t($this->_defaultErrorMessages[$options['message']]) : $options['message'];
+        $message = $this->getDefaultErrorMessageFor($options['message'], true);
         unset($options['message']);
 
         foreach ((array)$attribute_names as $attribute_name){
@@ -3726,7 +3569,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     public function validatesFormatOf($attribute_names, $regular_expression, $message = 'invalid', $regex_function = 'preg_match')
     {
-        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
+        $message = $this->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
@@ -3754,7 +3597,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     public function validatesInclusionOf($attribute_names, $array_of_possibilities, $message = 'inclusion', $allow_null = false)
     {
-        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
+        $message = $this->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
@@ -3783,7 +3626,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     public function validatesExclusionOf($attribute_names, $array_of_possibilities, $message = 'exclusion', $allow_null = false)
     {
-        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
+        $message = $this->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
@@ -3815,7 +3658,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     public function validatesNumericalityOf($attribute_names, $message = 'not_a_number', $only_integer = false, $allow_null = false)
     {
-        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
+        $message = $this->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
@@ -3896,7 +3739,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             !empty($this->$column_name) &&
             !empty($column_settings['maxLength']) && $column_settings['maxLength'] > 0 &&
             strlen($this->$column_name) > $column_settings['maxLength']){
-                $this->addError($column_name, sprintf($this->_defaultErrorMessages['too_long'], $column_settings['maxLength']));
+                $this->addError($column_name, sprintf($this->getDefaultErrorMessageFor('too_long'), $column_settings['maxLength']));
             }elseif($this->_automated_not_null_validator && empty($column_settings['primaryKey']) && !empty($column_settings['notNull']) && (!isset($this->$column_name) || is_null($this->$column_name))){
                 $this->addError($column_name,'empty');
             }
@@ -4063,235 +3906,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
 
 
-
-    /**
-                                    Error Handling
-    ====================================================================
-    See also: Validators.
-    */
-
-
-    /**
-    * Returns the Errors array that holds all information about attribute error messages.
-    */
-    public function getErrors()
-    {
-        return $this->_errors;
-    }
-
-    /**
-    * Adds an error to the base object instead of any particular attribute. This is used
-    * to report errors that doesn't tie to any specific attribute, but rather to the object
-    * as a whole. These error messages doesn't get prepended with any field name when iterating
-    * with yieldEachFullError, so they should be complete sentences.
-    */
-    public function addErrorToBase($message)
-    {
-        $this->addError($this->getModelName(), $message);
-    }
-
-    /**
-    * Returns errors assigned to base object through addToBase according to the normal rules of getErrorsOn($attribute).
-    */
-    public function getBaseErrors()
-    {
-        $errors = $this->getErrors();
-        return (array)@$errors[$this->getModelName()];
-    }
-
-
-    /**
-    * Adds an error message ($message) to the ($attribute), which will be returned on a call to <tt>getErrorsOn($attribute)</tt>
-    * for the same attribute and ensure that this error object returns false when asked if <tt>hasErrors</tt>. More than one
-    * error can be added to the same $attribute in which case an array will be returned on a call to <tt>getErrorsOn($attribute)</tt>.
-    * If no $message is supplied, "invalid" is assumed.
-    */
-    public function addError($attribute, $message = 'invalid')
-    {
-        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
-        $this->_errors[$attribute][] = $message;
-    }
-
-    /**
-    * Will add an error message to each of the attributes in $attributes that is empty.
-    */
-    public function addErrorOnEmpty($attribute_names, $message = 'empty')
-    {
-        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
-        $attribute_names = Ak::toArray($attribute_names);
-        foreach ($attribute_names as $attribute){
-            if(empty($this->$attribute)){
-                $this->addError($attribute, $message);
-            }
-        }
-    }
-
-    /**
-    * Will add an error message to each of the attributes in $attributes that is blank (using $this->isBlank).
-    */
-    public function addErrorOnBlank($attribute_names, $message = 'blank')
-    {
-        $message = isset($this->_defaultErrorMessages[$message]) ? $this->t($this->_defaultErrorMessages[$message]) : $message;
-        $attribute_names = Ak::toArray($attribute_names);
-        foreach ($attribute_names as $attribute){
-            if($this->isBlank(@$this->$attribute)){
-                $this->addError($attribute, $message);
-            }
-        }
-    }
-
-    /**
-    * Will add an error message to each of the attributes in $attributes that has a length outside of the passed boundary $range.
-    * If the length is above the boundary, the too_long_message message will be used. If below, the too_short_message.
-    */
-    public function addErrorOnBoundaryBreaking($attribute_names, $range_begin, $range_end, $too_long_message = 'too_long', $too_short_message = 'too_short')
-    {
-        $too_long_message = isset($this->_defaultErrorMessages[$too_long_message]) ? $this->_defaultErrorMessages[$too_long_message] : $too_long_message;
-        $too_short_message = isset($this->_defaultErrorMessages[$too_short_message]) ? $this->_defaultErrorMessages[$too_short_message] : $too_short_message;
-
-        $attribute_names = Ak::toArray($attribute_names);
-        foreach ($attribute_names as $attribute){
-            if(@$this->$attribute < $range_begin){
-                $this->addError($attribute, $too_short_message);
-            }
-            if(@$this->$attribute > $range_end){
-                $this->addError($attribute, $too_long_message);
-            }
-        }
-
-    }
-
-    public function addErrorOnBoundryBreaking ($attributes, $range_begin, $range_end, $too_long_message = 'too_long', $too_short_message = 'too_short')
-    {
-        $this->addErrorOnBoundaryBreaking($attributes, $range_begin, $range_end, $too_long_message, $too_short_message);
-    }
-
-    /**
-    * Returns true if the specified $attribute has errors associated with it.
-    */
-    public function isInvalid($attribute)
-    {
-        return $this->getErrorsOn($attribute);
-    }
-
-    /**
-    * Returns false, if no errors are associated with the specified $attribute.
-    * Returns the error message, if one error is associated with the specified $attribute.
-    * Returns an array of error messages, if more than one error is associated with the specified $attribute.
-    */
-    public function getErrorsOn($attribute)
-    {
-        if (empty($this->_errors[$attribute])){
-            return false;
-        }elseif (count($this->_errors[$attribute]) == 1){
-            $k = array_keys($this->_errors[$attribute]);
-            return $this->_errors[$attribute][$k[0]];
-        }else{
-            return $this->_errors[$attribute];
-        }
-    }
-
-
-    /**
-    * Yields each attribute and associated message per error added.
-    */
-    public function yieldEachError()
-    {
-        foreach ($this->_errors as $errors){
-            foreach ($errors as $error){
-                $this->yieldError($error);
-            }
-        }
-    }
-
-    public function yieldError($message)
-    {
-        $messages = is_array($message) ? $message : array($message);
-        foreach ($messages as $message){
-            echo "<div class='error'><p>$message</p></div>\n";
-        }
-
-    }
-
-    /**
-    * Yields each full error message added. So Person->addError("first_name", "can't be empty") will be returned
-    * through iteration as "First name can't be empty".
-    */
-    public function yieldEachFullError()
-    {
-        $full_messages = $this->getFullErrorMessages();
-        foreach ($full_messages as $full_message){
-            $this->yieldError($full_message);
-        }
-    }
-
-
-    /**
-    * Returns all the full error messages in an array.
-    */
-    public function getFullErrorMessages()
-    {
-        $full_messages = array();
-
-        foreach ($this->_errors as $attribute=>$errors){
-            $full_messages[$attribute] = array();
-            $attribute_name = AkInflector::humanize($this->_delocalizeAttribute($attribute));
-            foreach ($errors as $error){
-                $full_messages[$attribute][] = $this->t('%attribute_name %error', array(
-                '%attribute_name' => $attribute_name,
-                '%error' => $error
-                ));
-            }
-        }
-        return $full_messages;
-    }
-
-    /**
-    * Returns true if no errors have been added.
-    */
-    public function hasErrors()
-    {
-        return !empty($this->_errors);
-    }
-
-    /**
-    * Removes all the errors that have been added.
-    */
-    public function clearErrors()
-    {
-        $this->_errors = array();
-    }
-
-    /**
-    * Returns the total number of errors added. Two errors added to the same attribute will be counted as such
-    * with this as well.
-    */
-    public function countErrors()
-    {
-        $error_count = 0;
-        foreach ($this->_errors as $errors){
-            $error_count = count($errors)+$error_count;
-        }
-
-        return $error_count;
-    }
-
-
-    public function errorsToString($print = false)
-    {
-        $result = "\n<div id='errors'>\n<ul class='error'>\n";
-        foreach ($this->getFullErrorMessages() as $error){
-            $result .= is_array($error) ? "<li class='error'>".join('</li><li class=\'error\'>',$error)."</li>\n" : "<li class='error'>$error</li>\n";
-        }
-        $result .= "</ul>\n</div>\n";
-
-        if($print){
-            echo $result;
-        }
-        return $result;
-    }
-
-    /*/Error Handling*/
 
 
 
@@ -4947,6 +4561,11 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
 
 
+    public function t($string, $array = null,$model=null)
+    {
+        return Ak::t($string, $array, empty($model) ? AkInflector::underscore($this->getModelName()): $model);
+    }
+
 
     public function hasBeenModified()
     {
@@ -5022,8 +4641,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      */
     protected function _enableLazyLoadingExtenssions($options = array())
     {
-        empty($options['skip_calculations']) && $this->_enableCalculations();
-        empty($options['skip_table_inheritance']) && $this->_enableTableInheritance();
+        empty($options['skip_calculations'])        && $this->_enableCalculations();
+        empty($options['skip_table_inheritance'])   && $this->_enableTableInheritance();
+        empty($options['skip_localization'])        && $this->_enableLocalization();
+        empty($options['skip_errors'])              && $this->_enableErrors();
     }
 
     protected function _enableCalculations()
@@ -5041,6 +4662,65 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         array(
         'methods' => array('getInheritanceColumn','setInheritanceColumn','typeCondition'),
         'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'table_inheritance.php'
+        ));
+    }
+
+    private function _setInternationalizedColumnsStatus($force_enable = false)
+    {
+        if($force_enable){
+            $this->_internationalize = true;
+        }else{
+            $this->_internationalize = !empty($this->_internationalize) ? count($this->getAvailableLocales()) > 1 : true;
+        }
+    }
+
+    protected function _enableLocalization()
+    {
+        $this->extendClassLazily('AkActiveRecordLocalization',
+        array(
+        'methods' => array(
+            'getInternationalizedColumns',
+            'getAvailableLocales',
+            'getCurrentLocale',
+            'getAttributeByLocale',
+            'getAttributeLocales',
+            'setAttributeByLocale',
+            'setAttributeLocales',
+            'isInternationalizeCandidate',
+            'setInternationalizedAttribute',
+            'addInternationalizedColumn',
+            'delocalizeAttribute',
+            ),
+            'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'localization.php'
+        ));
+    }
+
+    protected function _enableErrors()
+    {
+        $this->extendClassLazily('AkActiveRecordErrors',
+        array(
+        'methods' => array(
+            'addError',
+            'addErrorOnBlank',
+            'addErrorOnBoundaryBreaking',
+            'addErrorOnBoundryBreaking',
+            'addErrorOnEmpty',
+            'addErrorToBase',
+            'clearErrors',
+            'countErrors',
+            'errorsToString',
+            'getBaseErrors',
+            'getDefaultErrorMessageFor',
+            'getErrors',
+            'getErrorsOn',
+            'getFullErrorMessages',
+            'hasErrors',
+            'isInvalid',
+            'yieldEachError',
+            'yieldEachFullError',
+            'yieldError',
+            ),
+            'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'errors.php'
         ));
     }
 
