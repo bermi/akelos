@@ -31,7 +31,7 @@ class AkSintagsLexer extends AkLexer
 
     public function __construct(&$parser)
     {
-        $this->AkLexer($parser, 'Text');
+        parent::__construct($parser, 'Text');
         $this->mapHandler('Text', 'Text');
         foreach ($this->_modes as $mode){
             $this->{'_add'.$mode.'Tokens'}();
