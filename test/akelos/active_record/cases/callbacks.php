@@ -12,11 +12,12 @@ class Callbacks_TestCase extends ActiveRecordUnitTest
         'afterCreate','afterValidation','afterValidationOnUpdate','afterValidationOnCreate','afterSave','afterUpdate','afterDestroy');
 
         function Callbacks_TestCase_createClass ($classname, $parent, $functions, $function_body){
-            $class_code = "class $classname extends $parent {";
+            $class_code = "class $classname extends $parent { public \$__called = array(); ";
             foreach ($functions as $function){
                 $class_code .= "public function $function(){".$function_body."}";
             }
             $class_code .= "}";
+
             eval($class_code);
         }
 

@@ -148,6 +148,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     $_attributes = array(),
     $_protectedAttributes = array(),
     $_accessibleAttributes = array(),
+    $_association_handler_copies = array(),
     $_recordTimestamps = true,
     $_columnNames = array(), // Column description
     $_columns = array(), // Array of column objects for the table associated with this class.

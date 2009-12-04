@@ -6,7 +6,7 @@ class AkAssociation extends AkObserver
     public $options = array();
     public $models = array();
 
-    public function AkAssociation(&$Owner)
+    public function __construct(&$Owner)
     {
         $this->Owner = $Owner;
         $this->observe($this->Owner);

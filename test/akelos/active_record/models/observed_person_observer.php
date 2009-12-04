@@ -1,6 +1,9 @@
 <?php
+
 class ObservedPersonObserver extends AkObserver
 {
+    public $notified_observers = array();
+
     public function update($state = '')
     {
         switch ($state)
@@ -40,6 +43,5 @@ class ObservedPersonObserver extends AkObserver
         }
         $record->notified_observers[$function]++;
     }
-
 }
 

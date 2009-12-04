@@ -6,9 +6,11 @@
  *
  * See also <AkActiveRecord> and <AkActionMailer> as those are the ones you will usually inherit from
 */
-class AkBaseModel extends AkObject
+class AkBaseModel extends AkLazyObject
 {
     public $_modelName;
+    protected
+    $_report_undefined_attributes = false;
 
     /**
     * Returns current model name

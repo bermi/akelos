@@ -6,6 +6,9 @@ class Observer_TestCase extends ActiveRecordUnitTest
 {
     public function test_start()
     {
+        eval("class ObservedAccount extends AkActiveRecord { public \$notified_observers = array();} ");
+        eval("class ObservedPerson extends AkActiveRecord { public \$notified_observers = array();} ");
+
         $this->installAndIncludeModels(array(
         'ObservedAccount'=>'id, balance, created_at, updated_at',
         'ObservedPerson'=>'id, user_name, first_name, last_name, city, state'));
