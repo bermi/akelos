@@ -161,7 +161,7 @@ class SourceAnalyzer
             $ComponentInstance = new Component(array('init'=>false));
             if($this->db) $ComponentInstance->setConnection($this->db);
             $ComponentInstance->init();
-            $ClassInstance = new AkelosClass(array('init'=>false));
+            $ClassInstance = new Klass(array('init'=>false));
             if($this->db) $ClassInstance->setConnection($this->db);
             $ClassInstance->init(array('init'=>false));
 
@@ -192,7 +192,7 @@ class SourceAnalyzer
             $ComponentInstance = new Component(array('init'=>false));
             if($this->db) $ComponentInstance->setConnection($this->db);
             $ComponentInstance->init();
-            $ClassInstance = new AkelosClass(array('init'=>false));
+            $ClassInstance = new Klass(array('init'=>false));
             if($this->db) $ClassInstance->setConnection($this->db);
             $ClassInstance->init();
             $this->log('Analyzing file '.$UnIndexedPage->path);

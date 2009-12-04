@@ -1,6 +1,6 @@
 <?php
 
-class AkelosClass extends AkActiveRecord
+class Klass extends AkActiveRecord
 {
     public $acts_as = 'tree';
     public $belongs_to = array('file', 'component');
@@ -81,7 +81,7 @@ class AkelosClass extends AkActiveRecord
                 $class_details = array('name'=>$class_details['name']);
             }
 
-            $Class = new AkelosClass(array('init'=>false));
+            $Class = new Klass(array('init'=>false));
             $Class->setConnection($this->getConnection());
             $Class->setAttributes($class_details);
             $Class->save();

@@ -1466,7 +1466,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $object = new $model_name(array('init'=>false));
         $object->_newRecord = $set_as_new;
         $object->setConnection($this->getConnection());
-        $object->init('attributes', $record);
+        $object->init(array('attributes', $record));
 
         if ($call_after_instantiate) {
             $object->afterInstantiate();
@@ -5347,7 +5347,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
                         Connection adapters
     ====================================================================
-    Right now Akelos uses phpAdodb for bd abstraction. This are functionalities not
+    Right now Akelos uses phpAdodb for bd abstraction. These are functionalities not
     provided in phpAdodb and that will move to a separated driver for each db
     engine in a future
     */

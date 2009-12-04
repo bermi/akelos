@@ -14,13 +14,13 @@ class ConnectionHandling_TestCase extends ActiveRecordUnitTest
         unset ($Model->_db);
 
         $this->assertReference($Model->establishConnection(),$default_connection);
-        $development_connection = $Model->establishConnection('development');
+        $development_connection = $Model->establishConnection('development', true);
 
         $available_tables_on_development = $development_connection->getAvailableTables();
         $this->assertFalse($development_connection===$default_connection);
 
         $this->assertUpcomingError("Could not find the database profile");
-        $this->assertFalse($Model->establishConnection('not_specified_profile'));
+        $this->assertFalse($Model->establishConnection('not_specified_profile', true));
 
         $check_default_connection = AkDbAdapter::getInstance();
         $this->assertReference($default_connection,$check_default_connection);

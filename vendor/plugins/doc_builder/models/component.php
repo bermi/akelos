@@ -3,7 +3,7 @@
 class Component extends AkActiveRecord
 {
     public $acts_as = 'tree';
-    public $has_many = array('files', 'methods', 'categories', 'akelos_classes');
+    public $has_many = array('files', 'methods', 'categories', 'klasses');
 
     public function validate()
     {

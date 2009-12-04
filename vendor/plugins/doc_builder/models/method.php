@@ -3,13 +3,13 @@
 class Method extends AkActiveRecord
 {
     public $has_many = array('parameters');//,'examples', array('comments'=>array('condition'=>'is_published = 1')));
-    public $belongs_to = array('akelos_class', 'category');
-    public $acts_as = array('list' => array('scope'=>'akelos_class_id'));
+    public $belongs_to = array('klass', 'category');
+    public $acts_as = array('list' => array('scope'=>'klass_id'));
 
 
     public function &updateMethodDetails(&$Class, $method_name, $method_details, &$SourceAnalyzer)
     {
-        $Method = $this->findOrCreateBy('name AND akelos_class_id', $method_name, $Class->getId());
+        $Method = $this->findOrCreateBy('name AND klass_id', $method_name, $Class->getId());
 
         $SourceAnalyzer->log(($Method->has_been_created ? 'Adding ' : 'Updating').' method '.$method_name);
 

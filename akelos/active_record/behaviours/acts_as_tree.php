@@ -83,7 +83,7 @@ class AkActsAsTree extends AkObserver
 
     public $_ActiveRecordInstance;
 
-    public function AkActsAsTree(&$ActiveRecordInstance)
+    public function __construct(&$ActiveRecordInstance)
     {
         $this->_ActiveRecordInstance = $ActiveRecordInstance;
     }
@@ -265,7 +265,6 @@ class AkActsAsTree extends AkObserver
         return $ancestors;
     }
 
-
     public function getSiblings($options = array())
     {
         $default_options = array('include_self'=>false);
@@ -333,6 +332,5 @@ class AkActsAsTree extends AkObserver
 
         return true;
     }
-
 }
 

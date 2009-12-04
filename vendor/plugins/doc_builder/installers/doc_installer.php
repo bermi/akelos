@@ -38,7 +38,7 @@ class DocInstaller extends AkInstaller
             updated_at
         ");
 
-        $this->createTable('akelos_classes', "
+        $this->createTable('klasses', "
             id,
             name,
             description,
@@ -53,7 +53,7 @@ class DocInstaller extends AkInstaller
             id,
             name,
             description,
-            akelos_class_id,
+            klass_id,
             category_id,
             is_private,
             returns_reference bool default 0,
@@ -108,7 +108,7 @@ class DocInstaller extends AkInstaller
 
     function down_1()
     {
-            $this->dropTables('components,files,methods,akelos_classes,parameters,examples,comments,categories,related_categories,data_types');
+            $this->dropTables('components,files,methods,klasses,parameters,examples,comments,categories,related_categories,data_types');
     }
 
 }

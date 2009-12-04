@@ -1,6 +1,6 @@
 <?php
 
-class AkPgsqlDbAdapter extends AkDbAdapter
+class AkPostgreDbAdapter extends AkDbAdapter
 {
 
     public function type()
