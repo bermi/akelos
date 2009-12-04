@@ -1,9 +1,8 @@
 <?php
 
-class AkActiveRecordErrors
+class AkActiveRecordErrors extends AkActiveRecordExtenssion
 {
     protected $_errors = array();
-    protected $_ActiveRecord;
     protected $_defaultErrorMessages = array( // Holds a hash with all the default error messages, such that they can be replaced by your own copy or localizations.
     'inclusion' =>  "is not included in the list",
     'exclusion' => "is reserved",
@@ -18,11 +17,6 @@ class AkActiveRecordErrors
     'taken' => "has already been taken",
     'not_a_number' => "is not a number"
     );
-
-    public function setExtendedBy(&$ActiveRecord)
-    {
-        $this->_ActiveRecord = $ActiveRecord;
-    }
 
     /**
     * Returns the Errors array that holds all information about attribute error messages.

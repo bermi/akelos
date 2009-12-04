@@ -1,14 +1,7 @@
 <?php
 
-class AkActiveRecordLocalization
+class AkActiveRecordLocalization extends AkActiveRecordExtenssion
 {
-    protected $_ActiveRecord;
-
-    public function setExtendedBy(&$ActiveRecord)
-    {
-        $this->_ActiveRecord = $ActiveRecord;
-    }
-
     public function getInternationalizedColumns()
     {
         static $cache;

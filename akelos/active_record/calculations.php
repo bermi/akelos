@@ -1,9 +1,8 @@
 <?php
 
-class AkActiveRecordCalculations
+class AkActiveRecordCalculations extends AkActiveRecordExtenssion
 {
     protected $_calculation_options = array('conditions', 'joins', 'order', 'select', 'group', 'having', 'distinct', 'limit', 'offset');
-    protected $_ActiveRecord;
 
     /**
       * Count operates using three different approaches.
@@ -253,10 +252,5 @@ class AkActiveRecordCalculations
         }else{
             return empty($column) ? $value : $this->_ActiveRecord->castAttributeFromDatabase($column, $value);
         }
-    }
-
-    public function setExtendedBy(&$ActiveRecord)
-    {
-        $this->_ActiveRecord = $ActiveRecord;
     }
 }

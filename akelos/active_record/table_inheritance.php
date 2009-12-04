@@ -22,10 +22,8 @@
 * Note, all the attributes for all the cases are kept in the same table. Read more:
 * http://www.martinfowler.com/eaaCatalog/singleTableInheritance.html
 */
-class AkActiveRecordTableInheritance
+class AkActiveRecordTableInheritance extends AkActiveRecordExtenssion
 {
-    protected $_ActiveRecord;
-
     /**
      * Gets the column name for use with single table inheritance. Can be overridden in subclasses.
     */
@@ -80,10 +78,5 @@ class AkActiveRecordTableInheritance
             $type_condition[] = ' '.($table_alias != null ? $table_alias : $table_name).'.'.$inheritance_column.' = \''.AkInflector::humanize(AkInflector::underscore($subclass)).'\' ';
         }
         return empty($type_condition) ? '' : '('.join('OR',$type_condition).') ';
-    }
-
-    public function setExtendedBy(&$ActiveRecord)
-    {
-        $this->_ActiveRecord = $ActiveRecord;
     }
 }
