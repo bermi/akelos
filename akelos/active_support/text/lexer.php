@@ -1,6 +1,5 @@
 <?php
 
-
 /**
 * Author Markus Baker: http://www.lastcraft.com
 * Version adapted from Simple Test: http://sourceforge.net/projects/simpletest/
@@ -257,7 +256,8 @@ class AkLexerStateStack {
  *    parser once. Lexer modes must not start
  *    with leading underscores.
  */
-class AkLexer {
+class AkLexer
+{
     public $_regexes;
     public $_parser;
     public $_mode;
@@ -273,7 +273,8 @@ class AkLexer {
      *    @param boolean $case            True for case sensitive.
      *    @access public
      */
-    public function AkLexer(&$parser, $start = 'accept', $case = false) {
+    public function __construct(&$parser, $start = 'accept', $case = false)
+    {
         $this->_case = $case;
         $this->_regexes = array();
         $this->_parser = &$parser;
@@ -292,7 +293,8 @@ class AkLexer {
      *                                this type of input.
      *    @access public
      */
-    public function addPattern($pattern, $mode = "accept") {
+    public function addPattern($pattern, $mode = 'accept')
+    {
         if (! isset($this->_regexes[$mode])) {
             $this->_regexes[$mode] = new AkLexerParallelRegex($this->_case);
         }
@@ -312,7 +314,8 @@ class AkLexer {
      *                                nested mode.
      *    @access public
      */
-    public function addEntryPattern($pattern, $mode, $new_mode) {
+    public function addEntryPattern($pattern, $mode, $new_mode)
+    {
         if (! isset($this->_regexes[$mode])) {
             $this->_regexes[$mode] = new AkLexerParallelRegex($this->_case);
         }
@@ -327,7 +330,8 @@ class AkLexer {
      *    @param string $mode         Mode to leave.
      *    @access public
      */
-    public function addExitPattern($pattern, $mode) {
+    public function addExitPattern($pattern, $mode)
+    {
         if (! isset($this->_regexes[$mode])) {
             $this->_regexes[$mode] = new AkLexerParallelRegex($this->_case);
         }
@@ -346,7 +350,8 @@ class AkLexer {
      *    @param string $special      Use this mode for this one token.
      *    @access public
      */
-    public function addSpecialPattern($pattern, $mode, $special) {
+    public function addSpecialPattern($pattern, $mode, $special)
+    {
         if (! isset($this->_regexes[$mode])) {
             $this->_regexes[$mode] = new AkLexerParallelRegex($this->_case);
         }
@@ -359,7 +364,8 @@ class AkLexer {
      *    @param string $handler     New target handler.
      *    @access public
      */
-    public function mapHandler($mode, $handler) {
+    public function mapHandler($mode, $handler)
+    {
         $this->_mode_handlers[$mode] = $handler;
     }
 
@@ -373,7 +379,8 @@ class AkLexer {
      *    @return boolean           True on success, else false.
      *    @access public
      */
-    public function parse($raw) {
+    public function parse($raw)
+    {
         if (! isset($this->_parser)) {
             return false;
         }
@@ -414,7 +421,8 @@ class AkLexer {
      *                                from the parser.
      *    @access private
      */
-    public function _dispatchTokens($unmatched, $matched, $mode = false, $initialPos, $matchPos) {
+    public function _dispatchTokens($unmatched, $matched, $mode = false, $initialPos, $matchPos)
+    {
         if (! $this->_invokeParser($unmatched, AK_LEXER_UNMATCHED, $initialPos) ){
             return false;
         }
@@ -446,8 +454,9 @@ class AkLexer {
      *    @return boolean        True if this is the exit mode.
      *    @access private
      */
-    public function _isModeEnd($mode) {
-        return ($mode === "__exit");
+    public function _isModeEnd($mode)
+    {
+        return ($mode === '__exit');
     }
 
     /**
@@ -458,8 +467,9 @@ class AkLexer {
      *    @return boolean        True if this is the exit mode.
      *    @access private
      */
-    public function _isSpecialMode($mode) {
-        return (strncmp($mode, "_", 1) == 0);
+    public function _isSpecialMode($mode)
+    {
+        return (strncmp($mode, '_', 1) == 0);
     }
 
     /**
@@ -469,7 +479,8 @@ class AkLexer {
      *    @return string         Underlying mode name.
      *    @access private
      */
-    public function _decodeSpecial($mode) {
+    public function _decodeSpecial($mode)
+    {
         return substr($mode, 1);
     }
 
@@ -484,7 +495,8 @@ class AkLexer {
      *                                thats being parsed
      *    @access private
      */
-    public function _invokeParser($content, $is_match, $pos) {
+    public function _invokeParser($content, $is_match, $pos)
+    {
         if (($content === '') || ($content === false)) {
             return true;
         }
@@ -509,7 +521,8 @@ class AkLexer {
      *                               is a parsing error.
      *    @access private
      */
-    public function _reduce(&$raw) {
+    public function _reduce(&$raw)
+    {
         if (! isset($this->_regexes[$this->_mode->getCurrent()])) {
             return false;
         }
@@ -525,4 +538,3 @@ class AkLexer {
 }
 
 
-?>

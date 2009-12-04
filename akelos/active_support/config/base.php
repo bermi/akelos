@@ -141,6 +141,93 @@ class AkConfig
         return $option;
     }
 
+    static function rebaseApp($base_path)
+    {
+        static $bases = array();
+
+        if($base_path == false){
+            if(count($bases) > 1){
+                $base = array_shift($bases);
+                foreach ($base as $type => $original_path){
+                    AkConfig::setDir($type, $original_path);
+                }
+                return true;
+            }
+            return false;
+        }
+        $bases[] =
+        array(
+        'app'               => AkConfig::getDir('app'),
+        'models'            => AkConfig::getDir('models'),
+        'app_installers'    => AkConfig::getDir('app_installers'),
+        'controllers'       => AkConfig::getDir('controllers'),
+        'views'             => AkConfig::getDir('views'),
+        'apis'              => AkConfig::getDir('apis'),
+        'helpers'           => AkConfig::getDir('helpers'),
+        'public'            => AkConfig::getDir('public'),
+        );
+
+        AkConfig::setDir('app',             $base_path);
+        AkConfig::setDir('app_installers',  $base_path.DS.'installers');
+        AkConfig::setDir('models',          $base_path.DS.'models');
+        AkConfig::setDir('controllers',     $base_path.DS.'controllers');
+        AkConfig::setDir('views',           $base_path.DS.'views');
+        AkConfig::setDir('apis',            $base_path.DS.'apis');
+        AkConfig::setDir('helpers',         $base_path.DS.'helpers');
+        AkConfig::setDir('public',          $base_path.DS.'public');
+        return true;
+    }
+
+    static function leaveBase()
+    {
+        return AkConfig::rebaseApp(false);
+    }
+
+    /*
+
+    public function rebaseAppPaths($base_path = null)
+    {
+    if(!is_dir($base_path) && $base_path_candidate = AkConfig::getDir('suite', false, false)){
+    $base_path = $base_path_candidate;
+    }else{
+    $base_path = (!is_dir($base_path) ? AkConfig::getDir('fixtures') : $base_path).DS.'app';
+    }
+
+    AkConfig::setDir('app',             $base_path);
+    AkConfig::setDir('app_installers',  $base_path.DS.'installers');
+    AkConfig::setDir('models',          $base_path.DS.'models');
+    AkConfig::setDir('controllers',     $base_path.DS.'controllers');
+    AkConfig::setDir('views',           $base_path.DS.'views');
+    AkConfig::setDir('apis',            $base_path.DS.'apis');
+    AkConfig::setDir('fixtures',        $base_path.DS.'fixtures');
+    AkConfig::setDir('helpers',         $base_path.DS.'helpers');
+    AkConfig::setDir('public',          $base_path.DS.'public');
+    $this->_path_rebased = true;
+    }
+
+    public function restoreAppPaths()
+    {
+    foreach ($this->_original_paths as $type => $original_path){
+    AkConfig::setDir($type, $original_path);
+    }
+    }
+
+    protected function _logOriginalPaths()
+    {
+    $this->_original_paths = array(
+    'app'               => AkConfig::getDir('app'),
+    'models'            => AkConfig::getDir('models'),
+    'app_installers'    => AkConfig::getDir('app_installers'),
+    'controllers'       => AkConfig::getDir('controllers'),
+    'views'             => AkConfig::getDir('views'),
+    'apis'              => AkConfig::getDir('apis'),
+    'fixtures'          => AkConfig::getDir('fixtures'),
+    'helpers'           => AkConfig::getDir('helpers'),
+    'public'            => AkConfig::getDir('public'),
+    );
+    }
+    */
+
     static function setOption($key, $value)
     {
         Ak::setStaticVar('AkConfig_'.$key, $value);

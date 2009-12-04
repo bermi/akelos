@@ -68,18 +68,18 @@ defined('AK_APP_DIR')               || define('AK_APP_DIR',             AK_BASE_
 defined('AK_PUBLIC_DIR')            || define('AK_PUBLIC_DIR',          AK_BASE_DIR.DS.'public');
 defined('AK_TEST_DIR')              || define('AK_TEST_DIR',            AK_BASE_DIR.DS.'test');
 defined('AK_SCRIPT_DIR')            || define('AK_SCRIPT_DIR',          AK_BASE_DIR.DS.'script');
+defined('AK_APP_VENDOR_DIR')        || define('AK_APP_VENDOR_DIR',      AK_BASE_DIR.DS.'vendor');
 
 defined('AK_APIS_DIR')              || define('AK_APIS_DIR',            AK_APP_DIR.DS.'apis');
 defined('AK_MODELS_DIR')            || define('AK_MODELS_DIR',          AK_APP_DIR.DS.'models');
 defined('AK_CONTROLLERS_DIR')       || define('AK_CONTROLLERS_DIR',     AK_APP_DIR.DS.'controllers');
 defined('AK_VIEWS_DIR')             || define('AK_VIEWS_DIR',           AK_APP_DIR.DS.'views');
 defined('AK_HELPERS_DIR')           || define('AK_HELPERS_DIR',         AK_APP_DIR.DS.'helpers');
-defined('AK_APP_VENDOR_DIR')        || define('AK_APP_VENDOR_DIR',      AK_APP_DIR.DS.'vendor');
 
 defined('AK_APP_PLUGINS_DIR')       || define('AK_APP_PLUGINS_DIR',     AK_APP_VENDOR_DIR.DS.'plugins');
 defined('AK_APP_INSTALLERS_DIR')    || define('AK_APP_INSTALLERS_DIR',  AK_APP_DIR.DS.'installers');
 
-defined('AK_PLUGINS_DIR')           || define('AK_PLUGINS_DIR', AkConfig::getDir('app').DS.'vendor'.DS.'plugins');
+defined('AK_PLUGINS_DIR')           || define('AK_PLUGINS_DIR', AK_APP_VENDOR_DIR.DS.'plugins');
 defined('AK_PLUGINS')               || define('AK_PLUGINS', 'auto');
 defined('AK_GENERATORS_DIR')        || define('AK_GENERATORS_DIR', AK_ACTIVE_SUPPORT_DIR.DS.'generators');
 

@@ -1,11 +1,26 @@
 <?php
 
 $doc_db_file = AK_DOCS_DIR.DS.'akelos'.DS.'doc.sqlite';
+$installed = file_exists($doc_db_file);
 $db = Ak::db('sqlite://'.urlencode($doc_db_file).'/?persist');
+AkConfig::rebaseApp(AK_PLUGINS_DIR.DS.'doc_builder');
+
+if(!$installed){
+    $DocInstaller = new DocInstaller($db);
+    $DocInstaller->install();
+}
+
+
+$SourceAnalyzer = new SourceAnalyzer();
+$SourceAnalyzer->db = $db;
+$SourceAnalyzer->storeFilesForIndexing(AK_ACTION_MAILER_DIR);
+$SourceAnalyzer->indexFiles();
+//unlink($doc_db_file);
+return;
 
 $dir_iterator = new RecursiveDirectoryIterator(AK_ACTION_MAILER_DIR);
 $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
-// could use CHILD_FIRST if you so wish
+
 
 foreach ($iterator as $file) {
     if($file->isFile()){

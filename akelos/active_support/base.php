@@ -2308,7 +2308,16 @@ class Ak
         }elseif(file_exists(DS.$name.'.php')){
             include DS.$name.'.php';
         }else{
-            Ak::import($name);
+            if(!Ak::import($name)){
+                if(strstr($name, 'Helper')){
+                    $file_path = AkConfig::getDir('helpers').DS.AkInflector::underscore($name).'.php';
+                }elseif(strstr($name, 'Installer')){
+                    $file_path = AkConfig::getDir('app_installers').DS.AkInflector::underscore($name).'.php';
+                }
+            }
+        }
+        if(isset($file_path) && file_exists($file_path)){
+            include $file_path;
         }
     }
 }

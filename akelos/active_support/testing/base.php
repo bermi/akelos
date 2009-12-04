@@ -59,6 +59,7 @@ class AkUnitTest extends UnitTestCase
         AkConfig::setDir('public',          $base_path.DS.'public');
         $this->_path_rebased = true;
     }
+
     public function restoreAppPaths()
     {
         foreach ($this->_original_paths as $type => $original_path){

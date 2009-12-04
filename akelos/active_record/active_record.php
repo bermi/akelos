@@ -180,6 +180,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     public function __construct()
     {
         $attributes = (array)func_get_args();
+        if(isset($attributes[0]['init']) && $attributes[0]['init'] == false){
+            return;
+        }
         return $this->init($attributes);
     }
 
@@ -325,7 +328,11 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         $model = $this->getModelName();
 
-        $object = new $model();
+        $object = new $model(array('init'=>false));
+        if(!empty($this->_db)){
+            $object->setConnection($this->getConnection());
+        }
+        $object->init();
         $object->setAttributes($attributes);
         $object->save();
         return $object;
@@ -1437,7 +1444,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /**
     * Finder methods must instantiate through this method to work with the single-table inheritance model and
     * eager loading associations.
-    * that makes it possible to create objects of different types from the same table.
+    * That makes it possible to create objects of different types from the same table.
     */
     public function &instantiate($record, $set_as_new = true, $call_after_instantiate = true)
     {
@@ -1456,9 +1463,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
 
         $model_name = isset($inheritance_model_name) ? $inheritance_model_name : $this->getModelName();
-        $object = new $model_name('attributes', $record);
-
+        $object = new $model_name(array('init'=>false));
         $object->_newRecord = $set_as_new;
+        $object->setConnection($this->getConnection());
+        $object->init('attributes', $record);
 
         if ($call_after_instantiate) {
             $object->afterInstantiate();
@@ -1964,11 +1972,11 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         foreach ($columns as $name => $details){
             if(
-                (substr($name,-3) == '_id' || substr($name,-6) == '_count') ||
-                !empty($details['primaryKey']) ||
-                ($inheritance_column !== false && $inheritance_column == $name)
+            (substr($name,-3) == '_id' || substr($name,-6) == '_count') ||
+            !empty($details['primaryKey']) ||
+            ($inheritance_column !== false && $inheritance_column == $name)
             ){
-                    unset($columns[$name]);
+                unset($columns[$name]);
             }
         }
         return $columns;
@@ -2286,10 +2294,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     *       )
     *     )
     */
-    public function &establishConnection($specification_or_profile = AK_DEFAULT_DATABASE_PROFILE)
+    public function &establishConnection($specification_or_profile = AK_DEFAULT_DATABASE_PROFILE, $force = false)
     {
-        $adapter = AkDbAdapter::getInstance($specification_or_profile);
-        return $this->setConnection($adapter);
+        if($force || !$this->isConnected()){
+            $adapter = AkDbAdapter::getInstance($specification_or_profile);
+            return $this->setConnection($adapter);
+        }
+        return $this->_db;
     }
 
 
@@ -2341,7 +2352,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     public function setPrimaryKey($primary_key = 'id')
     {
         if(!$this->hasColumn($primary_key)){
-            trigger_error($this->t('Opps! We could not find primary key column %primary_key on the table %table, for the model %model',array('%primary_key'=>$primary_key,'%table'=>$this->getTableName(), '%model'=>$this->getModelName())).Ak::getFileAndNumberTextForError(1),E_USER_ERROR);
+            trigger_error($this->t('Opps! We could not find primary key column %primary_key on the table %table, for the model %model',array('%primary_key'=>$primary_key,'%table'=>$this->getTableName(), '%model'=>$this->getModelName())).' '.Ak::getFileAndNumberTextForError(1),E_USER_ERROR);
         }else {
             $this->_primaryKey = $primary_key;
         }
@@ -2506,7 +2517,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             if(file_exists($installer_file)){
                 require_once($installer_file);
                 if(class_exists($installer_name)){
-                    $Installer = new $installer_name();
+                    $Installer = new $installer_name($this->getConnection());
                     if(method_exists($Installer,'install')){
                         $Installer->install();
                         $column_objects = $this->_databaseTableInternals($this->getTableName());
@@ -2558,7 +2569,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             !$this->_runCurrentModelInstallerIfExists($column_objects)){
                 // akelos_migrations is the first active record to be installed, therefore the table will be created after the first run.
                 if($this->getTableName() != 'akelos_migrations'){
-                     trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())).Ak::getFileAndNumberTextForError(1), E_USER_NOTICE);
+                    trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())).Ak::getFileAndNumberTextForError(4), E_USER_NOTICE);
                 }
                 return false;
             }elseif (empty($column_objects)){
@@ -4644,7 +4655,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      *        array ('18' => 'bermi@example.com')
      *    );
      */
-    public function collect(&$source_array, $key_index, $value_index)
+    public function collect($source_array, $key_index, $value_index)
     {
         $resulting_array = array();
         if(!empty($source_array) && is_array($source_array)) {
@@ -4787,7 +4798,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if (isset($attributes[0]) && is_array($attributes[0])) {
             $attributes = $attributes[0];
         }
-        $record = new $modelName('attributes',$this->_parseXmlAttributes($attributes));
+        $record = new $modelName('attributes', $this->_parseXmlAttributes($attributes));
         $record->_newRecord = !empty($attributes['id']);
 
         $associatedIds = array();

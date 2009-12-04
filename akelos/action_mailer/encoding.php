@@ -69,4 +69,3 @@ class AkMailEncoding extends Mail_mimeDecode
         return preg_match(AK_EMAIL_REGULAR_EXPRESSION, $email);
     }
 }
-

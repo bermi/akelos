@@ -251,7 +251,7 @@ Example:
 
     public function tableExists($table_name)
     {
-        return in_array($table_name,$this->getAvailableTables());
+        return in_array($table_name, $this->getAvailableTables());
     }
 
     /**
@@ -774,8 +774,8 @@ Example:
         if(!isset($this->AkelosMigration) || !($this->AkelosMigration instanceof AkActiveRecord)){
             $this->AkelosMigration = new AkelosMigration();
         }
-
         $this->_createMigrationsTableIfNeeded();
+        $this->AkelosMigration->setConnection($this->db);
     }
 
     private function _versionPath($options = array())
