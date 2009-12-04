@@ -4,102 +4,30 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
 {
-    /**/
+
     public function test_start()
     {
         $this->installAndIncludeModels(array('Activity', 'Kid','Father'));
     }
-    /**
- * Need to test:
- *
- * 1-1-1 (OK)
- * 1-n-m (OK)
- * 1-n-1 (OK)
- * n-m-1
- * n-m-n (OK)
- * n-n-1
- * n-n-m
- */
-    public function xtest_add_condition_statement()
-    {
-        $f = new Father();
-        $top_conditions = 'id = 1';
-        $top_prefix = array('_father','');
-        $father_conditions = 'name="franz"';
-        $father_prefix = '_father';
-        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix,$f);
-        $this->assertEqual('__owner.id = 1 AND _father.name="franz"', $result);
 
-        $top_conditions = 'id = 1';
-        $top_prefix = array('_father','');
-        $father_conditions = 'name IN ("franz","peter")';
-        $father_prefix = '_father';
-        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix,$f);
-        $this->assertEqual('__owner.id = 1 AND _father.name IN ("franz","peter")', $result);
+    // Need to test:
+    //
+    // 1-1-1 (OK)
+    // 1-n-m (OK)
+    // 1-n-1 (OK)
+    // n-m-1
+    // n-m-n (OK)
+    // n-n-1
+    // n-n-m
 
-        $top_conditions = 'id = 1';
-        $top_prefix = array('_father','');
-        $father_conditions = 'name <> "franz"';
-        $father_prefix = '_father';
-        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix,$f);
-        $this->assertEqual('__owner.id = 1 AND _father.name <> "franz"', $result);
+    //testing automatic loading of BelongsTo->Owner->BelongsTo
+    // will load 2 association leves at once
 
-        $top_conditions = 'id = 1';
-        $top_prefix = array('_father','');
-        $father_conditions = 'name < "franz"';
-        $father_prefix = '_father';
-        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix,$f);
-        $this->assertEqual('__owner.id = 1 AND _father.name < "franz"', $result);
-
-        $top_conditions = 'id = 1';
-        $top_prefix = array('_father','');
-        $father_conditions = 'name > "franz"';
-        $father_prefix = '_father';
-        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix,$f);
-        $this->assertEqual('__owner.id = 1 AND _father.name > "franz"', $result);
-
-        $top_conditions = 'id = 1';
-        $top_prefix = array('_father','');
-        $father_conditions = 'name != "franz"';
-        $father_prefix = '_father';
-        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix,$f);
-        $this->assertEqual('__owner.id = 1 AND _father.name != "franz"', $result);
-
-        $top_conditions = 'id = 1';
-        $top_prefix = array('_father','');
-        $father_conditions = 'name IS "franz"';
-        $father_prefix = '_father';
-        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix,$f);
-        $this->assertEqual('__owner.id = 1 AND _father.name IS "franz"', $result);
-
-        $top_conditions = 'id = 1';
-        $top_prefix = array('_father','');
-        $father_conditions = 'name IS NOT "franz"';
-        $father_prefix = '_father';
-        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix,$f);
-        $this->assertEqual('__owner.id = 1 AND _father.name IS NOT "franz"', $result);
-
-        /**
-         * bindable
-         */
-        $top_conditions = 'id = ?';
-        $top_prefix = array('_father','');
-        $father_conditions = 'name = ?';
-        $father_prefix = '_father';
-        $result = $f->_addToConditionsStatement($top_conditions, $father_conditions, $father_prefix, $top_prefix,$f);
-        $this->assertEqual('__owner.id = ? AND _father.name = ?', $result);
-        //die;
-    }
-    /**
-     * testing automatic loading of BelongsTo->Owner->BelongsTo
-     *
-     * will load 2 association leves at once
-     */
     public function test_1_1_1()
     {
-        $Activity = new Activity(array('name'=>'Test'));
-        $Child = new Kid(array('name'=>'Johanna'));
-        $Father = new Father(array('name'=>'Daddy'));
+        $Activity   = new Activity(array('name'=>'Test'));
+        $Child      = new Kid(array('name'=>'Johanna'));
+        $Father     = new Father(array('name'=>'Daddy'));
 
 
         $Child->father->assign($Father);
@@ -109,13 +37,14 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
         $Activity->save();
 
         $Test = $Activity->findFirstBy('name','Test',array('conditions'=>'id='.$Activity->getId(),'include'=>array('kid'=>array('conditions'=>'id='.$Child->getId(),'include'=>array('father'=>array('conditions'=>'id='.$Father->getId()))))));
+
         $this->assertEqual($Test->name,'Test');
         $this->assertEqual($Test->kid->name,'Johanna');
         $this->assertEqual($Test->kid->father->name,'Daddy');
         // die;
-        /**
-         * binds not working properly
-         */
+
+        //binds not working properly
+
         $Test = $Activity->findFirstBy('name','Test',array('conditions'=>'id=?','bind'=>$Test->getId(),'include'=>array('kid'=>array('conditions'=>'id=?','bind'=>$Child->getId(),'include'=>array('father'=>array('conditions'=>'id=?','bind'=>array($Father->getId())))))));
         $this->assertEqual($Test->name,'Test');
         $this->assertEqual($Test->kid->name,'Johanna');
@@ -156,15 +85,15 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
         $this->installAndIncludeModels(array('User', 'Post','Comment'));
         $this->User = new User();
         if ($this->User->_db->type()=='postgre') {
-            /**
-             * from postgres docs:
-             *
-             * A value of type name is a string of 63 or fewer characters.
-             * A name must start with a letter or an underscore;
-             * the rest of the string can contain letters, digits, and underscores.
-             *
-             * IF a column name here is over 63 characters long, the assoc finder will fail
-             */
+
+            //from postgres docs:
+
+            //A value of type name is a string of 63 or fewer characters.
+            //A name must start with a letter or an underscore;
+            //the rest of the string can contain letters, digits, and underscores.
+
+            //IF a column name here is over 63 characters long, the assoc finder will fail
+
             $this->assertTrue(true);
             return;
         }
@@ -201,9 +130,9 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Test->posts[1]->comments[0]->name,'Comment2_1');
         $this->assertEqual($Test->posts[1]->comments[1]->name,'Comment2_2');
 
-        /**
-         * singular in "post", plural in "comments"
-         */
+
+        // singular in "post", plural in "comments"
+
         $Test = $User->findFirstBy('name','Arno',array('include'=>array('post'=>array('order'=>'id ASC','include'=>array('comments'=>array('order'=>'id ASC'))))));
 
         $this->assertEqual($Test->name,'Arno');
@@ -214,9 +143,9 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Test->posts[1]->comments[0]->name,'Comment2_1');
         $this->assertEqual($Test->posts[1]->comments[1]->name,'Comment2_2');
 
-        /**
-         * plural in "posts", singular in "comment"
-         */
+
+        // plural in "posts", singular in "comment"
+
         $Test = $User->findFirstBy('name','Arno',array('include'=>array('posts'=>array('order'=>'id ASC','include'=>array('comments'=>array('order'=>'id ASC'))))));
 
         $this->assertEqual($Test->name,'Arno');
@@ -227,9 +156,9 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Test->posts[1]->comments[0]->name,'Comment2_1');
         $this->assertEqual($Test->posts[1]->comments[1]->name,'Comment2_2');
 
-        /**
-         * singular in "post", singular in "comment"
-         */
+
+        // singular in "post", singular in "comment"
+
         $Test = $User->findFirstBy('name','Arno',array('order'=>'id ASC','include'=>array('post'=>array('order'=>'id ASC','include'=>array('comment'=>array('order'=>'id ASC'))))));
 
         $this->assertEqual($Test->name,'Arno');
@@ -240,11 +169,11 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Test->posts[1]->comments[0]->name,'Comment2_1');
         $this->assertEqual($Test->posts[1]->comments[1]->name,'Comment2_2');
 
-        /**
-         * singular in "post", singular in "comment" + test order_statements in parent condition
-         */
+
+        // singular in "post", singular in "comment" + test order_statements in parent condition
+
         $Test = $User->findFirstBy('name','Arno',array('order'=>'id , _posts.id, _comments.id ASC','include'=>array('post'=>array('include'=>array('comment')))));
-        //die;
+
         $this->assertEqual($Test->name,'Arno');
         $this->assertEqual($Test->posts[0]->title,'Test1');
         $this->assertEqual($Test->posts[1]->title,'Test2');
@@ -253,9 +182,7 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Test->posts[1]->comments[0]->name,'Comment2_1');
         $this->assertEqual($Test->posts[1]->comments[1]->name,'Comment2_2');
 
-        /**
-         * singular in "post", singular in "comment" + test order_statements in parent condition using the handlername
-         */
+        // singular in "post", singular in "comment" + test order_statements in parent condition using the handlername
         $Test = $User->findFirstBy('name','Arno',array('order'=>'id , _post.id, _comment.id ASC','include'=>array('post'=>array('include'=>array('comment')))));
 
         $this->assertEqual($Test->name,'Arno');
@@ -272,15 +199,13 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
         $this->installAndIncludeModels(array('User', 'Post','Comment'));
         $this->User = new User();
         if ($this->User->_db->type()=='postgre') {
-            /**
-             * from postgres docs:
-             *
-             * A value of type name is a string of 63 or fewer characters.
-             * A name must start with a letter or an underscore;
-             * the rest of the string can contain letters, digits, and underscores.
-             *
-             * IF a column name here is over 63 characters long, the assoc finder will fail
-             */
+            // from postgres docs:
+            //
+            // A value of type name is a string of 63 or fewer characters.
+            // A name must start with a letter or an underscore;
+            // the rest of the string can contain letters, digits, and underscores.
+            // IF a column name here is over 63 characters long, the assoc finder will fail
+
             $this->assertTrue(true);
             return;
         }
@@ -318,8 +243,7 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
         $Comment3_1->save();
         $Comment3_2->save();
         $Test = $User1->findAllBy('name','Arno',array('order'=>'id ASC','include'=>array('posts'=>array('order'=>'id ASC','include'=>array('comments'=>array('order'=>'id ASC'))))));
-        //Ak::debug($Test);
-        //die;
+
         $this->assertEqual($Test[0]->email,'no-spam@bermilabs.com');
         $this->assertEqual($Test[1]->email,'no-spam2@bermilabs.com');
         $this->assertEqual($Test[0]->posts[0]->title,'Test1');
@@ -331,10 +255,9 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Test[1]->posts[0]->title,'Test3');
         $this->assertEqual($Test[1]->posts[0]->comments[0]->name,'Comment3_1');
         $this->assertEqual($Test[1]->posts[0]->comments[1]->name,'Comment3_2');
-        //die;
-        //die;
+
     }
-    /**/
+
 
     public function test_belongs_to_has_many()
     {
@@ -352,6 +275,7 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
 
         $this->assertEqual(2,count($result->belongs));
     }
+
 }
 
 ak_test_case('BelongsToFindIncludeOwner_TestCase');

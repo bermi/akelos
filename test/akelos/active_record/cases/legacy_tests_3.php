@@ -517,13 +517,13 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($AkTestMember->typeCondition(),"( ak_test_members.role = 'Ak test member' ) ");
     }
 
-    public function Test_of_addConditions()
+    public function Test_of_sanitizeConditions()
     {
         $AkTestUser = new AkTestUser();
         $sql = 'SELECT * FROM ak_test_users';
         $copy = $sql;
         $conditions = "last_name = 'Ferrer' AND country = 25";
-        $AkTestUser->addConditions($sql,$conditions);
+        $sql = $AkTestUser->sanitizeConditions($sql,$conditions);
         $this->assertEqual($sql,$copy.' WHERE '.$conditions);
 
         $AkTestMember = new AkTestMember();
@@ -532,7 +532,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
         $conditions = "ak_test_users.last_name = 'Ferrer' AND ak_test_users.country = 25";
         $AkTestMember->setInheritanceColumn('role');
         $this->assertEqual($AkTestMember->getInheritanceColumn(), 'role');
-        $AkTestMember->addConditions($sql, $conditions);
+        $sql = $AkTestMember->sanitizeConditions($sql, $conditions);
         $this->assertEqual($sql,$copy." WHERE ( ak_test_members.role = 'Ak test member' )  AND (".$conditions.")");
     }
 

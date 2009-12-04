@@ -159,7 +159,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
     {
         $operation = strtolower($operation);
         $aggregate_alias = $this->_getColumnAliasFor($operation, $column_name);
-        $use_workaround = $operation == 'count' && !empty($options['distinct']) && $this->_ActiveRecord->_getDatabaseType() == 'sqlite';
+        $use_workaround = $operation == 'count' && !empty($options['distinct']) && $this->_ActiveRecord->getDatabaseType() == 'sqlite';
 
         $sql = $use_workaround ?
         "SELECT COUNT(*) AS $aggregate_alias" : // A (slower) workaround if we're using a backend, like sqlite, that doesn't support COUNT DISTINCT.
@@ -172,7 +172,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
 
         $sql .=  empty($options['joins']) ? '' : " {$options['joins']} ";
 
-        empty($options['conditions']) ? null : $this->_ActiveRecord->addConditions($sql, $options['conditions']);
+        $sql = empty($options['conditions']) ? $sql : $this->_ActiveRecord->sanitizeConditions($sql, $options['conditions']);
 
         if (!empty($options['group'])){
             $sql .=  " GROUP BY {$options['group_field']} ";
@@ -252,5 +252,32 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
         }else{
             return empty($column) ? $value : $this->_ActiveRecord->castAttributeFromDatabase($column, $value);
         }
+    }
+
+
+    protected function _constructCalculationSqlWithAssociations($sql, $options = array())
+    {
+        $calculation_function = isset($options['calculation']) && isset($options['calculation']['function'])?$options['calculation']['function']:'count';
+        $calculation_column = isset($options['calculation']) && isset($options['calculation']['column'])?$options['calculation']['column']:'*';
+        $calculation_alias = isset($options['calculation']) && isset($options['calculation']['alias'])?$options['calculation']['alias']:'count_all';
+
+        $selection = $calculation_function.'( '.$calculation_column.' ) AS '.$calculation_alias.' ';
+
+        $sql = preg_replace('/SELECT (.*?) FROM/i','SELECT '.$selection. ' FROM', $sql);
+        $groupBy = 'GROUP BY __owner.id';
+        if (preg_match('/GROUP BY (.*?)($|ORDER)/i',$sql,$matches)) {
+            $sql = str_replace($matches[1],'__owner.id',$sql);
+        }
+        return $sql;
+    }
+
+    protected function &_calculateBySqlWithAssociations($sql)
+    {
+        $objects = array();
+        $results = $this->_db->execute ($sql,'find with associations');
+        if (!$results){
+            return $objects;
+        }
+        return $results;
     }
 }

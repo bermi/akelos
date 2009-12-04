@@ -43,8 +43,8 @@ class Ak
             return;
         }
         $backtrace = debug_backtrace();
-        $file = $backtrace[1]['file'];
-        $line = $backtrace[1]['line'];
+        $file = @$backtrace[1]['file'];
+        $line = @$backtrace[1]['line'];
         if (is_array($message)){
             trigger_error(Ak::t("DEPRECATED WARNING: ".array_shift($message), $message).' '.Ak::t('Called in %file line %line', array('%file' => $file, '%line' => $line)), E_USER_NOTICE);
         } else {

@@ -319,28 +319,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $this->isNewRecord() ? $this->_create() : $this->_update();
     }
 
-    public function &findOrCreateBy()
-    {
-        $args = func_get_args();
-        $Item = call_user_func_array(array($this,'findFirstBy'), $args);
-        if(!$Item){
-            $attributes = array();
-
-            list($sql, $columns) = $this->_getFindBySqlAndColumns(array_shift($args), $args);
-
-            if(!empty($columns)){
-                foreach ($columns as $column){
-                    $attributes[$column] = array_shift($args);
-                }
-            }
-            $Item = $this->create($attributes);
-            $Item->has_been_created = true;
-        }else{
-            $Item->has_been_created = false;
-        }
-        $Item->has_been_found = !$Item->has_been_created;
-        return $Item;
-    }
 
     /**
     * Creates a new record with values matching those of the instance attributes.
@@ -562,7 +540,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $conditions=array_shift($binds);
 
         }
-        $this->addConditions($sql, $conditions);
+        $sql = $this->sanitizeConditions($sql, $conditions);
         if($binds) {
             $sql = array_merge(array($sql),$binds);
         }
@@ -662,7 +640,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $conditions=array_shift($binds);
 
         }
-        $this->addConditions($sql, $conditions);
+        $sql = $this->sanitizeConditions($sql, $conditions);
         if($binds) {
             $sql = array_merge(array($sql),$binds);
         }
@@ -750,706 +728,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /*/Deleting records*/
 
 
-
-
-    /**
-                          Finding records
-    ====================================================================
-    */
-
-    /**
-    * Returns true if the given id represents the primary key of a record in the database, false otherwise. Example:
-    *
-    * $Person->exists(5);
-    */
-    public function exists($id)
-    {
-        return $this->find('first',array('conditions' => array($this->getPrimaryKey().' = '.$id))) !== false;
-    }
-
-    /**
-     * Find operates with three different retrieval approaches:
-    * * Find by id: This can either be a specific id find(1), a list of ids find(1, 5, 6),
-    *   or an array of ids find(array(5, 6, 10)). If no record can be found for all of the listed ids,
-    *   then RecordNotFound will be raised.
-    * * Find first: This will return the first record matched by the options used. These options
-    *   can either be specific conditions or merely an order.
-    *   If no record can matched, false is returned.
-    * * Find all: This will return all the records matched by the options used. If no records are found, an empty array is returned.
-    *
-    * All approaches accepts an $option array as their last parameter. The options are:
-    *
-    * 'conditions' => An SQL fragment like "administrator = 1" or array("user_name = ?" => $username). See conditions in the intro.
-    * 'order' => An SQL fragment like "created_at DESC, name".
-    * 'limit' => An integer determining the limit on the number of rows that should be returned.
-    * 'offset' => An integer determining the offset from where the rows should be fetched. So at 5, it would skip the first 4 rows.
-    * 'joins' => An SQL fragment for additional joins like "LEFT JOIN comments ON comments.post_id = $id". (Rarely needed).
-    * 'include' => Names associations that should be loaded alongside using LEFT OUTER JOINs. The symbols
-    * named refer to already defined associations. See eager loading under Associations.
-    *
-    * Examples for find by id:
-    * <code>
-    *   $Person->find(1);       // returns the object for ID = 1
-    *   $Person->find(1, 2, 6); // returns an array for objects with IDs in (1, 2, 6), Returns false if any of those IDs is not available
-    *   $Person->find(array(7, 17)); // returns an array for objects with IDs in (7, 17)
-    *   $Person->find(array(1));     // returns an array for objects the object with ID = 1
-    *   $Person->find(1, array('conditions' => "administrator = 1", 'order' => "created_on DESC"));
-    * </code>
-    *
-    * Examples for find first:
-    * <code>
-    *   $Person->find('first'); // returns the first object fetched by SELECT * FROM people
-    *   $Person->find('first', array('conditions' => array("user_name = ':user_name'", ':user_name' => $user_name)));
-    *   $Person->find('first', array('order' => "created_on DESC", 'offset' => 5));
-    * </code>
-    *
-    * Examples for find all:
-    * <code>
-    *   $Person->find('all'); // returns an array of objects for all the rows fetched by SELECT * FROM people
-    *   $Person->find(); // Same as $Person->find('all');
-    *   $Person->find('all', array('conditions' => array("category IN (categories)", 'categories' => join(','$categories)), 'limit' => 50));
-    *   $Person->find('all', array('offset' => 10, 'limit' => 10));
-    *   $Person->find('all', array('include' => array('account', 'friends'));
-    * </code>
-    */
-    public function &find()
-    {
-        $args = func_get_args();
-        $options = $this->_extractOptionsFromArgs($args);
-        list($fetch, $options) = $this->_extractConditionsFromArgs($args, $options);
-        $this->_sanitizeConditionsVariables($options);
-        switch ($fetch) {
-            case 'first':
-                return $this->_findInitial($options);
-
-            case 'all':
-                return $this->_findEvery($options);
-
-            default:
-                return $this->_findFromIds($args, $options);
-        }
-        return false;
-    }
-
-    public function &_findInitial($options)
-    {
-        // TODO: virtual_limit is a hack
-        // actually we fetch_all and return only the first row
-        $options = array_merge($options, array((!empty($options['include']) ?'virtual_limit':'limit')=>1));
-
-        $result = $this->_findEvery($options);
-
-        if(!empty($result) && is_array($result)){
-            $_result = $result[0];
-        }else{
-            $_result = false;
-            // if we return an empty array instead of false we need to change this->exists()!
-            //$_result = array();
-        }
-        return  $_result;
-
-    }
-
-    public function &_findEvery($options)
-    {
-        if((!empty($options['include']) && $this->hasAssociations())){
-            $result = $this->findWithAssociations($options);
-        }else{
-            $sql = $this->constructFinderSql($options);
-            if (isset($options['wrap'])) {
-                $sql = str_replace('{query}',$sql,$options['wrap']);
-            }
-            if(!empty($options['bind']) && is_array($options['bind']) && strstr($sql,'?')){
-                $sql = array_merge(array($sql),$options['bind']);
-            }
-            if (!empty($options['returns']) && $options['returns']!='default') {
-                $options['returns'] = in_array($options['returns'],array('simulated','default','array'))?$options['returns']:'default';
-                $simulation_class = !empty($options['simulation_class']) && class_exists($options['simulation_class'])?$options['simulation_class']:'AkActiveRecordMock';
-                $result = $this->findBySql($sql,null,null,null,$options['returns'],$simulation_class);
-            } else {
-                $result = $this->findBySql($sql);
-            }
-        }
-
-        if(!empty($result) && is_array($result)){
-            $_result = $result;
-        }else{
-            $_result = false;
-        }
-        return  $_result;
-
-    }
-
-    public function &_findFromIds($ids, $options)
-    {
-        $expects_array = is_array($ids[0]);
-
-        $ids = array_map(array($this, 'quotedId'),array_unique($expects_array ? (isset($ids[1]) ? array_merge($ids[0],$ids) : $ids[0]) : $ids));
-        $num_ids = count($ids);
-
-        //at this point $options['conditions'] can't be an array
-        //$conditions = !empty($options['conditions']) ? ' AND '.$options['conditions'] : '';
-        $conditions=!empty($options['conditions'])?$options['conditions']:'';
-        switch ($num_ids){
-            case 0 :
-                trigger_error($this->t('Couldn\'t find %object_name without an ID%conditions',array('%object_name'=>$this->getModelName(),'%conditions'=>$conditions)).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
-                break;
-
-            case 1 :
-                $table_name = !empty($options['include']) && $this->hasAssociations() ? '__owner' : $this->getTableName();
-
-                if (!preg_match('/SELECT .* FROM/is', $conditions)) {
-                    $options['conditions'] = $table_name.'.'.$this->getPrimaryKey().' = '.$ids[0].(empty($conditions)?'':' AND '.$conditions);
-                } else {
-                    if (false!==($pos=stripos($conditions,' WHERE '))) {
-                        $before_where = substr($conditions,0, $pos);
-                        $after_where = substr($conditions, $pos+7);
-                        $options['conditions'] = $before_where.' WHERE ('.$table_name.'.'.$this->getPrimaryKey().' = '.$ids[0].') AND ('.$after_where.')';
-                    } else {
-                        $options['conditions'].=' WHERE '.$table_name.'.'.$this->getPrimaryKey().' = '.$ids[0];
-                    }
-                }
-
-                $result = $this->_findEvery($options);
-                if (!$expects_array && $result !== false){
-                    return $result[0];
-                }
-                return  $result;
-                break;
-
-            default:
-                $without_conditions = empty($options['conditions']) ? true : false;
-                $ids_condition = $this->getPrimaryKey().' IN ('.join(', ', $this->castAttributesForDatabase($this->getPrimaryKey(), $ids)).')';
-                if (!preg_match('/SELECT .* FROM/is', $conditions)) {
-                    $options['conditions'] = $ids_condition.(empty($conditions)?'':' AND '.$conditions);
-                } else {
-                    if (false!==($pos=stripos($conditions,' WHERE '))) {
-                        $before_where = substr($conditions,0, $pos);
-                        $after_where = substr($conditions, $pos+7);
-                        $options['conditions'] = $before_where.' WHERE ('.$ids_condition.') AND ('.$after_where.')';
-                    } else {
-                        $options['conditions'].=' WHERE '.$ids_condition;
-                    }
-                }
-
-                $result = $this->_findEvery($options);
-                if(is_array($result) && ($num_ids==1 && count($result) != $num_ids && $without_conditions)){
-                    $result = false;
-                }
-                return $result;
-                break;
-        }
-    }
-
-    public function quotedId($id = false)
-    {
-        return $this->castAttributeForDatabase($this->getPrimaryKey(), $id ? $id : $this->getId());
-    }
-
-    protected function _extractOptionsFromArgs(&$args)
-    {
-        $last_arg = count($args)-1;
-        return isset($args[$last_arg]) && is_array($args[$last_arg]) && $this->_isOptionsHash($args[$last_arg]) ? array_pop($args) : array();
-    }
-
-    protected function _isOptionsHash($options)
-    {
-        if (isset($options[0])){
-            return false;
-        }
-        $valid_keys = array('simulation_class','returns','load_acts','wrap','conditions', 'include', 'joins', 'limit', 'offset', 'group', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly', 'load_associations', 'load_acts');
-        foreach (array_keys($options) as $key){
-            if (in_array($key,$valid_keys)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected function _extractConditionsFromArgs($args, $options)
-    {
-        if(empty($args)){
-            $fetch = 'all';
-        } else {
-            $fetch = $args[0];
-        }
-        $num_args = count($args);
-
-        // deprecated: acts like findFirstBySQL
-        if ($num_args === 1 && !is_numeric($args[0]) && is_string($args[0]) && $args[0] != 'all' && $args[0] != 'first'){
-            //  $Users->find("last_name = 'Williams'");    => find('first',"last_name = 'Williams'");
-            Ak::deprecateWarning(array("AR::find('%sql') is ambiguous and therefore deprecated, use AR::find('first',%sql) instead", '%sql'=>$args[0]));
-            $options = array('conditions'=> $args[0]);
-            return array('first',$options);
-        } //end
-
-        // set fetch_mode to 'all' if none is given
-        if (!is_numeric($fetch) && !is_array($fetch) && $fetch != 'all' && $fetch != 'first') {
-            array_unshift($args, 'all');
-            $num_args = count($args);
-        }
-        if ($num_args > 1) {
-            if (is_string($args[1])){
-                //  $Users->find(:fetch_mode,"first_name = ?",'Tim');
-                $fetch = array_shift($args);
-                $options = array_merge($options, array('conditions'=>$args));   //TODO: merge_conditions
-            }elseif (is_array($args[1])) {
-                //  $Users->find(:fetch_mode,array('first_name = ?,'Tim'));
-                $fetch = array_shift($args);
-                $options = array_merge($options, array('conditions'=>$args[0]));   //TODO: merge_conditions
-            }
-        }
-
-        return array($fetch,$options);
-    }
-
-    protected function _sanitizeConditionsVariables(&$options)
-    {
-        if(!empty($options['conditions']) && is_array($options['conditions'])){
-            if (isset($options['conditions'][0]) && strstr($options['conditions'][0], '?') && count($options['conditions']) > 1){
-                //array('conditions' => array("name=?",$name))
-                $pattern = array_shift($options['conditions']);
-                $options['bind'] = array_values($options['conditions']);
-                $options['conditions'] = $pattern;
-            }elseif (isset($options['conditions'][0])){
-                //array('conditions' => array("user_name = :user_name", ':user_name' => 'hilario')
-                $pattern = array_shift($options['conditions']);
-                $options['conditions'] = str_replace(array_keys($options['conditions']), array_values($this->getSanitizedConditionsArray($options['conditions'])),$pattern);
-            }else{
-                //array('conditions' => array('user_name'=>'Hilario'))
-                $options['conditions'] = join(' AND ',(array)$this->getAttributesQuoted($options['conditions']));
-            }
-        }
-        $this->_sanitizeConditionsCollections($options);
-    }
-
-    protected function _sanitizeConditionsCollections(&$options)
-    {
-        if(!empty($options['bind']) && is_array($options['bind']) && preg_match_all('/([a-zA-Z_]+)\s+IN\s+\(?\?\)?/i', $options['conditions'], $matches)){
-            $i = 0;
-            foreach($options['bind'] as $k => $v){
-                if(isset($matches[1][$i]) && is_array($v)){
-                    $value = join(', ', $this->castAttributesForDatabase($matches[1][$i], $v));
-                    $startpos=strpos($options['conditions'],$matches[0][$i]);
-                    $endpos=$startpos+strlen($matches[0][$i]);
-                    $options['conditions'] = substr($options['conditions'],0,$startpos).str_replace('?', $value, $matches[0][$i]).substr( $options['conditions'],$endpos);
-                    unset($options['bind'][$k]);
-                    $i++;
-                }
-            }
-        }
-    }
-
-
-    public function &findFirst()
-    {
-        $args = func_get_args();
-        $result = call_user_func_array(array($this,'find'), array_merge(array('first'),$args));
-        return $result;
-    }
-
-    public function &findAll()
-    {
-        $args = func_get_args();
-        $result = call_user_func_array(array($this,'find'), array_merge(array('all'),$args));
-        return $result;
-    }
-
-
-    /**
-    * Works like find_all, but requires a complete SQL string. Examples:
-    * $Post->findBySql("SELECT p.*, c.author FROM posts p, comments c WHERE p.id = c.post_id");
-    * $Post->findBySql(array("SELECT * FROM posts WHERE author = ? AND created_on > ?", $author_id, $start_date));
-    */
-    public function &findBySql($sql, $limit = null, $offset = null, $bindings = null, $returns = 'default', $simulation_class = 'AkActiveRecordMock')
-    {
-        if ($limit || $offset){
-            Ak::deprecateWarning("You're calling AR::findBySql with \$limit or \$offset parameters. This has been deprecated.");
-            $this->_db->addLimitAndOffset($sql, array('limit'=>$limit,'offset'=>$offset));
-        }
-        $objects = array();
-        $records = $this->_db->select ($sql,'selecting');
-        foreach ($records as $record){
-            if ($returns == 'default') {
-                $objects[] = $this->instantiate($this->getOnlyAvailableAttributes($record), false);
-            } else if ($returns == 'simulated') {
-                $objects[] = $this->_castAttributesFromDatabase($this->getOnlyAvailableAttributes($record),$this);
-            } else if ($returns == 'array') {
-
-                $objects[] = $this->_castAttributesFromDatabase($this->getOnlyAvailableAttributes($record),$this);
-            }
-        }
-        if ($returns == 'simulated') {
-            $false = false;
-            $objects = $this->_generateStdClasses($simulation_class,$objects,$this->getType(),$false,$false,array('__owner'=>array('pk'=>$this->getPrimaryKey(),'class'=>$this->getType())));
-        }
-
-        return $objects;
-    }
-
-    /**
-    * This function pretends to emulate RoR finders until AkActiveRecord::addMethod becomes stable on future PHP versions.
-    * @todo use PHP5 __call method for handling the magic finder methods like findFirstByUnsenameAndPassword('bermi','pass')
-    */
-    public function &findFirstBy()
-    {
-        $args = func_get_args();
-        array_unshift($args,'first');
-        $result = call_user_func_array(array($this,'findBy'), $args);
-        return $result;
-    }
-
-    public function &findLastBy()
-    {
-        $args = func_get_args();
-        $options = $this->_extractOptionsFromArgs($args);
-        $options['order'] = $this->getPrimaryKey().' DESC';
-        array_push($args, $options);
-        $result = call_user_func_array(array($this,'findFirstBy'), $args);
-        return $result;
-    }
-
-    public function &findAllBy()
-    {
-        $args = func_get_args();
-        array_unshift($args,'all');
-        $result = call_user_func_array(array($this,'findBy'), $args);
-        return $result;
-    }
-
-    /**
-    * This method allows you to use finders in a more flexible way like:
-    *
-    *   findBy('username AND password', $username, $password);
-    *   findBy('age > ? AND name:contains', 18, 'Joe');
-    *   findBy('is_active = true AND session_id', session_id());
-    *
-    */
-    public function &findBy()
-    {
-        $args = func_get_args();
-        $find_by_sql = array_shift($args);
-        if($find_by_sql == 'all' || $find_by_sql == 'first'){
-            $fetch = $find_by_sql;
-            $find_by_sql = array_shift($args);
-        }else{
-            $fetch = 'all';
-        }
-
-        $options = $this->_extractOptionsFromArgs($args);
-
-        $query_values = $args;
-        $query_arguments_count = count($query_values);
-
-        list($sql, $requested_args) = $this->_getFindBySqlAndColumns($find_by_sql, $query_values);
-
-        if($query_arguments_count != count($requested_args)){
-            trigger_error(Ak::t('Argument list did not match expected set. Requested arguments are:').join(', ',$requested_args), E_USER_ERROR);
-            $false = false;
-            return $false;
-        }
-
-        $true_bool_values = array(true,1,'true','True','TRUE','1','y','Y','yes','Yes','YES','s','Si','SI','V','v','T','t');
-
-        foreach ($requested_args as $k=>$v){
-            switch ($this->getColumnType($v)) {
-                case 'boolean':
-                    $query_values[$k] = in_array($query_values[$k],$true_bool_values) ? true : false;
-                    break;
-
-                case 'date':
-                case 'datetime':
-                    $query_values[$k] = str_replace('/','-', $this->castAttributeForDatabase($k,$query_values[$k],false));
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        $conditions = array($sql);
-        foreach ($query_values as $bind_value){
-            $conditions[] = $bind_value;
-        }
-        /**
-        * @todo merge_conditions
-        */
-        $options['conditions'] = $conditions;
-
-        $result = call_user_func_array(array($this,'find'), array($fetch,$options));
-        return $result;
-    }
-
-
-    protected function _getFindBySqlAndColumns($find_by_sql, &$query_values)
-    {
-        $sql = str_replace(array('(',')','||','|','&&','&','  '),array(' ( ',' ) ',' OR ',' OR ',' AND ',' AND ',' '), $find_by_sql);
-        $operators = array('AND','and','(',')','&','&&','NOT','<>','OR','|','||');
-        $pieces = explode(' ',$sql);
-        $pieces = array_diff($pieces,array(' ',''));
-        $params = array_diff($pieces,$operators);
-        $operators = array_diff($pieces,$params);
-
-        $new_sql = '';
-        $parameter_count = 0;
-        $requested_args = array();
-        foreach ($pieces as $piece){
-            if(in_array($piece,$params) && $this->hasColumn($piece)){
-                $new_sql .= $piece.' = ? ';
-                $requested_args[$parameter_count] = $piece;
-                $parameter_count++;
-            }elseif (!in_array($piece,$operators)){
-
-                if(strstr($piece,':')){
-                    $_tmp_parts = explode(':',$piece);
-                    if($this->hasColumn($_tmp_parts[0])){
-                        $query_values[$parameter_count] = isset($query_values[$parameter_count]) ? $query_values[$parameter_count] : $this->get($_tmp_parts[0]);
-                        switch (strtolower($_tmp_parts[1])) {
-                            case 'like':
-                            case '%like%':
-                            case 'is':
-                            case 'has':
-                            case 'contains':
-                                $query_values[$parameter_count] = '%'.$query_values[$parameter_count].'%';
-                                $new_sql .= $_tmp_parts[0]." LIKE ? ";
-                                break;
-                            case 'like_left':
-                            case 'like%':
-                            case 'begins':
-                            case 'begins_with':
-                            case 'starts':
-                            case 'starts_with':
-                                $query_values[$parameter_count] = $query_values[$parameter_count].'%';
-                                $new_sql .= $_tmp_parts[0]." LIKE ? ";
-                                break;
-                            case 'like_right':
-                            case '%like':
-                            case 'ends':
-                            case 'ends_with':
-                            case 'finishes':
-                            case 'finishes_with':
-                                $query_values[$parameter_count] = '%'.$query_values[$parameter_count];
-                                $new_sql .= $_tmp_parts[0]." LIKE ? ";
-                                break;
-                            case 'in':
-                                $values = join(', ', $this->castAttributesForDatabase($_tmp_parts[0], $query_values[$parameter_count]));
-                                if(!empty($values)){
-                                    $new_sql .= $_tmp_parts[0].' IN ('.$values.') ';
-                                }else{
-                                    $new_sql = preg_replace('/(AND|OR) $/','', $new_sql);
-                                }
-                                unset($query_values[$parameter_count]);
-                                break;
-                            default:
-                                $query_values[$parameter_count] = $query_values[$parameter_count];
-                                $new_sql .= $_tmp_parts[0].' '.$_tmp_parts[1].' ? ';
-                                break;
-                        }
-                        $requested_args[$parameter_count] = $_tmp_parts[0];
-                        $parameter_count++;
-                    }else {
-                        $new_sql .= $_tmp_parts[0];
-                    }
-                }else{
-                    $new_sql .= $piece.' ';
-                }
-            }else{
-                $new_sql .= $piece.' ';
-            }
-        }
-
-        return array($new_sql, $requested_args);
-    }
-
-
-    /**
-     *  Given a condition that uses bindings like "user = ?  AND created_at > ?" will return a
-     * string replacing the "?" bindings with the column values for current Active Record
-     *
-     * @return string
-     */
-    public function getVariableSqlCondition($variable_condition)
-    {
-        $query_values = array();
-        list($sql, $requested_columns) = $this->_getFindBySqlAndColumns($variable_condition, $query_values);
-        $replacements = array();
-        $sql = preg_replace('/((('.join($requested_columns,'|').') = \?) = \?)/','$2', $sql);
-        foreach ($requested_columns as $attribute){
-            $replacements[$attribute] = $this->castAttributeForDatabase($attribute, $this->get($attribute));
-        }
-
-        return trim(preg_replace('/('.join('|',array_keys($replacements)).')\s+([^\?]+)\s+\?/e', "isset(\$replacements['\\1']) ? '\\1 \\2 '.\$replacements['\\1']:'\\1 \\2 null'", $sql));
-    }
-
-
-    public function constructFinderSql($options, $select_from_prefix = 'default')
-    {
-        $sql = isset($options['select_prefix']) ? $options['select_prefix'] : ($select_from_prefix == 'default' ? 'SELECT '.(!empty($options['joins'])?$this->getTableName().'.':'') .'* FROM '.$this->getTableName() : $select_from_prefix);
-        $sql .= !empty($options['joins']) ? ' '.$options['joins'] : '';
-
-        $this->addConditions($sql, isset($options['conditions']) ? $options['conditions'] : array());
-
-        // Create an alias for order
-        if(empty($options['order']) && !empty($options['sort'])){
-            $options['order'] = $options['sort'];
-        }
-
-        $sql .= !empty($options['group']) ? ' GROUP BY '.$options['group'] : '';
-        $sql .= !empty($options['order']) ? ' ORDER BY '.$options['order'] : '';
-
-        $this->_db->addLimitAndOffset($sql,$options);
-
-        return $sql;
-    }
-
-
-    /**
-    * Adds a sanitized version of $conditions to the $sql string. Note that the passed $sql string is changed.
-    */
-    public function addConditions(&$sql, $conditions = null, $table_alias = null)
-    {
-        if (empty($sql)) {
-            $concat = '';
-        }
-        //if (is_string($conditions) && (stristr($conditions,' WHERE ') || stristr($conditions,'SELECT'))) {
-        if (is_string($conditions) && (preg_match('/^SELECT.*?WHERE/is',trim($conditions)))) {// || stristr($conditions,'SELECT'))) {
-            $concat = '';
-            $sql = $conditions;
-            $conditions = '';
-        } else {
-
-            $concat = 'WHERE';
-        }
-        $concat = empty($sql) ? '' : ' WHERE ';
-        if (stristr($sql,' WHERE ')) $concat = ' AND ';
-        if (empty($conditions) && $this->_getDatabaseType() == 'sqlite') $conditions = '1';  // sqlite HACK
-
-        if($this->getInheritanceColumn() !== false){
-            $type_condition = $this->typeCondition($table_alias);
-            if (empty($sql)) {
-                $sql .= !empty($type_condition) ? $concat.$type_condition : '';
-                $concat = ' AND ';
-                if (!empty($conditions)) {
-                    $conditions = '('.$conditions.')';
-                }
-            } else {
-                if (($wherePos=stripos($sql,'WHERE'))!==false) {
-                    if (!empty($type_condition)) {
-                        $oldConditions = trim(substr($sql,$wherePos+5));
-                        $sql = substr($sql,0,$wherePos).' WHERE '.$type_condition.' AND ('.$oldConditions.')';
-                        $concat = ' AND ';
-                    }
-                    if (!empty($conditions)) {
-                        $conditions = '('.$conditions.')';
-                    }
-                } else {
-                    if (!empty($type_condition)) {
-                        //$oldConditions = trim(substr($sql,$wherePos+5));
-                        $sql = $sql.' WHERE '.$type_condition.'';
-                        $concat = ' AND ';
-                    }
-                    if (!empty($conditions)) {
-                        $conditions = '('.$conditions.')';
-                    }
-                }
-
-            }
-        }
-
-        if(!empty($conditions)){
-
-            $sql  .= $concat.$conditions;
-            $concat = ' AND ';
-
-        }
-
-
-        return $sql;
-    }
-
-    /**
-    * Gets a sanitized version of the input array. Each element will be escaped
-    */
-    public function getSanitizedConditionsArray($conditions_array)
-    {
-        $result = array();
-        foreach ($conditions_array as $k=>$v){
-            $k = str_replace(':','',$k); // Used for Oracle type bindings
-            if($this->hasColumn($k)){
-                $v = $this->castAttributeForDatabase($k, $v);
-                $result[$k] = $v;
-            }
-        }
-        return $result;
-    }
-
-
-    /**
-    * This functions is used to get the conditions from an AkRequest object
-    */
-    public function getConditions($conditions, $prefix = '', $model_name = null)
-    {
-        $model_name = isset($model_name) ? $model_name : $this->getModelName();
-        $model_conditions = !empty($conditions[$model_name]) ? $conditions[$model_name] : $conditions;
-        if($this->$model_name instanceof $model_name){
-            $model_instance = $this->$model_name;
-        }else{
-            $model_instance = $this;
-        }
-        $new_conditions = array();
-        if(is_array($model_conditions)){
-            foreach ($model_conditions as $col=>$value){
-                if($model_instance->hasColumn($col)){
-                    $new_conditions[$prefix.$col] = $value;
-                }
-            }
-        }
-        return $new_conditions;
-    }
-
-    protected function _quoteColumnName($column_name)
-    {
-        return $this->_db->nameQuote.$column_name.$this->_db->nameQuote;
-    }
-
-
-    /**
-    * Finder methods must instantiate through this method to work with the single-table inheritance model and
-    * eager loading associations.
-    * That makes it possible to create objects of different types from the same table.
-    */
-    public function &instantiate($record, $set_as_new = true, $call_after_instantiate = true)
-    {
-        $inheritance_column = $this->getInheritanceColumn();
-        if(!empty($record[$inheritance_column])){
-            $inheritance_column = $record[$inheritance_column];
-            $inheritance_model_name = AkInflector::camelize($inheritance_column);
-            @require_once(AkInflector::toModelFilename($inheritance_model_name));
-            if(!class_exists($inheritance_model_name)){
-                trigger_error($this->t("The single-table inheritance mechanism failed to locate the subclass: '%class_name'. ".
-                "This error is raised because the column '%column' is reserved for storing the class in case of inheritance. ".
-                "Please rename this column if you didn't intend it to be used for storing the inheritance class ".
-                "or overwrite #{self.to_s}.inheritance_column to use another column for that information.",
-                array('%class_name'=>$inheritance_model_name, '%column'=>$this->getInheritanceColumn())).Ak::getFileAndNumberTextForError(1),E_USER_ERROR);
-            }
-        }
-
-        $model_name = isset($inheritance_model_name) ? $inheritance_model_name : $this->getModelName();
-        $object = new $model_name(array('init'=>false));
-        $object->_newRecord = $set_as_new;
-        $object->setConnection($this->getConnection());
-        $object->init(array('attributes', $record));
-
-        if ($call_after_instantiate) {
-            $object->afterInstantiate();
-            $object->notifyObservers('afterInstantiate');
-        }
-        (AK_CLI && AK_ENVIRONMENT == 'development') ? $object ->toString() : null;
-
-        return $object;
-    }
-
-    /*/Finding records*/
 
 
 
@@ -2220,10 +1498,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $db_adapter;
     }
 
-    protected function _getDatabaseType()
+    public function getDatabaseType()
     {
         return $this->_db->type();
     }
+
+
+
     /*/Database connection*/
 
 
@@ -2632,15 +1913,15 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             }
         }
 
-        if($this->_getDatabaseType() == 'mysql'){
+        if($this->getDatabaseType() == 'mysql'){
             if($result == 'integer' && stristr($adodb_column_object->type, 'TINYINT')){
                 return 'boolean';
             }
-        }elseif($this->_getDatabaseType() == 'postgre'){
+        }elseif($this->getDatabaseType() == 'postgre'){
             if($adodb_column_object->type == 'timestamp' || $result == 'datetime'){
                 $adodb_column_object->max_length = 19;
             }
-        }elseif($this->_getDatabaseType() == 'sqlite'){
+        }elseif($this->getDatabaseType() == 'sqlite'){
             if($result == 'integer' && (int)$adodb_column_object->max_length === 1 && stristr($adodb_column_object->type, 'TINYINT')){
                 return 'boolean';
             }elseif($result == 'integer' && stristr($adodb_column_object->type, 'DOUBLE')){
@@ -2758,6 +2039,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return empty($this->_columns[$column_name]['scale']) ? false : $this->_columns[$column_name]['scale'];
     }
 
+    public function quotedId($id = false)
+    {
+        return $this->castAttributeForDatabase($this->getPrimaryKey(), $id ? $id : $this->getId());
+    }
+
+
     public function castAttributeForDatabase($column_name, $value, $add_quotes = true)
     {
         $result = '';
@@ -2788,7 +2075,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 if(!empty($value) && $this->_shouldCompressColumn($column_name)){
                     $value = Ak::compress($value);
                 }
-                if($this->_getDatabaseType() == 'postgre'){
+                if($this->getDatabaseType() == 'postgre'){
                     $result =  is_null($value) ? 'null::bytea ' : " '".$this->_db->escape_blob($value)."'::bytea ";
                 }else{
                     $result = is_null($value) ? 'null' : ($add_quotes ? $this->_db->quote_string($value) : $value);
@@ -2813,7 +2100,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
             case 'float':
                 $result = (empty($value) && $value !== 0) ? 'null' : (is_numeric($value) ? $value : $this->_db->quote_string($value));
-                $result = !empty($this->_columns[$column_name]['notNull']) && $result == 'null' && $this->_getDatabaseType() == 'sqlite' ? '0' : $result;
+                $result = !empty($this->_columns[$column_name]['notNull']) && $result == 'null' && $this->getDatabaseType() == 'sqlite' ? '0' : $result;
                 break;
 
             default:
@@ -2848,6 +2135,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $casted_values;
     }
 
+    public function castAttributesFromDatabase($attributes = array())
+    {
+        foreach($attributes as $key => $value) {
+            $attributes[$key] = $this->castAttributeFromDatabase($key, $value);
+        }
+        return $attributes;
+    }
+
     public function castAttributeFromDatabase($column_name, $value)
     {
         if($this->hasColumn($column_name)){
@@ -2861,7 +2156,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     if (is_null($value)) {
                         return null;
                     }
-                    if ($this->_getDatabaseType()=='postgre'){
+                    if ($this->getDatabaseType()=='postgre'){
                         return $value=='t' ? true : false;
                     }
                     return (integer)$value === 1 ? true : false;
@@ -2869,7 +2164,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     return substr($value,0,10) == '0000-00-00' ? null : str_replace(substr($value,strpos($value,' ')), '', $value);
                 }elseif (!empty($value) && 'datetime' == $column_type && substr($value,0,10) == '0000-00-00'){
                     return null;
-                }elseif ('binary' == $column_type && $this->_getDatabaseType() == 'postgre'){
+                }elseif ('binary' == $column_type && $this->getDatabaseType() == 'postgre'){
                     $value = $this->_db->unescape_blob($value);
                     $value = empty($value) || trim($value) == 'null' ? null : $value;
                     if(!empty($value) && $this->_shouldCompressColumn($column_name)){
@@ -2958,6 +2253,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $this->_BlobQueryStack = null;
         }
     }
+
 
     /*/Type Casting*/
 
@@ -3972,7 +3268,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     protected function _extractValueFromDefault($default)
     {
-        if($this->_getDatabaseType() == 'postgre'){
+        if($this->getDatabaseType() == 'postgre'){
             if(preg_match("/^'(.*)'::/", $default, $match)){
                 return $match[1];
             }
@@ -3998,6 +3294,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         empty($options['skip_localization'])        && $this->_enableLocalization();
         empty($options['skip_errors'])              && $this->_enableErrors();
         empty($options['skip_validations'])         && $this->_enableValidations();
+        empty($options['skip_finders'])         && $this->_enableFinders();
     }
 
     protected function _enableCalculations()
@@ -4101,6 +3398,33 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             'validatesUniquenessOf',
             ),
             'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'validations.php'
+        ));
+    }
+
+    protected function _enableFinders()
+    {
+        $this->extendClassLazily('AkActiveRecordFinders',
+        array(
+        'methods' => array(
+            'exists',
+            'find',
+            'findFirst',
+            'findAll',
+            'findBySql',
+            'findFirstBy',
+            'findLastBy',
+            'findAllBy',
+            'findBy',
+            'findOrCreateBy',
+            'getVariableSqlCondition',
+            'constructFinderSql',
+            'constructFinderSqlWithAssociations',
+            'sanitizeConditions',
+            'getSanitizedConditionsArray',
+            'getConditions',
+            'instantiate',
+            ),
+            'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'finders.php'
         ));
     }
 
