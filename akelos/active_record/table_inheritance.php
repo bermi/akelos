@@ -24,13 +24,6 @@
 */
 class AkActiveRecordTableInheritance extends AkActiveRecordExtenssion
 {
-    /**
-     * Gets the column name for use with single table inheritance. Can be overridden in subclasses.
-    */
-    public function getInheritanceColumn()
-    {
-        return empty($this->_ActiveRecord->_inheritanceColumn) ? ($this->_ActiveRecord->hasColumn('type') ? 'type' : false ) : $this->_ActiveRecord->_inheritanceColumn;
-    }
 
     /**
      * Defines the column name for use with single table inheritance. Can be overridden in subclasses.
@@ -70,7 +63,7 @@ class AkActiveRecordTableInheritance extends AkActiveRecordExtenssion
 
     public function typeCondition($table_alias = null)
     {
-        $inheritance_column = $this->getInheritanceColumn();
+        $inheritance_column = $this->_ActiveRecord->getInheritanceColumn();
         $type_condition = array();
         $table_name = $this->_ActiveRecord->getTableName();
         $available_types = array_merge(array($this->_ActiveRecord->getModelName()), $this->getSubclasses());

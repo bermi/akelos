@@ -159,8 +159,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         AK_LOG_EVENTS ? ($this->Logger = Ak::getLogger()) : null;
 
-        $this->_setInternationalizedColumnsStatus();
-
         @$this->_instantiateDefaultObserver();
 
         $this->establishConnection();
@@ -762,7 +760,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     $this->composeCombinedAttribute($combined_attribute);
                 }
             }
-            if ($compose_after_set && $this->isCombinedAttribute($attribute)){
+            if ($compose_after_set && !empty($this->_combinedAttributes) && $this->isCombinedAttribute($attribute)){
                 $this->decomposeCombinedAttribute($attribute);
             }
         }elseif(substr($attribute,-12) == 'confirmation' && $this->hasAttribute(substr($attribute,0,-13))){
@@ -838,7 +836,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                 return $this->$_getter_method();
             }
         }
-        if(isset($this->$attribute) || (!isset($this->$attribute) && $this->isCombinedAttribute($attribute))){
+        if(isset($this->$attribute) || (!isset($this->$attribute) && !empty($this->_combinedAttributes) && $this->isCombinedAttribute($attribute))){
             if($this->hasAttribute($attribute)){
                 if (!empty($this->_combinedAttributes) && $this->isCombinedAttribute($attribute)){
                     $this->composeCombinedAttribute($attribute);
@@ -1020,7 +1018,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     public function getAvailableAttributes()
     {
-        return array_merge($this->getColumns(), $this->getAvailableCombinedAttributes());
+        return empty($this->_combinedAttributes) ? $this->getColumns() : array_merge($this->getColumns(), $this->getAvailableCombinedAttributes());
     }
 
     public function getAttributeCaption($attribute)
@@ -1117,249 +1115,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     /*/Model Attributes*/
 
-
-    /**
-                          Combined attributes
-    ====================================================================
-    *
-    * The Akelos Framework has a handy way to represent combined fields.
-    * You can add a new attribute to your models using a printf patter to glue
-    * multiple parameters in a single one.
-    *
-    * For example, If we set...
-    * $this->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
-    * $this->addCombinedAttributeConfiguration('date', "%04d-%02d-%02d", 'year', 'month', 'day');
-    * $this->setAttributes('first_name=>','John','last_name=>','Smith','year=>',2005,'month=>',9,'day=>',27);
-    *
-    * $this->name // will have "John Smith" as value and
-    * $this->date // will be 2005-09-27
-    *
-    * On the other hand if you do
-    *
-    *   $this->setAttribute('date', '2008-11-30');
-    *
-    *   All the 'year', 'month' and 'day' getters will be fired (if they exist) the following attributes will be set
-    *
-    *    $this->year // will be 2008
-    *    $this->month // will be 11 and
-    *    $this->day // will be 27
-    *
-    * Sometimes you might need a pattern for composing and another for decomposing attributes. In this case you can specify
-    * an array as the pattern values, where first element will be the composing pattern and second element will be used
-    * for decomposing.
-    *
-    * You can also specify a callback method from this object function instead of a pattern. You can also assign a callback
-    * for composing and another for decomposing by passing their names as an array like on the patterns.
-    *
-    *    <?php
-    *    class User extends ActiveRecord
-    *    {
-    *        public function User()
-    *        {
-    *            // You can use a multiple patterns array where "%s, %s" will be used for combining fields and "%[^,], %s" will be used
-    *            // for decomposing fields. (as you can see you can also use regular expressions on your patterns)
-    *            $User->addCombinedAttributeConfiguration('name', array("%s, %s","%[^,], %s"), 'last_name', 'first_name');
-    *
-    *            //Here we set email_link so compose_email_link() will be triggered for building up the field and parse_email_link will
-    *            // be used for getting the fields out
-    *            $User->addCombinedAttributeConfiguration('email_link', array("compose_email_link","parse_email_link"), 'email', 'name');
-    *
-    *            // We need to tell the ActiveRecord to load it's magic (see the example below for a simpler solution)
-    *            $attributes = (array)func_get_args();
-    *            return $this->init($attributes);
-    *
-    *        }
-    *        public function compose_email_link()
-    *        {
-    *            $args = func_get_arg(0);
-    *            return "<a href=\'mailto:{$args[\'email\']}\'>{$args[\'name\']}</a>";
-    *        }
-    *        public function parse_email_link($email_link)
-    *        {
-    *            $results = sscanf($email_link, "<a href=\'mailto:%[^\']\'>%[^<]</a>");
-    *            return array(\'email\'=>$results[0],\'name\'=>$results[1]);
-    *        }
-    *
-    *    }
-    *   ?>
-    *
-    * You can also simplify your live by declaring the combined attributes as a class variable like:
-    *    <?php
-    *    class User extends ActiveRecord
-    *    {
-    *       public $combined_attributes array(
-    *       array('name', array("%s, %s","%[^,], %s"), 'last_name', 'first_name')
-    *       array('email_link', array("compose_email_link","parse_email_link"), 'email', 'name')
-    *       );
-    *
-    *       // ....
-    *    }
-    *   ?>
-    *
-    */
-
-    /**
-    * Returns true if given attribute is a combined attribute for this Model.
-    *
-    * @param string $attribute
-    * @return boolean
-    */
-    public function isCombinedAttribute ($attribute)
-    {
-        return !empty($this->_combinedAttributes) && isset($this->_combinedAttributes[$attribute]);
-    }
-
-    public function addCombinedAttributeConfiguration($attribute)
-    {
-        $args = is_array($attribute) ? $attribute : func_get_args();
-        $columns = array_slice($args,2);
-        $invalid_columns = array();
-        foreach ($columns as $colum){
-            if(!$this->hasAttribute($colum)){
-                $invalid_columns[] = $colum;
-            }
-        }
-        if(!empty($invalid_columns)){
-            trigger_error(Ak::t('There was an error while setting the composed field "%field_name", the following mapping column/s "%columns" do not exist',
-            array('%field_name'=>$args[0],'%columns'=>join(', ',$invalid_columns))).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
-        }else{
-            $attribute = array_shift($args);
-            $this->_combinedAttributes[$attribute] = $args;
-            $this->composeCombinedAttribute($attribute);
-        }
-    }
-
-    public function composeCombinedAttributes()
-    {
-
-        if(!empty($this->_combinedAttributes)){
-            $attributes = array_keys($this->_combinedAttributes);
-            foreach ($attributes as $attribute){
-                $this->composeCombinedAttribute($attribute);
-            }
-        }
-    }
-
-    public function composeCombinedAttribute($combined_attribute)
-    {
-        if($this->isCombinedAttribute($combined_attribute)){
-            $config = $this->_combinedAttributes[$combined_attribute];
-            $pattern = array_shift($config);
-
-            $pattern = is_array($pattern) ? $pattern[0] : $pattern;
-            $got = array();
-
-            foreach ($config as $attribute){
-                if(isset($this->$attribute)){
-                    $got[$attribute] = $this->getAttribute($attribute);
-                }
-            }
-            if(count($got) === count($config)){
-                $this->$combined_attribute = method_exists($this, $pattern) ? $this->{$pattern}($got) : vsprintf($pattern, $got);
-            }
-        }
-    }
-
-    public function getCombinedAttributesWhereThisAttributeIsUsed($attribute)
-    {
-        $result = array();
-        foreach ($this->_combinedAttributes as $combined_attribute=>$settings){
-            if(in_array($attribute,$settings)){
-                $result[] = $combined_attribute;
-            }
-        }
-        return $result;
-    }
-
-
-    public function requiredForCombination($attribute)
-    {
-        foreach ($this->_combinedAttributes as $settings){
-            if(in_array($attribute,$settings)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public function hasCombinedAttributes()
-    {
-        return count($this->getCombinedSubattributes()) === 0 ? false :true;
-    }
-
-    public function getCombinedSubattributes($attribute)
-    {
-        $result = array();
-        if(is_array($this->_combinedAttributes[$attribute])){
-            $attributes = $this->_combinedAttributes[$attribute];
-            array_shift($attributes);
-            foreach ($attributes as $attribute_to_check){
-                if(isset($this->_combinedAttributes[$attribute_to_check])){
-                    $result[] = $attribute_to_check;
-                }
-            }
-        }
-        return $result;
-    }
-
-    public function decomposeCombinedAttributes()
-    {
-        if(!empty($this->_combinedAttributes)){
-            $attributes = array_keys($this->_combinedAttributes);
-            foreach ($attributes as $attribute){
-                $this->decomposeCombinedAttribute($attribute);
-            }
-        }
-    }
-
-    public function decomposeCombinedAttribute($combined_attribute, $used_on_combined_fields = false)
-    {
-        if(isset($this->$combined_attribute) && $this->isCombinedAttribute($combined_attribute)){
-            $config = $this->_combinedAttributes[$combined_attribute];
-            $pattern = array_shift($config);
-            $pattern = is_array($pattern) ? $pattern[1] : $pattern;
-
-            if(method_exists($this, $pattern)){
-                $pieces = $this->{$pattern}($this->$combined_attribute);
-                if(is_array($pieces)){
-                    foreach ($pieces as $k=>$v){
-                        $is_combined = $this->isCombinedAttribute($k);
-                        if($is_combined){
-                            $this->decomposeCombinedAttribute($k);
-                        }
-                        $this->setAttribute($k, $v, true, !$is_combined);
-                    }
-                    if($is_combined && !$used_on_combined_fields){
-                        $combined_attributes_contained_on_this_attribute = $this->getCombinedSubattributes($combined_attribute);
-                        if(count($combined_attributes_contained_on_this_attribute)){
-                            $this->decomposeCombinedAttribute($combined_attribute, true);
-                        }
-                    }
-                }
-            }else{
-                $got = sscanf($this->$combined_attribute, $pattern);
-                for ($x=0; $x<count($got); $x++){
-                    $attribute = $config[$x];
-                    $is_combined = $this->isCombinedAttribute($attribute);
-                    if($is_combined){
-                        $this->decomposeCombinedAttribute($attribute);
-                    }
-                    $this->setAttribute($attribute, $got[$x], true, !$is_combined);
-                }
-            }
-        }
-    }
-
-    public function getAvailableCombinedAttributes()
-    {
-        $combined_attributes = array();
-        foreach ($this->_combinedAttributes as $attribute=>$details){
-            $combined_attributes[$attribute] = array('name'=>$attribute, 'type'=>'string', 'path' => array_shift($details), 'uses'=>$details);
-        }
-        return !empty($this->_combinedAttributes) && is_array($this->_combinedAttributes) ? $combined_attributes : array();
-    }
-
-    /*/Combined attributes*/
 
 
 
@@ -2581,137 +2336,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     /*/Act as Behaviours*/
 
-    /**
-                            Debugging
-    ====================================================================
-    */
 
-
-    public function dbug()
-    {
-        if(!$this->isConnected()){
-            $this->establishConnection();
-        }
-        $this->_db->connection->debug = $this->_db->connection->debug ? false : true;
-        $this->db_debug = $this->_db->connection->debug;
-    }
-
-    public function toString($print = false)
-    {
-        $result = '';
-        if(!AK_CLI || (AK_ENVIRONMENT == 'testing' && !AK_CLI)){
-            $result = "<h2>Details for ".AkInflector::humanize(AkInflector::underscore($this->getModelName()))." with ".$this->getPrimaryKey()." ".$this->getId()."</h2>\n<dl>\n";
-            foreach ($this->getColumnNames() as $column=>$caption){
-                $result .= "<dt>$caption</dt>\n<dd>".$this->getAttribute($column)."</dd>\n";
-            }
-            $result .= "</dl>\n<hr />";
-            if($print){
-                echo $result;
-            }
-        }elseif(AK_DEV_MODE){
-            $result =   "\n".
-            str_replace("\n"," ",var_export($this->getAttributes(),true));
-            $result .= "\n";
-            echo $result;
-            return '';
-        }elseif (AK_CLI){
-            $result = "\n-------\n Details for ".AkInflector::humanize(AkInflector::underscore($this->getModelName()))." with ".$this->getPrimaryKey()." ".$this->getId()." ==\n\n/==\n";
-            foreach ($this->getColumnNames() as $column=>$caption){
-                $result .= "\t * $caption: ".$this->getAttribute($column)."\n";
-            }
-            $result .= "\n\n-------\n";
-            if($print){
-                echo $result;
-            }
-        }
-        return $result;
-    }
-
-    public function dbugging($trace_this_on_debug_mode = null)
-    {
-        if(!empty($this->_db->debug) && !empty($trace_this_on_debug_mode)){
-            $message = !is_scalar($trace_this_on_debug_mode) ? var_export($trace_this_on_debug_mode, true) : (string)$trace_this_on_debug_mode;
-            Ak::trace($message);
-        }
-        return !empty($this->_db->debug);
-    }
-
-
-
-    public function debug ($data = 'active_record_class', $_functions=0)
-    {
-        if(!AK_DEBUG && !AK_DEV_MODE){
-            return;
-        }
-
-        $data = $data == 'active_record_class' ?  clone($this) : $data;
-
-        if($_functions!=0) {
-            $sf=1;
-        } else {
-            $sf=0 ;
-        }
-
-        if (isset ($data)) {
-            if (is_array($data) || is_object($data)) {
-
-                if (count ($data)) {
-                    echo AK_CLI ? "/--\n" : "<ol>\n";
-                    while (list ($key,$value) = each ($data)) {
-                        if($key{0} == '_'){
-                            continue;
-                        }
-                        $type=gettype($value);
-                        if ($type=="array") {
-                            AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key) :
-                            printf ("<li>(%s) <b>%s</b>:\n",$type, $key);
-                            ob_start();
-                            Ak::debug ($value,$sf);
-                            $lines = explode("\n",ob_get_clean()."\n");
-                            foreach ($lines as $line){
-                                echo "\t".$line."\n";
-                            }
-                        }elseif($type == "object"){
-                            if(method_exists($value,'hasColumn') && $value->hasColumn($key)){
-                                $value->toString(true);
-                                AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key) :
-                                printf ("<li>(%s) <b>%s</b>:\n",$type, $key);
-                                ob_start();
-                                Ak::debug ($value,$sf);
-                                $lines = explode("\n",ob_get_clean()."\n");
-                                foreach ($lines as $line){
-                                    echo "\t".$line."\n";
-                                }
-                            }
-                        }elseif (stristr($type, "function")) {
-                            if ($sf) {
-                                AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key, $value) :
-                                printf ("<li>(%s) <b>%s</b> </li>\n",$type, $key, $value);
-                            }
-                        } else {
-                            if (!$value) {
-                                $value="(none)";
-                            }
-                            AK_CLI ? printf ("\t* (%s) %s = %s\n",$type, $key, $value) :
-                            printf ("<li>(%s) <b>%s</b> = %s</li>\n",$type, $key, $value);
-                        }
-                    }
-                    echo AK_CLI ? "\n--/\n" : "</ol>fin.\n";
-                } else {
-                    echo "(empty)";
-                }
-            }
-        }
-    }
-
-    /*/Debugging*/
-
-
-
-    /**
-                        Utilities
-    ====================================================================
-    */
     /**
      * Selects and filters a search result to include only specified columns
      *
@@ -2741,7 +2366,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $resulting_array;
     }
 
-
     /**
      * Collect is a function for selecting items from double depth array
      * like the ones returned by the AkActiveRecord. This comes useful when you just need some
@@ -2768,367 +2392,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $resulting_array;
     }
 
-    /**
-     * Generate a json representation of the model record.
-     *
-     * parameters:
-     *
-     * @param array $options
-     *
-     *              option parameters:
-     *             array(
-     *              'collection' => array($Person1,$Person), // array of ActiveRecords
-     *              'include' => array('association1','association2'), // include the associations when exporting
-     *              'exclude' => array('id','name'), // exclude the attribtues
-     *              'only' => array('email','last_name') // only export these attributes
-     *              )
-     * @return string in Json Format
-     */
-    public function toJson($options = array())
-    {
-        if (is_array($options) && isset($options[0]) && ($options[0] instanceof AkActiveRecord)) {
-            $options = array('collection'=>$options);
-        }
-        if (isset($options['collection']) && is_array($options['collection']) && $options['collection'][0]->_modelName == $this->_modelName) {
-            $json = '';
-
-            $collection = $options['collection'];
-            unset($options['collection']);
-            $jsonVals = array();
-            foreach ($collection as $element) {
-                $jsonVals[]= $element->toJson($options);
-            }
-            $json = '['.implode(',',$jsonVals).']';
-            return $json;
-        }
-        /**
-         * see if we need to include associations
-         */
-        $associatedIds = array();
-        if (isset($options['include']) && !empty($options['include'])) {
-            $options['include'] = is_array($options['include'])?$options['include']:preg_split('/,\s*/',$options['include']);
-            foreach ($this->_associations as $key => $obj) {
-                if (in_array($key,$options['include'])) {
-                    $associatedIds[$obj->getAssociationId() . '_id'] = array('name'=>$key,'type'=>$obj->getType());
-                }
-            }
-        }
-        if (isset($options['only'])) {
-            $options['only'] = is_array($options['only'])?$options['only']:preg_split('/,\s*/',$options['only']);
-        }
-        if (isset($options['except'])) {
-            $options['except'] = is_array($options['except'])?$options['except']:preg_split('/,\s*/',$options['except']);
-        }
-        foreach ($this->_columns as $key => $def) {
-
-            if (isset($options['except']) && in_array($key, $options['except'])) {
-                continue;
-            } else if (isset($options['only']) && !in_array($key, $options['only'])) {
-                continue;
-            } else {
-                $val = $this->$key;
-                $type = $this->getColumnType($key);
-                if (($type == 'serial' || $type=='integer') && $val!==null) $val = intval($val);
-                if ($type == 'float' && $val!==null) $val = floatval($val);
-                if ($type == 'boolean') $val = $val?1:0;
-                $data[$key] = $val;
-            }
-        }
-        if (isset($options['include'])) {
-            foreach($this->_associationIds as $key=>$val) {
-                if ((in_array($key,$options['include']) || in_array($val,$options['include']))) {
-                    $this->$key->load();
-                    $associationElement = $key;
-                    $associationElement = $this->_convertColumnToXmlElement($associationElement);
-                    if (is_array($this->$key)) {
-                        $data[$associationElement] = array();
-                        foreach ($this->$key as $el) {
-                            if ($el instanceof AkActiveRecord) {
-                                $attributes = $el->getAttributes();
-                                foreach($attributes as $ak=>$av) {
-                                    $type = $el->getColumnType($ak);
-                                    if (($type == 'serial' || $type=='integer') && $av!==null) $av = intval($av);
-                                    if ($type == 'float' && $av!==null) $av = floatval($av);
-                                    if ($type == 'boolean') $av = $av?1:0;
-                                    $attributes[$ak]=$av;
-                                }
-                                $data[$associationElement][] = $attributes;
-                            }
-                        }
-                    } else {
-                        $el = $this->$key->load();
-                        if ($el instanceof AkActiveRecord) {
-                            $attributes = $el->getAttributes();
-                            foreach($attributes as $ak=>$av) {
-                                $type = $el->getColumnType($ak);
-                                if (($type == 'serial' || $type=='integer') && $av!==null) $av = intval($av);
-                                if ($type == 'float' && $av!==null) $av = floatval($av);
-                                if ($type == 'boolean') $av = $av?1:0;
-                                $attributes[$ak]=$av;
-                            }
-                            $data[$associationElement] = $attributes;
-                        }
-                    }
-                }
-            }
-        }
-        return Ak::toJson($data);
-    }
-
-    protected function _convertColumnToXmlElement($col)
-    {
-        return str_replace('_','-',$col);
-    }
-
-    protected function _convertColumnFromXmlElement($col)
-    {
-        return str_replace('-','_',$col);
-    }
-
-    protected function _parseXmlAttributes($attributes)
-    {
-        $new = array();
-        foreach($attributes as $key=>$value)
-        {
-            $new[$this->_convertColumnFromXmlElement($key)] = $value;
-        }
-        return $new;
-    }
-
-    public function &_generateModelFromArray($modelName,$attributes)
-    {
-        if (isset($attributes[0]) && is_array($attributes[0])) {
-            $attributes = $attributes[0];
-        }
-        $record = new $modelName('attributes', $this->_parseXmlAttributes($attributes));
-        $record->_newRecord = !empty($attributes['id']);
-
-        $associatedIds = array();
-        foreach ($record->getAssociatedIds() as $key) {
-            if (isset($attributes[$key]) && is_array($attributes[$key])) {
-                $class = $record->$key->_AssociationHandler->getOption($key,'class_name');
-                $related = $this->_generateModelFromArray($class,$attributes[$key]);
-                $record->$key->build($related->getAttributes(),false);
-                $related = $record->$key->load();
-                $record->$key = $related;
-            }
-        }
-        return $record;
-    }
-
-    protected function _fromArray($array)
-    {
-        $data  = $array;
-        $modelName = $this->getModelName();
-        $values = array();
-        if (!isset($data[0])) {
-            $data = array($data);
-        }
-        foreach ($data as $key => $value) {
-            if (is_array($value)){
-                $values[] = $this->_generateModelFromArray($modelName, $value);
-            }
-        }
-        return count($values)==1?$values[0]:$values;
-    }
-
-    /**
-     * Reads Xml in the following format:
-     *
-     *
-     * <?xml version="1.0" encoding="UTF-8"?>
-     * <person>
-     *    <id>1</id>
-     *    <first-name>Hansi</first-name>
-     *    <last-name>Müller</last-name>
-     *    <email>hans@mueller.com</email>
-     *    <created-at type="datetime">2008-01-01 13:01:23</created-at>
-     * </person>
-     *
-     * and returns an ActiveRecord Object
-     *
-     * @param string $xml
-     * @return AkActiveRecord
-     */
-    public function fromXml($xml)
-    {
-        $array = Ak::convert('xml','array', $xml);
-        $array = $this->_fromXmlCleanup($array);
-        return $this->_fromArray($array);
-    }
-
-    protected function _fromXmlCleanup($array)
-    {
-        $result = array();
-        $key = key($array);
-        while(is_string($key) && is_array($array[$key]) && count($array[$key])==1) {
-            $array = $array[$key][0];
-            $key = key($array);
-        }
-        if (is_string($key) && is_array($array[$key])) {
-            $array = $array[$key];
-        }
-        return $array;
-    }
-    /**
-     * Reads Json string in the following format:
-     *
-     * {"id":1,"first_name":"Hansi","last_name":"M\u00fcller",
-     *  "email":"hans@mueller.com","created_at":"2008-01-01 13:01:23"}
-     *
-     * and returns an ActiveRecord Object
-     *
-     * @param string $json
-     * @return AkActiveRecord
-     */
-    public function fromJson($json)
-    {
-        $json = Ak::fromJson($json);
-        $array = Ak::convert('Object','Array',$json);
-        return $this->_fromArray($array);
-    }
-
-    /**
-     * Generate a xml representation of the model record.
-     *
-     * Example result:
-     *
-     * <?xml version="1.0" encoding="UTF-8"?>
-     * <person>
-     *    <id>1</id>
-     *    <first-name>Hansi</first-name>
-     *    <last-name>Müller</last-name>
-     *    <email>hans@mueller.com</email>
-     *    <created-at type="datetime">2008-01-01 13:01:23</created-at>
-     * </person>
-     *
-     * parameters:
-     *
-     * @param array $options
-     *
-     *              option parameters:
-     *             array(
-     *              'collection' => array($Person1,$Person), // array of ActiveRecords
-     *              'include' => array('association1','association2'), // include the associations when exporting
-     *              'exclude' => array('id','name'), // exclude the attribtues
-     *              'only' => array('email','last_name') // only export these attributes
-     *              )
-     * @return string in Xml Format
-     */
-    public function toXml($options = array())
-    {
-        if (is_array($options) && isset($options[0]) && ($options[0] instanceof AkActiveRecord)) {
-            $options = array('collection'=>$options);
-        }
-        if (isset($options['collection']) && is_array($options['collection']) && $options['collection'][0]->_modelName == $this->_modelName) {
-            $root = strtolower(AkInflector::pluralize($this->_modelName));
-            $root = $this->_convertColumnToXmlElement($root);
-            $xml = '';
-            if (!(isset($options['skip_instruct']) && $options['skip_instruct'] == true)) {
-                $xml .= '<?xml version="1.0" encoding="UTF-8"?>';
-            }
-            $xml .= '<' . $root . '>';
-            $collection = $options['collection'];
-            unset($options['collection']);
-            $options['skip_instruct'] = true;
-            foreach ($collection as $element) {
-                $xml .= $element->toXml($options);
-            }
-            $xml .= '</' . $root .'>';
-            return $xml;
-        }
-        /**
-         * see if we need to include associations
-         */
-        $associatedIds = array();
-        if (isset($options['include']) && !empty($options['include'])) {
-            $options['include'] = is_array($options['include'])?$options['include']:preg_split('/,\s*/',$options['include']);
-            foreach ($this->_associations as $key => $obj) {
-                if (in_array($key,$options['include'])) {
-                    if ($obj->getType()!='hasAndBelongsToMany') {
-                        $associatedIds[$obj->getAssociationId() . '_id'] = array('name'=>$key,'type'=>$obj->getType());
-                    } else {
-                        $associatedIds[$key] = array('name'=>$key,'type'=>$obj->getType());
-                    }
-                }
-            }
-        }
-        if (isset($options['only'])) {
-            $options['only'] = is_array($options['only'])?$options['only']:preg_split('/,\s*/',$options['only']);
-        }
-        if (isset($options['except'])) {
-            $options['except'] = is_array($options['except'])?$options['except']:preg_split('/,\s*/',$options['except']);
-        }
-        $xml = '';
-        if (!(isset($options['skip_instruct']) && $options['skip_instruct'] == true)) {
-            $xml .= '<?xml version="1.0" encoding="UTF-8"?>';
-        }
-        $root = $this->_convertColumnToXmlElement(strtolower($this->_modelName));
-
-        $xml .= '<' . $root . '>';
-        $xml .= "\n";
-        foreach ($this->_columns as $key => $def) {
-
-            if (isset($options['except']) && in_array($key, $options['except'])) {
-                continue;
-            } else if (isset($options['only']) && !in_array($key, $options['only'])) {
-                continue;
-            } else {
-                $columnType = $def['type'];
-                $elementName = $this->_convertColumnToXmlElement($key);
-                $xml .= '<' . $elementName;
-                $val = $this->$key;
-                if (!in_array($columnType,array('string','text','serial'))) {
-                    $xml .= ' type="' . $columnType . '"';
-                    if ($columnType=='boolean') $val = $val?1:0;
-                }
-                $xml .= '>' . Ak::utf8($val) . '</' . $elementName . '>';
-                $xml .= "\n";
-            }
-        }
-        if (isset($options['include'])) {
-            foreach($this->_associationIds as $key=>$val) {
-                if ((in_array($key,$options['include']) || in_array($val,$options['include']))) {
-                    if (is_array($this->$key)) {
-
-                        $associationElement = $key;
-                        $associationElement = AkInflector::pluralize($associationElement);
-                        $associationElement = $this->_convertColumnToXmlElement($associationElement);
-                        $xml .= '<'.$associationElement.'>';
-                        foreach ($this->$key as $el) {
-                            if ($el instanceof AkActiveRecord) {
-                                $xml .= $el->toXml(array('skip_instruct'=>true));
-                            }
-                        }
-                        $xml .= '</' . $associationElement .'>';
-                    } else {
-                        $el = $this->$key->load();
-                        if ($el instanceof AkActiveRecord) {
-                            $xml.=$el->toXml(array('skip_instruct'=>true));
-                        }
-                    }
-                }
-            }
-        }
-        $xml .= '</' . $root . '>';
-        return $xml;
-    }
-    /**
-     * converts to yaml-strings
-     *
-     * examples:
-     * User::toYaml($users->find('all'));
-     * $Bermi->toYaml();
-     *
-     * @param array of ActiveRecords[optional] $data
-     */
-    public function toYaml($data = null)
-    {
-        return Ak::convert('active_record', 'yaml', empty($data) ? $this : $data);
-    }
-
-
-    /*/Utilities*/
 
 
     public function getAttributeCondition($argument)
@@ -3141,7 +2404,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             return '= ?';
         }
     }
-
 
 
     public function t($string, $array = null,$model=null)
@@ -3224,13 +2486,16 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      */
     protected function _enableLazyLoadingExtenssions($options = array())
     {
-        empty($options['skip_calculations'])        && $this->_enableCalculations();
+        empty($options['skip_finders'])             && $this->_enableFinders();
+        empty($options['skip_validations'])         && $this->_enableValidations();
+        empty($options['skip_errors'])              && $this->_enableErrors();
         empty($options['skip_table_inheritance'])   && $this->_enableTableInheritance();
         empty($options['skip_localization'])        && $this->_enableLocalization();
-        empty($options['skip_errors'])              && $this->_enableErrors();
-        empty($options['skip_validations'])         && $this->_enableValidations();
-        empty($options['skip_finders'])             && $this->_enableFinders();
-        empty($options['skip_counter'])            && $this->_enableCounter();
+        empty($options['skip_calculations'])        && $this->_enableCalculations();
+        empty($options['skip_counter'])             && $this->_enableCounter();
+        empty($options['skip_combined_attributes']) && $this->_enableCombinedAttributes();
+        empty($options['skip_utilities'])           && $this->_enableUtilities();
+        empty($options['skip_debug'])               && $this->_enableDebug();
     }
 
     protected function _enableCalculations()
@@ -3242,17 +2507,26 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         ));
     }
 
+    /**
+     * Gets the column name for use with single table inheritance. Can be overridden in subclasses.
+    */
+    public function getInheritanceColumn()
+    {
+        return empty($this->_inheritanceColumn) ? ($this->hasColumn('type') ? 'type' : false ) : $this->_inheritanceColumn;
+    }
+
     protected function _enableTableInheritance()
     {
         $this->extendClassLazily('AkActiveRecordTableInheritance',
         array(
-        'methods' => array('getInheritanceColumn','setInheritanceColumn','typeCondition'),
+        'methods' => array('setInheritanceColumn','typeCondition'),
         'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'table_inheritance.php'
         ));
     }
 
     private function _setInternationalizedColumnsStatus($force_enable = false)
     {
+        return;
         if($force_enable){
             $this->_internationalize = true;
         }else{
@@ -3265,19 +2539,19 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $this->extendClassLazily('AkActiveRecordLocalization',
         array(
         'methods' => array(
-            'getInternationalizedColumns',
-            'getAvailableLocales',
-            'getCurrentLocale',
-            'getAttributeByLocale',
-            'getAttributeLocales',
-            'setAttributeByLocale',
-            'setAttributeLocales',
-            'isInternationalizeCandidate',
-            'setInternationalizedAttribute',
-            'addInternationalizedColumn',
-            'delocalizeAttribute',
-            ),
-            'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'localization.php'
+        'getInternationalizedColumns',
+        'getAvailableLocales',
+        'getCurrentLocale',
+        'getAttributeByLocale',
+        'getAttributeLocales',
+        'setAttributeByLocale',
+        'setAttributeLocales',
+        'isInternationalizeCandidate',
+        'setInternationalizedAttribute',
+        'addInternationalizedColumn',
+        'delocalizeAttribute',
+        ),
+        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'localization.php'
         ));
     }
 
@@ -3286,27 +2560,27 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $this->extendClassLazily('AkActiveRecordErrors',
         array(
         'methods' => array(
-            'addError',
-            'addErrorOnBlank',
-            'addErrorOnBoundaryBreaking',
-            'addErrorOnBoundryBreaking',
-            'addErrorOnEmpty',
-            'addErrorToBase',
-            'clearErrors',
-            'countErrors',
-            'errorsToString',
-            'getBaseErrors',
-            'getDefaultErrorMessageFor',
-            'getErrors',
-            'getErrorsOn',
-            'getFullErrorMessages',
-            'hasErrors',
-            'isInvalid',
-            'yieldEachError',
-            'yieldEachFullError',
-            'yieldError',
-            ),
-            'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'errors.php'
+        'addError',
+        'addErrorOnBlank',
+        'addErrorOnBoundaryBreaking',
+        'addErrorOnBoundryBreaking',
+        'addErrorOnEmpty',
+        'addErrorToBase',
+        'clearErrors',
+        'countErrors',
+        'errorsToString',
+        'getBaseErrors',
+        'getDefaultErrorMessageFor',
+        'getErrors',
+        'getErrorsOn',
+        'getFullErrorMessages',
+        'hasErrors',
+        'isInvalid',
+        'yieldEachError',
+        'yieldEachFullError',
+        'yieldError',
+        ),
+        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'errors.php'
         ));
     }
 
@@ -3316,24 +2590,24 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $this->extendClassLazily('AkActiveRecordValidations',
         array(
         'methods' => array(
-            'isBlank',
-            'isValid',
-            'validate',
-            'validateOnCreate',
-            'validateOnUpdate',
-            'validatesAcceptanceOf',
-            'validatesAssociated',
-            'validatesConfirmationOf',
-            'validatesExclusionOf',
-            'validatesFormatOf',
-            'validatesInclusionOf',
-            'validatesLengthOf',
-            'validatesNumericalityOf',
-            'validatesPresenceOf',
-            'validatesSizeOf',
-            'validatesUniquenessOf',
-            ),
-            'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'validations.php'
+        'isBlank',
+        'isValid',
+        'validate',
+        'validateOnCreate',
+        'validateOnUpdate',
+        'validatesAcceptanceOf',
+        'validatesAssociated',
+        'validatesConfirmationOf',
+        'validatesExclusionOf',
+        'validatesFormatOf',
+        'validatesInclusionOf',
+        'validatesLengthOf',
+        'validatesNumericalityOf',
+        'validatesPresenceOf',
+        'validatesSizeOf',
+        'validatesUniquenessOf',
+        ),
+        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'validations.php'
         ));
     }
 
@@ -3342,25 +2616,25 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $this->extendClassLazily('AkActiveRecordFinders',
         array(
         'methods' => array(
-            'exists',
-            'find',
-            'findFirst',
-            'findAll',
-            'findBySql',
-            'findFirstBy',
-            'findLastBy',
-            'findAllBy',
-            'findBy',
-            'findOrCreateBy',
-            'getVariableSqlCondition',
-            'constructFinderSql',
-            'constructFinderSqlWithAssociations',
-            'sanitizeConditions',
-            'getSanitizedConditionsArray',
-            'getConditions',
-            'instantiate',
-            ),
-            'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'finders.php'
+        'exists',
+        'find',
+        'findFirst',
+        'findAll',
+        'findBySql',
+        'findFirstBy',
+        'findLastBy',
+        'findAllBy',
+        'findBy',
+        'findOrCreateBy',
+        'getVariableSqlCondition',
+        'constructFinderSql',
+        'constructFinderSqlWithAssociations',
+        'sanitizeConditions',
+        'getSanitizedConditionsArray',
+        'getConditions',
+        'instantiate',
+        ),
+        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'finders.php'
         ));
     }
 
@@ -3370,14 +2644,63 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $this->extendClassLazily('AkActiveRecordCounter',
         array(
         'methods' => array(
-            'incrementCounter',
-            'decrementCounter',
-            'decrementAttribute',
-            'decrementAndSaveAttribute',
-            'incrementAttribute',
-            'incrementAndSaveAttribute',
-            ),
-            'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'counter.php'
+        'incrementCounter',
+        'decrementCounter',
+        'decrementAttribute',
+        'decrementAndSaveAttribute',
+        'incrementAttribute',
+        'incrementAndSaveAttribute',
+        ),
+        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'counter.php'
+        ));
+    }
+
+
+    protected function _enableCombinedAttributes()
+    {
+        $this->extendClassLazily('AkActiveRecordCombinedAttributes',
+        array(
+        'methods' => array(
+        'isCombinedAttribute',
+        'addCombinedAttributeConfiguration',
+        'composeCombinedAttributes',
+        'composeCombinedAttribute',
+        'getCombinedAttributesWhereThisAttributeIsUsed',
+        'requiredForCombination',
+        'hasCombinedAttributes',
+        'getCombinedSubattributes',
+        'decomposeCombinedAttributes',
+        'decomposeCombinedAttribute',
+        'getAvailableCombinedAttributes',
+        ),
+        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'combined_attributes.php'
+        ));
+    }
+    protected function _enableUtilities()
+    {
+        $this->extendClassLazily('AkActiveRecordUtilities',
+        array(
+        'methods' => array(
+        'fromXml',
+        'toJson',
+        'fromJson',
+        'toXml',
+        'toYaml',
+        ),
+        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'utilities.php'
+        ));
+    }
+    protected function _enableDebug()
+    {
+        $this->extendClassLazily('AkActiveRecordDebug',
+        array(
+        'methods' => array(
+        'dbug',
+        'toString',
+        'dbugging',
+        'debug'
+        ),
+        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'debug.php'
         ));
     }
 

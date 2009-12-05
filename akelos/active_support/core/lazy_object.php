@@ -232,6 +232,17 @@ class AkLazyObject
 
     public function __call($name, $attributes = array())
     {
+        /*
+        static $methods;
+        if(empty($methods)){
+            $methods = true;
+            register_shutdown_function('show_most_used_methods');
+        }
+        $stats = (array)@Ak::getStaticVar('stats');
+        @$stats[$name]++;
+        Ak::setStaticVar('stats', $stats);
+        */
+
         if($name[0] != '_'){
             static $handlers = array();
 
@@ -265,3 +276,11 @@ class AkLazyObject
         trigger_error("Fatal error: Call to undefined method ".get_class($this)."::".$name.'() in '.$backtrace[1]['file'].' on line '.$backtrace[1]['line'], E_USER_ERROR);
     }
 }
+
+/*
+function show_most_used_methods() {
+    $stats = (array)@Ak::getStaticVar('stats');
+    arsort($stats);
+    var_export($stats);
+}
+*/
