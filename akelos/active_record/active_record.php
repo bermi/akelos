@@ -2448,7 +2448,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
     /**
-     * LAZY LOCADING FUNCTIONALITY
+     * LAZY LOADING FUNCTIONALITY
      */
     protected function _enableLazyLoadingExtenssions($options = array())
     {
@@ -2686,8 +2686,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         return AK_TEST_MODE || Ak::setStaticVar('AR_'.$this->getModelName().$method, $value);
     }
-
-
 }
 
 

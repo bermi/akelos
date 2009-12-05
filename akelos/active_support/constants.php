@@ -30,7 +30,7 @@ defined('AK_ACTION_PACK_DIR')       || define('AK_ACTION_PACK_DIR',     AK_FRAME
 defined('AK_ACTIVE_RECORD_DIR')     || define('AK_ACTIVE_RECORD_DIR',   AK_FRAMEWORK_DIR.DS.'active_record');
 defined('AK_ACTIVE_RESOURCE_DIR')   || define('AK_ACTIVE_RESOURCE_DIR', AK_FRAMEWORK_DIR.DS.'active_resource');
 defined('AK_ACTIVE_SUPPORT_DIR')    || define('AK_ACTIVE_SUPPORT_DIR',  AK_FRAMEWORK_DIR.DS.'active_support');
-defined('AK_ACTIVE_DOCUMENT_PATH')  || define('AK_ACTIVE_DOCUMENT_PATH',AK_FRAMEWORK_DIR.DS.'active_document');
+defined('AK_ACTIVE_DOCUMENT_DIR')  || define('AK_ACTIVE_DOCUMENT_DIR',  AK_FRAMEWORK_DIR.DS.'active_document');
 
 // If you need to customize the framework default settings or specify internationalization options,
 // edit the files config/testing.php, config/development.php, config/production.php

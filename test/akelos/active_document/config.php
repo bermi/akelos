@@ -16,3 +16,6 @@ class ActiveDocumentUnitTest extends AkUnitTest
     }
 }
 
+AkConfig::setOption('document_connections', array(
+array('type' => 'mongo_db')
+));

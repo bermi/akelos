@@ -195,7 +195,9 @@ class AkUnitTest extends UnitTestCase
 
         if (isset($args[$last_arg]) && is_array($args[$last_arg]) && (isset($args[$last_arg]['instantiate']) || isset($args[$last_arg]['populate']))){
             $options = array_pop($args);
-        } else $options = array();
+        } else {
+            $options = array();
+        }
         $default_options = array('instantiate' => true);
         $options = array_merge($default_options, $options);
 
@@ -232,10 +234,13 @@ class AkUnitTest extends UnitTestCase
         if (!$this->uninstallAndInstallMigration($model)){
             $table_name = AkInflector::tableize($model);
             if (empty($table_definition)) {
-                $Instance = new $model;
-                if($table_name != $Instance->getTableName()){
-                    // skipping, table inheritance
-                    return;
+                Ak::import($model);
+                if(class_exists($model)){
+                    $Instance = new $model;
+                    if($table_name != $Instance->getTableName()){
+                        // skipping, table inheritance
+                        return;
+                    }
                 }
                 trigger_error(Ak::t('Could not install the table %tablename for the model %modelname',array('%tablename'=>$table_name, '%modelname'=>$model)),E_USER_ERROR);
                 return false;
