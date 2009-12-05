@@ -940,72 +940,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     /*/Toggling Attributes*/
 
 
-    /**
-                         Counting Attributes
-    ====================================================================
-    See also: Counting Records, Setting Attributes, Getting Attributes.
-    */
 
-    /**
-    * Increments the specified counter by one. So $DiscussionBoard->incrementCounter("post_count",
-    * $discussion_board_id); would increment the "post_count" counter on the board responding to
-    * $discussion_board_id. This is used for caching aggregate values, so that they doesn't need to
-    * be computed every time. Especially important for looping over a collection where each element
-    * require a number of aggregate values. Like the $DiscussionBoard that needs to list both the number of posts and comments.
-    */
-    public function incrementCounter($counter_name, $id, $difference = 1)
-    {
-        return $this->updateAll("$counter_name = $counter_name + $difference", $this->getPrimaryKey().' = '.$this->castAttributeForDatabase($this->getPrimaryKey(), $id)) === 1;
-    }
-
-    /**
-    * Works like AkActiveRecord::incrementCounter, but decrements instead.
-    */
-    public function decrementCounter($counter_name, $id, $difference = 1)
-    {
-        return $this->updateAll("$counter_name = $counter_name - $difference", $this->getPrimaryKey().' = '.$this->castAttributeForDatabase($this->getPrimaryKey(), $id)) === 1;
-    }
-
-    /**
-    * Initializes the attribute to zero if null and subtracts one. Only makes sense for number-based attributes. Returns attribute value.
-    */
-    public function decrementAttribute($attribute)
-    {
-        if(!isset($this->$attribute)){
-            $this->$attribute = 0;
-        }
-        return $this->$attribute -= 1;
-    }
-
-    /**
-    * Decrements the attribute and saves the record.
-    */
-    public function decrementAndSaveAttribute($attribute)
-    {
-        return $this->updateAttribute($attribute,$this->decrementAttribute($attribute));
-    }
-
-
-    /**
-    * Initializes the attribute to zero if null and adds one. Only makes sense for number-based attributes. Returns attribute value.
-    */
-    public function incrementAttribute($attribute)
-    {
-        if(!isset($this->$attribute)){
-            $this->$attribute = 0;
-        }
-        return $this->$attribute += 1;
-    }
-
-    /**
-    * Increments the attribute and saves the record.
-    */
-    public function incrementAndSaveAttribute($attribute)
-    {
-        return $this->updateAttribute($attribute,$this->incrementAttribute($attribute));
-    }
-
-    /*/Counting Attributes*/
 
     /**
                          Protecting attributes
@@ -3294,7 +3229,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         empty($options['skip_localization'])        && $this->_enableLocalization();
         empty($options['skip_errors'])              && $this->_enableErrors();
         empty($options['skip_validations'])         && $this->_enableValidations();
-        empty($options['skip_finders'])         && $this->_enableFinders();
+        empty($options['skip_finders'])             && $this->_enableFinders();
+        empty($options['skip_counter'])            && $this->_enableCounter();
     }
 
     protected function _enableCalculations()
@@ -3425,6 +3361,23 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             'instantiate',
             ),
             'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'finders.php'
+        ));
+    }
+
+
+    protected function _enableCounter()
+    {
+        $this->extendClassLazily('AkActiveRecordCounter',
+        array(
+        'methods' => array(
+            'incrementCounter',
+            'decrementCounter',
+            'decrementAttribute',
+            'decrementAndSaveAttribute',
+            'incrementAttribute',
+            'incrementAndSaveAttribute',
+            ),
+            'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'counter.php'
         ));
     }
 
