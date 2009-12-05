@@ -232,6 +232,11 @@ class AkUnitTest extends UnitTestCase
         if (!$this->uninstallAndInstallMigration($model)){
             $table_name = AkInflector::tableize($model);
             if (empty($table_definition)) {
+                $Instance = new $model;
+                if($table_name != $Instance->getTableName()){
+                    // skipping, table inheritance
+                    return;
+                }
                 trigger_error(Ak::t('Could not install the table %tablename for the model %modelname',array('%tablename'=>$table_name, '%modelname'=>$model)),E_USER_ERROR);
                 return false;
             }

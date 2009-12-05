@@ -24,6 +24,21 @@ class AkPostgreDbAdapter extends AkDbAdapter
         return $this->selectValues("SELECT tablename FROM pg_tables WHERE schemaname IN ($schemas)");
     }
 
+    public function extractValueFromDefault($default)
+    {
+        if(preg_match("/^'(.*)'::/", $default, $match)){
+            return $match[1];
+        }
+        // a postgre HACK; we dont know the column-type here
+        if ($default=='true') {
+            return true;
+        }
+        if ($default=='false') {
+            return false;
+        }
+        return $default;
+    }
+
     /* QUOTING */
 
     public function quote_string($value)

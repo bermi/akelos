@@ -4,7 +4,7 @@ class AkMongoDbAdapter extends AkDbAdapter
 {
     static function constructDsn($database_settings)
     {
-               
+
         die();
 
     }

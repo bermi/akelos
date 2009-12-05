@@ -35,17 +35,9 @@ class AkBaseModel extends AkLazyObject
         if(!empty($model_name)){
             $this->_modelName = $model_name;
         }else{
-            $this->_modelName = $this->_getModelName(get_class($this));
+            $this->_modelName = get_class($this);
         }
         return true;
-    }
-
-    /**
-     * @deprecated Used as a worarround for PHP4 case handling
-     */
-    public function _getModelName($class_name)
-    {
-        return $class_name;
     }
 
     public function getParentModelName()

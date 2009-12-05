@@ -631,7 +631,7 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
     */
     protected function _setDefaultAttributeValuesAutomatically()
     {
-        foreach ($this->_ActiveRecord->_columns as $column_name=>$column_settings){
+        foreach ($this->_ActiveRecord->getColumns() as $column_name=>$column_settings){
             if(empty($column_settings['primaryKey']) && isset($column_settings['hasDefault']) && $column_settings['hasDefault'] && (!isset($this->_ActiveRecord->$column_name) || is_null($this->_ActiveRecord->$column_name))){
                 if(empty($column_settings['defaultValue'])){
                     if($column_settings['type'] == 'integer' && empty($column_settings['notNull'])){

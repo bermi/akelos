@@ -231,12 +231,22 @@ class AkAssociatedActiveRecord extends AkBaseModel
 
     public function addTableAliasesToAssociatedSqlWithAlias($add_alias, $alias,$sql)
     {
-        return preg_replace($this->getColumnsWithRegexBoundariesAndAlias($alias),'\1'.$add_alias.'.\3',' '.$sql.' ');
+        return preg_replace($this->_getColumnsWithRegexBoundariesAndAlias($alias),'\1'.$add_alias.'.\3',' '.$sql.' ');
     }
 
     public function addTableAliasesToAssociatedSql($table_alias, $sql)
     {
         return preg_replace($this->getColumnsWithRegexBoundaries(),'\1'.$table_alias.'.\2',' '.$sql.' ');
+    }
+
+
+    private function _getColumnsWithRegexBoundariesAndAlias($alias)
+    {
+        $columns = array_keys($this->_ActiveRecord->getColumns());
+        foreach ($columns as $k=>$column){
+            $columns[$k] = '/([^_])\b('.$alias.')\.('.$column.')\b/';
+        }
+        return $columns;
     }
 
 }

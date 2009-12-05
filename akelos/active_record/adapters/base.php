@@ -445,5 +445,10 @@ class AkDbAdapter extends AkObject
     {
         return $this->connection->BlobDecode($value);
     }
+
+    public function extractValueFromDefault($value)
+    {
+        return $value;
+    }
 }
 

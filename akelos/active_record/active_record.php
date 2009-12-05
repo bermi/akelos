@@ -1221,7 +1221,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         if(!isset($this->_tableName)){
             // We check if we are on a inheritance Table Model
-            $this->getClassForDatabaseTableMapping();
+            $this->_getClassForDatabaseTableMapping();
             if(!isset($this->_tableName)){
                 $this->setTableName();
             }
@@ -1304,13 +1304,28 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    /*/Table Settings*/
-
     /**
-                           Database Reflection
-    ====================================================================
-    See also: Table Settings, Type Casting.
-    */
+     * This method retrieves current class name that will be used to map
+     * your database to this object.
+     */
+    protected function _getClassForDatabaseTableMapping()
+    {
+        $class_name = get_class($this);
+        if($this instanceof AkActiveRecord){
+            $parent_class = get_parent_class($this);
+            while (substr($parent_class,-12) != 'ActiveRecord'){
+                $class_name = $parent_class;
+                $parent_class = get_parent_class($parent_class);
+            }
+        }
+
+        // This is an Active Record Inheritance so we set current table to parent table.
+        if(!empty($class_name) && $class_name != 'ActiveRecord'){
+            $this->_inheritanceClassName = $class_name;
+            @$this->setTableName(AkInflector::tableize($class_name), false);
+        }
+        return $class_name;
+    }
 
 
     /**
@@ -1321,72 +1336,19 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     public function attributesFromColumnDefinition()
     {
-        $attributes = array();
-
-        foreach ((array)$this->getColumns() as $column_name=>$column_settings){
-            if (!isset($column_settings['primaryKey']) && isset($column_settings['hasDefault'])) {
-                $attributes[$column_name] = $this->_extractValueFromDefault($column_settings['defaultValue']);
-            } else {
-                $attributes[$column_name] = null;
+        if(!$attributes = $this->_getCacheForModelMethod(__METHOD__)){
+            $attributes = array();
+            foreach ((array)$this->getColumns() as $column_name=>$column_settings){
+                if (!isset($column_settings['primaryKey']) && isset($column_settings['hasDefault'])) {
+                    $attributes[$column_name] = $this->_db->extractValueFromDefault($column_settings['defaultValue']);
+                } else {
+                    $attributes[$column_name] = null;
+                }
             }
+            $this->_setCacheForModelMethod(__METHOD__, $attributes);
         }
         return $attributes;
     }
-
-    /**
-     * Gets information from the database engine about a single table
-     */
-    protected function _databaseTableInternals($table)
-    {
-        if (!$cache = AkDbSchemaCache::get('table_internals_for_'.$table)) {
-            $cache = $this->_db->getColumnDetails($table);
-            AkDbSchemaCache::set('table_internals_for_'.$table, $cache);
-        }
-        return $cache;
-    }
-    public function getColumnsWithRegexBoundariesAndAlias($alias)
-    {
-        $columns = array_keys($this->getColumns());
-        foreach ($columns as $k=>$column){
-            $columns[$k] = '/([^_])\b('.$alias.')\.('.$column.')\b/';
-        }
-        return $columns;
-    }
-    public function getColumnsWithRegexBoundaries()
-    {
-        $columns = array_keys($this->getColumns());
-        foreach ($columns as $k=>$column){
-            $columns[$k] = '/([^\.])\b('.$column.')\b/';
-        }
-        return $columns;
-    }
-
-
-    /**
-    * If is the first time we use a model this function will run the installer for the model if it exists
-    */
-    protected function _runCurrentModelInstallerIfExists(&$column_objects)
-    {
-        static $installed_models = array();
-        if(!defined('AK_AVOID_AUTOMATIC_ACTIVE_RECORD_INSTALLERS') && !in_array($this->getModelName(), $installed_models)){
-            $installed_models[] = $this->getModelName();
-            $installer_name = $this->getModelName().'Installer';
-            $installer_file = AkConfig::getDir('app_installers').DS.AkInflector::underscore($installer_name).'.php';
-            if(file_exists($installer_file)){
-                require_once($installer_file);
-                if(class_exists($installer_name)){
-                    $Installer = new $installer_name($this->getConnection());
-                    if(method_exists($Installer,'install')){
-                        $Installer->install();
-                        $column_objects = $this->_databaseTableInternals($this->getTableName());
-                        return !empty($column_objects);
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
 
     /**
     * Returns an array of column objects for the table associated with this class.
@@ -1416,69 +1378,52 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         $this->_columnsSettings = ($force_reload ? null : $this->_getPersistedTableColumnSettings());
         if(empty($this->_columnsSettings)){
-            if(empty($this->_dataDictionary)){
-                $this->_dataDictionary = $this->_db->getDictionary();
-            }
-
-            $column_objects = $this->_databaseTableInternals($this->getTableName());
-
-            if( !isset($this->_avoidTableNameValidation) &&
-            !is_array($column_objects) &&
-            !$this->_runCurrentModelInstallerIfExists($column_objects)){
-                // akelos_migrations is the first active record to be installed, therefore the table will be created after the first run.
-                if($this->getTableName() != 'akelos_migrations'){
-                    trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())).Ak::getFileAndNumberTextForError(4), E_USER_NOTICE);
-                }
-                return false;
-            }elseif (empty($column_objects)){
-                $this->_runCurrentModelInstallerIfExists($column_objects);
-            }
-            if(is_array($column_objects)){
-                foreach (array_keys($column_objects) as $k){
-                    $this->setColumnSettings($column_objects[$k]->name, $column_objects[$k]);
-                }
-            }
-            if(!empty($this->_columnsSettings)){
-                $this->_persistTableColumnSettings();
-            }
+            $this->readColumnSettings();
         }
         return isset($this->_columnsSettings) ? $this->_columnsSettings : array();
     }
 
-
-
-    public function setColumnSettings($column_name, $column_object)
+    public function initiateAttributeToNull($attribute)
     {
-        $this->_columnsSettings[$column_name] = array();
-        $this->_columnsSettings[$column_name]['name'] = $column_object->name;
+        if(!isset($this->$attribute)){
+            $this->$attribute = null;
+        }
+    }
 
-        if($this->_internationalize && $this->isInternationalizeCandidate($column_object->name)){
-            $this->addInternationalizedColumn($column_object->name);
+    public function initiateColumnsToNull()
+    {
+        if(isset($this->_columnsSettings) && is_array($this->_columnsSettings)){
+            array_map(array($this,'initiateAttributeToNull'), array_keys($this->_columnsSettings));
+        }
+    }
+
+
+    public function readColumnSettings()
+    {
+        if(empty($this->_dataDictionary)){
+            $this->_dataDictionary = $this->_db->getDictionary();
         }
 
-        $this->_columnsSettings[$column_name]['type'] = $this->getAkelosDataType($column_object);
+        $column_objects = $this->_databaseTableInternals($this->getTableName());
 
-        if(!empty($column_object->primary_key)){
-            $this->_primaryKey = empty($this->_primaryKey) ? $column_object->name : $this->_primaryKey;
-            $this->_columnsSettings[$column_name]['primaryKey'] = true;
+        if( !isset($this->_avoidTableNameValidation) &&
+        !is_array($column_objects) &&
+        !$this->_runCurrentModelInstallerIfExists($column_objects)){
+            // akelos_migrations is the first active record to be installed, therefore the table will be created after the first run.
+            if($this->getTableName() != 'akelos_migrations'){
+                trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())).Ak::getFileAndNumberTextForError(4), E_USER_NOTICE);
+            }
+            return false;
+        }elseif (empty($column_objects)){
+            $this->_runCurrentModelInstallerIfExists($column_objects);
         }
-        if(!empty($column_object->auto_increment)){
-            $this->_columnsSettings[$column_name]['autoIncrement'] = true;
+        if(is_array($column_objects)){
+            foreach (array_keys($column_objects) as $k){
+                $this->_setColumnSettings($column_objects[$k]->name, $column_objects[$k]);
+            }
         }
-        if(!empty($column_object->has_default)){
-            $this->_columnsSettings[$column_name]['hasDefault'] = true;
-        }
-        if(!empty($column_object->not_null)){
-            $this->_columnsSettings[$column_name]['notNull'] = true;
-        }
-        if(!empty($column_object->max_length) && $column_object->max_length > 0){
-            $this->_columnsSettings[$column_name]['maxLength'] = $column_object->max_length;
-        }
-        if(!empty($column_object->scale) && $column_object->scale > 0){
-            $this->_columnsSettings[$column_name]['scale'] = $column_object->scale;
-        }
-        if(isset($column_object->default_value)){
-            $this->_columnsSettings[$column_name]['defaultValue'] = $column_object->default_value;
+        if(!empty($this->_columnsSettings)){
+            $this->_persistTableColumnSettings();
         }
     }
 
@@ -1514,19 +1459,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
 
 
-    public function initiateAttributeToNull($attribute)
-    {
-        if(!isset($this->$attribute)){
-            $this->$attribute = null;
-        }
-    }
 
-    public function initiateColumnsToNull()
-    {
-        if(isset($this->_columnsSettings) && is_array($this->_columnsSettings)){
-            array_map(array($this,'initiateAttributeToNull'),array_keys($this->_columnsSettings));
-        }
-    }
 
 
     /**
@@ -1571,26 +1504,26 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         }
         $meta_type = $this->_dataDictionary->MetaType($adodb_column_object);
         $adodb_data_types = array(
-        'C'=>'string', // Varchar, capped to 255 characters.
-        'X' => 'text', // Larger varchar, capped to 4000 characters (to be compatible with Oracle).
-        'XL' => 'text', // For Oracle, returns CLOB, otherwise the largest varchar size.
+        'C'     =>  'string',   // Varchar, capped to 255 characters.
+        'X'     =>  'text',     // Larger varchar, capped to 4000 characters (to be compatible with Oracle).
+        'XL'    =>  'text',     // For Oracle, returns CLOB, otherwise the largest varchar size.
 
-        'C2' => 'string', // Multibyte varchar
-        'X2' => 'string', // Multibyte varchar (largest size)
+        'C2'    =>  'string',   // Multibyte varchar
+        'X2'    =>  'string',   // Multibyte varchar (largest size)
 
-        'B' => 'binary', // BLOB (binary large object)
+        'B'     =>  'binary',   // BLOB (binary large object)
 
-        'D' => array('date'), //  Date
-        'T' =>  array('datetime', 'timestamp'), //Datetime or Timestamp
-        'L' => 'boolean', // Integer field suitable for storing booleans (0 or 1)
-        'R' => 'serial', // Serial Integer
-        'I' => 'integer', // Integer (mapped to I4)
-        'I1' => 'integer', // 1-byte integer
-        'I2' => 'integer', // 2-byte integer
-        'I4' => 'integer', // 4-byte integer
-        'I8' => 'integer', // 8-byte integer
-        'F' => 'float', // Floating point number
-        'N' => 'decimal' //  Numeric or decimal number
+        'D'     =>  array('date'),  //  Date
+        'T'     =>  array('datetime', 'timestamp'), //Datetime or Timestamp
+        'L'     =>  'boolean',  // Integer field suitable for storing booleans (0 or 1)
+        'R'     =>  'serial',   // Serial Integer
+        'I'     =>  'integer',  // Integer (mapped to I4)
+        'I1'    =>  'integer',  // 1-byte integer
+        'I2'    =>  'integer',  // 2-byte integer
+        'I4'    =>  'integer',  // 4-byte integer
+        'I8'    =>  'integer',  // 8-byte integer
+        'F'     =>  'float',    // Floating point number
+        'N'     =>  'decimal'   //  Numeric or decimal number
         );
 
         $result = !isset($adodb_data_types[$meta_type]) ?
@@ -1627,48 +1560,81 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    /**
-     * This method retrieves current class name that will be used to map
-     * your database to this object.
-     */
-    public function getClassForDatabaseTableMapping()
+    private function _setColumnSettings($column_name, $column_object)
     {
-        $class_name = get_class($this);
-        if(is_subclass_of($this,'akactiverecord') || is_subclass_of($this,'AkActiveRecord')){
-            $parent_class = get_parent_class($this);
-            while (substr(strtolower($parent_class),-12) != 'activerecord'){
-                $class_name = $parent_class;
-                $parent_class = get_parent_class($parent_class);
+        $this->_columnsSettings[$column_name] = array();
+        $this->_columnsSettings[$column_name]['name'] = $column_object->name;
+
+        if($this->_internationalize && $this->isInternationalizeCandidate($column_object->name)){
+            $this->addInternationalizedColumn($column_object->name);
+        }
+
+        $this->_columnsSettings[$column_name]['type'] = $this->getAkelosDataType($column_object);
+
+        if(!empty($column_object->primary_key)){
+            $this->_primaryKey = empty($this->_primaryKey) ? $column_object->name : $this->_primaryKey;
+            $this->_columnsSettings[$column_name]['primaryKey'] = true;
+        }
+        if(!empty($column_object->auto_increment)){
+            $this->_columnsSettings[$column_name]['autoIncrement'] = true;
+        }
+        if(!empty($column_object->has_default)){
+            $this->_columnsSettings[$column_name]['hasDefault'] = true;
+        }
+        if(!empty($column_object->not_null)){
+            $this->_columnsSettings[$column_name]['notNull'] = true;
+        }
+        if(!empty($column_object->max_length) && $column_object->max_length > 0){
+            $this->_columnsSettings[$column_name]['maxLength'] = $column_object->max_length;
+        }
+        if(!empty($column_object->scale) && $column_object->scale > 0){
+            $this->_columnsSettings[$column_name]['scale'] = $column_object->scale;
+        }
+        if(isset($column_object->default_value)){
+            $this->_columnsSettings[$column_name]['defaultValue'] = $column_object->default_value;
+        }
+    }
+
+    /**
+    * If is the first time we use a model this function will run the installer for the model if it exists
+    */
+    private function _runCurrentModelInstallerIfExists(&$column_objects)
+    {
+        static $installed_models = array();
+        if(!defined('AK_AVOID_AUTOMATIC_ACTIVE_RECORD_INSTALLERS') && !in_array($this->getModelName(), $installed_models)){
+            $installed_models[] = $this->getModelName();
+            $installer_name = $this->getModelName().'Installer';
+            $installer_file = AkConfig::getDir('app_installers').DS.AkInflector::underscore($installer_name).'.php';
+            if(file_exists($installer_file)){
+                require_once($installer_file);
+                if(class_exists($installer_name)){
+                    $Installer = new $installer_name($this->getConnection());
+                    if(method_exists($Installer,'install')){
+                        $Installer->install();
+                        $column_objects = $this->_databaseTableInternals($this->getTableName());
+                        return !empty($column_objects);
+                    }
+                }
             }
         }
-
-        $class_name = $this->_getModelName($class_name);
-        // This is an Active Record Inheritance so we set current table to parent table.
-        if(!empty($class_name) && strtolower($class_name) != 'activerecord'){
-            $this->_inheritanceClassName = $class_name;
-            @$this->setTableName(AkInflector::tableize($class_name), false);
-        }
-
-        return $class_name;
+        return false;
     }
 
-    public function getDisplayField()
+    /**
+     * Gets information from the database engine about a single table
+     */
+    private function _databaseTableInternals($table)
     {
-        return  empty($this->displayField) && $this->hasAttribute('name') ? 'name' : (isset($this->displayField) && $this->hasAttribute($this->displayField) ? $this->displayField : $this->getPrimaryKey());
-    }
-
-    public function setDisplayField($attribute_name)
-    {
-        if($this->hasAttribute($attribute_name)){
-            $this->displayField = $attribute_name;
-            return true;
-        }else {
-            return false;
+        if (!$cache = AkDbSchemaCache::get('table_internals_for_'.$table)) {
+            $cache = $this->_db->getColumnDetails($table);
+            AkDbSchemaCache::set('table_internals_for_'.$table, $cache);
         }
+        return $cache;
     }
 
+    /*/Table Settings*/
 
-    /*/Database Reflection*/
+
 
 
 
@@ -2456,30 +2422,30 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
 
 
-    /**
-                        Connection adapters
-    ====================================================================
-    Right now Akelos uses phpAdodb for bd abstraction. These are functionalities not
-    provided in phpAdodb and that will move to a separated driver for each db
-    engine in a future
-    */
-    protected function _extractValueFromDefault($default)
+
+    public function getDisplayField()
     {
-        if($this->getDatabaseType() == 'postgre'){
-            if(preg_match("/^'(.*)'::/", $default, $match)){
-                return $match[1];
-            }
-            // a postgre HACK; we dont know the column-type here
-            if ($default=='true') {
-                return true;
-            }
-            if ($default=='false') {
-                return false;
-            }
-        }
-        return $default;
+        return  empty($this->displayField) && $this->hasAttribute('name') ? 'name' : (isset($this->displayField) && $this->hasAttribute($this->displayField) ? $this->displayField : $this->getPrimaryKey());
     }
 
+    public function setDisplayField($attribute_name)
+    {
+        if($this->hasAttribute($attribute_name)){
+            $this->displayField = $attribute_name;
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public function getColumnsWithRegexBoundaries()
+    {
+        $columns = array_keys($this->getColumns());
+        foreach ($columns as $k=>$column){
+            $columns[$k] = '/([^\.])\b('.$column.')\b/';
+        }
+        return $columns;
+    }
 
     /**
      * LAZY LOCADING FUNCTIONALITY
@@ -2703,6 +2669,24 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'debug.php'
         ));
     }
+
+    /**
+     * Caching of expensive model scoped methods (like table structure, default values...)
+     */
+    protected function &_getCacheForModelMethod($method)
+    {
+        if(AK_TEST_MODE){
+            $false = false;
+            return $false;
+        }
+        return Ak::getStaticVar('AR_'.$this->getModelName().$method);
+    }
+
+    protected function _setCacheForModelMethod($method, &$value)
+    {
+        return AK_TEST_MODE || Ak::setStaticVar('AR_'.$this->getModelName().$method, $value);
+    }
+
 
 }
 

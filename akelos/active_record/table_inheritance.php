@@ -56,7 +56,6 @@ class AkActiveRecordTableInheritance extends AkActiveRecordExtenssion
                 $classes[] = $parent_class;
             }
         }
-        $subclasses = array_unique(array_map(array($this->_ActiveRecord,'_getModelName'),$subclasses));
         return $subclasses;
     }
 
