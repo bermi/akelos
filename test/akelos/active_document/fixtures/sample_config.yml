@@ -1,0 +1,9 @@
+default:
+    type: mongo_db
+    host: localhost
+
+testing:
+    type: mongo_db
+    database_name: akelos_tests
+    host: localhost
+

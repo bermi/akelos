@@ -2287,6 +2287,10 @@ class Ak
             'AkInflector'               => 'active_support/text/inflector.php',
             'AkLexer'                   => 'active_support/text/lexer.php',
 
+            // Active Document
+            'AkActiveDocument'          => 'active_document/base.php',
+            'AkOdbAdapter'              => 'active_document/adapters/base.php',
+
             );
         }
 
