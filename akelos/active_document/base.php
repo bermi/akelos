@@ -9,7 +9,6 @@ class AkActiveDocument extends AkLazyObject
     private     $_internals = array();
     private     $_attributes = array();
 
-
     public function __construct(){
         $attributes = (array)func_get_args();
         if(isset($attributes[0]['init']) && $attributes[0]['init'] == false){
@@ -19,14 +18,12 @@ class AkActiveDocument extends AkLazyObject
     }
 
     public function init($attributes = array()){
-        if(isset($attributes[0]) && count($attributes) === 1){
+        if(isset($attributes[0]) && count($attributes) === 1 && array_key_exists(0, $attributes) && !is_array($attributes[0])){
             return $this->_loadFromDatabase($attributes[0]);
-        }elseif(!empty($attributes)){
-            $this->setAttributes($attributes);
+        }elseif(!empty($attributes[0]) && is_array($attributes[0])){
+            $this->setAttributes($attributes[0]);
         }
     }
-
-
 
     /**
     * Creates an object, instantly saves it as a record (if the validation permits it), and returns it.
@@ -272,9 +269,6 @@ class AkActiveDocument extends AkLazyObject
         }
         return $this->_Adapter;
     }
-
-
-
 
     public function __get($attribute){
         return $this->_attributes[$attribute];

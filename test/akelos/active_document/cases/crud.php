@@ -38,7 +38,6 @@ class DocumentCrud_TestCase extends ActiveDocumentUnitTest
         $this->assertNotNull($Akelos->getId());
     }
 
-
     public function test_should_not_duplicate_documents()
     {
         $attributes = array(
@@ -51,7 +50,6 @@ class DocumentCrud_TestCase extends ActiveDocumentUnitTest
         $AkelosDuplicated   = $this->WebPage->create($attributes);
         $this->assertNotEqual($AkelosDuplicated->getId(), $Akelos->getId());
     }
-
 
     public function test_should_set_and_get_attributes()
     {
@@ -103,6 +101,13 @@ class DocumentCrud_TestCase extends ActiveDocumentUnitTest
         $this->assertEqual($WebPage->getId(), $this->WebPage->getId());
     }
 
+    public function test_should_set_default_attributes_on_constructor()
+    {
+        $WebPage = new WebPage(array('body' => 'Akelos PHP framework'));
+        $WebPage->save();
+        $WebPage2 = new WebPage($WebPage->getId());
+        $this->assertEqual($WebPage->body, $WebPage2->body);
+    }
 }
 
 ak_test_case('DocumentCrud_TestCase');
