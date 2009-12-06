@@ -1,9 +1,9 @@
 <?php
 
-class AkActiveRecordErrors extends AkActiveRecordExtenssion
+class AkModelErrors extends AkModelExtenssion
 {
     protected $_errors = array();
-    protected $_defaultErrorMessages = array( // Holds a hash with all the default error messages, such that they can be replaced by your own copy or localizations.
+    protected $default_error_messages = array( // Holds a hash with all the default error messages, such that they can be replaced by your own copy or localizations.
     'inclusion' =>  "is not included in the list",
     'exclusion' => "is reserved",
     'invalid' => "is invalid",
@@ -34,7 +34,7 @@ class AkActiveRecordErrors extends AkActiveRecordExtenssion
     */
     public function addErrorToBase($message)
     {
-        $this->addError($this->_ActiveRecord->getModelName(), $message);
+        $this->addError($this->_Model->getModelName(), $message);
     }
 
     /**
@@ -43,7 +43,7 @@ class AkActiveRecordErrors extends AkActiveRecordExtenssion
     public function getBaseErrors()
     {
         $errors = $this->getErrors();
-        return (array)@$errors[$this->_ActiveRecord->getModelName()];
+        return (array)@$errors[$this->_Model->getModelName()];
     }
 
 
@@ -67,7 +67,7 @@ class AkActiveRecordErrors extends AkActiveRecordExtenssion
         $message = $this->getDefaultErrorMessageFor($message, true);
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute){
-            if(empty($this->_ActiveRecord->$attribute)){
+            if(empty($this->_Model->$attribute)){
                 $this->addError($attribute, $message);
             }
         }
@@ -81,7 +81,7 @@ class AkActiveRecordErrors extends AkActiveRecordExtenssion
         $message = $this->getDefaultErrorMessageFor($message, true);
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute){
-            if($this->_ActiveRecord->isBlank(@$this->_ActiveRecord->$attribute)){
+            if($this->_Model->isBlank(@$this->_Model->$attribute)){
                 $this->addError($attribute, $message);
             }
         }
@@ -98,10 +98,10 @@ class AkActiveRecordErrors extends AkActiveRecordExtenssion
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute){
-            if(@$this->_ActiveRecord->$attribute < $range_begin){
+            if(@$this->_Model->$attribute < $range_begin){
                 $this->addError($attribute, $too_short_message);
             }
-            if(@$this->_ActiveRecord->$attribute > $range_end){
+            if(@$this->_Model->$attribute > $range_end){
                 $this->addError($attribute, $too_long_message);
             }
         }
@@ -182,9 +182,9 @@ class AkActiveRecordErrors extends AkActiveRecordExtenssion
 
         foreach ($this->_errors as $attribute=>$errors){
             $full_messages[$attribute] = array();
-            $attribute_name = AkInflector::humanize($this->_ActiveRecord->_internationalize ? $this->_ActiveRecord->delocalizeAttribute($attribute) : $attribute);
+            $attribute_name = AkInflector::humanize($this->_Model->internationalize ? $this->_Model->delocalizeAttribute($attribute) : $attribute);
             foreach ($errors as $error){
-                $full_messages[$attribute][] = $this->_ActiveRecord->t('%attribute_name %error', array(
+                $full_messages[$attribute][] = $this->_Model->t('%attribute_name %error', array(
                 '%attribute_name' => $attribute_name,
                 '%error' => $error
                 ));
@@ -239,13 +239,13 @@ class AkActiveRecordErrors extends AkActiveRecordExtenssion
 
     public function getDefaultErrorMessageFor($type, $translated = false)
     {
-        if(isset($this->_ActiveRecord->_defaultErrorMessages[$type])){
-            $message = $this->_ActiveRecord->_defaultErrorMessages[$type];
-        }elseif(isset($this->_defaultErrorMessages[$type])){
-            $message = $this->_defaultErrorMessages[$type];
+        if(isset($this->_Model->default_error_messages[$type])){
+            $message = $this->_Model->default_error_messages[$type];
+        }elseif(isset($this->default_error_messages[$type])){
+            $message = $this->default_error_messages[$type];
         }
         if(!empty($message)){
-            return $translated ? $this->_ActiveRecord->t($message) : $message;
+            return $translated ? $this->_Model->t($message) : $message;
         }
         return $type;
     }

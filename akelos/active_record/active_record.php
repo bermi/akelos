@@ -122,7 +122,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     $_dataDictionary,
     $_primaryKey,
     $_inheritanceColumn,
-    $_internationalize = AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT,
+    $internationalize = AK_ACTIVE_RECORD_INTERNATIONALIZE_MODELS_BY_DEFAULT,
     $_attributes = array(),
     $_protectedAttributes = array(),
     $_accessibleAttributes = array(),
@@ -133,12 +133,13 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     $_contentColumns = array(), // Columns that can be edited/viewed
     $_combinedAttributes = array(),
     $_BlobQueryStack = null,
-    $_automated_max_length_validator = false,
-    $_automated_validators_enabled = false,
-    $_automated_not_null_validator = false,
-    $_set_default_attribute_values_automatically = true,
+    //$automated_max_length_validator = false,
+    //$automated_validators_enabled = false,
+    //$automated_not_null_validator = false,
+    $set_default_attribute_values_automatically = true,
     $_activeRecordHasBeenInstantiated = true, // This is needed for enabling support for static active record instantiation under php
-    $_defaultErrorMessages = array();
+
+    $default_error_messages = array();
 
     protected $_options = array(
     );
@@ -159,11 +160,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         AK_LOG_EVENTS ? ($this->Logger = Ak::getLogger()) : null;
 
-        @$this->_instantiateDefaultObserver();
-
         $this->establishConnection();
-
         $this->_enableLazyLoadingExtenssions();
+        $this->_instantiateDefaultObserver();
 
         if(!empty($this->table_name)){
             $this->setTableName($this->table_name);
@@ -767,7 +766,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $this->$attribute = $value;
         }
 
-        if($this->_internationalize){
+        if($this->internationalize){
             $this->setInternationalizedAttribute($attribute, $value, $inspect_for_callback_child_method, $compose_after_set);
         }
         return true;
@@ -842,7 +841,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     $this->composeCombinedAttribute($attribute);
                 }
                 return isset($this->$attribute) ? $this->$attribute : null;
-            }elseif($this->_internationalize && $this->isInternationalizeCandidate($attribute)){
+            }elseif($this->internationalize && $this->isInternationalizeCandidate($attribute)){
                 if(!empty($this->$attribute) && is_string($this->$attribute)){
                     return $this->$attribute;
                 }
@@ -854,7 +853,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             }
         }
 
-        if($this->_internationalize){
+        if($this->internationalize){
             return $this->getAttributeByLocale($attribute, is_bool($inspect_for_callback_child_method) ? $this->getCurrentLocale() : $inspect_for_callback_child_method);
         }
         return null;
@@ -877,7 +876,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $attributes[$available_attribute['name']] = is_object($attribute) ? clone($attribute) : $attribute;
         }
 
-        if($this->_internationalize){
+        if($this->internationalize){
             $current_locale = $this->getCurrentLocale();
             foreach ($this->getInternationalizedColumns() as $column=>$languages){
                 if(empty($attributes[$column]) && isset($attributes[$current_locale.'_'.$column]) && in_array($current_locale,$languages)){
@@ -1172,6 +1171,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     * "borrow" the connection to do database work unrelated to any of the specific Active Records.
     */
     public function &getConnection()
+    {
+        return $this->_db;
+    }
+    public function &getAdapter()
     {
         return $this->_db;
     }
@@ -1565,7 +1568,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $this->_columnsSettings[$column_name] = array();
         $this->_columnsSettings[$column_name]['name'] = $column_object->name;
 
-        if($this->_internationalize && $this->isInternationalizeCandidate($column_object->name)){
+        if($this->internationalize && $this->isInternationalizeCandidate($column_object->name)){
             $this->addInternationalizedColumn($column_object->name);
         }
 
@@ -2095,125 +2098,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
 
     /**
-                                  Observers
-    ====================================================================
-    See also: Callbacks.
-    */
-
-    /**
-    * $state store the state of this observable object
-    */
-    protected $_observable_state;
-
-    protected function _instantiateDefaultObserver()
-    {
-        $default_observer_name = ucfirst($this->getModelName().'Observer');
-        if(class_exists($default_observer_name)){
-            //$Observer = new $default_observer_name($this);
-            Ak::singleton($default_observer_name,  $this);
-        }
-    }
-
-    /**
-    * Calls the $method using the reference to each
-    * registered observer.
-    * @return true (this is used internally for triggering observers on default callbacks)
-    */
-    public function notifyObservers ($method = null)
-    {
-        $observers = $this->getObservers();
-        $observer_count = count($observers);
-
-        if(!empty($method)){
-            $this->setObservableState($method);
-        }
-
-        $model_name = $this->getModelName();
-        for ($i=0; $i<$observer_count; $i++) {
-            if(in_array($model_name, $observers[$i]->_observing)){
-                if(method_exists($observers[$i], $method)){
-                    $observers[$i]->$method($this);
-                }else{
-                    $observers[$i]->update($this->getObservableState(), $this);
-                }
-            }else{
-                $observers[$i]->update($this->getObservableState(), $this);
-            }
-        }
-        $this->setObservableState('');
-
-        return true;
-    }
-
-
-    public function setObservableState($state_message)
-    {
-        $this->_observable_state = $state_message;
-    }
-
-    public function getObservableState()
-    {
-        return $this->_observable_state;
-    }
-
-    /**
-    * Register the reference to an object object
-    *
-    *
-    * @param $observer AkObserver
-    * @param $options array of options for the observer
-    * @return void
-    */
-    public function addObserver(&$observer)
-    {
-        $staticVarNs='AkActiveRecord::observers::' . $this->_modelName;
-        $observer_class_name = get_class($observer);
-        /**
-         * get the statically stored observers for the namespace
-         */
-        $observers = Ak::getStaticVar($staticVarNs);
-        if (!is_array($observers)) {
-            $observers = array('classes'=>array(),'objects'=>array());
-        }
-        /**
-         * if not already registered, the observerclass will
-         * be registered now
-         */
-        if (!in_array($observer_class_name,$observers['classes'])) {
-            $observers['classes'][] = $observer_class_name;
-            $observers['objects'][] = $observer;
-            Ak::setStaticVar($staticVarNs, $observers);
-
-        }
-    }
-    /**
-    * Register the reference to an object object
-    * @return void
-    */
-    public function &getObservers()
-    {
-        $staticVarNs='AkActiveRecord::observers::' . $this->_modelName;
-        $key = 'objects';
-
-        $array = array();
-        $observers_arr = Ak::getStaticVar($staticVarNs);
-        if (isset($observers_arr[$key])) {
-            $observers = $observers_arr[$key];
-        } else {
-            $observers = $array;
-        }
-
-        return $observers;
-    }
-
-    /*/Observers*/
-
-
-
-
-
-
-    /**
                             Act as Behaviours
     ====================================================================
     See also: Acts as List, Acts as Tree, Acts as Nested Set.
@@ -2452,6 +2336,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      */
     protected function _enableLazyLoadingExtenssions($options = array())
     {
+        empty($options['skip_observer'])            && $this->_enableObserver();
         empty($options['skip_finders'])             && $this->_enableFinders();
         empty($options['skip_validations'])         && $this->_enableValidations();
         empty($options['skip_errors'])              && $this->_enableErrors();
@@ -2494,9 +2379,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     {
         return;
         if($force_enable){
-            $this->_internationalize = true;
+            $this->internationalize = true;
         }else{
-            $this->_internationalize = !empty($this->_internationalize) ? count($this->getAvailableLocales()) > 1 : true;
+            $this->internationalize = !empty($this->internationalize) ? count($this->getAvailableLocales()) > 1 : true;
         }
     }
 
@@ -2523,7 +2408,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     protected function _enableErrors()
     {
-        $this->extendClassLazily('AkActiveRecordErrors',
+        $this->extendClassLazily('AkModelErrors',
         array(
         'methods' => array(
         'addError',
@@ -2546,14 +2431,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         'yieldEachFullError',
         'yieldError',
         ),
-        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'errors.php'
+        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'errors.php'
         ));
     }
 
 
     protected function _enableValidations()
     {
-        $this->extendClassLazily('AkActiveRecordValidations',
+        $this->extendClassLazily('AkModelValidations',
         array(
         'methods' => array(
         'isBlank',
@@ -2573,7 +2458,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         'validatesSizeOf',
         'validatesUniquenessOf',
         ),
-        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'validations.php'
+        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'validations.php'
         ));
     }
 
@@ -2644,7 +2529,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     }
     protected function _enableUtilities()
     {
-        $this->extendClassLazily('AkActiveRecordUtilities',
+        $this->extendClassLazily('AkModelUtilities',
         array(
         'methods' => array(
         'fromXml',
@@ -2653,12 +2538,12 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         'toXml',
         'toYaml',
         ),
-        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'utilities.php'
+        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'utilities.php'
         ));
     }
     protected function _enableDebug()
     {
-        $this->extendClassLazily('AkActiveRecordDebug',
+        $this->extendClassLazily('AkModelDebug',
         array(
         'methods' => array(
         'dbug',
@@ -2666,9 +2551,33 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         'dbugging',
         'debug'
         ),
-        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'debug.php'
+        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'debug.php'
         ));
     }
+
+    protected function _enableObserver()
+    {
+        $this->extendClassLazily('AkModelObserver',
+        array(
+        'methods' => array (
+          'notifyObservers',
+          'setObservableState',
+          'getObservableState',
+          'addObserver',
+          'getObservers',
+        ),
+        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'observer.php'
+        ));
+    }
+
+    protected function _instantiateDefaultObserver()
+    {
+        $default_observer_name = $this->getModelName().'Observer';
+        if(class_exists($default_observer_name)){
+            Ak::singleton($default_observer_name,  $this);
+        }
+    }
+
 
     /**
      * Caching of expensive model scoped methods (like table structure, default values...)

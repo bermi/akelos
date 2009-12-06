@@ -73,3 +73,13 @@ class AkBaseModel extends AkLazyObject
     }
 }
 
+
+class AkModelExtenssion
+{
+    protected $_Model;
+    public function setExtendedBy(&$Model)
+    {
+        $this->_Model = $Model;
+    }
+}
+

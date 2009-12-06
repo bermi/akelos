@@ -123,7 +123,7 @@ class AkActiveRecordLocalization extends AkActiveRecordExtenssion
      */
     protected function _groupInternationalizedAttribute($attribute, $value)
     {
-        if($this->_ActiveRecord->_internationalize && $this->isInternationalizeCandidate($attribute)){
+        if($this->_ActiveRecord->internationalize && $this->isInternationalizeCandidate($attribute)){
             if(!empty($this->_ActiveRecord->$attribute)){
                 $_tmp_pos = strpos($attribute,'_');
                 $column = substr($attribute,$_tmp_pos+1);

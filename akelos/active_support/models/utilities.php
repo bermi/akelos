@@ -1,7 +1,7 @@
 <?php
 
 
-class AkActiveRecordUtilities extends AkActiveRecordExtenssion
+class AkModelUtilities extends AkModelExtenssion
 {
 
 
@@ -49,10 +49,10 @@ class AkActiveRecordUtilities extends AkActiveRecordExtenssion
      */
     public function toJson($options = array())
     {
-        if (is_array($options) && isset($options[0]) && ($options[0] instanceof AkActiveRecord)) {
+        if (is_array($options) && isset($options[0]) && ($options[0] instanceof AkBaseModel)) {
             $options = array('collection'=>$options);
         }
-        if (isset($options['collection']) && is_array($options['collection']) && $options['collection'][0]->_modelName == $this->_ActiveRecord->_modelName) {
+        if (isset($options['collection']) && is_array($options['collection']) && $options['collection'][0]->_modelName == $this->_Model->getModelName()) {
             $json = '';
 
             $collection = $options['collection'];
@@ -70,9 +70,9 @@ class AkActiveRecordUtilities extends AkActiveRecordExtenssion
         $associatedIds = array();
         if (isset($options['include']) && !empty($options['include'])) {
             $options['include'] = is_array($options['include'])?$options['include']:preg_split('/,\s*/',$options['include']);
-            foreach ($this->_ActiveRecord->_associations as $key => $obj) {
+            foreach ($this->_Model->getAssociations() as $key => $obj) {
                 if (in_array($key,$options['include'])) {
-                    $associatedIds[$obj->getAssociationId() . '_id'] = array('name'=>$key,'type'=>$obj->getType());
+                    $associatedIds[$obj->getAssociationIds() . '_id'] = array('name'=>$key,'type'=>$obj->getType());
                 }
             }
         }
@@ -82,15 +82,15 @@ class AkActiveRecordUtilities extends AkActiveRecordExtenssion
         if (isset($options['except'])) {
             $options['except'] = is_array($options['except'])?$options['except']:preg_split('/,\s*/',$options['except']);
         }
-        foreach ($this->_ActiveRecord->_columns as $key => $def) {
+        foreach ($this->_Model->getColumns() as $key => $def) {
 
             if (isset($options['except']) && in_array($key, $options['except'])) {
                 continue;
             } else if (isset($options['only']) && !in_array($key, $options['only'])) {
                 continue;
             } else {
-                $val = $this->_ActiveRecord->$key;
-                $type = $this->_ActiveRecord->getColumnType($key);
+                $val = $this->_Model->$key;
+                $type = $this->_Model->getColumnType($key);
                 if (($type == 'serial' || $type=='integer') && $val!==null) $val = intval($val);
                 if ($type == 'float' && $val!==null) $val = floatval($val);
                 if ($type == 'boolean') $val = $val?1:0;
@@ -98,15 +98,15 @@ class AkActiveRecordUtilities extends AkActiveRecordExtenssion
             }
         }
         if (isset($options['include'])) {
-            foreach($this->_ActiveRecord->_associationIds as $key=>$val) {
+            foreach($this->_Model->getAssociations() as $key=>$val) {
                 if ((in_array($key,$options['include']) || in_array($val,$options['include']))) {
-                    $this->_ActiveRecord->$key->load();
+                    $this->_Model->$key->load();
                     $associationElement = $key;
                     $associationElement = $this->_convertColumnToXmlElement($associationElement);
-                    if (is_array($this->_ActiveRecord->$key)) {
+                    if (is_array($this->_Model->$key)) {
                         $data[$associationElement] = array();
-                        foreach ($this->_ActiveRecord->$key as $el) {
-                            if ($el instanceof AkActiveRecord) {
+                        foreach ($this->_Model->$key as $el) {
+                            if ($el instanceof AkBaseModel) {
                                 $attributes = $el->getAttributes();
                                 foreach($attributes as $ak=>$av) {
                                     $type = $el->getColumnType($ak);
@@ -119,8 +119,8 @@ class AkActiveRecordUtilities extends AkActiveRecordExtenssion
                             }
                         }
                     } else {
-                        $el = $this->_ActiveRecord->$key->load();
-                        if ($el instanceof AkActiveRecord) {
+                        $el = $this->_Model->$key->load();
+                        if ($el instanceof AkBaseModel) {
                             $attributes = $el->getAttributes();
                             foreach($attributes as $ak=>$av) {
                                 $type = $el->getColumnType($ak);
@@ -187,11 +187,11 @@ class AkActiveRecordUtilities extends AkActiveRecordExtenssion
      */
     public function toXml($options = array())
     {
-        if (is_array($options) && isset($options[0]) && ($options[0] instanceof AkActiveRecord)) {
+        if (is_array($options) && isset($options[0]) && ($options[0] instanceof AkBaseModel)) {
             $options = array('collection'=>$options);
         }
-        if (isset($options['collection']) && is_array($options['collection']) && $options['collection'][0]->_modelName == $this->_ActiveRecord->_modelName) {
-            $root = strtolower(AkInflector::pluralize($this->_ActiveRecord->_modelName));
+        if (isset($options['collection']) && is_array($options['collection']) && $options['collection'][0]->_modelName == $this->_Model->getModelName()) {
+            $root = strtolower(AkInflector::pluralize($this->_Model->getModelName()));
             $root = $this->_convertColumnToXmlElement($root);
             $xml = '';
             if (!(isset($options['skip_instruct']) && $options['skip_instruct'] == true)) {
@@ -213,10 +213,10 @@ class AkActiveRecordUtilities extends AkActiveRecordExtenssion
         $associatedIds = array();
         if (isset($options['include']) && !empty($options['include'])) {
             $options['include'] = is_array($options['include'])?$options['include']:preg_split('/,\s*/',$options['include']);
-            foreach ($this->_ActiveRecord->_associations as $key => $obj) {
+            foreach ($this->_Model->getAssociations() as $key => $obj) {
                 if (in_array($key,$options['include'])) {
                     if ($obj->getType()!='hasAndBelongsToMany') {
-                        $associatedIds[$obj->getAssociationId() . '_id'] = array('name'=>$key,'type'=>$obj->getType());
+                        $associatedIds[$obj->getAssociationIds() . '_id'] = array('name'=>$key,'type'=>$obj->getType());
                     } else {
                         $associatedIds[$key] = array('name'=>$key,'type'=>$obj->getType());
                     }
@@ -233,11 +233,11 @@ class AkActiveRecordUtilities extends AkActiveRecordExtenssion
         if (!(isset($options['skip_instruct']) && $options['skip_instruct'] == true)) {
             $xml .= '<?xml version="1.0" encoding="UTF-8"?>';
         }
-        $root = $this->_convertColumnToXmlElement(strtolower($this->_ActiveRecord->_modelName));
+        $root = $this->_convertColumnToXmlElement(strtolower($this->_Model->getModelName()));
 
         $xml .= '<' . $root . '>';
         $xml .= "\n";
-        foreach ($this->_ActiveRecord->_columns as $key => $def) {
+        foreach ($this->_Model->getColumns() as $key => $def) {
 
             if (isset($options['except']) && in_array($key, $options['except'])) {
                 continue;
@@ -247,7 +247,7 @@ class AkActiveRecordUtilities extends AkActiveRecordExtenssion
                 $columnType = $def['type'];
                 $elementName = $this->_convertColumnToXmlElement($key);
                 $xml .= '<' . $elementName;
-                $val = $this->_ActiveRecord->$key;
+                $val = $this->_Model->$key;
                 if (!in_array($columnType,array('string','text','serial'))) {
                     $xml .= ' type="' . $columnType . '"';
                     if ($columnType=='boolean') $val = $val?1:0;
@@ -257,23 +257,23 @@ class AkActiveRecordUtilities extends AkActiveRecordExtenssion
             }
         }
         if (isset($options['include'])) {
-            foreach($this->_ActiveRecord->_associationIds as $key=>$val) {
+            foreach($this->_Model->getAssociations() as $key=>$val) {
                 if ((in_array($key,$options['include']) || in_array($val,$options['include']))) {
-                    if (is_array($this->_ActiveRecord->$key)) {
+                    if (is_array($this->_Model->$key)) {
 
                         $associationElement = $key;
                         $associationElement = AkInflector::pluralize($associationElement);
                         $associationElement = $this->_convertColumnToXmlElement($associationElement);
                         $xml .= '<'.$associationElement.'>';
-                        foreach ($this->_ActiveRecord->$key as $el) {
-                            if ($el instanceof AkActiveRecord) {
+                        foreach ($this->_Model->$key as $el) {
+                            if ($el instanceof AkBaseModel) {
                                 $xml .= $el->toXml(array('skip_instruct'=>true));
                             }
                         }
                         $xml .= '</' . $associationElement .'>';
                     } else {
-                        $el = $this->_ActiveRecord->$key->load();
-                        if ($el instanceof AkActiveRecord) {
+                        $el = $this->_Model->$key->load();
+                        if ($el instanceof AkBaseModel) {
                             $xml.=$el->toXml(array('skip_instruct'=>true));
                         }
                     }
@@ -294,7 +294,7 @@ class AkActiveRecordUtilities extends AkActiveRecordExtenssion
      */
     public function toYaml($data = null)
     {
-        return Ak::convert('active_record', 'yaml', empty($data) ? $this->_ActiveRecord : $data);
+        return Ak::convert('active_record', 'yaml', empty($data) ? $this->_Model : $data);
     }
 
     private function _convertColumnToXmlElement($col)
@@ -341,7 +341,7 @@ class AkActiveRecordUtilities extends AkActiveRecordExtenssion
     private function _fromArray($array)
     {
         $data  = $array;
-        $modelName = $this->_ActiveRecord->getModelName();
+        $modelName = $this->_Model->getModelName();
         $values = array();
         if (!isset($data[0])) {
             $data = array($data);

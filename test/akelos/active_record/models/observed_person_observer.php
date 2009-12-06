@@ -6,8 +6,7 @@ class ObservedPersonObserver extends AkObserver
 
     public function update($state = '')
     {
-        switch ($state)
-        {
+        switch ($state){
             case "new person created" :
                 echo $state;
                 break;

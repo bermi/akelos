@@ -235,8 +235,8 @@ class AkLazyObject
         /*
         static $methods;
         if(empty($methods)){
-            $methods = true;
-            register_shutdown_function('show_most_used_methods');
+        $methods = true;
+        register_shutdown_function('show_most_used_methods');
         }
         $stats = (array)@Ak::getStaticVar('stats');
         @$stats[$name]++;
@@ -279,8 +279,8 @@ class AkLazyObject
 
 /*
 function show_most_used_methods() {
-    $stats = (array)@Ak::getStaticVar('stats');
-    arsort($stats);
-    var_export($stats);
+$stats = (array)@Ak::getStaticVar('stats');
+arsort($stats);
+var_export($stats);
 }
 */

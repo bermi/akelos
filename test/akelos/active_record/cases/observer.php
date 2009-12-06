@@ -18,7 +18,7 @@ class Observer_TestCase extends ActiveRecordUnitTest
     public function Test_of__instantiateDefaultObserver()
     {
         $Observed = new ObservedPerson();
-        $ObeserversReference =& $Observed->getObservers();
+        $ObeserversReference = $Observed->getObservers();
         $this->assertEqual(strtolower(get_class($ObeserversReference[0])), 'observedpersonobserver');
     }
 
@@ -27,13 +27,13 @@ class Observer_TestCase extends ActiveRecordUnitTest
         $Observed = new ObservedPerson();
 
         $null = null;
-        $Observer =& Ak::singleton('ObservedPersonObserver', $null);
+        $Observer = Ak::singleton('ObservedPersonObserver', $null);
 
         $params = 'ObservedAccount';
-        $Auditor =& Ak::singleton('TestAuditor',$params);
+        $Auditor = Ak::singleton('TestAuditor',$params);
         $Auditor->observe($Observed);
 
-        $ObeserversReference =& $Observed->getObservers();
+        $ObeserversReference = $Observed->getObservers();
 
         $ObeserversReference[0]->message = 'Hello. I come from the past';
 
@@ -46,13 +46,13 @@ class Observer_TestCase extends ActiveRecordUnitTest
     {
         $ObservedPerson = new ObservedPerson();
 
-        $ObeserversReference =& $ObservedPerson->getObservers();
+        $ObeserversReference = $ObservedPerson->getObservers();
         $this->assertEqual(strtolower(get_class($ObeserversReference[0])), 'observedpersonobserver');
         $this->assertEqual($ObeserversReference[0]->message, 'Hello. I come from the past');
         $this->assertEqual(strtolower(get_class($ObeserversReference[1])), 'testauditor');
 
         $ObservedAccount = new ObservedAccount();
-        $ObeserversReference =& $ObservedAccount->getObservers();
+        $ObeserversReference = $ObservedAccount->getObservers();
         $this->assertEqual(strtolower(get_class($ObeserversReference[0])), 'testauditor');
     }
 

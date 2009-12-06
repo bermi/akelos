@@ -46,7 +46,7 @@
 * You can use "getErrors()" for getting and array of erros on Active Records.
 *
 */
-class AkActiveRecordValidations extends AkActiveRecordExtenssion
+class AkModelValidations extends AkModelExtenssion
 {
     /**
     * Overwrite this method for validation checks on all saves and use addError($field, $message); for invalid attributes.
@@ -93,12 +93,12 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
       */
     public function validatesConfirmationOf($attribute_names, $message = 'confirmation')
     {
-        $message = $this->_ActiveRecord->getDefaultErrorMessageFor($message, true);
+        $message = $this->_Model->getDefaultErrorMessageFor($message, true);
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
             $attribute_accessor = $attribute_name.'_confirmation';
-            if(isset($this->_ActiveRecord->$attribute_accessor) && @$this->_ActiveRecord->$attribute_accessor != @$this->_ActiveRecord->$attribute_name){
-                $this->_ActiveRecord->addError($attribute_name, $message);
+            if(isset($this->_Model->$attribute_accessor) && @$this->_Model->$attribute_accessor != @$this->_Model->$attribute_name){
+                $this->_Model->addError($attribute_name, $message);
             }
         }
     }
@@ -124,12 +124,12 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
       */
     public function validatesAcceptanceOf($attribute_names, $message = 'accepted', $accept = 1)
     {
-        $message = $this->_ActiveRecord->getDefaultErrorMessageFor($message, true);
+        $message = $this->_Model->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
-            if(@$this->_ActiveRecord->$attribute_name != $accept){
-                $this->_ActiveRecord->addError($attribute_name, $message);
+            if(@$this->_Model->$attribute_name != $accept){
+                $this->_Model->addError($attribute_name, $message);
             }
         }
     }
@@ -165,18 +165,18 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
     */
     public function validatesAssociated($attribute_names, $message = 'invalid')
     {
-        $message = $this->_ActiveRecord->getDefaultErrorMessageFor($message, true);
+        $message = $this->_Model->getDefaultErrorMessageFor($message, true);
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
-            if(!empty($this->_ActiveRecord->$attribute_name)){
-                if(is_array($this->_ActiveRecord->$attribute_name)){
-                    foreach(array_keys($this->_ActiveRecord->$attribute_name) as $k){
-                        if(($this->_ActiveRecord->{$attribute_name}[$k] instanceof AkActiveRecord) && !$this->_ActiveRecord->{$attribute_name}[$k]->isValid()){
-                            $this->_ActiveRecord->addError($attribute_name, $message);
+            if(!empty($this->_Model->$attribute_name)){
+                if(is_array($this->_Model->$attribute_name)){
+                    foreach(array_keys($this->_Model->$attribute_name) as $k){
+                        if(($this->_Model->{$attribute_name}[$k] instanceof AkBaseModel) && !$this->_Model->{$attribute_name}[$k]->isValid()){
+                            $this->_Model->addError($attribute_name, $message);
                         }
                     }
-                }elseif (($this->_ActiveRecord->$attribute_name instanceof AkActiveRecord) && !$this->_ActiveRecord->$attribute_name->isValid()){
-                    $this->_ActiveRecord->addError($attribute_name, $message);
+                }elseif (($this->_Model->$attribute_name instanceof AkBaseModel) && !$this->_Model->$attribute_name->isValid()){
+                    $this->_Model->addError($attribute_name, $message);
                 }
             }
         }
@@ -192,11 +192,11 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
       */
     public function validatesPresenceOf($attribute_names, $message = 'blank')
     {
-        $message = $this->_ActiveRecord->getDefaultErrorMessageFor($message, true);
+        $message = $this->_Model->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
-            $this->_ActiveRecord->addErrorOnBlank($attribute_name, $message);
+            $this->_Model->addErrorOnBlank($attribute_name, $message);
         }
     }
 
@@ -235,9 +235,9 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
     {
         // Merge given options with defaults.
         $default_options = array(
-        'too_long'      => $this->_ActiveRecord->getDefaultErrorMessageFor('too_long'),
-        'too_short'     => $this->_ActiveRecord->getDefaultErrorMessageFor('too_short'),
-        'wrong_length'  => $this->_ActiveRecord->getDefaultErrorMessageFor('wrong_length'),
+        'too_long'      => $this->_Model->getDefaultErrorMessageFor('too_long'),
+        'too_short'     => $this->_Model->getDefaultErrorMessageFor('too_short'),
+        'wrong_length'  => $this->_Model->getDefaultErrorMessageFor('wrong_length'),
         'allow_null' => false
         );
 
@@ -276,10 +276,10 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
                 $attribute_names = Ak::toArray($attribute_names);
 
                 foreach ($attribute_names as $attribute_name){
-                    if((!empty($option['allow_null']) && !isset($this->_ActiveRecord->$attribute_name)) || (Ak::size($this->_ActiveRecord->$attribute_name)) < $option_value[0]){
-                        $this->_ActiveRecord->addError($attribute_name, sprintf($options['too_short'], $option_value[0]));
-                    }elseif((!empty($option['allow_null']) && !isset($this->_ActiveRecord->$attribute_name)) || (Ak::size($this->_ActiveRecord->$attribute_name)) > $option_value[1]){
-                        $this->_ActiveRecord->addError($attribute_name, sprintf($options['too_long'], $option_value[1]));
+                    if((!empty($option['allow_null']) && !isset($this->_Model->$attribute_name)) || (Ak::size($this->_Model->$attribute_name)) < $option_value[0]){
+                        $this->_Model->addError($attribute_name, sprintf($options['too_short'], $option_value[0]));
+                    }elseif((!empty($option['allow_null']) && !isset($this->_Model->$attribute_name)) || (Ak::size($this->_Model->$attribute_name)) > $option_value[1]){
+                        $this->_Model->addError($attribute_name, sprintf($options['too_long'], $option_value[1]));
                     }
                 }
                 break;
@@ -301,9 +301,9 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
 
                 $attribute_names = Ak::toArray($attribute_names);
                 foreach ($attribute_names as $attribute_name){
-                    if((!$options['allow_null'] && !isset($this->_ActiveRecord->$attribute_name)) ||
-                    eval("return !(".Ak::size(@$this->_ActiveRecord->$attribute_name)." {$validity_checks[$option]} $option_value);")){
-                        $this->_ActiveRecord->addError($attribute_name, $message);
+                    if((!$options['allow_null'] && !isset($this->_Model->$attribute_name)) ||
+                    eval("return !(".Ak::size(@$this->_Model->$attribute_name)." {$validity_checks[$option]} $option_value);")){
+                        $this->_Model->addError($attribute_name, $message);
                     }
                 }
                 break;
@@ -362,8 +362,8 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
         $options = array_merge($default_options, $options);
 
         if(!empty($options['if'])){
-            if(method_exists($this->_ActiveRecord,$options['if'])){
-                if($this->_ActiveRecord->{$options['if']}() === false){
+            if(method_exists($this->_Model,$options['if'])){
+                if($this->_Model->{$options['if']}() === false){
                     return true;
                 }
             }else {
@@ -374,36 +374,36 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
             }
         }
 
-        $message = $this->_ActiveRecord->getDefaultErrorMessageFor($options['message'], true);
+        $message = $this->_Model->getDefaultErrorMessageFor($options['message'], true);
         unset($options['message']);
 
         foreach ((array)$attribute_names as $attribute_name){
-            $value = isset($this->_ActiveRecord->$attribute_name) ? $this->_ActiveRecord->$attribute_name : null;
+            $value = isset($this->_Model->$attribute_name) ? $this->_Model->$attribute_name : null;
 
-            if($value === null || ($options['case_sensitive'] || !$this->_ActiveRecord->hasColumn($attribute_name))){
-                $condition_sql = $this->_ActiveRecord->getTableName().'.'.$attribute_name.' '.$this->_ActiveRecord->getAttributeCondition($value);
+            if($value === null || ($options['case_sensitive'] || !$this->_Model->hasColumn($attribute_name))){
+                $condition_sql = $this->_Model->getTableName().'.'.$attribute_name.' '.$this->_Model->getAttributeCondition($value);
                 $condition_params = array($value);
             }else{
                 include_once(AK_CONTRIB_DIR.DS.'phputf8'.DS.'utf8.php');
-                $condition_sql = 'LOWER('.$this->_ActiveRecord->getTableName().'.'.$attribute_name.') '.$this->_ActiveRecord->getAttributeCondition($value);
+                $condition_sql = 'LOWER('.$this->_Model->getTableName().'.'.$attribute_name.') '.$this->_Model->getAttributeCondition($value);
                 $condition_params = array(is_array($value) ? array_map('utf8_strtolower',$value) : utf8_strtolower($value));
             }
 
             if(!empty($options['scope'])){
                 foreach ((array)$options['scope'] as $scope_item){
-                    $scope_value = $this->_ActiveRecord->get($scope_item);
-                    $condition_sql .= ' AND '.$this->_ActiveRecord->getTableName().'.'.$scope_item.' '.$this->_ActiveRecord->getAttributeCondition($scope_value);
+                    $scope_value = $this->_Model->get($scope_item);
+                    $condition_sql .= ' AND '.$this->_Model->getTableName().'.'.$scope_item.' '.$this->_Model->getAttributeCondition($scope_value);
                     $condition_params[] = $scope_value;
                 }
             }
 
-            if(!$this->_ActiveRecord->isNewRecord()){
-                $condition_sql .= ' AND '.$this->_ActiveRecord->getTableName().'.'.$this->_ActiveRecord->getPrimaryKey().' <> ?';
-                $condition_params[] = $this->_ActiveRecord->getId();
+            if(!$this->_Model->isNewRecord()){
+                $condition_sql .= ' AND '.$this->_Model->getTableName().'.'.$this->_Model->getPrimaryKey().' <> ?';
+                $condition_params[] = $this->_Model->getId();
             }
             array_unshift($condition_params,$condition_sql);
-            if ($this->_ActiveRecord->find('first', array('conditions' => $condition_params))){
-                $this->_ActiveRecord->addError($attribute_name, $message);
+            if ($this->_Model->find('first', array('conditions' => $condition_params))){
+                $this->_Model->addError($attribute_name, $message);
             }
         }
     }
@@ -446,12 +446,12 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
     */
     public function validatesFormatOf($attribute_names, $regular_expression, $message = 'invalid', $regex_function = 'preg_match')
     {
-        $message = $this->_ActiveRecord->getDefaultErrorMessageFor($message, true);
+        $message = $this->_Model->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
-            if(!isset($this->_ActiveRecord->$attribute_name) || !$regex_function($regular_expression, $this->_ActiveRecord->$attribute_name)){
-                $this->_ActiveRecord->addError($attribute_name, $message);
+            if(!isset($this->_Model->$attribute_name) || !$regex_function($regular_expression, $this->_Model->$attribute_name)){
+                $this->_Model->addError($attribute_name, $message);
             }
         }
     }
@@ -474,12 +474,12 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
     */
     public function validatesInclusionOf($attribute_names, $array_of_possibilities, $message = 'inclusion', $allow_null = false)
     {
-        $message = $this->_ActiveRecord->getDefaultErrorMessageFor($message, true);
+        $message = $this->_Model->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
-            if($allow_null ? (@$this->_ActiveRecord->$attribute_name != '' ? (!in_array($this->_ActiveRecord->$attribute_name,$array_of_possibilities)) : @$this->_ActiveRecord->$attribute_name === 0 ) : (isset($this->_ActiveRecord->$attribute_name) ? !in_array(@$this->_ActiveRecord->$attribute_name,$array_of_possibilities) : true )){
-                $this->_ActiveRecord->addError($attribute_name, $message);
+            if($allow_null ? (@$this->_Model->$attribute_name != '' ? (!in_array($this->_Model->$attribute_name,$array_of_possibilities)) : @$this->_Model->$attribute_name === 0 ) : (isset($this->_Model->$attribute_name) ? !in_array(@$this->_Model->$attribute_name,$array_of_possibilities) : true )){
+                $this->_Model->addError($attribute_name, $message);
             }
         }
     }
@@ -503,13 +503,13 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
     */
     public function validatesExclusionOf($attribute_names, $array_of_possibilities, $message = 'exclusion', $allow_null = false)
     {
-        $message = $this->_ActiveRecord->getDefaultErrorMessageFor($message, true);
+        $message = $this->_Model->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
 
-            if($allow_null ? (!empty($this->_ActiveRecord->$attribute_name) ? (in_array(@$this->_ActiveRecord->$attribute_name,$array_of_possibilities)) : false ) : (isset($this->_ActiveRecord->$attribute_name) ? in_array(@$this->_ActiveRecord->$attribute_name,$array_of_possibilities) : true )){
-                $this->_ActiveRecord->addError($attribute_name, $message);
+            if($allow_null ? (!empty($this->_Model->$attribute_name) ? (in_array(@$this->_Model->$attribute_name, $array_of_possibilities)) : false ) : (isset($this->_Model->$attribute_name) ? in_array(@$this->_Model->$attribute_name,$array_of_possibilities) : true )){
+                $this->_Model->addError($attribute_name, $message);
             }
         }
     }
@@ -535,12 +535,12 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
     */
     public function validatesNumericalityOf($attribute_names, $message = 'not_a_number', $only_integer = false, $allow_null = false)
     {
-        $message = $this->_ActiveRecord->getDefaultErrorMessageFor($message, true);
+        $message = $this->_Model->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
-            if (isset($this->_ActiveRecord->$attribute_name)){
-                $value = $this->_ActiveRecord->$attribute_name;
+            if (isset($this->_Model->$attribute_name)){
+                $value = $this->_Model->$attribute_name;
                 if ($only_integer){
                     $is_int = is_numeric($value) && (int)$value == $value;
                     $has_error = !$is_int;
@@ -552,7 +552,7 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
             }
 
             if ($has_error){
-                $this->_ActiveRecord->addError($attribute_name, $message);
+                $this->_Model->addError($attribute_name, $message);
             }
         }
     }
@@ -564,61 +564,61 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
     */
     public function isValid()
     {
-        $this->_ActiveRecord->clearErrors();
-        if($this->_ActiveRecord->beforeValidation() && $this->_ActiveRecord->notifyObservers('beforeValidation')){
+        $this->_Model->clearErrors();
+        if($this->_Model->beforeValidation() && $this->_Model->notifyObservers('beforeValidation')){
 
 
-            if($this->_ActiveRecord->_set_default_attribute_values_automatically){
+            if($this->_Model->set_default_attribute_values_automatically){
                 $this->_setDefaultAttributeValuesAutomatically();
             }
 
-            $this->_ActiveRecord->validate();
+            $this->_Model->validate();
 
-            if($this->_ActiveRecord->_automated_validators_enabled){
-                $this->_ActiveRecord->_runAutomatedValidators();
+            if(!empty($this->_Model->automated_validators_enabled)){
+                $this->_runAutomatedValidators();
             }
 
-            $this->_ActiveRecord->afterValidation();
-            $this->_ActiveRecord->notifyObservers('afterValidation');
+            $this->_Model->afterValidation();
+            $this->_Model->notifyObservers('afterValidation');
 
-            if ($this->_ActiveRecord->isNewRecord()){
-                if($this->_ActiveRecord->beforeValidationOnCreate()){
-                    $this->_ActiveRecord->notifyObservers('beforeValidationOnCreate');
-                    $this->_ActiveRecord->validateOnCreate();
-                    $this->_ActiveRecord->afterValidationOnCreate();
-                    $this->_ActiveRecord->notifyObservers('afterValidationOnCreate');
+            if ($this->_Model->isNewRecord()){
+                if($this->_Model->beforeValidationOnCreate()){
+                    $this->_Model->notifyObservers('beforeValidationOnCreate');
+                    $this->_Model->validateOnCreate();
+                    $this->_Model->afterValidationOnCreate();
+                    $this->_Model->notifyObservers('afterValidationOnCreate');
                 }
             }else{
-                if($this->_ActiveRecord->beforeValidationOnUpdate()){
-                    $this->_ActiveRecord->notifyObservers('beforeValidationOnUpdate');
-                    $this->_ActiveRecord->validateOnUpdate();
-                    $this->_ActiveRecord->afterValidationOnUpdate();
-                    $this->_ActiveRecord->notifyObservers('afterValidationOnUpdate');
+                if($this->_Model->beforeValidationOnUpdate()){
+                    $this->_Model->notifyObservers('beforeValidationOnUpdate');
+                    $this->_Model->validateOnUpdate();
+                    $this->_Model->afterValidationOnUpdate();
+                    $this->_Model->notifyObservers('afterValidationOnUpdate');
                 }
             }
         }
 
-        return !$this->_ActiveRecord->hasErrors();
+        return !$this->_Model->hasErrors();
     }
 
     /**
     * By default the Active Record will validate for the maximum length for database columns. You can
-    * disable the automated validators by setting $this->_automated_validators_enabled to false.
+    * disable the automated validators by setting $this->automated_validators_enabled to false.
     * Specific validators are (for now):
-    * $this->_automated_max_length_validator = false; // false by default, but you can set it to true on your model
-    * $this->_automated_not_null_validator = false; // disabled by default
+    * $this->automated_max_length_validator = false; // false by default, but you can set it to true on your model
+    * $this->automated_not_null_validator = false; // disabled by default
     */
     protected function _runAutomatedValidators()
     {
-        foreach ($this->_ActiveRecord->_columns as $column_name=>$column_settings){
-            if($this->_ActiveRecord->_automated_max_length_validator &&
+        foreach ($this->_Model->getColumns() as $column_name=>$column_settings){
+            if(!empty($this->_Model->automated_max_length_validator) &&
             empty($column_settings['primaryKey']) &&
-            !empty($this->_ActiveRecord->$column_name) &&
+            !empty($this->_Model->$column_name) &&
             !empty($column_settings['maxLength']) && $column_settings['maxLength'] > 0 &&
-            strlen($this->_ActiveRecord->$column_name) > $column_settings['maxLength']){
-                $this->_ActiveRecord->addError($column_name, sprintf($this->_ActiveRecord->getDefaultErrorMessageFor('too_long'), $column_settings['maxLength']));
-            }elseif($this->_ActiveRecord->_automated_not_null_validator && empty($column_settings['primaryKey']) && !empty($column_settings['notNull']) && (!isset($this->_ActiveRecord->$column_name) || is_null($this->_ActiveRecord->$column_name))){
-                $this->_ActiveRecord->addError($column_name,'empty');
+            strlen($this->_Model->$column_name) > $column_settings['maxLength']){
+                $this->_Model->addError($column_name, sprintf($this->_Model->getDefaultErrorMessageFor('too_long'), $column_settings['maxLength']));
+            }elseif(!empty($this->_Model->automated_not_null_validator) && empty($column_settings['primaryKey']) && !empty($column_settings['notNull']) && (!isset($this->_Model->$column_name) || is_null($this->_Model->$column_name))){
+                $this->_Model->addError($column_name,'empty');
             }
         }
     }
@@ -627,20 +627,20 @@ class AkActiveRecordValidations extends AkActiveRecordExtenssion
 
 
     /**
-    * $this->_set_default_attribute_values_automatically = true; // This enables automated attribute setting from database definition
+    * $this->set_default_attribute_values_automatically = true; // This enables automated attribute setting from database definition
     */
     protected function _setDefaultAttributeValuesAutomatically()
     {
-        foreach ($this->_ActiveRecord->getColumns() as $column_name=>$column_settings){
-            if(empty($column_settings['primaryKey']) && isset($column_settings['hasDefault']) && $column_settings['hasDefault'] && (!isset($this->_ActiveRecord->$column_name) || is_null($this->_ActiveRecord->$column_name))){
+        foreach ($this->_Model->getColumns() as $column_name=>$column_settings){
+            if(empty($column_settings['primaryKey']) && isset($column_settings['hasDefault']) && $column_settings['hasDefault'] && (!isset($this->_Model->$column_name) || is_null($this->_Model->$column_name))){
                 if(empty($column_settings['defaultValue'])){
                     if($column_settings['type'] == 'integer' && empty($column_settings['notNull'])){
-                        $this->_ActiveRecord->$column_name = 0;
+                        $this->_Model->$column_name = 0;
                     }elseif(($column_settings['type'] == 'string' || $column_settings['type'] == 'text') && empty($column_settings['notNull'])){
-                        $this->_ActiveRecord->$column_name = '';
+                        $this->_Model->$column_name = '';
                     }
                 }else {
-                    $this->_ActiveRecord->$column_name = $column_settings['defaultValue'];
+                    $this->_Model->$column_name = $column_settings['defaultValue'];
                 }
             }
         }

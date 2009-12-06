@@ -1,23 +1,23 @@
 <?php
 
-class AkActiveRecordDebug extends AkActiveRecordExtenssion
+class AkModelDebug extends AkModelExtenssion
 {
     public function dbug()
     {
-        if(!$this->_ActiveRecord->isConnected()){
-            $this->_ActiveRecord->establishConnection();
+        if(!$this->_Model->isConnected()){
+            $this->_Model->establishConnection();
         }
-        $this->_ActiveRecord->_db->connection->debug = $this->_ActiveRecord->_db->connection->debug ? false : true;
-        $this->_ActiveRecord->db_debug = $this->_ActiveRecord->_db->connection->debug;
+        $this->_Model->getAdapter()->connection->debug = $this->_Model->getAdapter()->connection->debug ? false : true;
+        $this->_Model->db_debug = $this->_Model->getAdapter()->connection->debug;
     }
 
     public function toString($print = false)
     {
         $result = '';
         if(!AK_CLI || (AK_ENVIRONMENT == 'testing' && !AK_CLI)){
-            $result = "<h2>Details for ".AkInflector::humanize(AkInflector::underscore($this->_ActiveRecord->getModelName()))." with ".$this->_ActiveRecord->getPrimaryKey()." ".$this->_ActiveRecord->getId()."</h2>\n<dl>\n";
-            foreach ($this->_ActiveRecord->getColumnNames() as $column=>$caption){
-                $result .= "<dt>$caption</dt>\n<dd>".$this->_ActiveRecord->getAttribute($column)."</dd>\n";
+            $result = "<h2>Details for ".AkInflector::humanize(AkInflector::underscore($this->_Model->getModelName()))." with ".$this->_Model->getPrimaryKey()." ".$this->_Model->getId()."</h2>\n<dl>\n";
+            foreach ($this->_Model->getColumnNames() as $column=>$caption){
+                $result .= "<dt>$caption</dt>\n<dd>".$this->_Model->getAttribute($column)."</dd>\n";
             }
             $result .= "</dl>\n<hr />";
             if($print){
@@ -25,14 +25,14 @@ class AkActiveRecordDebug extends AkActiveRecordExtenssion
             }
         }elseif(AK_DEV_MODE){
             $result =   "\n".
-            str_replace("\n"," ",var_export($this->_ActiveRecord->getAttributes(),true));
+            str_replace("\n"," ",var_export($this->_Model->getAttributes(),true));
             $result .= "\n";
             echo $result;
             return '';
         }elseif (AK_CLI){
-            $result = "\n-------\n Details for ".AkInflector::humanize(AkInflector::underscore($this->_ActiveRecord->getModelName()))." with ".$this->_ActiveRecord->getPrimaryKey()." ".$this->_ActiveRecord->getId()." ==\n\n/==\n";
-            foreach ($this->_ActiveRecord->getColumnNames() as $column=>$caption){
-                $result .= "\t * $caption: ".$this->_ActiveRecord->getAttribute($column)."\n";
+            $result = "\n-------\n Details for ".AkInflector::humanize(AkInflector::underscore($this->_Model->getModelName()))." with ".$this->_Model->getPrimaryKey()." ".$this->_Model->getId()." ==\n\n/==\n";
+            foreach ($this->_Model->getColumnNames() as $column=>$caption){
+                $result .= "\t * $caption: ".$this->_Model->getAttribute($column)."\n";
             }
             $result .= "\n\n-------\n";
             if($print){
@@ -44,11 +44,11 @@ class AkActiveRecordDebug extends AkActiveRecordExtenssion
 
     public function dbugging($trace_this_on_debug_mode = null)
     {
-        if(!empty($this->_ActiveRecord->_db->debug) && !empty($trace_this_on_debug_mode)){
+        if(!empty($this->_Model->getAdapter()->debug) && !empty($trace_this_on_debug_mode)){
             $message = !is_scalar($trace_this_on_debug_mode) ? var_export($trace_this_on_debug_mode, true) : (string)$trace_this_on_debug_mode;
             Ak::trace($message);
         }
-        return !empty($this->_ActiveRecord->_db->debug);
+        return !empty($this->_Model->getAdapter()->debug);
     }
 
 
@@ -59,7 +59,7 @@ class AkActiveRecordDebug extends AkActiveRecordExtenssion
             return;
         }
 
-        $data = $data == 'active_record_class' ?  clone($this->_ActiveRecord) : $data;
+        $data = $data == 'active_record_class' ?  clone($this->_Model) : $data;
 
         if($_functions!=0) {
             $sf=1;

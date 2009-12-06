@@ -2,6 +2,6 @@
 
 class Article extends ActiveRecord
 {
-    public $_internationalize = true;
+    public $internationalize = true;
 }
 

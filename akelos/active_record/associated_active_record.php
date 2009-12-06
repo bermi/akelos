@@ -28,6 +28,15 @@ class AkAssociatedActiveRecord extends AkBaseModel
     $_associationIds = array(),
     $_associations = array();
 
+    public function &getAssociations()
+    {
+        return $this->_associations;
+    }
+    public function &getAssociationIds()
+    {
+        return $this->_associationIds;
+    }
+
     public function _loadAssociationHandler($association_type)
     {
         if(empty($this->$association_type) && in_array($association_type, array('hasOne','belongsTo','hasMany','hasAndBelongsToMany'))){
