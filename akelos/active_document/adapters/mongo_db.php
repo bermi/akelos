@@ -104,10 +104,37 @@ class AkOdbMongoDbAdapter
     // CRUD
 
     public function &createRecord($collection_name, $attributes = array()){
-        $Collection = $this->getDatabase()->selectCollection($collection_name)->insert($attributes);
+        $this->getDatabase()->selectCollection($collection_name)->insert($attributes);
+        $attributes[$this->getDefaultPrimaryKey()] = (string)$attributes[$this->getDefaultPrimaryKey()];
         return $attributes;
     }
 
+    public function &updateRecord($collection_name, $attributes = array()){
+        $this->getDatabase()->selectCollection($collection_name)->save($attributes);
+        return $attributes;
+    }
+
+    public function &find($collection_name, $options = array()){
+        if(empty($options['attributes'])) return false;
+        $Cursor = $this->getDatabase()->selectCollection($collection_name)->find($this->_castAttributesForFinder($options['attributes']));
+        isset($options['limit'])    &&  $Cursor->limit($options['limit']);
+        isset($options['sort'])     &&  $Cursor->sort(array($options['sort'] => 1));
+        if($Cursor->count() == 0) {
+            $false = false;
+            return $false;
+        }
+        return new AkActiveDocumentIterator($Cursor);
+    }
+
+    private function _castAttributesForFinder($attributes = array()){
+        $pk = $this->getDefaultPrimaryKey();
+        foreach ($attributes as $k => $v){
+            if($k == $pk){
+                $attributes[$k] =  new MongoId("$v");
+            }
+        }
+        return $attributes;
+    }
 
     private function _authenticateDatabase(&$Database)
     {

@@ -75,10 +75,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             default:
                 return $this->_findFromIds($args, $options);
         }
-        return false;
     }
-
-
 
     public function &findFirst()
     {
@@ -433,12 +430,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             return false;
         }
         $valid_keys = array('simulation_class','returns','load_acts','wrap','conditions', 'include', 'joins', 'limit', 'offset', 'group', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly', 'load_associations', 'load_acts');
-        foreach (array_keys($options) as $key){
-            if (in_array($key,$valid_keys)){
-                return true;
-            }
-        }
-        return false;
+        return count($options) != count(array_diff(array_keys($options), $valid_keys));
     }
 
     protected function _extractConditionsFromArgs($args, $options)
@@ -604,14 +596,11 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         $result = $this->_findEvery($options);
 
         if(!empty($result) && is_array($result)){
-            $_result = $result[0];
+            return $result[0];
         }else{
             $_result = false;
-            // if we return an empty array instead of false we need to change this->exists()!
-            //$_result = array();
+            return  $_result;
         }
-        return  $_result;
-
     }
 
     protected function &_findEvery($options)
@@ -636,12 +625,11 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         }
 
         if(!empty($result) && is_array($result)){
-            $_result = $result;
+            return $result;
         }else{
             $_result = false;
+            return  $_result;
         }
-        return  $_result;
-
     }
 
     protected function &_findFromIds($ids, $options)
