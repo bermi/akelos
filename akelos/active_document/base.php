@@ -25,6 +25,7 @@ class AkActiveDocument extends AkLazyObject
         }
     }
 
+
     /**
     * Creates an object, instantly saves it as a record (if the validation permits it), and returns it.
     * If the save fail under validations, the unsaved object is still returned.
@@ -55,8 +56,11 @@ class AkActiveDocument extends AkLazyObject
 
     public function destroy($id = null)
     {
+        if(!$this->_callback('beforeDestroy')) return false;
         $this->delete(empty($id) ? $this->getId() : $id);
         unset($this->_internals['existing_record']);
+        if(!$this->_callback('afterDestroy')) return false;
+        return true;
     }
 
     /**
@@ -64,19 +68,26 @@ class AkActiveDocument extends AkLazyObject
     * - A record does exist: Updates the record with values matching those of the object attributes.
     */
     public function save($validate = true){
-        return $this->createOrUpdate($validate);
+        return $this->_createOrUpdate($validate);
     }
 
-    public function createOrUpdate($validate = true){
-        if($validate && !$this->isValid()){
-            return false;
-        }
-        $this->_setRecordTimestamps();
-        return $this->isNewRecord() ? $this->_create() : $this->_update();
+    /**
+    * Reloads the attributes of this object from the database.
+    */
+    public function reload()
+    {
+        return $this->_loadFromDatabase($this->getId());
     }
 
     public function isValid(){
-        return true;
+        return
+        (
+        !($this->_callback('beforeValidation')) ||
+        !($this->isNewRecord() ? $this->_callback('beforeValidationOnCreate') : $this->_callback('beforeValidationOnUpdate')) ||
+        !(true) || // real validation happens here
+        !($this->_callback('afterValidation')) ||
+        !($this->isNewRecord() ? $this->_callback('afterValidationOnCreate') : $this->_callback('afterValidationOnUpdate'))
+        ) ? false : true;
     }
 
     public function isNewRecord(){
@@ -84,26 +95,42 @@ class AkActiveDocument extends AkLazyObject
     }
 
 
+    private function _createOrUpdate($validate = true){
+        if($validate && !$this->isValid()){
+            return false;
+        }
+        $this->_setRecordTimestamps();
+        return
+        (
+        !($this->_callback('beforeSave')) ||
+        !($this->isNewRecord() ? $this->_create() : $this->_update()) ||
+        !($this->_callback('afterSave'))
+        ) ? false : true;
+    }
+
     /**
     * Creates a new record with values matching those of the instance attributes.
-    * Must be called as a result of a call to createOrUpdate.
+    * Must be called as a result of a call to _createOrUpdate.
     */
     private function _create(){
+        if(!$this->_callback('beforeCreate')) return false;
         if($record = $this->getAdapter()->createRecord($this->getCollectionName(), $this->_getAttributesCastedForDatabase())){
             $this->_matchCurrentModelWithDatabaseRecord($record);
+            if(!$this->_callback('afterCreate')) return false;
             return true;
         }
         return false;
     }
 
-
     /**
     * Updates the associated record with values matching those of the instance attributes.
-    * Must be called as a result of a call to createOrUpdate.
+    * Must be called as a result of a call to _createOrUpdate.
     */
     private function _update(){
+        if(!$this->_callback('beforeUpdate')) return false;
         if($record = $this->getAdapter()->updateRecord($this->getCollectionName(), $this->_getAttributesCastedForDatabase())){
             $this->_matchCurrentModelWithDatabaseRecord($record);
+            if(!$this->_callback('afterUpdate')) return false;
             return true;
         }
         return false;
@@ -244,7 +271,7 @@ class AkActiveDocument extends AkLazyObject
     private function _loadFromDatabase($id){
         if($record = $this->find($id)){
             $this->_setAttributesFromDatabase((array)$record);
-            return true;
+            return $this->_callback('afterInstantiate');
         }
         return false;
     }
@@ -287,6 +314,114 @@ class AkActiveDocument extends AkLazyObject
         }
         return $this->_Adapter;
     }
+
+
+
+
+
+    /**
+                                    Callbacks
+    ====================================================================
+    See also: Observers.
+    *
+    * Callbacks are hooks into the life-cycle of an Active Document object that allows you to trigger logic
+    * before or after an alteration of the object state. This can be used to make sure that associated and
+    * dependent objects are deleted when destroy is called (by overwriting beforeDestroy) or to massage attributes
+    * before they're validated (by overwriting beforeValidation). As an example of the callbacks initiated, consider
+    * the AkActiveDocument->save() call:
+    *
+    * - (-) save()
+    * - (-) needsValidation()
+    * - (1) beforeValidation()
+    * - (2) beforeValidationOnCreate() / beforeValidationOnUpdate()
+    * - (-) validate()
+    * - (-) validateOnCreate()
+    * - (4) afterValidation()
+    * - (5) afterValidationOnCreate() / afterValidationOnUpdate()
+    * - (6) beforeSave()
+    * - (7) beforeCreate() / beforeUpdate()
+    * - (-) create()
+    * - (8) afterCreate() / afterUpdate()
+    * - (9) afterSave()
+    * - (10) afterDestroy()
+    * - (11) beforeDestroy()
+    *
+    *
+    * That's a total of 15 callbacks, which gives you immense power to react and prepare for each state in the
+    * Active Document lifecycle.
+    *
+    * Examples:
+    *   class CreditCard extends ActiveDocument
+    *   {
+    *       // Strip everything but digits, so the user can specify "555 234 34" or
+    *       // "5552-3434" or both will mean "55523434"
+    *       private function _beforeValidationOnCreate
+    *       {
+    *           if(!empty($this->number)){
+    *               $this->number = preg_replace('/([^0-9]*)/','',$this->number);
+    *           }
+    *       }
+    *   }
+    *
+    *   class Subscription extends ActiveDocument
+    *   {
+    *       // Note: This is not implemented yet
+    *       public $beforeCreate  = 'recordSignup';
+    *
+    *       public function recordSignup()
+    *       {
+    *         $this->signed_up_on = date("Y-m-d");
+    *       }
+    *   }
+    *
+    *   class Firm extends ActiveDocument
+    *   {
+    *       //Destroys the associated clients and people when the firm is destroyed
+    *       // Note: This is not implemented yet
+    *       public $beforeDestroy = array('destroyAssociatedPeople', 'destroyAssociatedClients');
+    *
+    *       public function destroyAssociatedPeople()
+    *       {
+    *           $Person = new Person();
+    *           $Person->destroyAll("firm_id=>", $this->id);
+    *       }
+    *
+    *       public function destroyAssociatedClients()
+    *       {
+    *           $Client = new Client();
+    *           $Client->destroyAll("client_of=>", $this->id);
+    *       }
+    *   }
+    *
+    *
+    * == Canceling callbacks ==
+    *
+    * If a before* callback returns false, all the later callbacks and the associated action are cancelled. If an after* callback returns
+    * false, all the later callbacks are cancelled. Callbacks are generally run in the order they are defined, with the exception of callbacks
+    * defined as methods on the model, which are called last.
+    *
+    * Override this methods to hook Active Documents
+    */
+    private function _callback($type){
+        $result = true;
+        if(method_exists($this, $type)){
+            $result = $this->$type();
+        }
+        return $result ? $this->notifyObservers($type) : false;
+    }
+
+    /*/Callbacks*/
+
+    // Observers
+
+    public function notifyObservers(){
+        return true;
+    }
+
+
+
+    // Magic callback methods
+
 
     public function __get($attribute){
         return $this->_attributes[$attribute];
