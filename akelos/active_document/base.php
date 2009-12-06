@@ -42,6 +42,24 @@ class AkActiveDocument extends AkLazyObject
 
 
     /**
+    * Deletes the record with the given id without instantiating an object first. If an array of
+    * ids is provided, all of them are deleted.
+    */
+    public function delete($id)
+    {
+        $ids = is_array($id) ? $id : array($id);
+        foreach ($ids as $id){
+            $this->getAdapter()->delete($this->getCollectionName(), $id);
+        }
+    }
+
+    public function destroy($id = null)
+    {
+        $this->delete(empty($id) ? $this->getId() : $id);
+        unset($this->_internals['existing_record']);
+    }
+
+    /**
     * - No record exists: Creates a new record with values matching those of the object attributes.
     * - A record does exist: Updates the record with values matching those of the object attributes.
     */

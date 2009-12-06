@@ -126,6 +126,10 @@ class AkOdbMongoDbAdapter
         return new AkActiveDocumentIterator($Cursor);
     }
 
+    public function delete($collection_name, $id){
+        return $this->getDatabase()->selectCollection($collection_name)->remove($this->_castAttributesForFinder(array($this->getDefaultPrimaryKey() => $id)));
+    }
+
     private function _castAttributesForFinder($attributes = array()){
         $pk = $this->getDefaultPrimaryKey();
         foreach ($attributes as $k => $v){

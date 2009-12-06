@@ -108,6 +108,18 @@ class DocumentCrud_TestCase extends ActiveDocumentUnitTest
         $WebPage2 = new WebPage($WebPage->getId());
         $this->assertEqual($WebPage->body, $WebPage2->body);
     }
+
+    public function test_should_destroy_record()
+    {
+        $WebPage = new WebPage(array('body' => 'Akelos PHP framework'));
+        $WebPage->save();
+        $WebPage2 = new WebPage($WebPage->getId());
+        $this->assertEqual($WebPage->body, $WebPage2->body);
+        $WebPage2->destroy();
+        $WebPage2 = new WebPage($WebPage->getId());
+        $this->assertTrue($WebPage2->isNewRecord());
+        $this->assertFalse($WebPage->find($WebPage->getId()));
+    }
 }
 
 ak_test_case('DocumentCrud_TestCase');
