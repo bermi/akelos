@@ -1,6 +1,6 @@
 <?php
 
-class AkResponse extends AkObject
+class AkResponse
 {
     public $_resutl_stack = array();
     public $_headers = array();

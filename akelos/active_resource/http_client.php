@@ -1,6 +1,6 @@
 <?php
 
-class AkHttpClient extends AkObject
+class AkHttpClient
 {
     public $HttpRequest;
     public $error;

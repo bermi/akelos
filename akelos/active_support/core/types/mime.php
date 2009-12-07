@@ -1,6 +1,6 @@
 <?php
 
-class AkRequestMimeType extends AkObject
+class AkRequestMimeType
 {
     static function lookupMimeType($type = null)
     {

@@ -22,7 +22,7 @@
 * @since 0.9
 * @version $Revision 0.9 $
 */
-class AkSession extends AkObject
+class AkSession
 {
     /**
     * Session driver

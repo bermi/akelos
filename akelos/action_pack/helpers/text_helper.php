@@ -34,7 +34,7 @@ defined('AK_AUTO_LINK_REGEX')       || define('AK_AUTO_LINK_REGEX','/
 *     Title: <?= $text_helper->truncate($post->title, 20) ?>
 *   {end}
 */
-class TextHelper extends AkObject
+class TextHelper
 {
 
     public function setController(&$controller)

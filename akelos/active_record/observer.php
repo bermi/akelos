@@ -63,7 +63,7 @@
 *     $Model->addObserver($ComentObserverInstance);
 *
 */
-class AkObserver extends AkObject
+class AkObserver
 {
     /**
      * Models in this array will automatically be observed

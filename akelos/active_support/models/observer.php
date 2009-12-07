@@ -25,7 +25,10 @@ class AkModelObserver extends AkModelExtenssion
         for ($i=0; $i<$observer_count; $i++) {
             if(in_array($model_name, $observers[$i]->_observing)){
                 if(method_exists($observers[$i], $method)){
-                    $observers[$i]->$method($this->_Model);
+                    if($observers[$i]->$method($this->_Model) === false){
+                        $this->setObservableState('');
+                        return false;
+                    }
                 }else{
                     $observers[$i]->update($this->getObservableState(), $this);
                 }

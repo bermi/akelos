@@ -1,6 +1,6 @@
 <?php
 
-class AkActionViewHelper extends AkObject
+class AkActionViewHelper
 {
     public $locales_namespace = 'helpers';
 

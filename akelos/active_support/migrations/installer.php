@@ -43,7 +43,7 @@
  * default                        | string
  *
  */
-class AkInstaller extends AkObject
+class AkInstaller
 {
     public
     // Public paths, so they can be modified for testing purposes
@@ -818,5 +818,12 @@ Example:
         return $versions;
     }
 
+    public function log($message, $type = '', $identifyer = '')
+    {
+        if (AK_LOG_EVENTS){
+            $Logger =& Ak::getLogger();
+            $Logger->log($message, $type);
+        }
+    }
 }
 

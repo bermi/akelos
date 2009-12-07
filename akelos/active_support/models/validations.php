@@ -69,6 +69,11 @@ class AkModelValidations extends AkModelExtenssion
     {
     }
 
+    public function needsValidation()
+    {
+        return true;
+    }
+
     /**
       * Encapsulates the pattern of wanting to validate a password or email address field with a confirmation. Example:
       *
@@ -96,8 +101,8 @@ class AkModelValidations extends AkModelExtenssion
         $message = $this->_Model->getDefaultErrorMessageFor($message, true);
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
-            $attribute_accessor = $attribute_name.'_confirmation';
-            if(isset($this->_Model->$attribute_accessor) && @$this->_Model->$attribute_accessor != @$this->_Model->$attribute_name){
+            $value = @$this->_Model->$attribute_name;
+            if(!is_null($value) && @$this->_Model->{$attribute_name.'_confirmation'} != $value){
                 $this->_Model->addError($attribute_name, $message);
             }
         }
@@ -276,9 +281,10 @@ class AkModelValidations extends AkModelExtenssion
                 $attribute_names = Ak::toArray($attribute_names);
 
                 foreach ($attribute_names as $attribute_name){
-                    if((!empty($option['allow_null']) && !isset($this->_Model->$attribute_name)) || (Ak::size($this->_Model->$attribute_name)) < $option_value[0]){
+                    $value = @$this->_Model->$attribute_name;
+                    if((!empty($option['allow_null']) && is_null($value)) || (Ak::size($value)) < $option_value[0]){
                         $this->_Model->addError($attribute_name, sprintf($options['too_short'], $option_value[0]));
-                    }elseif((!empty($option['allow_null']) && !isset($this->_Model->$attribute_name)) || (Ak::size($this->_Model->$attribute_name)) > $option_value[1]){
+                    }elseif((!empty($option['allow_null']) && is_null($value)) || (Ak::size($value)) > $option_value[1]){
                         $this->_Model->addError($attribute_name, sprintf($options['too_long'], $option_value[1]));
                     }
                 }
@@ -294,15 +300,16 @@ class AkModelValidations extends AkModelExtenssion
                 }
 
                 // Declare different validations per option.
-                $validity_checks = array('is' => "==", 'minimum' => ">=", 'maximum' => "<=");
+                $validity_checks = array('is' => '==', 'minimum' => '>=', 'maximum' => '<=');
                 $message_options = array('is' => 'wrong_length', 'minimum' => 'too_short', 'maximum' => 'too_long');
 
                 $message = sprintf(!empty($options['message']) ? $options['message'] : $options[$message_options[$option]],$option_value);
 
                 $attribute_names = Ak::toArray($attribute_names);
                 foreach ($attribute_names as $attribute_name){
-                    if((!$options['allow_null'] && !isset($this->_Model->$attribute_name)) ||
-                    eval("return !(".Ak::size(@$this->_Model->$attribute_name)." {$validity_checks[$option]} $option_value);")){
+                    $value = @$this->_Model->$attribute_name;
+                    if((!$options['allow_null'] && is_null($value)) ||
+                    eval('return !('.Ak::size($value)." {$validity_checks[$option]} $option_value);")){
                         $this->_Model->addError($attribute_name, $message);
                     }
                 }
@@ -321,7 +328,7 @@ class AkModelValidations extends AkModelExtenssion
 
     /**
     * Validates whether the value of the specified attributes are unique across the system. Useful for making sure that only one user
-    * can be named "davidhh".
+    * can be named "james".
     *
     *  class Person extends ActiveRecord
     *   {
@@ -377,32 +384,50 @@ class AkModelValidations extends AkModelExtenssion
         $message = $this->_Model->getDefaultErrorMessageFor($options['message'], true);
         unset($options['message']);
 
-        foreach ((array)$attribute_names as $attribute_name){
-            $value = isset($this->_Model->$attribute_name) ? $this->_Model->$attribute_name : null;
+        $is_active_record = $this->_Model instanceof AkActiveRecord;
 
-            if($value === null || ($options['case_sensitive'] || !$this->_Model->hasColumn($attribute_name))){
-                $condition_sql = $this->_Model->getTableName().'.'.$attribute_name.' '.$this->_Model->getAttributeCondition($value);
+        foreach ((array)$attribute_names as $attribute_name){
+            $conditions = array();
+            $value = @$this->_Model->$attribute_name;
+            if(is_null($value) || ($options['case_sensitive'] || !$this->_Model->hasColumn($attribute_name))){
+                if($is_active_record){
+                    $condition_sql = $this->_Model->getTableName().'.'.$attribute_name.' '.$this->_Model->getAttributeCondition($value);
+                }
                 $condition_params = array($value);
             }else{
                 include_once(AK_CONTRIB_DIR.DS.'phputf8'.DS.'utf8.php');
-                $condition_sql = 'LOWER('.$this->_Model->getTableName().'.'.$attribute_name.') '.$this->_Model->getAttributeCondition($value);
+                if($is_active_record){
+                    $condition_sql = 'LOWER('.$this->_Model->getTableName().'.'.$attribute_name.') '.$this->_Model->getAttributeCondition($value);
+                }
                 $condition_params = array(is_array($value) ? array_map('utf8_strtolower',$value) : utf8_strtolower($value));
+            }
+            if(!$is_active_record){
+                $condition_params = array($attribute_name => $condition_params[0]);
             }
 
             if(!empty($options['scope'])){
                 foreach ((array)$options['scope'] as $scope_item){
                     $scope_value = $this->_Model->get($scope_item);
-                    $condition_sql .= ' AND '.$this->_Model->getTableName().'.'.$scope_item.' '.$this->_Model->getAttributeCondition($scope_value);
-                    $condition_params[] = $scope_value;
+                    if($is_active_record){
+                        $condition_sql .= ' AND '.$this->_Model->getTableName().'.'.$scope_item.' '.$this->_Model->getAttributeCondition($scope_value);
+                        $condition_params[] = $scope_value;
+                    }else{
+                        $condition_params[$scope_item] = $scope_value;
+                    }
                 }
             }
 
             if(!$this->_Model->isNewRecord()){
-                $condition_sql .= ' AND '.$this->_Model->getTableName().'.'.$this->_Model->getPrimaryKey().' <> ?';
-                $condition_params[] = $this->_Model->getId();
+                if($is_active_record){
+                    $condition_sql .= ' AND '.$this->_Model->getTableName().'.'.$this->_Model->getPrimaryKey().' <> ?';
+                }
+                $condition_params[] = $is_active_record ? $this->_Model->getId() : array($this->_Model->getPrimaryKey() => $this->_Model->getId(), '_operand' => 'not');
             }
-            array_unshift($condition_params,$condition_sql);
-            if ($this->_Model->find('first', array('conditions' => $condition_params))){
+
+            if($is_active_record){
+                array_unshift($condition_params,$condition_sql);
+            }
+            if ($Record = $this->_Model->find('first', array('conditions' => $condition_params))){
                 $this->_Model->addError($attribute_name, $message);
             }
         }
@@ -450,7 +475,8 @@ class AkModelValidations extends AkModelExtenssion
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
-            if(!isset($this->_Model->$attribute_name) || !$regex_function($regular_expression, $this->_Model->$attribute_name)){
+            $value = @$this->_Model->$attribute_name;
+            if(is_null($value) || !$regex_function($regular_expression, $value)){
                 $this->_Model->addError($attribute_name, $message);
             }
         }
@@ -478,7 +504,8 @@ class AkModelValidations extends AkModelExtenssion
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
-            if($allow_null ? (@$this->_Model->$attribute_name != '' ? (!in_array($this->_Model->$attribute_name,$array_of_possibilities)) : @$this->_Model->$attribute_name === 0 ) : (isset($this->_Model->$attribute_name) ? !in_array(@$this->_Model->$attribute_name,$array_of_possibilities) : true )){
+            $value = @$this->_Model->$attribute_name;
+            if($allow_null ? ($value != '' ? (!in_array($value, $array_of_possibilities)) : $value === 0 ) : (!is_null($value) ? !in_array($value, $array_of_possibilities) : true )){
                 $this->_Model->addError($attribute_name, $message);
             }
         }
@@ -507,8 +534,8 @@ class AkModelValidations extends AkModelExtenssion
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
-
-            if($allow_null ? (!empty($this->_Model->$attribute_name) ? (in_array(@$this->_Model->$attribute_name, $array_of_possibilities)) : false ) : (isset($this->_Model->$attribute_name) ? in_array(@$this->_Model->$attribute_name,$array_of_possibilities) : true )){
+            $value = @$this->_Model->$attribute_name;
+            if($allow_null ? (!empty($value) ? (in_array($value, $array_of_possibilities)) : false ) : (!is_null($value) ? in_array($value, $array_of_possibilities) : true )){
                 $this->_Model->addError($attribute_name, $message);
             }
         }
@@ -518,7 +545,7 @@ class AkModelValidations extends AkModelExtenssion
 
 
     /**
-    * Validates whether the value of the specified attribute is numeric.
+    * Vos whether the value of the specified attribute is numeric.
     *
     *   class Person extends ActiveRecord
     *   {
@@ -539,8 +566,8 @@ class AkModelValidations extends AkModelExtenssion
 
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
-            if (isset($this->_Model->$attribute_name)){
-                $value = $this->_Model->$attribute_name;
+            $value = @$this->_Model->$attribute_name;
+            if (!is_null($value)){
                 if ($only_integer){
                     $is_int = is_numeric($value) && (int)$value == $value;
                     $has_error = !$is_int;
@@ -550,7 +577,6 @@ class AkModelValidations extends AkModelExtenssion
             }else{
                 $has_error = $allow_null ? false : true;
             }
-
             if ($has_error){
                 $this->_Model->addError($attribute_name, $message);
             }
@@ -567,8 +593,7 @@ class AkModelValidations extends AkModelExtenssion
         $this->_Model->clearErrors();
         if($this->_Model->beforeValidation() && $this->_Model->notifyObservers('beforeValidation')){
 
-
-            if($this->_Model->set_default_attribute_values_automatically){
+            if(!empty($this->_Model->set_default_attribute_values_automatically)){
                 $this->_setDefaultAttributeValuesAutomatically();
             }
 

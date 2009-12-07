@@ -1,6 +1,6 @@
 <?php
 
-class AkTestDelivery extends AkObject
+class AkTestDelivery
 {
     public function deliver(&$Mailer, $settings = array())
     {

@@ -1,6 +1,6 @@
 <?php
 
-class AkXmlRpcServer extends AkObject
+class AkXmlRpcServer
 {
     public $_ActionWebServiceServer;
     public $options = array();

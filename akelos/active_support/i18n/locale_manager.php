@@ -6,7 +6,7 @@ if(!defined('AK_AVAILABLE_LOCALES')){
 
 defined('AK_FRAMEWORK_LANGUAGE') ? null : define('AK_FRAMEWORK_LANGUAGE', 'en');
 
-class AkLocaleManager extends AkObject
+class AkLocaleManager
 {
 
     public $available_locales = array(AK_FRAMEWORK_LANGUAGE=>array(AK_FRAMEWORK_LANGUAGE));

@@ -40,7 +40,7 @@ class ActsAsTree_TestCase extends ActiveRecordUnitTest
     public function Test_of__ensureIsActiveRecordInstance()
     {
         $Categories = new Category();
-        $Object = new AkObject();
+        $Object = new stdClass();
         $this->expectError(new PatternExpectation('/is not an active record/'));
         $Categories->tree->_ensureIsActiveRecordInstance($Object);
     }

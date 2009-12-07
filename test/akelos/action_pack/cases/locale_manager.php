@@ -156,7 +156,7 @@ class LocaleManager_TestCase extends ActionPackUnitTest
 
     public function test_should_get_language_from_url()
     {
-        $Request = new AkObject();
+        $Request = new stdClass();
 
         $Request->ak = 'en';
         $Request->_request['ak'] = 'en';

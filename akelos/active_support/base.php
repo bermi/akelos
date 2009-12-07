@@ -2242,7 +2242,6 @@ class Ak
             'AkMemcache'                => 'active_support/cache/memcache.php',
             'AkColor'                   => 'active_support/color/base.php',
             'AkConfig'                  => 'active_support/config/base.php',
-            'AkObject'                  => 'active_support/core/base_object.php',
             'AkClassExtender'           => 'active_support/core/class_extender.php',
             'AkLazyObject'              => 'active_support/core/lazy_object.php',
             'AkArray'                   => 'active_support/core/types/array.php',
@@ -2323,6 +2322,23 @@ class Ak
         }
         if(isset($file_path) && file_exists($file_path)){
             include $file_path;
+        }
+    }
+
+    /**
+    * Unsets circular reference children that are not freed from memory
+    * when calling unset() or when the parent object is garbage collected.
+    *
+    * @see http://paul-m-jones.com/?p=262
+    * @see http://bugs.php.net/bug.php?id=33595
+    */
+    static function unsetCircularReferences(&$Object)
+    {
+        // We can't use get_class_vars as it does not include runtime assigned attributes
+        foreach (array_keys((array)$Object) as $attribute){
+            if(isset($Object->$attribute)){
+                unset($Object->$attribute);
+            }
         }
     }
 }

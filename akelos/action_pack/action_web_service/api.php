@@ -15,7 +15,7 @@
  * See AkActionWebService/AkDirectContainer.php class methods for an example
  * of use.
  */
-class AkActionWebserviceApi extends AkObject
+class AkActionWebserviceApi
 {
     /**
      * Whether to transform the public API method names into camel-cased names

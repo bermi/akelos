@@ -1,6 +1,6 @@
 <?php
 
-class AkType extends AkObject
+class AkType
 {
     public
     $value;

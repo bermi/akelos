@@ -31,7 +31,7 @@
 * @deprecated use AkSession instead
 * @version $Revision 0.1 $
 */
-class AkDbSession extends AkObject
+class AkDbSession
 {
     /**
     * Secconds for the session to expire.

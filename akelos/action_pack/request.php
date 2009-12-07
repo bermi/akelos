@@ -10,7 +10,7 @@
 *
 * @author Bermi Ferrer <bermi a.t bermilabs dot co.m>
 */
-class AkRequest extends AkObject
+class AkRequest
 {
 
     /**

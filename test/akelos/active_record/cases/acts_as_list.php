@@ -42,7 +42,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
     public function Test_of__ensureIsActiveRecordInstance()
     {
         $TodoItems = new TodoItem();
-        $Object = new AkObject();
+        $Object = new stdClass();
         $this->expectError(new PatternExpectation('/is not an active record/'));
         $TodoItems->list->_ensureIsActiveRecordInstance($Object);
     }

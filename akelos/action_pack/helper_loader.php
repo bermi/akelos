@@ -7,7 +7,7 @@
  * Some helpers might require information available only on a conroller context
  * such as current URL, Request and Response information among others.
  */
-class AkHelperLoader extends AkObject
+class AkHelperLoader
 {
     public $_Controller;
     public $_HelperInstances = array();

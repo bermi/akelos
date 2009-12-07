@@ -89,6 +89,7 @@ class Observer_TestCase extends ActiveRecordUnitTest
         $ObservedPerson = new ObservedPerson(array('first_name' =>'Bermi'));
 
         $this->assertTrue(empty($ObservedPerson->audited));
+
         ob_start();
         $ObservedPerson->save();
 

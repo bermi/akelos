@@ -1,6 +1,6 @@
 <?php
 
-class AkActionWebServiceServer extends AkObject
+class AkActionWebServiceServer
 {
     public $_available_drivers = array('xml_rpc');
     public $_Server;

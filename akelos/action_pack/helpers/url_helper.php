@@ -1,6 +1,6 @@
 <?php
 
-class UrlHelper extends AkObject
+class UrlHelper
 {
     public function setController(&$controller)
     {

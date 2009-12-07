@@ -17,7 +17,7 @@
  * @subpackage Manager
  * @author Bermi Ferrer <bermi a.t bermilabs c.om> 2007
   */
-class AkPluginManager extends AkObject
+class AkPluginManager
 {
 
     /**

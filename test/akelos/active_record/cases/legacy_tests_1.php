@@ -46,7 +46,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
 
         $this->assertTrue($TestField instanceof AkActiveRecord);
 
-        $Object = new AkObject();
+        $Object = new stdClass();
         $this->assertFalse($Object instanceof AkActiveRecord);
     }
 
@@ -80,7 +80,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
     {
         $AkTestField = new AkTestField();
 
-        $adodb_column_object = new AkObject();
+        $adodb_column_object = new stdClass();
         $adodb_column_object->name = 'decimal_field';
 
         $adodb_column_object->type = 'BLOB';

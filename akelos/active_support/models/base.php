@@ -71,6 +71,16 @@ class AkBaseModel extends AkLazyObject
     {
         return Ak::t($string, $array, AkInflector::underscore($this->getModelName()));
     }
+
+
+
+    public function getAttributeCondition($argument)
+    {
+        return is_array($argument) ? 'IN (?)' : (is_null($argument) ? 'IS ?' : '= ?');
+    }
+
+
+
 }
 
 

@@ -1,7 +1,10 @@
 <?php
 
-class AkActiveDocument extends AkLazyObject
+class AkActiveDocument extends AkBaseModel
 {
+    public $default_error_messages  = array();
+    public $skip_attributes         = array();
+
     protected   $_primary_key;
     protected   $_record_timestamps = true;
 
@@ -18,13 +21,13 @@ class AkActiveDocument extends AkLazyObject
     }
 
     public function init($attributes = array()){
+        $this->_enableLazyLoadingExtenssions();
         if(isset($attributes[0]) && count($attributes) === 1 && array_key_exists(0, $attributes) && !is_array($attributes[0])){
             return $this->_loadFromDatabase($attributes[0]);
         }elseif(!empty($attributes[0]) && is_array($attributes[0])){
             $this->setAttributes($attributes[0]);
         }
     }
-
 
     /**
     * Creates an object, instantly saves it as a record (if the validation permits it), and returns it.
@@ -80,13 +83,16 @@ class AkActiveDocument extends AkLazyObject
     }
 
     public function isValid(){
+        $this->clearErrors();
+        $new_record = $this->isNewRecord();
         return
         (
         !($this->_callback('beforeValidation')) ||
-        !($this->isNewRecord() ? $this->_callback('beforeValidationOnCreate') : $this->_callback('beforeValidationOnUpdate')) ||
-        !(true) || // real validation happens here
+        !($new_record ? $this->_callback('beforeValidationOnCreate') : $this->_callback('beforeValidationOnUpdate')) ||
+        !($this->validate() !== false && !$this->hasErrors()) ||
+        !(($new_record ? $this->validateOnCreate() !== false : $this->validateOnUpdate() !== false) && !$this->hasErrors()) ||
         !($this->_callback('afterValidation')) ||
-        !($this->isNewRecord() ? $this->_callback('afterValidationOnCreate') : $this->_callback('afterValidationOnUpdate'))
+        !($new_record ? $this->_callback('afterValidationOnCreate') : $this->_callback('afterValidationOnUpdate'))
         ) ? false : true;
     }
 
@@ -96,7 +102,7 @@ class AkActiveDocument extends AkLazyObject
 
 
     private function _createOrUpdate($validate = true){
-        if($validate && !$this->isValid()){
+        if($validate && $this->needsValidation() && !$this->isValid()){
             return false;
         }
         $this->_setRecordTimestamps();
@@ -144,6 +150,7 @@ class AkActiveDocument extends AkLazyObject
         $args = func_get_args();
         $options = $this->_extractOptionsFromArgs($args);
         list($fetch, $options) = $this->_extractConditionsFromArgs($args, $options);
+
         switch ($fetch) {
             case 'first':
                 return $this->_findInitial($options);
@@ -151,6 +158,22 @@ class AkActiveDocument extends AkLazyObject
                 return $this->_findEvery($options);
         }
     }
+
+
+    public function &findFirst()
+    {
+        $args = func_get_args();
+        $result = call_user_func_array(array($this,'find'), array_merge(array('first'),$args));
+        return $result;
+    }
+
+    public function &findAll()
+    {
+        $args = func_get_args();
+        $result = call_user_func_array(array($this,'find'), array_merge(array('all'),$args));
+        return $result;
+    }
+
 
     private function &_findInitial($options){
         $options['limit'] = 1;
@@ -166,6 +189,9 @@ class AkActiveDocument extends AkLazyObject
 
     private function &_findEvery($options){
         $result = $this->getAdapter()->find($this->getCollectionName(), $options);
+        if(!empty($result)){
+            $result = new AkActiveDocumentIterator($result, $this);
+        }
         return  $result;
     }
 
@@ -181,15 +207,27 @@ class AkActiveDocument extends AkLazyObject
     }
 
     private function _extractConditionsFromArgs($args, $options){
+        $fetch = 'all';
+        $num_args = count($args);
         if(!empty($args) && count($args) == 1 && array_key_exists(0, $args)){
             $fetch = 'first';
-            $options['attributes'][$this->getPrimaryKey()] = $args[0];
+            if($args[0] != 'first'){
+                $options['attributes'][$this->getPrimaryKey()] = $args[0];
+            }
+        }
+        if ($num_args > 1 && is_array($args[1])) {
+            $fetch = array_shift($args);
+            $options = array_merge($options, array('conditions'=>$args[0]));
         }
         return array($fetch, $options);
     }
 
 
     // Attributes
+
+    public function hasColumn($column_name){
+        return !in_array($column_name, $this->skip_attributes);
+    }
 
     public function getPrimaryKey(){
         if(empty($this->_primary_key)){
@@ -236,6 +274,12 @@ class AkActiveDocument extends AkLazyObject
         return $this->_attributes;
     }
 
+
+    public function setAttributesFromDatabase($attributes){
+        $this->_internals['existing_record'] = true;
+        $this->setAttributes($attributes);
+    }
+
     public function castAttributeForDatabase($attribute, $value){
         return $value;
         if(preg_match('/^(is_|has_|do_|does_|are_)/', $attribute, $matches)){
@@ -270,15 +314,10 @@ class AkActiveDocument extends AkLazyObject
 
     private function _loadFromDatabase($id){
         if($record = $this->find($id)){
-            $this->_setAttributesFromDatabase((array)$record);
+            $this->setAttributesFromDatabase($record->getAttributes());
             return $this->_callback('afterInstantiate');
         }
         return false;
-    }
-
-    private function _setAttributesFromDatabase($attributes){
-        $this->_internals['existing_record'] = true;
-        $this->setAttributes($attributes);
     }
 
 
@@ -412,13 +451,87 @@ class AkActiveDocument extends AkLazyObject
 
     /*/Callbacks*/
 
-    // Observers
 
-    public function notifyObservers(){
-        return true;
+
+    // Lazy loading
+    protected function _enableLazyLoadingExtenssions($options = array())
+    {
+        empty($options['skip_observers'])   && $this->_enableObservers();
+        empty($options['skip_errors'])      && $this->_enableErrors();
+        empty($options['skip_validations']) && $this->_enableValidations();
+    }
+
+    protected function _enableObservers()
+    {
+        $this->extendClassLazily('AkModelObserver',
+        array(
+        'methods' => array (
+        'notifyObservers',
+        'setObservableState',
+        'getObservableState',
+        'addObserver',
+        'getObservers',
+        ),
+        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'observer.php'
+        ));
     }
 
 
+
+    protected function _enableErrors()
+    {
+        $this->extendClassLazily('AkModelErrors',
+        array(
+        'methods' => array(
+        'addError',
+        'addErrorOnBlank',
+        'addErrorOnBoundaryBreaking',
+        'addErrorOnBoundryBreaking',
+        'addErrorOnEmpty',
+        'addErrorToBase',
+        'clearErrors',
+        'countErrors',
+        'errorsToString',
+        'getBaseErrors',
+        'getDefaultErrorMessageFor',
+        'getErrors',
+        'getErrorsOn',
+        'getFullErrorMessages',
+        'hasErrors',
+        'isInvalid',
+        'yieldEachError',
+        'yieldEachFullError',
+        'yieldError',
+        ),
+        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'errors.php'
+        ));
+    }
+
+
+    protected function _enableValidations()
+    {
+        $this->extendClassLazily('AkModelValidations',
+        array(
+        'methods' => array(
+        'validate',
+        'validateOnCreate',
+        'validateOnUpdate',
+        'needsValidation',
+        'isBlank',
+        'validatesPresenceOf',
+        'validatesUniquenessOf',
+        'validatesLengthOf',
+        'validatesInclusionOf',
+        'validatesExclusionOf',
+        'validatesNumericalityOf',
+        'validatesFormatOf',
+        'validatesAcceptanceOf',
+        'validatesConfirmationOf',
+        'validatesSizeOf',
+        ),
+        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'validations.php'
+        ));
+    }
 
     // Magic callback methods
 
@@ -437,9 +550,14 @@ class AkActiveDocument extends AkLazyObject
 class AkActiveDocumentIterator implements Iterator
 {
     private $_AdapterIterator;
+    private $_Model;
+    private $_ModelInstance;
 
-    public function __construct($AdapterIterator){
+    public function __construct(&$AdapterIterator, &$Model){
         $this->_AdapterIterator = $AdapterIterator;
+        $this->_Model           = $Model;
+        $class_name = $Model->getModelName();
+        $this->_ModelInstance   = new $class_name;
     }
 
     public function rewind() {
@@ -447,7 +565,9 @@ class AkActiveDocumentIterator implements Iterator
     }
 
     public function current() {
-        return $this->_AdapterIterator->current();
+        $Model = clone($this->_ModelInstance);
+        $Model->setAttributesFromDatabase($this->_AdapterIterator->current());
+        return $Model;
     }
 
     public function key() {

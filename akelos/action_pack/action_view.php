@@ -73,7 +73,7 @@
 *
 * See the AkActionView/Helpers/PrototypeHelper/JavaScriptGenerator documentation for more details.
 */
-class AkActionView extends AkObject
+class AkActionView
 {
     public
     $first_render,

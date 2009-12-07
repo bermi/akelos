@@ -21,3 +21,22 @@ class WebPage extends AkActiveDocument
     public function beforeDestroy(){$this->callbacks[] = __FUNCTION__; return $this->halt_on_callback != __FUNCTION__;}
     public function afterSave(){$this->callbacks[] = __FUNCTION__; return $this->halt_on_callback != __FUNCTION__;}
 }
+
+class WebPageAuditor extends AkObserver
+{
+    public function beforeCreate(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+    public function beforeValidation(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+    public function beforeValidationOnCreate(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+    public function beforeValidationOnUpdate(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+    public function beforeSave(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+    public function beforeUpdate(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+    public function afterUpdate(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+    public function afterValidation(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+    public function afterValidationOnCreate(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+    public function afterValidationOnUpdate(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+    public function afterInstantiate(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+    public function afterCreate(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+    public function afterDestroy(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+    public function beforeDestroy(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+    public function afterSave(&$Record){$Record->callbacks[] = __METHOD__; return $Record->halt_on_callback != __METHOD__;}
+}

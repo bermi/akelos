@@ -55,7 +55,7 @@
 * @since 0.1
 * @version $Revision 0.1 $
 */
-class AkCache extends AkObject
+class AkCache
 {
 
     /**

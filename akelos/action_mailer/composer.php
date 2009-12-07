@@ -1,6 +1,6 @@
 <?php
 
-class AkMailComposer extends AkObject
+class AkMailComposer
 {
     public $Message;
     public $ActionMailer;

@@ -206,7 +206,7 @@
  *   $this->expireFragment("cacheFragmentKey")
  *
  */
-class AkCacheHandler extends AkObject
+class AkCacheHandler
 {
     public $cache_strip = array('<!--CACHE-SKIP-START-->.*?<!--CACHE-SKIP-END-->','<div class=\"flash_[a-z]+\">.*?<\/div>');
 

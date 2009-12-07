@@ -2246,20 +2246,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     public function getAttributeCondition($argument)
     {
-        if(is_array($argument)){
-            return 'IN (?)';
-        }elseif (is_null($argument)){
-            return 'IS ?';
-        }else{
-            return '= ?';
-        }
+        return is_array($argument) ? 'IN (?)' : (is_null($argument) ? 'IS ?' : '= ?');
     }
 
-
-    public function t($string, $array = null,$model=null)
-    {
-        return Ak::t($string, $array, empty($model) ? AkInflector::underscore($this->getModelName()): $model);
-    }
 
 
     public function hasBeenModified()
@@ -2336,7 +2325,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      */
     protected function _enableLazyLoadingExtenssions($options = array())
     {
-        empty($options['skip_observer'])            && $this->_enableObserver();
+        empty($options['skip_observers'])           && $this->_enableObservers();
         empty($options['skip_finders'])             && $this->_enableFinders();
         empty($options['skip_validations'])         && $this->_enableValidations();
         empty($options['skip_errors'])              && $this->_enableErrors();
@@ -2555,16 +2544,16 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         ));
     }
 
-    protected function _enableObserver()
+    protected function _enableObservers()
     {
         $this->extendClassLazily('AkModelObserver',
         array(
         'methods' => array (
-          'notifyObservers',
-          'setObservableState',
-          'getObservableState',
-          'addObserver',
-          'getObservers',
+        'notifyObservers',
+        'setObservableState',
+        'getObservableState',
+        'addObserver',
+        'getObservers',
         ),
         'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'observer.php'
         ));

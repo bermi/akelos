@@ -41,7 +41,7 @@
 *
 *   Normal view text
 */
-class CaptureHelper extends AkObject 
+class CaptureHelper 
 {
     protected 
     $_stack = array();

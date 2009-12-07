@@ -42,7 +42,7 @@ class ActsAsNestedSet_TestCase extends ActiveRecordUnitTest
     public function Test_of__ensureIsActiveRecordInstance()
     {
         $Categories = new NestedCategory();
-        $Object = new AkObject();
+        $Object = new stdClass();
         $this->expectError(new PatternExpectation('/is not an active record/'));
         $Categories->nested_set->_ensureIsActiveRecordInstance($Object);
     }

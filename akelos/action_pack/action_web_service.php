@@ -1,6 +1,6 @@
 <?php
 
-class AkActionWebService extends AkObject
+class AkActionWebService
 {
     public $_apis = array();
 

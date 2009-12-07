@@ -1,6 +1,6 @@
 <?php
 
-class FrameworkSetup extends AkObject
+class FrameworkSetup
 {
     public $available_databases = array(
     'mysql' => 'MySQL',

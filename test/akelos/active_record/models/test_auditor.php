@@ -1,22 +1,17 @@
 <?php
-    class TestAuditor extends AkObserver
-    {
-        public function update($state = '')
-        {
-            switch ($state)
-            {
-                case "new person created" :
+class TestAuditor extends AkObserver
+{
+    public function update($state = ''){
+        switch ($state){
+            case "new person created" :
                 echo $state;
                 break;
-                default:
+            default:
                 break;
-            }
         }
-
-        public function afterCreate(&$record)
-        {
-            $record->audited = true;
-        }
-
     }
-?>
+
+    public function afterCreate(&$record){
+        $record->audited = true;
+    }
+}

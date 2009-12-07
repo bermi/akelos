@@ -1,6 +1,6 @@
 <?php
 
-class AkImageColorScheme extends AkObject
+class AkImageColorScheme
 {
     public 
     $number_of_colors = 12,

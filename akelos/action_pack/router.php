@@ -13,7 +13,7 @@
 * @author Bermi Ferrer <bermi a.t akelos d.t c.om>
 * @license GNU Lesser General Public License <http://www.gnu.org/copyleft/lesser.html>
 */
-class AkRouter extends AkObject
+class AkRouter
 {
 
     /**

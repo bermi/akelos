@@ -1,6 +1,6 @@
 <?php
 
-class AkDbAdapter extends AkObject
+class AkDbAdapter
 {
     public $connection;
     public $settings;

@@ -3,14 +3,14 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class PHP_Bug_33595_A extends AkObject
+class PHP_Bug_33595_A
 {
     public $two = null;
     public $data = null;
 }
 
 
-class PHP_Bug_33595_B extends AkObject
+class PHP_Bug_33595_B
 {
     public $one = null;
 }
@@ -57,8 +57,8 @@ class PHP_Bug_33595_TestCase extends ActiveSupportUnitTest
         $Two->data = str_repeat('Two',10000);
 
         if($use_free_memory_hack){
-            $One->freeMemory();
-            $Two->freeMemory();
+            Ak::unsetCircularReferences($One);
+            Ak::unsetCircularReferences($Two);
         }
 
         unset($One);

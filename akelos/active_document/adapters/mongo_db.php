@@ -115,6 +115,10 @@ class AkOdbMongoDbAdapter
     }
 
     public function &find($collection_name, $options = array()){
+        if(!empty($options['conditions']) && empty($options['attributes'])){
+            $options['attributes'] = $options['conditions'];
+            unset($options['conditions']);
+        }
         if(empty($options['attributes'])) return false;
         $Cursor = $this->getDatabase()->selectCollection($collection_name)->find($this->_castAttributesForFinder($options['attributes']));
         isset($options['limit'])    &&  $Cursor->limit($options['limit']);
@@ -123,7 +127,7 @@ class AkOdbMongoDbAdapter
             $false = false;
             return $false;
         }
-        return new AkActiveDocumentIterator($Cursor);
+        return $Cursor;
     }
 
     public function delete($collection_name, $id){
