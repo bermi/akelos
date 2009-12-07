@@ -1,0 +1,27 @@
+#this file must be located in config/ci-config.yaml
+test-installation: ${test-installation}
+test-url: ${test-url}
+memcached-socket: ${memcached-socket}
+
+executables: 
+  php5:    ${php5}                         
+  php4:    ${php4}
+
+environments:                          
+  - mysql  # will look for config/mysql.yml
+  - postgres
+  - sqlite
+
+default_executables: 
+  - php5 
+  - php4
+
+valid_combinations:  
+  php4: 
+    - mysql
+    - postgres
+    
+  php5: 
+    - mysql
+    - postgres
+    - sqlite

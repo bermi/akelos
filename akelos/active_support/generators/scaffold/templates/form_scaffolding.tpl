@@ -1,0 +1,1 @@
+<?php  echo '<?php  echo '?>$active_record_helper->all_input_tags($<?php  echo $model_name?>, '<?php  echo $singular_name?>', array()) ?>

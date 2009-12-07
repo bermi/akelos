@@ -1,0 +1,1 @@
+_{index.js.tpl}

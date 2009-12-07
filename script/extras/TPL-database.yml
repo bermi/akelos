@@ -1,0 +1,8 @@
+default:
+    type: ${type}
+    host: ${host}
+    database_name: ${database_name}
+    database_file: ${database_file}
+    user: ${user}
+    password: ${password}
+    options: ${options}

@@ -1,0 +1,22 @@
+default:
+    value1: 1
+    value2: 2
+    value3:
+            subvalue1: 1
+            subvalue2: 2
+            subvalue3: 3
+            subvalue4:
+                    subsubvalue1: 1
+
+testing:
+    value3:
+            subvalue3: 5
+            subvalue4:
+                    subsubvalue1: 2
+                    
+production:
+    value1: 100
+    value3:
+            subvalue3: 7
+            subvalue4:
+                    subsubvalue1: 13

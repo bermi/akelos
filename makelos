@@ -1,0 +1,7 @@
+#!/usr/bin/env php
+<?php
+
+define('MAKELOS_BASE_DIR', dirname(__FILE__));
+
+include('./akelos/active_support/makelos.php');
+

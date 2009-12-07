@@ -1,0 +1,99 @@
+default:
+    pluralize:
+        replacements: 
+            Á: A
+            É: E
+            Í: I
+            Ó: O
+            Ú: U
+            á: a
+            é: e
+            í: i
+            ó: o
+            ú: u
+        rules:
+            /([aeiou])x$/i:  \1x
+            /([áéíóú])([ns])$/i:  @1\2es 
+            /(^[bcdfghjklmnñpqrstvwxyz]*)an$/i:  \1anes
+            /([áéíóú])s$/i:  |1ses 
+            /(^[bcdfghjklmnñpqrstvwxyz]*)([aeiou])([ns])$/i:  \1 \2 \3es
+            /([aeiouáéó])$/i:  \1s
+            /([aeiou])s$/i:  \1s
+            /([éí])(s)$/i:  @1\2es
+            /z$/i: ces
+            /([íú])$/i:  \1es
+            /(ng|[wckgtp])$/:  \1s
+            /$/i: es
+     
+        uncountable:
+            - tijeras
+            - gafas
+            - vacaciones
+            - víveres
+            - déficit
+    
+        irregular:
+            país: países
+            champú: champús
+            jersey: jerséis
+            carácter: caracteres
+            espécimen: especímenes
+            menú: menús
+            régimen: regímenes
+            curriculum: currículos
+            ultimátum: ultimatos
+            memorándum: memorandos
+            referéndum: referendos
+    
+    singularize:
+        replacements:
+            A: Á
+            E: É
+            I: Í
+            O: Ó
+            U: Ú
+            a: á
+            e: é
+            i: í
+            o: ó
+            u: ú
+        rules:
+            /^([bcdfghjklmnñpqrstvwxyz]*)([aeiou])([ns])es$/i: \1\2\3
+            /([aeiou])([ns])es$/i: @1\2
+            /oides$/i: oide
+            /(ces)$/i: z
+            /(sis|tis|xis)+$/i: \1
+            /(é)s$/i: \1
+            /([^e])s$/i: \1
+            /([bcdfghjklmnñprstvwxyz]{2,}e)s$/i: \1
+            /([ghñpv]e)s$/i: \1
+            /es$/i: ""
+     
+        uncountable:
+            - paraguas
+            - tijeras
+            - gafas
+            - vacaciones
+            - víveres
+            - lunes
+            - martes
+            - miércoles
+            - jueves
+            - viernes
+            - cumpleaños
+            - virus
+            - atlas
+            - sms
+    
+        irregular:
+            jersey: jerséis
+            espécimen: especímenes
+            carácter: caracteres
+            régimen: regímenes
+            menú: menús
+            régimen: regímenes
+            curriculum: currículos
+            ultimátum: ultimatos
+            memorándum: memorandos
+            referéndum: referendos
+            sándwich: sándwiches

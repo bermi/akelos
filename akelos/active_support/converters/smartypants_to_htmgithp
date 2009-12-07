@@ -1,0 +1,9 @@
+<?php
+
+class AkSmartypantsToHtml
+{
+    public function convert() {
+        return $this->source;
+    }
+}
+

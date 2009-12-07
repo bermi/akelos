@@ -1,0 +1,10 @@
+config/database.yml
+config/sqlite.yml
+config/mysql.yml
+config/testconfig1.yml
+config/plugin_repositories.txt
+app/locales/
+cache/
+test/_fixtures/
+nbproject/
+docs/akelos/doc.sqlite
