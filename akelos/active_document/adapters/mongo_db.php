@@ -19,11 +19,15 @@ class AkOdbMongoDbAdapter
         if($this->_meetsDependencies()){
             $port = $this->getOption('port');
             if(!$Connection = Ak::getStaticVar(__CLASS__.'_'.$this->_connetion_signature)){
-                $Connection = new Mongo($this->getOption('host').(empty($port)?'':':'.$port));
+                try{
+                    $Connection = new Mongo($this->getOption('host').(empty($port)?'':':'.$port));
+                }catch(MongoConnectionException $e){
+                    $Connection = false;
+                }
                 Ak::setStaticVar(__CLASS__.'_'.$this->_connetion_signature, $Connection);
             }
             $this->_Mongo[$this->_connetion_signature] = $Connection;
-            if(!$this->isConnected()){
+            if($Connection && !$this->isConnected()){
                 $Connection->connect();
             }
         }

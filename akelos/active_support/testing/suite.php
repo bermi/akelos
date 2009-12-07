@@ -128,6 +128,7 @@ class AkUnitTestSuite extends TestSuite
             $options['TestSuite']->addFile($file);
         }
 
+        //($options['TestSuite']->run(new $options['reporter']()) ? 0 : 1); file_put_contents(AK_LOG_DIR.DS.'included_files.php', var_export(get_included_files(), true)); return;
         exit ($options['TestSuite']->run(new $options['reporter']()) ? 0 : 1);
     }
 

@@ -9,10 +9,12 @@ class DatabaseSessions_TestCase extends AkWebTestCase
 
     public function __construct()
     {
-        if(!$this->webserver_enabled = AkConfig::getOption('webserver_enabled', false)){
-            echo "Skipping DatabaseSessions_TestCase: Web server not accesible at ".AkConfig::getOption('testing_url')."\n";
-        }
+        $this->webserver_enabled = AkConfig::getOption('webserver_enabled', false);
         parent::__construct();
+    }
+    
+    public function skip(){
+        $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
     }
 
     public function setUp()
@@ -29,8 +31,6 @@ class DatabaseSessions_TestCase extends AkWebTestCase
 
     public function test_open()
     {
-        if(!$this->webserver_enabled) return;
-
         $browser = $this->getBrowser();
         $this->get("$this->_test_script?open_check=1");
         $expected_session_id = $browser->getContentAsText();
@@ -41,8 +41,6 @@ class DatabaseSessions_TestCase extends AkWebTestCase
 
     public function test_read_write()
     {
-        if(!$this->webserver_enabled) return;
-
         $expected = 'test_value';
         $this->get("$this->_test_script?key=test_key&value=$expected");
         $this->get("$this->_test_script?key=test_key");
@@ -52,8 +50,6 @@ class DatabaseSessions_TestCase extends AkWebTestCase
 
     public function test_destroy()
     {
-        if(!$this->webserver_enabled) return;
-
         $expected = 'value not found';
         $this->get("$this->_test_script?key=test_key&value=test_value");
         $this->get("$this->_test_script?destroy_check=1");
@@ -63,8 +59,6 @@ class DatabaseSessions_TestCase extends AkWebTestCase
 
     public function test_gc()
     {
-        if(!$this->webserver_enabled) return;
-
         $expected = 'value not found';
         $copy = $this;
         $copy->get("$this->_test_script?key=test_key&value=test_value&expire=1");

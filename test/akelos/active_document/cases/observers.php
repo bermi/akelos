@@ -21,7 +21,7 @@ class DocumentObservers_TestCase extends ActiveDocumentUnitTest
         $this->db->dropDatabase();
         $this->db->disconnect();
     }
-
+    
     public function test_should_issue_observer_callbacks_in_the_right_order()
     {
         // Creation callbacks

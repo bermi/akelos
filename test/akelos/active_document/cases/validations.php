@@ -40,7 +40,7 @@ class DocumentValidations_TestCase extends ActiveDocumentUnitTest
         $this->db->dropDatabase();
         $this->db->disconnect();
     }
-
+    
     public function test_should_not_validate_if_an_error_is_added(){
         $this->ValidDocument->validate_code = '$this->addError("title", "is invalid");';
         $this->assertFalse($this->ValidDocument->save());

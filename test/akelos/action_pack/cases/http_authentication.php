@@ -8,18 +8,18 @@ class HttpAuthentication_TestCase extends AkWebTestCase
 
     public function __construct()
     {
-        if(!$this->webserver_enabled = AkConfig::getOption('webserver_enabled', false)){
-            echo "Skipping HttpAuthentication_TestCase: Web server not accesible at ".AkConfig::getOption('testing_url')."\n";
-        }
+        $this->webserver_enabled = AkConfig::getOption('webserver_enabled', false);
         parent::__construct();
         $this->_test_script = AkConfig::getOption('testing_url').
         '/action_pack/public/index.php?ak=';
     }
+    
+    public function skip(){
+        $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
+    }
 
     public function test_should_access_public_action()
     {
-        if(!$this->webserver_enabled) return;
-
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'authentication');
         $this->assertResponse(200);
@@ -28,8 +28,6 @@ class HttpAuthentication_TestCase extends AkWebTestCase
 
     public function test_should_show_login_with_realm()
     {
-        if(!$this->webserver_enabled) return;
-
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'authentication/edit');
         $this->assertRealm('App name');
@@ -38,8 +36,6 @@ class HttpAuthentication_TestCase extends AkWebTestCase
 
     public function test_should_fail_login()
     {
-        if(!$this->webserver_enabled) return;
-
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'authentication/edit');
         $this->authenticate('bermi', 'badpass');
@@ -49,8 +45,6 @@ class HttpAuthentication_TestCase extends AkWebTestCase
 
     public function test_should_login()
     {
-        if(!$this->webserver_enabled) return;
-
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'authentication/edit');
         $this->authenticate('bermi', 'secret');

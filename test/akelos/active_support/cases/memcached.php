@@ -12,6 +12,10 @@ class Memcached_TestCase extends ActiveSupportUnitTest
         parent::__construct();
         $this->memcached_enabled = AkConfig::getOption('memcached_enabled', false);
     }
+    
+    public function skip(){
+        $this->skipIf(!$this->memcached_enabled, '['.get_class($this).'] Can\'t connecto to memcached server.');
+    }
 
     public function setUp()
     {
@@ -24,7 +28,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_init_without_server_fallback_to_default()
     {
-        if(!$this->memcached_enabled) return;
         $this->memcache = new AkMemcache();
         $res = $this->memcache->init(array());
         $this->assertTrue(true);
@@ -32,7 +35,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_init_with_wrong_server()
     {
-        if(!$this->memcached_enabled) return;
         $this->memcache = new AkMemcache();
         $this->assertUpcomingError('Could not connect to MemCache daemon');
         $res = $this->memcache->init(array('servers'=>array('test:121')));
@@ -42,7 +44,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_init_with_wrong_server_using_AkCache_init()
     {
-        if(!$this->memcached_enabled) return;
         $cache=new AkCache();
         $this->assertUpcomingError('Could not connect to MemCache daemon');
         $res = $cache->init(array('servers'=>array('test:121')),3);
@@ -52,7 +53,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_init_with_wrong_server_using_AkCache_lookupStore()
     {
-        if(!$this->memcached_enabled) return;
         $options = array('enabled'=>true,'handler'=>array('type'=>3,'options'=>array('servers'=>array('test:121'))));
         $this->assertUpcomingError('Could not connect to MemCache daemon');
         $cache=AkCache::lookupStore($options);
@@ -61,7 +61,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_set_and_get_string()
     {
-        if(!$this->memcached_enabled) return;
         $original = 'test';
         $res = $this->memcache->save($original,'test_id_1','strings');
         $stored = $this->memcache->get('test_id_1','strings');
@@ -71,7 +70,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_set_and_get_integer()
     {
-        if(!$this->memcached_enabled) return;
         $original = 1111;
         $res = $this->memcache->save($original,'test_id_2','integers');
         $stored = $this->memcache->get('test_id_2','integers');
@@ -81,7 +79,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_set_and_get_float()
     {
-        if(!$this->memcached_enabled) return;
         $original = 11.11;
         $res = $this->memcache->save($original,'test_id_3','floats');
         $stored = $this->memcache->get('test_id_3','floats');
@@ -91,7 +88,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_set_and_get_array()
     {
-        if(!$this->memcached_enabled) return;
         $original = array(0,1,2,3,'test');
         $res = $this->memcache->save($original,'test_id_4','arrays');
         $stored = $this->memcache->get('test_id_4','arrays');
@@ -101,7 +97,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_set_and_get_object()
     {
-        if(!$this->memcached_enabled) return;
         $original = new stdClass;
         $original->id = 1;
         $res = $this->memcache->save($original,'test_id_5','objects');
@@ -113,7 +108,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_set_and_get_objects_within_arrays()
     {
-        if(!$this->memcached_enabled) return;
         $obj1=new stdClass;
         $obj1->id=1;
         $obj2=new stdClass;
@@ -129,7 +123,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_set_and_get_large_strings()
     {
-        if(!$this->memcached_enabled) return;
         $original = file_get_contents(__FILE__);
         $res = $this->memcache->save($original,'test_id_7','largestrings');
         $stored = $this->memcache->get('test_id_7','largestrings');
@@ -139,7 +132,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_set_and_get_binary_data()
     {
-        if(!$this->memcached_enabled) return;
         $original = file_get_contents(AK_BASE_DIR.DS.'public'.DS.'images'.DS.'akelos_framework_logo.png');
         $res = $this->memcache->save($original,'test_id_8','binary');
         $stored = $this->memcache->get('test_id_8','binary');
@@ -149,7 +141,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_set_and_get_really_large_string()
     {
-        if(!$this->memcached_enabled) return;
         $original = $this->_generateLargeString(1000000);
         $res = $this->memcache->save($original,'test_id_9','strings');
         $stored = $this->memcache->get('test_id_9','strings');
@@ -158,7 +149,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
     }
     public function test_set_and_get_really_really_large_string()
     {
-        if(!$this->memcached_enabled) return;
         $original = $this->_generateLargeString(2000000);
         $res = $this->memcache->save($original,'test_id_10','strings');
         $stored = $this->memcache->get('test_id_10','strings');
@@ -168,7 +158,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_set_and_remove_key()
     {
-        if(!$this->memcached_enabled) return;
         $original = $this->_generateLargeString(1000);
         $res = $this->memcache->save($original,'test_id_11','strings');
         $stored = $this->memcache->get('test_id_11','strings');
@@ -181,7 +170,6 @@ class Memcached_TestCase extends ActiveSupportUnitTest
 
     public function test_flush_group()
     {
-        if(!$this->memcached_enabled) return;
         $retrieved = $this->memcache->get('test_id_10','strings');
         $this->assertTrue($retrieved!=null);
 

@@ -22,15 +22,16 @@ class Image_TestCase extends ActiveSupportUnitTest
     }
 
     public function __destruct()
-    {
-        if($this->offline_mode) return;
+    {        
         Ak::directory_delete(AkConfig::getDir('fixtures').'/Image_TestCase');
+    }
+
+    public function skip(){
+        $this->skipIf($this->offline_mode, '['.get_class($this).'] Internet connection unavailable.');
     }
 
     public function test_image_save_as()
     {
-        if($this->offline_mode) return;
-
         $PngImage = new AkImage($this->image_path);
         $this->assertEqual($PngImage->getExtension(), 'png');
 
@@ -46,8 +47,6 @@ class Image_TestCase extends ActiveSupportUnitTest
 
     public function test_image_resize()
     {
-        if($this->offline_mode) return;
-
         $Image = new AkImage();
         $Image->load($this->image_path);
 
@@ -112,8 +111,7 @@ class Image_TestCase extends ActiveSupportUnitTest
 
     public function test_image_crop()
     {
-        if( $this->offline_mode ||
-            !$this->_run_extra_tests) return;
+        if(!$this->_run_extra_tests) return;
 
         $Image = new AkImage();
         $Image->load($this->photo_path);
@@ -148,8 +146,7 @@ class Image_TestCase extends ActiveSupportUnitTest
 
     public function test_image_watermark()
     {
-        if( $this->offline_mode ||
-            !$this->_run_extra_tests) return;
+        if(!$this->_run_extra_tests) return;
 
         $Image = new AkImage();
         $Image->load($this->photo_path);
@@ -160,8 +157,6 @@ class Image_TestCase extends ActiveSupportUnitTest
 
     public function test_should_apply_native_filters()
     {
-        if($this->offline_mode) return;
-
         $native_filters = array(
         'negate' =>         array('params' => array(), 'hash' => '8b44f26c9646ac69a1b48bbc66622184'),
         'grayscale' =>      array('params' => array(), 'hash' => 'd08a0ad61f4fd5b343c0a4af6d810ddf'),

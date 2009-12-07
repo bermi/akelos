@@ -8,18 +8,18 @@ class RenderFormat_TestCase extends AkWebTestCase
 
     public function __construct()
     {
-        if(!$this->webserver_enabled = AkConfig::getOption('webserver_enabled', false)){
-            echo "Skipping DatabaseSessions_TestCase: Web server not accesible at ".AkConfig::getOption('testing_url')."\n";
-        }
+        $this->webserver_enabled = AkConfig::getOption('webserver_enabled', false);
         parent::__construct();
         $this->_test_script = AkConfig::getOption('testing_url').
         '/action_pack/public/index.php?ak=';
     }
+    
+    public function skip(){
+        $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
+    }
 
     public function test_should_render_requested_format()
     {
-        if(!$this->webserver_enabled) return;
-
         $this->get($this->_test_script.'formats/index.xml');
         $this->assertTextMatch("index.xml.tpl");
         $this->assertHeader('Content-Type', 'application/xml; charset=UTF-8');

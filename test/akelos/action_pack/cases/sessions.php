@@ -10,11 +10,7 @@ class Sessions_TestCase extends AkWebTestCase
     public function __construct()
     {
         parent::__construct();
-
-        if(!$this->webserver_enabled = AkConfig::getOption('webserver_enabled', false)){
-            echo "Skipping DatabaseSessions_TestCase: Web server not accesible at ".AkConfig::getOption('testing_url')."\n";
-        }
-
+        $this->webserver_enabled = AkConfig::getOption('webserver_enabled', false);
         AkAdodbCache::install();
         AkDbSession::install();
         $this->_test_script = AkConfig::getOption('testing_url').
@@ -28,11 +24,13 @@ class Sessions_TestCase extends AkWebTestCase
         $Installer = new AkInstaller();
         $Installer->dropTable('akelos_migrations');
     }
-
+    
+    public function skip(){
+        $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
+    }
+    
     public function test_all_session_handlers()
     {
-        if(!$this->webserver_enabled) return;
-
         $cacheHandlers = array('cache_lite'=>1, 'akadodbcache'=>2);
 
         if (AkConfig::getOption('memcached_enabled', false)) {
