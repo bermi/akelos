@@ -4,20 +4,17 @@ class AkTestDispatcher extends AkDispatcher
 {
     public $_controllerVars;
 
-    public function __construct($controllerVars = array())
-    {
+    public function __construct($controllerVars = array()) {
         $this->_controllerVars = $controllerVars;
     }
 
-    public function get($url,$params = array())
-    {
+    public function get($url,$params = array()) {
         $_GET = $params;
         $_SERVER['REQUEST_METHOD'] = 'GET';
         return $this->process($url);
     }
 
-    public function post($url, $postParams)
-    {
+    public function post($url, $postParams) {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         if (is_array($postParams)) {
             $_POST = $postParams;
@@ -27,8 +24,7 @@ class AkTestDispatcher extends AkDispatcher
         return $this->process($url);
     }
 
-    public function put($url, $data)
-    {
+    public function put($url, $data) {
         $_SERVER['REQUEST_METHOD'] = 'PUT';
         $_SERVER['CONTENT_LENGTH'] = strlen($data);
         $fh = fopen('php://input', 'w');
@@ -41,14 +37,12 @@ class AkTestDispatcher extends AkDispatcher
         }
     }
 
-    public function delete($url)
-    {
+    public function delete($url) {
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
         return $this->process($url);
     }
 
-    public function process($url)
-    {
+    public function process($url) {
         $_SERVER['PHP_SELF'] = '/index.php';
         $parts = parse_url($url);
         if (isset($parts['scheme'])) {
@@ -71,8 +65,7 @@ class AkTestDispatcher extends AkDispatcher
         return $this->dispatch();
     }
 
-    public function dispatch()
-    {
+    public function dispatch() {
         $this->Request = new AkTestRequest();
         $this->Response = new AkTestResponse();
         $controller = $this->Request->recognize();

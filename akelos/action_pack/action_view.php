@@ -94,8 +94,7 @@ class AkActionView
     public $template_args = array();
 
 
-    public function __construct($base_path = null, $assigns_for_first_render = array(), $controller = null)
-    {
+    public function __construct($base_path = null, $assigns_for_first_render = array(), $controller = null) {
         $this->app_views_dir = AkConfig::getDir('views');
         $this->base_path = empty($base_path) ? $this->app_views_dir : $base_path;
         $this->assigns = $assigns_for_first_render;
@@ -104,8 +103,7 @@ class AkActionView
         $this->logger = !empty($controller) && !empty($controller->Logger);
     }
 
-    public function _loadHelpers($helper_dir = null)
-    {
+    public function _loadHelpers($helper_dir = null) {
         $helper_dir = empty($helper_dir) ? AK_ACTION_PACK_DIR.DS.'helpers' : $helper_dir;
         if (!empty($this->helpers)){
             $this->helpers = is_array($this->helpers) ? $this->helpers : array($this->helpers);
@@ -133,8 +131,7 @@ class AkActionView
     * local assigns available to the template. The "render" method ought to
     * return the rendered template as a string.
     */
-    public function _registerTemplateHandler($extension, $className)
-    {
+    public function _registerTemplateHandler($extension, $className) {
         $this->_template_handlers[$extension] = $className;
     }
 
@@ -144,8 +141,7 @@ class AkActionView
     * it's relative to the template_root, otherwise it's absolute. The array in <tt>local_assigns</tt>
     * is made available as local variables.
     */
-    public function renderFile($template_path, $use_full_path = true, $local_assigns = array())
-    {
+    public function renderFile($template_path, $use_full_path = true, $local_assigns = array()) {
         if(empty($this->first_render)){
             $this->first_render = $template_path;
         }
@@ -178,8 +174,7 @@ class AkActionView
     * Renders the template present at <tt>template_path</tt> (relative to the template_root).
     * The array in <tt>local_assigns</tt> is made available as local variables.
     */
-    public function render($options = array())
-    {
+    public function render($options = array()) {
         if(is_string($options)){
             return $this->renderFile($options, true);
         }elseif(is_array($options)){
@@ -202,8 +197,7 @@ class AkActionView
     * Renders the +template+ which is given as a string as tpl.php or js.tpl depending on <tt>template_extension</tt>.
     * The array in <tt>local_assigns</tt> is made available as local variables.
     */
-    public function renderTemplate($____template_extension, $____template, $____file_path = null, $____local_assigns = array(), $____save_content_in_attribute_as = 'layout')
-    {
+    public function renderTemplate($____template_extension, $____template, $____file_path = null, $____local_assigns = array(), $____save_content_in_attribute_as = 'layout') {
         $____result = '';
         $____controller_extras = isset($this->_controllerInstance) ? array('controller_name' => $this->_controllerInstance->getControllerName(), 'controller' => $this->_controllerInstance) : array();
         $____local_assigns = array_merge(array_merge($this->getGlobals(),(array)@$this->assigns,array_merge((array)@$this->_local_assigns,
@@ -234,13 +228,11 @@ class AkActionView
         return $____result;
     }
 
-    public function addSharedAttributes(&$local_assigns)
-    {
+    public function addSharedAttributes(&$local_assigns) {
         $this->_local_assigns = $local_assigns;
     }
 
-    public function pickTemplateExtension($template_path)
-    {
+    public function pickTemplateExtension($template_path) {
         if($match = $this->delegateTemplateExists($template_path)){
             return $match;
         }elseif($this->_templateExists($template_path,'tpl.php')){
@@ -253,8 +245,7 @@ class AkActionView
         }
     }
 
-    public function delegateTemplateExists($template_path)
-    {
+    public function delegateTemplateExists($template_path) {
         foreach (array_keys($this->_template_handlers) as $k){
             if($this->_templateExists($template_path, $k)){
                 return $k;
@@ -266,20 +257,17 @@ class AkActionView
     /**
     * Returns true is the file may be rendered implicitly.
     */
-    public function fileIsPublic($template_path)
-    {
+    public function fileIsPublic($template_path) {
         return strpos(strrchr($template_path,DS),'_') !== 1;
     }
 
-    public function getFullTemplatePath($template_path, $extension)
-    {
+    public function getFullTemplatePath($template_path, $extension) {
         $template_path = substr($template_path,-1*strlen($extension)) == $extension ? $template_path : $template_path.'.'.$extension;
         $result = substr($template_path, 0, strlen($this->app_views_dir)) == $this->app_views_dir ? $template_path : $this->base_path.DS.$template_path;
         return substr($template_path, 0, strlen($this->app_views_dir)) == $this->app_views_dir ? $template_path : $this->base_path.DS.$template_path;
     }
 
-    public function _templateExists($template_path, $extension)
-    {
+    public function _templateExists($template_path, $extension) {
         $file_path = $this->getFullTemplatePath($template_path, $extension);
         return !empty($this->_method_names[$file_path]) || file_exists($file_path);
     }
@@ -287,34 +275,29 @@ class AkActionView
     /**
       * This method reads a template file.
       */
-    public function _readTemplateFile($template_path)
-    {
+    public function _readTemplateFile($template_path) {
         return Ak::file_get_contents($template_path);
     }
 
-    public function evaluateAssigns()
-    {
+    public function evaluateAssigns() {
         if(empty($this->assigns_added)){
             $this->_assignVariablesFromController();
             $this->assigns_added = true;
         }
     }
 
-    public function _delegateRender($handler, $template, $local_assigns, $file_path)
-    {
+    public function _delegateRender($handler, $template, $local_assigns, $file_path) {
         $HandlerInstance = new $handler($this);
         return $HandlerInstance->render($template, $local_assigns, $file_path);
     }
 
-    public function _assignVariablesFromController()
-    {
+    public function _assignVariablesFromController() {
         foreach ($this->assigns as $k=>$v){
             $this->$k = $v;
         }
     }
 
-    public function _javascriptTemplateExists($template_path)
-    {
+    public function _javascriptTemplateExists($template_path) {
         return $this->_templateExists($template_path,'js.tpl');
     }
 
@@ -364,8 +347,7 @@ class AkActionView
     *
     *  This will render the partial "advertiser/_ad.tpl" regardless of which controller this is being called from.
     */
-    public function renderPartial($partial_path, $object, $local_assigns = array())
-    {
+    public function renderPartial($partial_path, $object, $local_assigns = array()) {
         $path = $this->_partialPathPiece($partial_path);
         $partial_name = $this->_partialPathName($partial_path);
         $local_assigns = array_merge((array)@$this->_controllerInstance->_assigns, (array)$local_assigns);
@@ -373,8 +355,7 @@ class AkActionView
         return $this->renderFile((empty($path) ? '' : $path.DS).'_'.$partial_name, true, $local_assigns);
     }
 
-    public function renderPartialCollection($partial_name, $collection, $partial_spacer_template = null, $local_assigns = array())
-    {
+    public function renderPartialCollection($partial_name, $collection, $partial_spacer_template = null, $local_assigns = array()) {
         $collection_of_partials = array();
         $counter_name = $this->_partialCounterName($partial_name);
         if(empty($local_assigns[$counter_name])){
@@ -399,14 +380,12 @@ class AkActionView
         }
     }
 
-    public function renderCollectionOfPartials($partial_name, $collection, $partial_spacer_template = null, $local_assigns = array())
-    {
+    public function renderCollectionOfPartials($partial_name, $collection, $partial_spacer_template = null, $local_assigns = array()) {
         return $this->renderPartialCollection($partial_name, $collection, $partial_spacer_template, $local_assigns);
     }
 
 
-    public function _partialPathPiece($partial_path)
-    {
+    public function _partialPathPiece($partial_path) {
         if(strstr($partial_path, '/')){
             $dir_name = dirname($partial_path);
             if(strstr($dir_name,'/')){
@@ -419,18 +398,15 @@ class AkActionView
         }
     }
 
-    public function _partialPathName($partial_path)
-    {
+    public function _partialPathName($partial_path) {
         return strstr($partial_path, '/') ? basename($partial_path) : $partial_path;
     }
 
-    public function _partialCounterName($partial_name)
-    {
+    public function _partialCounterName($partial_name) {
         return Ak::last(explode('/',$partial_name)).'_counter';
     }
 
-    public function &_extractingObject($partial_name, &$deprecated_local_assigns)
-    {
+    public function &_extractingObject($partial_name, &$deprecated_local_assigns) {
         if(is_array($deprecated_local_assigns)){
             if(!isset($this->_controllerInstance->$partial_name)){
                 return $partial_name;
@@ -441,13 +417,11 @@ class AkActionView
         }
     }
 
-    public function _addObjectToLocalAssigns($partial_name, $local_assigns, &$object)
-    {
+    public function _addObjectToLocalAssigns($partial_name, $local_assigns, &$object) {
         $local_assigns[$partial_name] = empty($object) ? $this->_controllerInstance->$partial_name : $object;
     }
 
-    public function _addObjectToLocalAssigns_($partial_name, &$local_assigns, $object)
-    {
+    public function _addObjectToLocalAssigns_($partial_name, &$local_assigns, $object) {
         if(!empty($object)){
             $local_assigns[$partial_name] = $object;
         }elseif(!empty($this->_controllerInstance->$partial_name)){
@@ -462,8 +436,7 @@ class AkActionView
      *
      * @static
      */
-    public function addGlobalVar($var_name, $value, $_retrieve = false)
-    {
+    public function addGlobalVar($var_name, $value, $_retrieve = false) {
         static $_global_vars = array();
         if($_retrieve){
             return $_global_vars;
@@ -479,8 +452,7 @@ class AkActionView
     /**
      * @static
      */
-    public function getGlobals()
-    {
+    public function getGlobals() {
         return AkActionView::addGlobalVar(null,null,true);
     }
 

@@ -51,26 +51,22 @@ class AkModelValidations extends AkModelExtenssion
     /**
     * Overwrite this method for validation checks on all saves and use addError($field, $message); for invalid attributes.
     */
-    public function validate()
-    {
+    public function validate() {
     }
 
     /**
     * Overwrite this method for validation checks used only on creation.
     */
-    public function validateOnCreate()
-    {
+    public function validateOnCreate() {
     }
 
     /**
     * Overwrite this method for validation checks used only on updates.
     */
-    public function validateOnUpdate()
-    {
+    public function validateOnUpdate() {
     }
 
-    public function needsValidation()
-    {
+    public function needsValidation() {
         return true;
     }
 
@@ -96,8 +92,7 @@ class AkModelValidations extends AkModelExtenssion
       * is not null.
       *
       */
-    public function validatesConfirmationOf($attribute_names, $message = 'confirmation')
-    {
+    public function validatesConfirmationOf($attribute_names, $message = 'confirmation') {
         $message = $this->_Model->getDefaultErrorMessageFor($message, true);
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
@@ -127,8 +122,7 @@ class AkModelValidations extends AkModelExtenssion
       * @param accept 1
       * Specifies value that is considered accepted.  The default value is a string "1", which makes it easy to relate to an HTML checkbox.
       */
-    public function validatesAcceptanceOf($attribute_names, $message = 'accepted', $accept = 1)
-    {
+    public function validatesAcceptanceOf($attribute_names, $message = 'accepted', $accept = 1) {
         $message = $this->_Model->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
@@ -168,8 +162,7 @@ class AkModelValidations extends AkModelExtenssion
     * NOTE: This validation will not fail if the association hasn't been assigned. If you want to ensure that the association
     * is both present and guaranteed to be valid, you also need to use validatesPresenceOf.
     */
-    public function validatesAssociated($attribute_names, $message = 'invalid')
-    {
+    public function validatesAssociated($attribute_names, $message = 'invalid') {
         $message = $this->_Model->getDefaultErrorMessageFor($message, true);
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute_name){
@@ -187,16 +180,14 @@ class AkModelValidations extends AkModelExtenssion
         }
     }
 
-    public function isBlank($value = null)
-    {
+    public function isBlank($value = null) {
         return trim((string)$value) == '';
     }
 
     /**
       * Validates that the specified attributes are not blank (as defined by AkActiveRecord::isBlank()).
       */
-    public function validatesPresenceOf($attribute_names, $message = 'blank')
-    {
+    public function validatesPresenceOf($attribute_names, $message = 'blank') {
         $message = $this->_Model->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
@@ -236,8 +227,7 @@ class AkModelValidations extends AkModelExtenssion
       * <tt>wrong_length</tt> - The error message if using the "is" method and the attribute is the wrong size (default "is" "is the wrong length (should be %d characters)")
       * <tt>message</tt> - The error message to use for a "minimum", "maximum", or "is" violation.  An alias of the appropriate too_long/too_short/wrong_length message
       */
-    public function validatesLengthOf($attribute_names, $options = array())
-    {
+    public function validatesLengthOf($attribute_names, $options = array()) {
         // Merge given options with defaults.
         $default_options = array(
         'too_long'      => $this->_Model->getDefaultErrorMessageFor('too_long'),
@@ -321,8 +311,7 @@ class AkModelValidations extends AkModelExtenssion
         return true;
     }
 
-    public function validatesSizeOf($attribute_names, $options = array())
-    {
+    public function validatesSizeOf($attribute_names, $options = array()) {
         return validatesLengthOf($attribute_names, $options);
     }
 
@@ -363,8 +352,7 @@ class AkModelValidations extends AkModelExtenssion
     * occur (e.g. 'if' => 'allowValidation', or 'if' => '$this->signup_step > 2').  The
     * method, or string should return or evaluate to a true or false value.
     */
-    public function validatesUniquenessOf($attribute_names, $options = array())
-    {
+    public function validatesUniquenessOf($attribute_names, $options = array()) {
         $default_options = array('case_sensitive'=>true, 'message'=>'taken');
         $options = array_merge($default_options, $options);
 
@@ -469,8 +457,7 @@ class AkModelValidations extends AkModelExtenssion
     * <tt>$message</tt> - A custom error message (default is: "is invalid")
     * <tt>$regular_expression</tt> - The regular expression used to validate the format with (note: must be supplied!)
     */
-    public function validatesFormatOf($attribute_names, $regular_expression, $message = 'invalid', $regex_function = 'preg_match')
-    {
+    public function validatesFormatOf($attribute_names, $regular_expression, $message = 'invalid', $regex_function = 'preg_match') {
         $message = $this->_Model->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
@@ -498,8 +485,7 @@ class AkModelValidations extends AkModelExtenssion
     * <tt>$message</tt> - Specifies a customer error message (default is: "is not included in the list")
     * <tt>$allow_null</tt> - If set to true, skips this validation if the attribute is null (default is: false)
     */
-    public function validatesInclusionOf($attribute_names, $array_of_possibilities, $message = 'inclusion', $allow_null = false)
-    {
+    public function validatesInclusionOf($attribute_names, $array_of_possibilities, $message = 'inclusion', $allow_null = false) {
         $message = $this->_Model->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
@@ -528,8 +514,7 @@ class AkModelValidations extends AkModelExtenssion
     * <tt>$message</tt> - Specifies a customer error message (default is: "is reserved")
     * <tt>$allow_null</tt> - If set to true, skips this validation if the attribute is null (default is: false)
     */
-    public function validatesExclusionOf($attribute_names, $array_of_possibilities, $message = 'exclusion', $allow_null = false)
-    {
+    public function validatesExclusionOf($attribute_names, $array_of_possibilities, $message = 'exclusion', $allow_null = false) {
         $message = $this->_Model->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
@@ -560,8 +545,7 @@ class AkModelValidations extends AkModelExtenssion
     * <tt>$only_integer</tt> Specifies whether the value has to be an integer, e.g. an integral value (default is false)
     * <tt>$allow_null</tt> Skip validation if attribute is null (default is false).
     */
-    public function validatesNumericalityOf($attribute_names, $message = 'not_a_number', $only_integer = false, $allow_null = false)
-    {
+    public function validatesNumericalityOf($attribute_names, $message = 'not_a_number', $only_integer = false, $allow_null = false) {
         $message = $this->_Model->getDefaultErrorMessageFor($message, true);
 
         $attribute_names = Ak::toArray($attribute_names);
@@ -588,8 +572,7 @@ class AkModelValidations extends AkModelExtenssion
     /**
     * Returns true if no errors were added otherwise false.
     */
-    public function isValid()
-    {
+    public function isValid() {
         $this->_Model->clearErrors();
         if($this->_Model->beforeValidation() && $this->_Model->notifyObservers('beforeValidation')){
 
@@ -633,8 +616,7 @@ class AkModelValidations extends AkModelExtenssion
     * $this->automated_max_length_validator = false; // false by default, but you can set it to true on your model
     * $this->automated_not_null_validator = false; // disabled by default
     */
-    protected function _runAutomatedValidators()
-    {
+    protected function _runAutomatedValidators() {
         foreach ($this->_Model->getColumns() as $column_name=>$column_settings){
             if(!empty($this->_Model->automated_max_length_validator) &&
             empty($column_settings['primaryKey']) &&
@@ -654,8 +636,7 @@ class AkModelValidations extends AkModelExtenssion
     /**
     * $this->set_default_attribute_values_automatically = true; // This enables automated attribute setting from database definition
     */
-    protected function _setDefaultAttributeValuesAutomatically()
-    {
+    protected function _setDefaultAttributeValuesAutomatically() {
         foreach ($this->_Model->getColumns() as $column_name=>$column_settings){
             if(empty($column_settings['primaryKey']) && isset($column_settings['hasDefault']) && $column_settings['hasDefault'] && (!isset($this->_Model->$column_name) || is_null($this->_Model->$column_name))){
                 if(empty($column_settings['defaultValue'])){

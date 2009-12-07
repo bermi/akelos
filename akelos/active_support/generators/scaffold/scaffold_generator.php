@@ -7,8 +7,7 @@ class ScaffoldGenerator extends  AkelosGenerator
     var $_skip_files = array();
     var $command_values = array('model_name','controller_name','(array)actions');
 
-    function cast()
-    {
+    function cast() {
         $this->model_name = AkInflector::camelize($this->model_name);
         $this->model_file_path = AkInflector::toModelFilename($this->model_name);
         $this->controller_name = empty($this->controller_name) ? $this->model_name : (AkInflector::camelize($this->controller_name));
@@ -50,8 +49,7 @@ class ScaffoldGenerator extends  AkelosGenerator
 
     }
 
-    function hasCollisions()
-    {
+    function hasCollisions() {
         $this->collisions = array();
         foreach (array_merge(array_values($this->files),array_values($this->user_actions)) as $file_name){
             $user_answer = 5;
@@ -75,8 +73,7 @@ class ScaffoldGenerator extends  AkelosGenerator
         return count($this->collisions) > 0;
     }
 
-    function generate()
-    {
+    function generate() {
         //Generate models if they don't exist
         $model_files = array(
         'model'=>$this->model_file_path,

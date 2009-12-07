@@ -5,13 +5,11 @@
 
 class <?php  echo $model_name?>TestCase extends AkUnitTest
 {
-    function test_setup()
-    {
+    function test_setup() {
         $this->installAndIncludeModels('<?php  echo $model_name?>');
     }
     
-    function test_<?php  echo $model_name?>()
-    {
+    function test_<?php  echo $model_name?>() {
         $this->assertTrue(false,'Unit test for <?php  echo $model_name?> not implemented');
     }
 }

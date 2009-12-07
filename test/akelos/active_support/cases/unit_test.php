@@ -4,12 +4,10 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class UnitTest_TestCase extends ActiveSupportUnitTest
 {
-    public function __destruct()
-    {
+    public function __destruct() {
         $this->dropTables('all');
     }
-    public function test_should_create_models_on_the_fly()
-    {
+    public function test_should_create_models_on_the_fly() {
         $unit_tester = new AkUnitTest();
         $this->assertFalse(class_exists('SomeSillyModel'));
 
@@ -29,8 +27,7 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
     }
 
 
-    public function test_should_instantiate_model()
-    {
+    public function test_should_instantiate_model() {
         $unit_tester = new AkUnitTest();
         $unit_tester->app_dir = AkConfig::getDir('suite');
         $this->assertFalse(isset($unit_tester->DummyAccount));
@@ -47,8 +44,7 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
         $this->assertTrue(isset($unit_tester->SomeSillyModel));
     }
 
-    public function test_should_produce_some_errors()
-    {
+    public function test_should_produce_some_errors() {
         $unit_tester = new AkUnitTest();
 
         $this->expectError('Could not install the table illegal_names for the model Illegal Name');
@@ -61,8 +57,7 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
         $unit_tester->installAndIncludeModels('AnotherModel',array('instantiate'=>false));
     }
 
-    public function test_should_fill_the_table_with_yaml_data()
-    {
+    public function test_should_fill_the_table_with_yaml_data() {
         $unit_tester = new AkUnitTest();
         $unit_tester->installAndIncludeModels(array('TheModel'=>'id,name'));
         $TheModel =& $unit_tester->TheModel;
@@ -89,8 +84,7 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
 
     }
 
-    public function test_should_instantiate_selected_models()
-    {
+    public function test_should_instantiate_selected_models() {
         $models = array('DummyPicture', 'DummyLandlord');
 
         $unit_tester = new AkUnitTest();
@@ -109,8 +103,7 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
 
     }
 
-    public function test_should_run_migration_up_and_down()
-    {
+    public function test_should_run_migration_up_and_down() {
         $unit_tester = new AkUnitTest();
         $unit_tester->includeAndInstatiateModels('DummyPicture');
 

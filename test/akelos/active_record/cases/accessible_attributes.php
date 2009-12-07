@@ -4,13 +4,11 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class AccessibleAttributes_TestCase extends ActiveRecordUnitTest
 {
-    public function test_start()
-    {
+    public function test_start() {
         $this->installAndIncludeModels(array('ProtectedPerson'));
     }
 
-    public function test_accessing_protected_attributes_via_find()
-    {
+    public function test_accessing_protected_attributes_via_find() {
         $ProtectedPerson = new ProtectedPerson();
         $this->assertEqual($ProtectedPerson->getTableName(),'protected_people');
         $Person = $ProtectedPerson->create(array('name' => 'Franz','birthday'=>'1956-06-12 09:31:12','created_by' => '12'));
@@ -55,8 +53,7 @@ class AccessibleAttributes_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_protected_attributes_when_updating()
-    {
+    public function test_protected_attributes_when_updating() {
         $ProtectedPerson = new ProtectedPerson();
         $Franz = $ProtectedPerson->findFirstBy('name','Franz');
         $Franz->updateAttributes(array('name'=> 'Franz Xaver','created_by'=> 15));
@@ -72,8 +69,7 @@ class AccessibleAttributes_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_using_new_record()
-    {
+    public function test_using_new_record() {
         $ProtectedPerson = new ProtectedPerson();
         $ProtectedPerson->newRecord(array('name'=> 'Ignatz Mentzel','created_by'=> 12));
         $this->assertNull($ProtectedPerson->getId());
@@ -118,8 +114,7 @@ class AccessibleAttributes_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Werner->credit_points,1000);
     }
 
-    public function test_using_instantiating()
-    {
+    public function test_using_instantiating() {
         $ProtectedPerson = new ProtectedPerson();
         $this->assertNull($ProtectedPerson->name);
         $Melanie = new ProtectedPerson(array('name'=> 'Melanie Klein','created_by'=> 11));
@@ -143,8 +138,7 @@ class AccessibleAttributes_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function _test_datetime_null()
-    {
+    public function _test_datetime_null() {
         $ProtectedPerson = new ProtectedPerson();
         $Person = $ProtectedPerson->findFirstBy('name','Heinz');
 

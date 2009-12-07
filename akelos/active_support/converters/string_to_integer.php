@@ -2,8 +2,7 @@
 
 class AkStringToInteger
 {
-    public function convert()
-    {
+    public function convert() {
         return intval($this->source);
     }
 }

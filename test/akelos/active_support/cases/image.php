@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class Image_TestCase extends ActiveSupportUnitTest
 {
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
         if(!($this->offline_mode = !(@file_get_contents('http://www.akelos.org/testing_resources/images/watermark.png')))){
             $this->image_path = AkConfig::getDir('fixtures').'/Image_TestCase/akelos_framework_logo.png';
@@ -21,8 +20,7 @@ class Image_TestCase extends ActiveSupportUnitTest
         }
     }
 
-    public function __destruct()
-    {        
+    public function __destruct() {        
         Ak::directory_delete(AkConfig::getDir('fixtures').'/Image_TestCase');
     }
 
@@ -30,8 +28,7 @@ class Image_TestCase extends ActiveSupportUnitTest
         $this->skipIf($this->offline_mode, '['.get_class($this).'] Internet connection unavailable.');
     }
 
-    public function test_image_save_as()
-    {
+    public function test_image_save_as() {
         $PngImage = new AkImage($this->image_path);
         $this->assertEqual($PngImage->getExtension(), 'png');
 
@@ -45,8 +42,7 @@ class Image_TestCase extends ActiveSupportUnitTest
         $this->assertEqual($GifImage->getExtension(), 'gif');
     }
 
-    public function test_image_resize()
-    {
+    public function test_image_resize() {
         $Image = new AkImage();
         $Image->load($this->image_path);
 
@@ -109,8 +105,7 @@ class Image_TestCase extends ActiveSupportUnitTest
     }
 
 
-    public function test_image_crop()
-    {
+    public function test_image_crop() {
         if(!$this->_run_extra_tests) return;
 
         $Image = new AkImage();
@@ -144,8 +139,7 @@ class Image_TestCase extends ActiveSupportUnitTest
         $this->assertEqual($Image->getHeight(), 359);
     }
 
-    public function test_image_watermark()
-    {
+    public function test_image_watermark() {
         if(!$this->_run_extra_tests) return;
 
         $Image = new AkImage();
@@ -155,8 +149,7 @@ class Image_TestCase extends ActiveSupportUnitTest
         $this->assertEqual(md5_file($this->photo_path.'_watermarked.jpg'), '234adf4a48224f8596e53d665bf41768');
     }
 
-    public function test_should_apply_native_filters()
-    {
+    public function test_should_apply_native_filters() {
         $native_filters = array(
         'negate' =>         array('params' => array(), 'hash' => '8b44f26c9646ac69a1b48bbc66622184'),
         'grayscale' =>      array('params' => array(), 'hash' => 'd08a0ad61f4fd5b343c0a4af6d810ddf'),

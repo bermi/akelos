@@ -11,8 +11,7 @@ class CloneGenerator extends  AkelosGenerator
 {
     var $command_values = array('class_to_clone','class_name');
 
-    function _setupCloner()
-    {
+    function _setupCloner() {
         $this->clone_setup_done = true;
         $this->class_to_clone = AkInflector::underscore($this->class_to_clone);
         $this->class_name = AkInflector::underscore($this->class_name);
@@ -58,8 +57,7 @@ class CloneGenerator extends  AkelosGenerator
         }
     }
 
-    function _getControllerViews()
-    {
+    function _getControllerViews() {
         $view_files = Ak::dir(AK_VIEWS_DIR.DS.$this->class_to_clone, array('dirs'=>false));
         foreach ($view_files as $k=>$view_file){
             $view_files[$k] = str_replace('.tpl','',$view_file);
@@ -67,8 +65,7 @@ class CloneGenerator extends  AkelosGenerator
         return $view_files;
     }
 
-    function hasCollisions()
-    {
+    function hasCollisions() {
         $this->_setupCloner();
         
         $this->collisions = array();
@@ -80,8 +77,7 @@ class CloneGenerator extends  AkelosGenerator
         return count($this->collisions) > 0;
     }
 
-    function generate()
-    {
+    function generate() {
         if (empty($this->clone_setup_done)) {
             $this->_setupCloner();	
         }

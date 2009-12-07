@@ -10,22 +10,19 @@ class MakelosRequest
     $tasks,
     $constants = array();
 
-    public function __construct()
-    {
+    public function __construct() {
         if(php_sapi_name() == 'cli'){
             $this->useCommandLineArguments();
         }
     }
 
-    public function useCommandLineArguments()
-    {
+    public function useCommandLineArguments() {
         $arguments = $GLOBALS['argv'];
         array_shift($arguments);
         $this->parse($arguments);
     }
 
-    public function parse($arguments)
-    {
+    public function parse($arguments) {
         $task_set = false;
 
         while(!empty($arguments)){
@@ -69,8 +66,7 @@ class MakelosRequest
         }
     }
 
-    public function get($name, $type = null)
-    {
+    public function get($name, $type = null) {
         if(!empty($type)){
             return isset($this->{$type}[$name]) ? $this->{$type}[$name] : false;
         }else{
@@ -80,23 +76,19 @@ class MakelosRequest
         }
     }
 
-    public function flag($name)
-    {
+    public function flag($name) {
         return $this->get($name, __FUNCTION__);
     }
 
-    public function constant($name)
-    {
+    public function constant($name) {
         return $this->get($name, __FUNCTION__);
     }
 
-    public function attribute($name)
-    {
+    public function attribute($name) {
         return $this->get($name, __FUNCTION__);
     }
 
-    public function defineConstants()
-    {
+    public function defineConstants() {
         foreach ($this->constants as $constant => $value){
             if(!preg_match('/^AK_/', $constant)){
                 define('AK_'.$constant, $value);
@@ -105,8 +97,7 @@ class MakelosRequest
         }
     }
 
-    private function _castValue($value)
-    {
+    private function _castValue($value) {
         if(in_array($value, array(true,1,'true','True','TRUE','1','y','Y','yes','Yes','YES'), true)){
             return true;
         }
@@ -150,16 +141,14 @@ class Makelos
     public $Request;
     public $Installer;
 
-    public function __construct(&$Request)
-    {
+    public function __construct(&$Request) {
         $this->Request = $Request;
         $this->Installer = new AkInstaller();
         !defined('AK_TASKS_DIR') && define('AK_TASKS_DIR', AK_BASE_DIR.DS.'lib'.DS.'tasks');
         $this->makefiles = array_merge(array_merge(array_merge(array_merge(array_merge(glob(AK_TASKS_DIR.DS.'makefile.php'), glob(AK_TASKS_DIR.DS.'*/makefile.php')), glob(AK_TASKS_DIR.DS.'*/*/makefile.php')), array(AK_BASE_DIR.DS.'*/*/*/makefile.php')),  array(AK_BASE_DIR.DS.'*/*/*/*/makefile.php')), array(AK_BASE_DIR.DS.'makefile.php'));
     }
 
-    public function loadMakefiles()
-    {
+    public function loadMakefiles() {
         foreach ($this->makefiles as $makefile){
             if(file_exists($makefile)){
                 include($makefile);
@@ -167,8 +156,7 @@ class Makelos
         }
     }
 
-    public function runTasks()
-    {
+    public function runTasks() {
         if(isset($this->Request->tasks['makelos:autocomplete'])){
             $this->runTask('makelos:autocomplete', $this->Request->tasks['makelos:autocomplete'], false);
             return;
@@ -183,8 +171,7 @@ class Makelos
         }
     }
 
-    public function runTask($task_name, $options = array(), $only_registered_tasks = true)
-    {
+    public function runTask($task_name, $options = array(), $only_registered_tasks = true) {
         $this->removeAutocompletionOptions($task_name);
         if(!empty($this->tasks[$task_name]['with_defaults'])){
             $options['attributes'] = array_merge((array)$this->tasks[$task_name]['with_defaults'], (array)@$options['attributes']);
@@ -214,8 +201,7 @@ class Makelos
 
 
 
-    public function showBaseTaskDocumentation($task_name)
-    {
+    public function showBaseTaskDocumentation($task_name) {
         $success = false;
         $this->message(' ');
         foreach ($this->tasks as $task => $details){
@@ -227,18 +213,15 @@ class Makelos
         return $success;
     }
 
-    public function showTaskDocumentation($task)
-    {
+    public function showTaskDocumentation($task) {
         $this->message(sprintf("%-30s",$task).'  '.@$this->tasks[$task]['description']);
     }
 
-    public function run($task_name, $options = array())
-    {
+    public function run($task_name, $options = array()) {
         return $this->runTask($task_name, $options);
     }
 
-    public function runTaskCode($code_snippets = array(), $options = array())
-    {
+    public function runTaskCode($code_snippets = array(), $options = array()) {
         foreach (@(array)$code_snippets as $language => $code_snippets){
             $code_snippets = is_array($code_snippets) ? $code_snippets : array($code_snippets);
             $language_method = AkInflector::camelize('run_'.$language.'_snippet');
@@ -253,8 +236,7 @@ class Makelos
         }
     }
 
-    public function runTaskFiles($task_name, $options = array())
-    {
+    public function runTaskFiles($task_name, $options = array()) {
         $task_name = str_replace(':', DS, $task_name);
         $Makelos = $this;
         $Logger = Ak::getLogger('makelos'.DS.AkInflector::underscore($task_name));
@@ -268,8 +250,7 @@ class Makelos
         }
     }
 
-    public function getParameters($parameters_settings, $request_parameters)
-    {
+    public function getParameters($parameters_settings, $request_parameters) {
         $parameters_settings = Ak::toArray($parameters_settings);
 
         if(empty($parameters_settings)){
@@ -294,20 +275,17 @@ class Makelos
         }
     }
 
-    public function runPhpSnippet($code, $options = array())
-    {
+    public function runPhpSnippet($code, $options = array()) {
         $fn = create_function('$options, $Makelos', $code.';');
         return $fn($options, $this);
     }
 
-    public function runSystemSnippet($code, $options = array())
-    {
+    public function runSystemSnippet($code, $options = array()) {
         $code = trim($code);
         return $this->message(`$code`);
     }
 
-    public function defineTask($task_name, $options = array())
-    {
+    public function defineTask($task_name, $options = array()) {
         $default_options = array();
         $task_names = strstr($task_name, ',') ? array_map('trim', explode(',', $task_name)) : array($task_name);
         foreach ($task_names as $task_name) {
@@ -320,13 +298,11 @@ class Makelos
         }
     }
 
-    public function addSettings($settings)
-    {
+    public function addSettings($settings) {
         $this->settings = array_merge($this->settings, $settings);
     }
 
-    public function displayAvailableTasks()
-    {
+    public function displayAvailableTasks() {
 
         $this->message("\nYou can perform taks by running:\n");
         $this->message("    ./makelos task:name");
@@ -340,22 +316,19 @@ class Makelos
     }
 
 
-    public function error($message, $fatal = false)
-    {
+    public function error($message, $fatal = false) {
         $this->message($message);
         if($fatal){
             die();
         }
     }
-    public function message($message)
-    {
+    public function message($message) {
         if(!empty($message)){
             echo $message."\n";
         }
     }
 
-    public function runTaskInBackground($task_name, $options = array())
-    {
+    public function runTaskInBackground($task_name, $options = array()) {
         $this->_ensurePosixAndPcntlAreAvailable();
         $pid = Ak::pcntl_fork();
         if($pid == -1){
@@ -371,8 +344,7 @@ class Makelos
     }
 
 
-    public function runTaskAsDaemon($task_name, $options = array())
-    {
+    public function runTaskAsDaemon($task_name, $options = array()) {
         $this->_ensurePosixAndPcntlAreAvailable();
 
         require_once 'System/Daemon.php';
@@ -434,13 +406,11 @@ class Makelos
 
     // Autocompletion handling
 
-    public function getAvailableTasksForAutocompletion()
-    {
+    public function getAvailableTasksForAutocompletion() {
         return array_keys($this->tasks);
     }
 
-    public function getAutocompletionOptionsForTask($task, $options = array(), $level = 1)
-    {
+    public function getAutocompletionOptionsForTask($task, $options = array(), $level = 1) {
         $task_name = str_replace(':', DS, $task);
         $Makelos = $this;
         $autocompletion_options = array();
@@ -468,8 +438,7 @@ class Makelos
         return $autocompletion_options;
     }
 
-    public function removeAutocompletionOptions($task_name)
-    {
+    public function removeAutocompletionOptions($task_name) {
         if (!empty($this->tasks[$task_name])) {
             foreach ($this->tasks[$task_name] as $k => $v){
                 if(preg_match('/^autocompletion/', $k)){
@@ -482,8 +451,7 @@ class Makelos
 
 
 
-    private function _ensurePosixAndPcntlAreAvailable()
-    {
+    private function _ensurePosixAndPcntlAreAvailable() {
         if(!function_exists('posix_geteuid')){
             trigger_error('POSIX functions not available. Please compile PHP with --enable-posix', E_USER_ERROR);
         }elseif(!function_exists('pcntl_fork')){

@@ -5,28 +5,23 @@ class AkType
     public
     $value;
 
-    public function __construct($value)
-    {
+    public function __construct($value) {
         $this->value = $value;
     }
 
-    public function toString()
-    {
+    public function toString() {
         return $this->value.'';
     }
 
-    public function getValue()
-    {
+    public function getValue() {
         return $this->value;
     }
 
-    public function inspect()
-    {
+    public function inspect() {
         return var_export($this->value, true);
     }
 
-    public function blank()
-    {
+    public function blank() {
         return empty($this->value);
     }
 }

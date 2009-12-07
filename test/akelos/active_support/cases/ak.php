@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class Ak_TestCase extends ActiveSupportUnitTest
 {
-    public function test_should_get_the_right_temp_dir()
-    {
+    public function test_should_get_the_right_temp_dir() {
         $tmp_dir = Ak::get_tmp_dir_name();
         $tmp_file = $tmp_dir.DS.'ak_test_'.__CLASS__;
         $tmp_file2 = $tmp_dir.DS.'ak_test_dir'.DS.'level_one'.DS.'file.txt';
@@ -18,31 +17,27 @@ class Ak_TestCase extends ActiveSupportUnitTest
         $this->assertEqual($tmp_dir, AK_TMP_DIR);
     }
 
-    public function test_static_var_set_value_null()
-    {
+    public function test_static_var_set_value_null() {
         $null = null;
         $return = Ak::setStaticVar('testVar1',$null);
         $this->assertEqual(null,$return);
     }
 
-    public function test_static_var_set_value_true()
-    {
+    public function test_static_var_set_value_true() {
         $true = true;
         $return = Ak::setStaticVar('testVar1',$true);
         $this->assertEqual(true,$return);
         $this->assertEqual(true,Ak::getStaticVar('testVar1'));
     }
 
-    public function test_static_var_set_value_false()
-    {
+    public function test_static_var_set_value_false() {
         $false = false;
         $return = Ak::setStaticVar('testVar1',$false);
         $this->assertEqual(true,$return);
         $this->assertEqual(false,Ak::getStaticVar('testVar1'));
     }
 
-    public function test_static_var_set_value_array()
-    {
+    public function test_static_var_set_value_array() {
         $value = array(1);
         $return = Ak::setStaticVar('testVar1',$value);
         $this->assertEqual(true,$return);
@@ -62,16 +57,14 @@ class Ak_TestCase extends ActiveSupportUnitTest
         $this->assertEqual($retrievedObject->id, $obj1->id);
 
     }
-    public function test_static_var_set_value_float()
-    {
+    public function test_static_var_set_value_float() {
         $value = 13.59;
         $return = Ak::setStaticVar('testVar1',$value);
         $this->assertEqual(true,$return);
         $this->assertEqual($value,Ak::getStaticVar('testVar1'));
     }
 
-    public function test_static_var_set_value_object_referenced()
-    {
+    public function test_static_var_set_value_object_referenced() {
         $value = new stdClass;
         $value->id = 1;
         $return = Ak::setStaticVar('testVar1',$value);
@@ -82,8 +75,7 @@ class Ak_TestCase extends ActiveSupportUnitTest
         $this->assertEqual($value->id, $storedValue->id);
     }
 
-    public function test_static_var_destruct_single_var()
-    {
+    public function test_static_var_destruct_single_var() {
         $value = new stdClass;
 
         $value->id = 1;
@@ -101,8 +93,7 @@ class Ak_TestCase extends ActiveSupportUnitTest
 
     }
 
-    public function test_static_var_destruct_all_vars()
-    {
+    public function test_static_var_destruct_all_vars() {
         $value = new stdClass;
         $value->id = 1;
         $return = Ak::setStaticVar('testVar1',$value);

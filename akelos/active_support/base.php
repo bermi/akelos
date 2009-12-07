@@ -28,8 +28,7 @@ class Ak
     * @static
     * @return resource Php AdoDb instance.
     */
-    static function &db($dsn = null)
-    {
+    static function &db($dsn = null) {
         return AkDbAdapter::getInstance($dsn);
     }
 
@@ -37,8 +36,7 @@ class Ak
      * @param string $message
      * @param [OPTIONAL] $fatal triggers even in production-mode
      */
-    static function deprecateWarning($message, $fatal=false)
-    {
+    static function deprecateWarning($message, $fatal=false) {
         if (!$fatal && AK_ENVIRONMENT == 'production'){
             return;
         }
@@ -52,16 +50,14 @@ class Ak
         }
     }
 
-    static function deprecateMethod($method, $new_method)
-    {
+    static function deprecateMethod($method, $new_method) {
         Ak::deprecateWarning("Method $method is deprecated and will be removed on future versions. Please use $new_method instead.");
     }
 
     /**
     * Gets a cache object singleton instance
     */
-    static function &cache()
-    {
+    static function &cache() {
         static $cache;
         if(!isset($cache)){
             $cache = new AkCache();
@@ -73,8 +69,7 @@ class Ak
     /**
      * Gets a route to an URL from the rules defined at config/routes.php
      */
-    static function toUrl($options, $set_routes = false)
-    {
+    static function toUrl($options, $set_routes = false) {
         static $Router;
         if(empty($Router)){
             if($set_routes){
@@ -112,8 +107,7 @@ class Ak
     * are replaced with the corresponding value.
     * @return string The translated string.
     */
-    static function t($string, $args = null, $controller = null)
-    {
+    static function t($string, $args = null, $controller = null) {
         static $framework_dictionary = array(), $lang, $_dev_shutdown = true, $locale_manager_class = false, $_custom_dev_shutdown = false;
         $original_string = $string;
         if(AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES && ($locale_manager_class == false || $locale_manager_class == 'AkLocaleManager')) {
@@ -216,8 +210,7 @@ class Ak
     *           target language or an array containing 0 => from, 1 => to.
     * @return string The untranslated string.
     */
-    static function translate($string, $target_language, $namespace = false)
-    {
+    static function translate($string, $target_language, $namespace = false) {
         $from = is_array($target_language) ? $target_language[0] : 'en' ;
         $to = is_array($target_language) ? $target_language[1] : $target_language ;
 
@@ -238,8 +231,7 @@ class Ak
     * @param    string    $current_language    A string containing the current language.
     * @return string The untranslated string.
     */
-    static function untranslate($string, $current_language, $namespace = false)
-    {
+    static function untranslate($string, $current_language, $namespace = false) {
         $dictionary = AkLocaleManager::getDictionary($current_language, $namespace);
         $untranslated_string = array_search($string, $dictionary);
         return $untranslated_string ? $untranslated_string : $string;
@@ -257,8 +249,7 @@ class Ak
      * 'time_format' // '%H:%i';
      * 'long_time_format' // '%H:%i:%s';
      */
-    static function locale($locale_setting, $locale = null)
-    {
+    static function locale($locale_setting, $locale = null) {
         static $settings;
 
         // We initiate the locale settings
@@ -286,16 +277,14 @@ class Ak
     }
 
 
-    static function lang($set_language = null)
-    {
+    static function lang($set_language = null) {
         static $lang;
         $lang = empty($set_language) ? (empty($lang) ? AK_FRAMEWORK_LANGUAGE : $lang) : $set_language;
         return $lang;
     }
 
 
-    static function get_url_locale($set_locale = null)
-    {
+    static function get_url_locale($set_locale = null) {
         static $locale;
         if(!empty($locale)){
             return $locale;
@@ -306,8 +295,7 @@ class Ak
 
 
 
-    static function langs()
-    {
+    static function langs() {
         static $langs;
         if(!empty($langs)){
             return $langs;
@@ -320,15 +308,13 @@ class Ak
         return $langs;
     }
 
-    static function base_lang()
-    {
+    static function base_lang() {
         return array_shift(Ak::langs());
     }
 
 
 
-    static function dir($path, $options = array())
-    {
+    static function dir($path, $options = array()) {
         $result = array();
 
         $path = rtrim($path, '/\\');
@@ -361,8 +347,7 @@ class Ak
     }
 
 
-    static function file_put_contents($file_name, $content, $options = array())
-    {
+    static function file_put_contents($file_name, $content, $options = array()) {
 
         $default_options = array(
         'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
@@ -395,8 +380,7 @@ class Ak
     }
 
 
-    static function file_get_contents($file_name, $options = array())
-    {
+    static function file_get_contents($file_name, $options = array()) {
         $default_options = array(
         'ftp' => defined('AK_READ_FILES_USING_FTP') && AK_READ_FILES_USING_FTP,
         'base_path' => AK_BASE_DIR,
@@ -415,14 +399,12 @@ class Ak
     /**
      * @todo Optimize this code (dirty add-on to log command line interpreter results)
      */
-    static function file_add_contents($file_name, $content, $options = array())
-    {
+    static function file_add_contents($file_name, $content, $options = array()) {
         $original_content = @Ak::file_get_contents($file_name, $options);
         return Ak::file_put_contents($file_name, $original_content.$content, $options);
     }
 
-    static function file_delete($file_name, $options = array())
-    {
+    static function file_delete($file_name, $options = array()) {
         $default_options = array(
         'ftp' => defined('AK_DELETE_FILES_USING_FTP') && AK_DELETE_FILES_USING_FTP,
         'base_path' => AK_BASE_DIR,
@@ -439,8 +421,7 @@ class Ak
         return false;
     }
 
-    static function directory_delete($dir_name, $options = array())
-    {
+    static function directory_delete($dir_name, $options = array()) {
         $default_options = array(
         'ftp' => defined('AK_DELETE_FILES_USING_FTP') && AK_DELETE_FILES_USING_FTP,
         'base_path' => AK_BASE_DIR,
@@ -478,8 +459,7 @@ class Ak
         }
     }
 
-    static function make_dir($path, $options = array())
-    {
+    static function make_dir($path, $options = array()) {
 
         $default_options = array(
         'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
@@ -510,8 +490,7 @@ class Ak
         return false;
     }
 
-    static function rmdir_tree($directory)
-    {
+    static function rmdir_tree($directory) {
         $files = glob($directory.'*', GLOB_MARK);
         foreach($files as $file){
             if(substr($file, -1) == DS){
@@ -531,8 +510,7 @@ class Ak
     *
     * It uses current installation settings, so it can perform copies via the filesystem or via FTP
     */
-    static function copy($origin, $target, $options = array())
-    {
+    static function copy($origin, $target, $options = array()) {
         $default_options = array(
         'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
         'base_path' => AK_BASE_DIR,
@@ -576,8 +554,7 @@ class Ak
      * This is used by Akelos to prevent functions namespaced under Ak
      * from writing out of the Akelos base directory for security reasons.
      */
-    static function getRestrictedPath($path, $options = array())
-    {
+    static function getRestrictedPath($path, $options = array()) {
         $default_options = array(
         'ftp' => false,
         'base_path' => AK_BASE_DIR,
@@ -606,8 +583,7 @@ class Ak
      * * method: In case params are given the will be requested using get method by default. Specify post if get is not what you need.
      * @return string
      */
-    static function url_get_contents($url, $options = array())
-    {
+    static function url_get_contents($url, $options = array()) {
         $Client = new AkHttpClient();
         $method = empty($options['method']) ? 'get' : strtolower($options['method']);
         if(empty($method) || !in_array($method, array('get','post','put','delete'))){
@@ -628,8 +604,7 @@ class Ak
     * @param    string    $file    Helper file
     * @return echoes result to screen
     */
-    static function trace($text = null, $line = null, $file = null, $method = null, $escape_html_entities = true)
-    {
+    static function trace($text = null, $line = null, $file = null, $method = null, $escape_html_entities = true) {
         static $counter = 0;
         if(AK_PRODUCTION_MODE){
             return;
@@ -680,8 +655,7 @@ class Ak
     /**
      * Returns a string representation of one of these PHP methods var_dump, var_export, or print_r
      */
-    static function dump($var, $method = null, $max_length = null)
-    {
+    static function dump($var, $method = null, $max_length = null) {
         $method = empty($method) ? (defined('AK_TRACE_DUMP_METHOD') ? AK_TRACE_DUMP_METHOD : 'var_dump') : $method;
         $methods = array('var_dump', 'var_export', 'print_r');
         if(!in_array($method, $methods)){
@@ -705,8 +679,7 @@ class Ak
         return $result;
     }
 
-    static function getLastFileAndLineAndMethod($only_app = false, $start_level = 1)
-    {
+    static function getLastFileAndLineAndMethod($only_app = false, $start_level = 1) {
         $backtrace = debug_backtrace();
         if(!$only_app){
             return array(@$backtrace[$start_level]['file'], @$backtrace[$start_level]['line'], @$backtrace[$start_level]['function']);
@@ -721,8 +694,7 @@ class Ak
         }
     }
 
-    static function getFileAndNumberTextForError($levels = 0)
-    {
+    static function getFileAndNumberTextForError($levels = 0) {
         list($file,$line,$method) = Ak::getLastFileAndLineAndMethod(false, $levels+1);
         return Ak::t('In %file line %line', array('%file' => $file, '%line' => $line));
     }
@@ -737,8 +709,7 @@ class Ak
     * resource..
     * @return void Prints debug info.
     */
-    static function debug ($data, $_functions=0)
-    {
+    static function debug ($data, $_functions=0) {
         if(!AK_DEBUG && !AK_DEV_MODE){
             return;
         }
@@ -809,8 +780,7 @@ class Ak
     * and methods will be included.
     * @return string html output with Object info
     */
-    static function get_object_info($object, $include_inherited_info = false)
-    {
+    static function get_object_info($object, $include_inherited_info = false) {
         $object_name = get_class($object);
         $methods = $include_inherited_info ? get_class_methods($object) : Ak::get_this_object_methods($object);
         $vars = $include_inherited_info ? get_class_vars($object_name) : Ak::get_this_object_attributes($object);
@@ -843,8 +813,7 @@ class Ak
     * @return array Returns an array with selected object methods. It
     * does not return inherited methods
     */
-    static function get_this_object_methods($object)
-    {
+    static function get_this_object_methods($object) {
         $array1 = get_class_methods($object);
         if($parent_object = get_parent_class($object)){
             $array2 = get_class_methods($parent_object);
@@ -873,8 +842,7 @@ class Ak
     * @return void Returns an array with selected object attributes.
     * It does not return inherited attributes
     */
-    static function get_this_object_attributes($object)
-    {
+    static function get_this_object_attributes($object) {
         $object = get_class($object);
         $array1 = get_class_vars($object);
         if($parent_object = get_parent_class($object)){
@@ -888,8 +856,7 @@ class Ak
 
 
 
-    static function &getLogger($namespace = 'default')
-    {
+    static function &getLogger($namespace = 'default') {
         static $Logger = array();
         if(empty($Logger[$namespace])){
             $Logger[$namespace] = new AkLogger();
@@ -905,8 +872,7 @@ class Ak
         return $Logger[$namespace];
     }
 
-    static function get_constants()
-    {
+    static function get_constants() {
         $constants = get_defined_constants();
         $keys = array_keys($constants);
         foreach ($keys as $k){
@@ -921,13 +887,11 @@ class Ak
     /**
     * @todo Use timezone time
     */
-    static function time()
-    {
+    static function time() {
         return time()+(defined('AK_TIME_DIFERENCE') ? AK_TIME_DIFERENCE*3600 : 0);
     }
 
-    static function gmt_time()
-    {
+    static function gmt_time() {
         return Ak::time()+(AK_TIME_DIFERENCE_FROM_GMT*3600);
     }
 
@@ -935,8 +899,7 @@ class Ak
     /**
     * Gets a timestamp for input date provided in one of this formats: "year-month-day hour:min:sec", "year-month-day", "hour:min:sec"
     */
-    static function getTimestamp($iso_date_or_hour = null)
-    {
+    static function getTimestamp($iso_date_or_hour = null) {
         if(empty($iso_date_or_hour)){
             return Ak::time();
         }
@@ -971,8 +934,7 @@ class Ak
     *
     * Default date is in ISO format
     */
-    static function getDate($timestamp = null, $format = null)
-    {
+    static function getDate($timestamp = null, $format = null) {
         $timestamp = empty($timestamp) ? Ak::time() : $timestamp;
         $use_adodb = $timestamp <= -3600 || $timestamp >= 2147468400;
         if($use_adodb){
@@ -1044,8 +1006,7 @@ class Ak
     *   @return boolean whether message has been sent or not.
     *
     */
-    static function mail ($from, $to, $subject, $body, $additional_headers = array())
-    {
+    static function mail ($from, $to, $subject, $body, $additional_headers = array()) {
         require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Mail.php');
 
         static $mail_connector;
@@ -1120,8 +1081,7 @@ class Ak
      *
      * IMPORTANT NOTE: You must define AK_ENABLE_PROFILER to true for this to work.
     */
-    static function profile($message = '')
-    {
+    static function profile($message = '') {
         if(AK_ENABLE_PROFILER){
             if(!$ProfileTimer = $Timer = Ak::getStaticVar('ProfileTimer')){
                 require_once 'Benchmark/Timer.php';
@@ -1140,8 +1100,7 @@ class Ak
     /**
     * Gets the size of given element. Counts arrays, returns numbers, string length or executes size() method on given object
     */
-    static function size($element)
-    {
+    static function size($element) {
         if(is_array($element)){
             return count($element);
         }elseif (is_numeric($element) && !is_string($element)){
@@ -1179,8 +1138,7 @@ class Ak
      *    );
      */
 
-    static function select(&$source_array)
-    {
+    static function select(&$source_array) {
         $resulting_array = array();
         if(!empty($source_array) && is_array($source_array) && func_num_args() > 1) {
             $args = array_slice(func_get_args(),1);
@@ -1201,8 +1159,7 @@ class Ak
         return $resulting_array;
     }
 
-    static function collect($source_array, $key_index, $value_index)
-    {
+    static function collect($source_array, $key_index, $value_index) {
         $resulting_array = array();
         if(!empty($source_array) && is_array($source_array)) {
             foreach ($source_array as $source_item){
@@ -1216,8 +1173,7 @@ class Ak
         return $resulting_array;
     }
 
-    static function delete($source_array, $attributes_to_delete_from_array)
-    {
+    static function delete($source_array, $attributes_to_delete_from_array) {
         $resulting_array = (array)$source_array;
         $args = array_slice(func_get_args(),1);
         $args = count($args) == 1 ? Ak::toArray($args[0]) : $args;
@@ -1227,8 +1183,7 @@ class Ak
         return $resulting_array;
     }
 
-    static function &singleton($class_name, &$arguments)
-    {
+    static function &singleton($class_name, &$arguments) {
         static $instances;
         if(!isset($instances[$class_name])) {
             if(is_object($arguments)){
@@ -1246,8 +1201,7 @@ class Ak
     }
 
 
-    static function encrypt($data, $key = null)
-    {
+    static function encrypt($data, $key = null) {
         $key = empty($key) ? md5(AK_SESSION_NAME) : $key;
         srand((double)microtime() *1000000);
         $k2 = md5(rand(0, 32000));
@@ -1272,8 +1226,7 @@ class Ak
         return base64_encode($m);
     }
 
-    static function decrypt($encrypted_data, $key = null)
-    {
+    static function decrypt($encrypted_data, $key = null) {
         $key = empty($key) ? md5(AK_SESSION_NAME) : $key;
         $t = base64_decode($encrypted_data);
         $k = md5($key);
@@ -1295,8 +1248,7 @@ class Ak
     }
 
 
-    static function blowfishEncrypt($data, $key = null)
-    {
+    static function blowfishEncrypt($data, $key = null) {
         $key = empty($key) ? md5(AK_SESSION_NAME) : $key;
         $key = substr($key,0,56);
         require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Crypt'.DS.'Blowfish.php');
@@ -1305,8 +1257,7 @@ class Ak
         return $Blowfish->encrypt(base64_encode($data));
     }
 
-    static function blowfishDecrypt($encrypted_data, $key = null)
-    {
+    static function blowfishDecrypt($encrypted_data, $key = null) {
         $key = empty($key) ? md5(AK_SESSION_NAME) : $key;
         $key = substr($key,0,56);
         require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Crypt'.DS.'Blowfish.php');
@@ -1316,8 +1267,7 @@ class Ak
     }
 
 
-    static function randomString($max_length = 8)
-    {
+    static function randomString($max_length = 8) {
         $randomString = '';
         srand((double)microtime()*1000000);
         for($i=0;$i<$max_length;$i++){
@@ -1331,8 +1281,7 @@ class Ak
     }
 
 
-    static function compress($data, $format = 'gzip')
-    {
+    static function compress($data, $format = 'gzip') {
         $key = Ak::randomString(15);
         $compressed_file = AK_TMP_DIR.DS.'d'.$key;
         $uncompressed_file = AK_TMP_DIR.DS.'s'.$key;
@@ -1354,8 +1303,7 @@ class Ak
         return $result;
     }
 
-    static function uncompress($compressed_data, $format = 'gzip')
-    {
+    static function uncompress($compressed_data, $format = 'gzip') {
         $key = Ak::randomString(15);
         $compressed_file = AK_TMP_DIR.DS.'s'.$key;
         $uncompressed_file = AK_TMP_DIR.DS.'d'.$key;
@@ -1385,8 +1333,7 @@ class Ak
      *
      * @return array available models
      */
-    static function import()
-    {
+    static function import() {
         $args = func_get_args();
         $args = is_array($args[0]) ? $args[0] : (func_num_args() > 1 ? $args : Ak::stringToArray($args[0]));
         $models = array();
@@ -1408,20 +1355,17 @@ class Ak
         return $models;
     }
 
-    static function import_mailer()
-    {
+    static function import_mailer() {
         $args = func_get_args();
         return call_user_func_array(array('Ak','import'),$args);
     }
 
-    static function uses()
-    {
+    static function uses() {
         $args = func_get_args();
         return call_user_func_array(array('Ak','import'),$args);
     }
 
-    static function stringToArray($string)
-    {
+    static function stringToArray($string) {
         $args = $string;
         if(count($args) == 1 && !is_array($args)){
         (array)$args = array_unique(array_map('trim',array_diff(explode(',',strtr($args.',',';|-',',,,')),array(''))));
@@ -1430,8 +1374,7 @@ class Ak
     }
 
 
-    static function toArray()
-    {
+    static function toArray() {
         $args = func_get_args();
         return is_array($args[0]) ? $args[0] : (func_num_args() === 1 ? Ak::stringToArray($args[0]) : $args);
     }
@@ -1454,8 +1397,7 @@ class Ak
      *     $this->user->setAttributes(Ak::pick('name,email', $this->params['user']));
      *
      */
-    static function pick($keys, $source_array)
-    {
+    static function pick($keys, $source_array) {
         $result = array();
         foreach (Ak::toArray($keys) as $k){
             $result[$k] = isset($source_array[$k]) ? $source_array[$k] : null;
@@ -1466,8 +1408,7 @@ class Ak
     /**
      * Gets a copy of the first element of an array. Similar to array_shift but it does not modify the original array
      */
-    static function first()
-    {
+    static function first() {
         $args = func_get_args();
         $arr = array_slice(is_array($args[0]) ? $args[0] : $args , 0);
         return array_shift($arr);
@@ -1476,8 +1417,7 @@ class Ak
     /**
      * Gets a copy of the last element of an array. Similar to array_pop but it does not modify the original array
      */
-    static function last()
-    {
+    static function last() {
         $args = func_get_args();
         $arr = array_slice(is_array($args[0]) ? $args[0] : $args , -1);
         return array_shift($arr);
@@ -1486,8 +1426,7 @@ class Ak
     /**
      * Includes PHP functions that are not available on current PHP version
      */
-    static function compat($function_name)
-    {
+    static function compat($function_name) {
         ak_compat($function_name);
     }
 
@@ -1512,8 +1451,7 @@ class Ak
     * If your converter needs to prepare something before the convert method is called, you just need to implement
     * a "init" method. You can avoid this by inspecting passed attributes to your constructor
     */
-    static function convert()
-    {
+    static function convert() {
         $args = func_get_args();
         $number_of_arguments = func_num_args();
         if($number_of_arguments > 1){
@@ -1573,22 +1511,19 @@ class Ak
      * @param string $input_string_encoding
      * @return string UTF-8 encoded string
      */
-    static function utf8($text, $input_string_encoding = null)
-    {
+    static function utf8($text, $input_string_encoding = null) {
         $input_string_encoding = empty($input_string_encoding) ? Ak::encoding() : $input_string_encoding;
         $Charset = Ak::singleton('AkCharset',$text);
         return $Charset->recodeString($text,'UTF-8',$input_string_encoding);
     }
 
-    static function recode($text, $output_string_encoding = null, $input_string_encoding = null, $recoding_engine = null)
-    {
+    static function recode($text, $output_string_encoding = null, $input_string_encoding = null, $recoding_engine = null) {
         $input_string_encoding = empty($input_string_encoding) ? Ak::encoding() : $input_string_encoding;
         $Charset = Ak::singleton('AkCharset',$text);
         return $Charset->recodeString($text,$output_string_encoding,$input_string_encoding, $recoding_engine);
     }
 
-    static function encoding()
-    {
+    static function encoding() {
         static $encoding;
         if(empty($encoding)){
             // This will force system language settings
@@ -1602,8 +1537,7 @@ class Ak
     /**
      * Get the encoding in which current user is sending the request
      */
-    static function userEncoding()
-    {
+    static function userEncoding() {
         static $encoding;
 
         if(!isset($encoding)){
@@ -1622,8 +1556,7 @@ class Ak
      * strlen for UTF-8 strings
      * Taken from anpaza at mail dot ru post at http://php.net/strlen
      */
-    static function strlen_utf8($str)
-    {
+    static function strlen_utf8($str) {
         $i = $count = 0;
         $len = strlen ($str);
         while ($i < $len){
@@ -1650,8 +1583,7 @@ class Ak
      * For AJAX driven pages, JSON can come in handy – you can return send JavaScript objects
      * directly from your actions.
      */
-    static function toJson($php_value)
-    {
+    static function toJson($php_value) {
         require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Services'.DS.'JSON.php');
         $use = 0;
         $json = Ak::singleton('Services_JSON', $use);
@@ -1661,16 +1593,14 @@ class Ak
     /**
      * Converts a JSON representation string into a PHP value.
      */
-    static function fromJson($json_string)
-    {
+    static function fromJson($json_string) {
         require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Services'.DS.'JSON.php');
         $use = 0;
         $json = Ak::singleton('Services_JSON', $use);
         return $json->decode($json_string);
     }
 
-    static function &memory_cache($key, &$value)
-    {
+    static function &memory_cache($key, &$value) {
         static $memory, $md5;
         if($value === false){
             // remove the object from cache
@@ -1692,8 +1622,7 @@ class Ak
         return $value;
     }
 
-    static function getStatusKey($element)
-    {
+    static function getStatusKey($element) {
         $element = clone($element);
         if(isset($element->___status_key)){
             unset($element->___status_key);
@@ -1701,19 +1630,16 @@ class Ak
         return md5(serialize($element));
     }
 
-    static function logObjectForModifications(&$object)
-    {
+    static function logObjectForModifications(&$object) {
         $object->___status_key = empty($object->___status_key) ? Ak::getStatusKey($object) : $object->___status_key;
         return $object->___status_key;
     }
 
-    static function resetObjectModificationsWacther(&$object)
-    {
+    static function resetObjectModificationsWacther(&$object) {
         unset($object->___status_key);
     }
 
-    static function objectHasBeenModified(&$object)
-    {
+    static function objectHasBeenModified(&$object) {
         if(isset($object->___status_key)){
             $old_status = $object->___status_key;
             $new_key = Ak::getStatusKey($object);
@@ -1725,16 +1651,14 @@ class Ak
         return true;
     }
 
-    static function &call_user_func_array($function_name, $parameters)
-    {
+    static function &call_user_func_array($function_name, $parameters) {
         Ak::deprecateWarning('Ak::call_user_func_array() is deprecated and will be removed from Akelos in future releases. Please use PHP\'s native call_user_func_array() function instead.');
         $result = call_user_func_array($function_name, $parameters);
         return $result;
     }
 
 
-    static function &array_sort_by($array,  $key = null, $direction = 'asc')
-    {
+    static function &array_sort_by($array,  $key = null, $direction = 'asc') {
         $array_copy = $sorted_array = array();
         foreach (array_keys($array) as $k) {
             $array_copy[$k] = $array[$k][$key];
@@ -1752,16 +1676,14 @@ class Ak
         return $sorted_array;
     }
 
-    static function mime_content_type($file)
-    {
+    static function mime_content_type($file) {
         static $mime_types;
         empty($mime_types) ? include AK_ACTIVE_SUPPORT_DIR.DS.'utils'.DS.'mime_types.php' : null;
         $file_extension = substr($file,strrpos($file,'.')+1);
         return !empty($mime_types[$file_extension]) ? $mime_types[$file_extension] : false;
     }
 
-    static function stream($path, $buffer_size = 4096)
-    {
+    static function stream($path, $buffer_size = 4096) {
         ob_implicit_flush();
         $len = empty($buffer_size) ? 4096 : $buffer_size;
         $fp = fopen($path, "rb");
@@ -1770,8 +1692,7 @@ class Ak
         }
     }
 
-    static function _nextPermutation($p, $size)
-    {
+    static function _nextPermutation($p, $size) {
         for ($i = $size - 1; isset($p[$i]) && isset($p[$i+1]) && $p[$i] >= $p[$i+1]; --$i) { }
         if ($i == -1) { return false; }
         for ($j = $size; $p[$j] <= $p[$i]; --$j) { }
@@ -1785,8 +1706,7 @@ class Ak
     /**
      * Returns all the possible permutations of given array
      */
-    static function permute($array, $join_with = false)
-    {
+    static function permute($array, $join_with = false) {
         $size = count($array) - 1;
         $perm = range(0, $size);
         $j = 0;
@@ -1833,8 +1753,7 @@ class Ak
      *
      * @return  string  A UUID, made up of 32 hex digits and 4 hyphens.
      */
-    static function uuid()
-    {
+    static function uuid() {
 
         // The field names refer to RFC 4122 section 4.1.2
         return sprintf('%04x%04x-%04x-%03x4-%04x-%04x%04x%04x',
@@ -1850,16 +1769,14 @@ class Ak
     }
 
 
-    static function test($test_case_name, $use_sessions = false)
-    {
+    static function test($test_case_name, $use_sessions = false) {
         ak_test($test_case_name, $use_sessions);
     }
 
     /**
      * Use this function for securing includes. This way you can prevent file inclusion attacks
      */
-    static function sanitize_include($include, $mode = 'normal')
-    {
+    static function sanitize_include($include, $mode = 'normal') {
         $rules = array(
         'paranoid' => '/([^A-Z^a-z^0-9^_^-^ ]+)/',
         'high' => '/([^A-Z^a-z^0-9^_^-^ ^\/^\\\^:]+)/',
@@ -1873,8 +1790,7 @@ class Ak
      * Returns a PHP Object from an API resource
      *
      */
-    static function client_api($resource, $options = array())
-    {
+    static function client_api($resource, $options = array()) {
         $default_options = array(
         'protocol' => 'xml_rpc',
         'build' => true
@@ -1890,23 +1806,20 @@ class Ak
     /**
      * Cross PHP version replacement for html_entity_decode. Emulates PHP5 behaviour on PHP4 on UTF-8 entities
      */
-    static function html_entity_decode($html, $translation_table_or_quote_style = null)
-    {
+    static function html_entity_decode($html, $translation_table_or_quote_style = null) {
         return html_entity_decode($html,empty($translation_table_or_quote_style) ? ENT_QUOTES : $translation_table_or_quote_style,'UTF-8');
     }
 
     /**
     * Loads the plugins found at app/vendor/plugins
     */
-    static function &loadPlugins()
-    {
+    static function &loadPlugins() {
         $PluginManager = new AkPluginLoader();
         $PluginManager->loadPlugins();
         return $PluginManager;
     }
 
-    static function setStaticVar($name,&$value)
-    {
+    static function setStaticVar($name,&$value) {
         $refhack = Ak::_staticVar($name,$value);
         return $refhack;
     }
@@ -1932,21 +1845,18 @@ class Ak
     *
     *     static $chache;
     */
-    static function &getStaticVar($name)
-    {
+    static function &getStaticVar($name) {
         $refhack = Ak::_staticVar($name);
         return $refhack;
     }
 
-    static function &unsetStaticVar($name)
-    {
+    static function &unsetStaticVar($name) {
         $null = null;
         $refhack = Ak::_staticVar($name, $null, true);
         return $refhack;
     }
 
-    static function &_staticVar($name, &$value = null, $destruct = false)
-    {
+    static function &_staticVar($name, &$value = null, $destruct = false) {
         static $_memory;
         if(!constant('AK_CAN_FORK') || (!$pid = getmypid())){
             $pid = 0;
@@ -1998,8 +1908,7 @@ class Ak
      * @param array $available_options
      * @param boolean $walk_keys
      */
-    static function parseOptions(&$options, $default_options = array(), $parameters = array(), $walk_keys=false)
-    {
+    static function parseOptions(&$options, $default_options = array(), $parameters = array(), $walk_keys=false) {
         if ($walk_keys) {
             foreach ($options as $key=>$value) {
                 if (!is_array($value)) {
@@ -2028,8 +1937,7 @@ class Ak
     /**
      * Returns YAML settings from config/$namespace.yml
      */
-    static function getSettings($namespace, $raise_error_if_config_file_not_found = true, $environment = AK_ENVIRONMENT)
-    {
+    static function getSettings($namespace, $raise_error_if_config_file_not_found = true, $environment = AK_ENVIRONMENT) {
         static $_config;
         if ($raise_error_if_config_file_not_found && !in_array($environment,Ak::toArray(AK_AVAILABLE_ENVIRONMENTS))) {
             trigger_error('The environment '.$environment.' is not allowed. Allowed environments: '.AK_AVAILABLE_ENVIRONMENTS, E_USER_ERROR);
@@ -2041,21 +1949,18 @@ class Ak
         return $_config->get($namespace, $environment, $raise_error_if_config_file_not_found);
     }
 
-    static function getSetting($namespace, $variable, $default_value = null)
-    {
+    static function getSetting($namespace, $variable, $default_value = null) {
         if($settings = Ak::getSettings($namespace)){
             return isset($settings[$variable]) ? $settings[$variable] : $default_value;
         }
         return $default_value;
     }
 
-    static function _parseSettingsConstants($settingsStr)
-    {
+    static function _parseSettingsConstants($settingsStr) {
         return preg_replace_callback('/\$\{(AK_.*?)\}/',array('Ak','getConstant'),$settingsStr);
     }
 
-    static function getConstant($name)
-    {
+    static function getConstant($name) {
         return defined($name[1])?constant($name[1]):'';
     }
 
@@ -2066,8 +1971,7 @@ class Ak
      *
      * On Akelos we can do Ak::get('Model')->find();
      */
-    static function get($model_name, $attributes = array())
-    {
+    static function get($model_name, $attributes = array()) {
         Ak::import($model_name);
         return new $model_name($attributes);
     }
@@ -2078,8 +1982,7 @@ class Ak
     *
     * For example PHP will return -5%7 = -5 when expected was 2
     */
-    static function modulo($a, $n)
-    {
+    static function modulo($a, $n) {
         $n = abs($n);
         return $n===0 ? null : $a-$n*floor($a/$n);
     }
@@ -2093,8 +1996,7 @@ class Ak
      *
      * @return Same as pcntl_fork (PID of the children to the parent, 0 to the children process and -1 if fails).
      */
-    static function pcntl_fork()
-    {
+    static function pcntl_fork() {
         $db = Ak::db();
         $can_connect = (isset($db->connection) && method_exists($db->connection, 'connect'));
         // Disconnect on the parent so we we don't have a zombie connection once the child closes the reused connection
@@ -2111,8 +2013,7 @@ class Ak
     /**
      * Getting the temporary directory
     */
-    static function get_tmp_dir_name()
-    {
+    static function get_tmp_dir_name() {
         if(!defined('AK_TMP_DIR')){
             if(defined('AK_BASE_DIR') && is_writable(AK_BASE_DIR.DS.'tmp')){
                 return AK_BASE_DIR.DS.'tmp';
@@ -2138,15 +2039,13 @@ class Ak
         return AK_TMP_DIR;
     }
 
-    static function registerAutoloader($autoloader)
-    {
+    static function registerAutoloader($autoloader) {
         spl_autoload_unregister(array('Ak','autoload'));
         spl_autoload_register($autoloader);
         spl_autoload_register(array('Ak','autoload'));
     }
 
-    static function autoload($name, $path = null)
-    {
+    static function autoload($name, $path = null) {
         static $paths = array(), $lib_paths = array(), $app_paths = array();
 
         if (!empty($path)){
@@ -2332,8 +2231,7 @@ class Ak
     * @see http://paul-m-jones.com/?p=262
     * @see http://bugs.php.net/bug.php?id=33595
     */
-    static function unsetCircularReferences(&$Object)
-    {
+    static function unsetCircularReferences(&$Object) {
         // We can't use get_class_vars as it does not include runtime assigned attributes
         foreach (array_keys((array)$Object) as $attribute){
             if(isset($Object->$attribute)){

@@ -12,8 +12,7 @@ class FrameworkSetup
 
     public $stylesheets = array('scaffold','forms');
 
-    public function __construct()
-    {
+    public function __construct() {
         if(file_exists(AK_CONFIG_DIR.DS.'config.php')){
             echo Ak::t('We found that you already have a configuration file at config/config.php. You need to remove that file first in order to run the setup.', array(), 'framework_setup');
             die();
@@ -28,16 +27,14 @@ class FrameworkSetup
      * If none of the above is
      *
      */
-    public function suggestDatabaseType()
-    {
+    public function suggestDatabaseType() {
         /**
          * @todo add database check for postgre
          */
         return $this->_suggestMysql() ? 'mysql' : (function_exists('pg_connect') ? 'pgsql' : (AK_PHP5 ? 'sqlite' : 'mysql'));
     }
 
-    public function _suggestMysql()
-    {
+    public function _suggestMysql() {
         if(function_exists('mysql_connect')){
             if($db = @mysql_connect(   $this->getDatabaseHost(),
             $this->getDatabaseUser(),
@@ -48,8 +45,7 @@ class FrameworkSetup
         return false;
     }
 
-    public function createDatabase($mode)
-    {
+    public function createDatabase($mode) {
         $success = true;
 
         $db = $this->databaseConnection('admin');
@@ -66,8 +62,7 @@ class FrameworkSetup
         return false;
     }
 
-    public function _createMysqlDatabase(&$db, $mode)
-    {
+    public function _createMysqlDatabase(&$db, $mode) {
         $success = true;
         $success = $db->Execute('CREATE DATABASE '.$this->getDatabaseName($mode)) ? $success : false;
         $success = $db->Execute("GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER ON ".
@@ -76,28 +71,23 @@ class FrameworkSetup
         return $success;
     }
 
-    public function getDatabaseHost($mode = '')
-    {
+    public function getDatabaseHost($mode = '') {
         return !isset($this->{$mode.'_database_host'}) ? $this->suggestDatabaseHost() : $this->{$mode.'_database_host'};
     }
 
-    public function getDatabaseUser($mode = '')
-    {
+    public function getDatabaseUser($mode = '') {
         return !isset($this->{$mode.'_database_user'}) ? $this->suggestUserName() : $this->{$mode.'_database_user'};
     }
 
-    public function getDatabasePassword($mode = '')
-    {
+    public function getDatabasePassword($mode = '') {
         return !isset($this->{$mode.'_database_password'}) ? '' : $this->{$mode.'_database_password'};
     }
 
-    public function getDatabaseType()
-    {
+    public function getDatabaseType() {
         return !isset($this->database_type) ? $this->suggestDatabaseType() : $this->database_type;
     }
 
-    public function setDatabaseType($database_type)
-    {
+    public function setDatabaseType($database_type) {
         $database_type = strtolower($database_type);
         if(!in_array($database_type, array_keys($this->available_databases))){
             trigger_error(Ak::t('Selected database is not supported yet by the Akelos Framework',array(),'framework_setup'));
@@ -110,58 +100,48 @@ class FrameworkSetup
         return false;
     }
 
-    public function getDatabaseName($mode)
-    {
+    public function getDatabaseName($mode) {
         return !isset($this->{$mode.'_database_name'}) ?
         $this->guessApplicationName().($mode=='development'?'_dev':($mode=='testing'?'_tests':'')) :
         $this->{$mode.'_database_name'};
     }
 
-    public function setDatabaseName($database_name, $mode)
-    {
+    public function setDatabaseName($database_name, $mode) {
         $this->{$mode.'_database_name'} = $database_name;
     }
 
-    public function setDatabaseHost($host, $mode)
-    {
+    public function setDatabaseHost($host, $mode) {
         $this->{$mode.'_database_host'} = $host;
     }
 
-    public function setDatabaseUser($user, $mode)
-    {
+    public function setDatabaseUser($user, $mode) {
         $this->{$mode.'_database_user'} = $user;
     }
 
-    public function setDatabasePassword($password, $mode)
-    {
+    public function setDatabasePassword($password, $mode) {
         $this->{$mode.'_database_password'} = $password;
     }
 
 
-    public function getDatabaseAdminUser()
-    {
+    public function getDatabaseAdminUser() {
         return !isset($this->admin_database_user) ? 'root' : $this->admin_database_user;
     }
 
-    public function getDatabaseAdminPassword()
-    {
+    public function getDatabaseAdminPassword() {
         return !isset($this->admin_database_password) ? '' : $this->admin_database_password;
     }
 
 
-    public function setDatabaseAdminUser($user)
-    {
+    public function setDatabaseAdminUser($user) {
         $this->admin_database_user = $user;
     }
 
-    public function setDatabaseAdminPassword($password)
-    {
+    public function setDatabaseAdminPassword($password) {
         $this->admin_database_password = $password;
     }
 
 
-    public function databaseConnection($mode)
-    {
+    public function databaseConnection($mode) {
         static $connections = array();
         require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb.inc.php');
 
@@ -175,8 +155,7 @@ class FrameworkSetup
         return $connections[$dsn];
     }
 
-    public function _getDsn($mode)
-    {
+    public function _getDsn($mode) {
         if($mode == 'admin'){
             $db_type = $this->getDatabaseType('production');
             return $db_type.'://'.
@@ -191,8 +170,7 @@ class FrameworkSetup
     }
 
 
-    public function getAvailableDatabases()
-    {
+    public function getAvailableDatabases() {
         $databases = array();
         foreach ($this->available_databases as $type=>$description){
             if($this->isDatabaseDriverAvalible($type)){
@@ -204,8 +182,7 @@ class FrameworkSetup
     }
 
 
-    public function isDatabaseDriverAvalible($database_type = null)
-    {
+    public function isDatabaseDriverAvalible($database_type = null) {
         $database_type = empty($database_type) ? $this->getDatabaseType() : $database_type;
         if(strstr($database_type,'mysql')){
             $function = 'mysql_connect';
@@ -219,14 +196,12 @@ class FrameworkSetup
         return function_exists($function);
     }
 
-    public function getUrlSuffix()
-    {
+    public function getUrlSuffix() {
         return empty($this->url_suffix) ? AK_SITE_URL_SUFFIX : $this->url_suffix;
     }
 
 
-    public function getConfigurationFile($settings = array())
-    {
+    public function getConfigurationFile($settings = array()) {
         $configuration_template = <<<CONFIG
 <?php
 
@@ -296,8 +271,7 @@ CONFIG;
         return str_replace(array_keys($settings), array_values($settings), $configuration_template);
 
     }
-    public function getDatabaseConfigurationFile($settings = array())
-    {
+    public function getDatabaseConfigurationFile($settings = array()) {
 
         $configuration_template = <<<CONFIG
 production:
@@ -360,38 +334,33 @@ CONFIG;
         return str_replace(array_keys($settings), array_values($settings), $configuration_template);
 
     }
-    public function writeConfigurationFile($configuration_details)
-    {
+    public function writeConfigurationFile($configuration_details) {
         if($this->canWriteConfigurationFile()){
             return Ak::file_put_contents(AK_CONFIG_DIR.DS.'config.php', $configuration_details);
         }
         return false;
     }
-    public function writeDatabaseConfigurationFile($configuration_details)
-    {
+    public function writeDatabaseConfigurationFile($configuration_details) {
         if($this->canWriteDbConfigurationFile()){
             return Ak::file_put_contents(AK_CONFIG_DIR.DS.'database.yml', $configuration_details);
         }
         return false;
     }
-    public function canWriteConfigurationFile()
-    {
+    public function canWriteConfigurationFile() {
         if(isset($this->ftp_enabled)){
             $this->testFtpSettings();
         }
         $file_path = AK_CONFIG_DIR.DS.'config.php';
         return !file_exists($file_path);
     }
-    public function canWriteDbConfigurationFile()
-    {
+    public function canWriteDbConfigurationFile() {
         if(isset($this->ftp_enabled)){
             $this->testFtpSettings();
         }
         $file_path = AK_CONFIG_DIR.DS.'database.yml';
         return !file_exists($file_path);
     }
-    public function writeRoutesFile()
-    {
+    public function writeRoutesFile() {
         if(isset($this->ftp_enabled)){
             $this->testFtpSettings();
         }
@@ -402,8 +371,7 @@ CONFIG;
         return false;
     }
 
-    public function modifyHtaccessFiles()
-    {
+    public function modifyHtaccessFiles() {
         if($this->isUrlRewriteEnabled()){
             return true;
         }
@@ -424,53 +392,44 @@ CONFIG;
         empty($file_2_content) || @Ak::file_put_contents($file_2, str_replace('# RewriteBase /framework',' RewriteBase '.$url_suffix, $file_2_content));
     }
 
-    public function isUrlRewriteEnabled()
-    {
+    public function isUrlRewriteEnabled() {
         return @file_get_contents(AK_SITE_URL.'/framework_setup/url_rewrite_check') == 'url_rewrite_working';
     }
 
-    public function getApplicationName()
-    {
+    public function getApplicationName() {
         if(!isset($this->application_name)){
             $this->setApplicationName($this->guessApplicationName());
         }
         return $this->application_name;
     }
 
-    public function setApplicationName($application_name)
-    {
+    public function setApplicationName($application_name) {
         $this->application_name = $application_name;
     }
 
-    public function guessApplicationName()
-    {
+    public function guessApplicationName() {
         $application_name = Ak::last(explode('/',AK_SITE_URL_SUFFIX));
         $application_name = empty($application_name) ? substr(AK_BASE_DIR, strrpos(AK_BASE_DIR, DS)+1) : $application_name;
         return empty($application_name) ? 'my_app' : $application_name;
     }
 
-    public function canWriteToTempDir()
-    {
+    public function canWriteToTempDir() {
         return $this->_writeToTemporaryFile(AK_BASE_DIR.DS.'tmp'.DS.'test_file.txt');
     }
 
-    public function canWriteToLocaleDir()
-    {
+    public function canWriteToLocaleDir() {
         return $this->_writeToTemporaryFile(AK_APP_DIR.DS.'locales'.DS.'test_file.txt');
     }
 
-    public function canWriteToPublicDir()
-    {
+    public function canWriteToPublicDir() {
         return $this->_writeToTemporaryFile(AK_PUBLIC_DIR.DS.'test_file.txt');
     }
 
-    public function needsFtpFileHandling()
-    {
+    public function needsFtpFileHandling() {
         return !$this->_writeToTemporaryFile(AK_CONFIG_DIR.DS.'test_file.txt');
     }
 
-    public function _writeToTemporaryFile($file_path, $content = '', $mode = 'a+')
-    {
+    public function _writeToTemporaryFile($file_path, $content = '', $mode = 'a+') {
         $result = false;
         if(strstr($file_path, AK_BASE_DIR)){
             if(!$fp = @fopen($file_path, $mode)) {
@@ -486,8 +445,7 @@ CONFIG;
         return $result;
     }
 
-    public function _temporaryFilesCleanUp($file_path = null)
-    {
+    public function _temporaryFilesCleanUp($file_path = null) {
         static $file_paths = array();
         if($file_path == null && count($file_paths) > 0){
             foreach ($file_paths as $file_path){
@@ -503,8 +461,7 @@ CONFIG;
         $file_paths[$file_path] = $file_path;
     }
 
-    public function addSetupOptions($options = array())
-    {
+    public function addSetupOptions($options = array()) {
         $options = array_merge($this->getDefaultOptions(), $options);
 
         if(!$this->isDatabaseDriverAvalible($options['database']['type'])){
@@ -535,23 +492,19 @@ CONFIG;
         $this->options = $options;
     }
 
-    public function getSetupOptions()
-    {
+    public function getSetupOptions() {
         return isset($this->options) ? $this->options : array();
     }
 
-    public function addError($error)
-    {
+    public function addError($error) {
         $this->errors[] = $error;
     }
 
-    public function getErrors()
-    {
+    public function getErrors() {
         return $this->errors;
     }
 
-    public function getDefaultOptions()
-    {
+    public function getDefaultOptions() {
         return array(
         'production_database_type'      => $this->getDatabaseType('production'),
         'production_database_host'      => $this->getDatabaseHost('production'),
@@ -584,13 +537,11 @@ CONFIG;
         );
     }
 
-    public function canUseFtpFileHandling()
-    {
+    public function canUseFtpFileHandling() {
         return function_exists('ftp_connect');
     }
 
-    public function getFtpHost()
-    {
+    public function getFtpHost() {
         if(!isset($this->ftp_host)){
             $details = explode('/', str_replace(array('http://','https://','www.'),array('','','ftp.'), AK_SITE_URL).'/');
             return array_shift($details);
@@ -598,13 +549,11 @@ CONFIG;
         return $this->ftp_host;
     }
 
-    public function setFtpHost($ftp_host)
-    {
+    public function setFtpHost($ftp_host) {
         $this->ftp_host = trim($ftp_host, '/');
     }
 
-    public function getFtpPath()
-    {
+    public function getFtpPath() {
         if(!isset($this->ftp_path)){
             return '/'.trim(join('/',array_slice(
             explode('/',
@@ -614,45 +563,37 @@ CONFIG;
         return $this->ftp_path;
     }
 
-    public function setFtpPath($ftp_path)
-    {
+    public function setFtpPath($ftp_path) {
         $this->ftp_path = empty($ftp_path) ? '' : '/'.trim($ftp_path,'/');
     }
 
-    public function getFtpUser()
-    {
+    public function getFtpUser() {
         return !isset($this->ftp_user) ? $this->suggestUserName() : $this->ftp_user;
     }
 
-    public function setFtpUser($ftp_user)
-    {
+    public function setFtpUser($ftp_user) {
         $this->ftp_user = $ftp_user;
     }
 
-    public function getFtpPassword()
-    {
+    public function getFtpPassword() {
         return !isset($this->ftp_password) ? '' : $this->ftp_password;
     }
 
-    public function setFtpPassword($ftp_password)
-    {
+    public function setFtpPassword($ftp_password) {
         $this->ftp_password = $ftp_password;
     }
 
-    public function setDefaultOptions()
-    {
+    public function setDefaultOptions() {
         foreach ($this->getDefaultOptions() as $k=>$v){
             $this->$k = $v;
         }
     }
 
-    public function hasUrlSuffix()
-    {
+    public function hasUrlSuffix() {
         return !empty($this->url_suffix) && trim($this->url_suffix,'/') != '';
     }
 
-    public function suggestUserName()
-    {
+    public function suggestUserName() {
         if(AK_OS === 'WINDOWS'){
             return 'root';
         }
@@ -660,8 +601,7 @@ CONFIG;
         return  $script_owner == '' ? 'root' : $script_owner;
     }
 
-    public function testFtpSettings()
-    {
+    public function testFtpSettings() {
         if(!$this->canUseFtpFileHandling()){
             return false;
         }
@@ -685,23 +625,19 @@ CONFIG;
         return $this->ftp_enabled;
     }
 
-    public function getLocales()
-    {
+    public function getLocales() {
         return join(',',!isset($this->locales) ? $this->suggestLocales() : $this->_getLocales($this->locales));
     }
 
-    public function setLocales($locales)
-    {
+    public function setLocales($locales) {
         $this->locales = $this->_getLocales($locales);
     }
 
-    public function _getLocales($locales)
-    {
+    public function _getLocales($locales) {
         return array_map('trim',array_unique(array_diff((is_array($locales) ? $locales : explode(',',$locales.',')), array(''))));
     }
 
-    public function suggestLocales()
-    {
+    public function suggestLocales() {
         $LocaleManager = new AkLocaleManager();
 
         $langs = array('en');
@@ -713,13 +649,11 @@ CONFIG;
         return array_unique(array_map('strtolower',array_diff($langs,array(''))));
     }
 
-    public function suggestDatabaseHost()
-    {
+    public function suggestDatabaseHost() {
         return 'localhost';
     }
 
-    public function relativizeStylesheetPaths()
-    {
+    public function relativizeStylesheetPaths() {
         $asset_path = $this->_getAssetBasePath();
         if($this->hasUrlSuffix() || !empty($asset_path)){
             $url_suffix = trim($this->getUrlSuffix(),'/');
@@ -734,8 +668,7 @@ CONFIG;
         }
     }
 
-    public function _getAssetBasePath()
-    {
+    public function _getAssetBasePath() {
         return defined('AK_INSECURE_APP_DIRECTORY_LAYOUT') && AK_INSECURE_APP_DIRECTORY_LAYOUT ? 'public' : '';
     }
 }

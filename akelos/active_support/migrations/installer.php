@@ -64,8 +64,7 @@ class AkInstaller
     protected
     $_inited                    = false;
 
-    public function __construct($db_connection = null)
-    {
+    public function __construct($db_connection = null) {
         $this->app_plugins_dir            = AkConfig::getDir('app_plugins');
         $this->app_app_dir                = AkConfig::getDir('app');
         $this->app_base_dir               = AkConfig::getDir('base');
@@ -78,8 +77,7 @@ class AkInstaller
         }
     }
 
-    public function init($db_connection = null, $reinit = false)
-    {
+    public function init($db_connection = null, $reinit = false) {
         if(!$this->_inited || $reinit){
 
             // Install scripts might use more RAM than normal requests.
@@ -101,8 +99,7 @@ class AkInstaller
         }
     }
 
-    public function __get($name)
-    {
+    public function __get($name) {
         if($name == 'db'){
             $this->init();
         }elseif($name == 'AkelosMigration'){
@@ -111,8 +108,7 @@ class AkInstaller
         return isset($this->$name) ? $this->$name : null;
     }
 
-    public function usage()
-    {
+    public function usage() {
         echo Ak::t("Description:
     Database migrations is a sort of SCM like subversion, but for database settings.
 
@@ -136,40 +132,33 @@ Example:
 ");
     }
 
-    public function install($version = null, $options = array())
-    {
+    public function install($version = null, $options = array()) {
         $version = (is_null($version)) ? max($this->getAvailableVersions()) : $version;
         return $this->_upgradeOrDowngrade('up',  $version , $options);
     }
 
-    public function up($version = null, $options = array())
-    {
+    public function up($version = null, $options = array()) {
         return $this->_upgradeOrDowngrade('up', $version, $options);
     }
 
-    public function uninstall($version = null, $options = array())
-    {
+    public function uninstall($version = null, $options = array()) {
         $version = (is_null($version)) ? 0 : $version;
         return $this->_upgradeOrDowngrade('down', $version, $options);
     }
 
-    public function down($version = null, $options = array())
-    {
+    public function down($version = null, $options = array()) {
         return $this->_upgradeOrDowngrade('down', $version, $options);
     }
 
-    public function execute($sql)
-    {
+    public function execute($sql) {
         return $this->db->execute($sql);
     }
 
-    public function debug($toggle = null)
-    {
+    public function debug($toggle = null) {
         $this->db->connection->debug = $toggle === null ? !$this->db->connection->debug : $toggle;
     }
 
-    public function dropTable($table_name, $options = array())
-    {
+    public function dropTable($table_name, $options = array()) {
         AkDbSchemaCache::clear($table_name);
         $result = $this->tableExists($table_name) ? $this->db->execute('DROP TABLE '.$table_name) : 1;
         if($result){
@@ -180,8 +169,7 @@ Example:
         }
     }
 
-    public function dropTables()
-    {
+    public function dropTables() {
         $args = func_get_args();
         if(!empty($args)){
             $num_args = count($args);
@@ -193,8 +181,7 @@ Example:
         }
     }
 
-    public function addIndex($table_name, $columns, $index_name = '')
-    {
+    public function addIndex($table_name, $columns, $index_name = '') {
         $index_name = ($index_name == '') ? 'idx_'.$table_name.'_'.$columns : $index_name;
         $index_options = array();
         if(preg_match('/(UNIQUE|FULLTEXT|HASH)/',$columns,$match)){
@@ -204,8 +191,7 @@ Example:
         return $this->tableExists($table_name) ? $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->CreateIndexSQL($index_name, $table_name, $columns, $index_options)) : false;
     }
 
-    public function removeIndex($table_name, $columns_or_index_name)
-    {
+    public function removeIndex($table_name, $columns_or_index_name) {
         AkDbSchemaCache::clear($table_name);
         if(!$this->tableExists($table_name)){
             return false;
@@ -219,22 +205,19 @@ Example:
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->DropIndexSQL($index_name, $table_name));
     }
 
-    public function dropIndex($table_name, $columns_or_index_name)
-    {
+    public function dropIndex($table_name, $columns_or_index_name) {
         $this->clearSchemaCacheForTable($table_name);
         return $this->removeIndex($table_name,$columns_or_index_name);
     }
 
-    public function createSequence($table_name)
-    {
+    public function createSequence($table_name) {
         $this->clearSchemaCacheForTable($table_name);
         $result = $this->tableExists('seq_'.$table_name) ? false : $this->db->connection->CreateSequence('seq_'.$table_name);
         $this->available_tables[] = 'seq_'.$table_name;
         return $result;
     }
 
-    public function dropSequence($table_name)
-    {
+    public function dropSequence($table_name) {
         $this->clearSchemaCacheForTable($table_name);
         $result = $this->tableExists('seq_'.$table_name) ? $this->db->connection->DropSequence('seq_'.$table_name) : true;
         if($result){
@@ -244,13 +227,11 @@ Example:
         return $result;
     }
 
-    public function getAvailableTables()
-    {
+    public function getAvailableTables() {
         return $this->available_tables = $this->db->getAvailableTables(true);
     }
 
-    public function tableExists($table_name)
-    {
+    public function tableExists($table_name) {
         return in_array($table_name, $this->getAvailableTables());
     }
 
@@ -269,23 +250,19 @@ Example:
     *
     *   $User->transactionComplete();
     */
-    public function transactionStart()
-    {
+    public function transactionStart() {
         return ($this->use_transactions ? $this->db->startTransaction() : true);
     }
 
-    public function transactionComplete()
-    {
+    public function transactionComplete() {
         return ($this->use_transactions ? $this->db->stopTransaction() : true);
     }
 
-    public function transactionFail()
-    {
+    public function transactionFail() {
         return ($this->use_transactions ? $this->db->failTransaction() : true);
     }
 
-    public function transactionHasFailed()
-    {
+    public function transactionHasFailed() {
         return ($this->use_transactions ? $this->db->hasTransactionFailed() : false);
     }
 
@@ -293,8 +270,7 @@ Example:
     /**
      * Promts for a variable on console scripts
      */
-    static function promptUserVar($message, $options = array())
-    {
+    static function promptUserVar($message, $options = array()) {
         $f = fopen("php://stdin","r");
         $default_options = array(
         'default' => null,
@@ -316,55 +292,47 @@ Example:
         return empty($value) ? $options['default'] : $value;
     }
 
-    public function installVersion($version, $options = array())
-    {
+    public function installVersion($version, $options = array()) {
         return $this->_runInstallerMethod('up', $version, $options);
     }
 
-    public function uninstallVersion($version, $options = array())
-    {
+    public function uninstallVersion($version, $options = array()) {
         return $this->_runInstallerMethod('down', $version, $options);
     }
 
-    public function modifyTable($table_name, $column_options = null, $table_options = array())
-    {
+    public function modifyTable($table_name, $column_options = null, $table_options = array()) {
         return $this->_createOrModifyTable($table_name, $column_options, $table_options);
     }
 
     /**
      * Adds a new column to the table called $table_name
      */
-    public function addColumn($table_name, $column_details)
-    {
+    public function addColumn($table_name, $column_details) {
         $this->clearSchemaCacheForTable($table_name);
         $this->timestamps = false;
         $column_details = $this->_getColumnsAsAdodbDataDictionaryString($column_details);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->AddColumnSQL($table_name, $column_details));
     }
 
-    public function changeColumn($table_name, $column_details)
-    {
+    public function changeColumn($table_name, $column_details) {
         $this->clearSchemaCacheForTable($table_name);
         $this->timestamps = false;
         $column_details = $this->_getColumnsAsAdodbDataDictionaryString($column_details);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->AlterColumnSQL($table_name, $column_details));
     }
 
-    public function removeColumn($table_name, $column_name)
-    {
+    public function removeColumn($table_name, $column_name) {
         $this->clearSchemaCacheForTable($table_name);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->DropColumnSQL($table_name, $column_name));
     }
 
-    public function renameColumn($table_name, $old_column_name, $new_column_name)
-    {
+    public function renameColumn($table_name, $old_column_name, $new_column_name) {
         $this->clearSchemaCacheForTable($table_name);
         return $this->db->renameColumn($table_name, $old_column_name, $new_column_name);
     }
 
 
-    public function createTable($table_name, $column_options = null, $table_options = array())
-    {
+    public function createTable($table_name, $column_options = null, $table_options = array()) {
         if($this->tableExists($table_name)){
             trigger_error(Ak::t('Table %table_name already exists on the database', array('%table_name'=>$table_name)), E_USER_NOTICE);
             return false;
@@ -374,14 +342,12 @@ Example:
         return $this->_createOrModifyTable($table_name, $column_options, $table_options);
     }
 
-    public function clearSchemaCacheForTable($table_name)
-    {
+    public function clearSchemaCacheForTable($table_name) {
         AkDbSchemaCache::clear($table_name);
     }
 
 
-    protected function _upgradeOrDowngrade($action, $version = null, $options = array())
-    {
+    protected function _upgradeOrDowngrade($action, $version = null, $options = array()) {
         AkDbSchemaCache::clearAll();
 
         if(in_array('quiet',$options) && AK_DEV_MODE){
@@ -445,8 +411,7 @@ Example:
     /**
      * Runs a a dow_1, up_3 method and wraps it into a transaction.
      */
-    protected function _runInstallerMethod($method_prefix, $version, $options = array(), $version_number = null)
-    {
+    protected function _runInstallerMethod($method_prefix, $version, $options = array(), $version_number = null) {
         $method_name = $method_prefix.'_'.$version;
         $version_number = empty($version_number) ? ($method_prefix=='down' ? $version-1 : $version) : $version_number;
 
@@ -473,8 +438,7 @@ Example:
         return $success;
     }
 
-    protected function _createOrModifyTable($table_name, $column_options = null, $table_options = array())
-    {
+    protected function _createOrModifyTable($table_name, $column_options = null, $table_options = array()) {
         $this->clearSchemaCacheForTable($table_name);
         if(empty($column_options) && $this->_loadDbDesignerDbSchema()){
             $column_options = $this->db_designer_schema[$table_name];
@@ -523,8 +487,7 @@ Example:
         return $result;
     }
 
-    protected function _getColumnsAsAdodbDataDictionaryString($columns)
-    {
+    protected function _getColumnsAsAdodbDataDictionaryString($columns) {
         $columns = $this->_setColumnDefaults($columns);
         $this->_ensureColumnNameCompatibility($columns);
 
@@ -556,8 +519,7 @@ Example:
         return trim(preg_replace(array_keys($equivalences),array_values($equivalences), ' '.$columns.' '), ' ');
     }
 
-    protected function _setColumnDefaults($columns)
-    {
+    protected function _setColumnDefaults($columns) {
         $columns = Ak::toArray($columns);
         foreach ((array)$columns as $column){
             $column = trim($column, "\n\t\r, ");
@@ -572,18 +534,15 @@ Example:
         return join(",\n", $single_columns);
     }
 
-    protected function _setColumnDefault($column)
-    {
+    protected function _setColumnDefault($column) {
         return $this->_needsDefaultAttributes($column) ? $this->_setDefaultAttributes($column) : $column;
     }
 
-    protected function _needsDefaultAttributes($column)
-    {
+    protected function _needsDefaultAttributes($column) {
         return preg_match('/^(([A-Z0-9_\(\)]+)|(.+ string[^\(.]*)|(\*.*))$/i',$column);
     }
 
-    protected function _setDefaultAttributes($column)
-    {
+    protected function _setDefaultAttributes($column) {
         $rules = $this->getDefaultColumnAttributesRules();
         foreach ($rules as $regex=>$replacement){
             if(is_string($replacement)){
@@ -599,8 +558,7 @@ Example:
      * Returns a key => value pair of regular expressions that will trigger methods
      * to cast database columns to their respective default values or a replacement expression.
      */
-    public function getDefaultColumnAttributesRules()
-    {
+    public function getDefaultColumnAttributesRules() {
         return array(
         '/^\*(.*)$/i' => array($this,'_castToMultilingualColumn'),
         '/^(description|content|body|details)$/i' => '\1 text',
@@ -617,8 +575,7 @@ Example:
         );
     }
 
-    protected function _castToMultilingualColumn($found, $column)
-    {
+    protected function _castToMultilingualColumn($found, $column) {
         $columns = array();
         foreach (Ak::langs() as $lang){
             $columns[] = $lang.'_'.ltrim($column);
@@ -626,8 +583,7 @@ Example:
         return $this->_setColumnDefaults($columns);
     }
 
-    protected function _getColumnsToIndex($column_string)
-    {
+    protected function _getColumnsToIndex($column_string) {
         $columns_to_index = array();
         foreach (explode(',',$column_string.',') as $column){
             if(preg_match('/([A-Za-z0-9_]+) (.*) (INDEX|UNIQUE|FULLTEXT|HASH) ?(.*)$/i',$column,$match)){
@@ -637,8 +593,7 @@ Example:
         return $columns_to_index;
     }
 
-    protected function _getUniqueValueColumns($column_string)
-    {
+    protected function _getUniqueValueColumns($column_string) {
         $unique_columns = array();
         foreach (explode(',',$column_string.',') as $column){
             if(preg_match('/([A-Za-z0-9_]+) (.*) UNIQUE ?(.*)$/',$column,$match)){
@@ -648,8 +603,7 @@ Example:
         return $unique_columns;
     }
 
-    protected function _requiresSequenceTable($column_string)
-    {
+    protected function _requiresSequenceTable($column_string) {
         if(in_array($this->db->type(),array('mysql','postgre'))){
             return false;
         }
@@ -664,8 +618,7 @@ Example:
         return false;
     }
 
-    protected function _loadDbDesignerDbSchema()
-    {
+    protected function _loadDbDesignerDbSchema() {
         if($path = $this->_getDbDesignerFilePath()){
             $this->db_designer_schema = Ak::convert('DBDesigner','AkelosDatabaseDesign', Ak::file_get_contents($path));
             return !empty($this->db_designer_schema);
@@ -673,14 +626,12 @@ Example:
         return false;
     }
 
-    protected function _getDbDesignerFilePath()
-    {
+    protected function _getDbDesignerFilePath() {
         $path = $this->app_installers_dir.DS.$this->getInstallerName().'.xml';
         return file_exists($path) ? $path : false;
     }
 
-    protected function _ensureColumnNameCompatibility($columns)
-    {
+    protected function _ensureColumnNameCompatibility($columns) {
         $columns = explode(',',$columns.',');
         foreach ($columns as $column){
             $column = trim($column);
@@ -689,8 +640,7 @@ Example:
         }
     }
 
-    protected function _canUseColumn($column_name)
-    {
+    protected function _canUseColumn($column_name) {
         $invalid_columns = $this->_getInvalidColumnNames();
         if(in_array($column_name, $invalid_columns)){
 
@@ -710,8 +660,7 @@ Example:
         }
     }
 
-    protected function _getInvalidColumnNames()
-    {
+    protected function _getInvalidColumnNames() {
         return defined('AK_INVALID_ACTIVE_RECORD_COLUMNS') ? explode(',',AK_INVALID_ACTIVE_RECORD_COLUMNS) : array('sanitized_conditions_array','conditions','inheritance_column','inheritance_column',
         'subclasses','attribute','attributes','attribute','attributes','accessible_attributes','protected_attributes',
         'serialized_attributes','available_attributes','attribute_caption','primary_key','column_names','content_columns',
@@ -732,8 +681,7 @@ Example:
      * Migration version management functions
      */
 
-    public function getInstalledVersion($options = array())
-    {
+    public function getInstalledVersion($options = array()) {
         if(!$Migration = $this->AkelosMigration->findFirstBy('name', $this->getInstallerName())) {
             $version_file = $this->_versionPath($options);
             if(!is_file($version_file)){
@@ -750,8 +698,7 @@ Example:
         return $version;
     }
 
-    public function setInstalledVersion($version, $options = array())
-    {
+    public function setInstalledVersion($version, $options = array()) {
         $this->log('Setting version of '.$this->getInstallerName().' to '.$version);
         if($Migration = $this->AkelosMigration->findFirstBy('name', $this->getInstallerName())){
             $Migration->version = $version;
@@ -761,13 +708,11 @@ Example:
         }
     }
 
-    public function getInstallerName()
-    {
+    public function getInstallerName() {
         return str_replace('installer','',strtolower(get_class($this)));
     }
 
-    public function ensureAkelosMigrationsModelIsAvailable()
-    {
+    public function ensureAkelosMigrationsModelIsAvailable() {
         if(!class_exists('AkelosMigration')){
             eval('class AkelosMigration extends AkActiveRecord {}');
         }
@@ -778,14 +723,12 @@ Example:
         $this->AkelosMigration->setConnection($this->db);
     }
 
-    private function _versionPath($options = array())
-    {
+    private function _versionPath($options = array()) {
         $mode = empty($options['mode']) ? AK_ENVIRONMENT : $options['mode'];
         return $this->app_tmp_dir.DS.'installer_versions'.DS.(empty($this->module)?'':$this->module.DS).$mode.'_'.$this->getInstallerName().'_version.txt';
     }
 
-    private function _createMigrationsTableIfNeeded()
-    {
+    private function _createMigrationsTableIfNeeded() {
         if(!$this->tableExists('akelos_migrations')) {
             AkDbSchemaCache::clearAll();
             $this->data_dictionary = $this->db->getDictionary();
@@ -795,8 +738,7 @@ Example:
         }
     }
 
-    protected function _removeOldVersionsFileAndUseMigrationsTable($options)
-    {
+    protected function _removeOldVersionsFileAndUseMigrationsTable($options) {
         $oldfile = $this->_versionPath($options);
         $version = Ak::file_get_contents($oldfile);
         Ak::copy($oldfile, $oldfile.'.backup');
@@ -806,8 +748,7 @@ Example:
         $this->AkelosMigration->create(array('name' => $this->getInstallerName(), 'version' => $version));
     }
 
-    public function getAvailableVersions()
-    {
+    public function getAvailableVersions() {
         $versions = array();
         foreach(get_class_methods($this) as $method_name){
             if(preg_match('/^up_([0-9]*)$/',$method_name, $match)){
@@ -818,8 +759,7 @@ Example:
         return $versions;
     }
 
-    public function log($message, $type = '', $identifyer = '')
-    {
+    public function log($message, $type = '', $identifyer = '') {
         if (AK_LOG_EVENTS){
             $Logger =& Ak::getLogger();
             $Logger->log($message, $type);

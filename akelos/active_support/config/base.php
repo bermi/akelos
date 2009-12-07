@@ -83,8 +83,7 @@ class AkConfig
 {
     const CONFIG_DIR = AK_CONFIG_DIR;
 
-    public function &get($namespace, $environment = AK_ENVIRONMENT, $raise_error_if_config_file_not_found = true, $uncached = false)
-    {
+    public function &get($namespace, $environment = AK_ENVIRONMENT, $raise_error_if_config_file_not_found = true, $uncached = false) {
         static $_configs = array();
         if (!$uncached && isset($_configs[$namespace]) && isset($_configs[$namespace][$environment])) {
             return $_configs[$namespace][$environment];
@@ -100,13 +99,11 @@ class AkConfig
         return $_configs[$namespace][$environment];
     }
 
-    static function getConstant($name)
-    {
+    static function getConstant($name) {
         return defined($name[1]) ? constant($name[1]) : '';
     }
 
-    static function getDir($type, $_set_value = false, $fail_if_not_found = true)
-    {
+    static function getDir($type, $_set_value = false, $fail_if_not_found = true) {
         static $dir_names = array();
         if($_set_value){
             $dir_names[$type] = $_set_value;
@@ -127,13 +124,11 @@ class AkConfig
         return $dir_names[$type];
     }
 
-    static function setDir($type, $value)
-    {
+    static function setDir($type, $value) {
         AkConfig::getDir($type, $value, false);
     }
 
-    static function getOption($key, $default = null)
-    {
+    static function getOption($key, $default = null) {
         $option = Ak::getStaticVar('AkConfig_'.$key);
         if(is_null($option) && !is_null($default)){
             return $default;
@@ -141,8 +136,7 @@ class AkConfig
         return $option;
     }
 
-    static function rebaseApp($base_path)
-    {
+    static function rebaseApp($base_path) {
         static $bases = array();
 
         if($base_path == false){
@@ -178,15 +172,13 @@ class AkConfig
         return true;
     }
 
-    static function leaveBase()
-    {
+    static function leaveBase() {
         return AkConfig::rebaseApp(false);
     }
 
     /*
 
-    public function rebaseAppPaths($base_path = null)
-    {
+    public function rebaseAppPaths($base_path = null) {
     if(!is_dir($base_path) && $base_path_candidate = AkConfig::getDir('suite', false, false)){
     $base_path = $base_path_candidate;
     }else{
@@ -205,15 +197,13 @@ class AkConfig
     $this->_path_rebased = true;
     }
 
-    public function restoreAppPaths()
-    {
+    public function restoreAppPaths() {
     foreach ($this->_original_paths as $type => $original_path){
     AkConfig::setDir($type, $original_path);
     }
     }
 
-    protected function _logOriginalPaths()
-    {
+    protected function _logOriginalPaths() {
     $this->_original_paths = array(
     'app'               => AkConfig::getDir('app'),
     'models'            => AkConfig::getDir('models'),
@@ -228,25 +218,21 @@ class AkConfig
     }
     */
 
-    static function setOption($key, $value)
-    {
+    static function setOption($key, $value) {
         Ak::setStaticVar('AkConfig_'.$key, $value);
         return $value;
     }
 
-    static function getLocalesReady()
-    {
+    static function getLocalesReady() {
         Ak::t('Akelos');
         AK_ENABLE_PROFILER &&  Ak::profile('Got multilingual ');
     }
 
-    static function parseSettingsConstants($settingsStr)
-    {
+    static function parseSettingsConstants($settingsStr) {
         return preg_replace_callback('/\$\{(AK_.*?)\}/',array('AkConfig','getConstant'),$settingsStr);
     }
 
-    public function readConfig($namespace, $environment = AK_ENVIRONMENT, $raise_error_if_config_file_not_found = true)
-    {
+    public function readConfig($namespace, $environment = AK_ENVIRONMENT, $raise_error_if_config_file_not_found = true) {
         $yaml_file_name = $this->_generateConfigFileName($namespace);
 
         if (!file_exists($yaml_file_name)){
@@ -282,18 +268,15 @@ class AkConfig
         return isset($configs[$environment]) ? $configs[$environment] : (in_array($environments, $environments) ? $default : false);
     }
 
-    static function generateCacheFileName($namespace, $environment = AK_ENVIRONMENT)
-    {
+    static function generateCacheFileName($namespace, $environment = AK_ENVIRONMENT) {
         return AkConfig::getCacheBasePath($environment).DS.'ak_config'.DS.'cache'.DS.$environment.DS.Ak::sanitize_include($namespace, 'high').'.php';
     }
 
-    static function getCacheBasePath()
-    {
+    static function getCacheBasePath() {
         return AK_TMP_DIR;
     }
 
-    public function readCache($namespace, $environment = AK_ENVIRONMENT, $force = false)
-    {
+    public function readCache($namespace, $environment = AK_ENVIRONMENT, $force = false) {
         if (!$force && !$this->_useReadCache($environment)){
             return false;
         }
@@ -306,8 +289,7 @@ class AkConfig
         return $config;
     }
 
-    public function writeCache($config, $namespace, $environment = AK_ENVIRONMENT, $force = false)
-    {
+    public function writeCache($config, $namespace, $environment = AK_ENVIRONMENT, $force = false) {
         if (!$force &&!$this->_useWriteCache($environment)){
             return false;
         }
@@ -355,8 +337,7 @@ CACHE;
         return true;
     }
 
-    static function getErrorReportingLevelDescription($error_reporting_level = null)
-    {
+    static function getErrorReportingLevelDescription($error_reporting_level = null) {
         if(is_null($error_reporting_level)){
             $error_reporting_level = error_reporting();
         }
@@ -379,24 +360,21 @@ CACHE;
         return join(' | ',$result);
     }
 
-    protected function _useReadCache($environment = AK_ENVIRONMENT)
-    {
+    protected function _useReadCache($environment = AK_ENVIRONMENT) {
         if(AK_CLI && AK_ENVIRONMENT != 'testing'){
             return false;
         }
         return $environment == 'production' || $environment == 'setup';
     }
 
-    protected function _useWriteCache($environment = AK_ENVIRONMENT)
-    {
+    protected function _useWriteCache($environment = AK_ENVIRONMENT) {
         if(AK_CLI && AK_ENVIRONMENT != 'testing'){
             return false;
         }
         return $environment != 'setup';
     }
 
-    protected function _checkCacheValidity($namespace,$environment)
-    {
+    protected function _checkCacheValidity($namespace,$environment) {
         $cacheFilename = $this->generateCacheFileName($namespace,$environment);
         $configFilename = $this->_generateConfigFileName($namespace);
 
@@ -405,8 +383,7 @@ CACHE;
         return $cacheMtime == $configMtime;
     }
 
-    protected function _setCacheValidity($namespace, $environment)
-    {
+    protected function _setCacheValidity($namespace, $environment) {
         $cacheFilename = $this->generateCacheFileName($namespace,$environment);
         $configFilename = $this->_generateConfigFileName($namespace);
         if(!touch($cacheFilename, filemtime($configFilename))){
@@ -414,15 +391,13 @@ CACHE;
         }
     }
 
-    protected function _generateConfigFileName($namespace)
-    {
+    protected function _generateConfigFileName($namespace) {
         $namespace = Ak::sanitize_include($namespace, 'high');
         $yaml_file_name = self::CONFIG_DIR.DS.$namespace.'.yml';
         return $yaml_file_name;
     }
 
-    protected function _merge($default,$env)
-    {
+    protected function _merge($default,$env) {
         if (is_array($default)) {
             foreach($default as $key => $value) {
                 if (!is_array($value)) {

@@ -11,16 +11,14 @@ class Cache_TestCase extends  ActiveSupportUnitTest
     public $text_to_catch = 'this is the text to catch on the test case of the AkCache class';
 
 
-    public function __test_install_db_tables()
-    {
+    public function __test_install_db_tables() {
         require_once(dirname(__FILE__).'/../../fixtures/app/installers/framework_installer.php');
         $installer = new FrameworkInstaller();
         $installer->uninstall();
         $installer->install();
     }
 
-    public function test_all_caches()
-    {
+    public function test_all_caches() {
         $cacheHandlers = array('cache_lite'=>1,'akadodbcache'=>2);
         $memcacheEnabled = AkConfig::getOption('memcached_enabled', false);
 
@@ -40,8 +38,7 @@ class Cache_TestCase extends  ActiveSupportUnitTest
         }
     }
 
-    public function _testInit($type, $class)
-    {
+    public function _testInit($type, $class) {
         //No driver is loaded
         $this->Cache->init(null, 0);
         $this->assertNull($this->Cache->DriverInstance,'Checking that no driver is loaded when cache is disabled');
@@ -52,8 +49,7 @@ class Cache_TestCase extends  ActiveSupportUnitTest
 
     }
 
-    public function _getAndSaveTests($type, $class)
-    {
+    public function _getAndSaveTests($type, $class) {
         //No cache
         $this->Cache->init(null, 0);
         $data = $this->Cache->get('id');
@@ -73,8 +69,7 @@ class Cache_TestCase extends  ActiveSupportUnitTest
         $this->assertFalse($data,'The cache has expired and we recognize it (Cache class:'.$class.')');
     }
 
-    public function _removeTests($type,$class)
-    {
+    public function _removeTests($type,$class) {
 
         $this->Cache->init(1,0);
         $this->assertFalse(!$this->Cache->remove($this->id, $this->group),'Removing cached file (Cache disabled must return success)');
@@ -89,8 +84,7 @@ class Cache_TestCase extends  ActiveSupportUnitTest
         $this->assertFalse($data,'The cache must have been removed at this point but stills here (Cache class:'.$class.')');
     }
 
-    public function _cleanTests($type, $class)
-    {
+    public function _cleanTests($type, $class) {
         $this->Cache->init(null,$type);
         $this->assertFalse(!$this->Cache->save($this->text_to_catch, $this->id, $this->group),'saving ('.$class.' based)');
         $this->Cache->init(null,$type);

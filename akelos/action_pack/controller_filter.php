@@ -213,8 +213,7 @@ class AkControllerFilter
     * The passed <tt>filters</tt> will be appended to the array of filters that's run _before_ actions
     * on this controller are performed.
     */
-    public function appendBeforeFilter()
-    {
+    public function appendBeforeFilter() {
         $filters = array_reverse(func_get_args());
         foreach (array_keys($filters) as $k){
             $conditions = $this->_extractConditions($filters[$k]);
@@ -227,8 +226,7 @@ class AkControllerFilter
     * The passed <tt>filters</tt> will be prepended to the array of filters that's run _before_ actions
     * on this controller are performed.
     */
-    public function prependBeforeFilter()
-    {
+    public function prependBeforeFilter() {
         $filters = array_reverse(func_get_args());
         foreach (array_keys($filters) as $k){
             $conditions = $this->_extractConditions($filters[$k]);
@@ -240,8 +238,7 @@ class AkControllerFilter
     /**
     * Short-hand for appendBeforeFilter since that's the most common of the two.
     */
-    public function beforeFilter()
-    {
+    public function beforeFilter() {
         $filters = func_get_args();
         foreach (array_keys($filters) as $k){
             $this->appendBeforeFilter($filters[$k]);
@@ -252,8 +249,7 @@ class AkControllerFilter
     * The passed <tt>filters</tt> will be appended to the array of filters that's run _after_ actions
     * on this controller are performed.
     */
-    public function appendAfterFilter()
-    {
+    public function appendAfterFilter() {
         $filters = array_reverse(func_get_args());
         foreach (array_keys($filters) as $k){
             $conditions = $this->_extractConditions($filters[$k]);
@@ -267,8 +263,7 @@ class AkControllerFilter
     * The passed <tt>filters</tt> will be prepended to the array of filters that's run _after_ actions
     * on this controller are performed.
     */
-    public function prependAfterFilter()
-    {
+    public function prependAfterFilter() {
         $filters = array_reverse(func_get_args());
         foreach (array_keys($filters) as $k){
             $conditions = $this->_extractConditions($filters[$k]);
@@ -280,8 +275,7 @@ class AkControllerFilter
     /**
     * Short-hand for appendAfterFilter since that's the most common of the two.
     * */
-    public function afterFilter()
-    {
+    public function afterFilter() {
         $filters = func_get_args();
         foreach (array_keys($filters) as $k){
             $this->appendAfterFilter($filters[$k]);
@@ -298,8 +292,7 @@ class AkControllerFilter
     *   A::after()
     *   B::after()
     */
-    public function appendAroundFilter()
-    {
+    public function appendAroundFilter() {
         $filters = func_get_args();
         foreach (array_keys($filters) as $k){
             $this->_ensureRespondsToBeforeAndAfter($filters[$k]);
@@ -321,8 +314,7 @@ class AkControllerFilter
     *   B::after()
     *   A::after()
     */
-    public function prependAroundFilter()
-    {
+    public function prependAroundFilter() {
         $filters = func_get_args();
         foreach (array_keys($filters) as $k){
             $this->_ensureRespondsToBeforeAndAfter($filters[$k]);
@@ -337,8 +329,7 @@ class AkControllerFilter
     /**
     * Short-hand for appendAroundFilter since that's the most common of the two.
     */
-    public function aroundFilter()
-    {
+    public function aroundFilter() {
         $filters = func_get_args();
         call_user_func_array(array($this,'appendAroundFilter'), $filters);
     }
@@ -348,8 +339,7 @@ class AkControllerFilter
     * This is especially useful for managing the chain in inheritance hierarchies where only one out
     * of many sub-controllers need a different hierarchy.
     */
-    public function skipBeforeFilter($filters)
-    {
+    public function skipBeforeFilter($filters) {
         $filters = func_get_args();
         $this->_skipFilter($filters, 'before');
     }
@@ -359,8 +349,7 @@ class AkControllerFilter
     * filters, not instances. This is especially useful for managing the chain in inheritance hierarchies where only one out
     * of many sub-controllers need a different hierarchy.
     */
-    public function skipAfterFilter($filters)
-    {
+    public function skipAfterFilter($filters) {
         $filters = func_get_args();
         $this->_skipFilter($filters, 'after');
     }
@@ -369,22 +358,19 @@ class AkControllerFilter
     /**
     * Returns all the before filters for this class.
     */
-    public function beforeFilters()
-    {
+    public function beforeFilters() {
         return $this->_beforeFilters;
     }
 
     /**
     * Returns all the after filters for this class and all its ancestors.
     */
-    public function afterFilters()
-    {
+    public function afterFilters() {
         return $this->_afterFilters;
     }
 
 
-    public function performActionWithFilters($method = '')
-    {
+    public function performActionWithFilters($method = '') {
         if ($this->beforeAction($method) !== false && !empty($this->_FilteredObject) && method_exists($this->_FilteredObject, 'hasPerformed') && !$this->_FilteredObject->hasPerformed()){
             AK_ENABLE_PROFILER &&  Ak::profile("Called $method  before filters");
             $this->_FilteredObject->performActionWithoutFilters($method);
@@ -396,8 +382,7 @@ class AkControllerFilter
         return false;
     }
 
-    public function performAction($method = '')
-    {
+    public function performAction($method = '') {
         $this->performActionWithFilters($method);
     }
 
@@ -406,8 +391,7 @@ class AkControllerFilter
     * Calls all the defined before-filter filters, which are added by using "beforeFilter($method)".
     * If any of the filters return false, no more filters will be executed and the action is aborted.
     */
-    public function beforeAction($method = '')
-    {
+    public function beforeAction($method = '') {
         return $this->_callFilters($this->_beforeFilters, $method);
     }
 
@@ -415,8 +399,7 @@ class AkControllerFilter
     * Calls all the defined after-filter filters, which are added by using "afterFilter($method)".
     * If any of the filters return false, no more filters will be executed.
     */
-    public function afterAction($method = '')
-    {
+    public function afterAction($method = '') {
         return $this->_callFilters($this->_afterFilters, $method);
     }
 
@@ -424,21 +407,18 @@ class AkControllerFilter
     /**
     * Returns a mapping between filters and the actions that may run them.
     */
-    public function getFilterIncludedActions()
-    {
+    public function getFilterIncludedActions() {
         return $this->_includedActions;
     }
 
     /**
     * Returns a mapping between filters and actions that may not run them.
     */
-    public function getFilterExcludedActions()
-    {
+    public function getFilterExcludedActions() {
         return $this->_excludedActions;
     }
 
-    private function _skipFilter(&$filters, $type)
-    {
+    private function _skipFilter(&$filters, $type) {
         $_filters =& $this->{'_'.$type.'Filters'};
         // array_diff doesn't play nice with some PHP5 releases when it comes to
         // Objects as it only diff equal references, not object types
@@ -463,25 +443,21 @@ class AkControllerFilter
     }
 
 
-    private function _appendFilterToChain($condition, $filters)
-    {
+    private function _appendFilterToChain($condition, $filters) {
         $this->{"_{$condition}Filters"}[] = $filters;
     }
 
-    private function _prependFilterToChain($condition, $filters)
-    {
+    private function _prependFilterToChain($condition, $filters) {
         array_unshift($this->{"_{$condition}Filters"}, $filters);
     }
 
-    private function _ensureRespondsToBeforeAndAfter(&$filter_object)
-    {
+    private function _ensureRespondsToBeforeAndAfter(&$filter_object) {
         if(!method_exists($filter_object, 'before') && !method_exists($filter_object, 'after')){
             trigger_error(Ak::t('Filter object must respond to both before and after'), E_USER_ERROR);
         }
     }
 
-    private function _extractConditions(&$filters)
-    {
+    private function _extractConditions(&$filters) {
         if(is_array($filters) && !isset($filters[0])){
             $keys = array_keys($filters);
             $conditions = $filters[$keys[0]];
@@ -490,8 +466,7 @@ class AkControllerFilter
         }
     }
 
-    private function _addActionConditions($filters, $conditions)
-    {
+    private function _addActionConditions($filters, $conditions) {
         if(!empty($conditions['only'])){
             $this->_includedActions[$this->_filterId($filters)] =  $this->_conditionArray($this->_includedActions, $conditions['only']);
         }
@@ -500,22 +475,19 @@ class AkControllerFilter
         }
     }
 
-    public function _conditionArray($actions, $filter_actions)
-    {
+    public function _conditionArray($actions, $filter_actions) {
         $filter_actions = is_array($filter_actions) ? $filter_actions : array($filter_actions);
         $filter_actions = array_map(array($this,'_filterId'),$filter_actions);
         return array_unique(array_merge($actions, $filter_actions));
     }
 
 
-    static function _filterId($filters)
-    {
+    static function _filterId($filters) {
         return is_string($filters) ? $filters : md5(serialize($filters));
     }
 
 
-    public function _callFilters(&$filters, $method = '')
-    {
+    public function _callFilters(&$filters, $method = '') {
         $filter_result = null;
         foreach (array_keys($filters) as $k){
             $filter =& $filters[$k];
@@ -540,14 +512,12 @@ class AkControllerFilter
     }
 
 
-    public function setObjectBeenFiltered(&$FilteredObject)
-    {
+    public function setObjectBeenFiltered(&$FilteredObject) {
         $this->_FilteredObject = $FilteredObject;
     }
 
 
-    public function _actionIsExempted($filter, $method = '')
-    {
+    public function _actionIsExempted($filter, $method = '') {
         $method_id = is_string($method) ? $method : $this->_filterId($method);
         $filter_id = $this->_filterId($filter);
 

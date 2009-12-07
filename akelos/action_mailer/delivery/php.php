@@ -2,8 +2,7 @@
 
 class AkPhpMailDelivery
 {
-    public function deliver(&$Mailer, $settings = array())
-    {
+    public function deliver(&$Mailer, $settings = array()) {
         $Message = $Mailer->Message;
         $to = $Message->getTo();
         $subject = $Message->getSubject();

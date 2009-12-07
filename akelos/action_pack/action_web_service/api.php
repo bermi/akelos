@@ -65,8 +65,7 @@ class AkActionWebserviceApi
     * <tt>returns</tt>             Signature for the method return value
     * <tt>expects_and_returns</tt> Signature for both input parameters and return value
     */
-    public function addApiMethod($name, $options = array())
-    {
+    public function addApiMethod($name, $options = array()) {
         $this->_validateOptions(array('expects', 'returns', 'expects_and_returns', 'documentation'), array_keys($options));
         if (!empty($options['expects_and_returns'])){
             $expects = $returns = $options['expects_and_returns'];
@@ -84,8 +83,7 @@ class AkActionWebserviceApi
     /**
     * Whether the given method name is a service method on this API
     */
-    public function hasApiMethod($name)
-    {
+    public function hasApiMethod($name) {
         return !empty($this->_api_methods[$name]);
     }
 
@@ -93,24 +91,21 @@ class AkActionWebserviceApi
     * Whether the given public method name has a corresponding service method
     * on this API
     */
-    public function hasPublicApiMethod($public_name)
-    {
+    public function hasPublicApiMethod($public_name) {
         return !empty($this->_api_public_method_names[$public_name]);
     }
 
     /**
     * The corresponding public method name for the given service method name
     */
-    public function getPublicApiMethodName($name)
-    {
+    public function getPublicApiMethodName($name) {
         return $this->inflect_names ? AkInflector::camelize($name) : $name;
     }
 
     /**
     * The corresponding service method name for the given public method name
     */
-    public function getApiMethodName($public_name)
-    {
+    public function getApiMethodName($public_name) {
         return $this->_api_public_method_names[$public_name];
     }
 
@@ -118,32 +113,28 @@ class AkActionWebserviceApi
     * An array containing all service methods on this API, and their
     * associated metadata.
     */
-    public function &getApiMethods()
-    {
+    public function &getApiMethods() {
         return $this->_api_methods;
     }
 
     /**
     * The Method instance for the given public API method name, if any
     */
-    public function &getPublicApiMethodInstance($public_method_name)
-    {
+    public function &getPublicApiMethodInstance($public_method_name) {
         return $this->getApiMethodInstance($this->getApiMethodName($public_method_name));
     }
 
     /**
     * The Method instance for the given API method name, if any
     */
-    public function &getApiMethodInstance($method_name)
-    {
+    public function &getApiMethodInstance($method_name) {
         return $this->_api_methods[$method_name];
     }
 
     /**
     * The Method instance for the default API method, if any
     */
-    public function &getDefaultApiMethodInstance()
-    {
+    public function &getDefaultApiMethodInstance() {
         if(empty($this->default_api_method)){
             $false = false;
             return $false;
@@ -158,13 +149,11 @@ class AkActionWebserviceApi
         return $this->default_api_method_instance;
     }
 
-    public function _getApiPublicMethodNames()
-    {
+    public function _getApiPublicMethodNames() {
         return array_keys($this->_api_public_method_names);
     }
 
-    public function _validateOptions($valid_option_keys, $supplied_option_keys)
-    {
+    public function _validateOptions($valid_option_keys, $supplied_option_keys) {
         $unknown_option_keys = array_diff($supplied_option_keys, $valid_option_keys);
         if(!empty($unknown_option_keys)){
             trigger_error(Ak::t('Unknown options: %options', array('%options'=> var_export($unknown_option_keys,true))), E_USER_ERROR);
@@ -187,8 +176,7 @@ class AkActionWebServiceMethod
     public $expects_documentation = array();
     public $returns_documentation = array();
 
-    public function AkActionWebServiceMethod($name, $public_name, $expects, $returns, $documentation, $localize_documentation = true)
-    {
+    public function AkActionWebServiceMethod($name, $public_name, $expects, $returns, $documentation, $localize_documentation = true) {
         $this->name = $name;
         $this->public_name = $public_name;
         $this->expects = $expects;
@@ -200,18 +188,15 @@ class AkActionWebServiceMethod
         $this->_extractDocumentationFromReturns();
     }
 
-    public function _extractDocumentationFromExpects()
-    {
+    public function _extractDocumentationFromExpects() {
         return $this->_extractDocumentationFromMethod('expects');
     }
 
-    public function _extractDocumentationFromReturns()
-    {
+    public function _extractDocumentationFromReturns() {
         return $this->_extractDocumentationFromMethod('returns');
     }
 
-    public function _extractDocumentationFromMethod($expects_or_returns)
-    {
+    public function _extractDocumentationFromMethod($expects_or_returns) {
         if(!in_array($expects_or_returns, array('expects', 'returns'))){
             trigger_error(Ak::t('Only expects and returns options are valid'), E_USER_ERROR);
             return false;

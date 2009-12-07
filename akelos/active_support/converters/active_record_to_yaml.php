@@ -2,8 +2,7 @@
 
 class AkActiveRecordToYaml
 {
-    public function convert()
-    {
+    public function convert() {
         $attributes = array();
         if(is_array($this->source)){
             foreach (array_keys($this->source) as $k){
@@ -18,8 +17,7 @@ class AkActiveRecordToYaml
         return Spyc::YAMLDump($attributes);
     }
 
-    public function _isActiveRecord(&$Candidate)
-    {
+    public function _isActiveRecord(&$Candidate) {
         return is_object($Candidate) && method_exists($Candidate, 'getAttributes') && method_exists($Candidate, 'getId');
     }
 }

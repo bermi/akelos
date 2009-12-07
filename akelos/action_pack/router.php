@@ -23,8 +23,7 @@ class AkRouter
     $_loaded_routes = array();
 
 
-    public function __construct()
-    {
+    public function __construct() {
         /**
         * We will try to guess if mod_rewrite is enabled.
         * Set AK_ENABLE_URL_REWRITE in your config
@@ -43,8 +42,7 @@ class AkRouter
     * @access public
     * @return array Returns Loaded Routes array.
     */
-    public function getRoutes()
-    {
+    public function getRoutes() {
         return $this->_loaded_routes;
     }
 
@@ -106,8 +104,7 @@ class AkRouter
     * <code>$Router->toUrl(array('controller' => 'themes','options' => array('blue','css','sans_serif'), 'action'=>'clone'));</code>
     * Produces: /customize/blue/css/sans_serif/clone/
     */
-    public function toUrl($params=array())
-    {
+    public function toUrl($params=array()) {
         static $_cache;
         $_cache_key = md5(serialize($params));
 
@@ -350,8 +347,7 @@ class AkRouter
     *
     * This function returns false in case no rule is found for selected URL
     */
-    public function toParams($url)
-    {
+    public function toParams($url) {
         $url = $url == '/' || $url == '' ? '/' : '/'.trim($url,'/').'/';
         $nurl = $url;
 
@@ -441,8 +437,7 @@ class AkRouter
     * NOTE:If option <b>'id'=>OPTIONAL</b> this requirement will be used in case 'id' is set to something
     * @return void
     */
-    public function connect($url_pattern, $options = array(), $requirements = null)
-    {
+    public function connect($url_pattern, $options = array(), $requirements = null) {
 
         if(!empty($options['requirements'])){
             $requirements = empty($requirements) ? $options['requirements'] : array_merge($options['requirements'],$requirements);
@@ -565,16 +560,14 @@ class AkRouter
     *
     * @see map
     */
-    public function map($url_pattern, $options = array(), $requirements = null)
-    {
+    public function map($url_pattern, $options = array(), $requirements = null) {
         return $this->connect($url_pattern, $options, $requirements);
     }
 
     /**
     * Url decode a string or an array of strings
     */
-    protected function _urlDecode($input)
-    {
+    protected function _urlDecode($input) {
         if(!empty($input)){
             if (is_scalar($input)){
                 return urldecode($input);
@@ -588,8 +581,7 @@ class AkRouter
     /**
     * Url encodes a string or an array of strings
     */
-    protected function _urlEncode($input)
-    {
+    protected function _urlEncode($input) {
         if(!empty($input)){
             if (is_scalar($input)){
                 return urlencode($input);
@@ -607,8 +599,7 @@ class AkRouter
     * AK_URL_REWRITE_ENABLED on your config file to the avoid overload
     * this function causes and to prevent from missfunctioning
     */
-    public function loadUrlRewriteSettings()
-    {
+    public function loadUrlRewriteSettings() {
         static $result;
         if(isset($result)){
             return $result;
@@ -699,8 +690,7 @@ class AkRouter
         return AK_URL_REWRITE_ENABLED;
     }
 
-    public function mapRules($rules_file = AK_ROUTES_MAPPING_FILE)
-    {
+    public function mapRules($rules_file = AK_ROUTES_MAPPING_FILE) {
         $Map =& $this;
         if(!@include($rules_file)){
             $this->connect('/:controller/:action/:id', array('controller' => 'page', 'action' => 'index'));

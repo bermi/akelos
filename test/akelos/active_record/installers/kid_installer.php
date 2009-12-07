@@ -2,8 +2,7 @@
 
 class KidInstaller extends AkInstaller
 {
-    public function up_1()
-    {
+    public function up_1() {
         $this->createTable('kids', '
         id,
         father_id,
@@ -12,8 +11,7 @@ class KidInstaller extends AkInstaller
         );
     }
 
-    public function down_1()
-    {
+    public function down_1() {
         $this->dropTable('kids');
     }
 }

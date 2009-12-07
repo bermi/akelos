@@ -2,8 +2,7 @@
 
 class AkXmlToArray
 {
-    public function convert()
-    {
+    public function convert() {
         $xml_parser = xml_parser_create ();
         xml_parser_set_option($xml_parser, XML_OPTION_CASE_FOLDING, 0);
         xml_parser_set_option($xml_parser, XML_OPTION_SKIP_WHITE, 1);

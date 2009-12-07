@@ -6,8 +6,7 @@ class Controller_forbidden_actions_TestCase extends AkWebTestCase
 {
     public $webserver_enabled;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->webserver_enabled = AkConfig::getOption('webserver_enabled', false);
         parent::__construct();
         $this->_test_script = AkConfig::getOption('testing_url').
@@ -18,8 +17,7 @@ class Controller_forbidden_actions_TestCase extends AkWebTestCase
         $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
     }
 
-    public function test_should_ignore_underscored_methods()
-    {
+    public function test_should_ignore_underscored_methods() {
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'intranet/_forbidden');
 
@@ -27,8 +25,7 @@ class Controller_forbidden_actions_TestCase extends AkWebTestCase
         $this->assertTextMatch('Intranet Controller Works');
     }
 
-    public function test_should_not_allow_calling_action_controller_methods()
-    {
+    public function test_should_not_allow_calling_action_controller_methods() {
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'intranet/render');
 

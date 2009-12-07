@@ -2,8 +2,7 @@
 
 class TagInstaller extends AkInstaller
 {
-    public function up_1()
-    {
+    public function up_1() {
         $this->createTable('tags', '
         id integer max=10 auto increment primary,
         score int default 100,
@@ -11,8 +10,7 @@ class TagInstaller extends AkInstaller
         );
     }
 
-    public function down_1()
-    {
+    public function down_1() {
         $this->dropTable('tags', array('sequence'=>true));
     }
 }

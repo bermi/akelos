@@ -2,8 +2,7 @@
 
 class AkCountries
 {
-    public function getCountriesDescriptions()
-    {
+    public function getCountriesDescriptions() {
         return explode("\n", Ak::t("ALA|Åland Islands
 AFG|Afghanistan
 ALB|Albania
@@ -237,8 +236,7 @@ ZMB|Zambia
 ZWE|Zimbabwe",array(),'localize/countries'));
     }
 
-    public function all()
-    {
+    public function all() {
         $countries_array = array();
         foreach (AkCountries::getCountriesDescriptions() as $country_string){
             list($code,$country) = explode('|',$country_string);

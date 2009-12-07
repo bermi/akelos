@@ -73,21 +73,18 @@ class AkControllerAuthentication
 {
     private $_Controller;
 
-    public function authenticateOrRequestWithHttpBasic($realm = AK_APP_NAME, $login_procedure)
-    {
+    public function authenticateOrRequestWithHttpBasic($realm = AK_APP_NAME, $login_procedure) {
         if($Result = $this->authenticateWithHttpBasic($login_procedure)){
             return $Result;
         }
         return $this->requestHttpBasicAuthentication($realm);
     }
 
-    public function authenticateWithHttpBasic($login_procedure)
-    {
+    public function authenticateWithHttpBasic($login_procedure) {
         return $this->_authenticate($login_procedure);
     }
 
-    public function requestHttpBasicAuthentication($realm = AK_APP_NAME)
-    {
+    public function requestHttpBasicAuthentication($realm = AK_APP_NAME) {
         return $this->_authenticationRequest($realm);
     }
 
@@ -110,8 +107,7 @@ class AkControllerAuthentication
      *
      * @return bool
      */
-    public function _authenticate($login_procedure)
-    {
+    public function _authenticate($login_procedure) {
         if(!$this->_authorization()){
             return false;
         }else{
@@ -129,14 +125,12 @@ class AkControllerAuthentication
         return false;
     }
 
-    public function _getUserNameAndPassword()
-    {
+    public function _getUserNameAndPassword() {
         $credentials = $this->_decodeCredentials();
         return !is_array($credentials) ? preg_split('/:/', $credentials , 2) : $credentials;
     }
 
-    public function _authorization()
-    {
+    public function _authorization() {
         return
         empty($this->_Controller->Request->env['PHP_AUTH_USER']) ? (
         empty($this->_Controller->Request->env['HTTP_AUTHORIZATION']) ? (
@@ -150,8 +144,7 @@ class AkControllerAuthentication
         ) : array($this->_Controller->Request->env['PHP_AUTH_USER'], $this->_Controller->Request->env['PHP_AUTH_PW']);
     }
 
-    public function _decodeCredentials()
-    {
+    public function _decodeCredentials() {
         $authorization = $this->_authorization();
         if(is_array($authorization)){
             return $authorization;
@@ -160,13 +153,11 @@ class AkControllerAuthentication
         return base64_decode(array_pop($credentials));
     }
 
-    public function _encodeCredentials($user_name, $password)
-    {
+    public function _encodeCredentials($user_name, $password) {
         return 'Basic '.base64_encode("$user_name:$password");
     }
 
-    public function _authenticationRequest($realm)
-    {
+    public function _authenticationRequest($realm) {
         header('WWW-Authenticate: Basic realm="' . str_replace('"','',$realm) . '"');
 
         if(method_exists($this, 'access_denied')){
@@ -178,8 +169,7 @@ class AkControllerAuthentication
         }
     }
 
-    public function setExtendedBy(&$Controller)
-    {
+    public function setExtendedBy(&$Controller) {
         $this->_Controller = $Controller;
     }
 }

@@ -5,13 +5,11 @@ require_once(dirname(__FILE__).'/../config.php');
 class HasMany_TestCase extends ActiveRecordUnitTest
 {
 
-    public function test_start()
-    {
+    public function test_start() {
         $this->installAndIncludeModels(array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType'));
     }
 
-    public function test_for_has_many()
-    {
+    public function test_for_has_many() {
         $Property = new Property();
         $this->assertEqual($Property->picture->getType(), 'hasMany');
         $this->assertTrue(is_array($Property->pictures) && count($Property->pictures) === 0);
@@ -186,16 +184,14 @@ class HasMany_TestCase extends ActiveRecordUnitTest
 
         $this->assertEqual($VillaAltea->pictures[0]->get('title'), 'Garden');
     }
-    public function test_association_create_and_reference_back_to_belongsTo()
-    {
+    public function test_association_create_and_reference_back_to_belongsTo() {
         $Property = new Property(array('description'=>'Hollywood Mansion'));
         $this->assertTrue($Property->save());
         $Pool = $Property->picture->create(array('title'=>'Pool views'));
         $this->assertReference($Pool, $Property->pictures[0]);
         $this->assertReference($Property, $Property->pictures[0]->property);
     }
-    public function test_clean_up_dependencies()
-    {
+    public function test_clean_up_dependencies() {
         $Property = new Property(array('description'=>'Ruins in Matamon'));
         $this->assertTrue($Property->save());
 
@@ -214,16 +210,14 @@ class HasMany_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function _test_should_not_die_on_unincluded_model()
-    {
+    public function _test_should_not_die_on_unincluded_model() {
         $this->installAndIncludeModels(array('Post'));
         $Post = new Post();
         $Post->dbug();
         $Post->find('all', array('include' => array('comments')));
     }
 
-    public function test_should_find_owner_even_if_it_has_no_relations()
-    {
+    public function test_should_find_owner_even_if_it_has_no_relations() {
         $this->installAndIncludeModels(array('Post', 'Comment'));
 
         $Post = new Post(array('title' => 'Post for unit testing', 'body' => 'This is a post for testing the model'));
@@ -237,8 +231,7 @@ class HasMany_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Result->getId(), $expected_id);
     }
 
-    public function test_should_find_owner_using_related_conditions()
-    {
+    public function test_should_find_owner_using_related_conditions() {
         $this->installAndIncludeModels(array('Post', 'Comment'));
 
         $Post = new Post(array('title' => 'Post for unit testing', 'body' => 'This is a post for testing the model'));
@@ -254,8 +247,7 @@ class HasMany_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_remove_existing_associates_before_setting_by_id()
-    {
+    public function test_remove_existing_associates_before_setting_by_id() {
         $this->installAndIncludeModels(array('Post', 'Comment'));
 
         foreach (range(1,10) as $i){
@@ -289,8 +281,7 @@ class HasMany_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Comment->get('post_id'), 11);
     }
 
-    public function test_find_with_include_on_associated_record()
-    {
+    public function test_find_with_include_on_associated_record() {
         $this->installAndIncludeModels('Property','Picture','Landlord');
         $Property = $this->Property->create(array('description'=>'A Property'));
         $Picture = $this->Picture->create(array('title'=>'With a picture'));
@@ -307,8 +298,7 @@ class HasMany_TestCase extends ActiveRecordUnitTest
         $Loaded = $Property->picture->find('all',array('include'=>'landlord'));
         $this->assertEqual('and a landlord',$Loaded[0]->landlord->name);
     }
-    public function xtest_has_many_finder_sql_with_foreign_key_value_replacement()
-    {
+    public function xtest_has_many_finder_sql_with_foreign_key_value_replacement() {
         $this->installAndIncludeModels('Group,Location');
 
         $group = new Group(array('name'=>'Test Group'));

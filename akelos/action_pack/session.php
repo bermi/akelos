@@ -43,15 +43,13 @@ class AkSession
     */
     public $_original_sess_value = '';
 
-    static function &initHandler()
-    {
+    static function &initHandler() {
         $settings = Ak::getSettings('sessions', false);
         $SessionHandler = AkSession::lookupStore($settings);
         return $SessionHandler;
     }
 
-    static function &lookupStore($options = null)
-    {
+    static function &lookupStore($options = null) {
         static $session_store;
         $false = false;
         if ($options === true && !empty($session_store)) {
@@ -76,8 +74,7 @@ class AkSession
         return $false;
     }
 
-    public function init($options = array(),$type = null)
-    {
+    public function init($options = array(),$type = null) {
         $options = is_int($options) ? array('lifeTime'=>$options) : (is_array($options) ? $options : array());
 
         switch ($type) {
@@ -123,8 +120,7 @@ class AkSession
     * @return bool Returns true if $this->sessionLife has been set
     * correctly.
     */
-    public function setSessionLife($sessionLife)
-    {
+    public function setSessionLife($sessionLife) {
         $this->sessionLife = $sessionLife;
 
     }
@@ -137,8 +133,7 @@ class AkSession
     * @access protected
     * @return boolean
     */
-    public function _open()
-    {
+    public function _open() {
         return true;
     }
 
@@ -148,8 +143,7 @@ class AkSession
     * @access protected
     * @return boolean
     */
-    public function _close()
-    {
+    public function _close() {
         /**
         * @todo Get from cached vars last time garbage collection was made to avoid hitting db
         * on every request
@@ -165,8 +159,7 @@ class AkSession
     * @param    string    $id    Session Id
     * @return string
     */
-    public function _read($id)
-    {
+    public function _read($id) {
         $result = $this->_driverInstance->get($id,'AK_SESSIONS');
         return is_null($result) ? '' : (string)$result;
     }
@@ -179,8 +172,7 @@ class AkSession
     * @param    string    $data
     * @return boolean
     */
-    public function _write($id, $data)
-    {
+    public function _write($id, $data) {
         // We don't want to hit the cache handler if nothing has changed
         if($this->_original_sess_value != $data){
             $ret = $this->_driverInstance->save($data, $id,'AK_SESSIONS');
@@ -201,8 +193,7 @@ class AkSession
     * @param    string    $id
     * @return boolean
     */
-    public function _destroy($id)
-    {
+    public function _destroy($id) {
         return (bool)$this->_driverInstance->remove($id,'AK_SESSIONS');
     }
 
@@ -212,8 +203,7 @@ class AkSession
     * @access protected
     * @return boolean
     */
-    public function _gc()
-    {
+    public function _gc() {
         return (bool)$this->_driverInstance->clean('AK_SESSIONS','old');
     }
 }

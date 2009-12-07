@@ -5,8 +5,7 @@ class AkActionWebServiceClient
     public $_available_drivers = array('xml_rpc');
     public $_Client;
 
-    public function __construct($client_driver)
-    {
+    public function __construct($client_driver) {
         $client_driver = AkInflector::underscore($client_driver);
         if(in_array($client_driver, $this->_available_drivers)){
             $client_class_name = 'Ak'.AkInflector::camelize($client_driver).'Client';
@@ -18,21 +17,18 @@ class AkActionWebServiceClient
         }
     }
 
-    public function init()
-    {
+    public function init() {
         if(method_exists($this->_Client, 'init')){
             $args = func_get_args();
             call_user_func_array(array($this->_Client, 'init'), $args);
         }
     }
 
-    public function hasErrors()
-    {
+    public function hasErrors() {
         return $this->_Client->hasErrors();
     }
 
-    public function getErrors()
-    {
+    public function getErrors() {
         return $this->_Client->getErrors();
     }
 }

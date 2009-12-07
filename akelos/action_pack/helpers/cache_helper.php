@@ -18,13 +18,11 @@
 class CacheHelper extends AkActionViewHelper 
 {
     
-    public function begin($key = array(), $options = array())
-    {
+    public function begin($key = array(), $options = array()) {
         return $this->_controller->cacheTplFragmentStart($key, $options);
     }
 
-    public function end($key = array(), $options = array())
-    {
+    public function end($key = array(), $options = array()) {
         return $this->_controller->cacheTplFragmentEnd($key, $options);
     }
 }

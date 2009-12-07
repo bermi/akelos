@@ -39,8 +39,7 @@ class AkPluginManager
     public $respository_discovery_page = AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE;
 
 
-    public function __construct()
-    {
+    public function __construct() {
         @set_time_limit(0);
         @ini_set('memory_limit', -1);
     }
@@ -52,8 +51,7 @@ class AkPluginManager
      * @return array   List of repository URLs
      * @access public
      */
-    public function getAvailableRepositories($force_reload = false)
-    {
+    public function getAvailableRepositories($force_reload = false) {
         if(!empty($this->tmp_repositories)){
             return $this->tmp_repositories;
         }
@@ -83,8 +81,7 @@ class AkPluginManager
      * @return void
      * @access public
      */
-    public function addRepository($repository_path)
-    {
+    public function addRepository($repository_path) {
         if(!in_array(trim($repository_path), $this->getAvailableRepositories(true))){
             Ak::file_add_contents($this->_getRepositoriesConfigPath(), $repository_path."\n");
         }
@@ -99,8 +96,7 @@ class AkPluginManager
      * @return boolean Returns false if the repository was not available
      * @access public
      */
-    public function removeRepository($repository_path)
-    {
+    public function removeRepository($repository_path) {
         if(file_exists($this->_getRepositoriesConfigPath())){
             $repositories = Ak::file_get_contents($this->_getRepositoriesConfigPath());
             if(!strstr($repositories, $repository_path)){
@@ -123,8 +119,7 @@ class AkPluginManager
      * @return array   Returns an array containing "plugin_name" => "repository URL"
      * @access public
      */
-    public function getPlugins($force_update = false)
-    {
+    public function getPlugins($force_update = false) {
         if($force_update || !is_file($this->_getRepositoriesCahePath()) || filemtime($this->_getRepositoriesCahePath()) > 3600){
             if(!$this->_updateRemotePluginsList()){
                 return array();
@@ -142,8 +137,7 @@ class AkPluginManager
      * @return array  Returns an array with the plugins available at AK_PLUGINS_DIR
      * @access public
      */
-    public function getInstalledPlugins()
-    {
+    public function getInstalledPlugins() {
         $Loader = new AkPluginLoader();
         return $Loader->getAvailablePlugins();
     }
@@ -169,8 +163,7 @@ class AkPluginManager
      * @return mixed Returns false if the plugin can't be found.
      * @access public
      */
-    public function installPlugin($plugin_name, $repository = null, $options = array())
-    {
+    public function installPlugin($plugin_name, $repository = null, $options = array()) {
         $default_options = array(
         'externals' => false,
         'checkout' => false,
@@ -196,8 +189,7 @@ class AkPluginManager
         }
     }
 
-    public function guessBestInstallMethod($options = array())
-    {
+    public function guessBestInstallMethod($options = array()) {
         if(defined('AK_BEST_PLUGIN_INSTALL_METHOD') && in_array(AK_BEST_PLUGIN_INSTALL_METHOD,
         array('local directory', 'checkout', 'export', 'http'))){
             return AK_BEST_PLUGIN_INSTALL_METHOD;
@@ -216,8 +208,7 @@ class AkPluginManager
         }
     }
 
-    public function canUseSvn()
-    {
+    public function canUseSvn() {
         return strstr(`svn --version`, 'CollabNet');
     }
 
@@ -234,8 +225,7 @@ class AkPluginManager
      * @return null
      * @access public
      */
-    public function updatePlugin($plugin_name, $repository = null)
-    {
+    public function updatePlugin($plugin_name, $repository = null) {
         $options = array(
         'externals' => false,
         'checkout' => false
@@ -261,8 +251,7 @@ class AkPluginManager
      * @return void
      * @access public
      */
-    public function uninstallPlugin($plugin_name)
-    {
+    public function uninstallPlugin($plugin_name) {
         $plugin_name = Ak::sanitize_include($plugin_name, 'high');
         $this->_runInstaller($plugin_name, 'uninstall');
         if(is_dir(AK_PLUGINS_DIR.DS.$plugin_name)){
@@ -280,8 +269,7 @@ class AkPluginManager
      * @return array An array of non trusted repositories available at http://www.akelos.org/wiki/plugins
      * @access public
      */
-    public function getDiscoveredRepositories()
-    {
+    public function getDiscoveredRepositories() {
         return array_diff($this->_getRepositoriesFromRemotePage(), $this->getAvailableRepositories(true));
     }
 
@@ -294,8 +282,7 @@ class AkPluginManager
      * @return mixed Repository URL or false if plugin can't be found
      * @access public
      */
-    public function getRepositoryForPlugin($plugin_name, $repository = null)
-    {
+    public function getRepositoryForPlugin($plugin_name, $repository = null) {
         if(empty($repository)){
             $available_plugins = $this->getPlugins();
         }else{
@@ -324,8 +311,7 @@ class AkPluginManager
      * @return void
      * @access private
      */
-    public function _runInstaller($plugin_name, $install_or_uninstall = 'install', $options = array())
-    {
+    public function _runInstaller($plugin_name, $install_or_uninstall = 'install', $options = array()) {
         $plugin_dir = AkConfig::getDir('plugins').DS.$plugin_name;
         if(file_exists($plugin_dir.DS.'installer'.DS.$plugin_name.'_installer.php')){
             require_once($plugin_dir.DS.'installer'.DS.$plugin_name.'_installer.php');
@@ -352,8 +338,7 @@ class AkPluginManager
      * @return array   An array of existing repository URLs
      * @access private
      */
-    public function _getRepositoriesFromRemotePage()
-    {
+    public function _getRepositoriesFromRemotePage() {
 
         $repositories = array();
         if(preg_match_all('/href="(http:\/\/(?!www\.akelos\.org\/wiki\/)[^"]*plugins)/', Ak::url_get_contents($this->respository_discovery_page), $matches)){
@@ -374,8 +359,7 @@ class AkPluginManager
      * @return void
      * @access private
      */
-    public function _copyRemoteDir($source, $destination)
-    {
+    public function _copyRemoteDir($source, $destination) {
         $dir_name = trim(substr($source, strrpos(rtrim($source, '/'), '/')),'/');
         Ak::make_dir($destination.DS.$dir_name);
 
@@ -400,8 +384,7 @@ class AkPluginManager
      * @return void
      * @access private
      */
-    public function _copyRemoteFile($source, $destination)
-    {
+    public function _copyRemoteFile($source, $destination) {
         Ak::file_put_contents($destination, Ak::url_get_contents($source));
     }
 
@@ -413,8 +396,7 @@ class AkPluginManager
      * @return boolean
      * @access private
      */
-    public function _updateRemotePluginsList()
-    {
+    public function _updateRemotePluginsList() {
         $new_plugins = array();
         foreach ($this->getAvailableRepositories() as $repository){
             $this->_addAvailablePlugins_($repository, $new_plugins);
@@ -436,8 +418,7 @@ class AkPluginManager
      * @return void
      * @access private
      */
-    public function _addAvailablePlugins_($repository, &$plugins_list)
-    {
+    public function _addAvailablePlugins_($repository, &$plugins_list) {
         list($directories) = $this->_parseRemoteAndGetDirectoriesAndFiles($repository);
         foreach ($directories as $plugin){
             if(empty($plugins_list[$plugin])){
@@ -455,8 +436,7 @@ class AkPluginManager
      * @return array   an array like array($directories, $files). Use list($directories, $files) = $this->_parseRemoteAndGetDirectoriesAndFiles($remote_path) for getting the results of this method
      * @access private
      */
-    public function _parseRemoteAndGetDirectoriesAndFiles($remote_path)
-    {
+    public function _parseRemoteAndGetDirectoriesAndFiles($remote_path) {
         $directories = $files = array();
         $remote_contents = Ak::url_get_contents(rtrim($remote_path, '/').'/');
 
@@ -483,8 +463,7 @@ class AkPluginManager
      * @return string  Trusted repositories  path
      * @access private
      */
-    public function _getRepositoriesConfigPath()
-    {
+    public function _getRepositoriesConfigPath() {
         if(empty($this->tmp_repositories)){
             return AK_CONFIG_DIR.DS.'plugin_repositories.txt';
         }else{
@@ -500,66 +479,56 @@ class AkPluginManager
      * @return string  Plugin information cache path. By default AK_TMP_DIR.DS.'plugin_repositories.yaml'
      * @access private
      */
-    public function _getRepositoriesCahePath()
-    {
+    public function _getRepositoriesCahePath() {
         return AK_TMP_DIR.DS.'plugin_repositories.yaml';
     }
 
 
 
-    public function _shouldUseSvnExternals()
-    {
+    public function _shouldUseSvnExternals() {
         return is_dir(AK_PLUGINS_DIR.DS.'.svn');
     }
 
-    public function _shouldUseSvnCheckout()
-    {
+    public function _shouldUseSvnCheckout() {
         return is_dir(AK_PLUGINS_DIR.DS.'.svn');
     }
 
-    public function _installUsingCheckout($name, $uri, $rev = null, $force = false)
-    {
+    public function _installUsingCheckout($name, $uri, $rev = null, $force = false) {
         $rev = empty($rev) ? '' : " -r $rev ";
         $force = $force ? ' --force ' : '';
         $plugin_dir = AK_PLUGINS_DIR.DS.$name;
         `svn co $force $rev $uri/$name $plugin_dir`;
     }
 
-    public function _updateUsingCheckout($name)
-    {
+    public function _updateUsingCheckout($name) {
         $plugin_dir = AK_PLUGINS_DIR.DS.$name;
         `svn update $plugin_dir`;
     }
 
-    public function _installUsingLocalDirectory($name, $path, $rev = null)
-    {
+    public function _installUsingLocalDirectory($name, $path, $rev = null) {
         $source = $path.DS.$name;
         $plugin_dir = AK_PLUGINS_DIR;
         $command = AK_OS == 'UNIX' ? 'cp -rf ' : 'xcopy /h /r /k /x /y /S /E ';
         `$command $source $plugin_dir`;
     }
 
-    public function _updateUsingLocalDirectory($name)
-    {
+    public function _updateUsingLocalDirectory($name) {
         trigger_error(Ak::t('Updating from local targets it\'s not supported yet. Please use install --force instead.'));
     }
 
-    public function _installUsingExport($name, $uri, $rev = null, $force = false)
-    {
+    public function _installUsingExport($name, $uri, $rev = null, $force = false) {
         $rev = empty($rev) ? '' : " -r $rev ";
         $force = $force ? ' --force ' : '';
         $plugin_dir = AK_PLUGINS_DIR.DS.$name;
         `svn export $force $rev $uri/$name $plugin_dir`;
     }
 
-    public function _updateUsingExport($name, $uri)
-    {
+    public function _updateUsingExport($name, $uri) {
         $plugin_dir = AK_PLUGINS_DIR.DS.$name;
         `svn export --force $uri/$name $plugin_dir`;
     }
 
-    public function _installUsingExternals($name, $uri, $rev = null, $force = false)
-    {
+    public function _installUsingExternals($name, $uri, $rev = null, $force = false) {
         $extras = empty($rev) ? '' : " -r $rev ";
         $extras .= ($force ? ' --force ' : '');
         $externals = $this->_getExternals();
@@ -568,13 +537,11 @@ class AkPluginManager
         $this->_installUsingCheckout($name, $uri, $rev, $force);
     }
 
-    public function _updateUsingExternals($name)
-    {
+    public function _updateUsingExternals($name) {
         $this->_updateUsingCheckout($name);
     }
 
-    public function _updateUsingHttp($name, $uri)
-    {
+    public function _updateUsingHttp($name, $uri) {
         if(is_file(AK_PLUGINS_DIR.DS.$name.DS.'CHANGELOG') &&
         md5(Ak::url_get_contents(rtrim($uri, '/').'/'.$name.'/CHANGELOG')) == md5_file(AK_PLUGINS_DIR.DS.$name.DS.'CHANGELOG')){
             return false;
@@ -583,8 +550,7 @@ class AkPluginManager
     }
 
 
-    public function _setExternals($items, $extras = '')
-    {
+    public function _setExternals($items, $extras = '') {
         $externals = array();
         foreach ($items as $name => $uri){
             $externals[] = "$name ".rtrim($uri, '/');
@@ -596,15 +562,13 @@ class AkPluginManager
         Ak::file_delete($tmp_file);
     }
 
-    public function _uninstallExternals($name)
-    {
+    public function _uninstallExternals($name) {
         $externals = $this->_getExternals();
         unset($externals[$name]);
         $this->_setExternals($externals);
     }
 
-    public function _getExternals()
-    {
+    public function _getExternals() {
         if($this->_shouldUseSvnExternals()){
             $plugins_dir = AK_PLUGINS_DIR;
             $svn_externals = array_diff(array_map('trim',(array)explode("\n", `svn propget svn:externals "$plugins_dir"`)), array(''));
@@ -619,8 +583,7 @@ class AkPluginManager
         }
     }
 
-    public function _installUsingHttp($name, $uri)
-    {
+    public function _installUsingHttp($name, $uri) {
         $this->_copyRemoteDir(rtrim($uri, '/').'/'.$name.'/', AK_PLUGINS_DIR);
     }
 

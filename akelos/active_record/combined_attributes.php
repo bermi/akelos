@@ -87,13 +87,11 @@ class AkActiveRecordCombinedAttributes extends AkActiveRecordExtenssion
     * @param string $attribute
     * @return boolean
     */
-    public function isCombinedAttribute ($attribute)
-    {
+    public function isCombinedAttribute ($attribute) {
         return !empty($this->_ActiveRecord->_combinedAttributes) && isset($this->_ActiveRecord->_combinedAttributes[$attribute]);
     }
 
-    public function addCombinedAttributeConfiguration($attribute)
-    {
+    public function addCombinedAttributeConfiguration($attribute) {
         $args = is_array($attribute) ? $attribute : func_get_args();
         $columns = array_slice($args,2);
         $invalid_columns = array();
@@ -112,8 +110,7 @@ class AkActiveRecordCombinedAttributes extends AkActiveRecordExtenssion
         }
     }
 
-    public function composeCombinedAttributes()
-    {
+    public function composeCombinedAttributes() {
 
         if(!empty($this->_ActiveRecord->_combinedAttributes)){
             $attributes = array_keys($this->_ActiveRecord->_combinedAttributes);
@@ -123,8 +120,7 @@ class AkActiveRecordCombinedAttributes extends AkActiveRecordExtenssion
         }
     }
 
-    public function composeCombinedAttribute($combined_attribute)
-    {
+    public function composeCombinedAttribute($combined_attribute) {
         if($this->isCombinedAttribute($combined_attribute)){
             $config = $this->_ActiveRecord->_combinedAttributes[$combined_attribute];
             $pattern = array_shift($config);
@@ -143,8 +139,7 @@ class AkActiveRecordCombinedAttributes extends AkActiveRecordExtenssion
         }
     }
 
-    public function getCombinedAttributesWhereThisAttributeIsUsed($attribute)
-    {
+    public function getCombinedAttributesWhereThisAttributeIsUsed($attribute) {
         $result = array();
         foreach ($this->_ActiveRecord->_combinedAttributes as $combined_attribute=>$settings){
             if(in_array($attribute,$settings)){
@@ -155,8 +150,7 @@ class AkActiveRecordCombinedAttributes extends AkActiveRecordExtenssion
     }
 
 
-    public function requiredForCombination($attribute)
-    {
+    public function requiredForCombination($attribute) {
         foreach ($this->_ActiveRecord->_combinedAttributes as $settings){
             if(in_array($attribute,$settings)){
                 return true;
@@ -165,13 +159,11 @@ class AkActiveRecordCombinedAttributes extends AkActiveRecordExtenssion
         return false;
     }
 
-    public function hasCombinedAttributes()
-    {
+    public function hasCombinedAttributes() {
         return count($this->getCombinedSubattributes()) === 0 ? false :true;
     }
 
-    public function getCombinedSubattributes($attribute)
-    {
+    public function getCombinedSubattributes($attribute) {
         $result = array();
         if(is_array($this->_ActiveRecord->_combinedAttributes[$attribute])){
             $attributes = $this->_ActiveRecord->_combinedAttributes[$attribute];
@@ -185,8 +177,7 @@ class AkActiveRecordCombinedAttributes extends AkActiveRecordExtenssion
         return $result;
     }
 
-    public function decomposeCombinedAttributes()
-    {
+    public function decomposeCombinedAttributes() {
         if(!empty($this->_ActiveRecord->_combinedAttributes)){
             $attributes = array_keys($this->_ActiveRecord->_combinedAttributes);
             foreach ($attributes as $attribute){
@@ -195,8 +186,7 @@ class AkActiveRecordCombinedAttributes extends AkActiveRecordExtenssion
         }
     }
 
-    public function decomposeCombinedAttribute($combined_attribute, $used_on_combined_fields = false)
-    {
+    public function decomposeCombinedAttribute($combined_attribute, $used_on_combined_fields = false) {
         if(isset($this->_ActiveRecord->$combined_attribute) && $this->isCombinedAttribute($combined_attribute)){
             $config = $this->_ActiveRecord->_combinedAttributes[$combined_attribute];
             $pattern = array_shift($config);
@@ -233,8 +223,7 @@ class AkActiveRecordCombinedAttributes extends AkActiveRecordExtenssion
         }
     }
 
-    public function getAvailableCombinedAttributes()
-    {
+    public function getAvailableCombinedAttributes() {
         $combined_attributes = array();
         foreach ($this->_ActiveRecord->_combinedAttributes as $attribute=>$details){
             $combined_attributes[$attribute] = array('name'=>$attribute, 'type'=>'string', 'path' => array_shift($details), 'uses'=>$details);

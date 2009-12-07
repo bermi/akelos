@@ -24,8 +24,7 @@ class DateHelper extends AkActionViewHelper
     *
     * Set <tt>include_seconds</tt> to true if you want more detailed approximations if distance < 1 minute
     */
-    static function distance_of_time_in_words($from_time, $to_time = 0, $include_seconds = false)
-    {
+    static function distance_of_time_in_words($from_time, $to_time = 0, $include_seconds = false) {
         $from_time = is_numeric($from_time) ? $from_time : Ak::getTimestamp($from_time);
         $to_time = is_numeric($to_time) ? $to_time : Ak::getTimestamp($to_time);
         $distance_in_minutes = round((abs($to_time - $from_time))/60);
@@ -64,12 +63,10 @@ class DateHelper extends AkActionViewHelper
     /**
       * Like distance_of_time_in_words, but where <tt>to_time</tt> is fixed to <tt>timestamp()</tt>.
       */
-    static function time_ago_in_words($from_time, $include_seconds = false)
-    {
+    static function time_ago_in_words($from_time, $include_seconds = false) {
         return DateHelper::distance_of_time_in_words($from_time, Ak::time(), $include_seconds);
     }
-    static function distance_of_time_in_words_to_now($from_time, $include_seconds = false)
-    {
+    static function distance_of_time_in_words_to_now($from_time, $include_seconds = false) {
         return DateHelper::time_ago_in_words($from_time, $include_seconds);
     }
 
@@ -97,8 +94,7 @@ class DateHelper extends AkActionViewHelper
       *
       * The selects are prepared for multi-parameter assignment to an Active Record object.
       */
-    public function date_select($object_name, $column_name, $options = array())
-    {
+    public function date_select($object_name, $column_name, $options = array()) {
         $defaults = array('discard_type' => true);
         $options  = array_merge($defaults, $options);
 
@@ -131,8 +127,7 @@ class DateHelper extends AkActionViewHelper
         return $date_select;
     }
 
-    static function _get_default_order_for_date_select()
-    {
+    static function _get_default_order_for_date_select() {
         $default_order = Ak::locale('long_date_format');
         $tokens = array(
         'year' => array('Y','y', 'o'),
@@ -163,8 +158,7 @@ class DateHelper extends AkActionViewHelper
       *
       * The selects are prepared for multi-parameter assignment to an Active Record object.
       */
-    public function datetime_select($object_name, $column_name, $options = array())
-    {
+    public function datetime_select($object_name, $column_name, $options = array()) {
         $defaults = array('discard_type' => true, 'order'=>explode(',',Ak::t('year,month,day,hour,minute',array(),'localize/date')));
         $options  = array_merge($defaults, $options);
 
@@ -201,8 +195,7 @@ class DateHelper extends AkActionViewHelper
     /**
       * Returns a set of html select-tags (one for year, month, and day) pre-selected with the +date+.
       */
-    static function select_date($date = null, $options = array())
-    {
+    static function select_date($date = null, $options = array()) {
         $date = empty($date) ? Ak::getDate() : $date;
         return DateHelper::select_year($date, $options) . DateHelper::select_month($date, $options) . DateHelper::select_day($date, $options);
     }
@@ -210,8 +203,7 @@ class DateHelper extends AkActionViewHelper
     /**
       * Returns a set of html select-tags (one for year, month, day, hour, and minute) pre-selected with the +datetime+.
       */
-    static function select_datetime($datetime = null, $options = array())
-    {
+    static function select_datetime($datetime = null, $options = array()) {
         $datetime = empty($datetime) ? Ak::getDate() : $datetime;
         return DateHelper::select_date($datetime, $options) . DateHelper::select_time($datetime, $options);
     }
@@ -219,8 +211,7 @@ class DateHelper extends AkActionViewHelper
     /**
       * Returns a set of html select-tags (one for hour and minute)
       */
-    static function select_time($datetime = null, $options = array())
-    {
+    static function select_time($datetime = null, $options = array()) {
         $datetime = empty($datetime) ? Ak::getDate() : $datetime;
         return DateHelper::select_hour($datetime, $options) . DateHelper::select_minute($datetime, $options) .
         (!empty($options['include_seconds']) ? DateHelper::select_second($datetime, $options) : '');
@@ -237,8 +228,7 @@ class DateHelper extends AkActionViewHelper
       *
       * Override the field name using the <tt>field_name</tt> option, 'second' by default.
       */
-    static function select_second($datetime, $options = array())
-    {
+    static function select_second($datetime, $options = array()) {
         return DateHelper::_select_for('second',range(0,59),'s',$datetime, $options);
     }
 
@@ -254,8 +244,7 @@ class DateHelper extends AkActionViewHelper
       *
       * Override the field name using the <tt>field_name</tt> option, 'minute' by default.
       */
-    static function select_minute($datetime, $options = array())
-    {
+    static function select_minute($datetime, $options = array()) {
         return DateHelper::_select_for('minute',range(0,59),'i',$datetime, $options);
     }
 
@@ -270,8 +259,7 @@ class DateHelper extends AkActionViewHelper
       *
       * Override the field name using the <tt>:field_name</tt> option, 'hour' by default
       */
-    static function select_hour($datetime, $options = array())
-    {
+    static function select_hour($datetime, $options = array()) {
         return DateHelper::_select_for('hour',range(0,23),'H',$datetime, $options);
     }
 
@@ -286,8 +274,7 @@ class DateHelper extends AkActionViewHelper
       *   $date_helper->select_day(['' | null | Ak::getDate()], array('prompt' => '-- Select --'));
       *
       */
-    static function select_day($date, $options = array())
-    {
+    static function select_day($date, $options = array()) {
         return DateHelper::_select_for('day',range(1,31),'j',$date, $options,false);
     }
 
@@ -312,8 +299,7 @@ class DateHelper extends AkActionViewHelper
       * If you would prefer to show month names as abbreviations, set the
       * <tt>use_short_month</tt> key in +options+ to true.
       */
-    static function select_month($date=null, $options = array())
-    {
+    static function select_month($date=null, $options = array()) {
 
         if(preg_match_all('/(\d{4}\-)?(\d{1,2})(\-\d{1,2})?/', $date, $matches) && !empty($matches[2][0])){
             $date = $matches[2][0];
@@ -353,8 +339,7 @@ class DateHelper extends AkActionViewHelper
       *
       * Override the field name using the <tt>field_name</tt> option, 'year' by default.
       */
-    static function select_year($date = null, $options = array())
-    {
+    static function select_year($date = null, $options = array()) {
         if(!empty($date)){
             $ts = Ak::getTimestamp(isset($date) ? substr($date, 0, 4).'-01-01' : null);
             $date = Ak::getDate($ts);
@@ -372,8 +357,7 @@ class DateHelper extends AkActionViewHelper
         return DateHelper::_select_for('year',$range,'Y',$date, $options,false);
     }
 
-    static function _select_for($select_type, $range, $date_format, $datetime, $options = array(), $unit_format_callback = '_leading_zero_on_single_digits')
-    {
+    static function _select_for($select_type, $range, $date_format, $datetime, $options = array(), $unit_format_callback = '_leading_zero_on_single_digits') {
         $options_array = array();
         if((!empty($options['prompt']) && ($datetime == null || empty($datetime))) || (!empty($options['include_blank']) && $datetime == 0)){
             $datetime_unit = "";
@@ -399,8 +383,7 @@ class DateHelper extends AkActionViewHelper
         $options_array, @$options['prefix'], @$options['include_blank'], @$options['discard_type'], @$options['disabled'], $date_blank, @$options['id']);
     }
 
-    static function _select_html($type, $options, $prefix = null, $include_blank = false, $discard_type = false, $disabled = false, $date_blank = false,$id = null)
-    {
+    static function _select_html($type, $options, $prefix = null, $include_blank = false, $discard_type = false, $disabled = false, $date_blank = false,$id = null) {
         $name = (empty($prefix) ? AK_DATE_HELPER_DEFAULT_PREFIX : $prefix).($discard_type ? '' : $type);
         return '<select name="'.$name.'"'.
         (!empty($id) ? ' id="'.$id.'"' : '').
@@ -410,13 +393,11 @@ class DateHelper extends AkActionViewHelper
         (!empty($options) ? join("\n",$options) : '')."\n</select>\n";
     }
 
-    static function _leading_zero_on_single_digits($number)
-    {
+    static function _leading_zero_on_single_digits($number) {
         return $number > 9 ? $number : '0'.$number;
     }
 
-    static function _add_one($number)
-    {
+    static function _add_one($number) {
         return $number+1;
     }
 
@@ -425,8 +406,7 @@ class DateHelper extends AkActionViewHelper
      * Converts an ISO date to current locale format
      *
      */
-    static function locale_date_time($iso_date_time = null)
-    {
+    static function locale_date_time($iso_date_time = null) {
         $timestamp = Ak::getTimestamp($iso_date_time);
         $format = Ak::locale('date_time_format');
         return Ak::getDate($timestamp, $format);
@@ -436,8 +416,7 @@ class DateHelper extends AkActionViewHelper
      * Converts an ISO date to current locale format
      *
      */
-    static function locale_date($iso_date = null)
-    {
+    static function locale_date($iso_date = null) {
         $timestamp = Ak::getTimestamp($iso_date);
         $format = Ak::locale('date_format');
         return Ak::getDate($timestamp, $format);

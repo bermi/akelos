@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class ReflectionFunction_TestCase extends ActiveSupportUnitTest
 {
-    public function test_string_constructor()
-    {
+    public function test_string_constructor() {
         $string ='
             /**
              * comment
@@ -22,8 +21,7 @@ class ReflectionFunction_TestCase extends ActiveSupportUnitTest
 
     }
 
-    public function test_array_constructor()
-    {
+    public function test_array_constructor() {
         $string ='
             /**
              * comment
@@ -48,8 +46,7 @@ class ReflectionFunction_TestCase extends ActiveSupportUnitTest
 
     }
 
-    public function test_add_doc_block_tag()
-    {
+    public function test_add_doc_block_tag() {
         $string ='
             /**
              * comment

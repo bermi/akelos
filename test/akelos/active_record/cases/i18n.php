@@ -4,13 +4,11 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class I18n_TestCase extends ActiveRecordUnitTest
 {
-    public function test_start()
-    {
+    public function test_start() {
         $this->installAndIncludeModels(array('Article'));
     }
 
-    public function test_multilingual_setting()
-    {
+    public function test_multilingual_setting() {
         $Article = new Article();
 
         $Article->set('headline', array(
@@ -33,8 +31,7 @@ class I18n_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_multilingual_setting_by_reference()
-    {
+    public function test_multilingual_setting_by_reference() {
         $Article = new Article();
 
         $Article->set('headline', array(
@@ -56,8 +53,7 @@ class I18n_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_multilingual_getting_an_specific_locale()
-    {
+    public function test_multilingual_getting_an_specific_locale() {
         $Article = new Article();
         $this->assertTrue($Article = $Article->findFirstBy('en_headline', 'New PHP Framework released'));
 
@@ -79,8 +75,7 @@ class I18n_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_multilingual_setting_an_specific_locale()
-    {
+    public function test_multilingual_setting_an_specific_locale() {
         $Article = new Article();
         $Article->set('headline','Happiness on developers boost productivity', 'en');
         $Article->set('headline','La felicidad de los programadores mejora la productivdad', 'es');

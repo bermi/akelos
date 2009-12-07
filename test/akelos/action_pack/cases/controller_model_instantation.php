@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class Controller_model_instantiation_TestCase extends AkWebTestCase
 {
-    public function test_setup()
-    {
+    public function test_setup() {
         $TestSetup = new AkUnitTest();
         $TestSetup->rebaseAppPaths();
         $TestSetup->installAndIncludeModels(array('DummyPost' => 'id, title, body, hip_factor int, comments_count, posted_on, expires_at', 'DummyComment' => 'id,name,body,dummy_post_id,created_at'));
@@ -24,14 +23,12 @@ class Controller_model_instantiation_TestCase extends AkWebTestCase
         '/action_pack/public/index.php?ak=';
     }
 
-    public function __destruct()
-    {
+    public function __destruct() {
         $TestSetup = new AkUnitTest();
         $TestSetup->dropTables('all');
     }
 
-    public function test_should_access_public_action()
-    {
+    public function test_should_access_public_action() {
         if(!$this->webserver_enabled) return ;
 
         $this->setMaximumRedirects(0);

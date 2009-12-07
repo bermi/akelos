@@ -2,8 +2,7 @@
 
 class AkDoubleToString
 {
-    public function convert()
-    {
+    public function convert() {
         return "".$this->source."";
     }
 }

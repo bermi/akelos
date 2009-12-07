@@ -4,8 +4,7 @@ class TestMailer extends AkActionMailer
 {
     public $delivery_method = 'test';
 
-    public function signed_up($recipient)
-    {
+    public function signed_up($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "[Signed up] Welcome $recipient",
@@ -15,8 +14,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    public function cancelled_account($recipient)
-    {
+    public function cancelled_account($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "[Cancelled] Goodbye $recipient",
@@ -26,8 +24,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    public function cc_bcc($recipient)
-    {
+    public function cc_bcc($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "testing bcc/cc",
@@ -39,8 +36,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    public function iso_charset($recipient)
-    {
+    public function iso_charset($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => Ak::recode('testing isø charsets','ISO-8859-1', 'UTF-8'),
@@ -53,8 +49,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    public function unencoded_subject($recipient)
-    {
+    public function unencoded_subject($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "testing unencoded subject",
@@ -67,8 +62,7 @@ class TestMailer extends AkActionMailer
     }
 
 
-    public function extended_headers($recipient)
-    {
+    public function extended_headers($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "testing extended headers",
@@ -81,8 +75,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    public function utf8_body($recipient)
-    {
+    public function utf8_body($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "testing utf-8 body",
@@ -95,8 +88,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    public function multipart_with_mime_version($recipient)
-    {
+    public function multipart_with_mime_version($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "multipart with mime_version",
@@ -112,8 +104,7 @@ class TestMailer extends AkActionMailer
 
     }
 
-    public function multipart_with_utf8_subject($recipient)
-    {
+    public function multipart_with_utf8_subject($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "Foo áëô îü",
@@ -126,8 +117,7 @@ class TestMailer extends AkActionMailer
         ));
 
     }
-    public function multipart_with_long_russian_utf8_subject($recipient)
-    {
+    public function multipart_with_long_russian_utf8_subject($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "Это какое-то осмысленное надеюсь, длинный русский текст с некоторыми Nice kyrillic символы в нем, и я могу использовать его для моих целей тестирования",
@@ -141,8 +131,7 @@ class TestMailer extends AkActionMailer
 
     }
 
-    public function multipart_with_long_russian_utf8_sender($recipient)
-    {
+    public function multipart_with_long_russian_utf8_sender($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "Это какое-то",
@@ -155,8 +144,7 @@ class TestMailer extends AkActionMailer
         ));
 
     }
-    public function explicitly_multipart_example($recipient, $content_type = null)
-    {
+    public function explicitly_multipart_example($recipient, $content_type = null) {
         empty($content_type) ? null : $this->setContentType($content_type);
         $this->set(array(
         'recipients' => $recipient,
@@ -169,8 +157,7 @@ class TestMailer extends AkActionMailer
 
     }
 
-    public function implicitly_multipart_example($recipient, $charset = null, $order = null)
-    {
+    public function implicitly_multipart_example($recipient, $charset = null, $order = null) {
         empty($charset) ? null : $this->setCharset($charset);
         empty($order) ? null : $this->setImplicitPartsOrder($order);
 
@@ -182,8 +169,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    public function implicitly_multipart_with_utf8()
-    {
+    public function implicitly_multipart_with_utf8() {
         empty($charset) ? null : $this->setCharset($charset);
         empty($order) ? null : $this->setImplicitPartsOrder($order);
 
@@ -196,8 +182,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    public function html_mail($recipient)
-    {
+    public function html_mail($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "html mail",
@@ -208,8 +193,7 @@ class TestMailer extends AkActionMailer
     }
 
 
-    public function html_mail_with_underscores()
-    {
+    public function html_mail_with_underscores() {
         $this->set(array(
         'subject' => "html mail with underscores",
         'body' => '<a href="http://google.com" target="_blank">_Google</a>'
@@ -217,8 +201,7 @@ class TestMailer extends AkActionMailer
     }
 
 
-    public function custom_template($recipient)
-    {
+    public function custom_template($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "[Signed up] Welcome $recipient",
@@ -228,8 +211,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    public function various_newlines($recipient)
-    {
+    public function various_newlines($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "various newlines",
@@ -239,8 +221,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    public function various_newlines_multipart($recipient)
-    {
+    public function various_newlines_multipart($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "various newlines multipart",
@@ -252,8 +233,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    public function nested_multipart($recipient)
-    {
+    public function nested_multipart($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "nested multipart",
@@ -278,8 +258,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    public function attachment_with_custom_header($recipient)
-    {
+    public function attachment_with_custom_header($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "custom header in attachment",
@@ -294,8 +273,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    public function unnamed_attachment($recipient)
-    {
+    public function unnamed_attachment($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "unnamed attachment",
@@ -310,8 +288,7 @@ class TestMailer extends AkActionMailer
         ));
     }
 
-    public function headers_with_nonalpha_chars($recipient)
-    {
+    public function headers_with_nonalpha_chars($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "nonalpha chars",
@@ -322,8 +299,7 @@ class TestMailer extends AkActionMailer
     }
 
 
-    public function custom_content_type_attributes()
-    {
+    public function custom_content_type_attributes() {
         $this->set(array(
         'recipients' => "no.one@example.com",
         'subject' => "custom content types",
@@ -335,8 +311,7 @@ class TestMailer extends AkActionMailer
 
 
 
-    public function alternative_message_from_templates($recipient, $include_logo = false, $include_external_image = false, $add_attachment = false)
-    {
+    public function alternative_message_from_templates($recipient, $include_logo = false, $include_external_image = false, $add_attachment = false) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "Alternative message from template",
@@ -360,8 +335,7 @@ class TestMailer extends AkActionMailer
         }
     }
 
-    public function message_with_helpers($recipient)
-    {
+    public function message_with_helpers($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "message_with_helpers",
@@ -370,8 +344,7 @@ class TestMailer extends AkActionMailer
     }
 
 
-    public function message_from_first_name($recipient)
-    {
+    public function message_from_first_name($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => "from includes name",
@@ -382,8 +355,7 @@ class TestMailer extends AkActionMailer
 
 
 
-    public function &receive($raw_email)
-    {
+    public function &receive($raw_email) {
         $Mail = parent::receive($raw_email);
         $this->received_body = $Mail->body;
         return $Mail;

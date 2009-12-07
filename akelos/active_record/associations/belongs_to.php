@@ -40,8 +40,7 @@ class AkBelongsTo extends AkAssociation
 {
     public $associated_ids = array();
 
-    public function &addAssociated($association_id, $options = array())
-    {
+    public function &addAssociated($association_id, $options = array()) {
         $default_options = array(
         'class_name' => empty($options['class_name']) ? AkInflector::camelize($association_id) : $options['class_name'],
         'primary_key_name',
@@ -76,13 +75,11 @@ class AkBelongsTo extends AkAssociation
     }
 
 
-    public function getType()
-    {
+    public function getType() {
         return 'belongsTo';
     }
 
-    public function &findAssociated($association_id)
-    {
+    public function &findAssociated($association_id) {
         $result = false;
         $primary_key_name = $this->Owner->$association_id->getAssociationOption('primary_key_name');
         $primary_key_name_value = $this->Owner->get($primary_key_name);
@@ -98,8 +95,7 @@ class AkBelongsTo extends AkAssociation
         return $result;
     }
 
-    public function &assign($association_id, &$Associated)
-    {
+    public function &assign($association_id, &$Associated) {
         $primary_key_name = $this->Owner->$association_id->getAssociationOption('primary_key_name');
         if($Associated->save()){
             $this->Owner->set($primary_key_name, $Associated->getId());
@@ -108,8 +104,7 @@ class AkBelongsTo extends AkAssociation
         return $Associated;
     }
 
-    public function &build($association_id, $attributes = array(), $replace = true)
-    {
+    public function &build($association_id, $attributes = array(), $replace = true) {
         $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
         Ak::import($class_name);
         $record = new $class_name($attributes);
@@ -121,8 +116,7 @@ class AkBelongsTo extends AkAssociation
     * Returns a new object of the associated type that has been instantiated with attributes
     * and linked to this object through a foreign key and that has already been saved (if it passed the validation)
     */
-    public function &create($association_id, $attributes = array())
-    {
+    public function &create($association_id, $attributes = array()) {
         $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
         $record = new $class_name($attributes);
         $record->save();
@@ -130,8 +124,7 @@ class AkBelongsTo extends AkAssociation
         return $this->Owner->$association_id;
     }
 
-    public function &load($association_id)
-    {
+    public function &load($association_id) {
         if (!$this->Owner->isNewRecord()){
             if(empty($this->Owner->$association_id->_loaded)){
                 if($Associated = $this->findAssociated($association_id)){
@@ -143,8 +136,7 @@ class AkBelongsTo extends AkAssociation
         return $this->Owner->$association_id;
     }
 
-    public function &replace($association_id, &$NewAssociated)
-    {
+    public function &replace($association_id, &$NewAssociated) {
         $counter_cache_name = $this->Owner->belongsTo->getOption($association_id, 'counter_cache_column');
         if(empty($NewAssociated)){
             $primary_key = $this->Owner->belongsTo->getOption($association_id, 'primary_key_name');
@@ -174,8 +166,7 @@ class AkBelongsTo extends AkAssociation
         return $NewAssociated;
     }
 
-    public function getAssociatedFinderSqlOptionsForInclusionChain($association_id, $prefix, $parent_handler_name, $options = array(),$pluralize=false)
-    {
+    public function getAssociatedFinderSqlOptionsForInclusionChain($association_id, $prefix, $parent_handler_name, $options = array(),$pluralize=false) {
         $default_options = array(
         'conditions' => $this->Owner->$association_id->getAssociationOption('include_conditions_when_included'),
         'order' => $this->Owner->$association_id->getAssociationOption('include_order_when_included')
@@ -223,8 +214,7 @@ class AkBelongsTo extends AkAssociation
         return $finder_options;
     }
 
-    public function getAssociatedFinderSqlOptions($association_id, $options = array())
-    {
+    public function getAssociatedFinderSqlOptions($association_id, $options = array()) {
 
         $default_options = array(
         'conditions' => $this->Owner->$association_id->getAssociationOption('include_conditions_when_included'),
@@ -259,8 +249,7 @@ class AkBelongsTo extends AkAssociation
         return $finder_options;
     }
 
-    public function constructSqlForInclusion($association_id)
-    {
+    public function constructSqlForInclusion($association_id) {
         return ' LEFT OUTER JOIN '.
         $this->Owner->$association_id->getTableName().' AS _'.$association_id.
         ' ON '.
@@ -269,8 +258,7 @@ class AkBelongsTo extends AkAssociation
         '_'.$association_id.'.'.$this->Owner->$association_id->getPrimaryKey().' ';
     }
 
-    public function constructSqlForInclusionChain($association_id, $handler_name, $parent_handler_name)
-    {
+    public function constructSqlForInclusionChain($association_id, $handler_name, $parent_handler_name) {
         //$handler_name = $association_id;
         return ' LEFT OUTER JOIN '.
         $this->Owner->$association_id->getTableName().' AS '.$parent_handler_name.'__'.$handler_name.
@@ -284,8 +272,7 @@ class AkBelongsTo extends AkAssociation
      * Triggers
      */
 
-    public function beforeSave(&$object)
-    {
+    public function beforeSave(&$object) {
         $association_ids = $object->getAssociatedIds();
         foreach ($association_ids as $association_id){
             if($object->$association_id instanceof AkActiveRecord &&
@@ -303,8 +290,7 @@ class AkBelongsTo extends AkAssociation
         return true;
     }
 
-    public function beforeDestroy(&$object)
-    {
+    public function beforeDestroy(&$object) {
         $association_ids = $object->getAssociatedIds();
         foreach ($association_ids as $association_id){
             if(!empty($object->$association_id) && is_object($object->$association_id) && method_exists($object->$association_id,'getType') &&
@@ -318,8 +304,7 @@ class AkBelongsTo extends AkAssociation
         return true;
     }
 
-    public function afterDestroy(&$object)
-    {
+    public function afterDestroy(&$object) {
         $success = true;
         $associated_ids = $object->getAssociatedIds();
         foreach ($associated_ids as $associated_id){

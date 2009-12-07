@@ -10,8 +10,7 @@ class AkReflectionClass extends AkReflection
     $_definition,
     $_docBlock;
 
-    public function __construct($class_definition)
-    {
+    public function __construct($class_definition) {
         if (is_array($class_definition)) {
             if (@$class_definition['type'] == 'class') {
                 $this->_definition = $class_definition;
@@ -37,13 +36,11 @@ class AkReflectionClass extends AkReflection
 
     }
 
-    public function getDefinition()
-    {
+    public function getDefinition() {
         return $this->_definition;
     }
 
-    public function toString()
-    {
+    public function toString() {
         $docBlock = $this->_docBlock;
         if ($docBlock->changed) {
             $string = $this->_definition['toString'];
@@ -55,38 +52,31 @@ class AkReflectionClass extends AkReflection
         }
     }
 
-    public function setTag($tag,$value)
-    {
+    public function setTag($tag,$value) {
         $this->_docBlock->setTag($tag,$value);
     }
 
-    public function getTag($tag)
-    {
+    public function getTag($tag) {
         return $this->_docBlock->getTag($tag);
     }
 
-    public function getName()
-    {
+    public function getName() {
         return isset($this->_definition['name'])?$this->_definition['name']:false;
     }
 
-    public function getVisibility()
-    {
+    public function getVisibility() {
         return isset($this->_definition['visibility'])?$this->_definition['visibility']:false;
     }
 
-    public function isStatic()
-    {
+    public function isStatic() {
         return isset($this->_definition['static'])?$this->_definition['static']:false;
     }
 
-    public function &getDocBlock()
-    {
+    public function &getDocBlock() {
         return $this->_docBlock;
     }
 
-    public function _parseDefinitions()
-    {
+    public function _parseDefinitions() {
         foreach($this->definitions as $definition) {
             switch ($definition['type']) {
                 case 'function':
@@ -96,8 +86,7 @@ class AkReflectionClass extends AkReflection
         }
     }
 
-    public function &getMethod($name)
-    {
+    public function &getMethod($name) {
         $false = false;
         foreach($this->methods as $method) {
             if ($method->getName()==$name){
@@ -107,8 +96,7 @@ class AkReflectionClass extends AkReflection
         return $false;
     }
 
-    public function getMethods($options = null)
-    {
+    public function getMethods($options = null) {
         if ($options == null) {
             return $this->methods;
         } else if (is_array($options)) {

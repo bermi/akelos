@@ -4,19 +4,16 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class Installer_TestCase extends ActiveRecordUnitTest
 {
-    public function setup()
-    {
+    public function setup() {
         $this->Installer = new AkInstaller();
     }
 
-    public function __tearDown()
-    {
+    public function __tearDown() {
         global $ADODB_FETCH_MODE;
         $ADODB_FETCH_MODE = $this->_original_ADODB_FETCH_MODE;
     }
 
-    public function test_should_parse_expected_table_settings()
-    {
+    public function test_should_parse_expected_table_settings() {
         $db_type = $this->Installer->db->type();
 
         switch ($db_type) {
@@ -102,8 +99,7 @@ class Installer_TestCase extends ActiveRecordUnitTest
         }
     }
 
-    public function test_should_create_tables()
-    {
+    public function test_should_create_tables() {
         $this->Installer->createTable('test_pages', "
     id integer not null auto_increment primary_key,
     title string(255),
@@ -147,8 +143,7 @@ class Installer_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_should_create_tables_using_simple_declarations()
-    {
+    public function test_should_create_tables_using_simple_declarations() {
         $this->Installer = new AkInstaller();
 
         $this->assertFalse($this->Installer->tableExists('test_1'));
@@ -191,8 +186,7 @@ class Installer_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_should_add_and_remove_indices()
-    {
+    public function test_should_add_and_remove_indices() {
         $this->Installer = new AkInstaller();
 
         $this->Installer->createTable('test_1','id int auto key,free string(32),beer string(23)');
@@ -227,8 +221,7 @@ class Installer_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_should_set_default_types()
-    {
+    public function test_should_set_default_types() {
         $this->Installer = new AkInstaller();
         $this->Installer->createTable('test_defaults','id,name,screen_name string,description,*url,owner_id,modified_at,created_on,is_featured,position,lock_version,edit_count');
         $from_datadict = $this->Installer->db->getColumnDetails('test_defaults');
@@ -240,16 +233,14 @@ class Installer_TestCase extends ActiveRecordUnitTest
         }
     }
 
-    public function test_should_create_default_values_correctly()
-    {
+    public function test_should_create_default_values_correctly() {
         $this->installAndIncludeModels(array('Thumbnail'));
         $Thumbnail = new Thumbnail();
         $this->assertEqual($Thumbnail->get('owner'), 'Picture');
     }
 
     // see AkDbAdapter_schema for the tests; this is only a wrapper
-    public function test_should_rename_columns()
-    {
+    public function test_should_rename_columns() {
         if ($this->Installer->db->type()=='sqlite') {
             $this->assertUpcomingError('renameColumn is not available');
         }
@@ -257,8 +248,7 @@ class Installer_TestCase extends ActiveRecordUnitTest
         $this->Installer->dropTable('test_defaults');
     }
 
-    private function _hasIndexes($meta_details, $search = false)
-    {
+    private function _hasIndexes($meta_details, $search = false) {
         $result = false;
         if(!empty($meta_details) && is_array($meta_details)){
             foreach ($meta_details as $k=>$meta_detail){

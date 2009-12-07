@@ -18,8 +18,7 @@ class AkUnitTestSuite extends TestSuite
     public $title = 'Akelos Tests';
     public $running_from_config = false;
 
-    public function __construct($label = false)
-    {
+    public function __construct($label = false) {
         if(!$label){
             $this->_init();
         }else {
@@ -28,8 +27,7 @@ class AkUnitTestSuite extends TestSuite
     }
 
 
-    static function runFromOptions($options = array())
-    {
+    static function runFromOptions($options = array()) {
         $default_options = array(
         'base_path' => empty($options['component']) ? AK_LIB_TESTS_DIRECTORY : AK_TEST_DIR,
         'TestSuite' => null,
@@ -132,8 +130,7 @@ class AkUnitTestSuite extends TestSuite
         exit ($options['TestSuite']->run(new $options['reporter']()) ? 0 : 1);
     }
 
-    static function createTestingDatabaseIfNotAvailable()
-    {
+    static function createTestingDatabaseIfNotAvailable() {
         if(!file_exists(AK_CONFIG_DIR.DS.'database.yml')){
             file_put_contents(AK_CONFIG_DIR.DS.'database.yml', 'default:
     type: sqlite
@@ -150,8 +147,7 @@ class AkUnitTestSuite extends TestSuite
         }
     }
 
-    static function checkIfTestingWebserverIsAccesible($options = array())
-    {
+    static function checkIfTestingWebserverIsAccesible($options = array()) {
         if(AkConfig::getOption('webserver_enabled', false)){
             return ;
         }
@@ -165,8 +161,7 @@ class AkUnitTestSuite extends TestSuite
         }
     }
 
-    static function getPossibleCases($options = array())
-    {
+    static function getPossibleCases($options = array()) {
         $default_options = array(
         'config'    => AK_TEST_DIR.DS.(AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE == 'Akelos' ? 'core_tests' : AkInflector::underscore(AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE)).'.yml',
         'base_path' => AK_LIB_TESTS_DIRECTORY,
@@ -181,8 +176,7 @@ class AkUnitTestSuite extends TestSuite
         }
     }
 
-    public function run($reporter)
-    {
+    public function run($reporter) {
         if($this->running_from_config){
             return parent::run($reporter);
         }
@@ -202,8 +196,7 @@ class AkUnitTestSuite extends TestSuite
         return $reporter->getStatus();
     }
 
-    public function _includeFiles($files)
-    {
+    public function _includeFiles($files) {
         foreach ($files as $test) {
             if (!is_dir($test)) {
                 if (!in_array($test,$this->excludes)) {
@@ -216,8 +209,7 @@ class AkUnitTestSuite extends TestSuite
             }
         }
     }
-    public function _init()
-    {
+    public function _init() {
         $this->logger = &Ak::getLogger();
         $base = AK_TEST_DIR.DS.'unit'.DS.'lib'.DS;
         $this->GroupTest($this->title);

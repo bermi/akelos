@@ -8,66 +8,54 @@ class PageCachingController extends ApplicationController
 
     var $caches_action = array('priority');
     
-    function ok()
-    {
+    function ok() {
         
         $this->renderNothing(200);
         
     }
-    function formatspecific()
-    {
+    function formatspecific() {
         if($this->respondToFormat()) return;
         $this->renderText('html format');
     }
-    function get_parameters()
-    {
+    function get_parameters() {
         $this->renderText('version:'.@$this->params['version']);
     }
-    function _handleFormatspecificAsJs()
-    {
+    function _handleFormatspecificAsJs() {
         $this->renderText('javascript format');
     }
     
-    function format()
-    {
+    function format() {
         if (!$this->respondToFormat()) {
             $this->renderText('<h1>hello business</h1>');
         }
     }
     
-    function _handleFormatAsXml()
-    {
+    function _handleFormatAsXml() {
         $this->renderText('<hello>business</hello>');
     }
     
-    function _handleFormatAsCsv()
-    {
+    function _handleFormatAsCsv() {
         $this->renderText('hello,business');
     }
     
-    function index()
-    {
+    function index() {
         $this->renderText('index');
     }
-    function priority()
-    {
+    function priority() {
         $this->renderText($this->getAppliedCacheType());
     }
     
-    function simple()
-    {
+    function simple() {
         
         $this->renderText('Simple Text');
         
     }
-    function expire()
-    {
+    function expire() {
         $this->expirePage(array('controller'=>'page_caching','action'=>'skip'));
         $this->renderNothing(200);
     }
     
-    function skip()
-    {
+    function skip() {
         $this->renderText('Hello<!--CACHE-SKIP-START-->
         
         You wont see me after the cache is rendered.
@@ -75,34 +63,28 @@ class PageCachingController extends ApplicationController
         <!--CACHE-SKIP-END-->');
     }
     
-    function no_content()
-    {
+    function no_content() {
         $this->renderNothing(204);
     }
-    function found()
-    {
+    function found() {
         $this->redirectToAction('ok');
     }
     
-    function not_found()
-    {
+    function not_found() {
         $this->renderNothing(404);
     }
     
-    function custom_path()
-    {
+    function custom_path() {
         $this->renderText('Akelos rulez');
         $this->cachePage('Akelos rulez', '/index.html');
     }
     
-    function expire_custom_path()
-    {
+    function expire_custom_path() {
         $this->expirePage('/index.html');
         $this->renderNothing(200);
     }
     
-    function trailing_slash()
-    {
+    function trailing_slash() {
         $this->renderText('Akelos');
     }
 }

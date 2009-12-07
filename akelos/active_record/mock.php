@@ -6,13 +6,11 @@ class AkActiveRecordMockHandler
     $_parent,
     $_association_id;
 
-    public function __construct(&$parent, $association_id)
-    {
+    public function __construct(&$parent, $association_id) {
         $this->_parent = $parent;
         $this->_association_id = $association_id;
     }
-    public function load()
-    {
+    public function load() {
         if (!empty($this->_parent)) {
             $assoc = $this->_association_id;
             return $this->_parent->$assoc;
@@ -20,8 +18,7 @@ class AkActiveRecordMockHandler
         return false;
     }
 
-    public function __call($name, $args)
-    {
+    public function __call($name, $args) {
         $handler = $this->_parent->_getHandlerForAssociation($this->_association_id);
         return call_user_func_array(array($handler, $name),$args);
     }
@@ -44,36 +41,30 @@ class AkActiveRecordMock
     $__associations = array(),
     $__handlers = array();
 
-    public function __construct($pk, $class, $handler, &$parent)
-    {
+    public function __construct($pk, $class, $handler, &$parent) {
         $this->_class = $class;
         $this->_pkValue = $pk;
         $this->_handler = $handler;
         $this->_parent = $parent;
     }
 
-    public function getId()
-    {
+    public function getId() {
         return $this->_pkValue;
     }
 
-    public function isCallable($method)
-    {
+    public function isCallable($method) {
         return is_callable(array($this->_class,$method));
     }
 
-    public function get($name)
-    {
+    public function get($name) {
         return isset($this->$name)?$this->$name:null;
     }
 
-    public function getAttribute($name)
-    {
+    public function getAttribute($name) {
         return $this->get($name);
     }
 
-    public function &_getHandlerForAssociation($association_id)
-    {
+    public function &_getHandlerForAssociation($association_id) {
         $false = false;
         if (isset($this->__handlers[$association_id])) {
             $class = $this->_class;
@@ -105,13 +96,11 @@ class AkActiveRecordMock
         return $false;
     }
 
-    protected function _getAssociationId($handler_name)
-    {
+    protected function _getAssociationId($handler_name) {
         return isset($this->__associations[$handler_name])?$this->__associations[$handler_name]:false;
     }
 
-    public function load()
-    {
+    public function load() {
         if (!empty($this->_parent)) {
             $assoc = $this->_parent->_getAssociationId($this->_handler);
             return $this->_parent->$assoc;
@@ -119,8 +108,7 @@ class AkActiveRecordMock
         return false;
     }
 
-    protected function addAssociated($association_id, $handler_name)
-    {
+    protected function addAssociated($association_id, $handler_name) {
         if ($association_id != $handler_name) {
             $this->$handler_name = new AkActiveRecordMockHandler($this,$association_id);
         }
@@ -131,8 +119,7 @@ class AkActiveRecordMock
         }
     }
 
-    public function &_getObject()
-    {
+    public function &_getObject() {
         $class = $this->_class;
         $object_vars = get_object_vars($this);
         $attributes = array();
@@ -156,13 +143,11 @@ class AkActiveRecordMock
         return $obj;
     }
 
-    protected function _getClass()
-    {
+    protected function _getClass() {
         return $this->_class;
     }
 
-    public function __call($name, $args = array())
-    {
+    public function __call($name, $args = array()) {
         if(method_exists($this, $name)){
             return call_user_func_array(array($this, $name),$args);
         }

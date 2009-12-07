@@ -12,23 +12,20 @@ class AkImageColorScheme
     $_tmp_file,
     $_frequentColors = array();
 
-    public function setImage($image_path)
-    {
+    public function setImage($image_path) {
         $this->Image = new AkImage($image_path);
         $this->Image->transform('resize',array('size'=>'24x24'));
         $this->_tmp_file = AK_TMP_DIR.DS.'__AkImageColorScheme_'.Ak::randomString(32).'.jpg';
         $this->Image->save($this->_tmp_file);
     }
 
-    public function __destruct()
-    {
+    public function __destruct() {
         if(file_exists($this->_tmp_file)){
             @Ak::file_delete($this->_tmp_file);
         }
     }
 
-    public function getColorScheme($number_of_colors = null)
-    {
+    public function getColorScheme($number_of_colors = null) {
         $colors = array();
         if($image = @imagecreatefromjpeg($this->_tmp_file)){
             $imgage_width = $this->Image->Transform->new_x;
@@ -61,8 +58,7 @@ class AkImageColorScheme
         return $this->_getColorsFromCounterColorArray($colors, $number_of_colors);
     }
 
-    protected function _getColorsFromCounterColorArray($colors_array, $number_of_colors = null)
-    {
+    protected function _getColorsFromCounterColorArray($colors_array, $number_of_colors = null) {
         $number_of_colors = empty($number_of_colors) ? $this->number_of_colors : $number_of_colors;
         asort($colors_array);
         $colors_array = array_slice(array_unique(array_keys(array_reverse($colors_array, true))), 0, $number_of_colors);
@@ -70,29 +66,24 @@ class AkImageColorScheme
         return $colors_array;
     }
 
-    protected function _getNegativeAsHex($red, $green, $blue)
-    {
+    protected function _getNegativeAsHex($red, $green, $blue) {
         $rgb = $red*0.15 + $green*0.5 + $blue * 0.35;
         return $this->_rgbToHex(array(255-$rgb, 255-$rgb, 255-$rgb));
     }
 
-    protected function _addToFrequentColors($hex_color)
-    {
+    protected function _addToFrequentColors($hex_color) {
         $this->_frequentColors[$hex_color] = empty($this->_frequentColors[$hex_color]) ? 1 : $this->_frequentColors[$hex_color]+1;
     }
 
-    public function resetFrequentColors()
-    {
+    public function resetFrequentColors() {
         $this->_frequentColors = array();
     }
 
-    public function getFrequentColors($number_of_colors = null)
-    {
+    public function getFrequentColors($number_of_colors = null) {
         return $this->_getColorsFromCounterColorArray($this->_frequentColors, $number_of_colors);
     }
 
-    protected function _rgbToHex($rgb)
-    {
+    protected function _rgbToHex($rgb) {
         $r = str_pad(dechex($rgb[0]), 2, '0', STR_PAD_LEFT);
         $g = str_pad(dechex($rgb[1]), 2, '0', STR_PAD_LEFT);
         $b = str_pad(dechex($rgb[2]), 2, '0', STR_PAD_LEFT);

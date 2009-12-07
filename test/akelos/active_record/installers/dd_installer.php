@@ -2,8 +2,7 @@
 
 class DdInstaller extends AkInstaller
 {
-    function up_1()
-    {
+    function up_1() {
         $this->createTable('dds', '
         id,
         mycc_id,
@@ -11,8 +10,7 @@ class DdInstaller extends AkInstaller
         );
     }
 
-    function down_1()
-    {
+    function down_1() {
         $this->dropTable('dds');
     }
 }

@@ -2,8 +2,7 @@
 
 class PersonInstaller extends AkInstaller
 {
-    function up_1()
-    {
+    function up_1() {
         $this->createTable('people', '
         id,
         first_name,
@@ -13,8 +12,7 @@ class PersonInstaller extends AkInstaller
         );
     }
 
-    function down_1()
-    {
+    function down_1() {
         $this->dropTable('people');
     }
 }

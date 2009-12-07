@@ -20,13 +20,11 @@ class AkClassExtender
 {
     var $_extended_classes;
 
-    function extendClassWithSource($class_name_to_extend, $extension_path, $priority = 10)
-    {
+    function extendClassWithSource($class_name_to_extend, $extension_path, $priority = 10) {
         $this->_extended_classes[$class_name_to_extend][$priority][] = $extension_path;
     }
 
-    function _getExtensionFilePaths($class_name_to_extend)
-    {
+    function _getExtensionFilePaths($class_name_to_extend) {
         $extension_files = array();
         if(!empty($this->_extended_classes[$class_name_to_extend])){
             $extensions = $this->_extended_classes[$class_name_to_extend];
@@ -38,8 +36,7 @@ class AkClassExtender
         return $extension_files;
     }
 
-    function _getExtensionSourceAndChecksum($class_name_to_extend)
-    {
+    function _getExtensionSourceAndChecksum($class_name_to_extend) {
         $file_contents = '';
         $file_paths = $this->_getExtensionFilePaths($class_name_to_extend);
         $checksum = md5(serialize($file_paths));
@@ -55,15 +52,13 @@ class AkClassExtender
         }
     }
 
-    function extendClasses()
-    {
+    function extendClasses() {
         foreach (array_keys($this->_extended_classes) as $class_name_to_extend){
             $this->makeClassExtensible($class_name_to_extend);
         }
     }
 
-    function makeClassExtensible($class_name_to_extend)
-    {
+    function makeClassExtensible($class_name_to_extend) {
         list($checksum, $source) = $this->_getExtensionSourceAndChecksum($class_name_to_extend);
         $merge_path = AK_TMP_DIR.DS.'.lib';
         if($source){
@@ -97,8 +92,7 @@ class AkClassExtender
         include_once($merge_path.DS.'Extensible'.$class_name_to_extend.'.php');
     }
 
-    function _canIncludeMergedFile($class_name_to_extend, $checksum)
-    {
+    function _canIncludeMergedFile($class_name_to_extend, $checksum) {
         $merge_path = AK_TMP_DIR.DS.'.lib';
         if(AK_CLASS_EXTENDER_ENABLE_CACHE && file_exists($merge_path.DS.'Extensible'.$class_name_to_extend.'.php') &&
         Ak::file_get_contents($merge_path.DS.'checksums'.DS.'Extensible'.$class_name_to_extend) == $checksum){

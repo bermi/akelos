@@ -4,15 +4,13 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class ActsAsList_TestCase extends ActiveRecordUnitTest
 {
-    public function test_AkActiveRecord_actsAsList()
-    {
+    public function test_AkActiveRecord_actsAsList() {
         $this->installAndIncludeModels(array(
         'TodoItem'=>'id, position int, task text, due_time datetime, created_at, expires datetime, updated_at,new_position int'
         ));
     }
 
-    public function Test_of_actsAsList_instatiation()
-    {
+    public function Test_of_actsAsList_instatiation() {
         $TodoItems = new TodoItem();
         $this->assertEqual($TodoItems->actsLike(), 'active record,list');
         $this->assertFalse(empty($TodoItems->list->column));
@@ -26,8 +24,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_Test_of___construct()
-    {
+    public function Test_of_Test_of___construct() {
         $TodoItems = new TodoItem();
         $TodoItems->actsAs('list',
         array(
@@ -39,50 +36,43 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
         $this->assertTrue(empty($TodoItems->list->custom_attribute));
     }
 
-    public function Test_of__ensureIsActiveRecordInstance()
-    {
+    public function Test_of__ensureIsActiveRecordInstance() {
         $TodoItems = new TodoItem();
         $Object = new stdClass();
         $this->expectError(new PatternExpectation('/is not an active record/'));
         $TodoItems->list->_ensureIsActiveRecordInstance($Object);
     }
 
-    public function Test_of_getType()
-    {
+    public function Test_of_getType() {
         $TodoItems = new TodoItem();
         $this->assertEqual($TodoItems->list->getType(), 'list');
     }
 
-    public function Test_of_getScopeCondition_and_setScopeCondition()
-    {
+    public function Test_of_getScopeCondition_and_setScopeCondition() {
         $TodoItems = new TodoItem();
         $this->assertEqual($TodoItems->list->getScopeCondition(), ($TodoItems->_db->type() == 'postgre') ? 'true' : '1');
         $TodoItems->list->setScopeCondition('true');
         $this->assertEqual($TodoItems->list->getScopeCondition(), 'true');
     }
 
-    public function Test_of_getBottomItem_1()
-    {
+    public function Test_of_getBottomItem_1() {
         $TodoItems = new TodoItem();
         $this->assertFalse($TodoItems->list->getBottomItem());
     }
 
-    public function Test_of_getBottomPosition_1()
-    {
+    public function Test_of_getBottomPosition_1() {
         $TodoItems = new TodoItem();
         $this->assertIdentical($TodoItems->list->getBottomPosition(), 0);
     }
 
-    public function Test_of__addToBottom_1()
-    {
+    public function Test_of__addToBottom_1() {
         $TodoItems = new TodoItem();
         $TodoItems->List->_addToBottom();
         $this->assertIdentical($TodoItems->position, 1);
         $this->assertIdentical($TodoItems->List->_ActiveRecordInstance->position, 1);
     }
 
-    public function Test_of_beforeCreate()
-    {
+    public function Test_of_beforeCreate() {
         $TodoItems = new TodoItem();
         $position = $TodoItems->getAttribute('position');
         $TodoItems->List->beforeCreate($TodoItems);
@@ -90,8 +80,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_getBottomItem_2()
-    {
+    public function Test_of_getBottomItem_2() {
         $TodoItems = new TodoItem(array('task' =>'Email Hilario with new product specs','due_time' => Ak::getDate(Ak::time()+(60*60*24*7))));
         $this->assertPattern('/list/',$TodoItems->actsLike());
         $this->assertTrue($TodoItems->isNewRecord());
@@ -114,8 +103,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_getBottomPosition_2()
-    {
+    public function Test_of_getBottomPosition_2() {
         $TodoItems = new TodoItem();
         $this->assertEqual($TodoItems->list->getBottomPosition(), 2);
 
@@ -123,8 +111,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($TodoItem->list->getBottomPosition(), 2);
     }
 
-    public function Test_of__addToBottom_2()
-    {
+    public function Test_of__addToBottom_2() {
         $TodoItems = new TodoItem();
         $TodoItems->list->_addToBottom();
         $this->assertIdentical($TodoItems->position, 3);
@@ -132,8 +119,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_isInList()
-    {
+    public function Test_of_isInList() {
         $TodoItems = new TodoItem();
         $this->assertFalse($TodoItems->list->isInList());
 
@@ -142,8 +128,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_populate_todo_list()
-    {
+    public function Test_of_populate_todo_list() {
         for ($i = 0; $i <= 30; $i++){
             $attributes = array('task'=>'Task number '.($i+3),'due_time'=>Ak::getDate(Ak::time()+(60*60*24*$i)));
             $TodoTask = new TodoItem($attributes);
@@ -153,8 +138,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_decrementPositionsOnLowerItems()
-    {
+    public function Test_of_decrementPositionsOnLowerItems() {
         $TodoItems = new TodoItem();
         $TodoItems->transactionStart();
         $this->assertFalse($TodoItems->list->decrementPositionsOnLowerItems());
@@ -176,8 +160,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($todo_list[10] , 'Task number 10','Test failed because a database transaction was not performed correctly');
     }
 
-    public function Test_of_removeFromList()
-    {
+    public function Test_of_removeFromList() {
         $TodoItems = new TodoItem(10);
 
         $TodoItems->transactionStart();
@@ -190,8 +173,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_afterDestroy_and_beforeDestroy()
-    {
+    public function Test_of_afterDestroy_and_beforeDestroy() {
         $TodoItems = new TodoItem(10);
 
         $TodoItems->transactionStart();
@@ -218,8 +200,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_getLowerItem()
-    {
+    public function Test_of_getLowerItem() {
         $TodoItems = new TodoItem();
         $this->assertFalse($TodoItems->list->getLowerItem());
         $TodoItem = $TodoItems->find(10);
@@ -241,8 +222,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
         $TodoItems->transactionComplete();
     }
 
-    public function Test_of_decrementPosition()
-    {
+    public function Test_of_decrementPosition() {
         $TodoItems = new TodoItem(10);
         $TodoItems->transactionStart();
 
@@ -252,8 +232,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
         $TodoItems->transactionComplete();
     }
 
-    public function Test_of_incrementPosition()
-    {
+    public function Test_of_incrementPosition() {
         $TodoItems = new TodoItem(10);
         $TodoItems->transactionStart();
 
@@ -263,8 +242,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
         $TodoItems->transactionComplete();
     }
 
-    public function Test_of_moveLower()
-    {
+    public function Test_of_moveLower() {
         $TodoItems = new TodoItem();
         $this->assertFalse($TodoItems->list->moveLower());
 
@@ -289,8 +267,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_getHigherItem()
-    {
+    public function Test_of_getHigherItem() {
         $TodoItems = new TodoItem();
         $this->assertFalse($TodoItems->list->getHigherItem());
 
@@ -313,8 +290,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_moveHigher()
-    {
+    public function Test_of_moveHigher() {
         $TodoItems = new TodoItem();
         $this->assertFalse($TodoItems->list->moveHigher());
 
@@ -338,8 +314,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
         $TodoItems->transactionComplete();
     }
 
-    public function Test_of_assumeBottomPosition()
-    {
+    public function Test_of_assumeBottomPosition() {
         $todo_list = $this->_getTodoList();
         $this->assertEqual($todo_list[10] , 'Task number 10');
 
@@ -355,8 +330,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
         $TodoItems->transactionComplete();
     }
 
-    public function Test_of_moveToBottom()
-    {
+    public function Test_of_moveToBottom() {
         $todo_list = $this->_getTodoList();
         $this->assertEqual($todo_list[10] , 'Task number 10');
 
@@ -388,8 +362,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
         $TodoItems->transactionComplete();
     }
 
-    public function Test_of_incrementPositionsOnHigherItems()
-    {
+    public function Test_of_incrementPositionsOnHigherItems() {
         $TodoItems = new TodoItem();
         $TodoItems->transactionStart();
         $this->assertFalse($TodoItems->list->incrementPositionsOnHigherItems());
@@ -406,8 +379,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_assumeTopPosition()
-    {
+    public function Test_of_assumeTopPosition() {
         $TodoItems = new TodoItem();
         $TodoItems->transactionStart();
 
@@ -421,8 +393,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
         $TodoItems->transactionComplete();
     }
 
-    public function Test_of_moveToTop()
-    {
+    public function Test_of_moveToTop() {
         $todo_list = $this->_getTodoList();
         $this->assertEqual($todo_list[10] , 'Task number 10');
 
@@ -454,8 +425,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
         $TodoItems->transactionComplete();
     }
 
-    public function Test_of_isFirst()
-    {
+    public function Test_of_isFirst() {
         $TodoItems = new TodoItem(1);
 
         $this->assertTrue($TodoItems->list->isFirst());
@@ -468,8 +438,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_isLast()
-    {
+    public function Test_of_isLast() {
         $TodoItems = new TodoItem(33);
         $this->assertTrue($TodoItems->list->isLast());
 
@@ -481,8 +450,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_incrementPositionsOnLowerItems()
-    {
+    public function Test_of_incrementPositionsOnLowerItems() {
         $TodoItems = new TodoItem();
         $TodoItems->transactionStart();
 
@@ -498,8 +466,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
         $TodoItems->transactionComplete();
 
     }
-    public function Test_of_insertAtPosition()
-    {
+    public function Test_of_insertAtPosition() {
         $TodoItems = new TodoItem(10);
         $TodoItems->transactionStart();
 
@@ -529,8 +496,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
     public function Test_of_insertAt(){} //Alias for insertAtPosition but with default value to 1
 
 
-    public function Test_of_incrementPositionsOnAllItems()
-    {
+    public function Test_of_incrementPositionsOnAllItems() {
         $TodoItems = new TodoItem();
         $TodoItems->transactionStart();
 
@@ -546,8 +512,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
 
     public function Test_of_addToListTop(){} // same as incrementPositionsOnAllItems()
 
-    public function Test_of_decrementPositionsOnHigherItems()
-    {
+    public function Test_of_decrementPositionsOnHigherItems() {
         $TodoItems = new TodoItem();
         $TodoItems->transactionStart();
 
@@ -562,8 +527,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
         $TodoItems->transactionComplete();
     }
 
-    public function _getTodoList($use_id_as_index = false)
-    {
+    public function _getTodoList($use_id_as_index = false) {
         $TodoItems = new TodoItem();
         $TodoItems = $TodoItems->find('all',array('order'=>'id ASC'));
         $list = array();
@@ -577,8 +541,7 @@ class ActsAsList_TestCase extends ActiveRecordUnitTest
         return $list;
     }
 
-    public function test_should_move_up_the_item_with_the_same_position_as_the_inserted()
-    {
+    public function test_should_move_up_the_item_with_the_same_position_as_the_inserted() {
         $this->installAndIncludeModels(array('TodoList', 'TodoTask'));
 
         $ListA = new TodoList(array('name' => 'A'));

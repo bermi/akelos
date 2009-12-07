@@ -12,13 +12,11 @@ class <?php  echo $model_name?>TestCase extends  AkUnitTest
 echo !empty($module_preffix) ? '    var $module = \''.trim($module_preffix,DS).'\';' : ''
 ?>
 
-    function test_setup()
-    {
+    function test_setup() {
         $this->installAndIncludeModels('<?php  echo $model_name?>');
     }
     
-    function test_should_be_added()
-    {
+    function test_should_be_added() {
         // An instance of <?php  echo $model_name?> model is available at 
         // $this-><?php  echo $model_name; ?>
         

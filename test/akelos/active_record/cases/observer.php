@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class Observer_TestCase extends ActiveRecordUnitTest
 {
-    public function test_start()
-    {
+    public function test_start() {
         eval("class ObservedAccount extends AkActiveRecord { public \$notified_observers = array();} ");
         eval("class ObservedPerson extends AkActiveRecord { public \$notified_observers = array();} ");
 
@@ -15,15 +14,13 @@ class Observer_TestCase extends ActiveRecordUnitTest
         Ak::import('TestAuditor','ObservedPersonObserver');
     }
 
-    public function Test_of__instantiateDefaultObserver()
-    {
+    public function Test_of__instantiateDefaultObserver() {
         $Observed = new ObservedPerson();
         $ObeserversReference = $Observed->getObservers();
         $this->assertEqual(strtolower(get_class($ObeserversReference[0])), 'observedpersonobserver');
     }
 
-    public function Test_of_addObserver()
-    {
+    public function Test_of_addObserver() {
         $Observed = new ObservedPerson();
 
         $null = null;
@@ -42,8 +39,7 @@ class Observer_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_addObserver2()
-    {
+    public function Test_of_addObserver2() {
         $ObservedPerson = new ObservedPerson();
 
         $ObeserversReference = $ObservedPerson->getObservers();
@@ -56,8 +52,7 @@ class Observer_TestCase extends ActiveRecordUnitTest
         $this->assertEqual(strtolower(get_class($ObeserversReference[0])), 'testauditor');
     }
 
-    public function __Test_of_setObservableState_and_getObservableState()
-    {
+    public function __Test_of_setObservableState_and_getObservableState() {
         $ObservedAccount1 = new ObservedAccount();
         $ObservedAccount1->setObservableState('creating account 1');
 
@@ -68,8 +63,7 @@ class Observer_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($ObservedAccount1->getObservableState(), 'creating account 1');
     }
 
-    public function Test_of_notifyObservers()
-    {
+    public function Test_of_notifyObservers() {
         $ObservedPerson = new ObservedPerson();
         $ObservedPerson->setObservableState('new person created');
 
@@ -84,8 +78,7 @@ class Observer_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_default_Active_record_observer_triggers()
-    {
+    public function Test_of_default_Active_record_observer_triggers() {
         $ObservedPerson = new ObservedPerson(array('first_name' =>'Bermi'));
 
         $this->assertTrue(empty($ObservedPerson->audited));
@@ -117,8 +110,7 @@ class Observer_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_beforeSave_trigger()
-    {
+    public function Test_of_beforeSave_trigger() {
         $ObservedPerson = new ObservedPerson();
 
         $ObservedPerson->city = "Carlet";

@@ -5,8 +5,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class ReflectionDocBlock_TestCase extends ActiveSupportUnitTest
 {
-    public function test_set_tag()
-    {
+    public function test_set_tag() {
         $string ='/**
  * test comment
  *

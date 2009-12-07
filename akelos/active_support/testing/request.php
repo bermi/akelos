@@ -2,8 +2,7 @@
 
 class AkTestRequest extends AkRequest
 {
-    public function &recognize($Map = null)
-    {
+    public function &recognize($Map = null) {
         $this->_startSession();
         $this->_enableInternationalizationSupport();
         $this->_mapRoutes($Map);
@@ -67,8 +66,7 @@ class AkTestRequest extends AkRequest
 
     }
 
-    public function getHost()
-    {
+    public function getHost() {
         if(!empty($this->_host)){
             return $this->_host;
         }

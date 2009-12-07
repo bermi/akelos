@@ -2,12 +2,10 @@
 
 class PageController extends AkActionController 
 {
-    function index()
-    {
+    function index() {
         
     }
-    function setup()
-    {
+    function setup() {
         
     }
 }

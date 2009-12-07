@@ -7,8 +7,7 @@ class CacheSweeperController extends ApplicationController
     var $caches_page = array('listing');
     var $cache_sweeper = array('person_sweeper'=>array('only'=>'update'));
     
-    function show()
-    {
+    function show() {
         
         if (isset($this->params['id'])) {
             $this->Person=@$this->Person->findFirstBy('id',$this->params['id']);
@@ -20,13 +19,11 @@ class CacheSweeperController extends ApplicationController
         }
     }
     
-    function listing()
-    {
+    function listing() {
         $this->Persons = $this->Person->findAll(array('limit',10));
     }
     
-    function update()
-    {
+    function update() {
         if (isset($this->params['id'])) {
             $this->Person=@$this->Person->findFirstBy('id',$this->params['id']);
         }
@@ -44,8 +41,7 @@ class CacheSweeperController extends ApplicationController
         }
     }
     
-    function create()
-    {
+    function create() {
         $person = new Person();
         $person->setAttributes($this->params);
         $res = $person->save();
@@ -57,8 +53,7 @@ class CacheSweeperController extends ApplicationController
         }
     }
     
-    function delete()
-    {
+    function delete() {
         if (isset($this->params['id'])) {
             $this->Person=@$this->Person->findFirstBy('id',$this->params['id']);
         }

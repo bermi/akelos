@@ -9,8 +9,7 @@ class <?php  echo $class_name?>Controller extends ApplicationController
 <?php   if(!empty($actions)) :?>
 <?php   foreach ($actions as $action) : ?>
 
-    function <?php echo $action?> ()
-    {
+    function <?php echo $action?> () {
     }
 <?php endforeach; ?>
 <?php endif; ?>

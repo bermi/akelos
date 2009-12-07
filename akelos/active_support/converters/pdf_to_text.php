@@ -6,8 +6,7 @@
  */
 class AkPdfToText
 {
-    public function extractTextFromPdf($postScriptData)
-    {
+    public function extractTextFromPdf($postScriptData) {
         if (!is_string($postScriptData)) {
             return '';
         }
@@ -55,8 +54,7 @@ class AkPdfToText
 
     }
 
-    public function convert()
-    {
+    public function convert() {
         $searchstart = 'stream';
         $searchend = 'endstream';
         $pdfText = '';

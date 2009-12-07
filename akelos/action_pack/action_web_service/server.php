@@ -6,8 +6,7 @@ class AkActionWebServiceServer
     public $_Server;
     public $_services = array();
 
-    public function __construct($server_driver)
-    {
+    public function __construct($server_driver) {
         $server_driver = AkInflector::underscore($server_driver);
         if(in_array($server_driver, $this->_available_drivers)){
             $server_class_name = 'Ak'.AkInflector::camelize($server_driver).'Server';
@@ -19,8 +18,7 @@ class AkActionWebServiceServer
         }
     }
 
-    public function addService($service)
-    {
+    public function addService($service) {
         $service_file = AkInflector::underscore($service);
         if(substr($service_file,-8) != '_service'){
             $service_file = $service_file.'_service';
@@ -40,16 +38,14 @@ class AkActionWebServiceServer
         }
     }
 
-    public function init()
-    {
+    public function init() {
         if(method_exists($this->_Server, 'init')){
             $args = func_get_args();
             call_user_func_array(array($this->_Server, 'init'), $args);
         }
     }
 
-    public function serve()
-    {
+    public function serve() {
         $this->_Server->serve();
     }
 }

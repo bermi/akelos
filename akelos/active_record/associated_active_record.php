@@ -28,17 +28,14 @@ class AkAssociatedActiveRecord extends AkBaseModel
     $_associationIds = array(),
     $_associations = array();
 
-    public function &getAssociations()
-    {
+    public function &getAssociations() {
         return $this->_associations;
     }
-    public function &getAssociationIds()
-    {
+    public function &getAssociationIds() {
         return $this->_associationIds;
     }
 
-    public function _loadAssociationHandler($association_type)
-    {
+    public function _loadAssociationHandler($association_type) {
         if(empty($this->$association_type) && in_array($association_type, array('hasOne','belongsTo','hasMany','hasAndBelongsToMany'))){
             $association_handler_class_name = 'Ak'.ucfirst($association_type);
             $this->$association_type = new $association_handler_class_name($this);
@@ -46,13 +43,11 @@ class AkAssociatedActiveRecord extends AkBaseModel
         return !empty($this->$association_type);
     }
 
-    public function setAssociationHandler(&$AssociationHandler, $association_id)
-    {
+    public function setAssociationHandler(&$AssociationHandler, $association_id) {
         $this->_AssociationHandler =& $AssociationHandler;
     }
 
-    public function loadAssociations()
-    {
+    public function loadAssociations() {
         $association_aliases = array(
         'hasOne' => array('hasOne','has_one'),
         'belongsTo' => array('belongsTo','belongs_to'),
@@ -80,8 +75,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
     /**
      * Gets an array of associated object of selected association type.
      */
-    public function &getAssociated($association_type)
-    {
+    public function &getAssociated($association_type) {
         $result = array();
         if(!empty($this->$association_type) && in_array($association_type, array('hasOne','belongsTo','hasMany','hasAndBelongsToMany'))){
             $result =& $this->$association_type->getModels();
@@ -89,14 +83,12 @@ class AkAssociatedActiveRecord extends AkBaseModel
         return $result;
     }
 
-    public function getId()
-    {
+    public function getId() {
         return false;
     }
 
 
-    public function &assign(&$Associated)
-    {
+    public function &assign(&$Associated) {
         $result = false;
         if(is_object($this->_AssociationHandler)){
             $result =& $this->_AssociationHandler->assign($this->getAssociationId(), $Associated);
@@ -108,8 +100,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
      * Returns a new object of the associated type that has been instantiated with attributes
      * and linked to this object through a foreign key but has not yet been saved.
      */
-    public function &build($attributes = array(), $replace_existing = true)
-    {
+    public function &build($attributes = array(), $replace_existing = true) {
         $result = false;
         if(!empty($this->_AssociationHandler)){
             $result =& $this->_AssociationHandler->build($this->getAssociationId(), $attributes, $replace_existing);
@@ -118,8 +109,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
     }
 
 
-    public function &create($attributes = array(), $replace_existing = true)
-    {
+    public function &create($attributes = array(), $replace_existing = true) {
         $result = false;
         if(!empty($this->_AssociationHandler)){
             $result =& $this->_AssociationHandler->create($this->getAssociationId(), $attributes, $replace_existing);
@@ -127,8 +117,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
         return $result;
     }
 
-    public function &replace(&$NewAssociated, $dont_save = false)
-    {
+    public function &replace(&$NewAssociated, $dont_save = false) {
         $result = false;
         if(!empty($this->_AssociationHandler)){
             $result =& $this->_AssociationHandler->replace($this->getAssociationId(), $NewAssociated, $dont_save = false);
@@ -137,8 +126,7 @@ class AkAssociatedActiveRecord extends AkBaseModel
     }
 
 
-    public function &load()
-    {
+    public function &load() {
         $result = false;
         $association_id = $this->getAssociationId();
         if(!empty($this->_AssociationHandler) && (empty($this->_loaded))){
@@ -149,39 +137,31 @@ class AkAssociatedActiveRecord extends AkBaseModel
         return $result;
     }
 
-    public function constructSql()
-    {
+    public function constructSql() {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->constructSql($this->getAssociationId()) : false;
     }
 
-    public function constructSqlForInclusion()
-    {
+    public function constructSqlForInclusion() {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->constructSqlForInclusion($this->getAssociationId()) : false;
     }
-    public function constructSqlForInclusionChain($handler_name,$parent_handler_name)
-    {
+    public function constructSqlForInclusionChain($handler_name,$parent_handler_name) {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->constructSqlForInclusionChain($this->getAssociationId(),$handler_name,$parent_handler_name) : false;
     }
-    public function getAssociatedFinderSqlOptions($options = array())
-    {
+    public function getAssociatedFinderSqlOptions($options = array()) {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->getAssociatedFinderSqlOptions($this->getAssociationId(), $options) : false;
     }
-    public function getAssociatedFinderSqlOptionsForInclusionChain($prefix, $parent_handler_name,$options = array(),$pluralize=false)
-    {
+    public function getAssociatedFinderSqlOptionsForInclusionChain($prefix, $parent_handler_name,$options = array(),$pluralize=false) {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->getAssociatedFinderSqlOptionsForInclusionChain($this->getAssociationId(), $prefix, $parent_handler_name, $options,$pluralize) : false;
     }
-    public function getAssociationOption($option)
-    {
+    public function getAssociationOption($option) {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->getOption($this->getAssociationId(), $option) : false;
     }
 
-    public function setAssociationOption($option, $value)
-    {
+    public function setAssociationOption($option, $value) {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->setOption($this->getAssociationId(), $option, $value) : false;
     }
 
-    public function getAssociationId()
-    {
+    public function getAssociationId() {
         if(empty($this->_associationId)){
             trigger_error(Ak::t('You are trying to access a non associated Object property. '.
             'This error might have been caused by asigning directly an object '.
@@ -190,39 +170,32 @@ class AkAssociatedActiveRecord extends AkBaseModel
         return $this->_associationId;
     }
 
-    public function getAssociatedIds()
-    {
+    public function getAssociatedIds() {
         return array_keys($this->_associationIds);
     }
 
-    public function getAssociatedHandlerName($association_id)
-    {
+    public function getAssociatedHandlerName($association_id) {
         return empty($this->_associationIds[$association_id]) ? false : $this->_associationIds[$association_id];
     }
 
-    public function getAssociatedType()
-    {
+    public function getAssociatedType() {
         return !empty($this->_AssociationHandler) ? $this->_AssociationHandler->getType() : false;
     }
 
-    public function getAssociationType()
-    {
+    public function getAssociationType() {
         return $this->getAssociatedType();
     }
 
-    public function getType()
-    {
+    public function getType() {
         return $this->getAssociatedType();
     }
 
-    public function hasAssociations()
-    {
+    public function hasAssociations() {
         return !empty($this->_associations) && count($this->_associations) > 0;
     }
 
 
-    public function getCollectionHandlerName($association_id)
-    {
+    public function getCollectionHandlerName($association_id) {
         if(isset($this->$association_id) && is_object($this->$association_id) && method_exists($this->$association_id,'getAssociatedFinderSqlOptions')){
             return false;
         }
@@ -238,19 +211,16 @@ class AkAssociatedActiveRecord extends AkBaseModel
         }
     }
 
-    public function addTableAliasesToAssociatedSqlWithAlias($add_alias, $alias,$sql)
-    {
+    public function addTableAliasesToAssociatedSqlWithAlias($add_alias, $alias,$sql) {
         return preg_replace($this->_getColumnsWithRegexBoundariesAndAlias($alias),'\1'.$add_alias.'.\3',' '.$sql.' ');
     }
 
-    public function addTableAliasesToAssociatedSql($table_alias, $sql)
-    {
+    public function addTableAliasesToAssociatedSql($table_alias, $sql) {
         return preg_replace($this->getColumnsWithRegexBoundaries(),'\1'.$table_alias.'.\2',' '.$sql.' ');
     }
 
 
-    private function _getColumnsWithRegexBoundariesAndAlias($alias)
-    {
+    private function _getColumnsWithRegexBoundariesAndAlias($alias) {
         $columns = array_keys($this->_ActiveRecord->getColumns());
         foreach ($columns as $k=>$column){
             $columns[$k] = '/([^_])\b('.$alias.')\.('.$column.')\b/';

@@ -8,8 +8,7 @@ class AkReflection
     $tokens,
     $symbols;
 
-    public function parse($source)
-    {
+    public function parse($source) {
         if (!function_exists('token_get_all')) {
             trigger_error('Function "token_get_all" is not defined');
             return false;
@@ -115,8 +114,7 @@ class AkReflection
         $this->definitions = array_merge($this->definitions,$this->requires);
     }
 
-    protected function _parseTag(&$tags, $tempTag)
-    {
+    protected function _parseTag(&$tags, $tempTag) {
         switch($tempTag[0]) {
             case 'param':
                 if (preg_match('/\$([a-zA-Z0-9_]+)\s+(.*)/s',$tempTag[1],$pmatches)) {
@@ -147,8 +145,7 @@ class AkReflection
         }
     }
 
-    protected function _parseDocBlock($string)
-    {
+    protected function _parseDocBlock($string) {
         preg_match_all('/\/\*\*\n(\s*\*([^\n]+?\n)+)+.*?\*\//',$string,$matches);
         $docBlockStructure = array('comment'=>null);
         if (isset($matches[1][0])) {
@@ -182,8 +179,7 @@ class AkReflection
         return $docBlockStructure;
     }
 
-    public function readDefinition($static = false, $visibility = 'public', $byReference = false, $docBlock = '', $string = '', $indent)
-    {
+    public function readDefinition($static = false, $visibility = 'public', $byReference = false, $docBlock = '', $string = '', $indent) {
         $t = current($this->tokens);
         $definitionType = $t[1];
 
@@ -266,14 +262,12 @@ class AkReflection
         $this->definitions[count($this->definitions)-1]['docBlock'] = implode("\n",$doclines);
     }
 
-    protected function _replaceVariablesInsideOptions($matches)
-    {
+    protected function _replaceVariablesInsideOptions($matches) {
         $name = $matches[0];
         return '"'.str_replace('$','\$',$name).'"';
     }
 
-    public function skipWhiteAndComments()
-    {
+    public function skipWhiteAndComments() {
         $string = '';
         while ($t = current($this->tokens)) {
             if (is_array($t) && ($t[0] == T_WHITESPACE || (defined('T_DOC_COMMENT')?$t[0] == T_DOC_COMMENT:false) || $t[0] == T_COMMENT)) {
@@ -285,8 +279,7 @@ class AkReflection
         }
     }
 
-    public function skipCodeBlock()
-    {
+    public function skipCodeBlock() {
         // we go forward until we find the first "{" token
 
         while(($t = current($this->tokens)) && $t != '{') {
@@ -313,8 +306,7 @@ class AkReflection
         }
     }
 
-    public function getCodeBlock()
-    {
+    public function getCodeBlock() {
         $prestring = '';
         $poststring = '';
         $codeblock = '';
@@ -371,8 +363,7 @@ class AkReflection
         }
     }
 
-    public function getDefinitions()
-    {
+    public function getDefinitions() {
         return $this->definitions;
     }
 }

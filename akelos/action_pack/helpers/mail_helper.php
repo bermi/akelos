@@ -2,8 +2,7 @@
 
 class MailHelper
 {
-    public function setController(&$controller)
-    {
+    public function setController(&$controller) {
         $this->_controller = $controller;
     }
 
@@ -11,8 +10,7 @@ class MailHelper
    * Uses TextHelper::format to take the text and format it, indented two spaces for
    * each line, and wrapped at 72 columns.
    */
-    public function block_format($text)
-    {
+    public function block_format($text) {
         $formatted = '';
         $paragraphs = preg_split("/(\n|\r){2,}/", $text);
         foreach ((array)$paragraphs as $paragraph){

@@ -2,8 +2,7 @@
 
 class AkRemoteConverter
 {
-    public function convert($from, $to, $data)
-    {
+    public function convert($from, $to, $data) {
         if(!defined('AK_REMOTE_CONVERTER_URI')){
             return false;
         }

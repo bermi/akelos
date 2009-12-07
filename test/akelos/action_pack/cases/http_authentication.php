@@ -6,8 +6,7 @@ class HttpAuthentication_TestCase extends AkWebTestCase
 {
     public $webserver_enabled;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->webserver_enabled = AkConfig::getOption('webserver_enabled', false);
         parent::__construct();
         $this->_test_script = AkConfig::getOption('testing_url').
@@ -18,24 +17,21 @@ class HttpAuthentication_TestCase extends AkWebTestCase
         $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
     }
 
-    public function test_should_access_public_action()
-    {
+    public function test_should_access_public_action() {
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'authentication');
         $this->assertResponse(200);
         $this->assertTextMatch('Everyone can see me!');
     }
 
-    public function test_should_show_login_with_realm()
-    {
+    public function test_should_show_login_with_realm() {
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'authentication/edit');
         $this->assertRealm('App name');
         $this->assertNoText("I'm only accessible if you know the password");
     }
 
-    public function test_should_fail_login()
-    {
+    public function test_should_fail_login() {
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'authentication/edit');
         $this->authenticate('bermi', 'badpass');
@@ -43,8 +39,7 @@ class HttpAuthentication_TestCase extends AkWebTestCase
         $this->assertNoText("I'm only accessible if you know the password");
     }
 
-    public function test_should_login()
-    {
+    public function test_should_login() {
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'authentication/edit');
         $this->authenticate('bermi', 'secret');

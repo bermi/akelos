@@ -41,19 +41,16 @@ class ObjectInspection_TestCase extends ActiveSupportUnitTest
 
     public $AkTestingObjectInspectionChildInstance;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->AkTestingObjectInspectionChildInstance = new AkTestingObjectInspectionChild();
     }
 
-    public function tearDown()
-    {
+    public function tearDown() {
         unset($this->AkTestingObjectInspectionChildInstance);
     }
 
 
-    public function Test_db()
-    {
+    public function Test_db() {
         include_once AK_CONTRIB_DIR.'/adodb/adodb.inc.php';
 
         $db = Ak::db();
@@ -61,8 +58,7 @@ class ObjectInspection_TestCase extends ActiveSupportUnitTest
         $this->assertReference($db,Ak::db(),'Checking db connection singleton');
     }
 
-    public function Test_t()
-    {
+    public function Test_t() {
         $text_to_translate = 'Hello, %name, today is %weekday';
         $vars_to_replace = array('%name'=>'Bermi','%weekday'=>'monday');
 
@@ -72,8 +68,7 @@ class ObjectInspection_TestCase extends ActiveSupportUnitTest
 
     }
 
-    public function Test_debug()
-    {
+    public function Test_debug() {
         ob_start();
         Ak::debug($this->AkTestingObjectInspectionChildInstance);
         $debug_str = ob_get_contents();
@@ -81,30 +76,26 @@ class ObjectInspection_TestCase extends ActiveSupportUnitTest
         $this->assertFalse($debug_str == '','Ak::debug not working properly');
     }
 
-    public function Test_get_object_info()
-    {
+    public function Test_get_object_info() {
         $this->assertNotEqual(md5(serialize(Ak::get_object_info($this->AkTestingObjectInspectionChildInstance))),
         md5(serialize(Ak::get_object_info($this->AkTestingObjectInspectionChildInstance,true))),'Object inspection does not exclude parent class methods');
 
     }
 
-    public function Test_get_this_object_methods()
-    {
+    public function Test_get_this_object_methods() {
         $expected_methods = array('AkTestingObjectInspectionChild','child_function','child_method');
         $resulting_methods = Ak::get_this_object_methods($this->AkTestingObjectInspectionChildInstance);
         $this->assertEqual($expected_methods,$resulting_methods);
     }
 
-    public function Test_get_this_object_attributes()
-    {
+    public function Test_get_this_object_attributes() {
         $expected_attributes = array('child_var'=>null,'child_var_null'=>null,'child_var_string'=>'abc','child_var_int'=>123);
         $resulting_attributes = Ak::get_this_object_attributes($this->AkTestingObjectInspectionChildInstance);
         $this->assertEqual($expected_attributes,$resulting_attributes);
     }
 
 
-    public function Test_for_getTimestamp()
-    {
+    public function Test_for_getTimestamp() {
         $this->assertEqual(Ak::getTimestamp(), Ak::time());
         $this->assertEqual('17:52:03', Ak::getDate(Ak::getTimestamp('17:52:03'),'H:i:s'));
         $this->assertEqual(date('Y-m-d').' 17:52:03', Ak::getDate(Ak::getTimestamp('17:52:03')));
@@ -114,13 +105,11 @@ class ObjectInspection_TestCase extends ActiveSupportUnitTest
         $this->assertEqual('2192-10-09 01:02:03', Ak::getDate(Ak::getTimestamp('2192-10-9 01:02:03')));
     }
 
-    public function Test_for_getDate()
-    {
+    public function Test_for_getDate() {
     }
 
 
-    public function Test_of_encrypt_decrypt()
-    {
+    public function Test_of_encrypt_decrypt() {
         $original = "Este es el texto que quiero encriptar";
         $this->assertEqual(Ak::decrypt(Ak::encrypt($original)), $original);
 
@@ -134,8 +123,7 @@ class ObjectInspection_TestCase extends ActiveSupportUnitTest
 
     /**/
 
-    public function Test_of_compress_decompress()
-    {
+    public function Test_of_compress_decompress() {
         $original = Ak::file_get_contents(__FILE__);
         $compressed = Ak::compress($original);
 
@@ -151,8 +139,7 @@ class ObjectInspection_TestCase extends ActiveSupportUnitTest
     }
     /**/
 
-    public function Test_for_StatusKeys()
-    {
+    public function Test_for_StatusKeys() {
         $Object = new Ak();
 
         $this->assertFalse(Ak::objectHasBeenModified($Object));

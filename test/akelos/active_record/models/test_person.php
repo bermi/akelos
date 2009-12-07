@@ -2,18 +2,15 @@
 
 class TestPerson extends ActiveRecord
 {
-    public function validate()
-    {
+    public function validate() {
         $this->validatesPresenceOf("first_name");
     }
 
-    public function validateOnCreate()
-    {
+    public function validateOnCreate() {
         $this->validatesAcceptanceOf("tos");
     }
 
-    public function validateOnUpdate()
-    {
+    public function validateOnUpdate() {
         $this->validatesPresenceOf("email");
     }
 

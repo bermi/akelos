@@ -2,8 +2,7 @@
 
 class AkStringToArray
 {
-    public function convert()
-    {
+    public function convert() {
         return Ak::toArray($this->source);
     }
 }

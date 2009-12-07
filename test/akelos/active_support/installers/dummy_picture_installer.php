@@ -2,8 +2,7 @@
 
 class DummyPictureInstaller extends AkInstaller
 {
-    public function install($version = null, $options = array())
-    {
+    public function install($version = null, $options = array()) {
         $this->createTable('dummy_pictures', '
         id,
         property_id,
@@ -12,8 +11,7 @@ class DummyPictureInstaller extends AkInstaller
         );
     }
 
-    public function uninstall($version = null, $options = array())
-    {
+    public function uninstall($version = null, $options = array()) {
         $this->dropTable('dummy_pictures', array('sequence'=>true));
     }
 }

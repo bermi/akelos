@@ -80,8 +80,7 @@ class AkObserver
     */
     public $_observing = array();
 
-    public function __construct()
-    {
+    public function __construct() {
         $num_args = func_num_args();
         for ($i = 0; $i < $num_args; $i++){
             $target = func_get_arg($i);
@@ -99,8 +98,7 @@ class AkObserver
      * in var $observe = array(...)
      *
      */
-    protected function _initModelObserver()
-    {
+    protected function _initModelObserver() {
         $this->observe = Ak::toArray($this->observe);
         if (count($this->observe)>0) {
             $this->setObservedModels($this->observe);
@@ -111,8 +109,7 @@ class AkObserver
     * Constructs the Observer
     * @param $subject the name or names of the Models to observe
     */
-    public function observe (&$target)
-    {
+    public function observe (&$target) {
         static $memo;
         $model_name = $target->getModelName();
         $class_name = get_class($this);
@@ -127,8 +124,7 @@ class AkObserver
     * Constructs the Observer
     * @param $subject the name or names of the Models to observe
     */
-    public function setObservedModels()
-    {
+    public function setObservedModels() {
         $args = func_get_args();
         $models = func_num_args() == 1 ? ( is_array($args[0]) ? $args[0] : array($args[0]) ) : $args;
 
@@ -138,8 +134,7 @@ class AkObserver
         }
     }
 
-    public function update($state = '')
-    {
+    public function update($state = '') {
     }
 
 }

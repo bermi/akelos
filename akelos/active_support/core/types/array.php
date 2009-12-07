@@ -2,8 +2,7 @@
 
 class AkArray extends AkType
 {
-    public function inGroupsOf($number, $filler = null)
-    {
+    public function inGroupsOf($number, $filler = null) {
         $slices = array();
         $start = 0;
         
@@ -19,8 +18,7 @@ class AkArray extends AkType
         return $slices;
     }
     
-    public function toSentence($options = array())
-    {
+    public function toSentence($options = array()) {
         $default_options = array('skip_last_comma'=>true,'connector'=>'and');
         Ak::parseOptions($options,$default_options);
         $parts = array();
@@ -38,8 +36,7 @@ class AkArray extends AkType
         return implode('',$parts);
     }
     
-    public function size()
-    {
+    public function size() {
         return count($this->value);
     }
 }

@@ -4,15 +4,13 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class TableInheritance_TestCase extends ActiveRecordUnitTest
 {
-    public function test_start()
-    {
+    public function test_start() {
         eval("class Schedule extends ActiveRecord { public \$belongs_to = 'event'; }");
         $this->installAndIncludeModels(array('Event', 'Concert','OpenHouseMeeting'));
     }
 
 
-    public function test_for_table_inheritance()
-    {
+    public function test_for_table_inheritance() {
         $Event = new Event(array('description'=>'Uncategorized Event'));
         $this->assertTrue($Event->save());
 
@@ -28,8 +26,7 @@ class TableInheritance_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_find_should_return_appropriate_models()
-    {
+    public function test_find_should_return_appropriate_models() {
         $Events = $this->Event->find('all');
         $expected = array(1 => 'Event', 2 => 'Concert', 3 => 'OpenHouseMeeting');
         foreach ($Events as $event){
@@ -37,8 +34,7 @@ class TableInheritance_TestCase extends ActiveRecordUnitTest
         }
     }
 
-    public function test_inheritance_should_lazy_load_right_model()
-    {
+    public function test_inheritance_should_lazy_load_right_model() {
         $this->installAndIncludeModels(array('Schedule'=>'id,name,event_id'));
         $this->Schedule->create(array('name'=>'to OpenHouseMeeting','event_id'=>3));
         $this->Schedule->create(array('name'=>'to Event','event_id'=>1));

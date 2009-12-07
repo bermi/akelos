@@ -5,21 +5,18 @@ require_once(dirname(__FILE__).'/../config.php');
 class Locking_TestCase extends ActiveRecordUnitTest
 {
 
-    public function test_should_give_a_deprecated_warning()
-    {
+    public function test_should_give_a_deprecated_warning() {
         $this->assertUpcomingError("DEPRECATED WARNING: Column lock_version should have a default setting");
         $this->installAndIncludeModels(array('BankAccount'=>'id,balance,lock_version int'));
         $Account = new BankAccount(array('balance'=>2000));
         $Account->save();
     }
 
-    public function test_start()
-    {
+    public function test_start() {
         $this->installAndIncludeModels(array('BankAccount'=>'id,balance,lock_version,created_at,updated_at'));
     }
 
-    public function test_should_have_locking_enabled()
-    {
+    public function test_should_have_locking_enabled() {
         $Account = new BankAccount();
         $this->assertTrue($Account->isLockingEnabled(),'Optimistic locking is enabled by default.');
 
@@ -27,8 +24,7 @@ class Locking_TestCase extends ActiveRecordUnitTest
         $this->assertFalse($Account->isLockingEnabled(),'Optimistic locking can be turned off.');
     }
 
-    public function test_should_lock_optimistically()
-    {
+    public function test_should_lock_optimistically() {
         $Account1 = new BankAccount(array('balance'=>2000));
         $this->assertEqual($Account1->lock_version,1,'Version attribute initially starts at 1.');
         $Account1->save();

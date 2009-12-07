@@ -14,16 +14,14 @@
 */
 class <?php  echo $model_name?>Installer extends AkInstaller
 {
-    function up_1()
-    {
+    function up_1() {
         $this->createTable('<?php  echo $plural_name?>', "
           id,
           name
         ");  
     }
     
-    function down_1()
-    {
+    function down_1() {
         $this->dropTable('<?php  echo $plural_name?>');  
     }
     

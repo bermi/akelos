@@ -10,8 +10,7 @@ class AkReflectionFile extends AkReflection
     $requires   =   array(),
     $includes   =   array();
 
-    public function __construct($file_name)
-    {
+    public function __construct($file_name) {
         $this->filename = $file_name;
         if (file_exists($file_name)) {
             $this->parse(file_get_contents($file_name));
@@ -21,8 +20,7 @@ class AkReflectionFile extends AkReflection
         $this->_parseDefinitions();
     }
 
-    public function getClasses($options = null)
-    {
+    public function getClasses($options = null) {
         if ($options == null) {
             return $this->classes;
         } else if (is_array($options)) {
@@ -49,27 +47,22 @@ class AkReflectionFile extends AkReflection
         }
     }
 
-    public function getFunctions()
-    {
+    public function getFunctions() {
         return $this->functions;
     }
-    public function getInterfaces()
-    {
+    public function getInterfaces() {
         return $this->interfaces;
     }
 
-    public function getIncludes()
-    {
+    public function getIncludes() {
         return $this->includes;
     }
 
-    public function getRequires()
-    {
+    public function getRequires() {
         return $this->requires;
     }
 
-    protected function _parseDefinitions()
-    {
+    protected function _parseDefinitions() {
         foreach($this->definitions as $key=>$definition) {
             if (isset($definition['type'])) {
                 switch ($definition['type']) {

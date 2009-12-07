@@ -100,8 +100,7 @@ class FormHelper extends AkActionViewHelper
       * Note: This also works for the methods in FormOptionHelper and DateHelper that are designed to work with an object as base.
       * Like collection_select and datetime_select.
       */
-    public function form_for($object_name, &$object, $options = array())
-    {
+    public function form_for($object_name, &$object, $options = array()) {
         $url_for_options = $options['url'];
         echo $this->_controller->form_tag_helper->form_tag($url_for_options, $options);
         return $this->fields_for($object_name, $object);
@@ -122,13 +121,11 @@ class FormHelper extends AkActionViewHelper
       * Note: This also works for the methods in FormOptionHelper and DateHelper that are designed to work with an object as base.
       * Like collection_select and datetime_select.
       */
-    public function fields_for($object_name, &$object)
-    {
+    public function fields_for($object_name, &$object) {
         return  new AkFormHelperBuilder($object_name, $object, $this);
     }
 
-    public function end_form_tag()
-    {
+    public function end_form_tag() {
         return '</form>';
     }
     /**
@@ -140,32 +137,28 @@ class FormHelper extends AkActionViewHelper
       *   $form_helper->text_field("post", "title", array("size" => 20));
       *     <input type="text" id="post_title" name="post[title]" size="20" value="{post.title}" />
       */
-    public function text_field($object_name, $column_name = null, $options = array())
-    {
+    public function text_field($object_name, $column_name = null, $options = array()) {
         return $this->_field($object_name, $column_name, $options,'text');
     }
 
     /**
       * Works just like text_field, but returns an input tag of the "password" type instead.
       */
-    public function password_field($object_name, $column_name = null, $options = array())
-    {
+    public function password_field($object_name, $column_name = null, $options = array()) {
         return $this->_field($object_name, $column_name, $options,'password');
     }
 
     /**
       * Works just like text_field, but returns an input tag of the "hidden" type instead.
       */
-    public function hidden_field($object_name, $column_name = null, $options = array())
-    {
+    public function hidden_field($object_name, $column_name = null, $options = array()) {
         return $this->_field($object_name, $column_name, $options,'hidden');
     }
 
     /**
       * Works just like text_field, but returns an input tag of the "file" type instead, which won't have a default value.
       */
-    public function file_field($object_name, $column_name = null, $options = array())
-    {
+    public function file_field($object_name, $column_name = null, $options = array()) {
         return $this->_field($object_name, $column_name, $options,'file');
     }
 
@@ -181,8 +174,7 @@ class FormHelper extends AkActionViewHelper
       *       {post.body}
       *     </textarea>
       */
-    public function text_area($object_name, $column_name = null, $options = array())
-    {
+    public function text_area($object_name, $column_name = null, $options = array()) {
         return $this->_field($object_name, $column_name, $options,'text_area');
     }
 
@@ -204,8 +196,7 @@ class FormHelper extends AkActionViewHelper
       *     <input type="checkbox" id="puppy_gooddog" name="puppy[gooddog]" value="yes" />
       *     <input name="puppy[gooddog]" type="hidden" value="no" />
       */
-    public function check_box($object_name, $column_name = null, $options = array(), $checked_value = '1', $unchecked_value = '0')
-    {
+    public function check_box($object_name, $column_name = null, $options = array(), $checked_value = '1', $unchecked_value = '0') {
         return $this->_field($object_name, $column_name, $options,'check_box', $checked_value, $unchecked_value);
     }
 
@@ -220,16 +211,14 @@ class FormHelper extends AkActionViewHelper
       *     <input type="radio" id="post_category" name="post[category]" value="PHP" checked="checked" />
       *     <input type="radio" id="post_category" name="post[category]" value="Ruby" />
       */
-    public function radio_button($object_name, $column_name = null, $tag_value, $options = array())
-    {
+    public function radio_button($object_name, $column_name = null, $tag_value, $options = array()) {
         return $this->_field($object_name, $column_name, $options,'radio_button', $tag_value);
     }
 
     /**
     * File field auxiliar function
     */
-    protected function _field($object_name, $column_name, $options = array(), $type, $extra_param_1 = '', $extra_param_2 = '')
-    {
+    protected function _field($object_name, $column_name, $options = array(), $type, $extra_param_1 = '', $extra_param_2 = '') {
         if(empty($column_name) && isset($this->object_name)){
             $column_name = $object_name;
             $object_name = $this->object_name;
@@ -285,8 +274,7 @@ class AkFormHelperInstanceTag
 
     //AkFormHelperInstanceTag
 
-    public function __construct($object_name, $column_name, &$template_object, $local_binding = null, $object = null)
-    {
+    public function __construct($object_name, $column_name, &$template_object, $local_binding = null, $object = null) {
         $this->object_name = $object_name;
         $this->_column_name = $column_name;
         $this->_template_object = $template_object;
@@ -304,8 +292,7 @@ class AkFormHelperInstanceTag
         }
     }
 
-    public function to_input_field_tag($field_type, $options = array())
-    {
+    public function to_input_field_tag($field_type, $options = array()) {
         $options['size'] = !empty($options['size']) ? $options['size'] : (!empty($options['maxlength']) ? $options['maxlength'] : $this->default_field_options['size']);
         $options = array_merge($this->default_field_options,$options);
         if($field_type == 'hidden'){
@@ -319,8 +306,7 @@ class AkFormHelperInstanceTag
         return TagHelper::tag('input', $options);
     }
 
-    public function to_radio_button_tag($tag_value, $options = array())
-    {
+    public function to_radio_button_tag($tag_value, $options = array()) {
         $options = array_merge($this->default_radio_options,$options);
         $options['type'] = 'radio';
         $options['value'] = $tag_value;
@@ -336,15 +322,13 @@ class AkFormHelperInstanceTag
         return TagHelper::tag('input', $options);
     }
 
-    public function to_text_area_tag($options = array())
-    {
+    public function to_text_area_tag($options = array()) {
         $options = array_merge($this->default_text_area_options,$options);
         $this->add_default_name_and_id($options);
         return TagHelper::content_tag('textarea', TagHelper::escape_once($this->value_before_type_cast()), $options);
     }
 
-    public function to_check_box_tag($options = array(), $checked_value = '1', $unchecked_value = '0')
-    {
+    public function to_check_box_tag($options = array(), $checked_value = '1', $unchecked_value = '0') {
         $options['type'] = 'checkbox';
         $options['value'] = $checked_value;
         $value = $this->getValue();
@@ -366,8 +350,7 @@ class AkFormHelperInstanceTag
         return TagHelper::tag('input', array('name' => $options['name'], 'type' => 'hidden', 'value' => $unchecked_value)).TagHelper::tag('input', $options);
     }
 
-    public function to_date_tag()
-    {
+    public function to_date_tag() {
         $defaults = $this->default_date_options;
         $date = $this->getValue();
         $date = !empty($date) ? $date : Ak::getDate();
@@ -376,8 +359,7 @@ class AkFormHelperInstanceTag
         DateHelper::select_year($date, array_merge($defaults,array('prefix'=>"{$this->object_name}[{$this->_column_name}(1)]")));
     }
 
-    public function to_date_select_tag($options = array())
-    {
+    public function to_date_select_tag($options = array()) {
         $DateHelper = new DateHelper();
         $object_name = empty($this->_object_name) ? $this->object_name : $this->_object_name;
         if(isset($this->object)){
@@ -386,8 +368,7 @@ class AkFormHelperInstanceTag
         return $DateHelper->date_select($object_name, $this->_column_name, $options);
     }
 
-    public function to_datetime_select_tag($options = array())
-    {
+    public function to_datetime_select_tag($options = array()) {
         $DateHelper = new DateHelper();
         $object_name = empty($this->_object_name) ? $this->object_name : $this->_object_name;
         if(isset($this->object)){
@@ -396,8 +377,7 @@ class AkFormHelperInstanceTag
         return $DateHelper->datetime_select($object_name, $this->_column_name, $options);
     }
 
-    public function to_boolean_select_tag($options = array())
-    {
+    public function to_boolean_select_tag($options = array()) {
         $this->add_default_name_and_id($options);
         return '<select'.
         TagHelper::tag_options($options).
@@ -408,13 +388,11 @@ class AkFormHelperInstanceTag
         '>'.Ak::t('True',array(),'helpers/form').'</option></select>';
     }
 
-    public function to_content_tag($tag_name, $options = array())
-    {
+    public function to_content_tag($tag_name, $options = array()) {
         return TagHelper::content_tag($tag_name, $this->getValue(), $options);
     }
 
-    public function &getObject($object_name = null)
-    {
+    public function &getObject($object_name = null) {
         if(!empty($this->object)){
             return $this->object;
         }elseif (!empty($this->_template_object->{$this->object_name})){
@@ -426,8 +404,7 @@ class AkFormHelperInstanceTag
         return $this->object;
     }
 
-    public function getValue()
-    {
+    public function getValue() {
         $object = $this->getObject();
         if(!empty($object)){
             if(method_exists($object, 'get')){
@@ -436,8 +413,7 @@ class AkFormHelperInstanceTag
         }
     }
 
-    public function value_before_type_cast()
-    {
+    public function value_before_type_cast() {
         $object = $this->getObject();
         if(!empty($object)){
             return !empty($object->{$this->_column_name.'_before_type_cast'}) ?
@@ -446,8 +422,7 @@ class AkFormHelperInstanceTag
         }
     }
 
-    public function add_default_name_and_id(&$options)
-    {
+    public function add_default_name_and_id(&$options) {
         if(isset($options['index'])){
             $options['name'] = empty($options['name']) ? $this->tag_name_with_index($options['index']) : $options['name'];
             $options['id'] = empty($options['id']) ? $this->tag_id_with_index($options['index']) : $options['id'];
@@ -467,31 +442,26 @@ class AkFormHelperInstanceTag
         }
     }
 
-    public function tag_name()
-    {
+    public function tag_name() {
         return "{$this->object_name}[{$this->_column_name}]";
     }
 
-    public function tag_name_with_index($index)
-    {
+    public function tag_name_with_index($index) {
         return "{$this->object_name}[{$index}][{$this->_column_name}]";
     }
 
-    public function tag_id()
-    {
+    public function tag_id() {
         return "{$this->object_name}_{$this->_column_name}";
     }
 
-    public function tag_id_with_index($index)
-    {
+    public function tag_id_with_index($index) {
         return "{$this->object_name}_{$index}_{$this->_column_name}";
     }
 }
 
 class AkFormHelperBuilder extends FormHelper
 {
-    public function __construct($object_name, &$object, &$template)
-    {
+    public function __construct($object_name, &$object, &$template) {
         $this->object_name = $object_name;
         $this->object = $object;
         $this->template = $template;

@@ -17,8 +17,7 @@
  */
 class AkImageCropFilter extends AkImageFilter
 {
-    public function setOptions($options = array())
-    {
+    public function setOptions($options = array()) {
         $default_options = array(
         'width'=> $this->Image->getWidth(),
         'height'=> $this->Image->getHeight(),
@@ -31,13 +30,11 @@ class AkImageCropFilter extends AkImageFilter
         $this->_variablizeOptions_($this->options);
     }
 
-    public function apply()
-    {
+    public function apply() {
         $this->Image->Transform->crop($this->options['width'], $this->options['height'], $this->options['x'], $this->options['y']);
     }
 
-    public function getName()
-    {
+    public function getName() {
         return 'crop';
     }
 }

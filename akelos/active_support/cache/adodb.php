@@ -78,8 +78,7 @@ class AkAdodbCache
     * using AdoBD
     * @return void
     */
-    public function setDb(&$db)
-    {
+    public function setDb(&$db) {
         $this->_db = $db;
 
     }
@@ -94,8 +93,7 @@ class AkAdodbCache
     * @param    integer    $refresh_time    Timestamp of the last valid cache
     * @return void
     */
-    public function setRefreshTime($refresh_time)
-    {
+    public function setRefreshTime($refresh_time) {
         $this->_refreshTime = $refresh_time;
 
     }
@@ -110,8 +108,7 @@ class AkAdodbCache
     * @param    integer    $life_time    Cache lifetime (in seconds)
     * @return void
     */
-    public function setLifeTime($life_time = 3600)
-    {
+    public function setLifeTime($life_time = 3600) {
         $this->_lifeTime = $life_time;
         $this->setRefreshTime(time() - $this->_lifeTime);
     }
@@ -128,8 +125,7 @@ class AkAdodbCache
     * NB : There is no lifetime for memory caching !
     * @return void
     */
-    public function setMemoryCaching($memory_caching = false)
-    {
+    public function setMemoryCaching($memory_caching = false) {
         $this->_memoryCaching = (bool)$memory_caching;
 
     }
@@ -144,8 +140,7 @@ class AkAdodbCache
     * @param    boolean    $automatic_serialization    Enable / disable automatic serialization
     * @return void
     */
-    public function setAutomaticSerialization($automatic_serialization = false)
-    {
+    public function setAutomaticSerialization($automatic_serialization = false) {
         $this->_automaticSerialization = (bool)$automatic_serialization;
 
     }
@@ -165,8 +160,7 @@ class AkAdodbCache
     * </code>
     * @return void
     */
-    public function init($options = array())
-    {
+    public function init($options = array()) {
         $this->_db = Ak::db();
 
         $available_options = array('memoryCaching', 'lifeTime', 'automaticSerialization');
@@ -188,8 +182,7 @@ class AkAdodbCache
     * @param    string    $group    Name of the cache group.
     * @return mixed Data of the cache (or false if no cache available)
     */
-    public function get($id, $group = 'default')
-    {
+    public function get($id, $group = 'default') {
         $this->_id = $id;
         $this->_group = $group;
         $cache_hash = md5($this->_id).'_'.md5($this->_group);
@@ -231,8 +224,7 @@ class AkAdodbCache
     * the group specified when calling $this->get
     * @return boolean True if no problem
     */
-    public function save($data, $id = null, $group = null)
-    {
+    public function save($data, $id = null, $group = null) {
         $this->_id = isset($id) ? $id : $this->_id;
         $this->_group = isset($group) ? $group : $this->_group;
 
@@ -268,8 +260,7 @@ class AkAdodbCache
     * @param    string    $group    Name of the cache group
     * @return boolean True if no problem
     */
-    public function remove($id, $group = 'default')
-    {
+    public function remove($id, $group = 'default') {
         $cache_hash = md5($id).'_'.md5($group);
 
         if (isset($this->_memoryCachingArray[$cache_hash])) {
@@ -296,8 +287,7 @@ class AkAdodbCache
     * - notingroup
     * @return boolean True if no problem
     */
-    public function clean($group = false, $mode = 'ingroup')
-    {
+    public function clean($group = false, $mode = 'ingroup') {
         switch ($mode) {
             case 'ingroup':
                 return (bool)$this->_db->delete('DELETE FROM cache WHERE cache_group = '.$this->_db->quote_string($group));
@@ -310,8 +300,7 @@ class AkAdodbCache
         }
     }
 
-    static function install()
-    {
+    static function install() {
         $db = Ak::db();
         if(!$db->tableExists('cache')){
             $Installer = new AkInstaller($db);
@@ -323,8 +312,7 @@ class AkAdodbCache
         }
     }
 
-    static function uninstall()
-    {
+    static function uninstall() {
         $db = Ak::db();
         if($db->tableExists('cache')){
             $Installer = new AkInstaller($db);

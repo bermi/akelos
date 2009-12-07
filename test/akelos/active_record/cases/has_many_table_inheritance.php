@@ -4,13 +4,11 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class HasManyTableInheritance_TestCase extends ActiveRecordUnitTest
 {
-    public function test_start()
-    {
+    public function test_start() {
         $this->installAndIncludeModels(array('ExtendedPost', 'ExtendedComment', 'Comment', 'User', 'Tagging', 'Tag'));
     }
 
-    public function test_normal_post_no_inheritance()
-    {
+    public function test_normal_post_no_inheritance() {
         $this->installAndIncludeModels(array('Post', 'Comment'));
 
         $Post = new Post(array('title' => 'Post for unit testing', 'body' => 'This is a post for testing the model'));
@@ -28,8 +26,7 @@ class HasManyTableInheritance_TestCase extends ActiveRecordUnitTest
      * Creates an ExtendedPost with type value 'ExtendedPost'
      *
      */
-    public function test_has_many_inheritance()
-    {
+    public function test_has_many_inheritance() {
         $this->installAndIncludeModels(array('ExtendedPost', 'ExtendedComment'));
 
         $Post = new ExtendedPost(array('title' => 'Post for unit testing', 'body' => 'This is a post for testing the model','type' => 'Extended post'));
@@ -45,8 +42,7 @@ class HasManyTableInheritance_TestCase extends ActiveRecordUnitTest
         }
     }
 
-    public function test_cleanup()
-    {
+    public function test_cleanup() {
         @Ak::file_delete(AkConfig::getDir('models').DS.'group_user.php');
     }
 }

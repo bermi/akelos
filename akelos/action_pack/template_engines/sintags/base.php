@@ -185,24 +185,20 @@ class AkSintags
 {
     protected $_code;
 
-    public function init($options = array())
-    {
+    public function init($options = array()) {
         $this->_code = $options['code'];
     }
 
-    public function toPhp()
-    {
+    public function toPhp() {
         $this->Parser = new AkSintagsParser();
         return $this->Parser->parse($this->_code);
     }
 
-    public function getErrors()
-    {
+    public function getErrors() {
         return $this->Parser->getErrors();
     }
 
-    public function getParsedCode()
-    {
+    public function getParsedCode() {
         return $this->Parser->parsed_code;
     }
 }

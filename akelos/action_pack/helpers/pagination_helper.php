@@ -2,8 +2,7 @@
     
 class PaginationHelper extends AkActionViewHelper
 {
-    public function sortable_link($column, $url_options = array(), $link_options = array())
-    {
+    public function sortable_link($column, $url_options = array(), $link_options = array()) {
         $default_url_options = array(
         'sort'=>$column,
         'direction' => empty($this->_controller->params['sort']) ? 'desc' : ($this->_controller->params['sort'] == $column ? (empty($this->_controller->params['direction']) ? 'desc' : ($this->_controller->params['direction'] == 'desc' ? 'asc' : 'desc')) : 'desc'),);
@@ -29,8 +28,7 @@ class PaginationHelper extends AkActionViewHelper
 
 
 
-    public function getFindOptions(&$object)
-    {
+    public function getFindOptions(&$object) {
         $paginator_name = AkInflector::underscore($object->getModelName()).'_pages';
 
         $limit_and_offset = isset($this->$paginator_name) ? array('limit' =>  $this->$paginator_name->getItemsPerPage(),
@@ -48,13 +46,11 @@ class PaginationHelper extends AkActionViewHelper
         return $find_options;
     }
 
-    public function _getOrderColumnFromCurrentModel(&$object, $paginator_name)
-    {
+    public function _getOrderColumnFromCurrentModel(&$object, $paginator_name) {
         return empty($this->$paginator_name->_ak_options['include']) ? $this->_controller->params['sort'] :  'parent_'.$object->getModelName().'.'.$this->_controller->params['sort'];
     }
 
-    public function _getOrderFromCustomDictionary($paginator_name, &$find_options)
-    {
+    public function _getOrderFromCustomDictionary($paginator_name, &$find_options) {
         if(!empty($this->_controller->params['sort']) && !empty($this->$paginator_name->_ak_options['column_dictionary'][$this->_controller->params['sort']])){
             $find_options['order'] = $this->$paginator_name->_ak_options['column_dictionary'][$this->_controller->params['sort']].$this->getSortDirection();
             return true;
@@ -62,8 +58,7 @@ class PaginationHelper extends AkActionViewHelper
         return false;
     }
 
-    public function _getOrderFromAssociations(&$object, $paginator_name, &$find_options)
-    {
+    public function _getOrderFromAssociations(&$object, $paginator_name, &$find_options) {
         if(!empty($this->_controller->params['sort']) && !empty($this->$paginator_name->_ak_options['include']) && $object->hasAssociations()){
             $included_models = Ak::toArray($this->$paginator_name->_ak_options['include']);
             foreach ($object->getAvailableAssociates() as $association_type=>$associated_models){
@@ -78,8 +73,7 @@ class PaginationHelper extends AkActionViewHelper
         return false;
     }
 
-    public function getSortDirection()
-    {
+    public function getSortDirection() {
         return (empty($this->_controller->params['direction']) || $this->_controller->params['direction'] == 'asc' ? ' ASC' : ' DESC');
     }
 
@@ -96,8 +90,7 @@ class PaginationHelper extends AkActionViewHelper
      * 'column_dictionary' => array() // In case you need to map the sort key from the url to the database column you must define an array pair
      * 'include' => array() // In case current sort column is not found on current model or in the column_dictionary this helper will look for the first associated model witrh a column named like given sort parameter.
      */
-    public function getPaginator(&$object, $options = array())
-    {
+    public function getPaginator(&$object, $options = array()) {
         $default_options = array(
         'items_per_page' => 15,
         'page_var_on_url' => 'page',

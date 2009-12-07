@@ -12,8 +12,7 @@ class AkResponse
 
     public $_default_status = 200;
 
-    public function set($data, $id = null)
-    {
+    public function set($data, $id = null) {
         if(isset($id)){
             $this->_resutl_stack[$id] = $data;
         }else{
@@ -21,21 +20,18 @@ class AkResponse
         }
     }
 
-    public function &get($id)
-    {
+    public function &get($id) {
         if(isset($this->_resutl_stack[$id])){
             return $this->_resutl_stack[$id];
         }
         return false;
     }
 
-    public function getAll()
-    {
+    public function getAll() {
         return $this->_resutl_stack;
     }
 
-    public function addHeader()
-    {
+    public function addHeader() {
         $args = func_get_args();
         if(!empty($args[1])){
             $this->_headers[$args[0]] = $args[1];
@@ -46,8 +42,7 @@ class AkResponse
         }
     }
 
-    public function setContentTypeForFormat($format)
-    {
+    public function setContentTypeForFormat($format) {
         if (!empty($format)) {
             $mime_type = Ak::mime_content_type('file.'.$format);
             if (!empty($mime_type)) {
@@ -56,8 +51,7 @@ class AkResponse
         }
     }
 
-    public function outputResults()
-    {
+    public function outputResults() {
         $this->sendHeaders();
         if($this->_streamBody()){
             AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message("Sending response as stream") : null;
@@ -68,13 +62,11 @@ class AkResponse
         }
     }
 
-    public function getStatus()
-    {
+    public function getStatus() {
         return isset($this->_headers['Status'])?$this->_headers['Status']:$this->_default_status;
     }
 
-    public function sendHeaders($terminate_if_redirected = true)
-    {
+    public function sendHeaders($terminate_if_redirected = true) {
         /**
         * Fix a problem with IE 6.0 on opening downloaded files:
         * If Cache-Control: IE removes the file it just downloaded from
@@ -140,13 +132,11 @@ class AkResponse
         $terminate_if_redirected ? (!empty($_redirected) ? exit() : null) : null;
     }
 
-    public function addSentHeader($header)
-    {
+    public function addSentHeader($header) {
         $this->_headers_sent[] = $header;
     }
 
-    public function deleteHeader($header)
-    {
+    public function deleteHeader($header) {
         unset($this->_headers[$header]);
     }
 
@@ -155,8 +145,7 @@ class AkResponse
     *
     * @param unknown_type $url
     */
-    public function redirect ($url)
-    {
+    public function redirect ($url) {
         $this->autoRender = false;
         if(!empty($this->_headers['Status']) && substr($this->_headers['Status'],0,3) != '301'){
             $this->_headers['Status'] = 302;
@@ -166,8 +155,7 @@ class AkResponse
     }
 
 
-    public function _getStatusHeader($status_code)
-    {
+    public function _getStatusHeader($status_code) {
         $status_codes = array (
         100 => "HTTP/1.1 100 Continue",
         101 => "HTTP/1.1 101 Switching Protocols",
@@ -212,8 +200,7 @@ class AkResponse
         return empty($status_codes[$status_code]) ? false : $status_codes[$status_code];
     }
 
-    public function _streamBody()
-    {
+    public function _streamBody() {
         return is_object($this->body) && method_exists($this->body,'stream');
     }
 }

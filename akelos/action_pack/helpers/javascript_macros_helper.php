@@ -40,8 +40,7 @@ class JavascriptMacrosHelper extends AkActionViewHelper
     *                               in the AJAX call, +form+ is an implicit parameter
     * @deprecated 
     */
-    public function in_place_editor($field_id, $options = array())
-    {
+    public function in_place_editor($field_id, $options = array()) {
         $function =  "new Ajax.InPlaceEditor(";
         $function .= "'{$field_id}', ";
         $function .= "'".UrlHelper::url_for($options['url'])."'";
@@ -124,8 +123,7 @@ class JavascriptMacrosHelper extends AkActionViewHelper
       *                       the entire element is used.
       * @deprecated 
       */
-    public function auto_complete_field($field_id, $options = array())
-    {
+    public function auto_complete_field($field_id, $options = array()) {
         $function =  "var {$field_id}_auto_completer = new Ajax.Autocompleter(";
         $function .= "'{$field_id}', ";
         $function .= !empty($options['update']) ? "'{$options['update']}', " : "'{$field_id}_auto_complete', ";
@@ -176,8 +174,7 @@ class JavascriptMacrosHelper extends AkActionViewHelper
       *
       * @deprecated 
       */
-    public function auto_complete_result($entries, $field, $phrase = null)
-    {
+    public function auto_complete_result($entries, $field, $phrase = null) {
         if (empty($entries)) {
             return '';
         }
@@ -196,8 +193,7 @@ class JavascriptMacrosHelper extends AkActionViewHelper
       * 
       * @deprecated 
       */
-    public function text_field_with_auto_complete($object, $method, $tag_options = array(), $completion_options = array())
-    {
+    public function text_field_with_auto_complete($object, $method, $tag_options = array(), $completion_options = array()) {
         if (!isset($tag_options['autocomplete'])) $tag_options['autocomplete'] = "off";
 
         return (
@@ -212,8 +208,7 @@ class JavascriptMacrosHelper extends AkActionViewHelper
     /**
        * @deprecated 
        */
-    public function _auto_complete_stylesheet()
-    {
+    public function _auto_complete_stylesheet() {
         return TagHelper::content_tag('style',
         <<<EOT
           div.auto_complete {

@@ -8,13 +8,11 @@ class AkOdbMongoDbAdapter
     private $_connetion_signature = 'default';
     private $_options = array();
 
-    public function __construct($options = array())
-    {
+    public function __construct($options = array()) {
         $this->setOptions($options);
     }
 
-    public function connect($options = null)
-    {
+    public function connect($options = null) {
         $this->setOptions($options);
         if($this->_meetsDependencies()){
             $port = $this->getOption('port');
@@ -34,8 +32,7 @@ class AkOdbMongoDbAdapter
         return $this->isConnected();
     }
 
-    public function disconnect()
-    {
+    public function disconnect() {
         if($this->isConnected()){
             $this->getConnection()->close();
             unset($this->_Mongo[$this->_connetion_signature]);
@@ -44,25 +41,21 @@ class AkOdbMongoDbAdapter
         return !$this->isConnected();
     }
 
-    public function dropDatabase($database_name = null)
-    {
+    public function dropDatabase($database_name = null) {
         $database_name = empty($database_name) ? $this->getOption('database') : $database_name;
         $this->getConnection()->dropDB($database_name);
     }
 
-    public function isConnected()
-    {
+    public function isConnected() {
         $Connection = $this->getConnection();
         return $Connection != false && !empty($Connection->connected);
     }
 
-    public function getOption($name, $default = null)
-    {
+    public function getOption($name, $default = null) {
         return isset($this->_options[$name]) ? $this->_options[$name] : $default;
     }
 
-    public function setOptions($options = array())
-    {
+    public function setOptions($options = array()) {
         if(is_null($options)) return;
         $default_options = array(
         'host'      => 'localhost',
@@ -74,13 +67,11 @@ class AkOdbMongoDbAdapter
         $this->_updateSignature();
     }
 
-    public function getType()
-    {
+    public function getType() {
         return 'mongo_db';
     }
 
-    public function &getDatabase($database_name = null)
-    {
+    public function &getDatabase($database_name = null) {
         $database_name = empty($database_name) ? $this->getOption('database') : $database_name;
         if(isset($this->_MongoDatabases[$this->_connetion_signature][$database_name])){
             return $this->_MongoDatabases[$this->_connetion_signature][$database_name];
@@ -91,8 +82,7 @@ class AkOdbMongoDbAdapter
         return $Database;
     }
 
-    public function &getConnection()
-    {
+    public function &getConnection() {
         if(!isset($this->_Mongo[$this->_connetion_signature])){
             $false = false;
             return $false;
@@ -148,8 +138,7 @@ class AkOdbMongoDbAdapter
         return $attributes;
     }
 
-    private function _authenticateDatabase(&$Database)
-    {
+    private function _authenticateDatabase(&$Database) {
         $user = $this->getOption('user');
         if(!empty($user)){
             $password = $this->getOption('password');
@@ -157,13 +146,11 @@ class AkOdbMongoDbAdapter
         }
     }
 
-    private function _updateSignature()
-    {
+    private function _updateSignature() {
         $this->_connetion_signature = md5(serialize($this->_options));
     }
 
-    private function _meetsDependencies()
-    {
+    private function _meetsDependencies() {
         if(!class_exists('Mongo')){
             trigger_error('Mongo extenssion is not enabled. You can enable it by running "sudo pecl install mongo"', E_USER_WARNING);
             return false;

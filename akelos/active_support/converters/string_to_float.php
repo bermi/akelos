@@ -2,8 +2,7 @@
 
 class AkStringToFloat
 {
-    public function convert()
-    {
+    public function convert() {
         return floatval($this->source);
     }
 }

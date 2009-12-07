@@ -2,8 +2,7 @@
 
 class AkHtmlToText
 {
-    public function convert()
-    {
+    public function convert() {
         require_once(AK_CONTRIB_DIR.DS.'TextParsers'.DS.'html2text.php');
         $Converter = new html2text(true, 0, false);
         $markdown = str_replace('__AK:AMP__','&', $Converter->load_string(str_replace('&','__AK:AMP__', $this->source)));
@@ -15,8 +14,7 @@ class AkHtmlToText
         return str_replace(" \n", "\n",trim($this->_simplifyMarkdown($markdown)));
     }
 
-    public function _simplifyMarkdown($markdown)
-    {
+    public function _simplifyMarkdown($markdown) {
         $markdown = trim($markdown);
         if(strstr($markdown,"\n")){
             if(preg_match_all('/([ \t]*[#]{1,2})(.*)(\{#[a-z0-9_]+}|$)+/i',$markdown,$matches)){

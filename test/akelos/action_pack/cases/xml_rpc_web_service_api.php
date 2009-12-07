@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class XmlRpcWebServiceApi_TestCase extends ActionPackUnitTest
 {
-    public function test_web_service_api()
-    {
+    public function test_web_service_api() {
         $this->rebaseAppPaths();
         require_once(AkConfig::getDir('apis').DS.'todo_api.php');
 
@@ -57,8 +56,7 @@ class XmlRpcWebServiceApi_TestCase extends ActionPackUnitTest
         //echo "<pre>".print_r($TodoApi,true)."</pre>";
     }
 
-    public function test_service_generator()
-    {
+    public function test_service_generator() {
         $TodoApi = new TodoApi();
         ob_start();
         $Generator = new AkelosGenerator();
@@ -71,8 +69,7 @@ class XmlRpcWebServiceApi_TestCase extends ActionPackUnitTest
         }
     }
 
-    public function test_clear()
-    {
+    public function test_clear() {
         Ak::file_delete(AkConfig::getDir('models').DS.'todo_service.php');
     }
 }

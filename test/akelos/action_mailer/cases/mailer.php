@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class Mailer_TestCase extends ActionMailerUnitTest
 {
-    public function setup()
-    {
+    public function setup() {
         $this->Mailer = new AkActionMailer();
         $this->Mailer->delivery_method = 'test';
         $this->Mailer->perform_deliveries = true;
@@ -13,23 +12,20 @@ class Mailer_TestCase extends ActionMailerUnitTest
         $this->recipient = 'test@localhost';
     }
 
-    public function test_inline_template()
-    {
+    public function test_inline_template() {
         $RenderMailer = new RenderMailer();
         $Mail = $RenderMailer->create('inline_template', $this->recipient);
         $this->assertEqual("Hello, World", $Mail->body);
     }
 
-    public function test_file_template()
-    {
+    public function test_file_template() {
         $RenderMailer = new RenderMailer();
         $Mail = $RenderMailer->create('file_template',$this->recipient);
         $this->assertEqual("Hello there,\n\nMr. test@localhost", trim($Mail->body));
     }
 
     // FirstSecondHelper
-    public function test_ordering()
-    {
+    public function test_ordering() {
         $FirstMailer = new FirstMailer();
         $Mail = $FirstMailer->create('share', $this->recipient);
         $this->assertEqual('first mail', trim($Mail->body));
@@ -48,29 +44,25 @@ class Mailer_TestCase extends ActionMailerUnitTest
         $this->assertEqual('second mail', trim($Mail->body));
     }
 
-    public function test_use_helper()
-    {
+    public function test_use_helper() {
         $HelperMailer = new HelperMailer();
         $Mail = $HelperMailer->create('use_helper', $this->recipient);
         $this->assertPattern('/Mr\. Joe Person/', trim($Mail->body));
     }
 
-    public function test_use_example_helper()
-    {
+    public function test_use_example_helper() {
         $HelperMailer = new HelperMailer();
         $Mail = $HelperMailer->create('use_example_helper', $this->recipient);
         $this->assertPattern('/<em><strong><small>emphasize me!/', trim($Mail->body));
     }
 
-    public function test_use_helper_method()
-    {
+    public function test_use_helper_method() {
         $HelperMailer = new HelperMailer();
         $Mail = $HelperMailer->create('use_helper_method', $this->recipient);
         $this->assertPattern('/HelperMailer/', trim($Mail->body));
     }
 
-    public function test_use_mail_helper()
-    {
+    public function test_use_mail_helper() {
         $HelperMailer = new HelperMailer();
         $Mail = $HelperMailer->create('use_mail_helper', $this->recipient);
         $this->assertPattern('/  But soft!/', trim($Mail->body));
@@ -78,16 +70,14 @@ class Mailer_TestCase extends ActionMailerUnitTest
     }
 
 
-    public function test_quote_multibyte_chars()
-    {
+    public function test_quote_multibyte_chars() {
         $original = "\303\246 \303\270 and \303\245";
         $result = AkActionMailerQuoting::quotedPrintableEncode($original);
         $unquoted = quoted_printable_decode($result);
         $this->assertEqual($unquoted, $original);
     }
 
-    public function test_mime_header_to_utf()
-    {
+    public function test_mime_header_to_utf() {
         $headers = array(
         "Subject: =?ISO-8859-1?Q?=C9ste_es_el_sof=E1_del_q_habl=E9_=5B?=\n\r =?ISO-8859-1?Q?Fwd=3A_Sof=E1=2E=5D_?="=>'Subject: Éste es el sofá del q hablé [Fwd: Sofá.]',
 
@@ -115,14 +105,12 @@ class Mailer_TestCase extends ActionMailerUnitTest
 
     // test an email that has been created using \r\n newlines, instead of
     // \n newlines.
-    public function test_email_quoted_with_0d0a()
-    {
+    public function test_email_quoted_with_0d0a() {
         $Mail = AkMailBase::parse(file_get_contents(AkConfig::getDir('fixtures').DS.'raw_email_quoted_with_0d0a'));
         $this->assertPattern('/Elapsed time/', $Mail->body);
     }
 
-    public function test_email_with_partially_quoted_subject()
-    {
+    public function test_email_with_partially_quoted_subject() {
         $Mail = AkMailBase::parse(file_get_contents(AkConfig::getDir('fixtures').DS.'raw_email_with_partially_quoted_subject'));
         $this->assertEqual("Re: Test: \"\346\274\242\345\255\227\" mid \"\346\274\242\345\255\227\" tail", $Mail->subject);
     }

@@ -43,8 +43,7 @@ class JavascriptHelper extends AkActionViewHelper
     *   $javascript_helper->link_to_function("Greeting", "alert('Hello world!')");
     *   $javascript_helper->link_to_function($tag->image_tag("delete"), "if confirm('Really?'){ do_delete(); }");
     */
-    public function link_to_function($name, $function, $html_options = array())
-    {
+    public function link_to_function($name, $function, $html_options = array()) {
         $default_html_options = array(
         'href'    => '#',
         'onclick' => (!empty($html_options['onclick']) ? "{$html_options['onclick']}; " : ""). "{$function}; return false;"
@@ -63,8 +62,7 @@ class JavascriptHelper extends AkActionViewHelper
     *   $javascript_helper->button_to_function("Greeting", "alert('Hello world!')");
     *   $javascript_helper->button_to_function("Delete", "if confirm('Really?'){ do_delete(); }"));
     */
-    public function button_to_function($name, $function, $html_options = array())
-    {
+    public function button_to_function($name, $function, $html_options = array()) {
         $default_html_options = array(
         'type'  => 'button',
         'value' => $name,
@@ -79,8 +77,7 @@ class JavascriptHelper extends AkActionViewHelper
     /**
     * Escape carrier returns and single and double quotes for JavaScript segments.
     */
-    public function escape_javascript($javascript)
-    {
+    public function escape_javascript($javascript) {
         return preg_replace(array('/\r\n|\n|\r/',"/[\"']/"), array('\\n','\\\${0}'), $javascript);
     }
 
@@ -88,18 +85,15 @@ class JavascriptHelper extends AkActionViewHelper
     * Returns a JavaScript tag with the +content+ inside. Example:
     *   javascript_tag("alert('All is good')") => <script type="text/javascript">alert('All is good')</script>
     */
-    public function javascript_tag($content)
-    {
+    public function javascript_tag($content) {
         return TagHelper::content_tag("script", JavascriptHelper::javascript_cdata_section($content), array('type' => 'text/javascript'));
     }
 
-    public function javascript_cdata_section($content)
-    {
+    public function javascript_cdata_section($content) {
         return "\n//<![CDATA[\n".$content."\n//]]>\n";
     }
 
-    public function _options_for_javascript($options)
-    {
+    public function _options_for_javascript($options) {
         $_js_options = array();
         foreach ($options as $k=>$v){
             $_js_options[] = "$k:$v";
@@ -109,13 +103,11 @@ class JavascriptHelper extends AkActionViewHelper
 
     }
 
-    static function array_or_string_for_javascript($option)
-    {
+    static function array_or_string_for_javascript($option) {
         return is_array($option) ? "['".join("', '",$option)."']" : "'".$option."'";
     }
     
-    public function _array_or_string_for_javascript($option)
-    {
+    public function _array_or_string_for_javascript($option) {
         Ak::deprecateMethod(__CLASS__.'::'.__METHOD__, __CLASS__.'::'.'array_or_string_for_javascript');
         return JavascriptHelper::array_or_string_for_javascript($option);
     }

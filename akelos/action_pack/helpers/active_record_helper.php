@@ -16,8 +16,7 @@ class ActiveRecordHelper extends AkActionViewHelper
     *   $active_record_helper->input('post', 'title'); =>
     *     <input id="post_title" name="post[title]" size="30" type="text" value="Hello World" />
     */
-    public function input($record_name, $method, $options = array())
-    {
+    public function input($record_name, $method, $options = array()) {
         $InstanceTag = new ActiveRecordInstanceTag($record_name, $method, $this);
         return $InstanceTag->to_tag($options);
     }
@@ -54,8 +53,7 @@ class ActiveRecordHelper extends AkActionViewHelper
     *       <input type='submit' value='Sign' />
     *     </form>
     */
-    public function form($record_name, $options = array())
-    {
+    public function form($record_name, $options = array()) {
         $record = $this->_controller->$record_name;
 
         $options['action'] = !empty($options['action']) ? $options['action'] : ($record->isNewRecord() ? 'create' : 'update');
@@ -84,8 +82,7 @@ class ActiveRecordHelper extends AkActionViewHelper
     *   <?=$active_record_helper->error_message_on('post','title','Title simply ', " (or it won't work)", 'inputError') ?> =>
     *     <div class="inputError">Title simply can't be empty (or it won't work)</div>
     */
-    public function error_message_on($object_name, $method, $prepend_text = '', $append_text = '', $css_class = 'formError')
-    {
+    public function error_message_on($object_name, $method, $prepend_text = '', $append_text = '', $css_class = 'formError') {
         if($errors = $this->_controller->$object_name->getErrorsOn($method)){
             $text = $prepend_text.(is_array($errors) ? array_shift($errors) : $errors).$append_text;
             return TagHelper::content_tag('div', Ak::t($text,array(),'helpers/active_record'), array('class'=>$css_class));
@@ -105,8 +102,7 @@ class ActiveRecordHelper extends AkActionViewHelper
     * you need is significantly different from the default presentation, it makes plenty of sense to access the $object->getErrors()
     * instance yourself and set it up. View the source of this method to see how easy it is.
     */
-    public function error_messages_for($object_name, $options = array())
-    {
+    public function error_messages_for($object_name, $options = array()) {
         $object = $this->_controller->$object_name;
         if($object->hasErrors()){
             $error_list = '<ul>';
@@ -132,8 +128,7 @@ class ActiveRecordHelper extends AkActionViewHelper
     }
 
 
-    public function all_input_tags(&$record, $record_name, $options = array())
-    {
+    public function all_input_tags(&$record, $record_name, $options = array()) {
         $input_block = !empty($options['input_block']) ? $options['input_block'] : $this->default_input_block();
         $columns = empty($options['columns']) ? array_keys($record->getContentColumns()) : $options['columns'];
         $result = '';
@@ -145,8 +140,7 @@ class ActiveRecordHelper extends AkActionViewHelper
         return $result;
     }
 
-    public function default_input_block()
-    {
+    public function default_input_block() {
         return '<p><label for="<?php echo $record_name; ?>_<?php echo $column; ?>"><?php echo AkInflector::humanize($column); ?></label><br /><?php echo $this->input($record_name, $column); ?></p>';
     }
 }
@@ -155,14 +149,12 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
 {
     public $method_name;
 
-    public function __construct($object_name, $column_name, &$template_object)
-    {
+    public function __construct($object_name, $column_name, &$template_object) {
         $column_name = $this->method_name = $this->_getColumnName($column_name, $object_name,  $template_object);
         parent::__construct($object_name, $column_name, $template_object);
     }
 
-    public function to_tag($options = array())
-    {
+    public function to_tag($options = array()) {
         $options = array_merge($this->object->getErrorsOn($this->method_name)==false?array():array("class"=>"fieldError"), $options);
 
         switch ($this->get_column_type()) {
@@ -201,8 +193,7 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
         }
     }
 
-    public function tag($name, $options = null, $open = false)
-    {
+    public function tag($name, $options = null, $open = false) {
         if($this->object->hasErrors()){
             return $this->error_wrapping($this->tag_without_error_wrapping($name, $options, $open), $this->object->getErrorsOn($this->method_name));
         }else{
@@ -210,14 +201,12 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
         }
     }
 
-    public function tag_without_error_wrapping($name, $options, $open = false)
-    {
+    public function tag_without_error_wrapping($name, $options, $open = false) {
         return parent::tag($name, $options, $open);
     }
 
 
-    public function content_tag($name, $content, $options = null)
-    {
+    public function content_tag($name, $content, $options = null) {
         if($this->object->hasErrors()){
             return $this->error_wrapping($this->content_tag_without_error_wrapping($name, $value, $options), $this->object->getErrorsOn($this->method_name));
         }else{
@@ -225,13 +214,11 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
         }
     }
 
-    public function content_tag_without_error_wrapping($name, $value, $options)
-    {
+    public function content_tag_without_error_wrapping($name, $value, $options) {
         return parent::content_tag($name, $value, $options);
     }
 
-    public function to_date_select_tag($options = array())
-    {
+    public function to_date_select_tag($options = array()) {
         if($this->object->hasErrors()){
             return $this->error_wrapping($this->to_date_select_tag_without_error_wrapping($options), $this->object->getErrorsOn($this->method_name));
         }else{
@@ -239,13 +226,11 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
         }
     }
 
-    public function to_date_select_tag_without_error_wrapping($options = array())
-    {
+    public function to_date_select_tag_without_error_wrapping($options = array()) {
         return parent::to_date_select_tag($options);
     }
 
-    public function to_datetime_select_tag($options = array())
-    {
+    public function to_datetime_select_tag($options = array()) {
         if($this->object->hasErrors()){
             return $this->error_wrapping($this->to_datetime_select_tag_without_error_wrapping($options), $this->object->getErrorsOn($this->method_name));
         }else{
@@ -253,13 +238,11 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
         }
     }
 
-    public function to_datetime_select_tag_without_error_wrapping($options = array())
-    {
+    public function to_datetime_select_tag_without_error_wrapping($options = array()) {
         return parent::to_datetime_select_tag($options);
     }
 
-    public function to_check_box_tag($options = array(), $checked_value = '1', $unchecked_value = '0')
-    {
+    public function to_check_box_tag($options = array(), $checked_value = '1', $unchecked_value = '0') {
         if($this->object->hasErrors()){
             return $this->error_wrapping($this->to_check_box_tag_without_error_wrapping($options), $this->object->getErrorsOn($this->method_name));
         }else{
@@ -267,28 +250,23 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
         }
     }
 
-    public function to_check_box_tag_without_error_wrapping($options = array())
-    {
+    public function to_check_box_tag_without_error_wrapping($options = array()) {
         return parent::to_check_box_tag($options);
     }
 
-    public function error_wrapping($html_tag, $has_error)
-    {
+    public function error_wrapping($html_tag, $has_error) {
         return $has_error ? "<div class=\"fieldWithErrors\">$html_tag</div>" : $html_tag;
     }
 
-    public function error_message()
-    {
+    public function error_message() {
         return $this->object->getErrorsOn($this->method_name);
     }
 
-    public function get_column_type()
-    {
+    public function get_column_type() {
         return $this->object->getColumnType($this->method_name);
     }
 
-    protected function _getColumnName($column_name, $object_name, &$template_object)
-    {
+    protected function _getColumnName($column_name, $object_name, &$template_object) {
         $object = $template_object->_controller->{$object_name};
         $internationalized_columns = $object->getInternationalizedColumns();
         if(!empty($internationalized_columns[$column_name]))  {

@@ -5,8 +5,7 @@ require_once(dirname(__FILE__).'/../config.php');
 class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
 {
 
-    public function test_start()
-    {
+    public function test_start() {
         $this->installAndIncludeModels(array('Activity', 'Kid','Father'));
     }
 
@@ -23,8 +22,7 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
     //testing automatic loading of BelongsTo->Owner->BelongsTo
     // will load 2 association leves at once
 
-    public function test_1_1_1()
-    {
+    public function test_1_1_1() {
         $Activity   = new Activity(array('name'=>'Test'));
         $Child      = new Kid(array('name'=>'Johanna'));
         $Father     = new Father(array('name'=>'Daddy'));
@@ -54,8 +52,7 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
 
 
 
-    public function test_1_n_1()
-    {
+    public function test_1_n_1() {
         $this->installAndIncludeModels(array('Activity', 'Kid','Father'));
         $Activity1 = new Activity(array('name'=>'Test1'));
         $Activity2 = new Activity(array('name'=>'Test2'));
@@ -80,8 +77,7 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
         //die;
     }
 
-    public function test_1_n_m()
-    {
+    public function test_1_n_m() {
         $this->installAndIncludeModels(array('User', 'Post','Comment'));
         $this->User = new User();
         if ($this->User->_db->type()=='postgre') {
@@ -193,8 +189,7 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Test->posts[1]->comments[0]->name,'Comment2_1');
         $this->assertEqual($Test->posts[1]->comments[1]->name,'Comment2_2');
     }
-    public function test_n_m_n()
-    {
+    public function test_n_m_n() {
 
         $this->installAndIncludeModels(array('User', 'Post','Comment'));
         $this->User = new User();
@@ -259,8 +254,7 @@ class BelongsToFindIncludeOwner_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_belongs_to_has_many()
-    {
+    public function test_belongs_to_has_many() {
         $this->installAndIncludeModels('Many,Belong');
         $hasMany = new Many();
         $belongsTo = new Belong();

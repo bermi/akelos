@@ -12,8 +12,7 @@ class MailerGenerator extends  AkelosGenerator
 {
     var $command_values = array('class_name','(array)actions');
 
-    function _preloadPaths()
-    {
+    function _preloadPaths() {
         $this->class_name = AkInflector::camelize($this->class_name);
         $this->assignVarToTemplate('class_name', $this->class_name);
         $this->actions = Ak::toArray(@$this->actions);
@@ -26,8 +25,7 @@ class MailerGenerator extends  AkelosGenerator
         $this->installer_path = 'app'.DS.'installers'.DS.$this->underscored_class_name.'_installer.php';
     }
 
-    function hasCollisions()
-    {
+    function hasCollisions() {
         $this->_preloadPaths();
         
         $this->collisions = array();
@@ -49,8 +47,7 @@ class MailerGenerator extends  AkelosGenerator
         return count($this->collisions) > 0;
     }
 
-    function generate()
-    {
+    function generate() {
         $this->_preloadPaths();
 
         $this->class_name = AkInflector::camelize($this->class_name);

@@ -5,8 +5,7 @@ require_once(dirname(__FILE__).'/../config.php');
 class DbAdapterSelect_TestCase extends ActiveRecordUnitTest
 {
     public $db;
-    public function setUp()
-    {
+    public function setUp() {
         $this->db = new AkDbAdapter(array());  // no conection details, we're using a Mock
 
         require_once(AK_CONTRIB_DIR.DS.'adodb'.DS.'adodb.inc.php');
@@ -26,8 +25,7 @@ class DbAdapterSelect_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_select_all()
-    {
+    public function test_select_all() {
         $result = array();
         $result[] = array('id'=>1,'name'=>'One');
         $result[] = array('id'=>2,'name'=>'Two');

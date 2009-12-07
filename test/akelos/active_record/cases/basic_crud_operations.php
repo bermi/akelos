@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class BasicCrudOperations_TestCase extends ActiveRecordUnitTest
 {
-    public function _test_should_return_false_when_destroy_fails()
-    {
+    public function _test_should_return_false_when_destroy_fails() {
         $this->installAndIncludeModels('Post');
 
         $Post = new Post(array('title'=>'A Title'));
@@ -14,8 +13,7 @@ class BasicCrudOperations_TestCase extends ActiveRecordUnitTest
         $this->assertFalse($Post->destroy());
     }
 
-    public function test_set_Integer_Column_To_Zero_When_Column_Defined_As_Not_Null__ticket_113()
-    {
+    public function test_set_Integer_Column_To_Zero_When_Column_Defined_As_Not_Null__ticket_113() {
         $this->installAndIncludeModels(array('Product'=>'id,products_status int not null'));
         $prod = new Product(array('products_status' => 2));
         $prod->save();
@@ -27,8 +25,7 @@ class BasicCrudOperations_TestCase extends ActiveRecordUnitTest
         $this->assertTrue($prod->products_status == 0,'Save failed. products_status is '.$prod->products_status);
     }
 
-    public function test_set_Null()
-    {
+    public function test_set_Null() {
         $this->installAndIncludeModels(array('Product'=>'id,reference int null'));
         $Product = new Product(array('reference'=>1));
         $Product->save();

@@ -20,8 +20,7 @@ class AkUnitTest extends UnitTestCase
     $_original_paths = array(),
     $_path_rebased = false;
 
-    public function __construct($label = false)
-    {
+    public function __construct($label = false) {
         $this->_logOriginalPaths();
         $this->app_dir = AkConfig::getDir('app');
         parent::__construct($label);
@@ -33,15 +32,13 @@ class AkUnitTest extends UnitTestCase
         }
     }
 
-    public function __destruct()
-    {
+    public function __destruct() {
         if($this->_path_rebased){
             $this->restoreAppPaths();
         }
     }
 
-    public function rebaseAppPaths($base_path = null)
-    {
+    public function rebaseAppPaths($base_path = null) {
         if(!is_dir($base_path) && $base_path_candidate = AkConfig::getDir('suite', false, false)){
             $base_path = $base_path_candidate;
         }else{
@@ -60,15 +57,13 @@ class AkUnitTest extends UnitTestCase
         $this->_path_rebased = true;
     }
 
-    public function restoreAppPaths()
-    {
+    public function restoreAppPaths() {
         foreach ($this->_original_paths as $type => $original_path){
             AkConfig::setDir($type, $original_path);
         }
     }
 
-    protected function _logOriginalPaths()
-    {
+    protected function _logOriginalPaths() {
         $this->_original_paths = array(
         'app'               => AkConfig::getDir('app'),
         'models'            => AkConfig::getDir('models'),
@@ -90,8 +85,7 @@ class AkUnitTest extends UnitTestCase
      *    @return array        List of test names.
      *    @access public
      */
-    public function getTests()
-    {
+    public function getTests() {
         $methods = array();
         if (isset($this->skip) && $this->skip == true) {
             return $methods;
@@ -104,14 +98,12 @@ class AkUnitTest extends UnitTestCase
         return $methods;
     }
 
-    protected function _configure()
-    {
+    protected function _configure() {
         $this->skip = !$this->_checkIfEnabled();
         $this->_loadFixtures();
     }
 
-    protected function _checkIfEnabled($file = null)
-    {
+    protected function _checkIfEnabled($file = null) {
         if ($file == null) {
             $file = isset($this->check_file) ? $this->check_file : null;
         }
@@ -125,8 +117,7 @@ class AkUnitTest extends UnitTestCase
     }
 
 
-    protected function _loadFixtures($loadFixture = null)
-    {
+    protected function _loadFixtures($loadFixture = null) {
         if (isset($this->fixtures)) {
             $this->fixtures = is_array($this->fixtures)?$this->fixtures:Ak::toArray($this->fixtures);
         } else {
@@ -188,8 +179,7 @@ class AkUnitTest extends UnitTestCase
      *
      * @param mixed $models
      */
-    public function installAndIncludeModels($models = array())
-    {
+    public function installAndIncludeModels($models = array()) {
         $args = func_get_args();
         $last_arg = count($args)-1;
 
@@ -217,8 +207,7 @@ class AkUnitTest extends UnitTestCase
         }
     }
 
-    public function log($message)
-    {
+    public function log($message) {
         if (AK_LOG_EVENTS){
             static $logger;
             if(empty($logger)) {
@@ -228,8 +217,7 @@ class AkUnitTest extends UnitTestCase
         }
     }
 
-    protected function _reinstallModel($model, $table_definition = '')
-    {
+    protected function _reinstallModel($model, $table_definition = '') {
         $this->log('Reinstalling model:'.$model);
         if (!$this->uninstallAndInstallMigration($model)){
             $table_name = AkInflector::tableize($model);
@@ -256,15 +244,13 @@ class AkUnitTest extends UnitTestCase
         }
     }
 
-    public function uninstallModels($models = array())
-    {
+    public function uninstallModels($models = array()) {
         foreach ($models as $model){
             $this->uninstallModel($model);
         }
     }
 
-    public function uninstallModel($model)
-    {
+    public function uninstallModel($model) {
         $this->log('Uninstalling model:'.$model);
         if (!$this->uninstallMigration($model)){
             $table_name = AkInflector::tableize($model);
@@ -273,18 +259,15 @@ class AkUnitTest extends UnitTestCase
         }
     }
 
-    public function uninstallAndInstallMigration($installer_name)
-    {
+    public function uninstallAndInstallMigration($installer_name) {
         return $this->_uninstallAndInstallMigration($installer_name, true);
     }
 
-    public function uninstallMigration($installer_name)
-    {
+    public function uninstallMigration($installer_name) {
         return $this->_uninstallAndInstallMigration($installer_name, false);
     }
 
-    public function dropTables($tables = array())
-    {
+    public function dropTables($tables = array()) {
         $installer = new AkInstaller();
         if(is_string($tables) && $tables == 'all'){
             $tables = Ak::db()->getAvailableTables();
@@ -295,8 +278,7 @@ class AkUnitTest extends UnitTestCase
 
     }
 
-    protected function _uninstallAndInstallMigration($installer_name, $reinstall = true)
-    {
+    protected function _uninstallAndInstallMigration($installer_name, $reinstall = true) {
         $installer_path = AkConfig::getDir('app_installers').DS.AkInflector::underscore($installer_name).'_installer.php';
         $this->log('Looking for installer:'.$installer_path);
         if (file_exists($installer_path)){
@@ -313,8 +295,7 @@ class AkUnitTest extends UnitTestCase
         return false;
     }
 
-    protected function _includeOrGenerateModel($model_name)
-    {
+    protected function _includeOrGenerateModel($model_name) {
         $model_file_name = AkInflector::toModelFilename($model_name);
         if (file_exists($model_file_name)){
             require_once($model_file_name);
@@ -328,8 +309,7 @@ class AkUnitTest extends UnitTestCase
         }
     }
 
-    public function populateTables()
-    {
+    public function populateTables() {
         $args = func_get_args();
         $tables = !empty($args) ? (is_array($args[0]) ? $args[0] : (count($args) > 1 ? $args : Ak::toArray($args))) : array();
         foreach ($tables as $table){
@@ -360,8 +340,7 @@ class AkUnitTest extends UnitTestCase
         }
     }
 
-    public function instantiateModel($model_name)
-    {
+    public function instantiateModel($model_name) {
         if(class_exists($model_name) || Ak::import($model_name)){
             $this->$model_name = new $model_name();
         } else {
@@ -370,8 +349,7 @@ class AkUnitTest extends UnitTestCase
         return !empty($this->$model_name) && is_object($this->$model_name) && strtolower(get_class($this->$model_name)) == strtolower($model_name);
     }
 
-    public function instantiateModels()
-    {
+    public function instantiateModels() {
         $args = func_get_args();
         $models = (count($args) > 1) ? $args : Ak::stringToArray(@$args[0]);
         call_user_func_array(array($this, 'instantiateModel'), $models);
@@ -380,8 +358,7 @@ class AkUnitTest extends UnitTestCase
     /**
      * Includes and instantiates given models
      */
-    public function includeAndInstatiateModels()
-    {
+    public function includeAndInstatiateModels() {
         $args = func_get_args();
         $models = isset($args[1]) ? (array)$args : Ak::toArray($args[0]);
         foreach ($models as $model){
@@ -393,8 +370,7 @@ class AkUnitTest extends UnitTestCase
     /**
      * In order to provide compatibility with the defunct assertError method, use this method befor trhowing the error
      */
-    public function assertUpcomingError($pattern)
-    {
+    public function assertUpcomingError($pattern) {
         $this->expectError(new PatternExpectation('/'.str_replace("'", "\'", preg_quote($pattern)).'/'));
     }
 
@@ -403,16 +379,14 @@ class AkUnitTest extends UnitTestCase
 
 class AkWebTestCase extends WebTestCase
 {
-    public function assertWantedText($text, $message = '%s')
-    {
+    public function assertWantedText($text, $message = '%s') {
         $this->assertPattern('/'.preg_quote($text).'/', $message);
     }
 
     /**
      * Asserts only if the whole response matches $text
      */
-    public function assertTextMatch($text, $message = '%s')
-    {
+    public function assertTextMatch($text, $message = '%s') {
         $this->assertPattern('/^'.preg_quote($text).'$/', $message);
     }
 }
@@ -491,8 +465,7 @@ class AkelosTextReporter extends TextReporter {
         if($this->verbose) print " completed in $duration using $memory bytes/s\n";
     }
 
-    public function logTestRunime()
-    {
+    public function logTestRunime() {
         if(empty($this->time_log['methods'])){
             return ;
         }

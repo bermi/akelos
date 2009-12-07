@@ -4,13 +4,11 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class Serialize_TestCase extends ActiveRecordUnitTest
 {
-    public function setUp()
-    {
+    public function setUp() {
         $this->includeAndInstatiateModels('Bb,Cc');
     }
 
-    public function test_first_level_serialization()
-    {
+    public function test_first_level_serialization() {
         $bb1 = $this->Bb->create(array('name'=>'first bb','languages'=>array('en','es','de')));
         $cc1 = $this->Cc->create(array('name'=>'first cc'));
         $cc2 = $this->Cc->create(array('name'=>'second cc'));
@@ -27,8 +25,7 @@ class Serialize_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_first_level_serialization_with_association_finder()
-    {
+    public function test_first_level_serialization_with_association_finder() {
         $bb1 = $this->Bb->create(array('name'=>'first bb','languages'=>array('en','es','de')));
         $cc1 = $this->Cc->create(array('name'=>'first cc'));
         $cc2 = $this->Cc->create(array('name'=>'second cc'));

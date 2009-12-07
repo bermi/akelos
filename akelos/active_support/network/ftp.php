@@ -5,8 +5,7 @@ defined('AK_FTP_SHOW_ERRORS')                   || define('AK_FTP_SHOW_ERRORS', 
 
 class AkFtp
 {
-    static function put_contents ($file, $contents)
-    {
+    static function put_contents ($file, $contents) {
         $result = false;
 
         if($ftp = AkFtp::connect()){
@@ -37,8 +36,7 @@ class AkFtp
     }
 
 
-    static function get_contents ($file)
-    {
+    static function get_contents ($file) {
         if($ftp = AkFtp::connect()){
 
             $file = AkFtp::unrelativizePath($file);
@@ -56,8 +54,7 @@ class AkFtp
         }
     }
 
-    static function connect($base_dir = null)
-    {
+    static function connect($base_dir = null) {
         static $ftp_conn, $_base_dir, $disconnected = false;
 
         if(!isset($ftp_conn) || $disconnected){
@@ -123,8 +120,7 @@ class AkFtp
         return $ftp_conn;
     }
 
-    static function disconnect()
-    {
+    static function disconnect() {
         static $disconnected = false;
         if(!$disconnected && $ftp_conn = AkFtp::connect('AK_DISCONNECT_FTP')){
             $disconnected = ftp_close($ftp_conn);
@@ -133,8 +129,7 @@ class AkFtp
         return false;
     }
 
-    static function make_dir($path)
-    {
+    static function make_dir($path) {
         if($ftp_conn = AkFtp::connect()){
             $path = AkFtp::unrelativizePath($path);
             $path = str_replace('\\','/',$path);
@@ -167,8 +162,7 @@ class AkFtp
         return false;
     }
 
-    static function delete($path, $only_files = false)
-    {
+    static function delete($path, $only_files = false) {
         $result = false;
         if($ftp_conn = AkFtp::connect()){
             $path = AkFtp::unrelativizePath($path);
@@ -222,8 +216,7 @@ class AkFtp
     }
 
 
-    static function is_dir($path)
-    {
+    static function is_dir($path) {
         if($ftp_conn = AkFtp::connect()){
             $path = AkFtp::unrelativizePath($path);
             $path = str_replace('\\','/',$path);
@@ -234,8 +227,7 @@ class AkFtp
         return false;
     }
 
-    static function unrelativizePath($path)
-    {
+    static function unrelativizePath($path) {
 
         if(!strstr($path,'..')){
             return $path;

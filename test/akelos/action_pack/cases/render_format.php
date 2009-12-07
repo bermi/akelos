@@ -6,8 +6,7 @@ class RenderFormat_TestCase extends AkWebTestCase
 {
     public $webserver_enabled;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->webserver_enabled = AkConfig::getOption('webserver_enabled', false);
         parent::__construct();
         $this->_test_script = AkConfig::getOption('testing_url').
@@ -18,8 +17,7 @@ class RenderFormat_TestCase extends AkWebTestCase
         $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
     }
 
-    public function test_should_render_requested_format()
-    {
+    public function test_should_render_requested_format() {
         $this->get($this->_test_script.'formats/index.xml');
         $this->assertTextMatch("index.xml.tpl");
         $this->assertHeader('Content-Type', 'application/xml; charset=UTF-8');

@@ -7,8 +7,7 @@
 class AssetTagHelper extends AkActionViewHelper
 {
 
-    public function setController(&$controller)
-    {
+    public function setController(&$controller) {
         $this->_controller = $controller;
     }
 
@@ -26,8 +25,7 @@ class AssetTagHelper extends AkActionViewHelper
      *   $asset_tag_helper->auto_discovery_link_tag('rss', array('action'=>'feed'), array('title'=>'My RSS')); # =>
      *     <link rel="alternate" type="application/rss+xml" title="My RSS" href="http://www.curenthost.com/controller/feed" />
      */
-    public function auto_discovery_link_tag($type = 'rss', $url_options = array(), $tag_options = array())
-    {
+    public function auto_discovery_link_tag($type = 'rss', $url_options = array(), $tag_options = array()) {
         return TagHelper::tag(
         'link',
         array(
@@ -44,8 +42,7 @@ class AssetTagHelper extends AkActionViewHelper
        *
        *   $asset_tag_helper->javascript_path('xmlhr'); # => /javascripts/xmlhr.js
        */
-    public function javascript_path($source)
-    {
+    public function javascript_path($source) {
         return $this->_compute_public_path($source, 'javascripts', 'js');
     }
 
@@ -71,8 +68,7 @@ class AssetTagHelper extends AkActionViewHelper
         * facilitates the inclusion of small snippets of JavaScript code, along the lines of
         * <tt>controllers/application.php</tt> and <tt>helpers/application_helper.php</tt>.
         */
-    public function javascript_include_tag()
-    {
+    public function javascript_include_tag() {
         $sources = func_get_args();
         $num_args = func_num_args();
         $options = !empty($sources[$num_args-1]) && is_array($sources[$num_args-1]) ? array_pop($sources) : array();
@@ -87,8 +83,7 @@ class AssetTagHelper extends AkActionViewHelper
         return $javascript_include_tags;
     }
 
-    public function _get_javascript_included_defaults()
-    {
+    public function _get_javascript_included_defaults() {
         static $defaults, $plugin_defaults = array();
         if(empty($defaults)){
             $defaults = array_unique(array_diff(array_filter(explode(',',JAVASCRIPT_DEFAULT_SOURCES.
@@ -109,13 +104,11 @@ class AssetTagHelper extends AkActionViewHelper
        * is called. This method is intended to be called only from plugin initialization
        * to register extra .js files the plugin installed in <tt>public/javascripts</tt>.
        */
-    public function register_javascript_include_default($sources)
-    {
+    public function register_javascript_include_default($sources) {
         $this->_get_javascript_included_defaults($sources);
     }
 
-    public function reset_javascript_include_default()
-    {
+    public function reset_javascript_include_default() {
         $this->_get_javascript_included_defaults(false);
     }
 
@@ -124,8 +117,7 @@ class AssetTagHelper extends AkActionViewHelper
         *
         *   $asset_tag_helper->stylesheet_path('style'); # => /stylesheets/style.css
         */
-    public function stylesheet_path($source)
-    {
+    public function stylesheet_path($source) {
         return $this->_compute_public_path($source, 'stylesheets', 'css');
     }
 
@@ -142,8 +134,7 @@ class AssetTagHelper extends AkActionViewHelper
      *     <link href="/stylesheets/random.styles" media="screen" rel="Stylesheet" type="text/css" />
      *     <link href="/css/stylish.css" media="screen" rel="Stylesheet" type="text/css" />
      */
-    public function stylesheet_link_tag()
-    {
+    public function stylesheet_link_tag() {
         $sources = func_get_args();
         $num_args = func_num_args();
 
@@ -165,8 +156,7 @@ class AssetTagHelper extends AkActionViewHelper
        * * file name, like "rss.gif", that gets expanded to "/images/rss.gif"
        * * file name without extension, like "logo", that gets expanded to "/images/logo.png"
        */
-    public function image_path($source)
-    {
+    public function image_path($source) {
         return $this->_compute_public_path($source, 'images', 'png');
     }
 
@@ -181,8 +171,7 @@ class AssetTagHelper extends AkActionViewHelper
         * * file name, like "rss.gif", that gets expanded to "/images/rss.gif"
         * * file name without extension, like "logo", that gets expanded to "/images/logo.png"
         */
-    public function image_tag($source, $options = array())
-    {
+    public function image_tag($source, $options = array()) {
         if(!empty($options['size'])){
             list($options['width'], $options['height']) = preg_split('/x|X| /',trim(str_replace(' ','',$options['size'])));
             unset($options['size']);
@@ -193,8 +182,7 @@ class AssetTagHelper extends AkActionViewHelper
         return TagHelper::tag('img', $options);
     }
 
-    public function _compute_public_path($source, $dir = '', $ext = '')
-    {
+    public function _compute_public_path($source, $dir = '', $ext = '') {
         $source = $source[0] != '/' && !strstr($source,':') ? "/$dir/$source" : $source;
         $source = !strstr($source,'.') ? "$source.$ext" : $source;
         $source = !preg_match('/^[-a-z]+:\/\//',$source) ? AK_ASSET_URL_PREFIX.$source : $source;
@@ -204,8 +192,7 @@ class AssetTagHelper extends AkActionViewHelper
         return $source;
     }
 
-    public function stylesheet_for_current_controller()
-    {
+    public function stylesheet_for_current_controller() {
         $stylesheet = AkInflector::underscore($this->_controller->getControllerName()).'.css';
         if(file_exists(AkConfig::getDir('public').DS.'stylesheets'.DS.$stylesheet)){
             return $this->stylesheet_link_tag($stylesheet);
@@ -213,8 +200,7 @@ class AssetTagHelper extends AkActionViewHelper
         return '';
     }
 
-    public function javascript_for_current_controller()
-    {
+    public function javascript_for_current_controller() {
         $js_file = AkInflector::underscore($this->_controller->getControllerName()).'.js';
         if(file_exists(AkConfig::getDir('public').DS.'javascripts'.DS.$js_file)){
             return $this->javascript_include_tag($js_file);

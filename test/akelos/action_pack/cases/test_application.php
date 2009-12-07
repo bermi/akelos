@@ -7,21 +7,18 @@ class MockTestApplication extends AkTestApplication
     public $passes = array();
     public $failures = array();
 
-    public function pass($message = '')
-    {
+    public function pass($message = '') {
         $this->passes[] = $message;
     }
 
-    public function fail($message = '')
-    {
+    public function fail($message = '') {
         $this->failures[] = $message;
     }
 }
 
 class TestApplication_TestCase extends ActionPackUnitTest
 {
-    public function test_assert_valid_xhtml()
-    {
+    public function test_assert_valid_xhtml() {
         $test_app = new MockTestApplication();
         $test_app->_response = file_get_contents(AkConfig::getDir('fixtures').DS.'valid_xhtml.html');
 
@@ -41,8 +38,7 @@ class TestApplication_TestCase extends ActionPackUnitTest
 
     }
 
-    public function test_assert_xpath()
-    {
+    public function test_assert_xpath() {
         $test_app = new MockTestApplication();
         $test_app->_response = file_get_contents(AkConfig::getDir('fixtures').DS.'valid_xhtml.html');
 

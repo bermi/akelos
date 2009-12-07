@@ -22,8 +22,7 @@ class TagHelper
     *   <%= tag 'input', { :type => 'text', :disabled => true } %>
     *    # => <input type="text" disabled="disabled" />
     */
-    static function tag($name, $options = null, $open = false)
-    {
+    static function tag($name, $options = null, $open = false) {
         return '<'.$name.(!empty($options) ? TagHelper::tag_options($options) : '').($open ? '>' : ' />');
     }
 
@@ -40,8 +39,7 @@ class TagHelper
     *   <%= content_tag("select", options, :multiple => true) %>
     *    # => <select multiple="multiple">...options...</select>
     */
-    static function content_tag($name, $content, $options = null)
-    {
+    static function content_tag($name, $content, $options = null) {
         return '<'.$name.(!empty($options) ? TagHelper::tag_options($options) : '').'>'.$content.'</'.$name.'>';
     }
 
@@ -52,8 +50,7 @@ class TagHelper
     * <tt>&lt;![CDATA[</tt> and } with (and may not contain) the string
     * <tt>]]></tt>.
     */
-    static function cdata_section($content)
-    {
+    static function cdata_section($content) {
         return '<![CDATA['.$content.']]>';
     }
 
@@ -64,8 +61,7 @@ class TagHelper
     *  <%= escape_once "1 > 2 &amp; 3" %>
     *    # => "1 &gt; 2 &amp; 3"
     */
-    static function escape_once($html)
-    {
+    static function escape_once($html) {
         static $charset;
         if(empty($charset)){
             $charset = Ak::locale('charset');
@@ -76,13 +72,11 @@ class TagHelper
     /**
     * Fix double-escaped entities, such as &amp;amp;, &amp;#123;, etc.
     */
-    static function fix_double_escape($escaped)
-    {
+    static function fix_double_escape($escaped) {
         return preg_replace('/&amp;([a-z]+|(#\d+));/i', '&$1;', $escaped);
     }
 
-    static function tag_options($options)
-    {
+    static function tag_options($options) {
         $formated_options = array();
         foreach ($options as $key=>$value){
             if(empty($value) && !is_string($value)){

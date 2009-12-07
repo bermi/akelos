@@ -2,8 +2,7 @@
 
 class AkDbSchemaCache
 {
-    static function shouldRefresh($set = null)
-    {
+    static function shouldRefresh($set = null) {
         static $refresh;
         if(!isset($refresh)){
             $refresh = !AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA;
@@ -12,19 +11,16 @@ class AkDbSchemaCache
         return $refresh;
     }
 
-    static function getCacheFileName($environment = AK_ENVIRONMENT)
-    {
+    static function getCacheFileName($environment = AK_ENVIRONMENT) {
         return AkDbSchemaCache::getCacheDir().DS.$environment.'.serialized';
     }
 
-    static function getCacheDir()
-    {
+    static function getCacheDir() {
         $cache_dir  = AK_TMP_DIR.DS.'ak_config';
         return $cache_dir.DS.'cache'.DS.'activerecord';
     }
 
-    static function clear($table, $environment = AK_ENVIRONMENT)
-    {
+    static function clear($table, $environment = AK_ENVIRONMENT) {
         AkDbSchemaCache::config($table, null, $environment, true);
         AkDbSchemaCache::config('database_table_internals_'.$table, null, $environment, true);
         AkDbSchemaCache::updateCacheFileAfterExecution($environment);
@@ -34,8 +30,7 @@ class AkDbSchemaCache
         }
     }
 
-    static function clearAll()
-    {
+    static function clearAll() {
         if(AK_LOG_EVENTS){
             $Logger = Ak::getLogger();
             $Logger->message('Clearing all database settings from cache');
@@ -43,19 +38,16 @@ class AkDbSchemaCache
         Ak::rmdir_tree(AkDbSchemaCache::getCacheDir());
     }
 
-    static function get($key, $environment = AK_ENVIRONMENT)
-    {
+    static function get($key, $environment = AK_ENVIRONMENT) {
         return AkDbSchemaCache::config($key, null, $environment, false);
     }
 
-    static function set($key, $value, $environment = AK_ENVIRONMENT)
-    {
+    static function set($key, $value, $environment = AK_ENVIRONMENT) {
         AkDbSchemaCache::updateCacheFileAfterExecution($environment);
         return AkDbSchemaCache::config($key, $value, $environment, !is_null($value));
     }
 
-    static function updateCacheFileAfterExecution($environment = null)
-    {
+    static function updateCacheFileAfterExecution($environment = null) {
         static $called = false, $_environment;
         if($called == false && !AkDbSchemaCache::shouldRefresh()){
             register_shutdown_function(array('AkDbSchemaCache','updateCacheFileAfterExecution'));
@@ -87,8 +79,7 @@ class AkDbSchemaCache
         }
     }
 
-    static function config($key = null, $value = null, $environment = AK_ENVIRONMENT, $unset = false)
-    {
+    static function config($key = null, $value = null, $environment = AK_ENVIRONMENT, $unset = false) {
         if(AkDbSchemaCache::shouldRefresh()){
             return false;
         }

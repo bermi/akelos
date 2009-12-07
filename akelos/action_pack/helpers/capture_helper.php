@@ -57,14 +57,12 @@ class CaptureHelper
      *     Welcome To my shiny new web page!
      *   <% $greeting = $capture_helper->end(); ?>      
      */
-    public function begin ($var_name = '')
-    {
+    public function begin ($var_name = '') {
         ob_start();
         $this->_stack[] = $var_name;
     }
 
-    public function end($add_to_view = true)
-    {
+    public function end($add_to_view = true) {
         $var_name = array_pop($this->_stack);
         $result = ob_get_clean();
         if($add_to_view && !empty($var_name)){
@@ -73,8 +71,7 @@ class CaptureHelper
         return $result;
     }
 
-    protected function _addVarToView($var_name, $content)
-    {
+    protected function _addVarToView($var_name, $content) {
         AkActionView::addGlobalVar($var_name, $content);
     }
 
@@ -98,8 +95,7 @@ class CaptureHelper
     * NOTE: Beware that content_for is ignored in caches. So you shouldn't use it
     * for elements that are going to be fragment cached. 
     */
-    public function content_for($name)
-    {
+    public function content_for($name) {
         $this->begin($name);
     }
 }

@@ -83,13 +83,11 @@ class AkActsAsTree extends AkObserver
 
     public $_ActiveRecordInstance;
 
-    public function __construct(&$ActiveRecordInstance)
-    {
+    public function __construct(&$ActiveRecordInstance) {
         $this->_ActiveRecordInstance = $ActiveRecordInstance;
     }
 
-    public function init($options = array())
-    {
+    public function init($options = array()) {
         empty($options['parent_column']) ? null : ($this->_parent_column_name = $options['parent_column']);
         empty($options['dependent']) ? null : ($this->_dependent = $options['dependent']);
         empty($options['scope']) ? null : $this->setScopeCondition($options['scope']);
@@ -98,8 +96,7 @@ class AkActsAsTree extends AkObserver
     }
 
 
-    public function _ensureIsActiveRecordInstance(&$ActiveRecordInstance)
-    {
+    public function _ensureIsActiveRecordInstance(&$ActiveRecordInstance) {
         if(is_object($ActiveRecordInstance) && method_exists($ActiveRecordInstance,'actsLike')){
             $this->_ActiveRecordInstance = $ActiveRecordInstance;
             if(!$this->_ActiveRecordInstance->hasColumn($this->_parent_column_name)){
@@ -118,13 +115,11 @@ class AkActsAsTree extends AkObserver
         return true;
     }
 
-    public function getType()
-    {
+    public function getType() {
         return 'tree';
     }
 
-    public function getScopeCondition()
-    {
+    public function getScopeCondition() {
         if (!empty($this->variable_scope_condition)){
             return $this->_ActiveRecordInstance->getVariableSqlCondition($this->variable_scope_condition);
 
@@ -138,8 +133,7 @@ class AkActsAsTree extends AkObserver
     }
 
 
-    public function setScopeCondition($scope_condition)
-    {
+    public function setScopeCondition($scope_condition) {
         if(!is_array($scope_condition) && strstr($scope_condition, '?')){
             $this->variable_scope_condition = $scope_condition;
         }else{
@@ -147,8 +141,7 @@ class AkActsAsTree extends AkObserver
         }
     }
 
-    public function getScopedColumn($column)
-    {
+    public function getScopedColumn($column) {
         if($this->_ActiveRecordInstance->hasColumn($column)){
             $value = $this->_ActiveRecordInstance->get($column);
             $condition = $this->_ActiveRecordInstance->getAttributeCondition($value);
@@ -159,39 +152,32 @@ class AkActsAsTree extends AkObserver
         }
     }
 
-    public function getParentColumnName()
-    {
+    public function getParentColumnName() {
         return $this->_parent_column_name;
     }
 
-    public function setParentColumnName($parent_column_name)
-    {
+    public function setParentColumnName($parent_column_name) {
         $this->_parent_column_name = $parent_column_name;
     }
 
-    public function getDependent()
-    {
+    public function getDependent() {
         return $this->_dependent;
     }
 
-    public function setDependent($val)
-    {
+    public function setDependent($val) {
         $this->_dependent = (bool)$val;
     }
 
-    public function hasChildren()
-    {
+    public function hasChildren() {
         return $this->childrenCount() > 0;
     }
 
-    public function hasParent()
-    {
+    public function hasParent() {
         $parent_id = $this->_ActiveRecordInstance->{$this->getParentColumnName()};
         return !empty($parent_id);
     }
 
-    public function addChild($child)
-    {
+    public function addChild($child) {
         $this->_ActiveRecordInstance->transactionStart();
 
         if ($this->_ActiveRecordInstance->isNewRecord()){
@@ -221,19 +207,16 @@ class AkActsAsTree extends AkObserver
         return $child;
     }
 
-    public function childrenCount()
-    {
+    public function childrenCount() {
 
         return $this->_ActiveRecordInstance->isNewRecord() ? 0 : $this->_ActiveRecordInstance->count(" ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." = ".$this->_ActiveRecordInstance->getId());
     }
 
-    public function getChildren()
-    {
+    public function getChildren() {
         return $this->_ActiveRecordInstance->isNewRecord() ? false : $this->_ActiveRecordInstance->findAll(" ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." = ".$this->_ActiveRecordInstance->getId());
     }
 
-    public function getParent()
-    {
+    public function getParent() {
         if (!$this->hasParent()){
             return false;
         } else {
@@ -245,8 +228,7 @@ class AkActsAsTree extends AkObserver
     /**
      * @param	integer	$level	How deep do you want to search? everything <= 0 means infinite deep
      */
-    public function getAncestors($level=0)
-    {
+    public function getAncestors($level=0) {
         if (!$this->hasParent()) {
             return array();
         }
@@ -265,8 +247,7 @@ class AkActsAsTree extends AkObserver
         return $ancestors;
     }
 
-    public function getSiblings($options = array())
-    {
+    public function getSiblings($options = array()) {
         $default_options = array('include_self'=>false);
         $options = array_merge($default_options, $options);
         $parent_condition = (is_null($this->_ActiveRecordInstance->{$this->getParentColumnName()})) ? 'ISNULL('. $this->getParentColumnName() .")" : $this->getParentColumnName() .' = '. $this->_ActiveRecordInstance->{$this->getParentColumnName()};
@@ -275,16 +256,14 @@ class AkActsAsTree extends AkObserver
         ' AND '. $parent_condition.$id_condition);
     }
 
-    public function getSelfAndSiblings()
-    {
+    public function getSelfAndSiblings() {
         return $this->getSiblings(array('include_self'=>true));
     }
 
     /**
      * @param	integer	$level	How deep do you want to search? everything <= 0 means infinite deep
      */
-    public function getDescendants($level=0)
-    {
+    public function getDescendants($level=0) {
         if (!$this->hasChildren()) {
             return array();
         }
@@ -310,8 +289,7 @@ class AkActsAsTree extends AkObserver
         return $children;
     }
 
-    public function beforeDestroy(&$object)
-    {
+    public function beforeDestroy(&$object) {
         if(!$object->tree->hasChildren()){
             return true;
         }

@@ -4,14 +4,12 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class TypeCasting_TestCase extends ActiveRecordUnitTest
 {
-    public function test_start()
-    {
+    public function test_start() {
         $this->installAndIncludeModels(array('Post', 'User', 'Tagging', 'Tag'));
     }
 
     // Ticket #21
-    public function _test_should_store_zero_strings_as_intergers()
-    {
+    public function _test_should_store_zero_strings_as_intergers() {
         $Tag = new Tag(array('name'=>'Ticket #21'));
         $this->assertTrue($Tag->save());
         $this->assertEqual($Tag->get('score'), 100);
@@ -25,8 +23,7 @@ class TypeCasting_TestCase extends ActiveRecordUnitTest
     }
 
     // Ticket #36
-    public function test_should_update_dates_correctly()
-    {
+    public function test_should_update_dates_correctly() {
         $params = array(
         //'title' => 'Hello',
         //'body' => 'Hello world!',
@@ -43,8 +40,7 @@ class TypeCasting_TestCase extends ActiveRecordUnitTest
 
 
     // Ticket #76
-    public function test_should_update_datetime_correctly()
-    {
+    public function test_should_update_datetime_correctly() {
         $params = array(
         'title' => 'Expiring salutation',
         'body' => 'Expiring Hello world!',
@@ -61,8 +57,7 @@ class TypeCasting_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Post->get('expires_at'), '2007-10-15 17:30:00');
     }
 
-    public function test_should_handle_empty_date_as_null()
-    {
+    public function test_should_handle_empty_date_as_null() {
         $this->installAndIncludeModels(array('Post'));
 
         $params = array('title'=>'An empty date is a null date','posted_on(1i)'=>'','posted_on(2i)'=>'','posted_on(3i)'=>'');
@@ -72,8 +67,7 @@ class TypeCasting_TestCase extends ActiveRecordUnitTest
         $this->assertNull($MyPost->posted_on);
     }
 
-    public function test_cast_date_parameters()
-    {
+    public function test_cast_date_parameters() {
         $params = array('posted_on(1i)'=>'','posted_on(2i)'=>'','posted_on(3i)'=>'');
         $this->Post->setAttributes($params);
         $this->assertEqual('', $this->Post->get('posted_on'));
@@ -87,8 +81,7 @@ class TypeCasting_TestCase extends ActiveRecordUnitTest
         $this->assertEqual('',$this->Post->{"posted_on(3i)"});
     }
 
-    public function test_should_serialize_attributes()
-    {
+    public function test_should_serialize_attributes() {
         $User = new User(array('preferences'=>array("background" => "black", "display" => 'large')));
         $User->save();
         $User = $User->find($User->getId());

@@ -15,22 +15,19 @@ class AkPluginInstaller extends AkInstaller
     protected
     $_plugin_definition;
 
-    public function __construct($db_connection = null, $plugin_name = '')
-    {
+    public function __construct($db_connection = null, $plugin_name = '') {
         parent::__construct($db_connection);
         $this->plugin_name = $plugin_name;
     }
 
-    public function installFiles($installer_dir = 'installer', $source_dir = 'files')
-    {
+    public function installFiles($installer_dir = 'installer', $source_dir = 'files') {
         $basePath = $this->app_plugins_dir.DS.$this->plugin_name.DS.$installer_dir.DS.$source_dir;
         $this->files = Ak::dir($basePath, array('recurse'=> true));
         empty($this->options['force']) ? $this->_checkForCollisions($this->files,$basePath) : null;
         $this->_copyFiles($this->files, $basePath, $basePath);
     }
 
-    public function autoInstallExtensions()
-    {
+    public function autoInstallExtensions() {
         $path = $this->app_plugins_dir.DS.$this->plugin_name.DS.'extensions';
         $extensionFiles = Ak::dir($path,array('recurse'=>true));
         foreach($extensionFiles as $extensionFile) {
@@ -38,8 +35,7 @@ class AkPluginInstaller extends AkInstaller
         }
     }
 
-    public function installExtensions($fromFile, $pluginIdentifier = null)
-    {
+    public function installExtensions($fromFile, $pluginIdentifier = null) {
         if (substr($fromFile,0,5) == 'file:') {
             $fromFile = trim(substr($fromFile,5));
         } else {
@@ -90,8 +86,7 @@ class AkPluginInstaller extends AkInstaller
         }
     }
 
-    public function removeExtensions($pluginIdentifier = null)
-    {
+    public function removeExtensions($pluginIdentifier = null) {
         if ($pluginIdentifier == null) {
             $pluginIdentifier = AkInflector::camelize($this->plugin_name);
         }
@@ -110,8 +105,7 @@ class AkPluginInstaller extends AkInstaller
     }
 
 
-    protected function _copyFiles($directory_structure, $base_path = null, $src_path = null)
-    {
+    protected function _copyFiles($directory_structure, $base_path = null, $src_path = null) {
         foreach ($directory_structure as $k=>$node){
             $path = $base_path.DS.$node;
             if(is_dir($path)){
@@ -133,16 +127,14 @@ class AkPluginInstaller extends AkInstaller
         }
     }
 
-    protected function _makeDir($path, $base_path)
-    {
+    protected function _makeDir($path, $base_path) {
         $dir = str_replace($base_path, $this->app_base_dir,$path);
         if(!is_dir($dir)){
             mkdir($dir);
         }
     }
 
-    protected function _removeDependency()
-    {
+    protected function _removeDependency() {
         if (!empty($this->dependencies)) {
             $this->dependencies = Ak::toArray($this->dependencies);
 
@@ -163,8 +155,7 @@ class AkPluginInstaller extends AkInstaller
         }
     }
 
-    protected function _copyFile($path, $base_path)
-    {
+    protected function _copyFile($path, $base_path) {
         $destination_file = str_replace($base_path, $this->app_base_dir,$path);
         copy($path, $destination_file);
         $source_file_mode =  fileperms($path);
@@ -174,8 +165,7 @@ class AkPluginInstaller extends AkInstaller
         }
     }
 
-    protected function _checkForCollisions(&$directory_structure, $base_path = null)
-    {
+    protected function _checkForCollisions(&$directory_structure, $base_path = null) {
         foreach ($directory_structure as $k=>$node){
             if(!empty($this->skip_all)){
                 return ;
@@ -209,8 +199,7 @@ class AkPluginInstaller extends AkInstaller
         }
     }
 
-    protected function _runInstallerMethod($method_prefix, $version, $options = array(), $version_number = null)
-    {
+    protected function _runInstallerMethod($method_prefix, $version, $options = array(), $version_number = null) {
         $auto_install_extensions = (isset($this->auto_install_extensions) && $this->auto_install_extensions === true);
         $auto_install_files = (isset($this->auto_install_files) && $this->auto_install_files === true);
 
@@ -277,8 +266,7 @@ class AkPluginInstaller extends AkInstaller
         return $success;
     }
 
-    protected function _checkUninstallDependencies()
-    {
+    protected function _checkUninstallDependencies() {
         $dependencyFile = $this->app_plugins_dir.DS.$this->plugin_name.DS.'dependent_plugins';
 
         if (file_exists($dependencyFile)) {
@@ -311,8 +299,7 @@ class AkPluginInstaller extends AkInstaller
         }
     }
 
-    protected function _checkInstallDependencies()
-    {
+    protected function _checkInstallDependencies() {
         if (isset($this->php_min_version)) {
             if(version_compare(PHP_VERSION,$this->php_min_version,'<')) {
                 trigger_error(Ak::t("This plugin requires at least php version: %version", array('%version'=>$this->php_min_version)), E_USER_ERROR);
@@ -367,8 +354,7 @@ class AkPluginInstaller extends AkInstaller
         return true;
     }
 
-    protected function _addMethodToClass($class,$name,$path,$methodString, $pluginName)
-    {
+    protected function _addMethodToClass($class,$name,$path,$methodString, $pluginName) {
         $targetReflection = new AkReflectionFile($path);
         $classes = $targetReflection->getClasses();
         foreach($classes as $c) {
@@ -389,8 +375,7 @@ $methodString
 
     }
 
-    protected function _removeMethodFromClass($path,$name,$pluginName)
-    {
+    protected function _removeMethodFromClass($path,$name,$pluginName) {
         return Ak::file_put_contents($path, preg_replace("|(\n[^\n]*?/\*\* AUTOMATED START: $pluginName::$name \*/.*?/\*\* AUTOMATED END: $pluginName::$name \*/\n)|s","",Ak::file_get_contents($path)));
     }
 }

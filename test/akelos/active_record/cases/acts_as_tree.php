@@ -4,16 +4,14 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class ActsAsTree_TestCase extends ActiveRecordUnitTest
 {
-    public function test_start()
-    {
+    public function test_start() {
         $this->installAndIncludeModels(array(
         'Category'=>'id, parent_id, description, department string(25)'
         ));
         Ak::import('DependentCategory');
     }
 
-    public function Test_of_actsAsTree_instatiation()
-    {
+    public function Test_of_actsAsTree_instatiation() {
         $Categories = new Category();
         $this->assertEqual($Categories->actsLike(), 'active record,tree');
 
@@ -27,8 +25,7 @@ class ActsAsTree_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_Test_of_init()
-    {
+    public function Test_of_Test_of_init() {
         $Categories = new Category();
         $Categories->tree->init(array('scope'=> 'category_id = ? AND completed = 0','custom_attribute'=>'This is not allowed here'));
 
@@ -37,31 +34,27 @@ class ActsAsTree_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of__ensureIsActiveRecordInstance()
-    {
+    public function Test_of__ensureIsActiveRecordInstance() {
         $Categories = new Category();
         $Object = new stdClass();
         $this->expectError(new PatternExpectation('/is not an active record/'));
         $Categories->tree->_ensureIsActiveRecordInstance($Object);
     }
 
-    public function Test_of_getType()
-    {
+    public function Test_of_getType() {
         $Categories = new Category();
         $this->assertEqual($Categories->tree->getType(), 'tree');
     }
 
 
-    public function Test_of_getScopeCondition_and_setScopeCondition()
-    {
+    public function Test_of_getScopeCondition_and_setScopeCondition() {
         $Categories = new Category();
         $this->assertEqual($Categories->tree->getScopeCondition(), ($Categories->_db->type() == 'postgre') ? 'true' : '1');
         $Categories->tree->setScopeCondition('true');
         $this->assertEqual($Categories->tree->getScopeCondition(), 'true');
     }
 
-    public function Test_of_getters_and_setters()
-    {
+    public function Test_of_getters_and_setters() {
         $Categories = new Category();
 
         $Categories->tree->setParentColumnName('column_name');
@@ -73,8 +66,7 @@ class ActsAsTree_TestCase extends ActiveRecordUnitTest
         $this->assertFalse($Categories->tree->getDependent());
     }
 
-    public function Test_of_hasChildren_and_hasParent()
-    {
+    public function Test_of_hasChildren_and_hasParent() {
         $CategoryA = new Category();
         $CategoryA->description = "Cat A";
 
@@ -95,8 +87,7 @@ class ActsAsTree_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_addChild_and_children()
-    {
+    public function Test_of_addChild_and_children() {
         $CategoryA = new Category();
         $CategoryA->description = "Cat A";
 
@@ -117,8 +108,7 @@ class ActsAsTree_TestCase extends ActiveRecordUnitTest
         $CategoryA->tree->addChild($CategoryA);
     }
 
-    public function Test_of_childrenCount()
-    {
+    public function Test_of_childrenCount() {
         $CategoryA = new Category();
         $CategoryA->description = "Cat A";
 
@@ -140,8 +130,7 @@ class ActsAsTree_TestCase extends ActiveRecordUnitTest
         $this->assertEqual(0, $CategoryAb->tree->childrenCount());
     }
 
-    public function Test_of_parent()
-    {
+    public function Test_of_parent() {
         $CategoryA = new Category();
         $CategoryA->description = "Cat A";
 
@@ -160,8 +149,7 @@ class ActsAsTree_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($CategoryA->getId(), $catAbParent->getId());
     }
 
-    public function Test_of_beforeDestroy()
-    {
+    public function Test_of_beforeDestroy() {
         $CategoryA = new DependentCategory();
         $CategoryA->description = "Cat A";
 

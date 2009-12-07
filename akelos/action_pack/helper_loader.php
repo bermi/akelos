@@ -13,13 +13,11 @@ class AkHelperLoader
     public $_HelperInstances = array();
     public $_Handler;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->_Handler = new stdClass();
     }
 
-    public function setController(&$ControllerInstance)
-    {
+    public function setController(&$ControllerInstance) {
         $this->_Controller = $ControllerInstance;
         $this->setHandler($this->_Controller);
     }
@@ -29,8 +27,7 @@ class AkHelperLoader
      *
      * Like setController but for Mailers and Testing
      */
-    public function setHandler(&$HandlerInstance)
-    {
+    public function setHandler(&$HandlerInstance) {
         $this->_Handler = $HandlerInstance;
     }
 
@@ -45,15 +42,13 @@ class AkHelperLoader
      *
      * Retuns an array with helper_name => HerlperInstace
      */
-    public function &instantiateHelpers()
-    {
+    public function &instantiateHelpers() {
         $this->instantiateHelpersAsHandlerAttributes($this->getHelperNames());
         $this->_storeInstantiatedHelperNames(array_keys($this->_HelperInstances));
         return $this->_HelperInstances;
     }
 
-    public function instantiateHelpersAsHandlerAttributes($helpers = array())
-    {
+    public function instantiateHelpersAsHandlerAttributes($helpers = array()) {
         $helpers_dir = AkConfig::getDir('helpers');
         foreach ($helpers as $file=>$helper){
             $helper_class_name = AkInflector::camelize(AkInflector::demodulize(strstr($helper, 'Helper') ? $helper : $helper.'Helper'));
@@ -89,8 +84,7 @@ class AkHelperLoader
      *
      * Mailer helpers work as Controller helpers but without the Request context
      */
-    public function getHelpersForMailer()
-    {
+    public function getHelpersForMailer() {
         $helper_names = $this->getHelperNames();
         $this->instantiateHelpersAsHandlerAttributes($helper_names);
         $this->_storeInstantiatedHelperNames(array_keys($this->_HelperInstances));
@@ -101,8 +95,7 @@ class AkHelperLoader
      * In order to help rendering engines to know which helpers are available
      * we need to persit them as a static var.
      */
-    public function _storeInstantiatedHelperNames($helpers)
-    {
+    public function _storeInstantiatedHelperNames($helpers) {
         Ak::setStaticVar('AkActionView::instantiated_helper_names', $helpers);
     }
 
@@ -111,14 +104,12 @@ class AkHelperLoader
      *
      *  array('url_helper', 'prototype_helper')
      */
-    static function getInstantiatedHelperNames()
-    {
+    static function getInstantiatedHelperNames() {
         return Ak::getStaticVar('AkActionView::instantiated_helper_names');
     }
 
 
-    public function getHelperNames()
-    {
+    public function getHelperNames() {
         //$helpers = $this->getDefaultHandlerHelperNames();
         $helpers = array_merge($this->getDefaultHandlerHelperNames(), $this->getApplicationHelperNames(), $this->getPluginHelperNames());
         //$helpers = array_merge($helpers, $this->getPluginHelperNames());
@@ -132,8 +123,7 @@ class AkHelperLoader
     }
 
 
-    public function getDefaultHandlerHelperNames()
-    {
+    public function getDefaultHandlerHelperNames() {
         $handler = $this->_Handler;
         $handler->helpers = !isset($handler->helpers) ? 'default' : $handler->helpers;
 
@@ -151,8 +141,7 @@ class AkHelperLoader
         return $handler->helpers;
     }
 
-    public function getApplicationHelperNames()
-    {
+    public function getApplicationHelperNames() {
         $handler = $this->_Handler;
         $handler->app_helpers = !isset($handler->app_helpers) ? 'all' : $handler->app_helpers;
         $helpers_dir = AkConfig::getDir('helpers');
@@ -173,8 +162,7 @@ class AkHelperLoader
         return $helper_names;
     }
 
-    public function getPluginHelperNames()
-    {
+    public function getPluginHelperNames() {
         $handler = $this->_Handler;
         $handler->plugin_helpers = !isset($handler->plugin_helpers) ? 'all' : $handler->plugin_helpers;
 
@@ -201,8 +189,7 @@ class AkHelperLoader
      * @param string $helper_name Helper class name like CalendarHelper
      * @param array $options - path: Path to the helper class, defaults to AK_PLUGINS_DIR/helper_name/lib/helper_name.php
      */
-    public function addPluginHelper($helper_name, $options = array())
-    {
+    public function addPluginHelper($helper_name, $options = array()) {
         static $helpers = array();
         if($helper_name === false){
             return $helpers;

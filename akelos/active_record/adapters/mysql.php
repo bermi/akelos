@@ -6,8 +6,7 @@ class AkMysqlDbAdapter extends AkDbAdapter
      * @param array $database_settings
      * @return string
      */
-    static function constructDsn($database_settings)
-    {
+    static function constructDsn($database_settings) {
         $dsn  = 'mysqlt://';
         $dsn .= $database_settings['user'].':'.$database_settings['password'];
         $dsn .= !empty($database_settings['host']) ? '@'.$database_settings['host'] : '@localhost';
@@ -18,13 +17,11 @@ class AkMysqlDbAdapter extends AkDbAdapter
         return $dsn;
     }
 
-    public function type()
-    {
+    public function type() {
         return 'mysql';
     }
 
-    public function addLimitAndOffset(&$sql,$options)
-    {
+    public function addLimitAndOffset(&$sql,$options) {
         if (isset($options['limit']) && $limit = $options['limit']){
             if (isset($options['offset']) && $offset = $options['offset'])
             $sql .= " LIMIT $offset, $limit";
@@ -36,8 +33,7 @@ class AkMysqlDbAdapter extends AkDbAdapter
 
     /* SCHEMA */
 
-    public function renameColumn($table_name,$column_name,$new_name)
-    {
+    public function renameColumn($table_name,$column_name,$new_name) {
         $column_details = $this->selectOne("SHOW COLUMNS FROM $table_name LIKE '$column_name'");
         if (!$column_details) {
             trigger_error(Ak::t("No such column '%column' in %table_name",array('%column'=>$column_name,'%table_name'=>$table_name)), E_USER_ERROR);
@@ -51,13 +47,11 @@ class AkMysqlDbAdapter extends AkDbAdapter
 
     /* QUOTING */
 
-    public function quote_string($value)
-    {
+    public function quote_string($value) {
         return "'".mysql_real_escape_string($value, $this->connection->_connectionID)."'";
     }
 
-    public function connect($die_on_error=true)
-    {
+    public function connect($die_on_error=true) {
         parent::connect($die_on_error);
         if(defined('AK_SET_UTF8_ON_MYSQL_CONNECT') && AK_SET_UTF8_ON_MYSQL_CONNECT){
             if(isset($this->connection->_connectionID)){

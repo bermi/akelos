@@ -10,8 +10,7 @@ class AkReflectionFunction extends AkReflection
     $methods = array(),
     $properties = array();
 
-    public function __construct($method_definition)
-    {
+    public function __construct($method_definition) {
         if (is_array($method_definition)) {
             if (@$method_definition['type'] == 'function') {
                 $this->_definition = $method_definition;
@@ -36,46 +35,38 @@ class AkReflectionFunction extends AkReflection
         $this->_parseDefinitions();
     }
 
-    public function getDefaultOptions()
-    {
+    public function getDefaultOptions() {
         return isset($this->_definition['default_options']) ? $this->_definition['default_options'] : false;
     }
 
-    public function getAvailableOptions()
-    {
+    public function getAvailableOptions() {
         return isset($this->_definition['available_options']) ? $this->_definition['available_options'] : false;
     }
 
-    public function getName()
-    {
+    public function getName() {
         return isset($this->_definition['name']) ? $this->_definition['name'] : false;
     }
 
-    public function getDefinition()
-    {
+    public function getDefinition() {
         return $this->_definition;
     }
 
-    public function setTag($tag,$value)
-    {
+    public function setTag($tag,$value) {
         if (!is_object($this->_docBlock)) {
             $this->_docBlock = new AkReflectionDocBlock('');
         }
         $this->_docBlock->setTag($tag,$value);
     }
 
-    public function getTag($tag)
-    {
+    public function getTag($tag) {
         return $this->_docBlock->getTag($tag);
     }
 
-    public function getParams()
-    {
+    public function getParams() {
         return isset($this->_definition['params']) ? $this->_definition['params'] : false;
     }
 
-    public function toString($indent=0, $methodName = null, $options = array())
-    {
+    public function toString($indent=0, $methodName = null, $options = array()) {
         $docBlock = $this->_docBlock;
         if ($docBlock->changed) {
             $string = $this->_definition['toString'];
@@ -105,18 +96,15 @@ class AkReflectionFunction extends AkReflection
         return $string;
     }
 
-    public function returnByReference()
-    {
+    public function returnByReference() {
         return isset($this->_definition['returnByReference']) ? $this->_definition['returnByReference'] : false;
     }
 
-    public function &getDocBlock()
-    {
+    public function &getDocBlock() {
         return $this->_docBlock;
     }
 
-    public function _parseDefinitions()
-    {
+    public function _parseDefinitions() {
         foreach($this->definitions as $definition) {
             if(isset($definition['type'])){
                 switch ($definition['type']) {

@@ -4,13 +4,11 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class NestedFinders_TestCase extends ActiveRecordUnitTest
 {
-    public function setup()
-    {
+    public function setup() {
         $this->installAndIncludeModels(array('Aa', 'Bb', 'Cc','Dd', 'Ee'));
     }
 
-    public function test_find_aa()
-    {
+    public function test_find_aa() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         /**
@@ -19,8 +17,7 @@ class NestedFinders_TestCase extends ActiveRecordUnitTest
         $this->assertTrue($aa->babies);
     }
 
-    public function test_find_aa_include_bbs()
-    {
+    public function test_find_aa_include_bbs() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb','languages'=>array('es','de'),'other'=>array(1,2,3)));
@@ -90,8 +87,7 @@ class NestedFinders_TestCase extends ActiveRecordUnitTest
         $this->assertEqual(array(1,2,3),$found_first_aa->bbs[0]->other);*/
     }
 
-    public function test_find_aa_include_bbs_and_ccs()
-    {
+    public function test_find_aa_include_bbs_and_ccs() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));
@@ -152,8 +148,7 @@ class NestedFinders_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_find_aa_include_bbs_and_ccs_and_dds()
-    {
+    public function test_find_aa_include_bbs_and_ccs_and_dds() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));
@@ -233,8 +228,7 @@ class NestedFinders_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_find_aa_include_bbs_and_ccs_and_dds_and_ees()
-    {
+    public function test_find_aa_include_bbs_and_ccs_and_dds_and_ees() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));
@@ -323,8 +317,7 @@ class NestedFinders_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_find_aa_include_bbs_and_ccs_and_dds_and_ees_and_back_to_aa()
-    {
+    public function test_find_aa_include_bbs_and_ccs_and_dds_and_ees_and_back_to_aa() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));

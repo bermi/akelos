@@ -35,8 +35,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
       *
       * Note: $Person->count('all') will not work because it will use 'all' as the condition.  Use $Person->count() instead.
       */
-    public function count()
-    {
+    public function count() {
         $args = func_get_args();
         list($column_name, $options) = $this->_constructCountOptionsFromLegacyArgs($args);
         return $this->calculate('count', $column_name, $options);
@@ -47,8 +46,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
       *
       *     $Person->average('age');
       */
-    public function average($column_name, $options = array())
-    {
+    public function average($column_name, $options = array()) {
         return $this->calculate('avg', $column_name, $options);
     }
 
@@ -57,8 +55,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
       *
       *   $Person->minimum('age');
       */
-    public function minimum($column_name, $options = array())
-    {
+    public function minimum($column_name, $options = array()) {
         return $this->calculate('min', $column_name, $options);
     }
 
@@ -67,8 +64,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
       *
       *   $Person->maximum('age');
       */
-    public function maximum($column_name, $options = array())
-    {
+    public function maximum($column_name, $options = array()) {
         return $this->calculate('max', $column_name, $options);
     }
 
@@ -77,8 +73,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
       *
       *   $Person->sum('age');
       */
-    public function sum($column_name, $options = array())
-    {
+    public function sum($column_name, $options = array()) {
         return $this->calculate('sum', $column_name, $options);
     }
 
@@ -109,8 +104,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
       *   $Person->minimum('age', array('conditions' => array('last_name != ?', 'Drake'))); // Selects the minimum age for everyone with a last name other than 'Drake'
       *   $Person->minimum('age', array('having' => 'min(age) > 17', 'group' => 'last'_name)); // Selects the minimum age for any family without any minors
       */
-    public function calculate($operation, $column_name, $options = array())
-    {
+    public function calculate($operation, $column_name, $options = array()) {
         $this->_validateCalculationOptions($options);
         $column_name = empty($options['select']) ? $column_name : $options['select'];
         $column_name = $column_name == 'all' ? '*' : $column_name;
@@ -124,8 +118,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
         return 0;
     }
 
-    protected function _constructCountOptionsFromLegacyArgs($args)
-    {
+    protected function _constructCountOptionsFromLegacyArgs($args) {
         $options = array();
         $column_name = 'all';
 
@@ -155,8 +148,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
     }
 
 
-    protected function _constructCalculationSql($operation, $column_name, $options)
-    {
+    protected function _constructCalculationSql($operation, $column_name, $options) {
         $operation = strtolower($operation);
         $aggregate_alias = $this->_getColumnAliasFor($operation, $column_name);
         $use_workaround = $operation == 'count' && !empty($options['distinct']) && $this->_ActiveRecord->getDatabaseType() == 'sqlite';
@@ -186,14 +178,12 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
     }
 
 
-    protected function _executeSimpleCalculation($operation, $column_name, $column, $options)
-    {
+    protected function _executeSimpleCalculation($operation, $column_name, $column, $options) {
         $value = $this->_ActiveRecord->_db->selectValue($this->_constructCalculationSql($operation, $column_name, $options));
         return $this->_typeCastCalculatedValue($value, $column, $operation);
     }
 
-    protected function _executeGroupedCalculation($operation, $column_name, $column, $options)
-    {
+    protected function _executeGroupedCalculation($operation, $column_name, $column, $options) {
         $group_field = $options['group'];
         $group_alias = $this->_getColumnAliasFor($group_field);
         $group_column = $this->_getColumnFor($group_field);
@@ -210,8 +200,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
         return $all;
     }
 
-    protected function _validateCalculationOptions($options = array())
-    {
+    protected function _validateCalculationOptions($options = array()) {
         $invalid_options = array_diff(array_keys($options),$this->_calculation_options);
         if(!empty($invalid_options)){
             trigger_error(Ak::t('%options are not valid calculation options.', array('%options'=>join(', ',$invalid_options))).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
@@ -226,15 +215,13 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
     *   count(distinct users.id) #=> count_distinct_users_id
     *   count(*) #=> count_all
     */
-    protected function _getColumnAliasFor()
-    {
+    protected function _getColumnAliasFor() {
         $args = func_get_args();
         $keys = strtolower(join(' ',(!empty($args) ? (is_array($args[0]) ? $args[0] : $args) : array())));
         return preg_replace(array('/\*/','/\W+/','/^ +/','/ +$/','/ +/'),array('all',' ','','','_'), $keys);
     }
 
-    protected function _getColumnFor($field)
-    {
+    protected function _getColumnFor($field) {
         $field_name = ltrim(substr($field,strpos($field,'.')),'.');
         if(in_array($field_name,$this->_ActiveRecord->getColumnNames())){
             return $field_name;
@@ -242,8 +229,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
         return $field;
     }
 
-    protected function _typeCastCalculatedValue($value, $column, $operation = null)
-    {
+    protected function _typeCastCalculatedValue($value, $column, $operation = null) {
         $operation = strtolower($operation);
         if($operation == 'count'){
             return intval($value);
@@ -255,8 +241,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
     }
 
 
-    protected function _constructCalculationSqlWithAssociations($sql, $options = array())
-    {
+    protected function _constructCalculationSqlWithAssociations($sql, $options = array()) {
         $calculation_function = isset($options['calculation']) && isset($options['calculation']['function'])?$options['calculation']['function']:'count';
         $calculation_column = isset($options['calculation']) && isset($options['calculation']['column'])?$options['calculation']['column']:'*';
         $calculation_alias = isset($options['calculation']) && isset($options['calculation']['alias'])?$options['calculation']['alias']:'count_all';
@@ -271,8 +256,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
         return $sql;
     }
 
-    protected function &_calculateBySqlWithAssociations($sql)
-    {
+    protected function &_calculateBySqlWithAssociations($sql) {
         $objects = array();
         $results = $this->_db->execute ($sql,'find with associations');
         if (!$results){

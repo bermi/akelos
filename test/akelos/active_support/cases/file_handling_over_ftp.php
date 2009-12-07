@@ -23,8 +23,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class FileHandlingOverFtp_TestCase extends ActiveSupportUnitTest
 {
-    public function test_file_put_contents()
-    {
+    public function test_file_put_contents() {
         if(!RUN_FTP_TESTS) return;
         $file_name = 'cache'.DS.'test_file_1.txt';
         $content = 'This is the content of file 1';
@@ -61,8 +60,7 @@ class FileHandlingOverFtp_TestCase extends ActiveSupportUnitTest
 
     }
 
-    public function test_file_get_contents()
-    {
+    public function test_file_get_contents() {
         if(!RUN_FTP_TESTS) return;
         $file_name = 'cache'.DS.'test_file_1.txt';
         $content = 'This is the NEW content for file 1';
@@ -87,8 +85,7 @@ class FileHandlingOverFtp_TestCase extends ActiveSupportUnitTest
 
     }
 
-    public function test_file_delete()
-    {
+    public function test_file_delete() {
         if(!RUN_FTP_TESTS) return;
         $this->assertTrue(Ak::file_delete('cache'.DS.'test_file_1.txt'));
         $this->assertTrue(Ak::file_delete('cache'.DS.'test_file_2.txt'));
@@ -99,8 +96,7 @@ class FileHandlingOverFtp_TestCase extends ActiveSupportUnitTest
 
     }
 
-    public function test_directory_delete()
-    {
+    public function test_directory_delete() {
         if(!RUN_FTP_TESTS) return;
         $this->assertTrue(Ak::directory_delete('ak_test_folder'));
         $this->assertFalse(Ak::directory_delete('../../'));
@@ -114,8 +110,7 @@ class FileHandlingOverFtp_TestCase extends ActiveSupportUnitTest
 
 class StaticFuntionsForFileHandlingOverFtp_TestCase extends ActiveSupportUnitTest
 {
-    public function test_connect()
-    {
+    public function test_connect() {
         if(!RUN_FTP_TESTS) return;
         $connection = AkFtp::connect();
         $this->assertTrue($connection);
@@ -123,15 +118,13 @@ class StaticFuntionsForFileHandlingOverFtp_TestCase extends ActiveSupportUnitTes
         $this->assertIdentical($connection, AkFtp::connect());
     }
 
-    public function test_disconnect()
-    {
+    public function test_disconnect() {
         if(!RUN_FTP_TESTS) return;
         $this->assertTrue(AkFtp::disconnect());
     }
 
 
-    public function test_file_put_contents()
-    {
+    public function test_file_put_contents() {
         if(!RUN_FTP_TESTS) return;
         $file_name = 'cache'.DS.'test_file_1.txt';
         $content = 'This is the content of file 1';
@@ -162,8 +155,7 @@ class StaticFuntionsForFileHandlingOverFtp_TestCase extends ActiveSupportUnitTes
         $this->assertTrue(Ak::file_put_contents($file_name, $content));
     }
 
-    public function test_file_get_contents()
-    {
+    public function test_file_get_contents() {
         if(!RUN_FTP_TESTS) return;
         $file_name = 'cache'.DS.'test_file_1.txt';
         $content = 'This is the NEW content for file 1';
@@ -183,8 +175,7 @@ class StaticFuntionsForFileHandlingOverFtp_TestCase extends ActiveSupportUnitTes
 
     }
 
-    public function test_file_delete()
-    {
+    public function test_file_delete() {
         if(!RUN_FTP_TESTS) return;
         $this->assertTrue(Ak::file_delete('cache'.DS.'test_file_1.txt'));
         $this->assertTrue(Ak::file_delete('cache'.DS.'test_file_2.txt'));
@@ -194,8 +185,7 @@ class StaticFuntionsForFileHandlingOverFtp_TestCase extends ActiveSupportUnitTes
 
     }
 
-    public function test_directory_delete()
-    {
+    public function test_directory_delete() {
         if(!RUN_FTP_TESTS) return;
         $this->assertTrue(Ak::directory_delete('ak_test_folder'));
         $this->assertFalse(Ak::directory_delete('../../'));
@@ -206,8 +196,7 @@ class StaticFuntionsForFileHandlingOverFtp_TestCase extends ActiveSupportUnitTes
     }
 
 
-    public function test_make_dir()
-    {
+    public function test_make_dir() {
         if(!RUN_FTP_TESTS) return;
         $this->assertTrue(AkFtp::make_dir('new_dir_1'));
         $this->assertTrue(AkFtp::make_dir('/new_dir_2'));
@@ -237,8 +226,7 @@ class StaticFuntionsForFileHandlingOverFtp_TestCase extends ActiveSupportUnitTes
 
     }
 
-    public function test_delete()
-    {
+    public function test_delete() {
         if(!RUN_FTP_TESTS) return;
         $this->assertTrue(AkFtp::delete('new_dir_8/*'));
 
@@ -266,8 +254,7 @@ class StaticFuntionsForFileHandlingOverFtp_TestCase extends ActiveSupportUnitTes
         $this->assertTrue(AkFtp::delete('/new_dir_8/'));
     }
 
-    public function test_is_dir()
-    {
+    public function test_is_dir() {
         if(!RUN_FTP_TESTS) return;
         $path = 'invalid path';
         $this->assertFalse(AkFtp::is_dir($path));

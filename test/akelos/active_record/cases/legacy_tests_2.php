@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class LegacyTests2_TestCase extends ActiveRecordUnitTest
 {
-    public function test_AkActiveRecord()
-    {
+    public function test_AkActiveRecord() {
         $this->installAndIncludeModels(array(
         'AkTestUser'=>'id I AUTO KEY, user_name C(32), first_name C(200), last_name C(200), email C(150), country I, password C(32), created_at T, updated_at T, expires_on T',
         'AkTestMember'=>'ak_test_user_id I, role C(25)',
@@ -19,8 +18,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
                     created_at T,updated_at T,expires_on T'));
     }
 
-    public function Test_of_newRecord()
-    {
+    public function Test_of_newRecord() {
         $User = new AkTestUser();
         $User->newRecord(array('last_name' =>'Ferrer','date' =>'1978-06-16','expires_on' =>'2120-06-16'));
         $User->set('first_name','Bermi');
@@ -35,8 +33,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
         $this->assertTrue($User->isNewRecord());
     }
 
-    public function Test_of_isNewRecord()
-    {
+    public function Test_of_isNewRecord() {
         $User = new AkTestUser();
         $this->assertTrue($User->isNewRecord());
 
@@ -50,16 +47,14 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
         $this->assertTrue($User->isNewRecord());
     }
 
-    public function Test_of_getCombinedAttributesWhereThisAttributeIsUsed()
-    {
+    public function Test_of_getCombinedAttributesWhereThisAttributeIsUsed() {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $User->addCombinedAttributeConfiguration('another_name', "Ms/Mr. %s", 'last_name');
         $this->assertEqual($User->getCombinedAttributesWhereThisAttributeIsUsed('last_name'),array('name','another_name'));
     }
 
-    public function Test_of_requiredForCombination()
-    {
+    public function Test_of_requiredForCombination() {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $this->assertIdentical($User->requiredForCombination('last_name'), true);
@@ -68,8 +63,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_should_save_record()
-    {
+    public function test_should_save_record() {
         $Users = new AkTestUser(array('first_name' =>'Tim','last_name' =>'Horton','user_name' =>'tim','email' =>'tim@example.com', 'expires_on' =>'+2 years'));
         $Users->save();
         $User = new AkTestUser($Users->getId());
@@ -80,8 +74,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_should_find_records()
-    {
+    public function test_should_find_records() {
         $User = new AkTestUser(array('first_name' =>'Bermi','last_name' =>'Ferrer Martínez','user_name' =>'bermi','email' =>'bermi@example.com'));
         $User->save();
         $User = new AkTestUser(array('first_name' =>'Hilario','last_name' =>'Hervás Añó','user_name' =>'hilario','email' =>'hilario@example.com'));
@@ -196,8 +189,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
         }
     }
 
-    public function Test_of_getContentColumns()
-    {
+    public function Test_of_getContentColumns() {
         $Comment = new AkTestComment();
         $this->assertEqual(array_keys($Comment->getContentColumns()), array('private_comment','birth_date'));
 
@@ -210,8 +202,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_save()
-    {
+    public function Test_of_save() {
         $Users = new AkTestUser();
         $User = $Users->find(3);
         $User->setAttribute('country',23);
@@ -238,8 +229,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_create()
-    {
+    public function Test_of_create() {
         $Users = new AkTestUser();
 
         $Got = $Users->create(array('first_name'=>'Jane','last_name'=>'Williams'));
@@ -262,8 +252,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_findFirst()
-    {
+    public function Test_of_findFirst() {
         $Users = new AkTestUser();
         $Got = $Users->findFirst("last_name = 'Williams'");
         $this->assertEqual($Got->first_name, 'Jane');
@@ -281,8 +270,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_findAll()
-    {
+    public function Test_of_findAll() {
         $Users = new AkTestUser();
 
         $Got = $Users->findAll("last_name = 'Williams'");
@@ -299,8 +287,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
         }
     }
 
-    public function Test_of_update()
-    {
+    public function Test_of_update() {
         $Users = new AkTestUser();
 
         $Users->update(3, array('last_name'=>'Ferrer'));
@@ -331,8 +318,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_createOrUpdate()
-    {
+    public function Test_of_createOrUpdate() {
         $Users = new AkTestUser();
         $Bermi = $Users->findFirst("first_name = 'Bermi'");
         $Bermi->last_name = 'Ferrer Martínez';
@@ -351,8 +337,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_reload()
-    {
+    public function Test_of_reload() {
         $Users = new AkTestUser();
         $Bermi = $Users->findFirst("first_name = 'Bermi'");
         $this->assertEqual($Bermi->last_name,'Ferrer Martínez');
@@ -365,8 +350,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
 
 
 
-    public function Test_of_updateAll()
-    {
+    public function Test_of_updateAll() {
         $Users = new AkTestUser();
         $modified_entries = $Users->updateAll("first_name = 'test_name', country = '50'", "first_name = 'NEW TEST NAME'");
         $this->assertEqual($modified_entries, 3);
@@ -380,8 +364,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_updateAll_with_binds()
-    {
+    public function Test_of_updateAll_with_binds() {
         $Users = new AkTestUser();
         $modified_entries = $Users->updateAll("first_name = 'new_test_name', country = '50'", array("first_name = ?",'test_name'));
         $this->assertEqual($modified_entries, 3);
@@ -394,8 +377,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
         }
     }
 
-    public function Test_of_updateAttribute()
-    {
+    public function Test_of_updateAttribute() {
         $Users = new AkTestUser();
         $Alicia = $Users->findFirst("first_name = 'Alicia'");
         $Alicia->updateAttribute('last_name','Sadurní');
@@ -405,8 +387,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_updateAttributes()
-    {
+    public function Test_of_updateAttributes() {
         $Users = new AkTestUser();
         $Hilario = $Users->findFirst("first_name = 'Hilario'");
         $Hilario->updateAttributes(array('last_name'=>'Hervás'));
@@ -421,15 +402,13 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_exists()
-    {
+    public function Test_of_exists() {
         $Users = new AkTestUser();
         $this->assertTrue($Users->exists(5));
         $this->assertFalse($Users->exists(500));
     }
 
-    public function Test_of_findBySql()
-    {
+    public function Test_of_findBySql() {
         $Users = new AkTestUser();
 
         $FoundUsers = $Users->findBySql("SELECT * FROM ak_test_users WHERE first_name = 'Hilario'");

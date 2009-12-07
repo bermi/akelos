@@ -4,13 +4,11 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class FindOrCreateBy_TestCase extends ActiveRecordUnitTest
 {
-    public function test_start()
-    {
+    public function test_start() {
         $this->installAndIncludeModels(array('Account'));
     }
 
-    public function test_should_create_new_users()
-    {
+    public function test_should_create_new_users() {
         $Account = new Account();
         $Bermi = $Account->findOrCreateBy('username', 'Bermi');
 
@@ -32,8 +30,7 @@ class FindOrCreateBy_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($SavedAlicia->getId(), $Alicia->getId());
     }
 
-    public function test_should_return_existing_record()
-    {
+    public function test_should_return_existing_record() {
         $Account = new Account();
         $Alicia = $Account->findFirstBy('username', 'Alicia');
         $this->assertEqual($Alicia->get('password'), 'pass');

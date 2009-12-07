@@ -6,8 +6,7 @@ class AkHtmlToRtf
     public $font_size = 24;
 
     // Convert special characters to ASCII
-    public function escapeCharacter($character)
-    {
+    public function escapeCharacter($character) {
         $escaped = '';
         if(ord($character) >= 0x00 && ord($character) < 0x20){
             $escaped = "\\'".dechex(ord($character));
@@ -32,8 +31,7 @@ class AkHtmlToRtf
         return $escaped;
     }
 
-    public function specialCharacters($text)
-    {
+    public function specialCharacters($text) {
         $text_buffer = '';
         for($i = 0; $i < strlen($text); $i++){
             $text_buffer .= $this->escapeCharacter($text[$i]);
@@ -41,8 +39,7 @@ class AkHtmlToRtf
         return $text_buffer;
     }
 
-    public function convert()
-    {
+    public function convert() {
         $this->source = str_replace(
         array('<ul>','<UL>','<ol>','<OL>','</ul>','</UL>','</ol>','</OL>'),
         '',

@@ -15,13 +15,11 @@ class HasManySpecifications_TestCase extends ActiveRecordUnitTest
      * @var ActiveRecord
      */
     public $Picture;
-    public function setUp()
-    {
+    public function setUp() {
         $this->installAndIncludeModels(array('Property','Picture', 'Thumbnail'));
     }
 
-    public function test_deletion_from_collection_should_destroy_the_active_record()
-    {
+    public function test_deletion_from_collection_should_destroy_the_active_record() {
         $Property = new Property(array('description'=>'This is a Property'));
         $Picture = $Property->picture->create(array('title'=>'Front'));
         $this->assertTrue($Property->save());
@@ -35,8 +33,7 @@ class HasManySpecifications_TestCase extends ActiveRecordUnitTest
         $this->assertFalse($this->Picture->find('first'));
     }
 
-    public function test_destroying_should_cascade()
-    {
+    public function test_destroying_should_cascade() {
         $Property = new Property(array('description'=>'This is a Property'));
         $Picture = $Property->picture->create(array('title'=>'Front'));
 

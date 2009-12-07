@@ -6,8 +6,7 @@
 
 class AkTime extends AkType
 {
-    public function toString($date_format = '')
-    {
+    public function toString($date_format = '') {
         if (!empty($date_format)) {
             $format = $date_format.'_';
         } else {
@@ -20,42 +19,34 @@ class AkTime extends AkType
         return date($format, $this->value);
     }
 
-    public function ago($val)
-    {
+    public function ago($val) {
 
     }
 
-    public function atBeginningOfDay()
-    {
+    public function atBeginningOfDay() {
 
     }
 
-    public function atBeginningOfWeek()
-    {
+    public function atBeginningOfWeek() {
 
     }
 
-    public function atBeginningOfQuarter()
-    {
+    public function atBeginningOfQuarter() {
 
     }
-    public function atBeginningOfMonth()
-    {
+    public function atBeginningOfMonth() {
 
     }
 
-    public function atBeginningOfYear()
-    {
+    public function atBeginningOfYear() {
 
     }
 
-    public function atMidnight()
-    {
+    public function atMidnight() {
 
     }
 
-    public function strftime($format)
-    {
+    public function strftime($format) {
         return strftime($format, $this->value);
     }
 }

@@ -45,8 +45,7 @@ class ScriptaculousHelper extends AkActionViewHelper
     * You can change the behaviour with various options, see
     * http://script.aculo.us for more documentation.
     */
-    public function visual_effect($name, $element_id = false, $js_options = array())
-    {
+    public function visual_effect($name, $element_id = false, $js_options = array()) {
         $element = $element_id ? Ak::toJson($element_id) : "element";
 
         if (!empty($js_options['queue']) && is_array($js_options['queue'])) {
@@ -85,8 +84,7 @@ class ScriptaculousHelper extends AkActionViewHelper
     * You can change the behaviour with various options, see
     * http://script.aculo.us for more documentation.
     */
-    public function sortable_element($element_id, $options = array())
-    {
+    public function sortable_element($element_id, $options = array()) {
         $options['with'] = !empty($options['with']) ? $options['with'] : "Sortable.serialize('{$element_id}')";
         $options['onUpdate'] = !empty($options['onUpdate']) ? $options['onUpdate'] : "function(){".PrototypeHelper::remote_function($options)."}";
 
@@ -132,13 +130,11 @@ class ScriptaculousHelper extends AkActionViewHelper
     * You can change the behaviour with various options, see
     * http://script.aculo.us for more documentation. 
     */
-    public function draggable_element($element_id, $options = array())
-    {
+    public function draggable_element($element_id, $options = array()) {
         return JavascriptHelper::javascript_tag(ScriptaculousHelper::draggable_element_js($element_id, $options));
     }
 
-    public function draggable_element_js($element_id, $options = array())
-    {
+    public function draggable_element_js($element_id, $options = array()) {
         return "new Draggable('{$element_id}', ".JavascriptHelper::_options_for_javascript($options).")";
     }
 
@@ -156,8 +152,7 @@ class ScriptaculousHelper extends AkActionViewHelper
     * You can change the behaviour with various options, see
     * http://script.aculo.us for more documentation.
     */
-    public function drop_receiving_element($element_id, $options = array())
-    {
+    public function drop_receiving_element($element_id, $options = array()) {
         $options['with'] = !empty($options['with']) ? $options['with'] : "'id='".urlencode(element.id);
         $options['onDrop'] = !empty($options['onDrop']) ? $options['onDrop'] : "function(element){". PrototypeHelper::remote_function($options) . "}";
 

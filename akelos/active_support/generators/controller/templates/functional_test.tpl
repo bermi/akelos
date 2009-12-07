@@ -6,8 +6,7 @@ require_once(AK_CONTROLLERS_DIR.DS.'<?php  echo AkInflector::underscore($class_n
 
 class <?php  echo $class_name?>ControllerTest extends  UnitTestCase
 {
-    function test_<?php  echo $class_name?>()
-    {
+    function test_<?php  echo $class_name?>() {
         $this->assertTrue(false, '<?php  echo $class_name?>Controller has not been tested');
     }
 }

@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class LegacyTests1_TestCase extends ActiveRecordUnitTest
 {
-    public function test_setup()
-    {
+    public function test_setup() {
         $this->installAndIncludeModels(array(
         'AkTestUser'=>'id I AUTO KEY, user_name C(32), first_name C(200), last_name C(200), email C(150), country I, password C(32), created_at T, updated_at T, expires_on T',
         'AkTestMember'=>'ak_test_user_id I, role C(25)',
@@ -21,15 +20,13 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_should_connect()
-    {
+    public function test_should_connect() {
         $User = new AkTestUser();
         $User->setConnection();
         $this->assertTrue($User->isConnected());
     }
 
-    public function test_should_instantiate()
-    {
+    public function test_should_instantiate() {
         $AkTestUser = new AkTestUser();
 
         $this->assertEqual($AkTestUser->getModelName(), 'AkTestUser');
@@ -39,8 +36,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_should_detect_if_descends_from_active_record()
-    {
+    public function test_should_detect_if_descends_from_active_record() {
         $User = new AkTestUser();
         $TestField = new AkTestField();
 
@@ -50,8 +46,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $this->assertFalse($Object instanceof AkActiveRecord);
     }
 
-    public function test_should_get_model_name()
-    {
+    public function test_should_get_model_name() {
         $AkTestUser = new AkTestUser();
         $this->assertEqual($AkTestUser->getModelName(), 'AkTestUser');
 
@@ -60,8 +55,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_should_set_and_get_parent_model_name()
-    {
+    public function test_should_set_and_get_parent_model_name() {
         $AkTestMember = new AkTestMember();
         $this->assertEqual($AkTestMember->getParentModelName(), 'AkTestUser');
 
@@ -76,8 +70,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
     }
 
     // More db type inspection on Test_of_db_inspection method of this test
-    public function test_should_get_akelos_database_type()
-    {
+    public function test_should_get_akelos_database_type() {
         $AkTestField = new AkTestField();
 
         $adodb_column_object = new stdClass();
@@ -99,8 +92,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
     // }
 
     // More of this testing in Test_of_db_inspection
-    public function test_should_load_column_settings()
-    {
+    public function test_should_load_column_settings() {
         AkDbSchemaCache::shouldRefresh(false);
         $AkTestField = new AkTestField();
         $AkTestField->loadColumnsSettings();
@@ -109,8 +101,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         AkDbSchemaCache::shouldRefresh(true);
     }
 
-    public function test_should_init_columns_to_null()
-    {
+    public function test_should_init_columns_to_null() {
         $AkTestField = new AkTestField();
         $AkTestField->loadColumnsSettings();
 
@@ -132,8 +123,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_should_get_Column_settings()
-    {
+    public function test_should_get_Column_settings() {
         $AkTestField = new AkTestField();
 
         $columns = array('id','varchar_field','longtext_field','text_field','logblob_field','date_field','datetime_field','tinyint_field','integer_field','smallint_field',
@@ -151,8 +141,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_should_get_columns_and_primary_key()
-    {
+    public function test_should_get_columns_and_primary_key() {
         $AkTestField = new AkTestField();
         $this->assertEqual($AkTestField->getPrimaryKey(), 'id');
 
@@ -163,8 +152,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $AkTestField->setPrimaryKey('unavailable_field');
     }
 
-    public function test_should_get_table_name()
-    {
+    public function test_should_get_table_name() {
         $AkTestField = new AkTestField();
         $this->assertEqual($AkTestField->getTableName(), 'ak_test_fields');
 
@@ -175,8 +163,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($AkTestField->getTableName(), 'ak_test_users');
     }
 
-    public function test_should_detect_if_Column_exists()
-    {
+    public function test_should_detect_if_Column_exists() {
         $AkTestUser = new AkTestUser();
         $this->assertTrue($AkTestUser->hasColumn('first_name'));
         $this->assertFalse($AkTestUser->hasColumn('not_valid'));
@@ -184,8 +171,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $this->assertFalse($AkTestUser->hasColumn('name'));
     }
 
-    public function test_should_get_column_name()
-    {
+    public function test_should_get_column_name() {
         $AkTestField = new AkTestField();
         $expected = array ( 'id' => 'Id', 'varchar_field' => 'Varchar field', 'longtext_field' => 'Longtext field', 'text_field' => 'Text field', 'logblob_field' => 'Logblob field', 'date_field' => 'Date field', 'datetime_field' => 'Datetime field', 'tinyint_field' => 'Tinyint field', 'integer_field' => 'Integer field', 'smallint_field' => 'Smallint field', 'bigint_field' => 'Bigint field', 'double_field' => 'Double field', 'numeric_field' => 'Numeric field', 'bytea_field' => 'Bytea field', 'timestamp_field' => 'Timestamp field', 'boolean_field' => 'Boolean field', 'int2_field' => 'Int2 field', 'int4_field' => 'Int4 field', 'int8_field' => 'Int8 field', 'foat_field' => 'Foat field', 'varchar4000_field' => 'Varchar4000 field', 'clob_field' => 'Clob field', 'nvarchar2000_field' => 'Nvarchar2000 field', 'blob_field' => 'Blob field', 'nvarchar_field' => 'Nvarchar field', 'decimal1_field' => 'Decimal1 field', /*'decimal3_field' => 'Decimal3 field',*/ 'decimal5_field' => 'Decimal5 field', 'decimal10_field' => 'Decimal10 field', 'decimal20_field' => 'Decimal20 field', 'decimal_field' => 'Decimal field', 'created_at' => 'Created at', 'updated_at' => 'Updated at', 'expires_on' => 'Expires on' );
         $this->assertEqual($AkTestField->getColumnNames(), $expected);
@@ -195,8 +181,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
     // function Test_of_getColumns(){}
 
 
-    public function test_should_get_the_correct_data_types()
-    {
+    public function test_should_get_the_correct_data_types() {
         $AkTestUser = new AkTestUser();
 
         $expected = array(
@@ -280,8 +265,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
 
     /////// COMBINED ATTRIBUTES TESTS
 
-    public function test_should_add_combined_attribute_configuration()
-    {
+    public function test_should_add_combined_attribute_configuration() {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $User->addCombinedAttributeConfiguration('reversed_name', "%s, %s", 'last_name', 'first_name');
@@ -293,8 +277,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($User->_combinedAttributes, $expected);
     }
 
-    public function test_should_compose_combined_attributes()
-    {
+    public function test_should_compose_combined_attributes() {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $User->addCombinedAttributeConfiguration('reversed_name', "%s, %s", 'last_name', 'first_name');
@@ -329,8 +312,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_should_decompose_combined_attributes()
-    {
+    public function test_should_decompose_combined_attributes() {
 
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
@@ -354,8 +336,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($User->get('email_header_from'), '<nospam@example.com>Bermi Ferrer');
     }
 
-    public function test_should_decompose_combined_attributes_2()
-    {
+    public function test_should_decompose_combined_attributes_2() {
 
         $User = new AkTestUser();
 
@@ -386,8 +367,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_should_get_attribute()
-    {
+    public function test_should_get_attribute() {
         $User = new AkTestUser();
 
         $User->first_name = 'Bermi';
@@ -401,8 +381,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_getAvailableAttributes()
-    {
+    public function Test_of_getAvailableAttributes() {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $tmp_got = $User->getAvailableAttributes();
@@ -420,8 +399,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_getAttributes()
-    {
+    public function Test_of_getAttributes() {
         $User = new AkTestUser();
 
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
@@ -434,8 +412,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_getAttributeNames()
-    {
+    public function Test_of_getAttributeNames() {
         $User = new AkTestUser();
 
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
@@ -443,8 +420,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_getAttributesBeforeTypeCast()
-    {
+    public function Test_of_getAttributesBeforeTypeCast() {
         $User = new AkTestUser();
         $User->set('password', 'bermi');
         $this->assertEqual($User->getAttributesBeforeTypeCast(), array('password' => 'c6dd746a20f85fecb18591f29508d42d'));
@@ -452,8 +428,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_getOnlyAvailableAttributes()
-    {
+    public function Test_of_getOnlyAvailableAttributes() {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $attributes = array('name'=>'Bermi Ferrer', 'email' => 'bermi@example.com', 'invalid_field'=>'value');
@@ -461,8 +436,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($attributes,array('name'=>'Bermi Ferrer', 'email' => 'bermi@example.com'));
     }
 
-    public function Test_of_getColumnsForAttributes()
-    {
+    public function Test_of_getColumnsForAttributes() {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $attributes = array('name'=>'Bermi Ferrer', 'email' => 'bermi@example.com', 'invalid_field'=>'value');
@@ -471,8 +445,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_hasAttribute()
-    {
+    public function Test_of_hasAttribute() {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $this->assertTrue($User->hasAttribute('name'));
@@ -483,8 +456,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $this->assertFalse($User->hasAttribute('_columns'));
     }
 
-    public function Test_of_isAttributePresent()
-    {
+    public function Test_of_isAttributePresent() {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
 
@@ -501,8 +473,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $this->assertFalse($User->isAttributePresent('first_name'));
     }
 
-    public function Test_of_getAvailableAttributesQuoted()
-    {
+    public function Test_of_getAvailableAttributesQuoted() {
         $User = new AkTestUser();
 
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
@@ -528,8 +499,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($expected, $got);
     }
 
-    public function Test_of_setAccessibleAttributes()
-    {
+    public function Test_of_setAccessibleAttributes() {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $User->setAccessibleAttributes('first_name','last_name','name','country','email');
@@ -538,8 +508,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_setProtectedAttributes()
-    {
+    public function Test_of_setProtectedAttributes() {
         $User = new AkTestUser();
         $User->addCombinedAttributeConfiguration('name', "%s %s", 'first_name', 'last_name');
         $User->setProtectedAttributes('first_name','last_name','name','country','email');
@@ -547,8 +516,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($expected, $User->_protectedAttributes);
     }
 
-    public function Test_of_setAttribute()
-    {
+    public function Test_of_setAttribute() {
         $User = new AkTestUser();
         $User->setAttribute('first_name', 'Bermi');
         $User->setAttribute('password', 'pass');
@@ -560,8 +528,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($User->getAttributeBeforeTypeCast('password'),'c6dd746a20f85fecb18591f29508d42d');
     }
 
-    public function Test_of_setAttributes()
-    {
+    public function Test_of_setAttributes() {
         $User = new AkTestUser();
         $attributes = array(
         'first_name'=> 'Bermi', 'password'=> 'bermi', '_columns'=>array(), '_test_private_var'=>true
@@ -576,8 +543,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $this->assertFalse(!empty($User->_test_private_var));
     }
 
-    public function Test_of_toggleAttribute()
-    {
+    public function Test_of_toggleAttribute() {
         $AkTestField = new AkTestField();
         $AkTestField->set('boolean_field', true);
         $this->assertTrue($AkTestField->boolean_field);
@@ -590,8 +556,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $this->assertTrue($AkTestField->get('boolean_field'));
     }
 
-    public function Test_of_get_and_set_DisplayField()
-    {
+    public function Test_of_get_and_set_DisplayField() {
         $AkTestField = new AkTestField();
         $this->assertEqual($AkTestField->getDisplayField(), 'id');
         $AkTestField->setDisplayField('text_field');
@@ -607,8 +572,7 @@ class LegacyTests1_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($AkTestUser->getDisplayField(), 'name');
     }
 
-    public function Test_of_get_and_get_Id()
-    {
+    public function Test_of_get_and_get_Id() {
         $AkTestField = new AkTestField();
         $this->assertEqual($AkTestField->getId(), null);
 

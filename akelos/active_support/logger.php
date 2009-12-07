@@ -39,55 +39,45 @@ class AkLogger
     public $error_file                 = AK_LOGER_DEFAULT_LOG_FILE;
     public $log_type;
 
-    public function AkLogger($mode = AK_LOGGER_MESSAGE)
-    {
+    public function AkLogger($mode = AK_LOGGER_MESSAGE) {
         $this->default_log_settings = $mode;
     }
 
-    public function log($type, $message, $vars = array(), $event_code = null)
-    {
+    public function log($type, $message, $vars = array(), $event_code = null) {
         $type = strtoupper($type);
         $event_code = empty ($event_code) ? (defined('AK_LOGGER_'.$type) ? 'AK_LOGGER_'.$type : AK_LOGGER_INFO) : $event_code;
         $this->_log($type, $message, $vars, $event_code);
     }
 
-    public function debug($message, $vars = array(), $event_code = null)
-    {
+    public function debug($message, $vars = array(), $event_code = null) {
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    public function info($message, $vars = array(), $event_code = null)
-    {
+    public function info($message, $vars = array(), $event_code = null) {
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    public function message($message, $vars = array(), $event_code = null)
-    {
+    public function message($message, $vars = array(), $event_code = null) {
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    public function notice($message, $vars = array(), $event_code = null)
-    {
+    public function notice($message, $vars = array(), $event_code = null) {
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    public function warning($message, $vars = array(), $event_code = null)
-    {
+    public function warning($message, $vars = array(), $event_code = null) {
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    public function error($message, $vars = array(), $event_code = null)
-    {
+    public function error($message, $vars = array(), $event_code = null) {
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    public function critical($message, $vars = array(), $event_code = null)
-    {
+    public function critical($message, $vars = array(), $event_code = null) {
         $this->log(__FUNCTION__, $message, $vars, $event_code);
     }
 
-    public function _log($error_mode, $error_message, $vars=array(), $event_code = null)
-    {
+    public function _log($error_mode, $error_message, $vars=array(), $event_code = null) {
         $this->setLogParams($vars);
         $this->mode = defined('AK_LOG_'.$error_mode) ? constant('AK_LOG_'.$error_mode) : $this->default_log_settings;
         $type = $this->log_type;
@@ -98,24 +88,21 @@ class AkLogger
         $this->mode & AK_MODE_DIE ? exit : null;
     }
 
-    public function _displayLog($type, $error_mode, $error_message)
-    {
+    public function _displayLog($type, $error_mode, $error_message) {
         $message = $this->_getLogFormatedAsHtml($type, $error_mode, $error_message);
         if($this->print_display_message){
             Ak::trace($message);
         }
         return $message;
     }
-    public function _mailLog($type, $error_mode, $error_message)
-    {
+    public function _mailLog($type, $error_mode, $error_message) {
         if(!empty($this->default_mail_destination)){
             $message = $this->_getLogFormatedAsString($type, $error_mode, $error_message);
             $message = strip_tags(str_replace('<li>',' - ',$message));
             Ak::mail($this->default_mail_sender, $this->default_mail_destination, $this->default_mail_subject, $message);
         }
     }
-    public function _appendLogToFile($type, $error_mode, $error_message)
-    {
+    public function _appendLogToFile($type, $error_mode, $error_message) {
         $filename = $this->error_file;
         if(!is_writable($filename)){
             clearstatcache();
@@ -139,8 +126,7 @@ class AkLogger
         @fclose($fp);
     }
 
-    public function _saveLogInDatabase($type, $error_mode, $error_message)
-    {
+    public function _saveLogInDatabase($type, $error_mode, $error_message) {
         $db =& Ak::db();
         $message = $this->_getLogFormatedAsRawText($type, $error_mode, $error_message);
         $sql = 'INSERT INTO log (user_id, type, message, severity, location, hostname, created) '.
@@ -151,8 +137,7 @@ class AkLogger
         }
     }
 
-    public function _getLogFormatedAsHtml($type, $error_mode, $error_message)
-    {
+    public function _getLogFormatedAsHtml($type, $error_mode, $error_message) {
         $error_type = $error_mode ? 'error' : 'info';
         $message = "\n<div id='logger_$error_type'>\n<p>".$this->t(ucfirst($error_type)).": [$error_mode] - $error_message</p>\n";
         $params = array_merge($this->_log_params, ($this->extended_details ? array('remote_address'=>$_SERVER['REMOTE_ADDR'], 'browser'=>$_SERVER['HTTP_USER_AGENT']) : array() ));
@@ -162,8 +147,7 @@ class AkLogger
         }
         return empty($details) ? $message.'</div>' : $message."<ul>\n$details\n</ul>\n</div>";
     }
-    public function _walkParams($params)
-    {
+    public function _walkParams($params) {
         $return = '';
         foreach ($params as $k=>$v){
                 if(is_scalar($v)) {
@@ -174,8 +158,7 @@ class AkLogger
             }
             return $return;
     }
-    public function _getLogFormatedAsString($type, $error_mode, $error_message, $serialized = false)
-    {
+    public function _getLogFormatedAsString($type, $error_mode, $error_message, $serialized = false) {
         $message = date('r')."\t[$error_mode]\t$error_message";
         $params = array_merge($this->_log_params, ($this->extended_details ? array('remote_address'=>$_SERVER['REMOTE_ADDR'], 'browser'=>$_SERVER['HTTP_USER_AGENT']) : array() ));
 
@@ -189,35 +172,29 @@ class AkLogger
         return $message;
     }
 
-    public function _getLogFormatedAsRawText($type, $error_mode, $error_message)
-    {
+    public function _getLogFormatedAsRawText($type, $error_mode, $error_message) {
         return $this->_getLogFormatedAsString($type, $error_mode, $error_message, $filename, $line_number, true);
     }
 
 
-    public function setLogParams($log_params)
-    {
+    public function setLogParams($log_params) {
         $this->_log_params = $log_params;
     }
 
-    public function getLogParams()
-    {
+    public function getLogParams() {
         return is_array($this->_log_params) ? $this->_log_params : array();
     }
 
 
-    public function internalError($message, $file, $line)
-    {
+    public function internalError($message, $file, $line) {
         return "<div id='internalError'><p><b>Error:</b> [internal] - $message<br /><b>File:</b> $file at line $line</p></div>";
     }
 
-    public function t($string, $array = null)
-    {
+    public function t($string, $array = null) {
         return Ak::t($string, $array, 'error');
     }
 
-    public function formatText($text, $color = 'normal')
-    {
+    public function formatText($text, $color = 'normal') {
         if(!AK_LOG_ENABLE_COLORING){
             return $text;
         }

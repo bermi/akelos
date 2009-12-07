@@ -7,8 +7,7 @@ class DatabaseSessions_TestCase extends AkWebTestCase
     public $sessionLife = NULL;
     public $webserver_enabled;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->webserver_enabled = AkConfig::getOption('webserver_enabled', false);
         parent::__construct();
     }
@@ -17,20 +16,17 @@ class DatabaseSessions_TestCase extends AkWebTestCase
         $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
     }
 
-    public function setUp()
-    {
+    public function setUp() {
         AkDbSession::install();
         $this->_test_script = AkConfig::getOption('testing_url').
         '/action_pack/public/database_sessions.php';
     }
 
-    public function tearDown()
-    {
+    public function tearDown() {
         AkDbSession::uninstall();
     }
 
-    public function test_open()
-    {
+    public function test_open() {
         $browser = $this->getBrowser();
         $this->get("$this->_test_script?open_check=1");
         $expected_session_id = $browser->getContentAsText();
@@ -39,8 +35,7 @@ class DatabaseSessions_TestCase extends AkWebTestCase
         $this->assertText($expected_session_id,'Sessions are not working correctly');
     }
 
-    public function test_read_write()
-    {
+    public function test_read_write() {
         $expected = 'test_value';
         $this->get("$this->_test_script?key=test_key&value=$expected");
         $this->get("$this->_test_script?key=test_key");
@@ -48,8 +43,7 @@ class DatabaseSessions_TestCase extends AkWebTestCase
         $this->_test_script.'?key=test_key');
     }
 
-    public function test_destroy()
-    {
+    public function test_destroy() {
         $expected = 'value not found';
         $this->get("$this->_test_script?key=test_key&value=test_value");
         $this->get("$this->_test_script?destroy_check=1");
@@ -57,8 +51,7 @@ class DatabaseSessions_TestCase extends AkWebTestCase
         $this->assertText($expected,'session_destroy(); is not working as expected');
     }
 
-    public function test_gc()
-    {
+    public function test_gc() {
         $expected = 'value not found';
         $copy = $this;
         $copy->get("$this->_test_script?key=test_key&value=test_value&expire=1");

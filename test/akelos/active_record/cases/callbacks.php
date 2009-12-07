@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class Callbacks_TestCase extends ActiveRecordUnitTest
 {
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
         /* Create Mocks */
         $callbacks_during_save = array('beforeCreate','beforeValidation','beforeValidationOnUpdate','beforeValidationOnCreate','beforeSave','beforeUpdate','beforeDestroy',
@@ -25,26 +24,22 @@ class Callbacks_TestCase extends ActiveRecordUnitTest
         Callbacks_TestCase_createClass('TestObserver','AkObserver',$callbacks_during_save,'$this->__called[]=__FUNCTION__;return true;');
     }
 
-    public function test_start()
-    {
+    public function test_start() {
         $this->installAndIncludeModels(array('TestCallback'=>'id,name'));
         if (!isset($this->Observer)) $this->Observer = new TestObserver($this->TestCallback);
     }
 
-    public function tearDown()
-    {
+    public function tearDown() {
         $this->Observer->__called = array();
     }
 
-    public function test_implementation_of_the_singleton_pattern()
-    {
+    public function test_implementation_of_the_singleton_pattern() {
         $ObservedModel = new TestCallback();
         $observers = $ObservedModel->getObservers();
         $this->assertReference($this->Observer,$observers[0]);
     }
 
-    public function test_callbacks_on_create()
-    {
+    public function test_callbacks_on_create() {
         $expected = array ('beforeSave','beforeCreate','afterCreate','afterSave');
 
         $CreateTest = new TestCallback(array('name'=>'A Name'));
@@ -54,8 +49,7 @@ class Callbacks_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($this->Observer->__called,$expected);
     }
 
-    public function test_callbacks_on_create_with_validation()
-    {
+    public function test_callbacks_on_create_with_validation() {
         $expected = array ('beforeSave','beforeValidation','afterValidation','beforeValidationOnCreate','afterValidationOnCreate','beforeCreate','afterCreate','afterSave');
 
         $CreateTest = new TestCallback(array('name'=>'Another Name'));
@@ -65,8 +59,7 @@ class Callbacks_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($this->Observer->__called,$expected);
     }
 
-    public function test_callbacks_on_update()
-    {
+    public function test_callbacks_on_update() {
         $expected = array ('beforeSave','beforeUpdate','afterUpdate','afterSave');
 
         $UpdateTest = $this->TestCallback->find('first',array('name'=>'A Name'));
@@ -76,8 +69,7 @@ class Callbacks_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($this->Observer->__called,$expected);
     }
 
-    public function test_callbacks_on_update_with_validation()
-    {
+    public function test_callbacks_on_update_with_validation() {
         $expected = array ('beforeSave','beforeValidation','afterValidation','beforeValidationOnUpdate','afterValidationOnUpdate','beforeUpdate','afterUpdate','afterSave');
 
         $UpdateTest = $this->TestCallback->find('first',array('name'=>'Another Name'));
@@ -87,8 +79,7 @@ class Callbacks_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($this->Observer->__called,$expected);
     }
 
-    public function test_callbacks_on_destroy()
-    {
+    public function test_callbacks_on_destroy() {
         $expected = array('beforeDestroy','afterDestroy');
 
         $DestroyTest = $this->TestCallback->find('first',array('name'=>'Another Name'));

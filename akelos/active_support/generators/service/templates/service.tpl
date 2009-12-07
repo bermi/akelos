@@ -15,8 +15,7 @@ class <?php  echo $service_class_name?> extends AkActionWebService
 <?php
         }
     ?>
-    function <?php  echo $method?>(<?php  echo $params?>)
-    {
+    function <?php  echo $method?>(<?php  echo $params?>) {
         
     }
     

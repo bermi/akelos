@@ -4,13 +4,11 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class DbAdapter_TestCase extends ActiveRecordUnitTest
 {
-    public function test_should_generate_sequence_ids()
-    {
+    public function test_should_generate_sequence_ids() {
         $db = AkDbAdapter::getInstance(array('type'=>'sqlite'),false);
     }
 
-    public function test_should_report_errors()
-    {
+    public function test_should_report_errors() {
         $db = AkDbAdapter::getInstance();
         $db->debug();
         $this->assertUpcomingError('selct');
@@ -18,8 +16,7 @@ class DbAdapter_TestCase extends ActiveRecordUnitTest
         //$db->debug(false);
     }
 
-    public function test_execute_should_handle_bindings()
-    {
+    public function test_execute_should_handle_bindings() {
         $db = new AkDbAdapter(array());  // no conection details, we're using a Mock
         Mock::generate('ADOConnection');
         $connection = new MockADOConnection();
@@ -31,8 +28,7 @@ class DbAdapter_TestCase extends ActiveRecordUnitTest
         $db->execute(array('SELECT * FROM articles WHERE id=?',1));
     }
 
-    public function test_should_add_limit_and_offset_mysql_style()
-    {
+    public function test_should_add_limit_and_offset_mysql_style() {
         $mysql_db = AkDbAdapter::getInstance(array('type'=>'mysql'),false);
         $sql = 'SELECT * FROM articles';
         $mysql_db->addLimitAndOffset($sql,array('limit'=>2,'offset'=>10));
@@ -47,8 +43,7 @@ class DbAdapter_TestCase extends ActiveRecordUnitTest
         $this->assertEqual('SELECT * FROM articles LIMIT 10',$sql);
     }
 
-    public function test_should_add_limit_and_offset_common_style()
-    {
+    public function test_should_add_limit_and_offset_common_style() {
         $mysql_db = AkDbAdapter::getInstance(array('type'=>'postgre'),false);
         $sql = 'SELECT * FROM articles';
         $mysql_db->addLimitAndOffset($sql,array('limit'=>2,'offset'=>10));
@@ -63,8 +58,7 @@ class DbAdapter_TestCase extends ActiveRecordUnitTest
         $this->assertEqual('SELECT * FROM articles LIMIT 10',$sql);
     }
 
-    public function test_should_quote_strings_for_mysql()
-    {
+    public function test_should_quote_strings_for_mysql() {
         $db = AkDbAdapter::getInstance();
         if ($db->type() != 'mysql') return;
 
@@ -75,8 +69,7 @@ class DbAdapter_TestCase extends ActiveRecordUnitTest
         $this->assertEqual("'Hel\\\lo'",$db->quote_string("Hel\\lo"));
     }
 
-    public function test_should_quote_strings_for_postgre()
-    {
+    public function test_should_quote_strings_for_postgre() {
         $db = AkDbAdapter::getInstance();
         if ($db->type() != 'postgre') return;
 
@@ -88,8 +81,7 @@ class DbAdapter_TestCase extends ActiveRecordUnitTest
         $this->assertEqual("'Hel\\\lo'",$db->quote_string("Hel\\lo"));
     }
 
-    public function test_should_quote_strings_for_sqlite()
-    {
+    public function test_should_quote_strings_for_sqlite() {
         $db = AkDbAdapter::getInstance();
         if ($db->type() != 'sqlite') return;
 
@@ -101,8 +93,7 @@ class DbAdapter_TestCase extends ActiveRecordUnitTest
         $this->assertEqual("'Hel\lo'",$db->quote_string("Hel\\lo"));
     }
 
-    public function _test_investigate_DBTimeStamp()
-    {
+    public function _test_investigate_DBTimeStamp() {
         $db = AkDbAdapter::getInstance();
 
         var_dump($db->DBTimeStamp('2007.11.17'));

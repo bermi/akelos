@@ -4,16 +4,14 @@ class HelperMailer extends AkActionMailer
 {
     public $helpers = 'mailer,example';
 
-    public function use_helper($recipient)
-    {
+    public function use_helper($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => 'using helpers',
         'from' => 'tester@example.com'));
     }
 
-    public function use_example_helper($recipient)
-    {
+    public function use_example_helper($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => 'using helpers',
@@ -21,8 +19,7 @@ class HelperMailer extends AkActionMailer
         'from' => 'tester@example.com'));
     }
 
-    public function use_mail_helper($recipient)
-    {
+    public function use_mail_helper($recipient) {
         $this->helpers = 'mail';
         $this->set(array(
         'recipients' => $recipient,
@@ -38,8 +35,7 @@ class HelperMailer extends AkActionMailer
         )));
     }
 
-    public function use_helper_method($recipient)
-    {
+    public function use_helper_method($recipient) {
         $this->set(array(
         'recipients' => $recipient,
         'subject' => 'using helpers',
@@ -48,8 +44,7 @@ class HelperMailer extends AkActionMailer
     }
 
 
-    public function name_of_the_mailer_class()
-    {
+    public function name_of_the_mailer_class() {
         return $this->getMailerName();
     }
     

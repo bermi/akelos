@@ -4,8 +4,7 @@ include_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Mail'.DS.'mimeDecode.php');
 
 class AkMailEncoding extends Mail_mimeDecode
 {
-    public function decode()
-    {
+    public function decode() {
         $this->_include_bodies = $this->_decode_bodies = $this->_decode_headers = true;
 
         $structure = $this->_decode($this->_header, $this->_body);
@@ -16,8 +15,7 @@ class AkMailEncoding extends Mail_mimeDecode
         return $structure;
     }
 
-    protected function _decodeHeader($encoded_header)
-    {
+    protected function _decodeHeader($encoded_header) {
         // PEAR's header decoding function is buggy and is not enough tested, so we
         // override it using the Akelos charset transcoding engine to get the result
         // as UTF-8
@@ -37,8 +35,7 @@ class AkMailEncoding extends Mail_mimeDecode
         return trim(preg_replace("/(%0A|%0D|\n+|\r+)/i",'',$decoded));
     }
 
-    protected function _encodeAddress($address_string, $header_name = '', $names = true)
-    {
+    protected function _encodeAddress($address_string, $header_name = '', $names = true) {
         $headers = '';
         $addresses = Ak::toArray($address_string);
         $addresses = array_map('trim', $addresses);
@@ -64,8 +61,7 @@ class AkMailEncoding extends Mail_mimeDecode
         return empty($headers) ? false : (!empty($header_name) ? $header_name.': '.$headers.AK_MAIL_HEADER_EOL : $headers);
     }
 
-    protected function _isValidAddress($email)
-    {
+    protected function _isValidAddress($email) {
         return preg_match(AK_EMAIL_REGULAR_EXPRESSION, $email);
     }
 }

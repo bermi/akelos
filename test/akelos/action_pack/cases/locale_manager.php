@@ -7,40 +7,34 @@ class LocaleManager_TestCase extends ActionPackUnitTest
     public $LocaleManager;
     public $original_locales = array();
 
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
         foreach (glob(AK_CONFIG_DIR.'/locales/*.php') as $file){
             $this->original_locales[$file] = file_get_contents($file);
         }
     }
 
-    public function __destruct()
-    {
+    public function __destruct() {
         parent::__destruct();
         foreach ($this->original_locales as $file => $content){
             file_put_contents($file, $content);
         }
     }
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->LocaleManager = new AkLocaleManager();
     }
 
-    public function tearDown()
-    {
+    public function tearDown() {
         unset ($this->LocaleManager);
     }
 
-    public function test_should_get_available_locales()
-    {
+    public function test_should_get_available_locales() {
         $available_locales = $this->LocaleManager->getAvailableLocales();
         $this->assertTrue(is_array($available_locales['en']) && count($available_locales) > 0 ,'Locale en was not found on config/locales folder.');
     }
 
-    public function test_should_parse_locale_strings()
-    {
+    public function test_should_parse_locale_strings() {
 
         $config_string = 'en';
         $expected = array('en'=>array('en'));
@@ -80,8 +74,7 @@ class LocaleManager_TestCase extends ActionPackUnitTest
 
     }
 
-    public function test_should_get_browser_language()
-    {
+    public function test_should_get_browser_language() {
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = $this->LocaleManager->_browser_language = 'en-us,en,es-es;q=0.5;';
 
         $this->LocaleManager->available_locales = array('en_us'=>'en_us','en'=>'en','es_es'=>'es_es');
@@ -102,8 +95,7 @@ class LocaleManager_TestCase extends ActionPackUnitTest
 
     }
 
-    public function test_should_get_default_language_for_user()
-    {
+    public function test_should_get_default_language_for_user() {
         unset($_SERVER['HTTP_ACCEPT_LANGUAGE']);
         $this->LocaleManager->available_locales = array('en_us'=>array('en_us'),'en'=>array('en'),'es_es'=>array('es_es'));
         $this->LocaleManager->browser_lang = $this->LocaleManager->getBrowserLanguages();
@@ -127,8 +119,7 @@ class LocaleManager_TestCase extends ActionPackUnitTest
 
     }
 
-    public function test_should_get_default_locale()
-    {
+    public function test_should_get_default_locale() {
         $this->LocaleManager->available_locales = array('es_es'=>array('es_es'));
         $result = $this->LocaleManager->getDefaultLocale();
         $expected = 'es_es';
@@ -154,8 +145,7 @@ class LocaleManager_TestCase extends ActionPackUnitTest
 
     }
 
-    public function test_should_get_language_from_url()
-    {
+    public function test_should_get_language_from_url() {
         $Request = new stdClass();
 
         $Request->ak = 'en';
@@ -228,8 +218,7 @@ class LocaleManager_TestCase extends ActionPackUnitTest
         $this->assertEqual($Request->ak,'people');
     }
 
-    public function test_should_get_locale_from_alias()
-    {
+    public function test_should_get_locale_from_alias() {
         $this->LocaleManager->available_locales = $this->LocaleManager->parseLocaleConfigString('es, en, fr (france)');
         $result = $this->LocaleManager->getLocaleFromAlias('france');
         $expected = 'fr';
@@ -239,8 +228,7 @@ class LocaleManager_TestCase extends ActionPackUnitTest
         $this->assertFalse($result);
     }
 
-    public function test_locale_setting_getting_deleting_methods()
-    {
+    public function test_locale_setting_getting_deleting_methods() {
         !defined('AK_TEST_TRANSLATIONS') ? define('AK_TEST_TRANSLATIONS',true):null;
         $translation_key = Ak::randomString(8);
         $namespace = Ak::randomString(8);
@@ -268,8 +256,7 @@ class LocaleManager_TestCase extends ActionPackUnitTest
         }
     }
 
-    public function test_framework_config_locale_update()
-    {
+    public function test_framework_config_locale_update() {
         $langs=Ak::langs();
         $translation_key=Ak::randomString(8);
         $this->assertEqual(Ak::t($translation_key),$translation_key);

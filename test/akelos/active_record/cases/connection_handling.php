@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class ConnectionHandling_TestCase extends ActiveRecordUnitTest
 {
-    public function test_should_establish_a_connection()
-    {
+    public function test_should_establish_a_connection() {
         $this->installAndIncludeModels(array('DummyModel'=>'id'));
 
         $Model = $this->DummyModel;
@@ -38,8 +37,7 @@ class ConnectionHandling_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_should_establish_multiple_connections()
-    {
+    public function test_should_establish_multiple_connections() {
         $db_settings = Ak::convert('yaml', 'array', AK_CONFIG_DIR.DS.'database.yml');
         $db_settings['sqlite_databases'] = array(
         'database_file' => AK_TMP_DIR.DS.'testing_sqlite_database.sqlite',

@@ -7,8 +7,7 @@ class Router_TestCase extends ActionPackUnitTest
     public $Router;
     public $url_prefix = '';
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->Router = new AkRouter();
 
         $this->Router->loadUrlRewriteSettings();
@@ -32,13 +31,11 @@ class Router_TestCase extends ActionPackUnitTest
     }
 
 
-    public function Test_connect()
-    {
+    public function Test_connect() {
         $this->assertEqual(count($this->Router->getRoutes()) , 12,'Wrong number of routes loaded. We expected 12');
     }
 
-    public function Test_toParams()
-    {
+    public function Test_toParams() {
         $input_value = '/lists/show/123/featured=1';
         $expected = array('controller'=>'todo','action'=>'show','id'=>123,'option'=>'featured=1');
         $this->assertEqual($this->Router->toParams($input_value),$expected);
@@ -120,8 +117,7 @@ class Router_TestCase extends ActionPackUnitTest
     }
 
 
-    public function Test_toUrl()
-    {
+    public function Test_toUrl() {
         $input_value = array('controller'=>'page','action'=>'view_page','webpage'=>'index');
         $expected = '/';
         $this->assertEqual($this->Router->toUrl($input_value),$expected);
@@ -177,8 +173,7 @@ class Router_TestCase extends ActionPackUnitTest
 
     }
 
-    public function test_url_with_optional_variables()
-    {
+    public function test_url_with_optional_variables() {
         $input_value = array('controller'=>'topic','action'=>'view', 'id'=>4);
         $expected = $this->url_prefix.'/topic/4/';
         $this->assertEqual($this->Router->toUrl($input_value),$expected);
@@ -199,34 +194,29 @@ class Router_UrlConstantsNamedAsUrlVariables_TestCase extends ActionPackUnitTest
     public $Router;
     public $url_prefix = '';
 
-    public function setup()
-    {
+    public function setup() {
         $this->Router = new AkRouter();
         $this->Router->loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
     }
 
-    public function test_same_pieces_1()
-    {
+    public function test_same_pieces_1() {
         $this->Router->connect('/foo/id/:id', array('controller'=>'some'), array('id'=>'[0-9]+'));
         $this->assertEqual($this->Router->toParams('/foo/id/1'), array('controller'=>'some', 'id'=>'1'));
     }
 
-    public function test_same_pieces_4()
-    {
+    public function test_same_pieces_4() {
         $this->Router->connect('/foo/bar/*bar', array('controller'=>'some'));
         $this->assertEqual($this->Router->toParams('/foo/bar/foobar'), array ('bar' => array ( 0 => 'foobar'), 'controller' => 'some'));
         $this->assertEqual($this->Router->toParams('/foo/bar/foobar/foobar2'), array('controller'=>'some', 'bar'=>array(0=>'foobar',1=>'foobar2')));
     }
 
-    public function test_same_pieces_5()
-    {
+    public function test_same_pieces_5() {
         $this->Router->connect('/foo/bar/*bar', array('controller'=>'some', 'bar'=>1));
         $this->assertEqual($this->Router->toParams('/foo/bar/foobar'), array('controller'=>'some', 'bar'=>array(0=>'foobar')));
     }
 
-    public function test_same_pieces_6()
-    {
+    public function test_same_pieces_6() {
         $this->Router->connect('/foo/:bar',	array('variable'=>'ok'));
         $this->Router->connect('/baz/:bar',	array('variable2'=>'ok', 'bar'=>COMPULSORY));
         $this->Router->connect('/:controller');
@@ -245,15 +235,13 @@ class Router_MiddleOptionalValuesWhenGeneratingUrls_TestCase extends ActionPackU
     public $Router;
     public $url_prefix = '';
 
-    public function setup()
-    {
+    public function setup() {
         $this->Router = new AkRouter();
         $this->Router->loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
     }
 
-    public function test_middle_values()
-    {
+    public function test_middle_values() {
         $this->Router->connect('/news/feed/:type/:category',
         array('controller'=>'news','action'=>'feed','type'=>'atom','category'=>'all'));
 
@@ -274,16 +262,14 @@ class Router_Modules_TestCase extends ActionPackUnitTest
     public $Router;
     public $url_prefix = '';
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->Router = new AkRouter();
         $this->Router->loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
         $this->Router->connect('/module_alias/:controller/:action/:id', array('controller' => 'test', 'action' => 'index', 'module'=>'testing_module'));
     }
 
-    public function test_should_set_underscored_module()
-    {
+    public function test_should_set_underscored_module() {
         $params = array('controller'=>'test','action'=>'show', 'id'=> 123, 'module' => 'testing_module');
         $url = '/module_alias/test/show/123/';
         $this->assertEqual($this->Router->toUrl($params), $url);
@@ -302,24 +288,21 @@ class Router_Conflicts_TestCase extends ActionPackUnitTest
     public $Router;
     public $url_prefix = '';
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->Router = new AkRouter();
         $this->Router->loadUrlRewriteSettings();
         $this->url_prefix = AK_URL_REWRITE_ENABLED ? '' : '/?ak=';
         $this->Router->connect('/:controller/:action/:value');
     }
 
-    public function test_should_allow_variables_with_slashes()
-    {
+    public function test_should_allow_variables_with_slashes() {
         $params = array('controller'=>'page','action'=>'redirect', 'value'=>'http://akelos.org/download/');
         $url = '/page/redirect/http%3A%2F%2Fakelos.org%2Fdownload%2F/';
         $this->assertEqual($this->Router->toUrl($params), $url);
         $this->assertEqual($this->Router->toParams($this->url_prefix.$url), $params);
     }
 
-    public function test_should_trigger_error_on_forbidden_router_variable()
-    {
+    public function test_should_trigger_error_on_forbidden_router_variable() {
         $this->expectError(new PatternExpectation('/reserved word this/'));
         $this->Router->connect('/:this');
     }

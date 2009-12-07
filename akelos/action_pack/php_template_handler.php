@@ -8,13 +8,11 @@ class AkPhpTemplateHandler
     public $_templateEngine = AK_DEFAULT_TEMPLATE_ENGINE;
     public $_codeSanitizerClass = AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER;
 
-    public function __construct(&$AkActionView)
-    {
+    public function __construct(&$AkActionView) {
         $this->_AkActionView = $AkActionView;
     }
 
-    public function render(&$____code, $____local_assigns, $____file_path)
-    {
+    public function render(&$____code, $____local_assigns, $____file_path) {
         $this->_options['variables'] = $____local_assigns;
         $this->_options['code'] =& $____code;
         $this->_options['functions'] = array('');
@@ -64,8 +62,7 @@ class AkPhpTemplateHandler
     }
 
 
-    public function _assertForValidTemplate()
-    {
+    public function _assertForValidTemplate() {
         static $CodeSanitizer;
         if(empty($CodeSanitizer)){
             $class = $this->_codeSanitizerClass;
@@ -75,8 +72,7 @@ class AkPhpTemplateHandler
         return $CodeSanitizer->isCodeSecure();
     }
 
-    public function _templateNeedsCompilation()
-    {
+    public function _templateNeedsCompilation() {
         if(!file_exists($this->_getCompiledTemplatePath()) || AK_FORCE_TEMPLATE_COMPILATION){
             return true;
         }
@@ -88,13 +84,11 @@ class AkPhpTemplateHandler
         return false;
     }
 
-    public function _templateNeedsValidation()
-    {
+    public function _templateNeedsValidation() {
         return true;
     }
 
-    public function _getTemplateBasePath()
-    {
+    public function _getTemplateBasePath() {
         if(empty($this->_options['template_base_path'])){
             $template_file_name = $this->_getTemplateFilename();
             if(!empty($template_file_name)){
@@ -110,27 +104,23 @@ class AkPhpTemplateHandler
     }
 
 
-    public function _getTemplatePath()
-    {
+    public function _getTemplatePath() {
         return $this->_options['file_path'];
     }
 
-    public function _getTemplateFilename()
-    {
+    public function _getTemplateFilename() {
         $this->_options['template_filename'] = empty($this->_options['template_filename']) && preg_match('/[^\/^\\\]+$/',$this->_options['file_path'],$match) ? $match[0] : @$this->_options['template_filename'];
         return $this->_options['template_filename'];
     }
 
-    public function _getCompiledTemplateBasePath()
-    {
+    public function _getCompiledTemplateBasePath() {
         if(empty($this->_options['compiled_template_base_path'])){
             $this->_options['compiled_template_base_path'] = $this->_getTemplateBasePath().DS.'compiled';
         }
         return $this->_options['compiled_template_base_path'];
     }
 
-    public function _getCompiledTemplatePath()
-    {
+    public function _getCompiledTemplatePath() {
         if(empty($this->_options['compiled_file_name'])){
             $template_filename = $this->_getTemplateFilename();
             $this->_options['compiled_file_name'] =  $this->_getCompiledTemplateBasePath().DS.
@@ -140,8 +130,7 @@ class AkPhpTemplateHandler
         return $this->_options['compiled_file_name'];
     }
 
-    public function _saveCompiledTemplate()
-    {
+    public function _saveCompiledTemplate() {
         $options = array('base_path' => (AK_COMPILED_VIEWS_DIR ? AK_TMP_DIR : AkConfig::getDir('base')));
         if(defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP && !strstr($options['base_path'], AkConfig::getDir('base'))){
             $options['ftp'] = false;
@@ -150,8 +139,7 @@ class AkPhpTemplateHandler
     }
 
 
-    public function _getHelpersChecksum()
-    {
+    public function _getHelpersChecksum() {
         if(!isset($this->_helpers_checksum)){
             $this->_helpers_checksum = md5(serialize(AkHelperLoader::getInstantiatedHelperNames()));
         }

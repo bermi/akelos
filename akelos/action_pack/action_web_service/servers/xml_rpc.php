@@ -5,13 +5,11 @@ class AkXmlRpcServer
     public $_ActionWebServiceServer;
     public $options = array();
 
-    public function AkXmlRpcServer(&$ActionWebServiceServer)
-    {
+    public function AkXmlRpcServer(&$ActionWebServiceServer) {
         $this->_ActionWebServiceServer = $ActionWebServiceServer;
     }
 
-    public function init($options = array())
-    {
+    public function init($options = array()) {
         $default_options = array(
         'dynamic_server_class_name' => 'AkDynamicXmlRpcServer'
         );
@@ -25,8 +23,7 @@ class AkXmlRpcServer
         }
     }
 
-    public function _addWebService($service_name, &$WebService)
-    {
+    public function _addWebService($service_name, &$WebService) {
         $Apis = $WebService->getApis();
 
         foreach (array_keys($Apis) as $k){
@@ -49,8 +46,7 @@ class AkXmlRpcServer
 
                 $this->_methods[] = "
 
-    public function _{$service_name}_{$api_method->name}_call()
-    {
+    public function _{$service_name}_{$api_method->name}_call() {
         \$args = func_get_args();
         return call_user_func_array(array(\$this->_{$service_name}, '".$api_method->name."'), (array)\$args[0]);
     }
@@ -60,8 +56,7 @@ class AkXmlRpcServer
         }
     }
 
-    public function _getDocumentationForMethod($ApiMethod)
-    {
+    public function _getDocumentationForMethod($ApiMethod) {
 
         $doc = !empty($ApiMethod->documentation)? $ApiMethod->documentation."\n" : '';
         foreach (array('expects', 'returns') as $expects_or_returns){
@@ -82,13 +77,11 @@ class AkXmlRpcServer
     }
 
 
-    public function _generateServerClassCode()
-    {
+    public function _generateServerClassCode() {
         $this->_serverClassCode = "<?php
 class {$this->options['dynamic_server_class_name']} extends AkIxrInstrospectionServer
 {
-    public function {$this->options['dynamic_server_class_name']}()
-    {
+    public function {$this->options['dynamic_server_class_name']}() {
         \$this->IXR_IntrospectionServer();
     }
     ";
@@ -96,8 +89,7 @@ class {$this->options['dynamic_server_class_name']} extends AkIxrInstrospectionS
         $this->_serverClassCode .= join("\n", $this->_methods);
 
         $this->_serverClassCode .= '
-    public function init()
-    {
+    public function init() {
     '. join("\n", $this->_callbacks).'
 
         $this->serve();
@@ -110,8 +102,7 @@ class {$this->options['dynamic_server_class_name']} extends AkIxrInstrospectionS
 
     }
 
-    public function serve()
-    {
+    public function serve() {
         $this->_generateServerClassCode();
         eval('?>'.$this->_serverClassCode.'<?php ');
         $Server = new $this->options['dynamic_server_class_name'];
@@ -119,8 +110,7 @@ class {$this->options['dynamic_server_class_name']} extends AkIxrInstrospectionS
         $Server->init();
     }
 
-    public function _linkWebServicesToServer(&$Server)
-    {
+    public function _linkWebServicesToServer(&$Server) {
         if(!empty($this->_ActionWebServiceServer->_services)){
             foreach (array_keys($this->_ActionWebServiceServer->_services) as $name_space){
                 $Server->{'_'.$name_space} = $this->_ActionWebServiceServer->_services[$name_space];
@@ -136,8 +126,7 @@ class AkIxrInstrospectionServer extends IXR_IntrospectionServer
 {
     public $_services = array();
 
-    public function output($xml)
-    {
+    public function output($xml) {
         $xml = '<?xml version="1.0"?>'."\n".$xml;
         $length = strlen($xml);
         header('Connection: close');
@@ -148,8 +137,7 @@ class AkIxrInstrospectionServer extends IXR_IntrospectionServer
         exit;
     }
 
-    public function _addService($service_name, &$ServiceInstance)
-    {
+    public function _addService($service_name, &$ServiceInstance) {
         $this->_services[$service_name] = $ServiceInstance;
     }
 }

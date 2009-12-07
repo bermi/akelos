@@ -2,8 +2,7 @@
 
 class <?php  echo $class_name?>Installer extends AkInstaller
 {
-    function up_1()
-    {
+    function up_1() {
         $this->createTable('<?php  echo AkInflector::tableize($class_name); ?>', "
         <?php  if(empty($table_columns)) : ?>
           id,
@@ -14,8 +13,7 @@ class <?php  echo $class_name?>Installer extends AkInstaller
         ");
     }
     
-    function down_1()
-    {
+    function down_1() {
         $this->dropTable('<?php  echo AkInflector::tableize($class_name); ?>');
     }
 }

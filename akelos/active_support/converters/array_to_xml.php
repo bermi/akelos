@@ -2,8 +2,7 @@
 
 class AkArrayToXml
 {
-    public function convert($options)
-    {
+    public function convert($options) {
         static $_tags = array();
         $header = !isset($options['header']) ? "<?xml version=\"1.0\"?>\r\n" : $options['header'];
         $parent = !isset($options['parent']) ? 'EMPTY_TAG' : $options['parent'];

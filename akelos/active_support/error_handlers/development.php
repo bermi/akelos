@@ -11,8 +11,7 @@ if(!defined('AK_DEBUG_OUTPUT_AS_HTML')){
 
 if(defined('AK_DEBUG') && AK_DEBUG){
 
-    function ak_backtrace($only_app = false, $html_output = AK_DEBUG_OUTPUT_AS_HTML)
-    {
+    function ak_backtrace($only_app = false, $html_output = AK_DEBUG_OUTPUT_AS_HTML) {
         $result = '';
         $bt = debug_backtrace();
         $result .= ("\nBacktrace (most recent call first):\n");
@@ -32,8 +31,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         return $html_output ? $result : html_entity_decode(strip_tags($result));
     }
 
-    function ak_show_app_backtrace()
-    {
+    function ak_show_app_backtrace() {
         $result = '';
         $bt = debug_backtrace();
         $result .= ("\n\Where in the application space the error occured?:\n\n\n");
@@ -59,8 +57,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         return $result;
     }
 
-    function ak_development_error_handler($error_number, $error_message, $file, $line)
-    {
+    function ak_development_error_handler($error_number, $error_message, $file, $line) {
         static $_sent_errors = array(), $_errors_shown = false;
 
         $error_number = $error_number & error_reporting();
@@ -148,8 +145,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
 
     }
 
-    function ak_show_source_line($file, $line, $highlight = '', $params = array())
-    {
+    function ak_show_source_line($file, $line, $highlight = '', $params = array()) {
         $result = ("File: ".$file."\n");
 
         $file = explode("\n", file_get_contents($file));
@@ -176,8 +172,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         return $result;
     }
 
-    function ak_show_params($params, $number_of_recursions = 0, $currently_inspecting = 'Array')
-    {
+    function ak_show_params($params, $number_of_recursions = 0, $currently_inspecting = 'Array') {
 
         $preffix = (str_repeat('        ',$number_of_recursions));
         if($number_of_recursions == 10){
@@ -202,8 +197,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         return $result;
     }
 
-    function ak_highlight_file($file, $line_number = 0)
-    {
+    function ak_highlight_file($file, $line_number = 0) {
         $highlighted = highlight_file($file, true);
         $highlighted = str_replace(array('<br /></span>',"<code><span style=\"color: #000000\">\n","\n</code>"), array('</span><br />','<span style="color: #000000">','',), $highlighted);
 
@@ -230,8 +224,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
 
     }
 
-    function ak_get_application_included_files($source_for = '')
-    {
+    function ak_get_application_included_files($source_for = '') {
         $app_files = array();
         foreach (get_included_files() as $k => $file){
             $short_path = str_replace(AK_BASE_DIR, '', $file);
@@ -262,8 +255,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
     !defined('AK_TRACE_ONLY_APP_DB_QUERIES') && define('AK_TRACE_ONLY_APP_DB_QUERIES', true);
     !defined('AK_TRACE_DB_QUERIES_INCLUDES_DB_TYPE') && define('AK_TRACE_DB_QUERIES_INCLUDES_DB_TYPE', false);
 
-    function ak_trace_db_query($message, $new_line = true)
-    {
+    function ak_trace_db_query($message, $new_line = true) {
         if(Ak::getStaticVar('ak_trace_db_query') === false){
             return ;
         }

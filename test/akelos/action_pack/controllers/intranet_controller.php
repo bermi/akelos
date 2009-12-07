@@ -2,13 +2,11 @@
 
 class IntranetController extends ApplicationController
 {
-    public function index()
-    {
+    public function index() {
         $this->renderText('Intranet Controller Works');
     }
 
-    public function _forbidden()
-    {
+    public function _forbidden() {
         $this->renderText('Holly s**t, fix this!');
     }
 }

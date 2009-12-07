@@ -4,14 +4,12 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class MultipleInclussion_TestCase extends ActiveRecordUnitTest
 {
-    public function test_start()
-    {
+    public function test_start() {
         $this->installAndIncludeModels(array('File', 'Tagging', 'Tag'));
     }
 
 
-    public function test_for_multiple_inclussion()
-    {
+    public function test_for_multiple_inclussion() {
         $AkelosLogFile = new File(array('name'=>'akelos.log'));
         $this->assertTrue($AkelosLogFile->save());
 

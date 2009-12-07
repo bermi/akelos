@@ -9,24 +9,21 @@ class AkActiveRecordCounter extends AkActiveRecordExtenssion
     * be computed every time. Especially important for looping over a collection where each element
     * require a number of aggregate values. Like the $DiscussionBoard that needs to list both the number of posts and comments.
     */
-    public function incrementCounter($counter_name, $id, $difference = 1)
-    {
+    public function incrementCounter($counter_name, $id, $difference = 1) {
         return $this->_ActiveRecord->updateAll("$counter_name = $counter_name + $difference", $this->_ActiveRecord->getPrimaryKey().' = '.$this->_ActiveRecord->castAttributeForDatabase($this->_ActiveRecord->getPrimaryKey(), $id)) === 1;
     }
 
     /**
     * Works like AkActiveRecord::incrementCounter, but decrements instead.
     */
-    public function decrementCounter($counter_name, $id, $difference = 1)
-    {
+    public function decrementCounter($counter_name, $id, $difference = 1) {
         return $this->_ActiveRecord->updateAll("$counter_name = $counter_name - $difference", $this->_ActiveRecord->getPrimaryKey().' = '.$this->_ActiveRecord->castAttributeForDatabase($this->_ActiveRecord->getPrimaryKey(), $id)) === 1;
     }
 
     /**
     * Initializes the attribute to zero if null and subtracts one. Only makes sense for number-based attributes. Returns attribute value.
     */
-    public function decrementAttribute($attribute)
-    {
+    public function decrementAttribute($attribute) {
         if(!isset($this->_ActiveRecord->$attribute)){
             $this->_ActiveRecord->$attribute = 0;
         }
@@ -36,8 +33,7 @@ class AkActiveRecordCounter extends AkActiveRecordExtenssion
     /**
     * Decrements the attribute and saves the record.
     */
-    public function decrementAndSaveAttribute($attribute)
-    {
+    public function decrementAndSaveAttribute($attribute) {
         return $this->_ActiveRecord->updateAttribute($attribute,$this->decrementAttribute($attribute));
     }
 
@@ -45,8 +41,7 @@ class AkActiveRecordCounter extends AkActiveRecordExtenssion
     /**
     * Initializes the attribute to zero if null and adds one. Only makes sense for number-based attributes. Returns attribute value.
     */
-    public function incrementAttribute($attribute)
-    {
+    public function incrementAttribute($attribute) {
         if(!isset($this->_ActiveRecord->$attribute)){
             $this->_ActiveRecord->$attribute = 0;
         }
@@ -56,8 +51,7 @@ class AkActiveRecordCounter extends AkActiveRecordExtenssion
     /**
     * Increments the attribute and saves the record.
     */
-    public function incrementAndSaveAttribute($attribute)
-    {
+    public function incrementAndSaveAttribute($attribute) {
         return $this->_ActiveRecord->updateAttribute($attribute, $this->incrementAttribute($attribute));
     }
 

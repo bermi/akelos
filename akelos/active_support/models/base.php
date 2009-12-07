@@ -15,8 +15,7 @@ class AkBaseModel extends AkLazyObject
     /**
     * Returns current model name
     */
-    public function getModelName()
-    {
+    public function getModelName() {
         if(!isset($this->_modelName)){
             if(!$this->setModelName()){
                 trigger_error(Ak::t('Unable to fetch current model name'),E_USER_NOTICE);
@@ -30,8 +29,7 @@ class AkBaseModel extends AkLazyObject
     *
     * Use this option if the model name can't be guessed by the Active Record
     */
-    public function setModelName($model_name = null)
-    {
+    public function setModelName($model_name = null) {
         if(!empty($model_name)){
             $this->_modelName = $model_name;
         }else{
@@ -40,8 +38,7 @@ class AkBaseModel extends AkLazyObject
         return true;
     }
 
-    public function getParentModelName()
-    {
+    public function getParentModelName() {
         if(!isset($this->_parentModelName)){
             if(!$this->setParentModelName()){
                 return false;
@@ -50,8 +47,7 @@ class AkBaseModel extends AkLazyObject
         return $this->_parentModelName;
     }
 
-    public function setParentModelName($model_name = null)
-    {
+    public function setParentModelName($model_name = null) {
         if(!empty($model_name)){
             $this->_parentModelName = $model_name;
         }else{
@@ -67,15 +63,13 @@ class AkBaseModel extends AkLazyObject
         return true;
     }
 
-    public function t($string, $array = null)
-    {
+    public function t($string, $array = null) {
         return Ak::t($string, $array, AkInflector::underscore($this->getModelName()));
     }
 
 
 
-    public function getAttributeCondition($argument)
-    {
+    public function getAttributeCondition($argument) {
         return is_array($argument) ? 'IN (?)' : (is_null($argument) ? 'IS ?' : '= ?');
     }
 
@@ -87,8 +81,7 @@ class AkBaseModel extends AkLazyObject
 class AkModelExtenssion
 {
     protected $_Model;
-    public function setExtendedBy(&$Model)
-    {
+    public function setExtendedBy(&$Model) {
         $this->_Model = $Model;
     }
 }

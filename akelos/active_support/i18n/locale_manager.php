@@ -12,8 +12,7 @@ class AkLocaleManager
     public $available_locales = array(AK_FRAMEWORK_LANGUAGE=>array(AK_FRAMEWORK_LANGUAGE));
     public $browser_lang = array(AK_FRAMEWORK_LANGUAGE);
 
-    public function init()
-    {
+    public function init() {
         if(AK_AVAILABLE_LOCALES == 'auto'){
             $this->available_locales = $this->getAvailableLocales();
         }elseif(AK_AVAILABLE_LOCALES != 'en'){
@@ -21,8 +20,7 @@ class AkLocaleManager
         }
     }
 
-    public function getAvailableLocales()
-    {
+    public function getAvailableLocales() {
         static $available_locales;
 
         if(empty($available_locales)){
@@ -40,8 +38,7 @@ class AkLocaleManager
         return $available_locales;
     }
 
-    public function parseLocaleConfigString($locale_settings)
-    {
+    public function parseLocaleConfigString($locale_settings) {
         $locale_settings = trim(str_replace(' ','',$locale_settings));
         $locale_settings = str_replace(array(';','(',')'), array(',','~','',''),$locale_settings);
         $available_locales = strstr($locale_settings,',') ? explode(',',$locale_settings) : array($locale_settings);
@@ -67,8 +64,7 @@ class AkLocaleManager
         return $locales;
     }
 
-    public function getBrowserLanguages()
-    {
+    public function getBrowserLanguages() {
         $browser_accepted_languages = str_replace('-','_', strtolower(preg_replace('/q=[0-9\.]+,*/','',@$_SERVER['HTTP_ACCEPT_LANGUAGE'])));
         $browser_languages = (array_diff(preg_split('/;|,/',$browser_accepted_languages.','), array('')));
         if(empty($browser_languages)){
@@ -78,8 +74,7 @@ class AkLocaleManager
     }
 
 
-    public function getDefaultLanguageForUser()
-    {
+    public function getDefaultLanguageForUser() {
         $browser_languages = $this->getBrowserLanguages();
 
         // First run for full locale (en_us, en_uk)
@@ -101,16 +96,14 @@ class AkLocaleManager
         return $this->getDefaultLocale();
     }
 
-    public function getDefaultLocale()
-    {
+    public function getDefaultLocale() {
         $available_locales = $this->available_locales;
         $default_locale = array_shift($available_locales);
         return is_array($default_locale) ? $default_locale[0] : $default_locale;
     }
 
 
-    static function getUsedLanguageEntries($lang_entry = null, $controller = null)
-    {
+    static function getUsedLanguageEntries($lang_entry = null, $controller = null) {
         static $_locale_entries = array();
 
         if(isset($controller)){
@@ -123,8 +116,7 @@ class AkLocaleManager
         }
     }
 
-    static function getNewEntries($array,$existing = array())
-    {
+    static function getNewEntries($array,$existing = array()) {
         foreach($array as $key => $value) {
             $value=trim($value);
             if(empty($value) || isset($existing[$key])) unset($array[$key]);
@@ -134,8 +126,7 @@ class AkLocaleManager
     /**
      * @todo Refactor this method
      */
-    static function updateLocaleFiles()
-    {
+    static function updateLocaleFiles() {
         if(defined('AK_LOCALE_MANAGER') && class_exists(AK_LOCALE_MANAGER) && in_array('AkLocaleManager',class_parents(AK_LOCALE_MANAGER))) {
             return;
         }
@@ -225,8 +216,7 @@ class AkLocaleManager
      */
 
 
-    public function initApplicationInternationalization(&$Request)
-    {
+    public function initApplicationInternationalization(&$Request) {
         if(!defined('AK_APP_LOCALES')){
             define('AK_APP_LOCALES',join(',',array_keys($this->available_locales)));
         }
@@ -247,8 +237,7 @@ class AkLocaleManager
      *
      * @return array
      */
-    public function getPublicLocales()
-    {
+    public function getPublicLocales() {
         static $public_locales;
         if(empty($public_locales)){
             $public_locales = defined('AK_PUBLIC_LOCALES') ?
@@ -258,8 +247,7 @@ class AkLocaleManager
         return $public_locales;
     }
 
-    static function getCoreDictionary($language,$set=false,$set_data=null)
-    {
+    static function getCoreDictionary($language,$set=false,$set_data=null) {
         static $dictionaries=array();
         $path = AK_CONFIG_DIR.DS.'locales'.DS.basename($language).'.php';
         if($set===true && is_array($set_data)) {
@@ -280,8 +268,7 @@ class AkLocaleManager
         return $dictionaries[$path];
     }
 
-    static function getDictionary($language,$namespace=false,$set=false,$set_data=null)
-    {
+    static function getDictionary($language,$namespace=false,$set=false,$set_data=null) {
         static $dictionaries=array();
         $path = AkConfig::getDir('app').DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
 
@@ -300,40 +287,35 @@ class AkLocaleManager
         return $dictionaries[$path];
     }
 
-    static function setCoreDictionary($locale, $dictionary, $language, $comment=null)
-    {
+    static function setCoreDictionary($locale, $dictionary, $language, $comment=null) {
 
         $path = AK_CONFIG_DIR.DS.'locales'.DS.basename($language).'.php';
         AkLocaleManager::getCoreDictionary($language,true,array($locale,$dictionary));
         return Ak::file_put_contents($path,"<?php\n/** $comment */\n\n\$locale=".var_export((array)$locale,true).";\n\n\$dictionary=".var_export((array)$dictionary,true).";\n");
     }
 
-    static function deleteDictionary($language, $namespace)
-    {
+    static function deleteDictionary($language, $namespace) {
         $path = AkConfig::getDir('app').DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
         AkLocaleManager::getDictionary($language,$namespace,true,array());
         clearstatcache();
         return (file_exists($path)?@unlink($path):false);
     }
 
-    static function deleteCoreDictionary($language)
-    {
+    static function deleteCoreDictionary($language) {
         $path = AK_CONFIG_DIR.DS.'locales'.DS.basename($language).'.php';
         AkLocaleManager::getCoreDictionary($language,true,array(array(),array()));
         clearstatcache();
         return (file_exists($path)?@unlink($path):false);
     }
 
-    static function setDictionary($dictionary,$language,$namespace=false,$comment=null)
-    {
+    static function setDictionary($dictionary,$language,$namespace=false,$comment=null) {
         $path = AkConfig::getDir('app').DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
         AkLocaleManager::getDictionary($language,$namespace,true,$dictionary);
         Ak::file_put_contents($path,"<?php\n/** $comment */\n\n\$dictionary=".var_export((array)$dictionary,true).";\n");
         return $path;
     }
 
-    protected function _getLocaleForRequest(&$Request)
-    {
+    protected function _getLocaleForRequest(&$Request) {
         $lang = $this->getNavigationLanguage();
 
         if($url_locale = $this->getLangFromUrl($Request)){
@@ -354,14 +336,12 @@ class AkLocaleManager
         return $lang;
     }
 
-    protected function _canUseLocaleOnCurrentRequest($lang, &$Request)
-    {
+    protected function _canUseLocaleOnCurrentRequest($lang, &$Request) {
         return in_array($lang, $this->getPublicLocales());
     }
 
 
-    public function getLangFromUrl(&$Request)
-    {
+    public function getLangFromUrl(&$Request) {
         $lang = false;
 
         if(isset($Request->lang)){
@@ -396,15 +376,13 @@ class AkLocaleManager
         return $lang;
     }
 
-    static function rememberNavigationLanguage($lang)
-    {
+    static function rememberNavigationLanguage($lang) {
         if(isset($_SESSION) && !empty($lang)){
             $_SESSION['lang'] = $lang;
         }
     }
 
-    public function getNavigationLanguage()
-    {
+    public function getNavigationLanguage() {
         if(!isset($_SESSION['lang'])){
             $this->browser_lang = $this->getDefaultLanguageForUser();
             return $this->getDefaultLanguageForUser();
@@ -413,8 +391,7 @@ class AkLocaleManager
         }
     }
 
-    public function getLocaleFromAlias($alias)
-    {
+    public function getLocaleFromAlias($alias) {
         foreach ($this->available_locales  as $locale=>$locale_arr){
             if(in_array($alias,$locale_arr)){
                 return $locale;

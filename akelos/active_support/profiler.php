@@ -1,8 +1,7 @@
 <?php
 
 if(!function_exists('memory_get_usage')){
-    function memory_get_usage()
-    {
+    function memory_get_usage() {
         if ( substr(PHP_OS,0,3) == 'WIN') {
             $tmp = explode(',"'.getmypid().'",',`TASKLIST /FO "CSV"`);
             $tmp = explode("\n",$tmp[1]);
@@ -23,25 +22,21 @@ class AkProfiler
     public $report = '';
     public $_timer = array();
 
-    public function init($message='Initializing profiler')
-    {
+    public function init($message='Initializing profiler') {
         $this->_timeStart = $this->getMicrotime();
         $this->setFlag($message);
     }
 
-    public function getMicrotime()
-    {
+    public function getMicrotime() {
         return array_sum(explode(' ',microtime()));
     }
 
-    public function setFlag($flag)
-    {
+    public function setFlag($flag) {
         $memory = AK_PROFILER_GET_MEMORY ? memory_get_usage() : 1;
         $this->_timer[] = array($this->getMicrotime(), $flag, $memory);
     }
 
-    public function renderReport()
-    {
+    public function renderReport() {
         $this->setFlag('end');
         $end_time = $this->getMicrotime();
         $report = array();
@@ -67,16 +62,14 @@ class AkProfiler
         $this->report .= "flag\tstarted\telapsed\taverage\n\n\nTotal time: <ul>".join("\n",$report).number_format($end_time-$this->_timeStart,6)."</ul>\n";
     }
 
-    public function saveReport()
-    {
+    public function saveReport() {
         if($this->report == ''){
             $this->renderReport();
         }
         Ak::file_put_contents('profiler_results.txt',$this->report);
     }
 
-    public function showReport()
-    {
+    public function showReport() {
         if($this->report == ''){
             $this->renderReport();
         }

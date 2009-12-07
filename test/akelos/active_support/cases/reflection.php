@@ -4,16 +4,14 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class Reflection_TestCase extends ActiveSupportUnitTest
 {
-    public function setUp()
-    {
+    public function setUp() {
         /**
          * AK_TEST_DIR.DS.'fixtures'.DS.'data'.DS.'reflection_test_class.php'
          */
         $this->Reflection = new AkReflection();
     }
 
-    public function test_parse_function()
-    {
+    public function test_parse_function() {
         $function = '   function testFunction($param) { testbody(); }';
         $this->Reflection->parse($function);
         $functionStructure = $this->Reflection->getDefinitions();
@@ -55,8 +53,7 @@ class Reflection_TestCase extends ActiveSupportUnitTest
         $this->assertEqual('_getPriorizedPlugins',$functionStructure[0]['name']);
 
     }
-    public function test_parse_require_include()
-    {
+    public function test_parse_require_include() {
         $function = '
         require_once(AK_APP_DIR.DS.\'require_once.php\');
         require(AK_APP_DIR.DS.\'require.php\');
@@ -70,8 +67,7 @@ class Reflection_TestCase extends ActiveSupportUnitTest
         $this->assertEqual(array("AK_APP_DIR.DS.'include.php'"),$structure['include']);
 
     }
-    public function test_parse_class()
-    {
+    public function test_parse_class() {
         $function = '
         require_once(AK_APP_DIR.DS.\'test.php\');
         /**

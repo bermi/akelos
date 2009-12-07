@@ -5,20 +5,17 @@ require_once(dirname(__FILE__).'/../config.php');
 class AssociationFinders_TestCase extends ActiveRecordUnitTest
 {
 
-    public function setup()
-    {
+    public function setup() {
         $this->installAndIncludeModels(array('Aa', 'Bb', 'Cc','Dd', 'Ee'));
     }
 
-    public function tearDown()
-    {
+    public function tearDown() {
         foreach (explode(',', 'aa_ee,bb_cc,dd_ee') as $file){
             @Ak::file_delete(AkConfig::getDir('models').DS.$file.'.php');
         }
     }
 
-    public function test_find_on_first_level_has_many_finder_with_conditions()
-    {
+    public function test_find_on_first_level_has_many_finder_with_conditions() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));
@@ -33,8 +30,7 @@ class AssociationFinders_TestCase extends ActiveRecordUnitTest
         $this->assertEqual('first bb',$firstbb->name);
     }
 
-    public function test_find_on_first_level_has_many_finder_with_conditions_as_array()
-    {
+    public function test_find_on_first_level_has_many_finder_with_conditions_as_array() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));
@@ -49,8 +45,7 @@ class AssociationFinders_TestCase extends ActiveRecordUnitTest
         $this->assertEqual('first bb',$firstbb->name);
     }
 
-    public function test_find_on_first_level_has_many_finder_with_conditions_and_bind()
-    {
+    public function test_find_on_first_level_has_many_finder_with_conditions_and_bind() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));
@@ -65,8 +60,7 @@ class AssociationFinders_TestCase extends ActiveRecordUnitTest
         $this->assertEqual('first bb',$firstbb->name);
     }
 
-    public function test_find_on_first_level_has_many_finder_with_order()
-    {
+    public function test_find_on_first_level_has_many_finder_with_order() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));
@@ -83,8 +77,7 @@ class AssociationFinders_TestCase extends ActiveRecordUnitTest
         $this->assertEqual('first bb',$babies[1]->name);
     }
 
-    public function test_find_on_first_level_has_many_finder_with_include()
-    {
+    public function test_find_on_first_level_has_many_finder_with_include() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));
@@ -117,8 +110,7 @@ class AssociationFinders_TestCase extends ActiveRecordUnitTest
      * fixing #219
      *
      */
-    public function test_find_on_first_level_has_many_finder_with_id_and_include()
-    {
+    public function test_find_on_first_level_has_many_finder_with_id_and_include() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));
@@ -148,8 +140,7 @@ class AssociationFinders_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($bb2->name,$babies[1]->name);
         $this->assertEqual(1,count($babies[1]->ccs));
     }
-    public function test_find_on_second_level_habtm_finder_with_conditions_and_bind()
-    {
+    public function test_find_on_second_level_habtm_finder_with_conditions_and_bind() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));
@@ -183,8 +174,7 @@ class AssociationFinders_TestCase extends ActiveRecordUnitTest
      * fixing #219
      *
      */
-    public function test_find_on_second_level_habtm_finder_with_id()
-    {
+    public function test_find_on_second_level_habtm_finder_with_id() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));
@@ -213,8 +203,7 @@ class AssociationFinders_TestCase extends ActiveRecordUnitTest
         $this->assertEqual('third cc',$thirdcc->name);
     }
 
-    public function test_find_on_second_level_habtm_finder_with_conditions_as_array()
-    {
+    public function test_find_on_second_level_habtm_finder_with_conditions_as_array() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));
@@ -248,8 +237,7 @@ class AssociationFinders_TestCase extends ActiveRecordUnitTest
      * habtm finder and includes is a bit difficult
      *
      */
-    public function xtest_find_on_second_level_habtm_finder_with_conditions_as_array_and_include()
-    {
+    public function xtest_find_on_second_level_habtm_finder_with_conditions_as_array_and_include() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));

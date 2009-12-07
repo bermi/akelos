@@ -2,12 +2,10 @@
 
 class AkObjectToArray
 {
-    public function convert()
-    {
+    public function convert() {
         return $this->_walkObject($this->source);
     }
-    public function _convertNumeric($value)
-    {
+    public function _convertNumeric($value) {
         if (is_string($value) && !preg_match('/\d/', $value{0})) {
             return $value;
         } else if (is_null($value)) {
@@ -21,8 +19,7 @@ class AkObjectToArray
         }
         return $value;
     }
-    public function _walkObject($obj)
-    {
+    public function _walkObject($obj) {
         $return = array();
         foreach($obj as $key=>$value) {
             if (is_object($value)) {

@@ -4,28 +4,24 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class DocumentCrud_TestCase extends ActiveDocumentUnitTest
 {
-    public function setup()
-    {
+    public function setup() {
         $this->db = new AkOdbAdapter();
         $this->db->connect(array('type' => 'mongo_db', 'database' => 'akelos_testing'));
         $this->WebPage = new WebPage();
         $this->WebPage->setAdapter($this->db);
     }
 
-    public function tearDown()
-    {
+    public function tearDown() {
         $this->db->dropDatabase();
         $this->db->disconnect();
     }
 
-    public function test_should_get_collection()
-    {
+    public function test_should_get_collection() {
         $this->assertEqual($this->WebPage->getCollectionName(), 'web_pages');
         $this->assertEqual($this->WebPage->getTableName(),      'web_pages');
     }
 
-    public function test_should_create_document()
-    {
+    public function test_should_create_document() {
         $attributes = array(
         'title' => 'Akelos.org',
         'body'  =>  'Akelos PHP framework...',
@@ -38,8 +34,7 @@ class DocumentCrud_TestCase extends ActiveDocumentUnitTest
         $this->assertNotNull($Akelos->getId());
     }
 
-    public function test_should_not_duplicate_documents()
-    {
+    public function test_should_not_duplicate_documents() {
         $attributes = array(
         'title' => 'Doc 1',
         );
@@ -51,8 +46,7 @@ class DocumentCrud_TestCase extends ActiveDocumentUnitTest
         $this->assertNotEqual($AkelosDuplicated->getId(), $Akelos->getId());
     }
 
-    public function test_should_set_and_get_attributes()
-    {
+    public function test_should_set_and_get_attributes() {
         $this->WebPage->title = 'Akelos.org';
         $this->WebPage->body  =  'Akelos PHP framework...';
         $this->WebPage->keywords = array('one', 'two');
@@ -67,8 +61,7 @@ class DocumentCrud_TestCase extends ActiveDocumentUnitTest
     }
 
 
-    public function test_should_update_records()
-    {
+    public function test_should_update_records() {
         $this->WebPage->body  =  'Akelos PHP framework...';
         $this->WebPage->save();
         $id = $this->WebPage->getId();
@@ -79,8 +72,7 @@ class DocumentCrud_TestCase extends ActiveDocumentUnitTest
         $this->assertEqual($id, $this->WebPage->getId());
     }
 
-    public function test_should_record_timestamps()
-    {
+    public function test_should_record_timestamps() {
         $this->WebPage->body  =  'Akelos PHP framework...';
         $this->WebPage->save();
         $created_at = Ak::getDate();
@@ -91,8 +83,7 @@ class DocumentCrud_TestCase extends ActiveDocumentUnitTest
         $this->assertEqual($this->WebPage->updated_at, Ak::getDate());
     }
 
-    public function test_should_instantiate_record_by_primary_key()
-    {
+    public function test_should_instantiate_record_by_primary_key() {
         $this->WebPage->body  =  'Akelos PHP framework...';
         $this->WebPage->save();
         $WebPage = new WebPage($this->WebPage->getId());
@@ -101,16 +92,14 @@ class DocumentCrud_TestCase extends ActiveDocumentUnitTest
         $this->assertEqual($WebPage->getId(), $this->WebPage->getId());
     }
 
-    public function test_should_set_default_attributes_on_constructor()
-    {
+    public function test_should_set_default_attributes_on_constructor() {
         $WebPage = new WebPage(array('body' => 'Akelos PHP framework'));
         $WebPage->save();
         $WebPage2 = new WebPage($WebPage->getId());
         $this->assertEqual($WebPage->body, $WebPage2->body);
     }
 
-    public function test_should_destroy_record()
-    {
+    public function test_should_destroy_record() {
         $WebPage = new WebPage(array('body' => 'Akelos PHP framework'));
         $WebPage->save();
         $WebPage2 = new WebPage($WebPage->getId());

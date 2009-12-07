@@ -18,8 +18,7 @@ class PHP_Bug_33595_B
 class PHP_Bug_33595_TestCase extends ActiveSupportUnitTest
 {
 
-    public function test_should_increase_memory()
-    {
+    public function test_should_increase_memory() {
         $this->log_memory(true);
 
         for($i = 0; $i<2; $i++) {
@@ -32,8 +31,7 @@ class PHP_Bug_33595_TestCase extends ActiveSupportUnitTest
 
     }
 
-    public function test_should_not_increase_memory()
-    {
+    public function test_should_not_increase_memory() {
         $this->log_memory(true);
 
         for($i = 0; $i<20; $i++) {
@@ -45,8 +43,7 @@ class PHP_Bug_33595_TestCase extends ActiveSupportUnitTest
         memory increase was '.$bytes.' bytes but should be lower than 500 bytes');
     }
 
-    public function instantiate_grow_and_unset($use_free_memory_hack = true)
-    {
+    public function instantiate_grow_and_unset($use_free_memory_hack = true) {
         $One = new PHP_Bug_33595_A();
         $Two = new PHP_Bug_33595_B();
 
@@ -65,8 +62,7 @@ class PHP_Bug_33595_TestCase extends ActiveSupportUnitTest
         unset($Two);
     }
 
-    public function log_memory($reset = false, $vervose = false)
-    {
+    public function log_memory($reset = false, $vervose = false) {
         if($reset || empty($this->initial)) $this->initial = memory_get_usage();
         $this->current = memory_get_usage();
         $this->difference = $this->current - $this->initial;

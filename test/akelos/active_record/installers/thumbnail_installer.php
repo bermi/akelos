@@ -2,8 +2,7 @@
 
 class ThumbnailInstaller extends AkInstaller
 {
-    public function install($version = null, $options = array())
-    {
+    public function install($version = null, $options = array()) {
         $this->createTable('thumbnails', '
         id integer(11) auto increment primary key,
         photo_id integer,
@@ -13,8 +12,7 @@ class ThumbnailInstaller extends AkInstaller
         );
     }
 
-    public function uninstall($version = null, $options = array())
-    {
+    public function uninstall($version = null, $options = array()) {
         $this->dropTable('thumbnails', array('sequence'=>true));
     }
 }

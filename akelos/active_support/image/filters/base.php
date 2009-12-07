@@ -6,18 +6,15 @@ class AkImageFilter
     $Image,
     $options = array();
 
-    public function setImage(&$Image)
-    {
+    public function setImage(&$Image) {
         $this->Image = $Image;
     }
 
-    public function &getImage()
-    {
+    public function &getImage() {
         return $this->Image;
     }
 
-    public function getOptions()
-    {
+    public function getOptions() {
         return $this->options;
     }
 
@@ -25,15 +22,13 @@ class AkImageFilter
      * Options for pear ImageTransform are normally in lower camelCase so we need to remap the option keys
      * to adhere to the framework convention of underscored options
      */
-    protected function _variablizeOptions_(&$options)
-    {
+    protected function _variablizeOptions_(&$options) {
         foreach ($options as $k=>$v){
             $options[AkInflector::variablize($k)] = $v;
         }
     }
 
-    protected function _setWidthAndHeight_(&$options)
-    {
+    protected function _setWidthAndHeight_(&$options) {
         if(!empty($options['size'])){
             list($options['width'], $options['height']) = preg_split('/x|X| /',trim(str_replace(' ','',$options['size'])).'x');
             unset($options['size']);

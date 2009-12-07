@@ -6,14 +6,12 @@ class PostgreSqlDatatypeMigration_TestCase extends ActiveRecordUnitTest
 {
     public $WeHaveAPostgreSqlEnvironment;
 
-    public function test_init()
-    {
+    public function test_init() {
         $this->db = Ak::db();
         $this->WeHaveAPostgreSqlEnvironment = $this->db->type() === 'postgre';
     }
 
-    public function test_integers_and_booleans_should_not_be_numerics()
-    {
+    public function test_integers_and_booleans_should_not_be_numerics() {
         if (!$this->WeHaveAPostgreSqlEnvironment) return;
         $this->installAndIncludeModels(array(
         'TestPage'=> "id,
@@ -26,8 +24,7 @@ class PostgreSqlDatatypeMigration_TestCase extends ActiveRecordUnitTest
                           $this->assertEqual($from_datadict['IS_PUBLIC']->type, 'bool');
     }
 
-    public function test_should_return_simplified_akelos_datatypes()
-    {
+    public function test_should_return_simplified_akelos_datatypes() {
         if (!$this->WeHaveAPostgreSqlEnvironment) return;
         $this->installAndIncludeModels(array('TestPage'=>"id,parent_id integer,is_public boolean"));
         $from_datadict = $this->TestPage->getColumnSettings();
@@ -36,8 +33,7 @@ class PostgreSqlDatatypeMigration_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_should_migrate_integers()
-    {
+    public function test_should_migrate_integers() {
         if (!$this->WeHaveAPostgreSqlEnvironment) return;
         // mimic OLD boolean and integer behavior!
         $this->installAndIncludeModels(array('TestPage'=>"id,parent_id n(11.0),is_public n(1)"));

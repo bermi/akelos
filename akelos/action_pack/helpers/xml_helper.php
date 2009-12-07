@@ -26,8 +26,7 @@ class XmlHelper
 {
     public $dynamic_helpers = array('xml_.*?');
     
-    public function rss2_builder($items = array(), $channel_options = array(), $item_options = array())
-    {
+    public function rss2_builder($items = array(), $channel_options = array(), $item_options = array()) {
         $return = array();
         
         $default_channel_options = array('title'=>'Please put your custom channel title in $channel_options[title]',
@@ -96,8 +95,7 @@ class XmlHelper
         return implode("\n",$return);
     }
     
-    public function _getValue($obj, $identifier)
-    {
+    public function _getValue($obj, $identifier) {
         $value = false;
         if(is_array($identifier)) {
             $value = '';
@@ -151,8 +149,7 @@ class XmlHelper
         return $value;
     }
     
-    public function _generate_date($db_date)
-    {
+    public function _generate_date($db_date) {
         //1998-05-12T14:15:00
         if (!is_int($db_date)) {
             $db_date=strtotime($db_date);
@@ -161,8 +158,7 @@ class XmlHelper
 
     }
     
-    public function setController(&$controller)
-    {
+    public function setController(&$controller) {
         $this->_controller = $controller;
     }
     
@@ -174,8 +170,7 @@ class XmlHelper
         return $this->_renderTag(false,$type,'',$options,'<?','?>','?>');
     }
     
-    public function __call($name,$args)
-    {
+    public function __call($name,$args) {
         if(preg_match('/^xml_([\w_]+?)_(open|close)$/',$name,$matches)) {
             $tagName = str_replace('-',':',$matches[1]);
             $name_space = false;
@@ -220,8 +215,7 @@ class XmlHelper
             return $this->_renderTag($name_space,$tagName,$content,$options,'<','>','/>');
         }
     }
-    public function _renderTag($name_space, $tagName, $content = null, $attributes = array(), $open = '<', $close = '>', $closeTag='/>')
-    {
+    public function _renderTag($name_space, $tagName, $content = null, $attributes = array(), $open = '<', $close = '>', $closeTag='/>') {
         $attribute_array = array();
         if (is_array($attributes) && count($attributes)>0) {
             

@@ -62,8 +62,7 @@ class FormOptionsHelper extends AkActionViewHelper
      * By default, $post.person_id is the selected option.  Specify 'selected' => value to use a different selection
      * or 'selected' => null to leave all options unselected. You can also specify a default value with 'default' => value.
      */
-    public function select($object_name,  $column_name, $choices, $options = array(), $html_options = array())
-    {
+    public function select($object_name,  $column_name, $choices, $options = array(), $html_options = array()) {
         $InstanceTag = new AkFormHelperOptionsInstanceTag($object_name,  $column_name, $this, null, $this->_object[$object_name]);
         return $InstanceTag->to_select_tag($choices, Ak::delete($options,'object'), $html_options);
     }
@@ -71,8 +70,7 @@ class FormOptionsHelper extends AkActionViewHelper
     /**
        * Return select and option tags for the given object and column_name using options_from_collection_for_select to generate the list of option tags.
        */
-    public function collection_select($object_name,  $column_name, $collection, $value_column_name, $text_column_name, $options = array(), $html_options = array())
-    {
+    public function collection_select($object_name,  $column_name, $collection, $value_column_name, $text_column_name, $options = array(), $html_options = array()) {
         $InstanceTag = new AkFormHelperOptionsInstanceTag($object_name,  $column_name, $this, null, $this->_object[$object_name]);
         return $InstanceTag->to_collection_select_tag($collection, $value_column_name, $text_column_name, Ak::delete($options,'object'), $html_options);
     }
@@ -80,8 +78,7 @@ class FormOptionsHelper extends AkActionViewHelper
     /**
       * Return select and option tags for the given object and column_name, using country_options_for_select to generate the list of option tags.
       */
-    public function country_select($object_name,  $column_name, $priority_countries = null, $options = array(), $html_options = array())
-    {
+    public function country_select($object_name,  $column_name, $priority_countries = null, $options = array(), $html_options = array()) {
         $InstanceTag = new AkFormHelperOptionsInstanceTag($object_name,  $column_name, $this, null, $this->_object[$object_name]);
         return $InstanceTag->to_country_select_tag($priority_countries, Ak::delete($options,'object'), $html_options);
     }
@@ -96,8 +93,7 @@ class FormOptionsHelper extends AkActionViewHelper
        * zone model object. (See #time_zone_options_for_select for more
        * information.)
        */
-    public function time_zone_select($object_name,  $column_name, $priority_zones = array(), $options = array(), $html_options = array())
-    {
+    public function time_zone_select($object_name,  $column_name, $priority_zones = array(), $options = array(), $html_options = array()) {
         $InstanceTag = new AkFormHelperOptionsInstanceTag($object_name,  $column_name, $this, null, $this->_object[$object_name]);
         return $InstanceTag->to_time_zone_select_tag($priority_zones, Ak::delete($options,'object'), $html_options);
     }
@@ -126,8 +122,7 @@ class FormOptionsHelper extends AkActionViewHelper
        *
        * NOTE: Only the option tags are returned, you have to wrap this call in a regular HTML select tag.
        */
-    public function options_for_select($container, $selected = array(), $options = array())
-    {
+    public function options_for_select($container, $selected = array(), $options = array()) {
         $container = (array)$container;
         if (empty($container)) {
             return '';
@@ -162,8 +157,7 @@ class FormOptionsHelper extends AkActionViewHelper
        *
        * NOTE: Only the option tags are returned, you have to wrap this call in a regular HTML select tag.
        */
-    public function options_from_collection_for_select($collection, $value_column_name, $text_column_name = null, $selected_value = array(), $options = array())
-    {
+    public function options_from_collection_for_select($collection, $value_column_name, $text_column_name = null, $selected_value = array(), $options = array()) {
         $text_column_name = is_null($text_column_name) ? $value_column_name : $text_column_name;
         $collection_options = array();
         if($value_column_name[0] == '_' || $text_column_name[0] == '_'){
@@ -214,8 +208,7 @@ class FormOptionsHelper extends AkActionViewHelper
       *
       * NOTE: Only the option tags are returned, you have to wrap this call in a regular HTML select tag.
       */
-    public function option_groups_from_collection_for_select($collection, $group_method, $group_label_method, $option_key_method, $option_value_method, $selected_key = null)
-    {
+    public function option_groups_from_collection_for_select($collection, $group_method, $group_label_method, $option_key_method, $option_value_method, $selected_key = null) {
 
         if($group_label_method[0] == '_' || $group_label_method[0] == '_' || $option_key_method[0] == '_' || $option_value_method[0] == '_'){
             trigger_error(Ak::t('You cannot call private methods from %helper_name helper',array('%helper_name'=>'option_groups_from_collection_for_select'),'helpers/form'), E_USER_ERROR);
@@ -249,8 +242,7 @@ class FormOptionsHelper extends AkActionViewHelper
        *
        * NOTE: Only the option tags are returned, you have to wrap this call in a regular HTML select tag.
        */
-    public function country_options_for_select($selected = null, $priority_countries = array(), $model = 'AkCountries', $options = array())
-    {
+    public function country_options_for_select($selected = null, $priority_countries = array(), $model = 'AkCountries', $options = array()) {
         $country_options = '';
 
         if($model == 'AkCountries'){
@@ -292,8 +284,7 @@ class FormOptionsHelper extends AkActionViewHelper
     * NOTE: Only the option tags are returned, you have to wrap this call in
     * a regular HTML select tag.
     */
-    public function time_zone_options_for_select($selected = null, $priority_zones = array(), $model = 'AkTimeZone')
-    {
+    public function time_zone_options_for_select($selected = null, $priority_zones = array(), $model = 'AkTimeZone') {
         $zone_options = '';
         if($model == 'AkTimeZone'){
             $Zones = AkTimeZone::all();
@@ -320,13 +311,11 @@ class FormOptionsHelper extends AkActionViewHelper
 
 class AkFormHelperOptionsInstanceTag extends AkFormHelperInstanceTag
 {
-    public function __construct($object_name, $column_name, &$template_object, $local_binding = null, &$object)
-    {
+    public function __construct($object_name, $column_name, &$template_object, $local_binding = null, &$object) {
         $this->AkFormHelperInstanceTag($object_name, $column_name, $template_object, $local_binding, $object);
     }
 
-    public function to_select_tag($choices, $options=array(), $html_options = array())
-    {
+    public function to_select_tag($choices, $options=array(), $html_options = array()) {
         $this->add_default_name_and_id($html_options);
         $selected_value = !empty($options['selected']) ? $options['selected'] : $this->getValue();
 
@@ -339,8 +328,7 @@ class AkFormHelperOptionsInstanceTag extends AkFormHelperInstanceTag
         $html_options, $this->getValue()), Ak::delete($html_options,'prompt','include_blank'));
     }
 
-    public function to_collection_select_tag($collection, $value_column_name, $text_column_name = null, $options = array(), $html_options = array())
-    {
+    public function to_collection_select_tag($collection, $value_column_name, $text_column_name = null, $options = array(), $html_options = array()) {
         $this->add_default_name_and_id($html_options);
 
         return TagHelper::content_tag('select', $this->_addOptions(
@@ -348,15 +336,13 @@ class AkFormHelperOptionsInstanceTag extends AkFormHelperInstanceTag
         $options, $this->getValue()), $html_options);
     }
 
-    public function to_country_select_tag($priority_countries = array(), $options = array(), $html_options = array())
-    {
+    public function to_country_select_tag($priority_countries = array(), $options = array(), $html_options = array()) {
         $this->add_default_name_and_id($html_options);
         return TagHelper::content_tag('select', $this->_addOptions($this->_template_object->country_options_for_select($this->getValue(), $priority_countries, 'AkCountries', $options),
         $options, $this->getValue()), $html_options);
     }
 
-    public function to_time_zone_select_tag($priority_zones = array(), $options = array(), $html_options = array())
-    {
+    public function to_time_zone_select_tag($priority_zones = array(), $options = array(), $html_options = array()) {
         $this->add_default_name_and_id($html_options);
 
         return TagHelper::content_tag('select',
@@ -364,8 +350,7 @@ class AkFormHelperOptionsInstanceTag extends AkFormHelperInstanceTag
         $this->getValue(),$priority_zones,(empty($options['model'])?'AkTimeZone':$options['model'])),$options,$this->getValue()),$html_options);
     }
 
-    public function _addOptions($option_tags, $options, $value = null)
-    {
+    public function _addOptions($option_tags, $options, $value = null) {
         $option_tags = (!empty($options['include_blank']) ? "<option value=\"\"></option>\n" : '').$option_tags;
         if(empty($value) && !empty($options['prompt'])){
             return '<option value="">'.(is_string($options['prompt']) ? $options['prompt'] : Ak::t('Please select',array(),'helpers/form'))."</option>\n".$option_tags;

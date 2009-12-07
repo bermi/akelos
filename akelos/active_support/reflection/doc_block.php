@@ -9,22 +9,18 @@ class AkReflectionDocBlock
     $changed  = false,
     $original = '';
 
-    public function __construct($string)
-    {
+    public function __construct($string) {
         $this->original = $string;
         $this->_structure = $this->_parseDocBlock($string);
     }
 
-    public function getComment()
-    {
+    public function getComment() {
         return isset($this->_structure['comment'])?$this->_structure['comment']:false;
     }
-    public function getParams()
-    {
+    public function getParams() {
         return isset($this->_structure['tags']['params'])?$this->_structure['tags']['params']:false;
     }
-    public function toString()
-    {
+    public function toString() {
         $string = '/**';
         isset($this->_structure['comment'])?$string.="\n * ".$this->_structure['comment']."\n *":null;
         $tags = $this->_structure['tags'];
@@ -49,13 +45,11 @@ class AkReflectionDocBlock
         $this->changed = true;
     }
 
-    public function getTag($tag)
-    {
+    public function getTag($tag) {
         return isset($this->_structure['tags'][$tag]) ? $this->_structure['tags'][$tag] : false;
     }
 
-    protected function _parseDocBlock($string)
-    {
+    protected function _parseDocBlock($string) {
         preg_match_all('/\/\*\*\n(\s*\*([^\n]+?\n)+)+.*?\*\//', $string, $matches);
 
         $docBlockStructure = array('comment'=>null);
@@ -92,8 +86,7 @@ class AkReflectionDocBlock
         return $docBlockStructure;
     }
 
-    protected function _parseTag(&$tags, $tempTag)
-    {
+    protected function _parseTag(&$tags, $tempTag) {
         switch($tempTag[0]) {
             case 'param':
                 if (preg_match('/\$([a-zA-Z0-9_]+)\s*(.*?)/s',$tempTag[1],$pmatches)) {

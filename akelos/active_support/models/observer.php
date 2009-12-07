@@ -12,8 +12,7 @@ class AkModelObserver extends AkModelExtenssion
     * registered observer.
     * @return true (this is used internally for triggering observers on default callbacks)
     */
-    public function notifyObservers ($method = null)
-    {
+    public function notifyObservers ($method = null) {
         $observers = $this->getObservers();
         $observer_count = count($observers);
 
@@ -42,13 +41,11 @@ class AkModelObserver extends AkModelExtenssion
     }
 
 
-    public function setObservableState($state_message)
-    {
+    public function setObservableState($state_message) {
         $this->_observable_state = $state_message;
     }
 
-    public function getObservableState()
-    {
+    public function getObservableState() {
         return $this->_observable_state;
     }
 
@@ -60,8 +57,7 @@ class AkModelObserver extends AkModelExtenssion
     * @param $options array of options for the observer
     * @return void
     */
-    public function addObserver($observer)
-    {
+    public function addObserver($observer) {
         $staticVarNs='AkActiveModel::observers::' . $this->_Model->getModelName();
         $observer_class_name = get_class($observer);
         /**
@@ -85,8 +81,7 @@ class AkModelObserver extends AkModelExtenssion
     * Register the reference to an object object
     * @return void
     */
-    public function &getObservers()
-    {
+    public function &getObservers() {
         $staticVarNs='AkActiveModel::observers::' . $this->_Model->getModelName();
         $key = 'objects';
 

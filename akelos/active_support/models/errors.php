@@ -21,8 +21,7 @@ class AkModelErrors extends AkModelExtenssion
     /**
     * Returns the Errors array that holds all information about attribute error messages.
     */
-    public function getErrors()
-    {
+    public function getErrors() {
         return $this->_errors;
     }
 
@@ -32,16 +31,14 @@ class AkModelErrors extends AkModelExtenssion
     * as a whole. These error messages doesn't get prepended with any field name when iterating
     * with yieldEachFullError, so they should be complete sentences.
     */
-    public function addErrorToBase($message)
-    {
+    public function addErrorToBase($message) {
         $this->addError($this->_Model->getModelName(), $message);
     }
 
     /**
     * Returns errors assigned to base object through addToBase according to the normal rules of getErrorsOn($attribute).
     */
-    public function getBaseErrors()
-    {
+    public function getBaseErrors() {
         $errors = $this->getErrors();
         return (array)@$errors[$this->_Model->getModelName()];
     }
@@ -53,8 +50,7 @@ class AkModelErrors extends AkModelExtenssion
     * error can be added to the same $attribute in which case an array will be returned on a call to <tt>getErrorsOn($attribute)</tt>.
     * If no $message is supplied, "invalid" is assumed.
     */
-    public function addError($attribute, $message = 'invalid')
-    {
+    public function addError($attribute, $message = 'invalid') {
         $message = $this->getDefaultErrorMessageFor($message, true);
         $this->_errors[$attribute][] = $message;
     }
@@ -62,8 +58,7 @@ class AkModelErrors extends AkModelExtenssion
     /**
     * Will add an error message to each of the attributes in $attributes that is empty.
     */
-    public function addErrorOnEmpty($attribute_names, $message = 'empty')
-    {
+    public function addErrorOnEmpty($attribute_names, $message = 'empty') {
         $message = $this->getDefaultErrorMessageFor($message, true);
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute){
@@ -76,8 +71,7 @@ class AkModelErrors extends AkModelExtenssion
     /**
     * Will add an error message to each of the attributes in $attributes that is blank (using $this->isBlank).
     */
-    public function addErrorOnBlank($attribute_names, $message = 'blank')
-    {
+    public function addErrorOnBlank($attribute_names, $message = 'blank') {
         $message = $this->getDefaultErrorMessageFor($message, true);
         $attribute_names = Ak::toArray($attribute_names);
         foreach ($attribute_names as $attribute){
@@ -91,8 +85,7 @@ class AkModelErrors extends AkModelExtenssion
     * Will add an error message to each of the attributes in $attributes that has a length outside of the passed boundary $range.
     * If the length is above the boundary, the too_long_message message will be used. If below, the too_short_message.
     */
-    public function addErrorOnBoundaryBreaking($attribute_names, $range_begin, $range_end, $too_long_message = 'too_long', $too_short_message = 'too_short')
-    {
+    public function addErrorOnBoundaryBreaking($attribute_names, $range_begin, $range_end, $too_long_message = 'too_long', $too_short_message = 'too_short') {
         $too_long_message = $this->getDefaultErrorMessageFor($too_long_message);
         $too_short_message = $this->getDefaultErrorMessageFor($too_short_message);
 
@@ -108,16 +101,14 @@ class AkModelErrors extends AkModelExtenssion
 
     }
 
-    public function addErrorOnBoundryBreaking ($attributes, $range_begin, $range_end, $too_long_message = 'too_long', $too_short_message = 'too_short')
-    {
+    public function addErrorOnBoundryBreaking ($attributes, $range_begin, $range_end, $too_long_message = 'too_long', $too_short_message = 'too_short') {
         $this->addErrorOnBoundaryBreaking($attributes, $range_begin, $range_end, $too_long_message, $too_short_message);
     }
 
     /**
     * Returns true if the specified $attribute has errors associated with it.
     */
-    public function isInvalid($attribute)
-    {
+    public function isInvalid($attribute) {
         return $this->getErrorsOn($attribute);
     }
 
@@ -126,8 +117,7 @@ class AkModelErrors extends AkModelExtenssion
     * Returns the error message, if one error is associated with the specified $attribute.
     * Returns an array of error messages, if more than one error is associated with the specified $attribute.
     */
-    public function getErrorsOn($attribute)
-    {
+    public function getErrorsOn($attribute) {
         if (empty($this->_errors[$attribute])){
             return false;
         }elseif (count($this->_errors[$attribute]) == 1){
@@ -142,8 +132,7 @@ class AkModelErrors extends AkModelExtenssion
     /**
     * Yields each attribute and associated message per error added.
     */
-    public function yieldEachError()
-    {
+    public function yieldEachError() {
         foreach ($this->_errors as $errors){
             foreach ($errors as $error){
                 $this->yieldError($error);
@@ -151,8 +140,7 @@ class AkModelErrors extends AkModelExtenssion
         }
     }
 
-    public function yieldError($message)
-    {
+    public function yieldError($message) {
         $messages = is_array($message) ? $message : array($message);
         foreach ($messages as $message){
             echo "<div class='error'><p>$message</p></div>\n";
@@ -164,8 +152,7 @@ class AkModelErrors extends AkModelExtenssion
     * Yields each full error message added. So Person->addError("first_name", "can't be empty") will be returned
     * through iteration as "First name can't be empty".
     */
-    public function yieldEachFullError()
-    {
+    public function yieldEachFullError() {
         $full_messages = $this->getFullErrorMessages();
         foreach ($full_messages as $full_message){
             $this->yieldError($full_message);
@@ -176,8 +163,7 @@ class AkModelErrors extends AkModelExtenssion
     /**
     * Returns all the full error messages in an array.
     */
-    public function getFullErrorMessages()
-    {
+    public function getFullErrorMessages() {
         $full_messages = array();
 
         foreach ($this->_errors as $attribute=>$errors){
@@ -196,16 +182,14 @@ class AkModelErrors extends AkModelExtenssion
     /**
     * Returns true if no errors have been added.
     */
-    public function hasErrors()
-    {
+    public function hasErrors() {
         return !empty($this->_errors);
     }
 
     /**
     * Removes all the errors that have been added.
     */
-    public function clearErrors()
-    {
+    public function clearErrors() {
         $this->_errors = array();
     }
 
@@ -213,8 +197,7 @@ class AkModelErrors extends AkModelExtenssion
     * Returns the total number of errors added. Two errors added to the same attribute will be counted as such
     * with this as well.
     */
-    public function countErrors()
-    {
+    public function countErrors() {
         $error_count = 0;
         foreach ($this->_errors as $errors){
             $error_count = count($errors)+$error_count;
@@ -223,8 +206,7 @@ class AkModelErrors extends AkModelExtenssion
         return $error_count;
     }
 
-    public function errorsToString($print = false)
-    {
+    public function errorsToString($print = false) {
         $result = "\n<div id='errors'>\n<ul class='error'>\n";
         foreach ($this->getFullErrorMessages() as $error){
             $result .= is_array($error) ? "<li class='error'>".join('</li><li class=\'error\'>',$error)."</li>\n" : "<li class='error'>$error</li>\n";
@@ -237,8 +219,7 @@ class AkModelErrors extends AkModelExtenssion
         return $result;
     }
 
-    public function getDefaultErrorMessageFor($type, $translated = false)
-    {
+    public function getDefaultErrorMessageFor($type, $translated = false) {
         if(isset($this->_Model->default_error_messages[$type])){
             $message = $this->_Model->default_error_messages[$type];
         }elseif(isset($this->default_error_messages[$type])){

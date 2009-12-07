@@ -11,29 +11,24 @@ class TestClassUsedViaProxyByALazyObject extends AkLazyObject
     public $_private_attribute = 'private';
     private $private_attribute = 'private';
 
-    public function concatenate($value = null)
-    {
+    public function concatenate($value = null) {
         $this->concatenated_string .= $value;
         return $this->concatenated_string;
     }
 
-    public function explicit()
-    {
+    public function explicit() {
         return 'French';
     }
 
-    public function _PrivateByConvention()
-    {
+    public function _PrivateByConvention() {
         return '_PrivateByConvention';
     }
 
-    public function findAll()
-    {
+    public function findAll() {
         return 'findAll';
     }
 
-    public function findOne()
-    {
+    public function findOne() {
         return 'findOne';
     }
 }
@@ -46,8 +41,7 @@ class TestLazyObject extends AkLazyObject
 
 class LazyObject_TestCase extends  ActiveSupportUnitTest
 {
-    public function test_should_extend_a_class_given_its_name()
-    {
+    public function test_should_extend_a_class_given_its_name() {
         $Lazy = new TestLazyObject();
         $Lazy->extendClassLazily('TestClassUsedViaProxyByALazyObject');
 
@@ -55,8 +49,7 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
         $this->assertTrue($Lazy->isExtendedBy($Proxy));
     }
 
-    public function test_should_remove_extensions_giving_its_name()
-    {
+    public function test_should_remove_extensions_giving_its_name() {
         $Lazy = new TestLazyObject();
         $Proxy = new TestClassUsedViaProxyByALazyObject();
         $this->assertTrue($Lazy->isExtendedBy($Proxy));
@@ -66,8 +59,7 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
         $this->assertFalse($Lazy->isExtendedBy($Proxy));
     }
 
-    public function test_should_be_extended_using_implicit_methods()
-    {
+    public function test_should_be_extended_using_implicit_methods() {
         $Lazy = new TestLazyObject();
         $Lazy->extendClassLazily('TestClassUsedViaProxyByALazyObject', array('methods' => array('concatenate')));
         $Proxy = $Lazy->getExtendedClassInstance('TestClassUsedViaProxyByALazyObject');
@@ -80,8 +72,7 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
     }
 
-    public function test_should_report_error_if_unregistered_methods_are_called()
-    {
+    public function test_should_report_error_if_unregistered_methods_are_called() {
         $Lazy = new TestLazyObject();
         $Lazy->extendClassLazily('TestClassUsedViaProxyByALazyObject', array('methods' => array('concatenate')));
 
@@ -94,8 +85,7 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
     }
 
-    public function test_should_be_extended_using_instance()
-    {
+    public function test_should_be_extended_using_instance() {
         $Lazy = new TestLazyObject();
         $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject());
 
@@ -109,8 +99,7 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
     }
 
-    public function test_should_allow_using_proxy_attributes_if_set_implicitly_only()
-    {
+    public function test_should_allow_using_proxy_attributes_if_set_implicitly_only() {
         $Lazy = new TestLazyObject();
         $Lazy->extendClassLazily('TestClassUsedViaProxyByALazyObject', array('attributes' => array('allowed')));
         $this->assertEqual($Lazy->allowed, 'yes');
@@ -120,8 +109,7 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
     }
 
-    public function test_should_allow_using_proxy_attributes_when_using_instance()
-    {
+    public function test_should_allow_using_proxy_attributes_when_using_instance() {
         $Lazy = new TestLazyObject();
         $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject());
         $this->assertEqual($Lazy->allowed, 'yes');
@@ -129,8 +117,7 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
     }
 
-    public function test_should_respect_attribute_visibility()
-    {
+    public function test_should_respect_attribute_visibility() {
         $Lazy = new TestLazyObject();
         $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject());
         $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::private_attribute.+\/lazy_object\.php .+'.(__LINE__+1).'/'));
@@ -141,8 +128,7 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
     }
 
 
-    public function test_should_add_methods_by_pattern()
-    {
+    public function test_should_add_methods_by_pattern() {
         $Lazy = new TestLazyObject();
         $Lazy->extendClassLazily('TestClassUsedViaProxyByALazyObject', array('methods_match' => '/find.+/'));
 
@@ -156,15 +142,13 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
 
 
 
-    public function test_should_not_allow_extending_by_class_using_by_name()
-    {
+    public function test_should_not_allow_extending_by_class_using_by_name() {
         $Lazy = new TestLazyObject();
         $this->expectError(new PatternExpectation('/expects a string, object given.+lazy_object\.php .+'.(__LINE__+1).'/'));
         $Lazy->extendClassLazily(new TestClassUsedViaProxyByALazyObject());
     }
 
-    public function test_should_not_register_twice_unless_forced()
-    {
+    public function test_should_not_register_twice_unless_forced() {
         $Lazy = new TestLazyObject();
         $Lazy->extendClassLazily('TestClassUsedViaProxyByALazyObject', array('methods_match' => '/find.+/'));
 
@@ -178,8 +162,7 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
     }
 
-    public function test_should_return_instance_being_extended_by_name()
-    {
+    public function test_should_return_instance_being_extended_by_name() {
         $Lazy = new TestLazyObject();
         $Lazy->extendClassLazily('TestClassUsedViaProxyByALazyObject');
         $Proxy = $Lazy->getExtendedClassInstance('TestClassUsedViaProxyByALazyObject');
@@ -189,8 +172,7 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
 
     }
 
-    public function test_should_return_instance_being_extended()
-    {
+    public function test_should_return_instance_being_extended() {
         $Lazy = new TestLazyObject();
         $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject());
         $Proxy = $Lazy->getExtendedClassInstance('TestClassUsedViaProxyByALazyObject');
@@ -198,8 +180,7 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
     }
 
-    public function test_should_report_if_lazy_objects_are_now_active()
-    {
+    public function test_should_report_if_lazy_objects_are_now_active() {
         $Lazy = new TestLazyObject();
         $Lazy->extendClassLazily('TestClassUsedViaProxyByALazyObject');
         $this->assertFalse($Lazy->hasInstantiatedClass('TestClassUsedViaProxyByALazyObject'));

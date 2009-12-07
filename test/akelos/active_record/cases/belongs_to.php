@@ -4,14 +4,12 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class BelongsTo_TestCase extends ActiveRecordUnitTest
 {
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
         $this->installAndIncludeModels(array('Picture', 'Thumbnail','Panorama', 'Property', 'PropertyType', 'Person', 'Account', 'Location'));
     }
 
-    public function test_for_single_has_one_association()
-    {
+    public function test_for_single_has_one_association() {
         $Picture = new Picture(array('title'=>'The Bermi Labs Team at SIMO'));
         $this->assertReference($Picture, $Picture->hasOne->Owner);
         $this->assertEqual($Picture->main_thumbnail->getAssociationId(), 'main_thumbnail');
@@ -128,8 +126,7 @@ class BelongsTo_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_for_belongs_to_association()
-    {
+    public function test_for_belongs_to_association() {
         $Thumbnail = new Thumbnail();
         $Thumbnail = $Thumbnail->findFirstBy('caption','Lucky (our pet)');
         $Thumbnail = new Thumbnail($Thumbnail->getId());
@@ -191,8 +188,7 @@ class BelongsTo_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_for_multiple_hasone_and_belongsto()
-    {
+    public function test_for_multiple_hasone_and_belongsto() {
         $Altea = new Picture(array('title'=>'Altea Cupula de Mediterraneo, Costa Blanca'));
         $Altea->main_thumbnail->build(array('caption'=>'Altea'));
         $this->assertTrue($Altea->main_thumbnail->isNewRecord());
@@ -236,8 +232,7 @@ class BelongsTo_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_primary_key_setting()
-    {
+    public function test_primary_key_setting() {
         $Hilario = new Person(array('first_name' =>'Hilario','last_name' =>'Hervás','email' =>'hilario@example.com'));
         $Jose = new Person(array('first_name' =>'Jose','last_name' =>'Salavert','email' =>'salavert@example.com'));
         $Vero = new Person(array('first_name' =>'Vero','last_name' =>'Machí','email' =>'vero@example.com'));
@@ -279,8 +274,7 @@ class BelongsTo_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_should_load_resquested_list()
-    {
+    public function test_should_load_resquested_list() {
         $this->installAndIncludeModels(array('TodoList', 'TodoTask'));
 
         $ListA = new TodoList(array('name' => 'A'));
@@ -296,8 +290,7 @@ class BelongsTo_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Task1->todo_list->getId(), $ListB->getId());
     }
 
-    public function test_should_delete_dependent_associates()
-    {
+    public function test_should_delete_dependent_associates() {
         $this->installAndIncludeModels(array('Location', 'Group'));
         $Location = new Location(array('name' => 'Palafolls'));
         $this->assertTrue($Location->save());
@@ -316,8 +309,7 @@ class BelongsTo_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_cleanup()
-    {
+    public function test_cleanup() {
         @Ak::file_delete(AkConfig::getDir('models').DS.'group_user.php');
     }
 

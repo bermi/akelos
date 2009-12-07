@@ -2,8 +2,7 @@
 
 class AkSmtpDelivery
 {
-    public function deliver(&$Mailer, $settings = array())
-    {
+    public function deliver(&$Mailer, $settings = array()) {
         $Message = $Mailer->Message;
 
         $SmtpClient = Mail::factory('smtp', $settings);

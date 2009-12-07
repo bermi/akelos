@@ -6,23 +6,19 @@
  */
 class PluginInstallerMethodExtensions
 {
-    function extension1()
-    {
+    function extension1() {
         
     }
     
-    function extension2()
-    {
+    function extension2() {
         
     }
     
-    private function _extension3()
-    {
+    private function _extension3() {
         
     }
     
-    static function _extension4()
-    {
+    static function _extension4() {
         
     }
     

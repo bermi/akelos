@@ -5,15 +5,13 @@ require_once(dirname(__FILE__).'/../config.php');
 class Finders_TestCase extends ActiveRecordUnitTest
 {
 
-    public function setup()
-    {
+    public function setup() {
         $this->installAndIncludeModels(array('Post', 'Comment', 'Tagging', 'Tag'));
         @Ak::file_delete(AkConfig::getDir('models').DS.'post_tag.php');
     }
 
 
-    public function test_should_find_using_id_and_options()
-    {
+    public function test_should_find_using_id_and_options() {
         $Tag = new Tag();
         $One = $Tag->create(array('name' => 'One'));
         $Two = $Tag->create(array('name' => 'Two'));
@@ -25,8 +23,7 @@ class Finders_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_should_not_return_duplicated_owners_when_including_multiple_associates()
-    {
+    public function test_should_not_return_duplicated_owners_when_including_multiple_associates() {
         $Post = new Post(array('title' => 'The best PHP Framework is ...'));
         $Post->comment->create(array('name'=>'Comment 1'));
         $Post->comment->create(array('name'=>'Comment 2'));
@@ -53,8 +50,7 @@ class Finders_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_should_parse_include_as_array()
-    {
+    public function test_should_parse_include_as_array() {
         $Post = new Post(array('title' => 'PHP Frameworks'));
         $Post->comment->create(array('name'=>'Comment 1'));
         $Post->comment->create(array('name'=>'Comment 2'));
@@ -72,8 +68,7 @@ class Finders_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Post->comments[1]->name, 'Comment 2');
     }
 
-    public function test_should_bind_sql_bind_in()
-    {
+    public function test_should_bind_sql_bind_in() {
         $Tag = new Tag();
         $Tag->create(array('name'=>'Tag 1'));
         $Tag->create(array('name'=>'Tag 2'));
@@ -82,8 +77,7 @@ class Finders_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Tags[1]->name, 'Tag 2');
     }
 
-    public function test_should_bind_sql_bind_in_using_active_records()
-    {
+    public function test_should_bind_sql_bind_in_using_active_records() {
         $Tag = new Tag();
         $Tag->create(array('name'=>'Tag 1'));
         $Tag->create(array('name'=>'Tag 2'));
@@ -92,8 +86,7 @@ class Finders_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Tags[1]->name, 'Tag 2');
     }
 
-    public function test_should_find_using_named_bindings()
-    {
+    public function test_should_find_using_named_bindings() {
         $this->installAndIncludeModels(array('Hybrid'=>'id,customer_id,input,parent_id'));
         $Hybrid = new Hybrid();
 

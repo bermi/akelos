@@ -23,8 +23,7 @@ class AkModelUtilities extends AkModelExtenssion
      * @param string $xml
      * @return AkActiveRecord
      */
-    public function fromXml($xml)
-    {
+    public function fromXml($xml) {
         $array = Ak::convert('xml','array', $xml);
         $array = $this->_fromXmlCleanup($array);
         return $this->_fromArray($array);
@@ -47,8 +46,7 @@ class AkModelUtilities extends AkModelExtenssion
      *              )
      * @return string in Json Format
      */
-    public function toJson($options = array())
-    {
+    public function toJson($options = array()) {
         if (is_array($options) && isset($options[0]) && ($options[0] instanceof AkBaseModel)) {
             $options = array('collection'=>$options);
         }
@@ -151,8 +149,7 @@ class AkModelUtilities extends AkModelExtenssion
      * @param string $json
      * @return AkActiveRecord
      */
-    public function fromJson($json)
-    {
+    public function fromJson($json) {
         $json = Ak::fromJson($json);
         $array = Ak::convert('Object','Array',$json);
         return $this->_fromArray($array);
@@ -185,8 +182,7 @@ class AkModelUtilities extends AkModelExtenssion
      *              )
      * @return string in Xml Format
      */
-    public function toXml($options = array())
-    {
+    public function toXml($options = array()) {
         if (is_array($options) && isset($options[0]) && ($options[0] instanceof AkBaseModel)) {
             $options = array('collection'=>$options);
         }
@@ -292,23 +288,19 @@ class AkModelUtilities extends AkModelExtenssion
      *
      * @param array of ActiveRecords[optional] $data
      */
-    public function toYaml($data = null)
-    {
+    public function toYaml($data = null) {
         return Ak::convert('active_record', 'yaml', empty($data) ? $this->_Model : $data);
     }
 
-    private function _convertColumnToXmlElement($col)
-    {
+    private function _convertColumnToXmlElement($col) {
         return str_replace('_','-',$col);
     }
 
-    private function _convertColumnFromXmlElement($col)
-    {
+    private function _convertColumnFromXmlElement($col) {
         return str_replace('-','_',$col);
     }
 
-    private function _parseXmlAttributes($attributes)
-    {
+    private function _parseXmlAttributes($attributes) {
         $new = array();
         foreach($attributes as $key=>$value)
         {
@@ -317,8 +309,7 @@ class AkModelUtilities extends AkModelExtenssion
         return $new;
     }
 
-    private function &_generateModelFromArray($modelName,$attributes)
-    {
+    private function &_generateModelFromArray($modelName,$attributes) {
         if (isset($attributes[0]) && is_array($attributes[0])) {
             $attributes = $attributes[0];
         }
@@ -338,8 +329,7 @@ class AkModelUtilities extends AkModelExtenssion
         return $record;
     }
 
-    private function _fromArray($array)
-    {
+    private function _fromArray($array) {
         $data  = $array;
         $modelName = $this->_Model->getModelName();
         $values = array();
@@ -354,8 +344,7 @@ class AkModelUtilities extends AkModelExtenssion
         return count($values)==1?$values[0]:$values;
     }
 
-    private function _fromXmlCleanup($array)
-    {
+    private function _fromXmlCleanup($array) {
         $result = array();
         $key = key($array);
         while(is_string($key) && is_array($array[$key]) && count($array[$key])==1) {

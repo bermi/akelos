@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
 {
-    public function test_start()
-    {
+    public function test_start() {
         $this->_cleanUpAutomaticGeneratedFiles();
 
         $Installer = new AkInstaller();
@@ -17,8 +16,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $this->assertReference($this->Post->tag->getAssociatedModelInstance(),$this->Post->tag->getAssociatedModelInstance());
     }
 
-    public function test_for_has_and_belongs_to_many()
-    {
+    public function test_for_has_and_belongs_to_many() {
         $Property = new Property(array('description'=>'Gandia Palace'));
         $this->assertEqual($Property->property_type->getType(), 'hasAndBelongsToMany');
         $this->assertTrue(is_array($Property->property_types) && count($Property->property_types) === 0);
@@ -208,8 +206,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_find_on_unsaved_models_including_associations()
-    {
+    public function test_find_on_unsaved_models_including_associations() {
         $Property = new Property(array('description' =>'Chalet by the sea'));
 
         $PropertyType = new PropertyType();
@@ -232,8 +229,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_clean_up_dependencies()
-    {
+    public function test_clean_up_dependencies() {
         $Property = new Property(array('description' =>'Luxury Estate'));
         $PropertyType = new PropertyType();
         $this->assertTrue($PropertyType = $PropertyType->create(array('description'=>'Mansion')));
@@ -256,8 +252,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_double_assignation()
-    {
+    public function test_double_assignation() {
         $AkelosOffice = new Property(array('description'=>'Akelos new Office'));
         $this->assertTrue($AkelosOffice->save());
 
@@ -275,8 +270,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_scope_for_multiple_member_deletion()
-    {
+    public function test_scope_for_multiple_member_deletion() {
         $PisoJose = new Property(array('description' =>'Piso Jose'));
         $PisoBermi = new Property(array('description' =>'Piso Bermi'));
 
@@ -314,8 +308,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_associated_uniqueness()
-    {
+    public function test_associated_uniqueness() {
         $Property = new Property();
         $PropertyType = new PropertyType();
 
@@ -339,8 +332,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Rancho->property->count(), 1);
     }
 
-    public function test_should_include_associates_using_simple_finder()
-    {
+    public function test_should_include_associates_using_simple_finder() {
         $Property = new Property();
         $PropertyType = new PropertyType();
         $this->assertTrue($Rancho =  $PropertyType->findFirstBy('description','Rancho Type', array('include'=>'properties')));
@@ -352,8 +344,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_should_remove_associated_using_the_right_key()
-    {
+    public function test_should_remove_associated_using_the_right_key() {
         $Installer = new AkInstaller();
         @$Installer->dropTable('groups_users');
         @Ak::file_delete(AkConfig::getDir('models').DS.'group_user.php');
@@ -389,8 +380,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_remove_existing_associates_before_setting_by_id()
-    {
+    public function test_remove_existing_associates_before_setting_by_id() {
 
         foreach (range(1,10) as $i){
             $Post = new Post(array('title' => 'Post '.$i));
@@ -424,8 +414,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
 
 
 
-    public function test_should_allow_multiple_habtm_associates_on_fresh_association_owner()
-    {
+    public function test_should_allow_multiple_habtm_associates_on_fresh_association_owner() {
         $Bermi = new User(array('name'=>'Bermi'));
         $Bermi->post->set(new Post(array('title' => 'Bermi Post')));
         $Bermi->save();
@@ -436,8 +425,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_should_remove_existing_associates_when_setting_new_ones_and_parent_is_saved()
-    {
+    public function test_should_remove_existing_associates_when_setting_new_ones_and_parent_is_saved() {
         $Bermi = $this->User->findFirstBy('name', 'Bermi');
         for ($i=0; $i < 3; $i++){
             $Post = $this->Post->findFirstBy('title', 'Bermi Post');
@@ -458,8 +446,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function test_should_allow_same_model_habtm_associations()
-    {
+    public function test_should_allow_same_model_habtm_associations() {
         $this->installAndIncludeModels(array('Friend'=>'id,name'));
 
         $Mary = $this->Friend->create(array('name' => 'Mary'));
@@ -471,8 +458,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Mary->friends[0]->name, 'James');
     }
 
-    public function test_find_on_association_with_conditions_string_sql()
-    {
+    public function test_find_on_association_with_conditions_string_sql() {
         $this->installAndIncludeModels(array('Friend'=>'id,name'));
         $Mary = $this->Friend->create(array('name' => 'Mary'));
         $Mary->friend->add($this->Friend->create(array('name' => 'James')));
@@ -495,8 +481,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $Mary->friend->find(array('conditions'=>"name = 'James'"));
         $Mary->_db->connection = $oldConnection;
     }
-    public function test_find_on_association_with_conditions_string()
-    {
+    public function test_find_on_association_with_conditions_string() {
         $this->installAndIncludeModels(array('Friend'=>'id,name'));
         $Mary = $this->Friend->create(array('name' => 'Mary'));
         $Mary->friend->add($this->Friend->create(array('name' => 'James')));
@@ -506,8 +491,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Mary->friends[0]->name, $James->name);
     }
 
-    public function test_find_on_association_with_conditions_array_sql()
-    {
+    public function test_find_on_association_with_conditions_array_sql() {
         $this->installAndIncludeModels(array('Friend'=>'id,name'));
         $Mary = $this->Friend->create(array('name' => 'Mary'));
         $Mary->friend->add($this->Friend->create(array('name' => 'James')));
@@ -531,8 +515,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $Mary->friend->find(array('conditions'=>array('name = ?','James')));
         $Mary->_db->connection = $oldConnection;
     }
-    public function test_find_on_association_with_conditions_array()
-    {
+    public function test_find_on_association_with_conditions_array() {
         $this->installAndIncludeModels(array('Friend'=>'id,name'));
         $Mary = $this->Friend->create(array('name' => 'Mary'));
         $Mary->friend->add($this->Friend->create(array('name' => 'James')));
@@ -542,13 +525,11 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Mary->friends[0]->name, $James->name);
     }
 
-    public function test_clean()
-    {
+    public function test_clean() {
         $this->_cleanUpAutomaticGeneratedFiles();
     }
 
-    public function _cleanUpAutomaticGeneratedFiles()
-    {
+    public function _cleanUpAutomaticGeneratedFiles() {
         foreach (explode(',', 'post_tag,post_user,friend_friend,aa_ee,bb_cc,dd_ee,group_user') as $file){
             @Ak::file_delete(AkConfig::getDir('models').DS.$file.'.php');
         }

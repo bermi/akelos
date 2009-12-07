@@ -103,8 +103,7 @@ class AkCache
      * @param mixed $options
      * @return mixed   false if no cache could be configured or AkCache instance
      */
-    static function &lookupStore($options = null)
-    {
+    static function &lookupStore($options = null) {
         static $cache_store;
         $false = false;
         if ($options === true && !empty($cache_store)) {
@@ -130,8 +129,7 @@ class AkCache
         return $false;
     }
 
-    static function expandCacheKey($key, $namespace = null)
-    {
+    static function expandCacheKey($key, $namespace = null) {
         $expanded_cache_key = $namespace != null? $namespace : '';
         if (isset($_ENV['AK_CACHE_ID'])) {
             $expanded_cache_key .= DS . $_ENV['AK_CACHE_ID'];
@@ -203,8 +201,7 @@ class AkCache
     * - 3: Memcached - The fastest option
     * @return void
     */
-    public function init($options = null, $cache_type = null)
-    {
+    public function init($options = null, $cache_type = null) {
         $options = is_int($options) ? array('lifeTime'=>$options) : (is_array($options) ? $options : array());
 
         switch ($cache_type) {
@@ -249,8 +246,7 @@ class AkCache
     * @param    string    $group    Name of the cache group.
     * @return mixed Data of the cache (or false if no cache available)
     */
-    public function get($id, $group = 'default')
-    {
+    public function get($id, $group = 'default') {
         return $this->cache_enabled ? $this->DriverInstance->get($id, $group) : false;
     }
 
@@ -264,8 +260,7 @@ class AkCache
     * @param    string    $group    Name of the cache group
     * @return boolean True if no problem
     */
-    public function save($data, $id = null, $group = 'default')
-    {
+    public function save($data, $id = null, $group = 'default') {
         return $this->cache_enabled ? $this->DriverInstance->save($data, $id, $group) : true;
     }
 
@@ -278,8 +273,7 @@ class AkCache
     * @param    string    $group    Name of the cache group
     * @return boolean True if no problem
     */
-    public function remove($id, $group = 'default')
-    {
+    public function remove($id, $group = 'default') {
         return $this->cache_enabled ? $this->DriverInstance->remove($id, $group) : true;
     }
 
@@ -303,18 +297,15 @@ class AkCache
     * - notingroup
     * @return boolean True if no problem
     */
-    public function clean($group = false, $mode = 'ingroup')
-    {
+    public function clean($group = false, $mode = 'ingroup') {
         return $this->cache_enabled ? $this->DriverInstance->clean($group, $mode) : true;
     }
 
-    public function install()
-    {
+    public function install() {
         return $this->cache_enabled ? $this->DriverInstance->install() : true;
     }
 
-    public function uninstall()
-    {
+    public function uninstall() {
         return $this->cache_enabled ? $this->DriverInstance->uninstall() : true;
     }
 

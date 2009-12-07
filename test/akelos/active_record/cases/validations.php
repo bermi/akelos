@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class Validations_TestCase extends ActiveRecordUnitTest
 {
-    public function test_start()
-    {
+    public function test_start() {
         $this->installAndIncludeModels(
         array('TestPerson'=>
         'id,
@@ -25,8 +24,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
                 $this->installAndIncludeModels(array('Picture', 'Landlord'));
     }
 
-    public function Test_of_isBlank()
-    {
+    public function Test_of_isBlank() {
         $Person = new TestPerson();
         $this->assertTrue($Person->isBlank());
         $this->assertTrue($Person->isBlank(''));
@@ -36,8 +34,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertFalse($Person->isBlank(0));
     }
 
-    public function Test_of_addError()
-    {
+    public function Test_of_addError() {
         $Person = new TestPerson();
         $Person->addError('user_name');
         $this->assertTrue(count($Person->getErrorsOn('user_name')) == 1);
@@ -49,8 +46,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertTrue(count($Person->getErrorsOn('user_name')) == 2);
     }
 
-    public function Test_of_clearErrors()
-    {
+    public function Test_of_clearErrors() {
         $Person = new TestPerson();
         $Person->addError('user_name');
         $Person->addError('user_name','has an error');
@@ -59,16 +55,14 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertTrue(count($Person->getErrors()) == 0);
     }
 
-    public function Test_of_hasErrors()
-    {
+    public function Test_of_hasErrors() {
         $Person = new TestPerson();
         $this->assertFalse($Person->hasErrors());
         $Person->addError('user_name');
         $this->assertTrue($Person->hasErrors());
     }
 
-    public function Test_of_getErrorsOn()
-    {
+    public function Test_of_getErrorsOn() {
         $Person = new TestPerson();
         $this->assertFalse($Person->getErrorsOn('user_name'));
         $Person->addError('user_name');
@@ -77,8 +71,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Person->getErrorsOn('user_name'),array($Person->getDefaultErrorMessageFor('invalid'),'not nice'));
     }
 
-    public function Test_of_countErrors()
-    {
+    public function Test_of_countErrors() {
         $Person = new TestPerson();
         $this->assertEqual($Person->countErrors(), 0);
         $Person->addError('user_name');
@@ -89,16 +82,14 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Person->countErrors(), 3);
     }
 
-    public function Test_of_isInvalid()
-    {
+    public function Test_of_isInvalid() {
         $Person = new TestPerson();
         $this->assertFalse($Person->isInvalid('user_name'));
         $Person->addError('user_name');
         $this->assertTrue($Person->isInvalid('user_name'));
     }
 
-    public function Test_of_getErrors()
-    {
+    public function Test_of_getErrors() {
         $Person = new TestPerson();
         $this->assertTrue(is_array($Person->getErrors()));
         $this->assertEqual(count($Person->getErrors()), 0);
@@ -116,8 +107,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Person->getErrors(), $expected);
     }
 
-    public function Test_of_getFullErrorMessages()
-    {
+    public function Test_of_getFullErrorMessages() {
         $Person = new TestPerson();
         $this->assertTrue(is_array($Person->getFullErrorMessages()));
         $this->assertEqual(count($Person->getFullErrorMessages()), 0);
@@ -136,8 +126,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_addErrorOnEmpty()
-    {
+    public function Test_of_addErrorOnEmpty() {
         $Person = new TestPerson();
         $Person->addErrorOnEmpty('user_name');
         $expected = array('user_name'=>array($Person->getDefaultErrorMessageFor('empty')));
@@ -148,8 +137,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Person->getErrors(), $expected);
     }
 
-    public function Test_of_addErrorOnBlank()
-    {
+    public function Test_of_addErrorOnBlank() {
         $Person = new TestPerson();
         $Person->addErrorOnBlank('user_name');
         $expected = array('user_name'=>array($Person->getDefaultErrorMessageFor('blank')));
@@ -160,8 +148,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Person->getErrors(), $expected);
     }
 
-    public function Test_of_addErrorOnBoundaryBreaking()
-    {
+    public function Test_of_addErrorOnBoundaryBreaking() {
         $Person = new TestPerson();
         $Person->set('age',17);
         $Person->addErrorOnBoundaryBreaking('age',18,65,'too old','too young');
@@ -184,13 +171,11 @@ class Validations_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_addErrorOnBoundryBreaking()
-    {
+    public function Test_of_addErrorOnBoundryBreaking() {
         //this is an alias of addErrorOnBoundaryBreaking
     }
 
-    public function Test_of_addErrorToBase()
-    {
+    public function Test_of_addErrorToBase() {
         $Person = new TestPerson();
         $Person->addErrorToBase('Nothing has changed');
         $expected = array('TestPerson'=>array('Nothing has changed'));
@@ -200,8 +185,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Person->getErrors(), $expected);
     }
 
-    public function Test_of_getBaseErrors()
-    {
+    public function Test_of_getBaseErrors() {
         $Person = new TestPerson();
         $this->assertEqual($Person->getBaseErrors(), array());
         $Person->addErrorToBase('Nothing has changed');
@@ -214,8 +198,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
 
 
 
-    public function Test_of_errorsToString()
-    {
+    public function Test_of_errorsToString() {
         $Person = new TestPerson();
         $Person->addErrorOnBlank('user_name');
         $Person->addErrorOnBlank('first_name');
@@ -224,8 +207,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_validatesConfirmationOf()
-    {
+    public function Test_of_validatesConfirmationOf() {
         $Person = new TestPerson();
         $Person->validatesConfirmationOf('user_name');
         $this->assertFalse($Person->hasErrors());
@@ -251,8 +233,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_validatesAcceptanceOf()
-    {
+    public function Test_of_validatesAcceptanceOf() {
         $Person = new TestPerson();
         $Person->validatesAcceptanceOf('tos');
         $this->assertEqual($Person->getErrorsOn('tos'),$Person->getDefaultErrorMessageFor('accepted'));
@@ -266,8 +247,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_validatesPresenceOf()
-    {
+    public function Test_of_validatesPresenceOf() {
         $Person = new TestPerson();
         $Person->validatesPresenceOf('user_name');
         $this->assertEqual($Person->getErrorsOn('user_name'),$Person->getDefaultErrorMessageFor('blank'));
@@ -282,8 +262,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
 
 
 
-    public function Test_of_validatesLengthOf()
-    {
+    public function Test_of_validatesLengthOf() {
         $Person = new TestPerson();
 
         $Person->city = 'Vilanova i la Geltrí';
@@ -367,13 +346,11 @@ class Validations_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_validatesSizeOf()
-    {
+    public function Test_of_validatesSizeOf() {
         //alias for validatesLengthOf
     }
 
-    public function Test_of_validatesUniquenessOf()
-    {
+    public function Test_of_validatesUniquenessOf() {
         $Person = new TestPerson(array('user_name' =>'bermi','first_name' =>'Bermi','last_name' =>'Ferrer','country' =>'ES','tos' => 1));
         $this->assertTrue($Person->save());
 
@@ -401,8 +378,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_validatesUniquenessOfUsingMultipleScopes()
-    {
+    public function Test_of_validatesUniquenessOfUsingMultipleScopes() {
         $Person = new TestPerson(array('user_name' =>'admin','first_name' =>'Sam','last_name->','','country' =>'ES','tos' => 1));
         $this->assertTrue($Person->save());
 
@@ -416,8 +392,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_validatesUniquenessOfConditionally()
-    {
+    public function Test_of_validatesUniquenessOfConditionally() {
         $Person = new TestPerson(array('user_name' =>'james','first_name' =>'James','last_name->','','country' =>'ES','tos' => 1));
         $this->assertTrue($Person->save());
 
@@ -434,8 +409,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
 
 
 
-    public function Test_of_validatesFormatOf()
-    {
+    public function Test_of_validatesFormatOf() {
         $Person = new TestPerson();
         $Person->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
         $this->assertEqual($Person->getErrorsOn('email'),$Person->getDefaultErrorMessageFor('invalid'));
@@ -548,8 +522,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function Test_of_validatesInclusionOf()
-    {
+    public function Test_of_validatesInclusionOf() {
         $Person = new TestPerson();
         $Person->validatesInclusionOf('gender', array('male', 'female'), "woah! what are you then!??!!");
         $this->assertEqual($Person->getErrorsOn('gender'),"woah! what are you then!??!!");
@@ -601,8 +574,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_validatesExclusionOf()
-    {
+    public function Test_of_validatesExclusionOf() {
         $Person = new TestPerson();
         $Person->validatesExclusionOf('gender', array('too much'), "don't lie");
         $this->assertEqual($Person->getErrorsOn('gender'),"don't lie");
@@ -638,8 +610,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Person->getErrorsOn('age'),$Person->getDefaultErrorMessageFor('exclusion'));
     }
 
-    public function Test_of_validatesNumericalityOf()
-    {
+    public function Test_of_validatesNumericalityOf() {
         $Person = new TestPerson();
 
         $Person->validatesNumericalityOf('age');
@@ -681,8 +652,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertTrue($Person->hasErrors());
     }
 
-    public function Test_of_validateOnCreate()
-    {
+    public function Test_of_validateOnCreate() {
         $Person = new TestPerson(array('user_name' =>'hilario','first_name' =>'Hilario','last_name' =>'Hervás','country' =>'ES','tos'=>1));
         $Person->validateOnCreate();
         $this->assertFalse($Person->hasErrors());
@@ -693,8 +663,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertFalse($Person->save());
     }
 
-    public function Test_of_validateOnUpdate()
-    {
+    public function Test_of_validateOnUpdate() {
         $Person = new TestPerson(array('email' =>'email@example.com'));
         $Person->validateOnUpdate();
         $this->assertFalse($Person->hasErrors());
@@ -705,8 +674,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_validate()
-    {
+    public function Test_of_validate() {
         $Person = new TestPerson(array('first_name' =>'Alicia'));
         $Person->validate();
         $this->assertFalse($Person->hasErrors());
@@ -716,8 +684,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Person->getErrorsOn('first_name'),$Person->getDefaultErrorMessageFor('blank'));
     }
 
-    public function Test_of_isValid()
-    {
+    public function Test_of_isValid() {
         $Person = new TestPerson(array('country' =>'ES'));
         $this->assertFalse($Person->isValid());
         $this->assertEqual($Person->getErrors(), array('first_name' => array("can't be blank"),'tos' =>array("must be accepted")));
@@ -730,8 +697,7 @@ class Validations_TestCase extends ActiveRecordUnitTest
     }
 
 
-    public function Test_of_validatesAssociated()
-    {
+    public function Test_of_validatesAssociated() {
         $Picture = new Picture(array('title' =>'Carlet'));
 
         $Landlord = new Landlord();

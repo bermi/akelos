@@ -30,8 +30,7 @@ class MenuHelper extends AkActionViewHelper
     * +current_class+: the class name of the current controller or the current action (default is "current")
     * +title_tag+: the tag that will contain the controller name link (default is "h2"). If it's empty, it won't be present
     */
-    public function menu_for_controllers($menu_options = array(), $div_menu_id = 'menu', $current_class = 'current', $title_tag = 'h2')
-    {
+    public function menu_for_controllers($menu_options = array(), $div_menu_id = 'menu', $current_class = 'current', $title_tag = 'h2') {
         $menu_options = empty($menu_options) ? $this->_get_default_full_menu() : $menu_options;
         $menu = '';
 
@@ -71,8 +70,7 @@ class MenuHelper extends AkActionViewHelper
         return TagHelper::content_tag('div', $menu, array('id' => $div_menu_id));
     }
 
-    public function _get_default_full_menu()
-    {
+    public function _get_default_full_menu() {
         $controllers_dir = AkConfig::getDir('controllers');
         $controller_file_names = array_map('array_pop', (array)Ak::dir($controllers_dir, array('files'=>false)));
 
@@ -91,8 +89,7 @@ class MenuHelper extends AkActionViewHelper
         return $menu_options;
     }
 
-    public function _get_this_class_methods($class)
-    {
+    public function _get_this_class_methods($class) {
         $array1 = get_class_methods($class);
         if($parent_class = get_parent_class($class)){
             $array2 = get_class_methods($parent_class);

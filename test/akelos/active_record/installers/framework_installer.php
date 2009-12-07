@@ -2,8 +2,7 @@
 
 class FrameworkInstaller extends AkInstaller
 {
-    public function up_1()
-    {
+    public function up_1() {
         $this->createTable('cache', '
         id string(65) not null index primary key unique,
         cache_group string(50) index,
@@ -23,8 +22,7 @@ class FrameworkInstaller extends AkInstaller
         );
     }
 
-    public function down_1()
-    {
+    public function down_1() {
         $this->dropTable('cache');
         $this->dropTable('sessions');
         $this->dropTable('var');        

@@ -10,15 +10,13 @@ class HasOneCascadingDestroy_TestCase extends ActiveRecordUnitTest
      * @var ActiveRecord
      */
     public $Picture;
-    public function setUp()
-    {
+    public function setUp() {
         $this->installAndIncludeModels(array('Picture','Thumbnail'));
         $Picture = $this->Picture->create(array('title'=>'This is not a picture'));
         $Picture->main_thumbnail->create(array('caption'=>'It cant have a thumbnail'));
     }
 
-    public function test_ensure_we_have_the_setup_right()
-    {
+    public function test_ensure_we_have_the_setup_right() {
         $Picture = $this->Picture->find('first',array('include'=>'main_thumbnail'));
         $this->assertEqual(1,$Picture->main_thumbnail->photo_id);
 
@@ -27,16 +25,14 @@ class HasOneCascadingDestroy_TestCase extends ActiveRecordUnitTest
         #var_dump($this->Picture->_db->select('SELECT * FROM thumbnails'));
     }
 
-    public function test_should_destroy_the_belonging_thumbnail()
-    {
+    public function test_should_destroy_the_belonging_thumbnail() {
         $Picture = $this->Picture->find('first',array('include'=>'main_thumbnail'));
         $Picture->destroy();
 
         $this->assertFalse($this->Thumbnail->find('first'));
     }
 
-    public function test_should_destroy_the_thumbnail_even_when_not_loaded()
-    {
+    public function test_should_destroy_the_thumbnail_even_when_not_loaded() {
         $Picture = $this->Picture->find('first');
         $Picture->destroy();
 

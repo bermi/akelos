@@ -4,13 +4,11 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class AssociatedInclusion_TestCase extends ActiveRecordUnitTest
 {
-    public function test_start()
-    {
+    public function test_start() {
         $this->installAndIncludeModels('Property','Picture', array('instantiate'=>true));
     }
 
-    public function test_belongs_to_inclusion_on_find()
-    {
+    public function test_belongs_to_inclusion_on_find() {
         $Apartment = $this->Property->create(array('description' =>'Docklands riverside apartment'));
         $Picture = $this->Picture->create(array('title' =>'Views from the living room'));
 
@@ -21,8 +19,7 @@ class AssociatedInclusion_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($ViewsPicture->property->description, $Apartment->description);
     }
 
-    public function test_collection_inclusion_on_find()
-    {
+    public function test_collection_inclusion_on_find() {
         $Apartment = $this->Property->findFirstBy('description','Docklands riverside apartment');
         $Picture = $this->Picture->create(array('title' =>'Living room'));
 

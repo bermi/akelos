@@ -9,55 +9,46 @@ class ActionCachingController extends ApplicationController
                                'edit'=>array('cache_path'=>'http://test.host/edit'),
                                'skip'
                                );
-    function _initActionCache()
-    {
+    function _initActionCache() {
         if (!empty($this->params['id'])) {
             $this->caches_action['edit'] = array('cache_path'=>'http://test.host/'.$this->params['id'].';edit');
         }
     }
     
-    function _initExtensions()
-    {
+    function _initExtensions() {
         $this->_initActionCache();
         parent::_initExtensions();
     }
-    function index()
-    {
+    function index() {
         
         $this->renderText($this->cache_this);
         
     }
     
-    function redirected()
-    {
+    function redirected() {
         $this->redirectToAction('index');
     }
-    function forbidden()
-    {
+    function forbidden() {
         $this->renderText('Forbidden',403);
     }
-    function skip()
-    {
+    function skip() {
         $this->renderText('Hello<!--CACHE-SKIP-START-->
         
         You wont see me after the cache is rendered.
         
         <!--CACHE-SKIP-END-->');
     }
-    function expire()
-    {
+    function expire() {
         $this->expireAction(array('controller'=>'action_caching','action'=>'index','lang'=>Ak::lang()));
         $this->expireAction(array('controller'=>'action_caching','action'=>'skip'));
         $this->renderNothing(200);
     }
     
-    function show()
-    {
+    function show() {
         $this->performActionWithoutFilters('index');
     }
     
-    function edit()
-    {
+    function edit() {
         $this->performActionWithoutFilters('index');
     }
     

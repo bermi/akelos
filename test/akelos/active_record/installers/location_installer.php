@@ -2,8 +2,7 @@
 
 class LocationInstaller extends AkInstaller
 {
-    public function install($version = null, $options = array())
-    {
+    public function install($version = null, $options = array()) {
         $this->createTable('locations', '
         id,
         parent_id,
@@ -15,8 +14,7 @@ class LocationInstaller extends AkInstaller
         );
     }
 
-    public function uninstall($version = null, $options = array())
-    {
+    public function uninstall($version = null, $options = array()) {
         $this->dropTable('locations');
     }
 }

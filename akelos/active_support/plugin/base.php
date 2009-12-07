@@ -54,8 +54,7 @@ class AkPlugin
      * @priority int $priority Multiple plugins can chain methods for extending classes. 
      *           A higher priority will will take precedence over a low priority.
      */
-    public function extendClassWithCode($class_name, $path_to_code, $priority = 100)
-    {
+    public function extendClassWithCode($class_name, $path_to_code, $priority = 100) {
         if(empty($this->PluginManager->ClassExtender)){
             $this->PluginManager->ClassExtender = new AkClassExtender();
         }
@@ -64,13 +63,11 @@ class AkPlugin
     }
 
 
-    public function observeModel($model_name, &$Observer, $priority = 100)
-    {
+    public function observeModel($model_name, &$Observer, $priority = 100) {
 
     }
 
-    public function addHelper($helper_name, $helper_path = null)
-    {
+    public function addHelper($helper_name, $helper_path = null) {
         $helper_name = AkInflector::camelize($helper_name);
         $helper_path = empty($helper_path) ? $this->getPath().DS.'lib'.DS.AkInflector::underscore($helper_name).'.php' : $helper_path;
         AkHelperLoader::addPluginHelper($helper_name, array('path' => $helper_path));
@@ -82,8 +79,7 @@ class AkPlugin
      * @return string Plugin path
      * @access public
      */
-    public function getPath()
-    {
+    public function getPath() {
         return $this->PluginManager->getBasePath($this->name);
     }
 }
@@ -134,8 +130,7 @@ class AkPluginLoader
      * @return void  
      * @access public
      */
-    public function loadPlugins()
-    {
+    public function loadPlugins() {
         $this->instantiatePlugins();
         $Plugins = $this->_getPriorizedPlugins();
         foreach (array_keys($Plugins) as $k) {
@@ -153,8 +148,7 @@ class AkPluginLoader
      * @return void  
      * @access public
      */
-    public function extendClasses()
-    {
+    public function extendClasses() {
         if(isset($this->ClassExtender)){
             $this->ClassExtender->extendClasses();
         }
@@ -169,8 +163,7 @@ class AkPluginLoader
      * @return void  
      * @access public
      */
-    public function instantiatePlugins()
-    {
+    public function instantiatePlugins() {
         foreach ($this->getAvailablePlugins() as $plugin){
             $this->instantiatePlugin($plugin);
         }
@@ -186,8 +179,7 @@ class AkPluginLoader
      * @return boolean Returns true if can instantiate the plugin and false if the plugin could not be intantiated.   
      * @access public 
      */
-    public function instantiatePlugin($plugin_name)
-    {
+    public function instantiatePlugin($plugin_name) {
         $init_path = $this->getBasePath($plugin_name).DS.'init.php';
         if(file_exists($init_path)){
             $plugin_class_name = AkInflector::camelize($plugin_name).'Plugin';
@@ -215,8 +207,7 @@ class AkPluginLoader
      * @return array    Array of existing plugins
      * @access public
      */
-    public function getAvailablePlugins()
-    {
+    public function getAvailablePlugins() {
         if(empty($this->_available_plugins)){
             if(AK_PLUGINS == 'auto'){
                 $this->_findPlugins();
@@ -234,8 +225,7 @@ class AkPluginLoader
      * @return string Plugin root path
      * @access public 
      */
-    public function getBasePath($plugin_name)
-    {
+    public function getBasePath($plugin_name) {
         return AK_PLUGINS_DIR.DS.Ak::sanitize_include($plugin_name);
     }
 
@@ -245,8 +235,7 @@ class AkPluginLoader
      * @return array   Priorized plugins
      * @access private
      */
-    public function &_getPriorizedPlugins()
-    {
+    public function &_getPriorizedPlugins() {
         if(!empty($this->_plugin_instances) && empty($this->_priorized_plugins)){
             ksort($this->_plugin_instances);
             foreach (array_keys($this->_plugin_instances) as $priority){
@@ -264,8 +253,7 @@ class AkPluginLoader
      * @return void   
      * @access private
      */
-    public function _findPlugins()
-    {
+    public function _findPlugins() {
         $plugin_dirs = Ak::dir(AK_PLUGINS_DIR, array('dirs' => true, 'files' => false));
         $this->_available_plugins = array();
         foreach ($plugin_dirs as $plugin_dir){

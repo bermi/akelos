@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class ReflectionClass_TestCase extends ActiveSupportUnitTest
 {
-    public function test_string_constructor()
-    {
+    public function test_string_constructor() {
         $string ='class Test {
 
             public function method1($param1) {
@@ -38,8 +37,7 @@ class ReflectionClass_TestCase extends ActiveSupportUnitTest
         $this->assertEqual('void',$docBlock->getTag('return'));
     }
 
-    public function test_array_constructor()
-    {
+    public function test_array_constructor() {
         $string ='class Test {
 
             public function method1($param1) {
@@ -79,8 +77,7 @@ class ReflectionClass_TestCase extends ActiveSupportUnitTest
         $this->assertEqual(1,count($voidMethods));
     }
 
-    public function test_get_methods_filtered()
-    {
+    public function test_get_methods_filtered() {
         $file = AkConfig::getDir('fixtures').DS.'reflection_test_class.php';
         $class = new AkReflectionClass(file_get_contents($file));
         $filteredMethods = $class->getMethods(array('tags'=>array('WingsPluginInstallAs'=>'.*')));

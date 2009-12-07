@@ -2,8 +2,7 @@
 
 class AkModelDebug extends AkModelExtenssion
 {
-    public function dbug()
-    {
+    public function dbug() {
         if(!$this->_Model->isConnected()){
             $this->_Model->establishConnection();
         }
@@ -11,8 +10,7 @@ class AkModelDebug extends AkModelExtenssion
         $this->_Model->db_debug = $this->_Model->getAdapter()->connection->debug;
     }
 
-    public function toString($print = false)
-    {
+    public function toString($print = false) {
         $result = '';
         if(!AK_CLI || (AK_ENVIRONMENT == 'testing' && !AK_CLI)){
             $result = "<h2>Details for ".AkInflector::humanize(AkInflector::underscore($this->_Model->getModelName()))." with ".$this->_Model->getPrimaryKey()." ".$this->_Model->getId()."</h2>\n<dl>\n";
@@ -42,8 +40,7 @@ class AkModelDebug extends AkModelExtenssion
         return $result;
     }
 
-    public function dbugging($trace_this_on_debug_mode = null)
-    {
+    public function dbugging($trace_this_on_debug_mode = null) {
         if(!empty($this->_Model->getAdapter()->debug) && !empty($trace_this_on_debug_mode)){
             $message = !is_scalar($trace_this_on_debug_mode) ? var_export($trace_this_on_debug_mode, true) : (string)$trace_this_on_debug_mode;
             Ak::trace($message);
@@ -53,8 +50,7 @@ class AkModelDebug extends AkModelExtenssion
 
 
 
-    public function debug ($data = 'active_record_class', $_functions=0)
-    {
+    public function debug ($data = 'active_record_class', $_functions=0) {
         if(!AK_DEBUG && !AK_DEV_MODE){
             return;
         }

@@ -8,33 +8,28 @@ class <?php echo $controller_class_name?> extends ApplicationController
         echo "    var \$models = '$singular_name';\n\n";
     }
 ?>
-    function index()
-    {
+    function index() {
         $this->redirectToAction('listing');
     }
 
 <?php  foreach((array)@$actions as $action) :?>
-    function <?php echo $action?>()
-    {
+    function <?php echo $action?>() {
     }
 
 <?php  endforeach; ?>
-    function listing()
-    {
+    function listing() {
         $this-><?php echo $singular_name?>_pages = $this->pagination_helper->getPaginator($this-><?php echo $model_name?>, array('items_per_page' => 10));
         $options = $this->pagination_helper->getFindOptions($this-><?php echo $model_name?>);
         $this-><?php echo $plural_name?> =& $this-><?php echo $model_name?>->find('all', $options);
     }
 
-    function show()
-    {<?php if($model_name != $controller_name){ ?>
+    function show() {<?php if($model_name != $controller_name){ ?>
 
         $this-><?php echo $singular_name?> =& $this-><?php echo $model_name?>->find(@$this->params['id']);<?php } ?>
 
     }
 
-    function add()
-    {
+    function add() {
         if(!empty($this->params['<?php echo $singular_name?>'])){
             $this-><?php echo $model_name?>->setAttributes($this->params['<?php echo $singular_name?>']);
             if ($this->Request->isPost() && $this-><?php echo $model_name?>->save()){
@@ -45,8 +40,7 @@ class <?php echo $controller_class_name?> extends ApplicationController
     }
     <?php  if($model_name != $controller_name){ ?>
 
-    function edit()
-    {
+    function edit() {
         if(!empty($this->params['id'])){
             if(empty($this-><?php echo $singular_name?>->id) || $this-><?php echo $singular_name?>->id != $this->params['id']){
                 $this-><?php echo $singular_name?> =& $this-><?php echo $model_name?>->find($this->params['id']);
@@ -65,8 +59,7 @@ class <?php echo $controller_class_name?> extends ApplicationController
     }
     <?php } else { ?>
 
-    function edit()
-    {
+    function edit() {
         if (empty($this->params['id'])){
          $this->redirectToAction('listing');
         }
@@ -80,8 +73,7 @@ class <?php echo $controller_class_name?> extends ApplicationController
     }
     <?php } ?>
     
-    function destroy()
-    {
+    function destroy() {
         if(!empty($this->params['id'])){
             $this-><?php echo $singular_name?> =& $this-><?php echo $model_name?>->find($this->params['id']);
             if($this->Request->isPost()){

@@ -15,8 +15,7 @@
  */
 class AkImageCenteredCropFilter extends AkImageFilter
 {
-    public function setOptions($options = array())
-    {
+    public function setOptions($options = array()) {
         $default_options = array(
         'width'=> $this->Image->getWidth(),
         'height'=> $this->Image->getHeight()
@@ -27,8 +26,7 @@ class AkImageCenteredCropFilter extends AkImageFilter
         $this->_variablizeOptions_($this->options);
     }
 
-    public function apply()
-    {
+    public function apply() {
         $height_ratio  = $this->Image->getHeight()/$this->options['height'];
         $width_ratio  = $this->Image->getWidth()/$this->options['width'];
 
@@ -55,13 +53,11 @@ class AkImageCenteredCropFilter extends AkImageFilter
         }
     }
 
-    public function getName()
-    {
+    public function getName() {
         return 'centered_crop';
     }
 
-    private function _resizeAndCrop($width, $height, $x, $y)
-    {
+    private function _resizeAndCrop($width, $height, $x, $y) {
         $this->Image->Transform->resize($width, $height);
         $this->Image->Transform->crop($this->options['width'], $this->options['height'], $x, $y);
     }

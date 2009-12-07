@@ -22,8 +22,7 @@ class AkTimeZone
     * Initiates a new AkTimeZone object with the given name and offset. The offset is
     * the number of seconds that this time zone is offset from UTC (GMT).
     */
-    public function init($name, $utc_offset, $dst = false)
-    {
+    public function init($name, $utc_offset, $dst = false) {
         $this->name = $name;
         $this->utc_offset = $utc_offset;
         $this->dst = $dst;
@@ -35,8 +34,7 @@ class AkTimeZone
     * string. If $colon is false, a colon will not be inserted into the
     * result.
     */
-    public function getFormattedOffset($colon = true)
-    {
+    public function getFormattedOffset($colon = true) {
         if($this->utc_offset == 0){
             return '';
         }
@@ -50,40 +48,35 @@ class AkTimeZone
     * Compute and return the current time, in the time zone represented by
     * AkTimeZone.
     */
-    public function now()
-    {
+    public function now() {
         return $this->adjust(isset($this->_timestamp) ? $this->_timestamp : Ak::getTimestamp());
     }
 
     /**
     * Return the current date in this time zone.
     */
-    public function today()
-    {
+    public function today() {
         return Ak::getDate($this->now(), Ak::locale('date_format'));
     }
 
     /**
     * Return the current time in this time zone.
     */
-    public function time()
-    {
+    public function time() {
         return Ak::getDate($this->now(), Ak::locale('time_format'));
     }
 
     /**
     * Return the current time in this time zone.
     */
-    public function dateTime()
-    {
+    public function dateTime() {
         return Ak::getDate($this->now(), Ak::locale('date_time_format'));
     }
 
     /**
     * Adjust the given time to the time zone represented by AkTimeZone.
     */
-    public function adjust($time)
-    {
+    public function adjust($time) {
         return $time + $this->utc_offset + ($this->dst && $this->inDst($time, $this->name) ? 3600 : 0) - AK_UTC_OFFSET;
     }
 
@@ -92,8 +85,7 @@ class AkTimeZone
     * zone, and then adjusts it to return the corresponding time in the
     * local time zone.
     */
-    public function unadjust($time)
-    {
+    public function unadjust($time) {
         return $time - $this->utc_offset - ($this->dst && $this->inDst($time, $this->name) ? 3600 : 0) + AK_UTC_OFFSET;
     }
 
@@ -101,8 +93,7 @@ class AkTimeZone
     * Compare this time zone to the parameter. The two are compared first on
     * their offsets, and then by name.
     */
-    public function compare($zone)
-    {
+    public function compare($zone) {
         $result = $this->utc_offset > $zone->utc_offset ? 1 : ($zone->utc_offset > $this->utc_offset ? -1 : 0);
         $result = $result == 0 ? strcoll($this->name, $zone->name) : $result;
         return $result == 0 ? 0 : ($result > 0 ? 1 : -1);
@@ -111,14 +102,12 @@ class AkTimeZone
     /**
     * Returns a textual representation of this time zone.
     */
-    public function toString()
-    {
+    public function toString() {
         return '(GMT'.$this->getFormattedOffset().") $this->name";
     }
 
 
-    public function inDst($timestamp, $zone_name)
-    {
+    public function inDst($timestamp, $zone_name) {
         $env_tz = function_exists('date_default_timezone_get') ?  @date_default_timezone_get() : @getenv('TZ');
         function_exists('date_default_timezone_set') ?  date_default_timezone_set($zone_name) : @putenv('TZ='.$zone_name);
         $localtime = localtime($timestamp, true);
@@ -132,8 +121,7 @@ class AkTimeZone
     /**
     * Static method for creating new AkTimeZone object with the given name, offset and an options zones array.
     */
-    static function create($name, $timezone = null, $zones = null, $dst_zones = null)
-    {
+    static function create($name, $timezone = null, $zones = null, $dst_zones = null) {
         $Zone = new AkTimeZone();
         if(!empty($zones)){
             $Zone->zones = $zones;
@@ -159,8 +147,7 @@ class AkTimeZone
     * timezone to find. (The first one with that offset will be returned.)
     * Returns false if no such time zone is known to the system.
     */
-    public function locateTimezone($timezone_name_or_offset)
-    {
+    public function locateTimezone($timezone_name_or_offset) {
         if(is_string($timezone_name_or_offset)){
             $timezones = $this->getTimezones();
             if(isset($timezones[$timezone_name_or_offset])){
@@ -186,8 +173,7 @@ class AkTimeZone
     *
     * Places prefixed with "-" are those who have DST in the South Hemisphere
     */
-    public function getTimezones()
-    {
+    public function getTimezones() {
         if(empty($this->zones)){
             $zones =  Ak::t(
             '-43200 | Etc/GMT+12
@@ -255,8 +241,7 @@ class AkTimeZone
     * Return an array of all AkTimeZone objects. There are multiple AkTimeZone objects
     * per time zone, in many cases, to make it easier for users to find their own time zone.
     */
-    static function &all()
-    {
+    static function &all() {
         $TimeZone = new AkTimeZone();
         $time_zones = $TimeZone->getTimezones();
         $dst_zones = $TimeZone->dst_zones;

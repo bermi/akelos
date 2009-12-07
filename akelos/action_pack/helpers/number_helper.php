@@ -17,8 +17,7 @@ class NumberHelper
       *   $number_helper->number_to_phone(1235551234, array('delimiter' => " "))    => 123 555 1234
       *   $number_helper->number_to_phone(1235551234, array('area_code' => true, 'extension' => 555))  => (123) 555-1234 x 555
       */
-    static function number_to_phone($number, $options = array())
-    {
+    static function number_to_phone($number, $options = array()) {
         $default_options = array(
         'area_code'=>false,
         'delimiter' => '-',
@@ -52,8 +51,7 @@ class NumberHelper
       * 			'unit_position' => 'right')) => 1.234.567.890,50 &euro;
       */
 
-    static function number_to_currency($number, $options = array())
-    {
+    static function number_to_currency($number, $options = array()) {
         $default_options = Ak::locale('currency');
 
         $options = array_merge($default_options, $options);
@@ -76,8 +74,7 @@ class NumberHelper
       *   $number_helper->number_to_percentage(100, array('precision' => 0)) => 100%
       *   $number_helper->number_to_percentage(302.0576, array('precision' => 3))  => 302.058%
       */
-    static function number_to_percentage($number, $options = array())
-    {
+    static function number_to_percentage($number, $options = array()) {
 
         $default_options = array(
         'precision'=>2,
@@ -94,8 +91,7 @@ class NumberHelper
       * Example:
       *    $number_helper->number_with_delimiter(12345678) => 12,345,678
       */
-    static function number_with_delimiter($number, $delimiter=',')
-    {
+    static function number_with_delimiter($number, $delimiter=',') {
         return preg_replace('/(\d)(?=(\d\d\d)+(?!\d))/', "\\1{$delimiter}", $number);
     }
 
@@ -109,8 +105,7 @@ class NumberHelper
     *   $number_helper->human_size(1234567)      => 1.2 MB
     *   $number_helper->human_size(1234567890)   => 1.1 GB
     */
-    static function number_to_human_size($size, $decimal = 1)
-    {
+    static function number_to_human_size($size, $decimal = 1) {
         if(is_numeric($size )){
             $position = 0;
             $units = array( ' Bytes', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB');
@@ -124,13 +119,11 @@ class NumberHelper
         }
     }
 
-    static function human_size($size)
-    {
+    static function human_size($size) {
         return NumberHelper::number_to_human_size($size);
     }
 
-    static function human_size_to_bytes($size)
-    {
+    static function human_size_to_bytes($size) {
         $units = array('BYTE','KB','MB','GB','TB');
         $size = str_replace(array('BYTE','KILOBYTE','MEGABYTE','GIGABYTE','TERABYTE'), $units, rtrim(strtoupper($size),'S'));
         if(preg_match('/([0-9\.]+) ?('.join('|',$units).')/', $size, $match)){
@@ -146,8 +139,7 @@ class NumberHelper
       *    $number_helper->number_with_precision(111.2345) => 111.235
       */
 
-    static function number_with_precision($number, $precision=3)
-    {
+    static function number_with_precision($number, $precision=3) {
         /**
          * @todo fix number rounding. Precision on linux boxes rounds to the lower (Mac and Windows work as the example)
          */
@@ -167,8 +159,7 @@ class NumberHelper
     * Example:
     *   $number_helper->zeropad(123, 6) => 000123
     */
-    static function zeropad($number, $length)
-    {
+    static function zeropad($number, $length) {
         return str_pad($number, $length*-1, '0');
     }
 }

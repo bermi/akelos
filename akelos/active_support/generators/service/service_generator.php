@@ -14,8 +14,7 @@ class ServiceGenerator extends  AkelosGenerator
     $api_methods,
     $api_method_doc;
 
-    public function _preloadPaths()
-    {
+    public function _preloadPaths() {
         $this->api_name = AkInflector::camelize($this->api_name);
         $this->api_class_name = $this->api_name.'Api';
 
@@ -30,8 +29,7 @@ class ServiceGenerator extends  AkelosGenerator
         $this->service_path = AkConfig::getDir('models').DS.$this->underscored_service_name.'_service.php';
     }
 
-    public function hasCollisions()
-    {
+    public function hasCollisions() {
         $this->_preloadPaths();
 
         $this->collisions = array();
@@ -47,8 +45,7 @@ class ServiceGenerator extends  AkelosGenerator
         return count($this->collisions) > 0;
     }
 
-    public function _loadServiceStructureFromApi()
-    {
+    public function _loadServiceStructureFromApi() {
         require_once($this->api_path);
         $Api = new $this->api_class_name;
         $api_methods = $Api->getApiMethods();
@@ -62,8 +59,7 @@ class ServiceGenerator extends  AkelosGenerator
         $this->assignVarToTemplate('api_method_doc', $this->api_method_doc);
     }
 
-    public function _getFunctionParamsAsText($ApiMethod)
-    {
+    public function _getFunctionParamsAsText($ApiMethod) {
         $params = array();
         foreach ($ApiMethod->expects as $k=>$param){
             $params[] = "\$param_".($k+1)."_as_".$param;
@@ -71,8 +67,7 @@ class ServiceGenerator extends  AkelosGenerator
         return join(", ", $params);
     }
 
-    public function _addDocBlock($ApiMethod)
-    {
+    public function _addDocBlock($ApiMethod) {
         $this->api_method_doc[$ApiMethod->name] = !empty($ApiMethod->documentation)? "\n\t* ".$ApiMethod->documentation."\n\t*" : '';
         foreach (array('expects', 'returns') as $expects_or_returns){
             if(!empty($ApiMethod->{$expects_or_returns})){
@@ -92,8 +87,7 @@ class ServiceGenerator extends  AkelosGenerator
     }
 
 
-    public function generate()
-    {
+    public function generate() {
         $this->_preloadPaths();
 
         $this->_loadServiceStructureFromApi();

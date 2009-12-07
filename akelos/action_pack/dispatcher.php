@@ -10,8 +10,7 @@ class AkDispatcher
     public $Response;
     public $Controller;
 
-    public function dispatch()
-    {
+    public function dispatch() {
         if(!$this->dispatchCached()){
             AK_ENABLE_PROFILER &&  Ak::profile(__CLASS__.'::'.__FUNCTION__.'() call');
             $this->Request = new AkRequest();
@@ -22,8 +21,7 @@ class AkDispatcher
         }
     }
 
-    public function dispatchCached()
-    {
+    public function dispatchCached() {
         $cache_settings = Ak::getSettings('caching', false);
         if ($cache_settings['enabled']) {
             $null = null;
@@ -47,8 +45,7 @@ class AkDispatcher
      * approach described at http://blog.milkfarmsoft.com/?p=51
      *
      */
-    public function restoreRequest()
-    {
+    public function restoreRequest() {
     }
 }
 

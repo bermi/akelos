@@ -36,21 +36,17 @@ class AkCacheSweeper extends AkObserver
 {
     public $_cache_handler;
 
-    public function __construct(&$cache_handler)
-    {
+    public function __construct(&$cache_handler) {
         $this->_cache_handler = $cache_handler;
         parent::__construct();
     }
-    public function expirePage($path = null, $language=null)
-    {
+    public function expirePage($path = null, $language=null) {
         return $this->_cache_handler->expirePage($path,$language);
     }
-    public function expireAction($options, $params = array())
-    {
+    public function expireAction($options, $params = array()) {
         return $this->_cache_handler->expireAction($options, $params);
     }
-    public function expireFragment($key, $options = array())
-    {
+    public function expireFragment($key, $options = array()) {
         return $this->_cache_handler->expireFragment($key, $options);
     }
 }

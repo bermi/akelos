@@ -27,8 +27,7 @@
  */
 class AkImageWatermarkFilter extends AkImageFilter
 {
-    public function setOptions($options = array())
-    {
+    public function setOptions($options = array()) {
         require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Image'.DS.'Tools.php');
         $this->Image->Transform =& Image_Tools::factory('Watermark');
 
@@ -46,14 +45,12 @@ class AkImageWatermarkFilter extends AkImageFilter
         $this->Image->Transform->set($this->options);
     }
 
-    public function apply()
-    {
+    public function apply() {
         $this->Image->Transform->preRender();
         $this->Image->Transform->render();
     }
 
-    public function getName()
-    {
+    public function getName() {
         return 'watermark';
     }
 }

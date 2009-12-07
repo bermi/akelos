@@ -2,14 +2,12 @@
 
 class AdvertiserController extends AkActionController
 {
-    function partial_in_template()
-    {
+    function partial_in_template() {
         $this->account = new stdClass();
         $this->account->name = 'Big Corp';
     }
 
-    function buy()
-    {
+    function buy() {
         $this->buyer = new stdClass();
         $this->buyer->name = 'Bermi Labs';
 
@@ -21,8 +19,7 @@ class AdvertiserController extends AkActionController
 
     }
 
-    function all()
-    {
+    function all() {
         $ad1 = new stdClass();
         $ad1->name = 'first_ad';
         $ad2 = new stdClass();
@@ -30,8 +27,7 @@ class AdvertiserController extends AkActionController
         $this->advertisements = array($ad1, $ad2);
     }
 
-    function show_all()
-    {
+    function show_all() {
         $ad1 = new stdClass();
         $ad1->name = 'first_ad';
         $ad2 = new stdClass();

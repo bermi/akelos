@@ -49,16 +49,14 @@ class AkActiveDocument extends AkBaseModel
     * Deletes the record with the given id without instantiating an object first. If an array of
     * ids is provided, all of them are deleted.
     */
-    public function delete($id)
-    {
+    public function delete($id) {
         $ids = is_array($id) ? $id : array($id);
         foreach ($ids as $id){
             $this->getAdapter()->delete($this->getCollectionName(), $id);
         }
     }
 
-    public function destroy($id = null)
-    {
+    public function destroy($id = null) {
         if(!$this->_callback('beforeDestroy')) return false;
         $this->delete(empty($id) ? $this->getId() : $id);
         unset($this->_internals['existing_record']);
@@ -77,8 +75,7 @@ class AkActiveDocument extends AkBaseModel
     /**
     * Reloads the attributes of this object from the database.
     */
-    public function reload()
-    {
+    public function reload() {
         return $this->_loadFromDatabase($this->getId());
     }
 
@@ -145,8 +142,7 @@ class AkActiveDocument extends AkBaseModel
 
     // Finder
 
-    public function &find()
-    {
+    public function &find() {
         $args = func_get_args();
         $options = $this->_extractOptionsFromArgs($args);
         list($fetch, $options) = $this->_extractConditionsFromArgs($args, $options);
@@ -160,15 +156,13 @@ class AkActiveDocument extends AkBaseModel
     }
 
 
-    public function &findFirst()
-    {
+    public function &findFirst() {
         $args = func_get_args();
         $result = call_user_func_array(array($this,'find'), array_merge(array('first'),$args));
         return $result;
     }
 
-    public function &findAll()
-    {
+    public function &findAll() {
         $args = func_get_args();
         $result = call_user_func_array(array($this,'find'), array_merge(array('all'),$args));
         return $result;
@@ -454,15 +448,13 @@ class AkActiveDocument extends AkBaseModel
 
 
     // Lazy loading
-    protected function _enableLazyLoadingExtenssions($options = array())
-    {
+    protected function _enableLazyLoadingExtenssions($options = array()) {
         empty($options['skip_observers'])   && $this->_enableObservers();
         empty($options['skip_errors'])      && $this->_enableErrors();
         empty($options['skip_validations']) && $this->_enableValidations();
     }
 
-    protected function _enableObservers()
-    {
+    protected function _enableObservers() {
         $this->extendClassLazily('AkModelObserver',
         array(
         'methods' => array (
@@ -478,8 +470,7 @@ class AkActiveDocument extends AkBaseModel
 
 
 
-    protected function _enableErrors()
-    {
+    protected function _enableErrors() {
         $this->extendClassLazily('AkModelErrors',
         array(
         'methods' => array(
@@ -508,8 +499,7 @@ class AkActiveDocument extends AkBaseModel
     }
 
 
-    protected function _enableValidations()
-    {
+    protected function _enableValidations() {
         $this->extendClassLazily('AkModelValidations',
         array(
         'methods' => array(

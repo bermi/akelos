@@ -7,8 +7,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     *
     * $Person->exists(5);
     */
-    public function exists($id)
-    {
+    public function exists($id) {
         return $this->find('first',array('conditions' => array($this->_ActiveRecord->getPrimaryKey().' = '.$id))) !== false;
     }
 
@@ -57,8 +56,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     *   $Person->find('all', array('include' => array('account', 'friends'));
     * </code>
     */
-    public function &find()
-    {
+    public function &find() {
         $args = func_get_args();
         $options = $this->_extractOptionsFromArgs($args);
         list($fetch, $options) = $this->_extractConditionsFromArgs($args, $options);
@@ -77,15 +75,13 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         }
     }
 
-    public function &findFirst()
-    {
+    public function &findFirst() {
         $args = func_get_args();
         $result = call_user_func_array(array($this,'find'), array_merge(array('first'),$args));
         return $result;
     }
 
-    public function &findAll()
-    {
+    public function &findAll() {
         $args = func_get_args();
         $result = call_user_func_array(array($this,'find'), array_merge(array('all'),$args));
         return $result;
@@ -97,8 +93,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     * $Post->findBySql("SELECT p.*, c.author FROM posts p, comments c WHERE p.id = c.post_id");
     * $Post->findBySql(array("SELECT * FROM posts WHERE author = ? AND created_on > ?", $author_id, $start_date));
     */
-    public function &findBySql($sql, $limit = null, $offset = null, $bindings = null, $returns = 'default', $simulation_class = 'AkActiveRecordMock')
-    {
+    public function &findBySql($sql, $limit = null, $offset = null, $bindings = null, $returns = 'default', $simulation_class = 'AkActiveRecordMock') {
         if ($limit || $offset){
             Ak::deprecateWarning("You're calling AR::findBySql with \$limit or \$offset parameters. This has been deprecated.");
             $this->_ActiveRecord->_db->addLimitAndOffset($sql, array('limit'=>$limit,'offset'=>$offset));
@@ -127,16 +122,14 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     * This function pretends to emulate RoR finders until AkActiveRecord::addMethod becomes stable on future PHP versions.
     * @todo use PHP5 __call method for handling the magic finder methods like findFirstByUnsenameAndPassword('bermi','pass')
     */
-    public function &findFirstBy()
-    {
+    public function &findFirstBy() {
         $args = func_get_args();
         array_unshift($args,'first');
         $result = call_user_func_array(array($this,'findBy'), $args);
         return $result;
     }
 
-    public function &findLastBy()
-    {
+    public function &findLastBy() {
         $args = func_get_args();
         $options = $this->_extractOptionsFromArgs($args);
         $options['order'] = $this->_ActiveRecord->getPrimaryKey().' DESC';
@@ -145,8 +138,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         return $result;
     }
 
-    public function &findAllBy()
-    {
+    public function &findAllBy() {
         $args = func_get_args();
         array_unshift($args,'all');
         $result = call_user_func_array(array($this,'findBy'), $args);
@@ -161,8 +153,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     *   findBy('is_active = true AND session_id', session_id());
     *
     */
-    public function &findBy()
-    {
+    public function &findBy() {
         $args = func_get_args();
         $find_by_sql = array_shift($args);
         if($find_by_sql == 'all' || $find_by_sql == 'first'){
@@ -216,8 +207,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         return $result;
     }
 
-    public function &findOrCreateBy()
-    {
+    public function &findOrCreateBy() {
         $args = func_get_args();
         $Item = call_user_func_array(array($this,'findFirstBy'), $args);
         if(!$Item){
@@ -246,8 +236,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
      *
      * @return string
      */
-    public function getVariableSqlCondition($variable_condition)
-    {
+    public function getVariableSqlCondition($variable_condition) {
         $query_values = array();
         list($sql, $requested_columns) = $this->_getFindBySqlAndColumns($variable_condition, $query_values);
         $replacements = array();
@@ -260,8 +249,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     }
 
 
-    public function constructFinderSql($options, $select_from_prefix = 'default')
-    {
+    public function constructFinderSql($options, $select_from_prefix = 'default') {
         $sql = isset($options['select_prefix']) ? $options['select_prefix'] : ($select_from_prefix == 'default' ? 'SELECT '.(!empty($options['joins'])?$this->_ActiveRecord->getTableName().'.':'') .'* FROM '.$this->_ActiveRecord->getTableName() : $select_from_prefix);
         $sql .= !empty($options['joins']) ? ' '.$options['joins'] : '';
 
@@ -284,8 +272,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     /**
     * Adds a sanitized version of $conditions to the $sql string.
     */
-    public function sanitizeConditions($sql = null, $conditions = null, $table_alias = null)
-    {
+    public function sanitizeConditions($sql = null, $conditions = null, $table_alias = null) {
         if (empty($sql)) {
             $concat = '';
         }
@@ -341,8 +328,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     /**
     * Gets a sanitized version of the input array. Each element will be escaped
     */
-    public function getSanitizedConditionsArray($conditions_array)
-    {
+    public function getSanitizedConditionsArray($conditions_array) {
         $result = array();
         foreach ($conditions_array as $k=>$v){
             $k = str_replace(':','',$k); // Used for Oracle type bindings
@@ -358,8 +344,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     /**
     * This functions is used to get the conditions from an AkRequest object
     */
-    public function getConditions($conditions, $prefix = '', $model_name = null)
-    {
+    public function getConditions($conditions, $prefix = '', $model_name = null) {
         $model_name = isset($model_name) ? $model_name : $this->_ActiveRecord->getModelName();
         $model_conditions = !empty($conditions[$model_name]) ? $conditions[$model_name] : $conditions;
         if($this->_ActiveRecord->$model_name instanceof $model_name){
@@ -385,8 +370,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     * eager loading associations.
     * That makes it possible to create objects of different types from the same table.
     */
-    public function &instantiate($record, $set_as_new = true, $call_after_instantiate = true)
-    {
+    public function &instantiate($record, $set_as_new = true, $call_after_instantiate = true) {
         $inheritance_column = $this->_ActiveRecord->getInheritanceColumn();
         if(!empty($record[$inheritance_column])){
             $inheritance_column = $record[$inheritance_column];
@@ -418,14 +402,12 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
 
 
 
-    protected function _extractOptionsFromArgs(&$args)
-    {
+    protected function _extractOptionsFromArgs(&$args) {
         $last_arg = count($args)-1;
         return isset($args[$last_arg]) && is_array($args[$last_arg]) && $this->_isOptionsHash($args[$last_arg]) ? array_pop($args) : array();
     }
 
-    protected function _isOptionsHash($options)
-    {
+    protected function _isOptionsHash($options) {
         if (isset($options[0])){
             return false;
         }
@@ -433,8 +415,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         return count($options) != count(array_diff(array_keys($options), $valid_keys));
     }
 
-    protected function _extractConditionsFromArgs($args, $options)
-    {
+    protected function _extractConditionsFromArgs($args, $options) {
         if(empty($args)){
             $fetch = 'all';
         } else {
@@ -470,8 +451,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         return array($fetch,$options);
     }
 
-    protected function _sanitizeConditionsVariables(&$options)
-    {
+    protected function _sanitizeConditionsVariables(&$options) {
         if(!empty($options['conditions']) && is_array($options['conditions'])){
             if (isset($options['conditions'][0]) && strstr($options['conditions'][0], '?') && count($options['conditions']) > 1){
                 //array('conditions' => array("name=?",$name))
@@ -490,8 +470,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         $this->_sanitizeConditionsCollections($options);
     }
 
-    protected function _sanitizeConditionsCollections(&$options)
-    {
+    protected function _sanitizeConditionsCollections(&$options) {
         if(!empty($options['bind']) && is_array($options['bind']) && preg_match_all('/([a-zA-Z_]+)\s+IN\s+\(?\?\)?/i', $options['conditions'], $matches)){
             $i = 0;
             foreach($options['bind'] as $k => $v){
@@ -507,8 +486,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         }
     }
 
-    protected function _getFindBySqlAndColumns($find_by_sql, &$query_values)
-    {
+    protected function _getFindBySqlAndColumns($find_by_sql, &$query_values) {
         $sql = str_replace(array('(',')','||','|','&&','&','  '),array(' ( ',' ) ',' OR ',' OR ',' AND ',' AND ',' '), $find_by_sql);
         $operators = array('AND','and','(',')','&','&&','NOT','<>','OR','|','||');
         $pieces = explode(' ',$sql);
@@ -588,8 +566,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     }
 
 
-    protected function &_findInitial($options)
-    {
+    protected function &_findInitial($options) {
         // TODO: virtual_limit is a hack
         // actually we fetch_all and return only the first row
         $options = array_merge($options, array((!empty($options['include']) ?'virtual_limit':'limit')=>1));
@@ -603,8 +580,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         }
     }
 
-    protected function &_findEvery($options)
-    {
+    protected function &_findEvery($options) {
         if((!empty($options['include']) && $this->_ActiveRecord->hasAssociations())){
             $result = $this->findWithAssociations($options);
         }else{
@@ -632,8 +608,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         }
     }
 
-    protected function &_findFromIds($ids, $options)
-    {
+    protected function &_findFromIds($ids, $options) {
         $expects_array = is_array($ids[0]);
 
         $ids = array_map(array($this->_ActiveRecord, 'quotedId'),array_unique($expects_array ? (isset($ids[1]) ? array_merge($ids[0],$ids) : $ids[0]) : $ids));
@@ -693,24 +668,13 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         }
     }
 
-    protected function _quoteColumnName($column_name)
-    {
+    protected function _quoteColumnName($column_name) {
         return $this->_ActiveRecord->_db->nameQuote.$column_name.$this->_ActiveRecord->_db->nameQuote;
     }
 
 
 
     // FROM ASSOCIATED ACTIVE RECORD
-
-    public function &___find() // originally &find()
-    {
-        $result = false;
-        if(!empty($this->_AssociationHandler)){
-            $result =& $this->_AssociationHandler->findAssociated($this->getAssociationId());
-        }
-        return $result;
-    }
-
 
     /**
      * $options['returns'] can be default, array, simulated
@@ -722,8 +686,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
      * @param array $options
      * @return array of ActiveRecord Objects
      */
-    public function &findWithAssociations($options)
-    {
+    public function &findWithAssociations($options) {
         $result = false;
         $options ['include'] = Ak::toArray($options ['include']);
 
@@ -914,8 +877,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
 
 
 
-    public function &_findBySqlWithAssociations($sql, $virtual_limit = false, $load_acts = true, $returns = 'default', $simulation_class = 'AkActiveRecordMock', $config = array())
-    {
+    public function &_findBySqlWithAssociations($sql, $virtual_limit = false, $load_acts = true, $returns = 'default', $simulation_class = 'AkActiveRecordMock', $config = array()) {
         $objects = array();
         $results = $this->_ActiveRecord->_db->execute ($sql,'find with associations ext');
         if (!$results){
@@ -939,8 +901,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
      * @param mixed $virtual_limit             int or false; unsure if this works
      * @return array                           ObjectGraph as an array
      */
-    public function &_generateObjectGraphFromResultSet($results, $virtual_limit = false, $load_acts=true, $returns = 'default',$simulation_class='AkActiveRecordMock', $config = array())
-    {
+    public function &_generateObjectGraphFromResultSet($results, $virtual_limit = false, $load_acts=true, $returns = 'default',$simulation_class='AkActiveRecordMock', $config = array()) {
         $return = array();
         $owner = array();
         $keys = array();
@@ -1034,8 +995,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         return $return;
     }
 
-    public function _reindexArray(&$array)
-    {
+    public function _reindexArray(&$array) {
         if (is_numeric(key($array))) {
             $array = array_values($array);
         }
@@ -1045,8 +1005,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             }
         }
     }
-    public function &_generateStdClasses($simulation_class,$owner, $class, $handler_name, &$parent, $config = array(), $config_key = '__owner')
-    {
+    public function &_generateStdClasses($simulation_class,$owner, $class, $handler_name, &$parent, $config = array(), $config_key = '__owner') {
         $return = array();
         $singularize=false;
         $pk = isset($config[$config_key]['pk'])?$config[$config_key]['pk']:'id';
@@ -1128,8 +1087,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         //$this->log('owner:'.var_export($owner,true));
     }
 
-    protected function _prepareIncludes($prefix, $parent_is_plural, &$parent, &$available_associated_options, $handler_name, $parent_association_id, $association_id, &$options, &$association_options, &$replacements, &$config)
-    {
+    protected function _prepareIncludes($prefix, $parent_is_plural, &$parent, &$available_associated_options, $handler_name, $parent_association_id, $association_id, &$options, &$association_options, &$replacements, &$config) {
         if (isset($association_options['include'])) {
             $association_options['include'] = Ak::toArray($association_options['include']);
             if (isset($parent->$handler_name) && ($parent->$handler_name instanceof AkBaseModel)) {
@@ -1235,8 +1193,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         }
     }
 
-    public function _setAssociations($assoc_name, $val, &$parent, $load_acts = true)
-    {
+    public function _setAssociations($assoc_name, $val, &$parent, $load_acts = true) {
         static $instances = array();
         static $instance_attributes = array();
         if ($assoc_name{0}=='_') return;
@@ -1340,8 +1297,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     /**
      * Used for generating custom selections for habtm, has_many and has_one queries
      */
-    public function constructFinderSqlWithAssociations($options, $include_owner_as_selection = true)
-    {
+    public function constructFinderSqlWithAssociations($options, $include_owner_as_selection = true) {
         $sql = 'SELECT ';
         $selection = '';
         $parent_pk = $this->_ActiveRecord->getPrimaryKey();

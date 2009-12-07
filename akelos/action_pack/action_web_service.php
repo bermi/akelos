@@ -4,13 +4,11 @@ class AkActionWebService
 {
     public $_apis = array();
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->_linkWebServiceApis();
     }
 
-    public function _linkWebServiceApis()
-    {
+    public function _linkWebServiceApis() {
         if(!empty($this->web_service_api)){
             $this->web_service_api = Ak::toArray($this->web_service_api);
             foreach ($this->web_service_api as $api){
@@ -19,8 +17,7 @@ class AkActionWebService
         }
     }
 
-    public function _linkWebServiceApi($api)
-    {
+    public function _linkWebServiceApi($api) {
         $api_path = AkInflector::underscore($api);
         if(substr($api_path,-4) != '_api'){
             $api_name_space = $api_path;
@@ -35,8 +32,7 @@ class AkActionWebService
         $this->_apis[$api_name_space] = new $api_class_name;
     }
 
-    public function &getApis()
-    {
+    public function &getApis() {
         return $this->_apis;
     }
 }

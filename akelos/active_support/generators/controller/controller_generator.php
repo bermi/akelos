@@ -13,8 +13,7 @@ class ControllerGenerator extends  AkelosGenerator
     var $scaffold = false;
 
 
-    function _preloadPaths()
-    {
+    function _preloadPaths() {
         if(!empty($this->class_name_arg)){
             $this->class_name = $this->class_name_arg;
         }
@@ -42,8 +41,7 @@ class ControllerGenerator extends  AkelosGenerator
 
     }
 
-    function hasCollisions()
-    {
+    function hasCollisions() {
         $this->collisions = array();
         $this->_preloadPaths();
         $this->actions = empty($this->actions) ? array() : (array)$this->actions;
@@ -68,8 +66,7 @@ class ControllerGenerator extends  AkelosGenerator
         return count($this->collisions) > 0;
     }
 
-    function generate()
-    {
+    function generate() {
         $this->_preloadPaths();
 
         $this->save(AkConfig::getDir('app').DS.$this->controller_path, $this->render('controller'));

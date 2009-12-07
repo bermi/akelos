@@ -2,8 +2,7 @@
 
 class AkRequestMimeType
 {
-    static function lookupMimeType($type = null)
-    {
+    static function lookupMimeType($type = null) {
         static $mime_types = array(
         'text/html'                => 'html',
         'application/xhtml+xml'    => 'html',
@@ -27,8 +26,7 @@ class AkRequestMimeType
         }
     }
 
-    static function getAccepts()
-    {
+    static function getAccepts() {
         $accept_header = isset($_SERVER['HTTP_ACCEPT'])?$_SERVER['HTTP_ACCEPT']:'';
         $accepts = array();
         foreach (explode(',',$accept_header) as $index=>$acceptable){
@@ -50,13 +48,11 @@ class AkRequestMimeType
         return $accepts;
     }
 
-    static function getMethod()
-    {
+    static function getMethod() {
         return strtolower(isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'get');
     }
 
-    static function getFormat($requestPath)
-    {
+    static function getFormat($requestPath) {
         $method = AkRequestMimeType::getMethod();
         $format = AkRequestMimeType::lookupMimeType('default');
 
@@ -80,14 +76,12 @@ class AkRequestMimeType
         return array($format, $requestPath);
     }
 
-    static function sortAcceptHeader($a, $b)
-    {
+    static function sortAcceptHeader($a, $b) {
         //preserve the original order if q is equal
         return $a['q'] == $b['q'] ? ($a['i'] > $b['i']) : ($a['q'] < $b['q']);
     }
 
-    static function parseMimeType($mime_type)
-    {
+    static function parseMimeType($mime_type) {
         @list($type,$parameter_string) = explode(';',$mime_type);
         $mime_type_struct = array();
         if ($parameter_string){
@@ -97,8 +91,7 @@ class AkRequestMimeType
         return $mime_type_struct;
     }
 
-    static function getMimeType($acceptables)
-    {
+    static function getMimeType($acceptables) {
         // we group by 'quality'
         $grouped_acceptables = array();
         foreach ($acceptables as $acceptable){
@@ -117,15 +110,13 @@ class AkRequestMimeType
         return AkRequestMimeType::lookupMimeType('default');
     }
 
-    static function getContentType()
-    {
+    static function getContentType() {
         if (empty($_SERVER['CONTENT_TYPE'])) return false;
         $mime_type_struct = AkRequestMimeType::parseMimeType($_SERVER['CONTENT_TYPE']);
         return $mime_type_struct['type'];
     }
 
-    static function bestMimeType()
-    {
+    static function bestMimeType() {
         return AkRequestMimeType::getMimeType(AkRequestMimeType::getAccepts());
     }
 }

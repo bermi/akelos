@@ -5,16 +5,14 @@ class AkOdbAdapter
     private $_Adapter;
     public $settings_namespace = 'object_database';
 
-    public function setupAdapter($settings = null)
-    {
+    public function setupAdapter($settings = null) {
         if(!$this->_loadAdapter($settings)){
             return false;
         }
         return true;
     }
 
-    public function connect($settings = null, $force_reconect = false)
-    {
+    public function connect($settings = null, $force_reconect = false) {
         if(!$this->isConnected() || $force_reconect){
             if(!$this->setupAdapter($settings)){
                 return false;
@@ -23,13 +21,11 @@ class AkOdbAdapter
         return $this->_Adapter->connect();
     }
 
-    public function isConnected()
-    {
+    public function isConnected() {
         return !empty($this->_Adapter) ? $this->_Adapter->isConnected() : false;
     }
 
-    private function _loadAdapter($settings = array())
-    {
+    private function _loadAdapter($settings = array()) {
         if(!$settings = $this->_getSettings($settings)){
             return false;
         }
@@ -44,8 +40,7 @@ class AkOdbAdapter
         }
     }
 
-    private function _instantiateAdapterClass($type, $settings = array())
-    {
+    private function _instantiateAdapterClass($type, $settings = array()) {
         $class_name = strstr($type,'Adapter') ? $type : 'AkOdb'.AkInflector::camelize($type).'Adapter';
         if(!class_exists($class_name) && !$this->_includeAdapterClass($settings['type'])){
             trigger_error(Ak::t('Could not find document adapter class %class', array('%class' => $class_name)), E_USER_ERROR);
@@ -55,18 +50,15 @@ class AkOdbAdapter
         return true;
     }
 
-    private function _includeAdapterClass($type)
-    {
+    private function _includeAdapterClass($type) {
         return include_once($this->_getAdapterFilePath($type));
     }
 
-    private function _getAdapterFilePath($type)
-    {
+    private function _getAdapterFilePath($type) {
         return AK_ACTIVE_DOCUMENT_DIR.DS.'adapters'.DS.AkInflector::underscore($type).'.php';
     }
 
-    private function _getSettings($settings = null)
-    {
+    private function _getSettings($settings = null) {
         if(is_string($settings)) {
             $this->_useCustomNamespace($settings);
         }
@@ -78,15 +70,13 @@ class AkOdbAdapter
         return $settings;
     }
 
-    private function _useCustomNamespace($namespace)
-    {
+    private function _useCustomNamespace($namespace) {
         if(file_exists(AK_CONFIG_DIR.DS.$namespace.'.yml')){
             $this->settings_namespace = $namespace;
         }
     }
 
-    public function __call($name, $attributes = array())
-    {
+    public function __call($name, $attributes = array()) {
         return call_user_func_array(array($this->_Adapter, $name), $attributes);
     }
 }

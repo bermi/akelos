@@ -7,48 +7,39 @@
  */
 class AkDate extends AkType
 {
-    public function yesterday()
-    {
+    public function yesterday() {
 
     }
 
-    public function tomorrow()
-    {
+    public function tomorrow() {
 
     }
 
-    public function ago($seconds = 0)
-    {
+    public function ago($seconds = 0) {
 
     }
 
-    public function since($seconds = 0)
-    {
+    public function since($seconds = 0) {
 
     }
 
-    public function beginningOfday()
-    {
+    public function beginningOfday() {
 
     }
 
-    public function endOfDay()
-    {
+    public function endOfDay() {
 
     }
 
-    public function plusWithDuration($duration)
-    {
+    public function plusWithDuration($duration) {
 
     }
 
-    public function minusWithDuration($duration)
-    {
+    public function minusWithDuration($duration) {
 
     }
 
-    public function advance($options = array())
-    {
+    public function advance($options = array()) {
         $available_options = array('day','days',
         'week','weeks',
         'fortnight','fortnights',
@@ -57,8 +48,7 @@ class AkDate extends AkType
         );
     }
 
-    public function change($options = array())
-    {
+    public function change($options = array()) {
         $available_options = array('year','month','day');
     }
 }

@@ -6,37 +6,32 @@ class AkTestApplication extends AkUnitTest
     public $_response;
     public $_cacheHeaders = array();
 
-    public function assertWantedText($text, $message = '%s')
-    {
+    public function assertWantedText($text, $message = '%s') {
         $this->assertPattern('/'.preg_quote($text).'/', $message);
     }
 
     /**
      * Asserts only if the whole response matches $text
      */
-    public function assertTextMatch($text, $message = '%s')
-    {
+    public function assertTextMatch($text, $message = '%s') {
         $this->assertPattern('|^'.$text.'$|', $message);
     }
 
-    public function assertText($text, $message = '%s')
-    {
+    public function assertText($text, $message = '%s') {
         return $this->assert(
         new TextExpectation($text),
         strip_tags($this->_response),
         $message);
     }
 
-    public function assertNoText($text, $message = '%s')
-    {
+    public function assertNoText($text, $message = '%s') {
         return $this->assert(
         new NoTextExpectation($text),
         strip_tags($this->_response),
         $message);
     }
 
-    public function assertHeader($header, $content = null)
-    {
+    public function assertHeader($header, $content = null) {
         if (is_array($this->_cacheHeaders)) {
             foreach ($this->_cacheHeaders as $ch) {
                 $parts = explode(': ', $ch);
@@ -63,21 +58,18 @@ class AkTestApplication extends AkUnitTest
     }
 
 
-    public function assertWantedPattern($pattern, $message = '%s')
-    {
+    public function assertWantedPattern($pattern, $message = '%s') {
         return $this->assertPattern($pattern, $message);
     }
 
-    public function assertPattern($pattern, $subject, $message = '%s')
-    {
+    public function assertPattern($pattern, $subject, $message = '%s') {
         return $this->assert(
             new PatternExpectation($pattern),
             $this->_response,
             $message);
     }
 
-    public function _testXPath($xpath_expression)
-    {
+    public function _testXPath($xpath_expression) {
         if (!class_exists('DOMDocument') || !class_exists('DOMXPath')) {
             if (function_exists('domxml_open_mem')) {
                 $dom = domxml_open_mem($this->_response);
@@ -112,8 +104,7 @@ class AkTestApplication extends AkUnitTest
         return $node;
     }
 
-    public function assertXPath($xpath_expression, $message = null)
-    {
+    public function assertXPath($xpath_expression, $message = null) {
         $node = $this->_testXPath($xpath_expression);
         if ($node->length<1) {
             $message = empty($message)?'Element not found using xpath: %xpath':$message;
@@ -125,8 +116,7 @@ class AkTestApplication extends AkUnitTest
         }
         return $node;
     }
-    public function assertNoXPath($xpath_expression, $message = null)
-    {
+    public function assertNoXPath($xpath_expression, $message = null) {
         $node = $this->_testXPath($xpath_expression);
         if ($node->length>0) {
             $message = empty($message)?'Element found using xpath: %xpath':$message;
@@ -137,8 +127,7 @@ class AkTestApplication extends AkUnitTest
             $this->pass($message);
         }
     }
-    public function assertValidXhtml($message = null)
-    {
+    public function assertValidXhtml($message = null) {
         $response = $this->_response;
 
         $validator = new AkXhtmlValidator();
@@ -154,8 +143,7 @@ class AkTestApplication extends AkUnitTest
         }
     }
 
-    public function &getController()
-    {
+    public function &getController() {
         if (isset($this->Dispatcher)) {
             $controller = $this->Dispatcher->Controller;
             return $controller;
@@ -164,41 +152,33 @@ class AkTestApplication extends AkUnitTest
             return $false;
         }
     }
-    public function _setConstants($constants = array())
-    {
+    public function _setConstants($constants = array()) {
         foreach ($constants as $constant=>$value) {
             !defined($constant)?define($constant,$value):null;
         }
     }
-    public function setIp($ip)
-    {
+    public function setIp($ip) {
         $_SERVER['HTTP_CLIENT_IP'] = $ip;
         $_SERVER['REMOTE_ADDR'] = $ip;
     }
 
-    public function assertResponse($code)
-    {
+    public function assertResponse($code) {
         $this->assertHeader('Status',$code);
     }
 
-    public function setForwaredForIp($ip)
-    {
+    public function setForwaredForIp($ip) {
         $_SERVER['HTTP_X_FORWARDED_FOR'] = $ip;
     }
-    public function addIfModifiedSince($gmtDateString)
-    {
+    public function addIfModifiedSince($gmtDateString) {
         $_SERVER['HTTP_IF_MODIFIED_SINCE'] = $gmtDateString;
     }
-    public function setXmlHttpRequest()
-    {
+    public function setXmlHttpRequest() {
         $_SERVER['HTTP_X_REQUESTED_WITH']='xmlhttprequest';
     }
-    public function setAcceptEncoding($encoding)
-    {
+    public function setAcceptEncoding($encoding) {
         $_SERVER['HTTP_ACCEPT_ENCODING']=$encoding;
     }
-    public function &getHeader($name)
-    {
+    public function &getHeader($name) {
         if ($this->Dispatcher) {
             $sentHeader = $this->Dispatcher->Response->getHeader($name);
         } else {
@@ -218,8 +198,7 @@ class AkTestApplication extends AkUnitTest
         return $sentHeader;
     }
 
-    public function _reset()
-    {
+    public function _reset() {
         $_REQUEST = array();
         $_POST = array();
         $_SESSION = array();
@@ -227,8 +206,7 @@ class AkTestApplication extends AkUnitTest
         $_POST = array();
     }
 
-    public function _init($url, $constants = array(), $controllerVars = array())
-    {
+    public function _init($url, $constants = array(), $controllerVars = array()) {
         $this->_reset();
         $this->_response = null;
         $this->_cacheHeaders = array();
@@ -263,8 +241,7 @@ class AkTestApplication extends AkUnitTest
         $this->Dispatcher = new AkTestDispatcher($controllerVars);
     }
 
-    public function get($url,$data = array(), $constants = array(), $controllerVars = array())
-    {
+    public function get($url,$data = array(), $constants = array(), $controllerVars = array()) {
         $_SERVER['REQUEST_METHOD'] = 'GET';
         ob_start();
         $rendered = $this->_init($url, $constants, $controllerVars);
@@ -278,14 +255,12 @@ class AkTestApplication extends AkUnitTest
         return $res;
     }
 
-    public function _cleanUp()
-    {
+    public function _cleanUp() {
         unset($_SERVER['HTTP_IF_MODIFIED_SINCE']);
         unset($_SERVER['HTTP_X_REQUESTED_WITH']);
         unset($_SERVER['HTTP_ACCEPT_ENCODING']);
     }
-    public function post($url, $data = null, $constants = array(), $controllerVars = array())
-    {
+    public function post($url, $data = null, $constants = array(), $controllerVars = array()) {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         ob_start();
 
@@ -299,8 +274,7 @@ class AkTestApplication extends AkUnitTest
         return $res;
     }
 
-    public function put($url,$data = null, $constants = array(), $controllerVars = array())
-    {
+    public function put($url,$data = null, $constants = array(), $controllerVars = array()) {
         $_SERVER['REQUEST_METHOD'] = 'PUT';
         ob_start();
         $rendered = $this->_init($url, $constants, $controllerVars);
@@ -313,8 +287,7 @@ class AkTestApplication extends AkUnitTest
         return $res;
     }
 
-    public function delete($url, $constants = array(), $controllerVars = array())
-    {
+    public function delete($url, $constants = array(), $controllerVars = array()) {
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
         ob_start();
         $rendered = $this->_init($url, $constants, $controllerVars);

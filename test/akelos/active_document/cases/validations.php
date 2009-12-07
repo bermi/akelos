@@ -28,8 +28,7 @@ class ValidDocument extends AkActiveDocument
 
 class DocumentValidations_TestCase extends ActiveDocumentUnitTest
 {
-    public function setup()
-    {
+    public function setup() {
         $this->db = new AkOdbAdapter();
         $this->db->connect(array('type' => 'mongo_db', 'database' => 'akelos_testing'));
         $this->ValidDocument = new ValidDocument();
@@ -178,8 +177,7 @@ class DocumentValidations_TestCase extends ActiveDocumentUnitTest
     }
 
 
-    public function test_should_validate_inclussion_of()
-    {
+    public function test_should_validate_inclussion_of() {
         $D= clone($this->ValidDocument);
         $D->validatesInclusionOf('gender', array('male', 'female'), "woah! what are you then!??!!");
         $this->assertEqual($D->getErrorsOn('gender'),"woah! what are you then!??!!");
@@ -232,8 +230,7 @@ class DocumentValidations_TestCase extends ActiveDocumentUnitTest
 
 
 
-    public function test_should_validate_exclussion_of()
-    {
+    public function test_should_validate_exclussion_of() {
         $D = clone($this->ValidDocument);
         $D->validatesExclusionOf('gender', array('too much'), "don't lie");
         $this->assertEqual($D->getErrorsOn('gender'),"don't lie");
@@ -269,8 +266,7 @@ class DocumentValidations_TestCase extends ActiveDocumentUnitTest
         $this->assertEqual($D->getErrorsOn('age'),$D->getDefaultErrorMessageFor('exclusion'));
     }
 
-    public function test_should_validate_numericality_of()
-    {
+    public function test_should_validate_numericality_of() {
         $D = clone($this->ValidDocument);
 
         $D->validatesNumericalityOf('age');
@@ -313,8 +309,7 @@ class DocumentValidations_TestCase extends ActiveDocumentUnitTest
     }
 
 
-    public function test_should_validate_format()
-    {
+    public function test_should_validate_format() {
         $D = $this->ValidDocument;;
         $D->validatesFormatOf('email', AK_EMAIL_REGULAR_EXPRESSION);
         $this->assertEqual($D->getErrorsOn('email'),$D->getDefaultErrorMessageFor('invalid'));
@@ -428,8 +423,7 @@ class DocumentValidations_TestCase extends ActiveDocumentUnitTest
     }
 
 
-    public function test_should_validate_acceptance_of()
-    {
+    public function test_should_validate_acceptance_of() {
         $D = clone($this->ValidDocument);
         $D->validatesAcceptanceOf('tos');
         $this->assertEqual($D->getErrorsOn('tos'),$D->getDefaultErrorMessageFor('accepted'));
@@ -443,8 +437,7 @@ class DocumentValidations_TestCase extends ActiveDocumentUnitTest
     }
 
 
-    public function test_should_validate_confirmation_of()
-    {
+    public function test_should_validate_confirmation_of() {
         $D = clone($this->ValidDocument);
         $D->validatesConfirmationOf('user_name');
         $this->assertFalse($D->hasErrors());
@@ -469,8 +462,7 @@ class DocumentValidations_TestCase extends ActiveDocumentUnitTest
         $this->assertEqual($D->getErrorsOn('password'), $D->getDefaultErrorMessageFor('confirmation'));
     }
 
-    public function test_should_validate_uniqueness_of_attribute()
-    {
+    public function test_should_validate_uniqueness_of_attribute() {
         $D = clone($this->ValidDocument);
         $D->setAttributes(array('user_name' =>'bermi','first_name' =>'Bermi','last_name' =>'Ferrer','country' =>'ES','tos' => 1));
         $this->assertTrue($D->save());

@@ -6,8 +6,7 @@ class FunkyPathMailer extends AkActionMailer
 {
     public $templateRoot = AK_FUNKY_MAILER_PATH;
 
-    public function multipart_with_template_path_with_dots()
-    {
+    public function multipart_with_template_path_with_dots() {
         $this->setRecipients($recipient);
         $this->setSubject("Have a lovely picture");
         $this->setFrom("Chad Fowler <chad@example.com>");

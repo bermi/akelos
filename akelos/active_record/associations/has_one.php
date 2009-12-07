@@ -39,8 +39,7 @@ class AkHasOne extends AkAssociation
     public
     $associated_ids = array();
 
-    public function &addAssociated($association_id, $options = array())
-    {
+    public function &addAssociated($association_id, $options = array()) {
         $default_options = array(
         'class_name' => empty($options['class_name']) ? AkInflector::camelize($association_id) : $options['class_name'],
         'foreign_key' => empty($options['foreign_key']) ? AkInflector::singularize($this->Owner->getTableName()).'_id' : $options['foreign_key'],
@@ -79,8 +78,7 @@ class AkHasOne extends AkAssociation
     /**
      * Assigns the associate object, extracts the primary key, sets it as the foreign key, and saves the associate object.
      */
-    public function &assign($association_id, &$Associated)
-    {
+    public function &assign($association_id, &$Associated) {
         if(!$this->Owner->isNewRecord()){
             $Associated->set($this->Owner->$association_id->getAssociationOption('foreign_key'), $this->Owner->getId());
             $Associated->save();
@@ -91,20 +89,17 @@ class AkHasOne extends AkAssociation
         return $Associated;
     }
 
-    public function getAssociatedId($association_id)
-    {
+    public function getAssociatedId($association_id) {
         return isset($this->associated_ids[$association_id]) ? $this->associated_ids[$association_id] : false;
     }
 
 
-    public function getType()
-    {
+    public function getType() {
         return 'hasOne';
     }
 
 
-    public function getAssociatedFinderSqlOptions($association_id, $options = array())
-    {
+    public function getAssociatedFinderSqlOptions($association_id, $options = array()) {
         $default_options = array(
         'conditions' => $this->Owner->$association_id->getAssociationOption('include_conditions_when_included'),
         'order' => $this->Owner->$association_id->getAssociationOption('include_order_when_included')
@@ -147,8 +142,7 @@ class AkHasOne extends AkAssociation
         return $finder_options;
     }
 
-    public function getAssociatedFinderSqlOptionsForInclusionChain($association_id, $prefix, $parent_handler_name, $options = array(),$pluralize=false)
-    {
+    public function getAssociatedFinderSqlOptionsForInclusionChain($association_id, $prefix, $parent_handler_name, $options = array(),$pluralize=false) {
 
         $default_options = array(
         'conditions' => $this->Owner->$association_id->getAssociationOption('include_conditions_when_included'),
@@ -191,8 +185,7 @@ class AkHasOne extends AkAssociation
         return $finder_options;
     }
 
-    public function constructSqlForInclusion($association_id)
-    {
+    public function constructSqlForInclusion($association_id) {
         return ' LEFT OUTER JOIN '.
         $this->Owner->$association_id->getTableName().' AS _'.$association_id.
         ' ON '.
@@ -201,8 +194,7 @@ class AkHasOne extends AkAssociation
         '_'.$association_id.'.'.$this->Owner->$association_id->getAssociationOption('foreign_key').' ';
     }
 
-    function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name)
-    {
+    function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name) {
         $return=' LEFT OUTER JOIN '.
         $this->Owner->$association_id->getTableName().' AS '.$parent_handler_name.'__'.$handler_name.
         ' ON '.
@@ -216,8 +208,7 @@ class AkHasOne extends AkAssociation
         return $return;
     }
 
-    public function &build($association_id, $attributes = array(), $replace_existing = true)
-    {
+    public function &build($association_id, $attributes = array(), $replace_existing = true) {
         $class_name = $this->Owner->$association_id->getAssociationOption('class_name');
         $foreign_key = $this->Owner->$association_id->getAssociationOption('foreign_key');
         Ak::import($class_name);
@@ -239,16 +230,14 @@ class AkHasOne extends AkAssociation
     * and linked to this object through a foreign key and that has already been
     * saved (if it passed the validation)
     */
-    public function &create($association_id, $attributes = array(), $replace_existing = true)
-    {
+    public function &create($association_id, $attributes = array(), $replace_existing = true) {
         $this->build($association_id, $attributes, $replace_existing);
         $this->Owner->$association_id->save();
         $this->Owner->$association_id->_loaded = true;
         return $this->Owner->$association_id;
     }
 
-    public function &replace($association_id, &$NewAssociated, $dont_save = false)
-    {
+    public function &replace($association_id, &$NewAssociated, $dont_save = false) {
         $Associated = $this->loadAssociated($association_id);
         if(($Associated instanceof AkActiveRecord) && ($NewAssociated instanceof AkActiveRecord) && $Associated->getId() == $NewAssociated->getId()){
             return $NewAssociated;
@@ -288,8 +277,7 @@ class AkHasOne extends AkAssociation
         return $result;
     }
 
-    public function &findAssociated($association_id)
-    {
+    public function &findAssociated($association_id) {
         $false = false;
         if(!$this->Owner->getId()){
             return $false;
@@ -319,8 +307,7 @@ class AkHasOne extends AkAssociation
     }
 
 
-    public function constructSqlConditions($association_id)
-    {
+    public function constructSqlConditions($association_id) {
         $foreign_key = $this->Owner->$association_id->getAssociationOption('foreign_key');
         $conditions = $this->Owner->$association_id->getAssociationOption('conditions');
 
@@ -333,8 +320,7 @@ class AkHasOne extends AkAssociation
         return (empty($conditions) ? '' : $conditions.' AND ').$foreign_key.' = '.$foreign_key_value;
     }
 
-    public function constructSql($association_id)
-    {
+    public function constructSql($association_id) {
         $foreign_key = $this->Owner->$association_id->getAssociationOption('foreign_key');
         $table_name = $this->Owner->$association_id->getAssociationOption('table_name');
         $owner_table = $this->Owner->getTableName();
@@ -346,8 +332,7 @@ class AkHasOne extends AkAssociation
     /**
      * Triggers
      */
-    public function afterSave(&$object)
-    {
+    public function afterSave(&$object) {
         $success = true;
         $associated_ids = $object->getAssociatedIds();
 
@@ -374,8 +359,7 @@ class AkHasOne extends AkAssociation
         return $success;
     }
 
-    public function afterDestroy(&$object)
-    {
+    public function afterDestroy(&$object) {
         $success = true;
         $associated_ids = $object->getAssociatedIds();
         foreach ($associated_ids as $associated_id){

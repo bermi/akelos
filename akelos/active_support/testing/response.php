@@ -2,13 +2,11 @@
 
 class AkTestResponse extends AkResponse
 {
-    public function __construct()
-    {
+    public function __construct() {
         $this->_headers = array();
         $this->_headers_sent = array();
     }
-    public function sendHeaders($terminate_if_redirected = true)
-    {
+    public function sendHeaders($terminate_if_redirected = true) {
         /**
          * Fix a problem with IE 6.0 on opening downloaded files:
          * If Cache-Control: IE removes the file it just downloaded from
@@ -56,8 +54,7 @@ class AkTestResponse extends AkResponse
 
         $terminate_if_redirected ? (!empty($_redirected) ? $this->isRedirected(true) : null) : null;
     }
-    public function _parseHeaders()
-    {
+    public function _parseHeaders() {
         $headers = array();
         foreach($this->_headers_sent as $header) {
             $parts = preg_split('/:\s+/',$header);
@@ -66,8 +63,7 @@ class AkTestResponse extends AkResponse
         }
         return $headers;
     }
-    public function getHeader($name)
-    {
+    public function getHeader($name) {
         $headers = $this->_parseHeaders();
         $sentHeader = isset($headers[strtolower($name)])?$headers[strtolower($name)]:false;
         if (!$sentHeader) {
@@ -76,8 +72,7 @@ class AkTestResponse extends AkResponse
         }
         return $sentHeader;
     }
-    public function isRedirected($set=false)
-    {
+    public function isRedirected($set=false) {
         static $isRedirected;
         if ($set) {
             $isRedirected = true;
@@ -85,8 +80,7 @@ class AkTestResponse extends AkResponse
         return $isRedirected;
     }
 
-    public function redirect ($url)
-    {
+    public function redirect ($url) {
         $this->autoRender = false;
         if(substr(@$this->_headers['Status'],0,3) != '301'){
             $this->_headers['Status'] = 302;

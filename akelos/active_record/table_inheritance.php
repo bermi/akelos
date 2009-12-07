@@ -28,8 +28,7 @@ class AkActiveRecordTableInheritance extends AkActiveRecordExtenssion
     /**
      * Defines the column name for use with single table inheritance. Can be overridden in subclasses.
      */
-    public function setInheritanceColumn($column_name)
-    {
+    public function setInheritanceColumn($column_name) {
         if(!$this->_ActiveRecord->hasColumn($column_name)){
             trigger_error(Ak::t('Could not set "%column_name" as the inheritance column as this column is not available on the database.',array('%column_name'=>$column_name)).' '.Ak::getFileAndNumberTextForError(1), E_USER_NOTICE);
             return false;
@@ -42,8 +41,7 @@ class AkActiveRecordTableInheritance extends AkActiveRecordExtenssion
         }
     }
 
-    public function getSubclasses()
-    {
+    public function getSubclasses() {
         $current_class = get_class($this->_ActiveRecord);
         $subclasses = array();
         $classes = get_declared_classes();
@@ -60,8 +58,7 @@ class AkActiveRecordTableInheritance extends AkActiveRecordExtenssion
     }
 
 
-    public function typeCondition($table_alias = null)
-    {
+    public function typeCondition($table_alias = null) {
         $inheritance_column = $this->_ActiveRecord->getInheritanceColumn();
         $type_condition = array();
         $table_name = $this->_ActiveRecord->getTableName();

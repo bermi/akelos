@@ -22,8 +22,7 @@ class AkPager extends Pager_Common
      *                          and their values
      * @access public
      */
-    public function init($options = array())
-    {
+    public function init($options = array()) {
         //set default AkPager options
         $this->_delta                 = 2;
         $this->_prevImg               = '&laquo;';
@@ -86,8 +85,7 @@ class AkPager extends Pager_Common
      * @return array  First and last offsets
      * @access public
      */
-    public function getPageRangeByPageId($pageid = null)
-    {
+    public function getPageRangeByPageId($pageid = null) {
         $pageid = isset($pageid) ? (int)$pageid : $this->_currentPage;
         if (!isset($this->_pageData)) {
             $this->_generatePageData();
@@ -120,8 +118,7 @@ class AkPager extends Pager_Common
      * @return array back/pages/next/first/last/all links
      * @access public
      */
-    public function getLinks($pageID = null)
-    {
+    public function getLinks($pageID = null) {
         if ($pageID != null) {
             $_sav = $this->_currentPage;
             $this->_currentPage = $pageID;
@@ -177,8 +174,7 @@ class AkPager extends Pager_Common
      * @return string Links
      * @access private
      */
-    public function _getPageLinks($url = '')
-    {
+    public function _getPageLinks($url = '') {
         //legacy setting... the preferred way to set an option now
         //is adding it to the constuctor
         if (!empty($url)) {
@@ -271,8 +267,7 @@ class AkPager extends Pager_Common
      * @return string The link in string form
      * @access private
      */
-    public function _renderLink($altText, $linkText)
-    {        
+    public function _renderLink($altText, $linkText) {        
         $href = $this->controller->url_helper->modify_current_url($this->_linkData);
         
         if ($this->_httpMethod == 'GET') {
@@ -311,8 +306,7 @@ class AkPaginator
     * than or equal to zero). The page GET parameter for links defaults to
     * "page" and can be overridden with +page_parameter+.
     */
-    public function &AkPaginator(&$controller, $item_count, $items_per_page, $current_page=1)
-    {
+    public function &AkPaginator(&$controller, $item_count, $items_per_page, $current_page=1) {
         static $paginator;
         if($items_per_page <= 0){
             trigger_error(Ak::t('must have at least one item per page'),E_USER_WARNING);
@@ -389,70 +383,57 @@ class AkPaginator
 
     }
 
-    public function &getController()
-    {
+    public function &getController() {
         return $this->controller;
     }
 
-    public function getItemCount()
-    {
+    public function getItemCount() {
         return $this->item_count;
     }
 
-    public function getItemsPerPage()
-    {
+    public function getItemsPerPage() {
         return $this->items_per_page;
     }
     
-    public function getOffset()
-    {
+    public function getOffset() {
         return array_shift($this->paginator->getOffsetByPageId($this->getCurrent()))-1;
     }
 
-    public function getCurrent()
-    {
+    public function getCurrent() {
         return $this->paginator->getCurrentPageID();
     }
     
-    public function getCurrentPage()
-    {
+    public function getCurrentPage() {
         return $this->paginator->getCurrentPageID();
     }
 
-    public function getFirstPage()
-    {
+    public function getFirstPage() {
         return 1;
     }
-    public function getFirst()
-    {
+    public function getFirst() {
         return 1;
     }
 
-    public function getLast()
-    {
+    public function getLast() {
         return $this->paginator->getLastPage();
     }
 
-    public function pageCount()
-    {
+    public function pageCount() {
         return $this->paginator->numPages();
     }
 
-    public function lenght()
-    {
+    public function lenght() {
         return $this->pageCount();
     }
 
     /**
       * Returns true if this paginator contains the page of index +number+.
       */
-    public function hasPageNumber($number)
-    {
+    public function hasPageNumber($number) {
         return $number >= 1 && $number <= $this->pageCount();
     }
     
-    public function links()
-    {
+    public function links() {
         return $this->paginator->links;
     }
 

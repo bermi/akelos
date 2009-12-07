@@ -5,13 +5,11 @@ require_once(dirname(__FILE__).'/../config.php');
 class ConversionBetweenFormats_TestCase extends ActiveRecordUnitTest
 {
     public $skip_fixtures = true;
-    public function setup()
-    {
+    public function setup() {
         $this->installAndIncludeModels(array('Person','Account'));
     }
 
-    public function test_simple_xml()
-    {
+    public function test_simple_xml() {
         $person = new Person();
         $person->setAttributes(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
         $expected = <<<EOX
@@ -32,8 +30,7 @@ EOX;
         $this->assertEqual($person->last_name,$person_reloaded->last_name);
     }
 
-    public function test_with_relations_xml()
-    {
+    public function test_with_relations_xml() {
         $person = $this->Person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
         $person_created_at = $person->created_at;
         $person->account->create(array('username'=>'hansi','password'=>'wilma'));
@@ -66,8 +63,7 @@ EOX;
         $this->assertEqual($person->account->id,$person_reloaded->account->id);
     }
 
-    public function test_collection_and_back_xml()
-    {
+    public function test_collection_and_back_xml() {
         $person = new Person();
         $p1=$person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
         $p1->account->create(array('username'=>'hansi','password'=>'wilma'));
@@ -85,8 +81,7 @@ EOX;
         $this->assertEqual($p2->account->id,$people_reloaded[1]->account->id);
     }
 
-    public function test_simple_json()
-    {
+    public function test_simple_json() {
         $person = new Person();
         $person->setAttributes(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
         $expected = <<<EOX
@@ -100,8 +95,7 @@ EOX;
         $this->assertEqual($person->first_name,$person_reloaded->first_name);
     }
 
-    public function test_collection_json()
-    {
+    public function test_collection_json() {
         $person = new Person();
         $person->setAttributes(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
 
@@ -120,8 +114,7 @@ EOX;
         $this->assertEqual($person2->first_name,$people_reloaded[1]->first_name);
     }
 
-    public function test_collection_and_back_json()
-    {
+    public function test_collection_and_back_json() {
         $person = new Person();
         $p1=$person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
         $p1->account->create(array('username'=>'hansi','password'=>'wilma'));
@@ -139,8 +132,7 @@ EOX;
         $this->assertEqual($p1->account->id,$people_reloaded[0]->account->id);
         $this->assertEqual($p2->account->id,$people_reloaded[1]->account->id);
     }
-    public function test_with_relations_json()
-    {
+    public function test_with_relations_json() {
         $person = $this->Person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
         $person_created_at = $person->created_at;
         $person->account->create(array('username'=>'hansi','password'=>'wilma'));

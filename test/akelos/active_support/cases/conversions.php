@@ -4,8 +4,7 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class Conversions_TestCase extends ActiveSupportUnitTest
 {
-    public function test_html_to_text()
-    {
+    public function test_html_to_text() {
         $html = <<<EOF
 <h1 id="creating_a_simple_application_using_the_akelos_framework">Creating a simple application using the Akelos Framework</h1>
 
@@ -53,8 +52,7 @@ EOF;
         $this->assertEqual(Ak::convert('html','text', $html), $markdown);
     }
 
-    public function test_html_to_text_with_entities()
-    {
+    public function test_html_to_text_with_entities() {
         $html = <<<EOF
 &&lt;b&gt;Hi there&lt;/b&gt;
 EOF;
@@ -66,8 +64,7 @@ EOF;
         $this->assertEqual($converted, $markdown);
     }
 
-    public function test_html_to_text_custom_tags()
-    {
+    public function test_html_to_text_custom_tags() {
         $html = <<<EOF
 <table><tr><td><rare><b>Hi</b></rare></td></tr>
 EOF;
@@ -77,8 +74,7 @@ EOF;
         $this->assertEqual(Ak::convert('html','text',$html), $markdown);
     }
 
-    public function test_html_to_text_removing_js()
-    {
+    public function test_html_to_text_removing_js() {
         $html = <<<EOF
 <script type="text/javascript">something_really_bad()</script><em>Hola</em>
 EOF;
@@ -88,8 +84,7 @@ EOF;
         $this->assertEqual(Ak::convert('html','text',$html), $markdown);
     }
 
-    public function test_html_to_with_text_using_quotes()
-    {
+    public function test_html_to_with_text_using_quotes() {
         $html = <<<EOF
 &#8220;I&#8217;m completelly agree&#8221;
 EOF;
@@ -99,8 +94,7 @@ EOF;
         $this->assertEqual(Ak::convert('html','text',$html), $markdown);
     }
 
-    public function test_html_to_text_using_smartipants()
-    {
+    public function test_html_to_text_using_smartipants() {
         $html = <<<EOF
 "I'm completelly agree"
 EOF;

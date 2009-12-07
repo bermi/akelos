@@ -17,8 +17,7 @@ class AuthenticationController extends ApplicationController
         $this->renderText("I'm only accessible if you know the password");
     }
 
-    public function authenticate()
-    {
+    public function authenticate() {
         return $this->authenticateOrRequestWithHttpBasic('App name', $this->_authorized_users);
     }
 }

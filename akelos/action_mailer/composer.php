@@ -11,14 +11,12 @@ class AkMailComposer
 
     protected $_boundary_stack = array();
 
-    public function init(&$ActionMailer)
-    {
+    public function init(&$ActionMailer) {
         $this->ActionMailer = $ActionMailer;
         $this->Message = $ActionMailer->Message;
     }
 
-    public function build()
-    {
+    public function build() {
         $args = func_get_args();
         $method_name = array_shift($args);
         $this->ActionMailer->initializeDefaults($method_name);
@@ -26,8 +24,7 @@ class AkMailComposer
         $this->_prepareInlineBodyParts();
     }
 
-    public function getRawMessage($MessageOrPart = null, $force_overload = false)
-    {
+    public function getRawMessage($MessageOrPart = null, $force_overload = false) {
         $Message = empty($MessageOrPart) ? $this->Message : $MessageOrPart;
         if($force_overload || empty($Message->raw_message)){
             list($raw_headers, $raw_body) = $this->getRawHeadersAndBody($Message);
@@ -38,8 +35,7 @@ class AkMailComposer
         return $Message->raw_message;
     }
 
-    public function getRawHeadersAndBody($MessageOrPart = null)
-    {
+    public function getRawHeadersAndBody($MessageOrPart = null) {
         $Message = empty($MessageOrPart) ? $this->Message : $MessageOrPart;
         $raw_body_or_parts = $this->getRawBodyOrRawParts($Message);
 
@@ -76,8 +72,7 @@ class AkMailComposer
         return array($raw_headers, $raw_body);
     }
 
-    public function getRawBodyOrRawParts($MessageOrPart = null)
-    {
+    public function getRawBodyOrRawParts($MessageOrPart = null) {
         $Message = empty($MessageOrPart) ? $this->Message : $MessageOrPart;
         $body = $Message->getBody();
         if(empty($body) && ($Message->hasParts() || $Message->hasAttachments())){
@@ -92,35 +87,29 @@ class AkMailComposer
         return $body;
     }
 
-    public function openMultipartBlock()
-    {
+    public function openMultipartBlock() {
         $this->setBoundary($this->getBoundaryString());
     }
 
-    public function closeMultipartBlock()
-    {
+    public function closeMultipartBlock() {
         $this->latest_closed_boundary = array_pop($this->_boundary_stack);
     }
 
-    public function setBoundary($boundary)
-    {
+    public function setBoundary($boundary) {
         $this->boundary = $boundary;
         array_push($this->_boundary_stack, $boundary);
         return $this->boundary;
     }
 
-    public function getBoundary()
-    {
+    public function getBoundary() {
         return $this->boundary;
     }
 
-    public function getBoundaryString()
-    {
+    public function getBoundaryString() {
         return md5(Ak::randomString(10).time());
     }
 
-    protected function _callActionMailerMethod($method_name, $params = array())
-    {
+    protected function _callActionMailerMethod($method_name, $params = array()) {
         if(method_exists($this->ActionMailer, $method_name)){
             call_user_func_array(array($this->ActionMailer, $method_name), $params);
         }else{
@@ -129,8 +118,7 @@ class AkMailComposer
         $this->_setAttributesIfRequired();
     }
 
-    protected function _setAttributesIfRequired()
-    {
+    protected function _setAttributesIfRequired() {
         if(empty($this->ActionMailer->_setter_has_been_called)){
             $attributes = array();
             foreach ((array)$this->ActionMailer as $k=>$v){
@@ -142,8 +130,7 @@ class AkMailComposer
         }
     }
 
-    protected function _prepareInlineBodyParts($message_content_type = 'multipart/alternative')
-    {
+    protected function _prepareInlineBodyParts($message_content_type = 'multipart/alternative') {
         if(!$this->_hasRenderedBody()){
             if(!$this->_renderMultiPartViews($message_content_type)){
                 $this->_renderMainTemplateIfNeeded();
@@ -152,8 +139,7 @@ class AkMailComposer
         }
     }
 
-    protected function _renderMainTemplateIfNeeded()
-    {
+    protected function _renderMainTemplateIfNeeded() {
         if($this->_shouldRenderMainTemplate()){
             $this->Message->setBody($this->_renderMainTemplate());
             return true;
@@ -161,13 +147,11 @@ class AkMailComposer
         return false;
     }
 
-    protected function _renderMainTemplate()
-    {
+    protected function _renderMainTemplate() {
         return $this->ActionMailer->renderMessage($this->ActionMailer->template, $this->Message->body);
     }
 
-    protected function _renderMultiPartViews($message_content_type)
-    {
+    protected function _renderMultiPartViews($message_content_type) {
         if(empty($this->Message->parts)){
             $parts = $this->_getPartsWithRenderedTemplates();
             $this->Message->setParts($parts, 'append', true);
@@ -179,21 +163,18 @@ class AkMailComposer
         return !empty($parts);
     }
 
-    protected function _hasRenderedBody()
-    {
+    protected function _hasRenderedBody() {
         return is_string($this->Message->body);
     }
 
-    protected function _moveBodyToPart()
-    {
+    protected function _moveBodyToPart() {
         if (!empty($this->Message->parts) && is_string($this->Message->body)){
             array_unshift($this->Message->parts, array('charset' => $this->Message->charset, 'body' => $this->Message->body));
             $this->ActionMailer->body = null;
         }
     }
 
-    protected function _shouldRenderMainTemplate()
-    {
+    protected function _shouldRenderMainTemplate() {
         $result = empty($this->Message->parts);
         if(!$result && empty($this->Message->implicit_parts_order) && $this->_hasIndividualTemplate()){
             $result = true;
@@ -201,8 +182,7 @@ class AkMailComposer
         return $result;
     }
 
-    protected function _hasIndividualTemplate()
-    {
+    protected function _hasIndividualTemplate() {
         $templates = $this->_getAvailableTemplates();
         foreach ($templates as $template){
             $parts = explode('.',$template);
@@ -213,8 +193,7 @@ class AkMailComposer
         return false;
     }
 
-    protected function &_getPartsWithRenderedTemplates()
-    {
+    protected function &_getPartsWithRenderedTemplates() {
         $templates = $this->_getAvailableTemplates();
         $alternative_multiparts = array();
         $parts = array();
@@ -234,8 +213,7 @@ class AkMailComposer
         return $parts;
     }
 
-    protected function _getAvailableTemplates()
-    {
+    protected function _getAvailableTemplates() {
         $path = $this->ActionMailer->getTemplatePath();
         if(!isset($templates[$path])){
             $templates[$path] = array_map('basename', Ak::dir($path, array('dirs'=>false)));

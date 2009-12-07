@@ -4,20 +4,17 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class FinderReturnTypes_TestCase extends ActiveRecordUnitTest
 {
-    public function setup()
-    {
+    public function setup() {
         $this->installAndIncludeModels(array('Aa', 'Bb', 'Cc','Dd', 'Ee'));
     }
 
-    public function tearDown()
-    {
+    public function tearDown() {
         foreach (explode(',', 'aa_ee,bb_cc,dd_ee') as $file){
             @Ak::file_delete(AkConfig::getDir('models').DS.$file.'.php');
         }
     }
 
-    public function test_normal_find_without_association_return_array()
-    {
+    public function test_normal_find_without_association_return_array() {
         $aa1 = $this->Aa->create(array('name'=>'first aa'));
         $aa2 = $this->Aa->create(array('name'=>'second aa'));
 
@@ -43,8 +40,7 @@ class FinderReturnTypes_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_normal_find_without_association_return_simulated()
-    {
+    public function test_normal_find_without_association_return_simulated() {
         $aa1 = $this->Aa->create(array('name'=>'first aa'));
         $aa2 = $this->Aa->create(array('name'=>'second aa'));
 
@@ -86,8 +82,7 @@ class FinderReturnTypes_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($aa1->getPrimaryKey(), $returned->getPrimaryKey());
     }
 
-    public function test_find_on_first_level_has_many_finder_with_conditions_return_as_array()
-    {
+    public function test_find_on_first_level_has_many_finder_with_conditions_return_as_array() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));
@@ -103,8 +98,7 @@ class FinderReturnTypes_TestCase extends ActiveRecordUnitTest
         $this->assertEqual('first bb',$firstbb['name']);
     }
 
-    public function test_find_aa_include_bbs_with_custom_handler_name_return_simulated()
-    {
+    public function test_find_aa_include_bbs_with_custom_handler_name_return_simulated() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));
@@ -144,8 +138,7 @@ class FinderReturnTypes_TestCase extends ActiveRecordUnitTest
 
     }
 
-    public function test_find_aa_include_bbs_with_custom_handler_name_return_array()
-    {
+    public function test_find_aa_include_bbs_with_custom_handler_name_return_array() {
         $aa = $this->Aa->create(array('name'=>'first aa'));
         $this->assertTrue($aa);
         $bb1 = $this->Bb->create(array('name'=>'first bb'));

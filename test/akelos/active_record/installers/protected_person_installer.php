@@ -2,8 +2,7 @@
 
 class ProtectedPersonInstaller extends AkInstaller
 {
-    public function up_1()
-    {
+    public function up_1() {
         $this->createTable('protected_people','
           id,
           name string(32) not null,
@@ -16,8 +15,7 @@ class ProtectedPersonInstaller extends AkInstaller
         ');
     }
 
-    public function down_1()
-    {
+    public function down_1() {
         $this->dropTable('protected_people', array('sequence'=>true));
     }
 }

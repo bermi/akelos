@@ -27,8 +27,7 @@ class AkMemcache
     protected $_servers = array();
     protected $_lifeTime = 0;
 
-    public function init($options = array())
-    {
+    public function init($options = array()) {
         $default_options = array('servers'=>array('localhost:11211'),'lifeTime'=>0);
         $options = array_merge($default_options, $options);
 
@@ -53,22 +52,19 @@ class AkMemcache
     }
 
 
-    protected function _getNamespaceId($group)
-    {
+    protected function _getNamespaceId($group) {
         $ident = $group;
         return $ident;
     }
 
-    protected function _clearNamespace($group)
-    {
+    protected function _clearNamespace($group) {
         $group = 'group_'.md5($group);
         $ident = $this->_getNamespaceId($group);
         unset($this->_namespaces[$group]);
         return $this->_memcache->incr($ident,1);
     }
 
-    protected function _getNamespace($group)
-    {
+    protected function _getNamespace($group) {
         $groupName = $group;
         $group = 'group_'.md5($groupName);
         if (!isset($this->_namespaces[$group])) {
@@ -87,16 +83,14 @@ class AkMemcache
         return $this->_namespaces[$group];
     }
 
-    protected function _generateCacheKey($id,$group)
-    {
+    protected function _generateCacheKey($id,$group) {
         $namespace = $this->_getNamespace($group);
         $key = $namespace.'_'.$id;
         $key = 'key_'.md5($key);
         return $key;
     }
 
-    public function get($id, $group = 'default')
-    {
+    public function get($id, $group = 'default') {
         $key = $this->_generateCacheKey($id, $group);
         $return = $this->_memcache->get($key);
 
@@ -120,8 +114,7 @@ class AkMemcache
         return $data;
     }
 
-    public function save($data, $id = null, $group = null)
-    {
+    public function save($data, $id = null, $group = null) {
         if (is_numeric($data) || is_bool($data)) {
             $type=gettype($data);
             $data = $type.'@#!'.$data;
@@ -142,15 +135,13 @@ class AkMemcache
         return $return !== false ? true:false;
     }
 
-    public function remove($id, $group = 'default')
-    {
+    public function remove($id, $group = 'default') {
         $key = $this->_generateCacheKey($id, $group);
         $return = $this->_memcache->delete($key);
         return $return;
     }
 
-    public function clean($group = false, $mode = 'ingroup')
-    {
+    public function clean($group = false, $mode = 'ingroup') {
         switch ($mode) {
             case 'ingroup':
                 return $this->_clearNamespace($group);
@@ -163,8 +154,7 @@ class AkMemcache
         }
     }
 
-    static function isServerUp($options = array())
-    {
+    static function isServerUp($options = array()) {
         $options['silent_mode'] = true;
         $Memcached = new AkMemcache();
         return $Memcached->init($options) != false;
