@@ -1,9 +1,0 @@
-default:
-    enabled: true
-    handler:
-        type: 1 #1=PEAR,2=AdoDB,3=Memcache
-        options: 
-                servers:
-                    - ${memcached_server}
-                permissions: 0777
-                cacheDir: ${AK_TMP_DIR}

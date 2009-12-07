@@ -1,5 +1,0 @@
-<input autocomplete="off" id="user_login" name="user[login]" size="30" type="text" /><div class="auto_complete" id="user_login_auto_complete"></div><script type="text/javascript">
-//<![CDATA[
-var user_login_auto_completer = new Ajax.Autocompleter('user_login', 'user_login_auto_complete', '/foo/bar/', {})
-//]]>
-</script>

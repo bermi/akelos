@@ -1,4 +1,0 @@
-enabled: true
-handler:
-    type: 2 #1=PEAR,2=AdoDB,3=Memcache
-    options: 

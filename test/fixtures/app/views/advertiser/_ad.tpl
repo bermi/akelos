@@ -1,1 +1,0 @@
-{ad_counter?}<?=$text_helper->humanize($ad->name)?>

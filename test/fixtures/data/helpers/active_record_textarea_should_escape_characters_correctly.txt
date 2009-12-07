@@ -1,5 +1,0 @@
-<form action="/test/update/1/" method="post"><input id="Property_id" name="Property[id]" type="hidden" value="1" /><p><label for="Property_description">Description</label><br /><input id="Property_description" name="Property[description]" size="30" type="text" value="阿尔罕布拉宫" /></p>
-<p><label for="Property_details">Details</label><br /><textarea cols="40" id="Property_details" name="Property[details]" rows="20">阿尔罕布拉宫 &lt;&gt; &amp; (阿拉伯语: الحمراء&lrm;&lrm; = Al Ħamrā'; 即&quot;红色城堡&quot;)</textarea></p>
-<p><label for="Property_price">Price</label><br /><input id="Property_price" name="Property[price]" size="30" type="text" /></p>
-<p><label for="Property_location">Location</label><br /><input id="Property_location" name="Property[location]" size="30" type="text" /></p>
-<input name="commit" type="submit" value="UPDATE" /></form>

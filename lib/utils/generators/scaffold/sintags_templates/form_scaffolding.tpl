@@ -1,1 +1,0 @@
-<?php  echo '<%='?> all_input_tags <?php  echo $model_name?>, '<?php  echo $singular_name?>', {} %>

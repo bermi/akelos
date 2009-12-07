@@ -1,1 +1,0 @@
-_{index.xml.tpl}

@@ -1,1 +1,0 @@
-<?=$text_helper->titleize('Hello'.@$cruel.'WorldFromPartial');?>
