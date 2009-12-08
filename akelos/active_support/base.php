@@ -2020,42 +2020,26 @@ class Ak
     */
     static function get_tmp_dir_name() {
         if(!defined('AK_TMP_DIR')){
-            $tmp_dir = AK_BASE_DIR.DS.'tmp';
-            @mkdir($tmp_dir);
-            $perms_cmd = 'chmod -R 777 '.$tmp_dir;
-            @`$perms_cmd`;
-            if(defined('AK_BASE_DIR') && is_writable($tmp_dir)){
-                $tmp_dir = $tmp_dir;
+            if(defined('AK_BASE_DIR') && is_writable(AK_BASE_DIR.DS.'tmp')){
+                return AK_BASE_DIR.DS.'tmp';
+            }
+            if(!function_exists('sys_get_temp_dir')){
+                $dir = empty($_ENV['TMP']) ? (empty($_ENV['TMPDIR']) ? (empty($_ENV['TEMP']) ? false : $_ENV['TEMP']) : $_ENV['TMPDIR']) : $_ENV['TMP'];
+                if(empty($dir) && $fn = tempnam(md5(rand()),'')){
+                    $dir = dirname($fn);
+                    unlink($fn);
+                }
             }else{
-                if(!function_exists('sys_get_temp_dir')){
-                    $dir = empty($_ENV['TMP']) ? (empty($_ENV['TMPDIR']) ? (empty($_ENV['TEMP']) ? false : $_ENV['TEMP']) : $_ENV['TMPDIR']) : $_ENV['TMP'];
-                    if(empty($dir) && $fn = tempnam(md5(rand()),'')){
-                        $dir = dirname($fn);
-                        unlink($fn);
-                    }
-                }else{
-                    $dir = sys_get_temp_dir();
-                }
-                if(empty($dir)){
-                    trigger_error('Could not find a path for temporary files. Please define AK_TMP_DIR in your config.php', E_USER_ERROR);
-                }
-                $dir = rtrim(realpath($dir), DS).DS.'ak_'.md5(AK_BASE_DIR);
-                if(!is_dir($dir)){
-                    mkdir($dir);
-                }
-                $tmp_dir = $dir;
+                $dir = sys_get_temp_dir();
             }
-            $config_file = AK_CONFIG_DIR.DS.'config.php';
-            if(!is_file($config_file)){
-                $config_file = AK_CONFIG_DIR.DS.AK_ENVIRONMENT.'.php';
+            if(empty($dir)){
+                trigger_error('Could not find a path for temporary files. Please define AK_TMP_DIR in your config.php', E_USER_ERROR);
             }
-            $config_contents = file_get_contents($config_file);
-            $config_contents = str_replace('?>', ' ', $config_contents)."\ndefined('AK_TMP_DIR') || define('AK_TMP_DIR', '$tmp_dir');\n";
-
-            define('AK_TMP_DIR', $tmp_dir);
-            if(!@file_put_contents($config_file, $config_contents)){
-                trigger_error('Could not set a path for temporary files. Please define AK_TMP_DIR in your config.php', E_USER_ERROR);
+            $dir = rtrim(realpath($dir), DS).DS.'ak_'.md5(AK_BASE_DIR);
+            if(!is_dir($dir)){
+                mkdir($dir);
             }
+            return $dir;
         }
         return AK_TMP_DIR;
     }
