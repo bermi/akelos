@@ -28,13 +28,16 @@ class Controller_model_instantiation_TestCase extends AkWebTestCase
         $TestSetup->dropTables('all');
     }
 
-    public function test_should_access_public_action() {
-        if(!$this->webserver_enabled) return ;
+    public function skip(){
+        $this->skipIf(!AkConfig::getOption('webserver_enabled', false), '['.get_class($this).'] Web server not enabled.');
+    }
 
+    public function test_should_access_public_action() {
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'dummy_post/comments/'.$this->dummy_post_id);
         $this->assertResponse(200);
-        $this->assertTextMatch('1st post2nd post3rd post4th post5th post');
+        $this->assertTextMatch('1st post2nd post3rd post4th post5th post',
+        'Did not get expected result when calling '.$this->_test_script.'dummy_post/comments/'.$this->dummy_post_id);
     }
 }
 

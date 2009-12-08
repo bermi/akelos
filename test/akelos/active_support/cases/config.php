@@ -30,7 +30,7 @@ class Config_TestCase extends  ActiveSupportUnitTest
 
     public function test_generate_cache_filename() {
         $expected = $this->_base_config_path.DS.'testing'.DS.'testconfig1.php';
-        $result = $this->Config->generateCacheFileName('testconfig1','testing');
+        $result = $this->Config->getCacheFileName('testconfig1','testing');
         $this->assertEqual($expected, $result);
     }
 
@@ -57,7 +57,7 @@ class Config_TestCase extends  ActiveSupportUnitTest
 
         foreach (array('testing', 'development', 'production') as $environment){
             $this->Config->writeCache($expectedConfig, 'testconfig1', $environment, true);
-            $expected_file = $this->Config->generateCacheFileName('testconfig1', $environment);
+            $expected_file = $this->Config->getCacheFileName('testconfig1', $environment);
             $this->assertTrue(file_exists($expected_file), "Could not read configuration cache file for $environment");
         }
 
@@ -81,7 +81,7 @@ class Config_TestCase extends  ActiveSupportUnitTest
         $this->assertEqual($expectedConfig, $config);
 
         $expectedConfig =array('value1'=>100,'value2'=>2,'value3'=>array('subvalue1'=>1,'subvalue2'=>2,'subvalue3'=>7,'subvalue4'=>array('subsubvalue1'=>13)));
-        $reader = new AkConfig();
+        $reader = new AkConfig(array('skip_cache' => true));
         $config = $reader->get('testconfig1','production');
         $this->assertEqual($expectedConfig, $config);
     }

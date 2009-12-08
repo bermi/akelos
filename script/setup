@@ -2,7 +2,8 @@
 <?php
 
 define('DS', DIRECTORY_SEPARATOR);
-define('AK_OS', (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'WINDOWS' : 'UNIX'));
+defined('AK_WIN')                                       || define('AK_WIN', strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
+defined('AK_OS')                                        || define('AK_OS', AK_WIN ? 'WINDOWS' : 'UNIX');
 define('AK_PHP5', version_compare(PHP_VERSION, '5', '>=') == 1 ? true : false);
 
 define('AK_BASE_DIR', str_replace(DS.'script'.DS.'setup','',__FILE__));
@@ -120,7 +121,7 @@ class AkelosInstaller
     // Environment specific tasks
     public function guessEnvironment()
     {
-        if(AK_OS == 'WINDOWS'){
+        if(AK_WIN){
             if(file_exists('C:/xampp/apache/conf/httpd.conf')){
                 return 'DefaultXamppOnWindows';
             }
@@ -346,12 +347,12 @@ class AkelosInstaller
     protected function _absolutePath($path)
     {
         $_path = $path;
-        if (!preg_match((AK_OS == 'WINDOWS' ? "/^\w+:/" : "/^\//"), $path )) {
-            $current_dir = AK_OS == 'WINDOWS' ? str_replace("\\", DS, realpath('.').DS) : realpath('.').DS;
+        if (!preg_match((AK_WIN ? "/^\w+:/" : "/^\//"), $path )) {
+            $current_dir = AK_WIN ? str_replace("\\", DS, realpath('.').DS) : realpath('.').DS;
             $_path = $current_dir . $_path;
         }
         $start = '';
-        if(AK_OS == 'WINDOWS'){
+        if(AK_WIN){
             list($start, $_path) = explode(':', $_path, 2);
             $start .= ':';
         }

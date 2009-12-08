@@ -8,8 +8,8 @@ defined('AK_LOG_DIR') || define('AK_LOG_DIR', AK_BASE_DIR.DS.'log');
 defined('AK_LOGER_DEFAULT_MAIL_DESTINATION') || define('AK_LOGER_DEFAULT_MAIL_DESTINATION', false);
 defined('AK_LOGER_DEFAULT_MAIL_SENDER')      || define('AK_LOGER_DEFAULT_MAIL_SENDER', AK_HOST);
 defined('AK_LOGER_DEFAULT_MAIL_SUBJECT')     || define('AK_LOGER_DEFAULT_MAIL_SUBJECT', 'Log message');
-                                             
-// Default file logger settings              
+
+// Default file logger settings
 defined('AK_LOGER_DEFAULT_LOG_FILE')         || define('AK_LOGER_DEFAULT_LOG_FILE', AK_LOG_DIR.DS.AK_ENVIRONMENT.'.log');
 
 // Loggin events for log types
@@ -39,7 +39,7 @@ class AkLogger
     public $error_file                 = AK_LOGER_DEFAULT_LOG_FILE;
     public $log_type;
 
-    public function AkLogger($mode = AK_LOGGER_MESSAGE) {
+    public function __construct($mode = AK_LOGGER_MESSAGE) {
         $this->default_log_settings = $mode;
     }
 
@@ -105,29 +105,24 @@ class AkLogger
     public function _appendLogToFile($type, $error_mode, $error_message) {
         $filename = $this->error_file;
         if(!is_writable($filename)){
-            clearstatcache();
-            Ak::file_put_contents($filename,'');
-            if(!is_writable($filename)){
-                trigger_error($this->internalError($this->t('Error writing file: %filename Description:',array('%filename'=>$filename)).$error_message,__FILE__,__LINE__), E_USER_NOTICE);
-                return ;
-            }
+            return;
         }
 
         $message = $this->_getLogFormatedAsString($type, $error_mode, $error_message);
         if(!$fp = fopen($filename, 'a')) {
             die($this->internalError($this->t('Cannot open file (%file)', array('%file'=>$filename)),__FILE__,__LINE__));
         }
-        @flock($fp, LOCK_EX);
-        if (@fwrite($fp, $message) === FALSE) {
-            @flock ($fp, LOCK_UN);
+        flock($fp, LOCK_EX);
+        if (fwrite($fp, $message) === FALSE) {
+            flock ($fp, LOCK_UN);
             die($this->internalError($this->t('Error writing file: %filename Description:',array('%filename'=>$filename)).$error_message,__FILE__,__LINE__));
         }
-        @flock ($fp, LOCK_UN);
-        @fclose($fp);
+        flock ($fp, LOCK_UN);
+        fclose($fp);
     }
 
     public function _saveLogInDatabase($type, $error_mode, $error_message) {
-        $db =& Ak::db();
+        $db = Ak::db();
         $message = $this->_getLogFormatedAsRawText($type, $error_mode, $error_message);
         $sql = 'INSERT INTO log (user_id, type, message, severity, location, hostname, created) '.
         " VALUES (0, ".$db->quote_string($type).", ".$db->quote_string($message).', '.($this->mode & AK_MODE_DIE ? 100 : 0).', '.
@@ -198,7 +193,7 @@ class AkLogger
         if(!AK_LOG_ENABLE_COLORING){
             return $text;
         }
-        
+
         $colors = array(
         'light_red '      => '[1;31m',
         'light_green'      => '[1;32m',

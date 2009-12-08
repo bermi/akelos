@@ -199,7 +199,8 @@ defined('AK_MODE_DIE')                                  || define('AK_MODE_DIE',
 defined('AK_LOG_DIR')                                   || define('AK_LOG_DIR', AK_BASE_DIR.DS.'log');
 defined('AK_LOG_EVENTS')                                || define('AK_LOG_EVENTS', false);
 defined('AK_ROUTES_MAPPING_FILE')                       || define('AK_ROUTES_MAPPING_FILE', AK_CONFIG_DIR.DS.'routes.php');
-defined('AK_OS')                                        || define('AK_OS', (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'WINDOWS' : 'UNIX'));
+defined('AK_WIN')                                       || define('AK_WIN', strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
+defined('AK_OS')                                        || define('AK_OS', AK_WIN ? 'WINDOWS' : 'UNIX');
 defined('AK_CAN_FORK')                                  || define('AK_CAN_FORK', function_exists('pcntl_fork'));
 defined('AK_CHARSET')                                   || define('AK_CHARSET', 'UTF-8');
 defined('AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE')    || define('AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE', 'web_request');

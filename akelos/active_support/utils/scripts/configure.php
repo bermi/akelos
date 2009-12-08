@@ -594,7 +594,7 @@ CONFIG;
     }
 
     public function suggestUserName() {
-        if(AK_OS === 'WINDOWS'){
+        if(AK_WIN){
             return 'root';
         }
         $script_owner = get_current_user();
@@ -641,7 +641,7 @@ CONFIG;
         $LocaleManager = new AkLocaleManager();
 
         $langs = array('en');
-        if(AK_OS === 'WINDOWS'){
+        if(AK_WIN){
             $langs[] = @$_ENV['LANG'];
         }
         $langs = array_merge($langs, $LocaleManager->getBrowserLanguages());

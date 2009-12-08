@@ -365,14 +365,14 @@ class Ak
 
             return AkFtp::put_contents($file_name, $content);
         }else{
-
-            if(!is_dir(dirname($options['base_path'].DS.$file_name))){
-                Ak::make_dir(dirname($options['base_path'].DS.$file_name), $options);
+            $base_path = (AK_WIN&&empty($options['base_path'])?'':$options['base_path'].DS);
+            if(!is_dir(dirname($base_path.$file_name))){
+                Ak::make_dir(dirname($base_path.$file_name), $options);
             }
 
-            if(!$result = file_put_contents($options['base_path'].DS.$file_name, $content)){
+            if(!$result = file_put_contents($base_path.$file_name, $content)){
                 if(!empty($content)){
-                    trigger_error(Ak::t("Could not write to file: %file_name. Please change file/dir permissions or enable FTP file handling on your Akelos application.", array('%file_name' => '"'.$options['base_path'].DS.$file_name.'"')),  E_USER_ERROR);
+                    trigger_error(Ak::t("Could not write to file: %file_name. Please change file/dir permissions or enable FTP file handling on your Akelos application.", array('%file_name' => '"'.$base_path.$file_name.'"')),  E_USER_ERROR);
                 }
             }
             return $result;
@@ -392,7 +392,8 @@ class Ak
             $file_name = trim(str_replace(array(DS,'//'),array('/','/'),$file_name),'/');
             return AkFtp::get_contents($file_name);
         }else{
-            return file_get_contents($options['base_path'].DS.$file_name);
+            $base_path = (AK_WIN&&empty($options['base_path'])?'':$options['base_path'].DS);
+            return file_get_contents($base_path.$file_name);
         }
     }
 
@@ -412,11 +413,12 @@ class Ak
         $options = array_merge($default_options, $options);
 
         $file_name = trim(str_replace($options['base_path'], '',$file_name),DS);
+        $base_path = (AK_WIN&&empty($options['base_path'])?'':$options['base_path'].DS);
         if($options['ftp']){
             $file_name = trim(str_replace(array(DS,'//'),array('/','/'),$file_name),'/');
             return AkFtp::delete($file_name, true);
-        }elseif (file_exists($options['base_path'].DS.$file_name)){
-            return unlink($options['base_path'].DS.$file_name);
+        }elseif (file_exists($base_path.$file_name)){
+            return unlink($base_path.$file_name);
         }
         return false;
     }
@@ -438,8 +440,9 @@ class Ak
         if($options['ftp']){
             return AkFtp::delete($dir_name);
         }else{
-            $items = glob($options['base_path'].DS.$dir_name."/*");
-            $hidden_items = glob($options['base_path'].DS.$dir_name."/.*");
+            $base_path = (AK_WIN&&empty($options['base_path'])?'':$options['base_path'].DS);
+            $items = glob($base_path.$dir_name."/*");
+            $hidden_items = glob($base_path.$dir_name."/.*");
             $fs_items = $items || $hidden_items ? array_merge((array)$items, (array)$hidden_items) : false;
             if($fs_items){
                 $items_to_delete = array('directories'=>array(), 'files'=>array());
@@ -455,7 +458,7 @@ class Ak
                     $sucess = $sucess ? Ak::directory_delete($directory, $options) : $sucess;
                 }
             }
-            return $sucess ? @rmdir($options['base_path'].DS.$dir_name) : $sucess;
+            return $sucess ? @rmdir($base_path.$dir_name) : $sucess;
         }
     }
 
@@ -478,7 +481,8 @@ class Ak
             $path = trim(str_replace(array(DS,'//'),array('/','/'),$path),'/');
             return AkFtp::make_dir($path);
         }else{
-            $path = rtrim($options['base_path'].DS.$path, DS);
+            $base_path = (AK_WIN&&empty($options['base_path'])?'':$options['base_path'].DS);
+            $path = rtrim($base_path.$path, DS);
 
             if (!file_exists($path)){
                 Ak::make_dir(dirname($path), $options);
@@ -527,11 +531,12 @@ class Ak
         }
 
         $destination = str_replace($origin, $target, $origin);
-        if(is_file($options['base_path'].DS.$origin)){
-            return Ak::file_put_contents($options['base_path'].DS.$destination, Ak::file_get_contents($options['base_path'].DS.$origin, $options), $options);
+        $base_path = (AK_WIN&&empty($options['base_path'])?'':$options['base_path'].DS);
+        if(is_file($base_path.$origin)){
+            return Ak::file_put_contents($base_path.$destination, Ak::file_get_contents($base_path.$origin, $options), $options);
         }
-        Ak::make_dir($options['base_path'].DS.$destination);
-        if($fs_items = glob($options['base_path'].DS.$origin."/*")){
+        Ak::make_dir($base_path.$destination);
+        if($fs_items = glob($base_path.$origin."/*")){
             $items_to_copy = array('directories'=>array(), 'files'=>array());
             foreach($fs_items as $fs_item) {
                 $items_to_copy[ (is_dir($fs_item) ? 'directories' : 'files') ][] = $fs_item;
@@ -2015,26 +2020,42 @@ class Ak
     */
     static function get_tmp_dir_name() {
         if(!defined('AK_TMP_DIR')){
-            if(defined('AK_BASE_DIR') && is_writable(AK_BASE_DIR.DS.'tmp')){
-                return AK_BASE_DIR.DS.'tmp';
-            }
-            if(!function_exists('sys_get_temp_dir')){
-                $dir = empty($_ENV['TMP']) ? (empty($_ENV['TMPDIR']) ? (empty($_ENV['TEMP']) ? false : $_ENV['TEMP']) : $_ENV['TMPDIR']) : $_ENV['TMP'];
-                if(empty($dir) && $fn = tempnam(md5(rand()),'')){
-                    $dir = dirname($fn);
-                    unlink($fn);
-                }
+            $tmp_dir = AK_BASE_DIR.DS.'tmp';
+            @mkdir($tmp_dir);
+            $perms_cmd = 'chmod -R 777 '.$tmp_dir;
+            @`$perms_cmd`;
+            if(defined('AK_BASE_DIR') && is_writable($tmp_dir)){
+                $tmp_dir = $tmp_dir;
             }else{
-                $dir = sys_get_temp_dir();
+                if(!function_exists('sys_get_temp_dir')){
+                    $dir = empty($_ENV['TMP']) ? (empty($_ENV['TMPDIR']) ? (empty($_ENV['TEMP']) ? false : $_ENV['TEMP']) : $_ENV['TMPDIR']) : $_ENV['TMP'];
+                    if(empty($dir) && $fn = tempnam(md5(rand()),'')){
+                        $dir = dirname($fn);
+                        unlink($fn);
+                    }
+                }else{
+                    $dir = sys_get_temp_dir();
+                }
+                if(empty($dir)){
+                    trigger_error('Could not find a path for temporary files. Please define AK_TMP_DIR in your config.php', E_USER_ERROR);
+                }
+                $dir = rtrim(realpath($dir), DS).DS.'ak_'.md5(AK_BASE_DIR);
+                if(!is_dir($dir)){
+                    mkdir($dir);
+                }
+                $tmp_dir = $dir;
             }
-            if(empty($dir)){
-                trigger_error('Could not find a path for temporary files. Please define AK_TMP_DIR in your config.php', E_USER_ERROR);
+            $config_file = AK_CONFIG_DIR.DS.'config.php';
+            if(!is_file($config_file)){
+                $config_file = AK_CONFIG_DIR.DS.AK_ENVIRONMENT.'.php';
             }
-            $dir = rtrim(realpath($dir), DS).DS.'ak_'.md5(AK_BASE_DIR);
-            if(!is_dir($dir)){
-                mkdir($dir);
+            $config_contents = file_get_contents($config_file);
+            $config_contents = str_replace('?>', ' ', $config_contents)."\ndefined('AK_TMP_DIR') || define('AK_TMP_DIR', '$tmp_dir');\n";
+
+            define('AK_TMP_DIR', $tmp_dir);
+            if(!@file_put_contents($config_file, $config_contents)){
+                trigger_error('Could not set a path for temporary files. Please define AK_TMP_DIR in your config.php', E_USER_ERROR);
             }
-            return $dir;
         }
         return AK_TMP_DIR;
     }

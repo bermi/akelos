@@ -8,14 +8,12 @@ class ActiveRecordUnitTest extends AkUnitTest
     public function __construct() {
         AkConfig::setDir('suite', dirname(__FILE__));
         $this->rebaseAppPaths();
-        @Ak::rmdir_tree(AK_TMP_DIR);
-        @mkdir(AK_TMP_DIR);
+        AkUnitTestSuite::cleanupTmpDir();
     }
 
     public function __destruct() {
         parent::__destruct();
-        @Ak::rmdir_tree(AK_TMP_DIR);
-        @mkdir(AK_TMP_DIR);
+        AkUnitTestSuite::cleanupTmpDir();
         $this->dropTables('all');
     }
 }

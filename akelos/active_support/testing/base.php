@@ -496,4 +496,10 @@ class AkelosTextReporter extends TextReporter {
 
 class AkelosVerboseTextReporter extends AkelosTextReporter {
     public $verbose = true;
+    public $paint_skips = true;
+    function paintSkip($message) {
+        if($this->paint_skips){
+            parent::paintSkip($message);
+        }
+    }
 }

@@ -22,14 +22,22 @@ class Sessions_TestCase extends AkWebTestCase
         $Installer = new AkInstaller();
         $Installer->dropTable('akelos_migrations');
     }
-    
-    public function skip(){
-        $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
-    }
-    
-    public function test_all_session_handlers() {
-        $cacheHandlers = array('cache_lite'=>1, 'akadodbcache'=>2);
 
+    public function skip(){
+        $this->skipIf((Ak::db() instanceof AkSqliteDbAdapter));
+        if(defined('MAKELOS_RUN')){
+            $this->skipIf(true, "Session tests need to run without makelos by calling:\n   php test/akelos/action_pack/cases/sessions.php\n");
+        }else{
+            $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
+        }
+    }
+
+    public function test_all_session_handlers() {
+        $cacheHandlers = array('cache_lite'=>1);
+
+        if(!(Ak::db() instanceof AkSqliteDbAdapter)) {
+            $cacheHandlers['akadodbcache'] = 2;
+        }
         if (AkConfig::getOption('memcached_enabled', false)) {
             $cacheHandlers['akmemcache'] = 3;
         }

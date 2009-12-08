@@ -3,7 +3,6 @@
 defined('AK_UNIT_TEST_SUITE')                   || define('AK_UNIT_TEST_SUITE',true);
 defined('AK_TEST_DEFAULT_REPORTER')             || define('AK_TEST_DEFAULT_REPORTER', 'AkelosTextReporter');
 defined('AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE')  || define('AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE', 'Akelos');
-defined('AK_LIB_TESTS_DIRECTORY')               || define('AK_LIB_TESTS_DIRECTORY', AK_TEST_DIR.DS.'unit'.DS.'lib');
 
 require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'unit_tester.php');
 require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'mock_objects.php');
@@ -29,12 +28,13 @@ class AkUnitTestSuite extends TestSuite
 
     static function runFromOptions($options = array()) {
         $default_options = array(
-        'base_path' => empty($options['component']) ? AK_LIB_TESTS_DIRECTORY : AK_TEST_DIR,
+        'base_path' => AK_TEST_DIR,
         'TestSuite' => null,
         'reporter'  => AK_TEST_DEFAULT_REPORTER,
         'files'  => array(),
         );
         $options = array_merge($default_options, $options);
+
         $descriptions = array();
         if(!empty($options['files'])){
             $full_paths = array();
@@ -61,17 +61,18 @@ class AkUnitTestSuite extends TestSuite
 
                 $options['base_path'] = $real_base_path.DS.$component;
                 if(empty($options['suites'])){
-                    $options['suites'] = array_diff(glob($options['base_path'].DS.'*/'), array(''));
+                    $options['suites'] = array_diff(glob($options['base_path'].DS.'*'), array(''));
                 }else{
                     $options['suites'] = Ak::toArray($options['suites']);
                 }
-
                 $options['description'] .= AkInflector::titleize($component)." unit tests: Suites(";
                 foreach ($options['suites'] as $k=>$suite){
                     $suite_name = $options['suites'][$k] = trim(str_replace($options['base_path'].DS, '', $suite), DS);
                     if(is_dir($options['base_path'].DS.$suite_name)){
                         $options['description'] .= $suite_name.',';
                         $options['files'] = array_merge($options['files'], array_diff(glob($options['base_path'].DS.$suite_name.DS.'cases'.DS.'*.php'), array('')));
+                    }else{
+                        unset($options['suites'][$k]);
                     }
                 }
                 $options['description'] = trim($options['description'], ', ')."):\n";
@@ -115,7 +116,6 @@ class AkUnitTestSuite extends TestSuite
             }
         }
 
-
         $options['TestSuite'] = new AkUnitTestSuite($options['title']);
         $options['TestSuite']->running_from_config = true;
 
@@ -132,18 +132,16 @@ class AkUnitTestSuite extends TestSuite
 
     static function createTestingDatabaseIfNotAvailable() {
         if(!file_exists(AK_CONFIG_DIR.DS.'database.yml')){
-            file_put_contents(AK_CONFIG_DIR.DS.'database.yml', 'default:
+            $Config = new AkConfig();
+            $Config->readConfigYaml('database', 'default:
     type: sqlite
     host:
     database_name:
     database_file: '.AK_TMP_DIR.DS.'akelos.sqlite
     user:
     password:
-    options: ');
-            function ak_remove_testing_db_settings(){
-                unlink(AK_CONFIG_DIR.DS.'database.yml');
-            }
-            register_shutdown_function('ak_remove_testing_db_settings');
+    options: '
+    );
         }
     }
 
@@ -164,10 +162,34 @@ class AkUnitTestSuite extends TestSuite
     static function getPossibleCases($options = array()) {
         $default_options = array(
         'config'    => AK_TEST_DIR.DS.(AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE == 'Akelos' ? 'core_tests' : AkInflector::underscore(AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE)).'.yml',
-        'base_path' => AK_LIB_TESTS_DIRECTORY,
+        'base_path' => AK_TEST_DIR,
         );
         $options = array_merge($default_options, $options);
         return array_map(array('AkInflector', 'camelize'),  (array)array_keys(Ak::convert('yaml', 'array', file_get_contents($options['config']))));
+    }
+
+    static function ensureTmpDirPermissions(){
+        defined('AK_TMP_DIR')   ||  define('AK_TMP_DIR', AK_BASE_DIR.DS.'tmp');
+        if(!is_dir(AK_TMP_DIR)){
+            !mkdir(AK_TMP_DIR);
+        }
+        if(!AK_WIN){
+            $cmd = 'chmod -R 777 '.AK_TMP_DIR;
+            echo `$cmd`;
+        }
+    }
+
+    static function cleanupTmpDir(){
+        $files = array_diff(glob(AK_TMP_DIR.DS.'*'), array(''));
+        foreach ($files as $file){
+                            Ak::trace($file);
+            if(!is_dir($file)){
+                unlink($file);
+
+            }else{
+                Ak::rmdir_tree($file);
+            }
+        }
     }
 
     public function log($message) {
@@ -236,5 +258,4 @@ class AkUnitTestSuite extends TestSuite
 
         }
     }
-
 }

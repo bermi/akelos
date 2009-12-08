@@ -83,12 +83,22 @@ class AkConfig
 {
     const CONFIG_DIR = AK_CONFIG_DIR;
 
-    public function &get($namespace, $environment = AK_ENVIRONMENT, $raise_error_if_config_file_not_found = true, $uncached = false) {
-        static $_configs = array();
-        if (!$uncached && isset($_configs[$namespace]) && isset($_configs[$namespace][$environment])) {
-            return $_configs[$namespace][$environment];
+    public $options = array(
+    'skip_cache' => false
+    );
+
+    public function __construct($options = array()){
+        if(!empty($options)){
+            $this->options = array_merge($this->options, $options);
         }
-        if ($uncached || !($config = $this->readCache($namespace, $environment))) {
+    }
+
+    public function &get($namespace, $environment = AK_ENVIRONMENT, $raise_error_if_config_file_not_found = true) {
+        $key = '_config_'.$namespace.$environment.AK_WEB_REQUEST;
+        if(empty($this->options['skip_cache']) && ($config = Ak::getStaticVar($key))){
+            return $config;
+        }
+        if (!($config = $this->readCache($namespace, $environment))) {
             $config = $this->readConfig($namespace, $environment, $raise_error_if_config_file_not_found);
         }
         if (!isset($_configs[$namespace])) {
@@ -96,6 +106,7 @@ class AkConfig
         } else {
             $_configs[$namespace][$environment] = $config;
         }
+        Ak::setStaticVar($key, $_configs[$namespace][$environment]);
         return $_configs[$namespace][$environment];
     }
 
@@ -176,48 +187,6 @@ class AkConfig
         return AkConfig::rebaseApp(false);
     }
 
-    /*
-
-    public function rebaseAppPaths($base_path = null) {
-    if(!is_dir($base_path) && $base_path_candidate = AkConfig::getDir('suite', false, false)){
-    $base_path = $base_path_candidate;
-    }else{
-    $base_path = (!is_dir($base_path) ? AkConfig::getDir('fixtures') : $base_path).DS.'app';
-    }
-
-    AkConfig::setDir('app',             $base_path);
-    AkConfig::setDir('app_installers',  $base_path.DS.'installers');
-    AkConfig::setDir('models',          $base_path.DS.'models');
-    AkConfig::setDir('controllers',     $base_path.DS.'controllers');
-    AkConfig::setDir('views',           $base_path.DS.'views');
-    AkConfig::setDir('apis',            $base_path.DS.'apis');
-    AkConfig::setDir('fixtures',        $base_path.DS.'fixtures');
-    AkConfig::setDir('helpers',         $base_path.DS.'helpers');
-    AkConfig::setDir('public',          $base_path.DS.'public');
-    $this->_path_rebased = true;
-    }
-
-    public function restoreAppPaths() {
-    foreach ($this->_original_paths as $type => $original_path){
-    AkConfig::setDir($type, $original_path);
-    }
-    }
-
-    protected function _logOriginalPaths() {
-    $this->_original_paths = array(
-    'app'               => AkConfig::getDir('app'),
-    'models'            => AkConfig::getDir('models'),
-    'app_installers'    => AkConfig::getDir('app_installers'),
-    'controllers'       => AkConfig::getDir('controllers'),
-    'views'             => AkConfig::getDir('views'),
-    'apis'              => AkConfig::getDir('apis'),
-    'fixtures'          => AkConfig::getDir('fixtures'),
-    'helpers'           => AkConfig::getDir('helpers'),
-    'public'            => AkConfig::getDir('public'),
-    );
-    }
-    */
-
     static function setOption($key, $value) {
         Ak::setStaticVar('AkConfig_'.$key, $value);
         return $value;
@@ -234,41 +203,42 @@ class AkConfig
 
     public function readConfig($namespace, $environment = AK_ENVIRONMENT, $raise_error_if_config_file_not_found = true) {
         $yaml_file_name = $this->_generateConfigFileName($namespace);
-
         if (!file_exists($yaml_file_name)){
             if($raise_error_if_config_file_not_found){
                 trigger_error(Ak::t('Could not find %namespace settings file in %path.', array('%namespace'=>$namespace, '%path'=>$yaml_file_name)).' '.Ak::getFileAndNumberTextForError(1)."\n", E_USER_ERROR);
             }
             return false;
         }
+        return $this->readConfigYaml($namespace, file_get_contents($yaml_file_name), $environment);
+    }
 
+    public function readConfigYaml($namespace, $yaml_string, $environment = AK_ENVIRONMENT){
         require_once(AK_CONTRIB_DIR.DS.'TextParsers'.DS.'spyc.php');
-        $content = file_get_contents($yaml_file_name);
-        $content = self::parseSettingsConstants($content);
+        $content = self::parseSettingsConstants($yaml_string);
         $config = Spyc::YAMLLoad($content);
+        return $this->readConfigArray($namespace, $config, $environment);
+    }
 
+    public function readConfigArray($namespace, $config = array(), $environment = AK_ENVIRONMENT){
         if (!is_array($config)){
             return false;
         }
-
-        $default = isset($config['default'])?$config['default']:array();
-
+        $default = isset($config['default']) ? $config['default'] : array();
         $configs = array();
-
         unset($config['default']);
         $environments = array_keys($config);
         $default_environments = Ak::toArray(AK_AVAILABLE_ENVIRONMENTS);
         $environments = array_merge($default_environments, $environments);
         foreach($environments as $env) {
-            $envConfig = $this->_merge($default, isset($config[$env])?$config[$env]:array());
-            $this->writeCache($envConfig,$namespace,$env,$this->_useWriteCache($environment));
+            $envConfig = $this->_merge($default, isset($config[$env]) ? $config[$env] : array());
+            $this->writeCache($envConfig, $namespace, $env, $this->_useWriteCache($environment));
             $configs[$env] = $envConfig;
         }
 
         return isset($configs[$environment]) ? $configs[$environment] : (in_array($environments, $environments) ? $default : false);
     }
 
-    static function generateCacheFileName($namespace, $environment = AK_ENVIRONMENT) {
+    static function getCacheFileName($namespace, $environment = AK_ENVIRONMENT) {
         return AkConfig::getCacheBasePath($environment).DS.'ak_config'.DS.'cache'.DS.$environment.DS.Ak::sanitize_include($namespace, 'high').'.php';
     }
 
@@ -277,11 +247,11 @@ class AkConfig
     }
 
     public function readCache($namespace, $environment = AK_ENVIRONMENT, $force = false) {
-        if (!$force && !$this->_useReadCache($environment)){
+        if ((!$force && !$this->_useReadCache($environment))){
             return false;
         }
-        $cacheFileName = $this->generateCacheFileName($namespace,$environment);
-        if ($this->_checkCacheValidity($namespace, $environment)) {
+        $cacheFileName = $this->getCacheFileName($namespace,$environment);
+        if (!$this->_configNeedsToBeCached($namespace, $environment)) {
             $config = include $cacheFileName;
         } else {
             $config = false;
@@ -290,9 +260,12 @@ class AkConfig
     }
 
     public function writeCache($config, $namespace, $environment = AK_ENVIRONMENT, $force = false) {
-        if (!$force &&!$this->_useWriteCache($environment)){
+        if (!$force && !$this->_useWriteCache($environment)){
             return false;
         }
+
+        $key = '_config_'.$namespace.$environment.AK_WEB_REQUEST;
+        Ak::setStaticVar($key, $config);
 
         $var_export = var_export($config, true);
         $cache = <<<CACHE
@@ -304,37 +277,14 @@ class AkConfig
 return \$config;
 
 CACHE;
-        $cache_file_name = $this->generateCacheFileName($namespace, $environment);
+        $cache_file_name = $this->getCacheFileName($namespace, $environment);
 
         if(!Ak::file_put_contents($cache_file_name, $cache, array('base_path' => AkConfig::getCacheBasePath()))){
             trigger_error(Ak::t('Could not create config cache file %file', array('%file'=>$cache_file_name)).' '.Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
             return false;
         }else{
-            $this->_setCacheValidity($namespace,$environment);
             return true;
         }
-
-        $cacheDir = dirname($cacheFileName);
-
-        if (!file_exists($cacheDir)) {
-            $oldumask = umask();
-            umask(0);
-            $res = @mkdir($cacheDir, 0777, true);
-            if (!$res) {
-                trigger_error(Ak::t('Could not create config cache dir %dir',array('%dir'=>$cacheDir)),E_USER_ERROR);
-            }
-            umask($oldumask);
-        }
-        $fh = fopen($cacheFileName,'w+');
-        if ($fh) {
-            fputs($fh,$cache);
-            fclose($fh);
-            @chmod($cacheFileName, 0777);
-        } else {
-            trigger_error(Ak::t('Could not create config cache file %file',array('%file'=>$cacheFileName)),E_USER_ERROR);
-        }
-        $this->_setCacheValidity($namespace,$environment);
-        return true;
     }
 
     static function getErrorReportingLevelDescription($error_reporting_level = null) {
@@ -364,7 +314,7 @@ CACHE;
         if(AK_CLI && AK_ENVIRONMENT != 'testing'){
             return false;
         }
-        return $environment == 'production' || $environment == 'setup';
+        return ($environment == 'production' || $environment == 'setup');
     }
 
     protected function _useWriteCache($environment = AK_ENVIRONMENT) {
@@ -374,21 +324,10 @@ CACHE;
         return $environment != 'setup';
     }
 
-    protected function _checkCacheValidity($namespace,$environment) {
-        $cacheFilename = $this->generateCacheFileName($namespace,$environment);
-        $configFilename = $this->_generateConfigFileName($namespace);
-
-        $cacheMtime = file_exists($cacheFilename) ? filemtime($cacheFilename): 1;
-        $configMtime = file_exists($cacheFilename) ? filemtime($configFilename) : 2;
-        return $cacheMtime == $configMtime;
-    }
-
-    protected function _setCacheValidity($namespace, $environment) {
-        $cacheFilename = $this->generateCacheFileName($namespace,$environment);
-        $configFilename = $this->_generateConfigFileName($namespace);
-        if(!touch($cacheFilename, filemtime($configFilename))){
-            echo "Error touching file $cacheFilename, check your permissions!\n";
-        }
+    protected function _configNeedsToBeCached($namespace,$environment) {
+        $cache_file = $this->getCacheFileName($namespace,$environment);
+        $config_file = $this->_generateConfigFileName($namespace);
+        return (@filemtime($config_file) > @filemtime($cache_file)) || !file_exists($config_file);
     }
 
     protected function _generateConfigFileName($namespace) {

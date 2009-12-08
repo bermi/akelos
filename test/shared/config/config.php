@@ -21,8 +21,6 @@ include_once(file_exists($_app_config_file) ? $_app_config_file : 'app_config.ph
 
 defined('AK_APP_LOCALES')           ||  define('AK_APP_LOCALES', 'en,es');
 defined('AK_PUBLIC_LOCALES')        ||  define('AK_PUBLIC_LOCALES', AK_APP_LOCALES);
-defined('AK_TESTING_URL')           ||  define('AK_TESTING_URL', 'http://localhost:81/test/fixtures/public');
-defined('AK_LIB_TESTS_DIRECTORY')   ||  define('AK_LIB_TESTS_DIRECTORY', AK_TEST_DIR.DS.'unit'.DS.'lib');
 
 defined('AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS')    ||  define('AK_ACTIVE_RECORD_ENABLE_AUTOMATIC_SETTERS_AND_GETTERS', true);
 

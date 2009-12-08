@@ -508,7 +508,7 @@ class AkPluginManager
     public function _installUsingLocalDirectory($name, $path, $rev = null) {
         $source = $path.DS.$name;
         $plugin_dir = AK_PLUGINS_DIR;
-        $command = AK_OS == 'UNIX' ? 'cp -rf ' : 'xcopy /h /r /k /x /y /S /E ';
+        $command = !AK_WIN ? 'cp -rf ' : 'xcopy /h /r /k /x /y /S /E ';
         `$command $source $plugin_dir`;
     }
 

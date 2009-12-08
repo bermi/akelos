@@ -44,13 +44,13 @@ while(true){
 
         $_script_name = array_shift(explode(' ',trim($command).' '));
 
-        $_script_file_name = AK_OS == 'WINDOWS' ? $_script_name : AK_SCRIPT_DIR.DS.$_script_name;
+        $_script_file_name = AK_WIN ? $_script_name : AK_SCRIPT_DIR.DS.$_script_name;
 
         if (file_exists($_script_file_name)){
 
             $command = trim(substr(trim($command),strlen($_script_name)));
                 echo "\n";
-                passthru((AK_OS == 'WINDOWS' ? 'php -q ':'').$_script_file_name.' '.escapeshellcmd($command));
+                passthru((AK_WIN ? 'php -q ':'').$_script_file_name.' '.escapeshellcmd($command));
                 echo "\n>>> ";
 
         }else{

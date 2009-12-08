@@ -5,7 +5,7 @@ class AkXdocToText
     public function convert() {
         $xdoc2txt_bin = AK_CONTRIB_DIR.DS.'hyperestraier'.DS.'xdoc2txt.exe';
 
-        if(AK_OS != 'WINDOWS'){
+        if(!AK_WIN){
             trigger_error(Ak::t('Xdoc2Text is a windows only application. Please use wvWare instead'), E_USER_WARNING);
             return false;
         }

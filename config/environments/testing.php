@@ -4,10 +4,11 @@
 // See file boot.php for more info
 
 ini_set('date.timezone', 'UTC');
-define('AK_DIE_ON_PHP4_ERROR', true);
+define('AK_DIE_ON_TRIGGER_ERROR', true);
 
 ini_set('display_errors', 1);
 ini_set('memory_limit', -1);
 ini_set('log_errors', 0);
 
 error_reporting(-1);
+

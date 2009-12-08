@@ -12,7 +12,7 @@ class RenderPartial_TestCase extends AkWebTestCase
         $this->_test_script = AkConfig::getOption('testing_url').
         '/action_pack/public/index.php?ak=';
     }
-    
+
     public function skip(){
         $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
     }

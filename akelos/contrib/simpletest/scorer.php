@@ -155,7 +155,7 @@ class SimpleScorer {
      *    @access public
      */
     function paintError($message) {
-        if(defined('AK_DIE_ON_PHP4_ERROR') && AK_DIE_ON_PHP4_ERROR){
+        if(defined('AK_DIE_ON_TRIGGER_ERROR') && AK_DIE_ON_TRIGGER_ERROR){
             die($message);
         }
         $this->exceptions++;

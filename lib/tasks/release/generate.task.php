@@ -63,7 +63,7 @@ $options['app_name'] = AkInflector::underscore(empty($options['app_name']) ? $is
 $options['revision'] = empty($options['revision']) ? 'HEAD' : $options['revision'];
 
 if($options['revision'] == 'HEAD' && preg_match('/commit (.+)/', `git log --no-color --abbrev-commit -n 1`, $matches)){
-    $options['revision'] = trim($matches[1], '.');
+    $options['revision'] = $matches[1];
 }
 
 $options['commit'] = isset($options['commit']) ? $is_akelos_core : false;
