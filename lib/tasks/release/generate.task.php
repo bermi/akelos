@@ -39,6 +39,7 @@ Valid options are:
     --skip_gzip Tarfiles will be gzipped unless this option is set
     --revision  Repositiory revision, default HEAD
     --checksum  Generate checksum files
+
 HELP
 );
 }
@@ -62,7 +63,7 @@ $options['app_name'] = AkInflector::underscore(empty($options['app_name']) ? $is
 $options['revision'] = empty($options['revision']) ? 'HEAD' : $options['revision'];
 
 if($options['revision'] == 'HEAD' && preg_match('/commit (.+)/', `git log --no-color --abbrev-commit -n 1`, $matches)){
-    $options['revision'] = $matches[1];
+    $options['revision'] = trim($matches[1], '.');
 }
 
 $options['commit'] = isset($options['commit']) ? $is_akelos_core : false;
