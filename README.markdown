@@ -1,7 +1,7 @@
 Introduction.
 ---------------------------------------
 
-The Akelos Framework is an open-source port of Ruby on Rails to the 
+The Akelos Framework is an open-source port of Ruby on Rails to the
 PHP programming language.
 
 The main goal of the Akelos Framework its to help programmers to build
@@ -10,21 +10,21 @@ Model-View-Control pattern. It lets you write less code by favoring
 conventions over configuration.
 
 You can find more information at the Akelos Framework website at
-http://www.akelos.org 
+http://www.akelos.org
 
 
 The tutorial
 ---------------------------------------
-Perhaps the easiest way to lear about Akelos is to get your hands on the tutorials 
+Perhaps the easiest way to lear about Akelos is to get your hands on the tutorials
 you can find on the docs folder.
 
 
 Setting up the framework.
 ---------------------------------------
-Once you checkout the code you'll need to make available the folder ./public 
+Once you checkout the code you'll need to make available the folder ./public
 to your webserver with a command like:
 
-    ln -s  /home/bermi/akelos_framework/public /usr/htdocs/akelos 
+    ln -s  /home/bermi/akelos_framework/public /usr/htdocs/akelos
 
 Then just point your browser to that url and follow the steps.
 
@@ -34,20 +34,20 @@ the Apache configuration directive AllowOverride is set to 'All' (you may allow 
 for the directory your project will be accessed from.
 
 
-If you have problems with the web setup you can copy and edit 
+If you have problems with the web setup you can copy and edit
 config/DEFAULT-config.php and config/DEFAULT-routes.php. You might also need
-to edit the  .htaccess files in ./ and ./public/  and un-comment/edit the 
+to edit the  .htaccess files in ./ and ./public/  and un-comment/edit the
 "# RewriteBase" directive so it matches to your url path.
 
 All the configuration params are on /lib/constants.php If you define any of them
-in your /config/config.php, /config/development.php, /config/production.php 
+in your /config/config.php, /config/development.php, /config/production.php
 or /config/testing.php the default setting will be overwritten.
 
 
 Accessing the Command Line interface
 ---------------------------------------
-In order to access the command line interface run 
-     
+In order to access the command line interface run
+
     ./script/console
 
 Then you can run any PHP code interactively.
@@ -55,21 +55,21 @@ Then you can run any PHP code interactively.
 Example:
 
 	>>> generate
-	
+
 	// Will show a list of available generators
-	
+
 	>>> test app/models/post.php
-	
+
 	// Will run the unit tests for the framework the Post model
-	
+
 You can also use the commands generate, migrate, setup ... by calling directly
-   
+
      ./script/generate
 
 
 Differences from Ruby on Rails.
 ---------------------------------------
-I've tried to adhere as much as I could to the original interfaces, but some 
+I've tried to adhere as much as I could to the original interfaces, but some
 general changes apply:
 
 - PHP doesn't have name spaces so on the controller you must access to
@@ -78,24 +78,24 @@ $this->params, $this->ModelName, $this->Request, $this->Response
 - Templates are ended in .tpl (there is only one render on the framework, but
 more can be added)
 
-- Views work using PHP, but some like file functions, static method calls, 
+- Views work using PHP, but some like file functions, static method calls,
 object instantiation.... will be disallowed for helping in keeping in the
 view just presentation logic. If you need extra logic for your views you can
 always create a helper "./app/helpers" so your views will be easier to
 maintain.
 
-- Helpers are made available automatically for your views under the naming 
+- Helpers are made available automatically for your views under the naming
 convention $name_helper were "name" is the name of the desired helper.
 
     $url_helper->url_for(array('action'=>'add'));
 
-- All the methods (but helpers) use PEAR like naming conventions so instead of 
+- All the methods (but helpers) use PEAR like naming conventions so instead of
 AkActionController::url_for() you need to call AkActionController::urlFor()
 
-- Helpers are located at /lib/AkActionView/helpers (it's worth having a look 
+- Helpers are located at /lib/AkActionView/helpers (it's worth having a look
 at them)
 
-- In order to expose data from your controllers to the views, you'll simply 
+- In order to expose data from your controllers to the views, you'll simply
 need to assign them as attributes of the controller that is handling the
 action so:
 
@@ -107,11 +107,11 @@ action so:
           }
     }
 
-Will expose  into ./app/views/post/index.tpl $message variable so you can use 
+Will expose  into ./app/views/post/index.tpl $message variable so you can use
 it like:
- 
-    <?php echo $message; ?> 
-    
+
+    <?php echo $message; ?>
+
 or the same using SinTags
 
     {message}
@@ -126,7 +126,7 @@ Locale files are located at:
     ./app/locales/NAMESPACE/ # Your application locales where NAMESPACE is
      replaced by your model/controller/view name
 
-In order to change the language of your application can prefix your request 
+In order to change the language of your application can prefix your request
 with the locale name so:
 
     http://example.com/es/post/add # will load ./config/locales/es.php
@@ -142,13 +142,13 @@ Based on the Ak::t() function you can find:
     $text_helper->translate() # for the view
     _{ hello world }  # for the view (SinTags)
 
-All these four will save new locales onto their corresponding namespace in 
+All these four will save new locales onto their corresponding namespace in
 the example above "./app/locales/post/en.php"
 
 If you want to use your own namespace for storing locales you can do it like:
-    
+
     translate('Hello world', null, 'shared_posts');
- 
+
 In this case it will store it at "./app/locales/shared_posts/en.php"
 
 
@@ -166,34 +166,100 @@ array('%title'=>$title,'%last_name'=>$last_name,'%first_name'=>$first_name));
     // You can use Ak::t or any of its derived methods
 
 The SinTags way to deal with compounded messages is
-    
+
     _{Today is %date}
     // which will be converted to
     // <?=$text_helper->translate('Today is %date', array('%date'=>$date));?>
     // note that $date is selected by replacing the % from the needle
 
-Internationalizing Models. 
+Internationalizing Models.
 
 You can have multilingual database columns by adding the locale prefix plus
-and underscore to the column name. This way when you do 
+and underscore to the column name. This way when you do
 
     $Article->get('title')
 
 you'll get the information on the "en_title" column if "en" is your current
-locale. 
+locale.
 
-The same way you can set posted attributes like 
+The same way you can set posted attributes like
 
     $_POST = array('title'=>array('en'=>'Tech details',
-     'es'=>'Detalles técnicos')); 
-    $Article->setAttributes($_POST); 
+     'es'=>'Detalles técnicos'));
+    $Article->setAttributes($_POST);
 
-and the attributes will be mapped to their corresponding columns. 
+and the attributes will be mapped to their corresponding columns.
 
 In order to make this work you need to add to your config/config.php
 
     define('AK_ACTIVE_RECORD_DEFAULT_LOCALES', 'en,es');
 
 
-In order to convert between charsets you can use Ak::recode() and 
+In order to convert between charsets you can use Ak::recode() and
 Ak::utf8('My  ISO Text', 'ISO-8859-1').
+
+
+
+
+Autocompletion on bash prompts
+--------------------------------
+
+You can add bash autocompletion support to Makelos
+
+First you'll need to have installed bash-completion
+
+    Mac OS: sudo port install bash-completion
+    Debian: apt-get install bash-completion
+
+Add to the very bottom of your bash profile (Nice post by
+Todd Werth http://blog.infinitered.com/entries/show/4 on
+the subject)
+
+    Mac OS ~/.profile:
+
+
+    if [ -f /opt/local/etc/bash_completion ]; then
+        . /opt/local/etc/bash_completion
+    fi
+
+    Debian ~/.bashrc:
+
+
+    if [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
+
+
+Create the file
+
+    Mac OS: /opt/local/etc/bash_completion.d/makelos
+    Debian: /etc/bash_completion.d/makelos
+
+with the following code
+
+_makelos()
+{
+   local cur colonprefixes arguments
+   COMPREPLY=()
+   cur=${COMP_WORDS[COMP_CWORD]}
+   # Work-around bash_completion issue where bash
+   # interprets a colon
+   # as a separator.
+   # Work-around borrowed from the darcs/Maven2
+   # work-around for the same issue.
+   colonprefixes=${cur%"${cur##*:}"}
+   arguments=("${COMP_WORDS[@]:1}")
+   COMPREPLY=( $(compgen -W '$(./makelos makelos:autocomplete \
+   ${arguments[@]})'  -- $cur))
+   local i=${#COMPREPLY[*]}
+   while [ $((--i)) -ge 0 ]; do
+      COMPREPLY[$i]=${COMPREPLY[$i]#"$colonprefixes"}
+   done
+   return 0
+} &&
+
+complete -o bashdefault -o default -F _makelos ./makelos 2>/dev/null \
+    || complete -o default -F _makelos ./makelos
+
+
+cd to your app dir in a new prompt and enjoy makelos autocompletion.

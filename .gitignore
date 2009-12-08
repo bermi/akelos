@@ -8,3 +8,4 @@ cache/
 test/_fixtures/
 nbproject/
 docs/akelos/doc.sqlite
+releases/
