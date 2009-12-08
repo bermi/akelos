@@ -237,26 +237,26 @@ Create the file
 
 with the following code
 
-_makelos()
-{
-   local cur colonprefixes arguments
-   COMPREPLY=()
-   cur=${COMP_WORDS[COMP_CWORD]}
-   # Work-around bash_completion issue where bash
-   # interprets a colon
-   # as a separator.
-   # Work-around borrowed from the darcs/Maven2
-   # work-around for the same issue.
-   colonprefixes=${cur%"${cur##*:}"}
-   arguments=("${COMP_WORDS[@]:1}")
-   COMPREPLY=( $(compgen -W '$(./makelos makelos:autocomplete \
-   ${arguments[@]})'  -- $cur))
-   local i=${#COMPREPLY[*]}
-   while [ $((--i)) -ge 0 ]; do
-      COMPREPLY[$i]=${COMPREPLY[$i]#"$colonprefixes"}
-   done
-   return 0
-} &&
+    _makelos()
+    {
+       local cur colonprefixes arguments
+       COMPREPLY=()
+       cur=${COMP_WORDS[COMP_CWORD]}
+       # Work-around bash_completion issue where bash
+       # interprets a colon
+       # as a separator.
+       # Work-around borrowed from the darcs/Maven2
+       # work-around for the same issue.
+       colonprefixes=${cur%"${cur##*:}"}
+       arguments=("${COMP_WORDS[@]:1}")
+       COMPREPLY=( $(compgen -W '$(./makelos makelos:autocomplete \
+       ${arguments[@]})'  -- $cur))
+       local i=${#COMPREPLY[*]}
+       while [ $((--i)) -ge 0 ]; do
+          COMPREPLY[$i]=${COMPREPLY[$i]#"$colonprefixes"}
+       done
+       return 0
+    } &&
 
 complete -o bashdefault -o default -F _makelos ./makelos 2>/dev/null \
     || complete -o default -F _makelos ./makelos
