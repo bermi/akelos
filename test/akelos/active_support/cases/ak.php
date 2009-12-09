@@ -6,6 +6,7 @@ class Ak_TestCase extends ActiveSupportUnitTest
 {
     public function test_should_get_the_right_temp_dir() {
         $tmp_dir = Ak::get_tmp_dir_name();
+
         $tmp_file = $tmp_dir.DS.'ak_test_'.__CLASS__;
         $tmp_file2 = $tmp_dir.DS.'ak_test_dir'.DS.'level_one'.DS.'file.txt';
         $this->assertTrue(is_dir($tmp_dir), 'Could not find temporary directory at: '.$tmp_dir);
