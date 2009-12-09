@@ -351,7 +351,7 @@ class Ak
 
         $default_options = array(
         'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
-        'base_path' => AK_BASE_DIR,
+        'base_path' => strstr($file_name, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
         );
         $options = array_merge($default_options, $options);
 
@@ -383,11 +383,12 @@ class Ak
     static function file_get_contents($file_name, $options = array()) {
         $default_options = array(
         'ftp' => defined('AK_READ_FILES_USING_FTP') && AK_READ_FILES_USING_FTP,
-        'base_path' => AK_BASE_DIR,
+        'base_path' => strstr($file_name, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
         );
         $options = array_merge($default_options, $options);
 
         $file_name = trim(str_replace($options['base_path'], '',$file_name),DS);
+
         if($options['ftp']){
             $file_name = trim(str_replace(array(DS,'//'),array('/','/'),$file_name),'/');
             return AkFtp::get_contents($file_name);
@@ -408,7 +409,7 @@ class Ak
     static function file_delete($file_name, $options = array()) {
         $default_options = array(
         'ftp' => defined('AK_DELETE_FILES_USING_FTP') && AK_DELETE_FILES_USING_FTP,
-        'base_path' => AK_BASE_DIR,
+        'base_path' => strstr($file_name, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
         );
         $options = array_merge($default_options, $options);
 
@@ -426,7 +427,7 @@ class Ak
     static function directory_delete($dir_name, $options = array()) {
         $default_options = array(
         'ftp' => defined('AK_DELETE_FILES_USING_FTP') && AK_DELETE_FILES_USING_FTP,
-        'base_path' => AK_BASE_DIR,
+        'base_path' => strstr($dir_name, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
         );
         $options = array_merge($default_options, $options);
 
@@ -517,7 +518,7 @@ class Ak
     static function copy($origin, $target, $options = array()) {
         $default_options = array(
         'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
-        'base_path' => AK_BASE_DIR,
+        'base_path' => strstr($origin, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
         );
         $options = array_merge($default_options, $options);
 
@@ -562,7 +563,7 @@ class Ak
     static function getRestrictedPath($path, $options = array()) {
         $default_options = array(
         'ftp' => false,
-        'base_path' => AK_BASE_DIR,
+        'base_path' => strstr($path, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
         );
         $options = array_merge($default_options, $options);
 
