@@ -38,7 +38,7 @@ foreach ($options as $k => $v){
     if(!in_array($k, $valid_options)){
         if(!is_bool($v)){
             $v = rtrim($v, DS);
-            if(strstr($v, DS)){
+            if(strstr($v, DS) || strstr($v, '/')){
                 $options['files'][] = $v.'.php';
             }else{
                 $suite .= $v.' ';

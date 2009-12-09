@@ -13,7 +13,7 @@ Ak::db();
 if(!empty($_GET['construct'])){
     @AkDbSession::install();
     @AkAdodbCache::install();
-}elseif ($_GET['destruct']){
+}elseif (!empty($_GET['destruct'])){
     AkAdodbCache::uninstall();
     AkDbSession::uninstall();
     $Installer = new AkInstaller();

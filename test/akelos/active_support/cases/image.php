@@ -7,9 +7,9 @@ class Image_TestCase extends ActiveSupportUnitTest
     public function __construct() {
         parent::__construct();
         if(!($this->offline_mode = !(@file_get_contents('http://www.akelos.org/testing_resources/images/watermark.png')))){
-            $this->image_path = AkConfig::getDir('fixtures').'/Image_TestCase/akelos_framework_logo.png';
-            $this->photo_path = AkConfig::getDir('fixtures').'/Image_TestCase/cristobal.jpg';
-            $this->watermark = AkConfig::getDir('fixtures').'/Image_TestCase/watermark.png';
+            $this->image_path = AkConfig::getDir('fixtures').DS.'Image_TestCase'.DS.'akelos_framework_logo.png';
+            $this->photo_path = AkConfig::getDir('fixtures').DS.'Image_TestCase'.DS.'cristobal.jpg';
+            $this->watermark = AkConfig::getDir('fixtures').DS.'Image_TestCase'.DS.'watermark.png';
 
             Ak::copy(AkConfig::getDir('fixtures').'/old_logo.png', $this->image_path);
             $cristobal = @Ak::url_get_contents('http://www.akelos.org/testing_resources/images/cristobal.jpg', array('cache'=>100000));
@@ -21,11 +21,11 @@ class Image_TestCase extends ActiveSupportUnitTest
     }
 
     public function __destruct() {        
-        Ak::directory_delete(AkConfig::getDir('fixtures').'/Image_TestCase');
+        Ak::directory_delete(AkConfig::getDir('fixtures').DS.'Image_TestCase');
     }
 
     public function skip(){
-        $this->skipIf($this->offline_mode, '['.get_class($this).'] Internet connection unavailable.');
+        $this->skipIf($this->offline_mode, '['.get_class($this).'] Internet connection unavailable, can\'t download remote images.');
     }
 
     public function test_image_save_as() {
@@ -146,24 +146,45 @@ class Image_TestCase extends ActiveSupportUnitTest
         $Image->load($this->photo_path);
         $Image->transform('watermark',array('mark'=>$this->watermark));
         $Image->save($this->photo_path.'_watermarked.jpg');
-        $this->assertEqual(md5_file($this->photo_path.'_watermarked.jpg'), '234adf4a48224f8596e53d665bf41768');
+        if(!AK_WIN){
+            $this->assertEqual(md5_file($this->photo_path.'_watermarked.jpg'), '234adf4a48224f8596e53d665bf41768');
+        }else{
+            $this->assertEqual(md5_file($this->photo_path.'_watermarked.jpg'), 'a26ad317083f831458e0e00b617786bd');
+        }
     }
 
     public function test_should_apply_native_filters() {
-        $native_filters = array(
-        'negate' =>         array('params' => array(), 'hash' => '8b44f26c9646ac69a1b48bbc66622184'),
-        'grayscale' =>      array('params' => array(), 'hash' => 'd08a0ad61f4fd5b343c0a4af6d810ddf'),
-        'brightness' =>     array('params' => 50, 'hash' => '1e38de2377e42848cae326de52a75252'),
-        'contrast' =>       array('params' => 50, 'hash' => 'ded57ff56253afb0efd4e09c17d44efb'),
-        'colorize' =>       array('params' => array(100,25,30), 'hash' => 'ddcb214d2e9c0c6c7d58a9bb0ce09b4a'),
-        'detect_edges' =>   array('params' => array(), 'hash' => '4c5f8c9f54917b66ecea8631aabb0e85'),
-        'emboss' =>         array('params' => array(), 'hash' => 'a3edb232afbd5d9e210172a40abec35e'),
-        'gaussian_blur' =>  array('params' => array(), 'hash' => 'd1d2ba1995dff5b7c638d85d968d070a'),
-        'selective_blur' => array('params' => array(), 'hash' => 'b68b972fc7d29d3a4942f2057ab085f2'),
-        'sketch' =>         array('params' => array(), 'hash' => '63d0dd06515c4ec72f8dc5fc9de74d8e'),
-        'smooth' =>         array('params' => 5, 'hash' => '6158f362febe3b7b9add756c9d5acf2c'),
-        //'pixelate' =>       array('params' => array(30,true), 'hash' => '123')
-        );
+        if(!AK_WIN){
+            $native_filters = array(
+            'negate' =>         array('params' => array(), 'hash' => '8b44f26c9646ac69a1b48bbc66622184'),
+            'grayscale' =>      array('params' => array(), 'hash' => 'd08a0ad61f4fd5b343c0a4af6d810ddf'),
+            'brightness' =>     array('params' => 50, 'hash' => '1e38de2377e42848cae326de52a75252'),
+            'contrast' =>       array('params' => 50, 'hash' => 'ded57ff56253afb0efd4e09c17d44efb'),
+            'colorize' =>       array('params' => array(100,25,30), 'hash' => 'ddcb214d2e9c0c6c7d58a9bb0ce09b4a'),
+            'detect_edges' =>   array('params' => array(), 'hash' => '4c5f8c9f54917b66ecea8631aabb0e85'),
+            'emboss' =>         array('params' => array(), 'hash' => 'a3edb232afbd5d9e210172a40abec35e'),
+            'gaussian_blur' =>  array('params' => array(), 'hash' => 'd1d2ba1995dff5b7c638d85d968d070a'),
+            'selective_blur' => array('params' => array(), 'hash' => 'b68b972fc7d29d3a4942f2057ab085f2'),
+            'sketch' =>         array('params' => array(), 'hash' => '63d0dd06515c4ec72f8dc5fc9de74d8e'),
+            'smooth' =>         array('params' => 5, 'hash' => '6158f362febe3b7b9add756c9d5acf2c'),
+            //'pixelate' =>       array('params' => array(30,true), 'hash' => '123')
+            );
+        }else{
+            $native_filters = array(
+            'negate' =>         array('params' => array(), 'hash' => '20702af44b9b6e796cb752fe64777cfe'),
+            'grayscale' =>      array('params' => array(), 'hash' => '913a5a05d89c5973cf7155e0170397f0'),
+            'brightness' =>     array('params' => 50, 'hash' => 'f0cf541e1ba8a9f7b0a9d8386f64c8fb'),
+            'contrast' =>       array('params' => 50, 'hash' => '2cf57abda9373882b89feb6f665ce45d'),
+            'colorize' =>       array('params' => array(100,25,30), 'hash' => 'e021098d74dfa3a6e12e11f3a4e25492'),
+            'detect_edges' =>   array('params' => array(), 'hash' => '4f27b0b316152dfdb10b921ac3b22b3c'),
+            'emboss' =>         array('params' => array(), 'hash' => '8ce6eed4fa060d3730f3718f6e0e2ed0'),
+            'gaussian_blur' =>  array('params' => array(), 'hash' => 'e9e9fa440f60d59dee4428b35737f33c'),
+            'selective_blur' => array('params' => array(), 'hash' => '72e419aab622a7d037c6e378167e197b'),
+            'sketch' =>         array('params' => array(), 'hash' => 'f0249953d159d4c2989c20d0604e8253'),
+            'smooth' =>         array('params' => 5, 'hash' => 'da52d906f99879737b5c318c0b02bd87'),
+            //'pixelate' =>       array('params' => array(30,true), 'hash' => '123')
+            );
+        }
 
         foreach ($native_filters as $native_filter => $options){
             $Image = new AkImage();

@@ -184,9 +184,9 @@ class AkUnitTestSuite extends TestSuite
         $files = array_diff(glob(AK_TMP_DIR.DS.'*'), array(''));
         foreach ($files as $file){
             if(!is_dir($file)){
-                unlink($file);
+                @unlink($file);
             }else{
-                Ak::rmdir_tree($file);
+                @Ak::rmdir_tree($file);
             }
         }
     }
