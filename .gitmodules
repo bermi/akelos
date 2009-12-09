@@ -1,0 +1,3 @@
+[submodule "akelos/contrib/iphp"]
+	path = akelos/contrib/iphp
+	url = git://github.com/apinstein/iphp.git
