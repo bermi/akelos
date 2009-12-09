@@ -9,8 +9,6 @@ defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       AK_BASE_DIR.
 defined('AK_TESTING_NAMESPACE') || define('AK_TESTING_NAMESPACE',   'akelos');
 defined('AK_TESTING_URL')       || define('AK_TESTING_URL',   'http://akelos.tests');
 
-defined('AK_TMP_DIR')               ||  define('AK_TMP_DIR', AK_BASE_DIR.DS.'tmp');
-
 include_once AK_FRAMEWORK_DIR.DS.'active_support'.DS.'base.php';
 include_once AK_FRAMEWORK_DIR.DS.'active_support'.DS.'constants.php';
 

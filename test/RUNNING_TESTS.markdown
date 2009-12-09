@@ -1,4 +1,4 @@
-You can run your tests by runnign the test file directly like:
+You can execute tests by simply running the php file:
 
     php test/akelos/active_support/cases/inflector.php
 
@@ -6,10 +6,15 @@ or by using ./makelos ("php makelos" on Windows)
 
     ./makelos test:case active_support/inflector
 
-The advantage of using makelos to run tests is that you can run
-multiple cases at once providing the suite name like:
+The advantage of using makelos is that you can run multiple
+cases at once providing the suite name like:
 
     ./makelos test:case active_support
+
+
+This will runn all the cases available at
+
+    test/appname/active_support/cases/*.php
 
 Using makelos you can also override default constants like
 
@@ -34,7 +39,8 @@ will look for the database settings defined in config/sqlite.yml
 ## Testing controllers with Apache2
 
 When testing controllers, Akelos will use the default host
-"akelos.tests"
+"akelos.tests", you can override this by defining AK_TESTING_URL in
+your config.php or config/environment/ files.
 
 You will have to add the line:
 
@@ -65,3 +71,5 @@ the locahost machine as defined in test/.httaccess
 You can Run Akelos core tests on a fresh copy by calling
 
     php makelos tests:units
+
+This will use sqlite are

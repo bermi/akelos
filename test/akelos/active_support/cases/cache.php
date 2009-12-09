@@ -11,17 +11,10 @@ class Cache_TestCase extends  ActiveSupportUnitTest
     public $text_to_catch = 'this is the text to catch on the test case of the AkCache class';
 
 
-    public function __test_install_db_tables() {
-        require_once(dirname(__FILE__).'/../../fixtures/app/installers/framework_installer.php');
-        $installer = new FrameworkInstaller();
-        $installer->uninstall();
-        $installer->install();
-    }
-
     public function test_all_caches() {
         $cacheHandlers = array('cache_lite'=>1,'akadodbcache'=>2);
         $memcacheEnabled = AkConfig::getOption('memcached_enabled', false);
-
+        AkUnitTestSuite::createTestingDatabaseIfNotAvailable();
         if ($memcacheEnabled) {
             $cacheHandlers['akmemcache'] = 3;
         }
@@ -45,7 +38,7 @@ class Cache_TestCase extends  ActiveSupportUnitTest
 
         //Pear Cache Lite driver is loaded
         $this->Cache->init(null, $type);
-        $this->assertIsA($this->Cache->DriverInstance,$class);
+        $this->assertIsA($this->Cache->DriverInstance, $class);
 
     }
 

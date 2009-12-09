@@ -10,6 +10,16 @@ require_once(dirname(__FILE__).'/../config.php');
 
 Ak::db();
 
+if(!empty($_GET['construct'])){
+    @AkDbSession::install();
+    @AkAdodbCache::install();
+}elseif ($_GET['destruct']){
+    AkAdodbCache::uninstall();
+    AkDbSession::uninstall();
+    $Installer = new AkInstaller();
+    $Installer->dropTable('akelos_migrations');
+}
+
 $session_handler = isset($_GET['handler'])?$_GET['handler']:null;
 
 $session_settings = Ak::getSettings('sessions',false);

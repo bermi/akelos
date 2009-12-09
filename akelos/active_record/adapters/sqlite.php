@@ -11,7 +11,6 @@ class AkSqliteDbAdapter extends AkDbAdapter
         $dsn  = $database_settings['type'].'://';
         $dsn .= $database_settings['database_file'].'/?persist';
         $dsn .= !empty($database_settings['options']) ? $database_settings['options'] : '';
-
         return $dsn;
     }
 

@@ -59,17 +59,16 @@ class AkDbAdapter
     static function &getInstance($database_specifications = AK_DEFAULT_DATABASE_PROFILE, $auto_connect = true, $namespace = null) {
         $settings_hash = is_string($database_specifications) ? $database_specifications : AkDbAdapter::hash($database_specifications);
         $static_var_name = 'AkDbAdapter_getInstance_'.$settings_hash;
-
         if (!$Connection = Ak::getStaticVar($static_var_name)){
 
             defined('AK_DATABASE_SETTINGS_NAMESPACE') || define('AK_DATABASE_SETTINGS_NAMESPACE', 'database');
             $namespace = empty($namespace) ? AK_DATABASE_SETTINGS_NAMESPACE : $namespace;
 
             if (empty($database_specifications)) {
-                $settings_hash = AK_ENVIRONMENT;
                 $database_specifications = Ak::getSettings($namespace, false, $settings_hash);
             } elseif (is_string($database_specifications)){
                 $environment_settings = Ak::getSettings($namespace, false, $database_specifications);
+
                 if (!empty($environment_settings)){
                     $database_specifications = $environment_settings;
                 } elseif(strstr($database_specifications, '://')) {
@@ -94,12 +93,18 @@ class AkDbAdapter
                 $database_specifications = $database_settings[$settings_hash];
             }
 
+            if(empty($database_specifications)){
+                trigger_error(Ak::t('Could not find database settings for %namespace.yml/%settings_hash', array('%namespace' => $namespace, '%settings_hash' => $settings_hash)), E_USER_ERROR);
+            }
+
             $class_name = 'AkDbAdapter';
             $class_name = 'Ak'.AkInflector::camelize($database_specifications['type']).'DbAdapter';
-            require_once(AK_ACTIVE_RECORD_DIR.DS.'adapters'.DS.AkInflector::underscore($database_specifications['type']).'.php');
+            $adapter_class_file = AK_ACTIVE_RECORD_DIR.DS.'adapters'.DS.AkInflector::underscore($database_specifications['type']).'.php';
+            if(!@include_once($adapter_class_file)){
+                trigger_error(Ak::t('Could not find database adapter file on %path', array('%path' => $adapter_class_file)), E_USER_ERROR);
+            }
 
             $Connection = new $class_name($database_specifications, $auto_connect);
-
             Ak::setStaticVar($static_var_name, $Connection);
         }
         return $Connection;

@@ -94,7 +94,7 @@ class AkConfig
     }
 
     public function &get($namespace, $environment = AK_ENVIRONMENT, $raise_error_if_config_file_not_found = true) {
-        $key = '_config_'.$namespace.$environment.AK_WEB_REQUEST;
+        $key = $this->_getCacheKey($namespace,$environment);
         if(empty($this->options['skip_cache']) && ($config = Ak::getStaticVar($key))){
             return $config;
         }
@@ -264,7 +264,7 @@ class AkConfig
             return false;
         }
 
-        $key = '_config_'.$namespace.$environment.AK_WEB_REQUEST;
+        $key = $this->_getCacheKey($namespace,$environment);
         Ak::setStaticVar($key, $config);
 
         $var_export = var_export($config, true);
@@ -285,6 +285,11 @@ CACHE;
         }else{
             return true;
         }
+    }
+
+    public function clearStaticCache($namespace, $environment = AK_ENVIRONMENT){
+        $key = $this->_getCacheKey($namespace,$environment);
+        Ak::unsetStaticVar($key);
     }
 
     static function getErrorReportingLevelDescription($error_reporting_level = null) {
@@ -349,6 +354,10 @@ CACHE;
             $env = empty($env) ? $default : $env;
         }
         return $env;
+    }
+
+    protected function _getCacheKey($namespace, $environment){
+        return '_config_'.$namespace.$environment.AK_WEB_REQUEST;
     }
 }
 

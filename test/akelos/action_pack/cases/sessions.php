@@ -14,22 +14,20 @@ class Sessions_TestCase extends AkWebTestCase
         AkDbSession::install();
         $this->_test_script = AkConfig::getOption('testing_url').
         '/action_pack/public/sessions.php';
+
+        if($this->webserver_enabled){
+            Ak::url_get_contents($this->_test_script.'?construct=1');
+        }
     }
 
     public function __destruct() {
-        AkAdodbCache::uninstall();
-        AkDbSession::uninstall();
-        $Installer = new AkInstaller();
-        $Installer->dropTable('akelos_migrations');
+        if($this->webserver_enabled){
+            Ak::url_get_contents($this->_test_script.'?destruct=1');
+        }
     }
 
     public function skip(){
-        $this->skipIf((Ak::db() instanceof AkSqliteDbAdapter));
-        if(defined('MAKELOS_RUN')){
-            $this->skipIf(true, "Session tests need to run without makelos by calling:\n   php test/akelos/action_pack/cases/sessions.php\n");
-        }else{
-            $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
-        }
+        $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
     }
 
     public function test_all_session_handlers() {

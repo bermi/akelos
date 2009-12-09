@@ -117,7 +117,6 @@ class AkHasAndBelongsToMany extends AkAssociation
         'limit' => false,
         'offset' => false,
         'handler_name' => strtolower(AkInflector::underscore(AkInflector::singularize($association_id))),
-        'select' => false,
         'instantiate' => false,
         'unique' => false
         /*
@@ -187,7 +186,6 @@ class AkHasAndBelongsToMany extends AkAssociation
         }
         return $this->Owner->$handler_name;
     }
-
 
     // We are going to load or create the join class
     public function _loadJoinObject() {
@@ -635,7 +633,6 @@ class AkHasAndBelongsToMany extends AkAssociation
         return $count;
     }
 
-
     public function &build($attributes = array(), $set_as_new_record = true) {
         $options = $this->getOptions($this->association_id);
         Ak::import($options['class_name']);
@@ -654,7 +651,6 @@ class AkHasAndBelongsToMany extends AkAssociation
         }
         return $record;
     }
-
 
     public function getAssociatedFinderSqlOptions($association_id, $options = array()) {
         $options = $this->getOptions($this->association_id);
@@ -690,6 +686,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
         return $finder_options;
     }
+
     public function getAssociatedFinderSqlOptionsForInclusionChain($prefix, $parent_handler_name, $options = array(),$pluralize=false) {
 
         $association_options = $this->getOptions($this->association_id);
@@ -744,6 +741,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
         return $finder_options;
     }
+
     public function constructSqlForInclusion() {
         $Associated = $this->getAssociatedModelInstance();
         $options = $this->getOptions($this->association_id);
@@ -763,7 +761,8 @@ class AkHasAndBelongsToMany extends AkAssociation
         '_'.$options['join_class_name'].'.'.$options['association_foreign_key'].' ';
 
     }
-    function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name) {
+
+    public function constructSqlForInclusionChain($association_id,$handler_name, $parent_handler_name) {
         $Associated = $this->getAssociatedModelInstance();
         $options = $this->getOptions($this->association_id);
         return
@@ -802,7 +801,6 @@ class AkHasAndBelongsToMany extends AkAssociation
         }
         return $ModelInstances[$class_name];
     }
-
 
     public function _notWorkingYetfind() {
         $result = false;
@@ -862,6 +860,7 @@ class AkHasAndBelongsToMany extends AkAssociation
         }
         return $result;
     }
+
     public function &find() {
         $result = false;
         if(!$this->Owner->isNewRecord()){
@@ -942,7 +941,6 @@ class AkHasAndBelongsToMany extends AkAssociation
         return $result;
     }
 
-
     public function isEmpty() {
         return $this->count() === 0;
     }
@@ -965,7 +963,6 @@ class AkHasAndBelongsToMany extends AkAssociation
     public function afterUpdate(&$object) {
         return $this->_afterCallback($object);
     }
-
 
     public function beforeDestroy(&$object) {
         $success = true;

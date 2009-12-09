@@ -50,7 +50,6 @@
  *  * 'group' An attribute name by which the result should be grouped. Uses the GROUP BY SQL-clause.
  *  * 'limit' An integer determining the limit on the number of rows that should be returned.
  *  * 'offset' An integer determining the offset from where the rows should be fetched. So at 5, it would skip the first 4 rows.
- *  * 'select' By default, this is * as in SELECT * FROM, but can be changed if you for example want to do a join, but not include the joined columns.
  *
  * Option examples:
  *
@@ -84,7 +83,6 @@ class AkHasMany extends AkAssociation
         'limit' => false,
         'offset' => false,
         'handler_name' => strtolower(AkInflector::underscore(AkInflector::singularize($association_id))),
-        'select' => false
         );
 
         $options = array_merge($default_options, $options);
@@ -134,7 +132,6 @@ class AkHasMany extends AkAssociation
         return $this->Owner->$handler_name;
     }
 
-
     public function &load($force_reload = false) {
         $options = $this->getOptions($this->association_id);
         if($force_reload || empty($this->Owner->{$options['handler_name']}->_loaded)){
@@ -168,7 +165,6 @@ class AkHasMany extends AkAssociation
         }
         return $this->Owner->{$this->association_id};
     }
-
 
     /**
      * add($object), add(array($object, $object2)) - adds one or more objects to the collection by setting
@@ -317,8 +313,6 @@ class AkHasMany extends AkAssociation
         return $success;
     }
 
-
-
     /**
     * Remove records from the collection. Use delete() in order to trigger database dependencies
     */
@@ -368,9 +362,6 @@ class AkHasMany extends AkAssociation
         }
     }
 
-
-
-
     public function _setAssociatedMemberId(&$Member) {
         if(empty($Member->__hasManyMemberId)) {
             $Member->__hasManyMemberId = Ak::randomString();
@@ -397,7 +388,6 @@ class AkHasMany extends AkAssociation
     public function _hasAssociatedMember(&$Member) {
         return !empty($Member->__hasManyMemberId);
     }
-
 
     public function _relateAssociatedWithOwner(&$Associated) {
         if(!$this->Owner->isNewRecord()){
@@ -441,9 +431,6 @@ class AkHasMany extends AkAssociation
         return $this->Owner->$association_id;
     }
 
-
-
-
     public function constructSql($set_owner_table_has_included = true) {
         $options = $this->getOptions($this->association_id);
         $Associated = $this->getAssociatedModelInstance();
@@ -482,8 +469,6 @@ class AkHasMany extends AkAssociation
         $this->setOptions($this->association_id, $options);
     }
 
-
-
     public function count($force_count = false) {
         $count = 0;
         $options = $this->getOptions($this->association_id);
@@ -517,7 +502,6 @@ class AkHasMany extends AkAssociation
         return $this->count();
     }
 
-
     public function &build($attributes = array(), $set_as_new_record = true) {
         $options = $this->getOptions($this->association_id);
         Ak::import($options['class_name']);
@@ -536,7 +520,6 @@ class AkHasMany extends AkAssociation
         }
         return $record;
     }
-
 
     public function getAssociatedFinderSqlOptions($association_id, $options = array()) {
         $options = $this->getOptions($this->association_id);
@@ -567,6 +550,7 @@ class AkHasMany extends AkAssociation
 
         return $finder_options;
     }
+
     public function getAssociatedFinderSqlOptionsForInclusionChain($prefix, $parent_handler_name, $options = array(),$pluralize=false) {
 
         $association_options = $this->getOptions($this->association_id);
@@ -610,6 +594,7 @@ class AkHasMany extends AkAssociation
 
         return $finder_options;
     }
+
     public function constructSqlForInclusion() {
         $Associated = $this->getAssociatedModelInstance();
         $options = $this->getOptions($this->association_id);
@@ -642,7 +627,6 @@ class AkHasMany extends AkAssociation
         return $this->association_id.'_count';
     }
 
-
     public function &getAssociatedModelInstance() {
         static $ModelInstances;
         $class_name = $this->getOption($this->association_id, 'class_name');
@@ -652,7 +636,6 @@ class AkHasMany extends AkAssociation
         }
         return $ModelInstances[$class_name];
     }
-
 
     public function &find() {
         $result = false;
@@ -706,7 +689,6 @@ class AkHasMany extends AkAssociation
         return $result;
     }
 
-
     public function isEmpty() {
         return $this->count() === 0;
     }
@@ -729,7 +711,6 @@ class AkHasMany extends AkAssociation
     public function afterUpdate(&$object) {
         return $this->_afterCallback($object);
     }
-
 
     public function beforeDestroy(&$object) {
         $success = true;

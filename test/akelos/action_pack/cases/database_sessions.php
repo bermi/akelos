@@ -14,23 +14,14 @@ class DatabaseSessions_TestCase extends AkWebTestCase
 
     public function skip()
     {
-        $this->skipIf((Ak::db() instanceof AkSqliteDbAdapter));
-        if(defined('MAKELOS_RUN')){
-            $this->skipIf(true, "Database session tests need to run without makelos by calling:\n   php test/akelos/action_pack/cases/database_sessions.php\n");
-        }else{
-            $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
-        }
+        $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
     }
 
     public function setUp() {
-        AkDbSession::install();
         $this->_test_script = AkConfig::getOption('testing_url').
         '/action_pack/public/database_sessions.php';
     }
 
-    public function tearDown() {
-        AkDbSession::uninstall();
-    }
 
     public function test_open() {
         $browser = $this->getBrowser();

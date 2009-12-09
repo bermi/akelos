@@ -9,6 +9,7 @@ if(isset($_GET['expire'])){
 require_once(dirname(__FILE__).'/../config.php');
 
 Ak::db();
+AkDbSession::install();
 
 $AkDbSession = new AkDbSession();
 $AkDbSession->session_life = AK_SESSION_EXPIRE;

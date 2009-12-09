@@ -3,6 +3,7 @@
 defined('AK_UNIT_TEST_SUITE')                   || define('AK_UNIT_TEST_SUITE',true);
 defined('AK_TEST_DEFAULT_REPORTER')             || define('AK_TEST_DEFAULT_REPORTER', 'AkelosTextReporter');
 defined('AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE')  || define('AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE', 'Akelos');
+defined('AK_TESTING_URL')                       || define('AK_TESTING_URL',   'http://akelos.tests');
 
 require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'unit_tester.php');
 require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'mock_objects.php');
@@ -78,7 +79,7 @@ class AkUnitTestSuite extends TestSuite
                 $options['description'] = trim($options['description'], ', ')."):\n";
 
                 if(empty($options['title'])){
-                    AkConfig::setOption('testing_url', 'http://akelos.tests');
+                    AkConfig::setOption('testing_url', AK_TESTING_URL);
                     AkConfig::setOption('memcached_enabled', AkMemcache::isServerUp());
                     AkUnitTestSuite::checkIfTestingWebserverIsAccesible($options);
                     $dabase_settings = AK_DATABASE_SETTINGS_NAMESPACE == 'database' ? Ak::getSetting('database', 'type') : AK_DATABASE_SETTINGS_NAMESPACE;
@@ -103,7 +104,7 @@ class AkUnitTestSuite extends TestSuite
             if(empty($options['title'])){
                 $suite_name = empty($options['suite']) ? preg_replace('/.+\/([^\/]+)\/cases.+/', '$1', @$options['files'][0]) : $options['suite'];
 
-                AkConfig::setOption('testing_url', 'http://akelos.tests');
+                AkConfig::setOption('testing_url', AK_TESTING_URL);
                 AkConfig::setOption('memcached_enabled', AkMemcache::isServerUp());
 
                 AkUnitTestSuite::checkIfTestingWebserverIsAccesible($options);
@@ -182,10 +183,8 @@ class AkUnitTestSuite extends TestSuite
     static function cleanupTmpDir(){
         $files = array_diff(glob(AK_TMP_DIR.DS.'*'), array(''));
         foreach ($files as $file){
-                            Ak::trace($file);
             if(!is_dir($file)){
                 unlink($file);
-
             }else{
                 Ak::rmdir_tree($file);
             }
