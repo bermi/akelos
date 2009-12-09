@@ -1,0 +1,7 @@
+<IfModule mod_rewrite.c>
+   RewriteEngine off
+</IfModule>
+
+order deny,allow
+deny from all
+allow from localhost 127.0.0.1 ::1
