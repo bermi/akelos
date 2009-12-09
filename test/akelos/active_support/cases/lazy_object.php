@@ -79,7 +79,7 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
         $this->expectError(new PatternExpectation('/undefined method TestLazyObject::invalid.+lazy_object\.php .+'.(__LINE__+1).'/'));
         $Lazy->invalid();
 
-        $this->expectError(new PatternExpectation('/undefined method TestLazyObject::explicit.+\/lazy_object\.php .+'.(__LINE__+1).'/'));
+        $this->expectError(new PatternExpectation('/undefined method TestLazyObject::explicit.+lazy_object\.php .+'.(__LINE__+1).'/'));
         $Lazy->explicit();
 
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
@@ -104,7 +104,7 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
         $Lazy->extendClassLazily('TestClassUsedViaProxyByALazyObject', array('attributes' => array('allowed')));
         $this->assertEqual($Lazy->allowed, 'yes');
 
-        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::not_allowed.+\/lazy_object\.php .+'.(__LINE__+1).'/'));
+        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::not_allowed.+lazy_object\.php .+'.(__LINE__+1).'/'));
         $this->assertNotEqual($Lazy->not_allowed, 'no');
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
     }
@@ -120,9 +120,9 @@ class LazyObject_TestCase extends  ActiveSupportUnitTest
     public function test_should_respect_attribute_visibility() {
         $Lazy = new TestLazyObject();
         $Lazy->extendClass(new TestClassUsedViaProxyByALazyObject());
-        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::private_attribute.+\/lazy_object\.php .+'.(__LINE__+1).'/'));
+        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::private_attribute.+lazy_object\.php .+'.(__LINE__+1).'/'));
         $this->assertNotEqual($Lazy->private_attribute, 'private');
-        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::_private_attribute.+\/lazy_object\.php .+'.(__LINE__+1).'/'));
+        $this->expectError(new PatternExpectation('/undefined attribute TestLazyObject::_private_attribute.+lazy_object\.php .+'.(__LINE__+1).'/'));
         $this->assertNotEqual($Lazy->_private_attribute, 'private');
         $Lazy->unregisterExtenssion('TestClassUsedViaProxyByALazyObject');
     }
