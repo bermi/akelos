@@ -312,7 +312,7 @@ class FormOptionsHelper extends AkActionViewHelper
 class AkFormHelperOptionsInstanceTag extends AkFormHelperInstanceTag
 {
     public function __construct($object_name, $column_name, &$template_object, $local_binding = null, &$object) {
-        $this->AkFormHelperInstanceTag($object_name, $column_name, $template_object, $local_binding, $object);
+        parent::__construct($object_name, $column_name, $template_object, $local_binding, $object);
     }
 
     public function to_select_tag($choices, $options=array(), $html_options = array()) {

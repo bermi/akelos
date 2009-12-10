@@ -198,7 +198,7 @@ class AkUnitTestSuite extends TestSuite
     }
 
     public function run($reporter) {
-        if($this->running_from_config){
+        if($this->running_from_config || empty($this->_test_cases)){
             return parent::run($reporter);
         }
         $reporter->paintGroupStart($this->getLabel(), $this->getSize());

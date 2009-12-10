@@ -2222,6 +2222,9 @@ class Ak
             if(!Ak::import($name)){
                 if(strstr($name, 'Helper')){
                     $file_path = AkConfig::getDir('helpers').DS.AkInflector::underscore($name).'.php';
+                    if(!file_exists($file_path)){
+                        $file_path = AK_ACTION_PACK_DIR.DS.'helpers'.DS.AkInflector::underscore($name).'.php';
+                    }
                 }elseif(strstr($name, 'Installer')){
                     $file_path = AkConfig::getDir('app_installers').DS.AkInflector::underscore($name).'.php';
                 }

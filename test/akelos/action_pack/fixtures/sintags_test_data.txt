@@ -6,7 +6,7 @@ echo "{@url_for controller:page}";
 
 -----------------------------------
 
-<?php
+<?php 
 echo "{@url_for controller:page}";
 ?>
 
@@ -282,7 +282,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 -----------------------------------
 
 
-<?php
+<?php 
  empty($posts) ? null : $post_loop_counter = 0;
  empty($posts) ? null : $posts_available = count($posts);
  if(!empty($posts))
@@ -306,7 +306,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 -----------------------------------
 
 
-<?php
+<?php 
  empty($posts) ? null : $post_loop_counter = 0;
  empty($posts) ? null : $posts_available = count($posts);
  if(!empty($posts))
@@ -326,7 +326,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 
 -----------------------------------
 
-<?php if(!empty($company)) { ?><?php
+<?php if(!empty($company)) { ?><?php 
  empty($people) ? null : $person_loop_counter = 0;
  empty($people) ? null : $people_available = count($people);
  if(!empty($people))
@@ -383,7 +383,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 
 -----------------------------------
 
-<?php
+<?php 
  empty($items['directories']) ? null : $directory_loop_counter = 0;
  empty($items['directories']) ? null : $directories_available = count($items['directories']);
  if(!empty($items['directories']))
@@ -412,7 +412,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 
 -----------------------------------
 
-<?php
+<?php 
  empty($Post->author->friends) ? null : $friend_loop_counter = 0;
  empty($Post->author->friends) ? null : $friends_available = count($Post->author->friends);
  if(!empty($Post->author->friends))
@@ -433,7 +433,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 
 -----------------------------------
 
-<?php
+<?php 
  empty($Post->versions) ? null : $Post_loop_counter = 0;
  empty($Post->versions) ? null : $Posts_available = count($Post->versions);
  if(!empty($Post->versions))

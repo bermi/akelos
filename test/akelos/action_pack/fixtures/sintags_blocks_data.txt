@@ -4,7 +4,7 @@
 
 -----------------------------------
 
-<?php
+<?php 
 if(!empty($keys)){
     foreach (array_keys((array)$keys) as $ak_sintags_key){
         $key =& $keys[$ak_sintags_key];
@@ -18,7 +18,7 @@ if(!empty($keys)){
 
 -----------------------------------
 
-<?php
+<?php 
 if(!empty($keys)){
     foreach (array_keys((array)$keys) as $ak_sintags_key){
         $key =& $keys[$ak_sintags_key];
@@ -37,7 +37,7 @@ if(!empty($keys)){
 <% incremented = keys {|key| ++$key} %>
 
 -----------------------------------
-<?php
+<?php 
 if(!empty($keys)){
     $incremented = array();
     foreach (array_keys((array)$keys) as $ak_sintags_key){

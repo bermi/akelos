@@ -8,7 +8,7 @@
 * will give <tt>disabled="disabled"</tt>.
 */
 
-class FormTagHelper  extends AkActionViewHelper
+class FormTagHelper extends AkActionViewHelper
 {
 
     /**

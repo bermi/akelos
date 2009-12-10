@@ -277,6 +277,11 @@ class AkActionMailer extends AkBaseModel
     public $Message;
     public $Composer;
     protected $_defaultMailDriverName = 'AkMailMessage';
+    
+
+    protected
+    $_dynamic_attributes = array(),
+    $_dynamic_methods = array();
 
     public function __construct(&$Driver = null) {
         $this->loadSettings();
@@ -722,21 +727,43 @@ class AkActionMailer extends AkBaseModel
         return $base_url.call_user_func_array(array('Ak','toUrl'), $args);
     }
 
-    /**
-     * Creates an instance of each available helper and links it into into current mailer.
-     *
-     * Mailer helpers work as Controller helpers but without the Request context
-     */
-    public function getHelpers() {
-        $HelperLoader = new AkHelperLoader();
-        $HelperLoader->setHandler($this);
-        return $HelperLoader->getHelpersForMailer();
-    }
 
     protected function &_initializeTemplateClass($assigns) {
         $TemplateInstance = new AkActionView($this->getTemplatePath(), $assigns, $this);
-        $TemplateInstance->_registerTemplateHandler('tpl','AkPhpTemplateHandler');
+        $TemplateInstance->registerTemplateHandler('tpl','AkPhpTemplateHandler');
+        $TemplateInstance->setHelperLoader($this->getHelperLoader());
         return $TemplateInstance;
+    }
+    
+    // Lazy helper loading
+
+    public function __get($attribute)
+    {
+        if(preg_match('/^(.+)_helper$/', $attribute, $matches)){
+            $this->getHelperLoader()->instantiateHelperAsHandlerAttribute($matches[1], $matches[0]);
+            if(isset($this->$attribute)){
+                return $this->$attribute;
+            }
+        }
+        if(!isset($this->_dynamic_attributes[$attribute])){
+            return parent::__get($attribute);
+        }
+        return $this->_dynamic_attributes[$attribute];
+    }
+
+    public function __set($attribute, $value)
+    {
+        $this->_dynamic_attributes[$attribute] = $value;
+        $this->$attribute = $value;
+    }
+
+    public function &getHelperLoader()
+    {
+        if(empty($this->_HelperLoader)){
+            $this->_HelperLoader = new AkHelperLoader();
+            $this->_HelperLoader->setController($this);
+        }
+        return $this->_HelperLoader;
     }
 
     protected function _deliverUsingMailDeliveryMethod($method, &$Message, $options) {
@@ -775,8 +802,7 @@ class AkActionMailer extends AkBaseModel
         } else {
             $Template = $this->_initializeTemplateClass($body);
         }
-        $options['locals'] = array_merge((array)@$options['locals'], $this->getHelpers());
-        $options['locals'] = array_merge($options['locals'], array('mailer'=>$this,'controller'=>$this));
+        $options['locals'] = array_merge((array)@$options['locals'], array('mailer'=>$this,'controller'=>$this));
         if(!empty($body)) {
             $options['locals']['body'] = $body;
         } else {

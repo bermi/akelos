@@ -267,7 +267,8 @@ class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
     }
 
     protected function _getColumnName($column_name, $object_name, &$template_object) {
-        $object = $template_object->_controller->{$object_name};
+
+        $object = $template_object->getController()->{$object_name};
         $internationalized_columns = $object->getInternationalizedColumns();
         if(!empty($internationalized_columns[$column_name]))  {
             $current_locale = $object->getCurrentLocale();

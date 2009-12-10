@@ -1,7 +1,7 @@
 <?php
 
 /**
-* Provides a set of helpers for creating JavaScript macros that rely on and often bundle methods from JavaScriptHelper into
+* Provides a set of helpers for creating JavaScript macros that rely on and often bundle methods from JavascriptHelper into
 * larger units. These macros are deprecated and will be removed on Akelos 0.9
 * 
 * @deprecated 
@@ -43,7 +43,7 @@ class JavascriptMacrosHelper extends AkActionViewHelper
     public function in_place_editor($field_id, $options = array()) {
         $function =  "new Ajax.InPlaceEditor(";
         $function .= "'{$field_id}', ";
-        $function .= "'".UrlHelper::url_for($options['url'])."'";
+        $function .= "'".$this->_controller->url_helper->url_for($options['url'])."'";
 
         $js_options = array();
         if (!empty($options['cancel_text'])){
@@ -65,11 +65,11 @@ class JavascriptMacrosHelper extends AkActionViewHelper
             $js_options['callback'] = "function(form) { return {$options['with']} }" ;
         }
         if (!empty($js_options)) {
-            $function .= (', ' . JavaScriptHelper::_options_for_javascript($js_options));
+            $function .= (', ' . JavascriptHelper::_options_for_javascript($js_options));
         }
         $function .= ')';
 
-        return JavaScriptHelper::javascript_tag($function);
+        return JavascriptHelper::javascript_tag($function);
     }
 
 
@@ -127,11 +127,11 @@ class JavascriptMacrosHelper extends AkActionViewHelper
         $function =  "var {$field_id}_auto_completer = new Ajax.Autocompleter(";
         $function .= "'{$field_id}', ";
         $function .= !empty($options['update']) ? "'{$options['update']}', " : "'{$field_id}_auto_complete', ";
-        $function .= "'".UrlHelper::url_for($options['url'])."'";
+        $function .= "'".$this->_controller->url_helper->url_for($options['url'])."'";
 
         $js_options = array();
         if (!empty($options['tokens'])){
-            $js_options['tokens'] = JavaScriptHelper::array_or_string_for_javascript($options['tokens']) ;
+            $js_options['tokens'] = JavascriptHelper::array_or_string_for_javascript($options['tokens']) ;
         }
         if (!empty($options['with'])) {
             $js_options['callback'] = "function(element, value) { return {$options['with']} }";
@@ -154,8 +154,8 @@ class JavascriptMacrosHelper extends AkActionViewHelper
                 $js_options[$default_option] = $options[$key];
             }
         }
-        $function .= ', '.JavaScriptHelper::_options_for_javascript($js_options).')';
-        return JavaScriptHelper::javascript_tag($function);
+        $function .= ', '.JavascriptHelper::_options_for_javascript($js_options).')';
+        return JavascriptHelper::javascript_tag($function);
     }
 
     /**

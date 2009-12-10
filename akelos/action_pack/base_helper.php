@@ -3,20 +3,25 @@
 class AkActionViewHelper
 {
     public $locales_namespace = 'helpers';
+    protected $_controller;
 
     public function __construct() {
         $args = func_get_args();
         if(!empty($args[0]) && is_array($args[0])){
-            foreach (array_keys($args[0]) as $object_name){
-                $this->addObject($object_name, $args[0][$object_name]);
-            }
+            $this->addObjects($args[0]);
         }
     }
 
-    public function addObject($object_name, &$Object) {
-        $this->_object[$object_name] = $Object;
-        if(!isset($this->_controller->$object_name)){
-            $this->_controller->$object_name = $Object;
+    public function addObjects(&$Objects) {
+        foreach ($Objects as $placeholder => $Object){
+            $this->addObject($placeholder, $Object);
+        }
+    }
+
+    public function addObject($placeholder, &$Object) {
+        $this->_object[$placeholder] = $Object;
+        if(isset($this->_controller) && !isset($this->_controller->$placeholder)){
+            $this->_controller->$placeholder = $Object;
         }
     }
 
@@ -26,6 +31,10 @@ class AkActionViewHelper
 
     public function setController(&$Controller) {
         $this->_controller = $Controller;
+    }
+
+    public function &getController() {
+        return $this->_controller;
     }
 
     public function t($string, $array = null, $name_space = AK_DEFAULT_LOCALE_NAMESPACE) {

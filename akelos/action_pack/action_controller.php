@@ -160,10 +160,6 @@ class AkActionController extends AkLazyObject
                 $this->loadPlugins();
                 AK_ENABLE_PROFILER &&  Ak::profile('Instantiated plugins');
             }
-            if(!empty($this->helpers)){
-                $this->instantiateHelpers();
-                AK_ENABLE_PROFILER &&  Ak::profile('Instantiated helpers');
-            }
         }else{
             $this->_enableLayoutOnRender = false;
         }
@@ -333,29 +329,17 @@ class AkActionController extends AkLazyObject
         empty($this->cookies) && isset($_COOKIE) ? ($this->cookies = $_COOKIE) : null;
 
         if(empty($this->Template)){
-            $this->Template = new AkActionView($this->_getTemplateBasePath(),
-            $this->Request->getParameters(),$this->Request->getController());
-
-            $this->Template->_controllerInstance = $this;
-            $this->Template->_registerTemplateHandler('tpl','AkPhpTemplateHandler');
+            $this->Template = new AkActionView(
+            $this->_getTemplateBasePath(),
+            $this->Request->getParameters(),
+            $this);
+            $this->Template->registerTemplateHandler('tpl','AkPhpTemplateHandler');
+            $this->Template->setHelperLoader($this->getHelperLoader());
         }
     }
 
     public function loadPlugins() {
         Ak::loadPlugins();
-    }
-
-    /**
-     * Creates an instance of each available helper and links it into into current controller.
-     *
-     * Per example, if a helper TextHelper is located into the file text_helper.php.
-     * An instance is created on current controller
-     * at $this->text_helper. This instance is also available on the view by calling $text_helper.
-     *
-     * Helpers can be found at lib/AkActionView/helpers (this might change in a future)
-     */
-    public function instantiateHelpers() {
-        Ak::setStaticVar('AkHelperLoader', $this->getHelperLoader());
     }
 
     public function getCurrentControllerHelper() {
@@ -664,9 +648,6 @@ class AkActionController extends AkLazyObject
     }
 
     public function renderAction($_action_name, $status = null, $with_layout = true) {
-        if($_action_name != $this->getActionName()){
-            $this->instantiateHelpers();
-        }
         $template = $this->getDefaultTemplateName($_action_name);
         if(!empty($with_layout) && !$this->_isTemplateExemptFromLayout($template)){
             return $this->renderWithLayout($template, $status, $with_layout);
@@ -1077,7 +1058,7 @@ class AkActionController extends AkLazyObject
 
     public function _isTemplateExemptFromLayout($template_name = null) {
         $template_name = empty($template_name) ? $this->getDefaultTemplateName() : $template_name;
-        return $this->Template->_javascriptTemplateExists($template_name);
+        return $this->Template->javascriptTemplateExists($template_name);
     }
 
     public function _assertExistanceOfTemplateFile($template_name) {
@@ -2207,7 +2188,7 @@ class AkActionController extends AkLazyObject
         $this->$attribute = $value;
     }
 
-    function &getHelperLoader()
+    public function &getHelperLoader()
     {
         if(empty($this->_HelperLoader)){
             $this->_HelperLoader = new AkHelperLoader();

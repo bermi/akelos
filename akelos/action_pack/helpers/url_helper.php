@@ -2,6 +2,8 @@
 
 class UrlHelper
 {
+    protected $_controller;
+    
     public function setController(&$controller) {
         $this->_controller = $controller;
     }
@@ -283,7 +285,7 @@ class UrlHelper
     }
 
     public function _confirm_javascript_function($confirm) {
-        return "confirm('".JavaScriptHelper::escape_javascript($confirm)."')";
+        return "confirm('".JavascriptHelper::escape_javascript($confirm)."')";
     }
 
 

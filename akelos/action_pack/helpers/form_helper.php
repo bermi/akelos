@@ -271,21 +271,22 @@ class AkFormHelperInstanceTag
     public $_object_name;
     public $_auto_index;
 
-
-    //AkFormHelperInstanceTag
-
     public function __construct($object_name, $column_name, &$template_object, $local_binding = null, $object = null) {
+                
+        $controller = $template_object->getController();
+
         $this->object_name = $object_name;
         $this->_column_name = $column_name;
         $this->_template_object = $template_object;
         $this->_local_binding = $local_binding;
 
-        if(empty($object) && !empty($this->_template_object->_controller->{$this->object_name})){
-            $this->object = $this->_template_object->_controller->{$this->object_name};
+        $controller = method_exists($template_object, 'getController') ? $template_object->getController() : $template_object;
+
+        if(empty($object) && @$controller->{$this->object_name}){
+            $this->object = $controller->{$this->object_name};
         }else{
             $this->object = $object;
         }
-
         $_object_name = preg_replace('/\[\]$/','',$this->object_name);
         if($_object_name != $this->object_name){
             $this->_auto_index = $this->_template_object->{AkInflector::camelize($_object_name)}->id_before_type_cast;

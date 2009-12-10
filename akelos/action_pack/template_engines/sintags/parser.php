@@ -643,35 +643,36 @@ class AkSintagsParser
     }
 
 
-    public function _getAvailableHelpers() {
+    private function _getAvailableHelpers() {
         $helpers = array();
         if(empty($this->available_helpers)){
             if(defined('AK_SINTAGS_AVALABLE_HELPERS')){
                 $helpers = unserialize(AK_SINTAGS_AVALABLE_HELPERS);
             }else{
-	            $AkHelperLoader = Ak::getStaticVar('AkHelperLoader');
-                $AkHelperLoader->instantiateHelpers();
-                if($underscored_helper_names = AkHelperLoader::getInstantiatedHelperNames()){
-                    foreach ($underscored_helper_names as $underscored_helper_name){
-                        $helper_class_name = AkInflector::camelize($underscored_helper_name);
-                        if(class_exists($helper_class_name)){
-                            $methods = get_class_methods($helper_class_name);
-                            $vars = get_class_vars($helper_class_name);
-                            if (AK_PHP5 && isset($vars['dynamic_helpers'])) {
-                                $dynamic_helpers = Ak::toArray($vars['dynamic_helpers']);
-                                foreach ($dynamic_helpers as $method_name){
-                                    $this->dynamic_helpers[$method_name] = $underscored_helper_name;
+                if($AkHelperLoader = Ak::getStaticVar('AkHelperLoader')){
+                    $AkHelperLoader->instantiateHelpers();
+                    if($underscored_helper_names = AkHelperLoader::getInstantiatedHelperNames()){
+                        foreach ($underscored_helper_names as $underscored_helper_name){
+                            $helper_class_name = AkInflector::camelize($underscored_helper_name);
+                            if(class_exists($helper_class_name)){
+                                $methods = get_class_methods($helper_class_name);
+                                $vars = get_class_vars($helper_class_name);
+                                if (isset($vars['dynamic_helpers'])) {
+                                    $dynamic_helpers = Ak::toArray($vars['dynamic_helpers']);
+                                    foreach ($dynamic_helpers as $method_name){
+                                        $this->dynamic_helpers[$method_name] = $underscored_helper_name;
+                                    }
                                 }
-                            }
-                            foreach (get_class_methods($helper_class_name) as $method_name){
-                                if($method_name[0] != '_'){
-                                    $helpers[$method_name] = $underscored_helper_name;
+                                foreach (get_class_methods($helper_class_name) as $method_name){
+                                    if($method_name[0] != '_'){
+                                        $helpers[$method_name] = $underscored_helper_name;
+                                    }
                                 }
                             }
                         }
+                        $helpers['render'] = 'controller';
+                        $helpers['render_partial'] = 'controller';
                     }
-                    $helpers['render'] = 'controller';
-                    $helpers['render_partial'] = 'controller';
                 }
             }
             $this->available_helpers = $helpers;

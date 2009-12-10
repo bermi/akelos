@@ -6,7 +6,7 @@
 *
 * To be able to use these helpers, you must include the Prototype 
 * JavaScript framework and the Scriptaculous JavaScript library in your 
-* pages. See the documentation for ActionView::Helpers::JavaScriptHelper
+* pages. See the documentation for ActionView::Helpers::JavascriptHelper
 * for more information on including the necessary JavaScript.
 *
 * The Scriptaculous helpers' behavior can be tweaked with various options.
