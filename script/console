@@ -1,13 +1,10 @@
 #!/usr/bin/env php
 <?php
 
-ob_start('ob_logstdout', 2);
-
 define('AK_CONSOLE_MODE', true);
 define('AK_ENABLE_AKELOS_ARGS', true);
 defined('DS')           || define('DS', DIRECTORY_SEPARATOR);
 defined('AK_BASE_DIR')  || define('AK_BASE_DIR', str_replace(DS.'script'.DS.'console','',__FILE__));
-
 
 $_app_config_file = AK_BASE_DIR.DS.'config'.DS.'config.php';
 
