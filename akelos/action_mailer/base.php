@@ -644,8 +644,7 @@ class AkActionMailer extends AkBaseModel
             }
 
         }
-        $options['locals'] = array_merge((array)@$options['locals'], $this->getHelpers());
-        $options['locals'] = array_merge($options['locals'], array('mailer'=>$this,'controller'=>$this));
+        $options['locals'] = array_merge((array)@$options['locals'], array('mailer'=>$this,'controller'=>$this));
         if(!empty($body)) {
             $options['locals']['body'] = $body;
         }

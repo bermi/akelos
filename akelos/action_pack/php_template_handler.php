@@ -1,6 +1,5 @@
 <?php
 
-
 class AkPhpTemplateHandler
 {
     public $_options = array();
@@ -27,7 +26,8 @@ class AkPhpTemplateHandler
             $TemplateEngine = new $____template_engine_name();
 
             $TemplateEngine->init(array(
-            'code' => $____code
+            'code' => $____code,
+            'helper_loader' => $this->_AkActionView->getHelperLoader()
             ));
 
             $____code = $TemplateEngine->toPhp();

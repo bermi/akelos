@@ -115,9 +115,8 @@ class AkHelperLoader
         $helpers = array_merge($this->getDefaultHandlerHelperNames(), $this->getApplicationHelperNames(), $this->getPluginHelperNames());
         //$helpers = array_merge($helpers, $this->getPluginHelperNames());
 
-        if(!empty($this->_Controller)){
+        if(!empty($this->_Controller) && ($this->_Controller instanceof AkActionController)){
             $helpers = array_merge($helpers, $this->_Controller->getModuleHelper(), $this->_Controller->getCurrentControllerHelper());
-            //$helpers = array_merge($helpers, $this->_Controller->getCurrentControllerHelper());
         }
 
         return $helpers;
@@ -223,13 +222,13 @@ class AkHelperLoader
 
     public function getHeperBasePaths(){
         $paths = array(
-        AK_HELPERS_DIR,
+        AkConfig::getDir('helpers'),
         AK_ACTION_PACK_DIR.DS.'helpers'
         );
-        if(!empty($this->_Controller)){
+        if(!empty($this->_Controller) && ($this->_Controller instanceof AkActionController)){
             $module_name = $this->_Controller->getModuleName();
             if(!empty($module_name)){
-                $paths[] = AK_HELPERS_DIR.DS.AkInflector::underscore($module_name);
+                $paths[] = AkConfig::getDir('helpers').DS.AkInflector::underscore($module_name);
             }
         }
         return $paths;

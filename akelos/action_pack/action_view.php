@@ -365,6 +365,10 @@ class AkActionView
         $this->HelperLoader = $HelperLoader;
     }
 
+    public function &getHelperLoader(){
+        return $this->HelperLoader;
+    }
+
     public function renderCollectionOfPartials($partial_name, $collection, $partial_spacer_template = null, $local_assigns = array()) {
         return $this->renderPartialCollection($partial_name, $collection, $partial_spacer_template, $local_assigns);
     }

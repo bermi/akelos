@@ -183,14 +183,22 @@ defined('AK_SINTAGS_HASH_KEY_VALUE_DELIMITER')      || define('AK_SINTAGS_HASH_K
  */
 class AkSintags
 {
-    protected $_code;
+    protected
+    $_helper_loader,
+    $_code;
 
     public function init($options = array()) {
         $this->_code = $options['code'];
+        if(isset($options['helper_loader'])){
+            $this->_helper_loader = $options['helper_loader'];
+        }
     }
 
     public function toPhp() {
         $this->Parser = new AkSintagsParser();
+        if(!empty($this->_helper_loader)){
+            $this->Parser->setHelperLoader($this->_helper_loader);
+        }
         return $this->Parser->parse($this->_code);
     }
 
