@@ -837,23 +837,6 @@ class Image_Transform
     }
 
     /**
-     * Saves image to file
-     *
-     * Place holder for the real save method
-     * used by extended methods to do the resizing
-     *
-     * @param string $filename Filename to save image to
-     * @param string $type Format of image to save as
-     * @param mixed  $quality Format-dependent
-     * @return PEAR_error
-     * @access public
-     */
-    function save($filename, $type, $quality = null) {
-        return PEAR::raiseError('save() method not supported by driver',
-            IMAGE_TRANSFORM_ERROR_UNSUPPORTED);
-    }
-
-    /**
      * Releases resource
      *
      * Place holder for the real free method

@@ -11,9 +11,9 @@ class Memcached_TestCase extends ActiveSupportUnitTest
         parent::__construct();
         $this->memcached_enabled = AkConfig::getOption('memcached_enabled', AkMemcache::isServerUp());
     }
-    
+
     public function skip(){
-        $this->skipIf(!$this->memcached_enabled, '['.get_class($this).'] Can\'t connecto to memcached server.');
+        $this->skipIf(!$this->memcached_enabled, '['.get_class($this).'] Can\'t connec to to memcached server.');
     }
 
     public function setUp() {

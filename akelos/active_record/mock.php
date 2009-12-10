@@ -108,7 +108,7 @@ class AkActiveRecordMock
         return false;
     }
 
-    protected function addAssociated($association_id, $handler_name) {
+    public function addAssociated($association_id, $handler_name) {
         if ($association_id != $handler_name) {
             $this->$handler_name = new AkActiveRecordMockHandler($this,$association_id);
         }

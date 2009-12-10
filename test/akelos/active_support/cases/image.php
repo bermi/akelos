@@ -20,11 +20,13 @@ class Image_TestCase extends ActiveSupportUnitTest
         }
     }
 
-    public function __destruct() {        
+    public function __destruct() {
         Ak::directory_delete(AkConfig::getDir('fixtures').DS.'Image_TestCase');
     }
 
     public function skip(){
+
+        $this->skipIf(!function_exists('gd_info'), '['.get_class($this).'] GD is not available.');
         $this->skipIf($this->offline_mode, '['.get_class($this).'] Internet connection unavailable, can\'t download remote images.');
     }
 
