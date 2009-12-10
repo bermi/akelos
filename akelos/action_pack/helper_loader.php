@@ -51,6 +51,7 @@ class AkHelperLoader
     public function instantiateHelpersAsHandlerAttributes($helpers = array()) {
         $helpers_dir = AkConfig::getDir('helpers');
         foreach ($helpers as $file=>$helper){
+            if (empty($helper)) continue;
             $helper_class_name = AkInflector::camelize(AkInflector::demodulize(strstr($helper, 'Helper') ? $helper : $helper.'Helper'));
             $helper_file_name = AkInflector::underscore($helper_class_name);
             if(is_int($file)){
@@ -175,7 +176,7 @@ class AkHelperLoader
             $selected_helper_names = array();
             foreach (Ak::toArray($handler->plugin_helpers) as $helper_name){
                 $helper_name = AkInflector::camelize($helper_name);
-                if($path = array_shift(array_keys($helper_names, AkInflector::camelize($helper_name)))){
+                if($path = Ak::first(array_keys($helper_names, AkInflector::camelize($helper_name)))){
                     $selected_helper_names[$path] = $helper_names[$path];
                 }
             }
@@ -200,6 +201,60 @@ class AkHelperLoader
         );
         $options = array_merge($default_options, $options);
         $helpers[$options['path']] = $helper_name;
+    }
+
+    public function getHelperFileName($file_name){
+        if(is_file($file_name)){
+            return $file_name;
+        }
+        $file_name = AkInflector::underscore($file_name);
+        if(!strstr($file_name, '.php')){
+            $file_name = $file_name.'.php';
+        }
+        foreach ($this->getHeperBasePaths() as $base_path){
+            if(!strstr($file_name, $base_path)){
+                if(is_file($base_path.DS.$file_name)){
+                    return $base_path.DS.$file_name;
+                }
+            }
+        }
+        return false;
+    }
+
+    public function getHeperBasePaths(){
+        $paths = array(
+        AK_HELPERS_DIR,
+        AK_ACTION_PACK_DIR.DS.'helpers'
+        );
+        if(!empty($this->_Controller)){
+            $module_name = $this->_Controller->getModuleName();
+            if(!empty($module_name)){
+                $paths[] = AK_HELPERS_DIR.DS.AkInflector::underscore($module_name);
+            }
+        }
+        return $paths;
+    }
+
+
+    public function instantiateHelperAsHandlerAttribute($helper, $file){
+        $helper_class_name = AkInflector::camelize(strstr($helper, 'Helper') ? $helper : $helper.'Helper');
+        if(!$file_path = $this->getHelperFileName($file)){
+            return false;
+        }
+        include_once($file_path);
+        if(class_exists($helper_class_name)){
+            $attribute_name = Ak::last(explode(DS, substr($file_path,0,-4)));
+            $this->_Handler->$attribute_name = new $helper_class_name($this->_Handler);
+            if(method_exists($this->_Handler->$attribute_name,'setController')){
+                $this->_Handler->$attribute_name->setController($this->_Handler);
+            }elseif(method_exists($this->_Handler->$attribute_name,'setMailer')){
+                $this->_Handler->$attribute_name->setMailer($this->_Handler);
+            }
+            if(method_exists($this->_Handler->$attribute_name,'init')){
+                $this->_Handler->$attribute_name->init();
+            }
+            $this->_HelperInstances[$attribute_name] = $this->_Handler->$attribute_name;
+        }
     }
 }
 

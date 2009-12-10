@@ -65,7 +65,7 @@ class AkSintagsParser
                 $this->output .= '<?php ';
                 break;
             case AK_LEXER_UNMATCHED:
-                $match = ltrim($match);
+                $match = preg_replace('/\$([\w_]+_helper)->/i', '$controller->$1->', ltrim($match));
                 if(!empty($match)){
                     if(substr($match,0,3) == 'php'){
                         $match = substr($match,3);
@@ -130,7 +130,7 @@ class AkSintagsParser
         switch ($state){
             case AK_LEXER_ENTER:
                 $this->_translation_tokens = array();
-                $this->output .= '<?php echo $text_helper->translate(\'';
+                $this->output .= '<?php echo $controller->text_helper->translate(\'';
                 break;
             case AK_LEXER_UNMATCHED:
                 $this->output.= $this->_unescapeChars(str_replace("'","\'",$match), true);
@@ -150,7 +150,7 @@ class AkSintagsParser
         switch ($state){
             case AK_LEXER_ENTER:
                 $this->_translation_tokens = array();
-                $this->output .= '$text_helper->translate(\'';
+                $this->output .= '$controller->text_helper->translate(\'';
                 break;
             case AK_LEXER_UNMATCHED:
                 $this->output.= $this->_unescapeChars($match, false);
@@ -176,7 +176,7 @@ class AkSintagsParser
             if($match[1] != '\\' && !strstr($php_variable, '$params[')){
                 $this->_translation_tokens[] = '\''.$match.'\' => @'.$php_variable;
             }else{
-                $this->_translation_tokens[] = '\''.$match.'\' => $text_helper->h(@'.$php_variable.')';
+                $this->_translation_tokens[] = '\''.$match.'\' => $controller->text_helper->h(@'.$php_variable.')';
             }
         }
         return true;
@@ -189,7 +189,7 @@ class AkSintagsParser
     public function VariableTranslation($match, $state) {
         $php_variable = $this->_convertSintagsVarToPhp(trim($match,'{_}?'));
         if($php_variable){
-            $this->output .= '<?php echo empty('.$php_variable.') || is_object('.$php_variable.') ? \'\' : $text_helper->translate('.$php_variable.'); ?>';
+            $this->output .= '<?php echo empty('.$php_variable.') || is_object('.$php_variable.') ? \'\' : $controller->text_helper->translate('.$php_variable.'); ?>';
         }else{
             $this->output .= $match;
         }
@@ -206,7 +206,7 @@ class AkSintagsParser
         $php_variable = $this->_convertSintagsVarToPhp(trim($match,'{}?'));
         if($php_variable){
             $this->output .= '<?php echo empty('.$php_variable.') ? \'\' : '.
-            ($_skip_sanitizing ? $php_variable : '$text_helper->h('.$php_variable.')').
+            ($_skip_sanitizing ? $php_variable : '$controller->text_helper->h('.$php_variable.')').
             '; ?>';
         }else{
             $this->output .= $match;
@@ -224,7 +224,7 @@ class AkSintagsParser
         $_skip_sanitizing = ($match[1] != '\\');
         $php_variable = $this->_convertSintagsVarToPhp($match);
         if($php_variable){
-            $this->output .= $_skip_sanitizing ? '<?php echo '.$php_variable.'; ?>' :  '<?php echo $text_helper->h('.$php_variable.'); ?>';
+            $this->output .= $_skip_sanitizing ? '<?php echo '.$php_variable.'; ?>' :  '<?php echo $controller->text_helper->h('.$php_variable.'); ?>';
         }else{
             $this->output .= $match;
         }
@@ -358,7 +358,11 @@ class AkSintagsParser
                     if(!strpos($helper, 'helper')){
                         $method_name = AkInflector::variablize($method_name);
                     }
-                    $this->output .= "\${$helper}->$method_name(";
+                    if($helper == 'controller'){
+                        $this->output .= "\$controller->$method_name(";
+                    }else{
+                        $this->output .= "\$controller->{$helper}->$method_name(";
+                    }
                     return true;
                 }else{
                     $this->addError(Ak::t('Could not find a helper to handle the method "%method" you called in your view', array('%method'=>$method_name)));
@@ -645,12 +649,14 @@ class AkSintagsParser
             if(defined('AK_SINTAGS_AVALABLE_HELPERS')){
                 $helpers = unserialize(AK_SINTAGS_AVALABLE_HELPERS);
             }else{
+	            $AkHelperLoader = Ak::getStaticVar('AkHelperLoader');
+                $AkHelperLoader->instantiateHelpers();
                 if($underscored_helper_names = AkHelperLoader::getInstantiatedHelperNames()){
                     foreach ($underscored_helper_names as $underscored_helper_name){
                         $helper_class_name = AkInflector::camelize($underscored_helper_name);
                         if(class_exists($helper_class_name)){
                             $methods = get_class_methods($helper_class_name);
-                            $vars=get_class_vars($helper_class_name);
+                            $vars = get_class_vars($helper_class_name);
                             if (AK_PHP5 && isset($vars['dynamic_helpers'])) {
                                 $dynamic_helpers = Ak::toArray($vars['dynamic_helpers']);
                                 foreach ($dynamic_helpers as $method_name){

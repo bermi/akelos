@@ -109,7 +109,11 @@ class AkActionController extends AkLazyObject
 
     public $_request_id = -1;
 
-    protected $_report_undefined_attributes = false;
+    protected
+
+    $_report_undefined_attributes = false,
+    $_dynamic_attributes = array(),
+    $_dynamic_methods = array();
 
     public function init($options = array()) {
         if(isset($this->_inited)){
@@ -351,9 +355,7 @@ class AkActionController extends AkLazyObject
      * Helpers can be found at lib/AkActionView/helpers (this might change in a future)
      */
     public function instantiateHelpers() {
-        $HelperLoader = new AkHelperLoader();
-        $HelperLoader->setController($this);
-        $HelperLoader->instantiateHelpers();
+        Ak::setStaticVar('AkHelperLoader', $this->getHelperLoader());
     }
 
     public function getCurrentControllerHelper() {
@@ -367,17 +369,16 @@ class AkActionController extends AkLazyObject
         return array();
     }
 
-    public function getModuleHelper() {
-        $this->getControllerName(); // module name is set when we first retrieve the controller name
-        if(!empty($this->module_name)){
-            $helper_file_name = AK_HELPERS_DIR.DS.AkInflector::underscore($this->module_name).'_helper.php';
+    public function getModuleHelper(){
+        $module_name = $this->getModuleName();
+        if(!empty($module_name)){
+            $helper_file_name = AK_HELPERS_DIR.DS.AkInflector::underscore($module_name).'_helper.php';
             if(file_exists($helper_file_name)){
-                return array($helper_file_name => $this->module_name);
+                return array($helper_file_name => $module_name);
             }
         }
         return array();
     }
-
 
     public function _validateGeneratedXhtml() {
         $XhtmlValidator = new AkXhtmlValidator();
@@ -878,7 +879,10 @@ class AkActionController extends AkLazyObject
         return $included_controllers[$key];
     }
 
-    public function getModuleName() {
+    public function getModuleName(){
+        if(empty($this->module_name)){
+            $this->getControllerName(); // module name is set when we first retrieve the controller name
+        }
         return $this->module_name;
     }
 
@@ -2179,5 +2183,37 @@ class AkActionController extends AkLazyObject
      * #
      * ########################################################################
      */
+
+
+    // Lazy helper loading
+
+    public function __get($attribute)
+    {
+        if(preg_match('/^(.+)_helper$/', $attribute, $matches)){
+            $this->getHelperLoader()->instantiateHelperAsHandlerAttribute($matches[1], $matches[0]);
+            if(isset($this->$attribute)){
+                return $this->$attribute;
+            }
+        }
+        if(!isset($this->_dynamic_attributes[$attribute])){
+            return parent::__get($attribute);
+        }
+        return $this->_dynamic_attributes[$attribute];
+    }
+
+    public function __set($attribute, $value)
+    {
+        $this->_dynamic_attributes[$attribute] = $value;
+        $this->$attribute = $value;
+    }
+
+    function &getHelperLoader()
+    {
+        if(empty($this->_HelperLoader)){
+            $this->_HelperLoader = new AkHelperLoader();
+            $this->_HelperLoader->setController($this);
+        }
+        return $this->_HelperLoader;
+    }
 }
 

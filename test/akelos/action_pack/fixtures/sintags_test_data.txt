@@ -1,12 +1,12 @@
 
 
-<?php 
+<?php
 echo "{@url_for controller:page}";
 ?>
 
 -----------------------------------
 
-<?php  
+<?php
 echo "{@url_for controller:page}";
 ?>
 
@@ -17,19 +17,19 @@ echo "{@url_for controller:page}";
 
 -----------------------------------
 
-<h1><?php echo $text_helper->translate('Ain\'t easy to translate text?', array()); ?></h1>
+<h1><?php echo $controller->text_helper->translate('Ain\'t easy to translate text?', array()); ?></h1>
 
 
 
 ===================================
 
-_{<p>It's really simple even to add 
+_{<p>It's really simple even to add
 <a href='http://google.co.uk'>Localized links</a>
 </p>}
 
 -----------------------------------
 
-<?php echo $text_helper->translate('<p>It\'s really simple even to add 
+<?php echo $controller->text_helper->translate('<p>It\'s really simple even to add
 <a href=\'http://google.co.uk\'>Localized links</a>
 </p>', array()); ?>
 
@@ -41,7 +41,7 @@ _{I need to print \{something_inside_curly_brackets\}. _\{Maybe a multilingual t
 
 -----------------------------------
 
-<?php echo $text_helper->translate('I need to print {something_inside_curly_brackets}. _{Maybe a multilingual text example} ', array()); ?>
+<?php echo $controller->text_helper->translate('I need to print {something_inside_curly_brackets}. _{Maybe a multilingual text example} ', array()); ?>
 
 
 
@@ -154,7 +154,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 -----------------------------------
 
 
-<?php echo empty($post->comment) || is_object($post->comment) ? '' : $text_helper->translate($post->comment); ?>
+<?php echo empty($post->comment) || is_object($post->comment) ? '' : $controller->text_helper->translate($post->comment); ?>
 
 
 
@@ -282,7 +282,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 -----------------------------------
 
 
-<?php 
+<?php
  empty($posts) ? null : $post_loop_counter = 0;
  empty($posts) ? null : $posts_available = count($posts);
  if(!empty($posts))
@@ -306,7 +306,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 -----------------------------------
 
 
-<?php 
+<?php
  empty($posts) ? null : $post_loop_counter = 0;
  empty($posts) ? null : $posts_available = count($posts);
  if(!empty($posts))
@@ -326,7 +326,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 
 -----------------------------------
 
-<?php if(!empty($company)) { ?><?php 
+<?php if(!empty($company)) { ?><?php
  empty($people) ? null : $person_loop_counter = 0;
  empty($people) ? null : $people_available = count($people);
  if(!empty($people))
@@ -344,7 +344,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 
 -----------------------------------
 
-<h1><?php echo $text_helper->translate('You can use %variables using the %sintags.variable-naming-way', array('%variables' => @$variables, '%sintags.variable-naming-way' => @$sintags->variable['naming']['way'])); ?></h1>
+<h1><?php echo $controller->text_helper->translate('You can use %variables using the %sintags.variable-naming-way', array('%variables' => @$variables, '%sintags.variable-naming-way' => @$sintags->variable['naming']['way'])); ?></h1>
 
 
 ===================================
@@ -353,7 +353,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 
 -----------------------------------
 
-<h1><?php echo $text_helper->translate('Mixing %variables and %escaped_variables', array('%variables' => @$variables)); ?></h1>
+<h1><?php echo $controller->text_helper->translate('Mixing %variables and %escaped_variables', array('%variables' => @$variables)); ?></h1>
 
 
 ===================================
@@ -383,7 +383,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 
 -----------------------------------
 
-<?php 
+<?php
  empty($items['directories']) ? null : $directory_loop_counter = 0;
  empty($items['directories']) ? null : $directories_available = count($items['directories']);
  if(!empty($items['directories']))
@@ -412,7 +412,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 
 -----------------------------------
 
-<?php 
+<?php
  empty($Post->author->friends) ? null : $friend_loop_counter = 0;
  empty($Post->author->friends) ? null : $friends_available = count($Post->author->friends);
  if(!empty($Post->author->friends))
@@ -433,7 +433,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 
 -----------------------------------
 
-<?php 
+<?php
  empty($Post->versions) ? null : $Post_loop_counter = 0;
  empty($Post->versions) ? null : $Posts_available = count($Post->versions);
  if(!empty($Post->versions))
@@ -453,7 +453,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 
 -----------------------------------
 
-<?php echo $text_helper->h($comment); ?>
+<?php echo $controller->text_helper->h($comment); ?>
 
 
 ===================================
@@ -463,7 +463,7 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 
 -----------------------------------
 
-<?php echo $text_helper->h($comment->one); ?>
+<?php echo $controller->text_helper->h($comment->one); ?>
 
 ===================================
 
@@ -472,18 +472,18 @@ This {should} {be?} {ignored}. _{Multilingual block} _{escaped using} {?backslas
 
 -----------------------------------
 
-<?php echo $text_helper->h($comment['two']); ?>
+<?php echo $controller->text_helper->h($comment['two']); ?>
 
 
 
 ===================================
- 
- 
+
+
 _{Signed up using %params-email address}
 
 -----------------------------------
 
-<?php echo $text_helper->translate('Signed up using %params-email address', array('%params-email' => $text_helper->h(@$params['email']))); ?>
+<?php echo $controller->text_helper->translate('Signed up using %params-email address', array('%params-email' => $controller->text_helper->h(@$params['email']))); ?>
 
 
 ===================================
@@ -493,7 +493,7 @@ _{Signed up using %\email address}
 
 -----------------------------------
 
-<?php echo $text_helper->translate('Signed up using %\email address', array('%\email' => $text_helper->h(@$email))); ?>
+<?php echo $controller->text_helper->translate('Signed up using %\email address', array('%\email' => $controller->text_helper->h(@$email))); ?>
 
 
 

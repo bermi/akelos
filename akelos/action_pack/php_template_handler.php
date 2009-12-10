@@ -141,7 +141,7 @@ class AkPhpTemplateHandler
 
     public function _getHelpersChecksum() {
         if(!isset($this->_helpers_checksum)){
-            $this->_helpers_checksum = md5(serialize(AkHelperLoader::getInstantiatedHelperNames()));
+            $this->_helpers_checksum = md5('v1'.serialize(AkHelperLoader::getInstantiatedHelperNames()));
         }
         return $this->_helpers_checksum;
     }

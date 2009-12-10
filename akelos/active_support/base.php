@@ -1978,8 +1978,10 @@ class Ak
      * On Akelos we can do Ak::get('Model')->find();
      */
     static function get($model_name, $attributes = array()) {
-        Ak::import($model_name);
-        return new $model_name($attributes);
+        $model_name = Ak::first(Ak::import($model_name));
+        if(!empty($model_name)){
+            return new $model_name($attributes);
+        }
     }
 
     /**
