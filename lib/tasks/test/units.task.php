@@ -14,7 +14,7 @@ if($db_type = empty($options['db']) ? false :  $options['db']){
     define('AK_DATABASE_SETTINGS_NAMESPACE', $db_type);
     unset($options['db']);
 }
-$valid_options = array('config', 'base_path', 'namespace', 'TestSuite', 'reporter', 'files');
+$valid_options = array('config', 'base_path', 'namespace', 'TestSuite', 'reporter', 'files', 'on_success', 'on_failure');
 
 $options['files'] = array();
 $component = '';

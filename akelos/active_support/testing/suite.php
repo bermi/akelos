@@ -128,7 +128,7 @@ class AkUnitTestSuite extends TestSuite
         }
 
         //($options['TestSuite']->run(new $options['reporter']()) ? 0 : 1); file_put_contents(AK_LOG_DIR.DS.'included_files.php', var_export(get_included_files(), true)); return;
-        exit ($options['TestSuite']->run(new $options['reporter']()) ? 0 : 1);
+        exit ($options['TestSuite']->run(new $options['reporter']()) ? $this->_runOnFailure(@$options['on_failure']) : $this->_runOnSuccess(@$options['on_success']));
     }
 
     static function createTestingDatabaseIfNotAvailable() {
@@ -256,5 +256,18 @@ class AkUnitTestSuite extends TestSuite
             echo "No files in : ".$this->title."\n";
 
         }
+    }
+    
+    private function _runOnSuccess($command){
+        if(!empty($command)){
+            `$command`;
+        }
+        return 1;
+    }
+    private function _runOnFailure($command){
+        if(!empty($command)){
+            `$command`;
+        }
+        return 0;
     }
 }
