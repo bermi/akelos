@@ -3,3 +3,5 @@
    RewriteRule    ^$ public/    [L]
    RewriteRule    (.*) public/$1 [L]
 </IfModule>
+
+ErrorDocument 500 "<h2>Apache server error</h2>Akelos application failed to start properly"

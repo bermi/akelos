@@ -5,3 +5,5 @@
 order deny,allow
 deny from all
 allow from localhost 127.0.0.1 ::1
+
+ErrorDocument 403 "<h1>Access forbidden! 403</h1><p>Akelos web testing folder can only accessed from localhost as defined in test/.htaccess</p>"
