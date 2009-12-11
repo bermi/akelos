@@ -70,6 +70,8 @@ defined('AK_PUBLIC_DIR')            || define('AK_PUBLIC_DIR',          AK_BASE_
 defined('AK_TEST_DIR')              || define('AK_TEST_DIR',            AK_BASE_DIR.DS.'test');
 defined('AK_SCRIPT_DIR')            || define('AK_SCRIPT_DIR',          AK_BASE_DIR.DS.'script');
 defined('AK_APP_VENDOR_DIR')        || define('AK_APP_VENDOR_DIR',      AK_BASE_DIR.DS.'vendor');
+defined('AK_APP_LIB_DIR')           || define('AK_APP_LIB_DIR',         AK_BASE_DIR.DS.'lib');
+defined('AK_TASKS_DIR')             || define('AK_TASKS_DIR',           AK_APP_LIB_DIR.DS.'tasks');
 
 defined('AK_APIS_DIR')              || define('AK_APIS_DIR',            AK_APP_DIR.DS.'apis');
 defined('AK_MODELS_DIR')            || define('AK_MODELS_DIR',          AK_APP_DIR.DS.'models');
@@ -82,7 +84,7 @@ defined('AK_APP_INSTALLERS_DIR')    || define('AK_APP_INSTALLERS_DIR',  AK_APP_D
 
 defined('AK_PLUGINS_DIR')           || define('AK_PLUGINS_DIR', AK_APP_VENDOR_DIR.DS.'plugins');
 defined('AK_PLUGINS')               || define('AK_PLUGINS', 'auto');
-defined('AK_GENERATORS_DIR')        || define('AK_GENERATORS_DIR', AK_ACTIVE_SUPPORT_DIR.DS.'generators');
+defined('AK_GENERATORS_DIR')        || define('AK_GENERATORS_DIR', AK_TASKS_DIR.DS.'generate'.DS.'generators');
 
 defined('AK_TMP_DIR')               || define('AK_TMP_DIR', Ak::get_tmp_dir_name());
 defined('AK_COMPILED_VIEWS_DIR')    || define('AK_COMPILED_VIEWS_DIR', AK_TMP_DIR.DS.'views');

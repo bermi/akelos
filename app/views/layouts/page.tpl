@@ -5,7 +5,7 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <title>_{Akelos Framework}</title>
     <style type="text/css" media="screen">
-        body {
+body {
             margin: 0;
             margin-bottom: 25px;
             padding: 0;
@@ -41,7 +41,7 @@
             background: #fff url('images/akelos_framework_logo.png') 10px 40px no-repeat;
             border: 3px solid #aaa;
             border-top: none;
-            padding: 25px;
+            padding: 145px 25px 25px 25px;
             width: 650px;
           }
 

@@ -24,7 +24,7 @@ class MakelosRequest
 
     public function parse($arguments) {
         $task_set = false;
-
+        $argv = $arguments;
         while(!empty($arguments)){
             $argument = array_shift($arguments);
             /**
@@ -240,7 +240,12 @@ class Makelos
         $task_name = str_replace(':', DS, $task_name);
         $Makelos = $this;
         $Logger = Ak::getLogger('makelos'.DS.AkInflector::underscore($task_name));
-        foreach (glob(AK_TASKS_DIR.DS.$task_name.'*.task.*') as $file){
+        foreach (
+        array_diff(array_merge(
+            glob(AK_TASKS_DIR.DS.$task_name.'*.task.*'),
+            glob(AK_TASKS_DIR.DS.$task_name.DS.$task_name.'*.task.*') 
+        ), array(''))
+        as $file){
             $pathinfo = @pathinfo($file);
             if(@$pathinfo['extension'] == 'php'){
                 include($file);
@@ -290,7 +295,8 @@ class Makelos
         $task_names = strstr($task_name, ',') ? array_map('trim', explode(',', $task_name)) : array($task_name);
         foreach ($task_names as $task_name) {
             $task_files = glob(AK_TASKS_DIR.DS.str_replace(':',DS, $task_name.'.task*.*'));
-
+            $task_files = array_merge($task_files, glob(AK_TASKS_DIR.DS.$task_name.DS.str_replace(':',DS, $task_name.'.task*.*')));
+            $task_files = array_diff($task_files, array(''));
             if(empty($options['run']) && empty($task_files)){
                 $this->error("No task file found for $task_name in ".AK_TASKS_DIR, true);
             }

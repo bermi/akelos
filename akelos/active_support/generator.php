@@ -16,7 +16,8 @@ class AkelosGenerator
         $generator_file_name = Ak::first(array_keys($available_generators, $generator_name));
 
         if(empty($generator_file_name)){
-            echo "\n   ".Ak::t("You must supply a valid generator as the first command.\n\n   Available generator are:");
+            echo "\n   ".Ak::t("You must supply a valid generator as the first command.\n".
+                 "          (i.e. # ./makelos generate controller)\n\n   Available generator are:");
             echo "\n\n   ".join("\n   ", $available_generators)."\n\n";
             defined('AK_CONSOLE_MODE') && AK_CONSOLE_MODE ? null : exit;
             return ;

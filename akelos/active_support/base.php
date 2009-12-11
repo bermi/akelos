@@ -2158,7 +2158,7 @@ class Ak
             'AkNumber'                  => 'active_support/core/types/number.php',
             'AkString'                  => 'active_support/core/types/string.php',
             'AkTime'                    => 'active_support/core/types/time.php',
-            'AkelosGenerator'           => 'active_support/generators/base.php',
+            'AkelosGenerator'           => 'active_support/generator.php',
             'AkCharset'                 => 'active_support/i18n/charset/base.php',
             'AkCountries'               => 'active_support/i18n/countries.php',
             'AkLocaleManager'           => 'active_support/i18n/locale_manager.php',
