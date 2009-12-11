@@ -2,7 +2,7 @@
 
 if(isset($options['ci'])){
     unset($options['ci']);
-    $options['reporter'] = 'JUnitXMLReporter';
+    $options['reporter'] = 'AkXUnitXmlReporter';
 }
 
 if(isset($options['verbose'])){
@@ -10,16 +10,11 @@ if(isset($options['verbose'])){
     $options['reporter'] = 'AkelosVerboseTextReporter';
 }
 
-if($reporter = empty($options['reporter']) ? false :  $options['reporter']){
-    unset($options['reporter']);
-}
-
 if($db_type = empty($options['db']) ? false :  $options['db']){
     define('AK_DATABASE_SETTINGS_NAMESPACE', $db_type);
     unset($options['db']);
 }
-
-$valid_options = array('config', 'base_path', 'namespace', 'TestSuite', 'reporter'  => 'TextReporter', 'files');
+$valid_options = array('config', 'base_path', 'namespace', 'TestSuite', 'reporter', 'files');
 
 $options['files'] = array();
 $component = '';

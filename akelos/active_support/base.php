@@ -2185,6 +2185,7 @@ class Ak
             'AkTestApplication'         => 'active_support/testing/application.php',
             'AkelosTextReporter'        => 'active_support/testing/base.php',
             'AkelosVerboseTextReporter' => 'active_support/testing/base.php',
+            'AkXUnitXmlReporter'        => 'active_support/testing/base.php',
             'AkUnitTest'                => 'active_support/testing/base.php',
             'AkWebTestCase'             => 'active_support/testing/base.php',
             'AkTestDispatcher'          => 'active_support/testing/dispatcher.php',

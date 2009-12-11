@@ -503,3 +503,104 @@ class AkelosVerboseTextReporter extends AkelosTextReporter {
         }
     }
 }
+
+class AkXUnitXmlReporter extends SimpleReporter {
+    private 
+    $_fp;
+    
+    function __construct() {
+        parent::__construct();
+        $this->doc = new DOMDocument();
+        $this->doc->loadXML('<testsuite/>');
+        $this->root = $this->doc->documentElement;
+        $file_path = AkConfig::getOption('report_path', AK_BASE_DIR.DS.'reports'.DS.'units.xml');
+        Ak::file_put_contents($file_path, "<?xml version=\"1.0\"?>\n");
+        $this->_fp = @fopen($file_path, 'a');
+    }
+    
+    function __destruct(){
+        @fclose($this->_fp);
+    }
+
+    function paintHeader($test_name) {
+        $this->testsStart = microtime(true);       
+        $this->root->setAttribute('name', $test_name);
+        $this->root->setAttribute('timestamp', date('c'));
+        $this->root->setAttribute('hostname', 'localhost');
+    }
+
+    /**
+     *    Paints the end of the test with a summary of
+     *    the passes and failures.
+     *    @param string $test_name        Name class of test.
+     *    @access public
+     */
+    function paintFooter($test_name) {
+        $duration = microtime(true) - $this->testsStart;
+        $this->root->setAttribute('tests', $this->getPassCount() + $this->getFailCount() + $this->getExceptionCount());
+        $this->root->setAttribute('failures', $this->getFailCount());
+        $this->root->setAttribute('errors', $this->getExceptionCount());
+        $this->root->setAttribute('time', $duration);
+        
+        $this->doc->formatOutput = true;
+        $xml = $this->doc->saveXML();
+        // Cut out XML declaration
+        @fwrite($this->_fp, preg_replace('/<\?[^>]*\?>/', "", $xml));
+    }
+    
+    function paintCaseStart($case) {
+        $this->currentCaseName = $case;
+    }
+
+    function paintCaseEnd($case) {
+        // No output here
+    }
+    
+    function paintMethodStart($test) {
+        $this->methodStart = microtime(true);
+        $this->currCase = $this->doc->createElement('testcase');
+    }
+    
+    function paintMethodEnd($test) {
+        $duration = microtime(true) - $this->methodStart;
+        
+        $this->currCase->setAttribute('name', $test);
+        $this->currCase->setAttribute('classname', $this->currentCaseName);
+        $this->currCase->setAttribute('time', $duration);
+        $this->root->appendChild($this->currCase);
+    }
+    
+    function paintFail($message) {
+        parent::paintFail($message);
+
+        error_log("Failure: " . $message);
+        $this->terminateAbnormally($message);
+    }
+    
+    function paintException($exception) {
+        parent::paintException($exception);
+        
+        error_log("Exception: " . $exception);
+        $this->terminateAbnormally($exception);
+    }
+    
+    function terminateAbnormally($message) {
+        if (!$this->currCase) {
+            error_log("!! currCase was not set.");
+            return;
+        }
+
+        $ch = $this->doc->createElement('failure');
+        $breadcrumb = $this->getTestList();
+        $ch->setAttribute('message', $breadcrumb[count($breadcrumb)-1]);
+        $ch->setAttribute('type', $breadcrumb[count($breadcrumb)-1]);
+        
+        $message = implode(' -> ', $breadcrumb) . "\n\n\n" . $message;
+        $content = $this->doc->createTextNode($message);
+        $ch->appendChild($content);
+        
+        $this->currCase->appendChild($ch);
+    }
+    
+}
+
