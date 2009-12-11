@@ -63,40 +63,6 @@ class AkelosGenerator
 
     }
 
-    public function _identifyUnnamedCommands(&$commands) {
-        $i = 0;
-        $extra_commands = array();
-        $unnamed_commands = array();
-        foreach ($commands as $param=>$value){
-            if($value[0] == '-'){
-                $next_is_value_for = trim($value,'- ');
-                $extra_commands[$next_is_value_for] = true;
-                continue;
-            }
-
-            if(isset($next_is_value_for)){
-                $extra_commands[$next_is_value_for] = trim($value,'- ');
-                unset($next_is_value_for);
-                continue;
-            }
-
-            if(is_numeric($param)){
-                if(!empty($this->command_values[$i])){
-                    $index =$this->command_values[$i];
-                    if(substr($this->command_values[$i],0,7) == '(array)'){
-                        $index =substr($this->command_values[$i],7);
-                        $unnamed_commands[$index][] = $value;
-                        $i--;
-                    }else{
-                        $unnamed_commands[$index] = $value;
-                    }
-                }
-                $i++;
-            }
-        }
-        $commands = array_merge($extra_commands, $unnamed_commands);
-    }
-
     public function render($template, $sintags_version = false) {
         $__file_path = $this->generators_dir.DS.$this->type.DS.($sintags_version?'sintags_':'').'templates'.DS.(strstr($template,'.') ? $template : $template.'.tpl');
         if(!file_exists($__file_path)){
@@ -122,18 +88,6 @@ class AkelosGenerator
             echo join("\n",$this->log)."\n";
         }
         $this->log = array();
-    }
-
-    public function _generate() {
-        if(isset($this->_template_vars['force']) || !$this->hasCollisions()){
-            $this->generate();
-            $this->printLog();
-        }else{
-            echo "\n".Ak::t('There where collisions when attempting to generate the %type.',array('%type'=>$this->type))."\n";
-            echo Ak::t('Please add --force to the argument list in order to overwrite existing files.')."\n\n";
-
-            echo join("\n",$this->collisions)."\n";
-        }
     }
 
     public function hasCollisions() {
@@ -170,22 +124,6 @@ class AkelosGenerator
         return $params;
     }
 
-    public function _addAmpersands($array) {
-        $ret = array();
-        foreach ($array as $arr){
-            $ret[] = '&'.trim($arr);
-        }
-        return $ret;
-    }
-
-    public function _maskAmpersands($str) {
-        return str_replace('&','___AMP___',$str);
-    }
-
-    public function _unmaskAmpersands($str) {
-        return str_replace('___AMP___','&',$str);
-    }
-
     public function manifest($call_generate = true) {
         return $call_generate ? $this->generate() : null;
     }
@@ -198,12 +136,74 @@ class AkelosGenerator
         $usage = @file_get_contents(@$this->_generator_base_path.DS.'USAGE');
         echo empty($usage) ? "\n".Ak::t('Could not locate usage file for this generator') : "\n".$usage."\n";
     }
+    
+    private function _identifyUnnamedCommands(&$commands) {
+        $i = 0;
+        $extra_commands = array();
+        $unnamed_commands = array();
+        foreach ($commands as $param=>$value){
+            if($value[0] == '-'){
+                $next_is_value_for = trim($value,'- ');
+                $extra_commands[$next_is_value_for] = true;
+                continue;
+            }
 
-    public function _getAvailableGenerators() {
+            if(isset($next_is_value_for)){
+                $extra_commands[$next_is_value_for] = trim($value,'- ');
+                unset($next_is_value_for);
+                continue;
+            }
+
+            if(is_numeric($param)){
+                if(!empty($this->command_values[$i])){
+                    $index =$this->command_values[$i];
+                    if(substr($this->command_values[$i],0,7) == '(array)'){
+                        $index =substr($this->command_values[$i],7);
+                        $unnamed_commands[$index][] = $value;
+                        $i--;
+                    }else{
+                        $unnamed_commands[$index] = $value;
+                    }
+                }
+                $i++;
+            }
+        }
+        $commands = array_merge($extra_commands, $unnamed_commands);
+    }
+    
+    private function _generate() {
+        if(isset($this->_template_vars['force']) || !$this->hasCollisions()){
+            $this->generate();
+            $this->printLog();
+        }else{
+            echo "\n".Ak::t('There where collisions when attempting to generate the %type.',array('%type'=>$this->type))."\n";
+            echo Ak::t('Please add --force to the argument list in order to overwrite existing files.')."\n\n";
+
+            echo join("\n",$this->collisions)."\n";
+        }
+    }
+
+    private function _addAmpersands($array) {
+        $ret = array();
+        foreach ($array as $arr){
+            $ret[] = '&'.trim($arr);
+        }
+        return $ret;
+    }
+
+    private function _maskAmpersands($str) {
+        return str_replace('&','___AMP___',$str);
+    }
+
+    private function _unmaskAmpersands($str) {
+        return str_replace('___AMP___','&',$str);
+    }
+
+    private function _getAvailableGenerators() {
         return array_merge($this->_getGeneratorsInsidePath($this->generators_dir), $this->_getPluginGenerators());
     }
 
-    public function _getPluginGenerators() {
+    private function _getPluginGenerators() {
         $generators = array();
         defined('AK_PLUGINS_DIR') ? null : define('AK_PLUGINS_DIR', AkConfig::getDir('app').DS.'vendor'.DS.'plugins');
         foreach (Ak::dir(AK_PLUGINS_DIR,array('files'=>false,'dirs'=>true)) as $folder){
@@ -213,7 +213,7 @@ class AkelosGenerator
         return $generators;
     }
 
-    public function _getGeneratorsInsidePath($path) {
+    private function _getGeneratorsInsidePath($path) {
         $generators = array();
         if(is_dir($path)){
             foreach (Ak::dir($path,array('files'=>false,'dirs'=>true)) as $folder){
