@@ -25,7 +25,6 @@ class TestingFiltersUtitlityClass extends AkActionController
     public function Q(){ $this->message .= 'Q';}
     public function R(){ $this->message .= 'R';}
     public function S(){ $this->message .= 'S';}
-    public function T($a = null, $b = null, $c = null){ $this->message .= 'T';}
     public function U(){ $this->message .= 'U';}
     public function V(){ $this->message .= 'V';}
     public function W(){ $this->message .= 'W';}
