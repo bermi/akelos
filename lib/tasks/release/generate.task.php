@@ -66,6 +66,8 @@ if($options['revision'] == 'HEAD' && preg_match('/commit (.+)/', `git log --no-c
     $options['revision'] = $matches[1];
 }
 
+$options['revision'] = trim($options['revision'], '. ');
+
 $options['commit'] = isset($options['commit']) ? $is_akelos_core : false;
 
 $version_file = empty($options['version_file']) ? AK_BASE_DIR.DS.'version.txt' : $options['version_file'];
