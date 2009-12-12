@@ -421,7 +421,11 @@ class Makelos
         $Makelos = $this;
         $autocompletion_options = array();
         $autocomplete_accessor = 'autocompletion'.($level === 1 ? '' : '_'.$level);
-        $autocompletion_executables = glob(AK_TASKS_DIR.DS.$task_name.'*.'.$autocomplete_accessor.'.*');
+        $autocompletion_executables = 
+        array_diff(array_merge(
+        glob(AK_TASKS_DIR.DS.$task_name.'*.'.$autocomplete_accessor.'.*'),
+        glob(AK_TASKS_DIR.DS.$task_name.DS.$task_name.'.'.$autocomplete_accessor.'.*')
+        ), array(''));
         if(!empty($autocompletion_executables)){
             ob_start();
             foreach ($autocompletion_executables as $file){
