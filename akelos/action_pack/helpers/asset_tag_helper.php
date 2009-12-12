@@ -3,7 +3,7 @@
 /**
  * Provides methods for linking a HTML page together with other assets, such as javascripts, stylesheets, and feeds.
  */
-class AssetTagHelper extends AkActionViewHelper
+class AssetTagHelper extends AkBaseHelper
 {
     /**
      * Returns a link tag that browsers and news readers can use to auto-detect a RSS or ATOM feed for this page. The +type+ can

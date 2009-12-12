@@ -1,6 +1,6 @@
 <?php
     
-class PaginationHelper extends AkActionViewHelper
+class PaginationHelper extends AkBaseHelper
 {
     public function sortable_link($column, $url_options = array(), $link_options = array()) {
         $default_url_options = array(

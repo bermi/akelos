@@ -32,7 +32,7 @@
 * For documentation on +javascript_include_tag+ see 
 * AkActionView/helpers/asset_tag_helpers.php
 */
-class JavascriptHelper extends AkActionViewHelper 
+class JavascriptHelper extends AkBaseHelper 
 {
 
     /**

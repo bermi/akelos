@@ -1,7 +1,7 @@
 <?php  echo '<?php'?>
 
 
-class <?php  echo $helper_name?> extends AkActionViewHelper
+class <?php  echo $helper_name?> extends AkBaseHelper
 { 
     function cancel($url = array('action' => 'listing')) {
         return '<input type="button" value="'.$this->_controller->t('Cancel').'" style="width: auto;" onclick="window.location.href = \''.$this->_controller->urlFor($url).'\';" />';

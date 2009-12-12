@@ -1,6 +1,6 @@
 <?php
 
-class AkActionViewHelper
+class AkBaseHelper
 {
     public $locales_namespace = 'helpers';
     protected $_controller;
@@ -43,3 +43,6 @@ class AkActionViewHelper
     }
 }
 
+/* Deprecated */
+class AkActionViewHelper extends AkBaseHelper{
+}

@@ -63,7 +63,7 @@
 */
 
 
-class FormHelper extends AkActionViewHelper
+class FormHelper extends AkBaseHelper
 {
 
     /**

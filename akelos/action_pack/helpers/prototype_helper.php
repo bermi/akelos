@@ -23,7 +23,7 @@
 * See JavaScriptGenerator for information on updating multiple elements
 * on the page in an Ajax response. 
 */
-class PrototypeHelper extends AkActionViewHelper
+class PrototypeHelper extends AkBaseHelper
 {
     public function getCallbacks() {
         if(empty($this->callbacks)){

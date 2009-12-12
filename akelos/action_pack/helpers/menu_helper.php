@@ -3,7 +3,7 @@
 /**
 * The Menu Helper makes it easier to create simple menus from controllers actions.
 */
-class MenuHelper extends AkActionViewHelper
+class MenuHelper extends AkBaseHelper
 {
 
     /**

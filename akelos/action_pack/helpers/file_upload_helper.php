@@ -1,6 +1,6 @@
 <?php
 
-class FileUploadHelper extends AkActionViewHelper
+class FileUploadHelper extends AkBaseHelper
 {
     /**
      * Handles a gmail-like file upload.

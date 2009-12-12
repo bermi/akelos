@@ -6,7 +6,7 @@
 * 
 * @deprecated 
 */
-class JavascriptMacrosHelper extends AkActionViewHelper
+class JavascriptMacrosHelper extends AkBaseHelper
 {
 
     /**

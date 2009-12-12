@@ -14,7 +14,7 @@
 * using these helpers in your application.
 */
 
-class ScriptaculousHelper extends AkActionViewHelper
+class ScriptaculousHelper extends AkBaseHelper
 {
     public $_toggle_effects = array('toggle_appear','toggle_slide','toggle_blind');
 

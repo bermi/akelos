@@ -33,7 +33,7 @@
 *     <option value="3">Tobias</option>
 *   </select>
 */
-class FormOptionsHelper extends AkActionViewHelper
+class FormOptionsHelper extends AkBaseHelper
 {
 
     /**

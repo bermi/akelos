@@ -7,7 +7,7 @@
 * is a great of making the record quickly available for editing, but likely to prove lackluster for a complicated real-world form.
 * In that case, it's better to use the input method and the specialized form methods from the FormHelper
 */
-class ActiveRecordHelper extends AkActionViewHelper
+class ActiveRecordHelper extends AkBaseHelper
 {
 
     /**

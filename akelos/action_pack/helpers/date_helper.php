@@ -10,7 +10,7 @@
 * * <tt>:discard_type</tt> - set to true if you want to discard the type part of the select name. If set to true, the select_month
 *   method would use simply "date" (which can be overwritten using <tt>:prefix</tt>) instead of "date[month]".
 */
-class DateHelper extends AkActionViewHelper
+class DateHelper extends AkBaseHelper
 {
 
     /**

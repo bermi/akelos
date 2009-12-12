@@ -1,6 +1,6 @@
 <?php
 
-class MailerHelper extends AkActionViewHelper
+class MailerHelper extends AkBaseHelper
 {
     public function person_name() {
         return "Mr. Joe Person";

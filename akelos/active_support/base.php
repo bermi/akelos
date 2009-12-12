@@ -2085,6 +2085,7 @@ class Ak
             // Action Pack
             'AkActionController'            => 'action_pack/action_controller.php',
             'AkActionView'                  => 'action_pack/action_view.php',
+            'AkBaseHelper'                  => 'action_pack/base_helper.php',
             'AkActionViewHelper'            => 'action_pack/base_helper.php',
             'AkCacheHandler'                => 'action_pack/cache_handler.php',
             'AkCacheSweeper'                => 'action_pack/cache_sweeper.php',

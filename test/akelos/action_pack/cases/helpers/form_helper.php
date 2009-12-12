@@ -14,9 +14,9 @@ class FormHelper_TestCase extends HelperUnitTest
 
         $this->controller->returnsByValue('__get', $this->active_record, array('person'));
 
-        Mock::generate('AkActionViewHelper');
+        Mock::generate('AkBaseHelper');
 
-        $this->mock = new MockAkActionViewHelper($this);
+        $this->mock = new MockAkBaseHelper($this);
         $this->mock->setReturnValue('getController', $this->controller);
 
         $this->ak_form_helper_instance_tag = new AkFormHelperInstanceTag('person', 'name', $this->mock);
