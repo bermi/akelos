@@ -12,7 +12,7 @@ class AkelosGenerator
         $commands = $this->getOptionsFromCommand($command);
         $generator_name = AkInflector::underscore(isset($commands['generator']) ? $commands['generator'] : array_shift($commands));
 
-        $available_generators = $this->_getAvailableGenerators();
+        $available_generators = $this->getAvailableGenerators();
         $generator_file_name = Ak::first(array_keys($available_generators, $generator_name));
 
         if(empty($generator_file_name)){
@@ -137,6 +137,10 @@ class AkelosGenerator
         echo empty($usage) ? "\n".Ak::t('Could not locate usage file for this generator') : "\n".$usage."\n";
     }
     
+    public function getAvailableGenerators() {
+        return array_merge($this->_getGeneratorsInsidePath($this->generators_dir), $this->_getPluginGenerators());
+    }
+
     private function _identifyUnnamedCommands(&$commands) {
         $i = 0;
         $extra_commands = array();
@@ -197,10 +201,6 @@ class AkelosGenerator
 
     private function _unmaskAmpersands($str) {
         return str_replace('___AMP___','&',$str);
-    }
-
-    private function _getAvailableGenerators() {
-        return array_merge($this->_getGeneratorsInsidePath($this->generators_dir), $this->_getPluginGenerators());
     }
 
     private function _getPluginGenerators() {
