@@ -89,6 +89,7 @@ class AkActionView
     $session,
     $headers,
     $HelperLoader,
+    $format,
     $flash;
 
     public $_template_handlers = array();
@@ -99,6 +100,7 @@ class AkActionView
         $this->app_views_dir = AkConfig::getDir('views');
         $this->base_path = empty($base_path) ? $this->app_views_dir : $base_path;
         $this->assigns = $assigns_for_first_render;
+        $this->format = !empty($assigns_for_first_render['format']) ? $assigns_for_first_render['format'] : 'html';
         $this->assigns_added = null;
         if(!empty($controller)){
             $this->controller = $controller;
@@ -246,9 +248,28 @@ class AkActionView
     }
 
     public function getFullTemplatePath($template_path, $extension) {
-        $template_path = substr($template_path,-1*strlen($extension)) == $extension ? $template_path : $template_path.'.'.$extension;
+        $template_path_with_format = $this->_getTemplatePathWithFormat($template_path, $extension);
+        $template_path = $this->_getTemplatePathWithoutFormat($template_path,$extension);
+        if($template_path_with_format != $template_path){
+            $template_path_with_format = $this->_getFullTemplatePath($template_path_with_format, true);
+            if(file_exists($template_path_with_format)){
+                return $template_path_with_format;
+            }
+        }
+        return $this->_getFullTemplatePath($template_path, true);
+    }
+
+    protected function _getTemplatePathWithFormat($template_path, $extension){
+        return substr($template_path,-1*strlen($extension)) == $extension ? $template_path :  $template_path.(strstr($extension,'.') ? '' : '.'.$this->format).'.'.$extension;
+    }
+
+    protected function _getTemplatePathWithoutFormat($template_path, $extension){
+        return substr($template_path,-1*strlen($extension)) == $extension ? $template_path : $template_path.'.'.$extension;
+    }
+
+    private function _getFullTemplatePath($template_path, $recheck = false){
         $result = substr($template_path, 0, strlen($this->app_views_dir)) == $this->app_views_dir ? $template_path : $this->base_path.DS.$template_path;
-        return substr($template_path, 0, strlen($this->app_views_dir)) == $this->app_views_dir ? $template_path : $this->base_path.DS.$template_path;
+        return $recheck ? $this->_getFullTemplatePath($result, false) : $result;
     }
 
     public function evaluateAssigns() {
@@ -425,7 +446,7 @@ class AkActionView
             }
         }
     }
-    
+
     static function getGlobals() {
         return AkActionView::addGlobalVar(null,null,true);
     }

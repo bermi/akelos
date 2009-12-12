@@ -311,9 +311,6 @@ class AkActionController extends AkLazyObject
             if (!isset($this->Response->_headers['Content-Type'])) {
                 $this->_sendMimeContentType();
             }
-            if(!empty($this->validate_output)){
-                $this->_validateGeneratedXhtml();
-            }
             if (!isset($this->Response->_headers['Status']) && !empty($this->_default_render_status_code)) {
                 $this->Response->_headers['Status'] = $this->_default_render_status_code;
             }
@@ -322,13 +319,8 @@ class AkActionController extends AkLazyObject
         }
     }
 
-    public function _loadActionView() {
-        empty($this->_assigns) ? ($this->_assigns = array()) : null;
-        $this->_enableLayoutOnRender = !isset($this->_enableLayoutOnRender) ? true : $this->_enableLayoutOnRender;
-        $this->passed_args = !isset($this->Request->pass)? array() : $this->Request->pass;
-        empty($this->cookies) && isset($_COOKIE) ? ($this->cookies = $_COOKIE) : null;
-
-        if(empty($this->Template)){
+    public function loadTemplateHandler($force_reload = false){
+        if(empty($this->Template) || $force_reload){
             $this->Template = new AkActionView(
             $this->_getTemplateBasePath(),
             $this->Request->getParameters(),
@@ -342,6 +334,14 @@ class AkActionController extends AkLazyObject
         Ak::loadPlugins();
     }
 
+    private function _loadActionView() {
+        empty($this->_assigns) ? ($this->_assigns = array()) : null;
+        $this->_enableLayoutOnRender = !isset($this->_enableLayoutOnRender) ? true : $this->_enableLayoutOnRender;
+        $this->passed_args = !isset($this->Request->pass)? array() : $this->Request->pass;
+        empty($this->cookies) && isset($_COOKIE) ? ($this->cookies = $_COOKIE) : null;
+        $this->loadTemplateHandler();
+    }
+    
     public function getCurrentControllerHelper() {
         $helper = $this->getControllerName();
         $helper = AkInflector::is_plural($helper)?AkInflector::singularize($helper):$helper;
@@ -362,18 +362,6 @@ class AkActionController extends AkLazyObject
             }
         }
         return array();
-    }
-
-    public function _validateGeneratedXhtml() {
-        $XhtmlValidator = new AkXhtmlValidator();
-        if($XhtmlValidator->validate($this->Response->body) === false){
-            $this->Response->sendHeaders();
-            echo '<h1>'.Ak::t('Ooops! There are some errors on current XHTML page').'</h1>';
-            echo '<small>'.Ak::t('In order to disable XHTML validation, set the <b>AK_ENABLE_STRICT_XHTML_VALIDATION</b> constant to false on your config/development.php file')."</small><hr />\n";
-            $XhtmlValidator->showErrors();
-            echo "<hr /><h2>".Ak::t('Showing XHTML code')."</h2><hr /><div style='border:5px solid red;margin:5px;padding:15px;'>".$this->Response->body."</pre>";
-            die();
-        }
     }
 
 

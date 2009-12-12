@@ -71,7 +71,7 @@ class ControllerGenerator extends  AkelosGenerator
         foreach ($this->actions as $action){
             //$this->action = $action;
             $this->assignVarToTemplate('action',$action);
-            $this->assignVarToTemplate('path', 'app'.DS.'views'.DS.$this->module_path.AkInflector::underscore($this->controller_name).'/'.$action.'.html.tpl\'');
+            $this->assignVarToTemplate('path', 'app'.DS.'views'.DS.$this->module_path.AkInflector::underscore($this->controller_name).DS.$action.'.html.tpl');
             $this->save(AkConfig::getDir('views').DS.$this->module_path.AkInflector::underscore($this->controller_name).DS.$action.'.html.tpl', $this->render('view'));
         }
     }
