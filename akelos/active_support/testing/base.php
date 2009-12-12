@@ -391,9 +391,6 @@ class AkWebTestCase extends WebTestCase
     }
 }
 
-
-
-
 class AkelosTextReporter extends TextReporter {
     public $time_log = array();
     public $log_time = true;

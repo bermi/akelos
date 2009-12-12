@@ -2088,6 +2088,8 @@ class Ak
             'AkActionViewHelper'            => 'action_pack/base_helper.php',
             'AkCacheHandler'                => 'action_pack/cache_handler.php',
             'AkCacheSweeper'                => 'action_pack/cache_sweeper.php',
+            'AkActionControllerTest'        => 'action_pack/testing.php',
+            'AkHelperTest'                  => 'action_pack/testing.php',
             'AkDbSession'                   => 'action_pack/db_session.php',
             'AkDispatcher'                  => 'action_pack/dispatcher.php',
             'ActiveRecordHelper'            => 'action_pack/helpers/active_record_helper.php',

@@ -1,18 +1,18 @@
-<?php  echo '<?php'?>
+<?php echo '<?php'; ?>
 
 
 class <?php  echo $class_name?>Controller extends ApplicationController
-{
-<?php   if(!empty($options['scaffold'])) :?>
-  var $scaffold = '<?php  echo AkInflector::singularize($class_name)?>';
-<?php endif; ?>
-<?php   if(!empty($actions)) :?>
+{<?php   if(!empty($options['scaffold'])) : ?>
+    public $scaffold = '<?php  echo AkInflector::singularize($class_name)?>';
+<?php 
+endif; 
+
+if(!empty($actions)) :?>
 <?php   foreach ($actions as $action) : ?>
 
-    function <?php echo $action?> () {
+    public function <?php echo $action?> () {
     }
 <?php endforeach; ?>
 <?php endif; ?>
 }
 
-?>

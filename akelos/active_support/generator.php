@@ -29,7 +29,7 @@ class AkelosGenerator
             $generator = new $generator_class_name();
             $generator->_generator_base_path = dirname($generator_file_name);
 
-            if(count(array_diff($commands,array('help','-help','usage','-usage','h','-h','USAGE','-USAGE'))) != count($commands) || count($commands) == 0){
+            if(count(array_diff($commands,array('help','-help','--help','usage','-usage','h','-h','USAGE','-USAGE'))) != count($commands) || count($commands) == 0){
                 if(empty($generator->command_values) && empty($commands)){
                     // generator without commands
                 }else{
