@@ -1,0 +1,373 @@
+h2. Creating and customizing Akelos Generators
+
+Akelos generators are an essential tool if you plan to improve your workflow and in this guide you will learn how to create and customize already existing generators.
+
+In this guide you will:
+
+* Learn how to see which generators are available in your application;
+* Create a generator using templates;
+* Learn how Akelos searches for generators before invoking them;
+* Customize your scaffold by creating new generators;
+* Customize your scaffold by changing generators templates;
+* Learn how to use fallbacks to avoid overwriting a huge set of generators;
+
+endprologue.
+
+NOTE: This guide is about Akelos generators for versions >= 3.0. Akelos generators from previous versions are not supported.
+
+h3. First contact
+
+When you create an application using the +akelos+ command, you are in fact using an Akelos generator. After that, you can get a list of all available generators by just invoking +./makelos generate+:
+
+<shell>
+$ akelos myapp
+$ cd myapp
+$ php makelos generate
+</shell>
+
+You will get a list of all generators that comes with Akelos. If you need a detailed description, for instance about the helper generator, you can simply do:
+
+<shell>
+$ php makelos generate helper --help
+</shell>
+
+h3. Creating your first generator
+
+Since Akelos 3.0, generators are built on top of "Thor":http://github.com/wycats/thor. Thor has a powerful options parsing and a great API for manipulating files. For instance, let's build a generator that creates an initializer file named +initializer.php+ inside +config/initializers+.
+
+The first step is to create a file at +AK_APP_DIR/lib/generators/initializer_generator.php+ with the following content:
+
+<php>
+class InitializerGenerator < Akelos::Generators::Base
+  def create_initializer_file
+    create_file "config/initializers/initializer.php", "# Add initialization content here"
+  end
+end
+</php>
+
+Our new generator is quite simple: it inherits from +Akelos::Generators::Base+ and have one method definition. Each public method in the generator is executed when a generator is invoked. Finally, we invoke the +create_file+ method that will create a file at the given destination with the given content. If you are familiar with Akelos Application Templates API, you are at home with new generators API.
+
+To invoke our new generator, we just need to do:
+
+<shell>
+$ php makelos generate initializer
+</shell>
+
+Before we go on, let's see our brand new generator description:
+
+<shell>
+$ php makelos generate initializer --help
+</shell>
+
+Akelos usually is able to generate good descriptions if a generator is namespaced, as +ActiveRecord::Generators::ModelGenerator+, but not in this particular case. We can solve this problem in two ways. The first one is calling +desc+ inside our generator:
+
+<php>
+class InitializerGenerator < Akelos::Generators::Base
+  desc "This generator creates an initializer file at config/initializers"
+  def create_initializer_file
+    create_file "config/initializers/initializer.php", "# Add initialization content here"
+  end
+end
+</php>
+
+Now we can see the new description by invoking +--help+ in the new generator. The second way to add a description is by creating a file named +USAGE+ in the same directory as our generator. We are going to do that in the next step.
+
+h3. Creating generators with generators
+
+A faster way to create a generator is using the generator's generator:
+
+<shell>
+$ php makelos generate generator initializer
+      create  lib/generators/initializer
+      create  lib/generators/initializer/initializer_generator.php
+      create  lib/generators/initializer/USAGE
+      create  lib/generators/initializer/templates
+</shell>
+
+And it will create a new generator as follow:
+
+<php>
+class InitializerGenerator < Akelos::Generators::NamedBase
+  public function source_root
+    @source_root ||= File.expand_path(File.join(File.dirname(__FILE__), 'templates'))
+  end
+end
+</php>
+
+At first, we can notice that we are inheriting from +Akelos::Generators::NamedBase+ instead of +Akelos::Generators::Base+. This means that our generator expects as least one argument, which will be the name of the initializer.
+
+We can see that by invoking the description of this new generator (don't forget to delete the old generator file):
+
+<shell>
+$ php makelos generate initializer --help
+Usage:
+  ./makelos generate initializer NAME [options]
+</shell>
+
+We can also see in our new generator that it has a class method called +source_root+. This method points to where our generator templates will be placed and by default it points to the created directory under +AK_APP_DIR/lib/generators/initializer/templates+. In order to understand what a generator template means, let's create a file at +AK_APP_DIR/lib/generators/initializer/templates/initializer.php+ with the following content:
+
+<php>
+# Add initialization content here
+
+</php>
+
+And now let's change the generator to copy this template when invoked:
+
+<php>
+class InitializerGenerator < Akelos::Generators::NamedBase
+  public function source_root
+    @source_root ||= File.expand_path(File.join(File.dirname(__FILE__), 'templates'))
+  end
+
+  def copy_initializer_file
+    copy_file "initializer.php", "config/initializers/#{file_name}.php"
+  end
+end
+</php>
+
+And let's execute our generator:
+
+<shell>
+$ php makelos generate initializer foo
+</shell>
+
+We can see that now a initializer named foo was created at +config/initializers/foo.php+ with the contents of our template. That means that copy_file copied a file in our source root to the destination path we gave. The method +file_name+ is automatically created when we inherit from +Akelos::Generators::NamedBase+.
+
+h3. Generators lookup
+
+Now that we know how to create generators, we must know where Akelos looks for generators before invoking them. When we invoke the initializer generator, Akelos looks at the following paths in the given order:
+
+<shell>
+AK_APP_DIR/lib/generators
+AK_APP_DIR/lib/akelos_generators
+AK_APP_DIR/vendor/plugins/*/lib/generators
+AK_APP_DIR/vendor/plugins/*/lib/akelos_generators
+GEMS_PATH/*/lib/generators
+GEMS_PATH/*/lib/akelos_generators
+~/akelos/generators
+~/akelos/akelos_generators
+RAILS_GEM/lib/akelos/generators
+</shell>
+
+First Akelos looks for generators in your application, then in plugins and/or gems, then in your home and finally the builtin generators. One very important thing to keep in mind is that in Akelos 3.0 and after it only looks for generators in gems being used in your application. So if you have rspec installed as a gem, but it's not declared in your application, Akelos won't be able to invoke it.
+
+h3. Customizing your workflow
+
+Akelos generators are flexible enough to let you customize your scaffold the way you want. In your +config/application.php+ there is a section just for generators:
+
+<php>
+config.generators do |g|
+  g.orm             :active_record
+  g.template_engine :tpl
+  g.test_framework  :test_unit, :fixture => true
+end
+</php>
+
+Before we customize our workflow, let's first see how our scaffold looks like:
+
+<shell>
+$ php makelos generate scaffold User name:string
+      invoke  active_record
+      create    db/migrate/20091120125558_create_users.php
+      create    app/models/user.php
+      invoke    test_unit
+      create      test/unit/user_test.php
+      create      test/fixtures/users.yml
+       route  map.resources :users
+      invoke  scaffold_controller
+      create    app/controllers/users_controller.php
+      invoke    tpl
+      create      app/views/users
+      create      app/views/users/index.html.tpl
+      create      app/views/users/edit.html.tpl
+      create      app/views/users/show.html.tpl
+      create      app/views/users/new.html.tpl
+      create      app/views/users/_form.html.tpl
+      create      app/views/layouts/users.html.tpl
+      invoke    test_unit
+      create      test/functional/users_controller_test.php
+      invoke    helper
+      create      app/helpers/users_helper.php
+      invoke      test_unit
+      create        test/unit/helpers/users_helper_test.php
+      invoke  stylesheets
+      create    public/stylesheets/scaffold.css
+</shell>
+
+Looking at this output, is easy to understand how generators work on Akelos 3.0 and above. The scaffold generator actually doesn't generate anything, it just invokes others to do the work. This allows us to add/replace/remove any of those invocations. For instance, the scaffold generator invokes the scaffold_controller generator, which invokes tpl, test_unit and helper generators. Since each generator has a single responsibility, they are easy to reuse, avoiding code duplication.
+
+Our first customization on the workflow will be to stop generating stylesheets and test fixtures on scaffold. We can achieve that by changing our application to the following:
+
+<php>
+config.generators do |g|
+  g.orm             :active_record
+  g.template_engine :tpl
+  g.test_framework  :test_unit, :fixture => false
+  g.stylesheets     false
+end
+</php>
+
+If we generate another resource on scaffold, we can notice that neither stylesheets nor fixtures are created anymore. If you want to customize it further, for example to use +Datamapper+ and +Rspec+ instead of +ActiveRecord+ and +TestUnit+, is just a matter of adding their gems to your application and configuring your generators.
+
+To show that, we are going to create a new helper generator that simply adds some instance variable readers. First, we create a generator:
+
+<shell>
+$ php makelos generate generator my_helper
+</shell>
+
+After that, we can delete both templates directory and the +source_root+ class method from our new generators, because we are not going to need them. So our new generator looks like the following:
+
+<php>
+class MyHelperGenerator < Akelos::Generators::NamedBase
+  def create_helper_file
+    create_file "app/helpers/#{file_name}_helper.php", <<-FILE
+module #{class_name}Helper
+  attr_reader :#{plural_name}, :#{plural_name.singularize}
+end
+    FILE
+  end
+end
+</php>
+
+We can try out our new generator by creating a helper for users:
+
+<shell>
+$ php makelos generate my_helper users
+</shell>
+
+And it will generate the following helper file in app/helpers:
+
+<php>
+module UsersHelper
+  attr_reader :users, :user
+end
+</php>
+
+Which is what we expected. We can now tell scaffold to use our new helper generator by configuring +config/application.php+ once again:
+
+<php>
+config.generators do |g|
+  g.orm             :active_record
+  g.template_engine :tpl
+  g.test_framework  :test_unit, :fixture => false
+  g.stylesheets     false
+  g.helper          :my_helper
+end
+</php>
+
+And see it in action when invoking generator once again:
+
+<shell>
+$ php makelos generate scaffold Post body:text
+      [...]
+      invoke    my_helper
+      create      app/helpers/posts_helper.php
+</shell>
+
+We can notice on the output that our new helper was invoked instead of the Akelos default. However one thing is missing, which is tests for our new generator and to do that, we are going to reuse old helpers test generators.
+
+Since Akelos 3.0, this is easy to do due to the hooks concept. Our new helper does not need to be focused in one specific test framework, it can simply provide a hook and a test framework just need to implement this hook in order to be compatible.
+
+To do that, we can change your generator to the following:
+
+<php>
+class MyHelperGenerator < Akelos::Generators::NamedBase
+  def create_helper_file
+    create_file "app/helpers/#{file_name}_helper.php", <<-FILE
+module #{class_name}Helper
+  attr_reader :#{plural_name}, :#{plural_name.singularize}
+end
+    FILE
+  end
+
+  hook_for :test_framework
+end
+</php>
+
+Now, when the helper generator is invoked and let's say test unit is configured as test framework, it will try to invoke both +MyHelper::Generators::TestUnitGenerator+ and +TestUnit::Generators::MyHelperGenerator+. Since none of those are defined, we can tell our generator to invoke +TestUnit::Generators::HelperGenerator+ instead, which is defined since it's an Akelos hook. To do that, we just need to add:
+
+<php>
+  # Search for :helper instead of :my_helper
+  hook_for :test_framework, :as => :helper
+</php>
+
+And now you can re-run scaffold for another resource and see it generating tests as well!
+
+h3. Customizing your workflow by changing generators templates
+
+In the step above, we simply wanted to add a line to the generated helper, without adding any extra functionality. There is a simpler way to do that, and it's by replacing the templates of already existing generators.
+
+In Akelos 3.0 and above, generators does not look only in the source root for templates, they also search for templates in other paths. And one of them is inside +AK_APP_DIR/lib/templates+. Since we want to customize +Akelos::Generators::HelperGenerator+, we can do that by simple making a template copy inside +AK_APP_DIR/lib/templates/akelos/helper+ with the name +helper.php+. So let's create such file with the following content:
+
+<tpl>
+module <%= class_name %>Helper
+  attr_reader :<%= plural_name %>, <%= plural_name.singularize %>
+end
+</tpl>
+
+So now we can revert the changes in +config/application.php+:
+
+<php>
+config.generators do |g|
+  g.orm             :active_record
+  g.template_engine :tpl
+  g.test_framework  :test_unit, :fixture => false
+  g.stylesheets     false
+end
+</php>
+
+If you generate another resource, you can see that we got exactly the same result! This is useful if you want to customize your scaffold templates and/or layout by just creating +edit.html.tpl+, +index.html.tpl+ and so on inside +AK_APP_DIR/lib/templates/tpl/scaffold+.
+
+h3. Adding generators fallbacks
+
+One last feature about generators which is quite useful for plugin generators is fallbacks. For example, imagine that you want to add a feature on top of TestUnit test framework, like "shoulda":http://github.com/thoughtbot/shoulda does. Since TestUnit already implements all generators required by Akelos and shoulda just want to overwrite part of it, there is no need for shoulda to reimplement some generators again, they can simply tell Akelos to use a +TestUnit+ generator if none was found under +Shoulda+ namespace.
+
+We can easily simulate this behavior by changing our +config/application.php+ once again:
+
+<php>
+config.generators do |g|
+  g.orm             :active_record
+  g.template_engine :tpl
+  g.test_framework  :shoulda, :fixture => false
+  g.stylesheets     false
+end
+</php>
+
+And at the end of the same file:
+
+<php>
+require 'akelos/generators'
+Akelos::Generators.fallbacks[:shoulda] = :test_unit
+</php>
+
+Now, if create a Comment scaffold, you will see that shoulda generators are being invoked, and at the end, they are just falling back to test unit generators:
+
+<shell>
+$ php makelos generate scaffold Comment body:text
+      invoke  active_record
+      create    db/migrate/20091120151323_create_comments.php
+      create    app/models/comment.php
+      invoke    shoulda
+      create      test/unit/comment_test.php
+      create      test/fixtures/comments.yml
+       route  map.resources :comments
+      invoke  scaffold_controller
+      create    app/controllers/comments_controller.php
+      invoke    tpl
+      create      app/views/comments
+      create      app/views/comments/index.html.tpl
+      create      app/views/comments/edit.html.tpl
+      create      app/views/comments/show.html.tpl
+      create      app/views/comments/new.html.tpl
+      create      app/views/comments/_form.html.tpl
+      create      app/views/layouts/comments.html.tpl
+      invoke    shoulda
+      create      test/functional/comments_controller_test.php
+      invoke    my_helper
+      create      app/helpers/comments_helper.php
+      invoke      shoulda
+      create        test/unit/helpers/comments_helper_test.php
+</shell>
+
+Such tool allows your generators to have single responsibility, increasing the code reuse and reducing the amount of code duplication.
+

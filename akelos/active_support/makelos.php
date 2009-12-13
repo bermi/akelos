@@ -521,7 +521,7 @@ function makelos_setting($settings = array()){
 ./makelos stats                     # Report code statistics (KLOCs, etc) from the application
 
 ./makelos test                      # Test all units and functionals
-./makelos test:functionals          # Run tests for functionalsdb:test:prepare
+./makelos test:functionals          # Run tests for functionals db:test:prepare
 ./makelos test:integration          # Run tests for integrationdb:test:prepare
 ./makelos test:plugins              # Run tests for pluginsenvironment
 ./makelos test:recent               # Run tests for recentdb:test:prepare
