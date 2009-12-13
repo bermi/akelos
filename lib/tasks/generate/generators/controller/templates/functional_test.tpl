@@ -1,6 +1,6 @@
 <?php  echo '<?php'?>
 
-require_once(dirname(__FILE__).'/../config.php');
+require_once(dirname(__FILE__).'/../../shared/config/config.php');
 
 class <?php  echo $class_name; ?>Controller_TestCase extends AkActionControllerTest
 {
