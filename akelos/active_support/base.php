@@ -2230,6 +2230,8 @@ class Ak
                     }
                 }elseif(strstr($name, 'Installer')){
                     $file_path = AkConfig::getDir('app_installers').DS.AkInflector::underscore($name).'.php';
+                }elseif(strstr($name, 'Controller')){
+                    $file_path = AkInflector::toControllerFilename($name);
                 }
             }
         }
