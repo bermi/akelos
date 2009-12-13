@@ -61,4 +61,31 @@ class AkActionControllerTest extends AkTestApplication
 
 class AkHelperTest extends AkUnitTest
 {
+    public $Helper;
+    public $helper_name;
+    public $skip_helper_instantation = false;
+
+    public function __construct(){
+        parent::__construct();
+        if(!$this->skip_helper_instantation){
+            $this->Helper = $this->getHelperInstance();
+        }
+    }
+
+    public function &getHelperInstance(){
+        $helper_name = $this->getHelperName();
+        $helper_class_name = $helper_name.'Helper';
+        $this->Helper = new $helper_class_name;
+
+        $controller_class_name = $helper_name.'Controller';
+        if(method_exists($this->Helper, 'setController') && class_exists($controller_class_name)){
+            $this->Helper->setController(new $controller_class_name());
+        }
+        return $this->Helper;
+    }
+
+    public function getHelperName(){
+        return $this->helper_name = empty($this->helper_name) ? AkInflector::camelize(preg_replace('/(Helper|_).*$/', '', get_class($this))) : $this->helper_name;
+    }
+
 }
