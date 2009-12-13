@@ -10,6 +10,9 @@ class AkTestApplication extends AkUnitTest
         $this->assertPattern('/'.preg_quote($text).'/', $message);
     }
 
+    public function getResponseText(){
+        return $this->_response;
+    }
     /**
      * Asserts only if the whole response matches $text
      */

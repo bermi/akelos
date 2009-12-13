@@ -1,6 +1,6 @@
 <?php
 
-class AkActionControllerTest extends AkWebTestCase
+class AkActionControllerTest extends AkTestApplication
 {
     // Any objects that are stored as instance variables in actions for use in views.
     public $assigns = array();
@@ -11,26 +11,51 @@ class AkActionControllerTest extends AkWebTestCase
     // Any object living in session variables.
     public $session = array();
 
-    public $Controller; // The controller processing the request
-    public $Request;    // The request
-    public $Response;   // The response
+    public $constants = array();
+    public $controller_vars = array();
 
-    public function get($action, $params = array(), $session = array(), $flash = array()){
+    public $controller_name;
+
+    public $Dispatcher;
+
+    private $_default_urlparams = array();
+
+    public function __construct(){
+        parent::__construct();
+        $this->_default_urlparams = array('controller' => $this->getControllerName());
     }
 
-    public function post()  {   }
-    public function put()   {   }
-    public function head()  {   }
-    public function delete(){   }
+    public function get($action, $params = array(), $session = array(), $flash = array()){
+        return $this->_runHttpVerb(__FUNCTION__, $action, $params, $session, $flash);
+    }
 
-    public function assertSelect(){}
-    public function cssSelect(){}
+    public function post($action, $params = array(), $session = array(), $flash = array())  {
+        return $this->_runHttpVerb(__FUNCTION__, $action, $params, $session, $flash);
+    }
 
-    public function getControllerInstance(){
-        //$this->get(AkConfig::getOption('testing_url').'/action_pack/public/index.php?ak=invalid');
+    public function put($action, $params = array(), $session = array(), $flash = array())   {
+        return $this->_runHttpVerb(__FUNCTION__, $action, $params, $session, $flash);
+    }
+
+    public function head($action, $params = array(), $session = array(), $flash = array())  {
+        return $this->_runHttpVerb(__FUNCTION__, $action, $params, $session, $flash);
+    }
+
+    public function delete($action, $params = array(), $session = array(), $flash = array()){
+    }
+
+    private function _runHttpVerb($verb, $action, $params = array(), $session = array(), $flash = array()){
+        $this->controller_vars['session'] = $session;
+        $this->controller_vars['flash'] = $flash;
+        return parent::$verb($this->_getUrlForAction($action, $params), $params, $this->constants, $this->controller_vars);
     }
 
     public function getControllerName(){
+        return $this->controller_name = empty($this->controller_name) ? AkInflector::underscore(preg_replace('/(Controller|_).*$/', '', get_class($this))) : $this->controller_name;
+    }
+
+    private function _getUrlForAction($action, $params = array()){
+        return Ak::toUrl(array_merge($params, array_merge(array('action' => $action), $this->_default_urlparams)));
     }
 }
 
