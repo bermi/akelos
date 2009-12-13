@@ -406,7 +406,7 @@ class AkInflector
 
     static function toControllerFilename($name) {
         $name = str_replace('::', '/', $name);
-        return AkConfig::getDir('controllers').DS.join(DS, array_map(array('AkInflector','underscore'), strstr($name, '/') ? explode('/', $name) : array($name))).'_controller.php';
+        return AkConfig::getDir('controllers').DS.join(DS, array_map(array('AkInflector','underscore'), strstr($name, '/') ? explode('/', $name) : array($name))).(stristr($name,'controller')?'':'_controller').'.php';
     }
 
     static function toModelFilename($name) {
