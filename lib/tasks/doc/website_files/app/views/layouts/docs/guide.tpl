@@ -4,53 +4,54 @@
 
 <title>{?page_title}{_page_title}{else}_{Akelos guides}{end}</title>
 
-<link rel="stylesheet" type="text/css" href="/stylesheets/docs/guide/style.css" />
-<link rel="stylesheet" type="text/css" href="/stylesheets/docs/guide/syntax.css" />
-<link rel="stylesheet" type="text/css" href="/stylesheets/docs/guide/print.css" media="print" />
+<%= stylesheet_link_tag 'docs/guide/style.css' %>
+<%= stylesheet_link_tag 'docs/guide/syntax.css' %>
+<%= stylesheet_link_tag 'docs/guide/print.css', :media => 'print' %>
 
-<script type="text/javascript" src="/javascripts/docs/guide/guides.js"></script>
-<script type="text/javascript" src="/javascripts/docs/guide/code_highlighter.js"></script>
-<script type="text/javascript" src="/javascripts/docs/guide/highlighters.js"></script>
+<%= javascript_include_tag 'docs/guide/guides.js' %>
+<%= javascript_include_tag 'docs/guide/code_highlighter.js' %>
+<%= javascript_include_tag 'docs/guide/highlighters.js' %>
 
 </head>
 <body class="guide">
   <div id="header">
     <div class="wrapper clearfix">
-      <h1><a href="/docs/guide/" title="Return to home page">guides.akelos.org</a></h1>
+      <h1><%= link_to_guide 'Guides Index' %></h1>
       <p class="hide"><a href="#mainCol">Skip navigation</a>.</p>
       <ul class="nav">
         <li><a href="index.html">Home</a></li>
-        <li class="index"><a href="/docs/guide/getting_started.html" onclick="guideMenu(); return false;" id="guidesMenu">Guides Index</a>
+        <li class="index">
+          <%= link_to_guide 'Guides Index', 'getting_started', :onclick=>"guideMenu(); return false;", :id=>"guidesMenu" %>
           <div id="guides" class="clearfix" style="display: none;">
             <hr />
             <dl class="L">
               <dt>Start Here</dt>
-              <dd><a href="/docs/guide/getting_started.html">Getting Started with Akelos</a></dd>
+              <dd><%= link_to_guide 'Getting Started with Akelos', 'getting_started' %></dd>
               <dt>Models</dt>
-              <dd><a href="/docs/guide/migrations.html">Akelos Database Migrations</a></dd>
-              <dd><a href="/docs/guide/activerecord_validations_callbacks.html">Active Record Validations and Callbacks</a></dd>
-              <dd><a href="/docs/guide/association_basics.html">Active Record Associations</a></dd>
-              <dd><a href="/docs/guide/active_record_querying.html">Active Record Query Interface</a></dd>
+              <dd><%= link_to_guide 'Akelos Database Migrations', 'migrations' %></dd>
+              <dd><%= link_to_guide 'Active Record Validations and Callbacks', 'activerecord_validations_callbacks' %></dd>
+              <dd><%= link_to_guide 'Active Record Associations', 'association_basics' %></dd>
+              <dd><%= link_to_guide 'Active Record Query Interface', 'active_record_querying' %></dd>
               <dt>Views</dt>
-              <dd><a href="/docs/guide/layouts_and_rendering.html">Layouts and Rendering in Akelos</a></dd>
-              <dd><a href="/docs/guide/form_helpers.html">Action View Form Helpers</a></dd>
+              <dd><%= link_to_guide 'Layouts and Rendering in Akelos', 'layouts_and_rendering' %></dd>
+              <dd><%= link_to_guide 'Action View Form Helpers', 'form_helpers' %></dd>
               <dt>Controllers</dt>
-              <dd><a href="/docs/guide/action_controller_overview.html">Action Controller Overview</a></dd>
-              <dd><a href="/docs/guide/routing.html">Akelos Routing from the Outside In</a></dd>
+              <dd><%= link_to_guide 'Action Controller Overview', 'action_controller_overview' %></dd>
+              <dd><%= link_to_guide 'Akelos Routing from the Outside In', 'routing' %></dd>
             </dl>
             <dl class="R">
               <dt>Digging Deeper</dt>
-              <dd><a href="/docs/guide/i18n.html">Akelos Internationalization API</a></dd>
-              <dd><a href="/docs/guide/action_mailer_basics.html">Action Mailer Basics</a></dd>
-              <dd><a href="/docs/guide/testing.html">Testing Akelos Applications</a></dd>
-              <dd><a href="/docs/guide/security.html">Securing Akelos Applications</a></dd>
-              <dd><a href="/docs/guide/debugging_akelos_applications.html">Debugging Akelos Applications</a></dd>
-              <dd><a href="/docs/guide/performance_testing.html">Performance Testing Akelos Applications</a></dd>
-              <dd><a href="/docs/guide/plugins.html">The Basics of Creating Akelos Plugins</a></dd>
-              <dd><a href="/docs/guide/configuring.html">Configuring Akelos Applications</a></dd>
-              <dd><a href="/docs/guide/command_line.html">Akelos Command Line Tools and Makelos Tasks</a></dd>
-              <dd><a href="/docs/guide/caching_with_akelos.html">Caching with Akelos</a></dd>
-              <dd><a href="/docs/guide/contributing_to_akelos.html">Contributing to Akelos</a></dd>
+              <dd><%= link_to_guide 'Akelos Internationalization API', 'i18n' %></dd>
+              <dd><%= link_to_guide 'Action Mailer Basics', 'action_mailer_basics' %></dd>
+              <dd><%= link_to_guide 'Testing Akelos Applications', 'testing' %></dd>
+              <dd><%= link_to_guide 'Securing Akelos Applications', 'security' %></dd>
+              <dd><%= link_to_guide 'Debugging Akelos Applications', 'debugging_akelos_applications' %></dd>
+              <dd><%= link_to_guide 'Performance Testing Akelos Applications', 'performance_testing' %></dd>
+              <dd><%= link_to_guide 'The Basics of Creating Akelos Plugins', 'plugins' %></dd>
+              <dd><%= link_to_guide 'Configuring Akelos Applications', 'configuring' %></dd>
+              <dd><%= link_to_guide 'Akelos Command Line Tools and Makelos Tasks', 'command_line' %></dd>
+              <dd><%= link_to_guide 'Caching with Akelos', 'caching_with_akelos' %></dd>
+              <dd><%= link_to_guide 'Contributing to Akelos', 'contributing_to_akelos' %></dd>
             </dl>
           </div>
         </li>
@@ -77,7 +78,8 @@
   <hr class="hide" />
   <div id="footer">
     <div class="wrapper">
-      <p>This work is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-Share Alike 3.0</a> License</a></p>
+      <p>_{This work is an adaptation from the <a href="http://guides.rubyonrails.org/credits.html">Ruby on Rails guides</a> to <a href="http://www.akelos.org/">Akelos</a>}</p>
+      <p>_{This work is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-Share Alike 3.0</a> License</a>}</p>
     </div>
   </div>
 </body>

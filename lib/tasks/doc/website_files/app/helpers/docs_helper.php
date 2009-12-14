@@ -12,6 +12,10 @@ class DocsHelper extends AkBaseHelper
     public function render_doc($doc_contents){
         return $this->_afterRender(TextHelper::textilize($this->_beforeRender($doc_contents)));
     }
+    
+    public function link_to_guide($guide_name, $slug = '', $html_options = array()){
+        return $this->_controller->url_helper->link_to($this->t($guide_name), array('controller'=>'docs', 'action'=>'guide', 'id' => $this->t($slug), 'format' =>'html'), $html_options);
+    }
 
     private function _getdocPath($doc_name, $language){
         $doc_name = AkInflector::underscore($language != 'en' ? Ak::untranslate($doc_name, $language) : $doc_name);
