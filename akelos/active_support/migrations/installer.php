@@ -765,5 +765,88 @@ Example:
             $Logger->log($message, $type);
         }
     }
+    
+
+    protected function _checkForCollisions(&$directory_structure, $base_path = null) {
+        foreach ($directory_structure as $k=>$node){
+            if(!empty($this->skip_all)){
+                return ;
+            }
+            $path = str_replace($base_path, $this->app_base_dir, $base_path.DS.$node);
+            if(is_file($path)){
+                $message = Ak::t('File %file exists.', array('%file'=>$path));
+                $user_response = AkInstaller::promptUserVar($message."\n d (overwrite mine), i (keep mine), a (abort), O (overwrite all), K (keep all)", 'i');
+                if($user_response == 'i'){
+                    unset($directory_structure[$k]);
+                }    elseif($user_response == 'O'){
+                    return false;
+                }    elseif($user_response == 'K'){
+                    $directory_structure = array();
+                    return false;
+                }elseif($user_response != 'd'){
+                    echo "\nAborting\n";
+                    exit;
+                }
+            }elseif(is_array($node)){
+                foreach ($node as $dir=>$items){
+                    $path = $base_path.DS.$dir;
+                    if(is_dir($path)){
+                        if($this->_checkForCollisions($directory_structure[$k][$dir], $path) === false){
+                            $this->skip_all = true;
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    protected function _copyFiles($directory_structure, $base_path = null, $src_path = null) {
+        foreach ($directory_structure as $k=>$node){
+            $path = $base_path.DS.$node;
+            if(is_dir($path)){
+                echo 'Creating dir '.$path."\n";
+                $this->_makeDir($path, $src_path);
+            }elseif(is_file($path)){
+                echo 'Creating file '.$path."\n";
+                $this->_copyFile($path, $src_path);
+            }elseif(is_array($node)){
+                foreach ($node as $dir=>$items){
+                    $path = $base_path.DS.$dir;
+                    if(is_dir($path)){
+                        echo 'Creating dir '.$path."\n";
+                        $this->_makeDir($path, $src_path);
+                        $this->_copyFiles($items, $path, $src_path);
+                    }
+                }
+            }
+        }
+    }
+
+    protected function _makeDir($path, $base_path) {
+        $dir = str_replace($base_path, $this->app_base_dir,$path);
+        if(!is_dir($dir)){
+            mkdir($dir);
+        }
+    }
+
+    protected function _copyFile($path, $base_path) {
+        $destination_file = str_replace($base_path, $this->app_base_dir,$path);
+        copy($path, $destination_file);
+        $source_file_mode =  fileperms($path);
+        $target_file_mode =  fileperms($destination_file);
+        if($source_file_mode != $target_file_mode){
+            chmod($destination_file,$source_file_mode);
+        }
+    }
+    
+
+
+    public function copyFilesIntoApp($files_dir) {
+        $this->files = Ak::dir($files_dir, array('recurse'=> true));
+        empty($this->options['force']) ? $this->_checkForCollisions($this->files, $files_dir) : null;
+        $this->_copyFiles($this->files, $files_dir, $files_dir);
+    }
+
 }
 
