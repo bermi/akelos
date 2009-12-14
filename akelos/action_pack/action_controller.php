@@ -1002,7 +1002,7 @@ class AkActionController extends AkLazyObject
 
     public function addToUrl($options = array(), $options_to_exclude = array()) {
         $options_to_exclude = array_merge(array('ak','lang',AK_SESSION_NAME,'AK_SESSID','PHPSESSID'), $options_to_exclude);
-        $options = array_merge(array_merge(array('action'=>$this->Request->getAction()),$this->params),$options);
+        $options = array_merge(array('action'=>$this->Request->getAction()),$this->params ,$options);
         foreach ($options_to_exclude as $option_to_exclude){
             unset($options[$option_to_exclude]);
         }

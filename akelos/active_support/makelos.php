@@ -145,7 +145,7 @@ class Makelos
         $this->Request = $Request;
         $this->Installer = new AkInstaller();
         !defined('AK_TASKS_DIR') && define('AK_TASKS_DIR', AK_BASE_DIR.DS.'lib'.DS.'tasks');
-        $this->makefiles = array_merge(array_merge(array_merge(array_merge(array_merge(glob(AK_TASKS_DIR.DS.'makefile.php'), glob(AK_TASKS_DIR.DS.'*/makefile.php')), glob(AK_TASKS_DIR.DS.'*/*/makefile.php')), array(AK_BASE_DIR.DS.'*/*/*/makefile.php')),  array(AK_BASE_DIR.DS.'*/*/*/*/makefile.php')), array(AK_BASE_DIR.DS.'makefile.php'));
+        $this->makefiles = array_merge(glob(AK_TASKS_DIR.DS.'makefile.php'), glob(AK_TASKS_DIR.DS.'*/makefile.php'), glob(AK_TASKS_DIR.DS.'*/*/makefile.php'), array(AK_BASE_DIR.DS.'*/*/*/makefile.php'),  array(AK_BASE_DIR.DS.'*/*/*/*/makefile.php'), array(AK_BASE_DIR.DS.'makefile.php'));
     }
 
     public function loadMakefiles() {

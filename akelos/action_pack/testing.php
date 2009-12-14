@@ -55,7 +55,7 @@ class AkActionControllerTest extends AkTestApplication
     }
 
     private function _getUrlForAction($action, $params = array()){
-        return Ak::toUrl(array_merge($params, array_merge(array('action' => $action), $this->_default_urlparams)));
+        return Ak::toUrl(array_merge($params, array('action' => $action), $this->_default_urlparams));
     }
 }
 
