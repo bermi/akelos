@@ -118,7 +118,8 @@ if(!AK_CLI && AK_WEB_REQUEST){
 
     if (!defined('AK_SITE_URL_SUFFIX')){
         $__ak_site_url_suffix_userdir = substr(AK_REQUEST_URI,1,1) == '~' ? substr(AK_REQUEST_URI, 0, strpos(AK_REQUEST_URI, '/', 1)) : '';
-        $__ak_site_url_suffix = str_replace(array(join(DS,array_diff((array)@explode(DS,AK_BASE_DIR), (array)@explode('/',AK_REQUEST_URI))), DS,'//'), array('','/','/'), AK_BASE_DIR);
+        $__ak_site_url_suffix = '/'.trim(str_replace(join(DS,array_diff((array)explode('/',AK_REQUEST_URI.'/'), (array)explode(DS,AK_BASE_DIR.DS))), '', AK_REQUEST_URI), '/');
+        //$__ak_site_url_suffix = str_replace(array(join(DS,array_diff((array)@explode(DS,AK_BASE_DIR), (array)@explode('/',AK_REQUEST_URI))), DS,'//'), array('','/','/'), AK_BASE_DIR);
         define('AK_SITE_URL_SUFFIX', $__ak_site_url_suffix_userdir.$__ak_site_url_suffix);
         unset($__ak_site_url_suffix_userdir, $__ak_site_url_suffix);
     }
@@ -168,7 +169,7 @@ if(!AK_CLI && AK_WEB_REQUEST){
     if(!defined('AK_ASSET_URL_PREFIX')){
         defined('AK_ASSET_URL_PREFIX')  || define('AK_ASSET_URL_PREFIX', AK_INSECURE_APP_DIRECTORY_LAYOUT ? AK_SITE_URL_SUFFIX.str_replace(array(AK_BASE_DIR,'\\','//'),array('','/','/'), AK_PUBLIC_DIR) : AK_SITE_URL_SUFFIX);
     }
-
+    
 }else{
     defined('AK_PROTOCOL')          || define('AK_PROTOCOL',        'http://');
     defined('AK_HOST')              || define('AK_HOST',            'localhost');
