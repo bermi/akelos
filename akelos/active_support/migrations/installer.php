@@ -804,7 +804,6 @@ Example:
         }
     }
 
-
     protected function _checkForModified(&$directory_structure, $base_path = null, $src_path = null) {
         foreach ($directory_structure as $k=>$node){
             if(!empty($this->skip_all)){
@@ -843,6 +842,24 @@ Example:
             }
         }
     }
+    
+    protected function _getInstalledFiles(&$directory_structure, $base_path = null, $src_path = null, $installed_files = array()) {
+        foreach ($directory_structure as $k=>$node){
+            if(is_array($node)){
+                foreach ($node as $dir=>$items){
+                    $path = $base_path.DS.$dir;
+                    if(is_dir($path)){
+                        $installed_files = array_merge($this->_getInstalledFiles($directory_structure[$k][$dir], $path, $src_path, $installed_files), $installed_files);
+                    }
+                }
+            }else{
+                $original_file = $base_path.DS.$node;
+                $new_file_location = $this->app_base_dir.str_replace($src_path, '', $original_file);
+                $installed_files[] = $new_file_location;
+            }
+        }
+        return array_unique($installed_files);
+    }
 
     protected function _copyFiles($directory_structure, $base_path = null, $src_path = null) {
         foreach ($directory_structure as $k=>$node){
@@ -860,33 +877,6 @@ Example:
                         echo 'Creating dir '.$path."\n";
                         $this->_makeDir($path, $src_path);
                         $this->_copyFiles($items, $path, $src_path);
-                    }
-                }
-            }
-        }
-    }
-
-    protected function _removeFiles($directory_structure, $base_path = null, $src_path = null) {
-        foreach ($directory_structure as $k=>$node){
-            $path = $base_path.DS.$node;
-            if(is_dir($path)){
-                $this->_removeFiles($items, $path, $src_path);
-                if(@rmdir($path)){
-                    echo 'Removing dir '.$path."\n";
-                }
-            }elseif(is_file($path)){
-                echo 'Removing file '.$path."\n";
-                unlink($path);
-            }elseif(is_array($node)){
-                foreach ($node as $dir=>$items){
-                    $path = $base_path.DS.$dir;
-                    if(is_dir($path)){
-                        echo 'Removing files from dir '.$path."\n";
-                        $this->_removeFiles($items, $path, $src_path);
-                        if(@rmdir($path)){
-                            echo 'Removing dir '.$path."\n";
-                        }
-                    }else{
                     }
                 }
             }
@@ -919,7 +909,11 @@ Example:
     public function removeFilesFromApp($files_dir) {
         $this->files = Ak::dir($files_dir, array('recurse'=> true));
         empty($this->options['force']) ? $this->_checkForModified($this->files, $files_dir, $files_dir) : null;
-        $this->_removeFiles($this->files, $files_dir, $files_dir);
+        $installed_files = $this->_getInstalledFiles($this->files, $files_dir, $files_dir);
+        foreach ($installed_files as $installed_file){
+            echo "Removing $installed_file\n";
+            unlink($installed_file);
+        }
     }
 
 }
