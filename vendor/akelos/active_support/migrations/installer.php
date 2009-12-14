@@ -844,7 +844,7 @@ Example:
             }
         }
     }
-    
+
     protected function _getInstalledFiles(&$directory_structure, $base_path = null, $src_path = null, $installed_files = array()) {
         foreach ($directory_structure as $k=>$node){
             if(is_array($node)){
@@ -902,10 +902,13 @@ Example:
         }
     }
 
-    public function copyFilesIntoApp($files_dir) {
+    public function copyFilesIntoApp($files_dir, $options = array()) {
         $this->files = Ak::dir($files_dir, array('recurse'=> true));
         empty($this->options['force']) ? $this->_checkForCollisions($this->files, $files_dir, $files_dir) : null;
         $this->_copyFiles($this->files, $files_dir, $files_dir);
+        if(!empty($options['relative_url'])){
+            $this->absolutizeStaticAssetFilePaths($files_dir, $options['relative_url']);
+        }
     }
 
     public function removeFilesFromApp($files_dir) {
@@ -917,6 +920,33 @@ Example:
             unlink($installed_file);
         }
         echo count($installed_files)." files removed\n";
+    }
+
+    public function absolutizeStaticAssetFilePaths($files_dir, $relative_url = '/') {
+        if($relative_url == '/') return ;
+        $relative_url = str_replace('//', '/', '/'.trim($relative_url, '/').'/');
+        $replacements = array(
+        'url(/images' => 'url('.$relative_url.'images',
+        'url(\'/images' => 'url(\''.$relative_url.'images',
+        'url("/images' => 'url("'.$relative_url.'images',
+        'src="/images/' => 'src="'.$relative_url.'images/',
+        'src=\'/images/' => 'src=\''.$relative_url.'images/',
+        'src="/javascrips/' => 'src="'.$relative_url.'javascrips/',
+        'src=\'/javascrips/' => 'src=\''.$relative_url.'javascrips/',
+        'type="text/css" href="/stylesheets' => 'type="text/css" href="'.$relative_url.'stylesheets',
+        'type=\'text/css\' href=\'/stylesheets' => 'type=\'text/css\' href=\''.$relative_url.'stylesheets',
+        );
+        $keys = array_keys($replacements);
+        $values = array_values($replacements);
+        $this->files = Ak::dir($files_dir, array('recurse'=> true));
+        empty($this->options['force']) ? $this->_checkForModified($this->files, $files_dir, $files_dir) : null;
+        $installed_files = $this->_getInstalledFiles($this->files, $files_dir, $files_dir);
+        foreach ($installed_files as $installed_file){
+            if(preg_match('/\.(js|css|html)$/', $installed_file)){
+                $contents = str_replace($keys, $values, file_get_contents($installed_file));
+                file_put_contents($installed_file, $contents);
+            }
+        }
     }
 
 }
