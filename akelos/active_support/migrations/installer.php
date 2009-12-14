@@ -276,7 +276,7 @@ Example:
         'default' => null,
         'optional' => false,
         );
-
+        $options = is_string($options) ? array('default' => $options) : $options;
         $options = array_merge($default_options, $options);
 
         echo "\n".$message.(empty($options['default'])?'': ' ['.$options['default'].']').': ';
@@ -765,42 +765,85 @@ Example:
             $Logger->log($message, $type);
         }
     }
-    
 
-    protected function _checkForCollisions(&$directory_structure, $base_path = null) {
+
+    protected function _checkForCollisions(&$directory_structure, $base_path = null, $src_path = null) {
         foreach ($directory_structure as $k=>$node){
             if(!empty($this->skip_all)){
                 return ;
             }
-            $path = str_replace($base_path, $this->app_base_dir, $base_path.DS.$node);
-            if(is_file($path)){
-                $message = Ak::t('File %file exists.', array('%file'=>$path));
-                $user_response = AkInstaller::promptUserVar($message."\n d (overwrite mine), i (keep mine), a (abort), O (overwrite all), K (keep all)", 'i');
-                if($user_response == 'i'){
-                    unset($directory_structure[$k]);
-                }    elseif($user_response == 'O'){
-                    return false;
-                }    elseif($user_response == 'K'){
-                    $directory_structure = array();
-                    return false;
-                }elseif($user_response != 'd'){
-                    echo "\nAborting\n";
-                    exit;
-                }
-            }elseif(is_array($node)){
+            if(is_array($node)){
                 foreach ($node as $dir=>$items){
                     $path = $base_path.DS.$dir;
                     if(is_dir($path)){
-                        if($this->_checkForCollisions($directory_structure[$k][$dir], $path) === false){
+                        if($this->_checkForCollisions($directory_structure[$k][$dir], $path, $src_path) === false){
                             $this->skip_all = true;
                             return;
                         }
                     }
                 }
+            }else{
+                $original_file = $base_path.DS.$node;
+                $new_file_location = $this->app_base_dir.str_replace($src_path, '', $original_file);
+                if(is_file($new_file_location)){
+                    $message = Ak::t('File %file exists.', array('%file'=>$new_file_location));
+                    $user_response = AkInstaller::promptUserVar($message."\n d (overwrite mine), i (keep mine), a (abort), O (overwrite all), K (keep all)", 'i');
+                    if($user_response == 'i'){
+                        unset($directory_structure[$k]);
+                    }    elseif($user_response == 'O'){
+                        return false;
+                    }    elseif($user_response == 'K'){
+                        $directory_structure = array();
+                        return false;
+                    }elseif($user_response != 'd'){
+                        echo "\nAborting\n";
+                        exit;
+                    }
+                }
             }
         }
     }
-    
+
+
+    protected function _checkForModified(&$directory_structure, $base_path = null, $src_path = null) {
+        foreach ($directory_structure as $k=>$node){
+            if(!empty($this->skip_all)){
+                return ;
+            }
+
+            if(is_array($node)){
+                foreach ($node as $dir=>$items){
+                    $path = $base_path.DS.$dir;
+                    if(is_dir($path)){
+                        if($this->_checkForModified($directory_structure[$k][$dir], $path, $src_path) === false){
+                            $this->skip_all = true;
+                            return;
+                        }
+                    }
+                }
+            }else{
+                $original_file = $base_path.DS.$node;
+                $new_file_location = $this->app_base_dir.str_replace($src_path, '', $original_file);
+                if(md5_file($new_file_location) != md5_file($original_file)){
+                    $message = Ak::t('The file %file exists has local modifications.', array('%file'=>$new_file_location));
+                    $user_response = AkInstaller::promptUserVar($message."\n k (keep mine), d (delete), a (abort), D (delete all), K (keep all)", 'k');
+                    if($user_response == 'k'){
+                        unset($directory_structure[$k]);
+                    }elseif($user_response == 'd'){
+                    }elseif($user_response == 'D'){
+                        return false;
+                    } elseif($user_response == 'K'){
+                        $directory_structure = array();
+                        return false;
+                    }elseif($user_response != 'd'){
+                        echo "\nAborting\n";
+                        exit;
+                    }
+                }
+            }
+        }
+    }
+
     protected function _copyFiles($directory_structure, $base_path = null, $src_path = null) {
         foreach ($directory_structure as $k=>$node){
             $path = $base_path.DS.$node;
@@ -823,6 +866,33 @@ Example:
         }
     }
 
+    protected function _removeFiles($directory_structure, $base_path = null, $src_path = null) {
+        foreach ($directory_structure as $k=>$node){
+            $path = $base_path.DS.$node;
+            if(is_dir($path)){
+                $this->_removeFiles($items, $path, $src_path);
+                if(@rmdir($path)){
+                    echo 'Removing dir '.$path."\n";
+                }
+            }elseif(is_file($path)){
+                echo 'Removing file '.$path."\n";
+                unlink($path);
+            }elseif(is_array($node)){
+                foreach ($node as $dir=>$items){
+                    $path = $base_path.DS.$dir;
+                    if(is_dir($path)){
+                        echo 'Removing files from dir '.$path."\n";
+                        $this->_removeFiles($items, $path, $src_path);
+                        if(@rmdir($path)){
+                            echo 'Removing dir '.$path."\n";
+                        }
+                    }else{
+                    }
+                }
+            }
+        }
+    }
+
     protected function _makeDir($path, $base_path) {
         $dir = str_replace($base_path, $this->app_base_dir,$path);
         if(!is_dir($dir)){
@@ -839,13 +909,17 @@ Example:
             chmod($destination_file,$source_file_mode);
         }
     }
-    
-
 
     public function copyFilesIntoApp($files_dir) {
         $this->files = Ak::dir($files_dir, array('recurse'=> true));
-        empty($this->options['force']) ? $this->_checkForCollisions($this->files, $files_dir) : null;
+        empty($this->options['force']) ? $this->_checkForCollisions($this->files, $files_dir, $files_dir) : null;
         $this->_copyFiles($this->files, $files_dir, $files_dir);
+    }
+
+    public function removeFilesFromApp($files_dir) {
+        $this->files = Ak::dir($files_dir, array('recurse'=> true));
+        empty($this->options['force']) ? $this->_checkForModified($this->files, $files_dir, $files_dir) : null;
+        $this->_removeFiles($this->files, $files_dir, $files_dir);
     }
 
 }
