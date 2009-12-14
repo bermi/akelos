@@ -237,15 +237,11 @@ class Makelos
     }
 
     public function runTaskFiles($task_name, $options = array()) {
+        $files = $this->_getTaskFiles($task_name);
         $task_name = str_replace(':', DS, $task_name);
         $Makelos = $this;
         $Logger = Ak::getLogger('makelos'.DS.AkInflector::underscore($task_name));
-        foreach (
-        array_diff(array_merge(
-            glob(AK_TASKS_DIR.DS.$task_name.'*.task.*'),
-            glob(AK_TASKS_DIR.DS.$task_name.DS.$task_name.'*.task.*') 
-        ), array(''))
-        as $file){
+        foreach ($files as $file){
             $pathinfo = @pathinfo($file);
             if(@$pathinfo['extension'] == 'php'){
                 include($file);
@@ -294,12 +290,6 @@ class Makelos
         $default_options = array();
         $task_names = strstr($task_name, ',') ? array_map('trim', explode(',', $task_name)) : array($task_name);
         foreach ($task_names as $task_name) {
-            $task_files = glob(AK_TASKS_DIR.DS.str_replace(':',DS, $task_name.'.task*.*'));
-            $task_files = array_merge($task_files, glob(AK_TASKS_DIR.DS.$task_name.DS.str_replace(':',DS, $task_name.'.task*.*')));
-            $task_files = array_diff($task_files, array(''));
-            if(empty($options['run']) && empty($task_files)){
-                $this->error("No task file found for $task_name in ".AK_TASKS_DIR, true);
-            }
             $this->tasks[$task_name] = $options;
         }
     }
@@ -316,6 +306,7 @@ class Makelos
         $this->message("    ./makelos task:name ENVIROMENT=production parameter=value param -abc --param=value");
 
         $this->message("\nShowing tasks avalable at ".AK_TASKS_DIR.":\n");
+
         foreach ($this->tasks as $task => $details){
             $this->showTaskDocumentation($task);
         }
@@ -409,7 +400,6 @@ class Makelos
     }
 
 
-
     // Autocompletion handling
 
     public function getAvailableTasksForAutocompletion() {
@@ -421,7 +411,7 @@ class Makelos
         $Makelos = $this;
         $autocompletion_options = array();
         $autocomplete_accessor = 'autocompletion'.($level === 1 ? '' : '_'.$level);
-        $autocompletion_executables = 
+        $autocompletion_executables =
         array_diff(array_merge(
         glob(AK_TASKS_DIR.DS.$task_name.'*.'.$autocomplete_accessor.'.*'),
         glob(AK_TASKS_DIR.DS.$task_name.DS.$task_name.'.'.$autocomplete_accessor.'.*')
@@ -459,6 +449,35 @@ class Makelos
     }
 
 
+
+    protected function _getTaskFiles($task_name, $bark_on_error = true){
+        $task_parts = array_diff(explode(':', $task_name.':'), array(''));
+        $task_part_count = count($task_parts);
+        $search_patterns = array();
+
+        $search_patterns[] = join(DS, $task_parts).'.task*.*';
+        if($task_part_count == 1){
+            $search_patterns[] = str_replace(':',DS, $task_name).DS.join(DS, $task_parts).'.task*.*';
+        }
+        $subtask = array_pop($task_parts);
+        if(!empty($subtask)){
+            $search_patterns[] = join(DS, $task_parts).'.'.$subtask.'.task*.*';
+            if($task_part_count == 1){
+                $search_patterns[] = str_replace(':',DS, $task_name).DS.join(DS, $task_parts).'.'.$subtask.'.task*.*';
+            }
+        }
+
+        $task_files = array();
+        foreach ($search_patterns as $search_pattern){
+            $task_files = array_merge($task_files, glob(AK_TASKS_DIR.DS.$search_pattern));
+        }
+        //
+        $task_files = array_diff($task_files, array(''));
+        if($bark_on_error && empty($this->tasks[$task_name]['run']) && empty($task_files)){
+            $this->error("No task file found for $task_name in ".AK_TASKS_DIR, true);
+        }
+        return $task_files;
+    }
 
 
     private function _ensurePosixAndPcntlAreAvailable() {
@@ -505,12 +524,11 @@ function makelos_setting($settings = array()){
 ./makelos db:test:prepare           # Prepare the test database and load the schema
 ./makelos db:test:purge             # Empty the test database
 
-./makelos doc:app                   # Build the app HTML Files
-./makelos doc:app:remove            # Remove app documentation
-./makelos doc:plugins:remove        # Remove plugin documentation
-./makelos doc:akelos:remove         # Remove akelos documentation
-./makelos doc:plugins               # Generate documation for all installed plugins
-./makelos doc:akelos                # Build the akelos HTML Files
+./makelos doc:app                   # Build the app documetation Files into docs/app/api
+./makelos doc:plugins               # Generate documation for all installed plugins in docs/plugins
+./makelos doc:akelos                # Build the akelos documentation files into docs/akelos/api
+./makelos doc:website               # Add a new controller at /docs to browse avaliable documentation
+./makelos doc:website:remove        # Removed the files added by ./makelos doc:website
 
 ./makelos log:clear                 # Truncates all *.log files in log/ to zero bytes
 
