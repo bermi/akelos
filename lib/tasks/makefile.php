@@ -19,10 +19,6 @@ makelos_task('test:units', array(
     //'autocompletion' => 'ENVIRONMENT=production'
 ));
 
-makelos_task('doc:akelos', array(
-    'description' => 'Build the akelos HTML Files'
-));
-
 makelos_task('release:generate', array(
     'description' => 'Generates a new release'
 ));
