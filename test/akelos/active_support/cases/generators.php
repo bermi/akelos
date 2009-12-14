@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../config.php');
 
-class GeneratorUnitTest extends ActiveSupportUnitTest
+class ControllerGenerator_TestCase extends ActiveSupportUnitTest
 {
     public function runGeneratorCommand($command){
         ob_start();
