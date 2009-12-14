@@ -79,7 +79,7 @@ class AkActionView
     $first_render,
     $app_views_dir,
     $base_path,
-    $assigns,
+    $assigns = array(),
     $template_extension,
     $controller,
     $logger,
@@ -94,14 +94,13 @@ class AkActionView
 
     public $_template_handlers = array();
     public $template_args = array();
-
+    private $_local_assigns = array();
 
     public function __construct($base_path = null, $assigns_for_first_render = array(), $controller = null) {
         $this->app_views_dir = AkConfig::getDir('views');
         $this->base_path = empty($base_path) ? $this->app_views_dir : $base_path;
         $this->assigns = $assigns_for_first_render;
         $this->format = !empty($assigns_for_first_render['format']) ? $assigns_for_first_render['format'] : 'html';
-        $this->assigns_added = null;
         if(!empty($controller)){
             $this->controller = $controller;
             $this->logger = !empty($controller) && !empty($controller->Logger);
@@ -179,15 +178,15 @@ class AkActionView
         }
     }
 
+
     /*
     * Renders the +template+ which is given as a string as tpl.php or js.tpl depending on <tt>template_extension</tt>.
     * The array in <tt>local_assigns</tt> is made available as local variables.
     */
     public function renderTemplate($____template_extension, $____template, $____file_path = null, $____local_assigns = array(), $____save_content_in_attribute_as = 'layout') {
         $____result = '';
-        $____controller_extras = isset($this->controller) ? array('controller_name' => $this->controller->getControllerName(), 'controller' => $this->controller) : array();
-        $____local_assigns = array_merge(array_merge($this->getGlobals(),(array)@$this->assigns,array_merge((array)@$this->_local_assigns,
-        array_merge((array)$____local_assigns, $____controller_extras))));
+
+        $____local_assigns = $this->getLocalAssigns($____local_assigns);
 
         if(strstr($____template_extension,'.')){
             $____format = substr($____template_extension, 0, strpos($____template_extension,'.'));
@@ -272,13 +271,6 @@ class AkActionView
         return $recheck ? $this->_getFullTemplatePath($result, false) : $result;
     }
 
-    public function evaluateAssigns() {
-        if(empty($this->assigns_added)){
-            $this->_assignVariablesFromController();
-            $this->assigns_added = true;
-        }
-    }
-
     protected function _templateExists($template_path, $extension) {
         $file_path = $this->getFullTemplatePath($template_path, $extension);
         return !empty($this->_method_names[$file_path]) || file_exists($file_path);
@@ -289,14 +281,15 @@ class AkActionView
     }
 
     protected function _delegateRender($handler, $template, $local_assigns, $file_path) {
-        $HandlerInstance = new $handler($this);
-        return $HandlerInstance->render($template, $local_assigns, $file_path);
-    }
-
-    protected function _assignVariablesFromController() {
-        foreach ($this->assigns as $k=>$v){
-            $this->$k = $v;
+        static $Handlers = array();
+        if(empty($Handlers[$handler])){
+            $HandlerInstance = new $handler($this);
+            $Handlers[$handler] = $HandlerInstance;
+        }else{
+            $HandlerInstance = $Handlers[$handler];
+            $HandlerInstance->init($this);
         }
+        return $HandlerInstance->render($template, $local_assigns, $file_path);
     }
 
     public function javascriptTemplateExists($template_path) {
@@ -393,8 +386,20 @@ class AkActionView
     public function renderCollectionOfPartials($partial_name, $collection, $partial_spacer_template = null, $local_assigns = array()) {
         return $this->renderPartialCollection($partial_name, $collection, $partial_spacer_template, $local_assigns);
     }
+    
+    protected function getLocalAssigns($extra_assigns = array()){
+        $controller_extras = isset($this->controller) ? array('controller_name' => $this->controller->getControllerName(), 'controller' => $this->controller) : array();
+        $result = array_merge(
+        $this->getGlobals(),
+        $this->assigns,
+        $this->_local_assigns,
+        $extra_assigns,
+        $controller_extras
+        );
 
-
+        return $result;
+    }
+    
     protected function _partialPathPiece($partial_path) {
         if(strstr($partial_path, '/')){
             $dir_name = dirname($partial_path);

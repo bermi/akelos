@@ -631,7 +631,6 @@ class AkActionController extends AkLazyObject
         $result = $this->render($options);
         $this->eraseRenderResults();
         $this->variables_added = null;
-        $this->Template->_assigns_added = null;
         return $result;
     }
 
@@ -658,7 +657,7 @@ class AkActionController extends AkLazyObject
 
     public function renderTemplate($template, $status = null, $type = 'tpl', $local_assigns = array()) {
         $this->_addVariablesToAssigns();
-        $local_assigns = array_merge($local_assigns,$this->_assigns);
+        $local_assigns = array_merge($local_assigns, $this->_assigns);
         return $this->renderText($this->Template->renderTemplate($type, $template, null, $local_assigns), $status);
     }
 

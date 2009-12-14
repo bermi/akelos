@@ -8,23 +8,23 @@ class AkPhpTemplateHandler
     public $_codeSanitizerClass = AK_PHP_CODE_SANITIZER_FOR_TEMPLATE_HANDLER;
 
     public function __construct(&$AkActionView) {
+        $this->init($AkActionView);
+    }
+
+    public function init(&$AkActionView) {
+        $this->_options = array();
         $this->_AkActionView = $AkActionView;
     }
 
     public function render(&$____code, $____local_assigns, $____file_path) {
+
         $this->_options['variables'] = $____local_assigns;
         $this->_options['code'] =& $____code;
         $this->_options['functions'] = array('');
         $this->_options['file_path'] = $____file_path;
 
         if($this->_templateNeedsCompilation()){
-            if(!class_exists($this->_templateEngine)){
-                require_once(AK_ACTION_PACK_DIR.DS.'template_engines'.DS.$this->_templateEngine.DS.'base.php');
-            }
-            $____template_engine_name = 'Ak'.AkInflector::camelize($this->_templateEngine);
-
-            $TemplateEngine = new $____template_engine_name();
-
+            $TemplateEngine = $this->_getTemplateEngineInstance($this->_templateEngine);
             $TemplateEngine->init(array(
             'code' => $____code,
             'helper_loader' => $this->_AkActionView->getHelperLoader()
@@ -49,18 +49,30 @@ class AkPhpTemplateHandler
             }
             $this->_saveCompiledTemplate();
         }
-
         (array)$____local_assigns;
         extract($____local_assigns, EXTR_SKIP);
         ob_start();
 
         include $this->_getCompiledTemplatePath();
 
-        !empty($shared) ? $this->_AkActionView->addSharedAttributes($shared) : null;
+        empty($shared) || $this->_AkActionView->addSharedAttributes($shared);
 
         return  ob_get_clean();
     }
 
+    private function &_getTemplateEngineInstance(){
+        static $TemplateEngineInstances = array();
+        if(!isset($TemplateEngineInstances[$this->_templateEngine])){
+            if(!class_exists($this->_templateEngine)){
+                require_once(AK_ACTION_PACK_DIR.DS.'template_engines'.DS.$this->_templateEngine.DS.'base.php');
+                $template_engine_name = 'Ak'.AkInflector::camelize($this->_templateEngine);
+            }else{
+                $template_engine_name = $this->_templateEngine;
+            }
+            $TemplateEngineInstances[$this->_templateEngine] = new $template_engine_name();
+        }
+        return $TemplateEngineInstances[$this->_templateEngine];
+    }
 
     public function _assertForValidTemplate() {
         static $CodeSanitizer;
