@@ -823,7 +823,9 @@ Example:
             }else{
                 $original_file = $base_path.DS.$node;
                 $new_file_location = $this->app_base_dir.str_replace($src_path, '', $original_file);
-                if(md5_file($new_file_location) != md5_file($original_file)){
+                if(!file_exists($new_file_location)){
+                    unset($directory_structure[$k]);
+                }elseif(md5_file($new_file_location) != md5_file($original_file)){
                     $message = Ak::t('The file %file exists has local modifications.', array('%file'=>$new_file_location));
                     $user_response = AkInstaller::promptUserVar($message."\n k (keep mine), d (delete), a (abort), D (delete all), K (keep all)", 'k');
                     if($user_response == 'k'){
@@ -914,6 +916,7 @@ Example:
             echo "Removing $installed_file\n";
             unlink($installed_file);
         }
+        echo count($installed_files)." files removed\n";
     }
 
 }
