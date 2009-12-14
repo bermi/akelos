@@ -274,11 +274,15 @@ class AkLexer
      *    @access public
      */
     public function __construct(&$parser, $start = 'accept', $case = false) {
-        $this->_case = $case;
         $this->_regexes = array();
-        $this->_parser = &$parser;
+        $this->init($parser, $start, $case);
         $this->_mode = new AkLexerStateStack($start);
         $this->_mode_handlers = array();
+    }
+    
+    public function init(&$parser, $start = 'accept', $case = false){
+        $this->_case = $case;
+        $this->_parser = &$parser;
     }
 
     /**

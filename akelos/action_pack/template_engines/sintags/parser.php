@@ -26,13 +26,13 @@ class AkSintagsParser
     private $_HelperLoader;
 
     public function __construct($mode = 'Text') {
-        $this->_Lexer = new $this->_lexer_name($this);
+        $this->_loadLexer();
         $this->_mode = $mode;
         $this->_matches = array();
         $this->_last_match = '';
         $this->_current_match = '';
     }
-
+    
     public function parse($raw) {
         if(empty($this->parsed_code)){
             $this->_Lexer->parse($this->beforeParsing($this->_escapeChars($raw)));
@@ -715,5 +715,16 @@ class AkSintagsParser
         }
     }
     
+    private function _loadLexer(){
+        static $Lexer;
+        if(empty($Lexer)){
+            $this->_Lexer = new $this->_lexer_name($this);
+            $Lexer = $this->_Lexer;
+        }else{
+            $this->_Lexer = $Lexer;
+            $this->_Lexer->init($this);
+        }
+    }
+   
 }
 
