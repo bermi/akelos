@@ -25,7 +25,7 @@ class AkTestRequest extends AkRequest
         }
 
         if(!is_file($controller_path) || !include_once($controller_path)){
-            defined('AK_LOG_EVENTS') && AK_LOG_EVENTS && $this->Logger->error('Controller '.$controller_path.' not found.');
+            AK_LOG_EVENTS && Ak::getLogger()->error('Controller '.$controller_path.' not found.');
             if(AK_ENVIRONMENT == 'development'){
                 trigger_error(Ak::t('Could not find the file /app/controllers/<i>%controller_file_name</i> for '.
                 'the controller %controller_class_name',
@@ -45,7 +45,7 @@ class AkTestRequest extends AkRequest
             }
         }
         if(!class_exists($controller_class_name)){
-            defined('AK_LOG_EVENTS') && AK_LOG_EVENTS && $this->Logger->error('Controller '.$controller_path.' does not implement '.$controller_class_name.' class.');
+            AK_LOG_EVENTS && Ak::getLogger()->error('Controller '.$controller_path.' does not implement '.$controller_class_name.' class.');
             if(AK_ENVIRONMENT == 'development'){
                 trigger_error(Ak::t('Controller <i>%controller_name</i> does not exist',
                 array('%controller_name' => $controller_class_name)), E_USER_ERROR);
@@ -60,7 +60,7 @@ class AkTestRequest extends AkRequest
             }
         }
         $Controller = new $controller_class_name(array('controller'=>true));
-        $Controller->_module_path = $module_path;
+        $Controller->setModulePath($module_path);
         isset($_SESSION) ? $Controller->session =& $_SESSION : null;
         return $Controller;
 

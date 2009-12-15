@@ -2119,6 +2119,7 @@ class Ak
             'AkResponse'                    => 'action_pack/response.php',
             'AkRouter'                      => 'action_pack/router.php',
             'AkSession'                     => 'action_pack/session.php',
+            'AkStream'                      => 'action_pack/stream.php',
             'AkSintags'                     => 'action_pack/template_engines/sintags/base.php',
             'AkSintagsLexer'                => 'action_pack/template_engines/sintags/lexer.php',
             'AkSintagsParser'               => 'action_pack/template_engines/sintags/parser.php',

@@ -40,6 +40,7 @@ class AkRequest
     public $controller = AK_DEFAULT_CONTROLLER;
     public $view;
 
+
     /**
     * Holds information about current environment. Initially a reference to $_SERVER
     *
@@ -66,6 +67,9 @@ class AkRequest
     );
 
     public $_format;
+
+    protected $_url_decoded = false;
+
     /**
     * String parse method.
     *
@@ -111,7 +115,7 @@ class AkRequest
     public function init($force = false) {
         if(!$this->_init_check || $force){
             $this->env =& $_SERVER;
-            $this->_urlDecode();
+            $this->_decodeUrl();
 
             $this->_mergeRequest();
 
@@ -183,11 +187,6 @@ class AkRequest
                     $this->_request[$k] = $v;
                 }
             }
-        }
-
-        if(defined('AK_LOG_EVENTS') && AK_LOG_EVENTS){
-            $this->Logger =& Ak::getLogger();
-            $this->Logger->message($this->Logger->formatText('Request','green').' from '.$this->getRemoteIp(), $this->getParams());
         }
     }
 
@@ -476,9 +475,6 @@ class AkRequest
     }
 
 
-
-    // {{{ _mergeRequest()
-
     /**
     * Populates $this->_request attribute with incoming request in the following precedence:
     *
@@ -504,8 +500,6 @@ class AkRequest
             array_merge($this->_request,$request) : $this->_request;
         }
     }
-
-    // }}}
 
     public function _getNormalizedFilesArray($params = null, $first_call = true) {
         $params = $first_call ? $_FILES : $params;
@@ -588,23 +582,6 @@ class AkRequest
         return false;
     }
 
-    // }}}
-
-
-    public function _urlDecode() {
-        if(!defined('AK_URL_DECODED')){
-            array_walk($_GET, array('AkRequest', '_performUrlDecode'));
-            define('AK_URL_DECODED',true);
-        }
-    }
-
-    public function _performUrlDecode(&$item) {
-        if (is_array($item)) {
-            array_walk($item, array('AkRequest', '_performUrlDecode'));
-        }else {
-            $item = urldecode($item);
-        }
-    }
     public function getAccepts() {
         $accept_header = isset($this->env['HTTP_ACCEPT'])?$this->env['HTTP_ACCEPT']:'';
         $accepts = array();
@@ -648,8 +625,6 @@ class AkRequest
     }
 
 
-    // {{{ recognize()
-
     /**
     * Recognizes a Request and returns the responsible controller instance
     *
@@ -659,87 +634,9 @@ class AkRequest
         $this->_startSession();
         $this->_enableInternationalizationSupport();
         $this->_mapRoutes($Map);
-
-        $params = $this->getParams();
-
-        $module_path = $module_class_peffix = '';
-        if(!empty($params['module'])){
-            $module_path = trim(str_replace(array('/','\\'), DS, Ak::sanitize_include($params['module'], 'high')), DS).DS;
-            $module_shared_model = AkConfig::getDir('controllers').DS.trim($module_path,DS).'_controller.php';
-            $module_class_peffix = AkInflector::camelize($params['module']).'_';
-        }
-
-        $controller_file_name = AkInflector::underscore($params['controller']).'_controller.php';
-        $controller_class_name = $module_class_peffix.AkInflector::camelize($params['controller']).'Controller';
-        $controller_path = AkConfig::getDir('controllers').DS.$module_path.$controller_file_name;
-
-        if(!empty($module_path) && isset($module_shared_model) && file_exists($module_shared_model)){
-            include_once($module_shared_model);
-        }
-
-        if(!is_file($controller_path) || !include_once($controller_path)){
-            defined('AK_LOG_EVENTS') && AK_LOG_EVENTS && $this->Logger->error('Controller '.$controller_path.' not found.');
-            if(AK_ENVIRONMENT == 'development'){
-                trigger_error(Ak::t('Could not find the file /app/controllers/<i>%controller_file_name</i> for '.
-                'the controller %controller_class_name',
-                array('%controller_file_name'=> $controller_file_name,
-                '%controller_class_name' => $controller_class_name)), E_USER_ERROR);
-            }elseif(@include(AkConfig::getDir('public').DS.'404.php')){
-                exit;
-            }else{
-                header("HTTP/1.1 404 Not Found");
-                die('404 Not found');
-            }
-        }
-        if(!class_exists($controller_class_name)){
-            defined('AK_LOG_EVENTS') && AK_LOG_EVENTS && $this->Logger->error('Controller '.$controller_path.' does not implement '.$controller_class_name.' class.');
-            if(AK_ENVIRONMENT == 'development'){
-                trigger_error(Ak::t('Controller <i>%controller_name</i> does not exist',
-                array('%controller_name' => $controller_class_name)), E_USER_ERROR);
-            }elseif(@include(AkConfig::getDir('public').DS.'405.php')){
-                exit;
-            }else{
-                header("HTTP/1.1 405 Method Not Allowed");
-                die('405 Method Not Allowed');
-            }
-        }
-        $Controller = new $controller_class_name(array('controller'=>true));
-        $Controller->_module_path = $module_path;
-
-        if(isset($_SESSION)){
-            $Controller->session =& $_SESSION;
-            $this->saveRefererIfNotRedirected();
-        }
+        $Controller = $this->_getControllerInstance();
         return $Controller;
 
-    }
-
-    // }}}
-
-    public function _enableInternationalizationSupport() {
-        if(AK_AVAILABLE_LOCALES != 'en'){
-            $LocaleManager = new AkLocaleManager();
-            $LocaleManager->init();
-            $LocaleManager->initApplicationInternationalization($this);
-            $this->__internationalization_support_enabled = true;
-        }
-    }
-
-    public function _mapRoutes($Router = null) {
-        if(empty($Router)){
-            $Router = new AkRouter();
-            $Router->mapRules();
-        }
-        $this->checkForRoutedRequests($Router);
-    }
-
-    public function _startSession() {
-        if(AK_AUTOMATIC_SESSION_START){
-            if(!isset($_SESSION)){
-                $SessionHandler = AkSession::initHandler();
-                session_start();
-            }
-        }
     }
 
     public function getPutParams() {
@@ -771,11 +668,152 @@ class AkRequest
         return $referer;
     }
 
+    public function reportError($options = array()){
+        AK_LOG_EVENTS && !empty($options['log']) && Ak::getLogger()->error($options['log']);
+        if(AK_DEV_MODE && !empty($options['message'])){
+            trigger_error($options['message'], E_USER_ERROR);
+            return ;
+        }
+        $status_code = empty($options['status_code']) ? 501 : $options['status_code'];
+        $status_header = AkResponse::getStatusHeader($status_code);
+        if(!@include(AkConfig::getDir('public').DS.$status_code.'.php')){
+            header($status_header);
+            die(str_replace('HTTP/1.1 ', '', $status_header));
+        }
+    }
+
     public function saveRefererIfNotRedirected() {
         if(isset($_SESSION) && !$this->isAjax()){
             $_SESSION['_ak_referer'] = $this->getRequestUri().$this->getPath();
         }
         return true;
+    }
+
+    protected function _decodeUrl() {
+        if(!$this->_url_decoded){
+            array_walk($_GET, array($this, '_decodeUrlItem'));
+            $this->_url_decoded = true;
+        }
+    }
+
+    protected function _decodeUrlItem(&$item) {
+        if (is_array($item)) {
+            array_walk($item, array($this, '_decodeUrlItem'));
+        }else {
+            $item = urldecode($item);
+        }
+    }
+
+    private function &_getControllerInstance(){
+        $params = $this->getParams();
+        if(isset($params['module'])){
+            $this->_rebaseApplicationForModule($params['module']);
+        }
+        $module_details = $this->_getModuleDetailsFromParams($params);
+        $controller_details = $this->_getControllerDetailsFromParamsAndModuleDetails($params, $module_details);
+
+        $this->_includeModuleSharedController($module_details);
+        $this->_includeController($controller_details);
+        $this->_ensureControllerClassExists($controller_details);
+
+        $Controller = new $controller_details['class_name'](array('controller'=>true));
+        $Controller->setModulePath($module_details['path']);
+        $this->_linkSessionToController($Controller);
+        return $Controller;
+    }
+
+    private function _linkSessionToController(&$Controller){
+        if(isset($_SESSION)){
+            $Controller->session =& $_SESSION;
+            $this->saveRefererIfNotRedirected();
+        }
+    }
+
+    private function _getModuleDetailsFromParams($params = array()){
+        $details = array();
+        $details['name'] =
+        $details['path'] =
+        $details['class_peffix'] = '';
+        if(!empty($params['module'])){
+            $details['name'] = Ak::sanitize_include($params['module'], 'high');
+            $details['path'] = trim(str_replace(array('/','\\'), DS, $details['name']), DS).DS;
+            $details['shared_controller'] = AkConfig::getDir('controllers').DS.trim($details['path'],DS).'_controller.php';
+            $details['class_peffix'] = AkInflector::camelize($params['module']).'_';
+        }
+        return $details;
+    }
+
+    private function _includeModuleSharedController($module_details = array()){
+        if(!empty($module_details['path']) && isset($module_details['shared_controller']) && file_exists($module_details['shared_controller'])){
+            include_once($module_details['shared_controller']);
+        }
+    }
+
+    private function _includeController($controller_details = array()){
+        if(!is_file($controller_details['path']) || !@include_once($controller_details['path'])){
+            $this->reportError(array(
+            'status_code' => 404,
+            'message' => Ak::t('Could not find the file <i>%controller_file_name</i> for '.
+            'the controller %controller_class_name',
+            array('%controller_file_name'=> $controller_details['path'],
+            '%controller_class_name' => $controller_details['class_name'])),
+            'log' => 'Controller '.$controller_details['path'].' not found.'
+            ));
+        }
+    }
+
+    private function _ensureControllerClassExists($controller_details = array()){
+        if(!class_exists($controller_details['class_name'])){
+            $this->reportError(array(
+            'status_code' => 405,
+            'message' => Ak::t('Controller <i>%controller_name</i> does not exist',
+            array('%controller_name' => $controller_details['class_name'])),
+            'log' => 'Controller '.$controller_details['path'].' does not implement '.$controller_details['class_name'].' class.'
+            ));
+        }
+    }
+
+    private function _getControllerDetailsFromParamsAndModuleDetails($params = array(), $module_details = array()){
+        $details = array();
+        $details['file_name'] = AkInflector::underscore($params['controller']).'_controller.php';
+        $details['class_name'] = $module_details['class_peffix'].AkInflector::camelize($params['controller']).'Controller';
+        $details['path'] = AkConfig::getDir('controllers').DS.$module_details['path'].$details['file_name'];
+        return $details;
+    }
+
+    protected function _enableInternationalizationSupport() {
+        if(AK_AVAILABLE_LOCALES != 'en'){
+            $LocaleManager = new AkLocaleManager();
+            $LocaleManager->init();
+            $LocaleManager->initApplicationInternationalization($this);
+            $this->__internationalization_support_enabled = true;
+        }
+    }
+
+    protected function _mapRoutes($Router = null) {
+        if(empty($Router)){
+            $Router = new AkRouter();
+            $Router->mapRules();
+        }
+        $this->checkForRoutedRequests($Router);
+    }
+
+    protected function _startSession() {
+        if(AK_AUTOMATIC_SESSION_START){
+            if(!isset($_SESSION)){
+                $SessionHandler = AkSession::initHandler();
+                session_start();
+            }
+        }
+    }
+
+    protected function _rebaseApplicationForModule($module_name){
+        if(AK_DEV_MODE && in_array(AK_REMOTE_IP, AkConfig::getOption('developer_ips', array('localhost','127.0.0.1','::1')))){
+            $BASE_CONSTANT = 'AK_'.strtoupper($module_name).'_MODULE_REBASE_PATH';
+            if(defined($BASE_CONSTANT)){
+                AkConfig::rebaseApp(constant($BASE_CONSTANT));
+            }
+        }
     }
 }
 

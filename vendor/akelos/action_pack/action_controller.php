@@ -105,12 +105,12 @@ class AkActionController extends AkLazyObject
     public $web_service_apis = array();
 
     public $module_name;
-    public $_module_path;
 
     public $_request_id = -1;
 
     protected
 
+    $_module_path,
     $_report_undefined_attributes = false,
     $_dynamic_attributes = array(),
     $_dynamic_methods = array();
@@ -345,7 +345,7 @@ class AkActionController extends AkLazyObject
     public function getCurrentControllerHelper() {
         $helper = $this->getControllerName();
         $helper = AkInflector::is_plural($helper)?AkInflector::singularize($helper):$helper;
-        $helper_file_name = AK_HELPERS_DIR.DS.$this->_module_path.AkInflector::underscore($helper).'_helper.php';
+        $helper_file_name = AkConfig::getDir('helpers').DS.$this->getModulePath().AkInflector::underscore($helper).'_helper.php';
 
         if(file_exists($helper_file_name)){
             return array($helper_file_name => $helper);
@@ -356,12 +356,20 @@ class AkActionController extends AkLazyObject
     public function getModuleHelper(){
         $module_name = $this->getModuleName();
         if(!empty($module_name)){
-            $helper_file_name = AK_HELPERS_DIR.DS.AkInflector::underscore($module_name).'_helper.php';
+            $helper_file_name = AkConfig::getDir('helpers').DS.AkInflector::underscore($module_name).'_helper.php';
             if(file_exists($helper_file_name)){
                 return array($helper_file_name => $module_name);
             }
         }
         return array();
+    }
+
+    public function getModulePath(){
+        return $this->_module_path;
+    }
+
+    public function setModulePath($module_path){
+        $this->_module_path = $module_path;
     }
 
 
@@ -879,8 +887,8 @@ class AkActionController extends AkLazyObject
     public function _getIncludedControllerNames() {
         $controllers = array();
         foreach (get_included_files() as $file_name){
-            if(strstr($file_name,AK_CONTROLLERS_DIR)){
-                $controllers[] = AkInflector::classify(str_replace(array(AK_CONTROLLERS_DIR.DS,'.php', DS, '//'),array('','','/', '/'),$file_name));
+            if(strstr($file_name,AkConfig::getDir('controllers'))){
+                $controllers[] = AkInflector::classify(str_replace(array(AkConfig::getDir('controllers').DS,'.php', DS, '//'),array('','','/', '/'),$file_name));
             }
         }
         return $controllers;
@@ -1412,13 +1420,14 @@ class AkActionController extends AkLazyObject
         }elseif(empty($layout) || $layout === true){
             $layout = $this->_doesActionHasLayout() ? $this->getActiveLayout() : false;
         }
+
         if(!empty($layout)){
 
             $layout = strstr($layout,'/') || strstr($layout,DS) ? $layout : 'layouts'.DS.$layout;
             $layout = preg_replace('/\.tpl$/', '', $layout);
 
             $layout = substr($layout,0,7) === 'layouts' ?
-            (empty($this->_module_path) || !empty($this->layout) ? AK_VIEWS_DIR.DS.$layout.'.tpl' : AK_VIEWS_DIR.DS.'layouts'.DS.trim($this->_module_path, DS).'.tpl') :
+            (empty($this->_module_path) || !empty($this->layout) ? AkConfig::getDir('views').DS.$layout.'.tpl' : AkConfig::getDir('views').DS.'layouts'.DS.trim($this->_module_path, DS).'.tpl') :
             $layout.'.tpl';
 
             if (file_exists($layout)) {
@@ -1427,7 +1436,7 @@ class AkActionController extends AkLazyObject
             $layout = null;
         }
         if(empty($layout) && $layout !== false && defined('AK_DEFAULT_LAYOUT')){
-            $layout = AK_VIEWS_DIR.DS.'layouts'.DS.AK_DEFAULT_LAYOUT.'.tpl';
+            $layout = AkConfig::getDir('views').DS.'layouts'.DS.AK_DEFAULT_LAYOUT.'.tpl';
         }
         return file_exists($layout) ? $layout : false;
     }
@@ -1976,7 +1985,7 @@ class AkActionController extends AkLazyObject
      * This way you might free memory usage is file is too large
      */
     public function sendDataAsStream($data, $options) {
-        $temp_file_name = tempnam(AK_TMP_DIR, Ak::randomString());
+        $temp_file_name = tempnam(AkConfig::getDir('tmp'), Ak::randomString());
         $fp = fopen($temp_file_name, 'w');
         fwrite($fp, $data);
         fclose($fp);
@@ -2049,7 +2058,7 @@ class AkActionController extends AkLazyObject
             '%action_name' => $this->_action_name,
             )), E_USER_ERROR);
             return true;
-        }elseif(@include(AK_PUBLIC_DIR.DS.'405.php')){
+        }elseif(@include(AkConfig::getDir('public').DS.'405.php')){
             return false;
         }else{
             $this->Response->addHeader('Status',405);//("HTTP/1.1 405 Method Not Allowed");

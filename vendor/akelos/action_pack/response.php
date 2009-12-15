@@ -82,7 +82,7 @@ class AkResponse
             $this->_headers['Status'] = $this->_default_status;
         }
 
-        $status = $this->_getStatusHeader($this->_headers['Status']);
+        $status = $this->getStatusHeader($this->_headers['Status']);
         array_unshift($this->_headers,  $status ? $status : (strstr('HTTP/1.1 '.$this->_headers['Status'],'HTTP') ? $this->_headers['Status'] : 'HTTP/1.1 '.$this->_headers['Status']));
         unset($this->_headers['Status']);
 
@@ -155,7 +155,7 @@ class AkResponse
     }
 
 
-    public function _getStatusHeader($status_code) {
+    static function getStatusHeader($status_code) {
         $status_codes = array (
         100 => "HTTP/1.1 100 Continue",
         101 => "HTTP/1.1 101 Switching Protocols",
