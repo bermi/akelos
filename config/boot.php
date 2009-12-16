@@ -20,6 +20,6 @@ defined('AK_BASE_DIR')          || define('AK_BASE_DIR',            str_replace(
 defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       AK_BASE_DIR.DS.'vendor'.DS.'akelos');
 defined('AK_TESTING_NAMESPACE') || define('AK_TESTING_NAMESPACE',   'akelos');
 
-include AK_FRAMEWORK_DIR.DS.'active_support'.DS.'base.php';
-include AK_FRAMEWORK_DIR.DS.'active_support'.DS.'constants.php';
+include AK_FRAMEWORK_DIR.DS.'autoload.php';
+
 

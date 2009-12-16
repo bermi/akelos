@@ -458,7 +458,10 @@ class AkRequest
     public function isAjax() {
         return $this->isXmlHttpRequest();
     }
-
+    
+    static function isLocal(){
+        return in_array(AK_REMOTE_IP, AkConfig::getOption('local_ips', array('localhost','127.0.0.1','::1')));
+    }
 
     /**
      * Receive the raw post data.
@@ -765,7 +768,7 @@ class AkRequest
     private function _ensureControllerClassExists($controller_details = array()){
         if(!class_exists($controller_details['class_name'])){
             $this->reportError(array(
-            'status_code' => 405,
+            'status_code' => 404,
             'message' => Ak::t('Controller <i>%controller_name</i> does not exist',
             array('%controller_name' => $controller_details['class_name'])),
             'log' => 'Controller '.$controller_details['path'].' does not implement '.$controller_details['class_name'].' class.'
@@ -806,9 +809,9 @@ class AkRequest
             }
         }
     }
-
+    
     protected function _rebaseApplicationForModule($module_name){
-        if(AK_DEV_MODE && in_array(AK_REMOTE_IP, AkConfig::getOption('developer_ips', array('localhost','127.0.0.1','::1')))){
+        if(AK_DEV_MODE && $this->isLocal()){
             $BASE_CONSTANT = 'AK_'.strtoupper($module_name).'_MODULE_REBASE_PATH';
             if(defined($BASE_CONSTANT)){
                 AkConfig::rebaseApp(constant($BASE_CONSTANT));

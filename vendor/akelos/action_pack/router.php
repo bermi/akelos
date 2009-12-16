@@ -700,10 +700,10 @@ class AkRouter
     }
 
     public function mapDefaultRoutes(){
-        if(AK_DEV_MODE && in_array(AK_REMOTE_IP, AkConfig::getOption('developer_ips', array('localhost','127.0.0.1','::1')))){
-            defined('AK_AKELOS_CORE_MODULE_REBASE_PATH') || define('AK_AKELOS_CORE_MODULE_REBASE_PATH', AK_ACTIVE_SUPPORT_DIR.DS.'utils'.DS.'akelos_core_app');
-            $this->connect('/:controller/:action/:id', array('controller' => 'akelos_dashboard', 'action' => 'index', 'module' => 'akelos_core'));
-            $this->connect('/', array('controller' => 'akelos_dashboard', 'action' => 'index', 'module' => 'akelos_core'));
+        if(AK_DEV_MODE && AkRequest::isLocal()){
+            defined('AK_AKELOS_CORE_MODULE_REBASE_PATH') || define('AK_AKELOS_PANEL_MODULE_REBASE_PATH', AK_AKELOS_UTILS_DIR.DS.'akelos_panel');
+            $this->connect('/:controller/:action/:id', array('controller' => 'akelos_dashboard', 'action' => 'index', 'module' => 'akelos_panel'));
+            $this->connect('/', array('controller' => 'akelos_dashboard', 'action' => 'index', 'module' => 'akelos_panel'));
             return;
         }
         $this->connect('/:controller/:action/:id', array('controller' => 'page', 'action' => 'index'));

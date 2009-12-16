@@ -1,5 +1,7 @@
 <?php
 
+define('AKELOS_VERSION', '1.0.0');
+
 /**
 * Akelos Framework static functions
 *
@@ -2048,198 +2050,9 @@ class Ak
     }
 
     static function registerAutoloader($autoloader) {
-        spl_autoload_unregister(array('Ak','autoload'));
+        spl_autoload_unregister('akelos_autoload');
         spl_autoload_register($autoloader);
-        spl_autoload_register(array('Ak','autoload'));
-    }
-
-    static function autoload($name, $path = null) {
-        static $paths = array(), $lib_paths = array(), $app_paths = array();
-
-        if (!empty($path)){
-            $paths[$name] = $path;
-            return ;
-        }
-
-        if(empty($app_paths)){
-            $app_paths = array(
-            'BaseActionController'      =>  'controllers/base_action_controller.php',
-            'BaseActiveRecord'          =>  'models/base_active_record.php',
-            'ApplicationController'     =>  'controllers/application_controller.php',
-            'ActiveRecord'              =>  'models/shared_model.php',
-            );
-        }
-
-        if(empty($lib_paths)){
-            $lib_paths = array(
-            // Action Mailer
-            'AkActionMailer'        => 'action_mailer/base.php',
-            'AkMailComposer'        => 'action_mailer/composer.php',
-            'AkMailEncoding'        => 'action_mailer/encoding.php',
-            'AkMailBase'            => 'action_mailer/mail_base.php',
-            'AkMailMessage'         => 'action_mailer/message.php',
-            'AkMailParser'          => 'action_mailer/parser.php',
-            'AkMailPart'            => 'action_mailer/part.php',
-            'AkActionMailerQuoting' => 'action_mailer/quoting.php',
-
-            // Action Pack
-            'AkActionController'            => 'action_pack/action_controller.php',
-            'AkActionView'                  => 'action_pack/action_view.php',
-            'AkBaseHelper'                  => 'action_pack/base_helper.php',
-            'AkActionViewHelper'            => 'action_pack/base_helper.php',
-            'AkCacheHandler'                => 'action_pack/cache_handler.php',
-            'AkCacheSweeper'                => 'action_pack/cache_sweeper.php',
-            'AkActionControllerTest'        => 'action_pack/testing.php',
-            'AkHelperTest'                  => 'action_pack/testing.php',
-            'AkDbSession'                   => 'action_pack/db_session.php',
-            'AkDispatcher'                  => 'action_pack/dispatcher.php',
-            'ActiveRecordHelper'            => 'action_pack/helpers/active_record_helper.php',
-            'AssetTagHelper'                => 'action_pack/helpers/asset_tag_helper.php',
-            'AkFormHelperBuilder'           => 'action_pack/helpers/form_helper.php',
-            'AkFormHelperInstanceTag'       => 'action_pack/helpers/form_helper.php',
-            'FormHelper'                    => 'action_pack/helpers/form_helper.php',
-            'AkFormHelperOptionsInstanceTag'=> 'action_pack/helpers/form_options_helper.php',
-            'FormTagHelper'                 => 'action_pack/helpers/form_tag_helper.php',
-            'JavascriptHelper'              => 'action_pack/helpers/javascript_helper.php',
-            'JavascriptMacrosHelper'        => 'action_pack/helpers/javascript_macros_helper.php',
-            'MailHelper'                    => 'action_pack/helpers/mail_helper.php',
-            'MenuHelper'                    => 'action_pack/helpers/menu_helper.php',
-            'NumberHelper'                  => 'action_pack/helpers/number_helper.php',
-            'PaginationHelper'              => 'action_pack/helpers/pagination_helper.php',
-            'PrototypeHelper'               => 'action_pack/helpers/prototype_helper.php',
-            'ScriptaculousHelper'           => 'action_pack/helpers/scriptaculous_helper.php',
-            'TextHelper'                    => 'action_pack/helpers/text_helper.php',
-            'UrlHelper'                     => 'action_pack/helpers/url_helper.php',
-            'XmlHelper'                     => 'action_pack/helpers/xml_helper.php',
-            'AkHelperLoader'                => 'action_pack/helper_loader.php',
-            'AkPaginator'                   => 'action_pack/pagination.php',
-            'AkPhpCodeSanitizer'            => 'action_pack/php_code_sanitizer.php',
-            'AkPhpTemplateHandler'          => 'action_pack/php_template_handler.php',
-            'AkRequest'                     => 'action_pack/request.php',
-            'AkResponse'                    => 'action_pack/response.php',
-            'AkRouter'                      => 'action_pack/router.php',
-            'AkSession'                     => 'action_pack/session.php',
-            'AkStream'                      => 'action_pack/stream.php',
-            'AkSintags'                     => 'action_pack/template_engines/sintags/base.php',
-            'AkSintagsLexer'                => 'action_pack/template_engines/sintags/lexer.php',
-            'AkSintagsParser'               => 'action_pack/template_engines/sintags/parser.php',
-            'AkXhtmlValidator'              => 'action_pack/xhtml_validator.php',
-
-
-            'AkActionWebService'        => 'action_pack/action_web_service.php',
-            'AkActionWebserviceApi'     => 'action_pack/action_web_service/api.php',
-            'AkActionWebServiceClient'  => 'action_pack/action_web_service/client.php',
-            'AkActionWebServiceServer'  => 'action_pack/action_web_service/server.php',
-
-            // Active Record
-            'AkActiveRecord'            => 'active_record/active_record.php',
-            'AkDbAdapter'               => 'active_record/adapters/base.php',
-            'AkAssociatedActiveRecord'  => 'active_record/associated_active_record.php',
-            'AkAssociation'             => 'active_record/associations/base.php',
-            'AkBelongsTo'               => 'active_record/associations/belongs_to.php',
-            'AkHasAndBelongsToMany'     => 'active_record/associations/has_and_belongs_to_many.php',
-            'AkHasMany'                 => 'active_record/associations/has_many.php',
-            'AkHasOne'                  => 'active_record/associations/has_one.php',
-            'AkDbSchemaCache'           => 'active_record/database_schema_cache.php',
-            'AkActiveRecordMock'        => 'active_record/mock.php',
-            'AkObserver'                => 'active_record/observer.php',
-
-            // Active Resource
-            'AkHttpClient' => 'active_resource/http_client.php',
-
-            // Active Support
-            'AkAdodbCache'              => 'active_support/cache/adodb.php',
-            'AkCache'                   => 'active_support/cache/base.php',
-            'AkMemcache'                => 'active_support/cache/memcache.php',
-            'AkColor'                   => 'active_support/color/base.php',
-            'AkConfig'                  => 'active_support/config/base.php',
-            'AkClassExtender'           => 'active_support/core/class_extender.php',
-            'AkLazyObject'              => 'active_support/core/lazy_object.php',
-            'AkArray'                   => 'active_support/core/types/array.php',
-            'AkType'                    => 'active_support/core/types/base.php',
-            'AkDate'                    => 'active_support/core/types/date.php',
-            'AkRequestMimeType'         => 'active_support/core/types/mime.php',
-            'AkNumber'                  => 'active_support/core/types/number.php',
-            'AkString'                  => 'active_support/core/types/string.php',
-            'AkTime'                    => 'active_support/core/types/time.php',
-            'AkelosGenerator'           => 'active_support/generator.php',
-            'AkCharset'                 => 'active_support/i18n/charset/base.php',
-            'AkCountries'               => 'active_support/i18n/countries.php',
-            'AkLocaleManager'           => 'active_support/i18n/locale_manager.php',
-            'AkTimeZone'                => 'active_support/i18n/time_zone.php',
-            'AkImage'                   => 'active_support/image/base.php',
-            'AkImageColorScheme'        => 'active_support/image/color_scheme.php',
-            'AkImageFilter'             => 'active_support/image/filters/base.php',
-            'AkLogger'                  => 'active_support/logger.php',
-            'AkInstaller'               => 'active_support/migrations/installer.php',
-            'AkBaseModel'               => 'active_support/models/base.php',
-            'AkModelExtenssion'         => 'active_support/models/base.php',
-            'AkFtp'                     => 'active_support/network/ftp.php',
-            'AkPlugin'                  => 'active_support/plugin/base.php',
-            'AkPluginLoader'            => 'active_support/plugin/base.php',
-            'AkPluginInstaller'         => 'active_support/plugin/installer.php',
-            'AkPluginManager'           => 'active_support/plugin/manager.php',
-            'AkProfiler'                => 'active_support/profiler.php',
-            'AkReflection'              => 'active_support/reflection/base.php',
-            'AkReflectionClass'         => 'active_support/reflection/class.php',
-            'AkReflectionDocBlock'      => 'active_support/reflection/doc_block.php',
-            'AkReflectionFile'          => 'active_support/reflection/file.php',
-            'AkReflectionFunction'      => 'active_support/reflection/function.php',
-            'AkReflectionMethod'        => 'active_support/reflection/method.php',
-            'AkTestApplication'         => 'active_support/testing/application.php',
-            'AkelosTextReporter'        => 'active_support/testing/base.php',
-            'AkelosVerboseTextReporter' => 'active_support/testing/base.php',
-            'AkXUnitXmlReporter'        => 'active_support/testing/base.php',
-            'AkUnitTest'                => 'active_support/testing/base.php',
-            'AkWebTestCase'             => 'active_support/testing/base.php',
-            'AkTestDispatcher'          => 'active_support/testing/dispatcher.php',
-            'AkTestRequest'             => 'active_support/testing/request.php',
-            'AkTestResponse'            => 'active_support/testing/response.php',
-            'AkUnitTestSuite'           => 'active_support/testing/suite.php',
-            'AkInflector'               => 'active_support/text/inflector.php',
-            'AkLexer'                   => 'active_support/text/lexer.php',
-
-            // Active Document
-            'AkActiveDocument'          => 'active_document/base.php',
-            'AkOdbAdapter'              => 'active_document/adapters/base.php',
-
-            );
-        }
-
-        if(isset($lib_paths[$name])){
-            include AK_FRAMEWORK_DIR.DS.$lib_paths[$name];
-            return ;
-        }
-
-        if(isset($app_paths[$name])){
-            $file_path = AkConfig::getDir('app').DS.$app_paths[$name];
-            if(file_exists($file_path)){
-                include $file_path;
-                return ;
-            }
-        }
-
-        if(isset($paths[$name])){
-            include $paths[$name];
-        }elseif(file_exists(DS.$name.'.php')){
-            include DS.$name.'.php';
-        }else{
-            if(!Ak::import($name)){
-                if(strstr($name, 'Helper')){
-                    $file_path = AkConfig::getDir('helpers').DS.AkInflector::underscore($name).'.php';
-                    if(!file_exists($file_path)){
-                        $file_path = AK_ACTION_PACK_DIR.DS.'helpers'.DS.AkInflector::underscore($name).'.php';
-                    }
-                }elseif(strstr($name, 'Installer')){
-                    $file_path = AkConfig::getDir('app_installers').DS.AkInflector::underscore($name).'.php';
-                }elseif(strstr($name, 'Controller')){
-                    $file_path = AkInflector::toControllerFilename($name);
-                }
-            }
-        }
-        if(isset($file_path) && file_exists($file_path)){
-            include $file_path;
-        }
+        spl_autoload_register('akelos_autoload');
     }
 
     /**
@@ -2261,11 +2074,15 @@ class Ak
 
 
 
+/**
+ * Procedural functions
+ */
+
+
 function translate($string, $args = null, $controller = null)
 {
     return Ak::t($string, $args, $controller);
 }
-
 
 
 /**
@@ -2276,7 +2093,6 @@ function ak_get_tmp_dir_name()
     Ak::deprecateWarning('ak_get_tmp_dir_name is deprecated. Please use Ak::get_tmp_dir_name()');
     return Ak::get_tmp_dir_name();
 }
-
 
 function ak_test($test_case_name, $use_sessions = false, $prevent_double_test_running = true, $custom_reporter = false)
 {
@@ -2337,5 +2153,4 @@ function ak_define($name, $value = null)
     return  defined($name) ? constant($name) : (is_null($value) ? null : (define($name, $value) ? $value : null));
 }
 
-spl_autoload_register(array('Ak', 'autoload'));
 

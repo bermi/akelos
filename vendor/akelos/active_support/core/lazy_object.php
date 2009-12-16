@@ -93,7 +93,7 @@ class AkLazyObject
         $this->__extenssionPointOptions[$extenssion_point] = $options;
 
         if(isset($options['autoload_path'])){
-            Ak::autoload($extenssion_point, $options['autoload_path']);
+            akelos_autoload($extenssion_point, $options['autoload_path']);
         }
     }
 
@@ -254,7 +254,7 @@ class AkLazyObject
             }
         }
         $backtrace = debug_backtrace();
-        trigger_error("Fatal error: Call to undefined method ".get_class($this)."::".$name.'() in '.$backtrace[1]['file'].' on line '.$backtrace[1]['line'], E_USER_ERROR);
+        trigger_error("Fatal error: Call to undefined method ".get_class($this)."::".$name.'() in '.@$backtrace[1]['file'].' on line '.@$backtrace[1]['line'], E_USER_ERROR);
     }
 }
 

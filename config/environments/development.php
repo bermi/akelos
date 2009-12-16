@@ -5,6 +5,7 @@
 
 @ini_set('display_errors', 1);
 error_reporting(-1);
-define('AK_ENABLE_STRICT_XHTML_VALIDATION', false); // At least until the validator is fully tested
 
-?>
+
+// Variable configuration options can be set at this point by calling
+AkConfig::setOption('dooo', 'baa');
