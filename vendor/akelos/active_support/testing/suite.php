@@ -175,7 +175,7 @@ class AkUnitTestSuite extends TestSuite
             !mkdir(AK_TMP_DIR);
         }
         if(!AK_WIN){
-            $cmd = 'chmod -R 777 '.AK_TMP_DIR;
+            $cmd = 'chmod 777 '.AK_TMP_DIR;
             echo `$cmd`;
         }
     }
@@ -184,7 +184,9 @@ class AkUnitTestSuite extends TestSuite
         $files = array_diff(glob(AK_TMP_DIR.DS.'*'), array(''));
         foreach ($files as $file){
             if(!is_dir($file)){
-                @unlink($file);
+                if($file != '.gitignore'){
+                    @unlink($file);
+                }
             }else{
                 @Ak::rmdir_tree($file);
             }
