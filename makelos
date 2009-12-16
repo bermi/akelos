@@ -3,5 +3,5 @@
 
 define('MAKELOS_BASE_DIR', dirname(__FILE__));
 
-include('./vendor/akelos/makelos/makelos.php');
+include MAKELOS_BASE_DIR.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'akelos'.DIRECTORY_SEPARATOR.'makelos'.DIRECTORY_SEPARATOR.'makelos.php';
 
