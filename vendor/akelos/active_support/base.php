@@ -1,7 +1,5 @@
 <?php
 
-define('AKELOS_VERSION', '1.0.0');
-
 /**
 * Akelos Framework static functions
 *

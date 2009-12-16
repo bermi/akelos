@@ -1,5 +1,7 @@
 <?php
 
+define('AKELOS_VERSION', '1.0.0');
+
 /**
  * This file will bootstrap the Akelos framework by:
  * 
