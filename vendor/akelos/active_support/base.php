@@ -2023,8 +2023,11 @@ class Ak
     */
     static function get_tmp_dir_name() {
         if(!defined('AK_TMP_DIR')){
-            if(defined('AK_BASE_DIR') && is_writable(AK_BASE_DIR.DS.'tmp')){
-                return AK_BASE_DIR.DS.'tmp';
+            if(defined('AK_BASE_DIR')){
+                $tmp_dir = AK_BASE_DIR.DS.'tmp'.DS.AK_ENVIRONMENT.DS.(AK_CLI?'console':'web');
+                if(is_writable($tmp_dir)){
+                    return $tmp_dir;
+                }
             }
             if(!function_exists('sys_get_temp_dir')){
                 $dir = empty($_ENV['TMP']) ? (empty($_ENV['TMPDIR']) ? (empty($_ENV['TEMP']) ? false : $_ENV['TEMP']) : $_ENV['TMPDIR']) : $_ENV['TMP'];

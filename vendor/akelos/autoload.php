@@ -267,6 +267,10 @@ defined('AK_WIN')                                       || define('AK_WIN', strt
 defined('AK_OS')                                        || define('AK_OS', AK_WIN ? 'WINDOWS' : 'UNIX');
 defined('AK_CAN_FORK')                                  || define('AK_CAN_FORK', function_exists('pcntl_fork'));
 
+defined('AK_CLI')                       || define('AK_CLI', php_sapi_name() == 'cli');
+defined('AK_WEB_REQUEST')               || define('AK_WEB_REQUEST', !empty($_SERVER['REQUEST_URI']));
+
+
 if(AK_ENVIRONMENT != 'setup'){
     require_once(AK_CONFIG_DIR.DS.'environments'.DS.AK_ENVIRONMENT.'.php');
 }
@@ -290,8 +294,6 @@ defined('AK_AVAILABLE_ENVIRONMENTS')    || define('AK_AVAILABLE_ENVIRONMENTS','s
 
 defined('AK_TIME_DIFFERENCE')           || define('AK_TIME_DIFFERENCE', 0); // Time difference from the webserver
 
-defined('AK_CLI')                       || define('AK_CLI', php_sapi_name() == 'cli');
-defined('AK_WEB_REQUEST')               || define('AK_WEB_REQUEST', !empty($_SERVER['REQUEST_URI']));
 defined('AK_REQUEST_URI')               || define('AK_REQUEST_URI', isset($_SERVER['REQUEST_URI']) ?
 $_SERVER['REQUEST_URI'] :
 $_SERVER['PHP_SELF'] .'?'.(isset($_SERVER['argv']) ? $_SERVER['argv'][0] : $_SERVER['QUERY_STRING']));
