@@ -27,6 +27,10 @@ class MakelosRequest
         $argv = $arguments;
         while(!empty($arguments)){
             $argument = array_shift($arguments);
+            if($argument == '--hide-makelos-folder'){
+                define('MAKELOS_SHOW_FOLDER', false);
+                continue;
+            }
             /**
              *  Captures assignments even if there are blank spaces before or after the equal symbol.
              */
@@ -51,7 +55,7 @@ class MakelosRequest
                     $task_set = true;
                 }elseif($matches[1] == '-'){
                     foreach (str_split($matches[2]) as $k){
-                        $this->flags[$k] = true;
+                        $this->tasks[$task]['attributes'][$k] = true;
                     }
                 }elseif($task_set){
                     if($matches[1] == '--'){
@@ -70,7 +74,7 @@ class MakelosRequest
         if(!empty($type)){
             return isset($this->{$type}[$name]) ? $this->{$type}[$name] : false;
         }else{
-            foreach (array('constants', 'flags', 'attributes') as $type){
+            foreach (array('constants', 'attributes') as $type){
                 return $this->get($name, $type);
             }
         }
@@ -161,7 +165,9 @@ class Makelos
             $this->runTask('makelos:autocomplete', $this->Request->tasks['makelos:autocomplete'], false);
             return;
         }
-        $this->message('(in '.MAKELOS_BASE_DIR.')');
+        if(!defined('MAKELOS_SHOW_FOLDER') || MAKELOS_SHOW_FOLDER){
+            $this->message('(in '.MAKELOS_BASE_DIR.')');
+        }
         if(!empty($this->Request->tasks)){
             foreach ($this->Request->tasks as $task => $arguments){
                 $this->runTask($task, $arguments);
