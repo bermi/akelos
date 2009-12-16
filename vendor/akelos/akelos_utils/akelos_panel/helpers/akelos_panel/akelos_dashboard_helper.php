@@ -4,7 +4,7 @@ class AkelosDashboardHelper extends AkBaseHelper {
     private $_capturing_snippet = false;
 
     function get_menu_option($description, $url, $options = array()){
-        if(!empty($url['action']) && $url['action'] == $this->C->params['action']){
+        if(!empty($url['action']) && ($url['action'] == $this->C->params['action'] || $url['action'] == @$this->C->tab)){
             $options['class'] = 'active';
         }
 
@@ -18,15 +18,18 @@ class AkelosDashboardHelper extends AkBaseHelper {
     public function flash_message($type, $message){
         return '<div class="flash radius_3 '.$type.'">'.
         '<p><span class="icon">'.$this->t(strtoupper($type)).': </span>'.
-        TextHelper::h($message).
+        str_replace("\n", "<br />", TextHelper::h($message)).
         '</p></div>';
     }
+    
     public function flash_error($message){
         return $this->flash_message('error', $message);
     }
+    
     public function flash_notice($message){
         return $this->flash_message('notice', $message);
     }
+    
     public function flash_warning($message){
         return $this->flash_message('warning', $message);
     }

@@ -4,13 +4,13 @@
 
 <title>{?page_title}{_page_title}{else}_{Akelos guides}{end}</title>
 
-<%= stylesheet_link_tag 'docs/guide/style.css' %>
-<%= stylesheet_link_tag 'docs/guide/syntax.css' %>
-<%= stylesheet_link_tag 'docs/guide/print.css', :media => 'print' %>
+<link href="<%= url_for :controller => 'virtual_assets', :action => "stylesheets", :id => "guides", :format => "css" %>" rel="stylesheet" type="text/css" />
+<link href="<%= url_for :controller => 'virtual_assets', :action => "stylesheets", :id => "print", :format => "css" %>" rel="stylesheet" type="text/css" />
+<link href="<%= url_for :controller => 'virtual_assets', :action => "stylesheets", :id => "syntax", :format => "css" %>" rel="stylesheet" type="text/css" />
 
-<%= javascript_include_tag 'docs/guide/guides.js' %>
-<%= javascript_include_tag 'docs/guide/code_highlighter.js' %>
-<%= javascript_include_tag 'docs/guide/highlighters.js' %>
+<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "guides", :format => "js") %>
+<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "code_highlighter", :format => "js") %>
+<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "highlighters", :format => "js") %>
 
 </head>
 <body class="guide">

@@ -121,6 +121,7 @@ class AkRouter
                 $params_copy = $params;
                 $_parsed = '';
                 $_controller = '';
+
                 foreach ($params_copy as $_k=>$_v){
                     if(isset($$_k)){
                         unset($$_k);
@@ -354,6 +355,8 @@ class AkRouter
         foreach ($this->_loaded_routes as $_route){
             $params = array();
 
+            AkConfig::setOption('rebase_path', $_route['rebase']);
+
             if(preg_match($_route['regex'], $url)){
                 foreach ($_route['regex_array'] as $single_regex_arr){
 
@@ -539,6 +542,8 @@ class AkRouter
         $regex = rtrim($regex ,'/').'){1}$/';
         $regex = str_replace('/^\$/','/^\\/?$/',$regex);
 
+        $rebase = !empty($options['rebase']) ? $options['rebase'] : false;
+        unset($options['rebase']);
 
         $this->_loaded_routes[] = array(
         'url_path' => $url_pattern,
@@ -549,7 +554,8 @@ class AkRouter
         'regex_array' => $regex_arr,
         'optional_params' => $optional_pieces,
         'var_params' => $var_params,
-        'arr_params' => $arr_params
+        'arr_params' => $arr_params,
+        'rebase' => $rebase,
         );
 
     }
@@ -701,8 +707,7 @@ class AkRouter
 
     public function mapDefaultRoutes(){
         if(AK_DEV_MODE && AkRequest::isLocal()){
-            defined('AK_AKELOS_CORE_MODULE_REBASE_PATH') || define('AK_AKELOS_PANEL_MODULE_REBASE_PATH', AK_AKELOS_UTILS_DIR.DS.'akelos_panel');
-            $this->connect('/:controller/:action/:id', array('controller' => 'akelos_dashboard', 'action' => 'index', 'module' => 'akelos_panel'));
+            $this->connect('/:controller/:action/:id', array('controller' => 'akelos_dashboard', 'action' => 'index', 'module' => 'akelos_panel', 'rebase' => AK_AKELOS_UTILS_DIR.DS.'akelos_panel'));
             $this->connect('/', array('controller' => 'akelos_dashboard', 'action' => 'index', 'module' => 'akelos_panel'));
             return;
         }

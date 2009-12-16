@@ -8,4 +8,4 @@ error_reporting(-1);
 
 
 // Variable configuration options can be set at this point by calling
-AkConfig::setOption('dooo', 'baa');
+//AkConfig::setOption('options', 'value');

@@ -59,7 +59,8 @@
 $Map->connect('/dev_panel/:controller/:action/:id', array(
               'controller' => 'akelos_dashboard', 
               'action' => 'index', 
-              'module' => 'akelos_panel'
+              'module' => 'akelos_panel',
+              'rebase' => AK_AKELOS_UTILS_DIR.DS.'akelos_panel'
             ));
 <%= format_snippet %>
 

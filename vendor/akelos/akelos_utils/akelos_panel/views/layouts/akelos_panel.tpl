@@ -4,9 +4,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>{application_name}, Akelos Panel</title>
 <%= javascript_include_tag %>
+
 <link href="<%= url_for :controller => 'virtual_assets', :action => "stylesheets", :id => "akelos", :format => "css" %>" rel="stylesheet" type="text/css" />
 <link href="<%= url_for :controller => 'virtual_assets', :action => "stylesheets", :id => "syntax", :format => "css" %>" rel="stylesheet" type="text/css" />
-
 
 <%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "guides", :format => "js") %>
 <%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "code_highlighter", :format => "js") %>

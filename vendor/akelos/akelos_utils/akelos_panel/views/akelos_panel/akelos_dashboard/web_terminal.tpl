@@ -1,11 +1,9 @@
-
-
 <div class="wide-content">
     <h1>_{Akelos Terminal for <strong>%application_name</strong>}</h1>
     {?enabled}
     <p>_{The Akelos terminal is running as user <strong>%user</strong>.}</p>
     {else}
-    <%= flash_warning _("In order to use the Akelos Terminal you need to define('AK_ENABLE_TERMINAL_ON_DEV', true); on your config.php file") %>
+    <%= flash_warning _("In order to use the Akelos Terminal you need to define('AK_ENABLE_TERMINAL_ON_DEV', true); on your \nconfig/environments/development.php file") %>
     {end}
 </div>
 

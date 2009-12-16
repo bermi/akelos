@@ -709,8 +709,8 @@ class AkRequest
 
     private function &_getControllerInstance(){
         $params = $this->getParams();
-        if(isset($params['module'])){
-            $this->_rebaseApplicationForModule($params['module']);
+        if($rebase_path = AkConfig::getOption('rebase_path', false)){
+            AkConfig::rebaseApp($rebase_path);
         }
         $module_details = $this->_getModuleDetailsFromParams($params);
         $controller_details = $this->_getControllerDetailsFromParamsAndModuleDetails($params, $module_details);
@@ -806,15 +806,6 @@ class AkRequest
             if(!isset($_SESSION)){
                 $SessionHandler = AkSession::initHandler();
                 session_start();
-            }
-        }
-    }
-    
-    protected function _rebaseApplicationForModule($module_name){
-        if(AK_DEV_MODE && $this->isLocal()){
-            $BASE_CONSTANT = 'AK_'.strtoupper($module_name).'_MODULE_REBASE_PATH';
-            if(defined($BASE_CONSTANT)){
-                AkConfig::rebaseApp(constant($BASE_CONSTANT));
             }
         }
     }

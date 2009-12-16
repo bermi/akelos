@@ -257,7 +257,7 @@ $ ./makelos server
 
 This will fire up an instance of the Mongrel web server by default (Akelos can also use several other web servers). To see your application in action, open a browser window and navigate to +http://localhost:3000+. You should see Akelos' default information page:
 
-!/images/docs/akelos_welcome.png(Welcome Aboard screenshot)!
+!/images/akelos_welcome.png(Welcome Aboard screenshot)!
 
 TIP: To stop the web server, hit Ctrl+C in the terminal window where it's running. In development mode, Akelos does not generally require you to stop the server; changes you make in files will be automatically picked up by the server.
 
@@ -376,7 +376,7 @@ h4. Working with Posts in the Browser
 
 Now you're ready to start working with posts. To do that, navigate to +http://localhost:3000+ and then click the "My Blog" link:
 
-!/images/docs/posts_index.png(Posts Index screenshot)!
+!/images/posts_index.png(Posts Index screenshot)!
 
 This is the result of Akelos rendering the +index+ view of your posts. There aren't currently any posts in the database, but if you click the +New Post+ link you can create one. After that, you'll find that you can edit posts, look at their details, or destroy them. All of the logic and HTML to handle this was built by the single +./makelos generate scaffold+ command.
 

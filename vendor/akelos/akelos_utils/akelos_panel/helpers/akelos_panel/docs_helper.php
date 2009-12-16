@@ -29,6 +29,7 @@ class DocsHelper extends AkBaseHelper
 
     private function _beforeRender($textile){
         $textile = $this->_replacePlusPlus($textile);
+        $textile = $this->_rebaseImagePaths($textile);
         $textile = $this->_setCodeBlocks($textile);
         return $textile;
     }
@@ -55,11 +56,28 @@ class DocsHelper extends AkBaseHelper
         return $textile;
     }
 
+    private function _rebaseImagePaths($textile){
+        //
+        if(preg_match_all('/\!\/images\/([^\.]+)\.([^\(]+)\(/', $textile, $matches)){
+            foreach ($matches[1] as $k => $name){
+                $new_url = $this->C->url_helper->url_for(array(
+                    'controller'=> 'virtual_assets', 
+                    'action'    => 'guide_images', 
+                    'id'        => $name, 
+                    'format'    => $matches[2][$k],
+                    ));
+                $textile = str_replace($matches[0][$k], '!'.$new_url.'(', $textile);
+            }
+        }
+        return $textile;
+    }
+
     private function _setCodeBlocks($textile){
         if(preg_match_all('/<(yaml|shell|php|tpl|html|sql|plain)>(.*?)<\/\\1>/ms', $textile, $matches)){
             foreach ($matches[1] as $k => $class){
                 $css_class = strtolower($class);
                 $css_class = in_array($css_class, array('shell')) ? 'html' : $css_class;
+                
                 $escaped = TextHelper::h($matches[2][$k]);
                 $textile = str_replace($matches[0][$k], $this->_tabText("<notextile><div class='code_container'><code class='$css_class'>$escaped</code></div></notextile>"), $textile);
             }
