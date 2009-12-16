@@ -259,8 +259,9 @@ defined('AK_ACTION_PACK_DIR')       || define('AK_ACTION_PACK_DIR',     AK_FRAME
 defined('AK_ACTIVE_RECORD_DIR')     || define('AK_ACTIVE_RECORD_DIR',   AK_FRAMEWORK_DIR.DS.'active_record');
 defined('AK_ACTIVE_RESOURCE_DIR')   || define('AK_ACTIVE_RESOURCE_DIR', AK_FRAMEWORK_DIR.DS.'active_resource');
 defined('AK_ACTIVE_SUPPORT_DIR')    || define('AK_ACTIVE_SUPPORT_DIR',  AK_FRAMEWORK_DIR.DS.'active_support');
-defined('AK_ACTIVE_DOCUMENT_DIR')   || define('AK_ACTIVE_DOCUMENT_DIR',  AK_FRAMEWORK_DIR.DS.'active_document');
-defined('AK_AKELOS_UTILS_DIR')      || define('AK_AKELOS_UTILS_DIR',  AK_FRAMEWORK_DIR.DS.'akelos_utils');
+defined('AK_ACTIVE_DOCUMENT_DIR')   || define('AK_ACTIVE_DOCUMENT_DIR', AK_FRAMEWORK_DIR.DS.'active_document');
+defined('AK_AKELOS_UTILS_DIR')      || define('AK_AKELOS_UTILS_DIR',    AK_FRAMEWORK_DIR.DS.'akelos_utils');
+defined('AK_CORE_TASKS_DIR')        || define('AK_CORE_TASKS_DIR',      AK_AKELOS_UTILS_DIR.DS.'makelos_tasks');
 
 defined('AK_WIN')                                       || define('AK_WIN', strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
 defined('AK_OS')                                        || define('AK_OS', AK_WIN ? 'WINDOWS' : 'UNIX');

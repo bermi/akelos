@@ -134,6 +134,7 @@ class Makelos
 {
     public $tasks = array();
     public $task_files = array();
+    public $task_paths = array(AK_TASKS_DIR, AK_CORE_TASKS_DIR);
     public $current_task;
     public $settings = array(
     'app_name' => 'Akelos application name'
@@ -144,10 +145,9 @@ class Makelos
     public function __construct(&$Request) {
         $this->Request = $Request;
         $this->Installer = new AkInstaller();
-        !defined('AK_TASKS_DIR') && define('AK_TASKS_DIR', AK_BASE_DIR.DS.'lib'.DS.'tasks');
-        $this->makefiles = array_merge(glob(AK_TASKS_DIR.DS.'makefile.php'), glob(AK_TASKS_DIR.DS.'*/makefile.php'), glob(AK_TASKS_DIR.DS.'*/*/makefile.php'), array(AK_BASE_DIR.DS.'*/*/*/makefile.php'),  array(AK_BASE_DIR.DS.'*/*/*/*/makefile.php'), array(AK_BASE_DIR.DS.'makefile.php'));
+        $this->makefiles = $this->getMakeFiles();
     }
-
+    
     public function loadMakefiles() {
         foreach ($this->makefiles as $makefile){
             if(file_exists($makefile)){
@@ -411,11 +411,11 @@ class Makelos
         $Makelos = $this;
         $autocompletion_options = array();
         $autocomplete_accessor = 'autocompletion'.($level === 1 ? '' : '_'.$level);
-        $autocompletion_executables =
-        array_diff(array_merge(
-        glob(AK_TASKS_DIR.DS.$task_name.'*.'.$autocomplete_accessor.'.*'),
-        glob(AK_TASKS_DIR.DS.$task_name.DS.$task_name.'.'.$autocomplete_accessor.'.*')
-        ), array(''));
+        $autocompletion_executables = $this->multiGlob(array(
+        $task_name.'*.'.$autocomplete_accessor.'.*',
+        $task_name.DS.$task_name.'.'.$autocomplete_accessor.'.*'
+        ));
+        
         if(!empty($autocompletion_executables)){
             ob_start();
             foreach ($autocompletion_executables as $file){
@@ -448,6 +448,26 @@ class Makelos
         }
     }
 
+    public function getMakeFiles(){
+        return $this->multiGlob(array(
+        'makefile.php',
+        '*/makefile.php',
+        '*/*/makefile.php',
+        '*/*/*/makefile.php',
+        '*/*/*/*/makefile.php'));
+    }
+    
+    public function multiGlob($patterns = array(), $task_path = null){
+        $task_paths = empty($task_path) ? AkConfig::getOption('makelos_task_paths', $this->task_paths) : (array)$task_path;
+        $glob_result = array();
+        foreach ($patterns as $pattern){
+            foreach ($task_paths as $task_path){
+                $glob_result = array_merge($glob_result, glob($task_path.DS.$pattern));
+            }
+        }
+        array_unique($glob_result);
+        return array_diff($glob_result, array(''));
+    }
 
 
     protected function _getTaskFiles($task_name, $bark_on_error = true){
@@ -467,10 +487,8 @@ class Makelos
             }
         }
 
-        $task_files = array();
-        foreach ($search_patterns as $search_pattern){
-            $task_files = array_merge($task_files, glob(AK_TASKS_DIR.DS.$search_pattern));
-        }
+        $task_files = $this->multiGlob($search_patterns);
+        
         //
         $task_files = array_diff($task_files, array(''));
         if($bark_on_error && empty($this->tasks[$task_name]['run']) && empty($task_files)){
