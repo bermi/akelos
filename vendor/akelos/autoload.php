@@ -27,7 +27,7 @@ defined('AK_ACTIVE_RESOURCE_DIR')   || define('AK_ACTIVE_RESOURCE_DIR', AK_FRAME
 defined('AK_ACTIVE_SUPPORT_DIR')    || define('AK_ACTIVE_SUPPORT_DIR',  AK_FRAMEWORK_DIR.DS.'active_support');
 defined('AK_ACTIVE_DOCUMENT_DIR')   || define('AK_ACTIVE_DOCUMENT_DIR', AK_FRAMEWORK_DIR.DS.'active_document');
 defined('AK_AKELOS_UTILS_DIR')      || define('AK_AKELOS_UTILS_DIR',    AK_FRAMEWORK_DIR.DS.'akelos_utils');
-
+defined('AK_GENERATORS_DIR')        || define('AK_GENERATORS_DIR',      AK_FRAMEWORK_DIR.DS.'generators');
 
 function akelos_autoload($name, $path = null) {
     static $paths = array(), $lib_paths = array(), $app_paths = array();
@@ -319,7 +319,6 @@ defined('AK_APP_INSTALLERS_DIR')    || define('AK_APP_INSTALLERS_DIR',  AK_APP_D
 
 defined('AK_PLUGINS_DIR')           || define('AK_PLUGINS_DIR', AK_APP_VENDOR_DIR.DS.'plugins');
 defined('AK_PLUGINS')               || define('AK_PLUGINS', 'auto');
-defined('AK_GENERATORS_DIR')        || define('AK_GENERATORS_DIR', AK_TASKS_DIR.DS.'generate'.DS.'generators');
 
 defined('AK_TMP_DIR')               || define('AK_TMP_DIR', Ak::get_tmp_dir_name());
 defined('AK_COMPILED_VIEWS_DIR')    || define('AK_COMPILED_VIEWS_DIR', AK_TMP_DIR.DS.'views');
