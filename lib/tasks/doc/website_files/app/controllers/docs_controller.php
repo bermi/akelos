@@ -5,7 +5,7 @@ class DocsController extends ApplicationController
     private $_authorized_users = array('akelos' => 'docs');
     
     public function __construct(){
-        if(!in_array(AK_REMOTE_IP, AkConfig::getOption('developer_ips', array('localhost','127.0.0.1','::1')))){
+        if(!AkRequest::isLocal()){
             parent::init();
             $this->beforeFilter(array('authenticate' => array('except' => array('index'))));
         }

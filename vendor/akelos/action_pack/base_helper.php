@@ -30,7 +30,9 @@ class AkBaseHelper
     }
 
     public function setController(&$Controller) {
-        $this->_controller = $Controller;
+        $this->_controller = 
+        $this->C =
+        $Controller;
     }
 
     public function &getController() {
@@ -41,6 +43,7 @@ class AkBaseHelper
         $name_space = empty($name_space) ? $this->locales_namespace : $name_space;
         return Ak::t($string, $array, $name_space);
     }
+    
 }
 
 /* Deprecated */
