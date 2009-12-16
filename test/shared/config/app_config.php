@@ -11,6 +11,14 @@ defined('AK_TESTING_URL')       || define('AK_TESTING_URL',   'http://akelos.tes
 
 include_once AK_FRAMEWORK_DIR.DS.'autoload.php';
 
+if(AK_CLI && !AK_WIN){
+    // will try to set the right mode for tmp folders, git does not kee trac of this for us
+    foreach ((array)glob(AK_BASE_DIR.DS.'tmp'.DS.'*'.DS.'*/') as $__folder){
+        `chmod 777 $__folder`;
+    }
+    unset($__folder);
+}
+
 if(!AkConfig::getOption('testing_url', false))
 AkConfig::setOption('testing_url', AK_TESTING_URL);
 AkUnitTestSuite::checkIfTestingWebserverIsAccesible(array('base_path' => AK_TEST_DIR.DS.AK_TESTING_NAMESPACE));
