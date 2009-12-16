@@ -1,2 +1,5 @@
 *
 !.gitignore
+!testing
+!production
+!development
