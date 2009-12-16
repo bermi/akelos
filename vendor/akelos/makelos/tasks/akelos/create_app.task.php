@@ -1,17 +1,41 @@
-#!/usr/bin/env php
 <?php
 
-define('DS', DIRECTORY_SEPARATOR);
-defined('AK_WIN')                                       || define('AK_WIN', strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
-defined('AK_OS')                                        || define('AK_OS', AK_WIN ? 'WINDOWS' : 'UNIX');
-define('AK_PHP5', version_compare(PHP_VERSION, '5', '>=') == 1 ? true : false);
-
-define('AK_BASE_DIR', str_replace(DS.'script'.DS.'setup','',__FILE__));
-@ini_set("include_path",(AK_BASE_DIR.DS.'vendor'.DS.'pear'.PATH_SEPARATOR.ini_get("include_path")));
+if(!empty($options['v']) || !empty($options['version'])){
+    echo AKELOS_VERSION."\n";
+    exit(0);
+}
 
 
-if(!empty($_SERVER['argv'][1]) && $_SERVER['argv'][1][0] != '-'){
-    $_SERVER['argv'][0] = '-d';
+if(!empty($options['h']) || !empty($options['help'])){
+    die(<<<HELP
+Description:
+    The 'akelos' command creates a new Akelos application with a default
+    directory structure and configuration at the path you specify.
+
+Example:
+    akelos ~/Code/PHP/weblog
+
+    This generates a skeletal Akelos installation in ~/Code/PHP/weblog.
+    See the README in the newly created application to get going.
+
+Usage: akelos [-vsqhf --dependencies] <-pd> 
+
+    -d --directory=<value>    Destination directory for installing 
+                              the application.
+    -p --public_html=<value>  Location where the application will be 
+                              accessed by the web server.
+    -i --dependencies         Includes a copy of the framework into the 
+                              application directory. (true)
+    -f --force                Overwrite files that already exist. (false)
+    -q --quiet                Suppress normal output. (false)
+    -s --skip                 Skip files that already exist. (false)
+    --prompt                  Prompts before performing install. (true)
+    -h --help                 Show this help message.
+    -v --version              Print the akelos version.
+
+
+HELP
+);
 }
 
 
@@ -24,19 +48,16 @@ class AkelosInstaller
     public function __construct($options)
     {
         $default_options = array(
-        'source' => $this->_absolutePath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'),
+        'source' => $this->getAbsolutePath(dirname(__FILE__).DIRECTORY_SEPARATOR.str_repeat(DIRECTORY_SEPARATOR.'..',5)),
         'force' => false,
         'skip' => false,
         'quiet' => false,
         'public_html' => false,
-        'dependencies' => false,
-        'version'=>false
+        'dependencies' => false
         );
         $this->options = array_merge($default_options, $options);
-        if (isset($this->options['version']) && $this->options['version']!==false) {
-            die(file_get_contents('version.txt')."\n");
-        }
-        $this->options['directory'] = $this->_absolutePath(@$this->options['directory']);
+        
+        $this->options['directory'] = $this->getAbsolutePath(@$this->options['directory']);
 
         if(empty($this->options['directory'])){
             trigger_error('You must supply a valid destination path', E_USER_ERROR);
@@ -45,7 +66,7 @@ class AkelosInstaller
         $this->source_tree = Ak::dir($this->options['source'],array('dirs'=>true,'recurse'=>true));
 
         if(empty($this->options['dependencies'])){
-            $this->framework_dirs = array('lib', 'vendor', 'test');
+            $this->framework_dirs = array('vendor');
 
             foreach ($this->framework_dirs as $framework_dir){
                 foreach ($this->source_tree as $k => $v){
@@ -72,7 +93,6 @@ class AkelosInstaller
             $this->_copyFrameworkFiles($this->source_tree, $this->options['source']);
 
             if(empty($this->options['dependencies'])){
-                //$this->_setupApplicationTestingEnvironment();
                 $this->_linkDependencies();
             }
 
@@ -175,43 +195,17 @@ class AkelosInstaller
 
     // Protected methods
 
-    protected function _setupApplicationTestingEnvironment()
-    {
-        return ;
-        $source_test_dir = $this->options['source'].DS.'test';
-        $test_dir = $this->options['directory'].DS.'test';
-
-        $this->_makeDir($test_dir);
-        $this->_copyFile($source_test_dir.DS.'app.php');
-
-        $this->_makeDir($test_dir.DS.'fixtures');
-        $this->_makeDir($test_dir.DS.'fixtures'.DS.'app');
-
-        $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'app'.DS.'controllers'.DS.'application_controller.php');
-        $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'app'.DS.'controllers'.DS.'base_action_controller.php');
-        $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'app'.DS.'models'.DS.'shared_model.php');
-        $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'app'.DS.'models'.DS.'base_active_record.php');
-
-        $this->_makeDir($test_dir.DS.'fixtures'.DS.'config');
-        $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'config'.DS.'config.php');
-
-        $this->_makeDir($test_dir.DS.'fixtures'.DS.'data');
-        $this->_makeDir($test_dir.DS.'fixtures'.DS.'public');
-        $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'public'.DS.'.htaccess');
-        $this->_copyFile($source_test_dir.DS.'fixtures'.DS.'public'.DS.'index.php');
-    }
-
 
     protected function _linkPublicHtmlFolder()
     {
         if(!empty($this->options['public_html'])){
             if(function_exists('symlink')){
-                $this->options['public_html'] = $this->_absolutePath($this->options['public_html']);
+                $this->options['public_html'] = $this->getAbsolutePath($this->options['public_html']);
                 $link_info = @linkinfo($this->options['public_html']);
                 $target = $this->options['directory'].DS.'public';
 
                 if($target == $this->options['public_html']){
-                    // No need to simlink, same path on target
+                    // No need to symlink, same path on target
                     return true;
                 }
                 if(!is_numeric($link_info) || $link_info < 0){
@@ -224,8 +218,8 @@ class AkelosInstaller
             $this->yield("\n    Could not create a symbolic link of ".$this->options['directory'].DS.'public'.' at '.$this->options['public_html']);
 
         }else{
-            $this->_addRootLevelDispatcher();
-            $this->_addHtaccessDirectoryProtection();
+            //$this->_addRootLevelDispatcher();
+            //$this->_addHtaccessDirectoryProtection();
         }
         return false;
     }
@@ -233,16 +227,10 @@ class AkelosInstaller
     protected function _linkDependencies()
     {
         $this->yield("\n    Linking the application with the framework at ".$this->options['source'])."\n";
-        foreach (array(
-        'config'.DS.'DEFAULT-config.php',
-        'app'.DS.'controllers'.DS.'framework_setup_controller.php') as $file){
-            if(file_exists($this->options['directory'].DS.$file)){
-                $file_contents = str_replace("// defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '/path/to/the/framework');",
-                "defined('AK_FRAMEWORK_DIR') ? null : define('AK_FRAMEWORK_DIR', '".addcslashes($this->options['source'],'\\')."');",
-                file_get_contents($this->options['directory'].DS.$file));
-                file_put_contents($this->options['directory'].DS.$file, $file_contents);
-            }
-        }
+        $old = "defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       AK_BASE_DIR.DS.'vendor'.DS.'akelos');";
+        $new = "defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       '".addcslashes($this->options['source'],'\\')."');";
+        $path = $this->options['directory'].DS.'config'.DS.'boot.php';
+        file_put_contents($path, str_replace($old, $new, file_get_contents($path)));
     }
 
     protected function _addRootLevelDispatcher()
@@ -338,13 +326,16 @@ class AkelosInstaller
      */
     protected function _canUsePath($path)
     {
+        if(strstr($path, '.empty_directory') || strstr($path, '.git')){
+            return false;
+        }
         if(is_file($path) || is_dir($path)){
             return !empty($this->options['skip']) ? false : !empty($this->options['force']);
         }
         return true;
     }
 
-    protected function _absolutePath($path)
+    static function getAbsolutePath($path)
     {
         $_path = $path;
         if (!preg_match((AK_WIN ? "/^\w+:/" : "/^\//"), $path )) {
@@ -374,102 +365,70 @@ class AkelosInstaller
     }
 }
 
-require_once (dirname(__FILE__).DS.'..'.DS.'akelos'.DS.'lib'.DS.'active_support'.DS.'base.php');
-require_once (dirname(__FILE__).DS.'..'.DS.'vendor'.DS.'pear'.DS.'PHP'.DS.'Compat'.DS.'Function'.DS.'file_put_contents.php');
-require_once (dirname(__FILE__).DS.'..'.DS.'vendor'.DS.'pear'.DS.'Console'.DS.'Getargs.php');
 
-$config =  array(
-
-
-'directory' => array(
-'short'   => 'd',
-'max'     => 1,
-'min'     => 1,
-'desc'    => 'Destination directory for installing the application.'),
-
-
-
-'force' => array(
-'short'   => 'f',
-'max'     => 0,
-'min'     => 0,
-'default' => 'false',
-'desc'    => 'Overwrite files that already exist.'),
-
-
-'skip' => array(
-'short'   => 's',
-'max'     => 0,
-'min'     => 0,
-'default' => 'false',
-'desc'    => 'Skip files that already exist.'),
-
-
-'quiet' => array(
-'short'   => 'q',
-'max'     => 0,
-'min'     => 0,
-'default' => 'false',
-'desc'    => 'Suppress normal output.'),
-
-
-'public_html' => array(
-'short'   => 'p',
-'max'     => 1,
-'min'     => 1,
-'desc'    => 'Location where the application will be accesed by the webserver.'),
-
-
-
-'dependencies' => array(
-'short'   => 'deps',
-'max'     => 0,
-'min'     => 0,
-'default' => 'true',
-'desc'    => 'Includes a copy of the framework into the application directory.'),
-
-
-
-'help' => array(
-'short'   => 'h',
-'max'     => 0,
-'min'     => 0,
-'desc'    => 'Show this help message.'),
-
-'version' => array(
-'short'   => 'v',
-'max'     => 0,
-'min'     => 0,
-'desc'    => 'Print the akelos version.'),
-
-);
-
-
-
-
-$args =& Console_Getargs::factory($config);
-
-if (PEAR::isError($args)) {
-    if ($args->getCode() === CONSOLE_GETARGS_ERROR_USER) {
-        echo Console_Getargs::getHelp($config, null, $args->getMessage())."\n";
-    } else if ($args->getCode() === CONSOLE_GETARGS_HELP) {
-        echo @Console_Getargs::getHelp($config)."\n";
+function get_command_value($short, $long, $default = null, $error_if_unset = null){
+    global $options;
+    $value = isset($options[$short]) ? 
+                $options[$short] : 
+               (isset($options[$long])?$options[$long]:$default);
+    if(is_null($value) && !empty($error_if_unset)){
+        echo Ak::t($error_if_unset)."\n";
+        exit(0);
     }
-    exit;
+    return $value;
 }
 
-$options = $args->getValues();
+$directory_candidate   = get_command_value('d', 'directory', false);
 
-if(empty($options)){
-    echo Console_Getargs::getHelp($config)."\n";
-    exit;
+foreach ($options as $k => $v){
+    if(!$directory_candidate && !preg_match('/^(d|directory|p|public_html|i|dependencies|f|force|q|quiet|s|skip|prompt)$/', $v)){
+        $directory_candidate = $v;
+    }
 }
 
-$Installer = new AkelosInstaller($options);
+
+$directory   = AkelosInstaller::getAbsolutePath(
+                get_command_value('d', 'directory',   $directory_candidate, 
+                'Destination directory can\'t be blank'));
+$public_html = get_command_value('p', 'public_html', false);
+$public_html = empty($public_html) ? false : AkelosInstaller::getAbsolutePath($public_html);
+$dependencies= get_command_value('i', 'dependencies', true);
+$force       = get_command_value('f', 'force', false);
+$quiet       = get_command_value('q', 'quiet', false);
+$skip        = get_command_value('s', 'skip', false);
+$prompt      = get_command_value('prompt', 'prompt', true);
+
+if($prompt){
+echo "\nInstall Akelos in $directory\n";
+
+if($public_html)
+echo "symlink the public directory to $public_html\n";
+
+echo $dependencies ? 
+ "copy the Akelos Framework files to vendor/akelos\n" :
+ "symlink the Akelos Framework in ".AK_FRAMEWORK_DIR."\n" ;
+
+if($force)
+ "OVERWRITE EXISTING FILES in $directory\n";
+ 
+  AkInstaller::promptUserVar("Shall web proceed installing? \nPress enter to continue", array('optional' => true));
+}
+
+
+$Installer = new AkelosInstaller(array(
+'directory'     =>$directory,
+'public_html'   =>$public_html,
+'public_html'   =>$public_html,
+'dependencies'  =>$dependencies,
+'force'         =>$force,
+'quiet'         =>$quiet,
+'skip'          =>$skip,
+'prompt'        =>$prompt,
+));
 
 $Installer->install();
 
-if($args->getValue('quiet') == ''){
+if(!$quiet){
     if($Installer->hasErrors()){
         echo "\nThere where some errors during the installation process:\n";
         echo "\n * ".join("\n    * ",$Installer->getErrors());
