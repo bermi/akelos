@@ -1,0 +1,7 @@
+Description:
+    Creates the base files for creating a generator in
+    ./generators/
+
+Example:
+    `./makelos generate generator generator_name`
+
