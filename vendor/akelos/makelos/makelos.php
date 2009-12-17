@@ -121,9 +121,9 @@ if(MAKELOS_RUN){
     $_config_file = dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php';
 
     if(!@include $_config_file){
-        defined('AK_ENVIRONMENT') ? null : define('AK_ENVIRONMENT', 'testing');
-        defined('AK_BASE_DIR') ? null : define('AK_BASE_DIR', MAKELOS_BASE_DIR);
-        include_once(MAKELOS_BASE_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'boot.php');
+        defined('AK_ENVIRONMENT')   || define('AK_ENVIRONMENT', 'testing');
+        defined('AK_BASE_DIR')      || define('AK_BASE_DIR', MAKELOS_BASE_DIR);
+        include_once(AK_BASE_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'boot.php');
     }
 
     Ak::setStaticVar('dsn', $dsn);

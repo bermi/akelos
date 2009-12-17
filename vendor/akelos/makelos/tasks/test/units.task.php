@@ -37,6 +37,6 @@ if(empty($options['component']) && !empty($component)){
 }
 
 $options = array_diff($options, array(''));
-$options['component'] = empty($options['component']) ? 'akelos' : $options['component'];
+$options['component'] = empty($options['component']) ? AkConfig::getOption('component', 'akelos') : $options['component'];
 
 AkUnitTestSuite::runFromOptions($options);
