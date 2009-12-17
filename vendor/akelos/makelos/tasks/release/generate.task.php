@@ -43,8 +43,8 @@ Valid options are:
 HELP
 );
 }
-
-$is_akelos_core = AK_APP_NAME=='Application' && !file_exists(AK_CONFIG_DIR.DS.'config.php');
+$default_app_name = (AK_APP_NAME == 'Application') ? basename(MAKELOS_BASE_DIR) : AK_APP_NAME;
+$is_akelos_core = empty($options['app_name']) && $default_app_name=='Application' && !file_exists(AK_CONFIG_DIR.DS.'config.php');
 
 $available_formats = array_diff(explode("\n", @`git archive -l`), array(''));
 if(empty($available_formats)){
@@ -58,8 +58,7 @@ foreach ($options['format'] as $format){
     }
 }
 
-
-$options['app_name'] = AkInflector::underscore(empty($options['app_name']) ? $is_akelos_core?'akelos':AK_APP_NAME:$options['app_name']);
+$options['app_name'] = AkInflector::underscore(empty($options['app_name']) ? $is_akelos_core?'akelos':$default_app_name:$options['app_name']);
 $options['revision'] = empty($options['revision']) ? 'HEAD' : $options['revision'];
 
 if($options['revision'] == 'HEAD' && preg_match('/commit (.+)/', `git log --no-color --abbrev-commit -n 1`, $matches)){
@@ -70,7 +69,7 @@ $options['revision'] = trim($options['revision'], '. ');
 
 $options['commit'] = isset($options['commit']) ? $is_akelos_core : false;
 
-$version_file = empty($options['version_file']) ? AK_BASE_DIR.DS.'version.txt' : $options['version_file'];
+$version_file = empty($options['version_file']) ? MAKELOS_BASE_DIR.DS.'version.txt' : $options['version_file'];
 
 if(!isset($options['version'])){
     $version_candidate = @file_get_contents($version_file);
@@ -98,8 +97,8 @@ $options['tag'] = empty($options['tag']) ? '' : '-'.$options['tag'];
 
 $skip_updating_version_number = !empty($options['skip_version_update']) || $options['tag'] == 'ci' || $options['tag'] == 'nighly';
 
-$options['path'] = empty($options['path']) ? AK_BASE_DIR.DS.'releases' : $options['path'];
-strstr($options['path'], AK_BASE_DIR) && @Ak::make_dir($options['path']);
+$options['path'] = empty($options['path']) ? MAKELOS_BASE_DIR.DS.'releases' : $options['path'];
+strstr($options['path'], MAKELOS_BASE_DIR) && Ak::make_dir($options['path'], array('base_path'=>MAKELOS_BASE_DIR));
 
 echo "Building version ".$options['version'].$options['tag']."\n";
 if(!$skip_updating_version_number){
