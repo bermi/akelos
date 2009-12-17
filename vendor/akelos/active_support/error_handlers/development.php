@@ -12,6 +12,7 @@ if(!defined('AK_DEBUG_OUTPUT_AS_HTML')){
 if(defined('AK_DEBUG') && AK_DEBUG){
 
     function ak_backtrace($only_app = false, $html_output = AK_DEBUG_OUTPUT_AS_HTML) {
+
         $result = '';
         $bt = debug_backtrace();
         $result .= ("\nBacktrace (most recent call first):\n");
@@ -63,7 +64,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         $error_number = $error_number & error_reporting();
 
         if($error_number == 0){
-            return;
+            return false;
         }
         /**
          * resetting content-encoding header to nil,
@@ -103,7 +104,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
 
         if(isset($_sent_errors[$error_type.$error_message])){
 
-            return;
+            return false;
         }else{
             $_sent_errors[$error_type.$error_message] = true;
         }
@@ -142,6 +143,8 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         echo !AK_DEBUG_OUTPUT_AS_HTML ? html_entity_decode(strip_tags($result)) : '<div style="background-color:#fff;margin:10px;padding:10px;color:#000;font-family:sans-serif;border-bottom:3px solid #f00;font-size:12px;">'. $result.'</div>';
 
         AK_DEBUG_OUTPUT_AS_HTML ? print('</pre>') : null;
+
+        return false;
 
     }
 
