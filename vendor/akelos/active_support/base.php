@@ -393,7 +393,7 @@ class Ak
             $file_name = trim(str_replace(array(DS,'//'),array('/','/'),$file_name),'/');
             return AkFtp::get_contents($file_name);
         }else{
-            $base_path = (AK_WIN&&empty($options['base_path'])?'':$options['base_path'].DS);
+            $base_path = (AK_WIN && empty($options['base_path']) ? '' : $options['base_path'] . DS);
             return file_get_contents($base_path.$file_name);
         }
     }
