@@ -1949,6 +1949,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     public function afterValidation(){return true;}
     public function afterValidationOnCreate(){return true;}
     public function afterValidationOnUpdate(){return true;}
+    public function beforeInstantiate(&$attributes = array()){return true;}
     public function afterInstantiate(){return true;}
     public function afterCreate(){return true;}
     public function afterDestroy(){return true;}
