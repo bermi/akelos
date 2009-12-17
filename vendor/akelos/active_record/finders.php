@@ -389,6 +389,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         $object = new $model_name(array('init'=>false));
         $object->_newRecord = $set_as_new;
         $object->setConnection($this->_ActiveRecord->getConnection());
+        $object->beforeInstantiate($record);
         $object->init(array('attributes', $record));
 
         if ($call_after_instantiate) {
@@ -787,17 +788,17 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
 
 
             $this->_prepareIncludes(
-                'owner[@'.$parent_pk.']',
-                $multi,
-                $this->_ActiveRecord,
-                $available_associated_options,
-                $handler_name,
-                $handler_name,
-                $association_id,
-                $options,
-                $association_options,
-                $replacements,
-                $config['__owner']);
+            'owner[@'.$parent_pk.']',
+            $multi,
+            $this->_ActiveRecord,
+            $available_associated_options,
+            $handler_name,
+            $handler_name,
+            $association_id,
+            $options,
+            $association_options,
+            $replacements,
+            $config['__owner']);
 
         }
         //$this->log('Config:'.var_export($config,true));
@@ -1179,16 +1180,16 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             }
             if (!empty($sub_options)) {
                 $this->_prepareIncludes(
-                    $prefix.'['.$handler_name.']'.($parent_is_plural?'[@'.$pk.']':''),
-                    $pluralize,
-                    $instance,
-                    $available_associated_options,
-                    $sub_handler_name,
-                    $parent_association_id.'__'.$sub_handler_name,
-                    $sub_association_id,
-                    $options['include'][$association_id],
-                    $association_options['include'][$idx],
-                    $replacements,$config[$handler_name]);
+                $prefix.'['.$handler_name.']'.($parent_is_plural?'[@'.$pk.']':''),
+                $pluralize,
+                $instance,
+                $available_associated_options,
+                $sub_handler_name,
+                $parent_association_id.'__'.$sub_handler_name,
+                $sub_association_id,
+                $options['include'][$association_id],
+                $association_options['include'][$idx],
+                $replacements,$config[$handler_name]);
             }
         }
     }
