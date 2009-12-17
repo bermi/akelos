@@ -138,7 +138,11 @@ class AkelosGenerator
     }
     
     public function getAvailableGenerators() {
-        return array_merge($this->_getGeneratorsInsidePath($this->generators_dir), $this->_getPluginGenerators());
+        return array_merge(
+            $this->_getGeneratorsInsidePath($this->generators_dir), 
+            $this->_getPluginGenerators(), 
+            $this->_getApplicationGenerators(), 
+            $this->_getExtraGenerators());
     }
 
     private function _identifyUnnamedCommands(&$commands) {
@@ -212,13 +216,29 @@ class AkelosGenerator
         }
         return $generators;
     }
+    
+    private function _getApplicationGenerators() {
+        return is_dir(AK_BASE_DIR.DS.'generators') ?
+                $this->_getGeneratorsInsidePath(AK_BASE_DIR.DS.'generators') :
+                array();
+    }
+
+    private function _getExtraGenerators() {
+        $result = array();
+        if($generator_paths = AkConfig::getOption('generator_paths', false)){
+            foreach ($generator_paths as $generator_path){
+                $result = array_merge($result, $this->_getGeneratorsInsidePath($generator_path));
+            }
+        }
+        return $result;
+    }
 
     private function _getGeneratorsInsidePath($path) {
         $generators = array();
         if(is_dir($path)){
             foreach (Ak::dir($path,array('files'=>false,'dirs'=>true)) as $folder){
                 $generator = Ak::first(array_keys($folder));
-                if(strstr($generator,'.php')){
+                if(strstr($generator,'.php') || is_file($path.DS.$generator)){
                     continue;
                 }
                 $generators[$path.DS.$generator.DS.$generator.'_generator.php'] = $generator;
