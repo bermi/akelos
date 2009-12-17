@@ -510,7 +510,7 @@ class AkXUnitXmlReporter extends SimpleReporter {
         $this->doc = new DOMDocument();
         $this->doc->loadXML('<testsuite/>');
         $this->root = $this->doc->documentElement;
-        $file_path = AkConfig::getOption('report_path', AK_BASE_DIR.DS.'reports'.DS.'units.xml');
+        $file_path = AkConfig::getOption('report_path', (defined('MAKELOS_BASE_DIR') ? MAKELOS_BASE_DIR : AK_BASE_DIR).DS.'reports'.DS.'units.xml');
         Ak::file_put_contents($file_path, "<?xml version=\"1.0\"?>\n");
         $this->_fp = @fopen($file_path, 'a');
     }

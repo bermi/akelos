@@ -2,7 +2,7 @@
 
 // WARNING. This is experimental. We might replace this by Logger4PHP
 
-defined('AK_LOG_DIR') || define('AK_LOG_DIR', AK_BASE_DIR.DS.'log');
+defined('AK_LOG_DIR') || define('AK_LOG_DIR', (defined('MAKELOS_BASE_DIR') ? MAKELOS_BASE_DIR : AK_BASE_DIR).DS.'log');
 
 // Default mail logger settings
 defined('AK_LOGER_DEFAULT_MAIL_DESTINATION') || define('AK_LOGER_DEFAULT_MAIL_DESTINATION', false);
