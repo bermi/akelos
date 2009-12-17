@@ -4,6 +4,10 @@ if(!empty($options['v']) || !empty($options['version'])){
     echo AKELOS_VERSION."\n";
     exit(0);
 }
+if(!empty($options['base_dir'])){
+    echo AK_BASE_DIR."\n";
+    exit(0);
+}
 
 
 if(!empty($options['h']) || !empty($options['help'])){
@@ -32,6 +36,7 @@ Usage: akelos [-vsqhf --dependencies] <-pd>
     --prompt                  Prompts before performing install. (true)
     -h --help                 Show this help message.
     -v --version              Print the akelos version.
+    --base_dir                Print the path where akelos resides.
 
 
 HELP
@@ -82,7 +87,7 @@ class AkelosInstaller
             if(empty($this->options['dependencies'])){
                 $this->_linkDependencies();
             }
-            $this->_cleanUpInstalledApp();
+
             $this->runEvironmentSpecificTasks();
 
             $this->_linkPublicHtmlFolder();
@@ -90,11 +95,6 @@ class AkelosInstaller
         }else{
             $this->addError('Installation directory is not empty. Add --force if you want to override existing files');
         }
-    }
-    
-    protected function _cleanUpInstalledApp(){
-        // Remove the installer
-        unlink($this->options['directory'].DS.'akelos');
     }
 
     public function yield($message)
