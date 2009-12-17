@@ -277,7 +277,7 @@ class AkActionView
     }
 
     protected function _readTemplateFile($template_path) {
-        return Ak::file_get_contents($template_path);
+        return file_get_contents($template_path);
     }
 
     protected function _delegateRender($handler, $template, $local_assigns, $file_path) {

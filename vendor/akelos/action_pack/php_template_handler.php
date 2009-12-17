@@ -104,14 +104,16 @@ class AkPhpTemplateHandler
         if(empty($this->_options['template_base_path'])){
             $template_file_name = $this->_getTemplateFilename();
             if(!empty($template_file_name)){
-                $this->_options['template_base_path'] = rtrim(str_replace($template_file_name,'',$this->_options['file_path']),'\/');
+                $file_path = str_replace(AkConfig::getDir('app'), AK_APP_DIR,  $this->_options['file_path']);
+                $this->_options['template_base_path'] = rtrim(str_replace($template_file_name,'',$file_path),'\/');
                 if(AK_COMPILED_VIEWS_DIR && !strstr($this->_options['template_base_path'], AK_TMP_DIR)){
-                    $this->_options['template_base_path'] = str_replace(AkConfig::getDir('base'), AK_COMPILED_VIEWS_DIR, $this->_options['template_base_path']);
+                    $this->_options['template_base_path'] = str_replace(AK_BASE_DIR, AK_COMPILED_VIEWS_DIR, $this->_options['template_base_path']);
                 }
             }else{
                 $this->_options['template_base_path'] = AK_COMPILED_VIEWS_DIR;
             }
         }
+
         return $this->_options['template_base_path'];
     }
 
