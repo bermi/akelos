@@ -5,6 +5,7 @@ define('MAKELOS_BASE_DIR', dirname(__FILE__));
 
 if(!@include(dirname(__FILE__).DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php')){
     defined('DS') || define('DS', DIRECTORY_SEPARATOR);
+    defined('AK_BASE_DIR')          || define('AK_BASE_DIR', dirname(__FILE__));
     defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       AK_BASE_DIR.DS.'vendor'.DS.'akelos');
 }
 
