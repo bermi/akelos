@@ -82,7 +82,7 @@ class AkelosInstaller
             if(empty($this->options['dependencies'])){
                 $this->_linkDependencies();
             }
-
+            $this->_cleanUpInstalledApp();
             $this->runEvironmentSpecificTasks();
 
             $this->_linkPublicHtmlFolder();
@@ -90,6 +90,11 @@ class AkelosInstaller
         }else{
             $this->addError('Installation directory is not empty. Add --force if you want to override existing files');
         }
+    }
+    
+    protected function _cleanUpInstalledApp(){
+        // Remove the installer
+        unlink($this->options['directory'].DS.'akelos');
     }
 
     public function yield($message)
