@@ -56,7 +56,7 @@ class AkelosInstaller
         'dependencies' => false
         );
         $this->options = array_merge($default_options, $options);
-        
+
         $this->options['directory'] = $this->getAbsolutePath(@$this->options['directory']);
 
         if(empty($this->options['directory'])){
@@ -212,14 +212,20 @@ class AkelosInstaller
     {
         $fw_path = str_replace(AK_BASE_DIR, '', AK_FRAMEWORK_DIR);
         $fw_on_app = $this->options['directory'].DS.trim($fw_path, DS);
-        
+
         $this->yield("\n    Linking the application with the framework at ".$this->options['source'])."\n";
         $old = "defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       AK_BASE_DIR.DS.'vendor'.DS.'akelos');";
         $new = "defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       '".addcslashes(AK_FRAMEWORK_DIR,'\\')."');";
-        
-        $path = $this->options['directory'].DS.'config'.DS.'boot.php';
-        file_put_contents($path, str_replace($old, $new, file_get_contents($path)));
-        
+
+
+        $paths = array(
+        $this->options['directory'].DS.'config'.DS.'boot.php',
+        $this->options['directory'].DS.'test'.DS.'shared'.DS.'config'.DS.'app_config.php');
+
+        foreach($paths as $path){
+            file_put_contents($path, str_replace($old, $new, file_get_contents($path)));
+        }
+
         Ak::rmdir_tree($fw_on_app);
     }
 
@@ -338,9 +344,9 @@ class AkelosInstaller
 
 function get_command_value($options, $short, $long, $default = null, $error_if_unset = null, $value_if_isset = null){
     $isset = isset($options[$long]) || isset($options[$short]);
-    $value = isset($options[$short]) ? 
-                $options[$short] : 
-               (isset($options[$long])?$options[$long]:$default);
+    $value = isset($options[$short]) ?
+    $options[$short] :
+    (isset($options[$long])?$options[$long]:$default);
 
     if(is_null($value) && !empty($error_if_unset)){
         echo Ak::t($error_if_unset)."\n";
@@ -362,8 +368,8 @@ foreach ($options as $k => $v){
 
 
 $directory   = AkelosInstaller::getAbsolutePath(
-                get_command_value($options, 'd', 'directory',   $directory_candidate, 
-                'Destination directory can\'t be blank'));
+get_command_value($options, 'd', 'directory',   $directory_candidate,
+'Destination directory can\'t be blank'));
 $public_html = get_command_value($options, 'p', 'public_html', false);
 $public_html = empty($public_html) ? false : AkelosInstaller::getAbsolutePath($public_html);
 $dependencies= get_command_value($options, 'i', 'dependencies', true, null, false);
@@ -373,19 +379,19 @@ $skip        = get_command_value($options, 's', 'skip', false);
 $prompt      = get_command_value($options, 'prompt', 'prompt', true);
 
 if($prompt){
-echo "\nInstall Akelos in $directory\n";
+    echo "\nInstall Akelos in $directory\n";
 
-if($public_html)
-echo "symlink the public directory to $public_html\n";
+    if($public_html)
+    echo "symlink the public directory to $public_html\n";
 
-echo $dependencies ? 
- "copy the Akelos Framework files to vendor/akelos\n" :
- "symlink the Akelos Framework in ".AK_FRAMEWORK_DIR."\n" ;
+    echo $dependencies ?
+    "copy the Akelos Framework files to vendor/akelos\n" :
+    "symlink the Akelos Framework in ".AK_FRAMEWORK_DIR."\n" ;
 
-if($force)
- "OVERWRITE EXISTING FILES in $directory\n";
- 
-  AkInstaller::promptUserVar("Shall web proceed installing? \nPress enter to continue", array('optional' => true));
+    if($force)
+    "OVERWRITE EXISTING FILES in $directory\n";
+
+    AkInstaller::promptUserVar("Shall web proceed installing? \nPress enter to continue", array('optional' => true));
 }
 
 
