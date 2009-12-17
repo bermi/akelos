@@ -3,10 +3,13 @@
 
 class <?php  echo $class_name; ?>Generator extends AkelosGenerator
 {
-    public $command_values = array('attribute1','(array)attribute2_is_array');
+    public $command_values = array('destination_path','(array)attribute2_is_array');
     
     public function hasCollisions() {
         $this->collisions = array(); // Add collisions to this array
+        if(is_dir($this->destination_path)){
+            $this->collisions[] = Ak::t('%path already exists', array('%path' => $this->destination_path));
+        }
         return count($this->collisions) > 0;
     }
 
@@ -14,7 +17,7 @@ class <?php  echo $class_name; ?>Generator extends AkelosGenerator
         
         $this->assignVarToTemplate('variables', 'Got value');
         $this->save(
-                AkConfig::getDir('app').DS.'generated_template.txt', 
+                $this->destination_path.DS.'generated_template.txt', 
                 $this->render('template')); // Will render template/template.tpl
     }
 }

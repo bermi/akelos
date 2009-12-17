@@ -64,7 +64,8 @@ class AkelosGenerator
     }
 
     public function render($template, $sintags_version = false) {
-        $__file_path = $this->generators_dir.DS.$this->type.DS.($sintags_version?'sintags_':'').'templates'.DS.(strstr($template,'.') ? $template : $template.'.tpl');
+        $__file_path = $this->getGeneratorDir().DS.$this->type.DS.($sintags_version?'sintags_':'').'templates'.DS.(strstr($template,'.') ? $template : $template.'.tpl');
+
         if(!file_exists($__file_path)){
             trigger_error(Ak::t('Template file %path not found.', array('%path'=>$__file_path)), E_USER_NOTICE);
         }
@@ -75,6 +76,15 @@ class AkelosGenerator
         ob_end_clean();
 
         return $result;
+    }
+    
+    public function getGeneratorDir(){
+        foreach (array_reverse(get_included_files()) as $file){
+            if(strstr($file, DS.$this->type.DS.$this->type.'_generator.php')){
+                return str_replace(DS.$this->type.DS.$this->type.'_generator.php', '' , $file);
+            }
+        }
+        return $this->generators_dir;
     }
 
     public function save($file_path, $content) {
