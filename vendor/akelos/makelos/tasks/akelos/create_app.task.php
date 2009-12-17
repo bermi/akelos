@@ -64,19 +64,6 @@ class AkelosInstaller
         }
 
         $this->source_tree = Ak::dir($this->options['source'],array('dirs'=>true,'recurse'=>true));
-
-        if(empty($this->options['dependencies'])){
-            $this->framework_dirs = array('vendor');
-
-            foreach ($this->framework_dirs as $framework_dir){
-                foreach ($this->source_tree as $k => $v){
-                    if(isset($v[$framework_dir])){
-                        unset($this->source_tree[$k]) ;
-                    }
-                }
-            }
-        }
-
         $this->destination_tree = Ak::dir($this->options['directory'],array('dirs'=>true,'recurse'=>true));
     }
 
@@ -90,7 +77,7 @@ class AkelosInstaller
                 }
             }
 
-            $this->_copyFrameworkFiles($this->source_tree, $this->options['source']);
+            $this->_copyApplicationFiles($this->source_tree, $this->options['source']);
 
             if(empty($this->options['dependencies'])){
                 $this->_linkDependencies();
@@ -217,43 +204,26 @@ class AkelosInstaller
             }
             $this->yield("\n    Could not create a symbolic link of ".$this->options['directory'].DS.'public'.' at '.$this->options['public_html']);
 
-        }else{
-            //$this->_addRootLevelDispatcher();
-            //$this->_addHtaccessDirectoryProtection();
         }
         return false;
     }
 
     protected function _linkDependencies()
     {
+        $fw_path = str_replace(AK_BASE_DIR, '', AK_FRAMEWORK_DIR);
+        $fw_on_app = $this->options['directory'].DS.trim($fw_path, DS);
+        
         $this->yield("\n    Linking the application with the framework at ".$this->options['source'])."\n";
         $old = "defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       AK_BASE_DIR.DS.'vendor'.DS.'akelos');";
-        $new = "defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       '".addcslashes($this->options['source'],'\\')."');";
+        $new = "defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       '".addcslashes(AK_FRAMEWORK_DIR,'\\')."');";
+        
         $path = $this->options['directory'].DS.'config'.DS.'boot.php';
         file_put_contents($path, str_replace($old, $new, file_get_contents($path)));
+        
+        Ak::rmdir_tree($fw_on_app);
     }
 
-    protected function _addRootLevelDispatcher()
-    {
-        $this->_copyFile($this->options['source'].DS.'index.php');
-        $this->_copyFile($this->options['source'].DS.'.htaccess');
-    }
-
-    protected function _addHtaccessDirectoryProtection()
-    {
-        foreach($this->source_tree as $k=>$node){
-            if (is_array($node)){
-                $keys = array_keys($node);
-                $folder = array_shift($keys);
-                $path = $this->options['directory'].DS.$folder;
-                if(is_dir($path) && !file_exists($path.DS.'.htaccess') && $folder != 'public'){
-                    file_put_contents($path.DS.'.htaccess', "order allow,deny\ndeny from all");
-                }
-            }
-        }
-    }
-
-    protected function _copyFrameworkFiles($directory_structure, $base_path = '.')
+    protected function _copyApplicationFiles($directory_structure, $base_path = '.')
     {
         foreach ($directory_structure as $k=>$node){
 
@@ -267,7 +237,7 @@ class AkelosInstaller
                     $path = $base_path.DS.$dir;
                     if(is_dir($path)){
                         $this->_makeDir($path);
-                        $this->_copyFrameworkFiles($items, $path);
+                        $this->_copyApplicationFiles($items, $path);
                     }
                 }
             }
@@ -366,19 +336,23 @@ class AkelosInstaller
 }
 
 
-function get_command_value($short, $long, $default = null, $error_if_unset = null){
-    global $options;
+function get_command_value($options, $short, $long, $default = null, $error_if_unset = null, $value_if_isset = null){
+    $isset = isset($options[$long]) || isset($options[$short]);
     $value = isset($options[$short]) ? 
                 $options[$short] : 
                (isset($options[$long])?$options[$long]:$default);
+
     if(is_null($value) && !empty($error_if_unset)){
         echo Ak::t($error_if_unset)."\n";
         exit(0);
     }
-    return $value;
+    if(!is_null($value_if_isset) && $isset){
+        return $isset ? $value_if_isset : $value;
+    }
+    return is_null($value) ? false : $value;
 }
 
-$directory_candidate   = get_command_value('d', 'directory', false);
+$directory_candidate   = get_command_value($options, 'd', 'directory', false);
 
 foreach ($options as $k => $v){
     if(!$directory_candidate && !preg_match('/^(d|directory|p|public_html|i|dependencies|f|force|q|quiet|s|skip|prompt)$/', $v)){
@@ -388,15 +362,15 @@ foreach ($options as $k => $v){
 
 
 $directory   = AkelosInstaller::getAbsolutePath(
-                get_command_value('d', 'directory',   $directory_candidate, 
+                get_command_value($options, 'd', 'directory',   $directory_candidate, 
                 'Destination directory can\'t be blank'));
-$public_html = get_command_value('p', 'public_html', false);
+$public_html = get_command_value($options, 'p', 'public_html', false);
 $public_html = empty($public_html) ? false : AkelosInstaller::getAbsolutePath($public_html);
-$dependencies= get_command_value('i', 'dependencies', true);
-$force       = get_command_value('f', 'force', false);
-$quiet       = get_command_value('q', 'quiet', false);
-$skip        = get_command_value('s', 'skip', false);
-$prompt      = get_command_value('prompt', 'prompt', true);
+$dependencies= get_command_value($options, 'i', 'dependencies', true, null, false);
+$force       = get_command_value($options, 'f', 'force', false);
+$quiet       = get_command_value($options, 'q', 'quiet', false);
+$skip        = get_command_value($options, 's', 'skip', false);
+$prompt      = get_command_value($options, 'prompt', 'prompt', true);
 
 if($prompt){
 echo "\nInstall Akelos in $directory\n";
