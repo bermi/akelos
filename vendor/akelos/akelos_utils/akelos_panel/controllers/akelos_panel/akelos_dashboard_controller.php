@@ -9,7 +9,7 @@ class AkelosPanel_AkelosDashboardController extends AkelosPanelController
         $this->has_configuration    = file_exists(AK_CONFIG_DIR.DS.'config.php');
         $this->has_routes           = file_exists(AK_CONFIG_DIR.DS.'routes.php');
         $this->has_database         = file_exists(AK_CONFIG_DIR.DS.'database.yml');
-        $this->new_install          =   !$this->has_configuration &&
+        $this->new_install          =   !$this->has_configuration ||
         !$this->has_routes;
         $this->environment          = AK_ENVIRONMENT;
         $this->memcached_on         = AkMemcache::isServerUp();
