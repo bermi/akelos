@@ -756,7 +756,15 @@ class AkActionController extends AkLazyObject
      * @see Ak::t
      */
     public function t($string, $array = null, $controller=null) {
-        return Ak::t($string, $array, empty($controller)?AkInflector::underscore($this->getControllerName()):$controller);
+        return Ak::t($string, $array, !empty($controller) ? $controller :
+                AkConfig::getOption('locale_namespace', 
+                    (!empty($this->_locale_namespace) ? $this->_locale_namespace : (
+                        defined('AK_DEFAULT_LOCALE_NAMESPACE') ? AK_DEFAULT_LOCALE_NAMESPACE : 
+                        AkInflector::underscore($this->getControllerName())
+                        )
+                    )
+                )
+            );
     }
 
 

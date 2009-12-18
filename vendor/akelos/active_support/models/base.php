@@ -64,7 +64,15 @@ class AkBaseModel extends AkLazyObject
     }
 
     public function t($string, $array = null) {
-        return Ak::t($string, $array, AkInflector::underscore($this->getModelName()));
+        return Ak::t($string, $array, 
+                AkConfig::getOption('locale_namespace', 
+                    (!empty($this->_locale_namespace) ? $this->_locale_namespace : (
+                        defined('AK_DEFAULT_LOCALE_NAMESPACE') ? AK_DEFAULT_LOCALE_NAMESPACE : 
+                        AkInflector::underscore($this->getModelName())
+                        )
+                    )
+                )
+            );
     }
 
 
