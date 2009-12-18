@@ -501,7 +501,7 @@ class Pager_Common
      * @param  string $next_html HTML to put inside the next link [deprecated: use the factory instead]
      * @return array back/next/first/last and page links
      */
-    function getLinks($pageID=null, $next_html='')
+    function getLinks($pageID=null)
     {
         $msg = '<b>PEAR::Pager Error:</b>'
               .' function "getLinks()" not implemented.';

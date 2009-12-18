@@ -118,7 +118,7 @@ class AkPager extends Pager_Common
      * @return array back/pages/next/first/last/all links
      * @access public
      */
-    public function getLinks($pageID = null) {
+    public function getLinks($pageID=null) {
         if ($pageID != null) {
             $_sav = $this->_currentPage;
             $this->_currentPage = $pageID;
@@ -316,7 +316,7 @@ class AkPaginator
             $current_page = 1;
             $controller->params[$controller->_pagination_options['parameter']] = 1;
         }
-        $this->controller =& $controller;
+        $this->controller = $controller;
         $controller_name = $controller->Request->getController();
         $this->item_count = !empty($item_count) ? $item_count : 0;
         $this->items_per_page = $items_per_page;
@@ -369,12 +369,12 @@ class AkPaginator
             );
             
             $paginator[$controller_name.'_paginator'] = new AkPager();
-            $paginator[$controller_name.'_paginator']->controller =& $controller;
+            $paginator[$controller_name.'_paginator']->controller = $controller;
             $paginator[$controller_name.'_paginator']->init($pager_options);
         }
 
-        $this->paginator =& $paginator[$controller_name.'_paginator'];
-        $this->controller->paginator =& $this->paginator;
+        $this->paginator = $paginator[$controller_name.'_paginator'];
+        $this->controller->paginator = $this->paginator;
         
         $this->links = $this->links();
         
@@ -396,7 +396,7 @@ class AkPaginator
     }
     
     public function getOffset() {
-        return array_shift($this->paginator->getOffsetByPageId($this->getCurrent()))-1;
+        return Ak::first($this->paginator->getOffsetByPageId($this->getCurrent()))-1;
     }
 
     public function getCurrent() {
