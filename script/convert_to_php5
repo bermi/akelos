@@ -3,7 +3,7 @@
 
 @include(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
 
-defined('AK_FRAMEWORK_DIR')   || define('AK_FRAMEWORK_DIR', 'vendor'.DS.'akelos');
 defined('DS')           || define('DS', DIRECTORY_SEPARATOR);
+defined('AK_FRAMEWORK_DIR')   || define('AK_FRAMEWORK_DIR', 'vendor'.DS.'akelos');
 require_once(AK_FRAMEWORK_DIR.DS.'active_support'.DS.'utils'.DS.'scripts'.DS.'convert_to_php5.php');
 
