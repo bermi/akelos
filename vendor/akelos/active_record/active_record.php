@@ -210,6 +210,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
     }
 
+    public function __toString(){
+        return $this->toString();
+    }
+
 
     /**
     * New objects can be instantiated as either empty (pass no construction parameter) or pre-set with attributes but not yet saved
