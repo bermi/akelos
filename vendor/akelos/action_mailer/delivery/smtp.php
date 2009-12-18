@@ -18,7 +18,7 @@ class AkSmtpDelivery
         }
 
         if (PEAR::isError($smtp->connect($SmtpClient->timeout))) {
-            trigger_error('unable to connect to smtp server '.$SmtpClient->host.':'.$SmtpClient->port, E_USER_NOTICE);
+            trigger_error('unable to connect to smtp server '.$SmtpClient->host.':'.$SmtpClient->port.'. SMTP settings can be fount at config/mailer.yml.', E_USER_NOTICE);
             return false;
         }
 
@@ -26,7 +26,7 @@ class AkSmtpDelivery
             $method = is_string($SmtpClient->auth) ? $SmtpClient->auth : '';
 
             if (PEAR::isError($smtp->auth($SmtpClient->username, $SmtpClient->password, $method))) {
-                trigger_error('unable to authenticate to smtp server', E_USER_ERROR);
+                trigger_error('unable to authenticate to smtp server. SMTP settings can be fount at config/mailer.yml.', E_USER_ERROR);
             }
         }
 
