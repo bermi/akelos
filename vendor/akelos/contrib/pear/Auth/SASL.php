@@ -57,7 +57,7 @@ class Auth_SASL
     *                             DigestMD5
     *                     Types are not case sensitive
     */
-    function &factory($type)
+    static function &factory($type)
     {
         switch (strtolower($type)) {
             case 'anonymous':

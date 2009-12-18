@@ -42,7 +42,7 @@ class Log
      * @var boolean
      * @access private
      */
-    var $_opened = false;
+    public $_opened = false;
 
     /**
      * Instance-specific unique identification number.
@@ -50,7 +50,7 @@ class Log
      * @var integer
      * @access private
      */
-    var $_id = 0;
+    public $_id = 0;
 
     /**
      * The label that uniquely identifies this set of log messages.
@@ -58,7 +58,7 @@ class Log
      * @var string
      * @access private
      */
-    var $_ident = '';
+    public $_ident = '';
 
     /**
      * The default priority to use when logging an event.
@@ -66,14 +66,14 @@ class Log
      * @var integer
      * @access private
      */
-    var $_priority = PEAR_LOG_INFO;
+    public $_priority = PEAR_LOG_INFO;
 
     /**
      * The bitmask of allowed log levels.
      * @var integer
      * @access private
      */
-    var $_mask = PEAR_LOG_ALL;
+    public $_mask = PEAR_LOG_ALL;
 
     /**
      * Holds all Log_observer objects that wish to be notified of new messages.
@@ -81,7 +81,7 @@ class Log
      * @var array
      * @access private
      */
-    var $_listeners = array();
+    public $_listeners = array();
 
 
     /**
@@ -109,7 +109,7 @@ class Log
      * @access public
      * @since Log 1.0
      */
-    function &factory($handler, $name = '', $ident = '', $conf = array(),
+    static function &factory($handler, $name = '', $ident = '', $conf = array(),
                       $level = PEAR_LOG_DEBUG)
     {
         $handler = strtolower($handler);
@@ -170,7 +170,7 @@ class Log
      * @access public
      * @since Log 1.0
      */
-    function &singleton($handler, $name = '', $ident = '', $conf = array(),
+    public function &singleton($handler, $name = '', $ident = '', $conf = array(),
                         $level = PEAR_LOG_DEBUG)
     {
         static $instances;
@@ -189,7 +189,7 @@ class Log
      * Abstract implementation of the open() method.
      * @since Log 1.0
      */
-    function open()
+    public function open()
     {
         return false;
     }
@@ -198,7 +198,7 @@ class Log
      * Abstract implementation of the close() method.
      * @since Log 1.0
      */
-    function close()
+    public function close()
     {
         return false;
     }
@@ -207,7 +207,7 @@ class Log
      * Abstract implementation of the flush() method.
      * @since Log 1.8.2
      */
-    function flush()
+    public function flush()
     {
         return false;
     }
@@ -216,7 +216,7 @@ class Log
      * Abstract implementation of the log() method.
      * @since Log 1.0
      */
-    function log($message, $priority = null)
+    public function log($message, $priority = null)
     {
         return false;
     }
@@ -233,7 +233,7 @@ class Log
      * @access  public
      * @since   Log 1.7.0
      */
-    function emerg($message)
+    public function emerg($message)
     {
         return $this->log($message, PEAR_LOG_EMERG);
     }
@@ -250,7 +250,7 @@ class Log
      * @access  public
      * @since   Log 1.7.0
      */
-    function alert($message)
+    public function alert($message)
     {
         return $this->log($message, PEAR_LOG_ALERT);
     }
@@ -267,7 +267,7 @@ class Log
      * @access  public
      * @since   Log 1.7.0
      */
-    function crit($message)
+    public function crit($message)
     {
         return $this->log($message, PEAR_LOG_CRIT);
     }
@@ -284,7 +284,7 @@ class Log
      * @access  public
      * @since   Log 1.7.0
      */
-    function err($message)
+    public function err($message)
     {
         return $this->log($message, PEAR_LOG_ERR);
     }
@@ -301,7 +301,7 @@ class Log
      * @access  public
      * @since   Log 1.7.0
      */
-    function warning($message)
+    public function warning($message)
     {
         return $this->log($message, PEAR_LOG_WARNING);
     }
@@ -318,7 +318,7 @@ class Log
      * @access  public
      * @since   Log 1.7.0
      */
-    function notice($message)
+    public function notice($message)
     {
         return $this->log($message, PEAR_LOG_NOTICE);
     }
@@ -335,7 +335,7 @@ class Log
      * @access  public
      * @since   Log 1.7.0
      */
-    function info($message)
+    public function info($message)
     {
         return $this->log($message, PEAR_LOG_INFO);
     }
@@ -352,7 +352,7 @@ class Log
      * @access  public
      * @since   Log 1.7.0
      */
-    function debug($message)
+    public function debug($message)
     {
         return $this->log($message, PEAR_LOG_DEBUG);
     }
@@ -374,7 +374,7 @@ class Log
      *
      * @access private
      */
-    function _extractMessage($message)
+    public function _extractMessage($message)
     {
         /*
          * If we've been given an object, attempt to extract the message using
@@ -418,7 +418,7 @@ class Log
      *
      * @since   Log 1.0
      */
-    function priorityToString($priority)
+    public function priorityToString($priority)
     {
         $levels = array(
             PEAR_LOG_EMERG   => 'emergency',
@@ -446,7 +446,7 @@ class Log
      *
      * @since   Log 1.9.0
      */
-    function stringToPriority($name)
+    public function stringToPriority($name)
     {
         $levels = array(
             'emergency' => PEAR_LOG_EMERG,
@@ -472,7 +472,7 @@ class Log
      * @access  public
      * @since   Log 1.7.0
      */
-    function MASK($priority)
+    public function MASK($priority)
     {
         return (1 << $priority);
     }
@@ -487,7 +487,7 @@ class Log
      * @access  public
      * @since   Log 1.7.0
      */
-    function UPTO($priority)
+    public function UPTO($priority)
     {
         return ((1 << ($priority + 1)) - 1);
     }
@@ -502,7 +502,7 @@ class Log
      * @access  public
      * @since   Log 1.7.0
      */
-    function setMask($mask)
+    public function setMask($mask)
     {
         $this->_mask = $mask;
 
@@ -517,7 +517,7 @@ class Log
      * @access  public
      * @since   Log 1.7.0
      */
-    function getMask()
+    public function getMask()
     {
         return $this->_mask;
     }
@@ -533,7 +533,7 @@ class Log
      * @access  private
      * @since   Log 1.7.0
      */
-    function _isMasked($priority)
+    public function _isMasked($priority)
     {
         return (Log::MASK($priority) & $this->_mask);
     }
@@ -546,7 +546,7 @@ class Log
      * @access  public
      * @since   Log 1.8.4
      */
-    function getPriority()
+    public function getPriority()
     {
         return $this->_priority;
     }
@@ -559,7 +559,7 @@ class Log
      * @access  public
      * @since   Log 1.8.4
      */
-    function setPriority($priority)
+    public function setPriority($priority)
     {
         $this->_priority = $priority;
     }
@@ -576,7 +576,7 @@ class Log
      * @access  public
      * @since   Log 1.0
      */
-    function attach(&$observer)
+    public function attach(&$observer)
     {
         if (!($observer instanceof Log_observer)) {
             return false;
@@ -598,7 +598,7 @@ class Log
      * @access  public
      * @since   Log 1.0
      */
-    function detach($observer)
+    public function detach($observer)
     {
         if (!($observer instanceof Log_observer) ||
             !isset($this->_listeners[$observer->_id])) {
@@ -618,7 +618,7 @@ class Log
      *
      * @access private
      */
-    function _announce($event)
+    public function _announce($event)
     {
         foreach ($this->_listeners as $id => $listener) {
             if ($event['priority'] <= $this->_listeners[$id]->_priority) {
@@ -635,7 +635,7 @@ class Log
      * @access  public
      * @since   Log 1.0
      */
-    function isComposite()
+    public function isComposite()
     {
         return false;
     }
@@ -648,7 +648,7 @@ class Log
      * @access  public
      * @since   Log 1.6.3
      */
-    function setIdent($ident)
+    public function setIdent($ident)
     {
         $this->_ident = $ident;
     }
@@ -661,7 +661,7 @@ class Log
      * @access  public
      * @since   Log 1.6.3
      */
-    function getIdent()
+    public function getIdent()
     {
         return $this->_ident;
     }

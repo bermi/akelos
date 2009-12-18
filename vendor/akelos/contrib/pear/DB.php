@@ -195,7 +195,7 @@ class DB
      * error
      */
 
-    function &factory($type)
+    static function &factory($type)
     {
         @include_once("DB/${type}.php");
 
@@ -206,7 +206,7 @@ class DB
                                     null, null, null, 'DB_Error', true);
         }
 
-        @$obj =& new $classname;
+        @$obj = new $classname;
 
         return $obj;
     }
@@ -232,7 +232,7 @@ class DB
      * @see DB::isError
      * @see DB_common::setOption
      */
-    function &connect($dsn, $options = false)
+    public function &connect($dsn, $options = false)
     {
         if (is_array($dsn)) {
             $dsninfo = $dsn;
@@ -255,7 +255,7 @@ class DB
                                     null, null, null, 'DB_Error', true);
         }
 
-        @$obj =& new $classname;
+        @$obj = new $classname;
 
         if (is_array($options)) {
             foreach ($options as $option => $value) {
@@ -282,7 +282,7 @@ class DB
      *
      * @return int the DB API version number
      */
-    function apiVersion()
+    public function apiVersion()
     {
         return 2;
     }
@@ -294,7 +294,7 @@ class DB
      *
      * @return bool whether $value is an error
      */
-    function isError($value)
+    public function isError($value)
     {
         return (is_object($value) &&
                 (get_class($value) == 'db_error' ||
@@ -312,7 +312,7 @@ class DB
      *
      * @return bool whether $query is a data manipulation query
      */
-    function isManip($query)
+    public function isManip($query)
     {
         $manips = 'INSERT|UPDATE|DELETE|'.'REPLACE|CREATE|DROP|'.
                   'ALTER|GRANT|REVOKE|'.'LOCK|UNLOCK';
@@ -331,7 +331,7 @@ class DB
      *
      * @return bool whether $value is a warning
      */
-    function isWarning($value)
+    public function isWarning($value)
     {
         return (is_object($value) &&
                 (get_class($value) == "db_warning" ||
@@ -346,7 +346,7 @@ class DB
      * @return string error message, or false if the error code was
      * not recognized
      */
-    function errorMessage($value)
+    public function errorMessage($value)
     {
         static $errorMessages;
         if (!isset($errorMessages)) {
@@ -420,7 +420,7 @@ class DB
      *
      * @author Tomas V.V.Cox <cox@idecnet.com>
      */
-    function parseDSN($dsn)
+    public function parseDSN($dsn)
     {
         if (is_array($dsn)) {
             return $dsn;
@@ -511,7 +511,7 @@ class DB
      * @return bool true if the extension was already or successfully
      * loaded, false if it could not be loaded
      */
-    function assertExtension($name)
+    public function assertExtension($name)
     {
         if (!extension_loaded($name)) {
             $dlext = OS_WINDOWS ? '.dll' : '.so';
@@ -543,7 +543,7 @@ class DB_Error extends PEAR_Error
      * @see PEAR_Error
      */
 
-    function DB_Error($code = DB_ERROR, $mode = PEAR_ERROR_RETURN,
+    public function DB_Error($code = DB_ERROR, $mode = PEAR_ERROR_RETURN,
               $level = E_USER_NOTICE, $debuginfo = null)
     {
         if (is_int($code)) {
@@ -576,7 +576,7 @@ class DB_Warning extends PEAR_Error
      * @see PEAR_Error
      */
 
-    function DB_Warning($code = DB_WARNING, $mode = PEAR_ERROR_RETURN,
+    public function DB_Warning($code = DB_WARNING, $mode = PEAR_ERROR_RETURN,
             $level = E_USER_NOTICE, $debuginfo = null)
     {
         if (is_int($code)) {
@@ -598,9 +598,9 @@ class DB_Warning extends PEAR_Error
 
 class DB_result
 {
-    var $dbh;
-    var $result;
-    var $row_counter = null;
+    public $dbh;
+    public $result;
+    public $row_counter = null;
 
     /**
      * DB_result constructor.
@@ -608,7 +608,7 @@ class DB_result
      * @param   $result result resource id
      */
 
-    function DB_result(&$dbh, $result)
+    public function DB_result(&$dbh, $result)
     {
         $this->dbh = &$dbh;
         $this->result = $result;
@@ -621,7 +621,7 @@ class DB_result
      *
      * @return  array a row of data, NULL on no more rows or PEAR_Error on error
      */
-    function fetchRow($fetchmode = DB_FETCHMODE_DEFAULT, $rownum=null)
+    public function fetchRow($fetchmode = DB_FETCHMODE_DEFAULT, $rownum=null)
     {
         if ($fetchmode === DB_FETCHMODE_DEFAULT) {
             $fetchmode = $this->dbh->fetchmode;
@@ -661,7 +661,7 @@ class DB_result
             if ($object_class == 'stdClass') {
                 $ret = (object) $arr;
             } else {
-                $ret =& new $object_class($arr);
+                $ret = new $object_class($arr);
             }
             return $ret;
         }
@@ -678,7 +678,7 @@ class DB_result
      * @return  mixed  DB_OK on success, NULL on no more rows or
      *                 a DB_Error object on error
      */
-    function fetchInto(&$arr, $fetchmode = DB_FETCHMODE_DEFAULT, $rownum=null)
+    public function fetchInto(&$arr, $fetchmode = DB_FETCHMODE_DEFAULT, $rownum=null)
     {
         if ($fetchmode === DB_FETCHMODE_DEFAULT) {
             $fetchmode = $this->dbh->fetchmode;
@@ -726,7 +726,7 @@ class DB_result
      *
      * @return int the number of columns, or a DB error
      */
-    function numCols()
+    public function numCols()
     {
         return $this->dbh->numCols($this->result);
     }
@@ -736,7 +736,7 @@ class DB_result
      *
      * @return int the number of rows, or a DB error
      */
-    function numRows()
+    public function numRows()
     {
         return $this->dbh->numRows($this->result);
     }
@@ -746,7 +746,7 @@ class DB_result
      *
      * @return bool true if a new result is available or false if not.
      */
-    function nextResult()
+    public function nextResult()
     {
         return $this->dbh->nextResult($this->result);
     }
@@ -755,7 +755,7 @@ class DB_result
      * Frees the resources allocated for this result set.
      * @return  int     error code
      */
-    function free()
+    public function free()
     {
         $err = $this->dbh->freeResult($this->result);
         if(DB::isError($err)) {
@@ -765,12 +765,12 @@ class DB_result
         return true;
     }
 
-    function tableInfo($mode = null)
+    public function tableInfo($mode = null)
     {
         return $this->dbh->tableInfo($this->result, $mode);
     }
 
-    function getRowCounter()
+    public function getRowCounter()
     {
         return $this->row_counter;
     }
@@ -782,7 +782,7 @@ class DB_result
 */
 class DB_row
 {
-    function DB_row(&$arr)
+    public function DB_row(&$arr)
     {
         for (reset($arr); $key = key($arr); next($arr)) {
             $this->$key = &$arr[$key];

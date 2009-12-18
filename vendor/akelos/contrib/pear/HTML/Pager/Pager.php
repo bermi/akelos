@@ -137,7 +137,7 @@ class Pager
      *                          their values.
      * @access public
      */
-    function Pager($options = array())
+    public function Pager($options = array())
     {
         //this check evaluates to true on 5.0.0RC-dev,
         //so i'm using another one, for now...
@@ -164,13 +164,13 @@ class Pager
      * @static
      * @access public
      */
-    function &factory($options = array())
+    static function &factory($options = array())
     {
         $mode = (isset($options['mode']) ? ucfirst($options['mode']) : 'Jumping');
         $classname = 'Pager_' . $mode;
         $classfile = 'Pager' . DIRECTORY_SEPARATOR . $mode . '.php';
         require_once $classfile;
-        $pager =& new $classname($options);
+        $pager = new $classname($options);
         return $pager;
     }
 

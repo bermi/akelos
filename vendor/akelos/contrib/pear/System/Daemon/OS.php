@@ -97,7 +97,7 @@ class System_Daemon_OS
      *
      * @return object
      */
-    public function &factory($force_os = false, $retried = false)
+    static function &factory($force_os = false, $retried = false)
     {
         $drivers      = array();
         $driversValid = array();

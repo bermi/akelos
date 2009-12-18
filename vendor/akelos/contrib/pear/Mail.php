@@ -35,7 +35,7 @@ class Mail
      * Line terminator used for separating header lines.
      * @var string
      */
-    var $sep = "\r\n";
+    public $sep = "\r\n";
 
     /**
      * Provides an interface for generating Mail:: objects of various
@@ -46,7 +46,7 @@ class Mail
      * @return object Mail a instance of the driver class or if fails a PEAR Error
      * @access public
      */
-    function &factory($driver, $params = array())
+    static function &factory($driver, $params = array())
     {
         $driver = strtolower($driver);
         @include_once 'Mail/' . $driver . '.php';
@@ -86,7 +86,7 @@ class Mail
      * @access public
      * @deprecated use Mail_mail::send instead
      */
-    function send($recipients, $headers, $body)
+    public function send($recipients, $headers, $body)
     {
         if (!is_array($headers)) {
             return PEAR::raiseError('$headers must be an array');
@@ -125,7 +125,7 @@ class Mail
      *
      * @access private
      */
-    function _sanitizeHeaders(&$headers)
+    public function _sanitizeHeaders(&$headers)
     {
         foreach ($headers as $key => $value) {
             $headers[$key] =
@@ -150,7 +150,7 @@ class Mail
      *               and the plain text version of the headers.
      * @access private
      */
-    function prepareHeaders($headers)
+    public function prepareHeaders($headers)
     {
         $lines = array();
         $from = null;
@@ -212,7 +212,7 @@ class Mail
      *               object if the address list could not be parsed.
      * @access private
      */
-    function parseRecipients($recipients)
+    public function parseRecipients($recipients)
     {
         include_once 'Mail/RFC822.php';
 

@@ -161,7 +161,7 @@ class VersionControl_SVN
      * @var     array
      * @access  public
      */
-    var $shortcuts = array(
+    public $shortcuts = array(
 
             'praise'    => 'Blame',
             'annotate'  => 'Blame',
@@ -199,7 +199,7 @@ class VersionControl_SVN
      * @var     bool
      * @access  public
      */
-    var $use_escapeshellcmd = true;
+    public $use_escapeshellcmd = true;
 
     /**
      * Location of the svn client binary installed as part of Subversion
@@ -207,7 +207,7 @@ class VersionControl_SVN
      * @var     string  $svn_path
      * @access  public
      */
-    var $svn_path = 'svn';
+    public $svn_path = 'svn';
 
     /**
      * Array of switches to use in building svn command
@@ -215,7 +215,7 @@ class VersionControl_SVN
      * @var     array
      * @access  public
      */
-    var $switches = array();
+    public $switches = array();
 
     /**
      * Runtime options being used. 
@@ -223,7 +223,7 @@ class VersionControl_SVN
      * @var     array
      * @access  public
      */
-    var $options = array();
+    public $options = array();
     
     /**
      * Preferred fetchmode. Note that not all subcommands have output available for 
@@ -237,7 +237,7 @@ class VersionControl_SVN
      * @var     int
      * @access  public
      */
-    var $fetchmode = VERSIONCONTROL_SVN_FETCHMODE_ASSOC;
+    public $fetchmode = VERSIONCONTROL_SVN_FETCHMODE_ASSOC;
 
     /**
      * XML::Parser class to use for parsing XML output
@@ -245,7 +245,7 @@ class VersionControl_SVN
      * @var     string
      * @access  public
      */
-    var $svn_cmd_parser;
+    public $svn_cmd_parser;
 
     // }}}
     // {{{ Private Properties
@@ -256,7 +256,7 @@ class VersionControl_SVN
      * @var     string
      * @access  private
      */
-    var $_svn_cmd = '';
+    public $_svn_cmd = '';
 
     /**
      * Keep track of whether options are prepared or not.
@@ -264,7 +264,7 @@ class VersionControl_SVN
      * @var     bool
      * @access  private
      */
-    var $_prepared = false;
+    public $_prepared = false;
 
     /**
      * Fully prepared command string.
@@ -272,7 +272,7 @@ class VersionControl_SVN
      * @var     string
      * @access  private
      */
-    var $_prepped_cmd = '';
+    public $_prepped_cmd = '';
 
     /**
      * Keep track of whether XML output is available for a command
@@ -280,7 +280,7 @@ class VersionControl_SVN
      * @var     bool
      * @access  private
      */
-    var $_xml_avail = false;
+    public $_xml_avail = false;
 
     /**
      * Error stack.
@@ -288,7 +288,7 @@ class VersionControl_SVN
      * @var     object
      * @access  private
      */
-    var $_stack;
+    public $_stack;
     
     /**
      * Assembled switches for command line execution
@@ -296,7 +296,7 @@ class VersionControl_SVN
      * @var     object
      * @access  private
      */
-    var $_switches = '';
+    public $_switches = '';
     
     // }}}
     // {{{ errorMessages()
@@ -308,7 +308,7 @@ class VersionControl_SVN
      * @return  array
      * @access  public
      */
-    function declareErrorMessages()
+    public function declareErrorMessages()
     {
         $messages = array(
             VERSIONCONTROL_SVN_ERROR => '%errstr%',
@@ -391,7 +391,7 @@ class VersionControl_SVN
      *
      * @access  public
      */
-    function &factory($command, $options = array())
+    static function &factory($command, $options = array())
     {
         $stack = &PEAR_ErrorStack::singleton('VersionControl_SVN');
         $stack->setErrorMessageTemplate(VersionControl_SVN::declareErrorMessages());
@@ -422,7 +422,7 @@ class VersionControl_SVN
      * @return  mixed   object on success, false on failure
      * @access public
      */
-    function init($command, $options)
+    public function init($command, $options)
     {
         // Check for shortcuts for commands
         $shortcuts = VersionControl_SVN::fetchShortcuts();
@@ -437,7 +437,7 @@ class VersionControl_SVN
         $class      = 'VersionControl_SVN_'.$cmd;
         if (include_once realpath(dirname(__FILE__)) . "/SVN/{$cmd}.php") {
             if (class_exists($class)) {
-                $obj =& new $class;
+                $obj = new $class;
                 $obj->options   = $options;
                 $obj->_svn_cmd  = $lowercmd;
                 $obj->_stack    = &PEAR_ErrorStack::singleton('VersionControl_SVN');
@@ -460,7 +460,7 @@ class VersionControl_SVN
      * @return  mixed    array on success, false on failure
      * @access  public
      */
-    function fetchCommands()
+    public function fetchCommands()
     {
         $commands = array();
         $dir = realpath(dirname(__FILE__)) . '/SVN';
@@ -491,7 +491,7 @@ class VersionControl_SVN
      * @return  array
      * @access public
      */
-    function fetchShortcuts()
+    public function fetchShortcuts()
     {
         $vars = get_class_vars('VersionControl_SVN');
         return $vars['shortcuts'];
@@ -504,7 +504,7 @@ class VersionControl_SVN
      * Allow for overriding of previously declared options.
      *
      */
-    function setOptions($options = array())
+    public function setOptions($options = array())
     {
         $opts = array_filter(array_keys(get_class_vars('VersionControl_SVN')), array($this, '_filterOpts'));
         foreach ($options as $option => $value) {
@@ -530,7 +530,7 @@ class VersionControl_SVN
      *
      * This function should be overloaded by the command class.
      */
-    function prepare()
+    public function prepare()
     {
         $this->_stack->push(VERSIONCONTROL_SVN_ERROR_NOT_IMPLEMENTED, 'error', 
             array('options' => $this->options, 'method' => 'prepare()', 'class' => get_class($this)));
@@ -549,7 +549,7 @@ class VersionControl_SVN
      *                  are pushed into the PEAR_ErrorStack for VersionControl_SVN
      * @access  public
      */
-    function checkCommandRequirements()
+    public function checkCommandRequirements()
     {
         // Set up error push parameters to avoid any notices about undefined indexes
         $params['options']  = $this->options;
@@ -605,7 +605,7 @@ class VersionControl_SVN
      *                  or false on failure.
      * @access  public
      */
-    function run($args = array(), $switches = array())
+    public function run($args = array(), $switches = array())
     {
         if (sizeof($switches) > 0) {
             $this->switches = $switches;
@@ -655,7 +655,7 @@ class VersionControl_SVN
      *                  if desired fetchmode is not available.
      * @access  public
      */
-    function parseOutput($out)
+    public function parseOutput($out)
     {
         return join("\n", $out);
     }
@@ -670,7 +670,7 @@ class VersionControl_SVN
      *
      * @access  public
      */
-    function apiVersion()
+    public function apiVersion()
     {
         return '@version@';
     }
@@ -682,7 +682,7 @@ class VersionControl_SVN
      * Callback function for array_filter. Keeps _private options
      * out of settable options.
      */
-    function _filterOpts($var)
+    public function _filterOpts($var)
     {
         $ret = ($var{0} == '_') ? false : true;
         return $ret;
