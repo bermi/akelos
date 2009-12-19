@@ -557,10 +557,11 @@ class AkActionMailer extends AkBaseModel
     public function performSmtpDelivery(&$Message, $settings = array()) {
         $default_settings = array(
         'host'     =>  @$this->server_settings['address'],
-        'localhost'     =>  @$this->server_settings['domain'],
+        'localhost'=>  @$this->server_settings['domain'],
         'port'     =>  @$this->server_settings['port'],
-        'username'     =>  @$this->server_settings['user_name'],
-        'password'     =>  @$this->server_settings['password'],
+        'username' =>  @$this->server_settings['user_name'],
+        'password' =>  @$this->server_settings['password'],
+        'debug'    =>  @$this->server_settings['debug'],
         'auth'     =>  (!empty($this->server_settings['user_name']) || @$this->server_settings['authentication']),
         //'debug'    =>  true
         );
