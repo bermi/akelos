@@ -69,24 +69,24 @@ function akelos_autoload($name, $path = null) {
         'AkHelperTest'                  => 'action_pack/testing.php',
         'AkDbSession'                   => 'action_pack/db_session.php',
         'AkDispatcher'                  => 'action_pack/dispatcher.php',
-        'ActiveRecordHelper'            => 'action_pack/helpers/active_record_helper.php',
-        'AssetTagHelper'                => 'action_pack/helpers/asset_tag_helper.php',
-        'AkFormHelperBuilder'           => 'action_pack/helpers/form_helper.php',
-        'AkFormHelperInstanceTag'       => 'action_pack/helpers/form_helper.php',
-        'FormHelper'                    => 'action_pack/helpers/form_helper.php',
-        'AkFormHelperOptionsInstanceTag'=> 'action_pack/helpers/form_options_helper.php',
-        'FormTagHelper'                 => 'action_pack/helpers/form_tag_helper.php',
-        'JavascriptHelper'              => 'action_pack/helpers/javascript_helper.php',
-        'JavascriptMacrosHelper'        => 'action_pack/helpers/javascript_macros_helper.php',
-        'MailHelper'                    => 'action_pack/helpers/mail_helper.php',
-        'MenuHelper'                    => 'action_pack/helpers/menu_helper.php',
-        'NumberHelper'                  => 'action_pack/helpers/number_helper.php',
-        'PaginationHelper'              => 'action_pack/helpers/pagination_helper.php',
-        'PrototypeHelper'               => 'action_pack/helpers/prototype_helper.php',
-        'ScriptaculousHelper'           => 'action_pack/helpers/scriptaculous_helper.php',
-        'TextHelper'                    => 'action_pack/helpers/text_helper.php',
-        'UrlHelper'                     => 'action_pack/helpers/url_helper.php',
-        'XmlHelper'                     => 'action_pack/helpers/xml_helper.php',
+        'AkActiveRecordHelper'          => 'action_pack/helpers/ak_active_record_helper.php',
+        'AkAssetTagHelper'              => 'action_pack/helpers/ak_asset_tag_helper.php',
+        'AkFormHelperBuilder'           => 'action_pack/helpers/ak_form_helper.php',
+        'AkFormHelperInstanceTag'       => 'action_pack/helpers/ak_form_helper.php',
+        'AkFormHelper'                  => 'action_pack/helpers/ak_form_helper.php',
+        'AkFormHelperOptionsInstanceTag'=> 'action_pack/helpers/ak_form_options_helper.php',
+        'AkFormTagHelper'               => 'action_pack/helpers/ak_form_tag_helper.php',
+        'AkJavascriptHelper'            => 'action_pack/helpers/ak_javascript_helper.php',
+        'AkJavascriptMacrosHelper'      => 'action_pack/helpers/ak_javascript_macros_helper.php',
+        'AkMailHelper'                  => 'action_pack/helpers/ak_mail_helper.php',
+        'AkMenuHelper'                  => 'action_pack/helpers/ak_menu_helper.php',
+        'AkNumberHelper'                => 'action_pack/helpers/ak_number_helper.php',
+        'AkPaginationHelper'            => 'action_pack/helpers/ak_pagination_helper.php',
+        'AkPrototypeHelper'             => 'action_pack/helpers/ak_prototype_helper.php',
+        'AkScriptaculousHelper'         => 'action_pack/helpers/ak_scriptaculous_helper.php',
+        'AkTextHelper'                  => 'action_pack/helpers/ak_text_helper.php',
+        'AkUrlHelper'                   => 'action_pack/helpers/ak_url_helper.php',
+        'AkXmlHelper'                   => 'action_pack/helpers/ak_xml_helper.php',
         'AkHelperLoader'                => 'action_pack/helper_loader.php',
         'AkPaginator'                   => 'action_pack/pagination.php',
         'AkPhpCodeSanitizer'            => 'action_pack/php_code_sanitizer.php',
@@ -200,14 +200,22 @@ function akelos_autoload($name, $path = null) {
     }elseif(file_exists(DS.$name.'.php')){
         include DS.$name.'.php';
     }else{
-        if(!Ak::import($name)){
+        $underscored_name = AkInflector::underscore($name);
+        if(!Ak::import($name)){            
             if(strstr($name, 'Helper')){
-                $file_path = AkConfig::getDir('helpers').DS.AkInflector::underscore($name).'.php';
+                $file_path = AkConfig::getDir('helpers').DS.$underscored_name.'.php';
                 if(!file_exists($file_path)){
-                    $file_path = AK_ACTION_PACK_DIR.DS.'helpers'.DS.AkInflector::underscore($name).'.php';
+                    $file_path = AK_ACTION_PACK_DIR.DS.'helpers'.DS.$underscored_name.'.php';
+                    if(!file_exists($file_path)){
+                        $file_path = AK_ACTION_PACK_DIR.DS.'helpers'.DS.'ak_'.$underscored_name.'.php';
+                        if(include_once($file_path)){
+                            eval('class '.$name.' extends Ak'.$name.'{}');
+                            return;
+                        }
+                    }
                 }
             }elseif(strstr($name, 'Installer')){
-                $file_path = AkConfig::getDir('app_installers').DS.AkInflector::underscore($name).'.php';
+                $file_path = AkConfig::getDir('app_installers').DS.$underscored_name.'.php';
             }elseif(strstr($name, 'Controller')){
                 $file_path = AkInflector::toControllerFilename($name);
             }

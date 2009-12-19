@@ -212,6 +212,9 @@ class AkHelperLoader
         }
         foreach ($this->getHeperBasePaths() as $base_path){
             if(!strstr($file_name, $base_path)){
+                if(AK_ACTION_PACK_DIR.DS.'helpers' == $base_path && substr($file_name, 0 , 3) != 'ak_'){
+                    $file_name = 'ak_'.$file_name;
+                }
                 if(is_file($base_path.DS.$file_name)){
                     return $base_path.DS.$file_name;
                 }
@@ -241,9 +244,22 @@ class AkHelperLoader
             return false;
         }
         include_once($file_path);
+
+        if(strstr($file_path, AK_ACTION_PACK_DIR.DS.'helpers') && substr($helper_class_name, 0 , 2) != 'Ak'){
+            $helper_class_name = 'Ak'.$helper_class_name;
+            $using_core_helper_alias = true;
+            
+        }
+        
         if(class_exists($helper_class_name)){
             $attribute_name = Ak::last(explode(DS, substr($file_path,0,-4)));
             $this->_Handler->$attribute_name = new $helper_class_name($this->_Handler);
+            if(isset($using_core_helper_alias)){
+                $attribute_name_alias = substr($attribute_name,3);
+                if(!isset($this->_Handler->$attribute_name_alias)){
+                    $this->_Handler->$attribute_name_alias = $this->_Handler->$attribute_name;
+                }
+            }
             if(method_exists($this->_Handler->$attribute_name,'setController')){
                 $this->_Handler->$attribute_name->setController($this->_Handler);
             }elseif(method_exists($this->_Handler->$attribute_name,'setMailer')){

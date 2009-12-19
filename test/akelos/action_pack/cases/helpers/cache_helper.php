@@ -17,7 +17,7 @@ class CacheHelper_TestCase extends HelperUnitTest
 
     public function test_helper_instance()
     {
-        $this->assertIsA($this->cache_helper,'CacheHelper');
+        $this->assertIsA($this->cache_helper,'AkCacheHelper');
     }
 
     public function _test_init()

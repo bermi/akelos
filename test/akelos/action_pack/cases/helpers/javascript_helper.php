@@ -5,9 +5,7 @@ require_once(dirname(__FILE__).'/../helpers.php');
 class JavascriptHelper_TestCase extends HelperUnitTest
 {    
     public function test_for_JavascriptHelper()
-    {
-        require_once(AK_LIB_DIR.DS.'action_pack'.DS.'helpers'.DS.'javascript_helper.php');
-        
+    {        
         $javascript = new JavascriptHelper();
         
         $this->assertEqual($javascript->link_to_function('Greeting', "alert('Hello world!')"),'<a href="#" onclick="alert(\'Hello world!\'); return false;">Greeting</a>');

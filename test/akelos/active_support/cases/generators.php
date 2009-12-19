@@ -4,6 +4,11 @@ require_once(dirname(__FILE__).'/../config.php');
 
 class ControllerGenerator_TestCase extends ActiveSupportUnitTest
 {
+    public function __construct(){
+        parent::__construct();
+        $this->webserver_enabled = AkConfig::getOption('webserver_enabled', false);
+    }
+    
     public function runGeneratorCommand($command){
         ob_start();
         $Generator = new AkelosGenerator();
@@ -14,7 +19,7 @@ class ControllerGenerator_TestCase extends ActiveSupportUnitTest
     }
 
     public function skip(){
-        $this->skipIf(!AkConfig::getOption('webserver_enabled', false), '['.get_class($this).'] Web server not enabled.');
+        $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
     }
 
     public function test_should_generate_controller_and_auxiliary_files(){
