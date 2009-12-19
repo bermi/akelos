@@ -304,7 +304,7 @@ if($command == 'install') {
         $repository = null;
         $plugin_name = basename($plugin);
         if($plugin_name != $plugin){
-            $repository = preg_replace('/\/?'.$plugin_name.'$/', '', trim($plugin));
+            $repository = preg_replace('/\/?'.$plugin_name.'[\/\\\]?$/', '', trim($plugin));
         }
         if(!is_dir($plugin)){
             if (!@$PluginManager->getRepositoryForPlugin($plugin_name, $repository)){
