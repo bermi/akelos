@@ -1,6 +1,6 @@
 <?php
     
-class PaginationHelper extends AkBaseHelper
+class AkPaginationHelper extends AkBaseHelper
 {
     public function sortable_link($column, $url_options = array(), $link_options = array()) {
         $default_url_options = array(
@@ -12,7 +12,7 @@ class PaginationHelper extends AkBaseHelper
 
         $url_options = array_merge($default_url_options, $url_options);
 
-        $link_options['href'] = html_entity_decode($this->_controller->url_helper->modify_current_url($url_options,array($page_var_on_url)));
+        $link_options['href'] = html_entity_decode($this->_controller->ak_url_helper->modify_current_url($url_options,array($page_var_on_url)));
 
         if(empty($link_options['title'])){
             $link_options['title'] = $this->_controller->t("Sort by $column ({$url_options['direction']})");
@@ -23,7 +23,7 @@ class PaginationHelper extends AkBaseHelper
         }else{
             $link_text =  $this->_controller->t(AkInflector::humanize($column));
         }
-        return TagHelper::content_tag('a',$link_text,$link_options);
+        return AkTagHelper::content_tag('a',$link_text,$link_options);
     }
 
 

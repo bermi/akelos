@@ -15,7 +15,7 @@
 *
 *   Normal view text
 */
-class CacheHelper extends AkBaseHelper 
+class AkCacheHelper extends AkBaseHelper 
 {
     
     public function begin($key = array(), $options = array()) {

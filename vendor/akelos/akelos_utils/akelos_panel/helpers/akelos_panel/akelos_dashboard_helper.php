@@ -9,16 +9,16 @@ class AkelosDashboardHelper extends AkBaseHelper {
         }
 
         //<li><a href="#"><span>Contribute</span></a></li>
-        return TagHelper::content_tag('li',
+        return AkTagHelper::content_tag('li',
         $this->C->url_helper->link_to(
-        TagHelper::content_tag('span',$description), $url, $options)
+        AkTagHelper::content_tag('span',$description), $url, $options)
         );
     }
 
     public function flash_message($type, $message){
         return '<div class="flash radius_3 '.$type.'">'.
         '<p><span class="icon">'.$this->t(strtoupper($type)).': </span>'.
-        str_replace("\n", "<br />", TextHelper::h($message)).
+        str_replace("\n", "<br />", AkTextHelper::h($message)).
         '</p></div>';
     }
     
@@ -40,13 +40,13 @@ class AkelosDashboardHelper extends AkBaseHelper {
 
     public function capture_snippet($snippet_type = true){
         $this->_capturing_snippet = $snippet_type;
-        $this->_controller->capture_helper->begin('snippet');
+        $this->_controller->ak_capture_helper->begin('snippet');
     }
 
     public function format_snippet($code = '', $snippet_type = ''){
         if($this->_capturing_snippet){
             $snippet_type = $this->_capturing_snippet;
-            $code = $this->_controller->capture_helper->end(false);
+            $code = $this->_controller->ak_capture_helper->end(false);
             $this->_capturing_snippet = false;
         }
 
@@ -62,11 +62,11 @@ class AkelosDashboardHelper extends AkBaseHelper {
 
         $total = count($lines);
         $line_numbers = join("<br />", range(1, $total));
-        $code = str_replace(array("\n"), array('<br />'), TextHelper::h($code));
+        $code = str_replace(array("\n"), array('<br />'), AkTextHelper::h($code));
 
         $copy_button_version = in_array($snippet_type, array('shell')) ? '-2' : '';
 
-        $snippet_corner_image = $this->_controller->url_helper->url_for(array('action' => "images", 'controller' => 'virtual_assets', 'module' => 'akelos_panel', 'id' => "$snippet_type-box-corner", 'format' => "gif"));
+        $snippet_corner_image = $this->_controller->ak_url_helper->url_for(array('action' => "images", 'controller' => 'virtual_assets', 'module' => 'akelos_panel', 'id' => "$snippet_type-box-corner", 'format' => "gif"));
 
         $snippet_type_description = (!$snippet_type_set ? '' : "<div class=\"code-snippet-title\"><span class=\"snippet-title-$snippet_type\">$snippet_type_uc</span></div>");
 

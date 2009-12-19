@@ -853,11 +853,11 @@ class AkXhtmlValidator
                     'color' => $color,
                     'phrase' => htmlentities($phrase)
                     );
-                    $highlighted_error_line = TextHelper::highlight($highlighted_error_line, $phrase.' ', ' <strong style="border:2px solid #'.$color.'; background: #ffc;">\1</strong> ');
+                    $highlighted_error_line = AkTextHelper::highlight($highlighted_error_line, $phrase.' ', ' <strong style="border:2px solid #'.$color.'; background: #ffc;">\1</strong> ');
                 }
                 $highlighted_error.= $highlighted_error_line;
             } else {
-                $highlighted_error = TextHelper::highlight($error, $phrases.' ', ' <strong style="border:2px solid #'.$color.'; background: #ffc">\1</strong> ');
+                $highlighted_error = AkTextHelper::highlight($error, $phrases.' ', ' <strong style="border:2px solid #'.$color.'; background: #ffc">\1</strong> ');
                 $this->_linesToHighlight[$line][$error] = array(
                 'color' => $color,
                 'phrase' => htmlentities($phrases)
@@ -877,7 +877,7 @@ class AkXhtmlValidator
                 $xhtml_line = htmlentities($xhtml_line);
                 if (isset($this->_linesToHighlight[$pos])) {
                     foreach($this->_linesToHighlight[$pos] as $highlight_details) {
-                        $highlighted_xhtml[$k].= TextHelper::highlight($xhtml_line, $highlight_details['phrase'], '<strong style="border:2px solid #'.$highlight_details['color'].';padding:1px; margin:1px; background: #ffc;">\1</strong>');
+                        $highlighted_xhtml[$k].= AkTextHelper::highlight($xhtml_line, $highlight_details['phrase'], '<strong style="border:2px solid #'.$highlight_details['color'].';padding:1px; margin:1px; background: #ffc;">\1</strong>');
                     }
                 } else {
                     $highlighted_xhtml[$k].= $xhtml_line;

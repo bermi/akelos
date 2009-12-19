@@ -7,7 +7,7 @@
 * is a great of making the record quickly available for editing, but likely to prove lackluster for a complicated real-world form.
 * In that case, it's better to use the input method and the specialized form methods from the FormHelper
 */
-class ActiveRecordHelper extends AkBaseHelper
+class AkActiveRecordHelper extends AkBaseHelper
 {
 
     /**
@@ -63,10 +63,10 @@ class ActiveRecordHelper extends AkBaseHelper
         $submit_value = !empty($options['submit_value']) ? $options['submit_value'] : strtoupper(preg_replace('/[^\w]/','',$options['action']));
 
         $contents = '';
-        $contents .= $record->isNewRecord() ? '' : $this->_controller->form_helper->hidden_field($record_name, 'id');
+        $contents .= $record->isNewRecord() ? '' : $this->_controller->ak_form_helper->hidden_field($record_name, 'id');
         $contents .= $this->all_input_tags($record, $record_name, $options);
-        $contents .= FormTagHelper::submit_tag($this->t($submit_value));
-        return TagHelper::content_tag('form', $contents, array('action'=>$action, 'method'=>'post',
+        $contents .= AkFormTagHelper::submit_tag($this->t($submit_value));
+        return AkTagHelper::content_tag('form', $contents, array('action'=>$action, 'method'=>'post',
         'enctype'=> !empty($options['multipart']) ? 'multipart/form-data': null ));
     }
 
@@ -85,7 +85,7 @@ class ActiveRecordHelper extends AkBaseHelper
     public function error_message_on($object_name, $method, $prepend_text = '', $append_text = '', $css_class = 'formError') {
         if($errors = $this->_controller->$object_name->getErrorsOn($method)){
             $text = $prepend_text.(is_array($errors) ? array_shift($errors) : $errors).$append_text;
-            return TagHelper::content_tag('div', $this->t($text), array('class'=>$css_class));
+            return AkTagHelper::content_tag('div', $this->t($text), array('class'=>$css_class));
         }
         return '';
     }
@@ -108,13 +108,13 @@ class ActiveRecordHelper extends AkBaseHelper
             $error_list = '<ul>';
             foreach ($object->getFullErrorMessages() as $field=>$errors){
                 foreach ($errors as $error){
-                    $error_list .= TagHelper::content_tag('li',$error);
+                    $error_list .= AkTagHelper::content_tag('li',$error);
                 }
             }
             $error_list .= '</ul>';
             return
-            TagHelper::content_tag('div',
-            TagHelper::content_tag(
+            AkTagHelper::content_tag('div',
+            AkTagHelper::content_tag(
                         (!empty($options['header_tag']) ? $options['header_tag'] :'h2'),
                         
                         $this->t('%number_of_errors %errors prohibited this %object_name from being saved' ,array(
@@ -123,7 +123,7 @@ class ActiveRecordHelper extends AkBaseHelper
                             '%object_name'=>$this->t(AkInflector::humanize($object->getModelName()))
                             ))
                     ).
-                    TagHelper::content_tag('p', $this->t('There were problems with the following fields:')).
+                    AkTagHelper::content_tag('p', $this->t('There were problems with the following fields:')).
                     $error_list,
                     
                     array(

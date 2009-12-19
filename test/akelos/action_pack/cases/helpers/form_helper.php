@@ -141,7 +141,7 @@ class FormHelper_TestCase extends HelperUnitTest
         $controller->setReturnValue('urlFor', '/url/for/test');
         $form_tag_helper = new FormTagHelper();
 
-        $controller->returnsByValue('__get', $form_tag_helper, array('form_tag_helper'));
+        $controller->returnsByValue('__get', $form_tag_helper, array('ak_form_tag_helper'));
 
         $form_tag_helper->setController($controller);
 
@@ -256,6 +256,7 @@ class FormHelper_TestCase extends HelperUnitTest
         '<input checked="checked" id="post_validate_1" name="post[validate]" type="radio" value="1" />'
         );
     }
+
 }
 
 ak_test_case('FormHelper_TestCase');

@@ -16,15 +16,15 @@ class <?php  echo $helper_name?> extends AkBaseHelper
     }
 
     function link_to_show(&$record) {
-        return $this->_controller->url_helper->link_to($this->_controller->t('Show'), array('action' => 'show', 'id' => $record->getId()));
+        return $this->_controller->ak_url_helper->link_to($this->_controller->t('Show'), array('action' => 'show', 'id' => $record->getId()));
     }  
 
     function link_to_edit(&$record) {
-        return $this->_controller->url_helper->link_to($this->_controller->t('Edit'), array('action' => 'edit', 'id' => $record->getId()));
+        return $this->_controller->ak_url_helper->link_to($this->_controller->t('Edit'), array('action' => 'edit', 'id' => $record->getId()));
     }  
 
     function link_to_destroy(&$record) {
-        return $this->_controller->url_helper->link_to($this->_controller->t('Delete'), array('action' => 'destroy', 'id' => $record->getId()));
+        return $this->_controller->ak_url_helper->link_to($this->_controller->t('Delete'), array('action' => 'destroy', 'id' => $record->getId()));
     }
 }
 

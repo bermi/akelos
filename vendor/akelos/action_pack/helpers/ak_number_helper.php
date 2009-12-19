@@ -4,7 +4,7 @@
 * Provides methods for converting a number into a formatted string that currently represents
 * one of the following forms: phone number, percentage, money, or precision level.
 */
-class NumberHelper
+class AkNumberHelper
 {
     /**
       * Formats a +number+ into a US phone number string. The +options+ can be a array used to customize the
@@ -120,7 +120,7 @@ class NumberHelper
     }
 
     static function human_size($size) {
-        return NumberHelper::number_to_human_size($size);
+        return AkNumberHelper::number_to_human_size($size);
     }
 
     static function human_size_to_bytes($size) {

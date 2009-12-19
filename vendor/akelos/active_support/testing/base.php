@@ -426,7 +426,7 @@ class AkelosTextReporter extends TextReporter {
             print "FAILURES!!!\n";
         }
         $this->time_log['total'] = array($duration, $memory);
-        print "Test cases completed in ".$duration."/s using ".NumberHelper::human_size($memory).":\n ". $this->getTestCaseProgress() .
+        print "Test cases completed in ".$duration."/s using ".AkNumberHelper::human_size($memory).":\n ". $this->getTestCaseProgress() .
         "/" . $this->getTestCaseCount() .
         ", Passes: " . $this->getPassCount() .
         ", Failures: " . $this->getFailCount() .

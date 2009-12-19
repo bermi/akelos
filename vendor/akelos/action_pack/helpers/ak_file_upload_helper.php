@@ -1,6 +1,6 @@
 <?php
 
-class FileUploadHelper extends AkBaseHelper
+class AkFileUploadHelper extends AkBaseHelper
 {
     /**
      * Handles a gmail-like file upload.
@@ -108,7 +108,7 @@ class FileUploadHelper extends AkBaseHelper
         foreach ($params as $name=>$details){
             if(is_array($details) && !empty($details['name']) &&  !empty($details['tmp_name']) &&  !empty($details['size'])){
                 $details['persistence_key'] = md5($details['tmp_name'].Ak::uuid());
-                $details['human_size'] = $this->_controller->number_helper->human_size($details['size']);
+                $details['human_size'] = $this->_controller->ak_number_helper->human_size($details['size']);
                 $file = $this->Cache->get($details['persistence_key'], 'persistent_files');
                 if (empty($file)) {
                     $this->Cache->save(serialize(array_merge($details,array('contents'=>base64_encode(file_get_contents($details['tmp_name']))))), $details['persistence_key'], 'persistent_files');

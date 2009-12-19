@@ -14,7 +14,7 @@
 * using these helpers in your application.
 */
 
-class ScriptaculousHelper extends AkBaseHelper
+class AkScriptaculousHelper extends AkBaseHelper
 {
     public $_toggle_effects = array('toggle_appear','toggle_slide','toggle_blind');
 
@@ -61,9 +61,9 @@ class ScriptaculousHelper extends AkBaseHelper
         }
 
         if(in_array('toggle_'.$name, $this->_toggle_effects)){
-            return "Effect.toggle({$element},'".str_replace('toggle_','',$name)."',".JavascriptHelper::_options_for_javascript($js_options).");";
+            return "Effect.toggle({$element},'".str_replace('toggle_','',$name)."',".AkJavascriptHelper::_options_for_javascript($js_options).");";
         }else{
-            return "new Effect.".AkInflector::camelize($name)."({$element},".JavascriptHelper::_options_for_javascript($js_options).");";
+            return "new Effect.".AkInflector::camelize($name)."({$element},".AkJavascriptHelper::_options_for_javascript($js_options).");";
         }
     }
 
@@ -86,14 +86,14 @@ class ScriptaculousHelper extends AkBaseHelper
     */
     public function sortable_element($element_id, $options = array()) {
         $options['with'] = !empty($options['with']) ? $options['with'] : "Sortable.serialize('{$element_id}')";
-        $options['onUpdate'] = !empty($options['onUpdate']) ? $options['onUpdate'] : "function(){".PrototypeHelper::remote_function($options)."}";
+        $options['onUpdate'] = !empty($options['onUpdate']) ? $options['onUpdate'] : "function(){".AkPrototypeHelper::remote_function($options)."}";
 
         foreach ($options as $key=>$option) {
 
             /**
              * @todo: fix this code when implemented PrototypeHelper
              * 
-             * if (in_array(PrototypeHelper::AJAX_OPTIONS[$option])) {
+             * if (in_array(AkPrototypeHelper::AJAX_OPTIONS[$option])) {
              *      unset($options[$option]);
              * }
              */
@@ -110,14 +110,14 @@ class ScriptaculousHelper extends AkBaseHelper
         }
 
         if (in_array($options['containment'])){
-            $options['containment'] = JavascriptHelper::array_or_string_for_javascript($options['containment']);
+            $options['containment'] = AkJavascriptHelper::array_or_string_for_javascript($options['containment']);
         }
 
         if (in_array($options['only'])){
-            $options['only'] = JavascriptHelper::array_or_string_for_javascript($options['only']);
+            $options['only'] = AkJavascriptHelper::array_or_string_for_javascript($options['only']);
         }
 
-        return JavascriptHelper::javascript_tag("Sortable.create('{$element_id}', ".JavascriptHelper::_options_for_javascript($options).")");
+        return AkJavascriptHelper::javascript_tag("Sortable.create('{$element_id}', ".AkJavascriptHelper::_options_for_javascript($options).")");
     }
 
 
@@ -131,11 +131,11 @@ class ScriptaculousHelper extends AkBaseHelper
     * http://script.aculo.us for more documentation. 
     */
     public function draggable_element($element_id, $options = array()) {
-        return JavascriptHelper::javascript_tag(ScriptaculousHelper::draggable_element_js($element_id, $options));
+        return AkJavascriptHelper::javascript_tag(AkScriptaculousHelper::draggable_element_js($element_id, $options));
     }
 
     public function draggable_element_js($element_id, $options = array()) {
-        return "new Draggable('{$element_id}', ".JavascriptHelper::_options_for_javascript($options).")";
+        return "new Draggable('{$element_id}', ".AkJavascriptHelper::_options_for_javascript($options).")";
     }
 
 
@@ -154,27 +154,27 @@ class ScriptaculousHelper extends AkBaseHelper
     */
     public function drop_receiving_element($element_id, $options = array()) {
         $options['with'] = !empty($options['with']) ? $options['with'] : "'id='".urlencode(element.id);
-        $options['onDrop'] = !empty($options['onDrop']) ? $options['onDrop'] : "function(element){". PrototypeHelper::remote_function($options) . "}";
+        $options['onDrop'] = !empty($options['onDrop']) ? $options['onDrop'] : "function(element){". AkPrototypeHelper::remote_function($options) . "}";
 
         foreach ($options as $key=>$option) {
             /**
              * @todo: fix this code when implemented PrototypeHelper
              * 
-             * if (in_array(PrototypeHelper::AJAX_OPTIONS[$option])) {
+             * if (in_array(AkPrototypeHelper::AJAX_OPTIONS[$option])) {
              *      unset($options[$option]);
              * }
              */
         }
 
         if (in_array($options['accept'])){
-            $options['accept'] = JavascriptHelper::array_or_string_for_javascript($options['accept']);
+            $options['accept'] = AkJavascriptHelper::array_or_string_for_javascript($options['accept']);
         }
 
         if (in_array($options['hoverclass'])){
             $options['hoverclass'] = "'{$options['hoverclass']}'";
         }
 
-        return JavascriptHelper::javascript_tag("Droppables.add('{$element_id}', ".JavascriptHelper::_options_for_javascript($options).")");
+        return AkJavascriptHelper::javascript_tag("Droppables.add('{$element_id}', ".AkJavascriptHelper::_options_for_javascript($options).")");
     }
 }
 

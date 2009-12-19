@@ -4,7 +4,7 @@
 * Use these methods to generate HTML tags programmatically when you can't use a Builder.
 * By default, they output XHTML compliant tags.
 */
-class TagHelper
+class AkTagHelper
 {
     /**
     * Returns an empty HTML tag of type *name* which by default is XHTML
@@ -23,7 +23,7 @@ class TagHelper
     *    # => <input type="text" disabled="disabled" />
     */
     static function tag($name, $options = null, $open = false) {
-        return '<'.$name.(!empty($options) ? TagHelper::tag_options($options) : '').($open ? '>' : ' />');
+        return '<'.$name.(!empty($options) ? AkTagHelper::tag_options($options) : '').($open ? '>' : ' />');
     }
 
     /**
@@ -40,7 +40,7 @@ class TagHelper
     *    # => <select multiple="multiple">...options...</select>
     */
     static function content_tag($name, $content, $options = null) {
-        return '<'.$name.(!empty($options) ? TagHelper::tag_options($options) : '').'>'.$content.'</'.$name.'>';
+        return '<'.$name.(!empty($options) ? AkTagHelper::tag_options($options) : '').'>'.$content.'</'.$name.'>';
     }
 
     /**
@@ -66,7 +66,7 @@ class TagHelper
         if(empty($charset)){
             $charset = Ak::locale('charset');
         }
-        return TagHelper::fix_double_escape(htmlentities($html, ENT_COMPAT, $charset));
+        return AkTagHelper::fix_double_escape(htmlentities($html, ENT_COMPAT, $charset));
     }
 
     /**
@@ -83,7 +83,7 @@ class TagHelper
                 continue;
             }
             if(!is_numeric($key) && !is_array($value) && !is_object($value)){
-                $formated_options[$key] =  $key.'="'.TagHelper::escape_once($value).'"';
+                $formated_options[$key] =  $key.'="'.AkTagHelper::escape_once($value).'"';
             }
         }
         ksort($formated_options);

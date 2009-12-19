@@ -8,7 +8,7 @@
 * will give <tt>disabled="disabled"</tt>.
 */
 
-class FormTagHelper extends AkBaseHelper
+class AkFormTagHelper extends AkBaseHelper
 {
 
     /**
@@ -26,11 +26,11 @@ class FormTagHelper extends AkBaseHelper
             unset($html_options['multipart']);
         }
 
-        // we need to avoid double ampersand scaping when calling TagHelper::tag method
+        // we need to avoid double ampersand scaping when calling AkTagHelper::tag method
         $html_options['action'] = str_replace('&amp;', '&', $this->_controller->urlFor($url_for_options));
 
 
-        return TagHelper::tag('form', $html_options, true);
+        return AkTagHelper::tag('form', $html_options, true);
     }
 
     public function start_form_tag($url_for_options = array(), $options = array()) {
@@ -60,7 +60,7 @@ class FormTagHelper extends AkBaseHelper
       * * <tt>'multiple'</tt> - If set to true the selection will allow multiple choices.
       */
     public function select_tag($name, $option_tags = null, $options = array()) {
-        return TagHelper::content_tag('select', $option_tags, array_merge(array('name'=> $name, 'id' => trim(AkInflector::underscore($name),'_')), $options));
+        return AkTagHelper::content_tag('select', $option_tags, array_merge(array('name'=> $name, 'id' => trim(AkInflector::underscore($name),'_')), $options));
     }
 
     /**
@@ -74,7 +74,7 @@ class FormTagHelper extends AkBaseHelper
       * An array of standard HTML options for the tag.
       */
     public function text_field_tag($name, $value = null, $options = array()) {
-        return TagHelper::tag('input', array_merge(array('type'=>'text','name'=>$name,'id'=>trim(AkInflector::underscore($name),'_'),'value'=>$value), $options));
+        return AkTagHelper::tag('input', array_merge(array('type'=>'text','name'=>$name,'id'=>trim(AkInflector::underscore($name),'_'),'value'=>$value), $options));
     }
 
     /**
@@ -121,7 +121,7 @@ class FormTagHelper extends AkBaseHelper
             list($options['cols'], $options['rows']) = preg_split('/x|X| /', trim(str_replace(' ','',$options['size'])));
             unset($options['size']);
         }
-        return TagHelper::content_tag('textarea', $content, array_merge(array('name'=>$name,'id'=>$name),$options));
+        return AkTagHelper::content_tag('textarea', $content, array_merge(array('name'=>$name,'id'=>$name),$options));
     }
 
     /**
@@ -132,7 +132,7 @@ class FormTagHelper extends AkBaseHelper
         if(!empty($html_options['checked']) || !empty($checked)){
             $html_options['checked'] = 'checked';
         }
-        return TagHelper::tag('input', $html_options);
+        return AkTagHelper::tag('input', $html_options);
     }
 
     /**
@@ -143,7 +143,7 @@ class FormTagHelper extends AkBaseHelper
         if(!empty($html_options['checked']) || !empty($checked)){
             $html_options['checked'] = 'checked';
         }
-        return TagHelper::tag('input', $html_options);
+        return AkTagHelper::tag('input', $html_options);
     }
 
     /**
@@ -157,7 +157,7 @@ class FormTagHelper extends AkBaseHelper
             unset($options['disable_with']);
             $options['onclick'] = "this.disabled=true;this.value='".addslashes($disable_with)."';this.form.submit();".@$options["onclick"];
         }
-        return TagHelper::tag('input', array_merge(array('type'=>'submit','name'=>'commit','value'=>$value),$options));
+        return AkTagHelper::tag('input', array_merge(array('type'=>'submit','name'=>'commit','value'=>$value),$options));
     }
 
     /**
@@ -166,7 +166,7 @@ class FormTagHelper extends AkBaseHelper
       * <tt>source</tt> is passed to AssetTagHelper#image_path
       */
     public function image_submit_tag($source, $options = array()) {
-        return TagHelper::tag('input',array_merge(array('type'=>'image','src'=>$this->_controller->asset_tag_helper->image_path($source)),$options));
+        return AkTagHelper::tag('input',array_merge(array('type'=>'image','src'=>$this->_controller->ak_asset_tag_helper->image_path($source)),$options));
     }
 }
 

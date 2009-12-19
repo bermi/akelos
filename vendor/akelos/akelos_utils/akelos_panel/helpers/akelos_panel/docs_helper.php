@@ -10,11 +10,11 @@ class DocsHelper extends AkBaseHelper
     }
 
     public function render_doc($doc_contents){
-        return $this->_afterRender(TextHelper::textilize($this->_beforeRender($doc_contents)));
+        return $this->_afterRender(AkTextHelper::textilize($this->_beforeRender($doc_contents)));
     }
     
     public function link_to_guide($guide_name, $slug = '', $html_options = array()){
-        return $this->_controller->url_helper->link_to($this->t($guide_name), array('controller'=>'docs', 'action'=>'guide', 'id' => $this->t($slug), 'format' =>'html'), $html_options);
+        return $this->_controller->ak_url_helper->link_to($this->t($guide_name), array('controller'=>'docs', 'action'=>'guide', 'id' => $this->t($slug), 'format' =>'html'), $html_options);
     }
 
     private function _getdocPath($doc_name, $language){
@@ -78,7 +78,7 @@ class DocsHelper extends AkBaseHelper
                 $css_class = strtolower($class);
                 $css_class = in_array($css_class, array('shell')) ? 'html' : $css_class;
                 
-                $escaped = TextHelper::h($matches[2][$k]);
+                $escaped = AkTextHelper::h($matches[2][$k]);
                 $textile = str_replace($matches[0][$k], $this->_tabText("<notextile><div class='code_container'><code class='$css_class'>$escaped</code></div></notextile>"), $textile);
             }
         }

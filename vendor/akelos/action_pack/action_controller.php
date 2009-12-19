@@ -391,7 +391,7 @@ class AkActionController extends AkLazyObject
     }
 
     public function getIncludedModelClassNames($extra_models = array()) {
-        empty($this->model)         && ($this->model        = $this->params['controller']);
+        empty($this->model)         && ($this->model        = $this->getControllerName());
         empty($this->models)        && ($this->models       = array());
         empty($this->app_models)    && ($this->app_models   = array());
         return (array)array_unique(array_diff(array_merge_recursive(Ak::toArray($extra_models), Ak::toArray($this->app_models), Ak::toArray($this->models), Ak::toArray($this->model)), array('')));
@@ -1681,7 +1681,7 @@ class AkActionController extends AkLazyObject
     * Record model for all actions in a controller (or certain actions if
     * specified with the <tt>actions</tt> option).
     *
-    * +options+ are the same as PaginationHelper::paginate, with the addition
+    * +options+ are the same as AkPaginationHelper::paginate, with the addition
     * of:
     * <tt>actions</tt>:: an array of actions for which the pagination is
     *                     active. Defaults to +null+ (i.e., every action)

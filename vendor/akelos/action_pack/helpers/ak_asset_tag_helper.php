@@ -3,7 +3,7 @@
 /**
  * Provides methods for linking a HTML page together with other assets, such as javascripts, stylesheets, and feeds.
  */
-class AssetTagHelper extends AkBaseHelper
+class AkAssetTagHelper extends AkBaseHelper
 {
     /**
      * Returns a link tag that browsers and news readers can use to auto-detect a RSS or ATOM feed for this page. The +type+ can
@@ -20,7 +20,7 @@ class AssetTagHelper extends AkBaseHelper
      *     <link rel="alternate" type="application/rss+xml" title="My RSS" href="http://www.curenthost.com/controller/feed" />
      */
     public function auto_discovery_link_tag($type = 'rss', $url_options = array(), $tag_options = array()) {
-        return TagHelper::tag(
+        return AkTagHelper::tag(
         'link',
         array(
         'rel' => empty($tag_options['rel']) ? 'alternate' : $tag_options['rel'],
@@ -72,7 +72,7 @@ class AssetTagHelper extends AkBaseHelper
         $javascript_include_tags = '';
         foreach ($sources as $source){
             $source = $this->javascript_path($source);
-            $javascript_include_tags .= TagHelper::content_tag('script', '', array_merge($options,array('type'=>'text/javascript','src'=>$source)))."\n";
+            $javascript_include_tags .= AkTagHelper::content_tag('script', '', array_merge($options,array('type'=>'text/javascript','src'=>$source)))."\n";
         }
         return $javascript_include_tags;
     }
@@ -137,7 +137,7 @@ class AssetTagHelper extends AkBaseHelper
         $style_include_tags = '';
         foreach ($sources as $source){
             $source = $this->stylesheet_path($source);
-            $style_include_tags .= TagHelper::tag('link', array_merge(array('rel'=>'Stylesheet','type'=>'text/css','media'=>'screen','href'=>$source),$options))."\n";
+            $style_include_tags .= AkTagHelper::tag('link', array_merge(array('rel'=>'Stylesheet','type'=>'text/css','media'=>'screen','href'=>$source),$options))."\n";
         }
         return $style_include_tags;
     }
@@ -173,7 +173,7 @@ class AssetTagHelper extends AkBaseHelper
         $options['src'] = $this->image_path($source);
         $options['alt'] = !empty($options['alt']) ? $options['alt'] : AkInflector::titleize(substr(basename($options['src']),0,strpos(basename($options['src']),'.')),'first');
 
-        return TagHelper::tag('img', $options);
+        return AkTagHelper::tag('img', $options);
     }
 
     public function _compute_public_path($source, $dir = '', $ext = '') {

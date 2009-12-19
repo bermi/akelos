@@ -208,7 +208,7 @@ class AkMailParser
 
     public function extractImagesIntoInlineParts(&$Mail, $options = array()) {
         $html =& $Mail->body;
-        $images = TextHelper::get_image_urls_from_html($html);
+        $images = AkTextHelper::get_image_urls_from_html($html);
 
         $html_images = array();
         if(!empty($images)){

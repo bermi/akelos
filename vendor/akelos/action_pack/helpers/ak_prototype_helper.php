@@ -23,7 +23,7 @@
 * See JavaScriptGenerator for information on updating multiple elements
 * on the page in an Ajax response. 
 */
-class PrototypeHelper extends AkBaseHelper
+class AkPrototypeHelper extends AkBaseHelper
 {
     public function getCallbacks() {
         if(empty($this->callbacks)){
@@ -63,7 +63,7 @@ class PrototypeHelper extends AkBaseHelper
     *
     * Examples:
     * $prototype_helper->link_to_remote('Delete this post', array('url' => array('action' => 'destroy', 'id' => $_POST['id']), 'update' => 'posts'));
-    *   $prototype_helper->link_to_remote(Asset$this->_controller->tag_helper->image_tag('refresh'), array('url' => array('action' => 'list_emails'), array('update => 'emails'));
+    *   $prototype_helper->link_to_remote(Asset$this->_controller->ak_tag_helper->image_tag('refresh'), array('url' => array('action' => 'list_emails'), array('update => 'emails'));
     *
     * You can also specify an array for <tt>options['update']</tt> to allow for
     * easy redirection of output to an other DOM element if a server-side 
@@ -137,7 +137,7 @@ class PrototypeHelper extends AkBaseHelper
     *                          table row or any other DOM element.
     */
     public function link_to_remote($name, $options = array(), $html_options = array()) {
-        return $this->_controller->javascript_helper->link_to_function($name, $this->remote_function($options), $html_options);
+        return $this->_controller->ak_javascript_helper->link_to_function($name, $this->remote_function($options), $html_options);
 
     }
 
@@ -152,7 +152,7 @@ class PrototypeHelper extends AkBaseHelper
     public function periodically_call_remote($options = array()) {
         $frequency = !empty($options['frequency']) ? $options['frequency'] : 10; // every ten seconds by default
         $code = "new PeriodicalExecuter(function() {".$this->remote_function($options)."}, {$frequency})";
-        return $this->_controller->javascript_helper->javascript_tag($code);
+        return $this->_controller->ak_javascript_helper->javascript_tag($code);
     }
 
     /**
@@ -168,7 +168,7 @@ class PrototypeHelper extends AkBaseHelper
     * specified with the 'action'/'method' options on 'html'.
     *
     * Example:
-    *   $prototype_helper->form_remote_tag('html' => array('action' => $this->_controller->url_helper->url_for(array('controller' => 'some', 'action' => 'place')));
+    *   $prototype_helper->form_remote_tag('html' => array('action' => $this->_controller->ak_url_helper->url_for(array('controller' => 'some', 'action' => 'place')));
     *   $prototype_helper->form_remote_tag('url' => array('controller' => 'foo', 'action' => 'bar'), 'update' => 'div_to_update', html => array('id' => 'form_id'));
     *
     * The Hash passed to the 'html' key is equivalent to the options (2nd) 
@@ -184,10 +184,10 @@ class PrototypeHelper extends AkBaseHelper
         $options['form'] = true;
         $options['html'] = empty($options['html']) ? array() : $options['html'];
         $options['html']['onsubmit'] = $this->remote_function($options).'; return false;';
-        $options['html']['action'] = !empty($options['html']['action']) ? $options['html']['action'] : (is_array($options['url']) ? $this->_controller->url_helper->url_for($options['url']) : $options['url']);
+        $options['html']['action'] = !empty($options['html']['action']) ? $options['html']['action'] : (is_array($options['url']) ? $this->_controller->ak_url_helper->url_for($options['url']) : $options['url']);
         $options['html']['method'] = !empty($options['html']['method']) ? $options['html']['method'] : 'post';
 
-        return $this->_controller->tag_helper->tag('form', $options['html'], true);
+        return $this->_controller->ak_tag_helper->tag('form', $options['html'], true);
 
     }
 
@@ -195,9 +195,9 @@ class PrototypeHelper extends AkBaseHelper
     * Works like form_remote_tag, but uses form_for semantics.
     */
     public function remote_form_for($object_name, $object, $options = array(), $proc) {
-        //$this->_controller->text_helper->concat($this->_controller->form_remote_tag($options),proc.binding);
-        return $this->_controller->form_helper->fields_for($object_name,$object,$proc);
-        //return $this->_controller->text_helper->concat('</form>', proc.binding);
+        //$this->_controller->ak_text_helper->concat($this->_controller->form_remote_tag($options),proc.binding);
+        return $this->_controller->ak_form_helper->fields_for($object_name,$object,$proc);
+        //return $this->_controller->ak_text_helper->concat('</form>', proc.binding);
     }
 
     /* Alias: remote_form_for */
@@ -219,7 +219,7 @@ class PrototypeHelper extends AkBaseHelper
         $options['html']['name'] = $name;
         $options['html']['value'] = $value;
 
-        return $this->_controller->tag_helper->tag('input', $options['html'], false);
+        return $this->_controller->ak_tag_helper->tag('input', $options['html'], false);
     }
 
     /**
@@ -245,7 +245,7 @@ class PrototypeHelper extends AkBaseHelper
     * a page. Example:
     *
     *   * Calling view
-    *   <?= $this->_controller->form_helper->form_remote_tag(array('url' => array('action' => 'buy')), array('complete' => evaluate_remote_response)) ?>
+    *   <?= $this->_controller->ak_form_helper->form_remote_tag(array('url' => array('action' => 'buy')), array('complete' => evaluate_remote_response)) ?>
     *   all the inputs here...
     *
     *   * Controller action
@@ -268,7 +268,7 @@ class PrototypeHelper extends AkBaseHelper
     * See also JavaScriptGenerator and update_page.
     */
     public function update_element_function($element_id, $options = array()) {
-        $content = !empty($options['content']) ? $this->_controller->javascript_helper->escape_javascript($options['content']) : '';
+        $content = !empty($options['content']) ? $this->_controller->ak_javascript_helper->escape_javascript($options['content']) : '';
         $content = empty($content) && func_num_args() == 3 ? func_get_arg(2) : (is_string($options) ? $options : $content);
         $action = !empty($options['action']) ? $options['action'] : 'update';
 
@@ -296,7 +296,7 @@ class PrototypeHelper extends AkBaseHelper
         }
 
         $javascript_function .= ";\n";
-        return !empty($options['binding']) ? $this->_controller->text_helper->concat($javascript_function, $options['binding']) : $javascript_function;
+        return !empty($options['binding']) ? $this->_controller->ak_text_helper->concat($javascript_function, $options['binding']) : $javascript_function;
     }
 
     /**
@@ -339,7 +339,7 @@ class PrototypeHelper extends AkBaseHelper
             }
         }
         $function = empty($update) ? "new Ajax.Request(" : "new Ajax.Updater({$update}, ";
-        $function .= "'".(is_array($options['url'])?$this->_controller->url_helper->url_for($options['url']):$options['url'])."'";
+        $function .= "'".(is_array($options['url'])?$this->_controller->ak_url_helper->url_for($options['url']):$options['url'])."'";
         $function .= ", {$javascript_options})";
 
         if (!empty($options['before'])) {
@@ -352,7 +352,7 @@ class PrototypeHelper extends AkBaseHelper
             $function = "if ({$options['condition']}) { {$function}; }";
         }
         if (!empty($options['confirm'])) {
-            $function = "if (confirm('".$this->_controller->javascript_helper->escape_javascript($options['confirm'])."')) { {$function}; }";
+            $function = "if (confirm('".$this->_controller->ak_javascript_helper->escape_javascript($options['confirm'])."')) { {$function}; }";
         }
 
         return $function;
@@ -425,7 +425,7 @@ class PrototypeHelper extends AkBaseHelper
         $javascript .= empty($options['on']) ? '' : ", '{$options['on']}'";
         $javascript .= ")";
 
-        return $this->_controller->javascript_helper->javascript_tag($javascript);
+        return $this->_controller->ak_javascript_helper->javascript_tag($javascript);
     }
 
     public function _buildCallbacks($options) {
@@ -456,7 +456,7 @@ class PrototypeHelper extends AkBaseHelper
             $js_options['parameters'] = $options['with'];
         }
 
-        return $this->_controller->javascript_helper->_options_for_javascript($js_options);
+        return $this->_controller->ak_javascript_helper->_options_for_javascript($js_options);
     }
 
     public function _methodOptionToString($method) {

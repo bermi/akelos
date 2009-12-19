@@ -6,7 +6,7 @@
 * 
 * @deprecated 
 */
-class JavascriptMacrosHelper extends AkBaseHelper
+class AkJavascriptMacrosHelper extends AkBaseHelper
 {
 
     /**
@@ -43,7 +43,7 @@ class JavascriptMacrosHelper extends AkBaseHelper
     public function in_place_editor($field_id, $options = array()) {
         $function =  "new Ajax.InPlaceEditor(";
         $function .= "'{$field_id}', ";
-        $function .= "'".$this->_controller->url_helper->url_for($options['url'])."'";
+        $function .= "'".$this->_controller->ak_url_helper->url_for($options['url'])."'";
 
         $js_options = array();
         if (!empty($options['cancel_text'])){
@@ -65,11 +65,11 @@ class JavascriptMacrosHelper extends AkBaseHelper
             $js_options['callback'] = "function(form) { return {$options['with']} }" ;
         }
         if (!empty($js_options)) {
-            $function .= (', ' . JavascriptHelper::_options_for_javascript($js_options));
+            $function .= (', ' . AkJavascriptHelper::_options_for_javascript($js_options));
         }
         $function .= ')';
 
-        return JavascriptHelper::javascript_tag($function);
+        return AkJavascriptHelper::javascript_tag($function);
     }
 
 
@@ -127,11 +127,11 @@ class JavascriptMacrosHelper extends AkBaseHelper
         $function =  "var {$field_id}_auto_completer = new Ajax.Autocompleter(";
         $function .= "'{$field_id}', ";
         $function .= !empty($options['update']) ? "'{$options['update']}', " : "'{$field_id}_auto_complete', ";
-        $function .= "'".$this->_controller->url_helper->url_for($options['url'])."'";
+        $function .= "'".$this->_controller->ak_url_helper->url_for($options['url'])."'";
 
         $js_options = array();
         if (!empty($options['tokens'])){
-            $js_options['tokens'] = JavascriptHelper::array_or_string_for_javascript($options['tokens']) ;
+            $js_options['tokens'] = AkJavascriptHelper::array_or_string_for_javascript($options['tokens']) ;
         }
         if (!empty($options['with'])) {
             $js_options['callback'] = "function(element, value) { return {$options['with']} }";
@@ -154,8 +154,8 @@ class JavascriptMacrosHelper extends AkBaseHelper
                 $js_options[$default_option] = $options[$key];
             }
         }
-        $function .= ', '.JavascriptHelper::_options_for_javascript($js_options).')';
-        return JavascriptHelper::javascript_tag($function);
+        $function .= ', '.AkJavascriptHelper::_options_for_javascript($js_options).')';
+        return AkJavascriptHelper::javascript_tag($function);
     }
 
     /**
@@ -179,9 +179,9 @@ class JavascriptMacrosHelper extends AkBaseHelper
             return '';
         }
         foreach ($entries as $entry) {
-            $items[] = TagHelper::content_tag('li',!empty($phrase) ? TextHelper::highlight(TextHelper::h($entry[$field]), $phrase) : TextHelper::h(@$entry[$field]));
+            $items[] = AkTagHelper::content_tag('li',!empty($phrase) ? AkTextHelper::highlight(AkTextHelper::h($entry[$field]), $phrase) : AkTextHelper::h(@$entry[$field]));
         }
-        return TagHelper::content_tag('ul', join('', array_unique($items)));
+        return AkTagHelper::content_tag('ul', join('', array_unique($items)));
     }
 
 
@@ -198,8 +198,8 @@ class JavascriptMacrosHelper extends AkBaseHelper
 
         return (
         !empty($completion_options['skip_style']) ? "" : $this->_auto_complete_stylesheet()) .
-        $this->_controller->form_helper->text_field($object, $method, $tag_options) .
-        TagHelper::content_tag('div', '', array('id' => "{$object}_{$method}_auto_complete", 'class' => 'auto_complete')) .
+        $this->_controller->ak_form_helper->text_field($object, $method, $tag_options) .
+        AkTagHelper::content_tag('div', '', array('id' => "{$object}_{$method}_auto_complete", 'class' => 'auto_complete')) .
         $this->auto_complete_field("{$object}_{$method}", array_merge(array('url' => array('action' => "auto_complete_for_{$object}_{$method}" )), $completion_options)
         );
     }
@@ -209,7 +209,7 @@ class JavascriptMacrosHelper extends AkBaseHelper
        * @deprecated 
        */
     public function _auto_complete_stylesheet() {
-        return TagHelper::content_tag('style',
+        return AkTagHelper::content_tag('style',
         <<<EOT
           div.auto_complete {
               width: 350px;

@@ -34,11 +34,11 @@ defined('AK_AUTO_LINK_REGEX')       || define('AK_AUTO_LINK_REGEX','/
 *     Title: <?= $text_helper->truncate($post->title, 20) ?>
 *   {end}
 */
-class TextHelper extends AkBaseHelper
+class AkTextHelper extends AkBaseHelper
 {
     public function __construct() {
         parent::__construct();
-        TextHelper::cycle(array('reset'=>'all'));
+        AkTextHelper::cycle(array('reset'=>'all'));
     }
 
 
@@ -202,7 +202,7 @@ class TextHelper extends AkBaseHelper
      * without the regular bounding <p> tag.
      */
     static function textilize_without_paragraph($text, $options = array()) {
-        return preg_replace('/^<p([A-Za-z0-9& ;\-=",\/:\.\']+)?>(.+)<\/p>$/u','\2', TextHelper::textilize($text, $options));
+        return preg_replace('/^<p([A-Za-z0-9& ;\-=",\/:\.\']+)?>(.+)<\/p>$/u','\2', AkTextHelper::textilize($text, $options));
     }
 
     /**
@@ -220,7 +220,7 @@ class TextHelper extends AkBaseHelper
         '/([^\\n])(\\n)([^\\n])/' => "\1\2<br />\3"
         );
         $text = preg_replace(array_keys($rules), array_values($rules), $text);
-        $text = TagHelper::content_tag('p',$text);
+        $text = AkTagHelper::content_tag('p',$text);
         return str_replace(array('<p></p>','</p><p>'),array('<br /><br />',"</p>\n<p>"),$text);
     }
 
@@ -244,21 +244,21 @@ class TextHelper extends AkBaseHelper
 
         switch ($link) {
             case 'all':
-                return TextHelper::auto_link_urls(
-                TextHelper::auto_link_email_addresses($text, $email_link_options),
+                return AkTextHelper::auto_link_urls(
+                AkTextHelper::auto_link_email_addresses($text, $email_link_options),
                 $href_options);
                 break;
 
             case 'email_addresses':
-                return TextHelper::auto_link_email_addresses($text, $email_link_options);
+                return AkTextHelper::auto_link_email_addresses($text, $email_link_options);
                 break;
 
             case 'urls':
-                return TextHelper::auto_link_urls($text, $href_options);
+                return AkTextHelper::auto_link_urls($text, $href_options);
                 break;
 
             default:
-                return TextHelper::auto_link($text, 'all', $href_options);
+                return AkTextHelper::auto_link($text, 'all', $href_options);
                 break;
         }
     }
@@ -277,12 +277,12 @@ class TextHelper extends AkBaseHelper
 	* Turns all links into words, like "<a href="something">else</a>" to "else".
 	*/
     static function strip_links($text) {
-        return TextHelper::strip_selected_tags($text, 'a');
+        return AkTextHelper::strip_selected_tags($text, 'a');
     }
 
     /**
 	 * Turns all email addresses into clickable links.  You can provide an options
-	 * array in order to generate links using UrlHelper::mail_to()
+	 * array in order to generate links using AkUrlHelper::mail_to()
 	 *
 	 * Example:
 	 *   $text_helper->auto_link_email_addresses($post->body);
@@ -294,7 +294,7 @@ class TextHelper extends AkBaseHelper
         }elseif(preg_match_all('/([\w\.!#\$%\-+.]+@[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)+)/',$text, $match)){
             $emails = $match[0];
             foreach ($emails as $email){
-                $encoded_emails[] = UrlHelper::mail_to($email, null, $email_options);
+                $encoded_emails[] = AkUrlHelper::mail_to($email, null, $email_options);
             }
             $text = str_replace($emails,$encoded_emails,$text);
         }
@@ -329,11 +329,11 @@ class TextHelper extends AkBaseHelper
      *  <?=$text_helper->auto_link_urls($post->body, array('all', 'target' => '_blank'));?>
      */
     static function auto_link_urls($text, $href_options = array()) {
-        $extra_options = TagHelper::tag_options($href_options);
+        $extra_options = AkTagHelper::tag_options($href_options);
         $extra_options_array = var_export($extra_options,true);
         return preg_replace_callback(AK_AUTO_LINK_REGEX, create_function(
         '$matched',
-        'return TextHelper::_replace_url_with_link_callback($matched,'.$extra_options_array.');'
+        'return AkTextHelper::_replace_url_with_link_callback($matched,'.$extra_options_array.');'
         ), $text);
     }
 
@@ -460,7 +460,7 @@ class TextHelper extends AkBaseHelper
     }
 
     static function reset_cycle($name) {
-        TextHelper::cycle(array('reset'=>$name));
+        AkTextHelper::cycle(array('reset'=>$name));
     }
 
 
@@ -571,20 +571,20 @@ class TextHelper extends AkBaseHelper
 
         $html_options = array_merge(array('id'=>'flash','class'=>'flash'), $html_options);
 
-        $close_button = !empty($options['close_button']) ? $this->_controller->asset_tag_helper->image_tag($options['close_button']).' ' : '';
+        $close_button = !empty($options['close_button']) ? $this->_controller->ak_asset_tag_helper->image_tag($options['close_button']).' ' : '';
 
         if(empty($message)){
             $message = '';
             foreach ($this->_controller->flash as $k=>$v){
                 if(is_string($v) && !empty($v)){
-                    $message .= TagHelper::content_tag('div', $v, array('id'=>'flash_'.$k));
+                    $message .= AkTagHelper::content_tag('div', $v, array('id'=>'flash_'.$k));
                 }
             }
         }elseif (is_array($message)){
             $message = '';
             foreach ($this->_controller->flash as $k=>$v){
                 if(is_string($v) && !empty($v)){
-                    $message .= TagHelper::content_tag('div', $v, array('id'=>'flash_'.$k));
+                    $message .= AkTagHelper::content_tag('div', $v, array('id'=>'flash_'.$k));
                 }
             }
         }
@@ -592,16 +592,16 @@ class TextHelper extends AkBaseHelper
             return '';
         }
 
-        $flash_message = '<!--CACHE-SKIP-START-->'.TagHelper::content_tag('div', $close_button.$message,$html_options).'<!--CACHE-SKIP-END-->';
+        $flash_message = '<!--CACHE-SKIP-START-->'.AkTagHelper::content_tag('div', $close_button.$message,$html_options).'<!--CACHE-SKIP-END-->';
 
         if ($options['animate']) {
             $animation_effects = '';
             if(!empty($effects)){
                 foreach ($effects as $name=>$effect_options){
                     if(is_numeric($name)){
-                        $animation_effects .= $this->_controller->scriptaculous_helper->visual_effect($effect_options, $html_options['id']);
+                        $animation_effects .= $this->_controller->ak_scriptaculous_helper->visual_effect($effect_options, $html_options['id']);
                     }else{
-                        $animation_effects .= $this->_controller->scriptaculous_helper->visual_effect($name, $html_options['id'], $effect_options);
+                        $animation_effects .= $this->_controller->ak_scriptaculous_helper->visual_effect($name, $html_options['id'], $effect_options);
                     }
                 }
             }
@@ -609,10 +609,10 @@ class TextHelper extends AkBaseHelper
                 $animation_effects .= 'setTimeout(\'new Effect.Fade($("'.$html_options['id'].'"));\', '.($options['seconds_to_close']*1000).');';
             }
             if(!empty($animation_effects)){
-                $flash_message .= $this->_controller->javascript_helper->javascript_tag($animation_effects);
+                $flash_message .= $this->_controller->ak_javascript_helper->javascript_tag($animation_effects);
             }
         }elseif (!empty($options['seconds_to_close'])) {
-            $flash_message .= $this->_controller->javascript_helper->javascript_tag('setTimeout(\'$("'.$html_options['id'].'").hide();\', '.($options['seconds_to_close']*1000).');');
+            $flash_message .= $this->_controller->ak_javascript_helper->javascript_tag('setTimeout(\'$("'.$html_options['id'].'").hide();\', '.($options['seconds_to_close']*1000).');');
         }
 
         return $flash_message;
@@ -659,7 +659,7 @@ class TextHelper extends AkBaseHelper
     }
 
     static function h($html) {
-        return TextHelper::html_escape($html);
+        return AkTextHelper::html_escape($html);
     }
 }
 

@@ -32,7 +32,7 @@
 * For documentation on +javascript_include_tag+ see 
 * AkActionView/helpers/asset_tag_helpers.php
 */
-class JavascriptHelper extends AkBaseHelper 
+class AkJavascriptHelper extends AkBaseHelper 
 {
 
     /**
@@ -51,7 +51,7 @@ class JavascriptHelper extends AkBaseHelper
 
         $html_options = array_merge($default_html_options, $html_options);
         
-        return TagHelper::content_tag('a',$name, $html_options);
+        return AkTagHelper::content_tag('a',$name, $html_options);
     }
 
     /**
@@ -71,7 +71,7 @@ class JavascriptHelper extends AkBaseHelper
 
         $html_options = array_merge($default_html_options, $html_options);
 
-        return TagHelper::tag('input', $html_options);
+        return AkTagHelper::tag('input', $html_options);
     }
 
     /**
@@ -86,7 +86,7 @@ class JavascriptHelper extends AkBaseHelper
     *   javascript_tag("alert('All is good')") => <script type="text/javascript">alert('All is good')</script>
     */
     static function javascript_tag($content) {
-        return TagHelper::content_tag("script", JavascriptHelper::javascript_cdata_section($content), array('type' => 'text/javascript'));
+        return AkTagHelper::content_tag("script", AkJavascriptHelper::javascript_cdata_section($content), array('type' => 'text/javascript'));
     }
 
     static function javascript_cdata_section($content) {
@@ -109,6 +109,6 @@ class JavascriptHelper extends AkBaseHelper
     
     static function _array_or_string_for_javascript($option) {
         Ak::deprecateMethod(__CLASS__.'::'.__METHOD__, __CLASS__.'::'.'array_or_string_for_javascript');
-        return JavascriptHelper::array_or_string_for_javascript($option);
+        return AkJavascriptHelper::array_or_string_for_javascript($option);
     }
 }

@@ -3,7 +3,7 @@
 /**
 * The Menu Helper makes it easier to create simple menus from controllers actions.
 */
-class MenuHelper extends AkBaseHelper
+class AkMenuHelper extends AkBaseHelper
 {
 
     /**
@@ -51,23 +51,23 @@ class MenuHelper extends AkBaseHelper
                         $content = $controller_human_name;
                         $options = array_merge($class, $href);
                     } else {
-                        $content = TagHelper::content_tag('a', $controller_human_name, $href);
+                        $content = AkTagHelper::content_tag('a', $controller_human_name, $href);
                         $options = $class;
                         $_title_tag = $title_tag;
                     }
-                    $menu_header = TagHelper::content_tag($_title_tag, $content, $options);
+                    $menu_header = AkTagHelper::content_tag($_title_tag, $content, $options);
                     $submenu = '';
                     foreach ((array)$actions as $action){
                         if($action[0] == '_'){
                             continue;
                         }
-                        $submenu .= TagHelper::content_tag('li', TagHelper::content_tag('a', AkInflector::humanize($action), array('href' => $this->_controller->urlFor(array('controller' => $controller, 'action' => $action)))), $current_controller_name == $controller_name && $current_action_name == $action ? array('class' => $current_class) : array());
+                        $submenu .= AkTagHelper::content_tag('li', AkTagHelper::content_tag('a', AkInflector::humanize($action), array('href' => $this->_controller->urlFor(array('controller' => $controller, 'action' => $action)))), $current_controller_name == $controller_name && $current_action_name == $action ? array('class' => $current_class) : array());
                     }
-                    $menu .= !empty($submenu) ? TagHelper::content_tag('ul', TagHelper::content_tag('li', $menu_header.TagHelper::content_tag('ul', $submenu))) : '';
+                    $menu .= !empty($submenu) ? AkTagHelper::content_tag('ul', AkTagHelper::content_tag('li', $menu_header.AkTagHelper::content_tag('ul', $submenu))) : '';
                 }
             }
         }
-        return TagHelper::content_tag('div', $menu, array('id' => $div_menu_id));
+        return AkTagHelper::content_tag('div', $menu, array('id' => $div_menu_id));
     }
 
     public function _get_default_full_menu() {

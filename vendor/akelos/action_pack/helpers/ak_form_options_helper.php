@@ -33,7 +33,7 @@
 *     <option value="3">Tobias</option>
 *   </select>
 */
-class FormOptionsHelper extends AkBaseHelper
+class AkFormOptionsHelper extends AkBaseHelper
 {
 
     /**
@@ -137,7 +137,7 @@ class FormOptionsHelper extends AkBaseHelper
         $compare_captions = !empty($selected) ? is_string(key(array_slice($selected,0,1))) : false;
 
         foreach ($container as $text=>$value){
-            $options_for_select .= TagHelper::content_tag('option',$text_is_value ? $value : $text,
+            $options_for_select .= AkTagHelper::content_tag('option',$text_is_value ? $value : $text,
             array_merge($options, ($compare_captions ?
             (isset($selected[$text]) && $selected[$text] == $value) :
             in_array($value, $selected)) ? array('value'=>$value,'selected'=>'selected') : array('value'=>$value))
@@ -222,7 +222,7 @@ class FormOptionsHelper extends AkBaseHelper
                     $options_group =& $group->$group_method;
                 }
 
-                $options_for_select .= TagHelper::content_tag('optgroup',
+                $options_for_select .= AkTagHelper::content_tag('optgroup',
                 $this->options_from_collection_for_select($options_group, $option_key_method, $option_value_method, $selected_key),
                 array('label'=>
                 method_exists($group, $group_label_method) ?
@@ -324,28 +324,28 @@ class AkFormHelperOptionsInstanceTag extends AkFormHelperInstanceTag
         }
 
         unset($options['selected']);
-        return TagHelper::content_tag('select', $this->_addOptions($this->_template_object->options_for_select($choices, $selected_value, $options),
+        return AkTagHelper::content_tag('select', $this->_addOptions($this->_template_object->options_for_select($choices, $selected_value, $options),
         $html_options, $this->getValue()), Ak::delete($html_options,'prompt','include_blank'));
     }
 
     public function to_collection_select_tag($collection, $value_column_name, $text_column_name = null, $options = array(), $html_options = array()) {
         $this->add_default_name_and_id($html_options);
 
-        return TagHelper::content_tag('select', $this->_addOptions(
+        return AkTagHelper::content_tag('select', $this->_addOptions(
         $this->_template_object->options_from_collection_for_select($collection, $value_column_name, $text_column_name, $this->getValue(), array_diff($options,array('prompt'=>true))),
         $options, $this->getValue()), $html_options);
     }
 
     public function to_country_select_tag($priority_countries = array(), $options = array(), $html_options = array()) {
         $this->add_default_name_and_id($html_options);
-        return TagHelper::content_tag('select', $this->_addOptions($this->_template_object->country_options_for_select($this->getValue(), $priority_countries, 'AkCountries', $options),
+        return AkTagHelper::content_tag('select', $this->_addOptions($this->_template_object->country_options_for_select($this->getValue(), $priority_countries, 'AkCountries', $options),
         $options, $this->getValue()), $html_options);
     }
 
     public function to_time_zone_select_tag($priority_zones = array(), $options = array(), $html_options = array()) {
         $this->add_default_name_and_id($html_options);
 
-        return TagHelper::content_tag('select',
+        return AkTagHelper::content_tag('select',
         $this->_addOptions($this->_template_object->time_zone_options_for_select(
         $this->getValue(),$priority_zones,(empty($options['model'])?'AkTimeZone':$options['model'])),$options,$this->getValue()),$html_options);
     }

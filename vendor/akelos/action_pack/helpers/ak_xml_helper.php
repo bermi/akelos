@@ -22,7 +22,7 @@
  * 
  *
  */
-class XmlHelper 
+class AkXmlHelper 
 {
     public $dynamic_helpers = array('xml_.*?');
     

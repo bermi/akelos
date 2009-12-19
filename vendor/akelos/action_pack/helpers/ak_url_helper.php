@@ -1,6 +1,6 @@
 <?php
 
-class UrlHelper
+class AkUrlHelper
 {
     protected $_controller;
     
@@ -60,7 +60,7 @@ class UrlHelper
     public function link_to($name = null, $options = array(), $html_options = array(), $parameters_for_method_reference = null) {
         if (!empty($html_options)) {
             $this->convert_options_to_javascript($html_options);
-            $tag_options = TagHelper::tag_options($html_options);
+            $tag_options = AkTagHelper::tag_options($html_options);
         }
         else{
             $tag_options = null;
@@ -126,11 +126,11 @@ class UrlHelper
 
         $url = is_string($options) ? $options : $this->url_for($options);
 
-        $name = !empty($name) ? $name : (is_string($options) ?  $options : TagHelper::escape_once($this->url_for($options)));
+        $name = !empty($name) ? $name : (is_string($options) ?  $options : AkTagHelper::escape_once($this->url_for($options)));
 
         $html_options = array_merge($html_options,array('type'=>'submit','value'=>$name));
         return '<form method="post" action="'.$url.'" class="button-to"><div>'.
-        TagHelper::tag('input', $html_options) . '</div></form>';
+        AkTagHelper::tag('input', $html_options) . '</div></form>';
     }
 
 
@@ -218,7 +218,7 @@ class UrlHelper
         $html_options = Ak::delete($html_options, 'cc','bcc','subject','body','encode');
 
         if ($encode == 'javascript'){
-            $tmp  = "document.write('".TagHelper::content_tag('a', htmlentities($name, null, Ak::locale('charset')), array_merge($html_options,array('href' => 'mailto:'.$email_address.$extras )))."');";
+            $tmp  = "document.write('".AkTagHelper::content_tag('a', htmlentities($name, null, Ak::locale('charset')), array_merge($html_options,array('href' => 'mailto:'.$email_address.$extras )))."');";
             for ($i=0; $i < strlen($tmp); $i++){
                 $string.='%'.dechex(ord($tmp[$i]));
             }
@@ -246,10 +246,10 @@ class UrlHelper
 
             $name = str_replace($email_address,$encoded_email_for_name,$name);
 
-            return TagHelper::content_tag('a', $name, array_merge($html_options,array('href' => 'mailto:'.$encoded_email_address.$extras)));
+            return AkTagHelper::content_tag('a', $name, array_merge($html_options,array('href' => 'mailto:'.$encoded_email_address.$extras)));
 
         }else{
-            return TagHelper::content_tag('a', $name, array_merge($html_options,array('href' => 'mailto:'.$email_address.$extras)));
+            return AkTagHelper::content_tag('a', $name, array_merge($html_options,array('href' => 'mailto:'.$email_address.$extras)));
         }
     }
 
@@ -285,7 +285,7 @@ class UrlHelper
     }
 
     public function _confirm_javascript_function($confirm) {
-        return "confirm('".JavascriptHelper::escape_javascript($confirm)."')";
+        return "confirm('".AkJavascriptHelper::escape_javascript($confirm)."')";
     }
 
 

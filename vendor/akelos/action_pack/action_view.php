@@ -57,7 +57,7 @@
 * and make updates to the page where the request originated from.
 *
 * An instance of the JavaScriptGenerator object named +page+ is automatically made available to your template,
-* which is implicitly wrapped in an AkActionView/Helpers/PrototypeHelper::update_page method.
+* which is implicitly wrapped in an AkActionView/Helpers/AkPrototypeHelper::update_page method.
 *
 * When an .js.tpl action is called with +linkToRemote+, the generated JavaScript is automatically evaluated.  Example:
 *

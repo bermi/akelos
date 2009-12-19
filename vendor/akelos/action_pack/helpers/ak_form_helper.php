@@ -63,7 +63,7 @@
 */
 
 
-class FormHelper extends AkBaseHelper
+class AkFormHelper extends AkBaseHelper
 {
 
     /**
@@ -102,7 +102,7 @@ class FormHelper extends AkBaseHelper
       */
     public function form_for($object_name, &$object, $options = array()) {
         $url_for_options = $options['url'];
-        echo $this->_controller->form_tag_helper->form_tag($url_for_options, $options);
+        echo $this->_controller->ak_form_tag_helper->form_tag($url_for_options, $options);
         return $this->fields_for($object_name, $object);
     }
 
@@ -304,7 +304,7 @@ class AkFormHelperInstanceTag
             $options['value'] = !empty($options['value']) ? $options['value'] : $this->value_before_type_cast();
         }
         $this->add_default_name_and_id($options);
-        return TagHelper::tag('input', $options);
+        return AkTagHelper::tag('input', $options);
     }
 
     public function to_radio_button_tag($tag_value, $options = array()) {
@@ -320,13 +320,13 @@ class AkFormHelperInstanceTag
         "{$this->object_name}_{$this->_auto_index}_{$this->_column_name}_{$pretty_tag_value}" :
         "{$this->object_name}_{$this->_column_name}_{$pretty_tag_value}";
         $this->add_default_name_and_id($options);
-        return TagHelper::tag('input', $options);
+        return AkTagHelper::tag('input', $options);
     }
 
     public function to_text_area_tag($options = array()) {
         $options = array_merge($this->default_text_area_options,$options);
         $this->add_default_name_and_id($options);
-        return TagHelper::content_tag('textarea', TagHelper::escape_once($this->value_before_type_cast()), $options);
+        return AkTagHelper::content_tag('textarea', AkTagHelper::escape_once($this->value_before_type_cast()), $options);
     }
 
     public function to_check_box_tag($options = array(), $checked_value = '1', $unchecked_value = '0') {
@@ -348,20 +348,20 @@ class AkFormHelperInstanceTag
             unset($options['checked']);
         }
         $this->add_default_name_and_id($options);
-        return TagHelper::tag('input', array('name' => $options['name'], 'type' => 'hidden', 'value' => $unchecked_value)).TagHelper::tag('input', $options);
+        return AkTagHelper::tag('input', array('name' => $options['name'], 'type' => 'hidden', 'value' => $unchecked_value)).AkTagHelper::tag('input', $options);
     }
 
     public function to_date_tag() {
         $defaults = $this->default_date_options;
         $date = $this->getValue();
         $date = !empty($date) ? $date : Ak::getDate();
-        return DateHelper::select_day($date, array_merge($defaults,array('prefix'=>"{$this->object_name}[{$this->_column_name}(3)]"))) .
-        DateHelper::select_month($date, array_merge($defaults,array('prefix'=>"{$this->object_name}[{$this->_column_name}(2)]"))) .
-        DateHelper::select_year($date, array_merge($defaults,array('prefix'=>"{$this->object_name}[{$this->_column_name}(1)]")));
+        return AkDateHelper::select_day($date, array_merge($defaults,array('prefix'=>"{$this->object_name}[{$this->_column_name}(3)]"))) .
+        AkDateHelper::select_month($date, array_merge($defaults,array('prefix'=>"{$this->object_name}[{$this->_column_name}(2)]"))) .
+        AkDateHelper::select_year($date, array_merge($defaults,array('prefix'=>"{$this->object_name}[{$this->_column_name}(1)]")));
     }
 
     public function to_date_select_tag($options = array()) {
-        $DateHelper = new DateHelper();
+        $DateHelper = new AkDateHelper();
         $object_name = empty($this->_object_name) ? $this->object_name : $this->_object_name;
         if(isset($this->object)){
             $DateHelper->_object[$object_name] = $this->object;
@@ -370,7 +370,7 @@ class AkFormHelperInstanceTag
     }
 
     public function to_datetime_select_tag($options = array()) {
-        $DateHelper = new DateHelper();
+        $DateHelper = new AkDateHelper();
         $object_name = empty($this->_object_name) ? $this->object_name : $this->_object_name;
         if(isset($this->object)){
             $DateHelper->_object[$object_name] = $this->object;
@@ -381,7 +381,7 @@ class AkFormHelperInstanceTag
     public function to_boolean_select_tag($options = array()) {
         $this->add_default_name_and_id($options);
         return '<select'.
-        TagHelper::tag_options($options).
+        AkTagHelper::tag_options($options).
         '><option value="false"'.
         ($this->getValue() == false ? ' selected' : '').
         '>'.Ak::t('False',array(),'helpers/form').'</option><option value="true"'.
@@ -390,7 +390,7 @@ class AkFormHelperInstanceTag
     }
 
     public function to_content_tag($tag_name, $options = array()) {
-        return TagHelper::content_tag($tag_name, $this->getValue(), $options);
+        return AkTagHelper::content_tag($tag_name, $this->getValue(), $options);
     }
 
     public function &getObject($object_name = null) {
