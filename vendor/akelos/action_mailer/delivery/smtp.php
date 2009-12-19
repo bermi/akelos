@@ -16,6 +16,10 @@ class AkSmtpDelivery
         if ($SmtpClient->debug) {
             $smtp->setDebug(true);
         }
+        if(isset($settings['auth']) && $settings['auth'] == 1 && !function_exists('openssl_verify')){
+            trigger_error('Can\'t authenticate on '.$SmtpClient->host.':'.$SmtpClient->port.'. PHP does not have OpenSSL support enabled', E_USER_ERROR);
+            return;
+        }
 
         if (PEAR::isError($smtp->connect($SmtpClient->timeout))) {
             trigger_error('unable to connect to smtp server '.$SmtpClient->host.':'.$SmtpClient->port.'. SMTP settings can be fount at config/mailer.yml.', E_USER_NOTICE);
