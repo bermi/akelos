@@ -2,6 +2,7 @@
 
 class AkActionController extends AkLazyObject
 {
+    public $locale_namespace;
     public $_high_load_mode = AK_HIGH_LOAD_MODE;
     public $_enable_plugins = true;
     public $_auto_instantiate_models = true;
@@ -758,7 +759,7 @@ class AkActionController extends AkLazyObject
     public function t($string, $array = null, $controller=null) {
         return Ak::t($string, $array, !empty($controller) ? $controller :
                 AkConfig::getOption('locale_namespace', 
-                    (!empty($this->_locale_namespace) ? $this->_locale_namespace : (
+                    (!empty($this->locale_namespace) ? $this->locale_namespace : (
                         defined('AK_DEFAULT_LOCALE_NAMESPACE') ? AK_DEFAULT_LOCALE_NAMESPACE : 
                         AkInflector::underscore($this->getControllerName())
                         )

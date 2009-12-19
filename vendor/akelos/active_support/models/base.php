@@ -8,6 +8,7 @@
 */
 class AkBaseModel extends AkLazyObject
 {
+    public $locale_namespace;
     public $_modelName;
     protected
     $_report_undefined_attributes = false;
@@ -66,7 +67,7 @@ class AkBaseModel extends AkLazyObject
     public function t($string, $array = null) {
         return Ak::t($string, $array, 
                 AkConfig::getOption('locale_namespace', 
-                    (!empty($this->_locale_namespace) ? $this->_locale_namespace : (
+                    (!empty($this->locale_namespace) ? $this->locale_namespace : (
                         defined('AK_DEFAULT_LOCALE_NAMESPACE') ? AK_DEFAULT_LOCALE_NAMESPACE : 
                         AkInflector::underscore($this->getModelName())
                         )

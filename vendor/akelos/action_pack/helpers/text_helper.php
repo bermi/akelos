@@ -34,14 +34,10 @@ defined('AK_AUTO_LINK_REGEX')       || define('AK_AUTO_LINK_REGEX','/
 *     Title: <?= $text_helper->truncate($post->title, 20) ?>
 *   {end}
 */
-class TextHelper
+class TextHelper extends AkBaseHelper
 {
-
-    public function setController(&$controller) {
-        $this->_controller = $controller;
-    }
-
     public function __construct() {
+        parent::__construct();
         TextHelper::cycle(array('reset'=>'all'));
     }
 
@@ -490,16 +486,23 @@ class TextHelper
     /**
     * Translate strings to the current locale.
     */
-    public function translate($string, $args = null, $locale_namespace = AK_DEFAULT_LOCALE_NAMESPACE) {
-        return Ak::t($string, $args, empty($locale_namespace) ?
-        AkInflector::underscore($this->_controller->getControllerName()) : $locale_namespace);
+    public function translate($string, $args = null, $name_space = null) {
+        return $this->t($string, $args, $name_space);
     }
 
     /**
     * Alias for translate
     */
-    static function t($string, $args = null, $locale_namespace = AK_DEFAULT_LOCALE_NAMESPACE) {
-        return TextHelper::translate($string, $args, $locale_namespace);
+    public function t($string, $args = null, $name_space = null) {
+        $name_space = !empty($name_space) ? $name_space :
+                AkConfig::getOption('locale_namespace', 
+                    (!empty($this->locale_namespace) ? $this->locale_namespace : (
+                        defined('AK_DEFAULT_LOCALE_NAMESPACE') && AK_DEFAULT_LOCALE_NAMESPACE != '' ? AK_DEFAULT_LOCALE_NAMESPACE : 
+                        'views'
+                        )
+                    )
+                );
+        return Ak::t($string, $args, $name_space);
     }
 
 

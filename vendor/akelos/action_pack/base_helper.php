@@ -2,7 +2,7 @@
 
 class AkBaseHelper
 {
-    protected $_locales_namespace = 'helpers';
+    public $locale_namespace;
     protected $_controller;
 
     public function __construct() {
@@ -33,6 +33,9 @@ class AkBaseHelper
         $this->_controller = 
         $this->C =
         $Controller;
+        if(isset($this->C->locale_namespace)){
+            $this->locale_namespace = $this->C->locale_namespace;
+        }
     }
 
     public function &getController() {
@@ -42,7 +45,7 @@ class AkBaseHelper
     public function t($string, $array = null, $name_space = null) {
         return Ak::t($string, $array, !empty($name_space) ? $name_space :
                 AkConfig::getOption('locale_namespace', 
-                    (!empty($this->_locale_namespace) ? $this->_locale_namespace : (
+                    (!empty($this->locale_namespace) ? $this->locale_namespace : (
                         defined('AK_DEFAULT_LOCALE_NAMESPACE') ? AK_DEFAULT_LOCALE_NAMESPACE : 
                         'helpers'
                         )
