@@ -472,7 +472,7 @@ class Ak
 
         $options = array_merge($default_options, $options);
 
-        if(!is_dir($options['base_path'])){
+        if(!is_dir($options['base_path']) && !Ak::make_dir($options['base_path'], array('base_path' => dirname($options['base_path'])))){
             trigger_error(Ak::t('Base path %path must exist in order to use it as base_path in Ak::make_dir()', array('%path' => $options['base_path'])), E_USER_ERROR);
         }
 

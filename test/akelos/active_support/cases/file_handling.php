@@ -122,6 +122,15 @@ class FileHandling_TestCase extends ActiveSupportUnitTest
         clearstatcache();
         $this->assertFalse(is_dir($tmp_dir));
     }
+    
+    public function test_should_create_base_path_ticket_148() {
+        $tmp_dir = AkConfig::getDir('tmp').DS.Ak::randomString();
+        $base_path = AkConfig::getDir('tmp').'new_dir_'.time();
+        Ak::make_dir($base_path, array('base_path'=>$base_path));
+        
+        $this->assertTrue(is_dir($base_path), 'Could base_path directory '.$base_path);
+        clearstatcache();
+    }
 }
 
 ak_test_case('FileHandling_TestCase');
