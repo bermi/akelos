@@ -59,7 +59,8 @@ class AkInstaller
     $vervose                    = AK_VERBOSE_INSTALLER,
     $module,
     $warn_if_same_version       = true,
-    $use_transactions           = true;
+    $use_transactions           = true,
+    $skip_db_sql                = false;
 
     protected
     $_inited                    = false;
@@ -155,7 +156,9 @@ Example:
     }
 
     public function debug($toggle = null) {
-        $this->db->connection->debug = $toggle === null ? !$this->db->connection->debug : $toggle;
+        if(empty($this->skip_db_sql)){
+            $this->db->connection->debug = $toggle === null ? !$this->db->connection->debug : $toggle;
+        }
     }
 
     public function dropTable($table_name, $options = array()) {
