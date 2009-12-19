@@ -65,7 +65,7 @@ class ActiveRecordHelper extends AkBaseHelper
         $contents = '';
         $contents .= $record->isNewRecord() ? '' : $this->_controller->form_helper->hidden_field($record_name, 'id');
         $contents .= $this->all_input_tags($record, $record_name, $options);
-        $contents .= FormTagHelper::submit_tag(Ak::t($submit_value,array(),'helpers/active_record'));
+        $contents .= FormTagHelper::submit_tag($this->t($submit_value));
         return TagHelper::content_tag('form', $contents, array('action'=>$action, 'method'=>'post',
         'enctype'=> !empty($options['multipart']) ? 'multipart/form-data': null ));
     }
@@ -85,7 +85,7 @@ class ActiveRecordHelper extends AkBaseHelper
     public function error_message_on($object_name, $method, $prepend_text = '', $append_text = '', $css_class = 'formError') {
         if($errors = $this->_controller->$object_name->getErrorsOn($method)){
             $text = $prepend_text.(is_array($errors) ? array_shift($errors) : $errors).$append_text;
-            return TagHelper::content_tag('div', Ak::t($text,array(),'helpers/active_record'), array('class'=>$css_class));
+            return TagHelper::content_tag('div', $this->t($text), array('class'=>$css_class));
         }
         return '';
     }
@@ -108,21 +108,28 @@ class ActiveRecordHelper extends AkBaseHelper
             $error_list = '<ul>';
             foreach ($object->getFullErrorMessages() as $field=>$errors){
                 foreach ($errors as $error){
-                    $error_list .= TagHelper::content_tag('li',Ak::t($error,array(),'helpers/active_record'));
+                    $error_list .= TagHelper::content_tag('li',$error);
                 }
             }
             $error_list .= '</ul>';
             return
             TagHelper::content_tag('div',
             TagHelper::content_tag(
-            (!empty($options['header_tag']) ? $options['header_tag'] :'h2'),
-            Ak::t('%number_of_errors %errors prohibited this %object_name from being saved' ,
-            array('%number_of_errors'=>$object->countErrors(),'%errors'=>Ak::t(AkInflector::conditionalPlural($object->countErrors(),'error'),array(),'helpers/active_record'),
-            '%object_name'=>Ak::t(AkInflector::humanize($object->getModelName()),array(),'helpers/active_record'))
-            ,'helpers/active_record')).
-            TagHelper::content_tag('p', Ak::t('There were problems with the following fields:',array(),'helpers/active_record')).
-            $error_list,
-            array('id'=> !empty($options['id']) ? $options['id'] : 'errorExplanation', 'class' => !empty($options['class']) ? $options['class'] : 'errorExplanation')
+                        (!empty($options['header_tag']) ? $options['header_tag'] :'h2'),
+                        
+                        $this->t('%number_of_errors %errors prohibited this %object_name from being saved' ,array(
+                            '%number_of_errors'=>$object->countErrors(),
+                            '%errors'=>$this->t(AkInflector::conditionalPlural($object->countErrors(),'error')),
+                            '%object_name'=>$this->t(AkInflector::humanize($object->getModelName()))
+                            ))
+                    ).
+                    TagHelper::content_tag('p', $this->t('There were problems with the following fields:')).
+                    $error_list,
+                    
+                    array(
+                        'id'=> !empty($options['id']) ? $options['id'] : 'errorExplanation', 
+                        'class' => !empty($options['class']) ? $options['class'] : 'errorExplanation'
+                        )
             );
         }
     }
