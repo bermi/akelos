@@ -23,7 +23,6 @@
 *   {
 *       public function __construct()
 *       {
-*           parent::init();
 *           $this->beforeFilter('_audit');
 *       }
 *
@@ -37,7 +36,6 @@
 *   {
 *       public function __construct()
 *       {
-*           parent::init();
 *           $this->beforeFilter('_verifyCredentials');
 *       }
 *
@@ -72,7 +70,6 @@
 *   {
 *       public function __construct()
 *       {
-*           parent::init();
 *           $this->afterFilter(new OutputCompressionFilter());
 *       }
 *   }
@@ -92,7 +89,6 @@
 *   {
 *       public function __construct()
 *       {
-*           parent::init();
 *           $this->beforeFilter('verifyOpenShop');
 *       }
 *   }
@@ -122,7 +118,6 @@
 *   {
 *       public function __construct()
 *       {
-*           parent::init();
 *           $this->aroundFilter(new BenchmarkingFilter());
 *       }
 *
@@ -157,7 +152,6 @@
 *   {
 *       public function __construct()
 *       {
-*           parent::init();
 *           $this->beforeFilter('authenticate');
 *       }
 *   }
@@ -171,7 +165,6 @@
 *   {
 *       public function __construct()
 *       {
-*           parent::init();
 *           $this->skipBeforeFilter('authenticate');
 *       }
 *       // will not run the authenticate filter
@@ -187,7 +180,6 @@
 *   {
 *       public function __construct()
 *       {   // only require authentication if the current action is edit or delete
-*           parent::init();
 *           $this->beforeFilter(array('_authorize'=>array('only'=>array('edit','delete')));
 *       }
 *

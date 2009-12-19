@@ -3,7 +3,9 @@
 class AkLazyObject
 {
     protected
-    $_report_undefined_attributes = true;
+    $_report_undefined_attributes = true,
+    $_extenssionInitMethod = '_enableLazyLoadingExtenssions',
+    $_extenssionsInited = false;
 
     private
     $__extenssionPoints = array(),
@@ -178,10 +180,19 @@ class AkLazyObject
         }
         return false;
     }
-
-
+    
+    private function _enableExtenssionsIfRequired(){
+        if(!$this->_extenssionsInited){
+            $this->_extenssionsInited = true;
+            if(method_exists($this, $this->_extenssionInitMethod)){
+                $this->{$this->_extenssionInitMethod}();
+            }
+        }
+    }
+    
     public function __get($name) {
         if($name[0] != '_'){
+            $this->_enableExtenssionsIfRequired();
             foreach ($this->__extenssionPoints as $extenssion_name => $ExtenssionPoint){
                 $has_implicit_attributes = !empty($this->__extenssionPointOptions[$extenssion_name]['attributes']);
                 if(!$has_implicit_attributes && isset($ExtenssionPoint->$name)){
@@ -227,6 +238,8 @@ class AkLazyObject
         if($name[0] != '_'){
             static $handlers = array();
 
+            $this->_enableExtenssionsIfRequired();
+            
             if(isset($handlers[$name])){
 
                 if(!$this->isExtendedBy($handlers[$name])){

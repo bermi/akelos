@@ -116,16 +116,6 @@ class AkActionController extends AkLazyObject
     $_dynamic_attributes = array(),
     $_dynamic_methods = array();
 
-    public function init($options = array()) {
-        if(isset($this->_inited)){
-            return ;
-        }
-        $this->_inited = true;
-        $this->_enableLazyLoadingExtenssions($options);
-        //$this->_initCacheHandler();
-        //$this->_registerModule('caching','AkActionControllerCaching','AkActionController/Caching.php');
-    }
-
     public function __destruct() {
         $this->_disbaleLazyLoadingExtenssions();
     }
@@ -167,7 +157,8 @@ class AkActionController extends AkLazyObject
 
         $this->_ensureProperProtocol();
 
-        $this->init($options);
+        $this->_lazy_loading_options = $options;
+        //$this->init($options);
 
         // After filters
         //$this->isFilteringActive() && $this->afterFilter('_handleFlashAttribute');
@@ -190,6 +181,7 @@ class AkActionController extends AkLazyObject
     }
 
     protected function _enableLazyLoadingExtenssions($options = array()) {
+        $options = empty($options) ? (empty($this->_lazy_loading_options) ? array() : $this->_lazy_loading_options) : $options;
         empty($options['skip_filters']) && $this->_enableFilters();
         empty($options['skip_authentication']) && $this->_enableAuthentication();
     }

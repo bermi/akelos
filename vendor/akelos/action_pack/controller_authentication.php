@@ -11,7 +11,6 @@
 *       public $_authorized_users = array('bermi' => 'secret');
 *
 *       public function __construct(){
-*           parent::init();
 *           $this->beforeFilter(array('authenticate' => array('except' => array('index'))));
 *       }
 *
@@ -36,7 +35,6 @@
 *       public $models = 'account';
 *
 *       public function __construct() {
-*         parent::init();
 *         $this->beforeFilter(array('_setAccount', 'authenticate'));
 *       }
 *

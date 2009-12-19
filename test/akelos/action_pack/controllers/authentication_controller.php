@@ -5,7 +5,6 @@ class AuthenticationController extends ApplicationController
     private $_authorized_users = array('bermi' => 'secret');
 
     public function __construct(){
-        parent::init();
         $this->beforeFilter(array('authenticate' => array('except' => array('index'))));
     }
 

@@ -5,7 +5,6 @@ require_once(dirname(__FILE__).'/../config.php');
 class TestingFiltersUtitlityClass extends AkActionController
 {
     public $message = '';
-    public function __construct(){$this->_enableLazyLoadingExtenssions(); }
     public function returnFalse(){ return false; }
     public function A(){ $this->message .= 'A'; }public function B(){ $this->message .= 'B';}
     public function C(){ $this->message .= 'C';}

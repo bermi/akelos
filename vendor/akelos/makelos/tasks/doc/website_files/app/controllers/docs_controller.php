@@ -6,7 +6,6 @@ class DocsController extends ApplicationController
     
     public function __construct(){
         if(!AkRequest::isLocal()){
-            parent::init();
             $this->beforeFilter(array('authenticate' => array('except' => array('index'))));
         }
     }

@@ -159,8 +159,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         AK_LOG_EVENTS ? ($this->Logger = Ak::getLogger()) : null;
 
         $this->establishConnection();
-        $this->_enableLazyLoadingExtenssions();
-        $this->_instantiateDefaultObserver();
 
         if(!empty($this->table_name)){
             $this->setTableName($this->table_name);
