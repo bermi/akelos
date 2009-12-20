@@ -64,6 +64,17 @@ class RenderPartial_TestCase extends AkWebTestCase
         $this->get($this->_test_script.'render_tests/ad');
         $this->assertTextMatch('First ad');
     }
+    
+    public function test_render_partial_empty_collection() {
+        $this->get($this->_test_script.'advertiser/empty_collection');
+        $this->assertTextMatch(' ');
+    }
+    
+    public function test_should_use_object_and_not_controllers_item() {
+        $this->get($this->_test_script.'advertiser/use_object_and_not_controllers_item');
+        $this->assertTextMatch('Render');
+    }
+
 }
 
 ak_test_case('RenderPartial_TestCase');

@@ -36,5 +36,18 @@ class AdvertiserController extends AkActionController
         $this->renderText($this->render(array('partial'=>'ad','collection'=>$advertisements)));
 
     }
+    
+    function empty_collection() {
+        $advertisements = array();
+        $this->renderText($this->render(array('partial'=>'ad','collection'=>$advertisements)));
+
+    }
+    function use_object_and_not_controllers_item() {
+        $this->ad = new stdClass();
+        $this->ad->name = 'controller';
+        $render= new stdClass();
+        $render->name = 'render';
+        $this->renderText($this->render(array('partial'=>'ad','object'=>$render)));
+    }
 }
 

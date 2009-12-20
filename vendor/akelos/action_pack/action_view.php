@@ -168,7 +168,7 @@ class AkActionView
 
             if (!empty($options['file'])){
                 return $this->renderFile($options['file'], $options['use_full_path'], $options['locals']);
-            }elseif (!empty($options['partial']) && !empty($options['collection'])){
+            }elseif (!empty($options['partial']) && (isset($options['collection']) && is_array($options['collection']))){
                 return $this->renderPartialCollection($options['partial'], $options['collection'], @$options['spacer_template'], @$options['locals']);
             }elseif (!empty($options['partial'])){
                 return $this->renderPartial($options['partial'], @$options['object'], @$options['locals']);
@@ -425,11 +425,11 @@ class AkActionView
         $local_assigns[$partial_name] = empty($object) ? $this->controller->$partial_name : $object;
     }
 
-    protected function _addObjectToLocalAssigns_($partial_name, &$local_assigns, $object) {
-        if(!empty($object)){
+    protected function _addObjectToLocalAssigns_($partial_name, &$local_assigns, &$object) {
+        if (is_null($object) && isset($this->controller->$partial_name)){
+            $local_assigns[$partial_name] =& $this->controller->$partial_name; 
+        } elseif (!is_null($object)) {
             $local_assigns[$partial_name] = $object;
-        }elseif(!empty($this->controller->$partial_name)){
-            $local_assigns[$partial_name] = $this->controller->$partial_name;
         }
     }
 

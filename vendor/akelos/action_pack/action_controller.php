@@ -609,7 +609,7 @@ class AkActionController extends AkLazyObject
                 if($options['partial'] === true){
                     $options['partial'] = !empty($options['template']) ? $options['template'] : $this->getDefaultTemplateName();
                 }
-                if(!empty($options['collection'])){
+                if(isset($options['collection']) && is_array($options['collection'])){
                     return $this->renderPartialCollection($options['partial'], $options['collection'], @$options['spacer_template'], @$options['locals'], @$options['status']);
                 }else{
                     return $this->renderPartial($options['partial'], @$options['object'], @$options['locals'], @$options['status']);
