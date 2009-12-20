@@ -125,7 +125,7 @@ class AkControllerAuthentication
 
     public function _getUserNameAndPassword() {
         $credentials = $this->_decodeCredentials();
-        return !is_array($credentials) ? preg_split('/:/', $credentials , 2) : $credentials;
+        return !is_array($credentials) ? explode(':', $credentials , 2) : $credentials;
     }
 
     public function _authorization() {

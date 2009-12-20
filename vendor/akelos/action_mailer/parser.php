@@ -362,7 +362,7 @@ class AkMailParser
     protected function _getRawHeaderAndBody($raw_part) {
         return
         array_map('trim',
-        preg_split("/\n\n/",
+        explode("\n\n",
         preg_replace("/(\n[\t ]+)/",'', // Join multiline headers
         str_replace(array("\r\n","\n\r","\r"),"\n", $raw_part."\n") // Lets keep it simple and use only \n for decoding
         )."\n\n",2));

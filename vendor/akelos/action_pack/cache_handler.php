@@ -570,7 +570,7 @@ class AkCacheHandler
         $headers = $this->_controller->Response->_headers_sent;
         $finalHeaders = array();
         foreach ($headers as $header) {
-            $parts = preg_split('/: /',$header);
+            $parts = explode(': ',$header);
             $type = $parts[0];
             if (!in_array(strtolower($type),$removeHeaders)) {
                 if (isset($addHeaders[$type])) {
@@ -593,7 +593,7 @@ class AkCacheHandler
         $headers = $this->_controller->Response->_headers_sent;
         $finalHeaders = array();
         foreach ($headers as $header) {
-            $parts = preg_split('/: /',$header);
+            $parts = explode(': ',$header);
             $type = $parts[0];
             if (!in_array(strtolower($type),$removeHeaders)) {
                 if (isset($addHeaders[$type])) {
@@ -836,13 +836,13 @@ EOF;
         }
         $path = ltrim($path,'/');
         if (preg_match('@^([a-z]{2,2}|[a-z]{2,2}_[a-z]{2,2})/.*$@', $path)) {
-            $parts = preg_split('/\//',$path);
+            $parts = explode('/',$path);
             $forcedLanguage = array_shift($parts);
             $path = implode('/',$parts);
         }
         $cacheId = preg_replace('|'.DS.'+|','/',$path);
         $cacheId = rtrim($cacheId,'/');
-        $parts = preg_split('/\//',$cacheId);
+        $parts = explode('/',$cacheId);
 
         $hasExtension = preg_match('/.+\..{2,4}/',$parts[count($parts)-1]);
         if (!$hasExtension) {
@@ -1329,7 +1329,7 @@ EOF;
 
     public function _handleEncodingAliases($header, $acceptedEncodings) {
         $_encodingAliases = array('gzip','x-gzip', 'compress', 'x-compress');
-        $parts = preg_split('/: /', $header);
+        $parts = explode(': ', $header);
         if (strtolower($parts[0])=='content-encoding' &&
         isset($parts[1]) &&
         in_array($parts[1],$_encodingAliases)) {

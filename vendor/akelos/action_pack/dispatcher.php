@@ -28,7 +28,7 @@ class AkDispatcher
             $pageCache = new AkCacheHandler();;
             $pageCache->init($null, $cache_settings);
             if (isset($_GET['allow_get'])) {
-                $options['include_get_parameters'] = split(',',$_GET['allow_get']);
+                $options['include_get_parameters'] = explode(',',$_GET['allow_get']);
             }
             if (isset($_GET['use_if_modified_since'])) {
                 $options['use_if_modified_since'] = true;
