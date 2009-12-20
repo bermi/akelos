@@ -163,7 +163,7 @@ Example:
 
     public function dropTable($table_name, $options = array()) {
         AkDbSchemaCache::clear($table_name);
-        $result = $this->tableExists($table_name) ? $this->db->execute('DROP TABLE '.$table_name) : 1;
+        $result = $this->tableExists($table_name) ? $this->db->execute('DROP TABLE '.$this->db->quoteTableName($table_name)) : 1;
         if($result){
             unset($this->available_tables[array_search($table_name, $this->available_tables)]);
             if(!empty($options['sequence'])){
@@ -464,9 +464,10 @@ Example:
 
         $column_string = $this->_getColumnsAsAdodbDataDictionaryString($column_options['columns']);
 
-        //$table_name = $this->db->quoteTableName($table_name);
-        
-        $create_or_alter_table_sql = $this->data_dictionary->ChangeTableSQL($table_name, str_replace(array(' UNIQUE', ' INDEX', ' FULLTEXT', ' HASH'), '', $column_string), $table_options);
+        $create_or_alter_table_sql = $this->data_dictionary->ChangeTableSQL(
+            $this->db->quoteTableName($table_name), 
+            str_replace(array(' UNIQUE', ' INDEX', ' FULLTEXT', ' HASH'), '', $column_string), 
+            $table_options);
         $result = $this->data_dictionary->ExecuteSQLArray($create_or_alter_table_sql, false);
 
         if($result){
@@ -527,6 +528,7 @@ Example:
     }
     
     private function _quoteColumnForDataDictionary($matches){
+        // '`$1`$2'    , array($this, '_quoteColumnForDataDictionary')
         return str_replace($matches[1],  $this->db->quoteColumnName(trim($matches[1], '"\'`')), $matches[0]);
     }
 

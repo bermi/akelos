@@ -6,13 +6,14 @@ class Find_TestCase extends ActiveRecordUnitTest
 {
     public $Hybrid;
 
-    public function setUp() {
+    public function test_init() {
         $this->installAndIncludeModels(array('Hybrid'=>'id,name'));
         Mock::generate('AkDbAdapter');
         $Db = new MockAkDbAdapter();
         $Db->setReturnValue('select',array());
         $this->Db = $Db;
         $this->Hybrid->setConnection($Db);
+        $this->Hybrid->find();
     }
 
     public function test_find_all() {
