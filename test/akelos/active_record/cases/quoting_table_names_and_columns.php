@@ -12,7 +12,7 @@ class Adapter_quoting_table_names_and_attributes_TestCase extends ActiveRecordUn
         $this->assertFalse($Installer->tableExists('exists'));
     }
     
-    public function _test_should_escape_attribute_names() {
+    public function test_should_escape_attribute_names() {
         $this->installAndIncludeModels(array('Exist'=>'id,order,index'));
         $Installer = new AkInstaller();
         $this->assertTrue($Installer->tableExists('exists'));
@@ -20,7 +20,7 @@ class Adapter_quoting_table_names_and_attributes_TestCase extends ActiveRecordUn
         $this->assertEqual(array_keys($Exist->getColumns()), array('id', 'order', 'index'));
     }
     
-    public function _test_should_crud_using_conflictive_column_names(){
+    public function test_should_crud_using_conflictive_column_names(){
         $this->installAndIncludeModels(array('Exist'=>'id,order,index, updated_at'));
         $Installer = new AkInstaller();
         $this->assertTrue($Installer->tableExists('exists'));
