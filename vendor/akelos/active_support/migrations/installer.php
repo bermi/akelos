@@ -449,7 +449,7 @@ Example:
             trigger_error(Ak::t('You must supply details for the table you are creating.'), E_USER_ERROR);
             return false;
         }
-
+        
         $column_options = is_string($column_options) ? array('columns'=>$column_options) : $column_options;
 
         $default_column_options = array(
@@ -464,6 +464,8 @@ Example:
 
         $column_string = $this->_getColumnsAsAdodbDataDictionaryString($column_options['columns']);
 
+        //$table_name = $this->db->quoteTableName($table_name);
+        
         $create_or_alter_table_sql = $this->data_dictionary->ChangeTableSQL($table_name, str_replace(array(' UNIQUE', ' INDEX', ' FULLTEXT', ' HASH'), '', $column_string), $table_options);
         $result = $this->data_dictionary->ExecuteSQLArray($create_or_alter_table_sql, false);
 
@@ -519,7 +521,13 @@ Example:
         '/ ((PRIMARY( |_)?)?KEY|pk)/i'=> ' KEY',
         );
 
-        return trim(preg_replace(array_keys($equivalences),array_values($equivalences), ' '.$columns.' '), ' ');
+        $result = trim(preg_replace(array_keys($equivalences),array_values($equivalences), ' '.$columns.' '), ' ');
+        $result = preg_replace('/([A-Za-z_0-9-]+)([^,]+)/', '`$1`$2', $result);
+        return $result;
+    }
+    
+    private function _quoteColumnForDataDictionary($matches){
+        return str_replace($matches[1],  $this->db->quoteColumnName(trim($matches[1], '"\'`')), $matches[0]);
     }
 
     protected function _setColumnDefaults($columns) {
@@ -589,7 +597,7 @@ Example:
     protected function _getColumnsToIndex($column_string) {
         $columns_to_index = array();
         foreach (explode(',',$column_string.',') as $column){
-            if(preg_match('/([A-Za-z0-9_]+) (.*) (INDEX|UNIQUE|FULLTEXT|HASH) ?(.*)$/i',$column,$match)){
+            if(preg_match('/["\'`]*([A-Za-z0-9_]+)["\'`]* (.*) (INDEX|UNIQUE|FULLTEXT|HASH) ?(.*)$/i',$column,$match)){
                 $columns_to_index[$match[1]] = $match[3];
             }
         }
@@ -599,7 +607,7 @@ Example:
     protected function _getUniqueValueColumns($column_string) {
         $unique_columns = array();
         foreach (explode(',',$column_string.',') as $column){
-            if(preg_match('/([A-Za-z0-9_]+) (.*) UNIQUE ?(.*)$/',$column,$match)){
+            if(preg_match('/["\'`]*([A-Za-z0-9_]+)["\'`]* (.*) UNIQUE ?(.*)$/',$column,$match)){
                 $unique_columns[] = $match[1];
             }
         }
@@ -611,10 +619,10 @@ Example:
             return false;
         }
         foreach (explode(',',$column_string.',') as $column){
-            if(preg_match('/([A-Za-z0-9_]+) (.*) AUTO (.*)$/',$column)){
+            if(preg_match('/["\'`]*([A-Za-z0-9_]+)["\'`]* (.*) AUTO (.*)$/',$column)){
                 return true;
             }
-            if(preg_match('/^id /',$column)){
+            if(preg_match('/^["\'`]*id["\'`]* /',$column)){
                 return true;
             }
         }

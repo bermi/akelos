@@ -339,14 +339,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $id = $this->_db->incrementsPrimaryKeyAutomatically() ? null : $this->_db->getNextSequenceValueFor($table);
         $attributes[$pk] = $id;
 
-        $attributes = array_diff($attributes, array(''));
+        $inserted_id = $this->_db->insertWithAttributes($table, $attributes, $pk, 'Create '.$this->getModelName());
 
-
-        $sql = 'INSERT INTO '.$table.' '.
-        '('.join(', ',array_keys($attributes)).') '.
-        'VALUES ('.join(',',array_values($attributes)).')';
-
-        $inserted_id = $this->_db->insert($sql, $id, $pk, $table, 'Create '.$this->getModelName());
         if ($this->transactionHasFailed()){
             return false;
         }
@@ -512,7 +506,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         /**
         * @todo sanitize sql conditions
         */
-        $sql = 'UPDATE '.$this->getTableName().' SET '.$updates;
+        $sql = 'UPDATE '.$this->_db->quoteTableName($this->getTableName()).' SET '.$updates;
         $binds = false;
         if(is_array($conditions)) {
             /*
@@ -549,10 +543,10 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $lock_check_sql = ' AND lock_version = '.$previous_value;
         }
 
-        $quoted_attributes = $this->getAvailableAttributesQuoted();
-        $sql = 'UPDATE '.$this->getTableName().' '.
+        $quoted_attributes = $this->getAvailableAttributesQuotedWithColumnsEscaped();
+        $sql = 'UPDATE '.$this->_db->quoteTableName($this->getTableName()).' '.
         'SET '.join(', ', $quoted_attributes) .' '.
-        'WHERE '.$this->getPrimaryKey().'='.$this->quotedId().$lock_check_sql;
+        'WHERE '.$this->_db->quoteColumnName($this->getPrimaryKey()).'='.$this->quotedId().$lock_check_sql;
 
         $affected_rows = $this->_db->update($sql,'Updating '.$this->getModelName());
         if($this->transactionHasFailed()){
@@ -1600,14 +1594,22 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         return $this->getAttributesQuoted($this->getAttributes($inspect_for_callback_child_method));
     }
 
+    public function getAvailableAttributesQuotedWithColumnsEscaped($inspect_for_callback_child_method = AK_ACTIVE_RECORD_ENABLE_CALLBACK_GETTERS) {
+        return $this->getAttributesQuoted($this->getAttributes($inspect_for_callback_child_method), array('escape_columns' => true));
+    }
 
-    public function getAttributesQuoted($attributes_array) {
+
+    public function getAttributesQuoted($attributes_array, $options = array()) {
         $set = array();
+        $escape_columns = !empty($options['escape_columns']);
         $attributes_array = $this->getSanitizedConditionsArray($attributes_array);
         foreach (array_diff($attributes_array,array('')) as $k=>$v){
-            $set[$k] = $k.'='.$v;
+            if($escape_columns){
+                $set[$k] = $this->_db->quoteColumnName($k).'='.$v;
+            }else{
+                $set[$k] = $k.'='.$v;
+            }
         }
-
         return $set;
     }
 

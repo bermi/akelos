@@ -2,6 +2,9 @@
 
 class AkSqliteDbAdapter extends AkDbAdapter
 {
+    public $column_quote = '"';
+    public $table_quote = '';
+    
     /**
      * @param array $database_settings
      * @return string
@@ -34,5 +37,6 @@ class AkSqliteDbAdapter extends AkDbAdapter
     public function quote_string($value) {
         return "'".sqlite_escape_string($value)."'";
     }
+    
 }
 

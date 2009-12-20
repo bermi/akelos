@@ -8,6 +8,9 @@ class AkDbAdapter
     public $debug=false;
     public $logger;
 
+    public $column_quote = '`';
+    public $table_quote = '`';
+
     /**
      * @param array $database_settings
      */
@@ -236,7 +239,7 @@ class AkDbAdapter
         if (!$result){
             return false;
         }
-        return is_null($id) ? $this->getLastInsertedId($table,$pk) : $id;
+        return is_null($id) ? $this->getLastInsertedId($table, $pk) : $id;
     }
 
     public function update($sql,$message = '') {
@@ -248,6 +251,24 @@ class AkDbAdapter
         $result = $this->execute($sql, $message);
         return ($result) ? $this->getAffectedRows() : false;
     }
+
+    public function insertWithAttributes($table, $attributes = array(), $pk = null, $message = null){
+        $attributes = array_diff($attributes, array(''));
+        $sql = 'INSERT INTO '.$this->quoteTableName($table).' '.
+        '('.join(', ', array_map(array($this, 'quoteColumnName'), array_keys($attributes)) ).') '.
+        'VALUES ('.join(',',array_values($attributes)).')';
+        $id = isset($attributes[$pk]) ? $attributes[$pk] : null;
+        return $this->insert($sql, $id, $pk, $table, $message);
+    }
+
+    public function quoteColumnName($column){
+        return $this->column_quote.$column.$this->column_quote;
+    }
+
+    public function quoteTableName($table_name){
+        return $this->table_quote.$table_name.$this->table_quote;
+    }
+
 
     /**
     * Returns a single value, the first column from the first row, from a record

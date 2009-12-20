@@ -132,7 +132,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     public function &findLastBy() {
         $args = func_get_args();
         $options = $this->_extractOptionsFromArgs($args);
-        $options['order'] = $this->_ActiveRecord->getPrimaryKey().' DESC';
+        $options['order'] = $this->_quoteAttributeName($this->_ActiveRecord->getPrimaryKey()).' DESC';
         array_push($args, $options);
         $result = call_user_func_array(array($this,'findFirstBy'), $args);
         return $result;
@@ -244,7 +244,6 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         foreach ($requested_columns as $attribute){
             $replacements[$attribute] = $this->_ActiveRecord->castAttributeForDatabase($attribute, $this->_ActiveRecord->get($attribute));
         }
-
         return trim(preg_replace('/('.join('|',array_keys($replacements)).')\s+([^\?]+)\s+\?/e', "isset(\$replacements['\\1']) ? '\\1 \\2 '.\$replacements['\\1']:'\\1 \\2 null'", $sql));
     }
 
@@ -534,7 +533,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
                             case 'finishes':
                             case 'finishes_with':
                                 $query_values[$parameter_count] = '%'.$query_values[$parameter_count];
-                                $new_sql .= $_tmp_parts[0]." LIKE ? ";
+                                $new_sql .= $this->_quoteAttributeName($_tmp_parts[0])." LIKE ? ";
                                 break;
                             case 'in':
                                 $values = join(', ', $this->_ActiveRecord->castAttributesForDatabase($_tmp_parts[0], $query_values[$parameter_count]));
@@ -1152,10 +1151,10 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             $sub_options, $pluralize);
 
             /**
-                     * Adding replacements for base options like order,conditions,group.
-                     * The table-aliases of the included associations will be replaced
-                     * with their respective __owner_$handler_name.$column_name representative.
-                     */
+             * Adding replacements for base options like order,conditions,group.
+             * The table-aliases of the included associations will be replaced
+             * with their respective __owner_$handler_name.$column_name representative.
+             */
             $replacements['/([,\s])_('.$sub_association_id.')\./']='\\1__owner__'.$parent_association_id.'__'.$sub_handler_name.'.';
             $replacements['/([,\s])('.$sub_association_id.')\./']='\\1__owner__'.$parent_association_id.'__'.$sub_handler_name.'.';
             $replacements['/([,\s])_('.$table_name.')\./']='\\1__owner__'.$parent_association_id.'__'.$sub_handler_name.'.';
@@ -1330,6 +1329,14 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         return $sql;
     }
 
+    private function _quoteTableName($table_name){
+        //return $table_name;
+        return $this->_ActiveRecord->_db->quoteTableName($table_name);
+    }
 
+    private function _quoteAttributeName($attribute){
+        //return $attribute;
+        return $this->_ActiveRecord->_db->quoteColumnName($attribute);
+    }
 
 }
