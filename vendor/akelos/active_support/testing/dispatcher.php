@@ -43,25 +43,18 @@ class AkTestDispatcher extends AkDispatcher
     }
 
     public function process($url) {
+       
         $_SERVER['PHP_SELF'] = '/index.php';
         $parts = parse_url($url);
         if (isset($parts['scheme'])) {
             $_SERVER['HTTPS']=$parts['scheme']=='https';
-
         }
         if (isset($parts['query'])) {
-            $parts = preg_split('&', $parts['query']);
-
-            foreach ($parts as $p) {
-                $gets = explode('=', $p);
-                $_GET[$gets[0]]=isset($gets[1])?$gets[1]:null;
-            }
+            parse_str($parts['query'], $_GET);
         }
         $_REQUEST['ak'] = isset($parts['path']) ? $parts['path'] : '/';
         $_SERVER['REQUEST_URI'] = isset($parts['path'])?$parts['path']:'/';
         $_SERVER['SERVER_NAME'] =  isset($parts['host'])?$parts['host']:null;
-
-
         return $this->dispatch();
     }
 

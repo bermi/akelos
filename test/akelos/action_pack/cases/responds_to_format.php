@@ -30,6 +30,19 @@ class RespondsToFormat_TestCase extends AkTestApplication
         $this->get('http://www.example.com/dummy_people/listing.xml');
         $this->assertHeader('Content-Type','application/xml');
     }
+
+    public function test_xml_format_with_parameters() {
+        $firodj = $this->DummyPerson->create(array('name' => 'firodj'));
+        //xdebug_break();
+        $this->get('http://www.example.com/dummy_people/show.xml?name=firodj&');
+        $this->assertHeader('Content-Type','application/xml');
+        $this->assertPattern('/<name>firodj<\/name>/', $this->getResponseText());
+        
+        $this->get('http://www.example.com/dummy_people/show/'.$firodj->id.'.xml');
+        $this->assertHeader('Content-Type','application/xml');
+        $this->assertPattern('/<name>firodj<\/name>/', $this->getResponseText());
+
+    }
 }
 
 ak_test_case('RespondsToFormat_TestCase');

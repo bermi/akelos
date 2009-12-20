@@ -9,10 +9,15 @@ class DummyPeopleController extends ApplicationController
         $this->respondToFormat();
 
     }
+    function show() {
+        $this->DummyPeople = array(isset($this->params['name']) ? $this->DummyPerson->findFirstBy('name',$this->params['name']) : $this->DummyPerson->find($this->params['id']));
+        $this->layout = false;
+        $this->renderText($this->DummyPerson->toXml($this->DummyPeople));
+    }
 
     function _handleListingAsXml() {
         $this->layout = false;
-        $this->renderText($this->DummyPerson->toXml($this->people));
+        $this->renderText($this->DummyPerson->toXml($this->DummyPeople));
     }
 
     function _handleListingAsCsv() {
