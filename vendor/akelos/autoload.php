@@ -343,6 +343,7 @@ defined('AK_DOCS_DIR')              || define('AK_DOCS_DIR',    AK_BASE_DIR.DS.'
 defined('AK_CONFIG_INCLUDED')       || define('AK_CONFIG_INCLUDED',true);
 defined('AK_FW')                    || define('AK_FW',true);
 
+
 if(AK_ENVIRONMENT != 'setup'){
     defined('AK_UPLOAD_FILES_USING_FTP')    || define('AK_UPLOAD_FILES_USING_FTP', !empty($ftp_settings));
     defined('AK_READ_FILES_USING_FTP')      || define('AK_READ_FILES_USING_FTP', false);
@@ -436,13 +437,11 @@ defined('AK_PRODUCTION_MODE')                           || define('AK_PRODUCTION
 defined('AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES')       || define('AK_AUTOMATICALLY_UPDATE_LANGUAGE_FILES', AK_DEV_MODE);
 defined('AK_ENABLE_PROFILER')                           || define('AK_ENABLE_PROFILER', false);
 defined('AK_PROFILER_GET_MEMORY')                       || define('AK_PROFILER_GET_MEMORY',false);
-defined('AK_MODE_DISPLAY')                              || define('AK_MODE_DISPLAY', 1);
-defined('AK_MODE_MAIL')                                 || define('AK_MODE_MAIL', 2);
-defined('AK_MODE_FILE')                                 || define('AK_MODE_FILE', 4);
-defined('AK_MODE_DATABASE')                             || define('AK_MODE_DATABASE', 8);
-defined('AK_MODE_DIE')                                  || define('AK_MODE_DIE', 16);
+
+// ERROR LOGGING
 defined('AK_LOG_DIR')                                   || define('AK_LOG_DIR', AK_BASE_DIR.DS.'log');
 defined('AK_LOG_EVENTS')                                || define('AK_LOG_EVENTS', false);
+
 defined('AK_ROUTES_MAPPING_FILE')                       || define('AK_ROUTES_MAPPING_FILE', AK_CONFIG_DIR.DS.'routes.php');
 defined('AK_CHARSET')                                   || define('AK_CHARSET', 'UTF-8');
 defined('AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE')    || define('AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE', 'web_request');

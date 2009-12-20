@@ -862,19 +862,18 @@ class Ak
 
 
 
-    static function &getLogger($namespace = 'default') {
+    static function &getLogger($namespace = AK_ENVIRONMENT) {
         static $Logger = array();
         if(empty($Logger[$namespace])){
-            $Logger[$namespace] = new AkLogger();
-            if($namespace != 'default'){
-                $file_name = AK_LOG_DIR.DS.$namespace.'.log';
-                if(!is_file($file_name)){
-                    Ak::file_put_contents($file_name, '');
-                }
-                $Logger[$namespace]->error_file = $file_name;
+            $logger_options = AkConfig::getOption($namespace.'_logger_options', array());
+            $logger_class = AkConfig::getOption('logger', 'AkLogger');
+            $logger_class_for_namespace = AkConfig::getOption($namespace.'_logger', $logger_class);
+            if(is_string($logger_class_for_namespace)){
+                $Logger[$namespace] = new $logger_class_for_namespace(array_merge($logger_options, array('namespace' => $namespace)));
+            }else{
+                $Logger[$namespace] = $logger_class_for_namespace;
             }
         }
-        $return = $Logger[$namespace];
         return $Logger[$namespace];
     }
 
