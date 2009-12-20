@@ -213,9 +213,10 @@ class AkHelperLoader
         foreach ($this->getHeperBasePaths() as $base_path){
             if(!strstr($file_name, $base_path)){
                 if(AK_ACTION_PACK_DIR.DS.'helpers' == $base_path && substr($file_name, 0 , 3) != 'ak_'){
-                    $file_name = 'ak_'.$file_name;
-                }
-                if(is_file($base_path.DS.$file_name)){
+                    if(is_file($base_path.DS.'ak_'.$file_name)){
+                        return $base_path.DS.'ak_'.$file_name;
+                    }
+                }elseif(is_file($base_path.DS.$file_name)){
                     return $base_path.DS.$file_name;
                 }
             }
