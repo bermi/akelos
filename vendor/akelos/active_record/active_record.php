@@ -603,7 +603,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         /**
         * @todo sanitize sql conditions
         */
-        $sql = 'DELETE FROM '.$this->getTableName();
+        $sql = 'DELETE FROM '.$this->_db->quoteTableName($this->getTableName());
         $binds = false;
         if(is_array($conditions)) {
             /*
@@ -662,7 +662,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         if(!$this->beforeDestroy() || !$this->notifyObservers('beforeDestroy')){
             return $this->transactionFail();
         }
-        $sql = 'DELETE FROM '.$this->getTableName().' WHERE '.$this->getPrimaryKey().' = '.$this->castAttributeForDatabase($this->getPrimaryKey(), $this->getId());
+        $sql = 'DELETE FROM '.$this->_db->quoteTableName($this->getTableName()).' WHERE '.$this->getPrimaryKey().' = '.$this->castAttributeForDatabase($this->getPrimaryKey(), $this->getId());
         if ($this->_db->delete($sql,$this->getModelName().' Destroy') !== 1){
             return $this->transactionFail();
         }
