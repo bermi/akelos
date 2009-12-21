@@ -458,7 +458,7 @@ class AkRequest
     public function isAjax() {
         return $this->isXmlHttpRequest();
     }
-    
+
     static function isLocal(){
         return in_array(AK_REMOTE_IP, AkConfig::getOption('local_ips', array('localhost','127.0.0.1','::1')));
     }
@@ -672,17 +672,18 @@ class AkRequest
     }
 
     public function reportError($options = array()){
-        AK_LOG_EVENTS && !empty($options['log']) && Ak::getLogger()->error($options['log']);
+        AK_PRODUCTION_MODE && AK_LOG_EVENTS && !empty($options['log']) && Ak::getLogger()->error($options['log']);
         if(AK_DEV_MODE && !empty($options['message'])){
             trigger_error($options['message'], E_USER_ERROR);
-            return ;
+        }else{
+            $status_code = empty($options['status_code']) ? 501 : $options['status_code'];
+            $status_header = AkResponse::getStatusHeader($status_code);
+            if(!@include(AkConfig::getDir('public').DS.$status_code.'.php')){
+                header($status_header);
+                echo str_replace('HTTP/1.1 ', '', $status_header);
+            }
         }
-        $status_code = empty($options['status_code']) ? 501 : $options['status_code'];
-        $status_header = AkResponse::getStatusHeader($status_code);
-        if(!@include(AkConfig::getDir('public').DS.$status_code.'.php')){
-            header($status_header);
-            die(str_replace('HTTP/1.1 ', '', $status_header));
-        }
+        exit(0);
     }
 
     public function saveRefererIfNotRedirected() {
