@@ -68,11 +68,11 @@
  * Messages will be rendered as html and will show the file and line where the
  * log was requested.
  * 
- * The display handler is disabled on production.
+ * The display handler is disabled on production and testing modes.
  *
  * ### mail
  * 
- * You can get a mail of critical issues when not running on testing mode.
+ * You can get a mail of critical issues when running on production mode.
  * 
  * You'll have to define an address where events will be received:
  *
@@ -220,7 +220,7 @@ class AkLogger implements AkLoggerInterface
         'log_handlers'          => Ak::toArray(AkConfig::getOption('log_handlers', AK_LOG_HANDLERS)),
         'handlers_for_levels'   => Ak::toArray(AkConfig::getOption('handlers_for_levels', $this->_handlers_for_levels)),
         'log_handling_methods'  => AkConfig::getOption('log_handling_methods', $this->getLogHandlingMethods($this->_log_handlers)),
-        'print'                 => !AK_PRODUCTION_MODE,
+        'print'                 => !AK_PRODUCTION_MODE && !AK_TEST_MODE,
         'send_mails'            => !AK_TEST_MODE,
         'mail_destination'      => AK_LOGER_DEFAULT_MAIL_DESTINATION,
         'mail_sender'           => AK_LOGER_DEFAULT_MAIL_SENDER,
@@ -253,7 +253,6 @@ class AkLogger implements AkLoggerInterface
         if(isset($this->_log_levels[$error_level]) && !($this->_log_levels[$error_level] & $this->_log_level)){
             return;
         }
-
         foreach ($this->_log_handlers as $handler => $mode){
             if($this->_handling_mode & $mode){
                 if(($this->_level_handlers[$error_level] & $mode) && isset($this->options['log_handling_methods'][$handler])){
@@ -272,10 +271,12 @@ class AkLogger implements AkLoggerInterface
         $log_dir = AkConfig::getDir('log');
         $file_name = $log_dir.DS.$namespace.'.log';
         $this->error_file = $file_name;
-        if(!is_file($file_name) && is_writable($log_dir)){
-            Ak::file_put_contents($file_name, '', array('base_path' => AkConfig::getDir('log')));
-        }else{
-            $this->error_file = false;
+        if(!is_file($file_name)){
+            if(is_writable($log_dir)){
+                Ak::file_put_contents($file_name, '', array('base_path' => AkConfig::getDir('log')));
+            }else{
+                $this->error_file = false;
+            }
         }
         
     }
@@ -353,7 +354,7 @@ class AkLogger implements AkLoggerInterface
     }
 
     public function handleMailMessage($error_level, $message, $parameters = array()){
-        if(!empty($this->options['send_mails']) && !empty($this->options['mail_destination'])){
+        if(!empty($this->options['send_mails']) && !empty($this->options['mail_destination']) && AK_PRODUCTION_MODE){
             $message = $this->getMessageFormatedAsString($error_level, $message, $parameters, true);
             $subject = str_replace(array('%error_level','%namespace'), array($error_level, $this->options['namespace']), $this->options['mail_subject']);
             Ak::mail($this->options['mail_sender'], $this->options['mail_destination'], $subject, $message);

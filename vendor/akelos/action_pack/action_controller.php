@@ -109,6 +109,8 @@ class AkActionController extends AkLazyObject
 
     public $_request_id = -1;
 
+    public $filter_parameter_logging = array(AK_SESSION_NAME, 'ak');
+
     protected
 
     $_module_path,
@@ -123,11 +125,14 @@ class AkActionController extends AkLazyObject
 
     public function process(&$Request, &$Response, $options = array()) {
         AK_ENABLE_PROFILER &&  Ak::profile('AkActionController::process() start');
-        AK_LOG_EVENTS && empty($this->_Logger) ? ($this->_Logger = Ak::getLogger()) : null;
 
         $this->Request = $Request;
         $this->Response = $Response;
         $this->params = $this->Request->getParams();
+
+        if(AK_LOG_EVENTS){
+            $this->_log('Parameters', array_diff(Ak::delete($this->params, $this->filter_parameter_logging), array('')));
+        }
 
         AK_ENABLE_PROFILER &&  Ak::profile('Got request paramenters');
 
@@ -308,7 +313,10 @@ class AkActionController extends AkLazyObject
                 $this->Response->_headers['Status'] = $this->_default_render_status_code;
             }
             $this->Response->outputResults();
-            $handled[$this->_request_id]=true;
+            if(AK_LOG_EVENTS && isset($this->ak_time_start)){
+                $this->_log('Completed in '.(microtime(true)-$this->ak_time_start));
+            }
+            $handled[$this->_request_id] = true;
         }
     }
 
@@ -334,7 +342,7 @@ class AkActionController extends AkLazyObject
         empty($this->cookies) && isset($_COOKIE) ? ($this->cookies = $_COOKIE) : null;
         $this->loadTemplateHandler();
     }
-    
+
     public function getCurrentControllerHelper() {
         $helper = $this->getControllerName();
         $helper = AkInflector::is_plural($helper)?AkInflector::singularize($helper):$helper;
@@ -647,12 +655,11 @@ class AkActionController extends AkLazyObject
     public function renderFile($template_path, $status = null, $use_full_path = false, $locals = array()) {
         $this->_addVariablesToAssigns();
         $locals = array_merge($locals,$this->_assigns);
-
+        $template_exists = true;
         if($use_full_path){
-            $this->_assertExistanceOfTemplateFile($template_path);
+            $template_exists = $this->_assertExistanceOfTemplateFile($template_path);
         }
-
-        AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message("Rendering $this->full_template_path" . (!empty($status) ? " ($status)":'')) : null;
+        AK_LOG_EVENTS && $template_exists && $this->_log("Rendering $template_path".(empty($status)?'':'('.$this->Response->getStatusDescription($status).')'));
         return $this->renderText($this->Template->renderFile($template_path, $use_full_path, $locals), $status);
     }
 
@@ -750,14 +757,14 @@ class AkActionController extends AkLazyObject
      */
     public function t($string, $array = null, $controller=null) {
         return Ak::t($string, $array, !empty($controller) ? $controller :
-                AkConfig::getOption('locale_namespace', 
-                    (!empty($this->locale_namespace) ? $this->locale_namespace : (
-                        defined('AK_DEFAULT_LOCALE_NAMESPACE') ? AK_DEFAULT_LOCALE_NAMESPACE : 
-                        AkInflector::underscore($this->getControllerName())
-                        )
-                    )
-                )
-            );
+        AkConfig::getOption('locale_namespace',
+        (!empty($this->locale_namespace) ? $this->locale_namespace : (
+        defined('AK_DEFAULT_LOCALE_NAMESPACE') ? AK_DEFAULT_LOCALE_NAMESPACE :
+        AkInflector::underscore($this->getControllerName())
+        )
+        )
+        )
+        );
     }
 
 
@@ -1062,11 +1069,15 @@ class AkActionController extends AkLazyObject
         $this->full_template_path = $this->Template->getFullTemplatePath($template_name, $extension ? $extension : 'tpl');
         if(!$this->_hasTemplate($this->full_template_path)){
             if(!empty($this->_ignore_missing_templates) && $this->_ignore_missing_templates === true){
-                return;
+                return true;
             }
             $template_type = strstr($template_name,'layouts') ? 'layout' : 'template';
-            trigger_error(Ak::t('Missing %template_type %full_template_path',array('%template_type'=>$template_type, '%full_template_path'=>$this->full_template_path)), E_USER_WARNING);
+            $error_message = Ak::t('Missing %template_type %full_template_path',array('%template_type'=>$template_type, '%full_template_path'=>$this->full_template_path));
+            AK_LOG_EVENTS && $this->_log($error_message, array(), 'warn');
+            trigger_error($error_message, E_USER_WARNING);
+            return false;
         }
+        return true;
     }
 
     public function getDefaultTemplateName($default_action_name = null) {
@@ -2192,6 +2203,15 @@ class AkActionController extends AkLazyObject
             $this->_HelperLoader->setController($this);
         }
         return $this->_HelperLoader;
+    }
+
+    protected function _log($message, $parameters = array(), $type = 'info'){
+        if(AK_LOG_EVENTS){
+            if(empty($this->_Logger)){
+                $this->_Logger = Ak::getLogger();
+            }
+            $this->_Logger->$type($message, $parameters);
+        }
     }
 }
 

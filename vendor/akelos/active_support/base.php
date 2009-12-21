@@ -1164,7 +1164,8 @@ class Ak
         return $resulting_array;
     }
 
-    static function collect($source_array, $key_index, $value_index) {
+    static function collect($source_array, $key_index, $value_index = null) {
+        $value_index = empty($value_index) ? $key_index : $value_index;
         $resulting_array = array();
         if(!empty($source_array) && is_array($source_array)) {
             foreach ($source_array as $source_item){

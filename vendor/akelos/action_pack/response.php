@@ -200,6 +200,10 @@ class AkResponse
         return empty($status_codes[$status_code]) ? false : $status_codes[$status_code];
     }
 
+    public function getStatusDescription($status_code){
+        return str_replace('HTTP/1.1 ','', $this->getStatusHeader($status_code));
+    }
+
     public function _streamBody() {
         return is_object($this->body) && method_exists($this->body,'stream');
     }

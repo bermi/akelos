@@ -637,6 +637,9 @@ class AkRequest
         $this->_startSession();
         $this->_enableInternationalizationSupport();
         $this->_mapRoutes($Map);
+
+        AK_LOG_EVENTS && Ak::getLogger()->info('Processing '.$this->getController().'#'.$this->getAction().' (for '.$this->getRemoteIp().')');
+
         $Controller = $this->_getControllerInstance();
         return $Controller;
 
@@ -672,7 +675,8 @@ class AkRequest
     }
 
     public function reportError($options = array()){
-        AK_PRODUCTION_MODE && AK_LOG_EVENTS && !empty($options['log']) && Ak::getLogger()->error($options['log']);
+        AK_LOG_EVENTS && !empty($options['log']) && Ak::getLogger()->error($options['log']);
+
         if(AK_DEV_MODE && !empty($options['message'])){
             trigger_error($options['message'], E_USER_ERROR);
         }else{

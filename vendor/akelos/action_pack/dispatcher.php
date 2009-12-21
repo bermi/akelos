@@ -12,10 +12,12 @@ class AkDispatcher
 
     public function dispatch() {
         if(!$this->dispatchCached()){
+            $time_start = microtime(true);
             AK_ENABLE_PROFILER &&  Ak::profile(__CLASS__.'::'.__FUNCTION__.'() call');
             $this->Request = new AkRequest();
             $this->Response = new AkResponse();
             $this->Controller = $this->Request->recognize();
+            $this->Controller->ak_time_start = $time_start;
             AK_ENABLE_PROFILER && Ak::profile('Request::recognize() completed');
             $this->Controller->process($this->Request, $this->Response);
         }
