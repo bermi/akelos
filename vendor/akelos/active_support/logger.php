@@ -269,11 +269,15 @@ class AkLogger implements AkLoggerInterface
     }
 
     public function setErrorFileForNamespace($namespace){
-        $file_name = AkConfig::getDir('log').DS.$namespace.'.log';
-        if(!is_file($file_name)){
-            Ak::file_put_contents($file_name, '', array('base_path' => AkConfig::getDir('log')));
-        }
+        $log_dir = AkConfig::getDir('log');
+        $file_name = $log_dir.DS.$namespace.'.log';
         $this->error_file = $file_name;
+        if(!is_file($file_name) && is_writable($log_dir)){
+            Ak::file_put_contents($file_name, '', array('base_path' => AkConfig::getDir('log')));
+        }else{
+            $this->error_file = false;
+        }
+        
     }
 
     public function setLogLevels($levels){
@@ -321,10 +325,10 @@ class AkLogger implements AkLoggerInterface
     }
 
     public function handleFileMessage($error_level, $message, $parameters = array()){
-        $filename = $this->error_file;
-        if(!is_writable($filename)){
+        if($this->error_file == false){
             return;
         }
+        $filename = $this->error_file;
         $message = $this->getMessageFormatedAsString($error_level, $message, $parameters);
         if(!$fp = fopen($filename, 'a')) {
             trigger_error('Cannot start logging to file '.$filename, E_USER_NOTICE);
