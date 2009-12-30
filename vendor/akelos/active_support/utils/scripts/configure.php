@@ -360,16 +360,6 @@ CONFIG;
         $file_path = AK_CONFIG_DIR.DS.'database.yml';
         return !file_exists($file_path);
     }
-    public function writeRoutesFile() {
-        if(isset($this->ftp_enabled)){
-            $this->testFtpSettings();
-        }
-        $file_path = AK_CONFIG_DIR.DS.'routes.php';
-        if(!file_exists($file_path)){
-            return Ak::file_put_contents($file_path, file_get_contents(AK_CONFIG_DIR.DS.'DEFAULT-routes.php'));
-        }
-        return false;
-    }
 
     public function modifyHtaccessFiles() {
         if($this->isUrlRewriteEnabled()){
@@ -817,8 +807,7 @@ $db_configuration_file = $FrameworkSetup->getDatabaseConfigurationFile();
 
 if( $FrameworkSetup->canWriteConfigurationFile() && $FrameworkSetup->canWriteDbConfigurationFile()){
     $FrameworkSetup->writeConfigurationFile($configuration_file) &&
-    $FrameworkSetup->writeDatabaseConfigurationFile($db_configuration_file) &&
-    $FrameworkSetup->writeRoutesFile();
+    $FrameworkSetup->writeDatabaseConfigurationFile($db_configuration_file);
     echo "\nYour application has been confirured correctly\n";
     echo "\nSee config/config.php and config/database.yml\n";
 }
