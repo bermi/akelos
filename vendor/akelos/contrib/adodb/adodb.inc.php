@@ -1,4 +1,14 @@
 <?php
+
+if(AK_CLI && !defined('ADODB_OUTP')){
+    define('ADODB_OUTP', 'ak_trace_db_query');
+    function ak_trace_db_query($message, $new_line = true) {
+        $message = preg_replace('/\([a-z0-9]+\): /','', trim($message, "\n-"));
+        $message = trim(html_entity_decode(strip_tags($message)));
+        echo trim(str_replace(array("\n","-----"), ' ', $message))."\n\n";
+    }
+}
+
 /*
 * Set tabs to 4 for best viewing.
 *
