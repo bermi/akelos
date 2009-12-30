@@ -1,0 +1,11 @@
+Description:
+    Creates a base makelos task in
+    ./lib/tasks/
+
+Example:
+    `./makelos generate task send_mailing`
+    
+or 
+
+    `./makelos generate task mailing:send`
+
