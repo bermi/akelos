@@ -37,6 +37,8 @@ if(empty($options['component']) && !empty($component)){
 }
 
 $options = array_diff($options, array(''));
-$options['component'] = empty($options['component']) ? AkConfig::getOption('component', 'akelos') : $options['component'];
+$options['component'] = empty($options['component']) ? AkConfig::getOption('component', 
+file_exists(AK_CONFIG_DIR.DS.'config.php') ? AkInflector::underscore(AK_APP_NAME) : 'akelos'
+) : $options['component'];
 
 AkUnitTestSuite::runFromOptions($options);

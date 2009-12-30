@@ -53,6 +53,7 @@ class AkUnitTestSuite extends TestSuite
 
         if(!empty($options['component'])){
             $components = Ak::toArray($options['component']);
+
             $real_base_path = $options['base_path'];
 
             $options['description'] = '';
@@ -76,7 +77,7 @@ class AkUnitTestSuite extends TestSuite
                         unset($options['suites'][$k]);
                     }
                 }
-                $options['description'] = trim($options['description'], ', ')."):\n";
+                $options['description'] = str_replace(' Suites():','', trim($options['description'], ', ')."):\n");
 
                 if(empty($options['title'])){
                     AkConfig::setOption('testing_url', AK_TESTING_URL);
@@ -88,7 +89,6 @@ class AkUnitTestSuite extends TestSuite
                     (AkConfig::getOption('webserver_enabled', false)?', Testing URL: '.AkConfig::getOption('testing_url'):', Testing URL: DISABLED!!!').
                     "\n"."Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n".trim($options['description']).'';
                 }
-
             }
         }else{
 
@@ -121,7 +121,15 @@ class AkUnitTestSuite extends TestSuite
         $options['TestSuite']->running_from_config = true;
 
         if(empty($options['files'])){
-            trigger_error('Could not find test cases to run.', E_USER_ERROR);
+            $component = AkInflector::underscore($options['component']);
+            if(AkInflector::underscore(AK_APP_NAME) == $component){
+                $options['files'] = glob(AK_TEST_DIR.DS.'unit'.DS.'*.php');
+            }else{
+                $options['files'] = glob(AK_TEST_DIR.DS.'unit'.DS.$component.'*.php');
+            }
+            if(empty($options['files'])){
+                trigger_error('Could not find test cases to run.', E_USER_ERROR);
+            }
         }
         foreach ($options['files'] as $file){
             $options['TestSuite']->addFile($file);
@@ -259,16 +267,16 @@ class AkUnitTestSuite extends TestSuite
 
         }
     }
-    
+
     static function runOnSuccess($command){
         if(!empty($command)){
-            `$command`;
+        `$command`;
         }
         return 1;
     }
     static function runOnFailure($command){
         if(!empty($command)){
-            `$command`;
+        `$command`;
         }
         return 0;
     }
