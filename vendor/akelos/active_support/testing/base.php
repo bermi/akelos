@@ -234,6 +234,7 @@ class AkUnitTest extends UnitTestCase
                 return false;
             }
             $installer = new AkInstaller();
+            $installer->skip_db_sql = true;
             $installer->dropTable($table_name, array('sequence'=>true));
             $installer->createTable($table_name,$table_definition, array('timestamp'=>false));
         } else {
@@ -255,6 +256,7 @@ class AkUnitTest extends UnitTestCase
         if (!$this->uninstallMigration($model)){
             $table_name = AkInflector::tableize($model);
             $installer = new AkInstaller();
+            $installer->skip_db_sql = true;
             $installer->dropTable($table_name, array('sequence'=>true));
         }
     }
@@ -286,9 +288,10 @@ class AkUnitTest extends UnitTestCase
             require_once($installer_path);
             $installer_class_name = $installer_name.'Installer';
             $Installer = new $installer_class_name();
-            $Installer->uninstall();
+            $Installer->skip_db_sql = true;
+            $Installer->uninstall(null, array('quiet'=>true));
             if($reinstall){
-                $Installer->install();
+                $Installer->install(null, array('quiet'=>true));
             }
             return true;
         }
