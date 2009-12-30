@@ -1,18 +1,10 @@
 <?php
 
-
-/**
- * @package ActiveSupport
- * @subpackage Generators
- * @author Bermi Ferrer <bermi a.t bermilabs c.om>
- */
-
-
 class ModelGenerator extends  AkelosGenerator
 {
-    var $command_values = array('class_name','(array)table_columns');
+    public $command_values = array('class_name','(array)table_columns');
 
-    function _preloadPaths() {
+    public function _preloadPaths() {
         $this->class_name = AkInflector::camelize($this->class_name);
         $this->assignVarToTemplate('class_name', $this->class_name);
         $this->table_columns = trim(join(' ', (array)@$this->table_columns));
@@ -23,7 +15,7 @@ class ModelGenerator extends  AkelosGenerator
         $this->installer_path = 'app'.DS.'installers'.DS.$this->underscored_model_name.'_installer.php';
     }
 
-    function hasCollisions() {
+    public function hasCollisions() {
         $this->_preloadPaths();
 
         $this->collisions = array();
@@ -47,7 +39,7 @@ class ModelGenerator extends  AkelosGenerator
         return count($this->collisions) > 0;
     }
 
-    function generate() {
+    public function generate() {
         $this->_preloadPaths();
 
         $this->class_name = AkInflector::camelize($this->class_name);
@@ -74,11 +66,8 @@ class ModelGenerator extends  AkelosGenerator
         }
     }
 
-    function cast() {
+    public function cast() {
         $this->_template_vars['class_name'] = AkInflector::camelize($this->class_name);
         $this->_template_vars['table_columns'] = (array)@$this->table_columns;
     }
-
 }
-
-?>
