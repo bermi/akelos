@@ -66,6 +66,10 @@ class AkReflectionFunction extends AkReflection
         return isset($this->_definition['params']) ? $this->_definition['params'] : false;
     }
 
+    public function getCode() {
+        return $this->_definition['code'];
+    }
+
     public function toString($indent=0, $methodName = null, $options = array()) {
         $docBlock = $this->_docBlock;
         if ($docBlock->changed) {

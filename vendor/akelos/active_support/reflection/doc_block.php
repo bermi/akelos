@@ -49,8 +49,12 @@ class AkReflectionDocBlock
         return isset($this->_structure['tags'][$tag]) ? $this->_structure['tags'][$tag] : false;
     }
 
+    public function getTags() {
+        return isset($this->_structure['tags']) ? $this->_structure['tags'] : array();
+    }
+
     protected function _parseDocBlock($string) {
-        preg_match_all('/\/\*\*\n(\s*\*([^\n]+?\n)+)+.*?\*\//', $string, $matches);
+        preg_match_all('/\/\*\*\n(\s*\*?([^\n]+?\n)+)+.*?\*\//', $string, $matches);
 
         $docBlockStructure = array('comment'=>null);
         if (isset($matches[1][0])) {
