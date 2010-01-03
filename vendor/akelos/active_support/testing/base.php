@@ -262,6 +262,7 @@ class AkUnitTest extends UnitTestCase
     }
 
     public function uninstallAndInstallMigration($installer_name) {
+        $installer_name = AkInflector::camelize($installer_name);
         return $this->_uninstallAndInstallMigration($installer_name, true);
     }
 
