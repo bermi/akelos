@@ -494,7 +494,7 @@ defined('AK_PLUGINS_MAIN_REPOSITORY')           || define('AK_PLUGINS_MAIN_REPOS
 defined('AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE') || define('AK_PLUGINS_REPOSITORY_DISCOVERY_PAGE', 'http://www.akelos.org/wiki/plugins');
 defined('AK_TESTING_NAMESPACE')                 || define('AK_TESTING_NAMESPACE', AK_APP_NAME);
 
-
+defined('AK_ACTION_MAILER_DELIVERY_METHOD')                 || define('AK_ACTION_MAILER_DELIVERY_METHOD', AK_TEST_MODE ? 'test' : 'php');
 defined('AK_ACTION_MAILER_DEFAULT_CHARSET')                 || define('AK_ACTION_MAILER_DEFAULT_CHARSET', AK_CHARSET);
 defined('AK_ACTION_MAILER_EOL')                             || define('AK_ACTION_MAILER_EOL', "\r\n");
 defined('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION')        || define('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION', "([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)");
