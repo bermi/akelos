@@ -67,9 +67,9 @@ class AkTestApplication extends AkUnitTest
 
     public function assertPattern($pattern, $subject, $message = '%s') {
         return $this->assert(
-            new PatternExpectation($pattern),
-            $this->_response,
-            $message);
+        new PatternExpectation($pattern),
+        $this->_response,
+        $message);
     }
 
     public function _testXPath($xpath_expression) {
@@ -146,6 +146,23 @@ class AkTestApplication extends AkUnitTest
         }
     }
 
+    /**
+     * Asserts a variable has been assined to the controller
+     *
+     * @variable string $variable
+     */
+    public function assertAssigns($variable){
+        if($Controller = $this->getController()){
+            if(isset($Controller->$variable)){
+                $this->pass('Variable '.$variable.' assigned to controller '.get_class($Controller));
+            }else{
+                $this->fail('Variable '.$variable.' is not set assigned to controller '.get_class($Controller));
+            }
+        }else{
+            $this->fail('Could not get controller instance');
+        }
+    }
+
     public function &getController() {
         if (isset($this->Dispatcher)) {
             $controller = $this->Dispatcher->Controller;
@@ -166,6 +183,9 @@ class AkTestApplication extends AkUnitTest
     }
 
     public function assertResponse($code) {
+        if($code == 'success'){
+            $code = 200;
+        }
         $this->assertHeader('Status',$code);
     }
 
