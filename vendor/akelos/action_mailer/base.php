@@ -267,7 +267,7 @@ class AkActionMailer extends AkBaseModel
     'authentication' => null
     );
 
-    public $delivery_method = 'php';
+    public $delivery_method = AK_ACTION_MAILER_DELIVERY_METHOD;
     public $perform_deliveries = true;
     public $deliveries = array();
     public $default_charset = AK_ACTION_MAILER_DEFAULT_CHARSET;
@@ -284,9 +284,8 @@ class AkActionMailer extends AkBaseModel
     $_dynamic_methods = array();
 
     public function __construct(&$Driver = null) {
-        $this->loadSettings();
         if(empty($Driver)){
-            $this->Message = new $this->_defaultMailDriverName();
+            $this->Message = new $this->_defaultMailDriverName ();
         }else{
             $this->Message = $Driver;
         }
@@ -545,6 +544,8 @@ class AkActionMailer extends AkBaseModel
         }elseif(!empty($Message)){
             $this->Message = $Message;
         }
+        $this->loadSettings();
+
 
         !empty($this->Message) or trigger_error(Ak::t('No mail object available for delivery!'), E_USER_ERROR);
         if(!empty($this->perform_deliveries)){
@@ -720,6 +721,8 @@ class AkActionMailer extends AkBaseModel
         if(isset($args[0]['base_url'])){
             $base_url = rtrim(preg_replace('/^(?!http[s]?:\/\/)(.+)/','http://$1', (strstr($args[0]['base_url'],'.')?$args[0]['base_url']:Ak::getSetting('mailer', 'base_url', AK_HOST))),'/');
             unset($args[0]['base_url']);
+        }else{
+            $base_url = Ak::getSetting('mailer', 'base_url', 'http://'.AK_HOST);
         }
 
         unset($args[0]['only_path'], $args[0]['base_url']);
@@ -770,6 +773,7 @@ class AkActionMailer extends AkBaseModel
         $file_name = AkInflector::underscore(Ak::sanitize_include($method, 'paranoid'));
         $handler_name = 'Ak'.AkInflector::camelize($file_name).'Delivery';
         $handler_path = AK_ACTION_MAILER_DIR.DS.'delivery'.DS.$file_name.'.php';
+
         if(file_exists($handler_path)){
             require_once($handler_path);
         }
