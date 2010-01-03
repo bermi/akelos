@@ -74,6 +74,9 @@ class AkHelperTest extends AkUnitTest
 
     public function &getHelperInstance(){
         $helper_name = $this->getHelperName();
+        if($helper_name == 'Ak'){
+            $helper_name = 'AkBase';
+        }
         $helper_class_name = $helper_name.'Helper';
         $this->Helper = new $helper_class_name;
 
