@@ -4,6 +4,7 @@ defined('AK_UNIT_TEST_SUITE')                   || define('AK_UNIT_TEST_SUITE',t
 defined('AK_TEST_DEFAULT_REPORTER')             || define('AK_TEST_DEFAULT_REPORTER', 'AkelosTextReporter');
 defined('AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE')  || define('AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE', 'Akelos');
 defined('AK_TESTING_URL')                       || define('AK_TESTING_URL',   'http://akelos.tests');
+defined('AK_DATABASE_SETTINGS_NAMESPACE')       || define('AK_DATABASE_SETTINGS_NAMESPACE', 'database');
 
 require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'unit_tester.php');
 require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'mock_objects.php');
@@ -48,7 +49,6 @@ class AkUnitTestSuite extends TestSuite
             $options['files'] = $full_paths;
         }
 
-        defined('AK_DATABASE_SETTINGS_NAMESPACE') || define('AK_DATABASE_SETTINGS_NAMESPACE', 'database');
         AkUnitTestSuite::createTestingDatabaseIfNotAvailable();
 
         if(!empty($options['component'])){
@@ -80,14 +80,7 @@ class AkUnitTestSuite extends TestSuite
                 $options['description'] = str_replace(' Suites():','', trim($options['description'], ', ')."):\n");
 
                 if(empty($options['title'])){
-                    AkConfig::setOption('testing_url', AK_TESTING_URL);
-                    AkConfig::setOption('memcached_enabled', AkMemcache::isServerUp());
-                    AkUnitTestSuite::checkIfTestingWebserverIsAccesible($options);
-                    $dabase_settings = AK_DATABASE_SETTINGS_NAMESPACE == 'database' ? Ak::getSetting('database', 'type') : AK_DATABASE_SETTINGS_NAMESPACE;
-                    $options['title'] =  "PHP ".phpversion().", Environment: ".AK_ENVIRONMENT.", Database: ".$dabase_settings.
-                    (AkConfig::getOption('memcached_enabled', false)?', Memcached: enabled':'').
-                    (AkConfig::getOption('webserver_enabled', false)?', Testing URL: '.AkConfig::getOption('testing_url'):', Testing URL: DISABLED!!!').
-                    "\n"."Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n".trim($options['description']).'';
+                    $options['title'] = AkUnitTestSuite::getTestTitle($options);
                 }
             }
         }else{
@@ -137,6 +130,41 @@ class AkUnitTestSuite extends TestSuite
 
         //($options['TestSuite']->run(new $options['reporter']()) ? 0 : 1); file_put_contents(AK_LOG_DIR.DS.'included_files.php', var_export(get_included_files(), true)); return;
         exit ($options['TestSuite']->run(new $options['reporter']()) ? AkUnitTestSuite::runOnFailure(@$options['on_failure']) : AkUnitTestSuite::runOnSuccess(@$options['on_success']));
+    }
+
+    static function runFunctionalFromOptions($options){
+        $default_options = array(
+        'base_path' => AK_TEST_DIR,
+        'TestSuite' => null,
+        'description' => null,
+        'reporter'  => AK_TEST_DEFAULT_REPORTER,
+        'files'  => array(),
+        );
+        $options = array_merge($default_options, $options);
+
+        if(empty($options['title'])){
+            $options['title'] = AkUnitTestSuite::getTestTitle($options);
+        }
+
+        $options['TestSuite'] = new AkUnitTestSuite($options['title']);
+        $options['TestSuite']->running_from_config = true;
+
+        foreach ($options['files'] as $file){
+            $options['TestSuite']->addFile($file);
+        }
+
+        exit ($options['TestSuite']->run(new $options['reporter']()) ? AkUnitTestSuite::runOnFailure(@$options['on_failure']) : AkUnitTestSuite::runOnSuccess(@$options['on_success']));
+    }
+
+    static function getTestTitle($options){
+        AkConfig::setOption('testing_url', AK_TESTING_URL);
+        AkConfig::setOption('memcached_enabled', AkMemcache::isServerUp());
+        AkUnitTestSuite::checkIfTestingWebserverIsAccesible($options);
+        $dabase_settings = AK_DATABASE_SETTINGS_NAMESPACE == 'database' ? Ak::getSetting('database', 'type') : AK_DATABASE_SETTINGS_NAMESPACE;
+        return "PHP ".phpversion().", Environment: ".AK_ENVIRONMENT.", Database: ".$dabase_settings.
+        (AkConfig::getOption('memcached_enabled', false)?', Memcached: enabled':'').
+        (AkConfig::getOption('webserver_enabled', false)?', Testing URL: '.AkConfig::getOption('testing_url'):', Testing URL: DISABLED!!!').
+        "\n"."Error reporting set to: ".AkConfig::getErrorReportingLevelDescription()."\n".trim($options['description']).'';
     }
 
     static function createTestingDatabaseIfNotAvailable() {

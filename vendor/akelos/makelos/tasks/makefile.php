@@ -19,6 +19,11 @@ makelos_task('test:units', array(
     //'autocompletion' => 'ENVIRONMENT=production'
 ));
 
+makelos_task('test:functionals', array(
+    'description' => 'Run all functional tests'
+    //'autocompletion' => 'ENVIRONMENT=production'
+));
+
 makelos_task('release:generate', array(
     'description' => 'Generates a new release'
 ));
