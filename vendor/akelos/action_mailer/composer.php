@@ -2,7 +2,7 @@
 
 defined('AK_ACTION_MAILER_LEGAL_HEADER') ||
 define('AK_ACTION_MAILER_LEGAL_ATTRIBUTE_SETTERS', 
-        '/^(from|delivered-to|to|subject|recipients|'.
+        '/^(from|delivered-to|to|subject|recipients|body|precedence|'.
         'content-type|content-transfer-encoding|authentication-results|'.
         'received|date|return-path|references|in-reply-to|x-[\w\d-]+|'.
         'received[\w\d-]*|mime-version|message-id|[\w\d-]*-spf)/i');
