@@ -1,6 +1,6 @@
 <?php
 
-class ApplicationHelper extends BaseHelper {
+class ApplicationHelper extends AkBaseHelper {
 
 }
 
