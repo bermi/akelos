@@ -1,3 +1,4 @@
+
 h2. A Guide to Testing Akelos Applications
 
 This guide covers built-in mechanisms offered by Akelos to test your application. By referring to this guide, you will be able to:
@@ -434,54 +435,60 @@ You should test for things such as:
 * was the correct object stored in the response template?
 * was the appropriate message displayed to the user in the view?
 
-Now that we have used Akelos scaffold generator for our +Post+ resource, it has already created the controller code and functional tests. You can take look at the file +posts_controller_test.php+ in the +test/functional+ directory.
+Now that we have used Akelos scaffold generator for our +Post+ resource, it has already created the controller code and functional tests. You can take look at the file +posts_controller_test.php+ in the +test/functional/controllers+ directory.
 
 Let me take you through one such test, +test_should_get_index+ from the file +posts_controller_test.php+.
 
 <php>
-test "should get index" do
-  get :index
-  assert_response :success
-  assert_not_nil assigns(:posts)
-end
+<?php
+require_once(dirname(__FILE__).'/../../shared/config/config.php');
+
+class PostsController_TestCase extends AkActionControllerTest
+{
+    function test_should_get_index() {
+        $this->get('index');
+        $this->assertResponse('success');
+        $this->assertAssigns('posts');
+    }
+}
+
+ak_test_case('AccountController_TestCase');
 </php>
 
 In the +test_should_get_index+ test, Akelos simulates a request on the action called index, making sure the request was successful and also ensuring that it assigns a valid +posts+ instance variable.
 
 The +get+ method kicks off the web request and populates the results into the response. It accepts 4 arguments:
 
-* The action of the controller you are requesting. This can be in the form of a string or a symbol.
-* An optional hash of request parameters to pass into the action (eg. query string parameters or post variables).
-* An optional hash of session variables to pass along with the request.
-* An optional hash of flash values.
+* The action string of the controller you are requesting.
+* An optional array of request parameters to pass into the action (eg. query string parameters or post variables).
+* An optional array of session variables to pass along with the request.
+* An optional array of flash values.
 
 Example: Calling the +:show+ action, passing an +id+ of 12 as the +params+ and setting a +user_id+ of 5 in the session:
 
 <php>
-get(:show, {'id' => "12"}, {'user_id' => 5})
+$this->get('show', array('id' => 12), array('user_id' => 5));
 </php>
 
 Another example: Calling the +:view+ action, passing an +id+ of 12 as the +params+, this time with no session, but with a flash message.
 
 <php>
-get(:view, {'id' => '12'}, nil, {'message' => 'booya!'})
+$this->get('view', array('id' => 12), null, array('message' => 'booya!'));
 </php>
 
-NOTE: If you try running +test_should_create_post+ test from +posts_controller_test.php+ it will fail on account of the newly added model level validation and rightly so.
-
-Let us modify +test_should_create_post+ test in +posts_controller_test.php+ so that all our test pass:
+If your controllers make use of models, you might need to install the migrations at the begining of your tests:
 
 <php>
-test "should create post" do
-  assert_difference('Post.count') do
-    post :create, :post => { :title => 'Some title'}
-  end
-
-  assert_redirected_to post_path(assigns(:post))
-end
+class PostsController_TestCase extends AkActionControllerTest
+{
+    public function test_setup(){
+        $this->uninstallAndInstallMigration('post');
+        $this->uninstallAndInstallMigration('comment');
+    }
+}
 </php>
 
-Now you can try running all the tests and they should pass.
+    
 
 h4. Available Request Types for Functional Tests
 
@@ -925,14 +932,4 @@ class UserControllerTest < ActionController::TestCase
   end
 end
 </php>
-
-h3. Other Testing Approaches
-
-The built-in +test/unit+ based testing is not the only way to test Akelos applications. Akelos developers have come up with a wide variety of other approaches and aids for testing, including:
-
-* "NullDB":http://avdi.org/projects/nulldb/, a way to speed up testing by avoiding database use.
-* "Factory Girl":http://github.com/thoughtbot/factory_girl/tree/master, as replacement for fixtures.
-* "Machinist":http://github.com/notahat/machinist/tree/master, another replacement for fixtures.
-* "Shoulda":http://www.thoughtbot.com/projects/shoulda, an extension to +test/unit+ with additional helpers, macros, and assertions.
-* "RSpec":http://rspec.info/, a behavior-driven development framework
 
