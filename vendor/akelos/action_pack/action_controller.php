@@ -1778,25 +1778,25 @@ class AkActionController extends AkLazyObject
     /**
      * Returns true if the current action is supposed to run as SSL
      */
-    public function _isSslRequired() {
+    public function isSslRequired() {
         return !empty($this->_ssl_required_actions) && is_array($this->_ssl_required_actions) && isset($this->_action_name) ?
         in_array($this->_action_name, $this->_ssl_required_actions) : false;
     }
 
-    public function _isSslAllowed() {
+    public function isSslAllowed() {
         return (!empty($this->ssl_for_all_actions) && empty($this->_ssl_allowed_actions)) ||
         (!empty($this->_ssl_allowed_actions) && is_array($this->_ssl_allowed_actions) && isset($this->_action_name) ?
         in_array($this->_action_name, $this->_ssl_allowed_actions) : false);
     }
 
     public function _ensureProperProtocol() {
-        if($this->_isSslAllowed()){
+        if($this->isSslAllowed() && $this->Request->isSsl()){
             return true;
         }
-        if ($this->_isSslRequired() && !$this->Request->isSsl()){
+        if ($this->isSslRequired() && !$this->Request->isSsl() && $this->isSslAllowed()){
             $this->redirectTo(substr_replace(AK_CURRENT_URL,'s:',4,1));
             return false;
-        }elseif($this->Request->isSsl() && !$this->_isSslRequired()){
+        }elseif($this->Request->isSsl() && (!$this->isSslRequired() || !$this->isSslAllowed())){
             $this->redirectTo(substr_replace(AK_CURRENT_URL,'',4,1));
             return false;
         }
@@ -1818,12 +1818,14 @@ class AkActionController extends AkLazyObject
     *
     * class ApplicationController extends AkActionController
     * {
-    *   var $before_filter = '_findAccount';
-    *
-    *   function _findAccount()
-    *   {
-    *       $this->account = Account::find(array('conditions'=>array('username = ?', $this->account_domain)));
+    *   public function __construct(){
+    *       $this->beforeFilter('_findAccount');
     *   }
+    *
+    *   public function _findAccount(){
+    *       $this->Account = Ak::get('Account')->findFirstBy('host', $this->getAccountSubdomain());
+    *   }
+    * }
     *
     *   class AccountController extends ApplicationController
     *   {
@@ -1882,7 +1884,7 @@ class AkActionController extends AkLazyObject
     }
 
     public function getAccountSubdomain() {
-        return array_shift($this->Request->getSubdomains());
+        return Ak::first($this->Request->getSubdomains());
     }
 
 
