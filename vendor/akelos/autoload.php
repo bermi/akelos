@@ -201,7 +201,7 @@ function akelos_autoload($name, $path = null) {
         include DS.$name.'.php';
     }else{
         $underscored_name = AkInflector::underscore($name);
-        if(!Ak::import($name)){            
+        if(!Ak::import($name)){
             if(strstr($name, 'Helper')){
                 $file_path = AkConfig::getDir('helpers').DS.$underscored_name.'.php';
                 if(!file_exists($file_path)){
@@ -302,9 +302,28 @@ defined('AK_AVAILABLE_ENVIRONMENTS')    || define('AK_AVAILABLE_ENVIRONMENTS','s
 
 defined('AK_TIME_DIFFERENCE')           || define('AK_TIME_DIFFERENCE', 0); // Time difference from the webserver
 
-defined('AK_REQUEST_URI')               || define('AK_REQUEST_URI', isset($_SERVER['REQUEST_URI']) ?
-$_SERVER['REQUEST_URI'] :
-$_SERVER['PHP_SELF'] .'?'.(isset($_SERVER['argv']) ? $_SERVER['argv'][0] : $_SERVER['QUERY_STRING']));
+defined('AK_PROTOCOL')                  || define('AK_PROTOCOL',isset($_SERVER['HTTPS']) ? 'https://' : 'http://');
+defined('AK_HOST')                      || define('AK_HOST', !isset($_SERVER['SERVER_NAME']) ? 'localhost' :
+($_SERVER['SERVER_NAME'] == 'localhost' ?
+// Will force to IP4 for localhost until IP6 is supported by helpers
+($_SERVER['SERVER_ADDR'] == '::1' ? '127.0.0.1' : $_SERVER['SERVER_ADDR']) :
+$_SERVER['SERVER_NAME']));
+
+// Under some circumstances like proxied requests, REQUEST_URI might include the
+// host and protocol, so we need to get rid of it.
+if(!defined('AK_REQUEST_URI')){
+    $__request_uri =
+    (isset($_SERVER['REQUEST_URI']) ?  $_SERVER['REQUEST_URI'] :
+    (isset($_SERVER['argv']) ?  $_SERVER['SCRIPT_NAME'].'?'. $_SERVER['argv'][0] :
+    (isset($_SERVER['QUERY_STRING']) ? $_SERVER['SCRIPT_NAME'].'?'.$_SERVER['QUERY_STRING'] :
+    $_SERVER['SCRIPT_NAME']
+    )));
+    if(strstr($__request_uri, AK_PROTOCOL)){
+       $__request_uri = str_replace(AK_PROTOCOL.AK_HOST, '', $__request_uri);
+    }
+    define('AK_REQUEST_URI', $__request_uri);
+    unset($__request_uri);
+}
 
 defined('AK_DEBUG')                 || define('AK_DEBUG', AK_ENVIRONMENT == 'production' ? 0 : 1);
 
@@ -367,11 +386,6 @@ if(!AK_CLI && AK_WEB_REQUEST){
         unset($__ak_site_url_suffix_userdir, $__ak_site_url_suffix);
     }
     defined('AK_AUTOMATIC_SSL_DETECTION')   || define('AK_AUTOMATIC_SSL_DETECTION', 1);
-    defined('AK_PROTOCOL')                  || define('AK_PROTOCOL',isset($_SERVER['HTTPS']) ? 'https://' : 'http://');
-    defined('AK_HOST')                      || define('AK_HOST', $_SERVER['SERVER_NAME'] == 'localhost' ?
-    // Will force to IP4 for localhost until IP6 is supported by helpers
-    ($_SERVER['SERVER_ADDR'] == '::1' ? '127.0.0.1' : $_SERVER['SERVER_ADDR']) :
-    $_SERVER['SERVER_NAME']);
     defined('AK_REMOTE_IP')                 || define('AK_REMOTE_IP',preg_replace('/,.*/','',((!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : (!empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : (!empty($_ENV['HTTP_X_FORWARDED_FOR']) ? $_ENV['HTTP_X_FORWARDED_FOR'] : (empty($_ENV['REMOTE_ADDR']) ? false : $_ENV['REMOTE_ADDR']))))));
     defined('AK_SERVER_STANDARD_PORT')      || define('AK_SERVER_STANDARD_PORT', AK_PROTOCOL == 'https://' ? '443' : '80');
 
@@ -412,10 +426,9 @@ if(!AK_CLI && AK_WEB_REQUEST){
     if(!defined('AK_ASSET_URL_PREFIX')){
         defined('AK_ASSET_URL_PREFIX')  || define('AK_ASSET_URL_PREFIX', AK_INSECURE_APP_DIRECTORY_LAYOUT ? AK_SITE_URL_SUFFIX.str_replace(array(AK_BASE_DIR,'\\','//'),array('','/','/'), AK_PUBLIC_DIR) : AK_SITE_URL_SUFFIX);
     }
-    
+
 }else{
     defined('AK_PROTOCOL')          || define('AK_PROTOCOL',        'http://');
-    defined('AK_HOST')              || define('AK_HOST',            'localhost');
     defined('AK_REMOTE_IP')         || define('AK_REMOTE_IP',       '127.0.0.1');
     defined('AK_SITE_URL')          || define('AK_SITE_URL',        'http://localhost');
     defined('AK_URL')               || define('AK_URL',             'http://localhost/');
