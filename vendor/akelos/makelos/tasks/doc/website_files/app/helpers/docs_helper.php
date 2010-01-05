@@ -60,7 +60,7 @@ class DocsHelper extends AkBaseHelper
             foreach ($matches[1] as $k => $class){
                 $css_class = strtolower($class);
                 $css_class = in_array($css_class, array('shell')) ? 'html' : $css_class;
-                $escaped = AkTextHelper::h($matches[2][$k]);
+                $escaped = AkTextHelper::html_escape($matches[2][$k]);
                 $textile = str_replace($matches[0][$k], $this->_tabText("<notextile><div class='code_container'><code class='$css_class'>$escaped</code></div></notextile>"), $textile);
             }
         }

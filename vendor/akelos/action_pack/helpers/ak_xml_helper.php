@@ -47,7 +47,7 @@ class AkXmlHelper
         $return[] = $this->xml_channel_open();
         $return[] = $this->xml_title($channel_options['title']);
         $return[] = $this->xml_description($channel_options['description']);
-        $return[] = $this->xml_link(htmlentities($channel_options['link']));
+        $return[] = $this->xml_link(AkTextHelper::html_escape($channel_options['link']));
         $return[] = $this->xml_language($channel_options['language']);
         $items = Ak::toArray($items);
         
@@ -222,11 +222,11 @@ class AkXmlHelper
             foreach($attributes as $name => $value) {
                 if(is_string($value)) {
                     
-                    $attribute_array[]=$name.'="'.htmlentities($value).'"';
+                    $attribute_array[]=$name.'="'.AkTextHelper::html_escape($value).'"';
                 } else if (is_array($value)) {
                     $attr_name_space = $name;
                     foreach($value as $name => $v) {
-                        $attribute_array[]=$attr_name_space.':'.$name.'="'.htmlentities($v).'"';
+                        $attribute_array[]=$attr_name_space.':'.$name.'="'.AkTextHelper::html_escape($v).'"';
                     }
                 }
             }

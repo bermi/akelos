@@ -18,7 +18,7 @@ class AkelosDashboardHelper extends AkBaseHelper {
     public function flash_message($type, $message){
         return '<div class="flash radius_3 '.$type.'">'.
         '<p><span class="icon">'.$this->t(strtoupper($type)).': </span>'.
-        str_replace("\n", "<br />", AkTextHelper::h($message)).
+        str_replace("\n", "<br />", AkTextHelper::html_escape($message)).
         '</p></div>';
     }
     
@@ -62,7 +62,7 @@ class AkelosDashboardHelper extends AkBaseHelper {
 
         $total = count($lines);
         $line_numbers = join("<br />", range(1, $total));
-        $code = str_replace(array("\n"), array('<br />'), AkTextHelper::h($code));
+        $code = str_replace(array("\n"), array('<br />'), AkTextHelper::html_escape($code));
 
         $copy_button_version = in_array($snippet_type, array('shell')) ? '-2' : '';
 

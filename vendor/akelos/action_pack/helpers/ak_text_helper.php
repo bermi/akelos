@@ -650,16 +650,16 @@ class AkTextHelper extends AkBaseHelper
         return $html;
     }
 
-    static function html_escape($html) {
+    static function html_escape($html, $quote_style = ENT_COMPAT) {
         static $charset;
         if(empty($charset)){
             $charset = Ak::locale('charset');
         }
-        return htmlentities($html, ENT_COMPAT, $charset);
+        return htmlentities($html, $quote_style, $charset);
     }
 
-    static function h($html) {
-        return AkTextHelper::html_escape($html);
+    static function h($html, $quote_style = ENT_COMPAT) {
+        return AkTextHelper::html_escape($html, $quote_style);
     }
 }
 

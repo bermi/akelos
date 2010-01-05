@@ -46,9 +46,9 @@ class AkelosPanel_AkelosDashboardController extends AkelosPanelController
                 list($response, $last_dir) = explode('----akelos-cmd----', $result);
                 $_SESSION['last_working_directory'] = trim($last_dir);
                 if($response){
-                    $this->renderText(AkTextHelper::h($response));
+                    $this->renderText(AkTextHelper::html_escape($response));
                 }else{
-                    $this->renderText(AkTextHelper::h($this->t('Error or empty response while running: %command', array('%command' => $this->params['cmd']))));
+                    $this->renderText(AkTextHelper::html_escape($this->t('Error or empty response while running: %command', array('%command' => $this->params['cmd']))));
                 }
             }
         }else{

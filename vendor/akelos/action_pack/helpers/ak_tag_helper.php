@@ -62,11 +62,7 @@ class AkTagHelper
     *    # => "1 &gt; 2 &amp; 3"
     */
     static function escape_once($html) {
-        static $charset;
-        if(empty($charset)){
-            $charset = Ak::locale('charset');
-        }
-        return AkTagHelper::fix_double_escape(htmlentities($html, ENT_COMPAT, $charset));
+        return AkTagHelper::fix_double_escape(AkTextHelper::html_escape($html));
     }
 
     /**

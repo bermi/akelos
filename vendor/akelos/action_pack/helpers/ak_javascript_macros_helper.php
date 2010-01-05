@@ -179,7 +179,7 @@ class AkJavascriptMacrosHelper extends AkBaseHelper
             return '';
         }
         foreach ($entries as $entry) {
-            $items[] = AkTagHelper::content_tag('li',!empty($phrase) ? AkTextHelper::highlight(AkTextHelper::h($entry[$field]), $phrase) : AkTextHelper::h(@$entry[$field]));
+            $items[] = AkTagHelper::content_tag('li',!empty($phrase) ? AkTextHelper::highlight(AkTextHelper::html_escape($entry[$field]), $phrase) : AkTextHelper::html_escape(@$entry[$field]));
         }
         return AkTagHelper::content_tag('ul', join('', array_unique($items)));
     }

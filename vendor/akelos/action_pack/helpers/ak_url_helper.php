@@ -218,7 +218,7 @@ class AkUrlHelper
         $html_options = Ak::delete($html_options, 'cc','bcc','subject','body','encode');
 
         if ($encode == 'javascript'){
-            $tmp  = "document.write('".AkTagHelper::content_tag('a', htmlentities($name, null, Ak::locale('charset')), array_merge($html_options,array('href' => 'mailto:'.$email_address.$extras )))."');";
+            $tmp  = "document.write('".AkTagHelper::content_tag('a', AkTextHelper::html_escape($name, null), array_merge($html_options,array('href' => 'mailto:'.$email_address.$extras )))."');";
             for ($i=0; $i < strlen($tmp); $i++){
                 $string.='%'.dechex(ord($tmp[$i]));
             }
