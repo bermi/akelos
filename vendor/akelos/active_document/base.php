@@ -174,7 +174,8 @@ class AkActiveDocument extends AkBaseModel
         $result = $this->_findEvery($options);
         if(!empty($result)){
             $result->rewind();
-            return $result->current();
+            $reference = $result->current();
+            return $reference;
         }else{
             $result = false;
             return  $result;
