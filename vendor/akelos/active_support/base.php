@@ -1588,22 +1588,20 @@ class Ak
      *
      * For AJAX driven pages, JSON can come in handy – you can return send JavaScript objects
      * directly from your actions.
+     * 
+     * @deprecated
      */
     static function toJson($php_value) {
-        require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Services'.DS.'JSON.php');
-        $use = 0;
-        $json = Ak::singleton('Services_JSON', $use);
-        return $json->encode($php_value);
+        return json_encode($php_value);
     }
 
     /**
      * Converts a JSON representation string into a PHP value.
+     * 
+     * @deprecated
      */
     static function fromJson($json_string) {
-        require_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Services'.DS.'JSON.php');
-        $use = 0;
-        $json = Ak::singleton('Services_JSON', $use);
-        return $json->decode($json_string);
+        return json_decode($json_string);
     }
 
     static function &memory_cache($key, &$value) {
