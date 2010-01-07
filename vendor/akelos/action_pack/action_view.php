@@ -133,6 +133,7 @@ class AkActionView
 
         $template_path = substr($template_path,0,7) === 'layouts' ? $this->base_path.DS.$template_path.'.tpl' : $template_path;
 
+        $template_path = substr($template_path,0,7) === 'layouts' ? AkConfig::getDir('views').DS.$template_path.'.tpl' : $template_path;
         if(!$use_full_path && strstr($template_path,'.')){
             $template_file_name = $template_path;
             $template_extension = substr($template_path,strpos($template_path,'.')+1);
