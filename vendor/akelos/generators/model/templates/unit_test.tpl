@@ -7,7 +7,7 @@ require_once(dirname(__FILE__).'/../shared/config/config.php');
  * 
  * Run this test with the command
  *
- *     ./makelos test:units <?php  echo $class_name?>
+ *     ./makelos test:units <?php  echo $class_name."\n";?>
  *
  * or
  * 
