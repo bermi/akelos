@@ -54,6 +54,10 @@ class AkBaseHelper
             );
     }
     
+    public function getHelperName(){
+        return preg_replace('/Helper$/', '', get_class($this));
+    }
+    
 }
 
 /* Deprecated */
