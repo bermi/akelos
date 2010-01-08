@@ -42,7 +42,7 @@ function akelos_autoload($name, $path = null) {
         'BaseActionController'      =>  'controllers/base_action_controller.php',
         'BaseActiveRecord'          =>  'models/base_active_record.php',
         'ApplicationController'     =>  'controllers/application_controller.php',
-        'ActiveRecord'              =>  'models/shared_model.php',
+        'ActiveRecord'              =>  'models/active_record.php',
         );
     }
 
