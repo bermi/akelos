@@ -961,6 +961,69 @@ Example:
             }
         }
     }
+    
+     /**
+     * Shortcuts for running migrations.
+     * 
+     * This can be useful for running individual migraitons from your application_installer.php
+     *  where you can use it like:
+     * 
+     * 
+     *     class ApplicationInstaller extends AkInstaller {
+     *
+     *       function up_2(){
+     *          // Will run a migration located in the plugins directory
+     *           $this->installMigration('Invitations', 1, AK_APP_DIR.DS.'vendor'.DS.'plugins'.DS.'invitations'.DS.'installer');
+     *       }
+     *       
+     *       function down_2(){
+     *           $this->uninstallMigration('Invitations', null, AK_APP_DIR.DS.'vendor'.DS.'plugins'.DS.'invitations'.DS.'installer');
+     *       }
+     *       
+     *       function up_1() {
+     *           $this->installMigration('Admin Plugin', 1); // Will install version 1 of the admin plugin
+     *       }
+     *       
+     *       function down_1(){
+     *           $this->uninstallMigration('Admin Plugin');
+     *       }
+     *     }
+     */
+
+    static function installMigration($installer_name, $version, $installer_base_path = null){
+        $Installer = self::getInstallerInstance($installer_name, $installer_base_path);
+        $Installer->up($version);
+        if($Installer->transactionHasFailed()){
+            $this->transactionFail();
+        }
+    }
+
+    static function uninstallMigration($installer_name, $version = null, $installer_base_path = null){
+        $Installer = self::getInstallerInstance($installer_name, $installer_base_path);
+        $Installer->down($version);
+        if($Installer->transactionHasFailed()){
+            $this->transactionFail();
+        }
+    }
+
+    static function getInstallerInstance($installer_name, $installer_base_path = null){
+
+        $installer_file_name = (empty($installer_base_path)?AkConfig::getDir('app').DS.'installers'.DS:$installer_base_path.DS).AkInflector::underscore($installer_name).'_installer.php';
+
+        if(!file_exists($installer_file_name)){
+            trigger_error('Oops, the installer file '.$installer_file_name.' does not exist.', E_USER_ERROR);
+        }
+        include_once($installer_file_name);
+
+        $installer_class_name = AkInflector::camelize($installer_name).'Installer';
+        if(!class_exists($installer_class_name)){
+            trigger_error('Oops, the installer class '.$installer_class_name.' does not exist.', E_USER_ERROR);
+        }
+        $Installer = new $installer_class_name();
+        $Installer->vervose = $this->vervose;
+        $Installer->use_transactions = false;
+        return $Installer;
+    }
 
 }
 
