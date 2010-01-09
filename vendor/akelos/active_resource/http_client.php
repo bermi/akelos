@@ -70,10 +70,14 @@ class AkHttpClient
 
         $this->HttpRequest->setMethod(constant('HTTP_REQUEST_METHOD_'.$http_verb));
 
-        if(!empty($body)){
+        if ($http_verb == 'PUT' && !empty($options['params'])){
+            $this->setBody(http_build_query($options['params']));
+        }
+        if (!empty($body)){
             $this->setBody($body);
-        }elseif ($http_verb == 'PUT' && !empty($options['params'])){
-            $this->setBody($options['params']);
+        }
+        if (!empty($options['file'])){
+            $this->HttpRequest->addFile($options['file']['inputname'],$options['file']['filename']);
         }
 
         !empty($options['params']) && $this->addParams($options['params']);
@@ -117,7 +121,7 @@ class AkHttpClient
     }
 
     public function setBody($body) {
-        $this->HttpRequest->setBody(http_build_query((array)$body));
+        $this->HttpRequest->setBody($body);
     }
 
     public function sendRequest($return_body = true) {

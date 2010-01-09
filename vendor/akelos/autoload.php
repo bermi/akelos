@@ -147,7 +147,7 @@ function akelos_autoload($name, $path = null) {
         'AkArray'                   => 'active_support/core/types/array.php',
         'AkType'                    => 'active_support/core/types/base.php',
         'AkDate'                    => 'active_support/core/types/date.php',
-        'AkRequestMimeType'         => 'active_support/core/types/mime.php',
+        'AkMimeType'                => 'active_support/core/types/mime.php',
         'AkNumber'                  => 'active_support/core/types/number.php',
         'AkString'                  => 'active_support/core/types/string.php',
         'AkTime'                    => 'active_support/core/types/time.php',
@@ -185,6 +185,9 @@ function akelos_autoload($name, $path = null) {
         'AkTestRequest'             => 'active_support/testing/request.php',
         'AkTestResponse'            => 'active_support/testing/response.php',
         'AkUnitTestSuite'           => 'active_support/testing/suite.php',
+        'AkRouterUnitTest'          => 'active_support/testing/router.php',
+        'AkRouteUnitTest'           => 'active_support/testing/route.php',
+        'AkControllerUnitTest'      => 'active_support/testing/controller.php',
         'AkInflector'               => 'active_support/text/inflector.php',
         'AkLexer'                   => 'active_support/text/lexer.php',
 
@@ -532,10 +535,13 @@ defined('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION')        || define('AK_ACTION
 defined('AK_ACTION_MAILER_EMULATE_IMAP_8_BIT')              || define('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION', '([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)');
 defined('AK_CLASS_EXTENDER_ENABLE_CACHE')                   || define('AK_CLASS_EXTENDER_ENABLE_CACHE', !AK_DEV_MODE);
 
+defined('AK_GENERATE_HELPER_FUNCTIONS_FOR_NAMED_ROUTES')    || define('AK_GENERATE_HELPER_FUNCTIONS_FOR_NAMED_ROUTES',true);
+defined('AK_AUTOMATICALLY_ACCEPT_KNOW_FORMATS')             || define('AK_AUTOMATICALLY_ACCEPT_KNOW_FORMATS', true);
 
-defined('OPTIONAL')                     || define('OPTIONAL',   false);
-defined('COMPULSORY')                   || define('COMPULSORY', true);
-defined('COMPULSORY_REGEX')             || define('COMPULSORY_REGEX', '([^\/]+){1}');
+defined('OPTIONAL')                     || define('OPTIONAL',   'OPTIONAL');
+defined('COMPULSORY')                   || define('COMPULSORY', 'COMPULSORY');
+defined('ANY')                          || define('ANY',        'ANY');
+
 defined('AK_ENABLE_URL_REWRITE')        || define('AK_ENABLE_URL_REWRITE',     true);
 defined('AK_URL_REWRITE_ENABLED')       || define('AK_URL_REWRITE_ENABLED',    true);
 defined('AK_DEFAULT_CONTROLLER')        || define('AK_DEFAULT_CONTROLLER', 'page');
@@ -548,6 +554,7 @@ defined('AK_IMAGE_DRIVER')              || define('AK_IMAGE_DRIVER', 'GD');
 defined('AK_ACTION_WEBSERVICE_CACHE_REMOTE_METHODS') || define('AK_ACTION_WEBSERVICE_CACHE_REMOTE_METHODS', AK_PRODUCTION_MODE);
 
 defined('AK_SET_UTF8_ON_MYSQL_CONNECT') || define('AK_SET_UTF8_ON_MYSQL_CONNECT', true);
+
 
 
 /**

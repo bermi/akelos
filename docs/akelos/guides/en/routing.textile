@@ -776,7 +776,7 @@ h4. Recognized MIME types
 By default, Akelos recognizes +html+, +text+, +json+, +csv+, +xml+, +rss+, +atom+, and +yaml+ as acceptable response types. If you need types beyond this, you can register them in your environment:
 
 <php>
-Mime::Type.register "image/jpg", :jpg
+AkMimeType::register("image/jpg", 'jpg');
 </php>
 
 h3. The Default Routes

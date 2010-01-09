@@ -774,8 +774,8 @@ Example:
 
     public function log($message, $type = '', $identifyer = '') {
         if (AK_LOG_EVENTS){
-            $Logger =& Ak::getLogger();
-            $Logger->log($message, $type);
+            $Logger = Ak::getLogger();
+            $Logger->info($message, $type);
         }
     }
 

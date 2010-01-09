@@ -18,6 +18,7 @@ class RenderFormat_TestCase extends AkWebTestCase
     }
 
     public function test_should_render_requested_format() {
+
         $this->get($this->_test_script.'formats/index.xml');
         $this->assertTextMatch("index.xml.tpl");
         $this->assertHeader('Content-Type', 'application/xml; charset=UTF-8');
@@ -26,18 +27,16 @@ class RenderFormat_TestCase extends AkWebTestCase
         $this->assertTextMatch("index.js.tpl");
         $this->assertHeader('Content-Type','application/x-javascript; charset=UTF-8');
 
-        $this->get($this->_test_script.'formats/index.php');
-        $this->assertTextMatch("index.php.tpl");
-        $this->assertHeader('Content-Type','application/x-httpd-php; charset=UTF-8');
-
-
         $this->get($this->_test_script.'formats/index.html');
         $this->assertTextMatch("index.tpl");
         $this->assertHeader('Content-Type','text/html; charset=UTF-8');
 
-        $this->get($this->_test_script.'formats/index.xhtml');
-        $this->assertTextMatch("index.tpl");
-        $this->assertHeader('Content-Type','application/xhtml+xml; charset=UTF-8');
+    }
+    
+    public function test_should_not_accept_unregistered_formats(){
+        $this->get($this->_test_script.'formats/index.php');
+        $this->assertPattern("/DispatchException/");
+
     }
 }
 

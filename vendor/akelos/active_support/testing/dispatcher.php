@@ -43,7 +43,7 @@ class AkTestDispatcher extends AkDispatcher
     }
 
     public function process($url) {
-       
+
         $_SERVER['PHP_SELF'] = '/index.php';
         $parts = parse_url($url);
         if (isset($parts['scheme'])) {
@@ -59,8 +59,8 @@ class AkTestDispatcher extends AkDispatcher
     }
 
     public function dispatch() {
-        $this->Request = new AkTestRequest();
-        $this->Response = new AkTestResponse();
+        $this->Request =  new AkRequest();
+        $this->Response = new AkResponse();
         $controller = $this->Request->recognize();
 
         if ($controller === false) {

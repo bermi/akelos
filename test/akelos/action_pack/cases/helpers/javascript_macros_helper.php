@@ -17,7 +17,7 @@ class JavascriptMacrosHelper_TestCase extends HelperUnitTest
     {
         $this->assertEqual(
             $this->javascript_macros_helper->in_place_editor('field_id', array('url' => array('controller' => 'foo', 'action' => 'bar', 'id' => 'beer'))),
-            "<script type=\"text/javascript\">\n//<![CDATA[\nnew Ajax.InPlaceEditor('field_id', '/foo/bar/beer/')\n//]]>\n</script>"
+            "<script type=\"text/javascript\">\n//<![CDATA[\nnew Ajax.InPlaceEditor('field_id', '/foo/bar/beer')\n//]]>\n</script>"
         );
     }
     
@@ -32,7 +32,7 @@ class JavascriptMacrosHelper_TestCase extends HelperUnitTest
     {
         $this->assertEqual(
             $this->javascript_macros_helper->auto_complete_field('field_id', array('url' => array('controller' => 'foo', 'action' => 'bar'))),
-            "<script type=\"text/javascript\">\n//<![CDATA[\nvar field_id_auto_completer = new Ajax.Autocompleter('field_id', 'field_id_auto_complete', '/foo/bar/', {})\n//]]>\n</script>"
+            "<script type=\"text/javascript\">\n//<![CDATA[\nvar field_id_auto_completer = new Ajax.Autocompleter('field_id', 'field_id_auto_complete', '/foo/bar', {})\n//]]>\n</script>"
         );
     }
     

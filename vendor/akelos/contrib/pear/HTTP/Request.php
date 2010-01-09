@@ -895,7 +895,6 @@ class HTTP_Request
         }
 
         $request = $this->_method . ' ' . $url . ' HTTP/' . $this->_http . "\r\n";
-
         if (in_array($this->_method, $this->_bodyDisallowed) ||
         (0 == strlen($this->_body) && (HTTP_REQUEST_METHOD_POST != $this->_method ||
         (empty($this->_postData) && empty($this->_postFiles)))))
@@ -926,7 +925,7 @@ class HTTP_Request
             $request .= "\r\n";
 
             // Post data if it's an array
-        } elseif (HTTP_REQUEST_METHOD_POST == $this->_method &&
+        } elseif (HTTP_REQUEST_METHOD_POST == $this->_method && empty($this->_body) && 
         (!empty($this->_postData) || !empty($this->_postFiles))) {
 
             // "normal" POST request

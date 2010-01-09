@@ -1,6 +1,5 @@
 <?php
 
-
 class AkRouterConfig
 {
     /**
@@ -33,9 +32,9 @@ class AkRouterConfig
         //echo '<pre>'.print_r(get_defined_functions(), true).'</pre>';
 
         if( isset($_SERVER['REDIRECT_STATUS'])
-        && $_SERVER['REDIRECT_STATUS'] == 200
-        && isset($_SERVER['REDIRECT_QUERY_STRING'])
-        && strstr($_SERVER['REDIRECT_QUERY_STRING'],'ak=')){
+            && $_SERVER['REDIRECT_STATUS'] == 200
+            && isset($_SERVER['REDIRECT_QUERY_STRING'])
+            && strstr($_SERVER['REDIRECT_QUERY_STRING'],'ak=')){
 
             if(strstr($_SERVER['REDIRECT_QUERY_STRING'],'&')){
                 $tmp_arr = explode('&',$_SERVER['REDIRECT_QUERY_STRING']);

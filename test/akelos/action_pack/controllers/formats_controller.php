@@ -8,5 +8,3 @@ class FormatsController extends ApplicationController
     }
 }
 
-
-?>

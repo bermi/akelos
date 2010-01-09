@@ -131,9 +131,8 @@ class AkActionView
             $this->first_render = $template_path;
         }
 
-        $template_path = substr($template_path,0,7) === 'layouts' ? $this->base_path.DS.$template_path.'.tpl' : $template_path;
-
         $template_path = substr($template_path,0,7) === 'layouts' ? AkConfig::getDir('views').DS.$template_path.'.tpl' : $template_path;
+        
         if(!$use_full_path && strstr($template_path,'.')){
             $template_file_name = $template_path;
             $template_extension = substr($template_path,strpos($template_path,'.')+1);
@@ -248,6 +247,13 @@ class AkActionView
     }
 
     public function getFullTemplatePath($template_path, $extension) {
+        //the '.html'-extension is handled by a special ExtensionHandler, so we remove this here 
+        //that is of course a hack, basically to allow that you can use either index.tpl or index.html.tpl 
+        //as your template-filename 
+        if(substr($template_path,-5)=='.html'){ 
+            $template_path = substr($template_path,0,-5); 
+        }
+
         $template_path_with_format = $this->_getTemplatePathWithFormat($template_path, $extension);
         $template_path = $this->_getTemplatePathWithoutFormat($template_path,$extension);
         if($template_path_with_format != $template_path){

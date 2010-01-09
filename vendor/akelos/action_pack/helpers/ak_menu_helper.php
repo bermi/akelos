@@ -17,10 +17,10 @@ class AkMenuHelper extends AkBaseHelper
     * <div id="menu">
     *  <ul>
     *   <li>
-    *    <h2><a href="/advertiser/">Advertiser</a></h2>
+    *    <h2><a href="/advertiser">Advertiser</a></h2>
     *    <ul>
-    *     <li><a href="/advertiser/buy/">Buy</a></li>
-    *     <li><a href="/advertiser/partial_in_template/">Partial in template</a></li>
+    *     <li><a href="/advertiser/buy">Buy</a></li>
+    *     <li><a href="/advertiser/partial_in_template">Partial in template</a></li>
     *    </ul>
     *   </li>
     *  </ul>

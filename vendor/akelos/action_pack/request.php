@@ -1,5 +1,14 @@
 <?php
 
+class DispatchException extends Exception
+{ }
+
+class NotAcceptableException extends Exception
+{ }
+
+class BadRequestException extends Exception
+{ }
+
 /**
 * Class that handles incoming request.
 *
@@ -7,8 +16,6 @@
 * cookie requests), transforms it and sets it up for the
 * ApplicationController class, who takes control of the data
 * flow.
-*
-* @author Bermi Ferrer <bermi a.t bermilabs dot co.m>
 */
 class AkRequest
 {
@@ -48,60 +55,14 @@ class AkRequest
     */
     public $env = array();
 
-    public $mime_types = array(
-    'text/html'                => 'html',
-    'application/xhtml+xml'    => 'html',
-    'application/xml'          => 'xml',
-    'text/xml'                 => 'xml',
-    'text/javascript'          => 'js',
-    'application/javascript'   => 'js',
-    'application/x-javascript' => 'js',
-    'application/json'         => 'json',
-    'text/x-json'              => 'json',
-    'application/rss+xml'      => 'rss',
-    'application/atom+xml'     => 'atom',
-    '*/*'                      => 'html',
-    //'application/x-www-form-urlencoded' => 'www-form',
-    //'application/x-www-form-urlencoded' => 'www-form',
-    'default'                  => 'html',
-    );
-
     public $_format;
 
     protected $_url_decoded = false;
 
-    /**
-    * String parse method.
-    *
-    * This method gets a petition as parameter, using the "Ruby
-    * on Rails" request format (see prettyURL in RoR documentation). The format is:
-    * file.php?ak=/controller/action/id&paramN=valueN
-    *
-    * This method requires for a previous execution of the _mergeRequest() method,
-    * in order to merge all the request all i one array.
-    *
-    * This method expands dynamically the class Request, adding a public property for
-    * every parameter sent in the request.
-    *
-    *
-    * @access public
-    * @return array
-    */
-    public function _parseAkRequestString($ak_request_string, $pattern = '/') {
-        $result = array();
-        $ak_request = trim($ak_request_string,$pattern);
-        if(strstr($ak_request,$pattern)){
-            $result = explode($pattern,$ak_request);
-        }
-        return $result;
-    }
-
-
     public function __construct () {
         $this->init();
-        $this->getFormat();
-
     }
+    
 
     /**
     * Initialization method.
@@ -129,12 +90,39 @@ class AkRequest
         }
     }
 
+    /**
+    * String parse method.
+    *
+    * This method gets a petition as parameter, using the "Akelos" request 
+    * format. The format is:
+    * 
+    *       file.php?ak=/controller/action/id&paramN=valueN
+    *
+    * This method requires for a previous execution of the _mergeRequest() method,
+    * in order to merge all the request all i one array.
+    *
+    * This method expands dynamically the class Request, adding a public property for
+    * every parameter sent in the request.
+    *
+    * @access public
+    * @return array
+    */
+    public function parseAkRequestString($ak_request_string, $pattern = '/') {
+        $result = array();
+        $ak_request = trim($ak_request_string,$pattern);
+        if(strstr($ak_request,$pattern)){
+            $result = explode($pattern,$ak_request);
+        }
+        return $result;
+    }
+
+
     public function get($var_name) {
         return isset($this->_request[$var_name]) ? $this->_request[$var_name] : null;
     }
 
     public function getParams() {
-        return array_merge(array('controller'=>$this->controller,'action'=>$this->action),$this->_request);
+        return $this->_request;
     }
 
     public function getAction() {
@@ -154,41 +142,47 @@ class AkRequest
         $this->_addParam($variable, $value);
     }
 
+    private $requested_url;
 
-    public function checkForRoutedRequests(&$Router) {
-        $ak_request = isset($this->_request['ak']) ? str_replace('//','/', '/'.trim($this->_request['ak'],'/').'/') : '/';
+    public function getRequestedUrl() {
+        if ($this->requested_url) return $this->requested_url;
 
-        if($this->_route_params = $Router->toParams($ak_request)){
-            if(!isset($this->_route_params['controller'])){
-                trigger_error(Ak::t('No controller was specified.'), E_USER_WARNING);
-            }
-            if(!isset($this->_route_params['action'])){
-                trigger_error(Ak::t('No action was specified.'), E_USER_WARNING);
-            }
-
-            if(isset($this->_route_params['controller'])){
-                if($this->_addParam('controller',$this->_route_params['controller'])){
-                    $this->controller = $this->_request['controller'] = $this->_route_params['controller'];
-                }
-            }
-            if(isset($this->_route_params['action'])){
-                if($this->_addParam('action',$this->_route_params['action'])){
-                    $this->action = $this->_request['action'] = $this->_route_params['action'];
-                }
-            }
-            if(isset($this->_route_params['module'])){
-                if($this->_addParam('module',$this->_route_params['module'])){
-                    $this->module = $this->_request['module'] = $this->_route_params['module'];
-                }
-            }
-
-            foreach ($this->_route_params as $k=>$v){
-                if($this->_addParam($k,$v)){
-                    $this->_request[$k] = $v;
-                }
-            }
-        }
+        $requested_url = isset($this->_request['ak']) ? '/'.trim($this->_request['ak'],'/') : '/';
+        return $this->requested_url = $requested_url;
     }
+
+    private $parameters_from_url;
+
+    public function getParametersFromRequestedUrl() {
+        return $this->parameters_from_url;
+    }
+
+    public function checkForRoutedRequests(AkRouter &$Router) {
+        $this->parameters_from_url = $params = $Router->match($this);
+
+        if(!isset($params['controller']) || !$this->isValidControllerName($params['controller'])){
+            throw new DispatchException('No controller was specified.');
+        }
+        if(!isset($params['action']) || !$this->isValidActionName($params['action'])){
+            throw new DispatchException('No action was specified.');
+        }
+        if(!empty($params['module']) && !$this->isValidModuleName($params['module'])){
+            throw new DispatchException('Invalid module.');
+        }
+
+        isset($params['module']) ? $this->module = $params['module'] : null;
+        $this->controller = $params['controller'];
+        $this->action     = $params['action'];
+
+        if(isset($params['lang'])){
+            AkLocaleManager::rememberNavigationLanguage($params['lang']);
+            Ak::lang($params['lang']);
+        }
+
+        $this->_request = array_merge($this->_request,$params);
+    }
+
+
 
     public function getRouteParams() {
         return $this->_route_params;
@@ -205,7 +199,6 @@ class AkRequest
     public function isValidModuleName($module_name) {
         return preg_match('/^[A-Za-z]{1,}[A-Za-z0-9_\/]*$/', $module_name);
     }
-
 
 
     /**
@@ -254,6 +247,87 @@ class AkRequest
             return $locale;
         }
         return '';
+    }
+
+    public function getAcceptHeader() {
+        if (!isset($this->env['HTTP_ACCEPT'])) return false;
+
+        $accept_header = $this->env['HTTP_ACCEPT'];
+
+        $accepts = array();
+        foreach (explode(',',$accept_header) as $index=>$acceptable){
+            $mime_struct = AkMimeType::parseMimeType($acceptable);
+
+            if (empty($mime_struct['q'])) $mime_struct['q'] = '1.0';
+
+            //we need the original index inside this structure
+            //because usort happily rearranges the array on equality
+            //therefore we first compare the 'q' and then 'i'
+            $mime_struct['i'] = $index;
+            $accepts[] = $mime_struct;
+        }
+        usort($accepts,array('AkMimeType','sortAcceptHeader'));
+
+        //we throw away the old index
+        foreach ($accepts as &$array){
+            unset($array['i']);
+        }
+        return $accepts;
+    }
+
+
+    public function getBestAcceptType() {
+        $mime_types = AkMimeType::getRegistered();
+        if($acceptables = $this->getAcceptHeader()){
+            // we group by 'quality'
+            $grouped_acceptables = array();
+            foreach ($acceptables as $acceptable){
+                $grouped_acceptables[$acceptable['q']][] = $acceptable['type'];
+            }
+
+            foreach ($grouped_acceptables as $q=>$array_with_acceptables_of_same_quality){
+                foreach ($mime_types as $mime_type=>$our_mime_type){
+                    foreach ($array_with_acceptables_of_same_quality as $acceptable){
+                        if ($mime_type == $acceptable){
+                            return $mime_type;
+                        }
+                    }
+                }
+            }
+        }
+        return 'text/html';
+    }
+
+    public function getContentType() {
+        if (empty($this->env['CONTENT_TYPE'])) return false;
+        $mime_type_struct = AkMimeType::parseMimeType($this->env['CONTENT_TYPE']);
+        return $mime_type_struct['type'];
+    }
+
+    /**
+     * @return string Their mime_type, f.i. 'application/xml'
+     */
+    public function getMimeType() {
+        if ($this->isPost() || $this->isPut()) return $this->getContentType();
+        return $this->getBestAcceptType();
+    }
+
+    /**
+     * @return string Our mime_type, f.i. 'xml'
+     */
+    public function getFormat() {
+        if (isset($this->_request['format'])){
+            if(!AkMimeType::isFormatRegistered($this->_request['format'])) throw new NotAcceptableException('Invalid format. Please register new formats in your config/ using AkMimeType::register("text/'.$this->_request['format'].'", "'.$this->_request['format'].'")');
+             return $this->_request['format'];
+        }
+        return $this->lookupMimeType($this->getMimeType());
+    }
+
+
+    public function lookupMimeType($mime_type) {
+        $mime_types = AkMimeType::getRegistered();
+        if (!isset($mime_types[$mime_type])) throw new NotAcceptableException('Invalid content type. Please register new content types in your config/ using AkMimeType::register("application/vnd.ms-excel", "xls")');
+        return $mime_types[$mime_type];
     }
 
     /**
@@ -496,7 +570,7 @@ class AkRequest
         $session_params = isset($_SESSION['request']) ? $_SESSION['request'] : null;
         $command_line_params = !empty($_REQUEST)  ? $_REQUEST : null;
 
-        $requests = array($command_line_params, $_GET, array_merge_recursive($_POST, $this->getPutParams(), $this->_getNormalizedFilesArray()), $_COOKIE, $session_params);
+        $requests = array($command_line_params, $_GET, array_merge_recursive($this->getPostParams(), $this->getPutParams(), $this->_getNormalizedFilesArray()), $_COOKIE, $session_params);
 
         foreach ($requests as $request){
             $this->_request = (!is_null($request) && is_array($request)) ?
@@ -573,60 +647,10 @@ class AkRequest
     */
     public function _addParam($variable, $value) {
         if($variable[0] != '_'){
-            if( ( $variable == 'action' && !$this->isValidActionName($value)) ||
-            ( $variable == 'controller' && !$this->isValidControllerName($value)) ||
-            ( $variable == 'module' && !$this->isValidModuleName($value))
-            ){
-                return false;
-            }
-            $this->$variable = $value;
-            return true;
+            return $this->$variable = $value;
         }
         return false;
     }
-
-    public function getAccepts() {
-        $accept_header = isset($this->env['HTTP_ACCEPT'])?$this->env['HTTP_ACCEPT']:'';
-        $accepts = array();
-        foreach (explode(',',$accept_header) as $index=>$acceptable){
-            $mime_struct = AkRequestMimeType::parseMimeType($acceptable);
-            if (empty($mime_struct['q'])) $mime_struct['q'] = '1.0';
-
-            //we need the original index inside this structure
-            //because usort happily rearranges the array on equality
-            //therefore we first compare the 'q' and then 'i'
-            $mime_struct['i'] = $index;
-            $accepts[] = $mime_struct;
-        }
-        usort($accepts, array('AkRequestMimeType','sortAcceptHeader'));
-
-        //we throw away the old index
-        foreach ($accepts as $array){
-            unset($array['i']);
-        }
-        return $accepts;
-    }
-    public function setFormat($format) {
-        $this->_format = $format;
-    }
-
-    public function getFormat() {
-        if (isset($this->_format)) {
-            return $this->_format;
-        } else if (isset($this->_request['format'])) {
-            $this->_format = $this->_request['format'];
-        } else {
-            list($format, $requestPath) = AkRequestMimeType::getFormat(isset($this->_request['ak']) ? $this->_request['ak'] : null);
-
-            $this->_format = $format;
-            $this->_request['format'] = $format;
-            if ($requestPath!=null) {
-                $this->_request['ak'] = $requestPath;
-            }
-        }
-        return $this->_format;
-    }
-
 
     /**
     * Recognizes a Request and returns the responsible controller instance
@@ -636,33 +660,84 @@ class AkRequest
     public function &recognize($Map = null) {
         $this->_startSession();
         $this->_enableInternationalizationSupport();
-        $this->_mapRoutes($Map);
-
+        try{
+            $this->_mapRoutes($Map);
+        }catch(Exception $e){
+            if(!AK_PRODUCTION_MODE){
+                throw $e;
+            }
+        }
         AK_LOG_EVENTS && Ak::getLogger()->info('Processing '.$this->getController().'#'.$this->getAction().' (for '.$this->getRemoteIp().')');
 
         $Controller = $this->_getControllerInstance();
         return $Controller;
-
     }
 
     public function getPutParams() {
-        if(!isset($this->put) && $this->isPut() && $data = $this->getPutRequestData()){
-            $this->put = array();
-            parse_str(urldecode($data), $this->put);
-        }
-        return isset($this->put) ? $this->put : array();
+        if (!$this->isPut()) return array();
+        return $this->parseMessageBody($this->getMessageBody());
     }
 
-    public function getPutRequestData() {
+    public function getPostParams() {
+        if (!$this->isPost()) return array();
+        //PHP automatically parses the input on the standard content_types 'application/x-www-form-urlencoded' etc
+        if (!empty($_POST)) return $_POST;
+
+        return $_POST = $this->parseMessageBody($this->getMessageBody());
+    }
+
+    private function parseMessageBody($data) {
+        if (empty($data)) return array();
+
+        $content_type = $this->getContentType();
+        
+        switch ($this->lookupMimeType($content_type)){
+            case 'html':
+                $as_array = array();
+                parse_str($data,$as_array);
+                return $as_array;
+            case 'xml':
+                return Ak::convert('xml', 'params_array',$data);
+                break;
+            case 'json':
+                return json_decode($data,true);
+            default:
+                return array('put_body'=>$data);
+                break;
+        }
+    }
+
+    public $message_body;
+
+    public function getMessageBody() {
+        if ($this->message_body) return $this->message_body;
+
+        $result = '';
         if(!empty($_SERVER['CONTENT_LENGTH'])){
             $putdata = fopen('php://input', 'r');
             $result = fread($putdata, $_SERVER['CONTENT_LENGTH']);
             fclose($putdata);
-            return $result;
-        }else{
-            return false;
         }
+        return $this->message_body = $result;
     }
+
+    static $singleton;
+
+    /**
+     * @return AkRequest
+     */
+    static function getInstance() {
+        if (!self::$singleton){
+            self::$singleton = new AkRequest();
+        }
+        return self::$singleton;
+    }
+
+
+
+
+
+
 
     public function getReferer() {
         $referer = AK_HOST;
@@ -783,8 +858,9 @@ class AkRequest
 
     private function _getControllerDetailsFromParamsAndModuleDetails($params = array(), $module_details = array()){
         $details = array();
-        $details['file_name'] = AkInflector::underscore($params['controller']).'_controller.php';
-        $details['class_name'] = $module_details['class_peffix'].AkInflector::camelize($params['controller']).'Controller';
+        $controller = isset($params['controller'])?$params['controller']:'';
+        $details['file_name'] = AkInflector::underscore($controller).'_controller.php';
+        $details['class_name'] = $module_details['class_peffix'].AkInflector::camelize($controller).'Controller';
         $details['path'] = AkConfig::getDir('controllers').DS.$module_details['path'].$details['file_name'];
         return $details;
     }
@@ -800,8 +876,7 @@ class AkRequest
 
     protected function _mapRoutes($Router = null) {
         if(empty($Router)){
-            $Router = new AkRouter();
-            $Router->mapRules();
+            $Router = AkRouter::getInstance();
         }
         $this->checkForRoutedRequests($Router);
     }

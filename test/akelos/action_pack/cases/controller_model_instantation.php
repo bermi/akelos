@@ -26,7 +26,7 @@ class Controller_model_instantiation_TestCase extends AkWebTestCase
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'dummy_post/comments/1');
         $this->assertResponse(200);
-        $this->assertTextMatch('1st post2nd post3rd post4th post5th post',
+        $this->assertTextMatch("1st post2nd post3rd post4th post5th post",
         'Did not get expected result when calling '.$this->_test_script.'dummy_post/comments/1');
     }
 }

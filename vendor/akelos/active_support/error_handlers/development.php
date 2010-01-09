@@ -16,8 +16,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         $result = '';
         $bt = debug_backtrace();
         $result .= ("\nBacktrace (most recent call first):\n");
-        for($i = 0; $i <= count($bt) - 1; $i++)
-        {
+        for($i = 0; $i <= count($bt) - 1; $i++) {
             if($bt[$i]["function"]!='ak_backtrace' && $bt[$i]["function"]!='ak_development_error_handler'){
                 if(isset($bt[$i]["line"])){
                     if(strstr($bt[$i]["file"], AK_COMPILED_VIEWS_DIR) || strstr($bt[$i]["file"], AkConfig::getDir('app'))){
@@ -26,7 +25,6 @@ if(defined('AK_DEBUG') && AK_DEBUG){
                         $result .= '<div style="margin:20px 0;padding:10px;border:1px solid #ccc;">'.ak_show_source_line($bt[$i]["file"],$bt[$i]["line"], $bt[$i]["function"], (array)@$bt[$i]['args']).'</div>';
                     }
                 }
-
             }
         }
         return $html_output ? $result : html_entity_decode(strip_tags($result));
@@ -109,10 +107,10 @@ if(defined('AK_DEBUG') && AK_DEBUG){
             $_sent_errors[$error_type.$error_message] = true;
         }
 
-        AK_DEBUG_OUTPUT_AS_HTML ? print('<pre>') : null;
+        $result = AK_DEBUG_OUTPUT_AS_HTML ? '<pre>' : '';
 
         //$result = ": <h3>$error_message</h3> in  $file on line $line\n";
-        $result = "<div style='text-align:left;'><h3 style='padding:5px; background-color:#f00;color:#fff;margin-bottom:0px;'>($error_type) $error_message</h3>";
+        $result .= "<div style='text-align:left;'><h3 style='padding:5px; background-color:#f00;color:#fff;margin-bottom:0px;'>($error_type) $error_message</h3>";
         $result .= "<p style='padding:5px;background-color:#ffc;color:#666;margin-top:0px;'>in <b>$file</b> on line <b>$line</b></p>";
         //$result .= ak_show_source_line($file, $line);
         //ak_show_app_backtrace();
@@ -139,10 +137,13 @@ if(defined('AK_DEBUG') && AK_DEBUG){
             }
         }
         $result .= '</div>';
+        
+        $result .= !AK_DEBUG_OUTPUT_AS_HTML ? html_entity_decode(strip_tags($result)) : '<div style="background-color:#fff;margin:10px;padding:10px;color:#000;font-family:sans-serif;border-bottom:3px solid #f00;font-size:12px;">'. $result.'</div>';
 
-        echo !AK_DEBUG_OUTPUT_AS_HTML ? html_entity_decode(strip_tags($result)) : '<div style="background-color:#fff;margin:10px;padding:10px;color:#000;font-family:sans-serif;border-bottom:3px solid #f00;font-size:12px;">'. $result.'</div>';
-
-        AK_DEBUG_OUTPUT_AS_HTML ? print('</pre>') : null;
+        $result .= AK_DEBUG_OUTPUT_AS_HTML ? '</pre>' : '';
+        
+        echo $result;
+        //throw Exception($result);
 
         return false;
 

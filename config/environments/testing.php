@@ -12,3 +12,5 @@ ini_set('log_errors', 0);
 
 error_reporting(-1);
 
+include AK_ACTIVE_SUPPORT_DIR.DS.'error_handlers'.DS.'testing.php';
+

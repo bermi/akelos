@@ -4,12 +4,14 @@ require_once(dirname(__FILE__).'/../helpers.php');
 
 class ActiveRecordHelper_TestCase extends HelperUnitTest
 {
-    public function test_setup()
-    {
+    public function test_setup() {
         //echo NumberHelper::human_size(memory_get_peak_usage()).' '.__LINE__."\n";
+        $Request = new MockAkRequest();
+        $Request->setReturnValue('getController','test');
+        $Request->setReturnValue('getRelativeUrlRoot','');
+        $Request->setReturnValue('getParametersFromRequestedUrl',array('controller'=>'test'));
         $this->controller = new AkActionController();
-        $this->controller->Request = new MockAkRequest($this);
-        $this->controller->controller_name = 'test';
+        $this->controller->Request = $Request;
 
         $this->active_record_helper = $this->controller->active_record_helper;
 
@@ -31,9 +33,7 @@ class ActiveRecordHelper_TestCase extends HelperUnitTest
         //echo NumberHelper::human_size(memory_get_peak_usage()).' '.__LINE__."\n";
     }
 
-
-    public function tests_input()
-    {
+    public function tests_input() {
         $this->assertEqual(
         $this->active_record_helper->input('DummyProtectedPerson', 'name'),
         '<input id="DummyProtectedPerson_name" name="DummyProtectedPerson[name]" size="30" type="text" value="Lucky Luke" />'
@@ -58,25 +58,22 @@ class ActiveRecordHelper_TestCase extends HelperUnitTest
         );
 
     }
-
-    public function test_form()
-    {
+/**/
+    public function test_form() {
         $this->assertEqual(
         $this->active_record_helper->form('DummyProtectedPerson'),
         file_get_contents(HelperUnitTest::getFixturesDir().DS.'active_record_form.txt')
         );
     }
 
-    public function test_should_render_limited_form_fields()
-    {
+    public function test_should_render_limited_form_fields() {
         $this->assertEqual(
         $this->active_record_helper->form('DummyProtectedPerson', array('columns'=>array('id','name'))),
         file_get_contents(HelperUnitTest::getFixturesDir().DS.'active_record_limited_form.txt')
         );
     }
 
-    public function test_error_message_on()
-    {
+    public function test_error_message_on() {
         $this->LuckyLuke->addError('name');
         $this->assertEqual(
         $this->active_record_helper->error_message_on('DummyProtectedPerson', 'name'),
@@ -89,8 +86,7 @@ class ActiveRecordHelper_TestCase extends HelperUnitTest
         );
     }
 
-    public function test_error_messages_for()
-    {
+    public function test_error_messages_for() {
         $this->LuckyLuke->addError('birthday');
         $this->assertEqual(
         $this->active_record_helper->error_messages_for('DummyProtectedPerson'),
@@ -103,8 +99,7 @@ class ActiveRecordHelper_TestCase extends HelperUnitTest
         );
     }
 
-    public function test_textarea_should_escape_characters_correctly()
-    {
+    public function test_textarea_should_escape_characters_correctly() {
         $this->assertEqual(
         $this->active_record_helper->form('DummyProperty'),
         file_get_contents(HelperUnitTest::getFixturesDir().DS.'active_record_textarea_should_escape_characters_correctly.txt')

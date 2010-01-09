@@ -20,15 +20,12 @@ class Controller_forbidden_actions_TestCase extends AkWebTestCase
     public function test_should_ignore_underscored_methods() {
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'intranet/_forbidden');
-
-        $this->assertResponse(200);
-        $this->assertTextMatch('Intranet Controller Works');
+        $this->assertText('No action was specified');
     }
 
     public function test_should_not_allow_calling_action_controller_methods() {
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'intranet/render');
-
         $this->assertResponse(405);
         $this->assertTextMatch('405 Method Not Allowed');
     }

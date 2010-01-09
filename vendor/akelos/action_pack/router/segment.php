@@ -3,13 +3,12 @@
 class SegmentDoesNotMatchParameterException extends RouteDoesNotMatchParametersException 
 { }
 
-
 abstract class AkSegment 
 {
     public     $name;
     protected  $delimiter;
 
-    static protected $DEFAULT_REQUIREMENT='[^/.]+';  //default requirement matches all but stops on dashes
+    static protected $DEFAULT_REQUIREMENT='[^/]+';  //default requirement matches all but stops on dashes
 
     public function __construct($name,$delimiter) {
         $this->name        = $name;
@@ -32,6 +31,5 @@ abstract class AkSegment
 
     abstract public function getRegEx();
     abstract public function generateUrlFromValue($value,$omit_optional_segments);
-
 }
 

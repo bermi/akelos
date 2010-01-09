@@ -76,8 +76,7 @@ class Ak
                 $Router = $options;
                 return;
             }else{
-                $Router = new AkRouter();
-                $Router->mapRules();
+                $Router = AkRouter::getInstance();
             }
         } else if (($options instanceof AkRouter) && $set_routes) {
             $Router = $options;

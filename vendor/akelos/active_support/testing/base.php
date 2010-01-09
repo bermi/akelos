@@ -213,7 +213,7 @@ class AkUnitTest extends UnitTestCase
             if(empty($logger)) {
                 $logger = Ak::getLogger();
             }
-            $logger->log('unit-test',$message);
+            $logger->info('unit-test',$message);
         }
     }
 
@@ -378,8 +378,66 @@ class AkUnitTest extends UnitTestCase
         $this->expectError(new PatternExpectation('/'.str_replace("'", "\'", preg_quote($pattern)).'/'));
     }
 
-}
+    public function mock($class_name, $returns = array()){
 
+        Mock::generate($class_name);
+        $name = 'Mock'.$class_name;
+        $Mock = new $name($this);
+
+        foreach ($returns as $method => $value){
+            if($value instanceof Exception){
+                $Mock->throwOn($method, $value);
+            }else{
+                $Mock->returnsByValue($method, $value);
+            }
+        }
+        return $Mock;
+    }
+    public function partialMock($class_name, $methods, $returns = array()){
+        $name = 'Mock'.time().Ak::randomString().$class_name;
+        Mock::generatePartial($class_name, $name, Ak::toArray($methods));
+
+        $Mock = new $name($this);
+
+        foreach ($returns as $method => $value){
+            if($value instanceof Exception){
+                $Mock->throwOn($method, $value);
+            }else{
+                $Mock->returnsByValue($method, $value);
+            }
+        }
+        return $Mock;
+    }
+    
+    /**
+     * Assert that an array contains another array partially
+     * 
+     * given: array('a'=>'1','b'=>2)
+     * 
+     * you can now assert that the given contains 'b'=>2
+     * 
+     * @param array $array
+     * @param array $partial_array 
+     */
+    public function assertArrayContains($array, array $partial_array) {
+        $scope = key($partial_array);
+        $value = current($partial_array);
+        $this->assertTrue(isset($array[$scope]), 'Could not find key '.$scope.' in array '.print_r($array, true));
+        $this->assertPattern('/'.$value.'/',@$array[$scope]);
+    }
+    
+    /**
+     * PHPUnit compatibility assertions
+     */
+    
+    public function assertType($type, $instance){
+        $this->assertIsA($instance, $type);
+    }
+    
+    public function assertArrayHasKey($array, $key){
+        $this->assertTrue(isset($array[$key]));
+    }
+}
 
 class AkWebTestCase extends WebTestCase
 {
@@ -506,9 +564,9 @@ class AkelosVerboseTextReporter extends AkelosTextReporter {
 }
 
 class AkXUnitXmlReporter extends SimpleReporter {
-    private 
+    private
     $_fp;
-    
+
     function __construct() {
         parent::__construct();
         $this->doc = new DOMDocument();
@@ -519,13 +577,13 @@ class AkXUnitXmlReporter extends SimpleReporter {
         Ak::file_put_contents($file_path, "<?xml version=\"1.0\"?>\n", array('base_path' => $base_path));
         $this->_fp = @fopen($file_path, 'a');
     }
-    
+
     function __destruct(){
         @fclose($this->_fp);
     }
 
     function paintHeader($test_name) {
-        $this->testsStart = microtime(true);       
+        $this->testsStart = microtime(true);
         $this->root->setAttribute('name', $test_name);
         $this->root->setAttribute('timestamp', date('c'));
         $this->root->setAttribute('hostname', 'localhost');
@@ -543,13 +601,13 @@ class AkXUnitXmlReporter extends SimpleReporter {
         $this->root->setAttribute('failures', $this->getFailCount());
         $this->root->setAttribute('errors', $this->getExceptionCount());
         $this->root->setAttribute('time', $duration);
-        
+
         $this->doc->formatOutput = true;
         $xml = $this->doc->saveXML();
         // Cut out XML declaration
         @fwrite($this->_fp, preg_replace('/<\?[^>]*\?>/', "", $xml));
     }
-    
+
     function paintCaseStart($case) {
         $this->currentCaseName = $case;
     }
@@ -557,35 +615,35 @@ class AkXUnitXmlReporter extends SimpleReporter {
     function paintCaseEnd($case) {
         // No output here
     }
-    
+
     function paintMethodStart($test) {
         $this->methodStart = microtime(true);
         $this->currCase = $this->doc->createElement('testcase');
     }
-    
+
     function paintMethodEnd($test) {
         $duration = microtime(true) - $this->methodStart;
-        
+
         $this->currCase->setAttribute('name', $test);
         $this->currCase->setAttribute('classname', $this->currentCaseName);
         $this->currCase->setAttribute('time', $duration);
         $this->root->appendChild($this->currCase);
     }
-    
+
     function paintFail($message) {
         parent::paintFail($message);
 
         error_log("Failure: " . $message);
         $this->terminateAbnormally($message);
     }
-    
+
     function paintException($exception) {
         parent::paintException($exception);
-        
+
         error_log("Exception: " . $exception);
         $this->terminateAbnormally($exception);
     }
-    
+
     function terminateAbnormally($message) {
         if (!$this->currCase) {
             error_log("!! currCase was not set.");
@@ -596,13 +654,11 @@ class AkXUnitXmlReporter extends SimpleReporter {
         $breadcrumb = $this->getTestList();
         $ch->setAttribute('message', $breadcrumb[count($breadcrumb)-1]);
         $ch->setAttribute('type', $breadcrumb[count($breadcrumb)-1]);
-        
+
         $message = implode(' -> ', $breadcrumb) . "\n\n\n" . $message;
         $content = $this->doc->createTextNode($message);
         $ch->appendChild($content);
-        
+
         $this->currCase->appendChild($ch);
     }
-    
 }
-

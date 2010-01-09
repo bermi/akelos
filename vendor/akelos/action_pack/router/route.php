@@ -1,13 +1,12 @@
 <?php
 
-class RouteDoesNotMatchRequestException extends Exception 
+class RouteDoesNotMatchRequestException extends Exception
 { }
-class RouteDoesNotMatchParametersException extends Exception 
+class RouteDoesNotMatchParametersException extends Exception
 { }
 
-class AkRoute extends AkObject 
+class AkRoute
 {
-
     private $url_pattern;
     private $defaults;
     private $requirements;
@@ -17,7 +16,7 @@ class AkRoute extends AkObject
     const   DELIMITER_CHAR_CLASS = '[/.]';   // Note: If you change this, take a look at AkSegment::$DEFAULT_REQUIREMENT too
 
     public function __construct($url_pattern, $defaults = array(), $requirements = array(), $conditions = array()) {
-        $this->url_pattern  = $url_pattern;    
+        $this->url_pattern  = $url_pattern;
         $this->defaults     = $defaults;
         $this->requirements = $requirements;
         $this->conditions   = $conditions;
@@ -28,22 +27,26 @@ class AkRoute extends AkObject
      */
     public function parametrize(AkRequest $Request) {
         $this->ensureRequestMethod($Request->getMethod());
-        
         $params = $this->extractParamsFromUrl($Request->getRequestedUrl());
+
         $this->addDefaults($params);
         $this->urlDecode($params);
 
         return $params;
     }
-    
-    protected function extractParamsFromUrl($url)
-    {
+
+    protected function extractParamsFromUrl($url) {
         if ($url=='/') $url = '';
-        
+
+        // if(strstr($url, 'redirect') && strstr($this->getRegex(), 'redirect') )
+        // Ak::trace($this->getRegex()."\n".$url);
         if (!preg_match($this->getRegex(),$url,$matches)) throw new RouteDoesNotMatchRequestException("Url doesn't match the regex of the route.");
         array_shift($matches);   //throw away the "all-match", we only need the groups
-        
+
+        // Ak::trace($matches);
+
         $params = array();
+        $name = '';
         $skipped_optional = false;
         foreach ($matches as $name=>$match){
             if (is_int($name)) continue;  // we use named-subpatterns, anything else we throw away
@@ -51,11 +54,14 @@ class AkRoute extends AkObject
                 if (!$this->segments[$name]->isOmitable()){
                     $skipped_optional = true;
                 }
-                continue;  
+                continue;
             }
             if ($skipped_optional) throw new RouteDoesNotMatchRequestException("Segment $name is missing.");
             $params[$name] = $this->segments[$name]->extractValueFromUrl($match);
         }
+
+        $this->addFormatToParams($params);
+
         return $params;
     }
 
@@ -92,15 +98,27 @@ class AkRoute extends AkObject
             if (!$url_piece = $segment->generateUrlFromValue(@$params[$name],$omit_defaults)) continue;
 
             $url_pieces[] = $url_piece;
-            unset ($params[$name]); 
+            unset ($params[$name]);
             $omit_defaults = false;
         }
         return join('',array_reverse($url_pieces));
     }
 
+    protected function addFormatToParams(&$params) {
+        if(!AK_AUTOMATICALLY_ACCEPT_KNOW_FORMATS || empty($params) || isset($params['format'])) return;
+        $last_key = Ak::last(array_keys($params));
+        if(!is_string($params[$last_key])) return;
+        if($format = strrchr($params[$last_key], '.')){
+            $trimmed_format = trim($format, '.');
+            if(!AkMimeType::isFormatRegistered($trimmed_format)) return;
+            $params[$last_key] = substr($params[$last_key], 0, strpos($params[$last_key], $format));
+            $params['format'] = $trimmed_format;
+        }
+    }
+
     protected function buildQueryStringFor($params) {
         if (empty($params)) return '';
-        
+
         $key_value_pairs = array();
         foreach ($params as $name=>$value){
             if (isset($this->defaults[$name])){
@@ -116,24 +134,26 @@ class AkRoute extends AkObject
 
     public function getRegex() {
         if ($this->regex) return $this->regex;
-        return $this->regex = '@^'.join('',$this->getSegments()).'$@';      
+        return $this->regex = '@^'.join('',$this->getSegments()).'$@';
     }
-    
+
     public function getSegments() {
         if ($this->segments) return $this->segments;
         return $this->segments = $this->buildSegments($this->url_pattern,$this->defaults,$this->requirements);
     }
-    
+
     protected function buildSegments($url_pattern,$defaults,$requirements) {
         $segments = array();
-        
+
         $subject = $url_pattern;
         $pattern = '@'.self::DELIMITER_CHAR_CLASS.'@';
         $matches = preg_split($pattern,$subject,-1,PREG_SPLIT_NO_EMPTY | PREG_SPLIT_OFFSET_CAPTURE);
+
         foreach ($matches as $match){
             $url_part  = $match[0];
+
             $delimiter = $subject{$match[1]-1};
-            
+
             $name = substr($url_part,1);
             switch ($this->segmentType($url_part)) {
                 case ':':
@@ -154,7 +174,7 @@ class AkRoute extends AkObject
                     break;
             }
         }
-        return $segments;        
+        return $segments;
     }
 
     protected function segmentType($name) {
@@ -163,9 +183,9 @@ class AkRoute extends AkObject
     }
 
     /*
-     * Returns an array with the names of the dynamic segments. 
-     * It's only used in AkRouterHelper; to avoid building the full segments-graph it uses a regex-match
-     */
+    * Returns an array with the names of the dynamic segments.
+    * It's only used in AkRouterHelper; to avoid building the full segments-graph it uses a regex-match
+    */
     public function getNamesOfDynamicSegments() {
         preg_match_all('@'.self::DELIMITER_CHAR_CLASS.'[:*](\w+)@',$this->url_pattern,$matches);
         return ($matches[1]);
@@ -194,7 +214,7 @@ class AkRoute extends AkObject
     private function _urlencode(&$input) {
         $input = urlencode($input);
     }
-    
+
 }
 
 

@@ -547,7 +547,7 @@ EOF;
         $TestMailer = new TestMailer();
         $Message = $TestMailer->create('message_with_helpers', $this->recipient);
         $rendered_message = $TestMailer->getRawMessage();
-        $this->assertPattern('/<a href="http:\/\/example.com\/offers\/">Our offers<\/a>/', $rendered_message);
+        $this->assertPattern('/<a href="http:\/\/example.com\/offers">Our offers<\/a>/', $rendered_message);
         $this->assertNoPattern('/text_helper/', $rendered_message);
     }
 

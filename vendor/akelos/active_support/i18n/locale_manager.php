@@ -316,7 +316,12 @@ class AkLocaleManager
     }
 
     protected function _getLocaleForRequest(&$Request) {
-        $lang = $this->getNavigationLanguage();
+        
+        if (isset($Request->lang)){ 
+            $lang = $Request->lang;
+        }else{
+            $lang = $this->getNavigationLanguage();
+        }
 
         if($url_locale = $this->getLangFromUrl($Request)){
             $lang = $this->getLocaleFromAlias($url_locale);

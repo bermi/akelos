@@ -849,7 +849,7 @@ EOF;
             if (isset($this->_controller)) {
                 $cacheId.= '.'.$this->_controller->Request->getFormat();
             } else {
-                list($format, $requestPath) = AkRequestMimeType::getFormat($path);
+                list($format, $requestPath) = AkMimeType::getFormat($path);
                 $cacheId.= '.'.$format;
             }
         }

@@ -15,7 +15,7 @@ class Request_TestCase extends ActionPackUnitTest
 
     public function setUp() {
         $sess_request = isset($_SESSION['request']) ? $_SESSION['request'] : null;
-        $this->_original_values = array($sess_request, $_COOKIE, $_POST, $_GET, $_REQUEST);
+        $this->_original_values = array($sess_request, $_COOKIE, $_POST, $_GET, $_REQUEST, $_SERVER);
 
         $_SESSION['request'] = array(
         'session_param'=>'session',
@@ -54,7 +54,8 @@ class Request_TestCase extends ActionPackUnitTest
         'general_param'=>'cmd'
         );
 
-
+        $_SERVER['REQUEST_METHOD'] = 'get';
+        
         $this->_testRequestInstance = new AkRequest();
         $this->_testRequestInstance->init(true);
 
@@ -69,10 +70,32 @@ class Request_TestCase extends ActionPackUnitTest
         $_POST = $this->_original_values[2];
         $_GET = $this->_original_values[3];
         $_REQUEST = $this->_original_values[4];
+        $_SERVER = $this->_original_values[5];
     }
 
 
-    public function Test_mergeRequest() {
+    public function test_mergeRequest_OnGetRequest()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'get';
+        $Request = new AkRequest();
+        
+        $expected = array(
+        'cmd_param'=>'cmd',
+        'get_param'=>'get',
+        'post_param'=>'get',
+        'cookie_param'=>'cookie',
+        'session_param'=>'session',
+        'general_param'=>'session',
+        'ak'=>'/session_controller/session_action',
+        );
+
+        $this->assertEqual($Request->_request, $expected,'Comparing request precedence');
+    }
+
+    public function Test_mergeRequest_OnPostRequest() {
+        $_SERVER['REQUEST_METHOD'] = 'post';
+        $Request = new AkRequest();
+        
         $expected = array(
         'cmd_param'=>'cmd',
         'get_param'=>'get',
@@ -83,28 +106,22 @@ class Request_TestCase extends ActionPackUnitTest
         'ak'=>'/session_controller/session_action',
         );
 
-        $this->_testRequestInstance->_mergeRequest();
-
-        if(!isset($this->_testRequestInstance->_request['cmd_param'])){
-            unset($expected['cmd_param']); // If ran as part of a suite we need to unset it
-        }
-        $this->assertEqual($this->_testRequestInstance->_request, $expected, 'Comparing request precedence');
+        $this->assertEqual($Request->_request,$expected,'Comparing request precedence');
     }
 
-
-    public function Test_parseAkRequestString() {
+    public function TestparseAkRequestString() {
         $expected_values = array('user','list','100');
 
-        $this->assertEqual($this->_testRequestInstance->_parseAkRequestString('/user/list/100'), $expected_values);
-        $this->assertEqual($this->_testRequestInstance->_parseAkRequestString('/user/list/100/'), $expected_values);
-        $this->assertEqual($this->_testRequestInstance->_parseAkRequestString('user/list/100/'), $expected_values);
-        $this->assertEqual($this->_testRequestInstance->_parseAkRequestString('user/list/100'), $expected_values);
+        $this->assertEqual($this->_testRequestInstance->parseAkRequestString('/user/list/100'), $expected_values);
+        $this->assertEqual($this->_testRequestInstance->parseAkRequestString('/user/list/100/'), $expected_values);
+        $this->assertEqual($this->_testRequestInstance->parseAkRequestString('user/list/100/'), $expected_values);
+        $this->assertEqual($this->_testRequestInstance->parseAkRequestString('user/list/100'), $expected_values);
 
         $expected_keys = array('controller','action','id');
-        $this->assertEqual($this->_testRequestInstance->_parseAkRequestString('/:controller/:action/:id','/:'), $expected_keys);
-        $this->assertEqual($this->_testRequestInstance->_parseAkRequestString('/:controller/:action/:id/:','/:'), $expected_keys);
-        $this->assertEqual($this->_testRequestInstance->_parseAkRequestString('controller/:action/:id/:','/:'), $expected_keys);
-        $this->assertEqual($this->_testRequestInstance->_parseAkRequestString('controller/:action/:id','/:'), $expected_keys);
+        $this->assertEqual($this->_testRequestInstance->parseAkRequestString('/:controller/:action/:id','/:'), $expected_keys);
+        $this->assertEqual($this->_testRequestInstance->parseAkRequestString('/:controller/:action/:id/:','/:'), $expected_keys);
+        $this->assertEqual($this->_testRequestInstance->parseAkRequestString('controller/:action/:id/:','/:'), $expected_keys);
+        $this->assertEqual($this->_testRequestInstance->parseAkRequestString('controller/:action/:id','/:'), $expected_keys);
     }
 
 

@@ -4,15 +4,10 @@
  * Native PHP URL rewriting for the Akelos Framework.
  */
 
-
-define ('COMPULSORY','COMPULSORY');
-define ('OPTIONAL','OPTIONAL');
-define ('ANY','ANY');
-
 class NoMatchingRouteException extends Exception 
 { }
 
-class AkRouter extends AkObject 
+class AkRouter
 {
     public  $automatic_lang_segment = true;
     public  $generate_helper_functions = AK_GENERATE_HELPER_FUNCTIONS_FOR_NAMED_ROUTES;
@@ -89,7 +84,7 @@ class AkRouter extends AkObject
         throw new NoMatchingRouteException();
     }
 
-    public function urlize($params,$name = null) {
+    public function urlize($params, $name = null) {
         if ($name){
             return $this->routes[$name]->urlize($params);
         }
@@ -98,7 +93,7 @@ class AkRouter extends AkObject
             try {
                 $url = $route->urlize($params);
                 return $url;
-            } catch (RouteDoesNotMatchParametersException $e) {}
+            } catch (RouteDoesNotMatchParametersException $e) { }
         }
         throw new NoMatchingRouteException();
     }
@@ -116,7 +111,7 @@ class AkRouter extends AkObject
         if (preg_match('/^(.*)_url$/',$name,$matches)){
             $args[] = $matches[1];
             return call_user_func_array(array($this,'urlize'),$args);
-        }else{
+        }elseif (!empty($args)){
             array_unshift($args,$name);
             return call_user_func_array(array($this,'connectNamed'),$args);
         }
@@ -145,8 +140,29 @@ class AkRouter extends AkObject
     }
 
     public function loadMap($file_name=AK_ROUTES_MAPPING_FILE) {
-        $Map = $this;
-        include(AK_ROUTES_MAPPING_FILE);
+        $Map =& $this;
+        
+        if(!@include($file_name)){
+            $this->connectDefaultRoutes();
+        }
+    }
+
+    public function connectDefaultRoutes(){
+        if(AK_DEV_MODE && AkRequest::isLocal()){
+            $this->connect('/:controller/:action/:id', array(
+            'controller' => 'akelos_dashboard', 
+            'action' => 'index', 
+            'module' => 'akelos_panel', 
+            'rebase' => AK_AKELOS_UTILS_DIR.DS.'akelos_panel'
+            ));
+            $this->connect('/', array(
+            'controller' => 'akelos_dashboard', 
+            'action' => 'index', 
+            'module' => 'akelos_panel'));
+            return;
+        }
+        $this->connect('/:controller/:action/:id', array('controller' => 'page', 'action' => 'index'));
+        $this->connect('/', array('controller' => 'page', 'action' => 'index'));
     }
 
 }

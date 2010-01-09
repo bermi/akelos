@@ -2,6 +2,8 @@
 
 class AkActionController extends AkLazyObject
 {
+    const DEFAULT_RENDER_STATUS_CODE = null;
+
     public $locale_namespace;
     public $_high_load_mode = AK_HIGH_LOAD_MODE;
     public $_enable_plugins = true;
@@ -126,17 +128,12 @@ class AkActionController extends AkLazyObject
     public function process(&$Request, &$Response, $options = array()) {
         AK_ENABLE_PROFILER &&  Ak::profile('AkActionController::process() start');
 
-        $this->Request = $Request;
-        $this->Response = $Response;
-        $this->params = $this->Request->getParams();
+        $this->setRequestAndResponse($Request, $Response);
 
         if(AK_LOG_EVENTS){
             $this->_log('Parameters', array_diff(Ak::delete($this->params, $this->filter_parameter_logging), array('')));
         }
-
         AK_ENABLE_PROFILER &&  Ak::profile('Got request paramenters');
-
-        $this->_action_name = $this->Request->getAction();
 
         $actionExists = $this->_ensureActionExists();
 
@@ -156,8 +153,6 @@ class AkActionController extends AkLazyObject
                 $this->loadPlugins();
                 AK_ENABLE_PROFILER &&  Ak::profile('Instantiated plugins');
             }
-        }else{
-            $this->_enableLayoutOnRender = false;
         }
 
         $this->_ensureProperProtocol();
@@ -304,7 +299,7 @@ class AkActionController extends AkLazyObject
         }
         if (!isset($handled[$this->_request_id])) {
             if (!$this->hasPerformed()){
-                $this->_enableLayoutOnRender ? $this->renderWithLayout() : $this->renderWithoutLayout();
+                $this->defaultRender();
             }
             if (!isset($this->Response->_headers['Content-Type'])) {
                 $this->_sendMimeContentType();
@@ -320,6 +315,13 @@ class AkActionController extends AkLazyObject
         }
     }
 
+    public function setRequestAndResponse($Request,$Response) {
+        $this->Request      = $Request;
+        $this->Response     = $Response;
+        $this->params       = $this->Request->getParams();
+        $this->_action_name = $this->Request->getAction();
+    }
+
     public function loadTemplateHandler($force_reload = false){
         if(empty($this->Template) || $force_reload){
             $this->Template = new AkActionView(
@@ -327,6 +329,10 @@ class AkActionController extends AkLazyObject
             $this->Request->getParameters(),
             $this);
             $this->Template->registerTemplateHandler('tpl','AkPhpTemplateHandler');
+            //we register a handler for the '.html.tpl' extension, so its optional to
+            //use the html-extension in template filenames. use index.tpl <=or=> index.html.tpl
+            $this->Template->registerTemplateHandler('html.tpl','AkPhpTemplateHandler');
+
             $this->Template->setHelperLoader($this->getHelperLoader());
         }
     }
@@ -337,7 +343,6 @@ class AkActionController extends AkLazyObject
 
     private function _loadActionView() {
         empty($this->_assigns) ? ($this->_assigns = array()) : null;
-        $this->_enableLayoutOnRender = !isset($this->_enableLayoutOnRender) ? true : $this->_enableLayoutOnRender;
         $this->passed_args = !isset($this->Request->pass)? array() : $this->Request->pass;
         empty($this->cookies) && isset($_COOKIE) ? ($this->cookies = $_COOKIE) : null;
         $this->loadTemplateHandler();
@@ -669,7 +674,7 @@ class AkActionController extends AkLazyObject
         return $this->renderText($this->Template->renderTemplate($type, $template, null, $local_assigns), $status);
     }
 
-    public function renderText($text = null, $status = null) {
+    public function renderText($text = null,  $status = self::DEFAULT_RENDER_STATUS_CODE) {
         $this->performed_render = true;
         if($status != null) {
             $this->Response->_headers['Status'] = $status;
@@ -703,6 +708,10 @@ class AkActionController extends AkLazyObject
         $this->performed_render = false;
 
         return $result;
+    }
+
+    public function defaultRender() {
+        return $this->_high_load_mode ? $this->renderWithoutLayout() : $this->renderWithLayout();
     }
 
     public function renderWithLayout($template_name = null, $status = null, $layout = null) {
@@ -823,24 +832,6 @@ class AkActionController extends AkLazyObject
 
     public function redirectToAction($action, $options = array()) {
         $this->redirectTo(array_merge(array('action'=>$action), $options));
-    }
-
-
-    /**
-     * This methods are required for retrieving available controllers for URL Routing
-     */
-    public function rewriteOptions($options) {
-        $defaults = $this->defaultUrlOptions($options);
-        if(!empty($this->module_name)){
-            $defaults['module'] = $this->getModuleName();
-        }
-        if(!empty($options['controller']) && strstr($options['controller'], '/')){
-            $defaults['module'] = substr($options['controller'], 0, strrpos($options['controller'], '/'));
-            $options['controller'] = substr($options['controller'], strrpos($options['controller'], '/') + 1);
-        }
-        $options = !empty($defaults) ? array_merge($defaults, $options) : $options;
-        $options['controller'] = empty($options['controller']) ? AkInflector::underscore($this->getControllerName()) : $options['controller'];
-        return $options;
     }
 
     public function getControllerName() {
@@ -1013,7 +1004,29 @@ class AkActionController extends AkLazyObject
     * would have slashed-off the path components after the changed action.
     */
     public function urlFor($options = array(), $parameters_for_method_reference = null) {
-        return $this->rewrite($this->rewriteOptions($options));
+        return $this->getUrlWriter()->urlFor($this->rewriteOptions($options));
+    }
+
+    private $url_writer;
+
+    /**
+    * @return AkUrlWriter
+    */
+    public function getUrlWriter() {
+        if ($this->url_writer) return $this->url_writer;
+        return $this->url_writer = new AkUrlWriter($this->Request);
+    }
+
+    /**
+    * This methods are required for retrieving available controllers for URL Routing
+    */
+    public function rewriteOptions($options) {
+        $defaults = $this->defaultUrlOptions($options);
+        if(!empty($this->module_name)){
+            $defaults['module'] = $this->getModuleName();
+        }
+        $options = !empty($defaults) ? array_merge($defaults, $options) : $options;
+        return $options;
     }
 
     public function addToUrl($options = array(), $options_to_exclude = array()) {
@@ -1065,14 +1078,14 @@ class AkActionController extends AkLazyObject
     }
 
     public function _assertExistanceOfTemplateFile($template_name) {
-        $extension = $this->Template->delegateTemplateExists($template_name);
-        $this->full_template_path = $this->Template->getFullTemplatePath($template_name, $extension ? $extension : 'tpl');
-        if(!$this->_hasTemplate($this->full_template_path)){
+        if($this->Template->delegateTemplateExists($template_name) === false){
             if(!empty($this->_ignore_missing_templates) && $this->_ignore_missing_templates === true){
                 return true;
             }
+            $template_name = $template_name.'.tpl';
             $template_type = strstr($template_name,'layouts') ? 'layout' : 'template';
-            $error_message = Ak::t('Missing %template_type %full_template_path',array('%template_type'=>$template_type, '%full_template_path'=>$this->full_template_path));
+
+            $error_message = Ak::t('Missing %template_type %controller_name::%template_name',array('%template_type'=>$template_type, '%template_name'=>$template_name,'%controller_name'=>$this->getControllerName()));
             AK_LOG_EVENTS && $this->_log($error_message, array(), 'warn');
             trigger_error($error_message, E_USER_WARNING);
             return false;
@@ -1080,8 +1093,13 @@ class AkActionController extends AkLazyObject
         return true;
     }
 
+    protected function respondTo() {
+        return $this->Request->getFormat();
+    }
+
     public function getDefaultTemplateName($default_action_name = null) {
-        return empty($default_action_name) ? (empty($this->_default_template_name) ? $this->_action_name : $this->_default_template_name) : $default_action_name;
+        $template_name = empty($default_action_name) ? (empty($this->_default_template_name) ? $this->_action_name : $this->_default_template_name) : $default_action_name;
+        return $template_name.'.'.$this->respondTo();
     }
 
     public function setDefaultTemplateName($template_name) {
@@ -1089,76 +1107,10 @@ class AkActionController extends AkLazyObject
     }
 
 
-
-    public function rewrite($options = array()) {
-        return $this->_rewriteUrl($this->_rewritePath($options), $options);
-    }
-
-
     public function toString() {
         return $this->Request->getProtocol().$this->Request->getHostWithPort().
         $this->Request->getPath().@$this->parameters['controller'].
         @$this->parameters['action'].@$this->parameters['inspect'];
-    }
-
-    /**
-     * Given a path and options, returns a rewritten URL string
-     */
-    public function _rewriteUrl($path, $options) {
-        $rewritten_url = '';
-        if(empty($options['only_path'])){
-            $rewritten_url .= !empty($options['protocol']) ? $options['protocol'] : $this->Request->getProtocol();
-            $rewritten_url .= empty($rewritten_url) || strpos($rewritten_url,'://') ? '' : '://';
-            $rewritten_url .= $this->_rewriteAuthentication($options);
-            $rewritten_url .= !empty($options['host']) ? $options['host'] : $this->Request->getHostWithPort();
-            $options = Ak::delete($options, array('user','password','host','protocol'));
-        }
-
-        $rewritten_url .= empty($options['skip_relative_url_root']) ? $this->Request->getRelativeUrlRoot() : '';
-
-        if(empty($options['skip_url_locale'])){
-            $locale = $this->Request->getLocaleFromUrl();
-            if(empty($options['lang'])){
-                $rewritten_url .= (empty($locale) ? '' : '/').$locale;
-            }
-
-        }
-
-        $rewritten_url .= (substr($rewritten_url,-1) == '/' ? '' : (AK_URL_REWRITE_ENABLED ? '' : (!empty($path[0]) && $path[0] != '/' ? '/' : '')));
-        $rewritten_url .= $path;
-        $rewritten_url .= empty($options['trailing_slash']) ? '' : '/';
-        $rewritten_url .= empty($options['anchor']) ? '' : '#'.$options['anchor'];
-
-        return $rewritten_url;
-    }
-
-    public function _rewriteAuthentication($options) {
-        if(!isset($options['user']) && isset($options['password'])){
-            return urlencode($options['user']).':'.urlencode($options['password']).'@';
-        }else{
-            return '';
-        }
-    }
-
-    public function _rewritePath($options) {
-        if(!empty($options['params'])){
-            foreach ($options['params'] as $k=>$v){
-                $options[$k] = $v;
-            }
-            unset($options['params']);
-        }
-        if(!empty($options['overwrite_params'])){
-            foreach ($options['overwrite_params'] as $k=>$v){
-                $options[$k] = $v;
-            }
-            unset($options['overwrite_params']);
-        }
-        foreach (array('anchor', 'params', 'only_path', 'host', 'protocol', 'trailing_slash', 'skip_relative_url_root') as $k){
-            unset($options[$k]);
-        }
-
-        $path = Ak::toUrl($options);
-        return $path;
     }
 
     /**
@@ -1381,16 +1333,17 @@ class AkActionController extends AkLazyObject
             $layout = $passed_layout;
         }
         if(is_array($layout) &&  is_object($layout[0]) && method_exists($layout[0], $layout[1])){
-            $this->active_layout = $layout[0]->{$layout[1]}();
+            $active_layout = $layout[0]->{$layout[1]}();
         }elseif(method_exists($this,$layout) &&  strtolower(get_class($this)) !== strtolower($layout)){
-            $this->active_layout = $this->$layout();
+            $active_layout = $this->$layout();
         }else{
-            $this->active_layout = $layout;
+            $active_layout = $layout;
         }
 
-        if(!empty($this->active_layout)){
-            return strstr($this->active_layout,DS) ? $this->active_layout : 'layouts'.DS.$this->active_layout;
+        if(!empty($active_layout)){
+            return strstr($active_layout,'/') ? str_replace('/',DS,$active_layout) : 'layouts'.DS.$active_layout;
         }
+        return false;
     }
 
 
@@ -1412,7 +1365,7 @@ class AkActionController extends AkLazyObject
 
             return $this->renderText($this->Template->renderFile($layout, true, $this->_assigns), $status);
         }else{
-            return $this->render($options, $status, $this->_assigns);
+            return $this->render($options, $status);
         }
     }
 
@@ -1437,10 +1390,13 @@ class AkActionController extends AkLazyObject
 
             $layout = strstr($layout,'/') || strstr($layout,DS) ? $layout : 'layouts'.DS.$layout;
             $layout = preg_replace('/\.tpl$/', '', $layout);
+            
+            $layout = preg_replace('/\.tpl$/', '', $layout);
+            
+            $layout = empty($this->_module_path) || !empty($this->layout) 
+                    ? AkConfig::getDir('views').DS.$layout.'.tpl' 
+                    : AkConfig::getDir('views').DS.'layouts'.DS.trim($this->_module_path, DS).'.tpl'; 
 
-            $layout = substr($layout,0,7) === 'layouts' ?
-            (empty($this->_module_path) || !empty($this->layout) ? AkConfig::getDir('views').DS.$layout.'.tpl' : AkConfig::getDir('views').DS.'layouts'.DS.trim($this->_module_path, DS).'.tpl') :
-            $layout.'.tpl';
 
             if (file_exists($layout)) {
                 return $layout;

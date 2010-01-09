@@ -441,7 +441,18 @@ class AkInflector
         return AkInflector::pluralize(AkInflector::singularize($plural)) == $plural;
     }
 
-
+    /**
+     * Simply checks if $collection_name is the plural of $child_name
+     *
+     * @param string $child_name
+     * @param string $collection_name
+     * @return boolean
+     */
+    static public function isCollectionOf($child_name,$collection_name)
+    {
+        return AkInflector::pluralize($child_name) == $collection_name;
+    }
+    
     /**
      * @deprecated
      */

@@ -8,6 +8,7 @@ class PrototypeHelper_TestCase extends HelperUnitTest
     {
         $this->controller = new AkActionController();
         $this->controller->Request = new MockAkRequest($this);
+        $this->controller->Request->setReturnValue('getParametersFromRequestedUrl',array('controller'=>'test')); 
         $this->controller->controller_name = 'test';
         
         $this->PrototypeHelper = $this->controller->prototype_helper;
@@ -25,12 +26,12 @@ class PrototypeHelper_TestCase extends HelperUnitTest
         );
         $this->assertEqual(
             $this->PrototypeHelper->link_to_remote('test', array('url' => array('controller' => 'foo', 'action' => 'bar'), 'update' => 'listing')),
-            '<a href="#" onclick="new Ajax.Updater(\'listing\', \'/foo/bar/\', {}); return false;">test</a>'
+            '<a href="#" onclick="new Ajax.Updater(\'listing\', \'/foo/bar\', {}); return false;">test</a>'
         );
 
         $this->assertEqual(
             $this->PrototypeHelper->link_to_remote('test', array('url' => array('controller' => 'foo', 'action' => 'bar', 'm' => 'ore', 'b' => 'eer'), 'update' => 'listing')),
-            '<a href="#" onclick="new Ajax.Updater(\'listing\', \'/foo/bar/?m=ore&amp;b=eer\', {}); return false;">test</a>'
+            '<a href="#" onclick="new Ajax.Updater(\'listing\', \'/foo/bar?m=ore&amp;b=eer\', {}); return false;">test</a>'
         );
 
     }
@@ -44,7 +45,7 @@ class PrototypeHelper_TestCase extends HelperUnitTest
 
         $this->assertEqual(
             $this->PrototypeHelper->periodically_call_remote(array('url' => array('controller' => 'foo', 'action' => 'bar'), 'update' => 'listing', 'frequency' => 1)),
-            "<script type=\"text/javascript\">\n//<![CDATA[\nnew PeriodicalExecuter(function() {new Ajax.Updater('listing', '/foo/bar/', {})}, 1)\n//]]>\n</script>"
+            "<script type=\"text/javascript\">\n//<![CDATA[\nnew PeriodicalExecuter(function() {new Ajax.Updater('listing', '/foo/bar', {})}, 1)\n//]]>\n</script>"
         );
     }
 
@@ -52,7 +53,7 @@ class PrototypeHelper_TestCase extends HelperUnitTest
     {
         $this->assertEqual(
             $this->PrototypeHelper->form_remote_tag(array('url' => array('controller' => 'foo', 'action' => 'bar'), 'update' => 'div_to_update', 'html' => array('id' => 'form_id'))),
-            '<form action="/foo/bar/" id="form_id" method="post" onsubmit="new Ajax.Updater(\'div_to_update\', \'/foo/bar/\', {parameters:Form.serialize(this)}); return false;">'
+            '<form action="/foo/bar" id="form_id" method="post" onsubmit="new Ajax.Updater(\'div_to_update\', \'/foo/bar\', {parameters:Form.serialize(this)}); return false;">'
         );
         $this->assertEqual(
             $this->PrototypeHelper->form_remote_tag(array('url' => 'http://www.akelos.org', 'update' => 'div_to_update', 'html' => array('id' => 'form_id'))),
@@ -60,7 +61,7 @@ class PrototypeHelper_TestCase extends HelperUnitTest
         );
         $this->assertEqual(
             $this->PrototypeHelper->form_remote_tag(array('url' => array('controller' => 'foo', 'action' => 'bar'), 'update' => 'div_to_update', 'html' => array('id' => 'form_id', 'action' => $this->controller->url_helper->url_for(array('controller' => 'some', 'action' => 'place'))))),
-            '<form action="/some/place/" id="form_id" method="post" onsubmit="new Ajax.Updater(\'div_to_update\', \'/foo/bar/\', {parameters:Form.serialize(this)}); return false;">'
+            '<form action="/some/place" id="form_id" method="post" onsubmit="new Ajax.Updater(\'div_to_update\', \'/foo/bar\', {parameters:Form.serialize(this)}); return false;">'
         );
     }
 
@@ -81,7 +82,7 @@ class PrototypeHelper_TestCase extends HelperUnitTest
 
         $this->assertEqual(
             $this->PrototypeHelper->submit_to_remote("More beer!", "1000000", array('update' => 'empty_bottle', 'url' => array('controller' => 'foo', 'action' => 'bar'))),
-            '<input name="More beer!" onclick="new Ajax.Updater(\'empty_bottle\', \'/foo/bar/\', {parameters:Form.serialize(this.form)}); return false;" type="button" value="1000000" />'
+            '<input name="More beer!" onclick="new Ajax.Updater(\'empty_bottle\', \'/foo/bar\', {parameters:Form.serialize(this.form)}); return false;" type="button" value="1000000" />'
         );
     }
 
