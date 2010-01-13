@@ -14,6 +14,8 @@ class AkSintagsParser
     public $_current_match;
     public $_block_vars = array();
     public $_errors = array();
+    public $_current_function_opening = null;
+    public $avoid_php_tags = null;
     public $parsed_code = null;
     public $output;
     public $escape_chars = array(
@@ -32,7 +34,7 @@ class AkSintagsParser
         $this->_last_match = '';
         $this->_current_match = '';
     }
-    
+
     public function parse($raw) {
         if(empty($this->parsed_code)){
             $this->_Lexer->parse($this->beforeParsing($this->_escapeChars($raw)));
@@ -53,7 +55,7 @@ class AkSintagsParser
     public function ignore($match, $state) {
         return true;
     }
-    
+
 
 
     public function setHelperLoader(&$HelperLoader){
@@ -365,19 +367,25 @@ class AkSintagsParser
                     return true;
                 }
                 $method_name = trim($match," =(\n\t".$this->_SINTAGS_OPEN_HELPER_TAG);
-                if($helper = $this->_getHelperNameForMethod($method_name)){
+                $helper = $this->_getHelperNameForMethod($method_name);
+                $named_route = in_array($method_name, AkRouterHelper::getDefinedFunctions());
+                if($helper || $named_route){
                     $this->avoid_php_tags = !$is_inline_function && !strstr($match,'=');
                     $this->_current_function_opening = strlen($this->output);
                     if(!$this->avoid_php_tags){
                         $this->output .= $is_inline_function ? '' : '<?php echo ';
                     }
-                    if(!strpos($helper, 'helper')){
-                        $method_name = AkInflector::variablize($method_name);
-                    }
-                    if($helper == 'controller'){
-                        $this->output .= "\$controller->$method_name(";
+                    if($named_route){
+                        $this->output .= "$method_name(";
                     }else{
-                        $this->output .= "\$controller->{$helper}->$method_name(";
+                        if(!strpos($helper, 'helper')){
+                            $method_name = AkInflector::variablize($method_name);
+                        }
+                        if($helper == 'controller'){
+                            $this->output .= "\$controller->$method_name(";
+                        }else{
+                            $this->output .= "\$controller->{$helper}->$method_name(";
+                        }
                     }
                     return true;
                 }else{
@@ -714,7 +722,7 @@ class AkSintagsParser
             return $this->available_helpers[$method_name];
         }
     }
-    
+
     private function _loadLexer(){
         static $Lexer;
         if(empty($Lexer)){
@@ -725,6 +733,6 @@ class AkSintagsParser
             $this->_Lexer->init($this);
         }
     }
-   
+
 }
 

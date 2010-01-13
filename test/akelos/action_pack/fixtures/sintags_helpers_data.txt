@@ -328,3 +328,21 @@
 -----------------------------------
 
 <?php echo $controller->text_helper->translate($controller->text_helper->h('<b>foo</b>')); ?>
+
+===================================
+
+<%= named_route_url :action => 'select_database' %>
+
+-----------------------------------
+
+
+<?php echo named_route_url( array('action' => 'select_database')); ?>
+
+===================================
+
+<%= named_route_path :action => 'select_database' %>
+
+-----------------------------------
+
+
+<?php echo named_route_path( array('action' => 'select_database')); ?>

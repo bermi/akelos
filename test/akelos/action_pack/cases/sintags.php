@@ -13,6 +13,7 @@ class Sintags_TestCase extends ActionPackUnitTest
         $this->_run_from_file('sintags_test_data.txt');
     }
     public function test_sintags_helpers() {
+        AkRouterHelper::generateHelperFunctionsFor('named_route', $this->mock('AkRoute'));
         $this->_run_from_file('sintags_helpers_data.txt');
     }
 
