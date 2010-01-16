@@ -34,7 +34,7 @@ class AkUrlWriter
         'protocol'          => $Request->getProtocol(),
         'host'              => $Request->getHostWithPort()
         );
-        $this->parameters_from_actual_request = $Request->getParametersFromRequestedUrl();
+        $this->parameters_from_actual_request = Ak::delete($Request->getParametersFromRequestedUrl(), array('id', 'action'));
     }
 
     public function urlFor($options = array()) {
