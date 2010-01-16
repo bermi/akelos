@@ -190,6 +190,7 @@ function akelos_autoload($name, $path = null) {
         'AkControllerUnitTest'      => 'active_support/testing/controller.php',
         'AkInflector'               => 'active_support/text/inflector.php',
         'AkLexer'                   => 'active_support/text/lexer.php',
+        'AkError'                   => 'active_support/error_handlers/base.php',
 
         // Active Document
         'AkActiveDocument'          => 'active_document/base.php',

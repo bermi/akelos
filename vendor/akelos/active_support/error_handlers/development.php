@@ -1,5 +1,26 @@
 <?php
 
+function ak_development_error_handler($error_number, $error_message, $file, $line) {
+    $error_number = $error_number & error_reporting();
+    if($error_number == 0){
+        return false;
+    }
+    if(AK_WEB_REQUEST){
+        echo "<pre>";
+    }
+    throw new Exception($error_message);
+    if(AK_WEB_REQUEST){
+        echo "</pre>";
+    }
+}
+
+
+    set_error_handler('ak_development_error_handler');
+
+
+return;
+/*
+?>
 if(!defined('AK_DEBUG_OUTPUT_AS_HTML')){
     if(AK_WEB_REQUEST){
         $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strstr(strtolower($_SERVER['HTTP_X_REQUESTED_WITH']),'xmlhttprequest');
@@ -67,7 +88,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         /**
          * resetting content-encoding header to nil,
          * if it was set to gzip before, otherwise we get an encoding error
-         */
+         * /
         if(AK_WEB_REQUEST) {
             $headers = headers_list();
             if (in_array('Content-Encoding: gzip', $headers) || in_array('Content-Encoding: xgzip', $headers)) {
@@ -279,3 +300,4 @@ if(defined('AK_DEBUG') && AK_DEBUG){
     }
 }
 
+*/
