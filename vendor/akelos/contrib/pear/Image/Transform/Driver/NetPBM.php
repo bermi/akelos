@@ -538,10 +538,10 @@ class Image_Transform_Driver_NetPBM extends Image_Transform
      *
      * @param $filename string the name of the file to write to
      * @param string $type (jpeg,png...);
-     * @param int $quality 75
+     * @param int $quality 100
      * @return TRUE or PEAR Error object on error
      */
-    public function save($filename, $type = null, $quality = 75)
+    public function save($filename, $type = null, $quality = 100)
     {
         $type    = (is_null($type)) ? $this->type : $type;
         $options = array();
@@ -566,7 +566,7 @@ class Image_Transform_Driver_NetPBM extends Image_Transform
      * Display image without saving and lose changes
      *
      * @param string $type (jpeg,png...);
-     * @param int $quality 75
+     * @param int $quality 100
      * @return TRUE or PEAR Error object on error
      */
     public function display($type = null, $quality = null)
@@ -576,7 +576,7 @@ class Image_Transform_Driver_NetPBM extends Image_Transform
         if (!is_null($quality)) {
             $options['quality'] = $quality;
         }
-        $quality = $this->_getOption('quality', $options, 75);
+        $quality = $this->_getOption('quality', $options, 100);
 
         header('Content-type: ' . $this->getMimeType($type));
         $cmd = $this->_postProcess($type, $quality);

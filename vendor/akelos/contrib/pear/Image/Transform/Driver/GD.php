@@ -81,14 +81,6 @@ class Image_Transform_Driver_GD extends Image_Transform
 
     /**
      * Check settings
-     */
-    public function Image_Transform_Driver_GD()
-    {
-        $this->__construct();
-    } // End function Image
-
-    /**
-     * Check settings
      *
      * @since PHP 5
      */
@@ -328,14 +320,19 @@ class Image_Transform_Driver_GD extends Image_Transform
      */
     public function crop($width, $height, $x = 0, $y = 0)
     {
+        $width   = min($width,  $this->new_x - $x - 1);
+        $height  = min($height, $this->new_y - $y - 1);
+
         // Sanity check
         if (!$this->intersects($width, $height, $x, $y)) {
             return PEAR::raiseError('Nothing to crop', IMAGE_TRANSFORM_ERROR_OUTOFBOUND);
         }
+        /*
         $x = min($this->new_x, max(0, $x));
         $y = min($this->new_y, max(0, $y));
         $width   = min($width,  $this->new_x - $x);
         $height  = min($height, $this->new_y - $y);
+        */
         $new_img = $this->_createImage($width, $height);
 
         if (!imagecopy($new_img, $this->imageHandle, 0, 0, $x, $y, $width, $height)) {
@@ -436,7 +433,7 @@ class Image_Transform_Driver_GD extends Image_Transform
      * @param string $filename the name of the file to write to (blank to output)
      * @param string $types    define the output format, default
      *                          is the current used format
-     * @param int    $quality  output DPI, default is 75
+     * @param int    $quality  output DPI, default is 100
      *
      * @return bool|PEAR_Error TRUE on success or PEAR_Error object on error
      * @access protected
@@ -452,7 +449,7 @@ class Image_Transform_Driver_GD extends Image_Transform
                 if (is_numeric($quality)) {
                     $options['quality'] = $quality;
                 }
-                $quality = $this->_getOption('quality', $options, 75);
+                $quality = $this->_getOption('quality', $options, 100);
                 break;
         }
         if (!$this->supportsType($type, 'w')) {
@@ -497,7 +494,7 @@ class Image_Transform_Driver_GD extends Image_Transform
      * This method adds the Content-type HTTP header
      *
      * @param string $type (JPEG, PNG...);
-     * @param int    $quality 75
+     * @param int    $quality 100
      *
      * @return bool|PEAR_Error TRUE or PEAR_Error object on error
      * @access public
@@ -513,7 +510,7 @@ class Image_Transform_Driver_GD extends Image_Transform
      * @param string $filename the name of the file to write to
      * @param string $type     the output format, default
      *                          is the current used format
-     * @param int    $quality  default is 75
+     * @param int    $quality  default is 100
      *
      * @return bool|PEAR_Error TRUE on success or PEAR_Error object on error
      * @access public

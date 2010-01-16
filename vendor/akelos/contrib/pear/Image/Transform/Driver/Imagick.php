@@ -184,7 +184,7 @@ class Image_Transform_Driver_Imagick extends Image_Transform
      *
      * @return none
      */
-    public function save($filename, $type='', $quality = 75)
+    public function save($filename, $type='', $quality = 100)
     {
         if ($type == '') {
             $type = strtoupper($type);
@@ -199,7 +199,7 @@ class Image_Transform_Driver_Imagick extends Image_Transform
      * Display image without saving and lose changes
      *
      * @param string type (JPG,PNG...);
-     * @param int quality 75
+     * @param int quality 100
      *
      * @return none
      */

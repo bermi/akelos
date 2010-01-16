@@ -318,7 +318,7 @@ class Image_Transform_Driver_IM extends Image_Transform
      * @access public
      *
      * @param $filename string  the name of the file to write to
-     * @param $quality  quality image dpi, default=75
+     * @param $quality  quality image dpi, default=100
      * @param $type     string  (JPEG, PNG...)
      *
      * @return mixed TRUE or a PEAR error object on error
@@ -335,7 +335,7 @@ class Image_Transform_Driver_IM extends Image_Transform
         if (!is_null($quality)) {
             $options['quality'] = $quality;
         }
-        $quality = $this->_getOption('quality', $options, 75);
+        $quality = $this->_getOption('quality', $options, 100);
 
         $cmd = $this->_prepare_cmd(
             IMAGE_TRANSFORM_IM_PATH,
@@ -362,7 +362,7 @@ class Image_Transform_Driver_IM extends Image_Transform
      * @access public
      *
      * @param string type (JPEG,PNG...);
-     * @param int quality 75
+     * @param int quality 100
      *
      * @return mixed TRUE or a PEAR error object on error
      */
@@ -378,7 +378,7 @@ class Image_Transform_Driver_IM extends Image_Transform
         if (!is_null($quality)) {
             $options['quality'] = $quality;
         }
-        $quality = $this->_getOption('quality', $options, 75);
+        $quality = $this->_getOption('quality', $options, 100);
 
         $this->_send_display_headers($type);
 

@@ -234,11 +234,11 @@ class Image_Transform_Driver_Imlib extends Image_Transform {
      * @param $filename string  the name of the file to write to
      * @param $type     string  (optional) define the output format, default
      *                          is the current used format
-     * @param $quality  int     (optional) output DPI, default is 75
+     * @param $quality  int     (optional) output DPI, default is 100
      *
      * @return TRUE on success or PEAR Error object on error
      */
-    public function save($filename, $type = '', $quality = 75)
+    public function save($filename, $type = '', $quality = 100)
     {
         if (!is_resource($this->imageHandle)) {
             return PEAR::raiseError('Invalid image', true);
@@ -266,7 +266,7 @@ class Image_Transform_Driver_Imlib extends Image_Transform {
      * This method adds the Content-type HTTP header
      *
      * @param string $type (optional) (JPG,PNG...);
-     * @param int $quality (optional) 75
+     * @param int $quality (optional) 100
      *
      * @return TRUE on success or PEAR Error object on error
      */

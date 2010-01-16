@@ -223,7 +223,7 @@ class Image_Transform_Driver_Imagick2 extends Image_Transform
         if (is_numeric($quality)) {
             $options['quality'] = $quality;
         }
-        $quality = $this->_getOption('quality', $options, 75);
+        $quality = $this->_getOption('quality', $options, 100);
         imagick_setcompressionquality($this->imageHandle, $quality);
 
         if ($type && strcasecmp($type, $this->type)
@@ -251,7 +251,7 @@ class Image_Transform_Driver_Imagick2 extends Image_Transform
      * This method adds the Content-type HTTP header
      *
      * @param string type (JPG,PNG...);
-     * @param int quality 75
+     * @param int quality 100
      *
      * @return bool|PEAR_Error TRUE or a PEAR_Error object on error
      * @access public
@@ -262,7 +262,7 @@ class Image_Transform_Driver_Imagick2 extends Image_Transform
         if (is_numeric($quality)) {
             $options['quality'] = $quality;
         }
-        $quality = $this->_getOption('quality', $options, 75);
+        $quality = $this->_getOption('quality', $options, 100);
         imagick_setcompressionquality($this->imageHandle, $quality);
 
         if ($type && strcasecmp($type, $this->type)
