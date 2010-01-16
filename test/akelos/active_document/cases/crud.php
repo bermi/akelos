@@ -40,7 +40,9 @@ class DocumentCrud_TestCase extends ActiveDocumentUnitTest
         );
         $Akelos             = $this->WebPage->create($attributes);
         $AkelosDuplicated   = $this->WebPage->create($attributes);
-
+        
+        $this->assertNotEqual($AkelosDuplicated->getId(), $Akelos->getId());
+        
         $attributes['body'] = 'Akelos PHP framework...';
         $AkelosDuplicated   = $this->WebPage->create($attributes);
         $this->assertNotEqual($AkelosDuplicated->getId(), $Akelos->getId());
@@ -108,6 +110,16 @@ class DocumentCrud_TestCase extends ActiveDocumentUnitTest
         $WebPage2 = new WebPage($WebPage->getId());
         $this->assertTrue($WebPage2->isNewRecord());
         $this->assertFalse($WebPage->find($WebPage->getId()));
+    }
+
+    public function test_should_allow_custom_primary_key() {
+        $WebPage = new WebPage(array('body' => 'My key'));
+        $WebPage->setId('mykey');
+        $WebPage->save();
+        $WebPage = new WebPage('mykey');
+        $this->assertFalse($WebPage->isNewRecord());
+        $this->assertEqual('mykey', $WebPage->getId());
+        
     }
 }
 

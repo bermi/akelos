@@ -1,5 +1,8 @@
 <?php
 
+defined('AK_MONGO_DEFAULT_HOST')        || define('AK_MONGO_DEFAULT_HOST', 'localhost');
+defined('AK_MONGO_DEFAULT_DATABASE')    || define('AK_MONGO_DEFAULT_DATABASE', AkInflector::underscore(AK_APP_NAME));
+
 class AkOdbMongoDbAdapter
 {
     private $_is_connected = false;
@@ -58,10 +61,10 @@ class AkOdbMongoDbAdapter
     public function setOptions($options = array()) {
         if(is_null($options)) return;
         $default_options = array(
-        'host'      => 'localhost',
+        'host'      => AK_MONGO_DEFAULT_HOST,
         'user'      => '',
         'password'  => '',
-        'database'  => AK_APP_NAME,
+        'database'  => AK_MONGO_DEFAULT_DATABASE,
         );
         $this->_options = array_merge($default_options, $options);
         $this->_updateSignature();
@@ -72,7 +75,7 @@ class AkOdbMongoDbAdapter
     }
 
     public function &getDatabase($database_name = null) {
-        $database_name = empty($database_name) ? $this->getOption('database') : $database_name;
+        $database_name = AkInflector::underscore(empty($database_name) ? $this->getOption('database') : $database_name);
         if(isset($this->_MongoDatabases[$this->_connetion_signature][$database_name])){
             return $this->_MongoDatabases[$this->_connetion_signature][$database_name];
         }
@@ -109,16 +112,16 @@ class AkOdbMongoDbAdapter
     }
 
     public function &find($collection_name, $options = array()){
+        $false = false;
         if(!empty($options['conditions']) && empty($options['attributes'])){
             $options['attributes'] = $options['conditions'];
             unset($options['conditions']);
         }
-        if(empty($options['attributes'])) return false;
+        if(empty($options['attributes'])) return $false;
         $Cursor = $this->getDatabase()->selectCollection($collection_name)->find($this->_castAttributesForFinder($options['attributes']));
         isset($options['limit'])    &&  $Cursor->limit($options['limit']);
         isset($options['sort'])     &&  $Cursor->sort(array($options['sort'] => 1));
         if($Cursor->count() == 0) {
-            $false = false;
             return $false;
         }
         return $Cursor;

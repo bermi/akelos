@@ -343,12 +343,15 @@ class AkActiveDocument extends AkBaseModel
     public function &getAdapter(){
         if(empty($this->_Adapter)){
             if(!$this->_Adapter = Ak::getStaticVar($this->getModelName().'_last_used_Adapter')){
-                $this->_Adapter = Ak::getStaticVar('AkActiveDocument_last_used_Adapter');
+                if(!$this->_Adapter = Ak::getStaticVar('AkActiveDocument_last_used_Adapter')){
+                    $db = new AkOdbAdapter();
+                    $db->connect();
+                    $this->setAdapter($db);
+                }
             }
         }
         return $this->_Adapter;
     }
-
 
 
 
@@ -538,11 +541,12 @@ class AkActiveDocument extends AkBaseModel
 
 
 
-class AkActiveDocumentIterator implements Iterator
+class AkActiveDocumentIterator implements Iterator, ArrayAccess
 {
     private $_AdapterIterator;
     private $_Model;
     private $_ModelInstance;
+    private $_documents = array();
 
     public function __construct(&$AdapterIterator, &$Model){
         $this->_AdapterIterator = $AdapterIterator;
@@ -571,6 +575,36 @@ class AkActiveDocumentIterator implements Iterator
 
     public function valid() {
         return $this->_AdapterIterator->valid();
+    }
+
+    private function _enableArrayAccess(){
+        if(empty($this->_documents)){
+            $this->rewind();
+            $i = 0;
+            foreach ($this as $Document){
+                $this->_documents[$i] = $Document;
+                $i++;
+            }
+        }
+    }
+
+    public function offsetSet($offset, $value) {
+        $this->_enableArrayAccess();
+        $this->_documents[$offset] = $value;
+    }
+
+    public function offsetExists($offset) {
+        $this->_enableArrayAccess();
+        return isset($this->_documents[$offset]);
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->_documents[$offset]);
+    }
+
+    public function offsetGet($offset) {
+        $this->_enableArrayAccess();
+        return isset($this->_documents[$offset]) ? $this->_documents[$offset] : null;
     }
 }
 
