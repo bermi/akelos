@@ -112,15 +112,6 @@ class DocumentCrud_TestCase extends ActiveDocumentUnitTest
         $this->assertFalse($WebPage->find($WebPage->getId()));
     }
 
-    public function test_should_allow_custom_primary_key() {
-        $WebPage = new WebPage(array('body' => 'My key'));
-        $WebPage->setId('mykey');
-        $WebPage->save();
-        $WebPage = new WebPage('mykey');
-        $this->assertFalse($WebPage->isNewRecord());
-        $this->assertEqual('mykey', $WebPage->getId());
-        
-    }
 }
 
 ak_test_case('DocumentCrud_TestCase');
