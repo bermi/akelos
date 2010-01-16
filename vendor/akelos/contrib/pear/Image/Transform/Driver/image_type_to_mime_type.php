@@ -7,7 +7,7 @@
 
 include_once('Image/Transform/IMAGETYPE.php');
 
-function image_type_to_mime_type($type) {
+public function image_type_to_mime_type($type) {
     switch ($type) {
         case IMAGETYPE_GIF:
             return 'image/gif';

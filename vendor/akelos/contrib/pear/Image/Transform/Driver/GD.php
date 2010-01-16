@@ -21,17 +21,17 @@
  * @author     Philippe Jausions <Philippe.Jausions@11abacus.com>
  * @copyright  2002-2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: GD.php,v 1.29 2005/05/13 16:34:58 jausions Exp $
+ * @version    CVS: $Id: GD.php 287351 2009-08-16 03:28:48Z clockwerx $
  * @link       http://pear.php.net/package/Image_Transform
  */
 
-require_once "Image/Transform.php";
+require_once 'Image/Transform.php';
 
 /**
  * GD implementation for Image_Transform package
  *
  * Usage :
- *    $img    =& Image_Transform::factory('GD');
+ *    $img    = Image_Transform::factory('GD');
  *    $angle  = -78;
  *    $img->load('magick.png');
  *
@@ -63,21 +63,29 @@ require_once "Image/Transform.php";
  */
 class Image_Transform_Driver_GD extends Image_Transform
 {
-	/**
-	 * Holds the image resource for manipulation
+    /**
+     * Holds the image resource for manipulation
      *
      * @var resource $imageHandle
      * @access protected
-	 */
+     */
     public $imageHandle = null;
 
-	/**
-	 * Holds the original image file
+    /**
+     * Holds the original image file
      *
      * @var resource $imageHandle
      * @access protected
-	 */
-    public $old_image = null;
+     */
+    public $oldImage = null;
+
+    /**
+     * Check settings
+     */
+    public function Image_Transform_Driver_GD()
+    {
+        $this->__construct();
+    } // End function Image
 
     /**
      * Check settings
@@ -113,7 +121,6 @@ class Image_Transform_Driver_GD extends Image_Transform
 
     } // End function Image
 
-
     /**
      * Loads an image from file
      *
@@ -146,6 +153,17 @@ class Image_Transform_Driver_GD extends Image_Transform
 
     } // End load
 
+    /**
+     * Returns the GD image handle
+     *
+     * @return resource
+     *
+     * @access public
+     */
+    public function getHandle()
+    {
+        return $this->imageHandle;
+    }//function getHandle()
 
     /**
      * Adds a border of constant width around an image
@@ -179,7 +197,6 @@ class Image_Transform_Driver_GD extends Image_Transform
         return true;
     }
 
-
     /**
      * addText
      *
@@ -197,9 +214,10 @@ class Image_Transform_Driver_GD extends Image_Transform
      *
      * @return bool|PEAR_Error TRUE or a PEAR_Error object on error
      */
-	function addText($params)
+    public function addText($params)
     {
-		$params = array_merge($this->_get_default_text_params(), $params);
+        $this->oldImage = $this->imageHandle;
+        $params = array_merge($this->_get_default_text_params(), $params);
         extract($params);
 
         $options = array('fontColor' => $color);
@@ -208,13 +226,13 @@ class Image_Transform_Driver_GD extends Image_Transform
         $c = imagecolorresolve ($this->imageHandle, $color[0], $color[1], $color[2]);
 
         if ('ttf' == substr($font, -3)) {
-			ImageTTFText($this->imageHandle, $size, $angle, $x, $y, $c, $font, $text);
+            ImageTTFText($this->imageHandle, $size, $angle, $x, $y, $c, $font, $text);
         } else {
-        	ImagePSText($this->imageHandle, $size, $angle, $x, $y, $c, $font, $text);
+            ImagePSText($this->imageHandle, $size, $angle, $x, $y, $c, $font, $text);
         }
-        return true;
-	} // End addText
 
+        return true;
+    } // End addText
 
     /**
      * Rotates image by the given angle
@@ -239,9 +257,9 @@ class Image_Transform_Driver_GD extends Image_Transform
         $color_mask = $this->_getColor('canvasColor', $options,
                                         array(255, 255, 255));
 
-        $mask   = imagecolorresolve($this->imageHandle, $color_mask[0], $color_mask[1], $color_mask[2]);
+        $mask = imagecolorresolve($this->imageHandle, $color_mask[0], $color_mask[1], $color_mask[2]);
 
-        $this->old_image   = $this->imageHandle;
+        $this->oldImage = $this->imageHandle;
 
         // Multiply by -1 to change the sign, so the image is rotated clockwise
         $this->imageHandle = ImageRotate($this->imageHandle, $angle * -1, $mask);
@@ -305,14 +323,19 @@ class Image_Transform_Driver_GD extends Image_Transform
      * @param int height Cropped image height
      * @param int x X-coordinate to crop at
      * @param int y Y-coordinate to crop at
-     *
      * @return bool|PEAR_Error TRUE or a PEAR_Error object on error
      * @access public
      */
     public function crop($width, $height, $x = 0, $y = 0)
     {
-        $width   = min($width,  $this->new_x - $x - 1);
-        $height  = min($height, $this->new_y - $y - 1);
+        // Sanity check
+        if (!$this->intersects($width, $height, $x, $y)) {
+            return PEAR::raiseError('Nothing to crop', IMAGE_TRANSFORM_ERROR_OUTOFBOUND);
+        }
+        $x = min($this->new_x, max(0, $x));
+        $y = min($this->new_y, max(0, $y));
+        $width   = min($width,  $this->new_x - $x);
+        $height  = min($height, $this->new_y - $y);
         $new_img = $this->_createImage($width, $height);
 
         if (!imagecopy($new_img, $this->imageHandle, 0, 0, $x, $y, $width, $height)) {
@@ -321,7 +344,7 @@ class Image_Transform_Driver_GD extends Image_Transform
                 IMAGE_TRANSFORM_ERROR_FAILED);
         }
 
-        $this->old_image = $this->imageHandle;
+        $this->oldImage = $this->imageHandle;
         $this->imageHandle = $new_img;
         $this->resized = true;
 
@@ -329,7 +352,6 @@ class Image_Transform_Driver_GD extends Image_Transform
         $this->new_y = $height;
         return true;
     }
-
 
     /**
      * Converts the image to greyscale
@@ -342,24 +364,23 @@ class Image_Transform_Driver_GD extends Image_Transform
         return true;
     }
 
-
-   /**
-    * Resize Action
-    *
-    * For GD 2.01+ the new copyresampled function is used
-    * It uses a bicubic interpolation algorithm to get far
-    * better result.
-    *
-    * Options:
-    *  - scaleMethod: "pixel" or "smooth"
-    *
-    * @param int   $new_x   New width
-    * @param int   $new_y   New height
-    * @param mixed $options Optional parameters
-    *
-    * @return bool|PEAR_Error TRUE on success or PEAR_Error object on error
-    * @access protected
-    */
+    /**
+     * Resize Action
+     *
+     * For GD 2.01+ the new copyresampled function is used
+     * It uses a bicubic interpolation algorithm to get far
+     * better result.
+     *
+     * @param int   $new_x   New width
+     * @param int   $new_y   New height
+     * @param array $options Optional parameters
+     * <ul>
+     *  <li>'scaleMethod': "pixel" or "smooth"</li>
+     * </ul>
+     *
+     * @return bool|PEAR_Error TRUE on success or PEAR_Error object on error
+     * @access protected
+     */
     public function _resize($new_x, $new_y, $options = null)
     {
         if ($this->resized === true) {
@@ -382,9 +403,9 @@ class Image_Transform_Driver_GD extends Image_Transform
             $icr_res = ImageCopyResampled($new_img, $this->imageHandle, 0, 0, 0, 0, $new_x, $new_y, $this->img_x, $this->img_y);
         }
         if (!$icr_res) {
-            imagecopyresampled($new_img, $this->imageHandle, 0, 0, 0, 0, $new_x, $new_y, $this->img_x, $this->img_y);
+            ImageCopyResized($new_img, $this->imageHandle, 0, 0, 0, 0, $new_x, $new_y, $this->img_x, $this->img_y);
         }
-        $this->old_image = $this->imageHandle;
+        $this->oldImage = $this->imageHandle;
         $this->imageHandle = $new_img;
         $this->resized = true;
 
@@ -431,7 +452,7 @@ class Image_Transform_Driver_GD extends Image_Transform
                 if (is_numeric($quality)) {
                     $options['quality'] = $quality;
                 }
-                $quality = $this->_getOption('quality', $options, 100);
+                $quality = $this->_getOption('quality', $options, 75);
                 break;
         }
         if (!$this->supportsType($type, 'w')) {
@@ -441,9 +462,9 @@ class Image_Transform_Driver_GD extends Image_Transform
 
         if ($filename == '') {
             header('Content-type: ' . $this->getMimeType($type));
-            $action = 'save image to file';
-        } else {
             $action = 'output image';
+        } else {
+            $action = 'save image to file';
         }
 
         $functionName = 'image' . $type;
@@ -452,20 +473,23 @@ class Image_Transform_Driver_GD extends Image_Transform
                 $result = $functionName($this->imageHandle, $filename, $quality);
                 break;
             default:
-                $result = $functionName($this->imageHandle, $filename);
+                if ($filename == '') {
+                    $result = $functionName($this->imageHandle);
+                } else {
+                    $result = $functionName($this->imageHandle, $filename);
+                }
         }
         if (!$result) {
             return PEAR::raiseError('Couldn\'t ' . $action,
                 IMAGE_TRANSFORM_ERROR_IO);
         }
-        $this->imageHandle = $this->old_image;
+        $this->imageHandle = $this->oldImage;
         if (!$this->keep_settings_on_save) {
             $this->free();
         }
         return true;
 
     } // End save
-
 
     /**
      * Displays image without saving and lose changes.
@@ -480,7 +504,7 @@ class Image_Transform_Driver_GD extends Image_Transform
      */
     public function display($type = '', $quality = null)
     {
-        return $this->_generate('', $type, $quality);;
+        return $this->_generate('', $type, $quality);
     }
 
     /**
@@ -515,10 +539,10 @@ class Image_Transform_Driver_GD extends Image_Transform
             ImageDestroy($this->imageHandle);
         }
         $this->imageHandle = null;
-        if (is_resource($this->old_image)){
-            ImageDestroy($this->old_image);
+        if (is_resource($this->oldImage)){
+            ImageDestroy($this->oldImage);
         }
-        $this->old_image = null;
+        $this->oldImage = null;
     }
 
     /**
@@ -552,6 +576,8 @@ class Image_Transform_Driver_GD extends Image_Transform
         if ($createtruecolor
             && function_exists('ImageCreateTrueColor')) {
             $new_img = @ImageCreateTrueColor($width, $height);
+            imagealphablending($new_img, false);
+            imagesavealpha($new_img, true);
         }
         if (!$new_img) {
             $new_img = ImageCreate($width, $height);
@@ -565,5 +591,3 @@ class Image_Transform_Driver_GD extends Image_Transform
         return $new_img;
     }
 }
-
-?>

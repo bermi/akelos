@@ -19,7 +19,7 @@
  * @author     Philippe Jausions <Philippe.Jausions@11abacus.com>
  * @copyright  2002-2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: IM.php,v 1.23 2005/04/28 03:56:25 jausions Exp $
+ * @version    CVS: $Id: IM.php 287351 2009-08-16 03:28:48Z clockwerx $
  * @link       http://pear.php.net/package/Image_Transform
  */
 
@@ -47,24 +47,22 @@ class Image_Transform_Driver_IM extends Image_Transform
      * @var array
      * @access private
      */
-    var $command;
+    public $command;
 
     /**
      * Class constructor
      */
-    function Image_Transform_Driver_IM()
+    public function Image_Transform_Driver_IM()
     {
         $this->__construct();
     } // End Image_IM
 
-
     /**
      * Class constructor
      */
-    function __construct()
+    public function __construct()
     {
         $this->_init();
-        require_once 'System.php';
         if (!defined('IMAGE_TRANSFORM_IM_PATH')) {
             $path = dirname(System::which('convert'))
                     . DIRECTORY_SEPARATOR;
@@ -78,11 +76,10 @@ class Image_Transform_Driver_IM extends Image_Transform
         }
     } // End Image_IM
 
-
     /**
      * Initialize the state of the object
      **/
-    function _init()
+    public function _init()
     {
         $this->command = array();
     }
@@ -97,7 +94,7 @@ class Image_Transform_Driver_IM extends Image_Transform
      * @return mixed TRUE or a PEAR error object on error
      * @see PEAR::isError()
      */
-    function load($image)
+    public function load($image)
     {
         $this->_init();
         if (!file_exists($image)) {
@@ -113,14 +110,13 @@ class Image_Transform_Driver_IM extends Image_Transform
 
     } // End load
 
-
     /**
      * Image_Transform_Driver_IM::_get_image_details()
      *
      * @param string $image the path and name of the image file
      * @return none
      */
-    function _get_image_details($image)
+    public function _get_image_details($image)
     {
         $retval = Image_Transform::_get_image_details($image);
         if (PEAR::isError($retval)) {
@@ -134,15 +130,15 @@ class Image_Transform_Driver_IM extends Image_Transform
                 '-format %w:%h:%m ' . escapeshellarg($image));
             exec($cmd, $res, $exit);
 
-            if ($exit == 0) {
-                $data  = explode(':', $res[0]);
-                $this->img_x = $data[0];
-                $this->img_y = $data[1];
-                $this->type  = strtolower($data[2]);
-                $retval = true;
-            } else {
+            if ($exit != 0) {
                 return PEAR::raiseError("Cannot fetch image or images details.", true);
             }
+
+            $data  = explode(':', $res[0]);
+            $this->img_x = $data[0];
+            $this->img_y = $data[1];
+            $this->type  = strtolower($data[2]);
+            $retval = true;
 
         }
 
@@ -161,7 +157,7 @@ class Image_Transform_Driver_IM extends Image_Transform
      * @return true on success or PEAR Error object on error
      * @see PEAR::isError()
      */
-    function _resize($new_x, $new_y, $options = null)
+    public function _resize($new_x, $new_y, $options = null)
     {
         if (isset($this->command['resize'])) {
             return PEAR::raiseError('You cannot scale or resize an image more than once without calling save() or display()', true);
@@ -182,7 +178,7 @@ class Image_Transform_Driver_IM extends Image_Transform
      * @param   array   options no option allowed
      * @return mixed TRUE or a PEAR error object on error
      */
-    function rotate($angle, $options = null)
+    public function rotate($angle, $options = null)
     {
         $angle = $this->_rotation_angle($angle);
         if ($angle % 360) {
@@ -191,7 +187,6 @@ class Image_Transform_Driver_IM extends Image_Transform
         return true;
 
     } // End rotate
-
 
     /**
      * Crop image
@@ -206,12 +201,12 @@ class Image_Transform_Driver_IM extends Image_Transform
      *
      * @return mixed TRUE or a PEAR error object on error
      */
-    function crop($width, $height, $x = 0, $y = 0) {
+    public function crop($width, $height, $x = 0, $y = 0) {
         // Do we want a safety check - i.e. if $width+$x > $this->img_x then we
         // raise a warning? [and obviously same for $height+$y]
         $this->command['crop'] = '-crop '
             . ((int) $width)  . 'x' . ((int) $height)
-            . '+' . ((int) $x) . '+' . ((int) $y);
+            . '+' . ((int) $x) . '+' . ((int) $y) . '!';
 
         // I think that setting img_x/y is wrong, but scaleByLength() & friends
         // mess up the aspect after a crop otherwise.
@@ -239,10 +234,12 @@ class Image_Transform_Driver_IM extends Image_Transform
      * @return mixed TRUE or a PEAR error object on error
      * @see PEAR::isError()
      */
-    function addText($params)
+    public function addText($params)
     {
+        $this->old_image = $this->imageHandle;
          $params = array_merge($this->_get_default_text_params(), $params);
          extract($params);
+
          if (true === $resize_first) {
              // Set the key so that this will be the last item in the array
             $key = 'ztext';
@@ -265,7 +262,7 @@ class Image_Transform_Driver_IM extends Image_Transform
      * @param float $outputgamma
      * @return mixed TRUE or a PEAR error object on error
      */
-    function gamma($outputgamma = 1.0) {
+    public function gamma($outputgamma = 1.0) {
         if ($outputgamme != 1.0) {
             $this->command['gamma'] = '-gamma ' . (float) $outputgamma;
         }
@@ -278,7 +275,7 @@ class Image_Transform_Driver_IM extends Image_Transform
      * @access public
      * @return mixed TRUE or a PEAR error object on error
      */
-    function greyscale() {
+    public function greyscale() {
         $this->command['type'] = '-type Grayscale';
         return true;
     }
@@ -289,7 +286,7 @@ class Image_Transform_Driver_IM extends Image_Transform
      * @access public
      * @return TRUE or PEAR Error object on error
      */
-    function mirror() {
+    public function mirror() {
         // We can only apply "flop" once
         if (isset($this->command['flop'])) {
             unset($this->command['flop']);
@@ -305,7 +302,7 @@ class Image_Transform_Driver_IM extends Image_Transform
      * @access public
      * @return TRUE or PEAR Error object on error
      */
-    function flip() {
+    public function flip() {
         // We can only apply "flip" once
         if (isset($this->command['flip'])) {
             unset($this->command['flip']);
@@ -326,7 +323,7 @@ class Image_Transform_Driver_IM extends Image_Transform
      *
      * @return mixed TRUE or a PEAR error object on error
      */
-    function save($filename, $type = '', $quality = null)
+    public function save($filename, $type = '', $quality = null)
     {
         $type = strtoupper(($type == '') ? $this->type : $type);
         switch ($type) {
@@ -338,7 +335,7 @@ class Image_Transform_Driver_IM extends Image_Transform
         if (!is_null($quality)) {
             $options['quality'] = $quality;
         }
-        $quality = $this->_getOption('quality', $options, 100);
+        $quality = $this->_getOption('quality', $options, 75);
 
         $cmd = $this->_prepare_cmd(
             IMAGE_TRANSFORM_IM_PATH,
@@ -348,6 +345,10 @@ class Image_Transform_Driver_IM extends Image_Transform
                . escapeshellarg($this->image) . ' ' . $type . ':'
                . escapeshellarg($filename) . ' 2>&1');
         exec($cmd, $res, $exit);
+
+        if (!$this->keep_settings_on_save) {
+            $this->free();
+        }
 
         return ($exit == 0) ? true : PEAR::raiseError(implode('. ', $res),
             IMAGE_TRANSFORM_ERROR_IO);
@@ -365,9 +366,9 @@ class Image_Transform_Driver_IM extends Image_Transform
      *
      * @return mixed TRUE or a PEAR error object on error
      */
-    function display($type = '', $quality = null)
+    public function display($type = '', $quality = null)
     {
-        $type    = strtoupper(($type == '') ? $type : $this->type);
+        $type    = strtoupper(($type == '') ? $this->type : $type);
         switch ($type) {
             case 'JPEG':
                 $type = 'JPG';
@@ -377,7 +378,7 @@ class Image_Transform_Driver_IM extends Image_Transform
         if (!is_null($quality)) {
             $options['quality'] = $quality;
         }
-        $quality = $this->_getOption('quality', $options, 100);
+        $quality = $this->_getOption('quality', $options, 75);
 
         $this->_send_display_headers($type);
 
@@ -388,9 +389,9 @@ class Image_Transform_Driver_IM extends Image_Transform
                    $this->image . ' ' . $type . ":-");
         passthru($cmd);
 
-		if (!$this->keep_settings_on_save) {
-		    $this->free();
-		}
+        if (!$this->keep_settings_on_save) {
+            $this->free();
+        }
         return true;
     }
 
@@ -399,13 +400,11 @@ class Image_Transform_Driver_IM extends Image_Transform
      *
      * @return void
      */
-    function free()
+    public function free()
     {
-	    $this->command = array();
+        $this->command = array();
         $this->image = '';
         $this->type = '';
     }
 
 } // End class ImageIM
-
-?>

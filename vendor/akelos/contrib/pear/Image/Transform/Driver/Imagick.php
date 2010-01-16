@@ -43,7 +43,7 @@ class Image_Transform_Driver_Imagick extends Image_Transform
      * Handler of the imagick image ressource
      * @var array
      */
-    var $imageHandle;
+    public $imageHandle;
 
 
     /**
@@ -51,13 +51,13 @@ class Image_Transform_Driver_Imagick extends Image_Transform
      * the last transformation
      * @var array
      */
-    var $oldImage;
+    public $oldImage;
 
     /**
      *
      *
      */
-    function Image_Transform_Driver_Imagick()
+    public function Image_Transform_Driver_Imagick()
     {
         if (!PEAR::loadExtension('imagick')) {
             return PEAR::raiseError('The imagick extension can not be found.', true);
@@ -74,7 +74,7 @@ class Image_Transform_Driver_Imagick extends Image_Transform
      * @return mixed none or a PEAR error object on error
      * @see PEAR::isError()
      */
-    function load($image)
+    public function load($image)
     {
         $this->imageHandle = imagick_create();
         if ( !is_resource( $this->imageHandle ) ) {
@@ -100,7 +100,7 @@ class Image_Transform_Driver_Imagick extends Image_Transform
      * @return none
      * @see PEAR::isError()
      */
-    function _resize($new_x, $new_y)
+    public function _resize($new_x, $new_y)
     {
         if ($img2 = imagick_copy_resize($this->imageHandle, $new_x, $new_y, IMAGICK_FILTER_CUBIC, 1)){
             $this->oldImage = $this->imageHandle;
@@ -122,7 +122,7 @@ class Image_Transform_Driver_Imagick extends Image_Transform
      * @return none
      * @see PEAR::isError()
      */
-    function rotate($angle,$options=null)
+    public function rotate($angle,$options=null)
     {
         if ($img2 = imagick_copy_rotate ($this->imageHandle, $angle)){
             $this->oldImage     = $this->imageHandle;
@@ -152,7 +152,7 @@ class Image_Transform_Driver_Imagick extends Image_Transform
      * @return none
      * @see PEAR::isError()
      */
-    function addText($params)
+    public function addText($params)
     {
         $default_params = array(
                                 'text'          => 'This is a Text',
@@ -184,7 +184,7 @@ class Image_Transform_Driver_Imagick extends Image_Transform
      *
      * @return none
      */
-    function save($filename, $type='', $quality = 75)
+    public function save($filename, $type='', $quality = 75)
     {
         if ($type == '') {
             $type = strtoupper($type);
@@ -203,7 +203,7 @@ class Image_Transform_Driver_Imagick extends Image_Transform
      *
      * @return none
      */
-    function display($type = '', $quality = 100)
+    public function display($type = '', $quality = 100)
     {
         if ($type == '') {
             header('Content-type: image/' . $this->type);
@@ -221,7 +221,7 @@ class Image_Transform_Driver_Imagick extends Image_Transform
      *
      * @return none
      */
-    function free()
+    public function free()
     {
         if(is_resource($this->imageHandle)){
             imagick_free($this->imageHandle);
