@@ -1,10 +1,5 @@
 <?php
 
-class RouteDoesNotMatchRequestException extends Exception
-{ }
-class RouteDoesNotMatchParametersException extends Exception
-{ }
-
 class AkRoute
 {
     private $url_pattern;
@@ -31,33 +26,39 @@ class AkRoute
 
         $this->addDefaults($params);
         $this->urlDecode($params);
-
         return $params;
     }
 
     protected function extractParamsFromUrl($url) {
         if ($url=='/') $url = '';
 
-        // if(strstr($url, 'redirect') && strstr($this->getRegex(), 'redirect') )
         // Ak::trace($this->getRegex()."\n".$url);
-        if (!preg_match($this->getRegex(),$url,$matches)) throw new RouteDoesNotMatchRequestException("Url doesn't match the regex of the route.");
+        if (!preg_match($this->getRegex(),rtrim($url, '/'),$matches)) throw new RouteDoesNotMatchRequestException("Url doesn't match the regex of the route.");
         array_shift($matches);   //throw away the "all-match", we only need the groups
 
-        // Ak::trace($matches);
+        $this->_rebaseApplicationIfRequired();
 
         $params = array();
         $name = '';
         $skipped_optional = false;
-        foreach ($matches as $name=>$match){
-            if (is_int($name)) continue;  // we use named-subpatterns, anything else we throw away
-            if (empty($match)) {
-                if (!$this->segments[$name]->isOmitable()){
-                    $skipped_optional = true;
+        if(!empty($matches)){
+            foreach ($matches as $name=>$match){
+                if (is_int($name)) continue;  // we use named-subpatterns, anything else we throw away
+                if (empty($match)) {
+                    if (!$this->segments[$name]->isOmitable()){
+                        $skipped_optional = true;
+                    }
+                    continue;
                 }
-                continue;
+
+                if ($skipped_optional) throw new RouteDoesNotMatchRequestException("Segment $name is missing.");
+                $params[$name] = $this->segments[$name]->extractValueFromUrl($match);
             }
-            if ($skipped_optional) throw new RouteDoesNotMatchRequestException("Segment $name is missing.");
-            $params[$name] = $this->segments[$name]->extractValueFromUrl($match);
+        }else{
+            foreach ($this->getRequirements() as $name => $requirement){
+                if(isset($this->segments[$name]) && $this->segments[$name]->isOmitable())
+                $params[$name] = $this->segments[$name]->generateUrlFromValue(null, false);
+            }
         }
 
         $this->addFormatToParams($params);
@@ -72,11 +73,14 @@ class AkRoute
             }
         }
     }
+    public function getDefaults() {
+        return $this->defaults;
+    }
 
     protected function ensureRequestMethod($method) {
         if (!isset($this->conditions['method'])) return true;
-        if ($this->conditions['method'] === ANY) return true;
-        if (strstr($this->conditions['method'],$method)) return true;
+        if ($this->conditions['method'] == ANY) return true;
+        if (strstr($this->conditions['method'], $method)) return true;
         throw new RouteDoesNotMatchRequestException("Method does not match.");
     }
 
@@ -123,13 +127,23 @@ class AkRoute
         foreach ($params as $name=>$value){
             if (isset($this->defaults[$name])){
                 // don't override defaults that don't correspond to dynamic segments, but break
-                if ($this->defaults[$name] != $value) throw new RouteDoesNotMatchParametersException("Parameter $name is not dynamic.");
+                if ($this->defaults[$name] != $value){
+                    throw new RouteDoesNotMatchParametersException("Parameter $name is not dynamic.");
+                }
                 // don't append defaults
                 continue;
             }
             $key_value_pairs[] = "$name=$value";
         }
         return join('&',$key_value_pairs);
+    }
+
+    public function getConditions() {
+        return $this->conditions;
+    }
+
+    public function getRequirements() {
+        return $this->requirements;
     }
 
     public function getRegex() {
@@ -213,6 +227,13 @@ class AkRoute
 
     private function _urlencode(&$input) {
         $input = urlencode($input);
+    }
+
+    private function _rebaseApplicationIfRequired() {
+        if(isset($this->requirements['rebase'])){
+            AkConfig::setOption('rebase_path', (AK_WIN?'':DS).$this->requirements['rebase']);
+            unset($this->requirements['rebase']);
+        }
     }
 
 }

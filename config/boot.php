@@ -22,4 +22,6 @@ defined('AK_TESTING_NAMESPACE') || define('AK_TESTING_NAMESPACE',   'akelos');
 
 include AK_FRAMEWORK_DIR.DS.'autoload.php';
 
-
+// Akelos only shows debug messages if accessed from the localhost IP, you can manually tell
+// Akelos wich IP's you consider to be local.
+// AkConfig::setOption('local_ips', array('127.0.0.1', '192.168.1.69'));

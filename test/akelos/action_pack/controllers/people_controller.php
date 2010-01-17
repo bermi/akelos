@@ -3,7 +3,7 @@
 class MethodNotAllowedException extends Exception 
 { } 
 
-class PersonController extends ApplicationController
+class PeopleController extends ApplicationController
 {
     var $Request;
     
@@ -36,7 +36,7 @@ class PersonController extends ApplicationController
     
     protected function renderXml($xml_string,$status=null,$location=null) {
         $this->Response->addHeader(array('content-type'=>'text/xml'));
-        $this->renderText($xml_string,$status);
+        $this->renderText((string)$xml_string,$status);
     }
     
 }

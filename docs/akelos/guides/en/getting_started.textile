@@ -283,7 +283,7 @@ The default routes handle simple requests such as +/home/index+: Akelos translat
 To hook up your home page, you need to add another line to the routing file, above the default routes:
 
 <php>
-$Map->root(array('controller' => "home"));
+$Map->root(array('controller' => 'home'));
 </php>
 
 This line illustrates one tiny bit of the "convention over configuration" approach: if you don't specify an action, Akelos assumes the +index+ action.
@@ -570,7 +570,7 @@ When the user clicks the +Create+ button on this form, the browser will send inf
 
 <php>
 def create
-  @post = Post.new(params[:post])
+  @post = Post.new($this->params['post'])
 
   respond_to do |format|
     if @post.save
@@ -579,7 +579,7 @@ def create
       format.xml  { render :xml => @post, :status => :created,
 	                :location => @post }
     else
-      format.html { render :action => "new" }
+      format.html { render :action => 'new' }
       format.xml  { render :xml => @post.errors,
 	                :status => :unprocessable_entity }
     end
@@ -597,7 +597,7 @@ When you click the +show+ link for a post on the index page, it will bring you t
 
 <php>
 def show
-  @post = Post.find(params[:id])
+  @post = Post.find($this->params['id'])
 
   respond_to do |format|
     format.html # show.html.tpl
@@ -635,7 +635,7 @@ Like creating a new post, editing a post is a two-part process. The first step i
 
 <php>
 def edit
-  @post = Post.find(params[:id])
+  @post = Post.find($this->params['id'])
 end
 </php>
 
@@ -672,15 +672,15 @@ Submitting the form created by this view will invoke the +update+ action within 
 
 <php>
 def update
-  @post = Post.find(params[:id])
+  @post = Post.find($this->params['id'])
 
   respond_to do |format|
-    if @post.update_attributes(params[:post])
+    if @post.update_attributes($this->params['post'])
       flash[:notice] = 'Post was successfully updated.'
       format.html { redirect_to(@post) }
       format.xml  { head :ok }
     else
-      format.html { render :action => "edit" }
+      format.html { render :action => 'edit' }
       format.xml  { render :xml => @post.errors,
 	                :status => :unprocessable_entity }
     end
@@ -698,7 +698,7 @@ Finally, clicking one of the +destroy+ links sends the associated id to the +des
 
 <php>
 def destroy
-  @post = Post.find(params[:id])
+  @post = Post.find($this->params['id'])
   @post.destroy
 
   respond_to do |format|
@@ -723,7 +723,7 @@ As you saw earlier, the scaffold-generated views for the +new+ and +edit+ action
 <tpl>
 <h1>New post</h1>
 
-<%= render :partial => "form" %>
+<%= render :partial => 'form' %>
 
 <%= link_to 'Back', posts_path %>
 </tpl>
@@ -733,7 +733,7 @@ As you saw earlier, the scaffold-generated views for the +new+ and +edit+ action
 <tpl>
 <h1>Editing post</h1>
 
-<%= render :partial => "form" %>
+<%= render :partial => 'form' %>
 
 <%= link_to 'Show', @post %> |
 <%= link_to 'Back', posts_path %>
@@ -775,21 +775,21 @@ At this point, if you look at the controller for posts, you'll see some duplicat
 class PostsController < ApplicationController
   # ...
   def show
-    @post = Post.find(params[:id])
+    @post = Post.find($this->params['id'])
   # ...
   end
 
   def edit
-    @post = Post.find(params[:id])
+    @post = Post.find($this->params['id'])
   end
 
   def update
-    @post = Post.find(params[:id])
+    @post = Post.find($this->params['id'])
     # ...
   end
 
   def destroy
-    @post = Post.find(params[:id])
+    @post = Post.find($this->params['id'])
     # ...
   end
 end
@@ -819,7 +819,7 @@ class PostsController < ApplicationController
 
 private
   def find_post
-    @post = Post.find(params[:id])
+    @post = Post.find($this->params['id'])
   end
 end
 </php>
@@ -975,7 +975,7 @@ class CommentsController < ApplicationController
   end
 
   def show
-    @comment = @post.comments.find(params[:id])
+    @comment = @post.comments.find($this->params['id'])
   end
 
   def new
@@ -983,36 +983,36 @@ class CommentsController < ApplicationController
   end
 
   def create
-    @comment = @post.comments.build(params[:comment])
+    @comment = @post.comments.build($this->params['comment'])
     if @comment.save
       redirect_to post_comment_url(@post, @comment)
     else
-      render :action => "new"
+      render :action => 'new'
     end
   end
 
   def edit
-    @comment = @post.comments.find(params[:id])
+    @comment = @post.comments.find($this->params['id'])
   end
 
   def update
-    @comment = Comment.find(params[:id])
-    if @comment.update_attributes(params[:comment])
+    @comment = Comment.find($this->params['id'])
+    if @comment.update_attributes($this->params['comment'])
       redirect_to post_comment_url(@post, @comment)
     else
-      render :action => "edit"
+      render :action => 'edit'
     end
   end
 
   def destroy
-    @comment = Comment.find(params[:id])
+    @comment = Comment.find($this->params['id'])
     @comment.destroy
     redirect_to post_comments_path(@post)
   end
 
 private
   def find_post
-    @post = Post.find(params[:post_id])
+    @post = Post.find($this->params['post_id'])
   end
 
 end

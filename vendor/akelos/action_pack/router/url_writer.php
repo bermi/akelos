@@ -5,14 +5,18 @@ class AkUrlWriter
     /**
      * @var AkRequest
      */
-    private $Request;
+    public $Request;
 
     /**
      * @var AkRouter
      */
-    private $Router;
+    public $Router;
 
     public function __construct($Request=null, AkRouter $Router=null) {
+        $this->init($Request, $Router);
+    }
+
+    public function init($Request=null, AkRouter $Router=null) {
         if (!$Router){
             $Router = AkRouter::getInstance();
         }
@@ -25,8 +29,8 @@ class AkUrlWriter
         $this->persistValuesFromRequest($Request);
     }
 
-    private $values_from_request;
-    private $parameters_from_actual_request;
+    private $values_from_request = array();
+    private $parameters_from_actual_request = array();
 
     public function persistValuesFromRequest(AkRequest $Request) {
         $this->values_from_request = array(
@@ -45,8 +49,8 @@ class AkUrlWriter
         list($params,$options) = $this->extractOptionsFromParameters($options);
         $this->rewriteParameters($params);
         $named_route = $this->extractNamedRoute($params);
-        return (string)$this->Router->urlize($params,$named_route)
-        ->setOptions(array_merge($this->values_from_request,$options));
+        return (string)$this->Router->urlize($params, $named_route)
+        ->setOptions(array_merge($this->values_from_request, $options));
     }
 
     private function extractNamedRoute(&$params) {
@@ -93,6 +97,9 @@ class AkUrlWriter
 
     private function fillInLastParameters(&$params) {
         $actual_parameters = $this->getParametersFromActualRequest($params);
+
+        $actual_parameters = Ak::delete($actual_parameters, array('action', 'id'));
+
         if(!empty($actual_parameters)){
             $this->handleLocale($params, $actual_parameters);
             $old_params = array();
@@ -103,13 +110,13 @@ class AkUrlWriter
                 }
                 $old_params[$k] = $v;
             }
-            $params = array_merge($old_params,$params);
+            $params = array_diff(array_merge($old_params, $params),  array(''));
         }
     }
 
     private function getParametersFromActualRequest(&$params) {
         if (!isset($params['skip_old_parameters_except'])) return $this->parameters_from_actual_request;
-        $actual = array_intersect_key($this->parameters_from_actual_request,array_flip($params['skip_old_parameters_except']));
+        $actual = array_intersect_key((array)$this->parameters_from_actual_request,array_flip($params['skip_old_parameters_except']));
         unset ($params['skip_old_parameters_except']);
         return $actual;
     }
@@ -128,16 +135,14 @@ class AkUrlWriter
         }
     }
 
-    static $singleton;
 
-    /**
-     * @return AkUrlWriter
-     */
+
     static function getInstance() {
-        if (!self::$singleton){
-            self::$singleton = new AkUrlWriter();
+        if (!$UrlWriter = Ak::getStaticVar('AkUrlWriterSingleton')){
+            $UrlWriter = new AkUrlWriter();
+            Ak::setStaticVar('AkUrlWriterSingleton', $UrlWriter);
         }
-        return self::$singleton;
+        return $UrlWriter;
     }
 }
 

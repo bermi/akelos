@@ -12,15 +12,16 @@ class AkRouterHelper
         $names_array_as_string = var_export($Route->getNamesOfDynamicSegments(),true);
         $names_array_as_string = str_replace(array("\n","  "),'',$names_array_as_string);
         
-        self::generateFunction($name,'url',$names_array_as_string);
-        self::generateFunction($name,'path',$names_array_as_string,"'only_path'=>true");
+        self::generateFunction($name,'url',$names_array_as_string,'',str_replace(array("\n","  "),'',var_export($Route->getDefaults(), true)));
+        self::generateFunction($name,'path',$names_array_as_string,"'only_path'=>true", str_replace(array("\n","  "),'',var_export($Route->getDefaults(), true)));
     }
 
     /**
     * @todo Investigate if its possible to cache generated functions based on the mtime of the routes file.
     */
-    private static function generateFunction($route_name,$function_suffix,$excluded_params_as_string,$additional_parameters='') {
+    private static function generateFunction($route_name,$function_suffix,$excluded_params_as_string,$additional_parameters='',$default_parameters = '') {
         $function_name = $route_name.'_'.$function_suffix;
+        $parameters_function_name = $route_name.'_params';
         if (function_exists($function_name)) return;
 
         $additional_parameters ? $additional_parameters .= ',' : null;
@@ -39,9 +40,23 @@ function $function_name(\$params=array())
 }
 
 BANNER;
-        #echo $code;
+        //echo $code;
         eval($code);
         self::$defined_functions[] = $function_name;
+        
+        if (function_exists($parameters_function_name)) return $code;
+        
+        $parameters_code = <<<BANNER
+function $parameters_function_name(\$params=array())
+{
+    return array_merge($default_parameters,\$params);
+}
+
+BANNER;
+
+        eval($parameters_code);
+        self::$defined_functions[] = $parameters_function_name;
+                
         return $code;
     }
 }

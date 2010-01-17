@@ -4,7 +4,7 @@
  * Native PHP URL rewriting for the Akelos Framework.
  */
 
-class NoMatchingRouteException extends Exception 
+class NoMatchingRouteException extends Exception
 { }
 
 class AkRouter
@@ -12,7 +12,8 @@ class AkRouter
     public  $automatic_lang_segment = true;
     public  $generate_helper_functions = AK_GENERATE_HELPER_FUNCTIONS_FOR_NAMED_ROUTES;
 
-    private $routes = array();
+    public $routes = array();
+    private $resources = array();
 
     public function connect($url_pattern, $defaults = array(), $requirements = array(), $conditions = array()) {
         return $this->connectNamed(null,$url_pattern,$defaults,$requirements,$conditions);
@@ -20,14 +21,14 @@ class AkRouter
 
     protected function handleApiShortcuts(&$url_pattern,&$defaults,&$requirements) {
         $this->addLanguageSegment($url_pattern);
-        $this->deprecatedMoveExplicitRequirementsFromDefaultsToRequirements($defaults,$requirements);
-        $this->deprecatedMoveImplicitRequirementsFromDefaultsToRequirements($defaults,$requirements);
+        $this->deprecatedMoveExplicitRequirementsFromDefaultsToRequirements($defaults, $requirements);
+        $this->deprecatedMoveImplicitRequirementsFromDefaultsToRequirements($defaults, $requirements);
         $this->deprecatedRemoveDelimitersFromRequirements($requirements);
         $this->deprecatedRemoveExplicitOptional($defaults);
     }
 
     private function addLanguageSegment(&$url_pattern) {
-        if ($this->automatic_lang_segment) $url_pattern = '/:lang'.$url_pattern;
+        if ($this->automatic_lang_segment) $url_pattern = '/:lang/'.ltrim($url_pattern, '/');
     }
 
     private function deprecatedRemoveDelimitersFromRequirements(&$requirements) {
@@ -40,8 +41,9 @@ class AkRouter
     }
 
     private function deprecatedMoveImplicitRequirementsFromDefaultsToRequirements(&$defaults, &$requirements) {
+
         foreach ($defaults as $key=>$value){
-            if ($value{0}=='/'){
+            if (is_string($value) && $value{0}=='/'){
                 #Ak::deprecateWarning('Don\'t use implicit requirements in the defaults-array. Move it explicitly to the requirements-array.');
                 $requirements[$key] = trim($value,'/');
                 unset ($defaults[$key]);
@@ -59,43 +61,46 @@ class AkRouter
 
     private function deprecatedMoveExplicitRequirementsFromDefaultsToRequirements(&$defaults, &$requirements) {
         if (isset($defaults['requirements'])){
-            $requirements = array_merge($defaults['requirements'],$requirements);
-            unset($defaults['requirements']);            
+            $requirements = array_merge($defaults['requirements'], $requirements);
+            unset($defaults['requirements']);
         }
     }
 
-    public function addRoute($name = null,AkRoute $route) {
-        $name && !isset($this->routes[$name]) ? $this->routes[$name] = $route : $this->routes[] = $route;
-        return $route;
+    public function addRoute($name = null, AkRoute $Route) {
+        $name && !isset($this->routes[$name]) ? ($this->routes[$name] = $Route) : ($this->routes[] = $Route);
+        return $Route;
     }
 
-    public function getRoutes() {
+    public function &getRoutes() {
         return $this->routes;
     }
 
     public function match(AkRequest $Request) {
-        foreach ($this->routes as $route){
+        foreach ($this->routes as $Route){
             try {
-                $params = $route->parametrize($Request);
-                $this->currentRoute = $route;
+                $params = $Route->parametrize($Request);
+                $this->currentRoute = $Route;
                 return $params;
             } catch (RouteDoesNotMatchRequestException $e) {}
         }
-        throw new NoMatchingRouteException();
+        throw new NoMatchingRouteException('No route matches "'.$Request->getPath().'" with {:method=>:'.$Request->getMethod().'}');
     }
 
     public function urlize($params, $name = null) {
         if ($name){
+            if(!isset($this->routes[$name])){
+                throw new NoMatchingRouteException('Named route '.$name.' is not available within this router instance.');
+            }
             return $this->routes[$name]->urlize($params);
         }
-        
-        foreach ($this->routes as $route){
+
+        foreach ($this->routes as $Route){
             try {
-                $url = $route->urlize($params);
+                $url = $Route->urlize($params);
                 return $url;
             } catch (RouteDoesNotMatchParametersException $e) { }
         }
-        throw new NoMatchingRouteException();
+        throw new NoMatchingRouteException(json_encode($params));
     }
 
     public function toUrl($params) {
@@ -117,31 +122,58 @@ class AkRouter
         }
     }
 
-    private function connectNamed($name,$url_pattern, $defaults = array(), $requirements = array(), $conditions = array()) {
-        $this->handleApiShortcuts($url_pattern,$defaults,$requirements);       
+    public function resources($name, $options = array()) {
+        $Resources = new AkResources($this);
+        return $Resources->resources($name, $options);
+    }
+
+    public function resource($name, $options = array()) {
+        $Resources = new AkResources($this);
+        return $Resources->resource($name, $options);
+    }
+
+
+    public function connectNamed($name, $url_pattern = '', $defaults = array(), $requirements = array(), $conditions = array()) {
+        $this->_logNamedRoute($name);
+        $this->handleApiShortcuts($url_pattern, $defaults,  $requirements);
+
+        if(isset($defaults['conditions'])){
+            throw new Exception();
+        }
+
         $Route = new AkRoute($url_pattern,$defaults,$requirements,$conditions);
-        if ($this->generate_helper_functions){
+        if ($this->generate_helper_functions && !empty($name)){
             AkRouterHelper::generateHelperFunctionsFor($name,$Route);
         }
         return $this->addRoute($name,$Route);
     }
 
-    static $singleton;
+    private $_named_routes = array();
+    private function _logNamedRoute($name){
+        if(is_string($name)){
+            $this->_named_routes[] = $name;
+        }
+    }
+
+    public function getNamedRouteNames(){
+        return $this->_named_routes;
+    }
 
     /**
      * @return AkRouter
      */
     static function getInstance() {
-        if (!self::$singleton){
-            $Map = self::$singleton = new AkRouter();
-            $Map->loadMap();
+        if (!$Router = Ak::getStaticVar('AkRouterSingleton')){
+            $Router = new AkRouter();
+            $Router->loadMap();
+            Ak::setStaticVar('AkRouterSingleton', $Router);
         }
-        return self::$singleton;
+        return $Router;
     }
 
     public function loadMap($file_name=AK_ROUTES_MAPPING_FILE) {
         $Map =& $this;
-        
+
         if(!@include($file_name)){
             $this->connectDefaultRoutes();
         }
@@ -150,18 +182,19 @@ class AkRouter
     public function connectDefaultRoutes(){
         if(AK_DEV_MODE && AkRequest::isLocal()){
             $this->connect('/:controller/:action/:id', array(
-            'controller' => 'akelos_dashboard', 
-            'action' => 'index', 
-            'module' => 'akelos_panel', 
+            'controller' => 'akelos_dashboard',
+            'action' => 'index',
+            'module' => 'akelos_panel',
             'rebase' => AK_AKELOS_UTILS_DIR.DS.'akelos_panel'
             ));
             $this->connect('/', array(
-            'controller' => 'akelos_dashboard', 
-            'action' => 'index', 
+            'controller' => 'akelos_dashboard',
+            'action' => 'index',
             'module' => 'akelos_panel'));
             return;
         }
         $this->connect('/:controller/:action/:id', array('controller' => 'page', 'action' => 'index'));
+        $this->connect('/:controller/:action/:id.:format', array('controller' => 'page', 'action' => 'index'));
         $this->connect('/', array('controller' => 'page', 'action' => 'index'));
     }
 

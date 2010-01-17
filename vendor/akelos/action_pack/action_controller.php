@@ -837,9 +837,6 @@ class AkActionController extends AkLazyObject
     public function getControllerName() {
         if(!isset($this->controller_name)){
             $current_class_name = str_replace('_', '::', get_class($this));
-            if (!AK_PHP5){
-                $current_class_name = $this->__getControllerName_PHP4_fix($current_class_name);
-            }
             $controller_name = substr($current_class_name,0,-10);
             $this->controller_name = $this->_removeModuleNameFromControllerName($controller_name);
             $this->singularized_controller_name = AkInflector::singularize($this->controller_name);
@@ -1047,7 +1044,9 @@ class AkActionController extends AkLazyObject
     }
 
     public function _doubleRenderError($message = null) {
-        trigger_error(!empty($message) ? $message : Ak::t("Render and/or redirect were called multiple times in this action. Please note that you may only call render OR redirect, and only once per action. Also note that neither redirect nor render terminate execution of the action, so if you want to exit an action after redirecting, you need to do something like \"redirectTo(...); return;\". Finally, note that to cause a before filter to halt execution of the rest of the filter chain, the filter must return false, explicitly, so \"render(...); return; false\"."),E_USER_ERROR);
+        $Exception = new ControllerException(!empty($message) ? $message : Ak::t("Render and/or redirect were called multiple times in this action. Please note that you may only call render OR redirect, and only once per action. Also note that neither redirect nor render terminate execution of the action, so if you want to exit an action after redirecting, you need to do something like \"redirectTo(...); return;\". Finally, note that to cause a before filter to halt execution of the rest of the filter chain, the filter must return false, explicitly, so \"render(...); return; false\"."));
+        $Exception->status = 500;
+        throw $Exception;
     }
 
     public function _getRequestOrigin() {
@@ -1086,8 +1085,7 @@ class AkActionController extends AkLazyObject
             $template_type = strstr($template_name,'layouts') ? 'layout' : 'template';
 
             $error_message = Ak::t('Missing %template_type %controller_name::%template_name',array('%template_type'=>$template_type, '%template_name'=>$template_name,'%controller_name'=>$this->getControllerName()));
-            AK_LOG_EVENTS && $this->_log($error_message, array(), 'warn');
-            trigger_error($error_message, E_USER_WARNING);
+            throw new MissingTemplateException($error_message);
             return false;
         }
         return true;
@@ -1390,12 +1388,12 @@ class AkActionController extends AkLazyObject
 
             $layout = strstr($layout,'/') || strstr($layout,DS) ? $layout : 'layouts'.DS.$layout;
             $layout = preg_replace('/\.tpl$/', '', $layout);
-            
+
             $layout = preg_replace('/\.tpl$/', '', $layout);
-            
-            $layout = empty($this->_module_path) || !empty($this->layout) 
-                    ? AkConfig::getDir('views').DS.$layout.'.tpl' 
-                    : AkConfig::getDir('views').DS.'layouts'.DS.trim($this->_module_path, DS).'.tpl'; 
+
+            $layout = empty($this->_module_path) || !empty($this->layout)
+            ? AkConfig::getDir('views').DS.$layout.'.tpl'
+            : AkConfig::getDir('views').DS.'layouts'.DS.trim($this->_module_path, DS).'.tpl';
 
 
             if (file_exists($layout)) {
@@ -1614,7 +1612,7 @@ class AkActionController extends AkLazyObject
         $unknown_option_keys = array_diff(array_keys($this->_pagination_options) , $valid_options);
 
         if(!empty($unknown_option_keys)){
-            trigger_error(Ak::t('Unknown options for pagination: %unknown_option',array('%unknown_option'=>join(', ',$unknown_option_keys))), E_USER_WARNING);
+            throw new ControllerException(Ak::t('Unknown options for pagination: %unknown_option',array('%unknown_option'=>join(', ',$unknown_option_keys))));
         }
 
         $this->_pagination_options['singular_name'] = !empty($this->_pagination_options['singular_name']) ? $this->_pagination_options['singular_name'] : AkInflector::singularize($collection_id);
@@ -1904,8 +1902,9 @@ class AkActionController extends AkLazyObject
     public function sendFile($path, $options = array()) {
         $path = realpath($path);
         if(!file_exists($path)){
-            trigger_error(Ak::t('Cannot read file %path',array('%path'=>$path)), E_USER_NOTICE);
-            return false;
+            $Exception = new ControllerException(Ak::t('Cannot read file %path',array('%path'=>$path)));
+            $Exception->status = 500;
+            throw $Exception;
         }
         $options['length'] = empty($options['length']) ? filesize($path) : $options['length'];
         $options['filename'] = empty($options['filename']) ? basename($path) : $options['filename'];
@@ -1966,7 +1965,11 @@ class AkActionController extends AkLazyObject
     public function _sendFileHeaders(&$options) {
         $options = array_merge($this->default_send_file_options,$options);
         foreach (array('length', 'type', 'disposition') as $arg){
-            empty($options[$arg]) ? trigger_error(Ak::t('%arg option required', array('%arg'=>$arg)), E_USER_ERROR) : null;
+            if(empty($options[$arg])){
+                $Exception = new ControllerException(Ak::t('%arg option required', array('%arg'=>$arg)));
+                $Exception->status = 500;
+                throw $Exception;
+            }
         }
         $disposition = empty($options['disposition']) ? 'attachment' : $options['disposition'];
         $disposition .= !empty($options['filename']) ? '; filename="'.$options['filename'].'"' : '';
@@ -2013,29 +2016,27 @@ class AkActionController extends AkLazyObject
 
 
     public function _ensureActionExists() {
-        if(!method_exists($this, $this->getActionName()) || $this->_isActionForbidden()){
-            return $this->_renderActionNotExists();
+
+        if(!method_exists($this, $this->getActionName())){
+            throw new UnknownActionException('No action responded to '.$this->getActionName().'. Actions: '.join(', ',$this->getAvailableActions()));
+        }elseif($this->_isActionForbidden()){
+            throw new ForbiddenActionException('Forbidden action '.$this->getActionName().' called. Available actions are: '.join(', ',$this->getAvailableActions()));
         }
         return true;
     }
 
-    public function _renderActionNotExists() {
-        if(AK_ENVIRONMENT == 'development'){
-            AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->error('Action '.$this->_action_name.' not found on '.$this->getControllerName()) : null;
-            trigger_error(Ak::t('Controller <i>%controller_name</i> can\'t handle action %action_name',
-            array(
-            '%controller_name' => $this->getControllerName(),
-            '%action_name' => $this->_action_name,
-            )), E_USER_ERROR);
-            return true;
-        }elseif(@include(AkConfig::getDir('public').DS.'405.php')){
-            return false;
-        }else{
-            $this->Response->addHeader('Status',405);//("HTTP/1.1 405 Method Not Allowed");
-            $this->renderText('405 Method Not Allowed');
-            return false;
+    public function getAvailableActions(){
+        $actions = array();
+        $klass = get_class($this);
+        $actions = array_diff(get_class_methods($klass), get_class_methods(__CLASS__));
+        foreach ($actions as $k => $action){
+            if($action[0] == '_' || AkInflector::underscore($action) != $action){
+                unset($actions[$k]);
+            }
         }
+        return $actions;
     }
+
     public function _isActionForbidden() {
         $methods = get_class_methods('AkActionController');
         $action = $this->getActionName();

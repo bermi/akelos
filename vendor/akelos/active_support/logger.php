@@ -278,7 +278,7 @@ class AkLogger implements AkLoggerInterface
                 $this->error_file = false;
             }
         }
-        
+
     }
 
     public function setLogLevels($levels){
@@ -344,25 +344,31 @@ class AkLogger implements AkLoggerInterface
     }
 
     public function handleDisplayMessage($error_level, $message, $parameters = array()){
-        if(!empty($this->options['print'])){
-            list($file,$line,$method) = Ak::getLastFileAndLineAndMethod(false, 3);
-            Ak::trace("<strong>[$error_level]</strong> - ".AkTextHelper::html_escape($message), $line, $file, $method, false);
-            if(!empty($parameters)) {
-                Ak::trace($parameters, $line, $file, $method);
+        if(AkConfig::getOption('logger.display_message', true)){
+            if(!empty($this->options['print'])){
+                list($file,$line,$method) = Ak::getLastFileAndLineAndMethod(false, 3);
+                Ak::trace("<strong>[$error_level]</strong> - ".AkTextHelper::html_escape($message), $line, $file, $method, false);
+                if(!empty($parameters)) {
+                    Ak::trace($parameters, $line, $file, $method);
+                }
             }
         }
     }
 
     public function handleMailMessage($error_level, $message, $parameters = array()){
-        if(!empty($this->options['send_mails']) && !empty($this->options['mail_destination']) && AK_PRODUCTION_MODE){
-            $message = $this->getMessageFormatedAsString($error_level, $message, $parameters, true);
-            $subject = str_replace(array('%error_level','%namespace'), array($error_level, $this->options['namespace']), $this->options['mail_subject']);
-            Ak::mail($this->options['mail_sender'], $this->options['mail_destination'], $subject, $message);
+        if(AkConfig::getOption('logger.send_mails', true)){
+            if(!empty($this->options['send_mails']) && !empty($this->options['mail_destination']) && AK_PRODUCTION_MODE){
+                $message = $this->getMessageFormatedAsString($error_level, $message, $parameters, true);
+                $subject = str_replace(array('%error_level','%namespace'), array($error_level, $this->options['namespace']), $this->options['mail_subject']);
+                Ak::mail($this->options['mail_sender'], $this->options['mail_destination'], $subject, $message);
+            }
         }
     }
 
     public function handleFatalMessage($error_level, $message, $parameters = array()){
-        exit(0);
+        if(AkConfig::getOption('logger.exit_on_fatal', true)){
+            exit(0);
+        }
     }
 
     public function getMessageFormatedAsString($error_level, $error_message, $parameters = array(), $prevent_color = false) {

@@ -19,7 +19,25 @@ abstract class AkControllerUnitTest extends AkUnitTest
     public function useController($controller_name) {
         $this->controller_name = $controller_name;
     }
+    
+    protected function _enableAssertions() {
 
+        parent::_enableAssertions();
+
+        $this->extendClassLazily('AkRoutingAssertions',
+        array(
+        'methods' => array (
+        'assertRecognizes',
+        'assertGenerates',
+        'assertRouting',
+        'nextAssertionUsingRouter',
+        'recognizeRouteForPath',
+        ),
+        'autoload_path' => dirname(__FILE__).DS.'assertions'.DS.'routing_assertions.php'
+        ));
+    }
+    
+    
     public function process($request_type,$action_name,$options) {
         $this->action_name = $action_name;
         $this->addExpectationsDependendOnActionName($action_name);

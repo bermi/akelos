@@ -18,11 +18,6 @@ class IdealWorld_TestCase extends IdealWorldUnitTest
         $this->assertTrue(function_exists('namespaced_name_url'));
         $this->assertTrue(function_exists('namespaced_name_path'));
     }
-    
-    public function testEnsureSingletonsAreNull() {
-        $this->assertNull(AkRouter::$singleton);
-        $this->assertNull(AkRequest::$singleton);
-    }
 
     public function testEnsureHelperFunctionsAreAvailable() {
         $this->createRouter();

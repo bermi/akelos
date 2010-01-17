@@ -8,4 +8,6 @@ function ak_testing_error_handler($error_number, $error_message, $file, $line) {
     throw new Exception($error_message);
 }
 
+include_once(dirname(__FILE__).DS.'error_functions.php');
+
 set_error_handler('ak_testing_error_handler');

@@ -35,7 +35,7 @@ class RenderFormat_TestCase extends AkWebTestCase
     
     public function test_should_not_accept_unregistered_formats(){
         $this->get($this->_test_script.'formats/index.php');
-        $this->assertPattern("/DispatchException/");
+        $this->assertPattern("/Routing Error/");
 
     }
 }

@@ -617,9 +617,9 @@ class Ak
         $html_entities_function = $escape_html_entities ? 'htmlentities' : 'trim';
         list($default_file, $default_line, $default_method) = Ak::getLastFileAndLineAndMethod();
         $default_method = is_bool($text) || empty($text)  ? 'var_dump' : $default_method;
-        $line = empty($line) ? $default_line : $line;
-        $file = empty($file) ? $default_file : $file;
-        $method = empty($method) ? $default_method : $method;
+        $line = is_null($line) ? $default_line : $line;
+        $file = is_null($file) ? $default_file : $file;
+        $method = is_null($method) ? $default_method : $method;
 
         if(AK_CLI){
             $text = Ak::dump($text, 'print_r');
@@ -654,7 +654,13 @@ class Ak
             $text = AK_CLI?'---> '.$text : ($text);
         }
 
-        echo AK_CLI?"----------------\n$file ($line):\n $text\n----------------\n":"<div style='background-color:#fff;margin:10px;color:#000;font-family:sans-serif;border:3px solid #fc0;font-size:12px;'><div style='background-color:#ffc;padding:10px;color:#000;font-family:sans-serif;'>$file <span style='font-weight:bold'>$line</span> <span style='font-style:italic'>$method</span></div>".$text."</div>\n";
+        $include_file_and_line = strlen(trim($file.$line)) > 0;
+
+        if($include_file_and_line){
+            echo AK_CLI?"----------------\n$file ($line):\n $text\n----------------\n":"<div style='background-color:#fff;margin:10px;color:#000;font-family:sans-serif;border:3px solid #fc0;font-size:12px;'><div style='background-color:#ffc;padding:10px;color:#000;font-family:sans-serif;'>$file <span style='font-weight:bold'>$line</span></div>".$text."</div>\n";
+        }else{
+            echo AK_CLI?"----------------\n $text\n----------------\n":"<div style='background-color:#fff;margin:10px;color:#000;font-family:sans-serif;border:1px solid #ccc;font-size:12px;'>".$text."</div>\n";
+        }
     }
 
     /**
@@ -1178,6 +1184,20 @@ class Ak
         return $resulting_array;
     }
 
+    static function valuesAt($source_array, $keys){
+        $values = array();
+        $args = array_slice(func_get_args(),1);
+        $args = count($args) == 1 ? Ak::toArray($args[0]) : $args;
+        foreach ($keys as $k){
+            if(isset($source_array[$k])){
+                $values[] = $source_array[$k];
+            }else{
+                $values[] = null;
+            }
+        }
+        return $values;
+    }
+
     static function delete($source_array, $attributes_to_delete_from_array) {
         $resulting_array = (array)$source_array;
         $args = array_slice(func_get_args(),1);
@@ -1186,6 +1206,24 @@ class Ak
             unset($resulting_array[$arg]);
         }
         return $resulting_array;
+    }
+
+    static function deleteAndGetValue(&$source_array, $attributes_to_discard_from_array) {
+        $discarded_items = array();
+        $args = array_slice(func_get_args(),1);
+        $args = count($args) == 1 ? Ak::toArray($args[0]) : $args;
+        $multiple = count($args) > 1;
+        foreach ($args as $arg){
+            if(isset($source_array[$arg])){
+                $value = $source_array[$arg];
+                unset($source_array[$arg]);
+                if(!$multiple){
+                    return $value;
+                }
+                $discarded_items[$arg] = $value;
+            }
+        }
+        return empty($discarded_items) ? ($multiple ? array() : null) : $discarded_items;
     }
 
     static function &singleton($class_name, &$arguments) {

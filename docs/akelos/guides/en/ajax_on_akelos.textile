@@ -55,7 +55,7 @@ And here is a simple example of link_to_remote in action:
 <php>
 link_to_remote "Add to cart",
   :url => add_to_cart_url(product.id),
-  :update => "cart"
+  :update => 'cart'
 </php>
 
 * The very first parameter, a string, is the text of the link which appears on the page.
@@ -67,7 +67,7 @@ link_to_remote "Add to cart",
 <php>
 link_to_remote "Add to cart",
   :url => add_to_cart_url(product),
-  :update => { :success => "cart", :failure => "error" }
+  :update => { :success => 'cart', :failure => 'error' }
 </php>
 
 If the server returns 200, the output of the above example is equivalent to our first, simple one. However, in case of error, the element with the DOM id +error+ is updated rather than the +cart+ element.
@@ -125,14 +125,14 @@ This generates a remote link which adds 2 parameters to the standard URL generat
 <php>
 link_to_remote "Add new item",
   :url => items_url,
-  :update => "item_list",
+  :update => 'item_list',
   404 => "alert('Item not found!')"
 </php>
 Let's see a typical example for the most frequent callbacks, +:success+, +:failure+ and +:complete+ in action:
 <php>
 link_to_remote "Add new item",
   :url => items_url,
-  :update => "item_list",
+  :update => 'item_list',
   :before => "$('progress').show()",
   :complete => "$('progress').hide()",
   :success => "display_item_added(request)",
@@ -262,7 +262,7 @@ Position can be one of these four values:
 The third parameter can either be a string, or a hash of options to be passed to ActionView::Base#render - for example:
 
 <php>
-page.insert_html :top, :result, :partial => "the_answer"
+page.insert_html :top, :result, :partial => 'the_answer'
 </php>
 
 You can replace the contents (innerHTML) of an element with the +replace_html+ method. The only difference is that since it's clear where should the new content go, there is no need for a position parameter - so +replace_html+ takes only two arguments, 

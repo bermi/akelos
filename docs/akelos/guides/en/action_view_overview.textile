@@ -654,7 +654,7 @@ The core method of this helper, form_for, gives you the ability to create a form
 
 <php>
 # Note: a @person variable will have been created in the controller (e.g. @person = Person.new)
-<% form_for :person, @person, :url => { :action => "create" } do |f| %>
+<% form_for :person, @person, :url => { :action => 'create' } do |f| %>
   <%= f.text_field :first_name %>
   <%= f.text_field :last_name %>
   <%= submit_tag 'Create' %>
@@ -674,10 +674,10 @@ The HTML generated for this would be:
 The params object created when this form is submitted would look like:
 
 <php>
-{"action"=>"create", "controller"=>"persons", "person"=>{"first_name"=>"William", "last_name"=>"Smith"}}
+{"action"=>'create', "controller"=>'persons', "person"=>{"first_name"=>'William', "last_name"=>'Smith'}}
 </php>
 
-The params hash has a nested person value, which can therefore be accessed with params[:person] in the controller.
+The params hash has a nested person value, which can therefore be accessed with $this->params['person'] in the controller.
 
 h5. check_box
 
@@ -695,7 +695,7 @@ h5. fields_for
 Creates a scope around a specific model object like form_for, but doesn‘t create the form tags themselves. This makes fields_for suitable for specifying additional model objects in the same form:
 
 <php>
-<% form_for @person, :url => { :action => "update" } do |person_form| %>
+<% form_for @person, :url => { :action => 'update' } do |person_form| %>
   First name: <%= person_form.text_field :first_name %>
   Last name : <%= person_form.text_field :last_name %>
 
@@ -970,7 +970,7 @@ Creates a file upload field.
 If you are using file uploads then you will also need to set the multipart option for the form tag:
 
 <php>
-<%= form_tag { :action => "post" }, { :multipart => true } %>
+<%= form_tag { :action => 'post' }, { :multipart => true } %>
   <label for="file">File to Upload</label> <%= file_field_tag "file" %>
   <%= submit_tag %>
 <%= end_form_tag %>
@@ -1201,7 +1201,7 @@ Returns a form tag that will submit using XMLHttpRequest in the background inste
 For example, this:
 
 <php>
-form_remote_tag :html => { :action => url_for(:controller => "some", :action => "place") }
+form_remote_tag :html => { :action => url_for(:controller => 'some', :action => 'place') }
 </php>
 
 would generate the following:
@@ -1217,8 +1217,8 @@ Returns a link to a remote action that's called in the background using XMLHttpR
 
 <php>
 link_to_remote "Delete this post",
-  { :update => "posts", :url => { :action => "destroy", :id => post.id } },
-  :href => url_for(:action => "destroy", :id => post.id)
+  { :update => 'posts', :url => { :action => 'destroy', :id => post.id } },
+  :href => url_for(:action => 'destroy', :id => post.id)
 </php>
 
 h5. observe_field
@@ -1261,7 +1261,7 @@ h5. remote_function
 Returns the JavaScript needed for a remote function. Takes the same arguments as +link_to_remote+.
 
 <php>
-<select id="options" onchange="<%= remote_function(:update => "options", :url => { :action => :update_options }) %>">
+<select id="options" onchange="<%= remote_function(:update => 'options', :url => { :action => :update_options }) %>">
   <option value="0">Hello</option>
   <option value="1">World</option>
 </select>

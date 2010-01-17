@@ -16,11 +16,24 @@ abstract class IdealWorldUnitTest extends AkUnitTest
      */
     public $Routes = array();
     
-    // we mock away the singletons!
-    public function tearDown() {
-        AkRouter   ::$singleton = null;
-        AkRequest  ::$singleton = null;
-        AkUrlWriter::$singleton = null;
+
+    private $_singletons = array(
+    'AkRouterSingleton' => null,
+    'AkRequestSingleton' => null,
+    'AkUrlWriterSingleton' => null,
+    );
+
+    public function setup(){
+        foreach (array_keys($this->_singletons) as $singleton){
+            $this->_singletons[$singleton] = Ak::getStaticVar($singleton);
+            Ak::unsetStaticVar($singleton);
+        }
+    }
+
+    public function tearDown(){
+        foreach (array_keys($this->_singletons) as $singleton){
+            Ak::setStaticVar($singleton, $this->_singletons[$singleton]);
+        }
     }
     
     /**
@@ -39,8 +52,7 @@ abstract class IdealWorldUnitTest extends AkUnitTest
      */
     public function createUrlWriter($Request,$Router) {
         $UrlWriter = new AkUrlWriter($Request,$Router);
-        
-        AkUrlWriter::$singleton = $UrlWriter;
+        Ak::setStaticVar('AkUrlWriterSingleton', $UrlWriter);
         return $this->UrlWriter = $UrlWriter;
     }
     
@@ -63,8 +75,7 @@ abstract class IdealWorldUnitTest extends AkUnitTest
         foreach ($this->Routes as $name=>$args){
             call_user_func_array(array($Router,$name),$args);
         }
-        
-        AkRouter::$singleton = $Router;
+        Ak::setStaticVar('AkRouterSingleton', $Router);
         return $this->Router = $Router;
     }
     
@@ -77,8 +88,7 @@ abstract class IdealWorldUnitTest extends AkUnitTest
             'getMethod'             => $method,
             'getRelativeUrlRoot'    => ''
             ));
-
-        AkRequest::$singleton = $Request;
+        Ak::setStaticVar('AkAkRequestSingleton', $Request);
         return $this->Request = $Request;
     }
     

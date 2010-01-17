@@ -18,7 +18,7 @@ class IdealWorldNamedRoutes_TestCase extends IdealWorldUnitTest
     
     public function testChangeLanguage() {
         $url_writer = $this->withRequestTo('/en/user/show/1');
-        $this->assertEqual('/es/user/show/1',default_path(array('overwrite_params'=>array('lang'=>'es'))));
+        $this->assertEqual('/es/user/show/1',default_path(array('action'=>'show','id'=>1,'overwrite_params'=>array('lang'=>'es'))));
     }
     
     public function testFromDefaultToAuthor() {

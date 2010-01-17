@@ -35,7 +35,7 @@ if (! defined('SIMPLE_TEST')) {
  *    @package      SimpleTest
  *    @subpackage   UnitTester
  */
-class SimpleTestCase {
+class SimpleTestCase extends AkLazyObject{
     private $label = false;
     protected $reporter;
     private $observers;

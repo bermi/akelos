@@ -8,9 +8,9 @@
 <link href="<%= url_for :controller => 'virtual_assets', :action => "stylesheets", :id => "akelos", :format => "css" %>" rel="stylesheet" type="text/css" />
 <link href="<%= url_for :controller => 'virtual_assets', :action => "stylesheets", :id => "syntax", :format => "css" %>" rel="stylesheet" type="text/css" />
 
-<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "guides", :format => "js") %>
-<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "code_highlighter", :format => "js") %>
-<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "highlighters", :format => "js") %>
+<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "guides") %>
+<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "code_highlighter") %>
+<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "highlighters") %>
 
 </head>
 <body>

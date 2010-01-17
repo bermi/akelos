@@ -52,21 +52,21 @@ Probably the most minimal form often seen on the web is a search form with a sin
 # a text input element, and
 # a submit element.
 
-IMPORTANT: Always use "GET" as the method for search forms. This allows users to bookmark a specific search and get back to it. More generally Akelos encourages you to use the right HTTP vtpl for an action.
+IMPORTANT: Always use "GET" as the method for search forms. This allows users to bookmark a specific search and get back to it. More generally Akelos encourages you to use the right HTTP verb for an action.
 
 To create this form you will use +form_tag+, +label_tag+, +text_field_tag+, and +submit_tag+, respectively.
 
 A basic search form
 
 <html>
-<% form_tag(search_path, :method => "get") do %>
+<% form_tag(search_path, :method => 'get') do %>
   <%= label_tag(:q, "Search for:") %>
   <%= text_field_tag(:q) %>
   <%= submit_tag("Search") %>
 <% end %>
 </html>
 
-TIP: +search_path+ can be a named route specified in "routes.php": <pre>map.search "search", :controller => "search"</pre>
+TIP: +search_path+ can be a named route specified in "routes.php": <pre>map.search "search", :controller => 'search'</pre>
 
 The above view code will result in the following markup:
 
@@ -89,14 +89,14 @@ By now you've seen that the +form_tag+ helper accepts 2 arguments: the path for 
 As with the +link_to+ helper, the path argument doesn't have to be given a string. It can be a hash of URL parameters that Akelos' routing mechanism will turn into a valid URL. However, this is a bad way to pass multiple hashes as method arguments:
 
 <php>
-form_tag(:controller => "people", :action => "search", :method => "get", :class => "nifty_form")
+form_tag(:controller => 'people', :action => 'search', :method => 'get', :class => 'nifty_form')
 # => <form action="/people/search?method=get&class=nifty_form" method="post">
 </php>
 
 Here you wanted to pass two hashes, but the PHP interpreter sees only one hash, so Akelos will construct a URL with extraneous parameters. The correct way of passing multiple hashes as arguments is to delimit the first hash (or both hashes) with curly brackets:
 
 <php>
-form_tag({:controller => "people", :action => "search"}, :method => "get", :class => "nifty_form")
+form_tag({:controller => 'people', :action => 'search'}, :method => 'get', :class => 'nifty_form')
 # => <form action="/people/search" method="get" class="nifty_form">
 </php>
 
@@ -115,7 +115,7 @@ Akelos provides a series of helpers for generating form elements such as checkbo
 then the controller code should use
 
 <php>
-params[:query]
+$this->params['query']
 </php>
 
 to retrieve the value entered by the user. When naming inputs, be aware that Akelos uses certain conventions that control whether values are at the top level of the +params+ hash, inside an array or a nested hash and so on. You can read more about them in the parameter_names section. For details on the precise usage of these helpers, please refer to the "API documentation":http://api.akelos.org/classes/ActionView/Helpers/FormTagHelper.html.
@@ -138,7 +138,7 @@ output:
   <label for="pet_cat">I own a cat</label>
 </tpl>
 
-The second parameter to +check_box_tag+ is the value of the input. This is the value that will be submitted by the browser if the checkbox is ticked (i.e. the value that will be present in the +params+ hash). With the above form you would check the value of +params[:pet_dog]+ and +params[:pet_cat]+ to see which pets the user owns.
+The second parameter to +check_box_tag+ is the value of the input. This is the value that will be submitted by the browser if the checkbox is ticked (i.e. the value that will be present in the +params+ hash). With the above form you would check the value of +$this->params['pet_dog']+ and +$this->params['pet_cat']+ to see which pets the user owns.
 
 h5. Radio Buttons
 
@@ -158,7 +158,7 @@ output:
   <label for="age_adult">I'm over 21</label>
 </tpl>
 
-As with +check_box_tag+ the second parameter to +radio_button_tag+ is the value of the input. Because these two radio buttons share the same name (age) the user will only be able to select one and +params[:age]+ will contain either "child" or "adult".
+As with +check_box_tag+ the second parameter to +radio_button_tag+ is the value of the input. Because these two radio buttons share the same name (age) the user will only be able to select one and +$this->params['age']+ will contain either "child" or "adult".
 
 IMPORTANT: Always use labels for each checkbox and radio button. They associate text with a specific option and provide a larger clickable region.
 
@@ -187,7 +187,7 @@ h3. Dealing with Model Objects
 
 h4. Model Object Helpers
 
-A particularly common task for a form is editing or creating a model object. While the +*_tag+ helpers can certainly be used for this task they are somewhat vtplose as for each tag you would have to ensure the correct parameter name is used and set the default value of the input appropriately. Akelos provides helpers tailored to this task. These helpers lack the <notextile>_tag</notextile> suffix, for example +text_field+, +text_area+.
+A particularly common task for a form is editing or creating a model object. While the +*_tag+ helpers can certainly be used for this task they are somewhat verbose as for each tag you would have to ensure the correct parameter name is used and set the default value of the input appropriately. Akelos provides helpers tailored to this task. These helpers lack the <notextile>_tag</notextile> suffix, for example +text_field+, +text_area+.
 
 For these helpers the first argument is the name of an instance variable and the second is the name of a method (usually an attribute) to call on that object. Akelos will set the value of the input control to the return value of that method for the object and set an appropriate input name. If your controller has defined +@person+ and that person's name is Henry then a form containing:
 
@@ -201,7 +201,7 @@ will produce output similar to
 <input id="person_name" name="person[name]" type="text" value="Henry"/>
 </tpl>
 
-Upon form submission the value entered by the user will be stored in +params[:person][:name]+. The +params[:person]+ hash is suitable for passing to +Person.new+ or, if +@person+ is an instance of Person, +@person.update_attributes+. While the name of an attribute is the most common second parameter to these helpers this is not compulsory. In the example above, as long as person objects have a +name+ and a +name=+ method Akelos will be happy.
+Upon form submission the value entered by the user will be stored in +$this->params['person'][:name]+. The +$this->params['person']+ hash is suitable for passing to +Person.new+ or, if +@person+ is an instance of Person, +@person.update_attributes+. While the name of an attribute is the most common second parameter to these helpers this is not compulsory. In the example above, as long as person objects have a +name+ and a +name=+ method Akelos will be happy.
 
 WARNING: You must pass the name of an instance variable, i.e. +:person+ or +"person"+, not an actual instance of your model object.
 
@@ -222,7 +222,7 @@ end
 The corresponding view +app/views/articles/new.html.tpl+ using +form_for+ looks like this:
 
 <tpl>
-<% form_for :article, @article, :url => { :action => "create" }, :html => {:class => "nifty_form"} do |f| %>
+<% form_for :article, @article, :url => { :action => 'create' }, :html => {:class => 'nifty_form'} do |f| %>
   <%= f.text_field :title %>
   <%= f.text_area :body, :size => "60x12" %>
   <%= submit_tag "Create" %>
@@ -246,14 +246,14 @@ The resulting HTML is:
 </form>
 </html>
 
-The name passed to +form_for+ controls the key used in +params+ to access the form's values. Here the name is +article+ and so all the inputs have names of the form +article[<em>attribute_name</em>]+. Accordingly, in the +create+ action +params[:article]+ will be a hash with keys +:title+ and +:body+. You can read more about the significance of input names in the parameter_names section.
+The name passed to +form_for+ controls the key used in +params+ to access the form's values. Here the name is +article+ and so all the inputs have names of the form +article[<em>attribute_name</em>]+. Accordingly, in the +create+ action +$this->params['article']+ will be a hash with keys +:title+ and +:body+. You can read more about the significance of input names in the parameter_names section.
 
 The helper methods called on the form builder are identical to the model object helpers except that it is not necessary to specify which object is being edited since this is already managed by the form builder.
 
 You can create a similar binding without actually creating  +&lt;form&gt;+ tags with the +fields_for+ helper. This is useful for editing additional model objects with the same form. For example if you had a Person model with an associated ContactDetail model you could create a form for creating both like so:
 
 <tpl>
-<% form_for :person, @person, :url => { :action => "create" } do |person_form| %>
+<% form_for :person, @person, :url => { :action => 'create' } do |person_form| %>
   <%= person_form.text_field :name %>
   <% fields_for @person.contact_detail do |contact_details_form| %>
     <%= contact_details_form.text_field :phone_number %>
@@ -293,7 +293,7 @@ form_for(@article)
 
 ## Editing an existing article
 # long-style:
-form_for(:article, @article, :url => article_path(@article), :method => "put")
+form_for(:article, @article, :url => article_path(@article), :method => 'put')
 # short-style:
 form_for(@article)
 </php>
@@ -328,7 +328,7 @@ The Akelos framework encourages RESTful design of your applications, which means
 Akelos works around this issue by emulating other methods over POST with a hidden input named +"_method"+, which is set to reflect the desired method:
 
 <php>
-form_tag(search_path, :method => "put")
+form_tag(search_path, :method => 'put')
 </php>
 
 output:
@@ -440,7 +440,7 @@ Generating options tags with +options_for_select+ requires that you create an ar
 <%= options_for_select(cities_array) %>
 </tpl>
 
-This is a perfectly valid solution, but Akelos provides a less vtplose alternative: +options_from_collection_for_select+. This helper expects a collection of arbitrary objects and two additional arguments: the names of the methods to read the option *value* and *text* from, respectively:
+This is a perfectly valid solution, but Akelos provides a less verbose alternative: +options_from_collection_for_select+. This helper expects a collection of arbitrary objects and two additional arguments: the names of the methods to read the option *value* and *text* from, respectively:
 
 <tpl>
 <%= options_from_collection_for_select(City.all, :id, :name) %>
@@ -493,10 +493,10 @@ outputs (with actual option values omitted for brevity)
 <select id="start_date_day" name="start_date[day]"> ... </select>
 </html>
 
-The above inputs would result in +params[:start_date]+ being a hash with keys +:year+, +:month+, +:day+. To get an actual Time or Date object you would have to extract these values and pass them to the appropriate constructor, for example
+The above inputs would result in +$this->params['start_date']+ being a hash with keys +:year+, +:month+, +:day+. To get an actual Time or Date object you would have to extract these values and pass them to the appropriate constructor, for example
 
 <php>
-Date.civil(params[:start_date][:year].to_i, params[:start_date][:month].to_i, params[:start_date][:day].to_i)
+Date.civil($this->params['start_date'][:year].to_i, $this->params['start_date'][:month].to_i, $this->params['start_date'][:day].to_i)
 </php>
 
 The +:prefix+ option is the key used to retrieve the hash of date components from the +params+ hash. Here it was set to +start_date+, if omitted it will default to +date+.
@@ -545,7 +545,7 @@ The first parameter specifies which value should be selected and can either be a
 <%= select_year(Time.now) %>
 </tpl>
 
-will produce the same output if the current year is 2009 and the value chosen by the user can be retrieved by +params[:date][:year]+.
+will produce the same output if the current year is 2009 and the value chosen by the user can be retrieved by +$this->params['date'][:year]+.
 
 h3. Uploading Files
 
@@ -563,7 +563,7 @@ The following two forms both upload a file.
 <% end %>
 </tpl>
 
-Akelos provides the usual pair of helpers: the barebones +file_field_tag+ and the model oriented +file_field+. The only difference with other helpers is that you cannot set a default value for file inputs as this would have no meaning. As you would expect in the first case the uploaded file is in +params[:picture]+ and in the second case in +params[:person][:picture]+.
+Akelos provides the usual pair of helpers: the barebones +file_field_tag+ and the model oriented +file_field+. The only difference with other helpers is that you cannot set a default value for file inputs as this would have no meaning. As you would expect in the first case the uploaded file is in +$this->params['picture']+ and in the second case in +$this->params['person'][:picture]+.
 
 h4. What Gets Uploaded
 
@@ -571,7 +571,7 @@ The object in the +params+ hash is an instance of a subclass of IO. Depending on
 
 <php>
 def upload
-  uploaded_io = params[:person][:picture]
+  uploaded_io = $this->params['person'][:picture]
   File.open(Akelos.root.join('public', 'uploads', uploaded_io.original_filename), 'w') do |file|
     file.write(uploaded_io.read)
   end
@@ -627,11 +627,11 @@ If +f+ is an instance of FormBuilder then this will render the +form+ partial, s
 h3. Understanding Parameter Naming Conventions
 
 As you've seen in the previous sections, values from forms can be at the top level of the +params+ hash or nested in another hash. For example in a standard +create+
-action for a Person model, +params[:model]+ would usually be a hash of all the attributes for the person to create. The +params+ hash can also contain arrays, arrays of hashes and so on.
+action for a Person model, +$this->params['model']+ would usually be a hash of all the attributes for the person to create. The +params+ hash can also contain arrays, arrays of hashes and so on.
 
 Fundamentally HTML forms don't know about any sort of structured data, all they generate is name–value pairs, where pairs are just plain strings. The arrays and hashes you see in your application are the result of some parameter naming conventions that Akelos uses.
 
-TIP: You may find you can try out examples in this section faster by using the console to directly invoke Akelos' parameter parser. For example <pre> ActionController::UrlEncodedPairParser.parse_query_parameters "name=fred&phone=0123456789" # => {"name"=>"fred", "phone"=>"0123456789"} </pre>
+TIP: You may find you can try out examples in this section faster by using the console to directly invoke Akelos' parameter parser. For example <pre> ActionController::UrlEncodedPairParser.parse_query_parameters "name=fred&phone=0123456789" # => {"name"=>'fred', "phone"=>"0123456789"} </pre>
 
 h4. Basic Structures
 
@@ -669,7 +669,7 @@ Normally Akelos ignores duplicate parameter names. If the parameter name contain
 <input name="person[phone_number][]" type="text"/>
 </html>
 
-This would result in +params[:person][:phone_number]+ being an array.
+This would result in +$this->params['person'][:phone_number]+ being an array.
 
 h4. Combining Them
 
@@ -681,7 +681,7 @@ We can mix and match these two concepts. For example, one element of a hash migh
 <input name="addresses[][city]" type="text"/>
 </html>
 
-This would result in +params[:addresses]+ being an array of hashes with keys +line1+, +line2+ and +city+. Akelos decides to start accumulating values in a new hash whenever it encounters an input name that already exists in the current hash.
+This would result in +$this->params['addresses']+ being an array of hashes with keys +line1+, +line2+ and +city+. Akelos decides to start accumulating values in a new hash whenever it encounters an input name that already exists in the current hash.
 
 There's a restriction, however, while hashes can be nested arbitrarily, only one level of "arrayness" is allowed. Arrays can be usually replaced by hashes, for example instead of having an array of model objects one can have a hash of model objects keyed by their id, an array index or some other parameter.
 
@@ -720,7 +720,7 @@ This will result in a +params+ hash that looks like
 {'person' => {'name' => 'Bob', 'address' => {'23' => {'city' => 'Paris'}, '45' => {'city' => 'London'}}}}
 </php>
 
-Akelos knows that all these inputs should be part of the person hash because you called +fields_for+ on the first form builder. By specifying an +:index+ option you're telling Akelos that instead of naming the inputs +person[address][city]+ it should insert that index surrounded by [] between the address and the city. If you pass an Active Record object as we did then Akelos will call +to_param+ on it, which by default returns the database id. This is often useful as it is then easy to locate which Address record should be modified. You can pass numbers with some other significance, strings or even +nil+ (which will result in an array parameter being created).
+Akelos knows that all these inputs should be part of the person hash because you called +fields_for+ on the first form builder. By specifying an +:index+ option you're telling Akelos that instead of naming the inputs +person[address][city]+ it should insert that index surrounded by [] between the address and the city. If you pass an Active Record object as we did then Akelos will call +to_param+ on it, which by default returns the database id. This is often useful as it is then easy to locate which Address record should be modified. You can pass numbers with some other significance, strings or even +null+ (which will result in an array parameter being created).
 
 To create more intricate nestings, you can specify the first part of the input name (+person[address]+ in the previous example) explicitly, for example
 

@@ -1,14 +1,5 @@
 <?php
 
-class DispatchException extends Exception
-{ }
-
-class NotAcceptableException extends Exception
-{ }
-
-class BadRequestException extends Exception
-{ }
-
 /**
 * Class that handles incoming request.
 *
@@ -62,7 +53,7 @@ class AkRequest
     public function __construct () {
         $this->init();
     }
-    
+
 
     /**
     * Initialization method.
@@ -161,13 +152,20 @@ class AkRequest
         $this->parameters_from_url = $params = $Router->match($this);
 
         if(!isset($params['controller']) || !$this->isValidControllerName($params['controller'])){
-            throw new DispatchException('No controller was specified.');
+            throw new NoMatchingRouteException('No route matches "'.$this->getPath().'" with {:method=>:'.$this->getMethod().'}');
         }
-        if(!isset($params['action']) || !$this->isValidActionName($params['action'])){
-            throw new DispatchException('No action was specified.');
+        if(empty($params['action'])){
+            $params['action'] = 'index';
         }
-        if(!empty($params['module']) && !$this->isValidModuleName($params['module'])){
-            throw new DispatchException('Invalid module.');
+        if(!$this->isValidActionName($params['action'])){
+            throw new NoMatchingRouteException('No action was specified.');
+        }
+        if(!empty($params['module'])){
+            if(!$this->isValidModuleName($params['module'])){
+                throw new DispatchException('Invalid module '.$params['module'].'.');
+            }
+        }else{
+            unset($this->_request['module']);
         }
 
         isset($params['module']) ? $this->module = $params['module'] : null;
@@ -179,7 +177,7 @@ class AkRequest
             Ak::lang($params['lang']);
         }
 
-        $this->_request = array_merge($this->_request,$params);
+        $this->_request = array_merge($this->_request, $params);
     }
 
 
@@ -211,14 +209,6 @@ class AkRequest
         return $this->parameters;
     }
 
-    public function setPathParameters($parameters) {
-        $this->_path_parameters = $parameters;
-    }
-
-    public function getPathParameters() {
-        return empty($this->_path_parameters) ? array() : $this->_path_parameters;
-    }
-
     public function getUrlParams() {
         return $_GET;
     }
@@ -235,6 +225,7 @@ class AkRequest
      * Returns the path minus the web server relative installation directory. This method returns null unless the web server is apache.
      */
     public function getRelativeUrlRoot() {
+        if(AK_CLI) return '';
         return str_replace('/index.php','', @$this->env['PHP_SELF']);
     }
 
@@ -318,7 +309,7 @@ class AkRequest
     public function getFormat() {
         if (isset($this->_request['format'])){
             if(!AkMimeType::isFormatRegistered($this->_request['format'])) throw new NotAcceptableException('Invalid format. Please register new formats in your config/ using AkMimeType::register("text/'.$this->_request['format'].'", "'.$this->_request['format'].'")');
-             return $this->_request['format'];
+            return $this->_request['format'];
         }
         return $this->lookupMimeType($this->getMimeType());
     }
@@ -660,17 +651,14 @@ class AkRequest
     public function &recognize($Map = null) {
         $this->_startSession();
         $this->_enableInternationalizationSupport();
-        try{
-            $this->_mapRoutes($Map);
-        }catch(Exception $e){
-            if(!AK_PRODUCTION_MODE){
-                throw $e;
-            }
+        if($this->mapRoutes($Map)){
+            AK_LOG_EVENTS && Ak::getLogger()->info('Processing '.$this->getController().'#'.$this->getAction().' (for '.$this->getRemoteIp().')');
+            $Controller = $this->_getControllerInstance();
+            return $Controller;
+        }else{
+            $false = false;
+            return $false;
         }
-        AK_LOG_EVENTS && Ak::getLogger()->info('Processing '.$this->getController().'#'.$this->getAction().' (for '.$this->getRemoteIp().')');
-
-        $Controller = $this->_getControllerInstance();
-        return $Controller;
     }
 
     public function getPutParams() {
@@ -690,7 +678,7 @@ class AkRequest
         if (empty($data)) return array();
 
         $content_type = $this->getContentType();
-        
+
         switch ($this->lookupMimeType($content_type)){
             case 'html':
                 $as_array = array();
@@ -721,22 +709,13 @@ class AkRequest
         return $this->message_body = $result;
     }
 
-    static $singleton;
-
-    /**
-     * @return AkRequest
-     */
     static function getInstance() {
-        if (!self::$singleton){
-            self::$singleton = new AkRequest();
+        if (!$Request = Ak::getStaticVar('AkRequestSingleton')){
+            $Request = new AkRequest();
+            Ak::setStaticVar('AkRequestSingleton', $Request);
         }
-        return self::$singleton;
+        return $Request;
     }
-
-
-
-
-
 
 
     public function getReferer() {
@@ -758,7 +737,7 @@ class AkRequest
             $status_code = empty($options['status_code']) ? 501 : $options['status_code'];
             $status_header = AkResponse::getStatusHeader($status_code);
             if(!@include(AkConfig::getDir('public').DS.$status_code.'.php')){
-                header($status_header);
+                @header($status_header);
                 echo str_replace('HTTP/1.1 ', '', $status_header);
             }
         }
@@ -768,6 +747,24 @@ class AkRequest
     public function saveRefererIfNotRedirected() {
         if(isset($_SESSION) && !$this->isAjax()){
             $_SESSION['_ak_referer'] = $this->getRequestUri().$this->getPath();
+        }
+        return true;
+    }
+
+    public function mapRoutes($Router = null) {
+        if(empty($Router)){
+            $Router = AkRouter::getInstance();
+        }
+        try{
+            $this->checkForRoutedRequests($Router);
+        }catch(Exception $e){
+            if(AK_TEST_MODE){
+                throw $e;
+            }else{
+                $ExceptionDispatcher = new AkExceptionDispatcher();
+                $ExceptionDispatcher->renderException($e);
+                return false;
+            }
         }
         return true;
     }
@@ -834,25 +831,23 @@ class AkRequest
 
     private function _includeController($controller_details = array()){
         if(!is_file($controller_details['path']) || !@include_once($controller_details['path'])){
-            $this->reportError(array(
-            'status_code' => 404,
-            'message' => Ak::t('Could not find the file <i>%controller_file_name</i> for '.
+            $Exception = new Exception(Ak::t('Could not find the file %controller_file_name for '.
             'the controller %controller_class_name',
             array('%controller_file_name'=> $controller_details['path'],
-            '%controller_class_name' => $controller_details['class_name'])),
-            'log' => 'Controller '.$controller_details['path'].' not found.'
-            ));
+            '%controller_class_name' => $controller_details['class_name'])));
+            $Exception->controller = $controller_details['class_name'];
+            $Exception->params = $this->getParams();
+            throw $Exception;
         }
     }
 
     private function _ensureControllerClassExists($controller_details = array()){
         if(!class_exists($controller_details['class_name'])){
-            $this->reportError(array(
-            'status_code' => 404,
-            'message' => Ak::t('Controller <i>%controller_name</i> does not exist',
-            array('%controller_name' => $controller_details['class_name'])),
-            'log' => 'Controller '.$controller_details['path'].' does not implement '.$controller_details['class_name'].' class.'
-            ));
+            $Exception = new Exception(Ak::t('Expected %file to define %controller_name',
+            array('%file' => $controller_details['path'], '%controller_name' => $controller_details['class_name'])));
+            $Exception->controller = $controller_details['class_name'];
+            $Exception->params = $this->getParams();
+            throw $Exception;
         }
     }
 
@@ -872,13 +867,6 @@ class AkRequest
             $LocaleManager->initApplicationInternationalization($this);
             $this->__internationalization_support_enabled = true;
         }
-    }
-
-    protected function _mapRoutes($Router = null) {
-        if(empty($Router)){
-            $Router = AkRouter::getInstance();
-        }
-        $this->checkForRoutedRequests($Router);
     }
 
     protected function _startSession() {

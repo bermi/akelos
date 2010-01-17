@@ -720,6 +720,7 @@ class AkRouter
             return;
         }
         $this->connect('/:controller/:action/:id', array('controller' => 'page', 'action' => 'index'));
+        $this->connect('/:controller/:action/:id.:format', array('controller' => 'page', 'action' => 'index'));
         $this->connect('/', array('controller' => 'page', 'action' => 'index'));
     }
 }

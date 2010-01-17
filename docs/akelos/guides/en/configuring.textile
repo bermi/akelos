@@ -59,7 +59,7 @@ h4. Akelos General Configuration
 
 * +config.load_paths+ accepts an array of additional paths to prepend to the load path. By default, all app, lib, vendor and mock paths are included in this list. 
 
-* +config.log_level+ defines the vtplosity of the Akelos logger. In production mode, this defaults to +:info+. In development mode, it defaults to +:debug+. 
+* +config.log_level+ defines the verbosity of the Akelos logger. In production mode, this defaults to +:info+. In development mode, it defaults to +:debug+. 
 
 * +config.log_path+ overrides the path to the log file to use. Defaults to +log/#{environment}.log+ (e.g. log/development.log or log/production.log). 
 
@@ -153,7 +153,7 @@ WARNING: Threadsafe operation in incompatible with the normal workings of develo
 
 * +config.action_controller.optimise_named_routes+ turns on some optimizations in generating the routing table. It is set to +true+ by default.
 
-* +config.action_controller.use_accept_header+ sets the rules for determining the response format. If this is set to +true+ (the default) then +respond_to+ and +Request#format+ will take the Accept header into account. If it is set to false then the request format will be determined solely by examining +params[:format]+. If there is no +format+ parameter, then the response format will be either HTML or Javascript depending on whether the request is an AJAX request.
+* +config.action_controller.use_accept_header+ sets the rules for determining the response format. If this is set to +true+ (the default) then +respond_to+ and +Request#format+ will take the Accept header into account. If it is set to false then the request format will be determined solely by examining +$this->params['format']+. If there is no +format+ parameter, then the response format will be either HTML or Javascript depending on whether the request is an AJAX request.
 
 * +config.action_controller.allow_forgery_protection+ enables or disables CSRF protection. By default this is +false+ in test mode and +true+ in all other modes.
 

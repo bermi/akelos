@@ -5,7 +5,7 @@ class AkTestRequest extends AkRequest
     public function &recognize($Map = null) {
         $this->_startSession();
         $this->_enableInternationalizationSupport();
-        $this->_mapRoutes($Map);
+        $this->mapRoutes($Map);
 
         $params = $this->getParams();
 

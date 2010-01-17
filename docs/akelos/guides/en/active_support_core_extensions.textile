@@ -12,7 +12,7 @@ h4. +blank?+ and +present?+
 
 The following values are considered to be blank in an Akelos application:
 
-* +nil+ and +false+,
+* +null+ and +false+,
 
 * strings composed only of whitespace, i.e. matching +/\A\s*\z/+,
 
@@ -22,7 +22,7 @@ The following values are considered to be blank in an Akelos application:
 
 WARNING: Note that numbers are not mentioned, in particular 0 and 0.0 are *not* blank.
 
-For example, this method from +ActionDispatch::Response+ uses +blank?+ to easily be robust to +nil+ and whitespace strings in one shot:
+For example, this method from +ActionDispatch::Response+ uses +blank?+ to easily be robust to +null+ and whitespace strings in one shot:
 
 <php>
 def charset
@@ -77,7 +77,7 @@ Active Support provides +duplicable?+ to programmatically query an object about 
 false.duplicable?  # => false
 </php>
 
-By definition all objects are +duplicable?+ except +nil+, +false+, +true+, symbols, numbers, and class objects.
+By definition all objects are +duplicable?+ except +null+, +false+, +true+, symbols, numbers, and class objects.
 
 WARNING. Using +duplicable?+ is discouraged because it depends on a hard-coded list. Classes have means to disallow duplication like removing +dup+ and +clone+ or raising exceptions from them, only +rescue+ can tell.
 
@@ -96,7 +96,7 @@ end
 
 h4. +try+
 
-Sometimes you want to call a method provided the receiver object is not +nil+, which is something you usually check first.
+Sometimes you want to call a method provided the receiver object is not +null+, which is something you usually check first.
 
 For instance, note how this method of +ActiveRecord::ConnectionAdapters::AbstractAdapter+ checks if there's a +@logger+:
 
@@ -109,7 +109,7 @@ def log_info(sql, name, ms)
 end
 </php>
 
-You can shorten that using +Object#try+. This method is a synonim for +Object#send+ except that it returns +nil+ if sent to +nil+. The previous example could then be rewritten as:
+You can shorten that using +Object#try+. This method is a synonim for +Object#send+ except that it returns +null+ if sent to +null+. The previous example could then be rewritten as:
 
 <php>
 def log_info(sql, name, ms)
@@ -183,7 +183,7 @@ The return value of +to_param+ should *not* be escaped:
 
 Several classes in Akelos overwrite this method.
 
-For example +nil+, +true+, and +false+ return themselves. +Array#to_param+ calls +to_param+ on the elements and joins the result with "/":
+For example +null+, +true+, and +false+ return themselves. +Array#to_param+ calls +to_param+ on the elements and joins the result with "/":
 
 <php>
 [0, true, String].to_param # => "0/true/String"
@@ -205,7 +205,7 @@ we get:
 user_path(@user) # => "/users/357-john-smith"
 </php>
 
-WARNING. Controllers need to be aware of any redifinition of +to_param+ because when a request like that comes in "357-john-smith" is the value of +params[:id]+.
+WARNING. Controllers need to be aware of any redifinition of +to_param+ because when a request like that comes in "357-john-smith" is the value of +$this->params['id']+.
 
 h4. +to_query+
 
@@ -285,7 +285,7 @@ end
 That idiom may convey _grouping_ to the reader as well. For example, say you want to send a newsletter whose language depends on the user. Somewhere in the mailer you could group locale-dependent bits like this:
 
 <php>
-I18n.with_options :locale => user.locale, :scope => "newsletter" do |i18n|
+I18n.with_options :locale => user.locale, :scope => 'newsletter' do |i18n|
   subject i18n.t :subject
   body    i18n.t :body, :user_name => user.name 
 end
@@ -456,7 +456,7 @@ h3. Extensions to +Class+
 
 h4. Class Attribute Accessors
 
-The macros +cattr_reader+, +cattr_writer+, and +cattr_accessor+ are analogous to their +attr_*+ counterparts but for classes. They initialize a class variable to +nil+ unless it already exists, and generate the corresponding class methods to access it:
+The macros +cattr_reader+, +cattr_writer+, and +cattr_accessor+ are analogous to their +attr_*+ counterparts but for classes. They initialize a class variable to +null+ unless it already exists, and generate the corresponding class methods to access it:
 
 <php>
 class MysqlAdapter < AbstractAdapter
@@ -629,8 +629,8 @@ In PHP 1.9 the <tt>%</tt> string operator supports key-based interpolation, both
 
 <php>
 "Total is %<total>.02f" % {:total => 43.1}  # => Total is 43.10
-"I say %{foo}" % {:foo => "wadus"}          # => "I say wadus"
-"I say %{woo}" % {:foo => "wadus"}          # => KeyError
+"I say %{foo}" % {:foo => 'wadus'}          # => "I say wadus"
+"I say %{woo}" % {:foo => 'wadus'}          # => KeyError
 </php>
 
 Active Support adds that functionality to <tt>%</tt> in previous versions of PHP.
@@ -651,9 +651,9 @@ h5. +at(position)+
 Returns the character of the string at position +position+:
 
 <php>
-"hello".at(0)  # => "h"
-"hello".at(4)  # => "o"
-"hello".at(-1) # => "o"
+"hello".at(0)  # => 'h'
+"hello".at(4)  # => 'o'
+"hello".at(-1) # => 'o'
 "hello".at(10) # => ERROR if < 1.9, nil in 1.9
 </php>
 
@@ -662,9 +662,9 @@ h5. +from(position)+
 Returns the substring of the string starting at position +position+:
 
 <php>
-"hello".from(0)  # => "hello"
-"hello".from(2)  # => "llo"
-"hello".from(-2) # => "lo"
+"hello".from(0)  # => 'hello'
+"hello".from(2)  # => 'llo'
+"hello".from(-2) # => 'lo'
 "hello".from(10) # => "" if < 1.9, nil in 1.9
 </php>
 
@@ -673,10 +673,10 @@ h5. +to(position)+
 Returns the substring of the string up to position +position+:
 
 <php>
-"hello".to(0)  # => "h"
-"hello".to(2)  # => "hel"
-"hello".to(-2) # => "hell"
-"hello".to(10) # => "hello"
+"hello".to(0)  # => 'h'
+"hello".to(2)  # => 'hel'
+"hello".to(-2) # => 'hell'
+"hello".to(10) # => 'hello'
 </php>
 
 h5. +first(limit = 1)+
@@ -779,7 +779,7 @@ Addition only assumes the elements respond to <tt>+</tt>:
 
 <php>
 [[1, 2], [2, 3], [3, 4]].sum    # => [1, 2, 2, 3, 3, 4]
-%w(foo bar baz).sum             # => "foobarbaz"
+%w(foo bar baz).sum             # => 'foobarbaz'
 {:a => 1, :b => 2, :c => 3}.sum # => [:b, 2, :c, 3, :a, 1]
 </php>
 
@@ -861,7 +861,7 @@ The method +many?+ is shorthand for +collection.size > 1+:
 If an optional block is given +many?+ only takes into account those elements that return true:
 
 <php>
-@see_more = videos.many? {|video| video.category == params[:category]}
+@see_more = videos.many? {|video| video.category == $this->params['category']}
 </php>
 
 h3. Extensions to +Array+
@@ -896,7 +896,7 @@ h4. Options Extraction
 When the last argument in a method call is a hash, except perhaps for a +&block+ argument, PHP allows you to omit the brackets:
 
 <php>
-User.exists?(:email => params[:email])
+User.exists?(:email => $this->params['email'])
 </php>
 
 That syntactic sugar is used a lot in Akelos to avoid positional arguments where there would be too many, offering instead interfaces that emulate named parameters. In particular it is very idiomatic to use a trailing hash for options.
@@ -925,7 +925,7 @@ The method +to_sentence+ turns an array into a string containing a sentence that
 
 <php>
 %w().to_sentence                # => ""
-%w(Earth).to_sentence           # => "Earth"
+%w(Earth).to_sentence           # => 'Earth'
 %w(Earth Wind).to_sentence      # => "Earth and Wind"
 %w(Earth Wind Fire).to_sentence # => "Earth, Wind, and Fire"
 </php>
@@ -952,7 +952,7 @@ The method +to_formatted_s+ acts like +to_s+ by default.
 If the array contains items that respond to +id+, however, it may be passed the symbol <tt>:db</tt> as argument. That's typically used with collections of ARs, though technically any object in PHP 1.8 responds to +id+ indeed. Returned strings are:
 
 <php>
-[].to_formatted_s(:db)            # => "null"
+[].to_formatted_s(:db)            # => 'null'
 [user].to_formatted_s(:db)        # => "8456"
 invoice.lines.to_formatted_s(:db) # => "23,567,556,12"
 </php>
@@ -1092,7 +1092,7 @@ or yields them in turn if a block is passed:
 <% end %>
 </php>
 
-The first example shows +in_groups_of+ fills the last group with as many +nil+ elements as needed to have the requested size. You can change this padding value using the second optional argument:
+The first example shows +in_groups_of+ fills the last group with as many +null+ elements as needed to have the requested size. You can change this padding value using the second optional argument:
 
 <php>
 [1, 2, 3].in_groups_of(2, 0) # => [[1, 2], [3, 0]]
@@ -1124,7 +1124,7 @@ or yields them in turn if a block is passed:
 ["6", "7", nil]
 </php>
 
-The examples above show that +in_groups+ fills some groups with a trailing +nil+ element as needed. A group can get at most one of these extra elements, the rightmost one if any. And the groups that have them are always the last ones.
+The examples above show that +in_groups+ fills some groups with a trailing +null+ element as needed. A group can get at most one of these extra elements, the rightmost one if any. And the groups that have them are always the last ones.
 
 You can change this padding value using the second optional argument:
 
@@ -1153,7 +1153,7 @@ If a block is passed the separators are those elements of the array for which th
 # => [[-5], [-3, -2, -1], [1, 2, 3], [5]]
 </php>
 
-Otherwise, the value received as argument, which defaults to +nil+, is the separator:
+Otherwise, the value received as argument, which defaults to +null+, is the separator:
 
 <php>
 [0, 1, -5, 1, 1, "foo", "bar"].split(1)
@@ -1190,19 +1190,19 @@ To do so, the method loops over the pairs and builds nodes that depend on the _v
 
 * If +value+ responds to +to_xml+ the method is invoked with +key+ as <tt>:root</tt>.
 
-* Otherwise, a node with +key+ as tag is created with a string representation of +value+ as text node. If +value+ is +nil+ an attribute "nil" set to "true" is added. Unless the option <tt>:skip_types</tt> exists and is true, an attribute "type" is added as well according to the following mapping:
+* Otherwise, a node with +key+ as tag is created with a string representation of +value+ as text node. If +value+ is +null+ an attribute "nil" set to "true" is added. Unless the option <tt>:skip_types</tt> exists and is true, an attribute "type" is added as well according to the following mapping:
 <php>
 XML_TYPE_NAMES = {
-  "Symbol"     => "symbol",
-  "Fixnum"     => "integer",
-  "Bignum"     => "integer",
-  "BigDecimal" => "decimal",
-  "Float"      => "float",
-  "TrueClass"  => "boolean",
-  "FalseClass" => "boolean",
-  "Date"       => "date",
-  "DateTime"   => "datetime",
-  "Time"       => "datetime"
+  "Symbol"     => 'symbol',
+  "Fixnum"     => 'integer',
+  "Bignum"     => 'integer',
+  "BigDecimal" => 'decimal',
+  "Float"      => 'float',
+  "TrueClass"  => 'boolean',
+  "FalseClass" => 'boolean',
+  "Date"       => 'date',
+  "DateTime"   => 'datetime',
+  "Time"       => 'datetime'
 }
 </php>
 
@@ -1318,8 +1318,8 @@ If the receiver responds to +convert_key+, the method is called on each of the a
 The method +except+ may come in handy for example when you want to protect some parameter that can't be globally protected with +attr_protected+:
 
 <php>
-params[:account] = params[:account].except(:plan_id) unless admin?
-@account.update_attributes(params[:account])
+$this->params['account'] = $this->params['account'].except(:plan_id) unless admin?
+@account.update_attributes($this->params['account'])
 </php>
 
 There's also the bang variant +except!+ that removes keys in the very receiver.
@@ -1359,8 +1359,8 @@ h5. +symbolize_keys+ and +symbolize_keys!+
 The method +symbolize_keys+ returns a hash that has a symbolized version of the keys in the receiver, where possible. It does so by sending +to_sym+ to them:
 
 <php>
-{nil => nil, 1 => 1, "a" => "a"}.symbolize_keys
-# => {1 => 1, nil => nil, :a => "a"}
+{nil => nil, 1 => 1, "a" => 'a'}.symbolize_keys
+# => {1 => 1, nil => nil, :a => 'a'}
 </php>
 
 WARNING. Note in the previous example only one key was symbolized.

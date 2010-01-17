@@ -60,6 +60,7 @@ function akelos_autoload($name, $path = null) {
 
         // Action Pack
         'AkActionController'            => 'action_pack/action_controller.php',
+        'AkExceptionDispatcher'         => 'action_pack/exception_dispatcher.php',
         'AkActionView'                  => 'action_pack/action_view.php',
         'AkBaseHelper'                  => 'action_pack/base_helper.php',
         'AkActionViewHelper'            => 'action_pack/base_helper.php',
@@ -106,6 +107,9 @@ function akelos_autoload($name, $path = null) {
         'AkUrlWriter'                   => 'action_pack/router/url_writer.php',
         'AkVariableSegment'             => 'action_pack/router/variable_segment.php',
         'AkWildcardSegment'             => 'action_pack/router/wildcard_segment.php',
+        'AkResource'                    => 'action_pack/router/resources.php',
+        'AkResources'                   => 'action_pack/router/resources.php',
+        'AkSingletonResource'           => 'action_pack/router/resources.php',
 
         'AkSession'                     => 'action_pack/session.php',
         'AkStream'                      => 'action_pack/stream.php',
@@ -336,7 +340,7 @@ if(!defined('AK_REQUEST_URI')){
     $_SERVER['SCRIPT_NAME']
     )));
     if(strstr($__request_uri, AK_PROTOCOL)){
-       $__request_uri = str_replace(AK_PROTOCOL.AK_HOST, '', $__request_uri);
+        $__request_uri = str_replace(AK_PROTOCOL.AK_HOST, '', $__request_uri);
     }
     define('AK_REQUEST_URI', $__request_uri);
     unset($__request_uri);
@@ -570,5 +574,18 @@ $ADODB_CACHE_DIR = AK_CACHE_DIR;
 ini_set('arg_separator.output', '&');
 ini_set('include_path', (AK_CONTRIB_DIR.DS.'pear'.PATH_SEPARATOR.ini_get('include_path')));
 ini_set('session.name', AK_SESSION_NAME);
+
+
+
+class ControllerException       extends Exception{}
+class UnknownActionException    extends ControllerException{}
+class ForbiddenActionException  extends ControllerException{}
+class DispatchException         extends ControllerException{}
+class NotAcceptableException    extends ControllerException{}
+class BadRequestException       extends ControllerException{}
+class MissingTemplateException  extends ControllerException{}
+class RouteException extends ControllerException{}
+class RouteDoesNotMatchRequestException extends RouteException{}
+class RouteDoesNotMatchParametersException extends RouteException{}
 
 

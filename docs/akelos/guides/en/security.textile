@@ -205,9 +205,9 @@ The HTTP protocol basically provides two main types of requests - GET and POST (
 * The interaction _(highlight)changes the state_ of the resource in a way that the user would perceive (e.g., a subscription to a service), or
 * The user is _(highlight)held accountable for the results_ of the interaction.
 
-If your web application is RESTful, you might be used to additional HTTP vtpls, such as PUT or DELETE. Most of today‘s web browsers, however do not support them - only GET and POST. Akelos uses a hidden +_method+ field to handle this barrier.
+If your web application is RESTful, you might be used to additional HTTP verbs, such as PUT or DELETE. Most of today‘s web browsers, however do not support them - only GET and POST. Akelos uses a hidden +_method+ field to handle this barrier.
 
-_(highlight)The verify method in a controller can make sure that specific actions may not be used over GET_. Here is an example to verify the use of the transfer action over POST. If the action comes in using any other vtpl, it redirects to the list action.
+_(highlight)The verify method in a controller can make sure that specific actions may not be used over GET_. Here is an example to verify the use of the transfer action over POST. If the action comes in using any other verb, it redirects to the list action.
 
 <php>
 verify :method => :post, :only => [:transfer], :redirect_to => {:action => :list}
@@ -316,7 +316,7 @@ h4. File Downloads
 Just as you have to filter file names for uploads, you have to do so for downloads. The send_file() method sends files from the server to the client. If you use a file name, that the user entered, without filtering, any file can be downloaded:
 
 <php>
-send_file('/var/www/uploads/' + params[:filename])
+send_file('/var/www/uploads/' + $this->params['filename'])
 </php>
 
 Simply pass a file name like “../../../etc/passwd” to download the server's login information. A simple solution against this, is to _(highlight)check that the requested file is in the expected directory_:
@@ -365,14 +365,14 @@ The common admin interface works like this: it's located at www.example.com/admi
 
 h3. Mass Assignment
 
--- _Without any precautions Model.new(params[:model]) allows attackers to set any database column's value._
+-- _Without any precautions Model.new($this->params['model']) allows attackers to set any database column's value._
 
 The mass-assignment feature may become a problem, as it allows an attacker to set any model's attributes by manipulating the hash passed to a model's +new()+ method:
 
 <php>
 def signup
-  params[:user] #=> {:name => “ow3ned”, :admin => true}
-  @user = User.new(params[:user])
+  $this->params['user'] #=> {:name => “ow3ned”, :admin => true}
+  @user = User.new($this->params['user'])
 end
 </php>
 
@@ -385,7 +385,7 @@ Mass-assignment saves you much work, because you don't have to set each value in
 This will set the following parameters in the controller:
 
 <php>
-params[:user] #=> {:name => “ow3ned”, :admin => true}
+$this->params['user'] #=> {:name => “ow3ned”, :admin => true}
 </php>
 
 So if you create a new user using mass-assignment, it may be too easy to become an administrator.
@@ -423,8 +423,8 @@ attr_accessible :name
 If you want to set a protected attribute, you will to have to assign it individually:
 
 <php>
-params[:user] #=> {:name => "ow3ned", :admin => true}
-@user = User.new(params[:user])
+$this->params['user'] #=> {:name => "ow3ned", :admin => true}
+@user = User.new($this->params['user'])
 @user.admin #=> false # not mass-assigned
 @user.admin = true
 @user.admin #=> true
@@ -451,10 +451,10 @@ http://localhost:3006/user/activate
 http://localhost:3006/user/activate?id=
 </plain>
 
-This is possible because on some servers, this way the parameter id, as in params[:id], would be nil. However, here is the finder from the activation action:
+This is possible because on some servers, this way the parameter id, as in $this->params['id'], would be nil. However, here is the finder from the activation action:
 
 <php>
-User.find_by_activation_code(params[:id])
+User.find_by_activation_code($this->params['id'])
 </php>
 
 If the parameter was nil, the resulting SQL query will be
@@ -573,13 +573,13 @@ h4. Privilege Escalation
 The most common parameter that a user might tamper with, is the id parameter, as in +http://www.domain.com/project/1+, whereas 1 is the id. It will be available in params in the controller. There, you will most likely do something like this:
 
 <php>
-@project = Project.find(params[:id])
+@project = Project.find($this->params['id'])
 </php>
 
 This is alright for some web applications, but certainly not if the user is not authorized to view all projects. If the user changes the id to 42, and he is not allowed to see that information, he will have access to it anyway. Instead, _(highlight)query the user's access rights, too_:
 
 <php>
-@project = @current_user.projects.find(params[:id])
+@project = @current_user.projects.find($this->params['id'])
 </php>
 
 Depending on your web application, there will be many more parameters the user can tamper with. As a rule of thumb, _(highlight)no user input data is secure, until proven otherwise, and every parameter from the user is potentially manipulated_.
@@ -616,7 +616,7 @@ h5. Introduction
 SQL injection attacks aim at influencing database queries by manipulating web application parameters. A popular goal of SQL injection attacks is to bypass authorization. Another goal is to carry out data manipulation or reading arbitrary data. Here is an example of how not to use user input data in a query:
 
 <php>
-Project.find(:all, :conditions => "name = '#{params[:name]}'")
+Project.find(:all, :conditions => "name = '#{$this->params['name']}'")
 </php>
 
 This could be in a search action and the user may enter a project's name that he wants to find. If a malicious user enters ' OR 1 --, the resulting SQL query will be:
@@ -632,7 +632,7 @@ h5. Bypassing Authorization
 Usually a web application includes access control. The user enters his login credentials, the web application tries to find the matching record in the users table. The application grants access when it finds a record. However, an attacker may possibly bypass this check with SQL injection. The following shows a typical database query in Akelos to find the first record in the users table which matches the login credentials parameters supplied by the user.
 
 <php>
-User.find(:first, "login = '#{params[:name]}' AND password = '#{params[:password]}'")
+User.find(:first, "login = '#{$this->params['name']}' AND password = '#{$this->params['password']}'")
 </php>
 
 If an attacker enters ' OR '1'='1 as the name, and ' OR '2'>'1 as the password, the resulting SQL query will be:
@@ -648,7 +648,7 @@ h5. Unauthorized Reading
 The UNION statement connects two SQL queries and returns the data in one set. An attacker can use it to read arbitrary data from the database. Let's take the example from above:
 
 <php>
-Project.find(:all, :conditions => "name = '#{params[:name]}'")
+Project.find(:all, :conditions => "name = '#{$this->params['name']}'")
 </php>
 
 And now let's inject another query using the UNION statement:
@@ -918,7 +918,7 @@ HTTP request headers have a Referer, User-Agent (client software), and Cookie fi
 Besides that, it is _(highlight)important to know what you are doing when building response headers partly based on user input._ For example you want to redirect the user back to a specific page. To do that you introduced a “referer“ field in a form to redirect to the given address:
 
 <php>
-redirect_to params[:referer]
+redirect_to $this->params['referer']
 </php>
 
 What happens is that Akelos puts the string into the Location header field and sends a 302 (redirect) status to the browser. The first thing a malicious user would do, is this:

@@ -191,7 +191,7 @@ URLs can be generated in mailer views using +url_for+ or named routes.
 Unlike controllers, the mailer instance doesn't have any context about the incoming request so you'll need to provide the +:host+, +:controller+, and +:action+:
 
 <tpl>
-<%= url_for(:host => "example.com", :controller => "welcome", :action => "greeting") %>
+<%= url_for(:host => "example.com", :controller => 'welcome', :action => 'greeting') %>
 </tpl>
 
 When using named routes you only need to supply the +:host+:
@@ -381,7 +381,7 @@ ActionMailer::Base.smtp_settings = {
   :port           => 587,
   :domain         => "domain.com",
   :user_name      => "user@domain.com",
-  :password       => "password",
+  :password       => 'password',
   :authentication => :plain
 }
 </php>

@@ -23,28 +23,30 @@ class RestfulRequests_TestCase extends ActionPackUnitTest
         $options = array('header'=>array('accept'=>'text/xml'));
         $result = $Http->get($this->_test_script.'people',$options);
         $headers = $Http->getResponseHeaders();
-        
         $this->assertEqual('application/xml',$headers['content-type']);
     }
     
+
     public function testPutPersonOnTheServerViaXml() {
         $person = '<person><name>Steve</name></person>';
         $Http = new AkHttpClient();
         $options = array('header'=>array(
             'content-type'=>'text/xml',
         ));
-        $result = $Http->put($this->_test_script.'person/1', $options, $person);
+
+        $result = $Http->put($this->_test_script.'people/1', $options, $person);
         $this->assertEqual('Steve',$result);
     }
-
+    
     public function testPutPersonOnTheServerViaWwwForm() {
         $person = array('person'=>array('name'=>'Steve'));
         $Http = new AkHttpClient();
 
         $options['params'] = $person;
-        $result = $Http->put($this->_test_script.'person/1',$options);
+        $result = $Http->put($this->_test_script.'people/1',$options);
         $this->assertEqual('Steve',$result);
     }
+
 
     public function testPostPersonOnTheServerViaXml() {
         $person = '<person><name>Steve</name></person>';
@@ -52,7 +54,7 @@ class RestfulRequests_TestCase extends ActionPackUnitTest
         $options = array('header'=>array(
             'content-type'=>'text/xml',
         ));
-        $result = $Http->post($this->_test_script.'person',$options,$person);
+        $result = $Http->post($this->_test_script.'people',$options,$person);
         $this->assertEqual('Steve',$result);
     }
 
@@ -61,16 +63,15 @@ class RestfulRequests_TestCase extends ActionPackUnitTest
         $Http = new AkHttpClient();
 
         $options['params'] = $person;
-        $result = $Http->post($this->_test_script.'person', $options);
+        $result = $Http->post($this->_test_script.'people', $options);
         $this->assertEqual('Steve',$result);
     }
-    
+
     public function testFileUpload() {
         $Http = new AkHttpClient();
         $options['params'] = array('photo'=>array('title'=>'My Photo.'));
         $options['file'] = array('inputname'=>'photo','filename'=>__FILE__);
-        $result = $Http->post($this->_test_script.'person/1/photo',$options);
-        
+        $result = $Http->post($this->_test_script.'people/1/photo',$options);
         $this->assertEqual("My Photo.|".basename(__FILE__),$result);
     }
 

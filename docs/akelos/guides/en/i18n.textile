@@ -137,8 +137,8 @@ The _setting part_ is easy. You can set the locale in a +before_filter+ in the A
 <php>
 before_filter :set_locale
 def set_locale
-  # if params[:locale] is nil then I18n.default_locale will be used
-  I18n.locale = params[:locale]
+  # if $this->params['locale'] is nil then I18n.default_locale will be used
+  I18n.locale = $this->params['locale']
 end
 </php>
 
@@ -201,7 +201,7 @@ This solution has aforementioned advantages, however, you may not be able or may
 
 h4. Setting the Locale from the URL Params
 
-The most usual way of setting (and passing) the locale would be to include it in URL params, as we did in the +I18n.locale = params[:locale]+ _before_filter_ in the first example. We would like to have URLs like +www.example.com/books?locale=ja+ or +www.example.com/ja/books+ in this case.
+The most usual way of setting (and passing) the locale would be to include it in URL params, as we did in the +I18n.locale = $this->params['locale']+ _before_filter_ in the first example. We would like to have URLs like +www.example.com/books?locale=ja+ or +www.example.com/ja/books+ in this case.
 
 This approach has almost the same set of advantages as setting the locale from the domain name: namely that it's RESTful and in accord with the rest of the World Wide Web. It does require a little bit more work to implement, though.
 
@@ -232,13 +232,13 @@ map.resources :books, :path_prefix => '/:locale'
 
 Now, when you call the +books_path+ method you should get +"/en/books"+ (for the default locale). An URL like +http://localhost:3001/nl/books+ should load the Netherlands locale, then, and following calls to +books_path+ should return +"/nl/books"+ (because the locale changed).
 
-Of course, you need to take special care of the root URL (usually "homepage" or "dashboard") of your application. An URL like +http://localhost:3001/nl+ will not work automatically, because the +map.root :controller => "dashboard"+ declaration in your +routes.php+ doesn't take locale into account. (And rightly so: there's only one "root" URL.)
+Of course, you need to take special care of the root URL (usually "homepage" or "dashboard") of your application. An URL like +http://localhost:3001/nl+ will not work automatically, because the +map.root :controller => 'dashboard'+ declaration in your +routes.php+ doesn't take locale into account. (And rightly so: there's only one "root" URL.)
 
 You would probably need to map URLs like these:
 
 <php>
 # config/routes.php
-map.dashboard '/:locale', :controller => "dashboard"
+map.dashboard '/:locale', :controller => 'dashboard'
 </php>
 
 Do take special care about the *order of your routes*, so this route declaration does not "eat" other ones. (You may want to add it directly before the +map.root+ declaration.)
@@ -598,7 +598,7 @@ For example a PHP Hash providing translations can look like this:
 {
   :pt => {
     :foo => {
-      :bar => "baz"
+      :bar => 'baz'
     }
   }
 }

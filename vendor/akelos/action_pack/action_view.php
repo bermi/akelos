@@ -131,15 +131,7 @@ class AkActionView
             $this->first_render = $template_path;
         }
 
-        $template_path = substr($template_path,0,7) === 'layouts' ? AkConfig::getDir('views').DS.$template_path.'.tpl' : $template_path;
-        
-        if(!$use_full_path && strstr($template_path,'.')){
-            $template_file_name = $template_path;
-            $template_extension = substr($template_path,strpos($template_path,'.')+1);
-        }else{
-            $template_extension = $this->pickTemplateExtension($template_path);
-            $template_file_name = $this->getFullTemplatePath($template_path, $template_extension);
-        }
+        list($template_extension, $template_file_name) = $this->_getTemplateExtenssionAndFileName($template_path, $use_full_path);
 
         $format = '';
         if(isset($local_assigns['params']['format']) && $local_assigns['params']['format'] != 'html'){
@@ -154,6 +146,7 @@ class AkActionView
 
         return $this->renderTemplate($template_extension, null, $template_file_name, $local_assigns);
     }
+    
 
     /**
     * Renders the template present at <tt>template_path</tt> (relative to the template_root).
@@ -161,21 +154,27 @@ class AkActionView
     */
     public function render($options = array()) {
         if(is_string($options)){
-            return $this->renderFile($options, true);
+            $result = $this->renderFile($options, true);
         }elseif(is_array($options)){
             $options['locals'] = empty($options['locals']) ? array() : $options['locals'];
             $options['use_full_path'] = empty($options['use_full_path']) ? true : false;
 
-            if (!empty($options['file'])){
-                return $this->renderFile($options['file'], $options['use_full_path'], $options['locals']);
+            if(!empty($options['file'])){
+                $result = $this->renderFile($options['file'], $options['use_full_path'], $options['locals']);
             }elseif (!empty($options['partial']) && (isset($options['collection']) && is_array($options['collection']))){
-                return $this->renderPartialCollection($options['partial'], $options['collection'], @$options['spacer_template'], @$options['locals']);
+                $result = $this->renderPartialCollection($options['partial'], $options['collection'], @$options['spacer_template'], @$options['locals']);
             }elseif (!empty($options['partial'])){
-                return $this->renderPartial($options['partial'], @$options['object'], @$options['locals']);
+                $result = $this->renderPartial($options['partial'], @$options['object'], @$options['locals']);
             }elseif ($options['inline']){
-                return $this->renderTemplate(empty($options['type']) ? 'tpl' : $options['type'], $options['inline'], null, empty($options['locals']) ? array() : $options['locals']);
+                $result = $this->renderTemplate(empty($options['type']) ? 'tpl' : $options['type'], $options['inline'], null, empty($options['locals']) ? array() : $options['locals']);
             }
         }
+        if(!empty($options['layout'])){
+            $layout = Ak::deleteAndGetValue($options, 'layout');
+            list($template_extension, $template_file_name) = $this->_getTemplateExtenssionAndFileName($layout);
+            return $this->renderTemplate('tpl', null, $template_file_name, array_merge($options['locals'], array('content_for_layout'=>$result)));
+        }
+        return $result;
     }
 
 
@@ -247,11 +246,11 @@ class AkActionView
     }
 
     public function getFullTemplatePath($template_path, $extension) {
-        //the '.html'-extension is handled by a special ExtensionHandler, so we remove this here 
-        //that is of course a hack, basically to allow that you can use either index.tpl or index.html.tpl 
-        //as your template-filename 
-        if(substr($template_path,-5)=='.html'){ 
-            $template_path = substr($template_path,0,-5); 
+        //the '.html'-extension is handled by a special ExtensionHandler, so we remove this here
+        //that is of course a hack, basically to allow that you can use either index.tpl or index.html.tpl
+        //as your template-filename
+        if(substr($template_path,-5)=='.html'){
+            $template_path = substr($template_path,0,-5);
         }
 
         $template_path_with_format = $this->_getTemplatePathWithFormat($template_path, $extension);
@@ -393,7 +392,7 @@ class AkActionView
     public function renderCollectionOfPartials($partial_name, $collection, $partial_spacer_template = null, $local_assigns = array()) {
         return $this->renderPartialCollection($partial_name, $collection, $partial_spacer_template, $local_assigns);
     }
-    
+
     protected function getLocalAssigns($extra_assigns = array()){
         $controller_extras = isset($this->controller) ? array('controller_name' => $this->controller->getControllerName(), 'controller' => $this->controller) : array();
         $result = array_merge(
@@ -406,7 +405,7 @@ class AkActionView
 
         return $result;
     }
-    
+
     protected function _partialPathPiece($partial_path) {
         if(strstr($partial_path, '/')){
             $dir_name = dirname($partial_path);
@@ -434,10 +433,23 @@ class AkActionView
 
     protected function _addObjectToLocalAssigns_($partial_name, &$local_assigns, &$object) {
         if (is_null($object) && isset($this->controller->$partial_name)){
-            $local_assigns[$partial_name] =& $this->controller->$partial_name; 
+            $local_assigns[$partial_name] =& $this->controller->$partial_name;
         } elseif (!is_null($object)) {
             $local_assigns[$partial_name] = $object;
         }
+    }
+    
+
+    protected function _getTemplateExtenssionAndFileName($template_path, $use_full_path = true){
+        $template_path = substr($template_path,0,7) === 'layouts' ? AkConfig::getDir('views').DS.$template_path.'.tpl' : $template_path;
+        if(!$use_full_path && strstr($template_path,'.')){
+            $template_file_name = $template_path;
+            $template_extension = substr($template_path,strpos($template_path,'.')+1);
+        }else{
+            $template_extension = $this->pickTemplateExtension($template_path);
+            $template_file_name = $this->getFullTemplatePath($template_path, $template_extension);
+        }
+        return array($template_extension, $template_file_name);
     }
 
     /**

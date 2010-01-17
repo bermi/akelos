@@ -11,20 +11,25 @@ class AkDispatcher
     public $Controller;
 
     public function dispatch() {
-
         try{
             if(!$this->dispatchCached()){
                 $time_start = microtime(true);
                 AK_ENABLE_PROFILER &&  Ak::profile(__CLASS__.'::'.__FUNCTION__.'() call');
                 $this->Request = AkRequest::getInstance();
                 $this->Response = new AkResponse();
-                $this->Controller = $this->Request->recognize();
-                $this->Controller->ak_time_start = $time_start;
-                AK_ENABLE_PROFILER && Ak::profile('Request::recognize() completed');
-                $this->Controller->process($this->Request, $this->Response);
+                if($this->Controller = $this->Request->recognize()){
+                    $this->Controller->ak_time_start = $time_start;
+                    AK_ENABLE_PROFILER && Ak::profile('Request::recognize() completed');
+                    $this->Controller->process($this->Request, $this->Response);
+                }
             }
         }catch(Exception $e){
-            AkError::handle($e);
+            if(isset($this->Controller) && method_exists($this->Controller, 'render_error')){
+                $this->Controller->render_error($e);
+            }else{
+                $ExceptionDispatcher = new AkExceptionDispatcher();
+                $ExceptionDispatcher->renderException($e);
+            }
         }
     }
 

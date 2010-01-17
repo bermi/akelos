@@ -12,7 +12,7 @@ class Controller_forbidden_actions_TestCase extends AkWebTestCase
         $this->_test_script = AkConfig::getOption('testing_url').
         '/action_pack/public/index.php?ak=';
     }
-    
+
     public function skip(){
         $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
     }
@@ -26,8 +26,8 @@ class Controller_forbidden_actions_TestCase extends AkWebTestCase
     public function test_should_not_allow_calling_action_controller_methods() {
         $this->setMaximumRedirects(0);
         $this->get($this->_test_script.'intranet/render');
-        $this->assertResponse(405);
-        $this->assertTextMatch('405 Method Not Allowed');
+        $this->assertResponse(404);
+        $this->assertText('Forbidden action render called');
     }
 }
 

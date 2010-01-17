@@ -49,5 +49,3 @@ abstract class UrlWriterUnitTest extends AkUnitTest
         return $this->Router = $Router;
     }
 }
-
-

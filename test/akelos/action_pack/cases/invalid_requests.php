@@ -12,7 +12,7 @@ class InvalidRequestsIntegration_TestCase extends AkWebTestCase
         $this->setMaximumRedirects(0);
         $this->get(AkConfig::getOption('testing_url').'/action_pack/public/index.php?ak=invalid');
         $this->assertResponse(404);
-        $this->assertPattern("/The page you were looking for/");
+        $this->assertText("Exception in InvalidController#index");
     }
 }
 

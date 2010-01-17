@@ -4,7 +4,6 @@ require_once(dirname(__FILE__).'/../router.php');
 
 class Route_TestCase extends AkRouteUnitTest
 {
-
     public function testStaticRouteDoesNotMatchAgainstRoot() {
         $this->withRoute('/person');
         
@@ -29,13 +28,13 @@ class Route_TestCase extends AkRouteUnitTest
         
         $this->get('/')->matches(array('controller'=>'person','action'=>'list'));
     }
-    
+
     public function testRootMatchesAgainstRouteWithOptionalsOnly() {
         $this->withRoute('/:controller',array(),array('controller'=>'[a-z]+'));
         
         $this->get('/')->matches();
     }
-    
+
     public function testOptionalSegment() {
         $this->withRoute('/person/:name/:age');
         

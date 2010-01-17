@@ -103,7 +103,7 @@ class PeopleController < ActionController:Base
   end
   
   def create
-    @person = Person.new(params[:person])
+    @person = Person.new($this->params['person'])
     if @person.save
       # ...
     end

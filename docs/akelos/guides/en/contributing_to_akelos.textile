@@ -315,7 +315,7 @@ You can access these cache stores at a low level for storing queries and other o
 <php>
 Akelos.cache.read("city")   # => nil
 Akelos.cache.write("city", "Duckburgh")
-Akelos.cache.read("city")   # => "Duckburgh"
+Akelos.cache.read("city")   # => 'Duckburgh'
 </php>
 
 h3. Conditional GET support
@@ -330,7 +330,7 @@ It is the server's (i.e. our) responsibility to look for a last modified timesta
 class ProductsController < ApplicationController
 
   def show
-    @product = Product.find(params[:id])
+    @product = Product.find($this->params['id'])
 
     # If the request is stale according to the given timestamp and etag value
     # (i.e. it needs to be processed again) then execute this block
@@ -356,7 +356,7 @@ class ProductsController < ApplicationController
   # and will render the default template (product.*) if it's stale.
 
   def show
-    @product = Product.find(params[:id])
+    @product = Product.find($this->params['id'])
     fresh_when :last_modified => @product.published_at.utc, :etag => @product
   end
 end

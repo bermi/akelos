@@ -3,32 +3,33 @@
 require_once(dirname(__FILE__).'/../router.php');
 require_once(dirname(__FILE__).'/../../lib/url_writer.php');
 
-class UrlWriter_TestCase extends UrlWriterUnitTest
+ class UrlWriter_TestCase extends UrlWriterUnitTest
 {
-    public function testUseLastRequestToFillParameters() {
-        $this->withRequestTo(array('controller'=>'author','action'=>'show','name'=>'martin'));
-        $this->urlFor(array())->isRewrittenTo(array('controller'=>'author','action'=>'show','name'=>'martin'));
+    public function testUseLastRequestToFillController() {
+        $this->withRequestTo(array('controller'=>'author'));
+        $this->urlFor(array())->isRewrittenTo(array('controller'=>'author'));
     }
 
     public function testAGivenParameterOverridesTheOldOne() {
         $this->withRequestTo(array('controller'=>'author','action'=>'show'));
         $this->urlFor(array('action'=>'list'))->isRewrittenTo(array('controller'=>'author','action'=>'list'));
+        $this->urlFor(array('controller'=>'author'))->isRewrittenTo(array('controller'=>'author'));
     }
 
     public function testDontFillBeyondAGivenParameter() {
         $this->withRequestTo(array('controller'=>'author','action'=>'show','name'=>'martin'));
-        $this->urlFor(array('action'=>'list'))->isRewrittenTo(array('controller'=>'author','action'=>'list'));
+        $this->urlFor(array('controller'=>'author','action'=>'list'))->isRewrittenTo(array('controller'=>'author','action'=>'list'));
     }
 
     public function testAParameterSetToNullWillBeUnset() {
         $this->withRequestTo(array('controller'=>'author','action'=>'show','name'=>'martin'));
-        $this->urlFor(array('action'=>null))->isRewrittenTo(array('controller'=>'author'));
+        $this->urlFor(array('controller'=>'author', 'action'=>null))->isRewrittenTo(array('controller'=>'author'));
     }
 
     public function testOverwriteParametersOptionShouldNotStopTheFilling() {
         $this->withRequestTo(array('controller'=>'author','action'=>'show','name'=>'martin'));
         $this->urlFor(array('overwrite_params'=>array('action'=>'edit')))
-        ->isRewrittenTo(array('controller'=>'author','action'=>'edit','name'=>'martin'));
+        ->isRewrittenTo(array('controller'=>'author','name'=>'martin', 'action'=>'edit'));
     }
 
     public function testSplitGivenControllerIntoModuleAndControllerPart() {
@@ -86,8 +87,7 @@ class UrlWriter_TestCase extends UrlWriterUnitTest
         $UrlWriter = new AkUrlWriter($this->Request,$Router);
                
         $UrlWriter->urlFor($asked_url_for_parameters);
-    }
-
+    }   
 }
 
 ak_test_case('UrlWriter_TestCase');

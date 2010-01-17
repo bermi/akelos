@@ -30,6 +30,7 @@ class AkUnitTest extends UnitTestCase
         if(!$this->skip_fixtures){
             $this->_configure();
         }
+        $this->_enableAssertions();
     }
 
     public function __destruct() {
@@ -424,6 +425,9 @@ class AkUnitTest extends UnitTestCase
         $value = current($partial_array);
         $this->assertTrue(isset($array[$scope]), 'Could not find key '.$scope.' in array '.print_r($array, true));
         $this->assertPattern('/'.$value.'/',@$array[$scope]);
+    }
+    
+    protected function _enableAssertions(){
     }
     
     /**

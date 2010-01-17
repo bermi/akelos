@@ -339,9 +339,9 @@ In designing a data model, you will sometimes find a model that should have a re
 
 <php>
 class Employee extends ActiveRecord {
-  has_many :subordinates, :class_name => "Employee",
-    :foreign_key => "manager_id"
-  belongs_to :manager, :class_name => "Employee"
+  has_many :subordinates, :class_name => 'Employee',
+    :foreign_key => 'manager_id'
+  belongs_to :manager, :class_name => 'Employee'
 end
 </php>
 
@@ -542,7 +542,7 @@ create_customer
 
 h6. _association_(force_reload = false)
 
-The <tt><em>association</em></tt> method returns the associated object, if any. If no associated object is found, it returns +nil+.
+The <tt><em>association</em></tt> method returns the associated object, if any. If no associated object is found, it returns +null+.
 
 <php>
 @customer = @order.customer
@@ -613,7 +613,7 @@ If the name of the other model cannot be derived from the association name, you 
 
 <php>
 class Order extends ActiveRecord {
-  belongs_to :customer, :class_name => "Patron"
+  belongs_to :customer, :class_name => 'Patron'
 end
 </php>
 
@@ -678,8 +678,8 @@ By convention, Akelos guesses that the column used to hold the foreign key on th
 
 <php>
 class Order extends ActiveRecord {
-  belongs_to :customer, :class_name => "Patron",
-    :foreign_key => "patron_id"
+  belongs_to :customer, :class_name => 'Patron',
+    :foreign_key => 'patron_id'
 end
 </php>
 
@@ -809,7 +809,7 @@ create_account
 
 h6. <tt><em>association</em>(force_reload = false)</tt>
 
-The <tt><em>association</em></tt> method returns the associated object, if any. If no associated object is found, it returns +nil+.
+The <tt><em>association</em></tt> method returns the associated object, if any. If no associated object is found, it returns +null+.
 
 <php>
 @account = @supplier.account
@@ -847,7 +847,7 @@ In many situations, you can use the default behavior of +has_one+ without any cu
 
 <php>
 class Supplier extends ActiveRecord {
-  has_one :account, :class_name => "Billing", :dependent => :nullify
+  has_one :account, :class_name => 'Billing', :dependent => :nullify
 end
 </php>
 
@@ -883,7 +883,7 @@ If the name of the other model cannot be derived from the association name, you 
 
 <php>
 class Supplier extends ActiveRecord {
-  has_one :account, :class_name => "Billing"
+  has_one :account, :class_name => 'Billing'
 end
 </php>
 
@@ -907,7 +907,7 @@ By convention, Akelos guesses that the column used to hold the foreign key on th
 
 <php>
 class Supplier extends ActiveRecord {
-  has_one :account, :foreign_key => "supp_id"
+  has_one :account, :foreign_key => 'supp_id'
 end
 </php>
 
@@ -1193,7 +1193,7 @@ If the name of the other model cannot be derived from the association name, you 
 
 <php>
 class Customer extends ActiveRecord {
-  has_many :orders, :class_name => "Transaction"
+  has_many :orders, :class_name => 'Transaction'
 end
 </php>
 
@@ -1203,7 +1203,7 @@ The +:conditions+ option lets you specify the conditions that the associated obj
 
 <php>
 class Customer extends ActiveRecord {
-  has_many :confirmed_orders, :class_name => "Order",
+  has_many :confirmed_orders, :class_name => 'Order',
     :conditions => "confirmed = 1"
 end
 </php>
@@ -1212,7 +1212,7 @@ You can also set conditions via a hash:
 
 <php>
 class Customer extends ActiveRecord {
-  has_many :confirmed_orders, :class_name => "Order",
+  has_many :confirmed_orders, :class_name => 'Order',
     :conditions => { :confirmed => true }
 end
 </php>
@@ -1223,7 +1223,7 @@ If you need to evaluate conditions dynamically at runtime, you could use string 
 
 <php>
 class Customer extends ActiveRecord {
-  has_many :latest_orders, :class_name => "Order",
+  has_many :latest_orders, :class_name => 'Order',
     :conditions => 'orders.created_at > #{10.hours.ago.to_s(:db).inspect}'
 end
 </php>
@@ -1256,7 +1256,7 @@ By convention, Akelos guesses that the column used to hold the foreign key on th
 
 <php>
 class Customer extends ActiveRecord {
-  has_many :orders, :foreign_key => "cust_id"
+  has_many :orders, :foreign_key => 'cust_id'
 end
 </php>
 
@@ -1314,7 +1314,7 @@ The +:limit+ option lets you restrict the total number of objects that will be f
 
 <php>
 class Customer extends ActiveRecord {
-  has_many :recent_orders, :class_name => "Order",
+  has_many :recent_orders, :class_name => 'Order',
     :order => "order_date DESC", :limit => 100
 end
 </php>
@@ -1569,9 +1569,9 @@ TIP: The +:foreign_key+ and +:association_foreign_key+ options are useful when s
 
 <php>
 class User extends ActiveRecord {
-  has_and_belongs_to_many :friends, :class_name => "User",
-    :foreign_key => "this_user_id",
-    :association_foreign_key => "other_user_id"
+  has_and_belongs_to_many :friends, :class_name => 'User',
+    :foreign_key => 'this_user_id',
+    :association_foreign_key => 'other_user_id'
 end
 </php>
 
@@ -1585,7 +1585,7 @@ If the name of the other model cannot be derived from the association name, you 
 
 <php>
 class Parts extends ActiveRecord {
-  has_and_belongs_to_many :assemblies, :class_name => "Gadget"
+  has_and_belongs_to_many :assemblies, :class_name => 'Gadget'
 end
 </php>
 
@@ -1635,9 +1635,9 @@ By convention, Akelos guesses that the column in the join table used to hold the
 
 <php>
 class User extends ActiveRecord {
-  has_and_belongs_to_many :friends, :class_name => "User",
-    :foreign_key => "this_user_id",
-    :association_foreign_key => "other_user_id"
+  has_and_belongs_to_many :friends, :class_name => 'User',
+    :foreign_key => 'this_user_id',
+    :association_foreign_key => 'other_user_id'
 end
 </php>
 
@@ -1647,7 +1647,7 @@ The +:group+ option supplies an attribute name to group the result set by, using
 
 <php>
 class Parts extends ActiveRecord {
-  has_and_belongs_to_many :assemblies, :group => "factory"
+  has_and_belongs_to_many :assemblies, :group => 'factory'
 end
 </php>
 

@@ -31,7 +31,7 @@ You've heard that Akelos promotes "convention over configuration." Default rende
 
 <php>
 def show
-  @book = Book.find(params[:id])
+  @book = Book.find($this->params['id'])
 end
 </php>
 
@@ -63,8 +63,8 @@ If you want to render the view that corresponds to a different action within the
 
 <php>
 def update
-  @book = Book.find(params[:id])
-    if @book.update_attributes(params[:book])
+  @book = Book.find($this->params['id'])
+    if @book.update_attributes($this->params['book'])
       redirect_to(@book)
     else
       render "edit"
@@ -79,8 +79,8 @@ If you prefer, you can use a symbol instead of a string to specify the action to
 
 <php>
 def update
-  @book = Book.find(params[:id])
-    if @book.update_attributes(params[:book])
+  @book = Book.find($this->params['id'])
+    if @book.update_attributes($this->params['book'])
       redirect_to(@book)
     else
       render :edit
@@ -93,11 +93,11 @@ To be explicit, you can use +render+ with the +:action+ option (though this is n
 
 <php>
 def update
-  @book = Book.find(params[:id])
-    if @book.update_attributes(params[:book])
+  @book = Book.find($this->params['id'])
+    if @book.update_attributes($this->params['book'])
       redirect_to(@book)
     else
-      render :action => "edit"
+      render :action => 'edit'
     end
   end
 end
@@ -175,7 +175,7 @@ h5. Rendering Text
 You can send plain text - with no markup at all - back to the browser by using the +:text+ option to +render+:
 
 <php>
-render :text => "OK"
+render :text => 'OK'
 </php>
 
 TIP: Rendering pure text is most useful when you're responding to AJAX or web service requests that are expecting something other than proper HTML.
@@ -301,7 +301,7 @@ class ProductsController < ApplicationController
   layout :products_layout
 
   def show
-    @product = Product.find(params[:id])
+    @product = Product.find($this->params['id'])
   end
 
   private
@@ -371,12 +371,12 @@ class OldPostsController < SpecialPostsController
   layout nil
 
   def show
-    @post = Post.find(params[:id])
+    @post = Post.find($this->params['id'])
   end
 
   def index
     @old_posts = Post.older
-    render :layout => "old"
+    render :layout => 'old'
   end
   # ...
 end
@@ -398,11 +398,11 @@ For example, here's some code that will trigger this error:
 
 <php>
 def show
-  @book = Book.find(params[:id])
+  @book = Book.find($this->params['id'])
   if @book.special?
-    render :action => "special_show"
+    render :action => 'special_show'
   end
-  render :action => "regular_show"
+  render :action => 'regular_show'
 end
 </php>
 
@@ -410,11 +410,11 @@ If +@book.special?+ evaluates to +true+, Akelos will start the rendering process
 
 <php>
 def show
-  @book = Book.find(params[:id])
+  @book = Book.find($this->params['id'])
   if @book.special?
-    render :action => "special_show" and return
+    render :action => 'special_show' and return
   end
-  render :action => "regular_show"
+  render :action => 'regular_show'
 end
 </php>
 
@@ -422,9 +422,9 @@ Note that the implicit render done by ActionController detects if +render+ has b
 
 <php>
 def show
-  @book = Book.find(params[:id])
+  @book = Book.find($this->params['id'])
   if @book.special?
-    render :action => "special_show"
+    render :action => 'special_show'
   end
 end
 </php>
@@ -467,14 +467,14 @@ def index
 end
 
 def show
-  @book = Book.find(params[:id])
+  @book = Book.find($this->params['id'])
   if @book.nil?
-    render :action => "index"
+    render :action => 'index'
   end
 end
 </php>
 
-With the code in this form, there will be likely be a problem if the +@book+ variable is +nil+. Remember, a +render :action+ doesn't run any code in the target action, so nothing will set up the +@books+ variable that the +index+ view is presumably depending on. One way to fix this is to redirect instead of rendering:
+With the code in this form, there will be likely be a problem if the +@book+ variable is +null+. Remember, a +render :action+ doesn't run any code in the target action, so nothing will set up the +@books+ variable that the +index+ view is presumably depending on. One way to fix this is to redirect instead of rendering:
 
 <php>
 def index
@@ -482,9 +482,9 @@ def index
 end
 
 def show
-  @book = Book.find(params[:id])
+  @book = Book.find($this->params['id'])
   if @book.nil?
-    redirect_to :action => "index"
+    redirect_to :action => 'index'
   end
 end
 </php>
@@ -533,7 +533,7 @@ h5. Linking to Feeds with +auto_discovery_link_tag+
 The +auto_discovery_link_tag+ helper builds HTML that most browsers and newsreaders can use to detect the presences of RSS or ATOM feeds. It takes the type of the link (+:rss+ or +:atom+), a hash of options that are passed through to url_for, and a hash of options for the tag:
 
 <tpl>
-<%= auto_discovery_link_tag(:rss, {:action => "feed"}, 
+<%= auto_discovery_link_tag(:rss, {:action => 'feed'}, 
   {:title => "RSS Feed"}) %>
 </tpl>
 
@@ -631,7 +631,7 @@ To include +http://example.com/main.css+:
 By default, +stylesheet_link_tag+ creates links with +media="screen" rel="stylesheet" type="text/css"+. You can override any of these defaults by specifying an appropriate option (+:media+, +:rel+, or +:type+):
 
 <tpl>
-<%= stylesheet_link_tag "main_print", :media => "print" %>
+<%= stylesheet_link_tag "main_print", :media => 'print' %>
 </tpl>
 
 The +all+ option links every CSS file in +public/stylesheets+:
@@ -752,7 +752,7 @@ h5. Naming Partials
 To render a partial as part of a view, you use the +render+ method within the view, and include the +:partial+ option:
 
 <php>
-<%= render :partial => "menu" %>
+<%= render :partial => 'menu' %>
 </php>
 
 This will render a file named +_menu.html.tpl+ at that point within the view being rendered. Note the leading underscore character: partials are named with a leading underscore to distinguish them from regular views, even though they are referred to without the underscore. This holds true even when you're pulling in a partial from another folder:
@@ -787,7 +787,7 @@ h5. Partial Layouts
 A partial can use its own layout file, just as a view can use a layout. For example, you might call a partial like this:
 
 <tpl>
-<%= render :partial => "link_area", :layout => "graybar" %>
+<%= render :partial => 'link_area', :layout => 'graybar' %>
 </tpl>
 
 This would look for a partial named +_link_area.html.tpl+ and render it using the layout +_graybar.html.tpl+. Note that layouts for partials follow the same leading-underscore naming as regular partials, and are placed in the same folder with the partial that they belong to (not in the master +layouts+ folder).
@@ -801,7 +801,7 @@ You can also pass local variables into partials, making them even more powerful 
 <tpl>
 <h1>New zone</h1>
 <%= error_messages_for :zone %>
-<%= render :partial => "form", :locals => 
+<%= render :partial => 'form', :locals => 
   { :button_label => "Create zone", :zone => @zone } %>
 </tpl>
 
@@ -810,7 +810,7 @@ You can also pass local variables into partials, making them even more powerful 
 <tpl>
 <h1>Editing zone</h1>
 <%= error_messages_for :zone %>
-<%= render :partial => "form", :locals => 
+<%= render :partial => 'form', :locals => 
   { :button_label => "Update zone", :zone => @zone } %>
 </tpl>
 
@@ -833,7 +833,7 @@ Although the same partial will be rendered into both views, the label on the sub
 Every partial also has a local variable with the same name as the partial (minus the underscore). You can pass an object in to this local variable via the +:object+ option:
 
 <tpl>
-<%= render :partial => "customer", :object => @new_customer %>
+<%= render :partial => 'customer', :object => @new_customer %>
 </tpl>
 
 Within the +customer+ partial, the +customer+ variable will refer to +@new_customer+ from the parent view.
@@ -856,7 +856,7 @@ Partials are very useful in rendering collections. When you pass a collection to
 
 <tpl>
 <h1>Products</h1>
-<%= render :partial => "product", :collection => @products %>
+<%= render :partial => 'product', :collection => @products %>
 </tpl>
 
 * +_product.html.tpl+
@@ -868,7 +868,7 @@ Partials are very useful in rendering collections. When you pass a collection to
 When a partial is called with a pluralized collection, then the individual instances of the partial have access to the member of the collection being rendered via a variable named after the partial. In this case, the partial is +_product+, and within the +_product+ partial, you can refer to +product+ to get the instance that is being rendered. To use a custom local variable name within the partial, specify the +:as+ option in the call to the partial:
 
 <tpl>
-<%= render :partial => "product", :collection => @products, :as => :item %>
+<%= render :partial => 'product', :collection => @products, :as => :item %>
 </tpl>
 
 With this change, you can access an instance of the +@products+ collection as the +item+ local variable within the partial.
@@ -878,8 +878,8 @@ TIP: Akelos also makes a counter variable available within a partial called by t
 You can also specify a second partial to be rendered between instances of the main partial by using the +:spacer_template+ option:
 
 <tpl>
-<%= render :partial => "product", :collection => @products, 
-  :spacer_template => "product_ruler" %>
+<%= render :partial => 'product', :collection => @products, 
+  :spacer_template => 'product_ruler' %>
 </tpl>
 
 Akelos will render the +_product_ruler+ partial (with no data passed in to it) between each pair of +_product+ partials.

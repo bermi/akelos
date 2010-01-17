@@ -216,7 +216,7 @@ In your view template you could use something like
 <%= text_field :person, :email_confirmation %>
 </tpl>
 
-This check is performed only if +email_confirmation+ is not +nil+. To require confirmation, make sure to add a presence check for the confirmation attribute (we'll take a look at +validates_presence_of+ later on this guide):
+This check is performed only if +email_confirmation+ is not +null+. To require confirmation, make sure to add a presence check for the confirmation attribute (we'll take a look at +validates_presence_of+ later on this guide):
 
 <php>
 class Person extends ActiveRecord {
@@ -349,7 +349,7 @@ The default error message for +validates_numericality_of+ is "_is not a number_"
 
 h4. +validates_presence_of+
 
-This helper validates that the specified attributes are not empty. It uses the +blank?+ method to check if the value is either +nil+ or a blank string, that is, a string that is either empty or consists of whitespace.
+This helper validates that the specified attributes are not empty. It uses the +blank?+ method to check if the value is either +null+ or a blank string, that is, a string that is either empty or consists of whitespace.
 
 <php>
 class Person extends ActiveRecord {
@@ -462,9 +462,9 @@ h3. Common Validation Options
 
 There are some common options that all the validation helpers can use. Here they are, except for the +:if+ and +:unless+ options, which are discussed later in "Conditional Validation":#conditional-validation.
 
-h4. +:allow_nil+
+h4. +:allow_null+
 
-The +:allow_nil+ option skips the validation when the value being validated is +nil+. Using +:allow_nil+ with +validates_presence_of+ allows for +nil+, but any other +blank?+ value will still be rejected.
+The +:allow_null+ option skips the validation when the value being validated is +null+. Using +:allow_null+ with +validates_presence_of+ allows for +null+, but any other +blank?+ value will still be rejected.
 
 <php>
 class Coffee extends ActiveRecord {
@@ -475,7 +475,7 @@ end
 
 h4. +:allow_blank+
 
-The +:allow_blank+ option is similar to the +:allow_nil+ option. This option will let validation pass if the attribute's value is +blank?+, like +nil+ or an empty string for example.
+The +:allow_blank+ option is similar to the +:allow_null+ option. This option will let validation pass if the attribute's value is +blank?+, like +null+ or an empty string for example.
 
 <php>
 class Topic extends ActiveRecord {
@@ -629,7 +629,7 @@ person.errors.full_messages
 
 h4. +errors.on+
 
-The +on+ method is used when you want to check the error messages for a specific attribute. It returns different kinds of objects depending on the state of the +errors+ collection for the given attribute. If there are no errors related to the attribute +on+ returns +nil+. If there is just one error message for this attribute +on+ returns a string with the message. When +errors+ holds two or more error messages for the attribute, +on+ returns an array of strings, each one with one error message.
+The +on+ method is used when you want to check the error messages for a specific attribute. It returns different kinds of objects depending on the state of the +errors+ collection for the given attribute. If there are no errors related to the attribute +on+ returns +null+. If there is just one error message for this attribute +on+ returns a string with the message. When +errors+ holds two or more error messages for the attribute, +on+ returns an array of strings, each one with one error message.
 
 <php>
 class Person extends ActiveRecord {
@@ -641,7 +641,7 @@ person = Person.new(:name => "John Doe")
 person.valid? # => true
 person.errors.on(:name) # => nil
 
-person = Person.new(:name => "JD")
+person = Person.new(:name => 'JD')
 person.valid? # => false
 person.errors.on(:name)
  # => "is too short (minimum is 3 characters)"
@@ -691,7 +691,7 @@ person = Person.new
 person.valid? # => false
 person.errors.size # => 3
 
-person = Person.new(:name => "Andrea", :email => "andrea@example.com")
+person = Person.new(:name => 'Andrea', :email => "andrea@example.com")
 person.valid? # => true
 person.errors.size # => 0
 </php>
@@ -752,7 +752,7 @@ Which results in the following content
 
 !/images/docs/customized_error_messages.png(Customized error messages)!
 
-If you pass +nil+ to any of these options, it will get rid of the respective section of the +div+.
+If you pass +null+ to any of these options, it will get rid of the respective section of the +div+.
 
 h4. Customizing the Error Messages CSS
 

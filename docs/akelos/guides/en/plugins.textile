@@ -748,7 +748,7 @@ class RoutingTest < Test::Unit::TestCase
   end
 
   def test_yaffles_route
-    assert_recognition :get, "/yaffles", :controller => "yaffles_controller", :action => "index"
+    assert_recognition :get, "/yaffles", :controller => 'yaffles_controller', :action => 'index'
   end
 
   private
@@ -775,7 +775,7 @@ module Yaffle #:nodoc:
   module Routing #:nodoc:
     module MapperExtensions
       def yaffles
-        @set.add_route("/yaffles", {:controller => "yaffles_controller", :action => "index"})
+        @set.add_route("/yaffles", {:controller => 'yaffles_controller', :action => 'index'})
       end
     end
   end
@@ -1157,7 +1157,7 @@ namespace :db do
 
     desc description
     task :yaffle => :environment do
-      ActiveRecord::Migration.vtplose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
+      ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
       ActiveRecord::Migrator.migrate("vendor/plugins/yaffle/lib/db/migrate/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
       Rake::Task["db:schema:dump"].invoke if ActiveRecord.schema_format == :php
     end

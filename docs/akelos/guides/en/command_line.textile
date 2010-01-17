@@ -506,7 +506,7 @@ I got assigned some args:
 [["arg1", "arg2", "arg3"],
  {:collision=>:ask,
   :quiet=>false,
-  :generator=>"tutorial_test",
+  :generator=>'tutorial_test',
   :command=>:create}]
 </shell>
 

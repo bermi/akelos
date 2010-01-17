@@ -59,7 +59,7 @@ class ClientsController < ActionController::Base
   # this action would look like this in order to list activated
   # clients: /clients?status=activated
   def index
-    if params[:status] == "activated"
+    if $this->params['status'] == "activated"
       @clients = Client.activated
     else
       @clients = Client.unactivated
@@ -71,13 +71,13 @@ class ClientsController < ActionController::Base
   # this RESTful request will be "/clients", and the data will be
   # sent as part of the request body.
   def create
-    @client = Client.new(params[:client])
+    @client = Client.new($this->params['client'])
     if @client.save
       redirect_to @client
     else
       # This line overrides the default rendering behavior, which
       # would have been to render the "create" view.
-      render :action => "new"
+      render :action => 'new'
     end
   end
 end
@@ -93,7 +93,7 @@ GET /clients?ids[]=1&ids[]=2&ids[]=3
 
 NOTE: The actual URL in this example will be encoded as "/clients?ids%5b%5d=1&ids%5b%5d=2&ids%5b%5b=3" as "[" and "]" are not allowed in URLs. Most of the time you don't have to worry about this because the browser will take care of it for you, and Akelos will decode it back when it receives it, but if you ever find yourself having to send those requests to the server manually you have to keep this in mind.
 
-The value of +params[:ids]+ will now be +["1", "2", "3"]+. Note that parameter values are always strings; Akelos makes no attempt to guess or cast the type.
+The value of +$this->params['ids']+ will now be +["1", "2", "3"]+. Note that parameter values are always strings; Akelos makes no attempt to guess or cast the type.
 
 To send a hash you include the key name inside the brackets:
 
@@ -106,7 +106,7 @@ To send a hash you include the key name inside the brackets:
 </form>
 </html>
 
-When this form is submitted, the value of +params[:client]+ will be <tt>{"name" => "Acme", "phone" => "12345", "address" => {"postcode" => "12345", "city" => "Carrot City"}}</tt>. Note the nested hash in +params[:client][:address]+.
+When this form is submitted, the value of +$this->params['client']+ will be <tt>{"name" => 'Acme', "phone" => "12345", "address" => {"postcode" => "12345", "city" => "Carrot City"}}</tt>. Note the nested hash in +$this->params['client'][:address]+.
 
 Note that the +params+ hash is actually an instance of +HashWithIndifferentAccess+ from Active Support, which acts like a hash that lets you use symbols and strings interchangeably as keys.
 
@@ -116,12 +116,12 @@ The +params+ hash will always contain the +:controller+ and +:action+ keys, but 
 
 <php>
 map.connect "/clients/:status", 
-  :controller => "clients",
-  :action => "index",
-  :foo => "bar"
+  :controller => 'clients',
+  :action => 'index',
+  :foo => 'bar'
 </php>
 
-In this case, when a user opens the URL +/clients/active+, +params[:status]+ will be set to "active". When this route is used, +params[:foo]+ will also be set to "bar" just like it was passed in the query string. In the same way +params[:action]+ will contain "index".
+In this case, when a user opens the URL +/clients/active+, +$this->params['status']+ will be set to "active". When this route is used, +$this->params['foo']+ will also be set to "bar" just like it was passed in the query string. In the same way +$this->params['action']+ will contain "index".
 
 h4. +default_url_options+
 
@@ -210,7 +210,7 @@ To store something in the session, just assign it to the key like a hash:
 class LoginsController < ApplicationController
   # "Create" a login, aka "log the user in"
   def create
-    if user = User.authenticate(params[:username], params[:password])
+    if user = User.authenticate($this->params['username'], $this->params['password'])
       # Save the user ID in the session so it can be used in
       # subsequent requests
       session[:current_user_id] = user.id
@@ -220,7 +220,7 @@ class LoginsController < ApplicationController
 end
 </php>
 
-To remove something from the session, assign that key to be +nil+:
+To remove something from the session, assign that key to be +null+:
 
 <php>
 class LoginsController < ApplicationController
@@ -295,12 +295,12 @@ By default, adding values to the flash will make them available to the next requ
 <php>
 class ClientsController < ApplicationController
   def create
-    @client = Client.new(params[:client])
+    @client = Client.new($this->params['client'])
     if @client.save
       # ...
     else
       flash.now[:error] = "Could not save client"
-      render :action => "new"
+      render :action => 'new'
     end
   end
 end
@@ -318,10 +318,10 @@ class CommentsController < ApplicationController
   end
 
   def create
-    @comment = Comment.new(params[:comment])
+    @comment = Comment.new($this->params['comment'])
     if @comment.save
       flash[:notice] = "Thanks for your comment!"
-      if params[:remember_name]
+      if $this->params['remember_name']
         # Remember the commenter's name.
         cookies[:commenter_name] = @comment.name
       else
@@ -330,13 +330,13 @@ class CommentsController < ApplicationController
       end
       redirect_to @comment.article
     else
-      render :action => "new"
+      render :action => 'new'
     end
   end
 end
 </php>
 
-Note that while for session values you set the key to +nil+, to delete a cookie value you should use +cookies.delete(:key)+.
+Note that while for session values you set the key to +null+, to delete a cookie value you should use +cookies.delete(:key)+.
 
 h3. Filters
 
@@ -451,18 +451,18 @@ Here's an example of using verification to make sure the user supplies a usernam
 <php>
 class LoginsController < ApplicationController
   verify :params => [:username, :password],
-         :render => {:action => "new"},
+         :render => {:action => 'new'},
          :add_flash => {
            :error => "Username and password required to log in"
          }
 
   def create
-    @user = User.authenticate(params[:username], params[:password])
+    @user = User.authenticate($this->params['username'], $this->params['password'])
     if @user
       flash[:notice] = "You're logged in"
       redirect_to root_url
     else
-      render :action => "new"
+      render :action => 'new'
     end
   end
 end
@@ -473,7 +473,7 @@ Now the +create+ action won't run unless the "username" and "password" parameter
 <php>
 class LoginsController < ApplicationController
   verify :params => [:username, :password],
-         :render => {:action => "new"},
+         :render => {:action => 'new'},
          :add_flash => {
            :error => "Username and password required to log in"
          },
@@ -596,7 +596,7 @@ HTTP digest authentication is superior to the basic authentication as it does no
 
 <php>
 class AdminController < ApplicationController
-  USERS = { "lifo" => "world" }
+  USERS = { "lifo" => 'world' }
 
   before_filter :authenticate
 
@@ -610,7 +610,7 @@ class AdminController < ApplicationController
 end
 </php>
 
-As seen in the example above, the +authenticate_or_request_with_http_digest+ block takes only one argument - the username. And the block returns the password. Returning +false+ or +nil+ from the +authenticate_or_request_with_http_digest+ will cause authentication failure.
+As seen in the example above, the +authenticate_or_request_with_http_digest+ block takes only one argument - the username. And the block returns the password. Returning +false+ or +null+ from the +authenticate_or_request_with_http_digest+ will cause authentication failure.
 
 h3. Streaming and File Downloads
 
@@ -624,7 +624,7 @@ class ClientsController < ApplicationController
   # Generates a PDF document with information on the client and
   # returns it. The user will get the PDF as a file download.
   def download_pdf
-    client = Client.find(params[:id])
+    client = Client.find($this->params['id'])
     send_data(generate_pdf, 
               :filename => "#{client.name}.pdf",
               :type => "application/pdf")
@@ -652,7 +652,7 @@ If you want to send a file that already exists on disk, use the +send_file+ meth
 class ClientsController < ApplicationController
   # Stream a file that has already been generated and stored on disk.
   def download_pdf
-    client = Client.find(params[:id])
+    client = Client.find($this->params['id'])
     send_data("#{Akelos.root}/files/clients/#{client.id}.pdf",
               :filename => "#{client.name}.pdf",
               :type => "application/pdf")
@@ -674,7 +674,7 @@ While +send_data+ works just fine, if you are creating a RESTful application hav
 class ClientsController < ApplicationController
   # The user can request to receive this resource as HTML or PDF.
   def show
-    @client = Client.find(params[:id])
+    @client = Client.find($this->params['id'])
 
     respond_to do |format|
       format.html
@@ -760,7 +760,7 @@ class ClientsController < ApplicationController
 
   # Note how the actions don't have to worry about all the auth stuff.
   def edit
-    @client = Client.find(params[:id])
+    @client = Client.find($this->params['id'])
   end
 
   private
