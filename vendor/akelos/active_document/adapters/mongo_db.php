@@ -50,8 +50,14 @@ class AkOdbMongoDbAdapter
     }
 
     public function isConnected() {
-        $Connection = $this->getConnection();
-        return $Connection != false && !empty($Connection->connected);
+        try{
+            $this->getConnection();
+            return true;
+        }catch (AkDatabaseConnectionException $e){
+            return false;
+        }catch (Exception $e){
+            throw $e;
+        }
     }
 
     public function getOption($name, $default = null) {
@@ -86,9 +92,8 @@ class AkOdbMongoDbAdapter
     }
 
     public function &getConnection() {
-        if(!isset($this->_Mongo[$this->_connetion_signature])){
-            $false = false;
-            return $false;
+        if(empty($this->_Mongo[$this->_connetion_signature])){
+            throw new AkDatabaseConnectionException('Could not get MogoDb connection.');
         }
         return $this->_Mongo[$this->_connetion_signature];
     }

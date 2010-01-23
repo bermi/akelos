@@ -587,5 +587,5 @@ class MissingTemplateException  extends ControllerException{}
 class RouteException extends ControllerException{}
 class RouteDoesNotMatchRequestException extends RouteException{}
 class RouteDoesNotMatchParametersException extends RouteException{}
-
+class AkDatabaseConnectionException extends Exception{}
 
