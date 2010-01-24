@@ -45,7 +45,7 @@ defined('AK_ACTIVE_RESOURCE_DIR')   || define('AK_ACTIVE_RESOURCE_DIR', AK_FRAME
 defined('AK_ACTIVE_SUPPORT_DIR')    || define('AK_ACTIVE_SUPPORT_DIR',  AK_FRAMEWORK_DIR.DS.'active_support');
 defined('AK_ACTIVE_DOCUMENT_DIR')   || define('AK_ACTIVE_DOCUMENT_DIR', AK_FRAMEWORK_DIR.DS.'active_document');
 defined('AK_AKELOS_UTILS_DIR')      || define('AK_AKELOS_UTILS_DIR',    AK_FRAMEWORK_DIR.DS.'akelos_utils');
-defined('AK_GENERATORS_DIR')        || define('AK_GENERATORS_DIR',      AK_FRAMEWORK_DIR.DS.'generators');
+defined('AK_GENERATORS_DIR')        || define('AK_GENERATORS_DIR',      AK_AKELOS_UTILS_DIR.DS.'generators');
 
 function akelos_autoload($name, $path = null) {
     static $paths = array(), $lib_paths = array(), $app_paths = array();
@@ -309,7 +309,6 @@ defined('AK_ACTIVE_RESOURCE_DIR')   || define('AK_ACTIVE_RESOURCE_DIR', AK_FRAME
 defined('AK_ACTIVE_SUPPORT_DIR')    || define('AK_ACTIVE_SUPPORT_DIR',  AK_FRAMEWORK_DIR.DS.'active_support');
 defined('AK_ACTIVE_DOCUMENT_DIR')   || define('AK_ACTIVE_DOCUMENT_DIR', AK_FRAMEWORK_DIR.DS.'active_document');
 defined('AK_AKELOS_UTILS_DIR')      || define('AK_AKELOS_UTILS_DIR',    AK_FRAMEWORK_DIR.DS.'akelos_utils');
-defined('AK_CORE_TASKS_DIR')        || define('AK_CORE_TASKS_DIR',      AK_FRAMEWORK_DIR.DS.'makelos'.DS.'tasks');
 
 defined('AK_WIN')                                       || define('AK_WIN', strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
 defined('AK_OS')                                        || define('AK_OS', AK_WIN ? 'WINDOWS' : 'UNIX');
@@ -392,7 +391,7 @@ defined('AK_CACHE_DIR')             || define('AK_CACHE_DIR', AK_TMP_DIR.DS.'cac
 
 defined('AK_DEFAULT_LAYOUT')        || define('AK_DEFAULT_LAYOUT', 'application');
 
-defined('AK_CONTRIB_DIR')           || define('AK_CONTRIB_DIR', AK_FRAMEWORK_DIR.DS.'contrib');
+defined('AK_CONTRIB_DIR')           || define('AK_CONTRIB_DIR', AK_AKELOS_UTILS_DIR.DS.'contrib');
 defined('AK_LIB_DIR')               || define('AK_LIB_DIR',     AK_FRAMEWORK_DIR);
 
 defined('AK_VENDOR_DIR')            || define('AK_VENDOR_DIR',  AK_CONTRIB_DIR);

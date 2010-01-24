@@ -4,7 +4,16 @@
 # (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
 # See LICENSE and CREDITS for details
 
-defined('MAKELOS_BASE_DIR') || define('MAKELOS_BASE_DIR', dirname(__FILE__));
+defined('DS') || define('DS', DIRECTORY_SEPARATOR);
+
+if(!defined('AK_BASE_DIR')){
+    $__ak_base_dir = array_slice(get_included_files(),-2,1);
+    define('AK_BASE_DIR', dirname($__ak_base_dir[0]));
+    unset($__ak_base_dir);
+    define('AK_SKIP_CONFIG', true);
+}
+
+defined('MAKELOS_BASE_DIR') || define('MAKELOS_BASE_DIR', AK_BASE_DIR);
 defined('MAKELOS_RUN')      || define('MAKELOS_RUN', preg_match('/makelos$/', $_SERVER['PHP_SELF']));
 
 class MakelosRequest
@@ -58,6 +67,7 @@ class MakelosRequest
                     $this->tasks[$task] = array();
                     $task_set = true;
                 }elseif($matches[1] == '-'){
+                    $task = trim($matches[2], ' -');
                     foreach (str_split($matches[2]) as $k){
                         $this->tasks[$task]['attributes'][$k] = true;
                     }
@@ -122,7 +132,7 @@ if(MAKELOS_RUN){
     // Setting constants from arguments before including configurations
     $MakelosRequest->defineConstants();
 
-    $_config_file = dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php';
+    $_config_file = AK_BASE_DIR.DS.'config'.DS.'config.php';
 
     if(!@include $_config_file){
         defined('AK_ENVIRONMENT')   || define('AK_ENVIRONMENT', 'testing');
@@ -144,7 +154,7 @@ class Makelos
 {
     public $tasks = array();
     public $task_files = array();
-    public $task_paths = array(AK_TASKS_DIR, AK_CORE_TASKS_DIR);
+    public $task_paths = array(AK_TASKS_DIR);
     public $current_task;
     public $settings = array(
     'app_name' => 'Akelos application name'
@@ -470,7 +480,8 @@ class Makelos
     }
     
     public function multiGlob($patterns = array(), $task_path = null){
-        $task_paths = empty($task_path) ? AkConfig::getOption('makelos_task_paths', $this->task_paths) : (array)$task_path;
+        $task_paths = empty($task_path) ? AkConfig::getOption('makelos_task_paths', array_merge($this->task_paths, array(dirname(__FILE__).DS.'tasks'))) : (array)$task_path;
+
         $glob_result = array();
         foreach ($patterns as $pattern){
             foreach ($task_paths as $task_path){
@@ -498,7 +509,6 @@ class Makelos
                 $search_patterns[] = str_replace(':',DS, $task_name).DS.join(DS, $task_parts).'.'.$subtask.'.task*.*';
             }
         }
-
         $task_files = $this->multiGlob($search_patterns);
         
         //

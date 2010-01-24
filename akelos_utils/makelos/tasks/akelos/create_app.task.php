@@ -223,7 +223,7 @@ class AkelosInstaller
         $fw_on_app = $this->options['directory'].DS.trim($fw_path, DS);
 
         $this->yield("\n    Linking the application with the framework at ".$this->options['source'])."\n";
-        $old = "defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       AK_BASE_DIR.DS.'vendor'.DS.'akelos');";
+        $old = "defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       AK_BASE_DIR);";
         $new = "defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       '".addcslashes(AK_FRAMEWORK_DIR,'\\')."');";
 
 
