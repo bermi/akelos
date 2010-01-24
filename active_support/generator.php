@@ -232,8 +232,8 @@ class AkelosGenerator
     }
     
     private function _getApplicationGenerators() {
-        return is_dir(AK_BASE_DIR.DS.'generators') ?
-                $this->_getGeneratorsInsidePath(AK_BASE_DIR.DS.'generators') :
+        return is_dir(AK_APP_LIB_DIR.DS.'generators') ?
+                $this->_getGeneratorsInsidePath(AK_APP_LIB_DIR.DS.'generators') :
                 array();
     }
 

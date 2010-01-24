@@ -8,8 +8,8 @@ class GeneratorGenerator extends AkelosGenerator
     public function hasCollisions() {
         $this->collisions = array();
         $this->generator_name = AkInflector::underscore($this->generator_name);
-        $this->class_name = AK_BASE_DIR.DS.'generators'.DS.$this->generator_name;
-        $this->destination_path = AK_BASE_DIR.DS.'generators'.DS.$this->generator_name;
+        $this->class_name = AK_APP_LIB_DIR.DS.'generators'.DS.$this->generator_name;
+        $this->destination_path = AK_APP_LIB_DIR.DS.'generators'.DS.$this->generator_name;
         if(is_dir($this->destination_path)){
             $this->collisions[] = Ak::t('%path already exists', array('%path' => $this->destination_path));
         }
@@ -17,7 +17,7 @@ class GeneratorGenerator extends AkelosGenerator
     }
 
     public function generate() {
-        $destination_path = AK_BASE_DIR.DS.'generators'.DS.$this->generator_name;
+        $destination_path = AK_APP_LIB_DIR.DS.'generators'.DS.$this->generator_name;
         $this->assignVarToTemplate('class_name', AkInflector::camelize($this->generator_name));
         $this->save($destination_path.DS.$this->generator_name.'_generator.php', $this->render('generator'));
         $this->save($destination_path.DS.'templates'.DS.'template.tpl', $this->render('template'));
