@@ -16,6 +16,20 @@ define('AKELOS_VERSION', '1.2.1');
  *      Ak::registerAutoloader('my_better_loader');
  */
 
+defined('DS')               || define('DS',             DIRECTORY_SEPARATOR);
+defined('AK_ENVIRONMENT')   || define('AK_ENVIRONMENT', 'development');
+
+// You should declare AK_BASE_DIR before including the autoloader.
+if(!defined('AK_BASE_DIR')){
+    $__ak_base_dir = array_slice(get_included_files(),-2,1);
+    define('AK_BASE_DIR', dirname($__ak_base_dir[0]));
+    unset($__ak_base_dir);
+    define('AK_SKIP_CONFIG', true);
+}
+
+defined('AK_SKIP_CONFIG')       || define('AK_SKIP_CONFIG',         false);
+defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       str_replace(DS.'autoload.php','',__FILE__));
+defined('AK_TESTING_NAMESPACE') || define('AK_TESTING_NAMESPACE',   'akelos');
 
 /**
  * Paths for the frameworks in Akelos
