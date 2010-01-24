@@ -318,8 +318,7 @@ defined('AK_CAN_FORK')                                  || define('AK_CAN_FORK',
 defined('AK_CLI')                       || define('AK_CLI', php_sapi_name() == 'cli');
 defined('AK_WEB_REQUEST')               || define('AK_WEB_REQUEST', !empty($_SERVER['REQUEST_URI']));
 
-
-if(AK_ENVIRONMENT != 'setup'){
+if(AK_ENVIRONMENT != 'setup' && !AK_SKIP_CONFIG){
     require_once(AK_CONFIG_DIR.DS.'environments'.DS.AK_ENVIRONMENT.'.php');
 }
 
@@ -594,7 +593,6 @@ ini_set('include_path', (AK_CONTRIB_DIR.DS.'pear'.PATH_SEPARATOR.ini_get('includ
 ini_set('session.name', AK_SESSION_NAME);
 
 
-
 class ArgumentException         extends Exception {}
 class ControllerException       extends Exception{}
 class UnknownActionException    extends ControllerException{}
@@ -607,4 +605,5 @@ class RouteException extends ControllerException{}
 class RouteDoesNotMatchRequestException extends RouteException{}
 class RouteDoesNotMatchParametersException extends RouteException{}
 class AkDatabaseConnectionException extends Exception{}
+class RecordNotFoundException extends Exception{}
 

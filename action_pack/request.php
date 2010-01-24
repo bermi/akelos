@@ -217,14 +217,10 @@ class AkRequest
         return $_GET;
     }
 
-    /**
-    * Must be implemented in the concrete request
-    */
-    public function getQueryParameters () {
+    public function getUrl(){
+        return AK_CURRENT_URL;
     }
-    public function getRequestParameters () {
-    }
-
+    
     /**
      * Returns the path minus the web server relative installation directory. This method returns null unless the web server is apache.
      */
@@ -238,7 +234,7 @@ class AkRequest
      */
     public function getLocaleFromUrl() {
         $locale = Ak::get_url_locale();
-        if(strstr(AK_CURRENT_URL,AK_SITE_URL.$locale)){
+        if(strstr($this->getUrl(),AK_SITE_URL.$locale)){
             return $locale;
         }
         return '';
@@ -500,10 +496,13 @@ class AkRequest
         return $this->env;
     }
 
-
+    public function &getHeaders(){
+        return $this->env;
+    }
+    
     public function getServerSoftware() {
         if(!empty($this->env['SERVER_SOFTWARE'])){
-            if(preg_match('/^([a-zA-Z]+)/', $this->env['SERVER_SOFTWARE'],$match)){
+            if(preg_match('/^([a-zA-Z]+)/', $this->env['SERVER_SOFTWARE'], $match)){
                 return strtolower($match[0]);
             }
         }
@@ -737,7 +736,7 @@ class AkRequest
         if(AK_DEV_MODE && !empty($options['message'])){
             trigger_error($options['message'], E_USER_ERROR);
         }else{
-            $status_code = empty($options['status_code']) ? 501 : $options['status_code'];
+            $status_code = intval(empty($options['status_code']) ? 501 : $options['status_code']);
             $status_header = AkResponse::getStatusHeader($status_code);
             if(!@include(AkConfig::getDir('public').DS.$status_code.'.php')){
                 @header($status_header);

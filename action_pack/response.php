@@ -16,6 +16,14 @@ class AkResponse
 
     public $_default_status = 200;
 
+    public function setBody($body){
+        $this->body = $body;
+    }
+
+    public function &getBody(){
+        return $this->body;
+    }
+
     public function set($data, $id = null) {
         if(isset($id)){
             $this->_resutl_stack[$id] = $data;
@@ -46,6 +54,11 @@ class AkResponse
         }
     }
 
+    public function addHeaders(){
+        $args = func_get_args();
+        call_user_func_array(array($this, 'addHeader'), $args);
+    }
+
     public function setContentTypeForFormat($format) {
         if (!empty($format)) {
             $mime_type = Ak::mime_content_type('file.'.$format);
@@ -66,8 +79,28 @@ class AkResponse
         }
     }
 
+    public function getContentType() {
+        return $this->getHeader('Content-Type', $this->_default_status);
+    }
+
+    public function getLocation() {
+        return $this->getHeader('Location', $this->_default_status);
+    }
+
     public function getStatus() {
-        return isset($this->_headers['Status'])?$this->_headers['Status']:$this->_default_status;
+        return $this->getHeader('Status', $this->_default_status);
+    }
+
+    public function setStatus($status) {
+        $this->_headers['Status'] = $status;
+    }
+
+    public function getHeaders() {
+        return $this->_headers;
+    }
+
+    public function getHeader($name, $default = null) {
+        return isset($this->_headers[$name])?$this->_headers[$name]:$default;
     }
 
     public function sendHeaders($terminate_if_redirected = true) {
