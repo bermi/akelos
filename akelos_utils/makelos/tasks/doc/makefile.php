@@ -18,3 +18,10 @@ makelos_task('doc:website', array(
 makelos_task('doc:website:remove', array(
 'description' => 'Removes the files added by ./makelos doc:website'
 ));
+
+/*
+makelos_task('doc:extract_metadata', array(
+    'description' => 'Extracts metadata from source code files to generate the documentation'
+));
+
+*/
