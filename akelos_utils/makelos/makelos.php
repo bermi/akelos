@@ -67,7 +67,6 @@ class MakelosRequest
                     $this->tasks[$task] = array();
                     $task_set = true;
                 }elseif($matches[1] == '-'){
-                    $task = trim($matches[2], ' -');
                     foreach (str_split($matches[2]) as $k){
                         $this->tasks[$task]['attributes'][$k] = true;
                     }
