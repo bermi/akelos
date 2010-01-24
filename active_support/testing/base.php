@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'unit_tester.php');
 require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'mock_objects.php');
 require_once(AK_CONTRIB_DIR.DS.'simpletest'.DS.'reporter.php');

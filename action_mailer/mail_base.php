@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 include_once(AK_CONTRIB_DIR.DS.'pear'.DS.'Mail.php');
 
 class AkMailBase extends Mail

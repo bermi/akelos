@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 class AkNumber extends AkType
 {
     public $_default_date_format = 'Y-m-d H:i:s';

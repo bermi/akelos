@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 /**
  * Helpers are normally loaded in the context of a controller call, but some
  * times they might be useful in Mailers, Comand line tools or for unit testing

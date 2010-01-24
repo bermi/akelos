@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 if(!function_exists('memory_get_usage')){
     function memory_get_usage() {
         if ( substr(PHP_OS,0,3) == 'WIN') {

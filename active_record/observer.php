@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 /**
 * Observer classes respond to life-cycle callbacks to implement trigger-like
 * behavior outside the original class. This is a great way to reduce the clutter

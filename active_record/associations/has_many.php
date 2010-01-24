@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 /**
  * Adds the following methods for retrieval and query of collections of associated objects.
  * collection is replaced with the singular form of current association,

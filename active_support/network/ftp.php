@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION')  || define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
 defined('AK_FTP_SHOW_ERRORS')                   || define('AK_FTP_SHOW_ERRORS', true);
 

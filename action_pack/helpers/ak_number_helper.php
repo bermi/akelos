@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 /**
 * Provides methods for converting a number into a formatted string that currently represents
 * one of the following forms: phone number, percentage, money, or precision level.

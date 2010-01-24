@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 defined('AK_VALID_URL_CHARS_REGEX') || define('AK_VALID_URL_CHARS_REGEX','A-Z-a-z0-9:=?&\/\.\-\\%~#_;,+');
 defined('AK_AUTO_LINK_REGEX')       || define('AK_AUTO_LINK_REGEX','/
         (                          # leading text

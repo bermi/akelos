@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 defined('AK_MONGO_DEFAULT_HOST')        || define('AK_MONGO_DEFAULT_HOST', 'localhost');
 defined('AK_MONGO_DEFAULT_DATABASE')    || define('AK_MONGO_DEFAULT_DATABASE', AkInflector::underscore(AK_APP_NAME));
 

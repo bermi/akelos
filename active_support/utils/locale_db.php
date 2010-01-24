@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 $ISO_3166_1_COUNTRIES = array('AD','AE','AF','AG','AI','AL','AM','AN',
 'AO','AQ','AR','AS','AT','AU','AW','AZ','BA','BB','BD','BE','BF','BG',
 'BH','BI','BJ','BM','BN','BO','BR','BS','BT','BV','BW','BY','BZ','CA',

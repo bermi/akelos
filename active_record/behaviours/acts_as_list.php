@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 /**
 * This act provides the capabilities for sorting and reordering a number of objects in list.
 * The class that has this specified needs to have a "position" column defined as an integer on

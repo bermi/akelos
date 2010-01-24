@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 class AkMsExcelToMany
 {
     public $_file_type_codes = array('csv' => 6,'msdos' => 21,'xls'=>-4143,'rtf'=>6,'unicode'=>7,'doc'=>0,'html'=>8,'txt'=>4);

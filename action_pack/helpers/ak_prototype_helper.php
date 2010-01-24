@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 /**
 * Provides a set of helpers for calling Prototype JavaScript functions, 
 * including functionality to call remote methods using 

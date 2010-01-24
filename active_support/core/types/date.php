@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 /**
  * see http://dev.rubyonrails.org/browser/branches/2-1-caching/activesupport/lib/active_support/core_ext/date/calculations.rb
  * 

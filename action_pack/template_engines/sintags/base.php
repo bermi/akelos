@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 defined('AK_SINTAGS_REMOVE_PHP_SILENTLY')           || define('AK_SINTAGS_REMOVE_PHP_SILENTLY', false);
 defined('AK_SINTAGS_REPLACE_SHORTHAND_PHP_TAGS')    || define('AK_SINTAGS_REPLACE_SHORTHAND_PHP_TAGS', true);
 defined('AK_SINTAGS_HIDDEN_COMMENTS_TAG')           || define('AK_SINTAGS_HIDDEN_COMMENTS_TAG', 'hidden');

@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 if(!isset($options['base_path'])){
     $options['base_path'] = AK_TEST_DIR.DS.AK_TESTING_NAMESPACE;
 }

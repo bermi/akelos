@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 $Installer = new AkInstaller();
 $Installer->copyFilesIntoApp(dirname(__FILE__).DS.'website_files', array('relative_url' => $Installer->promptUserVar("Relative url path for serving images on CSS files\n    (ie. /public /akelos/public or /)\n hit enter if your application is served from the base of hostname\n", '/')));
 

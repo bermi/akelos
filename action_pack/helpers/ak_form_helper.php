@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 /**
 * Provides a set of methods for working with forms and especially forms related to objects assigned to the template.
 * The following is an example of a complete form for a person object that works for both creates and updates built

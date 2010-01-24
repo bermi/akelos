@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 
 /**
 * The Active Record Helper makes it easier to create forms for records kept in instance variables. The most far-reaching is the form

@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 /**
 * Adds the following methods for retrieval and query for a single associated object that this object holds an id to.
 * * <tt>belongsTo->assign($association_id, $Associate);</tt> - assigns the associate object, extracts the primary key, and sets it as the foreign key.

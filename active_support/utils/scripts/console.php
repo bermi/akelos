@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 if(defined('AK_CONSOLE_MODE')){
 
     require_once(AK_ACTIVE_SUPPORT_DIR.DS.'base.php');

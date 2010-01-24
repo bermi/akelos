@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 /**
 * Provides a set of helpers for calling Scriptaculous JavaScript 
 * functions, including those which create Ajax controls and visual effects.

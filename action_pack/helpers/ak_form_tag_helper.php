@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 /**
 * Provides a number of methods for creating form tags that doesn't rely on conventions with an object assigned to the template like
 * FormHelper does. With the FormTagHelper, you provide the names and values yourself.

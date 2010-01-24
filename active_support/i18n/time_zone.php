@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 /**
 * A value object representing a time zone. A time zone is simply a named
 * offset (in seconds) from GMT. Note that two time zone objects are only

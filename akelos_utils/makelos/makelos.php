@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 defined('MAKELOS_BASE_DIR') || define('MAKELOS_BASE_DIR', dirname(__FILE__));
 defined('MAKELOS_RUN')      || define('MAKELOS_RUN', preg_match('/makelos$/', $_SERVER['PHP_SELF']));
 

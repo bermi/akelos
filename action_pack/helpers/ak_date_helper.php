@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 /**
 * The Date Helper primarily creates select/option tags for different kinds of dates and date elements. All of the select-type methods
 * share a number of common options that are as follows:

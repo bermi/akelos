@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 $doc_db_file = AK_DOCS_DIR.DS.'akelos'.DS.'doc.sqlite';
 $installed = file_exists($doc_db_file);
 $db = Ak::db('sqlite://'.urlencode($doc_db_file).'/?persist');

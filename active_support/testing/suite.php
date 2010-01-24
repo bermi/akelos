@@ -1,5 +1,9 @@
 <?php
 
+# This file is part of the Akelos Framework
+# (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
+# See LICENSE and CREDITS for details
+
 defined('AK_UNIT_TEST_SUITE')                   || define('AK_UNIT_TEST_SUITE',true);
 defined('AK_TEST_DEFAULT_REPORTER')             || define('AK_TEST_DEFAULT_REPORTER', 'AkelosTextReporter');
 defined('AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE')  || define('AK_UNIT_TEST_SUITE_GLOBAL_NAMESPACE', 'Akelos');
