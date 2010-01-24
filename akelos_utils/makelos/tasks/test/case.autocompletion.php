@@ -51,4 +51,13 @@ if(!empty($autocomplete_options[0])){
     }
 }
 
+if(count($suggestions) > 80){
+    foreach ($suggestions as $k => $v){
+        $suggestions[$k] = $v = trim($v, '/');
+        if(strstr($v, '/')){
+            unset($suggestions[$k]);
+        }
+    }
+}
+
 echo join("\n", $suggestions);
