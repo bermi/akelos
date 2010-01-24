@@ -115,7 +115,8 @@ class AkActionController extends AkLazyObject
 
     public $_request_id = -1;
 
-    public $filter_parameter_logging = array(AK_SESSION_NAME, 'ak');
+    public $filter_parameter_logging = array();
+    public $skip_parameter_logging = array(AK_SESSION_NAME, 'ak');
 
     protected
 
@@ -2192,6 +2193,17 @@ class AkActionController extends AkLazyObject
                 $this->_Logger = Ak::getLogger();
             }
             $this->_Logger->$type($message, $parameters);
+        }
+    }
+    
+    protected function _logRequestParams($log_params){
+        array_walk_recursive($log_params, array($this, '_filterRequestParamsForLogging'));
+        $this->_log('Parameters', array_diff(Ak::delete($log_params, $this->skip_parameter_logging), array('')));
+    }
+    
+    function _filterRequestParamsForLogging(&$value, $key) {
+        if(in_array($key, $this->filter_parameter_logging)){
+                $value = '[FILTERED]';
         }
     }
 }
