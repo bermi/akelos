@@ -87,6 +87,7 @@ function akelos_autoload($name, $path = null) {
         'AkActionControllerTest'        => 'action_pack/testing.php',
         'AkHelperTest'                  => 'action_pack/testing.php',
         'AkDbSession'                   => 'action_pack/db_session.php',
+        'AkCookieStore'                 => 'action_pack/cookie_store.php',
         'AkDispatcher'                  => 'action_pack/dispatcher.php',
         'AkActiveRecordHelper'          => 'action_pack/helpers/ak_active_record_helper.php',
         'AkAssetTagHelper'              => 'action_pack/helpers/ak_asset_tag_helper.php',
@@ -478,7 +479,7 @@ if(!AK_CLI && AK_WEB_REQUEST){
 }
 
 defined('AK_CALLED_FROM_LOCALHOST')                     || define('AK_CALLED_FROM_LOCALHOST', AK_REMOTE_IP == '127.0.0.1');
-defined('AK_SESSION_HANDLER')                           || define('AK_SESSION_HANDLER', 0);
+defined('AK_SESSION_HANDLER')                           || define('AK_SESSION_HANDLER', 4);
 defined('AK_SESSION_EXPIRE')                            || define('AK_SESSION_EXPIRE', 600);
 defined('AK_SESSION_NAME')                              || define('AK_SESSION_NAME', 'AK_'.substr(md5(AK_HOST.AK_APP_DIR),0,6));
 defined('AK_ASSET_HOST')                                || define('AK_ASSET_HOST','');
@@ -569,7 +570,6 @@ defined('AK_ENABLE_URL_REWRITE')        || define('AK_ENABLE_URL_REWRITE',     t
 defined('AK_URL_REWRITE_ENABLED')       || define('AK_URL_REWRITE_ENABLED',    true);
 defined('AK_DEFAULT_CONTROLLER')        || define('AK_DEFAULT_CONTROLLER', 'page');
 defined('AK_DEFAULT_ACTION')            || define('AK_DEFAULT_ACTION', 'index');
-defined('AK_AUTOMATIC_SESSION_START')   || define('AK_AUTOMATIC_SESSION_START', !AK_HIGH_LOAD_MODE);
 
 defined('AK_IMAGE_DRIVER')              || define('AK_IMAGE_DRIVER', 'GD');
 
@@ -595,6 +595,7 @@ ini_set('session.name', AK_SESSION_NAME);
 
 
 
+class ArgumentException         extends Exception {}
 class ControllerException       extends Exception{}
 class UnknownActionException    extends ControllerException{}
 class ForbiddenActionException  extends ControllerException{}

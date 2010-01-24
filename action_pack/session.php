@@ -47,10 +47,9 @@ class AkSession
     */
     public $_original_sess_value = '';
 
-    static function &initHandler() {
+    static function initHandler() {
         $settings = Ak::getSettings('sessions', false);
-        $SessionHandler = AkSession::lookupStore($settings);
-        return $SessionHandler;
+        return AkSession::lookupStore($settings);
     }
 
     static function &lookupStore($options = null) {
@@ -93,6 +92,11 @@ class AkSession
                 break;
             case 3:
                 $this->_driverInstance = new AkMemcache();
+                $res = $this->_driverInstance->init($options);
+                $this->sessions_enabled = $res;
+                break;
+            case 4:
+                $this->_driverInstance = new AkCookieStore();
                 $res = $this->_driverInstance->init($options);
                 $this->sessions_enabled = $res;
                 break;
