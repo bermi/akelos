@@ -1,0 +1,19 @@
+default:
+    type: mongo_db
+    host: localhost
+
+production:
+    type: mongo_db
+    database_name: app_prod
+    host: localhost
+
+development:
+    type: mongo_db
+    database_name: app_dev
+    host: localhost
+
+testing:
+    type: mongo_db
+    database_name: app_tests
+    host: localhost
+
