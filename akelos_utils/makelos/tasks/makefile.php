@@ -33,3 +33,8 @@ makelos_task('release:generate', array(
 ));
 
 
+makelos_task('db:sessions:create', array(
+    'description' => 'Creates the database table for storing sessions'
+));
+
+

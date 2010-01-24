@@ -58,9 +58,9 @@ class AkSession
         if ($options === true && !empty($session_store)) {
             return $session_store;
         } else if (is_array($options) &&
-                   isset($options['enabled']) && $options['enabled']==true &&
-                   isset($options['handler']) &&
-                   isset($options['handler']['type'])) {
+        isset($options['enabled']) && $options['enabled']==true &&
+        isset($options['handler']) &&
+        isset($options['handler']['type'])) {
             $type = $options['handler']['type'];
             $options = isset($options['handler']['options'])?$options['handler']['options']:array();
         } else if (is_string($options) || is_int($options)) {
@@ -82,14 +82,26 @@ class AkSession
 
         switch ($type) {
             case 1:
-                $sessionpath = session_save_path();
+                // session_save_path();
                 $this->sessions_enabled = false; // Use PHP session handling
                 break;
             case 2:
+                $AkDbSession = new AkDbSession();
+                $AkDbSession->session_life = AK_SESSION_EXPIRE;
+                session_set_save_handler (
+                array($AkDbSession, '_open'),
+                array($AkDbSession, '_close'),
+                array($AkDbSession, '_read'),
+                array($AkDbSession, '_write'),
+                array($AkDbSession, '_destroy'),
+                array($AkDbSession, '_gc')
+                );
+                /*
                 $this->_driverInstance = new AkAdodbCache();
                 $res = $this->_driverInstance->init($options);
                 $this->sessions_enabled = $res;
                 break;
+                */
             case 3:
                 $this->_driverInstance = new AkMemcache();
                 $res = $this->_driverInstance->init($options);
@@ -105,15 +117,15 @@ class AkSession
                 break;
         }
         if ($this->sessions_enabled) {
-             $this->sessionLife = $options['lifeTime'];
-             session_set_save_handler (
-             array($this, '_open'),
-             array($this, '_close'),
-             array($this, '_read'),
-             array($this, '_write'),
-             array($this, '_destroy'),
-             array($this, '_gc')
-             );
+            $this->sessionLife = $options['lifeTime'];
+            session_set_save_handler (
+            array($this, '_open'),
+            array($this, '_close'),
+            array($this, '_read'),
+            array($this, '_write'),
+            array($this, '_destroy'),
+            array($this, '_gc')
+            );
 
         }
     }
