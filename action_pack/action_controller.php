@@ -198,7 +198,10 @@ class AkActionController extends AkLazyObject
     protected function _enableAuthentication() {
         $this->extendClassLazily('AkControllerAuthentication',
         array(
-        'methods' => array('authenticateOrRequestWithHttpBasic','authenticateWithHttpBasic','requestHttpBasicAuthentication'),
+        'methods' => array(
+        'authenticateOrRequestWithHttpBasic','authenticateWithHttpBasic','requestHttpBasicAuthentication',
+        'authenticateOrRequestWithHttpDigest','authenticateWithHttpDigest','requestHttpDigestAuthentication'
+        ),
         'autoload_path' => AK_ACTION_PACK_DIR.DS.'controller_authentication.php'
         ));
     }
