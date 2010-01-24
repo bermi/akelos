@@ -72,6 +72,15 @@ Named routes give you very readable links in your code, as well as handling inco
 $Map->login('/login', array('controller'=>'account', 'action'=>'sign_in'));
 </php>
 
+h4. Nested Routes
+
+Nested routes let you declare that one resource is contained within another resource. You'll see later on how this translates to URLs and paths in your code. For example, if your application includes users, each of which belongs to a project, you might have this nested route declaration:
+
+<php>
+$Projects = $Map->resources('projects');
+    $Projects->resources('users');
+</php>
+
 h4. Regular Routes
 
 In many applications, you'll also see non-RESTful routing, which explicitly connects the parts of a URL to a particular action. For example,
@@ -690,7 +699,7 @@ $Photo = $Map->with_options(array('controller' => 'photo'));;
   $Photo->list  ('',            array('action' => 'index'));
   $Photo->delete(':id/delete',  array('action' => 'delete'));
   $Photo->edit  (':id/edit',    array('action' => 'edit'));
-end
+}
 </php>
 
 The importance of +$Map->with_options+ has declined with the introduction of RESTful routes.
@@ -723,7 +732,7 @@ h4. Recognized MIME types
 By default, Akelos recognizes +html+, +text+, +json+, +csv+, +xml+, +rss+, +atom+, and +yaml+ as acceptable response types. If you need types beyond this, you can register them in your environment:
 
 <php>
-AkMimeType::register("image/jpg", 'jpg');
+AkMimeType::register('image/jpg', 'jpg');
 </php>
 
 h3. The Default Routes
