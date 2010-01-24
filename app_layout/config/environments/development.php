@@ -1,7 +1,7 @@
 <?php
 
 // Define constants that are used only on a development environment
-// See file boot.php for more info
+// See file environment.php for more info
 
 @ini_set('display_errors', 1);
 error_reporting(-1);

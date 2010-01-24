@@ -1,7 +1,7 @@
 <?php
 
 // Define constants that are used only on a testing environment
-// See file boot.php for more info
+// See file environment.php for more info
 
 ini_set('date.timezone', 'UTC');
 define('AK_DIE_ON_TRIGGER_ERROR', true);

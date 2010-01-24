@@ -170,7 +170,7 @@ If you need a different session storage mechanism, you can define it in your +co
 # AkDbSession::install();
 </php>
 
-Akelos sets up a session key (the name of the cookie) and (for the CookieStore) a secret key used when signing the session data. These can also be changed in +config/boot.php+:
+Akelos sets up a session key (the name of the cookie) and (for the CookieStore) a secret key used when signing the session data. These can also be changed in +config/environment.php+:
 
 <php>
 # Your secret key for verifying cookie session data integrity.
@@ -559,7 +559,7 @@ class ClientsController extends ApplicationController {
 }
 </php>
 
-In order for this example to work, you have to add the PDF MIME type to Akelos. This can be done by adding the following line to the file +config/boot.php+:
+In order for this example to work, you have to add the PDF MIME type to Akelos. This can be done by adding the following line to the file +config/environment.php+:
 
 <php>
 AkMimeType::register('application/pdf', 'pdf');

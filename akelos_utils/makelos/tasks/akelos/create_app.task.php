@@ -228,7 +228,7 @@ class AkelosInstaller
 
 
         $paths = array(
-        $this->options['directory'].DS.'config'.DS.'boot.php',
+        $this->options['directory'].DS.'config'.DS.'environment.php',
         $this->options['directory'].DS.'makelos',
         $this->options['directory'].DS.'test'.DS.'shared'.DS.'config'.DS.'app_config.php');
 

@@ -15,7 +15,7 @@
 * A message digest is included with the cookie to ensure data integrity:
 * a user cannot alter his +user_id+ without knowing the secret key
 * included in the hash. New apps are generated with a pregenerated secret
-* in config/boot.php. Set your own for old apps you're upgrading.
+* in config/environment.php. Set your own for old apps you're upgrading.
 * 
 * Session options:
 * 
@@ -59,7 +59,7 @@ class AkCookieStore {
             throw new ArgumentException(
             Ak::t('A key is required to write a cookie containing the session data. Use ' .
             'AkConfig::setOption(\'action_controller.session\', '.
-            'array("key" => "_myapp_session", "secret" => "some secret phrase")); in config/boot.php'));
+            'array("key" => "_myapp_session", "secret" => "some secret phrase")); in config/environment.php'));
         }
     }
 
@@ -73,7 +73,7 @@ class AkCookieStore {
             Ak::t('A secret is required to generate an integrity hash for cookie session data. Use '.
             'AkConfig::setOption(\'action_controller.session\', '.
             'array("key" => "_myapp_session", "secret" => "some secret '.
-            'phrase of at least %length characters")); in config/boot.php', array('%length' => self::SECRET_MIN_LENGTH)));
+            'phrase of at least %length characters")); in config/environment.php', array('%length' => self::SECRET_MIN_LENGTH)));
         }
         if(strlen($this->options['secret']) < self::SECRET_MIN_LENGTH){
             throw new ArgumentException(

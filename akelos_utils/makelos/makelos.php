@@ -126,8 +126,10 @@ if(MAKELOS_RUN){
 
     if(!@include $_config_file){
         defined('AK_ENVIRONMENT')   || define('AK_ENVIRONMENT', 'testing');
-        defined('AK_BASE_DIR')      || define('AK_BASE_DIR', MAKELOS_BASE_DIR);
-        include_once(AK_BASE_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'boot.php');
+        if(!@include AK_BASE_DIR.DS.'config'.DS.'environment.php'){
+            defined('AK_SKIP_CONFIG') || define('AK_SKIP_CONFIG', true);
+            include AK_BASE_DIR.DS.'autoload.php';
+        }
     }
 
     Ak::setStaticVar('dsn', $dsn);
