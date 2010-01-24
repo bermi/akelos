@@ -269,8 +269,7 @@ class AkRequest
         }
         return $accepts;
     }
-
-
+    
     public function getBestAcceptType() {
         $mime_types = AkMimeType::getRegistered();
         if($acceptables = $this->getAcceptHeader()){
@@ -280,8 +279,8 @@ class AkRequest
                 $grouped_acceptables[$acceptable['q']][] = $acceptable['type'];
             }
 
-            foreach ($grouped_acceptables as $q=>$array_with_acceptables_of_same_quality){
-                foreach ($mime_types as $mime_type=>$our_mime_type){
+            foreach ($grouped_acceptables as $array_with_acceptables_of_same_quality){
+                foreach (array_keys($mime_types) as $mime_type){
                     foreach ($array_with_acceptables_of_same_quality as $acceptable){
                         if ($mime_type == $acceptable){
                             return $mime_type;
@@ -656,7 +655,7 @@ class AkRequest
         $this->_startSession();
         $this->_enableInternationalizationSupport();
         if($this->mapRoutes($Map)){
-            AK_LOG_EVENTS && Ak::getLogger()->info('Processing '.$this->getController().'#'.$this->getAction().' (for '.$this->getRemoteIp().')');
+            if(AK_LOG_EVENTS) Ak::getLogger()->info('Processing '.$this->getController().'#'.$this->getAction().' (for '.$this->getRemoteIp().')');
             $Controller = $this->_getControllerInstance();
             return $Controller;
         }else{
@@ -733,7 +732,7 @@ class AkRequest
     }
 
     public function reportError($options = array()){
-        AK_LOG_EVENTS && !empty($options['log']) && Ak::getLogger()->error($options['log']);
+        if(AK_LOG_EVENTS && !empty($options['log'])) Ak::getLogger()->error($options['log']);
 
         if(AK_DEV_MODE && !empty($options['message'])){
             trigger_error($options['message'], E_USER_ERROR);
@@ -876,7 +875,7 @@ class AkRequest
     protected function _startSession() {
         if(AK_AUTOMATIC_SESSION_START){
             if(!isset($_SESSION)){
-                $SessionHandler = AkSession::initHandler();
+                AkSession::initHandler();
                 session_start();
             }
         }

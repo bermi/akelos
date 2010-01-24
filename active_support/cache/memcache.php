@@ -109,7 +109,7 @@ class AkMemcache
         }
 
         if (is_string($return) && substr($return,0,15) == '@____join____@:') {
-            list($start, $parts) = explode(':', $return, 2);
+            list(, $parts) = explode(':', $return, 2);
             $return = '';
             for($i=0;$i<(int)$parts;$i++) {
                 $return.=$this->_memcache->get($key.'_'.$i);
@@ -125,7 +125,6 @@ class AkMemcache
         } else if (is_string($data) && ($strlen=strlen($data))> $this->_max_size) {
             $parts = round($strlen / $this->_max_size);
             $key = $this->_generateCacheKey($id, $group);
-            $keys = array();
             for ($i=0;$i<$parts;$i++) {
                 $nkey = $key.'_'.$i;
                 $this->_memcache->set($nkey,substr($data,$i*$this->_max_size,$this->_max_size),$this->_lifeTime);

@@ -368,11 +368,11 @@ class AkControllerFilter
 
     public function performActionWithFilters($method = '') {
         if ($this->beforeAction($method) !== false && !empty($this->_FilteredObject) && method_exists($this->_FilteredObject, 'hasPerformed') && !$this->_FilteredObject->hasPerformed()){
-            AK_ENABLE_PROFILER &&  Ak::profile("Called $method  before filters");
+            if(AK_ENABLE_PROFILER) Ak::profile("Called $method  before filters");
             $this->_FilteredObject->performActionWithoutFilters($method);
-            AK_ENABLE_PROFILER &&  Ak::profile("Performed $method  action");
+            if(AK_ENABLE_PROFILER) Ak::profile("Performed $method  action");
             $this->afterAction($method);
-            AK_ENABLE_PROFILER &&  Ak::profile("Called $method  after filters");
+            if(AK_ENABLE_PROFILER) Ak::profile("Called $method  after filters");
             return true;
         }
         return false;
@@ -460,6 +460,7 @@ class AkControllerFilter
             $filters = $keys[0];
             return $conditions;
         }
+        return array();
     }
 
     private function _addActionConditions($filters, $conditions) {
