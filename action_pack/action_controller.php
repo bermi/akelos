@@ -131,14 +131,12 @@ class AkActionController extends AkLazyObject
 
 
     public function process(&$Request, &$Response, $options = array()) {
-        AK_ENABLE_PROFILER &&  Ak::profile('AkActionController::process() start');
+        if(AK_ENABLE_PROFILER) Ak::profile('AkActionController::process() start');
 
         $this->setRequestAndResponse($Request, $Response);
 
-        if(AK_LOG_EVENTS){
-            $this->_log('Parameters', array_diff(Ak::delete($this->params, $this->filter_parameter_logging), array('')));
-        }
-        AK_ENABLE_PROFILER &&  Ak::profile('Got request paramenters');
+        if(AK_LOG_EVENTS) $this->_logRequestParams($this->params);
+        if(AK_ENABLE_PROFILER) Ak::profile('Got request paramenters');
 
         $actionExists = $this->_ensureActionExists();
 
@@ -152,11 +150,11 @@ class AkActionController extends AkLazyObject
         if($this->_high_load_mode !== true){
             if(!empty($this->_auto_instantiate_models)){
                 $this->instantiateIncludedModelClasses();
-                AK_ENABLE_PROFILER &&  Ak::profile('Instantiated models');
+                if(AK_ENABLE_PROFILER) Ak::profile('Instantiated models');
             }
             if(!empty($this->_enable_plugins)){
                 $this->loadPlugins();
-                AK_ENABLE_PROFILER &&  Ak::profile('Instantiated plugins');
+                if(AK_ENABLE_PROFILER)  Ak::profile('Instantiated plugins');
             }
         }
 
@@ -182,13 +180,13 @@ class AkActionController extends AkLazyObject
             $this->performActionWithoutFilters($this->_action_name);
         }
 
-        $this->handleResponse();
+        return $this->handleResponse();
     }
 
     protected function _enableLazyLoadingExtenssions($options = array()) {
         $options = empty($options) ? (empty($this->_lazy_loading_options) ? array() : $this->_lazy_loading_options) : $options;
-        empty($options['skip_filters']) && $this->_enableFilters();
-        empty($options['skip_authentication']) && $this->_enableAuthentication();
+        if(empty($options['skip_filters'])) $this->_enableFilters();
+        if(empty($options['skip_authentication'])) $this->_enableAuthentication();
     }
 
     protected function _disbaleLazyLoadingExtenssions() {
@@ -412,9 +410,9 @@ class AkActionController extends AkLazyObject
     }
 
     public function getIncludedModelClassNames($extra_models = array()) {
-        empty($this->model)         && ($this->model        = $this->getControllerName());
-        empty($this->models)        && ($this->models       = array());
-        empty($this->app_models)    && ($this->app_models   = array());
+        if(empty($this->model))      $this->model      = $this->getControllerName();
+        if(empty($this->models))     $this->models     = array();
+        if(empty($this->app_models)) $this->app_models = array();
         return (array)array_unique(array_diff(array_merge_recursive(Ak::toArray($extra_models), Ak::toArray($this->app_models), Ak::toArray($this->models), Ak::toArray($this->model)), array('')));
     }
 
@@ -463,6 +461,7 @@ class AkActionController extends AkLazyObject
                 $this->$underscored_model_class_name = $model;
             }
         }
+        return true;
     }
 
 
@@ -641,7 +640,6 @@ class AkActionController extends AkLazyObject
             }else{
                 return $this->renderFile($this->getDefaultTemplateName(), @$options['status'], true);
             }
-            return true;
         }
     }
 
@@ -672,7 +670,7 @@ class AkActionController extends AkLazyObject
         if($use_full_path){
             $template_exists = $this->_assertExistanceOfTemplateFile($template_path);
         }
-        AK_LOG_EVENTS && $template_exists && $this->_log("Rendering $template_path".(empty($status)?'':'('.$this->Response->getStatusDescription($status).')'));
+        if(AK_LOG_EVENTS && $template_exists) $this->_log("Rendering $template_path".(empty($status)?'':'('.$this->Response->getStatusDescription($status).')'));
         return $this->renderText($this->Template->renderFile($template_path, $use_full_path, $locals), $status);
     }
 
@@ -705,7 +703,7 @@ class AkActionController extends AkLazyObject
         return $this->$partial_path;
     }
 
-    public function renderPartialCollection($partial_name, $collection, $partial_spacer_template = null, $local_assigns = null, $status = null) {
+    public function renderPartialCollection($partial_name, $collection, $partial_spacer_template = null, $local_assigns = null) {
         $this->_addVariablesToAssigns();
         $collection_name = AkInflector::pluralize($partial_name).'_collection';
         $result = $this->Template->renderPartialCollection($partial_name, $collection, $partial_spacer_template, $local_assigns);
@@ -922,7 +920,8 @@ class AkActionController extends AkLazyObject
     * Please note that any individual $this->urlFor call can always override the defaults set
     * by this method.
     */
-    public function defaultUrlOptions($options) {
+    public function defaultUrlOptions($options = array()) {
+        return $options;
     }
 
 
@@ -1008,7 +1007,7 @@ class AkActionController extends AkLazyObject
     * <tt>$this->urlFor(array('action'=>'print'));</tt>
     * would have slashed-off the path components after the changed action.
     */
-    public function urlFor($options = array(), $parameters_for_method_reference = null) {
+    public function urlFor($options = array()) {
         return $this->getUrlWriter()->urlFor($this->rewriteOptions($options));
     }
 
@@ -1094,7 +1093,6 @@ class AkActionController extends AkLazyObject
 
             $error_message = Ak::t('Missing %template_type %controller_name::%template_name',array('%template_type'=>$template_type, '%template_name'=>$template_name,'%controller_name'=>$this->getControllerName()));
             throw new MissingTemplateException($error_message);
-            return false;
         }
         return true;
     }
@@ -1612,7 +1610,7 @@ class AkActionController extends AkLazyObject
     public $_pagination_actions = array();
 
     public function _paginationValidateOptions($collection_id, $options = array(), $in_action) {
-        $this->_pagination_options = array_merge($this->_pagination_default_options, $this->_pagination_options);
+        $this->_pagination_options = array_merge($this->_pagination_default_options, $this->_pagination_options, $options);
         $valid_options = array_keys($this->_pagination_default_options);
 
         $valid_options = !in_array($in_action, $valid_options) ? array_merge($valid_options, $this->_pagination_actions) : $valid_options;
@@ -1667,14 +1665,14 @@ class AkActionController extends AkLazyObject
 
     public function _paginationCreateAndRetrieveCollections() {
         foreach($this->_pagination_options[$this->class]  as $collection_id=>$options){
-            if(!empty($options['actions']) && in_array($options['actions'], $action_name)){
+            if(!empty($options['actions']) && in_array($options['actions'], $this->getActionName())){
                 continue;
             }
 
             list($paginator, $collection) = $this->_paginationLoadPaginatorAndCollection($collection_id, $this->_pagination_options);
 
             $this->{$options['singular_name'].'_pages'} = $paginator;
-            $this->$collection_name = $collection;
+            $this->$collection_id = $collection;
         }
     }
 
@@ -1708,7 +1706,7 @@ class AkActionController extends AkLazyObject
      */
     public function _paginationLoadPaginatorAndCollection($collection_id, $options) {
         $page = $this->params[$options['parameter']];
-        $count = $this->_paginationCountCollection($klass, $options['conditions'],
+        $count = $this->_paginationCountCollection($this->$collection_id, $options['conditions'],
         empty($options['join']) ? $options['join'] : $options['joins']);
 
         $paginator = new AkPaginator($this, $count, $options['per_page'], $page);
@@ -1762,6 +1760,7 @@ class AkActionController extends AkLazyObject
             $this->redirectTo(substr_replace(AK_CURRENT_URL,'',4,1));
             return false;
         }
+        return true;
     }
 
     /**
@@ -1820,6 +1819,7 @@ class AkActionController extends AkLazyObject
         if(!empty($this->account)){
             return $this->account->respondsTo('username');
         }
+        return '';
     }
 
     public function accountUrl($account_subdomain = null, $use_ssl = null) {
@@ -2100,6 +2100,7 @@ class AkActionController extends AkLazyObject
         if (!isset($this->_CacheHandler)) return false;
         return $this->_CacheHandler->cacheConfigured();
     }
+    
     public function cachePage($content, $path = null) {
         if (!isset($this->_CacheHandler)) return false;
         return $this->_CacheHandler->cachePage($content, $path);
@@ -2114,10 +2115,12 @@ class AkActionController extends AkLazyObject
         if (!isset($this->_CacheHandler)) return false;
         return $this->_CacheHandler->expirePage($options);
     }
+    
     public function fragmentCacheKey($key) {
         if (!isset($this->_CacheHandler)) return false;
         return $this->_CacheHandler->fragmentCacheKey($key);
     }
+    
     public function cacheTplFragmentStart($key, $options = array()) {
         if (!isset($this->_CacheHandler)) return false;
         return $this->_CacheHandler->cacheTplFragmentStart($key, $options);
@@ -2142,6 +2145,7 @@ class AkActionController extends AkLazyObject
         if (!isset($this->_CacheHandler)) return false;
         return $this->_CacheHandler->expireFragment($key,$options);
     }
+    
     public function expireAction($options = array()) {
         if (!isset($this->_CacheHandler)) return false;
         return $this->_CacheHandler->expireAction($options);
@@ -2158,8 +2162,8 @@ class AkActionController extends AkLazyObject
 
     // Lazy helper loading
 
-    public function __get($attribute)
-    {
+    public function __get($attribute) {
+        $matches = array();
         if(preg_match('/^(.+)_helper$/', $attribute, $matches)){
             $this->getHelperLoader()->instantiateHelperAsHandlerAttribute($matches[1], $matches[0]);
             if(isset($this->$attribute)){
@@ -2172,14 +2176,12 @@ class AkActionController extends AkLazyObject
         return $this->_dynamic_attributes[$attribute];
     }
 
-    public function __set($attribute, $value)
-    {
+    public function __set($attribute, $value) {
         $this->_dynamic_attributes[$attribute] = $value;
         $this->$attribute = $value;
     }
 
-    public function &getHelperLoader()
-    {
+    public function &getHelperLoader() {
         if(empty($this->_HelperLoader)){
             $this->_HelperLoader = new AkHelperLoader();
             $this->_HelperLoader->setController($this);
