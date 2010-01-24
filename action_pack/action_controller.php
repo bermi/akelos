@@ -2199,7 +2199,9 @@ class AkActionController extends AkLazyObject
     }
     
     protected function _logRequestParams($log_params){
-        array_walk_recursive($log_params, array($this, '_filterRequestParamsForLogging'));
+        if(!empty($this->filter_parameter_logging)){
+            array_walk_recursive($log_params, array($this, '_filterRequestParamsForLogging'));
+        }
         $this->_log('Parameters', array_diff(Ak::delete($log_params, $this->skip_parameter_logging), array('')));
     }
     
