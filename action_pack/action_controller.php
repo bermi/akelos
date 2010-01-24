@@ -1853,10 +1853,11 @@ class AkActionController extends AkLazyObject
     */
 
     public $default_send_file_options = array(
-    'type' => 'application/octet-stream',
-    'disposition' => 'attachment',
-    'stream' => true,
-    'buffer_size' => 4096
+    'type'          => 'application/octet-stream',
+    'disposition'   => 'attachment',
+    'stream'        => true,
+    'buffer_size'   => 4096,
+    'x_sendfile'    => false
     );
 
     /**
@@ -1879,6 +1880,12 @@ class AkActionController extends AkLazyObject
     *   or to read the entire file before sending (false). Defaults to true.
     * * <tt>buffer_size</tt> - specifies size (in bytes) of the buffer used to stream the file.
     *   Defaults to 4096.
+    * <tt>:x_sendfile</tt> - uses X-Sendfile to send the file when set to +true+. This is currently
+        only available with Lighttpd/Apache2 and specific modules installed and activated. Since this
+    *   uses the web server to send the file, this may lower memory consumption on your server and
+    *   it will not block your application for further requests.
+    *   See http://blog.lighttpd.net/articles/2006/07/02/x-sendfile and
+    *   http://tn123.ath.cx/mod_xsendfile/ for details. Defaults to +false+.
     *
     * The default Content-Type and Content-Disposition headers are
     * set to download arbitrary binary files in as many browsers as
@@ -1910,11 +1917,19 @@ class AkActionController extends AkLazyObject
             $Exception->status = 500;
             throw $Exception;
         }
+        $this->performed_render = false;
+        
+        if(!empty($options['x_sendfile'])){
+            $this->_log("Sending X-Sendfile header $path");
+            $this->Response->addHeader(array('X-Sendfile'  => $path));
+            $this->renderNothing(empty($options['status']) ? 200 : $options['status']);
+            return;
+        }
+        
         $options['length'] = empty($options['length']) ? filesize($path) : $options['length'];
         $options['filename'] = empty($options['filename']) ? basename($path) : $options['filename'];
         $options['type'] = empty($options['type']) ? Ak::mime_content_type($path) : $options['type'];
 
-        $this->performed_render = false;
         $this->_sendFileHeaders($options);
 
         if(!empty($options['stream'])){
