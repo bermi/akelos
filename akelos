@@ -1,6 +1,11 @@
 #!/usr/bin/env php
 <?php
 
+/**
+ * The +akelos+ command will create an application skeleton and will link it to
+ * the Akelos Framework library
+ */
+
 $argv = $_SERVER['argv'];
 array_shift($argv);
 passthru(dirname(__FILE__).DIRECTORY_SEPARATOR.'makelos akelos:create_app --hide-makelos-folder '.implode(' ',$argv));
