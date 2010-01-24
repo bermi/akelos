@@ -1,6 +1,6 @@
 #!/usr/bin/env php
 
-WARNING ./script generate is no longer supported
+WARNING ./script/generate is no longer supported
 
 Use:
 

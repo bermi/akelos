@@ -167,4 +167,3 @@ function ak_prompt($message, $options = array())
     return empty($value) ? $options['default'] : $value;
 }
 
-?>

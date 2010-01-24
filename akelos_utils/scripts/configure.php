@@ -233,7 +233,7 @@ define('AK_PUBLIC_LOCALES',                 AK_AVAILABLE_LOCALES);
 // \$ftp_settings = 'ftp://username:password@example.com/path/to_your/base/dir';
 \$ftp_settings = '%ftp_settings';
 
-include_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'boot.php');
+include_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'environment.php');
 
 CONFIG;
 

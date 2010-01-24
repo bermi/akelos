@@ -7,5 +7,5 @@ define('AK_BASE_DIR',       str_replace(DS.'script'.DS.'configure', '', __FILE__
 define('AK_CONFIG_DIR',     AK_BASE_DIR.DS.'config');
 
 include AK_CONFIG_DIR.DS.'boot.php';
-include AK_ACTIVE_SUPPORT_DIR.DS.'utils'.DS.'scripts'.DS.'configure.php';
+include AK_AKELOS_UTILS_DIR.DS.'scripts'.DS.'configure.php';
 

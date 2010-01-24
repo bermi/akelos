@@ -14,5 +14,5 @@ if(file_exists($_app_config_file)){
     include(AK_BASE_DIR.DS.'test'.DS.'shared'.DS.'config'.DS.'config.php');
 }
 defined('AK_ENVIRONMENT')           || define('AK_ENVIRONMENT', 'testing');
-require_once(AK_ACTIVE_SUPPORT_DIR.DS.'utils'.DS.'scripts'.DS.'console.php');
+require_once(AK_AKELOS_UTILS_DIR.DS.'scripts'.DS.'console.php');
 
