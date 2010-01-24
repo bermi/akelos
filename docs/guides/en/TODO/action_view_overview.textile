@@ -42,9 +42,9 @@ require 'phpgems'
 require 'action_view'
 require 'rack'
 
-def hello_world(env)
+public function hello_world(env)
   [200, {"Content-Type" => "text/html"}, "hello world".titleize]
-end
+}
 
 Rack::Handler::Mongrel.run method(:hello_world), :Port => 4567
 </php>
@@ -79,7 +79,7 @@ require 'sinatra'
 
 get '/' do
   tpl 'hello world'.titleize
-end
+}
 </php>
 
 Then, we can run the application:
@@ -109,7 +109,7 @@ Partials can have their own layouts applied to them. These layouts are different
 Let's say we're displaying a post on a page where it should be wrapped in a +div+ for display purposes. First, we'll create a new +Post+:
 
 <php>
-Post.create(:body => 'Partial Layouts are cool!')
+Post.create('body' => 'Partial Layouts are cool!')
 </php>
 
 In the +show+ template, we'll render the +post+ partial wrapped in the +box+ layout:
@@ -117,7 +117,7 @@ In the +show+ template, we'll render the +post+ partial wrapped in the +box+ lay
 *posts/show.html.tpl*
 
 <php>
-<%= render :partial => 'post', :layout => 'box', :locals => {:post => @post} %>
+<%= render 'partial' => 'post', 'layout' => 'box', 'locals' => {'post' => @post} %>
 </php>
 
 The +box+ layout simply wraps the +post+ partial in a +div+:
@@ -157,7 +157,7 @@ You can also render a block of code within a partial layout instead of calling +
 *posts/show.html.tpl*
 
 <php>
-<% render(:layout => 'box', :locals => {:post => @post}) do %>
+<% render('layout' => 'box', 'locals' => {'post' => @post}) do %>
   <% div_for(post) do %>
     <p><%= post.body %></p>
   <% end %>
@@ -233,10 +233,10 @@ h4. AssetTagHelper
 
 This module provides methods for generating HTML that links views to assets such as images, javascripts, stylesheets, and feeds. 
 
-By default, Akelos links to these assets on the current host in the public folder, but you can direct Akelos to link to assets from a dedicated assets server by setting +ActionController::Base.asset_host+ in your +config/environment.php+. For example, let's say your asset host is +assets.example.com+:
+By default, Akelos links to these assets on the current host in the public folder, but you can direct Akelos to link to assets from a dedicated assets server by setting +AkActionController.asset_host+ in your +config/environment.php+. For example, let's say your asset host is +assets.example.com+:
 
 <php>
-ActionController::Base.asset_host = "assets.example.com"
+AkActionController.asset_host = "assets.example.com"
 image_tag("akelos.png") # => <img src="http://assets.example.com/images/akelos.png" alt="Akelos" /> 
 </php>
 
@@ -245,7 +245,7 @@ h5. register_javascript_expansion
 Register one or more javascript files to be included when symbol is passed to javascript_include_tag. This method is typically intended to be called from plugin initialization to register javascript files that the plugin installed in public/javascripts.
 
 <php>
-ActionView::Helpers::AssetTagHelper.register_javascript_expansion :monkey => ["head", "body", "tail"]
+ActionView::Helpers::AssetTagHelper.register_javascript_expansion 'monkey' => ["head", "body", "tail"]
 
 javascript_include_tag :monkey # =>
   <script type="text/javascript" src="/javascripts/head.js"></script>
@@ -262,7 +262,7 @@ h5. register_stylesheet_expansion
 Register one or more stylesheet files to be included when symbol is passed to +stylesheet_link_tag+. This method is typically intended to be called from plugin initialization to register stylesheet files that the plugin installed in +public/stylesheets+.
 
 <php>
-ActionView::Helpers::AssetTagHelper.register_stylesheet_expansion :monkey => ["head", "body", "tail"]
+ActionView::Helpers::AssetTagHelper.register_stylesheet_expansion 'monkey' => ["head", "body", "tail"]
 
 stylesheet_link_tag :monkey # =>
   <link href="/stylesheets/head.css"  media="screen" rel="stylesheet" type="text/css" />
@@ -275,7 +275,7 @@ h5. auto_discovery_link_tag
 Returns a link tag that browsers and news readers can use to auto-detect an RSS or ATOM feed.
 
 <php>
-auto_discovery_link_tag(:rss, "http://www.example.com/feed.rss", {:title => "RSS Feed"}) # =>
+auto_discovery_link_tag(:rss, "http://www.example.com/feed.rss", {'title' => "RSS Feed"}) # =>
   <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="http://www.example.com/feed" />
 </php>
 
@@ -304,22 +304,22 @@ javascript_include_tag "common" # =>
   <script type="text/javascript" src="/javascripts/common.js"></script>  
 </php>
 
-To include the Prototype and Scriptaculous javascript libraries in your application, pass +:defaults+ as the source. When using +:defaults+, if an +application.js+ file exists in your +public/javascripts+ directory, it will be included as well. 
+To include the Prototype and Scriptaculous javascript libraries in your application, pass +'defaults'+ as the source. When using +'defaults'+, if an +application.js+ file exists in your +public/javascripts+ directory, it will be included as well. 
 
 <php>
 javascript_include_tag :defaults
 </php>
 
-You can also include all javascripts in the javascripts directory using +:all+ as the source.
+You can also include all javascripts in the javascripts directory using +'all'+ as the source.
 
 <php>
 javascript_include_tag :all
 </php>
 
-You can also cache multiple javascripts into one file, which requires less HTTP connections to download and can better be compressed by gzip (leading to faster transfers). Caching will only happen if +ActionController::Base.perform_caching+ is set to true (which is the case by default for the Akelos production environment, but not for the development environment).
+You can also cache multiple javascripts into one file, which requires less HTTP connections to download and can better be compressed by gzip (leading to faster transfers). Caching will only happen if +AkActionController.perform_caching+ is set to true (which is the case by default for the Akelos production environment, but not for the development environment).
 
 <php>
-javascript_include_tag :all, :cache => true # => 
+javascript_include_tag :all, 'cache' => true # => 
   <script type="text/javascript" src="/javascripts/all.js"></script>  
 </php>
 
@@ -346,10 +346,10 @@ You can also include all styles in the stylesheet directory using :all as the so
 stylesheet_link_tag :all
 </php>
 
-You can also cache multiple stylesheets into one file, which requires less HTTP connections and can better be compressed by gzip (leading to faster transfers). Caching will only happen if ActionController::Base.perform_caching is set to true (which is the case by default for the Akelos production environment, but not for the development environment). 
+You can also cache multiple stylesheets into one file, which requires less HTTP connections and can better be compressed by gzip (leading to faster transfers). Caching will only happen if AkActionController.perform_caching is set to true (which is the case by default for the Akelos production environment, but not for the development environment). 
 
 <php>
-stylesheet_link_tag :all, :cache => true
+stylesheet_link_tag :all, 'cache' => true
   <link href="/stylesheets/all.css"  media="screen" rel="stylesheet" type="text/css" />
 </php>
 
@@ -376,14 +376,14 @@ map.resources :posts
 *app/controllers/posts_controller.php*
 
 <php>
-def index
+public function index
   @posts = Post.find(:all)
 
   respond_to do |format|
     format.html
     format.atom
-  end
-end
+  }
+}
 </php>
 
 *app/views/posts/index.atom.builder*
@@ -396,14 +396,14 @@ atom_feed do |feed|
   for post in @posts
     feed.entry(post) do |entry|
       entry.title(post.title)
-      entry.content(post.body, :type => 'html')
+      entry.content(post.body, 'type' => 'html')
 
       entry.author do |author|
         author.name(post.author_name)
-      end
-    end
-  end
-end
+      }
+    }
+  }
+}
 </php>
 
 h4. BenchmarkHelper
@@ -428,7 +428,7 @@ A method for caching fragments of a view rather than an entire action or page. T
 
 <php>
 <% cache do %>
-  <%= render :partial => "shared/footer" %>
+  <%= render 'partial' => "shared/footer" %>
 <% end %>
 </php>
 
@@ -597,14 +597,14 @@ select_time(Time.now)
 
 h5. select_year
 
-Returns a select tag with options for each of the five years on each side of the current, which is selected. The five year radius can be changed using the +:start_year+ and +:end_year+ keys in the +options+.
+Returns a select tag with options for each of the five years on each side of the current, which is selected. The five year radius can be changed using the +'start_year'+ and +'end_year'+ keys in the +options+.
 
 <php>
 # Generates a select field for five years on either side of +Date.today+ that defaults to the current year
 select_year(Date.today)
 
 # Generates a select field from 1900 to 2009 that defaults to the current year
-select_year(Date.today, :start_year => 1900, :end_year => 2009)
+select_year(Date.today, 'start_year' => 1900, 'end_year' => 2009)
 </php>
 
 h5. time_ago_in_words
@@ -629,8 +629,8 @@ h4. DebugHelper
 Returns a +pre+ tag that has object dumped by YAML. This creates a very readable way to inspect an object.
 
 <php>
-my_hash = {'first' => 1, 'second' => 'two', 'third' => [1,2,3]}
-debug(my_hash)
+my_array = {'first' => 1, 'second' => 'two', 'third' => [1,2,3]}
+debug(my_array)
 </php>
 
 <html>
@@ -653,8 +653,8 @@ There are two types of form helpers: those that specifically work with model att
 The core method of this helper, form_for, gives you the ability to create a form for a model instance; for example, let's say that you have a model Person and want to create a new instance of it:
 
 <php>
-# Note: a @person variable will have been created in the controller (e.g. @person = Person.new)
-<% form_for :person, @person, :url => { :action => 'create' } do |f| %>
+# Note: a @person variable will have been created in the controller (e.g. @person = new Person)
+<% form_for :person, @person, 'url' => { 'action' => 'create' } do |f| %>
   <%= f.text_field :first_name %>
   <%= f.text_field :last_name %>
   <%= submit_tag 'Create' %>
@@ -677,7 +677,7 @@ The params object created when this form is submitted would look like:
 {"action"=>'create', "controller"=>'persons', "person"=>{"first_name"=>'William', "last_name"=>'Smith'}}
 </php>
 
-The params hash has a nested person value, which can therefore be accessed with $this->params['person'] in the controller.
+The params array has a nested person value, which can therefore be accessed with $this->params['person'] in the controller.
 
 h5. check_box
 
@@ -695,7 +695,7 @@ h5. fields_for
 Creates a scope around a specific model object like form_for, but doesn‘t create the form tags themselves. This makes fields_for suitable for specifying additional model objects in the same form:
 
 <php>
-<% form_for @person, :url => { :action => 'update' } do |person_form| %>
+<% form_for @person, 'url' => { 'action' => 'update' } do |person_form| %>
   First name: <%= person_form.text_field :first_name %>
   Last name : <%= person_form.text_field :last_name %>
 
@@ -771,7 +771,7 @@ h5. text_area
 Returns a textarea opening and closing tag set tailored for accessing a specified attribute.
 
 <php>
-text_area(:comment, :text, :size => "20x30")
+text_area(:comment, :text, 'size' => "20x30")
 # => <textarea cols="20" rows="30" id="comment_text" name="comment[text]">
 #      #{@comment.text}
 #    </textarea>
@@ -799,20 +799,20 @@ Example object structure for use with this method:
 <php>
 class Post extends ActiveRecord {
   belongs_to :author
-end
+}
 
 class Author extends ActiveRecord {
   has_many :posts
-  def name_with_initial
+  public function name_with_initial() {
     "#{first_name.first}. #{last_name}"
-  end
-end
+  }
+}
 </php>
 
 Sample usage (selecting the associated Author for an instance of Post, +@post+):
 
 <php>
-collection_select(:post, :author_id, Author.find(:all), :id, :name_with_initial, {:prompt => true})
+collection_select(:post, :author_id, Author.find(:all), :id, :name_with_initial, {'prompt' => true})
 </php>
 
 If @post.author_id is already 1, this would return:
@@ -844,12 +844,12 @@ Example object structure for use with this method:
 class Continent extends ActiveRecord {
   has_many :countries
   # attribs: id, name
-end
+}
 
 class Country extends ActiveRecord {
   belongs_to :continent
   # attribs: id, name, continent_id
-end
+}
 </php>
 
 Sample usage:
@@ -880,7 +880,7 @@ Note: Only the +optgroup+ and +option+ tags are returned, so you still have to w
 
 h5. options_for_select
 
-Accepts a container (hash, array, enumerable, your type) and returns a string of option tags. 
+Accepts a container (array, array, enumerable, your type) and returns a string of option tags. 
 
 <php>
 options_for_select([ "VISA", "MasterCard" ])
@@ -913,7 +913,7 @@ Create a select tag and a series of contained option tags for the provided objec
 Example with @post.person_id => 1:
 
 <php>
-select("post", "person_id", Person.find(:all).collect {|p| [ p.name, p.id ] }, { :include_blank => true })
+select("post", "person_id", Person.find(:all).collect {|p| [ p.name, p.id ] }, { 'include_blank' => true })
 </php>
 
 could become:
@@ -970,7 +970,7 @@ Creates a file upload field.
 If you are using file uploads then you will also need to set the multipart option for the form tag:
 
 <php>
-<%= form_tag { :action => 'post' }, { :multipart => true } %>
+<%= form_tag { 'action' => 'post' }, { 'multipart' => true } %>
   <label for="file">File to Upload</label> <%= file_field_tag "file" %>
   <%= submit_tag %>
 <%= end_form_tag %>
@@ -985,7 +985,7 @@ file_field_tag 'attachment'
 
 h5. form_tag
 
-Starts a form tag that points the action to an url configured with +url_for_options+ just like +ActionController::Base#url_for+.
+Starts a form tag that points the action to an url configured with +url_for_options+ just like +AkActionController#url_for+.
 
 <php>
 <% form_tag '/posts' do -%>
@@ -1079,7 +1079,7 @@ h4. JavaScriptHelper
 
 Provides functionality for working with JavaScript in your views.
 
-Akelos includes the Prototype JavaScript framework and the Scriptaculous JavaScript controls and visual effects library. If you wish to use these libraries and their helpers, make sure +<%= javascript_include_tag :defaults, :cache => true %>+ is in the HEAD section of your page. This function will include the necessary JavaScript files Akelos generated in the public/javascripts directory.
+Akelos includes the Prototype JavaScript framework and the Scriptaculous JavaScript controls and visual effects library. If you wish to use these libraries and their helpers, make sure +<%= javascript_include_tag :defaults, 'cache' => true %>+ is in the HEAD section of your page. This function will include the necessary JavaScript files Akelos generated in the public/javascripts directory.
 
 h5. button_to_function
 
@@ -1089,8 +1089,8 @@ Returns a button that'll trigger a JavaScript function using the onclick handler
 button_to_function "Greeting", "alert('Hello world!')"
 button_to_function "Delete", "if (confirm('Really?')) do_delete()"
 button_to_function "Details" do |page|
-  page[:details].visual_effect :toggle_slide
-end
+  page['details'].visual_effect :toggle_slide
+}
 </php>
 
 h5. define_javascript_functions
@@ -1152,7 +1152,7 @@ h5. number_to_percentage
 Formats a number as a percentage string.
 
 <php>
-number_to_percentage(100, :precision => 0)        # => 100%
+number_to_percentage(100, 'precision' => 0)        # => 100%
 </php>
 
 h5. number_to_phone
@@ -1192,7 +1192,7 @@ javascript_include_tag 'prototype'
 
 h5. evaluate_remote_response
 
-Returns +eval(request.responseText)+ which is the JavaScript function that form_remote_tag can call in +:complete+ to evaluate a multiple update return document using +update_element_function+ calls.
+Returns +eval(request.responseText)+ which is the JavaScript function that form_remote_tag can call in +'complete'+ to evaluate a multiple update return document using +update_element_function+ calls.
 
 h5. form_remote_tag
 
@@ -1201,7 +1201,7 @@ Returns a form tag that will submit using XMLHttpRequest in the background inste
 For example, this:
 
 <php>
-form_remote_tag :html => { :action => url_for(:controller => 'some', :action => 'place') }
+form_remote_tag 'html' => { 'action' => url_for('controller' => 'some', 'action' => 'place') }
 </php>
 
 would generate the following:
@@ -1217,8 +1217,8 @@ Returns a link to a remote action that's called in the background using XMLHttpR
 
 <php>
 link_to_remote "Delete this post",
-  { :update => 'posts', :url => { :action => 'destroy', :id => post.id } },
-  :href => url_for(:action => 'destroy', :id => post.id)
+  { 'update' => 'posts', 'url' => { 'action' => 'destroy', 'id' => post.id } },
+  'href' => url_for('action' => 'destroy', 'id' => post.id)
 </php>
 
 h5. observe_field
@@ -1226,7 +1226,7 @@ h5. observe_field
 Observes the field specified and calls a callback when its contents have changed.
 
 <php>
-observe_field("my_field", :function => "alert('Field changed')")
+observe_field("my_field", 'function' => "alert('Field changed')")
 </php>
 
 h5. observe_form
@@ -1234,7 +1234,7 @@ h5. observe_form
 Observes the form specified and calls a callback when its contents have changed. The options for observe_form are the same as the options for observe_field.
 
 <php>
-observe_field("my_form", :function => "alert('Form changed')")
+observe_field("my_form", 'function' => "alert('Form changed')")
 </php>
 
 h5. periodically_call_remote
@@ -1242,7 +1242,7 @@ h5. periodically_call_remote
 Periodically calls the specified url as often as specified. Usually used to update a specified div with the results of the remote call. The following example will call update every 20 seconds and update the news_block div:
 
 <php>
-periodically_call_remote(:url => 'update', :frequency => '20', :update => 'news_block')
+periodically_call_remote('url' => 'update', 'frequency' => '20', 'update' => 'news_block')
 # => PeriodicalExecuter(function() {new Ajax.Updater('news_block', 'update', {asynchronous:true, evalScripts:true})}, 20)
 </php>
 
@@ -1261,7 +1261,7 @@ h5. remote_function
 Returns the JavaScript needed for a remote function. Takes the same arguments as +link_to_remote+.
 
 <php>
-<select id="options" onchange="<%= remote_function(:update => 'options', :url => { :action => :update_options }) %>">
+<select id="options" onchange="<%= remote_function('update' => 'options', 'url' => { 'action' => :update_options }) %>">
   <option value="0">Hello</option>
   <option value="1">World</option>
 </select>
@@ -1275,7 +1275,7 @@ Returns a button input tag that will submit form using XMLHttpRequest in the bac
 For example, the following:
 
 <php>
-submit_to_remote 'create_btn', 'Create', :url => { :action => 'create' }
+submit_to_remote 'create_btn', 'Create', 'url' => { 'action' => 'create' }
 </php>
 
 would generate:
@@ -1351,7 +1351,7 @@ Executes the content of the block after a delay of the number of seconds provide
 <php>
 page.delay(20) do
   page.visual_effect :fade, 'notice'
-end
+}
 </php>
 
 h5. draggable
@@ -1382,12 +1382,12 @@ h5. literal
 
 Returns an object whose to_json evaluates to the code provided. Use this to pass a literal JavaScript expression as an argument to another JavaScriptGenerator method.
 
-h5. redirect_to
+h5. $this->redirectTo(
 
 Redirects the browser to the given location using JavaScript, in the same form as +url_for+.
 
 <php>
-page.redirect_to(:controller => 'accounts', :action => 'new')
+page.$this->redirectTo(('controller' => 'accounts', 'action' => 'new')
 </php>
 
 h5. remove
@@ -1403,7 +1403,7 @@ h5. replace
 Replaces the "outer HTML" (i.e., the entire element, not just its contents) of the DOM element with the given id.
 
 <php>
-page.replace 'person-45', :partial => 'person', :object => @person
+page.replace 'person-45', 'partial' => 'person', 'object' => @person
 </php>
 
 h5. replace_html
@@ -1411,7 +1411,7 @@ h5. replace_html
 Replaces the inner HTML of the DOM element with the given id.
 
 <php>
-page.replace_html 'person-45', :partial => 'person', :object => @person
+page.replace_html 'person-45', 'partial' => 'person', 'object' => @person
 </php>
 
 h5. select
@@ -1455,18 +1455,18 @@ h3. Localized Views
 
 Action View has the ability render different templates depending on the current locale.
 
-For example, suppose you have a Posts controller with a show action. By default, calling this action will render +app/views/posts/show.html.tpl+. But if you set +I18n.locale = :de+, then +app/views/posts/show.de.html.tpl+ will be rendered instead. If the localized template isn't present, the undecorated version will be used. This means you're not required to provide localized views for all cases, but they will be preferred and used if available. 
+For example, suppose you have a Posts controller with a show action. By default, calling this action will render +app/views/posts/show.html.tpl+. But if you set +Ak::lang() = :de+, then +app/views/posts/show.de.html.tpl+ will be rendered instead. If the localized template isn't present, the undecorated version will be used. This means you're not required to provide localized views for all cases, but they will be preferred and used if available. 
 
-You can use the same technique to localize the rescue files in your public directory. For example, setting +I18n.locale = :de+ and creating +public/500.de.html+ and +public/404.de.html+ would allow you to have localized rescue pages.
+You can use the same technique to localize the rescue files in your public directory. For example, setting +Ak::lang() = :de+ and creating +public/500.de.html+ and +public/404.de.html+ would allow you to have localized rescue pages.
 
-Since Akelos doesn't restrict the symbols that you use to set I18n.locale, you can leverage this system to display different content depending on anything you like. For example, suppose you have some "expert" users that should see different pages from "normal" users. You could add the following to +app/controllers/application.php+: 
+Since Akelos doesn't restrict the symbols that you use to set Ak::lang(), you can leverage this system to display different content depending on anything you like. For example, suppose you have some "expert" users that should see different pages from "normal" users. You could add the following to +app/controllers/application.php+: 
 
 <php>
 before_filter :set_expert_locale
 
-def set_expert_locale
-  I18n.locale = :expert if current_user.expert?
-end
+public function set_expert_locale
+  Ak::lang() = :expert if current_user.expert?
+}
 </php>
 
 Then you could create special views like +app/views/posts/show.expert.html.tpl+ that would only be displayed to expert users.

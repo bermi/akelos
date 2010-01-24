@@ -115,12 +115,12 @@ Akelos by default automatically loads all fixtures from the 'test/fixtures' fold
 * Load the fixture data into the table
 * Dump the fixture data into a variable in case you want to access it directly
 
-h5. Hashes with Special Powers
+h5. Arrays with Special Powers
 
-Fixtures are basically Hash objects. As mentioned in point #3 above, you can access the hash object directly because it is automatically setup as a local variable of the test case. For example:
+Fixtures are basically Array objects. As mentioned in point #3 above, you can access the array object directly because it is automatically setup as a local variable of the test case. For example:
 
 <php>
-# this will return the Hash for the fixture named david
+# this will return the Array for the fixture named david
 users(:david)
 
 # this will return the property for david called id
@@ -161,12 +161,12 @@ The default test stub in +test/unit/post_test.php+ looks like this:
 <php>
 require 'test_helper'
 
-class PostTest < ActiveSupport::TestCase
+class PostTest extends ActiveSupport::TestCase
   # Replace this with your real tests.
   test "the truth" do
     assert true
-  end
-end
+  }
+}
 </php>
 
 A line by line examination of this file will help get you oriented to Akelos testing code and terminology.
@@ -178,13 +178,13 @@ require 'test_helper'
 As you know by now that +test_helper.php+ specifies the default configuration to run our tests. This is included with all the tests, so any methods added to this file are available to all your tests.
 
 <php>
-class PostTest < ActiveSupport::TestCase
+class PostTest extends ActiveSupport::TestCase
 </php>
 
 The +PostTest+ class defines a _test case_ because it inherits from +ActiveSupport::TestCase+. +PostTest+ thus has all the methods available from +ActiveSupport::TestCase+. You'll see those methods a little later in this guide.
 
 <php>
-def test_truth
+public function test_truth
 </php>
 
 Any method defined within a +Test::Unit+ test case that begins with +test+ (case sensitive) is simply called a test. So, +test_password+, +test_valid_password+ and +testValidPassword+ all are legal test names and are run automatically when the test case is run.
@@ -194,7 +194,7 @@ Akelos adds a +test+ method that takes a test name and a block. It generates a n
 <php>
 test "the truth" do
   # ...
-end
+}
 </php>
 
 This makes test names more readable by replacing underscores with regular language.
@@ -274,9 +274,9 @@ To see how a test failure is reported, you can add a failing test to the +post_t
 
 <php>
 test "should not save post without title" do
-  post = Post.new
-  assert !post.save
-end
+  post = new Post
+  assert !post->save()
+}
 </php>
 
 Let us run this newly added test.
@@ -299,9 +299,9 @@ In the output, +F+ denotes a failure. You can see the corresponding trace shown 
 
 <php>
 test "should not save post without title" do
-  post = Post.new
-  assert !post.save, "Saved the post without a title"
-end
+  post = new Post
+  assert !post->save(), "Saved the post without a title"
+}
 </php>
 
 Running this test shows the friendlier assertion message:
@@ -318,7 +318,7 @@ Now to get this test to pass we can add a model level validation for the _title_
 <php>
 class Post extends ActiveRecord {
   validates_presence_of :title
-end
+}
 </php>
 
 Now the test should pass. Let us verify by running the test again:
@@ -344,7 +344,7 @@ test "should report error" do
   # some_undefined_variable is not defined elsewhere in the test case
   some_undefined_variable
   assert true
-end
+}
 </php>
 
 Now you can see even more output in the console from running the tests:
@@ -413,10 +413,10 @@ NOTE: +assert_valid(record)+ has been deprecated. Please use +assert(record.vali
 |+assert_valid(record)+                                                             |Ensures that the passed record is valid by Active Record standards and returns any error messages if it is not.|
 |+assert_difference(expressions, difference = 1, message = nil) {...}+           |Test numeric difference between the return value of an expression as a result of what is evaluated in the yielded block.|
 |+assert_no_difference(expressions, message = nil, &block)+                         |Asserts that the numeric result of evaluating an expression is not changed before and after invoking the passed in block.|
-|+assertRecognizes(expected_options, path, extras={}, message=nil)+                |Asserts that the routing of the given path was handled correctly and that the parsed options (given in the expected_options hash) match path. Basically, it asserts that Akelos recognizes the route given by expected_options.|
+|+assertRecognizes(expected_options, path, extras={}, message=nil)+                |Asserts that the routing of the given path was handled correctly and that the parsed options (given in the expected_options array) match path. Basically, it asserts that Akelos recognizes the route given by expected_options.|
 |+assertGenerates(expected_path, options, defaults={}, extras = {}, message=nil)+  |Asserts that the provided options can be used to generate the provided path. This is the inverse of assertRecognizes. The extras parameter is used to tell the request the names and values of additional request parameters that would be in a query string. The message parameter allows you to specify a custom error message for assertion failures.|
-|+assert_response(type, message = nil)+                                             |Asserts that the response comes with a specific status code. You can specify +:success+ to indicate 200,  +:redirect+ to indicate 300-399, +:missing+ to indicate 404, or +:error+ to match the 500-599 range|
-|+assert_redirected_to(options = {}, message=nil)+                                  |Assert that the redirection options passed in match those of the redirect called in the latest action. This match can be partial, such that +assert_redirected_to(:controller => 'weblog')+ will also match the redirection of +redirect_to(:controller => 'weblog', :action => 'show')+ and so on.|
+|+assert_response(type, message = nil)+                                             |Asserts that the response comes with a specific status code. You can specify +'success'+ to indicate 200,  +'redirect'+ to indicate 300-399, +'missing'+ to indicate 404, or +'error'+ to match the 500-599 range|
+|+assert_redirected_to(options = {}, message=nil)+                                  |Assert that the redirection options passed in match those of the redirect called in the latest action. This match can be partial, such that +assert_redirected_to('controller' => 'weblog')+ will also match the redirection of +$this->redirectTo(('controller' => 'weblog', 'action' => 'show')+ and so on.|
 |+assert_template(expected = nil, message=nil)+                                     |Asserts that the request was rendered with the appropriate template file.|
 
 You'll see the usage of some of these assertions in the next chapter.
@@ -464,13 +464,13 @@ The +get+ method kicks off the web request and populates the results into the re
 * An optional array of session variables to pass along with the request.
 * An optional array of flash values.
 
-Example: Calling the +:show+ action, passing an +id+ of 12 as the +params+ and setting a +user_id+ of 5 in the session:
+Example: Calling the +'show'+ action, passing an +id+ of 12 as the +params+ and setting a +user_id+ of 5 in the session:
 
 <php>
 $this->get('show', array('id' => 12), array('user_id' => 5));
 </php>
 
-Another example: Calling the +:view+ action, passing an +id+ of 12 as the +params+, this time with no session, but with a flash message.
+Another example: Calling the +'view'+ action, passing an +id+ of 12 as the +params+, this time with no session, but with a flash message.
 
 <php>
 $this->get('view', array('id' => 12), null, array('message' => 'booya!'));
@@ -502,23 +502,23 @@ If you're familiar with the HTTP protocol, you'll know that +get+ is a type of r
 
 All of request types are methods that you can use, however, you'll probably end up using the first two more often than the others.
 
-h4. The Four Hashes of the Apocalypse
+h4. The Four Arrays of the Apocalypse
 
-After a request has been made by using one of the 5 methods (+get+, +post+, etc.) and processed, you will have 4 Hash objects ready for use:
+After a request has been made by using one of the 5 methods (+get+, +post+, etc.) and processed, you will have 4 Array objects ready for use:
 
 * +assigns+ - Any objects that are stored as instance variables in actions for use in views.
 * +cookies+ - Any cookies that are set.
 * +flash+ - Any objects living in the flash.
 * +session+ - Any object living in session variables.
 
-As is the case with normal Hash objects, you can access the values by referencing the keys by string. You can also reference them by symbol name, except for +assigns+. For example:
+As is the case with normal Array objects, you can access the values by referencing the keys by string. You can also reference them by symbol name, except for +assigns+. For example:
 
 <php>
-  flash["gordon"]               flash[:gordon]
-  session["shmession"]          session[:shmession]
-  cookies["are_good_for_u"]     cookies[:are_good_for_u]
+  flash["gordon"]               flash['gordon']
+  session["shmession"]          session['shmession']
+  cookies["are_good_for_u"]     cookies['are_good_for_u']
 
-# Because you can't use assigns[:something] for historical reasons:
+# Because you can't use assigns['something'] for historical reasons:
   assigns["something"]          assigns(:something)
 </php>
 
@@ -537,11 +537,11 @@ Here's another example that uses +flash+, +assert_redirected_to+, and +assert_di
 <php>
 test "should create post" do
   assert_difference('Post.count') do
-    post :create, :post => { :title => 'Hi', :body => 'This is my first post.'}
-  end
+    post :create, 'post' => { 'title' => 'Hi', 'body' => 'This is my first post.'}
+  }
   assert_redirected_to post_path(assigns(:post))
-  assert_equal 'Post was successfully created.', flash[:notice]
-end
+  assert_equal 'Post was successfully created.', flash['notice']
+}
 </php>
 
 h4. Testing Views
@@ -567,7 +567,7 @@ You can also use nested +assert_select+ blocks. In this case the inner +assert_s
 <php>
 assert_select 'ul.navigation' do
   assert_select 'li.menu_item'
-end
+}
 </php>
 
 Alternatively the collection of elements selected by the outer +assert_select+ may be iterated through so that +assert_select+ may be called separately for each element. Suppose for example that the response contains two ordered lists, each with four list elements then the following tests will both pass.
@@ -576,12 +576,12 @@ Alternatively the collection of elements selected by the outer +assert_select+ m
 assert_select "ol" do |elements|
   elements.each do |element|
     assert_select element, "li", 4
-  end
-end
+  }
+}
 
 assert_select "ol" do
   assert_select "li", 8
-end
+}
 </php>
 
 The +assert_select+ assertion is quite powerful. For more advanced usage, refer to its "documentation":http://api.akelos.org/classes/ActionController/Assertions/SelectorAssertions.html.
@@ -601,7 +601,7 @@ Here's an example of using +assert_select_email+:
 <php>
 assert_select_email do
   assert_select 'small', 'Please click the "Unsubscribe" link if you want to opt-out.'
-end
+}
 </php>
 
 h3. Integration Testing
@@ -621,14 +621,14 @@ Here's what a freshly-generated integration test looks like:
 <php>
 require 'test_helper'
 
-class UserFlowsTest < ActionController::IntegrationTest
+class UserFlowsTest extends ActionController::IntegrationTest
   # fixtures :your, :models
 
   # Replace this with your real tests.
   test "the truth" do
     assert true
-  end
-end
+  }
+}
 </php>
 
 Integration tests inherit from +ActionController::IntegrationTest+. This makes available some additional helpers to use in your integration tests. Also you need to explicitly include the fixtures to be made available to the test.
@@ -657,7 +657,7 @@ A simple integration test that exercises multiple controllers:
 <php>
 require 'test_helper'
 
-class UserFlowsTest < ActionController::IntegrationTest
+class UserFlowsTest extends ActionController::IntegrationTest
   fixtures :users
 
   test "login and browse site" do
@@ -666,16 +666,16 @@ class UserFlowsTest < ActionController::IntegrationTest
     get "/login"
     assert_response :success
 
-    post_via_redirect "/login", :username => users(:avs).username, :password => users(:avs).password
+    post_via_redirect "/login", 'username' => users(:avs).username, 'password' => users(:avs).password
     assert_equal '/welcome', path
-    assert_equal 'Welcome avs!', flash[:notice]
+    assert_equal 'Welcome avs!', flash['notice']
 
     https!(false)
     get "/posts/all"
     assert_response :success
     assert assigns(:products)
-  end
-end
+  }
+}
 </php>
 
 As you can see the integration test involves multiple controllers and exercises the entire stack from database to dispatcher. In addition you can have multiple session instances open simultaneously in a test and extend those instances with assertion methods to create a very powerful testing DSL (domain-specific language) just for your application.
@@ -685,7 +685,7 @@ Here's an example of multiple sessions and custom DSL in an integration test
 <php>
 require 'test_helper'
 
-class UserFlowsTest < ActionController::IntegrationTest
+class UserFlowsTest extends ActionController::IntegrationTest
   fixtures :users
 
   test "login and browse site" do
@@ -696,8 +696,8 @@ class UserFlowsTest < ActionController::IntegrationTest
     guest = login(:guest)
 
     # Both are now available in different sessions
-    assert_equal 'Welcome avs!', avs.flash[:notice]
-    assert_equal 'Welcome guest!', guest.flash[:notice]
+    assert_equal 'Welcome avs!', avs.flash['notice']
+    assert_equal 'Welcome guest!', guest.flash['notice']
 
     # User avs can browse site
     avs.browses_site
@@ -705,29 +705,29 @@ class UserFlowsTest < ActionController::IntegrationTest
     guest.browses_site
 
     # Continue with other assertions
-  end
+  }
 
   private
 
     module CustomDsl
-      def browses_site
+      public function browses_site() {
         get "/products/all"
         assert_response :success
         assert assigns(:products)
-      end
-    end
+      }
+    }
 
-    def login(user)
+    public function login($user) {
       open_session do |sess|
         sess.extend(CustomDsl)
         u = users(user)
         sess.https!
-        sess.post "/login", :username => u.username, :password => u.password
+        sess.post "/login", 'username' => u.username, 'password' => u.password
         assert_equal '/welcome', path
         sess.https!(false)
-      end
-    end
-end
+      }
+    }
+}
 </php>
 
 h3. Makelos Tasks for Running your Tests
@@ -756,35 +756,35 @@ If you would like to run a block of code before the start of each test and anoth
 <php>
 require 'test_helper'
 
-class PostsControllerTest < ActionController::TestCase
+class PostsControllerTest extends ActionController::TestCase
 
   # called before every single test
-  def setup
+  public function setup() {
     @post = posts(:one)
-  end
+  }
 
   # called after every single test
-  def teardown
+  public function teardown() {
     # as we are re-initializing @post before every test
     # setting it to nil here is not essential but I hope
     # you understand how you can use the teardown method
     @post = nil
-  end
+  }
 
   test "should show post" do
-    get :show, :id => @post.id
+    get :show, 'id' => @post.id
     assert_response :success
-  end
+  }
 
   test "should destroy post" do
     assert_difference('Post.count', -1) do
-      delete :destroy, :id => @post.id
-    end
+      delete :destroy, 'id' => @post.id
+    }
 
     assert_redirected_to posts_path
-  end
+  }
 
-end
+}
 </php>
 
 Above, the +setup+ method is called before each test and so +@post+ is available for each of the tests. Akelos implements +setup+ and +teardown+ as ActiveSupport::Callbacks. Which essentially means you need not only use +setup+ and +teardown+ as methods in your tests. You could specify them by using:
@@ -799,41 +799,41 @@ Let's see the earlier example by specifying +setup+ callback by specifying a met
 <php>
 require '../test_helper'
 
-class PostsControllerTest < ActionController::TestCase
+class PostsControllerTest extends ActionController::TestCase
 
   # called before every single test
   setup :initialize_post
 
   # called after every single test
-  def teardown
+  public function teardown() {
     @post = nil
-  end
+  }
 
   test "should show post" do
-    get :show, :id => @post.id
+    get :show, 'id' => @post.id
     assert_response :success
-  end
+  }
 
   test "should update post" do
-    put :update, :id => @post.id, :post => { }
+    put :update, 'id' => @post.id, 'post' => { }
     assert_redirected_to post_path(assigns(:post))
-  end
+  }
 
   test "should destroy post" do
     assert_difference('Post.count', -1) do
-      delete :destroy, :id => @post.id
-    end
+      delete :destroy, 'id' => @post.id
+    }
 
     assert_redirected_to posts_path
-  end
+  }
 
   private
 
-  def initialize_post
+  public function initialize_post() {
     @post = posts(:one)
-  end
+  }
 
-end
+}
 </php>
 
 h3. Testing Routes
@@ -842,8 +842,8 @@ Like everything else in your Akelos application, it is recommended that you test
 
 <php>
 test "should route to post" do
-  assertRouting '/posts/1', { :controller => 'posts', :action => 'show', :id => "1" }
-end
+  assertRouting '/posts/1', { 'controller' => 'posts', 'action' => 'show', 'id' => "1" }
+}
 </php>
 
 h3. Testing Your Mailers
@@ -881,7 +881,7 @@ Here's a unit test to test a mailer named +UserMailer+ whose action +invite+ is 
 <php>
 require 'test_helper'
 
-class UserMailerTest < ActionMailer::TestCase
+class UserMailerTest extends ActionMailer::TestCase
   tests UserMailer
   test "invite" do
     @expected.from    = 'me@example.com'
@@ -891,9 +891,9 @@ class UserMailerTest < ActionMailer::TestCase
     @expected.date    = Time.now
 
     assert_equal @expected.encoded, UserMailer.create_invite('me@example.com', 'friend@example.com', @expected.date).encoded
-  end
+  }
 
-end
+}
 </php>
 
 In this test, +@expected+ is an instance of +TMail::Mail+ that you can use in your tests. It is defined in +ActionMailer::TestCase+. The test above uses +@expected+ to construct an email, which it then asserts with email created by the custom mailer. The +invite+ fixture is the body of the email and is used as the sample content to assert against. The helper +read_fixture+ is used to read in the content from this file.
@@ -919,17 +919,17 @@ Functional testing for mailers involves more than just checking that the email b
 <php>
 require 'test_helper'
 
-class UserControllerTest < ActionController::TestCase
+class UserControllerTest extends ActionController::TestCase
   test "invite friend" do
     assert_difference 'ActionMailer::Base.deliveries.size', +1 do
-      post :invite_friend, :email => 'friend@example.com'
-    end
+      post :invite_friend, 'email' => 'friend@example.com'
+    }
     invite_email = ActionMailer::Base.deliveries.first
 
     assert_equal invite_email.subject, "You have been invited by me@example.com"
     assert_equal invite_email.to[0], 'friend@example.com'
     assert_match /Hi friend@example.com/, invite_email.body
-  end
-end
+  }
+}
 </php>
 

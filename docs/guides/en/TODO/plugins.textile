@@ -18,7 +18,7 @@ After reading this guide you should be familiar with:
 
 This guide describes how to build a test-driven plugin that will:
 
-* Extend core php classes like Hash and String
+* Extend core php classes like Array and String
 * Add methods to ActiveRecord in the tradition of the 'acts_as' plugins
 * Add a view helper that can be used in tpl templates
 * Add a new generator that will generate a migration
@@ -153,21 +153,21 @@ For this guide you'll need 2 tables/models, Hickwalls and Wickwalls, so add the 
 *vendor/plugins/yaffle/test/schema.php:*
 
 <php>
-ActiveRecord::Schema.define(:version => 0) do
-  create_table :hickwalls, :force => true do |t|
+ActiveRecord::Schema.define('version' => 0) do
+  create_table :hickwalls, 'force' => true do |t|
     t.string :name
     t.string :last_squawk
     t.datetime :last_squawked_at
-  end
-  create_table :wickwalls, :force => true do |t|
+  }
+  create_table :wickwalls, 'force' => true do |t|
     t.string :name
     t.string :last_tweet
     t.datetime :last_tweeted_at
-  end
-  create_table :woodpeckers, :force => true do |t|
+  }
+  create_table :woodpeckers, 'force' => true do |t|
     t.string :name
-  end
-end
+  }
+}
 </php>
 
 *vendor/plugins/yaffle/test/test_helper.php:*
@@ -179,9 +179,9 @@ ENV['AK_BASE_DIR'] ||= File.dirname(__FILE__) + '/../../../..'
 require 'test/unit'
 require File.expand_path(File.join(ENV['AK_BASE_DIR'], 'config/environment.php'))
 
-def load_schema
+public function load_schema
   config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
-  ActiveRecord.logger = Logger.new(File.dirname(__FILE__) + "/debug.log")
+  ActiveRecord.logger = new Logger(File.dirname(__FILE__) + "/debug.log")
 
   db_adapter = ENV['DB']
 
@@ -196,17 +196,17 @@ def load_schema
         require 'sqlite3'
         'sqlite3'
       rescue MissingSourceFile
-      end
-    end
+      }
+    }
 
   if db_adapter.nil?
     raise "No DB Adapter selected. Pass the DB= option to pick one, or install Sqlite or Sqlite3."
-  end
+  }
 
   ActiveRecord.establish_connection(config[db_adapter])
   load(File.dirname(__FILE__) + "/schema.php")
   require File.dirname(__FILE__) + '/../akelos/init.php'
-end
+}
 </php>
 
 Now whenever you write a test that requires the database, you can call 'load_schema'.
@@ -220,21 +220,21 @@ Once you have these files in place, you can write your first test to ensure that
 <php>
 require File.dirname(__FILE__) + '/test_helper.php'
 
-class YaffleTest < Test::Unit::TestCase
+class YaffleTest extends Test::Unit::TestCase
   load_schema
 
   class Hickwall extends ActiveRecord {
-  end
+  }
 
   class Wickwall extends ActiveRecord {
-  end
+  }
 
-  def test_schema_has_loaded_correctly
+  public function test_schema_has_loaded_correctly() {
     assert_equal [], Hickwall.all
     assert_equal [], Wickwall.all
-  end
+  }
 
-end
+}
 </php>
 
 To run this, go to the plugin directory and run +./makelos+:
@@ -286,11 +286,11 @@ In this example you will add a method to String named +to_squawk+.  To begin, cr
 <php>
 require File.dirname(__FILE__) + '/test_helper.php'
 
-class CoreExtTest < Test::Unit::TestCase
-  def test_to_squawk_prepends_the_word_squawk
+class CoreExtTest extends Test::Unit::TestCase
+  public function test_to_squawk_prepends_the_word_squawk() {
     assert_equal "squawk! Hello World", "Hello World".to_squawk
-  end
-end
+  }
+}
 </php>
 
 Navigate to your plugin directory and run +./makelos test+:
@@ -325,10 +325,10 @@ Finally, create the 'core_ext.php' file and add the 'to_squawk' method:
 
 <php>
 String.class_eval do
-  def to_squawk
+  public function to_squawk() {
     "squawk! #{self}".strip
-  end
-end
+  }
+}
 </php>
 
 To test that your method does what it says it does, run the unit tests with +./makelos+ from your plugin directory.  To see this in action, fire up a console and start squawking:
@@ -350,23 +350,23 @@ If you must reopen a class in +init.php+ you can use +module_eval+ or +class_eva
 * *vendor/plugins/yaffle/akelos/init.php*
 
 <php>
-Hash.class_eval do
-  def is_a_special_hash?
+Array.class_eval do
+  public function is_a_special_array() {
     true
-  end
-end
+  }
+}
 </php>
 
-Another way is to explicitly define the top-level module space for all modules and classes, like +::Hash+:
+Another way is to explicitly define the top-level module space for all modules and classes, like +::Array+:
 
 * *vendor/plugins/yaffle/akelos/init.php*
 
 <php>
-class ::Hash
-  def is_a_special_hash?
+class ::Array
+  public function is_a_special_array() {
     true
-  end
-end
+  }
+}
 </php>
 
 h3. Add an "acts_as" Method to Active Record
@@ -380,8 +380,8 @@ To begin, set up your files so that you have:
 <php>
 require File.dirname(__FILE__) + '/test_helper.php'
 
-class ActsAsYaffleTest < Test::Unit::TestCase
-end
+class ActsAsYaffleTest extends Test::Unit::TestCase
+}
 </php>
 
 * *vendor/plugins/yaffle/lib/yaffle.php*
@@ -395,7 +395,7 @@ require 'yaffle/acts_as_yaffle'
 <php>
 module Yaffle
   # your code will go here
-end
+}
 </php>
 
 Note that after requiring 'acts_as_yaffle' you also have to include it into ActiveRecord so that your plugin methods will be available to the akelos models.
@@ -408,19 +408,19 @@ One of the most common plugin patterns for 'acts_as_yaffle' plugins is to struct
 module Yaffle
   public function included(base)
     base.send :extend, ClassMethods
-  end
+  }
 
   module ClassMethods
     # any method placed here will apply to classes, like Hickwall
-    def acts_as_something
+    public function acts_as_something() {
       send :include, InstanceMethods
-    end
-  end
+    }
+  }
 
   module InstanceMethods
     # any method placed here will apply to instaces, like @hickwall
-  end
-end
+  }
+}
 </php>
 
 With structure you can easily separate the methods that will be used for the class (like +Hickwall.some_method+) and the instance (like +@hickwell.some_method+).
@@ -438,23 +438,23 @@ require File.dirname(__FILE__) + '/test_helper.php'
 
 class Hickwall extends ActiveRecord {
   acts_as_yaffle
-end
+}
 
 class Wickwall extends ActiveRecord {
-  acts_as_yaffle :yaffle_text_field => :last_tweet
-end
+  acts_as_yaffle 'yaffle_text_field' => :last_tweet
+}
 
-class ActsAsYaffleTest < Test::Unit::TestCase
+class ActsAsYaffleTest extends Test::Unit::TestCase
   load_schema
 
-  def test_a_hickwalls_yaffle_text_field_should_be_last_squawk
+  public function test_a_hickwalls_yaffle_text_field_should_be_last_squawk() {
     assert_equal "last_squawk", Hickwall.yaffle_text_field
-  end
+  }
 
-  def test_a_wickwalls_yaffle_text_field_should_be_last_tweet
+  public function test_a_wickwalls_yaffle_text_field_should_be_last_tweet() {
     assert_equal "last_tweet", Wickwall.yaffle_text_field
-  end
-end
+  }
+}
 </php>
 
 To make these tests pass, you could modify your +acts_as_yaffle+ file like so:
@@ -465,15 +465,15 @@ To make these tests pass, you could modify your +acts_as_yaffle+ file like so:
 module Yaffle
   public function included(base)
     base.send :extend, ClassMethods
-  end
+  }
 
   module ClassMethods
-    def acts_as_yaffle(options = {})
+    public function acts_as_yaffle($options = {})
       cattr_accessor :yaffle_text_field
-      self.yaffle_text_field = (options[:yaffle_text_field] || :last_squawk).to_s
-    end
-  end
-end
+      self.yaffle_text_field = (options['yaffle_text_field'] || :last_squawk).to_s
+    }
+  }
+}
 
 ActiveRecord.send :include, Yaffle
 </php>
@@ -491,35 +491,35 @@ require File.dirname(__FILE__) + '/test_helper.php'
 
 class Hickwall extends ActiveRecord {
   acts_as_yaffle
-end
+}
 
 class Wickwall extends ActiveRecord {
-  acts_as_yaffle :yaffle_text_field => :last_tweet
-end
+  acts_as_yaffle 'yaffle_text_field' => :last_tweet
+}
 
-class ActsAsYaffleTest < Test::Unit::TestCase
+class ActsAsYaffleTest extends Test::Unit::TestCase
   load_schema
 
-  def test_a_hickwalls_yaffle_text_field_should_be_last_squawk
+  public function test_a_hickwalls_yaffle_text_field_should_be_last_squawk() {
     assert_equal "last_squawk", Hickwall.yaffle_text_field
-  end
+  }
 
-  def test_a_wickwalls_yaffle_text_field_should_be_last_tweet
+  public function test_a_wickwalls_yaffle_text_field_should_be_last_tweet() {
     assert_equal "last_tweet", Wickwall.yaffle_text_field
-  end
+  }
 
-  def test_hickwalls_squawk_should_populate_last_squawk
-    hickwall = Hickwall.new
+  public function test_hickwalls_squawk_should_populate_last_squawk() {
+    hickwall = new Hickwall
     hickwall.squawk("Hello World")
     assert_equal "squawk! Hello World", hickwall.last_squawk
-  end
+  }
 
-  def test_wickwalls_squawk_should_populate_last_tweeted_at
-    wickwall = Wickwall.new
+  public function test_wickwalls_squawk_should_populate_last_tweeted_at() {
+    wickwall = new Wickwall
     wickwall.squawk("Hello World")
     assert_equal "squawk! Hello World", wickwall.last_tweet
-  end
-end
+  }
+}
 </php>
 
 Run this test to make sure the last two tests fail, then update 'acts_as_yaffle.php' to look like this:
@@ -530,22 +530,22 @@ Run this test to make sure the last two tests fail, then update 'acts_as_yaffle.
 module Yaffle
   public function included(base)
     base.send :extend, ClassMethods
-  end
+  }
 
   module ClassMethods
-    def acts_as_yaffle(options = {})
+    public function acts_as_yaffle($options = {})
       cattr_accessor :yaffle_text_field
-      self.yaffle_text_field = (options[:yaffle_text_field] || :last_squawk).to_s
+      self.yaffle_text_field = (options['yaffle_text_field'] || :last_squawk).to_s
       send :include, InstanceMethods
-    end
-  end
+    }
+  }
 
   module InstanceMethods
-    def squawk(string)
+    public function squawk($string) {
       write_attribute(self.class.yaffle_text_field, string.to_squawk)
-    end
-  end
-end
+    }
+  }
+}
 
 ActiveRecord.send :include, Yaffle
 </php>
@@ -579,13 +579,13 @@ As always, start with a test:
 <php>
 require File.dirname(__FILE__) + '/test_helper.php'
 
-class WoodpeckerTest < Test::Unit::TestCase
+class WoodpeckerTest extends Test::Unit::TestCase
   load_schema
 
-  def test_woodpecker
-    assert_kind_of Woodpecker, Woodpecker.new
-  end
-end
+  public function test_woodpecker() {
+    assert_kind_of Woodpecker, new Woodpecker
+  }
+}
 </php>
 
 This is just a simple test to make sure the class is being loaded correctly.  After watching it fail with +./makelos+, you can make it pass like so:
@@ -598,7 +598,7 @@ This is just a simple test to make sure the class is being loaded correctly.  Af
   $LOAD_PATH << path
   ActiveSupport::Dependencies.load_paths << path
   ActiveSupport::Dependencies.load_once_paths.delete(path)
-end
+}
 </php>
 
 Adding directories to the load path makes them appear just like files in the main app directory - except that they are only loaded once, so you have to restart the web server to see the changes in the browser.  Removing directories from the 'load_once_paths' allow those changes to picked up as soon as you save the file - without having to restart the web server.  This is particularly useful as you develop the plugin.
@@ -615,9 +615,9 @@ Finally, add the following to your plugin's 'schema.php':
 * *vendor/plugins/yaffle/test/schema.php:*
 
 <php>
-create_table :woodpeckers, :force => true do |t|
+create_table :woodpeckers, 'force' => true do |t|
   t.string :name
-end
+}
 </php>
 
 Now your test should be passing, and you should be able to use the Woodpecker model from within your akelos app, and any changes made to it are reflected immediately when running in development mode.
@@ -635,24 +635,24 @@ require File.dirname(__FILE__) + '/test_helper.php'
 require 'woodpeckers_controller'
 require 'action_controller/test_process'
 
-class WoodpeckersController; def rescue_action(e) raise e end; end
+class WoodpeckersController; public function rescue_action(e) raise e end; }
 
-class WoodpeckersControllerTest < Test::Unit::TestCase
-  def setup
-    @controller = WoodpeckersController.new
+class WoodpeckersControllerTest extends Test::Unit::TestCase
+  public function setup() {
+    @controller = new WoodpeckersController
     @request = ActionController::TestRequest.new
     @response = ActionController::TestResponse.new
 
     ActionController::Routing::Routes.draw do |map|
       map.resources :woodpeckers
-    end
-  end
+    }
+  }
 
-  def test_index
+  public function test_index() {
     get :index
     assert_response :success
-  end
-end
+  }
+}
 </php>
 
 This is just a simple test to make sure the controller is being loaded correctly.  After watching it fail with +./makelos+, you can make it pass like so:
@@ -665,19 +665,19 @@ This is just a simple test to make sure the controller is being loaded correctly
   $LOAD_PATH << path
   ActiveSupport::Dependencies.load_paths << path
   ActiveSupport::Dependencies.load_once_paths.delete(path)
-end
+}
 </php>
 
 * *vendor/plugins/yaffle/lib/app/controllers/woodpeckers_controller.php:*
 
 <php>
-class WoodpeckersController < ActionController::Base
+class WoodpeckersController extends AkActionController
 
-  def index
-    render :text => "Squawk!"
-  end
+  public function index() {
+    render 'text' => "Squawk!"
+  }
 
-end
+}
 </php>
 
 Now your test should be passing, and you should be able to use the Woodpeckers controller in your app.  If you add a route for the woodpeckers controller you can start up your server and go to http://localhost:3000/woodpeckers to see your controller in action.
@@ -694,11 +694,11 @@ You can test your plugin's helper as you would test any other helper:
 require File.dirname(__FILE__) + '/test_helper.php'
 include WoodpeckersHelper
 
-class WoodpeckersHelperTest < Test::Unit::TestCase
-  def test_tweet
+class WoodpeckersHelperTest extends Test::Unit::TestCase
+  public function test_tweet() {
     assert_equal "Tweet! Hello", tweet("Hello")
-  end
-end
+  }
+}
 </php>
 
 This is just a simple test to make sure the helper is being loaded correctly.  After watching it fail with +./makelos+, you can make it pass like so:
@@ -711,7 +711,7 @@ This is just a simple test to make sure the helper is being loaded correctly.  A
   $LOAD_PATH << path
   ActiveSupport::Dependencies.load_paths << path
   ActiveSupport::Dependencies.load_once_paths.delete(path)
-end
+}
 </php>
 
 * *vendor/plugins/yaffle/lib/app/helpers/woodpeckers_helper.php:*
@@ -719,11 +719,11 @@ end
 <php>
 module WoodpeckersHelper
 
-  def tweet(text)
+  public function tweet($text) {
     "Tweet! #{text}"
-  end
+  }
 
-end
+}
 </php>
 
 Now your test should be passing, and you should be able to use the Woodpeckers helper in your app.
@@ -739,25 +739,25 @@ Testing routes from plugins is slightly different from testing routes in a stand
 <php>
 require "#{File.dirname(__FILE__)}/test_helper"
 
-class RoutingTest < Test::Unit::TestCase
+class RoutingTest extends Test::Unit::TestCase
 
-  def setup
+  public function setup() {
     ActionController::Routing::Routes.draw do |map|
       map.yaffles
-    end
-  end
+    }
+  }
 
-  def test_yaffles_route
-    assert_recognition :get, "/yaffles", :controller => 'yaffles_controller', :action => 'index'
-  end
+  public function test_yaffles_route() {
+    assert_recognition :get, "/yaffles", 'controller' => 'yaffles_controller', 'action' => 'index'
+  }
 
   private
 
-    def assert_recognition(method, path, options)
-      result = ActionController::Routing::Routes.recognize_path(path, :method => method)
+    public function assert_recognition($method, path, options)
+      result = ActionController::Routing::Routes.recognize_path(path, 'method' => method)
       assert_equal options, result
-    end
-end
+    }
+}
 </php>
 
 Once you see the tests fail by running './makelos', you can make them pass with:
@@ -774,12 +774,12 @@ require "yaffle/routing"
 module Yaffle #:nodoc:
   module Routing #:nodoc:
     module MapperExtensions
-      def yaffles
-        @set.add_route("/yaffles", {:controller => 'yaffles_controller', :action => 'index'})
-      end
-    end
-  end
-end
+      public function yaffles() {
+        @set.add_route("/yaffles", {'controller' => 'yaffles_controller', 'action' => 'index'})
+      }
+    }
+  }
+}
 
 ActionController::Routing::RouteSet::Mapper.send :include, Yaffle::Routing::MapperExtensions
 </php>
@@ -789,7 +789,7 @@ ActionController::Routing::RouteSet::Mapper.send :include, Yaffle::Routing::Mapp
 <php>
 ActionController::Routing::Routes.draw do |map|
   map.yaffles
-end
+}
 </php>
 
 You can also see if your routes work by running +./makelos routes+ from your app directory.
@@ -818,34 +818,34 @@ require File.dirname(__FILE__) + '/test_helper.php'
 require 'akelos_generator'
 require 'akelos_generator/scripts/generate'
 
-class DefinitionGeneratorTest < Test::Unit::TestCase
+class DefinitionGeneratorTest extends Test::Unit::TestCase
 
-  def setup
+  public function setup() {
     FileUtils.mkdir_p(fake_akelos_root)
     @original_files = file_list
-  end
+  }
 
-  def teardown
+  public function teardown() {
     FileUtils.rm_r(fake_akelos_root)
-  end
+  }
 
-  def test_generates_correct_file_name
-    Akelos::Generator::Scripts::Generate.new.run(["yaffle_definition"], :destination => fake_akelos_root)
+  public function test_generates_correct_file_name() {
+    Akelos::Generator::Scripts::Generate.new.run(["yaffle_definition"], 'destination' => fake_akelos_root)
     new_file = (file_list - @original_files).first
     assert_equal "definition.txt", File.basename(new_file)
-  end
+  }
 
   private
 
-    def fake_akelos_root
+    public function fake_akelos_root() {
       File.join(File.dirname(__FILE__), 'akelos_root')
-    end
+    }
 
-    def file_list
+    public function file_list() {
       Dir.glob(File.join(fake_akelos_root, "*"))
-    end
+    }
 
-end
+}
 </php>
 
 You can run './makelos' from the plugin directory to see this fail.  Unless you are doing more advanced generator commands it typically suffices to just test the Generate script, and trust that akelos will handle the Destroy and Update commands for you.
@@ -855,13 +855,13 @@ To make it pass, create the generator:
 * *vendor/plugins/yaffle/generators/yaffle_definition/yaffle_definition_generator.php*
 
 <php>
-class YaffleDefinitionGenerator < Akelos::Generator::Base
-  def manifest
+class YaffleDefinitionGenerator extends Akelos::Generator::Base
+  public function manifest() {
     record do |m|
       m.file "definition.txt", "definition.txt"
-    end
-  end
-end
+    }
+  }
+}
 </php>
 
 h4. The +USAGE+ File
@@ -902,11 +902,11 @@ To start, add the following test method:
 * *vendor/plugins/yaffle/test/generator_test.php*
 
 <php>
-def test_generates_definition
-  Akelos::Generator::Scripts::Generate.new.run(["yaffle", "bird"], :destination => fake_akelos_root)
+public function test_generates_definition
+  Akelos::Generator::Scripts::Generate.new.run(["yaffle", "bird"], 'destination' => fake_akelos_root)
   definition = File.read(File.join(fake_akelos_root, "definition.txt"))
   assert_match /Yaffle\:/, definition
-end
+}
 </php>
 
 Run +./makelos+ to watch the test fail, then make the test pass add the following:
@@ -933,31 +933,31 @@ module Yaffle #:nodoc:
   module Generator #:nodoc:
     module Commands #:nodoc:
       module Create
-        def yaffle_definition
+        public function yaffle_definition() {
           file("definition.txt", "definition.txt")
-        end
-      end
+        }
+      }
 
       module Destroy
-        def yaffle_definition
+        public function yaffle_definition() {
           file("definition.txt", "definition.txt")
-        end
-      end
+        }
+      }
 
       module List
-        def yaffle_definition
+        public function yaffle_definition() {
           file("definition.txt", "definition.txt")
-        end
-      end
+        }
+      }
 
       module Update
-        def yaffle_definition
+        public function yaffle_definition() {
           file("definition.txt", "definition.txt")
-        end
-      end
-    end
-  end
-end
+        }
+      }
+    }
+  }
+}
 
 Akelos::Generator::Commands::Create.send   :include,  Yaffle::Generator::Commands::Create
 Akelos::Generator::Commands::Destroy.send  :include,  Yaffle::Generator::Commands::Destroy
@@ -970,11 +970,11 @@ Finally, call your new method in the manifest:
 * *vendor/plugins/yaffle/generators/yaffle/yaffle_generator.php*
 
 <php>
-class YaffleGenerator < Akelos::Generator::NamedBase
-  def manifest
+class YaffleGenerator extends Akelos::Generator::NamedBase
+  public function manifest() {
     m.yaffle_definition
-  end
-end
+  }
+}
 </php>
 
 h3. Generator Commands
@@ -993,54 +993,54 @@ require 'akelos_generator'
 require 'akelos_generator/scripts/generate'
 require 'akelos_generator/scripts/destroy'
 
-class RouteGeneratorTest < Test::Unit::TestCase
+class RouteGeneratorTest extends Test::Unit::TestCase
 
-  def setup
+  public function setup() {
     FileUtils.mkdir_p(File.join(fake_akelos_root, "config"))
-  end
+  }
 
-  def teardown
+  public function teardown() {
     FileUtils.rm_r(fake_akelos_root)
-  end
+  }
 
-  def test_generates_route
+  public function test_generates_route() {
     content = <<-END
       ActionController::Routing::Routes.draw do |map|
-        map.connect ':controller/:action/:id'
-        map.connect ':controller/:action/:id.:format'
-      end
+        $Map->connect(':controller/:action/:id'
+        $Map->connect(':controller/:action/:id.:format'
+      }
     END
     File.open(routes_path, 'wb') {|f| f.write(content) }
 
-    Akelos::Generator::Scripts::Generate.new.run(["yaffle_route"], :destination => fake_akelos_root)
+    Akelos::Generator::Scripts::Generate.new.run(["yaffle_route"], 'destination' => fake_akelos_root)
     assert_match /map\.yaffles/, File.read(routes_path)
-  end
+  }
 
-  def test_destroys_route
+  public function test_destroys_route() {
     content = <<-END
       ActionController::Routing::Routes.draw do |map|
         map.yaffles
-        map.connect ':controller/:action/:id'
-        map.connect ':controller/:action/:id.:format'
-      end
+        $Map->connect(':controller/:action/:id'
+        $Map->connect(':controller/:action/:id.:format'
+      }
     END
     File.open(routes_path, 'wb') {|f| f.write(content) }
 
-    Akelos::Generator::Scripts::Destroy.new.run(["yaffle_route"], :destination => fake_akelos_root)
+    Akelos::Generator::Scripts::Destroy.new.run(["yaffle_route"], 'destination' => fake_akelos_root)
     assert_no_match /map\.yaffles/, File.read(routes_path)
-  end
+  }
 
   private
 
-    def fake_akelos_root
+    public function fake_akelos_root() {
       File.join(File.dirname(__FILE__), "akelos_root")
-    end
+    }
 
-    def routes_path
+    public function routes_path() {
       File.join(fake_akelos_root, "config", "routes.php")
-    end
+    }
 
-end
+}
 </php>
 
 Run +./makelos+ to watch the test fail, then make the test pass add the following:
@@ -1061,34 +1061,34 @@ module Yaffle #:nodoc:
   module Generator #:nodoc:
     module Commands #:nodoc:
       module Create
-        def yaffle_route
+        public function yaffle_route() {
           logger.route "map.yaffle"
           look_for = 'ActionController::Routing::Routes.draw do |map|'
-          unless options[:pretend]
+          unless options['pretend']
             gsub_file('config/routes.php', /(#{Regexp.escape(look_for)})/mi){|match| "#{match}\n  map.yaffles\n"}
-          end
-        end
-      end
+          }
+        }
+      }
 
       module Destroy
-        def yaffle_route
+        public function yaffle_route() {
           logger.route "map.yaffle"
           gsub_file 'config/routes.php', /\n.+?map\.yaffles/mi, ''
-        end
-      end
+        }
+      }
 
       module List
-        def yaffle_route
-        end
-      end
+        public function yaffle_route() {
+        }
+      }
 
       module Update
-        def yaffle_route
-        end
-      end
-    end
-  end
-end
+        public function yaffle_route() {
+        }
+      }
+    }
+  }
+}
 
 Akelos::Generator::Commands::Create.send   :include,  Yaffle::Generator::Commands::Create
 Akelos::Generator::Commands::Destroy.send  :include,  Yaffle::Generator::Commands::Destroy
@@ -1099,13 +1099,13 @@ Akelos::Generator::Commands::Update.send   :include,  Yaffle::Generator::Command
 * *vendor/plugins/yaffle/generators/yaffle_route/yaffle_route_generator.php*
 
 <php>
-class YaffleRouteGenerator < Akelos::Generator::Base
-  def manifest
+class YaffleRouteGenerator extends Akelos::Generator::Base
+  public function manifest() {
     record do |m|
       m.yaffle_route
-    end
-  end
-end
+    }
+  }
+}
 </php>
 
 To see this work, type:
@@ -1128,18 +1128,18 @@ Let's say you have the following migration in your plugin:
 * *vendor/plugins/yaffle/lib/db/migrate/20081116181115_create_birdhouses.php:*
 
 <php>
-class CreateBirdhouses < ActiveRecord::Migration
+class CreateBirdhouses extends ActiveRecord::Migration
   public function up
-    create_table :birdhouses, :force => true do |t|
+    create_table :birdhouses, 'force' => true do |t|
       t.string :name
       t.timestamps
-    end
-  end
+    }
+  }
 
   public function down
     drop_table :birdhouses
-  end
-end
+  }
+}
 </php>
 
 Here are a few possibilities for how to allow developers to use your plugin migrations:
@@ -1156,13 +1156,13 @@ namespace :db do
     description << "Target specific version with VERSION=x. Turn off output with VERBOSE=false."
 
     desc description
-    task :yaffle => :environment do
+    task 'yaffle' => :environment do
       ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
       ActiveRecord::Migrator.migrate("vendor/plugins/yaffle/lib/db/migrate/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
       Rake::Task["db:schema:dump"].invoke if ActiveRecord.schema_format == :php
-    end
-  end
-end
+    }
+  }
+}
 </php>
 
 h4. Call Migrations Directly
@@ -1172,21 +1172,21 @@ h4. Call Migrations Directly
 <php>
 Dir.glob(File.join(File.dirname(__FILE__), "db", "migrate", "*")).each do |file|
   require file
-end
+}
 </php>
 
 * *db/migrate/20081116181115_create_birdhouses.php:*
 
 <php>
-class CreateBirdhouses < ActiveRecord::Migration
+class CreateBirdhouses extends ActiveRecord::Migration
   public function up
     Yaffle::CreateBirdhouses.up
-  end
+  }
 
   public function down
     Yaffle::CreateBirdhouses.down
-  end
-end
+  }
+}
 </php>
 
 NOTE: several plugin frameworks such as Desert and Engines provide more advanced plugin functionality.
@@ -1207,45 +1207,45 @@ require File.dirname(__FILE__) + '/test_helper.php'
 require 'akelos_generator'
 require 'akelos_generator/scripts/generate'
 
-class MigrationGeneratorTest < Test::Unit::TestCase
+class MigrationGeneratorTest extends Test::Unit::TestCase
 
-  def setup
+  public function setup() {
     FileUtils.mkdir_p(fake_akelos_root)
     @original_files = file_list
-  end
+  }
 
-  def teardown
+  public function teardown() {
     ActiveRecord.pluralize_table_names = true
     FileUtils.rm_r(fake_akelos_root)
-  end
+  }
 
-  def test_generates_correct_file_name
+  public function test_generates_correct_file_name() {
     Akelos::Generator::Scripts::Generate.new.run(["yaffle_migration", "some_name_nobody_is_likely_to_ever_use_in_a_real_migration"],
-      :destination => fake_akelos_root)
+      'destination' => fake_akelos_root)
     new_file = (file_list - @original_files).first
     assert_match /add_yaffle_fields_to_some_name_nobody_is_likely_to_ever_use_in_a_real_migrations/, new_file
     assert_match /add_column :some_name_nobody_is_likely_to_ever_use_in_a_real_migrations do |t|/, File.read(new_file)
-  end
+  }
 
-  def test_pluralizes_properly
+  public function test_pluralizes_properly() {
     ActiveRecord.pluralize_table_names = false
     Akelos::Generator::Scripts::Generate.new.run(["yaffle_migration", "some_name_nobody_is_likely_to_ever_use_in_a_real_migration"],
-      :destination => fake_akelos_root)
+      'destination' => fake_akelos_root)
     new_file = (file_list - @original_files).first
     assert_match /add_yaffle_fields_to_some_name_nobody_is_likely_to_ever_use_in_a_real_migration/, new_file
     assert_match /add_column :some_name_nobody_is_likely_to_ever_use_in_a_real_migration do |t|/, File.read(new_file)
-  end
+  }
 
   private
-    def fake_akelos_root
+    public function fake_akelos_root() {
       File.join(File.dirname(__FILE__), 'akelos_root')
-    end
+    }
 
-    def file_list
+    public function file_list() {
       Dir.glob(File.join(fake_akelos_root, "db", "migrate", "*"))
-    end
+    }
 
-end
+}
 </php>
 
 NOTE: the migration generator checks to see if a migation already exists, and it's hard-coded to check the 'db/migrate' directory.  As a result, if your test tries to generate a migration that already exists in the app, it will fail.  The easy workaround is to make sure that the name you generate in your test is very unlikely to actually appear in the app.
@@ -1255,31 +1255,31 @@ After running the test with './makelos' you can make it pass with:
 * *vendor/plugins/yaffle/generators/yaffle_migration/yaffle_migration_generator.php*
 
 <php>
-class YaffleMigrationGenerator < Akelos::Generator::NamedBase
-  def manifest
+class YaffleMigrationGenerator extends Akelos::Generator::NamedBase
+  public function manifest() {
     record do |m|
-      m.migration_template 'migration:migration.php', "db/migrate", {:assigns => yaffle_local_assigns,
-        :migration_file_name => "add_yaffle_fields_to_#{custom_file_name}"
+      m.migration_template 'migration:migration.php', "db/migrate", {'assigns' => yaffle_local_assigns,
+        'migration_file_name' => "add_yaffle_fields_to_#{custom_file_name}"
       }
-    end
-  end
+    }
+  }
 
   private
-    def custom_file_name
+    public function custom_file_name() {
       custom_name = class_name.underscore.downcase
       custom_name = custom_name.pluralize if ActiveRecord.pluralize_table_names
       custom_name
-    end
+    }
 
-    def yaffle_local_assigns
+    public function yaffle_local_assigns() {
       returning(assigns = {}) do
-        assigns[:migration_action] = "add"
-        assigns[:class_name] = "add_yaffle_fields_to_#{custom_file_name}"
-        assigns[:table_name] = custom_file_name
-        assigns[:attributes] = [Akelos::Generator::GeneratedAttribute.new("last_squawk", "string")]
-      end
-    end
-end
+        assigns['migration_action'] = "add"
+        assigns['class_name'] = "add_yaffle_fields_to_#{custom_file_name}"
+        assigns['table_name'] = custom_file_name
+        assigns['attributes'] = [Akelos::Generator::GeneratedAttribute.new("last_squawk", "string")]
+      }
+    }
+}
 </php>
 
 The generator creates a new file in 'db/migrate' with a timestamp and an 'add_column' statement.  It reuses the built in akelos +migration_template+ method, and reuses the built-in akelos migration template.
@@ -1297,15 +1297,15 @@ and you will see a new file:
 * *db/migrate/20080529225649_add_yaffle_fields_to_birds.php*
 
 <php>
-class AddYaffleFieldsToBirds < ActiveRecord::Migration
+class AddYaffleFieldsToBirds extends ActiveRecord::Migration
   public function up
     add_column :birds, :last_squawk, :string
-  end
+  }
 
   public function down
     remove_column :birds, :last_squawk
-  end
-end
+  }
+}
 </php>
 
 h3. Makelos tasks
@@ -1319,10 +1319,10 @@ Many plugin authors put all of their makelos tasks into a common namespace that 
 <php>
 namespace :yaffle do
   desc "Prints out the word 'Yaffle'"
-  task :squawk => :environment do
+  task 'squawk' => :environment do
     puts "squawk!"
-  end
-end
+  }
+}
 </php>
 
 When you run +./makelos -T+ from your plugin you will see:
@@ -1367,12 +1367,12 @@ spec = Gem::Specification.new do |s|
   s.require_path = "lib"
   s.has_rdoc = false
   s.extra_rdoc_files = ["README"]
-end
+}
 
 desc 'Turn this plugin into a gem.'
 Rake::GemPackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec
-end
+}
 </php>
 
 To build and install the gem locally, run the following commands:
@@ -1432,12 +1432,12 @@ require "yaffle/routing"
   $LOAD_PATH << path
   ActiveSupport::Dependencies.load_paths << path
   ActiveSupport::Dependencies.load_once_paths.delete(path)
-end
+}
 
 # optionally:
 # Dir.glob(File.join(File.dirname(__FILE__), "db", "migrate", "*")).each do |file|
 #   require file
-# end
+# }
 </php>
 
 h4. Final Plugin Directory Structure

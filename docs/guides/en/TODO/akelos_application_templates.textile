@@ -37,12 +37,12 @@ Akelos templates API is very self explanatory and easy to understand. Here's an 
 # template.php
 run "rm public/index.html"
 generate(:scaffold, "person name:string")
-route "map.root :controller => 'people'"
+route "map.root 'controller' => 'people'"
 ./makelos("db:migrate")
 
 git :init
-git :add => "."
-git :commit => "-a -m 'Initial commit'"
+git 'add' => "."
+git 'commit' => "-a -m 'Initial commit'"
 </php>
 
 The following sections outlines the primary methods provided by the API :
@@ -55,7 +55,7 @@ For example, if your application depends on the gems +bj+ and +hpricot+ :
 
 <php>
 gem "bj"
-gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
+gem "hpricot", 'version' => '0.6', 'source' => "http://code.whytheluckystiff.net"
 </php>
 
 Please note that this will NOT install the gems for you. So you may want to run the +./makelos gems:install+ task too :
@@ -73,14 +73,14 @@ Installs a plugin to the generated application.
 Plugin can be installed from Git :
 
 <php>
-plugin 'authentication', :git => 'git://github.com/foor/bar.git'
+plugin 'authentication', 'git' => 'git://github.com/foor/bar.git'
 </php>
 
 You can even install plugins as git submodules :
 
 <php>
-plugin 'authentication', :git => 'git://github.com/foor/bar.git', 
-                         :submodule => true
+plugin 'authentication', 'git' => 'git://github.com/foor/bar.git', 
+                         'submodule' => true
 </php>
 
 Please note that you need to +git :init+ before you can install a plugin as a submodule.
@@ -88,7 +88,7 @@ Please note that you need to +git :init+ before you can install a plugin as a su
 Or use plain old SVN :
 
 <php>
-plugin 'wtfsvn', :svn => 'svn://crap.com/wtf/trunk'
+plugin 'wtfsvn', 'svn' => 'svn://crap.com/wtf/trunk'
 </php>
 
 h4. vendor/lib/file/initializer(filename, data = nil, &block)
@@ -100,14 +100,14 @@ Lets say you like using +Object#not_nil?+ and +Object#not_blank?+ :
 <php>
 initializer 'bloatlol.php', <<-CODE
 class Object
-  def not_nil?
+  public function is_not_nil() {
     !nil?
-  end
+  }
   
-  def not_blank?
+  public function is_not_blank() {
     !blank?
-  end
-end
+  }
+}
 CODE
 </php>
 
@@ -118,7 +118,7 @@ There is even +file()+, which accepts a relative path from +AK_BASE_DIR+ and cre
 <php>
 file 'app/components/foo.php', <<-CODE
 class Foo
-end
+}
 CODE
 </php>
 
@@ -134,10 +134,10 @@ Creates a new makelos file under +lib/tasks+ with the supplied tasks :
     namespace :boot do
       task :strap do
         puts "i like boots!"
-      end
-    end
+      }
+    }
   TASK
-end
+}
 </php>
 
 The above creates +lib/tasks/bootstrap../makelos+ with a +boot:strap+ makelos task.
@@ -169,13 +169,13 @@ Runs the supplied makelos tasks in the Akelos application. Let's say you want to
 You can also run makelos tasks with a different Akelos environment :
 
 <php>
-./makelos "db:migrate", :env => 'production'
+./makelos "db:migrate", 'env' => 'production'
 </php>
 
 Or even use sudo :
 
 <php>
-./makelos "gems:install", :sudo => true
+./makelos "gems:install", 'sudo' => true
 </php>
 
 h4. route(routing_code)
@@ -183,7 +183,7 @@ h4. route(routing_code)
 This adds a routing entry to the +config/routes.php+ file. In above steps, we generated a person scaffold and also removed +public/index.html+. Now to make +PeopleController#index+ as the default page for the application :
 
 <php>
-route "map.root :controller => :person"
+route "map.root 'controller' => :person"
 </php>
 
 h4. inside(dir)
@@ -193,7 +193,7 @@ I have my edge akelos lying at +~/commit-akelos/akelos+. So every time i have to
 <php>
 inside('vendor') do
   run "ln -s ~/commit-akelos/akelos akelos"
-end
+}
 </php>
 
 So +inside()+ runs the command from the given directory.
@@ -208,7 +208,7 @@ lib_name << ".php" unless lib_name.index(".php")
 
 lib lib_name, <<-CODE
 class Shiny
-end
+}
 CODE
 </php>
 
@@ -221,13 +221,13 @@ These methods let you ask questions from templates and decide the flow based on 
 no?(question) acts just the opposite.
 </php>
 
-h4. git(:must => "-a love")
+h4. git('must' => "-a love")
 
 Akelos templates let you run any git command :
 
 <php>
 git :init
-git :add => "."
-git :commit => "-a -m 'Initial commit'"
+git 'add' => "."
+git 'commit' => "-a -m 'Initial commit'"
 </php>
 

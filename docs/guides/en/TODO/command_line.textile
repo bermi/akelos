@@ -142,12 +142,12 @@ Look there! Now what all did this generate? It looks like it made sure a bunch o
 Let's check out the controller and modify it a little (in +app/controllers/greetings_controller.php+):
 
 <php>
-class GreetingsController < ApplicationController
-  def hello
+class GreetingsController extends ApplicationController
+  public function hello() {
     @message = "Hello, how are you today? I am exuberant!"
-  end
+  }
 
-end
+}
 </php>
 
 Then the view, to display our nice message (in +app/views/greetings/hello.html.tpl+):
@@ -445,20 +445,20 @@ $ touch ~/.akelos/generators/tutorial_test/tutorial_test_generator.php
 We'll fill +tutorial_test_generator.php+ out with:
 
 <php>
-class TutorialTestGenerator < Akelos::Generator::Base
-  def initialize(*runtime_args)
+class TutorialTestGenerator extends Akelos::Generator::Base
+  public function initialize() {(*runtime_args)
     super(*runtime_args)
     @tut_args = runtime_args
-  end
+  }
 
-  def manifest
+  public function manifest() {
     record do |m|
       m.directory "public"
       m.template "tutorial.tpl", File.join("public", "tutorial.txt"),
-        :assigns => { :args => @tut_args }
-    end
-  end
-end
+        'assigns' => { 'args' => @tut_args }
+    }
+  }
+}
 </php>
 
 We take whatever args are supplied, save them to an instance variable, and literally copying from the Akelos source, implement a +manifest+ method, which calls +record+ with a block, and we:
@@ -466,7 +466,7 @@ We take whatever args are supplied, save them to an instance variable, and liter
 * Check there's a *public* directory. You bet there is.
 * Run the ERb template called "tutorial.tpl".
 * Save it into "Akelos.root/public/tutorial.txt".
-* Pass in the arguments we saved through the +:assign+ parameter.
+* Pass in the arguments we saved through the +'assign'+ parameter.
 
 Next we'll build the template:
 

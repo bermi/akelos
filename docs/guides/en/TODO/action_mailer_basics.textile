@@ -33,22 +33,22 @@ h5. Edit the Model
 +app/models/user_mailer.php+ contains an empty mailer:
 
 <php>
-class UserMailer < ActionMailer::Base
-end
+class UserMailer extends ActionMailer::Base
+}
 </php>
 
 Let's add a method called +welcome_email+, that will send an email to the user's registered email address:
 
 <php>
-class UserMailer < ActionMailer::Base
-  def welcome_email(user)
+class UserMailer extends ActionMailer::Base
+  public function welcome_email($user) {
     recipients    user.email
     from          "My Awesome Site Notifications <notifications@example.com>"
     subject       "Welcome to My Awesome Site"
     sent_on       Time.now
-    body(         {:user => user, :url => "http://example.com/login"})
-  end
-end
+    body(         {'user' => user, 'url' => "http://example.com/login"})
+  }
+}
 </php>
 
 Here is a quick explanation of the options presented in the preceding method. For a full list of all available options, please have a look further down at the Complete List of ActionMailer user-settable attributes section.
@@ -58,7 +58,7 @@ Here is a quick explanation of the options presented in the preceding method. Fo
 |subject| The subject of the email|
 |sent_on| The timestamp for the email|
 
-The keys of the hash passed to +body+ become instance variables in the view. Thus, in our example the mailer view will have a +@user+ and a +@url+ instance variables available.
+The keys of the array passed to +body+ become instance variables in the view. Thus, in our example the mailer view will have a +@user+ and a +@url+ instance variables available.
 
 h5. Create a Mailer View
 
@@ -95,7 +95,7 @@ In +config/environment.php+:
 Akelos::Initializer.run do |config|
   # ...
   config.active_record.observers = :user_observer
-end
+}
 </php>
 
 You can place the observer in +app/models+ where it will be loaded automatically by Akelos.
@@ -103,11 +103,11 @@ You can place the observer in +app/models+ where it will be loaded automatically
 Now create a file called +user_observer.php+ in +app/models+ depending on where you stored it, and make it look like:
 
 <php>
-class UserObserver < ActiveRecord::Observer
-  def after_create(user)
+class UserObserver extends ActiveRecord::Observer
+  public function after_create($user) {
     UserMailer.deliver_welcome_email(user)
-  end
-end
+  }
+}
 </php>
 
 Notice how we call +deliver_welcome_email+? In Action Mailer we send emails by calling +deliver_&lt;method_name&gt;+. In UserMailer, we defined a method called +welcome_email+, and so we deliver the email by calling +deliver_welcome_email+. The next section will go through how Action Mailer achieves this.
@@ -123,14 +123,14 @@ So, how exactly does this work?
 Looking at the +ActionMailer::Base+ source, you will find this:
 
 <php>
-def method_missing(method_symbol, *parameters)#:nodoc:
+public function method_missing(method_symbol, *parameters)#:nodoc:
   case method_symbol.id2name
     when /^create_([_a-z]\w*)/  then new($1, *parameters).mail
     when /^deliver_([_a-z]\w*)/ then new($1, *parameters).deliver!
     when "new" then nil
     else super
-  end
-end
+  }
+}
 </php>
 
 Hence, if the method name starts with +deliver_+ followed by any combination of lowercase letters or underscore, +method_missing+  calls +new+ on your mailer class (+UserMailer+ in our example above), sending the combination of lower case letters or underscore, along with the parameters. The resulting object is then sent the +deliver!+ method, which well... delivers it.
@@ -138,7 +138,7 @@ Hence, if the method name starts with +deliver_+ followed by any combination of 
 h4. Complete List of Action Mailer User-Settable Attributes
 
 |bcc| The BCC addresses of the email, either as a string (for a single address) or an array of strings (for multiple addresses)|
-|body| The body of the email. This is either a hash (in which case it specifies the variables to pass to the template when it is rendered), or a string, in which case it specifies the actual body of the message|
+|body| The body of the email. This is either an array (in which case it specifies the variables to pass to the template when it is rendered), or a string, in which case it specifies the actual body of the message|
 |cc| The CC addresses for the email, either as a string (for a single address) or an array of strings (for multiple addresses)|
 |charset| The charset to use for the email. This defaults to the +default_charset+ specified for ActionMailer::Base.|
 |content_type| The content type for the email. This defaults to "text/plain" but the filename may specify it|
@@ -159,18 +159,18 @@ Mailer views are located in the +app/views/name_of_mailer_class+ directory. The 
 To change the default mailer view for your action you do something like:
 
 <php>
-class UserMailer < ActionMailer::Base
-  def welcome_email(user)
+class UserMailer extends ActionMailer::Base
+  public function welcome_email($user) {
     recipients    user.email
     from          "My Awesome Site Notifications<notifications@example.com>"
     subject       "Welcome to My Awesome Site"
     sent_on       Time.now
-    body(         {:user => user, :url => "http://example.com/login"})
+    body(         {'user' => user, 'url' => "http://example.com/login"})
     content_type  "text/html"
     # use some_other_template.text.(html|plain).tpl instead
     template "some_other_template"
-  end
-end
+  }
+}
 </php>
 
 h4. Action Mailer Layouts
@@ -178,9 +178,9 @@ h4. Action Mailer Layouts
 Just like controller views, you can also have mailer layouts. The layout name needs to end in "_mailer" to be automatically recognized by your mailer as a layout. So in our UserMailer example, we need to call our layout +user_mailer.text.(html|plain).tpl+. In order to use a different file just use:
 
 <php>
-class UserMailer < ActionMailer::Base
+class UserMailer extends ActionMailer::Base
   layout 'awesome' # use awesome.text.(html|plain).tpl as the layout
-end
+}
 </php>
 
 Just like with controller views, use +yield+ to render the view inside the layout.
@@ -188,34 +188,34 @@ Just like with controller views, use +yield+ to render the view inside the layou
 h4. Generating URLs in Action Mailer Views
 
 URLs can be generated in mailer views using +url_for+ or named routes.
-Unlike controllers, the mailer instance doesn't have any context about the incoming request so you'll need to provide the +:host+, +:controller+, and +:action+:
+Unlike controllers, the mailer instance doesn't have any context about the incoming request so you'll need to provide the +'host'+, +'controller'+, and +'action'+:
 
 <tpl>
-<%= url_for(:host => "example.com", :controller => 'welcome', :action => 'greeting') %>
+<%= url_for('host' => "example.com", 'controller' => 'welcome', 'action' => 'greeting') %>
 </tpl>
 
-When using named routes you only need to supply the +:host+:
+When using named routes you only need to supply the +'host'+:
 
 <tpl>
-<%= users_url(:host => "example.com") %>
+<%= users_url('host' => "example.com") %>
 </tpl>
 
 Email clients have no web context and so paths have no base URL to form complete web addresses. Thus, when using named routes only the "_url" variant makes sense.
 
-It is also possible to set a default host that will be used in all mailers by setting the +:host+ option in
-the +ActionMailer::Base.default_url_options+ hash as follows:
+It is also possible to set a default host that will be used in all mailers by setting the +'host'+ option in
+the +ActionMailer::Base.defaultUrlOptions+ array as follows:
 
 <tpl>
-ActionMailer::Base.default_url_options[:host] = "example.com"
+ActionMailer::Base.defaultUrlOptions['host'] = "example.com"
 </tpl>
 
 This can also be set as a configuration option in +config/environment.php+:
 
 <tpl>
-config.action_mailer.default_url_options = { :host => "example.com" }
+config.action_mailer.defaultUrlOptions = { 'host' => "example.com" }
 </tpl>
 
-If you set a default +:host+ for your mailers you need to pass +:only_path => false+ to +url_for+. Otherwise it doesn't get included.
+If you set a default +'host'+ for your mailers you need to pass +'only_path' => false+ to +url_for+. Otherwise it doesn't get included.
 
 h4. Sending Multipart Emails
 
@@ -224,21 +224,21 @@ Action Mailer will automatically send multipart emails if you have different tem
 To explicitly specify multipart messages, you can do something like:
 
 <php>
-class UserMailer < ActionMailer::Base
-  def welcome_email(user)
+class UserMailer extends ActionMailer::Base
+  public function welcome_email($user) {
     recipients      user.email_address
     subject         "New account information"
     from            "system@example.com"
     content_type    "multipart/alternative"
 
-    part :content_type => "text/html",
-      :body => "<p>html content, can also be the name of an action that you call<p>"
+    part 'content_type' => "text/html",
+      'body' => "<p>html content, can also be the name of an action that you call<p>"
 
     part "text/plain" do |p|
       p.body = "text content, can also be the name of an action that you call"
-    end
-  end
-end
+    }
+  }
+}
 </php>
 
 h4. Sending Emails with Attachments
@@ -246,21 +246,21 @@ h4. Sending Emails with Attachments
 Attachments can be added by using the +attachment+ method:
 
 <php>
-class UserMailer < ActionMailer::Base
-  def welcome_email(user)
+class UserMailer extends ActionMailer::Base
+  public function welcome_email($user) {
     recipients      user.email_address
     subject         "New account information"
     from            "system@example.com"
     content_type    "multipart/alternative"
 
-    attachment :content_type => "image/jpeg",
-      :body => File.read("an-image.jpg")
+    attachment 'content_type' => "image/jpeg",
+      'body' => File.read("an-image.jpg")
 
     attachment "application/pdf" do |a|
       a.body = generate_your_pdf_here()
-    end
-  end
-end
+    }
+  }
+}
 </php>
 
 h4. Sending Multipart Emails with Attachments
@@ -270,30 +270,30 @@ Once you use the +attachment+ method, ActionMailer will no longer automagically 
 In the following example, there would be two template files, +welcome_email_html.tpl+ and +welcome_email_plain.tpl+ in the +app/views/user_mailer+ folder.  The +text/plain+ part must be listed first for full compatibility with email clients.  If +text/plain+ is listed after +text/html+, some clients may display both the HTML and plain text versions of the email.  The text alternatives alone must be enclosed in a +multipart/alternative+ part.  Do not set the entire message's +content_type+ to +multipart/alternative+ or some email clients may ignore the display of attachments such as PDF's.
 
 <php>
-class UserMailer < ActionMailer::Base
-  def welcome_email(user)
+class UserMailer extends ActionMailer::Base
+  public function welcome_email($user) {
     recipients      user.email_address
     subject         "New account information"
     from            "system@example.com"
 
     part "multipart/alternative" do |pt|
       pt.part "text/plain" do |p|
-        p.body = render_message("welcome_email_plain", :message => "text content")
-      end
+        p.body = render_message("welcome_email_plain", 'message' => "text content")
+      }
 
       pt.part "text/html" do |p|
-        p.body = render_message("welcome_email_html", :message => "<h1>HTML content</h1>")
-      end
-    end
+        p.body = render_message("welcome_email_html", 'message' => "<h1>HTML content</h1>")
+      }
+    }
 
-    attachment :content_type => "image/jpeg",
-      :body => File.read("an-image.jpg")
+    attachment 'content_type' => "image/jpeg",
+      'body' => File.read("an-image.jpg")
 
     attachment "application/pdf" do |a|
       a.body = generate_your_pdf_here()
-    end
-  end
-end
+    }
+  }
+}
 </php>
 
 h3. Receiving Emails
@@ -307,24 +307,24 @@ Receiving and parsing emails with Action Mailer can be a rather complex endeavou
 Once a method called +receive+ is defined in any mailer, Action Mailer will parse the raw incoming email into an email object, decode it, instantiate a new mailer, and pass the email object to the mailer +receive+ instance method. Here's an example:
 
 <php>
-class UserMailer < ActionMailer::Base
-  def receive(email)
+class UserMailer extends ActionMailer::Base
+  public function receive($email) {
     page = Page.find_by_address(email.to.first)
     page.emails.create(
-      :subject => email.subject,
-      :body => email.body
+      'subject' => email.subject,
+      'body' => email.body
     )
 
     if email.has_attachments?
       for attachment in email.attachments
         page.attachments.create({
-          :file => attachment,
-          :description => email.subject
+          'file' => attachment,
+          'description' => email.subject
         })
-      end
-    end
-  end
-end
+      }
+    }
+  }
+}
 </php>
 
 h3. Using Action Mailer Helpers
@@ -332,8 +332,8 @@ h3. Using Action Mailer Helpers
 Action Mailer classes have 4 helper methods available to them:
 
 |add_template_helper(helper_module)|Makes all the (instance) methods in the helper module available to templates rendered through this controller.|
-|helper(*args, &block)| Declare a helper: helper :foo requires 'foo_helper' and includes FooHelper in the template class.  helper FooHelper includes FooHelper in the template class.  helper { def foo() "#{bar} is the very best" end } evaluates the block in the template class, adding method foo.  helper(:three, BlindHelper) { def mice() 'mice' end } does all three. |
-|helper_method| Declare a controller method as a helper.  For example, helper_method :link_to def link_to(name, options) ... end makes the link_to controller method available in the view.|
+|helper(*args, &block)| Declare a helper: helper :foo requires 'foo_helper' and includes FooHelper in the template class.  helper FooHelper includes FooHelper in the template class.  helper { public function foo() "#{bar} is the very best" end } evaluates the block in the template class, adding method foo.  helper(:three, BlindHelper) { public function mice() 'mice' end } does all three. |
+|helper_method| Declare a controller method as a helper.  For example, helper_method :link_to public function link_to(name, options) ... end makes the link_to controller method available in the view.|
 |helper_attr| Declare a controller attribute as a helper.  For example, helper_attr :name attr_accessor :name makes the name and name= controller methods available in the view.  The is a convenience wrapper for helper_method.|
 
 h3. Action Mailer Configuration
@@ -361,8 +361,8 @@ An example would be:
 <php>
 ActionMailer::Base.delivery_method = :sendmail
 ActionMailer::Base.sendmail_settings = {
-  :location => '/usr/sbin/sendmail',
-  :arguments => '-i -t'
+  'location' => '/usr/sbin/sendmail',
+  'arguments' => '-i -t'
 }
 ActionMailer::Base.perform_deliveries = true
 ActionMailer::Base.raise_delivery_errors = true
@@ -382,7 +382,7 @@ ActionMailer::Base.smtp_settings = {
   :domain         => "domain.com",
   :user_name      => "user@domain.com",
   :password       => 'password',
-  :authentication => :plain
+  'authentication' => :plain
 }
 </php>
 
@@ -401,8 +401,8 @@ By default Action Mailer does not send emails in the test environment. They are 
 Testing mailers normally involves two things: One is that the mail was queued, and the other one that the email is correct. With that in mind, we could test our example mailer from above like so:
 
 <php>
-class UserMailerTest < ActionMailer::TestCase
-  def test_welcome_email
+class UserMailerTest extends ActionMailer::TestCase
+  public function test_welcome_email() {
     user = users(:some_user_in_your_fixtures)
 
     # Send the email, then test that it got queued
@@ -413,8 +413,8 @@ class UserMailerTest < ActionMailer::TestCase
     assert_equal [user.email], email.to
     assert_equal "Welcome to My Awesome Site", email.subject
     assert_match /Welcome to example.com, #{user.first_name}/, email.body
-  end
-end
+  }
+}
 </php>
 
 In the test we send the email and store the returned object in the +email+ variable. We then ensure that it was sent (the first assert), then, in the second batch of assertions, we ensure that the email does indeed contain the what we expect.

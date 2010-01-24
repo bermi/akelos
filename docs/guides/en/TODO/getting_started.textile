@@ -340,12 +340,12 @@ class CreatePosts extends AkActiveRecordMigration{
       t.text :content
 
       t.timestamps
-    end
-  end
+    }
+  }
 
   public function down
     drop_table :posts
-  end
+  }
 }
 </php>
 
@@ -402,8 +402,8 @@ Akelos includes methods to help you validate the data that you send to models. O
 <php>
 class Post extends ActiveRecord {
   validates_presence_of :name, :title
-  validates_length_of :title, :minimum => 5
-end
+  validates_length_of :title, 'minimum' => 5
+}
 </php>
 
 These changes will ensure that all posts have a name and a title, and that the title is at least five characters long. Akelos can validate a variety of conditions in a model, including the presence or uniqueness of columns, their format, and the existence of associated objects.
@@ -419,10 +419,10 @@ $ ./makelos console
 After the console loads, you can use it to work with your application's models:
 
 <shell>
->> p = Post.create(:content => "A new post")
+>> p = Post.create('content' => "A new post")
 => #<Post id: nil, name: nil, title: nil, content: "A new post",
 created_at: nil, updated_at: nil>
->> p.save
+>> p->save()
 => false
 >> p.errors
 => #<ActiveRecord::Errors:0x23bcf0c @base=#<Post id: nil, name: nil,
@@ -440,14 +440,14 @@ h4. Listing All Posts
 The easiest place to start looking at functionality is with the code that lists all posts. Open the file +app/controllers/posts_controller.php + and look at the +index+ action:
 
 <php>
-def index
+public function index
   @posts = Post.all
 
   respond_to do |format|
     format.html # index.html.tpl
-    format.xml  { render :xml => @posts }
-  end
-end
+    format.xml  { render 'xml' => @posts }
+  }
+}
 </php>
 
 This code sets the +@posts+ instance variable to an array of all posts in the database. +Post.find(:all)+ or +Post.all+ calls the +Post+ model to return all of the posts that are currently in the database, with no limiting conditions.
@@ -473,8 +473,8 @@ The +respond_to+ block handles both HTML and XML calls to this action. If you br
     <td><%=h post.content %></td>
     <td><%= link_to 'Show', post %></td>
     <td><%= link_to 'Edit', edit_post_path(post) %></td>
-    <td><%= link_to 'Destroy', post, :confirm => 'Are you sure?',
-            :method => :delete %></td>
+    <td><%= link_to 'Destroy', post, 'confirm' => 'Are you sure?',
+            'method' => :delete %></td>
   </tr>
 <% end %>
 </table>
@@ -509,7 +509,7 @@ The view is only part of the story of how HTML is displayed in your web browser.
 </head>
 <body style="background: #EEEEEE;">
 
-<p style="color: green"><%= flash[:notice] %></p>
+<p style="color: green"><%= flash['notice'] %></p>
 
 <%= yield  %>
 
@@ -524,14 +524,14 @@ h4. Creating New Posts
 Creating a new post involves two actions. The first is the +new+ action, which instantiates an empty +Post+ object:
 
 <php>
-def new
-  @post = Post.new
+public function new
+  @post = new Post
 
   respond_to do |format|
     format.html # new.html.tpl
-    format.xml  { render :xml => @post }
-  end
-end
+    format.xml  { render 'xml' => @post }
+  }
+}
 </php>
 
 The +new.html.tpl+ view displays this empty Post to the user:
@@ -569,41 +569,41 @@ TIP: If you need to create an HTML form that displays arbitrary fields, not tied
 When the user clicks the +Create+ button on this form, the browser will send information back to the +create+ method of the controller (Akelos knows to call the +create+ method because the form is sent with an HTTP POST request; that's one of the conventions that I mentioned earlier):
 
 <php>
-def create
-  @post = Post.new($this->params['post'])
+public function create
+  @post = new Post($this->params['post'])
 
   respond_to do |format|
-    if @post.save
-      flash[:notice] = 'Post was successfully created.'
-      format.html { redirect_to(@post) }
-      format.xml  { render :xml => @post, :status => :created,
-	                :location => @post }
+    if @post->save()
+      flash['notice'] = 'Post was successfully created.'
+      format.html { $this->redirectTo((@post) }
+      format.xml  { render 'xml' => @post, 'status' => :created,
+	                'location' => @post }
     else
-      format.html { render :action => 'new' }
-      format.xml  { render :xml => @post.errors,
-	                :status => :unprocessable_entity }
-    end
-  end
-end
+      format.html { render 'action' => 'new' }
+      format.xml  { render 'xml' => @post.errors,
+	                'status' => :unprocessable_entity }
+    }
+  }
+}
 </php>
 
-The +create+ action instantiates a new Post object from the data supplied by the user on the form, which Akelos makes available in the +params+ hash. After saving the new post, it uses +flash[:notice]+ to create an informational message for the user, and redirects to the show action for the post. If there's any problem, the +create+ action just shows the +new+ view a second time, with any error messages.
+The +create+ action instantiates a new Post object from the data supplied by the user on the form, which Akelos makes available in the +params+ array. After saving the new post, it uses +flash['notice']+ to create an informational message for the user, and redirects to the show action for the post. If there's any problem, the +create+ action just shows the +new+ view a second time, with any error messages.
 
-Akelos provides the +flash+ hash (usually just called the Flash) so that messages can be carried over to another action, providing the user with useful information on the status of their request. In the case of +create+, the user never actually sees any page rendered during the Post creation process, because it immediately redirects to the new Post as soon Akelos saves the record. The Flash carries over a message to the next action, so that when the user is redirected back to the +show+ action, they are presented with a message saying "Post was successfully created."
+Akelos provides the +flash+ array (usually just called the Flash) so that messages can be carried over to another action, providing the user with useful information on the status of their request. In the case of +create+, the user never actually sees any page rendered during the Post creation process, because it immediately redirects to the new Post as soon Akelos saves the record. The Flash carries over a message to the next action, so that when the user is redirected back to the +show+ action, they are presented with a message saying "Post was successfully created."
 
 h4. Showing an Individual Post
 
-When you click the +show+ link for a post on the index page, it will bring you to a URL like +http://localhost:3000/posts/1+. Akelos interprets this as a call to the +show+ action for the resource, and passes in +1+ as the +:id+ parameter. Here's the +show+ action:
+When you click the +show+ link for a post on the index page, it will bring you to a URL like +http://localhost:3000/posts/1+. Akelos interprets this as a call to the +show+ action for the resource, and passes in +1+ as the +'id'+ parameter. Here's the +show+ action:
 
 <php>
-def show
+public function show
   @post = Post.find($this->params['id'])
 
   respond_to do |format|
     format.html # show.html.tpl
-    format.xml  { render :xml => @post }
-  end
-end
+    format.xml  { render 'xml' => @post }
+  }
+}
 </php>
 
 The +show+ action uses +Post.find+ to search for a single record in the database by its id value. After finding the record, Akelos displays it by using +show.html.tpl+:
@@ -634,9 +634,9 @@ h4. Editing Posts
 Like creating a new post, editing a post is a two-part process. The first step is a request to +edit_post_path(@post)+ with a particular post. This calls the +edit+ action in the controller:
 
 <php>
-def edit
+public function edit
   @post = Post.find($this->params['id'])
-end
+}
 </php>
 
 After finding the requested post, Akelos uses the +edit.html.tpl+ view to display it:
@@ -671,24 +671,24 @@ After finding the requested post, Akelos uses the +edit.html.tpl+ view to displa
 Submitting the form created by this view will invoke the +update+ action within the controller:
 
 <php>
-def update
+public function update
   @post = Post.find($this->params['id'])
 
   respond_to do |format|
     if @post.update_attributes($this->params['post'])
-      flash[:notice] = 'Post was successfully updated.'
-      format.html { redirect_to(@post) }
+      flash['notice'] = 'Post was successfully updated.'
+      format.html { $this->redirectTo((@post) }
       format.xml  { head :ok }
     else
-      format.html { render :action => 'edit' }
-      format.xml  { render :xml => @post.errors,
-	                :status => :unprocessable_entity }
-    end
-  end
-end
+      format.html { render 'action' => 'edit' }
+      format.xml  { render 'xml' => @post.errors,
+	                'status' => :unprocessable_entity }
+    }
+  }
+}
 </php>
 
-In the +update+ action, Akelos first uses the +:id+ parameter passed back from the edit view to locate the database record that's being edited. The +update_attributes+ call then takes the rest of the parameters from the request and applies them to this record. If all goes well, the user is redirected to the post's +show+ view. If there are any problems, it's back to +edit+ to correct them.
+In the +update+ action, Akelos first uses the +'id'+ parameter passed back from the edit view to locate the database record that's being edited. The +update_attributes+ call then takes the rest of the parameters from the request and applies them to this record. If all goes well, the user is redirected to the post's +show+ view. If there are any problems, it's back to +edit+ to correct them.
 
 NOTE. Sharp-eyed readers will have noticed that the +form_for+ declaration is identical for the +new+ and +edit+ views. Akelos generates different code for the two forms because it's smart enough to notice that in the one case it's being passed a new record that has never been saved, and in the other case an existing record that has already been saved to the database. In a production Akelos application, you would ordinarily eliminate this duplication by moving identical code to a _partial template_, which you could then include in both parent templates. But the scaffold generator tries not to make too many assumptions, and generates code that's easy to modify if you want different forms for +create+ and +edit+.
 
@@ -697,15 +697,15 @@ h4. Destroying a Post
 Finally, clicking one of the +destroy+ links sends the associated id to the +destroy+ action:
 
 <php>
-def destroy
+public function destroy
   @post = Post.find($this->params['id'])
   @post.destroy
 
   respond_to do |format|
-    format.html { redirect_to(posts_url) }
+    format.html { $this->redirectTo((posts_url) }
     format.xml  { head :ok }
-  end
-end
+  }
+}
 </php>
 
 The +destroy+ method of an Active Record model instance removes the corresponding record from the database. After that's done, there isn't any record to display, so Akelos redirects the user's browser to the index view for the model.
@@ -723,7 +723,7 @@ As you saw earlier, the scaffold-generated views for the +new+ and +edit+ action
 <tpl>
 <h1>New post</h1>
 
-<%= render :partial => 'form' %>
+<%= render 'partial' => 'form' %>
 
 <%= link_to 'Back', posts_path %>
 </tpl>
@@ -733,7 +733,7 @@ As you saw earlier, the scaffold-generated views for the +new+ and +edit+ action
 <tpl>
 <h1>Editing post</h1>
 
-<%= render :partial => 'form' %>
+<%= render 'partial' => 'form' %>
 
 <%= link_to 'Show', @post %> |
 <%= link_to 'Back', posts_path %>
@@ -772,59 +772,59 @@ h4. Using Filters to Eliminate Controller Duplication
 At this point, if you look at the controller for posts, you'll see some duplication:
 
 <php>
-class PostsController < ApplicationController
+class PostsController extends ApplicationController
   # ...
-  def show
+  public function show() {
     @post = Post.find($this->params['id'])
   # ...
-  end
+  }
 
-  def edit
+  public function edit() {
     @post = Post.find($this->params['id'])
-  end
+  }
 
-  def update
+  public function update() {
     @post = Post.find($this->params['id'])
     # ...
-  end
+  }
 
-  def destroy
+  public function destroy() {
     @post = Post.find($this->params['id'])
     # ...
-  end
-end
+  }
+}
 </php>
 
 Four instances of the exact same line of code doesn't seem very DRY. Akelos provides _filters_ as a way to address this sort of repeated code. In this case, you can DRY things up by using a +before_filter+:
 
 <php>
-class PostsController < ApplicationController
+class PostsController extends ApplicationController
   before_filter :find_post,
-    :only => [:show, :edit, :update, :destroy]
+    'only' => [:show, :edit, :update, :destroy]
   # ...
-  def show
+  public function show() {
   # ...
-  end
+  }
 
-  def edit
-  end
+  public function edit() {
+  }
 
-  def update
+  public function update() {
     # ...
-  end
+  }
 
-  def destroy
+  public function destroy() {
     # ...
-  end
+  }
 
 private
-  def find_post
+  public function find_post() {
     @post = Post.find($this->params['id'])
-  end
-end
+  }
+}
 </php>
 
-Akelos runs _before filters_ before any action in the controller. You can use the +:only+ clause to limit a before filter to only certain actions, or an +:except+ clause to specifically skip a before filter for certain actions. Akelos also allows you to define _after filters_ that run after processing an action, as well as _around filters_ that surround the processing of actions. Filters can also be defined in external classes to make it easy to share them between controllers.
+Akelos runs _before filters_ before any action in the controller. You can use the +'only'+ clause to limit a before filter to only certain actions, or an +'except'+ clause to specifically skip a before filter for certain actions. Akelos also allows you to define _after filters_ that run after processing an action, as well as _around filters_ that surround the processing of actions. Filters can also be defined in external classes to make it easy to share them between controllers.
 
 For more information on filters, see the "Action Controller Overview":action_controller_overview.html guide.
 
@@ -852,7 +852,7 @@ First, take a look at +comment.php+:
 <php>
 class Comment extends ActiveRecord {
   belongs_to :post
-end
+}
 </php>
 
 This is very similar to the +post.php+ model that you saw earlier. The difference is the line +belongs_to :post+, which sets up an Active Record _association_. You'll learn a little about associations in the next section of this guide.
@@ -860,7 +860,7 @@ This is very similar to the +post.php+ model that you saw earlier. The differenc
 In addition to the model, Akelos has also made a migration to create the corresponding database table:
 
 <php>
-class CreateComments < ActiveRecord::Migration
+class CreateComments extends ActiveRecord::Migration
   public function up
     create_table :comments do |t|
       t.string :commenter
@@ -868,13 +868,13 @@ class CreateComments < ActiveRecord::Migration
       t.references :post
 
       t.timestamps
-    end
-  end
+    }
+  }
 
   public function down
     drop_table :comments
-  end
-end
+  }
+}
 </php>
 
 The +t.references+ line sets up a foreign key column for the association between the two models. Go ahead and run the migration:
@@ -897,7 +897,7 @@ In fact, this is very close to the syntax that Akelos uses to declare this assoc
 <php>
 class Comment extends ActiveRecord {
   belongs_to :post
-end
+}
 </php>
 
 You'll need to edit the +post.php+ file to add the other side of the association:
@@ -905,9 +905,9 @@ You'll need to edit the +post.php+ file to add the other side of the association
 <php>
 class Post extends ActiveRecord {
   validates_presence_of :name, :title
-  validates_length_of :title, :minimum => 5
+  validates_length_of :title, 'minimum' => 5
   has_many :comments
-end
+}
 </php>
 
 These two declarations enable a good bit of automatic behavior. For example, if you have an instance variable +@post+ containing a post, you can retrieve all the comments belonging to that post as the array +@post.comments+.
@@ -919,7 +919,7 @@ h4. Adding a Route
 _Routes_ are entries in the +config/routes.php+ file that tell Akelos how to match incoming HTTP requests to controller actions. Open up that file and find the existing line referring to +posts+ (it will be right at the top of the file). Then edit it as follows:
 
 <php>
-map.resources :posts, :has_many => :comments
+map.resources :posts, 'has_many' => :comments
 </php>
 
 This creates +comments+ as a _nested resource_ within +posts+. This is another part of capturing the hierarchical relationship that exists between posts and comments.
@@ -948,74 +948,74 @@ This creates eight files:
 The controller will be generated with empty methods and views for each action that you specified in the call to +./makelos generate controller+:
 
 <php>
-class CommentsController < ApplicationController
-  def index
-  end
+class CommentsController extends ApplicationController
+  public function index() {
+  }
 
-  def show
-  end
+  public function show() {
+  }
 
-  def new
-  end
+  public function add
+  }
 
-  def edit
-  end
+  public function edit() {
+  }
 
-end
+}
 </php>
 
 You'll need to flesh this out with code to actually process requests appropriately in each method. Here's a version that (for simplicity's sake) only responds to requests that require HTML:
 
 <php>
-class CommentsController < ApplicationController
+class CommentsController extends ApplicationController
   before_filter :find_post
 
-  def index
+  public function index() {
     @comments = @post.comments
-  end
+  }
 
-  def show
+  public function show() {
     @comment = @post.comments.find($this->params['id'])
-  end
+  }
 
-  def new
+  public function add
     @comment = @post.comments.build
-  end
+  }
 
-  def create
+  public function create() {
     @comment = @post.comments.build($this->params['comment'])
-    if @comment.save
-      redirect_to post_comment_url(@post, @comment)
+    if @comment->save()
+      $this->redirectTo( post_comment_url(@post, @comment)
     else
-      render :action => 'new'
-    end
-  end
+      render 'action' => 'new'
+    }
+  }
 
-  def edit
+  public function edit() {
     @comment = @post.comments.find($this->params['id'])
-  end
+  }
 
-  def update
+  public function update() {
     @comment = Comment.find($this->params['id'])
     if @comment.update_attributes($this->params['comment'])
-      redirect_to post_comment_url(@post, @comment)
+      $this->redirectTo( post_comment_url(@post, @comment)
     else
-      render :action => 'edit'
-    end
-  end
+      render 'action' => 'edit'
+    }
+  }
 
-  def destroy
+  public function destroy() {
     @comment = Comment.find($this->params['id'])
     @comment.destroy
-    redirect_to post_comments_path(@post)
-  end
+    $this->redirectTo( post_comments_path(@post)
+  }
 
 private
-  def find_post
+  public function find_post() {
     @post = Post.find($this->params['post_id'])
-  end
+  }
 
-end
+}
 </php>
 
 You'll see a bit more complexity here than you did in the controller for posts. That's a side-effect of the nesting that you've set up; each request for a comment has to keep track of the post to which the comment is attached.
@@ -1053,7 +1053,7 @@ The +views/comments/index.html.tpl+ view:
     </td>
     <td>
         <%= link_to 'Destroy', post_comment_path(@post, comment),
-            :confirm => 'Are you sure?', :method => :delete %>
+            'confirm' => 'Are you sure?', 'method' => :delete %>
     </td>
   </tr>
 <% end %>
@@ -1182,9 +1182,9 @@ If you decide at some point to delete a post, you likely want to delete the comm
 <php>
 class Post extends ActiveRecord {
   validates_presence_of :name, :title
-  validates_length_of :title, :minimum => 5
-  has_many :comments, :dependent => :destroy
-end
+  validates_length_of :title, 'minimum' => 5
+  has_many :comments, 'dependent' => :destroy
+}
 </php> 
 
 h3. Building a Multi-Model Form
@@ -1206,16 +1206,16 @@ Next, edit the +post.php+ file to create the other side of the association, and 
 <php>
 class Post extends ActiveRecord {
   validates_presence_of :name, :title
-  validates_length_of :title, :minimum => 5
+  validates_length_of :title, 'minimum' => 5
   has_many :comments
   has_many :tags
 
-  accepts_nested_attributes_for :tags, :allow_destroy => :true,
-    :reject_if => proc { |attrs| attrs.all? { |k, v| v.blank? } }
-end
+  accepts_nested_attributes_for :tags, 'allow_destroy' => :true,
+    'reject_if' => proc { |attrs| attrs.all? { |k, v| v.blank? } }
+}
 </php>
 
-The +:allow_destroy+ option on the nested attribute declaration tells Akelos to display a "remove" checkbox on the view that you'll build shortly. The +:reject_if+ option prevents saving new tags that do not have any attributes filled in.
+The +'allow_destroy'+ option on the nested attribute declaration tells Akelos to display a "remove" checkbox on the view that you'll build shortly. The +'reject_if'+ option prevents saving new tags that do not have any attributes filled in.
 
 You'll also need to modify +views/posts/_form.html.tpl+ to include the tags:
 

@@ -43,7 +43,7 @@ h4. Akelos General Configuration
 
 * +config.cache_classes+ controls whether or not application classes should be reloaded on each request.
 
-* +config.cache_store+ configures which cache store to use for Akelos caching. Options include +:memory_store+, +:file_store+, +:mem_cache_store+ or the name of your own custom class.
+* +config.cache_store+ configures which cache store to use for Akelos caching. Options include +'memory_store'+, +'file_store'+, +'mem_cache_store'+ or the name of your own custom class.
 
 * +config.controller_paths+ accepts an array of paths that will be searched for controllers. Defaults to +app/controllers+.
 
@@ -53,13 +53,13 @@ h4. Akelos General Configuration
 
 * +config.eager_load_paths+ accepts an array of paths from which Akelos will eager load on boot if cache classes is enabled. All elements of this array must also be in +load_paths+. 
 
-* +config.frameworks+ accepts an array of akelos framework components that should be loaded. (Defaults to +:active_record+, +:action_controller+, +:action_view+, +:action_mailer+, and +:active_resource+). 
+* +config.frameworks+ accepts an array of akelos framework components that should be loaded. (Defaults to +'active_record'+, +'action_controller'+, +'action_view'+, +'action_mailer'+, and +'active_resource'+). 
 
 * +config.load_once_paths+ accepts an array of paths from which Akelos will automatically load from only once. All elements of this array must also be in +load_paths+.
 
 * +config.load_paths+ accepts an array of additional paths to prepend to the load path. By default, all app, lib, vendor and mock paths are included in this list. 
 
-* +config.log_level+ defines the verbosity of the Akelos logger. In production mode, this defaults to +:info+. In development mode, it defaults to +:debug+. 
+* +config.log_level+ defines the verbosity of the Akelos logger. In production mode, this defaults to +'info'+. In development mode, it defaults to +'debug'+. 
 
 * +config.log_path+ overrides the path to the log file to use. Defaults to +log/#{environment}.log+ (e.g. log/development.log or log/production.log). 
 
@@ -89,7 +89,7 @@ h4. Akelos General Configuration
 
 h4. Configuring i18n
 
-* +config.i18n.default_locale+ sets the default locale of an application used for i18n. Defaults to +:en+.
+* +config.i18n.default_locale+ sets the default locale of an application used for i18n. Defaults to +'en'+.
 
 * +config.i18n.load_path+ sets the path Akelos uses to look for locale files. Defaults to +config/locales/*.{yml,rb}+
 
@@ -100,8 +100,8 @@ h4. Configuring Active Record
 * +config.active_record.logger+ accepts a logger conforming to the interface of Log4r or the default PHP 1.8.x Logger class, which is then passed on to any new database connections made. You can retrieve this logger by calling +logger+ on either an Active Record model class or an Active Record model instance. Set to nil to disable logging.
 
 * +config.active_record.primary_key_prefix_type+ lets you adjust the naming for primary key columns. By default, Akelos assumes that primary key columns are named +id+ (and this configuration option doesn't need to be set.) There are two other choices:
-** +:table_name+ would make the primary key for the Customer class +customerid+
-** +:table_name_with_underscore+ would make the primary key for the Customer class +customer_id+
+** +'table_name'+ would make the primary key for the Customer class +customerid+
+** +'table_name_with_underscore'+ would make the primary key for the Customer class +customer_id+
 
 * +config.active_record.table_name_prefix+ lets you set a global string to be prepended to table names. If you set this to +northwest_+, then the Customer class will look for +northwest_customers+ as its table. The default is an empty string.
 
@@ -111,9 +111,9 @@ h4. Configuring Active Record
 
 * +config.active_record.colorize_logging+ (true by default) specifies whether or not to use ANSI color codes when logging information from ActiveRecord.
 
-* +config.active_record.default_timezone+ determines whether to use +Time.local+ (if set to +:local+) or +Time.utc+ (if set to +:utc+) when pulling dates and times from the database. The default is +:local+.
+* +config.active_record.default_timezone+ determines whether to use +Time.local+ (if set to +'local'+) or +Time.utc+ (if set to +'utc'+) when pulling dates and times from the database. The default is +'local'+.
 
-* +config.active_record.schema_format+ controls the format for dumping the database schema to a file. The options are +:php+ (the default) for a database-independent version that depends on migrations, or +:sql+ for a set of (potentially database-dependent) SQL statements.
+* +config.active_record.schema_format+ controls the format for dumping the database schema to a file. The options are +'php'+ (the default) for a database-independent version that depends on migrations, or +'sql'+ for a set of (potentially database-dependent) SQL statements.
 
 * +config.active_record.timestamped_migrations+ controls whether migrations are numbered with serial integers or with timestamps. The default is +true+, to use timestamps, which are preferred if there are multiple developers working on the same application.
 
@@ -139,7 +139,7 @@ h4. Configuring Action Controller
 
 WARNING: Threadsafe operation in incompatible with the normal workings of development mode Akelos. In particular, automatic dependency loading and class reloading are automatically disabled when you call +config.threadsafe!+.
 
-* +config.action_controller.param_parsers+ provides an array of handlers that can extract information from incoming HTTP requests and add it to the +params+ hash. By default, parsers for multipart forms, URL-encoded forms, XML, and JSON are active.
+* +config.action_controller.param_parsers+ provides an array of handlers that can extract information from incoming HTTP requests and add it to the +params+ array. By default, parsers for multipart forms, URL-encoded forms, XML, and JSON are active.
 
 * +config.action_controller.default_charset+ specifies the default character set for all renders. The default is "utf-8".
 
@@ -147,9 +147,9 @@ WARNING: Threadsafe operation in incompatible with the normal workings of develo
 
 * +config.action_controller.resource_action_separator+ gives the token to be used between resources and actions when building or interpreting RESTful URLs. By default, this is "/".
 
-* +config.action_controller.resource_path_names+ is a hash of default names for several RESTful actions. By default, the new action is named +new+ and the edit action is named +edit+.
+* +config.action_controller.resource_path_names+ is an array of default names for several RESTful actions. By default, the new action is named +new+ and the edit action is named +edit+.
 
-* +config.action_controller.request_forgery_protection_token+ sets the token parameter name for RequestForgery. Calling +protect_from_forgery+ sets it to +:authenticity_token+ by default.
+* +config.action_controller.request_forgery_protection_token+ sets the token parameter name for RequestForgery. Calling +protect_from_forgery+ sets it to +'authenticity_token'+ by default.
 
 * +config.action_controller.optimise_named_routes+ turns on some optimizations in generating the routing table. It is set to +true+ by default.
 
@@ -159,13 +159,13 @@ WARNING: Threadsafe operation in incompatible with the normal workings of develo
 
 * +config.action_controller.relative_url_root+ can be used to tell Akelos that you are deploying to a subdirectory. The default is +ENV['RAILS_RELATIVE_URL_ROOT']+.
 
-* +config.action_controller.session_store+ sets the name of the store for session data. The default is +:cookie_store+; other valid options include +:active_record_store+, +:mem_cache_store+ or the name of your own custom class.
+* +config.action_controller.session_store+ sets the name of the store for session data. The default is +'cookie_store'+; other valid options include +'active_record_store'+, +'mem_cache_store'+ or the name of your own custom class.
 
 The caching code adds two additional settings:
 
-* +ActionController::Base.page_cache_directory+ sets the directory where Akelos will create cached pages for your web server. The default is +Akelos.public_path+ (which is usually set to +AK_BASE_DIR + "/public"+).
+* +AkActionController.page_cache_directory+ sets the directory where Akelos will create cached pages for your web server. The default is +Akelos.public_path+ (which is usually set to +AK_BASE_DIR + "/public"+).
 
-* +ActionController::Base.page_cache_extension+ sets the extension to be used when generating pages for the cache (this is ignored if the incoming request already has an extension). The default is +.html+.
+* +AkActionController.page_cache_extension+ sets the extension to be used when generating pages for the cache (this is ignored if the incoming request already has an extension). The default is +.html+.
 
 The Active Record session store can also be configured:
 
@@ -199,21 +199,21 @@ There are a number of settings available on +config.action_mailer+:
 
 * +config.action_mailer.logger+ accepts a logger conforming to the interface of Log4r or the default PHP 1.8+ Logger class, which is then used to log information from Action Mailer. Set to nil to disable logging.
 
-* +config.action_mailer.smtp_settings+ allows detailed configuration for the +:smtp+ delivery method. It accepts a hash of options, which can include any of these options:
-** +:address+ - Allows you to use a remote mail server. Just change it from its default "localhost" setting.
-** +:port+ - On the off chance that your mail server doesn't run on port 25, you can change it.
-** +:domain+ - If you need to specify a HELO domain, you can do it here.
-** +:user_name+ - If your mail server requires authentication, set the username in this setting.
-** +:password+ - If your mail server requires authentication, set the password in this setting.
-** +:authentication+ - If your mail server requires authentication, you need to specify the authentication type here. This is a symbol and one of +:plain+, +:login+, +:cram_md5+.
+* +config.action_mailer.smtp_settings+ allows detailed configuration for the +'smtp'+ delivery method. It accepts an array of options, which can include any of these options:
+** +'address'+ - Allows you to use a remote mail server. Just change it from its default "localhost" setting.
+** +'port'+ - On the off chance that your mail server doesn't run on port 25, you can change it.
+** +'domain'+ - If you need to specify a HELO domain, you can do it here.
+** +'user_name'+ - If your mail server requires authentication, set the username in this setting.
+** +'password'+ - If your mail server requires authentication, set the password in this setting.
+** +'authentication'+ - If your mail server requires authentication, you need to specify the authentication type here. This is a symbol and one of +'plain'+, +'login'+, +:cram_md5+.
 
-* +config.action_mailer.sendmail_settings+ allows detailed configuration for the +sendmail+ delivery method. It accepts a hash of options, which can include any of these options:
-** +:location+ - The location of the sendmail executable. Defaults to +/usr/sbin/sendmail+.
-** +:arguments+ - The command line arguments. Defaults to +-i -t+.
+* +config.action_mailer.sendmail_settings+ allows detailed configuration for the +sendmail+ delivery method. It accepts an array of options, which can include any of these options:
+** +'location'+ - The location of the sendmail executable. Defaults to +/usr/sbin/sendmail+.
+** +'arguments'+ - The command line arguments. Defaults to +-i -t+.
 
 * +config.action_mailer.raise_delivery_errors+ specifies whether to raise an error if email delivery cannot be completed. It defaults to +true+.
 
-* +config.action_mailer.delivery_method+ defines the delivery method. The allowed values are +:smtp+ (default), +:sendmail+, and +:test+.
+* +config.action_mailer.delivery_method+ defines the delivery method. The allowed values are +'smtp'+ (default), +'sendmail'+, and +'test'+.
 
 * +config.action_mailer.perform_deliveries+ specifies whether mail will actually be delivered. By default this is +true+; it can be convenient to set it to +false+ for testing.
 
@@ -262,7 +262,7 @@ After-initializers are run (as you might guess) after any initializers are loade
 <php>
 config.after_initialize do
   SomeClass.init
-end
+}
 </php>
 
 WARNING: Some parts of your application, notably observers and routing, are not yet set up at the point where the +after_initialize+ block is called.

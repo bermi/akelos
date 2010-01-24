@@ -36,24 +36,24 @@ h4. What are Sessions?
 Most applications need to keep track of certain state of a particular user. This could be the contents of a shopping basket or the user id of the currently logged in user. Without the idea of sessions, the user would have to identify, and probably authenticate, on every request.
 Akelos will create a new session automatically if a new user accesses the application. It will load an existing session if the user has already used the application.
 
-A session usually consists of a hash of values and a session id, usually a 32-character string, to identify the hash. Every cookie sent to the client's browser includes the session id. And the other way round: the browser will send it to the server on every request from the client. In Akelos you can save and retrieve values using the session method:
+A session usually consists of an array of values and a session id, usually a 32-character string, to identify the array. Every cookie sent to the client's browser includes the session id. And the other way round: the browser will send it to the server on every request from the client. In Akelos you can save and retrieve values using the session method:
 
 <php>
-session[:user_id] = @current_user.id
-User.find(session[:user_id])
+session['user_id'] = @current_user.id
+User.find(session['user_id'])
 </php>
 
 h4. Session id
 
--- _The session id is a 32 byte long MD5 hash value._
+-- _The session id is a 32 byte long MD5 array value._
 
-A session id consists of the hash value of a random string. The random string is the current time, a random number between 0 and 1, the process id number of the PHP interpreter (also basically a random number) and a constant string. Currently it is not feasible to brute-force Akelos' session ids. To date MD5 is uncompromised, but there have been collisions, so it is theoretically possible to create another input text with the same hash value. But this has had no security impact to date.
+A session id consists of the array value of a random string. The random string is the current time, a random number between 0 and 1, the process id number of the PHP interpreter (also basically a random number) and a constant string. Currently it is not feasible to brute-force Akelos' session ids. To date MD5 is uncompromised, but there have been collisions, so it is theoretically possible to create another input text with the same array value. But this has had no security impact to date.
 
 h4. Session Hijacking
 
 -- _Stealing a user's session id lets an attacker use the web application in the victim's name._
 
-Many web applications have an authentication system: a user provides a user name and password, the web application checks them and stores the corresponding user id in the session hash. From now on, the session is valid. On every request the application will load the user, identified by the user id in the session, without the need for new authentication. The session id in the cookie identifies the session.
+Many web applications have an authentication system: a user provides a user name and password, the web application checks them and stores the corresponding user id in the session array. From now on, the session is valid. On every request the application will load the user, identified by the user id in the session, without the need for new authentication. The session id in the cookie identifies the session.
 
 Hence, the cookie serves as temporary authentication for the web application. Everyone who seizes a cookie from someone else, may use the web application as this user – with possibly severe consequences. Here are some ways to hijack a session, and their countermeasures:
 
@@ -79,26 +79,26 @@ This will also be a good idea, if you modify the structure of an object and old 
 
 h4. Session Storage
 
--- _Akelos provides several storage mechanisms for the session hashes. The most important are ActiveRecordStore and CookieStore._
+-- _Akelos provides several storage mechanisms for the session arrays. The most important are ActiveRecordStore and CookieStore._
 
-There are a number of session storages, i.e. where Akelos saves the session hash and session id. Most real-live applications choose ActiveRecordStore (or one of its derivatives) over file storage due to performance and maintenance reasons. ActiveRecordStore keeps the session id and hash in a database table and saves and retrieves the hash on every request.
+There are a number of session storages, i.e. where Akelos saves the session array and session id. Most real-live applications choose ActiveRecordStore (or one of its derivatives) over file storage due to performance and maintenance reasons. ActiveRecordStore keeps the session id and array in a database table and saves and retrieves the array on every request.
 
-Akelos 2 introduced a new default session storage, CookieStore. CookieStore saves the session hash directly in a cookie on the client-side. The server retrieves the session hash from the cookie and eliminates the need for a session id. That will greatly increase the speed of the application, but it is a controversial storage option and you have to think about the security implications of it:
+Akelos 2 introduced a new default session storage, CookieStore. CookieStore saves the session array directly in a cookie on the client-side. The server retrieves the session array from the cookie and eliminates the need for a session id. That will greatly increase the speed of the application, but it is a controversial storage option and you have to think about the security implications of it:
 
 * Cookies imply a strict size limit of 4kB. This is fine as you should not store large amounts of data in a session anyway, as described before. _(highlight)Storing the current user's database id in a session is usually ok_.
 
-* The client can see everything you store in a session, because it is stored in clear-text (actually Base64-encoded, so not encrypted). So, of course, _(highlight)you don't want to store any secrets here_. To prevent session hash tampering, a digest is calculated from the session with a server-side secret and inserted into the end of the cookie.
+* The client can see everything you store in a session, because it is stored in clear-text (actually Base64-encoded, so not encrypted). So, of course, _(highlight)you don't want to store any secrets here_. To prevent session array tampering, a digest is calculated from the session with a server-side secret and inserted into the end of the cookie.
 
 That means the security of this storage depends on this secret (and on the digest algorithm, which defaults to SHA512, which has not been compromised, yet). So _(highlight)don't use a trivial secret, i.e. a word from a dictionary, or one which is shorter than 30 characters_. Put the secret in your environment.php:
 
 <php>
 config.action_controller.session = {
   :key    => '_app_session',
-  :secret => '0x0dkfj3927dkc7djdh36rkckdfzsg...'
+  'secret' => '0x0dkfj3927dkc7djdh36rkckdfzsg...'
 }
 </php>
 
-There are, however, derivatives of CookieStore which encrypt the session hash, so the client cannot see it.
+There are, however, derivatives of CookieStore which encrypt the session array, so the client cannot see it.
 
 h4. Replay Attacks for CookieStore Sessions
 
@@ -159,8 +159,8 @@ class Session extends ActiveRecord {
     } if time.is_a?(String)
 
     delete_all "updated_at < '#{time.ago.to_s(:db)}'"
-  end
-end
+  }
+}
 </php>
 
 The section about session fixation introduced the problem of maintained sessions. An attacker maintaining a session every five minutes can keep the session alive forever, although you are expiring sessions. A simple solution for this would be to add a created_at column to the sessions table. Now you can delete sessions that were created a long time ago. Use this line in the sweep method above:
@@ -176,13 +176,13 @@ h3. Cross-Site Request Forgery (CSRF)
 
 !/images/docs/csrf.png!
 
-In the <a href="#sessions">session chapter</a> you have learned that most Akelos applications use cookie-based sessions. Either they store the session id in the cookie and have a server-side session hash, or the entire session hash is on the client-side. In either case the browser will automatically send along the cookie on every request to a domain, if it can find a cookie for that domain. The controversial point is, that it will also send the cookie, if the request comes from a site of a different domain. Let's start with an example:
+In the <a href="#sessions">session chapter</a> you have learned that most Akelos applications use cookie-based sessions. Either they store the session id in the cookie and have a server-side session array, or the entire session array is on the client-side. In either case the browser will automatically send along the cookie on every request to a domain, if it can find a cookie for that domain. The controversial point is, that it will also send the cookie, if the request comes from a site of a different domain. Let's start with an example:
 
 * Bob browses a message board and views a post from a hacker where there is a crafted HTML image element. The element references a command in Bob's project management application, rather than an image file.
 * +&lt;img src="http://www.webapp.com/project/1/destroy"&gt;+
 * Bob's session at www.webapp.com is still alive, because he didn't log out a few minutes ago.
 * By viewing the post, the browser finds an image tag. It tries to load the suspected image from www.webapp.com. As explained before, it will also send along the cookie with the valid session id.
-* The web application at www.webapp.com verifies the user information in the corresponding session hash and destroys the project with the ID 1. It then returns a result page which is an unexpected result for the browser, so it will not display the image.
+* The web application at www.webapp.com verifies the user information in the corresponding session array and destroys the project with the ID 1. It then returns a result page which is an unexpected result for the browser, so it will not display the image.
 * Bob doesn't notice the attack -- but a few days later he finds out that project number one is gone.
 
 It is important to notice that the actual crafted image or link doesn't necessarily have to be situated in the web application's domain, it can be anywhere – in a forum, blog post or email.
@@ -210,7 +210,7 @@ If your web application is RESTful, you might be used to additional HTTP verbs, 
 _(highlight)The verify method in a controller can make sure that specific actions may not be used over GET_. Here is an example to verify the use of the transfer action over POST. If the action comes in using any other verb, it redirects to the list action.
 
 <php>
-verify :method => :post, :only => [:transfer], :redirect_to => {:action => :list}
+verify 'method' => :post, 'only' => ['transfer'], :$this->redirectTo( => {'action' => :list}
 </php>
 
 With this precaution, the attack from above will not work, because the browser sends a GET request for images, which will not be accepted by the web application.
@@ -237,7 +237,7 @@ Or the attacker places the code into the onmouseover event handler of an image:
 There are many other possibilities, including Ajax to attack the victim in the background. The  _(highlight)solution to this is including a security token in non-GET requests_ which check on the server-side. In Akelos 2 or higher, this is a one-liner in the application controller:
 
 <php>
-protect_from_forgery :secret => "123456789012345678901234567890..."
+protect_from_forgery 'secret' => "123456789012345678901234567890..."
 </php>
 
 This will automatically include a security token, calculated from the current session and the server-side secret, in all forms and Ajax requests generated by Akelos. You won't need the secret, if you use CookieStorage as session storage. It will raise an ActionController::InvalidAuthenticityToken error, if the security token doesn't match what was expected.
@@ -255,9 +255,9 @@ h4. Redirection
 Whenever the user is allowed to pass (parts of) the URL for redirection, it is possibly vulnerable. The most obvious attack would be to redirect users to a fake web application which looks and feels exactly as the original one. This so-called phishing attack works by sending an unsuspicious link in an email to the users, injecting the link by XSS in the web application or putting the link into an external site. It is unsuspicious, because the link starts with the URL to the web application and the URL to the malicious site is hidden in the redirection parameter: http://www.example.com/site/redirect?to= www.attacker.com. Here is an example of a legacy action:
 
 <php>
-def legacy
-  redirect_to(params.update(:action=>'main'))
-end
+public function legacy
+  $this->redirectTo((params.update(:action=>'main'))
+}
 </php>
 
 This will redirect the user to the main action if he tried to access a legacy action. The intention was to preserve the URL parameters to the legacy action and pass them to the main action. However, it can exploited by an attacker if he includes a host key in the URL:
@@ -285,7 +285,7 @@ Many web applications allow users to upload files. _(highlight)File names, which
 When filtering user input file names, _(highlight)don't try to remove malicious parts_. Think of a situation where the web application removes all “../” in a file name and an attacker uses a string such as “....//” - the result will be “../”. It is best to use a whitelist approach, which _(highlight)checks for the validity of a file name with a set of accepted characters_. This is opposed to a blacklist approach which attempts to remove not allowed characters. In case it isn't a valid file name, reject it (or replace not accepted characters), but don't remove them. Here is the file name sanitizer from the "attachment_fu plugin":http://github.com/technoweenie/attachment_fu/tree/master:
 
 <php>
-def sanitize_filename(filename)
+public function sanitize_filename(filename)
   returning filename.strip do |name|
     # NOTE: File.basename doesn't work right with Windows paths on Unix
     # get only the filename, not the whole path
@@ -293,8 +293,8 @@ def sanitize_filename(filename)
     # Finally, replace all non alphanumeric, underscore
     # or periods with underscore
     name.gsub! /[^\w\.\-]/, '_'
-  end
-end
+  }
+}
 </php>
 
 A significant disadvantage of synchronous processing of file uploads (as the attachment_fu plugin may do with images), is its _(highlight)vulnerability to denial-of-service attacks_. An attacker can synchronously start image file uploads from many computers which increases the server load and may eventually crash or stall the server.
@@ -326,7 +326,7 @@ basename = File.expand_path(File.join(File.dirname(__FILE__), '../../files'))
 filename = File.expand_path(File.join(basename, @file.public_filename))
 raise if basename !=
      File.expand_path(File.join(File.dirname(filename), '../../../'))
-send_file filename, :disposition => 'inline'
+send_file filename, 'disposition' => 'inline'
 </php>
 
 Another (additional) approach is to store the file names in the database and name the files on the disk after the ids in the database. This is also a good approach to avoid possible code in an uploaded file to be executed. The attachment_fu plugin does this in a similar way.
@@ -365,18 +365,18 @@ The common admin interface works like this: it's located at www.example.com/admi
 
 h3. Mass Assignment
 
--- _Without any precautions Model.new($this->params['model']) allows attackers to set any database column's value._
+-- _Without any precautions new Model($this->params['model']) allows attackers to set any database column's value._
 
-The mass-assignment feature may become a problem, as it allows an attacker to set any model's attributes by manipulating the hash passed to a model's +new()+ method:
+The mass-assignment feature may become a problem, as it allows an attacker to set any model's attributes by manipulating the array passed to a model's +new()+ method:
 
 <php>
-def signup
-  $this->params['user'] #=> {:name => “ow3ned”, :admin => true}
-  @user = User.new($this->params['user'])
-end
+public function signup
+  $this->params['user'] #=> {'name' => “ow3ned”, 'admin' => true}
+  @user = new User($this->params['user'])
+}
 </php>
 
-Mass-assignment saves you much work, because you don't have to set each value individually. Simply pass a hash to the new() method, or assign attributes=(attributes) a hash value, to set the model's attributes to the values in the hash. The problem is that it is often used in conjunction with the parameters (params) hash available in the controller, which may be manipulated by an attacker. He may do so by changing the URL like this:
+Mass-assignment saves you much work, because you don't have to set each value individually. Simply pass an array to the new() method, or assign attributes=(attributes) an array value, to set the model's attributes to the values in the array. The problem is that it is often used in conjunction with the parameters (params) array available in the controller, which may be manipulated by an attacker. He may do so by changing the URL like this:
 
 <pre>
 "name":http://www.example.com/user/signup?user[name]=ow3ned&user[admin]=1
@@ -385,7 +385,7 @@ Mass-assignment saves you much work, because you don't have to set each value in
 This will set the following parameters in the controller:
 
 <php>
-$this->params['user'] #=> {:name => “ow3ned”, :admin => true}
+$this->params['user'] #=> {'name' => “ow3ned”, 'admin' => true}
 </php>
 
 So if you create a new user using mass-assignment, it may be too easy to become an administrator.
@@ -397,7 +397,7 @@ Note that this vulnerability is not restricted to database columns.  Any setter 
     has_many :children
 
     accepts_nested_attributes_for :children
-  end
+  }
 
   class Child extends ActiveRecord {
     belongs_to :person
@@ -423,8 +423,8 @@ attr_accessible :name
 If you want to set a protected attribute, you will to have to assign it individually:
 
 <php>
-$this->params['user'] #=> {:name => "ow3ned", :admin => true}
-@user = User.new($this->params['user'])
+$this->params['user'] #=> {'name' => "ow3ned", 'admin' => true}
+@user = new User($this->params['user'])
 @user.admin #=> false # not mass-assigned
 @user.admin = true
 @user.admin #=> true
@@ -550,8 +550,8 @@ PHP uses a slightly different approach than many other languages to match the en
 
 <php>
 class File extends ActiveRecord {
-  validates_format_of :name, :with => /^[\w\.\-\+]+$/
-end
+  validates_format_of :name, 'with' => /^[\w\.\-\+]+$/
+}
 </php>
 
 This means, upon saving, the model will validate the file name to consist only of alphanumeric characters, dots, + and -. And the programmer added ^ and $ so that file name will contain these characters from the beginning to the end of the string. However, _(highlight)in PHP ^ and $ matches the *line* beginning and line end_. And thus a file name like this passes the filter without problems:
@@ -598,7 +598,7 @@ h4. Whitelists versus Blacklists
 
 A blacklist can be a list of bad e-mail addresses, non-public actions or bad HTML tags. This is opposed to a whitelist which lists the good e-mail addresses, public actions, good HTML tags and so on. Although, sometimes it is not possible to create a whitelist (in a SPAM filter, for example), _(highlight)prefer to use whitelist approaches_:
 
-* Use before_filter :only => [...] instead of :except => [...]. This way you don't forget to turn it off for newly added actions.
+* Use before_filter 'only' => [...] instead of 'except' => [...]. This way you don't forget to turn it off for newly added actions.
 * Use attr_accessible instead of attr_protected. See the mass-assignment section for details
 * Allow &lt;strong&gt; instead of removing &lt;script&gt; against Cross-Site Scripting (XSS). See below for details.
 * Don't try to correct user input by blacklists:
@@ -616,7 +616,7 @@ h5. Introduction
 SQL injection attacks aim at influencing database queries by manipulating web application parameters. A popular goal of SQL injection attacks is to bypass authorization. Another goal is to carry out data manipulation or reading arbitrary data. Here is an example of how not to use user input data in a query:
 
 <php>
-Project.find(:all, :conditions => "name = '#{$this->params['name']}'")
+Project.find(:all, 'conditions' => "name = '#{$this->params['name']}'")
 </php>
 
 This could be in a search action and the user may enter a project's name that he wants to find. If a malicious user enters ' OR 1 --, the resulting SQL query will be:
@@ -648,7 +648,7 @@ h5. Unauthorized Reading
 The UNION statement connects two SQL queries and returns the data in one set. An attacker can use it to read arbitrary data from the database. Let's take the example from above:
 
 <php>
-Project.find(:all, :conditions => "name = '#{$this->params['name']}'")
+Project.find(:all, 'conditions' => "name = '#{$this->params['name']}'")
 </php>
 
 And now let's inject another query using the UNION statement:
@@ -670,21 +670,21 @@ Also, the second query renames some columns with the AS statement so that the we
 
 h5. Countermeasures
 
-Akelos has a built in filter for special SQL characters, which will escape ' , " , NULL character and line breaks. <em class="highlight">Using +Model.find(id)+ or +Model.find_by_some thing(something)+ automatically applies this countermeasure</em>. But in SQL fragments, especially <em class="highlight">in conditions fragments (+:conditions => "..."+), the +connection.execute()+ or +Model.find_by_sql()+ methods, it has to be applied manually</em>.
+Akelos has a built in filter for special SQL characters, which will escape ' , " , NULL character and line breaks. <em class="highlight">Using +Model.find(id)+ or +Model.find_by_some thing(something)+ automatically applies this countermeasure</em>. But in SQL fragments, especially <em class="highlight">in conditions fragments (+'conditions' => "..."+), the +connection.execute()+ or +Model.find_by_sql()+ methods, it has to be applied manually</em>.
 
 Instead of passing a string to the conditions option, you can pass an array to sanitize tainted strings like this:
 
 <php>
-Model.find(:first, :conditions => ["login = ? AND password = ?", entered_user_name, entered_password])
+Model.find(:first, 'conditions' => ["login = ? AND password = ?", entered_user_name, entered_password])
 </php>
 
-As you can see, the first part of the array is an SQL fragment with question marks. The sanitized versions of the variables in the second part of the array replace the question marks. Or you can pass a hash for the same result:
+As you can see, the first part of the array is an SQL fragment with question marks. The sanitized versions of the variables in the second part of the array replace the question marks. Or you can pass an array for the same result:
 
 <php>
-Model.find(:first, :conditions => {:login => entered_user_name, :password => entered_password})
+Model.find(:first, 'conditions' => {'login' => entered_user_name, 'password' => entered_password})
 </php>
 
-The array or hash form is only available in model instances. You can try +sanitize_sql()+ elsewhere. _(highlight)Make it a habit to think about the security consequences when using an external string in SQL_.
+The array form is only available in model instances. You can try +sanitize_sql()+ elsewhere. _(highlight)Make it a habit to think about the security consequences when using an external string in SQL_.
 
 h4. Cross-Site Scripting (XSS)
 
@@ -776,7 +776,7 @@ This returned "some&lt;script&gt;alert('hello')&lt;/script&gt;", which makes an 
 
 <php>
 tags = %w(a acronym b strong i em li ul ol h1 h2 h3 h4 h5 h6 blockquote br cite sub sup ins p)
-s = sanitize(user_input, :tags => tags, :attributes => %w(href title))
+s = sanitize(user_input, 'tags' => tags, 'attributes' => %w(href title))
 </php>
 
 This allows only the given tags and does a good job, even against all kinds of tricks and malformed tags.
@@ -868,14 +868,14 @@ RedCloth.new('<script>alert(1)</script>').to_html
 Use the :filter_html option to remove HTML which was not created by the Textile processor.
 
 <php>
-RedCloth.new('<script>alert(1)</script>', [:filter_html]).to_html
+RedCloth.new('<script>alert(1)</script>', ['filter_html']).to_html
 # => "alert(1)"
 </php>
 
 However, this does not filter all HTML, a few tags will be left (by design), for example &lt;a&gt;:
 
 <php>
-RedCloth.new("<a href='javascript:alert(1)'>hello</a>", [:filter_html]).to_html
+RedCloth.new("<a href='javascript:alert(1)'>hello</a>", ['filter_html']).to_html
 # => "<p><a href="javascript:alert(1)">hello</a></p>"
 </php>
 
@@ -918,7 +918,7 @@ HTTP request headers have a Referer, User-Agent (client software), and Cookie fi
 Besides that, it is _(highlight)important to know what you are doing when building response headers partly based on user input._ For example you want to redirect the user back to a specific page. To do that you introduced a “referer“ field in a form to redirect to the given address:
 
 <php>
-redirect_to $this->params['referer']
+$this->redirectTo( $this->params['referer']
 </php>
 
 What happens is that Akelos puts the string into the Location header field and sends a 302 (redirect) status to the browser. The first thing a malicious user would do, is this:
@@ -942,7 +942,7 @@ HTTP/1.1 302 Moved Temporarily
 Location: http://www.malicious.tld
 </plain>
 
-So _(highlight)attack vectors for Header Injection are based on the injection of CRLF characters in a header field._ And what could an attacker do with a false redirection? He could redirect to a phishing site that looks the same as yours, but asks to login again (and sends the login credentials to the attacker). Or he could install malicious software through browser security holes on that site. Akelos 2.1.2 escapes these characters for the Location field in the +redirect_to+ method. _(highlight)Make sure you do it yourself when you build other header fields with user input._
+So _(highlight)attack vectors for Header Injection are based on the injection of CRLF characters in a header field._ And what could an attacker do with a false redirection? He could redirect to a phishing site that looks the same as yours, but asks to login again (and sends the login credentials to the attacker). Or he could install malicious software through browser security holes on that site. Akelos 2.1.2 escapes these characters for the Location field in the +$this->redirectTo(+ method. _(highlight)Make sure you do it yourself when you build other header fields with user input._
 
 h5. Response Splitting
 

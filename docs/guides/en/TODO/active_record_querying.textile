@@ -24,25 +24,25 @@ class Client extends ActiveRecord {
   has_one :address
   has_many :orders
   has_and_belongs_to_many :roles
-end
+}
 </php>
 
 <php>
 class Address extends ActiveRecord {
   belongs_to :client
-end
+}
 </php>
 
 <php>
 class Order extends ActiveRecord {
-  belongs_to :client, :counter_cache => true
-end
+  belongs_to :client, 'counter_cache' => true
+}
 </php>
 
 <php>
 class Role extends ActiveRecord {
   has_and_belongs_to_many :clients
-end
+}
 </php>
 
 Active Record will perform queries on the database for you and is compatible with most database systems (MySQL, PostgreSQL and SQLite to name a few). Regardless of which database system you're using, the Active Record method format will always be the same.
@@ -78,7 +78,7 @@ SQL equivalent of the above is:
 SELECT * FROM clients WHERE (clients.id = 10)
 </sql>
 
-<tt>Model.find(primary_key)</tt> will raise an +ActiveRecord::RecordNotFound+ exception if no matching record is found.
+<tt>Model.find(primary_key)</tt> will raise an +AkRecordNotFoundException+ exception if no matching record is found.
 
 h5. +first+
 
@@ -136,7 +136,7 @@ SQL equivalent of the above is:
 SELECT * FROM clients WHERE (clients.id IN (1,10))
 </sql>
 
-<tt>Model.find(array_of_primary_key)</tt> will raise an +ActiveRecord::RecordNotFound+ exception unless a matching record is found for <strong>all</strong> of the supplied primary keys.
+<tt>Model.find(array_of_primary_key)</tt> will raise an +AkRecordNotFoundException+ exception unless a matching record is found for <strong>all</strong> of the supplied primary keys.
 
 h5. Find all
 
@@ -168,7 +168,7 @@ The following may seem very straight forward at first:
 # Very inefficient when users table has thousands of rows.
 User.all.each do |user|
   NewsLetter.weekly_deliver(user)
-end
+}
 </php>
 
 But if the total number of rows in the table is very large, the above approach may vary from being under performant to just plain impossible.
@@ -182,36 +182,36 @@ To efficiently iterate over a large table, Active Record provides a batch finder
 <php>
 User.find_each do |user|
   NewsLetter.weekly_deliver(user)
-end
+}
 </php>
 
 *Configuring the batch size*
 
-Behind the scenes +find_each+ fetches rows in batches of +1000+ and yields them one by one. The size of the underlying batches is configurable via the +:batch_size+ option.
+Behind the scenes +find_each+ fetches rows in batches of +1000+ and yields them one by one. The size of the underlying batches is configurable via the +'batch_size'+ option.
 
 To fetch +User+ records in batch size of +5000+:
 
 <php>
-User.find_each(:batch_size => 5000) do |user|
+User.find_each('batch_size' => 5000) do |user|
   NewsLetter.weekly_deliver(user)
-end
+}
 </php>
 
 *Starting batch find from a specific primary key*
 
-Records are fetched in ascending order on the primary key, which must be an integer. The +:start+ option allows you to configure the first ID of the sequence if the lowest is not the one you need. This may be useful for example to be able to resume an interrupted batch process if it saves the last processed ID as a checkpoint.
+Records are fetched in ascending order on the primary key, which must be an integer. The +'start'+ option allows you to configure the first ID of the sequence if the lowest is not the one you need. This may be useful for example to be able to resume an interrupted batch process if it saves the last processed ID as a checkpoint.
 
 To send newsletters only to users with the primary key starting from +2000+:
 
 <php>
-User.find_each(:batch_size => 5000, :start => 2000) do |user|
+User.find_each('batch_size' => 5000, 'start' => 2000) do |user|
   NewsLetter.weekly_deliver(user)
-end
+}
 </php>
 
 *Additional options*
 
-+find_each+ accepts the same options as the regular +find+ method. However, +:order+ and +:limit+ are needed internally and hence not allowed to be passed explicitly.
++find_each+ accepts the same options as the regular +find+ method. However, +'order'+ and +'limit'+ are needed internally and hence not allowed to be passed explicitly.
 
 h5. +find_in_batches+
 
@@ -219,29 +219,29 @@ You can also work by chunks instead of row by row using +find_in_batches+. This 
 
 <php>
 # Works in chunks of 1000 invoices at a time.
-Invoice.find_in_batches(:include => :invoice_lines) do |invoices|
+Invoice.find_in_batches('include' => :invoice_lines) do |invoices|
   export.add_invoices(invoices)
-end
+}
 </php>
 
 The above will yield the supplied block with +1000+ invoices every time.
 
 h3. Conditions
 
-The +find+ method allows you to specify conditions to limit the records returned, representing the +WHERE+-part of the SQL statement. Conditions can either be specified as a string, array, or hash.
+The +find+ method allows you to specify conditions to limit the records returned, representing the +WHERE+-part of the SQL statement. Conditions can either be specified as a string, array, or array.
 
 h4. Pure String Conditions
 
-If you'd like to add conditions to your find, you could just specify them in there, just like +Client.first(:conditions => "orders_count = '2'")+. This will find all clients where the +orders_count+ field's value is 2.
+If you'd like to add conditions to your find, you could just specify them in there, just like +Client.first('conditions' => "orders_count = '2'")+. This will find all clients where the +orders_count+ field's value is 2.
 
-WARNING: Building your own conditions as pure strings can leave you vulnerable to SQL injection exploits. For example, +Client.first(:conditions => "name LIKE '%#{$this->params['name']}%'")+ is not safe. See the next section for the preferred way to handle conditions using an array.
+WARNING: Building your own conditions as pure strings can leave you vulnerable to SQL injection exploits. For example, +Client.first('conditions' => "name LIKE '%#{$this->params['name']}%'")+ is not safe. See the next section for the preferred way to handle conditions using an array.
 
 h4. Array Conditions
 
 Now what if that number could vary, say as an argument from somewhere, or perhaps from the user's level status somewhere? The find then becomes something like:
 
 <php>
-Client.first(:conditions => ["orders_count = ?", $this->params['orders']])
+Client.first('conditions' => ["orders_count = ?", $this->params['orders']])
 </php>
 
 Active Record will go through the first element in the conditions value and any additional elements will replace the question marks +(?)+ in the first element.
@@ -249,7 +249,7 @@ Active Record will go through the first element in the conditions value and any 
 Or if you want to specify two conditions, you can do it like:
 
 <php>
-Client.first(:conditions => ["orders_count = ? AND locked = ?", $this->params['orders'], false])
+Client.first('conditions' => ["orders_count = ? AND locked = ?", $this->params['orders'], false])
 </php>
 
 In this example, the first question mark will be replaced with the value in +$this->params['orders']+ and the second will be replaced with the SQL representation of +false+, which depends on the adapter.
@@ -257,13 +257,13 @@ In this example, the first question mark will be replaced with the value in +$th
 The reason for doing code like:
 
 <php>
-Client.first(:conditions => ["orders_count = ?", $this->params['orders']])
+Client.first('conditions' => ["orders_count = ?", $this->params['orders']])
 </php>
 
 instead of:
 
 <php>
-Client.first(:conditions => "orders_count = #{$this->params['orders']}")
+Client.first('conditions' => "orders_count = #{$this->params['orders']}")
 </php>
 
 is because of argument safety. Putting the variable directly into the conditions string will pass the variable to the database *as-is*. This means that it will be an unescaped variable directly from a user who may have malicious intent. If you do this, you put your entire database at risk because once a user finds out he or she can exploit your database they can do just about anything to it. Never ever put your arguments directly inside the conditions string.
@@ -272,11 +272,11 @@ TIP: For more information on the dangers of SQL injection, see the "Akelos Secur
 
 h5. Placeholder Conditions
 
-Similar to the +(?)+ replacement style of params, you can also specify keys/values hash in your array conditions:
+Similar to the +(?)+ replacement style of params, you can also specify keys/values array in your array conditions:
 
 <php>
-Client.all(:conditions =>
-  ["created_at >= :start_date AND created_at <= :end_date", { :start_date => $this->params['start_date'], :end_date => $this->params['end_date'] }])
+Client.all('conditions' =>
+  ["created_at >= :start_date AND created_at <= :end_date", { 'start_date' => $this->params['start_date'], 'end_date' => $this->params['end_date'] }])
 </php>
 
 This makes for clearer readability if you have a large number of variable conditions.
@@ -286,7 +286,7 @@ h5. Range Conditions
 If you're looking for a range inside of a table (for example, users created in a certain timeframe) you can use the conditions option coupled with the +IN+ SQL statement for this. If you had two dates coming in from a controller you could do something like this to look for a range:
 
 <php>
-Client.all(:conditions => ["created_at IN (?)",
+Client.all('conditions' => ["created_at IN (?)",
   ($this->params['start_date'].to_date)..($this->params['end_date'].to_date)])
 </php>
 
@@ -308,7 +308,7 @@ h5. Time and Date Conditions
 Things can get *really* messy if you pass in Time objects as it will attempt to compare your field to *every second* in that range:
 
 <php>
-Client.all(:conditions => ["created_at IN (?)",
+Client.all('conditions' => ["created_at IN (?)",
   ($this->params['start_date'].to_date.to_time)..($this->params['end_date'].to_date.to_time)])
 </php>
 
@@ -329,35 +329,35 @@ Where _query_ is the actual query used to get that error.
 In this example it would be better to use greater-than and less-than operators in SQL, like so:
 
 <php>
-Client.all(:conditions =>
+Client.all('conditions' =>
   ["created_at > ? AND created_at < ?", $this->params['start_date'], $this->params['end_date']])
 </php>
 
 You can also use the greater-than-or-equal-to and less-than-or-equal-to like this:
 
 <php>
-Client.all(:conditions =>
+Client.all('conditions' =>
   ["created_at >= ? AND created_at <= ?", $this->params['start_date'], $this->params['end_date']])
 </php>
 
-Just like in PHP. If you want a shorter syntax be sure to check out the "Hash Conditions":#hash-conditions section later on in the guide.
+Just like in PHP. If you want a shorter syntax be sure to check out the "Array Conditions":#array-conditions section later on in the guide.
 
-h4. Hash Conditions
+h4. Array Conditions
 
-Active Record also allows you to pass in a hash conditions which can increase the readability of your conditions syntax. With hash conditions, you pass in a hash with keys of the fields you want conditionalised and the values of how you want to conditionalise them:
+Active Record also allows you to pass in an array conditions which can increase the readability of your conditions syntax. With array conditions, you pass in an array with keys of the fields you want conditionalised and the values of how you want to conditionalise them:
 
-NOTE: Only equality, range and subset checking are possible with Hash conditions.
+NOTE: Only equality, range and subset checking are possible with Array conditions.
 
 h5. Equality Conditions
 
 <php>
-Client.all(:conditions => { :locked => true })
+Client.all('conditions' => { 'locked' => true })
 </php>
 
 The field name does not have to be a symbol it can also be a string:
 
 <php>
-Client.all(:conditions => { 'locked' => true })
+Client.all('conditions' => { 'locked' => true })
 </php>
 
 h5. Range Conditions
@@ -365,7 +365,7 @@ h5. Range Conditions
 The good thing about this is that we can pass in a range for our fields without it generating a large query as shown in the preamble of this section.
 
 <php>
-Client.all(:conditions => { :created_at => (Time.now.midnight - 1.day)..Time.now.midnight})
+Client.all('conditions' => { 'created_at' => (Time.now.midnight - 1.day)..Time.now.midnight})
 </php>
 
 This will find all clients created yesterday by using a +BETWEEN+ SQL statement:
@@ -378,10 +378,10 @@ This demonstrates a shorter syntax for the examples in "Array Conditions":#array
 
 h5. Subset Conditions
 
-If you want to find records using the +IN+ expression you can pass an array to the conditions hash:
+If you want to find records using the +IN+ expression you can pass an array to the conditions array:
 
 <php>
-Client.all(:conditions => { :orders_count => [1,3,5] })
+Client.all('conditions' => { 'orders_count' => [1,3,5] })
 </php>
 
 This code will generate SQL like this:
@@ -392,58 +392,58 @@ SELECT * FROM clients WHERE (clients.orders_count IN (1,3,5))
 
 h3. Find Options
 
-Apart from +:conditions+, +Model.find+ takes a variety of other options via the options hash for customizing the resulting record set.
+Apart from +'conditions'+, +Model.find+ takes a variety of other options via the options array for customizing the resulting record set.
 
 <php>
-Model.find(id_or_array_of_ids, options_hash)
-Model.find(:last, options_hash)
-Model.find(:first, options_hash)
+Model.find(id_or_array_of_ids, options_array)
+Model.find(:last, options_array)
+Model.find(:first, options_array)
 
-Model.first(options_hash)
-Model.last(options_hash)
-Model.all(options_hash)
+Model.first(options_array)
+Model.last(options_array)
+Model.all(options_array)
 </php>
 
-The following sections give a top level overview of all the possible keys for the +options_hash+.
+The following sections give a top level overview of all the possible keys for the +options_array+.
 
 h4. Ordering
 
-To retrieve records from the database in a specific order, you can specify the +:order+ option to the +find+ call.
+To retrieve records from the database in a specific order, you can specify the +'order'+ option to the +find+ call.
 
 For example, if you're getting a set of records and want to order them in ascending order by the +created_at+ field in your table:
 
 <php>
-Client.all(:order => 'created_at')
+Client.all('order' => 'created_at')
 </php>
 
 You could specify +ASC+ or +DESC+ as well:
 
 <php>
-Client.all(:order => "created_at DESC")
+Client.all('order' => "created_at DESC")
 # OR
-Client.all(:order => "created_at ASC")
+Client.all('order' => "created_at ASC")
 </php>
 
 Or ordering by multiple fields:
 
 <php>
-Client.all(:order => "orders_count ASC, created_at DESC")
+Client.all('order' => "orders_count ASC, created_at DESC")
 </php>
 
 h4. Selecting Specific Fields
 
 By default, <tt>Model.find</tt> selects all the fields from the result set using +select *+.
 
-To select only a subset of fields from the result set, you can specify the subset via +:select+ option on the +find+.
+To select only a subset of fields from the result set, you can specify the subset via +'select'+ option on the +find+.
 
-NOTE: If the +:select+ option is used, all the returning objects will be "read only":#readonly-objects.
+NOTE: If the +'select'+ option is used, all the returning objects will be "read only":#readonly-objects.
 
 <br />
 
 For example, to select only +viewable_by+ and +locked+ columns:
 
 <php>
-Client.all(:select => "viewable_by, locked")
+Client.all('select' => "viewable_by, locked")
 </php>
 
 The SQL query used by this find call will be somewhat like:
@@ -463,17 +463,17 @@ Where +&lt;attribute&gt;+ is the attribute you asked for. The +id+ method will n
 You can also call SQL functions within the select option. For example, if you would like to only grab a single record per unique value in a certain field by using the +DISTINCT+ function you can do it like this:
 
 <php>
-Client.all(:select => "DISTINCT(name)")
+Client.all('select' => "DISTINCT(name)")
 </php>
 
 h4. Limit and Offset
 
-To apply +LIMIT+ to the SQL fired by the +Model.find+, you can specify the +LIMIT+ using +:limit+ and +:offset+ options on the find.
+To apply +LIMIT+ to the SQL fired by the +Model.find+, you can specify the +LIMIT+ using +'limit'+ and +'offset'+ options on the find.
 
-If you want to limit the amount of records to a certain subset of all the records retrieved you usually use +:limit+ for this, sometimes coupled with +:offset+. Limit is the maximum number of records that will be retrieved from a query, and offset is the number of records it will start reading from from the first record of the set. For example:
+If you want to limit the amount of records to a certain subset of all the records retrieved you usually use +'limit'+ for this, sometimes coupled with +'offset'+. Limit is the maximum number of records that will be retrieved from a query, and offset is the number of records it will start reading from from the first record of the set. For example:
 
 <php>
-Client.all(:limit => 5)
+Client.all('limit' => 5)
 </php>
 
 This code will return a maximum of 5 clients and because it specifies no offset it will return the first 5 clients in the table. The SQL it executes will look like this:
@@ -482,10 +482,10 @@ This code will return a maximum of 5 clients and because it specifies no offset 
 SELECT * FROM clients LIMIT 5
 </sql>
 
-Or specifying both +:limit+ and +:offset+:
+Or specifying both +'limit'+ and +'offset'+:
 
 <php>
-Client.all(:limit => 5, :offset => 5)
+Client.all('limit' => 5, 'offset' => 5)
 </php>
 
 This code will return a maximum of 5 clients and because it specifies an offset this time, it will return these records starting from the 5th client in the clients table. The SQL looks like:
@@ -496,12 +496,12 @@ SELECT * FROM clients LIMIT 5, 5
 
 h4. Group
 
-To apply +GROUP BY+ clause to the SQL fired by the +Model.find+, you can specify the +:group+ option on the find.
+To apply +GROUP BY+ clause to the SQL fired by the +Model.find+, you can specify the +'group'+ option on the find.
 
 For example, if you want to find a collection of the dates orders were created on:
 
 <php>
-Order.all(:group => "date(created_at)", :order => 'created_at')
+Order.all('group' => "date(created_at)", 'order' => 'created_at')
 </php>
 
 And this will give you a single +Order+ object for each date where there are orders in the database.
@@ -514,12 +514,12 @@ SELECT * FROM orders GROUP BY date(created_at)
 
 h4. Having
 
-SQL uses +HAVING+ clause to specify conditions on the +GROUP BY+ fields. You can specify the +HAVING+ clause to the SQL fired by the +Model.find+ using +:having+ option on the find.
+SQL uses +HAVING+ clause to specify conditions on the +GROUP BY+ fields. You can specify the +HAVING+ clause to the SQL fired by the +Model.find+ using +'having'+ option on the find.
 
 For example:
 
 <php>
-Order.all(:group => "date(created_at)", :having => ["created_at > ?", 1.month.ago])
+Order.all('group' => "date(created_at)", 'having' => ["created_at > ?", 1.month.ago])
 </php>
 
 The SQL that would be executed would be something like this:
@@ -532,20 +532,20 @@ This will return single order objects for each day, but only for the last month.
 
 h4. Readonly Objects
 
-To explicitly disallow modification/destruction of the matching records returned by +Model.find+, you could specify the +:readonly+ option as +true+ to the find call.
+To explicitly disallow modification/destruction of the matching records returned by +Model.find+, you could specify the +'readonly'+ option as +true+ to the find call.
 
 Any attempt to alter or destroy the readonly records will not succeed, raising an +ActiveRecord::ReadOnlyRecord+ exception. To set this option, specify it like this:
 
 <php>
-Client.first(:readonly => true)
+Client.first('readonly' => true)
 </php>
 
 If you assign this record to a variable client, calling the following code will raise an +ActiveRecord::ReadOnlyRecord+ exception:
 
 <php>
-client = Client.first(:readonly => true)
+client = Client.first('readonly' => true)
 client.locked = false
-client.save
+client->save()
 </php>
 
 h4. Locking Records for Update
@@ -587,21 +587,21 @@ To override the name of the +lock_version+ column, +ActiveRecord+ provides a cla
 <php>
 class Client extends ActiveRecord {
   set_locking_column :lock_client_column
-end
+}
 </php>
 
 h5. Pessimistic Locking
 
-Pessimistic locking uses locking mechanism provided by the underlying database. Passing +:lock => true+ to +Model.find+ obtains an exclusive lock on the selected rows. +Model.find+ using +:lock+ are usually wrapped inside a transaction for preventing deadlock conditions.
+Pessimistic locking uses locking mechanism provided by the underlying database. Passing +'lock' => true+ to +Model.find+ obtains an exclusive lock on the selected rows. +Model.find+ using +'lock'+ are usually wrapped inside a transaction for preventing deadlock conditions.
 
 For example:
 
 <php>
 Item.transaction do
-  i = Item.first(:lock => true)
+  i = Item.first('lock' => true)
   i.name = 'Jones'
-  i.save
-end
+  i->save()
+}
 </php>
 
 The above session produces the following SQL for a MySQL backend:
@@ -613,25 +613,25 @@ Item Update (0.4ms)   UPDATE `items` SET `updated_at` = '2009-02-07 18:05:56', `
 SQL (0.8ms)   COMMIT
 </sql>
 
-You can also pass raw SQL to the +:lock+ option to allow different types of locks. For example, MySQL has an expression called +LOCK IN SHARE MODE+ where you can lock a record but still allow other queries to read it. To specify this expression just pass it in as the lock option:
+You can also pass raw SQL to the +'lock'+ option to allow different types of locks. For example, MySQL has an expression called +LOCK IN SHARE MODE+ where you can lock a record but still allow other queries to read it. To specify this expression just pass it in as the lock option:
 
 <php>
 Item.transaction do
-  i = Item.find(1, :lock => "LOCK IN SHARE MODE")
+  i = Item.find(1, 'lock' => "LOCK IN SHARE MODE")
   i.increment!(:views)
-end
+}
 </php>
 
 h3. Joining Tables
 
-<tt>Model.find</tt> provides a +:joins+ option for specifying +JOIN+ clauses on the resulting SQL. There multiple different ways to specify the +:joins+ option:
+<tt>Model.find</tt> provides a +'joins'+ option for specifying +JOIN+ clauses on the resulting SQL. There multiple different ways to specify the +'joins'+ option:
 
 h4. Using a String SQL Fragment
 
-You can just supply the raw SQL specifying the +JOIN+ clause to the +:joins+ option. For example:
+You can just supply the raw SQL specifying the +JOIN+ clause to the +'joins'+ option. For example:
 
 <php>
-Client.all(:joins => 'LEFT OUTER JOIN addresses ON addresses.client_id = clients.id')
+Client.all('joins' => 'LEFT OUTER JOIN addresses ON addresses.client_id = clients.id')
 </php>
 
 This will result in the following SQL:
@@ -640,35 +640,35 @@ This will result in the following SQL:
 SELECT clients.* FROM clients LEFT OUTER JOIN addresses ON addresses.client_id = clients.id
 </sql>
 
-h4. Using Array/Hash of Named Associations
+h4. Using Array/Array of Named Associations
 
 WARNING: This method only works with +INNER JOIN+,
 
 <br />
 
-Active Record lets you use the names of the "associations":association_basics.html defined on the model as a shortcut for specifying the +:joins+ option.
+Active Record lets you use the names of the "associations":association_basics.html defined on the model as a shortcut for specifying the +'joins'+ option.
 
 For example, consider the following +Category+, +Post+, +Comments+ and +Guest+ models:
 
 <php>
 class Category extends ActiveRecord {
   has_many :posts
-end
+}
 
 class Post extends ActiveRecord {
   belongs_to :category
   has_many :comments
   has_many :tags
-end
+}
 
 class Comments extends ActiveRecord {
   belongs_to :post
   has_one :guest
-end
+}
 
 class Guest extends ActiveRecord {
   belongs_to :comment
-end
+}
 </php>
 
 Now all of the following will produce the expected join queries using +INNER JOIN+:
@@ -676,7 +676,7 @@ Now all of the following will produce the expected join queries using +INNER JOI
 h5. Joining a Single Association
 
 <php>
-Category.all :joins => :posts
+Category.all 'joins' => :posts
 </php>
 
 This produces:
@@ -689,7 +689,7 @@ SELECT categories.* FROM categories
 h5. Joining Multiple Associations
 
 <php>
-Post.all :joins => [:category, :comments]
+Post.all 'joins' => [:category, :comments]
 </php>
 
 This produces:
@@ -703,29 +703,29 @@ SELECT posts.* FROM posts
 h5. Joining Nested Associations (Single Level)
 
 <php>
-Post.all :joins => {:comments => :guest}
+Post.all 'joins' => {'comments' => :guest}
 </php>
 
 h5. Joining Nested Associations (Multiple Level)
 
 <php>
-Category.all :joins => {:posts => [{:comments => :guest}, :tags]}
+Category.all 'joins' => {'posts' => [{'comments' => :guest}, :tags]}
 </php>
 
 h4. Specifying Conditions on the Joined Tables
 
-You can specify conditions on the joined tables using the regular "Array":#array-conditions and "String":#pure-string-conditions conditions. "Hash conditions":#hash-conditions provides a special syntax for specifying conditions for the joined tables:
+You can specify conditions on the joined tables using the regular "Array":#array-conditions and "String":#pure-string-conditions conditions. "Array conditions":#array-conditions provides a special syntax for specifying conditions for the joined tables:
 
 <php>
 time_range = (Time.now.midnight - 1.day)..Time.now.midnight
-Client.all :joins => :orders, :conditions => {'orders.created_at' => time_range}
+Client.all 'joins' => :orders, 'conditions' => {'orders.created_at' => time_range}
 </php>
 
-An alternative and cleaner syntax to this is to nest the hash conditions:
+An alternative and cleaner syntax to this is to nest the array conditions:
 
 <php>
 time_range = (Time.now.midnight - 1.day)..Time.now.midnight
-Client.all :joins => :orders, :conditions => {:orders => {:created_at => time_range}}
+Client.all 'joins' => :orders, 'conditions' => {'orders' => {'created_at' => time_range}}
 </php>
 
 This will find all clients who have orders that were created yesterday, again using a +BETWEEN+ SQL expression.
@@ -739,27 +739,27 @@ Eager loading is the mechanism for loading the associated records of the objects
 Consider the following code, which finds 10 clients and prints their postcodes:
 
 <php>
-clients = Client.all(:limit => 10)
+clients = Client.all('limit' => 10)
 
 clients.each do |client|
   puts client.address.postcode
-end
+}
 </php>
 
 This code looks fine at the first sight. But the problem lies within the total number of queries executed. The above code executes 1 ( to find 10 clients ) <plus> 10 ( one per each client to load the address ) = <strong>11</strong> queries in total.
 
 <strong>Solution to N <plus> 1 queries problem</strong>
 
-Active Record lets you specify all the associations in advanced that are going to be loaded. This is possible by specifying the +:include+ option of the +Model.find+ call. By +:include+, Active Record ensures that all the specified associations are loaded using minimum possible number of queries.
+Active Record lets you specify all the associations in advanced that are going to be loaded. This is possible by specifying the +'include'+ option of the +Model.find+ call. By +'include'+, Active Record ensures that all the specified associations are loaded using minimum possible number of queries.
 
 Revisiting the above case, we could rewrite +Client.all+ to use eager load addresses:
 
 <php>
-clients = Client.all(:include => :address, :limit => 10)
+clients = Client.all('include' => :address, 'limit' => 10)
 
 clients.each do |client|
   puts client.address.postcode
-end
+}
 </php>
 
 The above code will execute just <strong>2</strong> queries, as opposed to <strong>11</strong> queries in the previous case:
@@ -772,27 +772,27 @@ SELECT addresses.* FROM addresses
 
 h4. Eager Loading Multiple Associations
 
-Active Record lets you eager load any possible number of associations with a single +Model.find+ call by using an array, hash, or a nested hash of array/hash with the +:include+ option.
+Active Record lets you eager load any possible number of associations with a single +Model.find+ call by using an array, array, or a nested array of array/array with the +'include'+ option.
 
 h5. Array of Multiple Associations 
 
 <php>
-Post.all :include => [:category, :comments]
+Post.all 'include' => [:category, :comments]
 </php>
 
 This loads all the posts and the associated category and comments for each post.
 
-h5. Nested Associations Hash
+h5. Nested Associations Array
 
 <php>
-Category.find 1, :include => {:posts => [{:comments => :guest}, :tags]}
+Category.find 1, 'include' => {'posts' => [{'comments' => :guest}, :tags]}
 </php>
 
 The above code finds the category with id 1 and eager loads all the posts associated with the found category. Additionally, it will also eager load every posts' tags and comments. Every comment's guest association will get eager loaded as well.
 
 h4. Specifying Conditions on Eager Loaded Associations
 
-Even though Active Record lets you specify conditions on the eager loaded associations just like +:joins+, the recommended way is to use ":joins":#joining-tables instead. 
+Even though Active Record lets you specify conditions on the eager loaded associations just like +'joins'+, the recommended way is to use ":joins":#joining-tables instead. 
 
 h3. Dynamic Finders
 
@@ -800,7 +800,7 @@ For every field (also known as an attribute) you define in your table, Active Re
 
 You can do +find_last_by_*+ methods too which will find the last record matching your argument.
 
-You can specify an exclamation point (<tt>!</tt>) on the end of the dynamic finders to get them to raise an +ActiveRecord::RecordNotFound+ error if they do not return any records, like +Client.find_by_name!("Ryan")+
+You can specify an exclamation point (<tt>!</tt>) on the end of the dynamic finders to get them to raise an +AkRecordNotFoundException+ error if they do not return any records, like +Client.find_by_name!("Ryan")+
 
 If you want to find both by name and locked, you can chain these finders together by simply typing +and+ between the fields for example +Client.find_by_name_and_locked("Ryan", true)+.
 
@@ -821,7 +821,7 @@ COMMIT
 client = Client.find_or_initialize_by_name('Ryan')
 </php>
 
-will either assign an existing client object with the name "Ryan" to the client local variable, or initialize a new object similar to calling +Client.new(:name => 'Ryan')+. From here, you can modify other fields in client by calling the attribute setters on it: +client.locked = true+ and when you want to write it to the database just call +save+ on it.
+will either assign an existing client object with the name "Ryan" to the client local variable, or initialize a new object similar to calling +Client.new('name' => 'Ryan')+. From here, you can modify other fields in client by calling the attribute setters on it: +client.locked = true+ and when you want to write it to the database just call +save+ on it.
 
 h3. Finding by SQL
 
@@ -837,7 +837,7 @@ Client.find_by_sql("SELECT * FROM clients
 
 h3. +select_all+
 
-<tt>find_by_sql</tt> has a close relative called +connection#select_all+. +select_all+ will retrieve objects from the database using custom SQL just like +find_by_sql+ but will not instantiate them. Instead, you will get an array of hashes where each hash indicates a record.
+<tt>find_by_sql</tt> has a close relative called +connection#select_all+. +select_all+ will retrieve objects from the database using custom SQL just like +find_by_sql+ but will not instantiate them. Instead, you will get an array of arrays where each array indicates a record.
 
 <php>
 Client.connection.select_all("SELECT * FROM clients WHERE id = '1'")
@@ -862,7 +862,7 @@ Client.exists?([1,2,3])
 Further more, +exists+ takes a +conditions+ option much like find:
 
 <php>
-Client.exists?(:conditions => "first_name = 'Ryan'")
+Client.exists?('conditions' => "first_name = 'Ryan'")
 </php>
 
 It's even possible to use +exists?+ without any arguments:
@@ -880,7 +880,7 @@ This section uses count as an example method in this preamble, but the options d
 <tt>count</tt> takes conditions much in the same way +exists?+ does:
 
 <php>
-Client.count(:conditions => "first_name = 'Ryan'")
+Client.count('conditions' => "first_name = 'Ryan'")
 </php>
 
 Which will execute:
@@ -889,10 +889,10 @@ Which will execute:
 SELECT count(*) AS count_all FROM clients WHERE (first_name = 'Ryan')
 </sql>
 
-You can also use +:include+ or +:joins+ for this to do something a little more complex:
+You can also use +'include'+ or +'joins'+ for this to do something a little more complex:
 
 <php>
-Client.count(:conditions => "clients.first_name = 'Ryan' AND orders.status = 'received'", :include => 'orders')
+Client.count('conditions' => "clients.first_name = 'Ryan' AND orders.status = 'received'", 'include' => 'orders')
 </php>
 
 Which will execute:

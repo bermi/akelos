@@ -23,11 +23,11 @@ require 'test_helper'
 require 'performance_test_help'
 
 # Profiling results for each test method are written to tmp/performance.
-class BrowsingTest < ActionController::PerformanceTest
-  def test_homepage
+class BrowsingTest extends ActionController::PerformanceTest
+  public function test_homepage() {
     get '/'
-  end
-end
+  }
+}
 </php>
 
 This example is a simple performance test case for profiling a GET request to the application's homepage.
@@ -46,12 +46,12 @@ This generates +homepage_test.php+ in the +test/performance+ directory:
 require 'test_helper'
 require 'performance_test_help'
 
-class HomepageTest < ActionController::PerformanceTest
+class HomepageTest extends ActionController::PerformanceTest
   # Replace this with your real tests.
-  def test_homepage
+  public function test_homepage() {
     get '/'
-  end
-end
+  }
+}
 </php>
 
 h4. Examples
@@ -60,39 +60,39 @@ Let's assume your application has the following controller and model:
 
 <php>
 # routes.php
-map.root :controller => 'home'
+map.root 'controller' => 'home'
 map.resources :posts
 
 # home_controller.php
-class HomeController < ApplicationController
-  def dashboard
-    @users = User.last_ten(:include => :avatars)
+class HomeController extends ApplicationController
+  public function dashboard() {
+    @users = User.last_ten('include' => :avatars)
     @posts = Post.all_today
-  end
-end
+  }
+}
 
 # posts_controller.php
-class PostsController < ApplicationController
-  def create
+class PostsController extends ApplicationController
+  public function create() {
     @post = Post.create($this->params['post'])
-    redirect_to(@post)
-  end
-end
+    $this->redirectTo((@post)
+  }
+}
 
 # post.php
 class Post extends ActiveRecord {
   before_save :recalculate_costly_stats
 
-  def slow_method
+  public function slow_method() {
     # I fire gallzilion queries sleeping all around
-  end
+  }
 
   private
 
-  def recalculate_costly_stats
+  public function recalculate_costly_stats() {
     # CPU heavy calculations
-  end
-end
+  }
+}
 </php>
 
 h5. Controller Example
@@ -105,20 +105,20 @@ Here's the performance test for +HomeController#dashboard+ and +PostsController#
 require 'test_helper'
 require 'performance_test_help'
 
-class PostPerformanceTest < ActionController::PerformanceTest
-  def setup
+class PostPerformanceTest extends ActionController::PerformanceTest
+  public function setup() {
     # Application requires logged-in user
     login_as(:lifo)
-  end
+  }
 
-  def test_homepage
+  public function test_homepage() {
     get '/dashboard'
-  end
+  }
 
-  def test_creating_new_post
-    post '/posts', :post => { :body => 'lifo is fooling you' }
-  end
-end
+  public function test_creating_new_post() {
+    post '/posts', 'post' => { 'body' => 'lifo is fooling you' }
+  }
+}
 </php>
 
 You can find more details about the +get+ and +post+ methods in the "Testing Akelos Applications":testing.html guide.
@@ -133,16 +133,16 @@ Performance test for +Post+ model:
 require 'test_helper'
 require 'performance_test_help'
 
-class PostModelTest < ActionController::PerformanceTest
-  def test_creation
-    Post.create :body => 'still fooling you', :cost => '100'
-  end
+class PostModelTest extends ActionController::PerformanceTest
+  public function test_creation() {
+    Post.create 'body' => 'still fooling you', 'cost' => '100'
+  }
 
-  def test_slow_method
+  public function test_slow_method() {
     # Using posts(:awesome) fixture
     posts(:awesome).slow_method
-  end
-end
+  }
+}
 </php>
 
 h4. Modes
@@ -296,12 +296,12 @@ h4. Performance Test Environment
 Performance tests are run in the +test+ environment. But running performance tests will set the following configuration parameters:
 
 <shell>
-ActionController::Base.perform_caching = true
+AkActionController.perform_caching = true
 ActiveSupport::Dependencies.mechanism = :require
 Akelos.logger.level = ActiveSupport::BufferedLogger::INFO
 </shell>
 
-As +ActionController::Base.perform_caching+ is set to +true+, performance tests will behave much as they do in the +production+ environment.
+As +AkActionController.perform_caching+ is set to +true+, performance tests will behave much as they do in the +production+ environment.
 
 h4. Installing GC-Patched PHP
 
@@ -437,7 +437,7 @@ Project.benchmark("Creating project") do
   project = Project.create("name" => 'stuff')
   project.create_manager("name" => 'David')
   project.milestones << Milestone.find(:all)
-end
+}
 </php>
 
 This benchmarks the code enclosed in the +Project.benchmark("Creating project") do...end+ block and prints the result to the log file:
@@ -453,12 +453,12 @@ h4. Controller
 Similarly, you could use this helper method inside "controllers":http://api.akelos.org/classes/ActionController/Benchmarking/ClassMethods.html#M000715
 
 <php>
-def process_projects
+public function process_projects
   self.class.benchmark("Processing projects") do
     Project.process($this->params['project_ids'])
     Project.update_cached_projects
-  end
-end
+  }
+}
 </php>
 
 NOTE: +benchmark+ is a class method inside controllers
@@ -469,7 +469,7 @@ And in "views":http://api.akelos.org/classes/ActionController/Benchmarking/Class
 
 <tpl>
 <% benchmark("Showing projects partial") do %>
-  <%= render :partial => @projects %>
+  <%= render 'partial' => @projects %>
 <% end %>
 </tpl>
 

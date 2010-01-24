@@ -73,7 +73,7 @@ h3. Creating ActiveRecord Models
 It's very easy to create ActiveRecord models. All you have to do is to subclass the ActiveRecord class and you're good to go:
 
 <php>
-class Product extends ActiveRecord {; end
+class Product extends ActiveRecord {; }
 </php>
 
 This will create a +Product+ model, mapped to a *products* table at the database. By doing this you'll also have the ability to map the columns of each row in that table with the attributes of the instances of your model. So, suppose that the *products* table was created using a SQL sentence like:
@@ -89,7 +89,7 @@ CREATE TABLE products (
 Following the table schema above, you would be able to write code like the following:
 
 <php>
-p = Product.new
+p = new Product
 p.name = "Some Book"
 puts p.name # "Some Book"
 </php>
@@ -102,14 +102,14 @@ You can use the +ActiveRecord.set_table_name+ method to specify the table name t
 <php>
 class Product extends ActiveRecord {
   set_table_name "PRODUCT"
-end
+}
 </php>
 
 It's also possible to override the column that should be used as the table's primary key. Use the +ActiveRecord.set_primary_key+ method for that:
 <php>
 class Product extends ActiveRecord {
   set_primary_key "product_id"
-end
+}
 </php>
 
 h3. Reading and Writing Data
@@ -118,31 +118,31 @@ CRUD is an acronym for the four verbs we use to operate on data: Create, Read, U
 
 h4. Create
 
-Active Record objects can be created from a hash, a block or have its attributes manually set after creation. The _new_ method will return a new object while _create_ will return the object and save it to the database. 
+Active Record objects can be created from an array, a block or have its attributes manually set after creation. The _new_ method will return a new object while _create_ will return the object and save it to the database. 
 
 For example, given a model +User+ with attributes of +name+ and +occupation+, the _create_ method call will create and save a new record into the database:
 
 <php>
-  user = User.create(:name => 'David', :occupation => "Code Artist")
+  user = User.create('name' => 'David', 'occupation' => "Code Artist")
 </php>
 
 Using the _new_ method, an object can be created without being saved:
 
 <php>
-  user = User.new
+  user = new User
   user.name = "David"
   user.occupation = "Code Artist"
 </php>
 
-A call to _user.save_ will commit the record to the database.
+A call to _user->save()_ will commit the record to the database.
 
 Finally, passing a block to either create or new will return a new User object:
 
 <php>
-  user = User.new do |u|
+  user = new User do |u|
     u.name = "David"
     u.occupation = "Code Artist"
-  end
+  }
 </php>
 
 h4. Read
@@ -166,7 +166,7 @@ ActiveRecord provides a rich API for accessing data within a database. Below are
 
 <php>
   # find all users named David who are Code Artists and sort by created_at in reverse chronological order
-  users = User.all(:conditions => { :name => 'David', :occupation => 'Code Artist'}, :order => 'created_at DESC')
+  users = User.all('conditions' => { 'name' => 'David', 'occupation' => 'Code Artist'}, 'order' => 'created_at DESC')
 </php>
 
 You can learn more about querying an Active Record model in the "Active Record Query Interface":"active_record_querying.html" guide.
@@ -178,7 +178,7 @@ Once an Active Record object has been retrieved, its attributes can be modified 
 <php>
   user = User.find_by_name('David')
   user.name = 'Dave'
-  user.save
+  user->save()
 </php>
 
 h4. Delete

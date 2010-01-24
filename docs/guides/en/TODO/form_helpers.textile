@@ -59,14 +59,14 @@ To create this form you will use +form_tag+, +label_tag+, +text_field_tag+, and 
 A basic search form
 
 <html>
-<% form_tag(search_path, :method => 'get') do %>
+<% form_tag(search_path, 'method' => 'get') do %>
   <%= label_tag(:q, "Search for:") %>
   <%= text_field_tag(:q) %>
   <%= submit_tag("Search") %>
 <% end %>
 </html>
 
-TIP: +search_path+ can be a named route specified in "routes.php": <pre>map.search "search", :controller => 'search'</pre>
+TIP: +search_path+ can be a named route specified in "routes.php": <pre>map.search "search", 'controller' => 'search'</pre>
 
 The above view code will result in the following markup:
 
@@ -82,31 +82,31 @@ Besides +text_field_tag+ and +submit_tag+, there is a similar helper for _every_
 
 TIP: For every form input, an ID attribute is generated from its name ("q" in the example). These IDs can be very useful for CSS styling or manipulation of form controls with JavaScript.
 
-h4. Multiple Hashes in Form Helper Calls
+h4. Multiple Arrays in Form Helper Calls
 
-By now you've seen that the +form_tag+ helper accepts 2 arguments: the path for the action and an options hash. This hash specifies the method of form submission and HTML options such as the form element's class.
+By now you've seen that the +form_tag+ helper accepts 2 arguments: the path for the action and an options array. This array specifies the method of form submission and HTML options such as the form element's class.
 
-As with the +link_to+ helper, the path argument doesn't have to be given a string. It can be a hash of URL parameters that Akelos' routing mechanism will turn into a valid URL. However, this is a bad way to pass multiple hashes as method arguments:
+As with the +link_to+ helper, the path argument doesn't have to be given a string. It can be an array of URL parameters that Akelos' routing mechanism will turn into a valid URL. However, this is a bad way to pass multiple arrays as method arguments:
 
 <php>
-form_tag(:controller => 'people', :action => 'search', :method => 'get', :class => 'nifty_form')
+form_tag('controller' => 'people', 'action' => 'search', 'method' => 'get', 'class' => 'nifty_form')
 # => <form action="/people/search?method=get&class=nifty_form" method="post">
 </php>
 
-Here you wanted to pass two hashes, but the PHP interpreter sees only one hash, so Akelos will construct a URL with extraneous parameters. The correct way of passing multiple hashes as arguments is to delimit the first hash (or both hashes) with curly brackets:
+Here you wanted to pass two arrays, but the PHP interpreter sees only one array, so Akelos will construct a URL with extraneous parameters. The correct way of passing multiple arrays as arguments is to delimit the first array (or both arrays) with curly brackets:
 
 <php>
-form_tag({:controller => 'people', :action => 'search'}, :method => 'get', :class => 'nifty_form')
+form_tag({'controller' => 'people', 'action' => 'search'}, 'method' => 'get', 'class' => 'nifty_form')
 # => <form action="/people/search" method="get" class="nifty_form">
 </php>
 
-This is a common pitfall when using form helpers, since many of them accept multiple hashes. So in future, if a helper produces unexpected output, make sure that you have delimited the hash parameters properly.
+This is a common pitfall when using form helpers, since many of them accept multiple arrays. So in future, if a helper produces unexpected output, make sure that you have delimited the array parameters properly.
 
-WARNING: Do not delimit the second hash without doing so with the first hash, otherwise your method invocation will result in an +expecting tASSOC+ syntax error.
+WARNING: Do not delimit the second array without doing so with the first array, otherwise your method invocation will result in an +expecting tASSOC+ syntax error.
 
 h4. Helpers for Generating Form Elements
 
-Akelos provides a series of helpers for generating form elements such as checkboxes, text fields, radio buttons, and so on. These basic helpers, with names ending in <notextile>_tag</notextile> such as +text_field_tag+, +check_box_tag+, etc., generate just a single +&lt;input&gt;+ element. The first parameter to these is always the name of the input. In the controller this name will be the key in the +params+ hash used to get the value entered by the user. For example, if the form contains
+Akelos provides a series of helpers for generating form elements such as checkboxes, text fields, radio buttons, and so on. These basic helpers, with names ending in <notextile>_tag</notextile> such as +text_field_tag+, +check_box_tag+, etc., generate just a single +&lt;input&gt;+ element. The first parameter to these is always the name of the input. In the controller this name will be the key in the +params+ array used to get the value entered by the user. For example, if the form contains
 
 <tpl>
 <%= text_field_tag(:query) %>
@@ -118,7 +118,7 @@ then the controller code should use
 $this->params['query']
 </php>
 
-to retrieve the value entered by the user. When naming inputs, be aware that Akelos uses certain conventions that control whether values are at the top level of the +params+ hash, inside an array or a nested hash and so on. You can read more about them in the parameter_names section. For details on the precise usage of these helpers, please refer to the "API documentation":http://api.akelos.org/classes/ActionView/Helpers/FormTagHelper.html.
+to retrieve the value entered by the user. When naming inputs, be aware that Akelos uses certain conventions that control whether values are at the top level of the +params+ array, inside an array or a nested array and so on. You can read more about them in the parameter_names section. For details on the precise usage of these helpers, please refer to the "API documentation":http://api.akelos.org/classes/ActionView/Helpers/FormTagHelper.html.
 
 h5. Checkboxes
 
@@ -138,7 +138,7 @@ output:
   <label for="pet_cat">I own a cat</label>
 </tpl>
 
-The second parameter to +check_box_tag+ is the value of the input. This is the value that will be submitted by the browser if the checkbox is ticked (i.e. the value that will be present in the +params+ hash). With the above form you would check the value of +$this->params['pet_dog']+ and +$this->params['pet_cat']+ to see which pets the user owns.
+The second parameter to +check_box_tag+ is the value of the input. This is the value that will be submitted by the browser if the checkbox is ticked (i.e. the value that will be present in the +params+ array). With the above form you would check the value of +$this->params['pet_dog']+ and +$this->params['pet_cat']+ to see which pets the user owns.
 
 h5. Radio Buttons
 
@@ -167,7 +167,7 @@ h4. Other Helpers of Interest
 Other form controls worth mentioning are the text area, password input and hidden input:
 
 <tpl>
-<%= text_area_tag(:message, "Hi, nice site", :size => "24x6") %>
+<%= text_area_tag(:message, "Hi, nice site", 'size' => "24x6") %>
 <%= password_field_tag(:password) %>
 <%= hidden_field_tag(:parent_id, "5") %>
 
@@ -201,9 +201,9 @@ will produce output similar to
 <input id="person_name" name="person[name]" type="text" value="Henry"/>
 </tpl>
 
-Upon form submission the value entered by the user will be stored in +$this->params['person'][:name]+. The +$this->params['person']+ hash is suitable for passing to +Person.new+ or, if +@person+ is an instance of Person, +@person.update_attributes+. While the name of an attribute is the most common second parameter to these helpers this is not compulsory. In the example above, as long as person objects have a +name+ and a +name=+ method Akelos will be happy.
+Upon form submission the value entered by the user will be stored in +$this->params['person']['name']+. The +$this->params['person']+ array is suitable for passing to +Person.new+ or, if +@person+ is an instance of Person, +@person.update_attributes+. While the name of an attribute is the most common second parameter to these helpers this is not compulsory. In the example above, as long as person objects have a +name+ and a +name=+ method Akelos will be happy.
 
-WARNING: You must pass the name of an instance variable, i.e. +:person+ or +"person"+, not an actual instance of your model object.
+WARNING: You must pass the name of an instance variable, i.e. +'person'+ or +"person"+, not an actual instance of your model object.
 
 Akelos provides helpers for displaying the validation errors associated with a model object. These are covered in detail by the "Active Record Validations and Callbacks":./activerecord_validations_callbacks.html#_using_the_tt_errors_tt_collection_in_your_view_templates guide.
 
@@ -214,25 +214,25 @@ While this is an increase in comfort it is far from perfect. If Person has many 
 Assume we have a controller for dealing with articles +app/controllers/articles_controller.php+:
 
 <php>
-def new
-  @article = Article.new
-end
+public function new
+  @article = new Article
+}
 </php>
 
 The corresponding view +app/views/articles/new.html.tpl+ using +form_for+ looks like this:
 
 <tpl>
-<% form_for :article, @article, :url => { :action => 'create' }, :html => {:class => 'nifty_form'} do |f| %>
+<% form_for :article, @article, 'url' => { 'action' => 'create' }, 'html' => {'class' => 'nifty_form'} do |f| %>
   <%= f.text_field :title %>
-  <%= f.text_area :body, :size => "60x12" %>
+  <%= f.text_area :body, 'size' => "60x12" %>
   <%= submit_tag "Create" %>
 <% end %>
 </tpl>
 
 There are a few things to note here:
 
-# +:article+ is the name of the model and +@article+ is the actual object being edited.
-# There is a single hash of options. Routing options are passed in the +:url+ hash, HTML options are passed in the +:html+ hash.
+# +'article'+ is the name of the model and +@article+ is the actual object being edited.
+# There is a single array of options. Routing options are passed in the +'url'+ array, HTML options are passed in the +'html'+ array.
 # The +form_for+ method yields a *form builder* object (the +f+ variable).
 # Methods to create form controls are called *on* the form builder object +f+
 
@@ -246,14 +246,14 @@ The resulting HTML is:
 </form>
 </html>
 
-The name passed to +form_for+ controls the key used in +params+ to access the form's values. Here the name is +article+ and so all the inputs have names of the form +article[<em>attribute_name</em>]+. Accordingly, in the +create+ action +$this->params['article']+ will be a hash with keys +:title+ and +:body+. You can read more about the significance of input names in the parameter_names section.
+The name passed to +form_for+ controls the key used in +params+ to access the form's values. Here the name is +article+ and so all the inputs have names of the form +article[<em>attribute_name</em>]+. Accordingly, in the +create+ action +$this->params['article']+ will be an array with keys +'title'+ and +'body'+. You can read more about the significance of input names in the parameter_names section.
 
 The helper methods called on the form builder are identical to the model object helpers except that it is not necessary to specify which object is being edited since this is already managed by the form builder.
 
 You can create a similar binding without actually creating  +&lt;form&gt;+ tags with the +fields_for+ helper. This is useful for editing additional model objects with the same form. For example if you had a Person model with an associated ContactDetail model you could create a form for creating both like so:
 
 <tpl>
-<% form_for :person, @person, :url => { :action => 'create' } do |person_form| %>
+<% form_for :person, @person, 'url' => { 'action' => 'create' } do |person_form| %>
   <%= person_form.text_field :name %>
   <% fields_for @person.contact_detail do |contact_details_form| %>
     <%= contact_details_form.text_field :phone_number %>
@@ -287,13 +287,13 @@ When dealing with RESTful resources, calls to +form_for+ can get significantly e
 <php>
 ## Creating a new article
 # long-style:
-form_for(:article, @article, :url => articles_path)
+form_for(:article, @article, 'url' => articles_path)
 # same thing, short-style (record identification gets used):
 form_for(@article)
 
 ## Editing an existing article
 # long-style:
-form_for(:article, @article, :url => article_path(@article), :method => 'put')
+form_for(:article, @article, 'url' => article_path(@article), 'method' => 'put')
 # short-style:
 form_for(@article)
 </php>
@@ -302,7 +302,7 @@ Notice how the short-style +form_for+ invocation is conveniently the same, regar
 
 Akelos will also automatically set the +class+ and +id+ of the form appropriately: a form creating an article would have +id+ and +class+ +new_article+. If you were editing the article with id 23, the +class+ would be set to +edit_article+ and the id to +edit_article_23+. These attributes will be omitted for brevity in the rest of this guide.
 
-WARNING: When you're using STI (single-table inheritance) with your models, you can't rely on record identification on a subclass if only their parent class is declared a resource. You will have to specify the model name, +:url+, and +:method+ explicitly.
+WARNING: When you're using STI (single-table inheritance) with your models, you can't rely on record identification on a subclass if only their parent class is declared a resource. You will have to specify the model name, +'url'+, and +'method'+ explicitly.
 
 h5. Dealing with Namespaces
 
@@ -328,7 +328,7 @@ The Akelos framework encourages RESTful design of your applications, which means
 Akelos works around this issue by emulating other methods over POST with a hidden input named +"_method"+, which is set to reflect the desired method:
 
 <php>
-form_tag(search_path, :method => 'put')
+form_tag(search_path, 'method' => 'put')
 </php>
 
 output:
@@ -404,7 +404,7 @@ output:
 
 Whenever Akelos sees that the internal value of an option being generated matches this value, it will add the +selected+ attribute to that option.
 
-TIP: The second argument to +options_for_select+ must be exactly equal to the desired internal value. In particular if the value is the integer 2 you cannot pass "2" to +options_for_select+ -- you must pass 2. Be aware of values extracted from the +params+ hash as they are all strings.
+TIP: The second argument to +options_for_select+ must be exactly equal to the desired internal value. In particular if the value is the integer 2 you cannot pass "2" to +options_for_select+ -- you must pass 2. Be aware of values extracted from the +params+ array as they are all strings.
 
 h4. Select Boxes for Dealing with Models
 
@@ -412,7 +412,7 @@ In most cases form controls will be tied to a specific database model and as you
 
 <php>
 # controller:
-@person = Person.new(:city_id => 2)
+@person = new Person('city_id' => 2)
 </php>
 
 <tpl>
@@ -429,7 +429,7 @@ As with other helpers, if you were to use the +select+ helper on a form builder 
 <%= f.select(:city_id, ...) %>
 </tpl>
 
-WARNING: If you are using +select+ (or similar helpers such as +collection_select+, +select_tag+) to set a +belongs_to+ association you must pass the name of the foreign key (in the example above +city_id+), not the name of association itself.  If you specify +city+ instead of +city_id+ Active Record will raise an error along the lines of <pre> ActiveRecord::AssociationTypeMismatch: City(#17815740) expected, got String(#1138750) </pre> when you pass the +params+ hash to +Person.new+ or +update_attributes+. Another way of looking at this is that form helpers only edit attributes.  You should also be aware of the potential security ramifications of allowing users to edit foreign keys directly. You may wish to consider the use of +attr_protected+ and +attr_accessible+. For further details on this, see the "Akelos Security Guide":security.html#_mass_assignment.
+WARNING: If you are using +select+ (or similar helpers such as +collection_select+, +select_tag+) to set a +belongs_to+ association you must pass the name of the foreign key (in the example above +city_id+), not the name of association itself.  If you specify +city+ instead of +city_id+ Active Record will raise an error along the lines of <pre> ActiveRecord::AssociationTypeMismatch: City(#17815740) expected, got String(#1138750) </pre> when you pass the +params+ array to +Person.new+ or +update_attributes+. Another way of looking at this is that form helpers only edit attributes.  You should also be aware of the potential security ramifications of allowing users to edit foreign keys directly. You may wish to consider the use of +attr_protected+ and +attr_accessible+. For further details on this, see the "Akelos Security Guide":security.html#_mass_assignment.
 
 h4. Option Tags from a Collection of Arbitrary Objects
 
@@ -472,7 +472,7 @@ h3. Using Date and Time Form Helpers
 
 The date and time helpers differ from all the other form helpers in two important respects:
 
-# Dates and times are not representable by a single input element. Instead you have several, one for each component (year, month, day etc.) and so there is no single value in your +params+ hash with your date or time.
+# Dates and times are not representable by a single input element. Instead you have several, one for each component (year, month, day etc.) and so there is no single value in your +params+ array with your date or time.
 # Other helpers use the +_tag+ suffix to indicate whether a helper is a barebones helper or one that operates on model objects. With dates and times, +select_date+, +select_time+ and +select_datetime+ are the barebones helpers, +date_select+, +time_select+ and +datetime_select+ are the equivalent model object helpers.
 
 Both of these families of helpers will create a series of select boxes for the different components (year, month, day etc.).
@@ -482,7 +482,7 @@ h4. Barebones Helpers
 The +select_*+ family of helpers take as their first argument an instance of Date, Time or DateTime that is used as the currently selected value. You may omit this parameter, in which case the current date is used. For example
 
 <tpl>
-<%= select_date Date.today, :prefix => :start_date %>
+<%= select_date Date.today, 'prefix' => :start_date %>
 </tpl>
 
 outputs (with actual option values omitted for brevity)
@@ -493,17 +493,17 @@ outputs (with actual option values omitted for brevity)
 <select id="start_date_day" name="start_date[day]"> ... </select>
 </html>
 
-The above inputs would result in +$this->params['start_date']+ being a hash with keys +:year+, +:month+, +:day+. To get an actual Time or Date object you would have to extract these values and pass them to the appropriate constructor, for example
+The above inputs would result in +$this->params['start_date']+ being an array with keys +'year'+, +'month'+, +'day'+. To get an actual Time or Date object you would have to extract these values and pass them to the appropriate constructor, for example
 
 <php>
-Date.civil($this->params['start_date'][:year].to_i, $this->params['start_date'][:month].to_i, $this->params['start_date'][:day].to_i)
+Date.civil($this->params['start_date']['year'].to_i, $this->params['start_date']['month'].to_i, $this->params['start_date']['day'].to_i)
 </php>
 
-The +:prefix+ option is the key used to retrieve the hash of date components from the +params+ hash. Here it was set to +start_date+, if omitted it will default to +date+.
+The +'prefix'+ option is the key used to retrieve the array of date components from the +params+ array. Here it was set to +start_date+, if omitted it will default to +date+.
 
 h4. Model Object Helpers
 
-+select_date+ does not work well with forms that update or create Active Record objects as Active Record expects each element of the +params+ hash to correspond to one attribute.
++select_date+ does not work well with forms that update or create Active Record objects as Active Record expects each element of the +params+ array to correspond to one attribute.
 The model object helpers for dates and times submit parameters with special names,  when Active Record sees parameters with such names it knows they must be combined with the other parameters and given to a constructor appropriate to the column type. For example:
 
 <tpl>
@@ -518,17 +518,17 @@ outputs (with actual option values omitted for brevity)
 <select id="person_birth_date_3i" name="person[birth_date(3i)]"> ... </select>
 </html>
 
-which results in a +params+ hash like
+which results in a +params+ array like
 
 <php>
-{:person => {'birth_date(1i)' => '2008', 'birth_date(2i)' => '11', 'birth_date(3i)' => '22'}}
+{'person' => {'birth_date(1i)' => '2008', 'birth_date(2i)' => '11', 'birth_date(3i)' => '22'}}
 </php>
 
 When this is passed to +Person.new+ (or +update_attributes+), Active Record spots that these parameters should all be used to construct the +birth_date+ attribute and uses the suffixed information to determine in which order it should pass these parameters to functions such as +Date.civil+.
 
 h4. Common Options
 
-Both families of helpers use the same core set of functions to generate the individual select tags and so both accept largely the same options. In particular, by default Akelos will generate year options 5 years either side of the current year. If this is not an appropriate range, the +:start_year+ and +:end_year+ options override this. For an exhaustive list of the available options, refer to the "API documentation":http://api.akelos.org/classes/ActionView/Helpers/DateHelper.html.
+Both families of helpers use the same core set of functions to generate the individual select tags and so both accept largely the same options. In particular, by default Akelos will generate year options 5 years either side of the current year. If this is not an appropriate range, the +'start_year'+ and +'end_year'+ options override this. For an exhaustive list of the available options, refer to the "API documentation":http://api.akelos.org/classes/ActionView/Helpers/DateHelper.html.
 
 As a rule of thumb you should be using +date_select+ when working with model objects and +select_date+ in other cases, such as a search form which filters results by date.
 
@@ -536,7 +536,7 @@ NOTE: In many cases the built-in date pickers are clumsy as they do not aid the 
 
 h4. Individual Components
 
-Occasionally you need to display just a single date component such as a year or a month. Akelos provides a series of helpers for this, one for each component +select_year+, +select_month+, +select_day+, +select_hour+, +select_minute+, +select_second+. These helpers are fairly straightforward. By default they will generate an input field named after the time component (for example "year" for +select_year+, "month" for +select_month+ etc.) although this can be overriden with the  +:field_name+ option. The +:prefix+ option works in the same way that it does for +select_date+ and +select_time+ and has the same default value.
+Occasionally you need to display just a single date component such as a year or a month. Akelos provides a series of helpers for this, one for each component +select_year+, +select_month+, +select_day+, +select_hour+, +select_minute+, +select_second+. These helpers are fairly straightforward. By default they will generate an input field named after the time component (for example "year" for +select_year+, "month" for +select_month+ etc.) although this can be overriden with the  +'field_name'+ option. The +'prefix'+ option works in the same way that it does for +select_date+ and +select_time+ and has the same default value.
 
 The first parameter specifies which value should be selected and can either be an instance of a Date, Time or DateTime, in which case the relevant component will be extracted, or a numerical value. For example
 
@@ -545,37 +545,37 @@ The first parameter specifies which value should be selected and can either be a
 <%= select_year(Time.now) %>
 </tpl>
 
-will produce the same output if the current year is 2009 and the value chosen by the user can be retrieved by +$this->params['date'][:year]+.
+will produce the same output if the current year is 2009 and the value chosen by the user can be retrieved by +$this->params['date']['year']+.
 
 h3. Uploading Files
 
-A common task is uploading some sort of file, whether it's a picture of a person or a CSV file containing data to process. The most important thing to remember with file uploads is that the form's encoding *MUST* be set to "multipart/form-data". If you forget to do this the file will not be uploaded. This can be done by passing +:multi_part => true+ as an HTML option. This means that in the case of +form_tag+ it must be passed in the second options hash and in the case of +form_for+ inside the +:html+ hash.
+A common task is uploading some sort of file, whether it's a picture of a person or a CSV file containing data to process. The most important thing to remember with file uploads is that the form's encoding *MUST* be set to "multipart/form-data". If you forget to do this the file will not be uploaded. This can be done by passing +'multi_part' => true+ as an HTML option. This means that in the case of +form_tag+ it must be passed in the second options array and in the case of +form_for+ inside the +'html'+ array.
 
 The following two forms both upload a file.
 
 <tpl>
-<% form_tag({:action => :upload}, :multipart => true) do %>
+<% form_tag({'action' => :upload}, 'multipart' => true) do %>
   <%= file_field_tag 'picture' %>
 <% end %>
 
-<% form_for @person, :html => {:multipart => true} do |f| %>
+<% form_for @person, 'html' => {'multipart' => true} do |f| %>
   <%= f.file_field :picture %>
 <% end %>
 </tpl>
 
-Akelos provides the usual pair of helpers: the barebones +file_field_tag+ and the model oriented +file_field+. The only difference with other helpers is that you cannot set a default value for file inputs as this would have no meaning. As you would expect in the first case the uploaded file is in +$this->params['picture']+ and in the second case in +$this->params['person'][:picture]+.
+Akelos provides the usual pair of helpers: the barebones +file_field_tag+ and the model oriented +file_field+. The only difference with other helpers is that you cannot set a default value for file inputs as this would have no meaning. As you would expect in the first case the uploaded file is in +$this->params['picture']+ and in the second case in +$this->params['person']['picture']+.
 
 h4. What Gets Uploaded
 
-The object in the +params+ hash is an instance of a subclass of IO. Depending on the size of the uploaded file it may in fact be a StringIO or an instance of File backed by a temporary file. In both cases the object will have an +original_filename+ attribute containing the name the file had on the user's computer and a +content_type+ attribute containing the MIME type of the uploaded file. The following snippet saves the uploaded content in +#{Akelos.root}/public/uploads+ under the same name as the original file (assuming the form was the one in the previous example).
+The object in the +params+ array is an instance of a subclass of IO. Depending on the size of the uploaded file it may in fact be a StringIO or an instance of File backed by a temporary file. In both cases the object will have an +original_filename+ attribute containing the name the file had on the user's computer and a +content_type+ attribute containing the MIME type of the uploaded file. The following snippet saves the uploaded content in +#{Akelos.root}/public/uploads+ under the same name as the original file (assuming the form was the one in the previous example).
 
 <php>
-def upload
-  uploaded_io = $this->params['person'][:picture]
+public function upload
+  uploaded_io = $this->params['person']['picture']
   File.open(Akelos.root.join('public', 'uploads', uploaded_io.original_filename), 'w') do |file|
     file.write(uploaded_io.read)
-  end
-end
+  }
+}
 </php>
 
 Once a file has been uploaded, there are a multitude of potential tasks, ranging from where to store the files (on disk, Amazon S3, etc) and associating them with models to resizing image files and generating thumbnails. The intricacies of this are beyond the scope of this guide, but there are several plugins designed to assist with these. Two of the better known ones are "Attachment-Fu":http://github.com/technoweenie/attachment_fu and "Paperclip":http://www.thoughtbot.com/projects/paperclip.
@@ -599,7 +599,7 @@ As mentioned previously the object yielded by +form_for+ and +fields_for+ is an 
 can be replaced with
 
 <tpl>
-<% form_for @person, :builder => LabellingFormBuilder do |f| %>
+<% form_for @person, 'builder' => LabellingFormBuilder do |f| %>
   <%= f.text_field :first_name %>
 <% end %>
 </tpl>
@@ -607,41 +607,41 @@ can be replaced with
 by defining a LabellingFormBuilder class similar to the following:
 
 <php>
-class LabellingFormBuilder < ActionView::Helpers::FormBuilder
-  def text_field(attribute, options={})
+class LabellingFormBuilder extends ActionView::Helpers::FormBuilder
+  public function text_field($attribute, options={})
     label(attribute) + super
-  end
-end
+  }
+}
 </php>
 
-If you reuse this frequently you could define a +labeled_form_for+ helper that automatically applies the +:builder => LabellingFormBuilder+ option.
+If you reuse this frequently you could define a +labeled_form_for+ helper that automatically applies the +'builder' => LabellingFormBuilder+ option.
 
 The form builder used also determines what happens when you do
 
 <tpl>
-<%= render :partial => f %>
+<%= render 'partial' => f %>
 </tpl>
 
 If +f+ is an instance of FormBuilder then this will render the +form+ partial, setting the partial's object to the form builder. If the form builder is of class LabellingFormBuilder then the +labelling_form+ partial would be rendered instead.
 
 h3. Understanding Parameter Naming Conventions
 
-As you've seen in the previous sections, values from forms can be at the top level of the +params+ hash or nested in another hash. For example in a standard +create+
-action for a Person model, +$this->params['model']+ would usually be a hash of all the attributes for the person to create. The +params+ hash can also contain arrays, arrays of hashes and so on.
+As you've seen in the previous sections, values from forms can be at the top level of the +params+ array or nested in another array. For example in a standard +create+
+action for a Person model, +$this->params['model']+ would usually be an array of all the attributes for the person to create. The +params+ array can also contain arrays, arrays of arrays and so on.
 
-Fundamentally HTML forms don't know about any sort of structured data, all they generate is name–value pairs, where pairs are just plain strings. The arrays and hashes you see in your application are the result of some parameter naming conventions that Akelos uses.
+Fundamentally HTML forms don't know about any sort of structured data, all they generate is name–value pairs, where pairs are just plain strings. The arrays and arrays you see in your application are the result of some parameter naming conventions that Akelos uses.
 
 TIP: You may find you can try out examples in this section faster by using the console to directly invoke Akelos' parameter parser. For example <pre> ActionController::UrlEncodedPairParser.parse_query_parameters "name=fred&phone=0123456789" # => {"name"=>'fred', "phone"=>"0123456789"} </pre>
 
 h4. Basic Structures
 
-The two basic structures are arrays and hashes. Hashes mirror the syntax used for accessing the value in +params+. For example if a form contains
+The two basic structures are arrays and arrays. Arrays mirror the syntax used for accessing the value in +params+. For example if a form contains
 
 <html>
 <input id="person_name" name="person[name]" type="text" value="Henry"/>
 </html>
 
-the +params+ hash will contain
+the +params+ array will contain
 
 <tpl>
 {'person' => {'name' => 'Henry'}}
@@ -649,13 +649,13 @@ the +params+ hash will contain
 
 and +params["name"]+ will retrieve the submitted value in the controller.
 
-Hashes can be nested as many levels as required, for example
+Arrays can be nested as many levels as required, for example
 
 <html>
 <input id="person_address_city" name="person[address][city]" type="text" value="New York"/>
 </html>
 
-will result in the +params+ hash being
+will result in the +params+ array being
 
 <php>
 {'person' => {'address' => {'city' => 'New York'}}}
@@ -669,11 +669,11 @@ Normally Akelos ignores duplicate parameter names. If the parameter name contain
 <input name="person[phone_number][]" type="text"/>
 </html>
 
-This would result in +$this->params['person'][:phone_number]+ being an array.
+This would result in +$this->params['person']['phone_number']+ being an array.
 
 h4. Combining Them
 
-We can mix and match these two concepts. For example, one element of a hash might be an array as in the previous example, or you can have an array of hashes. For example a form might let you create any number of addresses by repeating the following form fragment
+We can mix and match these two concepts. For example, one element of an array might be an array as in the previous example, or you can have an array of arrays. For example a form might let you create any number of addresses by repeating the following form fragment
 
 <html>
 <input name="addresses[][line1]" type="text"/>
@@ -681,15 +681,15 @@ We can mix and match these two concepts. For example, one element of a hash migh
 <input name="addresses[][city]" type="text"/>
 </html>
 
-This would result in +$this->params['addresses']+ being an array of hashes with keys +line1+, +line2+ and +city+. Akelos decides to start accumulating values in a new hash whenever it encounters an input name that already exists in the current hash.
+This would result in +$this->params['addresses']+ being an array of arrays with keys +line1+, +line2+ and +city+. Akelos decides to start accumulating values in a new array whenever it encounters an input name that already exists in the current array.
 
-There's a restriction, however, while hashes can be nested arbitrarily, only one level of "arrayness" is allowed. Arrays can be usually replaced by hashes, for example instead of having an array of model objects one can have a hash of model objects keyed by their id, an array index or some other parameter.
+There's a restriction, however, while arrays can be nested arbitrarily, only one level of "arrayness" is allowed. Arrays can be usually replaced by arrays, for example instead of having an array of model objects one can have an array of model objects keyed by their id, an array index or some other parameter.
 
-WARNING: Array parameters do not play well with the +check_box+ helper. According to the HTML specification unchecked checkboxes submit no value. However it is often convenient for a checkbox to always submit a value. The +check_box+ helper fakes this by creating an auxiliary hidden input with the same name. If the checkbox is unchecked only the hidden input is submitted and if it is checked then both are submitted but the value submitted by the checkbox takes precedence. When working with array parameters this duplicate submission will confuse Akelos since duplicate input names are how it decides when to start a new array element. It is preferable to either use +check_box_tag+ or to use hashes instead of arrays.
+WARNING: Array parameters do not play well with the +check_box+ helper. According to the HTML specification unchecked checkboxes submit no value. However it is often convenient for a checkbox to always submit a value. The +check_box+ helper fakes this by creating an auxiliary hidden input with the same name. If the checkbox is unchecked only the hidden input is submitted and if it is checked then both are submitted but the value submitted by the checkbox takes precedence. When working with array parameters this duplicate submission will confuse Akelos since duplicate input names are how it decides when to start a new array element. It is preferable to either use +check_box_tag+ or to use arrays instead of arrays.
 
 h4. Using Form Helpers
 
-The previous sections did not use the Akelos form helpers at all. While you can craft the input names yourself and pass them directly to helpers such as +text_field_tag+ Akelos also provides higher level support. The two tools at your disposal here are the name parameter to +form_for+ and +fields_for+ and the +:index+ option that helpers take.
+The previous sections did not use the Akelos form helpers at all. While you can craft the input names yourself and pass them directly to helpers such as +text_field_tag+ Akelos also provides higher level support. The two tools at your disposal here are the name parameter to +form_for+ and +fields_for+ and the +'index'+ option that helpers take.
 
 You might want to render a form with a set of edit fields for each of a person's addresses. For example:
 
@@ -697,7 +697,7 @@ You might want to render a form with a set of edit fields for each of a person's
 <% form_for @person do |person_form| %>
   <%= person_form.text_field :name %>
   <% for address in @person.addresses %>
-    <% person_form.fields_for address, :index => address do |address_form|%>
+    <% person_form.fields_for address, 'index' => address do |address_form|%>
       <%= address_form.text_field :city %>
     <% end %>
   <% end %>
@@ -714,18 +714,18 @@ Assuming the person had two addresses, with ids 23 and 45 this would create outp
 </form>
 </html>
 
-This will result in a +params+ hash that looks like
+This will result in a +params+ array that looks like
 
 <php>
 {'person' => {'name' => 'Bob', 'address' => {'23' => {'city' => 'Paris'}, '45' => {'city' => 'London'}}}}
 </php>
 
-Akelos knows that all these inputs should be part of the person hash because you called +fields_for+ on the first form builder. By specifying an +:index+ option you're telling Akelos that instead of naming the inputs +person[address][city]+ it should insert that index surrounded by [] between the address and the city. If you pass an Active Record object as we did then Akelos will call +to_param+ on it, which by default returns the database id. This is often useful as it is then easy to locate which Address record should be modified. You can pass numbers with some other significance, strings or even +null+ (which will result in an array parameter being created).
+Akelos knows that all these inputs should be part of the person array because you called +fields_for+ on the first form builder. By specifying an +'index'+ option you're telling Akelos that instead of naming the inputs +person[address][city]+ it should insert that index surrounded by [] between the address and the city. If you pass an Active Record object as we did then Akelos will call +to_param+ on it, which by default returns the database id. This is often useful as it is then easy to locate which Address record should be modified. You can pass numbers with some other significance, strings or even +null+ (which will result in an array parameter being created).
 
 To create more intricate nestings, you can specify the first part of the input name (+person[address]+ in the previous example) explicitly, for example
 
 <tpl>
-<% fields_for 'person[address][primary]', address, :index => address do |address_form| %>
+<% fields_for 'person[address][primary]', address, 'index' => address do |address_form| %>
   <%= address_form.text_field :city %>
 <% end %>
 </tpl>
@@ -736,9 +736,9 @@ will create inputs like
 <input id="person_address_primary_1_city" name="person[address][primary][1][city]" size="30" type="text" value="bologna" />
 </html>
 
-As a general rule the final input name is the concatenation of the name given to +fields_for+/+form_for+, the index value and the name of the attribute. You can also pass an +:index+ option directly to helpers such as +text_field+, but it is usually less repetitive to specify this at the form builder level rather than on individual input controls.
+As a general rule the final input name is the concatenation of the name given to +fields_for+/+form_for+, the index value and the name of the attribute. You can also pass an +'index'+ option directly to helpers such as +text_field+, but it is usually less repetitive to specify this at the form builder level rather than on individual input controls.
 
-As a shortcut you can append [] to the name and omit the +:index+ option. This is the same as specifying +:index => address+ so
+As a shortcut you can append [] to the name and omit the +'index'+ option. This is the same as specifying +'index' => address+ so
 
 <tpl>
 <% fields_for 'person[address][primary][]', address do |address_form| %>

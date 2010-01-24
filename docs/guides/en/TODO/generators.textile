@@ -38,11 +38,11 @@ Since Akelos 3.0, generators are built on top of "Thor":http://github.com/wycats
 The first step is to create a file at +AK_APP_DIR/lib/generators/initializer_generator.php+ with the following content:
 
 <php>
-class InitializerGenerator < Akelos::Generators::Base
-  def create_initializer_file
+class InitializerGenerator extends Akelos::Generators::Base
+  public function create_initializer_file() {
     create_file "config/initializers/initializer.php", "# Add initialization content here"
-  end
-end
+  }
+}
 </php>
 
 Our new generator is quite simple: it inherits from +Akelos::Generators::Base+ and have one method definition. Each public method in the generator is executed when a generator is invoked. Finally, we invoke the +create_file+ method that will create a file at the given destination with the given content. If you are familiar with Akelos Application Templates API, you are at home with new generators API.
@@ -62,12 +62,12 @@ $ php makelos generate initializer --help
 Akelos usually is able to generate good descriptions if a generator is namespaced, as +ActiveRecord::Generators::ModelGenerator+, but not in this particular case. We can solve this problem in two ways. The first one is calling +desc+ inside our generator:
 
 <php>
-class InitializerGenerator < Akelos::Generators::Base
+class InitializerGenerator extends Akelos::Generators::Base
   desc "This generator creates an initializer file at config/initializers"
-  def create_initializer_file
+  public function create_initializer_file() {
     create_file "config/initializers/initializer.php", "# Add initialization content here"
-  end
-end
+  }
+}
 </php>
 
 Now we can see the new description by invoking +--help+ in the new generator. The second way to add a description is by creating a file named +USAGE+ in the same directory as our generator. We are going to do that in the next step.
@@ -87,11 +87,11 @@ $ php makelos generate generator initializer
 And it will create a new generator as follow:
 
 <php>
-class InitializerGenerator < Akelos::Generators::NamedBase
+class InitializerGenerator extends Akelos::Generators::NamedBase
   public function source_root
     @source_root ||= File.expand_path(File.join(File.dirname(__FILE__), 'templates'))
-  end
-end
+  }
+}
 </php>
 
 At first, we can notice that we are inheriting from +Akelos::Generators::NamedBase+ instead of +Akelos::Generators::Base+. This means that our generator expects as least one argument, which will be the name of the initializer.
@@ -114,15 +114,15 @@ We can also see in our new generator that it has a class method called +source_r
 And now let's change the generator to copy this template when invoked:
 
 <php>
-class InitializerGenerator < Akelos::Generators::NamedBase
+class InitializerGenerator extends Akelos::Generators::NamedBase
   public function source_root
     @source_root ||= File.expand_path(File.join(File.dirname(__FILE__), 'templates'))
-  end
+  }
 
-  def copy_initializer_file
+  public function copy_initializer_file() {
     copy_file "initializer.php", "config/initializers/#{file_name}.php"
-  end
-end
+  }
+}
 </php>
 
 And let's execute our generator:
@@ -159,8 +159,8 @@ Akelos generators are flexible enough to let you customize your scaffold the way
 config.generators do |g|
   g.orm             :active_record
   g.template_engine :tpl
-  g.test_framework  :test_unit, :fixture => true
-end
+  g.test_framework  :test_unit, 'fixture' => true
+}
 </php>
 
 Before we customize our workflow, let's first see how our scaffold looks like:
@@ -202,9 +202,9 @@ Our first customization on the workflow will be to stop generating stylesheets a
 config.generators do |g|
   g.orm             :active_record
   g.template_engine :tpl
-  g.test_framework  :test_unit, :fixture => false
+  g.test_framework  :test_unit, 'fixture' => false
   g.stylesheets     false
-end
+}
 </php>
 
 If we generate another resource on scaffold, we can notice that neither stylesheets nor fixtures are created anymore. If you want to customize it further, for example to use +Datamapper+ and +Rspec+ instead of +ActiveRecord+ and +TestUnit+, is just a matter of adding their gems to your application and configuring your generators.
@@ -218,15 +218,15 @@ $ php makelos generate generator my_helper
 After that, we can delete both templates directory and the +source_root+ class method from our new generators, because we are not going to need them. So our new generator looks like the following:
 
 <php>
-class MyHelperGenerator < Akelos::Generators::NamedBase
-  def create_helper_file
+class MyHelperGenerator extends Akelos::Generators::NamedBase
+  public function create_helper_file() {
     create_file "app/helpers/#{file_name}_helper.php", <<-FILE
 module #{class_name}Helper
   attr_reader :#{plural_name}, :#{plural_name.singularize}
-end
+}
     FILE
-  end
-end
+  }
+}
 </php>
 
 We can try out our new generator by creating a helper for users:
@@ -240,7 +240,7 @@ And it will generate the following helper file in app/helpers:
 <php>
 module UsersHelper
   attr_reader :users, :user
-end
+}
 </php>
 
 Which is what we expected. We can now tell scaffold to use our new helper generator by configuring +config/application.php+ once again:
@@ -249,10 +249,10 @@ Which is what we expected. We can now tell scaffold to use our new helper genera
 config.generators do |g|
   g.orm             :active_record
   g.template_engine :tpl
-  g.test_framework  :test_unit, :fixture => false
+  g.test_framework  :test_unit, 'fixture' => false
   g.stylesheets     false
   g.helper          :my_helper
-end
+}
 </php>
 
 And see it in action when invoking generator once again:
@@ -271,24 +271,24 @@ Since Akelos 3.0, this is easy to do due to the hooks concept. Our new helper do
 To do that, we can change your generator to the following:
 
 <php>
-class MyHelperGenerator < Akelos::Generators::NamedBase
-  def create_helper_file
+class MyHelperGenerator extends Akelos::Generators::NamedBase
+  public function create_helper_file() {
     create_file "app/helpers/#{file_name}_helper.php", <<-FILE
 module #{class_name}Helper
   attr_reader :#{plural_name}, :#{plural_name.singularize}
-end
+}
     FILE
-  end
+  }
 
   hook_for :test_framework
-end
+}
 </php>
 
 Now, when the helper generator is invoked and let's say test unit is configured as test framework, it will try to invoke both +MyHelper::Generators::TestUnitGenerator+ and +TestUnit::Generators::MyHelperGenerator+. Since none of those are defined, we can tell our generator to invoke +TestUnit::Generators::HelperGenerator+ instead, which is defined since it's an Akelos hook. To do that, we just need to add:
 
 <php>
   # Search for :helper instead of :my_helper
-  hook_for :test_framework, :as => :helper
+  hook_for :test_framework, 'as' => :helper
 </php>
 
 And now you can re-run scaffold for another resource and see it generating tests as well!
@@ -302,7 +302,7 @@ In Akelos 3.0 and above, generators does not look only in the source root for te
 <tpl>
 module <%= class_name %>Helper
   attr_reader :<%= plural_name %>, <%= plural_name.singularize %>
-end
+}
 </tpl>
 
 So now we can revert the changes in +config/application.php+:
@@ -311,9 +311,9 @@ So now we can revert the changes in +config/application.php+:
 config.generators do |g|
   g.orm             :active_record
   g.template_engine :tpl
-  g.test_framework  :test_unit, :fixture => false
+  g.test_framework  :test_unit, 'fixture' => false
   g.stylesheets     false
-end
+}
 </php>
 
 If you generate another resource, you can see that we got exactly the same result! This is useful if you want to customize your scaffold templates and/or layout by just creating +edit.html.tpl+, +index.html.tpl+ and so on inside +AK_APP_DIR/lib/templates/tpl/scaffold+.
@@ -328,16 +328,16 @@ We can easily simulate this behavior by changing our +config/application.php+ on
 config.generators do |g|
   g.orm             :active_record
   g.template_engine :tpl
-  g.test_framework  :shoulda, :fixture => false
+  g.test_framework  :shoulda, 'fixture' => false
   g.stylesheets     false
-end
+}
 </php>
 
 And at the end of the same file:
 
 <php>
 require 'akelos/generators'
-Akelos::Generators.fallbacks[:shoulda] = :test_unit
+Akelos::Generators.fallbacks['shoulda'] = :test_unit
 </php>
 
 Now, if create a Comment scaffold, you will see that shoulda generators are being invoked, and at the end, they are just falling back to test unit generators:
