@@ -875,7 +875,6 @@ class AkRequest
         if(AK_AUTOMATIC_SESSION_START){
             if(!isset($_SESSION)){
                 AkSession::initHandler();
-                session_start();
             }
         }
     }

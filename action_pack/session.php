@@ -84,7 +84,8 @@ class AkSession
             case 1:
                 // session_save_path();
                 $this->sessions_enabled = false; // Use PHP session handling
-                break;
+                session_start();
+                return true;
             case 2:
                 $AkDbSession = new AkDbSession();
                 $AkDbSession->session_life = AK_SESSION_EXPIRE;
@@ -126,6 +127,7 @@ class AkSession
             array($this, '_destroy'),
             array($this, '_gc')
             );
+            session_start();
 
         }
     }

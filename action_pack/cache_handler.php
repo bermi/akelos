@@ -323,7 +323,6 @@ class AkCacheHandler
     public function _startSession() {
         if(isset($_COOKIE[AK_SESSION_NAME]) && !isset($_SESSION)){
             AkSession::initHandler();
-            session_start();
         }
     }
 
