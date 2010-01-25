@@ -29,14 +29,12 @@ Example:
     This generates a skeletal Akelos installation in ~/Code/PHP/weblog.
     See the README in the newly created application to get going.
 
-Usage: akelos [-vsqhf --dependencies] <-pd> 
+Usage: akelos [-vsqhf] <-pd> 
 
     -d --directory=<value>    Destination directory for installing 
                               the application.
     -p --public_html=<value>  Location where the application will be 
                               accessed by the web server.
-    -i --dependencies         Includes a copy of the framework into the 
-                              application directory. (true)
     -f --force                Overwrite files that already exist. (false)
     -q --quiet                Suppress normal output. (false)
     -s --skip                 Skip files that already exist. (false)
@@ -61,8 +59,7 @@ class AkelosInstaller
         'force' => false,
         'skip' => false,
         'quiet' => false,
-        'public_html' => false,
-        'dependencies' => false
+        'public_html' => false
         );
 
         $this->options = array_merge($default_options, $options);
@@ -88,14 +85,9 @@ class AkelosInstaller
 
             $this->_copyApplicationFiles($this->source_tree, $this->options['source']);
 
-
-            if(empty($this->options['dependencies'])){
-                $this->_linkDependencies();
-            }
-
             $this->_linkPublicHtmlFolder();
+            $this->_copyAkelosToVendors();
             $this->_cleanUpAndCreateEmptyFolders();
-
             $this->runEvironmentSpecificTasks();
 
 
@@ -212,10 +204,10 @@ class AkelosInstaller
         return false;
     }
 
-    protected function _linkDependencies() {
-        $this->yield("\n    Linking the application with the framework at ".$this->options['source'])."\n";
-        $old = "defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       AK_BASE_DIR);";
-        $new = "defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       '".addcslashes(AK_FRAMEWORK_DIR,'\\')."');";
+    protected function _copyAkelosToVendors() {
+        $this->yield("\nCopying akelos framework from ".AK_FRAMEWORK_DIR." to ".$this->options['directory'].DS.'vendor'.DS.'akelos');
+
+        self::copyRecursivelly(AK_FRAMEWORK_DIR, $this->options['directory'].DS.'vendor'.DS.'akelos');
     }
 
     protected function _copyApplicationFiles($directory_structure, $base_path = '.') {
@@ -272,9 +264,43 @@ class AkelosInstaller
             }
         }
     }
-    
+
+    static function copyRecursivelly($source, $destination) {
+        $dir = opendir($source);
+
+        @mkdir($destination);
+        @self::equalPermissions($source, $destination);
+        while(false !== ($file = readdir($dir))) {
+            if ($file != '.' && $file != '..' && $file != '.git' && $file != '.svn' && $file != '.empty_directory') {
+                if (is_dir($source.DS.$file)) {
+                    self::copyRecursivelly($source.DS.$file,$destination.DS.$file);
+                } else {
+                    if(!@copy($source.DS.$file, $destination.DS.$file)){
+                        if(!file_put_contents($destination.DS.$file, file_get_contents($source.DS.$file))){
+                            throw new Exception('Error While copying file: '.$source.DS.$file.' to '.$destination.DS.$file);
+                        }
+                        @self::equalPermissions($source.DS.$file, $destination.DS.$file);
+                    }
+                }
+            }
+        }
+        closedir($dir);
+    }
+
+    static function equalPermissions($source, $destination){
+        $source_file_mode =  fileperms($source);
+        $target_file_mode =  fileperms($destination);
+        if($source_file_mode != $target_file_mode){
+            chmod($destination, $source_file_mode);
+        }
+    }
+
     protected function _cleanUpAndCreateEmptyFolders(){
-    
+        # empty log files
+
+        // Copy docs
+        self::copyRecursivelly($this->options['directory'].DS.'vendor'.DS.'akelos'.DS.'docs', $this->options['directory'].DS.'docs');
+
     }
 
     /**
@@ -348,7 +374,7 @@ function get_command_value($options, $short, $long, $default = null, $error_if_u
 $directory_candidate   = get_command_value($options, 'd', 'directory', false);
 
 foreach ($options as $k => $v){
-    if(!$directory_candidate && !preg_match('/^(d|directory|p|public_html|i|dependencies|f|force|q|quiet|s|skip|prompt)$/', $v)){
+    if(!$directory_candidate && !preg_match('/^(d|directory|p|public_html||f|force|q|quiet|s|skip|prompt)$/', $v)){
         $directory_candidate = $v;
     }
 }
@@ -359,7 +385,6 @@ get_command_value($options, 'd', 'directory',   $directory_candidate,
 'Destination directory can\'t be blank'));
 $public_html = get_command_value($options, 'p', 'public_html', false);
 $public_html = empty($public_html) ? false : AkelosInstaller::getAbsolutePath($public_html);
-$dependencies= AK_WIN ? true : !get_command_value($options, 'i', 'dependencies', true, null, false);
 $force       = get_command_value($options, 'f', 'force', false);
 $quiet       = get_command_value($options, 'q', 'quiet', false);
 $skip        = get_command_value($options, 's', 'skip', false);
@@ -370,10 +395,6 @@ if($prompt){
 
     if($public_html)
     echo "symlink the public directory to $public_html\n";
-
-    echo $dependencies ?
-    "and copy the Akelos core files to vendor/akelos\n" :
-    "symlink Akelos in ".AK_FRAMEWORK_DIR."\n" ;
 
     if($force)
     "OVERWRITE EXISTING FILES in $directory\n";
@@ -386,7 +407,6 @@ $Installer = new AkelosInstaller(array(
 'directory'     =>$directory,
 'public_html'   =>$public_html,
 'public_html'   =>$public_html,
-'dependencies'  =>$dependencies,
 'force'         =>$force,
 'quiet'         =>$quiet,
 'skip'          =>$skip,
