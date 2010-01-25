@@ -479,7 +479,7 @@ if(!AK_CLI && AK_WEB_REQUEST){
 defined('AK_CALLED_FROM_LOCALHOST')                     || define('AK_CALLED_FROM_LOCALHOST', AK_REMOTE_IP == '127.0.0.1');
 defined('AK_SESSION_HANDLER')                           || define('AK_SESSION_HANDLER', 4);
 defined('AK_SESSION_EXPIRE')                            || define('AK_SESSION_EXPIRE', 600);
-defined('AK_SESSION_NAME')                              || define('AK_SESSION_NAME', 'AK_'.substr(md5(AK_HOST.AK_APP_DIR),0,6));
+defined('AK_SESSION_NAME')                              || define('AK_SESSION_NAME', '_sess_id');
 defined('AK_ASSET_HOST')                                || define('AK_ASSET_HOST','');
 defined('AK_DEV_MODE')                                  || define('AK_DEV_MODE',        AK_ENVIRONMENT == 'development');
 defined('AK_TEST_MODE')                                 || define('AK_TEST_MODE',       AK_ENVIRONMENT == 'testing');
