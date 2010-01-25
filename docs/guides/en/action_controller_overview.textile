@@ -234,7 +234,7 @@ class LoginsController extends ApplicationController {
 }
 </php>
 
-To reset the entire session, +unset($_SESSION)+.
+To reset the entire session, +$_SESSION = null;+.
 
 h4. The Flash
 
