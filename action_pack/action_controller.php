@@ -313,6 +313,7 @@ class AkActionController extends AkLazyObject
             if (!isset($this->Response->_headers['Status']) && !empty($this->_default_render_status_code)) {
                 $this->Response->_headers['Status'] = $this->_default_render_status_code;
             }
+            $this->_closeSession();
             $this->Response->outputResults();
             if(AK_LOG_EVENTS && isset($this->ak_time_start)){
                 $this->_log('Completed in '.(microtime(true)-$this->ak_time_start));
@@ -816,15 +817,19 @@ class AkActionController extends AkLazyObject
                 }
                 AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message('Redirected to '.$options) : null;
                 $this->_handleFlashAttribute();
+                $this->_closeSession();
                 $this->Response->redirect($options);
                 $this->Response->redirected_to = $options;
                 $this->performed_redirect = true;
             }elseif ($options == 'back'){
+                $this->_closeSession();
                 $this->redirectTo($this->Request->getReferer());
             }else{
+                $this->_closeSession();
                 $this->redirectTo($this->Request->getProtocol(). $this->Request->getHostWithPort(). $options);
             }
         }else{
+            $this->_closeSession();
             if(empty($parameters_for_method_reference)){
                 $this->redirectTo($this->urlFor($options));
                 $this->Response->redirected_to = $options;
