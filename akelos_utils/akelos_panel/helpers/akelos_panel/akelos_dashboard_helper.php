@@ -39,7 +39,7 @@ class AkelosDashboardHelper extends AkBaseHelper {
     }
     
     public function get_twitter_feeds($screen_name = 'akelos'){
-        return json_decode(Ak::url_get_contents('http://twitter.com/statuses/user_timeline/'.$screen_name.'.json?count=4', array('cache'=>240)));
+        return json_decode(@Ak::url_get_contents('http://twitter.com/statuses/user_timeline/'.$screen_name.'.json?count=4', array('cache'=>240)));
     }
 
     public function capture_snippet($snippet_type = true){
