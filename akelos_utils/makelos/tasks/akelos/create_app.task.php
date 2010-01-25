@@ -298,6 +298,31 @@ class AkelosInstaller
     protected function _cleanUpAndCreateEmptyFolders(){
         # empty log files
 
+        if(!AK_WIN){
+            $writable_files = array(
+            'log',
+            'log/development.log',
+            'log/production.log',
+            'log/testing.log',
+            'config/locales',
+            'app/locales',
+            );
+
+            foreach ($writable_files as $file){
+                $file = $this->options['directory'].DS.$file;
+                `chmod -R 777 $file`;
+            }
+        }
+        
+        $files_and_replacements = array(
+        'config/environment.php' => array('[SECRET]' => Ak::uuid())
+        );
+        
+        foreach ($files_and_replacements as $file => $replacements) {
+                $file = $this->options['directory'].DS.$file;
+        	file_put_contents($file, str_replace(array_keys($replacements), array_values($replacements), file_get_contents($file)));
+        }
+
         // Copy docs
         self::copyRecursivelly($this->options['directory'].DS.'vendor'.DS.'akelos'.DS.'docs', $this->options['directory'].DS.'docs');
 
@@ -421,10 +446,9 @@ if(!$quiet){
         echo "\n * ".join("\n    * ",$Installer->getErrors());
     }elseif(empty($Installer->options['force'])){
 
-        echo "\n    Please point your browser to ".
-        (empty($Installer->options['public_html']) ? $Installer->options['directory'] : $Installer->options['public_html']).
-        " in order to complete the installation process or\n\n".
-        " run \n\n    ./script/configure -i\n\nto configure the database details\n";
+        echo "\n    In order to create the config.php file and setup a database...\n\n".
+        " change to \n\n    $directory\n".
+        " and run \n\n    ./script/configure \n\nto configure the database details\n";
     }
     echo "\n";
 }
