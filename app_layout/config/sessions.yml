@@ -1,7 +1,7 @@
 default:
     enabled: true
     handler:
-        type: 1 #1=File based,2=AdoDB,3=Memcache
+        type: 4 #1=File based,2=AdoDB,3=Memcache,4=Cookie
         options: 
                lifeTime: 3600
                save_path: ${AK_TMP_DIR}

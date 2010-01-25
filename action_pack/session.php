@@ -110,9 +110,9 @@ class AkSession
                 break;
             case 4:
                 $this->_driverInstance = new AkCookieStore();
-                $res = $this->_driverInstance->init($options);
-                $this->sessions_enabled = $res;
-                break;
+                $this->_driverInstance->init($options);
+                Ak::setStaticVar('SessionHandler', $this->_driverInstance);
+                return true;
             default:
                 $this->sessions_enabled = false;
                 break;

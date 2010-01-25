@@ -43,15 +43,33 @@ class AkCookieStore {
     'domain'       => AK_HOST,
     'path'         => '/',
     'expire_after' => AK_SESSION_EXPIRE,
-    'httponly'     => true
+    'secure'       => false,
+    'httponly'     => true,
     );
 
     public $options = array();
 
+    public function __destruct(){
+        session_write_close();
+    }
+
     public function init($options){
-        $this->options = array_merge($this->default_options, $options);
+        $this->options = array_merge($this->default_options, AkConfig::getOption('action_controller.session', array()));
+        $this->options = array_merge($this->options, $options);
+        $this->options['expire_after'] = time()+$this->options['expire_after'];
         $this->ensureSessionKey();
         $this->ensureSecretSecure();
+
+        session_set_save_handler(
+        array($this, 'open'),
+        array($this, 'close'),
+        array($this, 'read'),
+        array($this, 'write'),
+        array($this, 'destroy'),
+        array($this, 'gc')
+        );
+        session_start();
+        return true;
     }
 
     private function ensureSessionKey(){
@@ -83,32 +101,44 @@ class AkCookieStore {
         }
     }
 
-
-    public function get($session_id){
-        $data = '';
-        try{
-            if(isset($_COOKIE[$session_id])){
-                $data = rtrim(Ak::blowfishDecrypt(base64_decode($_COOKIE[$session_id]), $this->options['secret']), "\0");
-            }
-        }catch(Exception $e){}
-        return $data;
-    }
-
-    public function save($session_id, $data){
-        setcookie($this->options['key'], $session_id, $this->options['expire_after'], $this->options['path'], $this->options['domain']);
-        $ecrypted_data = base64_encode(Ak::blowfishEncrypt($data, $this->options['secret']));
-        if(strlen($ecrypted_data) > self::$MAX){
-            throw new CookieOverflowException();
-        }
-        setcookie($this->options['key'], $ecrypted_data, $this->options['expire_after'], $this->options['path'], '.'.$this->options['domain']);
-    }
-
-    public function remove($session_id){
-        setcookie($session_id, '');
+    public function open($save_path, $session_name) {
+        $this->session_name = $session_name;
         return true;
     }
 
-    public function clean(){
+    public function close() {
+        session_write_close();
+        return true;
+    }
+
+    public function read($session_id) {
+        if(!isset($_COOKIE[$session_id])){
+            session_id(substr($session_id,0,6));
+            return '';
+        }
+        list($checksum, $data) = explode('|',$_COOKIE[$session_id].'|', 2);
+        $data = rtrim(@base64_decode($data), "\0");
+        if(sha1(sha1($this->options['secret'].$data)) != $checksum){
+            return '';
+        }
+        return $data;
+    }
+
+    public function write($session_id, $data) {
+        $data = sha1(sha1($this->options['secret'].$data)).'|'.base64_encode($data);
+        if(strlen($data) > self::MAX){
+            throw new CookieOverflowException();
+        }
+        setcookie($session_id, $data, 0, '/', AK_HOST);
+        return true;
+    }
+
+    public function destroy($session_id) {
+        $this->write($session_id, '');
+        return true;
+    }
+
+    public function gc($lifetime) {
         return true;
     }
 }
