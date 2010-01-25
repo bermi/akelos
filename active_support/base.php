@@ -564,6 +564,7 @@ class Ak
      * from writing out of the Akelos base directory for security reasons.
      */
     static function getRestrictedPath($path, $options = array()) {
+        if(!empty($options['skip_path_restriction'])) return $path;
         $default_options = array(
         'ftp' => false,
         'base_path' => strstr($path, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
