@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+
+defined('DS') || define('DS', DIRECTORY_SEPARATOR);
+
+if (strstr(@$argv[1], 'test:')){
+    define('AK_ENVIRONMENT', 'testing');
+}
+
+!@include(dirname(__FILE__).DS.'config'.DS.'config.php');
+
+if(defined('AK_FRAMEWORK_DIR')){
+    include AK_FRAMEWORK_DIR.DS.'akelos_utils'.DS.'makelos'.DS.'makelos.php';
+}else{
+    include 'akelos_utils'.DS.'makelos'.DS.'makelos.php';
+}
