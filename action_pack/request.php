@@ -722,8 +722,8 @@ class AkRequest
 
     public function getReferer() {
         $referer = AK_HOST;
-        if(isset($_SESSION['_ak_referer']) && preg_match('/^\w+:\/\/.*/', $_SESSION['_ak_referer'])){
-            $referer = $_SESSION['_ak_referer'];
+        if(isset($_SESSION['_akrf']) && preg_match('/^\w+:\/\/.*/', $_SESSION['_akrf'])){
+            $referer = $_SESSION['_akrf'];
         }elseif(isset($this->env['HTTP_REFERER']) && preg_match('/^\w+:\/\/.*/', $this->env['HTTP_REFERER'])){
             $referer = $this->env['HTTP_REFERER'];
         }
@@ -748,7 +748,7 @@ class AkRequest
 
     public function saveRefererIfNotRedirected() {
         if(isset($_SESSION) && !$this->isAjax()){
-            $_SESSION['_ak_referer'] = $this->getRequestUri().$this->getPath();
+            $_SESSION['_akrf'] = $this->getRequestUri().$this->getPath();
         }
         return true;
     }

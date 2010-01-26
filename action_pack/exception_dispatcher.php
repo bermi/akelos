@@ -14,6 +14,7 @@ class AkExceptionDispatcher
     'DispatchException'                     => 'exception',
     'MissingTemplateException'              => 'missing_template',
     'ControllerException'                   => 'exception',
+    'CookieOverflowException'               => 'exception',
     );
     
     public function __construct($consider_all_requests_local = false){

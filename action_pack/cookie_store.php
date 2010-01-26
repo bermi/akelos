@@ -50,16 +50,18 @@ class AkCookieStore {
     public $options = array();
 
     public function __destruct(){
+        # Ak::getLogger('sessions')->info(__METHOD__);
         session_write_close();
     }
 
     public function init($options){
+        # Ak::getLogger('sessions')->info(__METHOD__);
         $this->options = array_merge($this->default_options, AkConfig::getOption('action_controller.session', array()));
         $this->options = array_merge($this->options, $options);
         $this->options['expire_after'] = time()+$this->options['expire_after'];
         $this->ensureSessionKey();
         $this->ensureSecretSecure();
-
+        ini_set('session.use_cookies','0');
         session_set_save_handler(
         array($this, 'open'),
         array($this, 'close'),
@@ -102,43 +104,65 @@ class AkCookieStore {
     }
 
     public function open($save_path, $session_name) {
+        # Ak::getLogger('sessions')->info(__METHOD__);
         $this->session_name = $session_name;
         return true;
     }
 
     public function close() {
+        # Ak::getLogger('sessions')->info(__METHOD__);
         session_write_close();
         return true;
     }
 
-    public function read($session_id) {
-        if(!isset($_COOKIE[$session_id])){
-            session_id(substr($session_id,0,6));
-            return '';
-        }
-        list($checksum, $data) = explode('|',$_COOKIE[$session_id].'|', 2);
-        $data = rtrim(@base64_decode($data), "\0");
-        if(sha1(sha1($this->options['secret'].$data)) != $checksum){
-            return '';
-        }
+    public function read() {
+        $data = empty($_COOKIE[$this->session_name]) ? '' : $this->_decodeData($_COOKIE[$this->session_name]);
+        # Ak::getLogger('sessions')->info(__METHOD__.' '.$data);
         return $data;
     }
 
-    public function write($session_id, $data) {
-        $data = sha1(sha1($this->options['secret'].$data)).'|'.base64_encode($data);
-        if(strlen($data) > self::MAX){
-            throw new CookieOverflowException();
-        }
-        setcookie($session_id, $data, 0, '/', AK_HOST);
+    public function write($irrelevant_but_needed_session_id, $data) {
+        # Ak::getLogger('sessions')->info(__METHOD__.' '.$data.' '.AkNumberHelper::human_size(strlen($data)));
+        $data = $this->_encodeData($data);
+        setcookie($this->session_name, $data, 0, '/', $this->options['domain']);
         return true;
     }
 
-    public function destroy($session_id) {
-        $this->write($session_id, '');
+    public function destroy() {
+        # Ak::getLogger('sessions')->info(__METHOD__);
+        $this->write($this->session_name, '');
         return true;
     }
 
     public function gc($lifetime) {
         return true;
+    }
+
+    public function _decodeData($encoded_data){
+        # Ak::getLogger('sessions')->info(__METHOD__);
+        list($checksum, $data) = explode('|',$encoded_data.'|', 2);
+        $data = @base64_decode($data);
+        if(empty($data)){
+            return '';
+        }
+        if($this->_getChecksumForData($data) != $checksum){
+            throw new ControllerException("Cookie data tamper atempt.  Received: \"$data\"\nVisitor IP:".AK_REMOTE_IP);
+            return '';
+        }
+        return $data;
+    }
+
+    public function _encodeData($data){
+        # Ak::getLogger('sessions')->info(__METHOD__);
+        $data = $this->_getChecksumForData($data).'|'.base64_encode($data);
+        if(strlen($data) > self::MAX){
+            throw new CookieOverflowException('Tried to allocate '.strlen($data).' chars into a session based cookie. The limit is '.self::MAX.' chars. Please try storing smaller sets into cookies or use another session handler.');
+        }
+        return $data;
+    }
+
+    public function _getChecksumForData($data){
+        # Ak::getLogger('sessions')->info(__METHOD__);
+        return sha1(sha1($this->options['secret'].$this->session_name.$data.$this->options['domain']));
     }
 }
