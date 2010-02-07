@@ -1502,6 +1502,8 @@ class AkActionController extends AkLazyObject
             }
             $this->_handleFlashOptions();
         }
+        // remove empty values
+        $_SESSION = array_diff($_SESSION, array(''));
     }
 
     public function _handleFlashOptions() {
