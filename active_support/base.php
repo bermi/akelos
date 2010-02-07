@@ -2013,7 +2013,7 @@ class Ak
     /**
      * Get a models a model instance. Including and instantiating the model for us.
      *
-     * This kinds mimics the ideal (new Model())->find() wich does not exist on PHP yet.
+     * This kinds mimics the ideal (new Model())->find() which does not exist on PHP yet.
      *
      * On Akelos we can do Ak::get('Model')->find();
      */
@@ -2036,7 +2036,7 @@ class Ak
     }
 
     /**
-     * Akelos version of pcntl_fork wich prevents forked processes from killing the database connection.
+     * Akelos version of pcntl_fork which prevents forked processes from killing the database connection.
      *
      * See http://dev.mysql.com/doc/refman/5.0/en/gone-away.html
      *

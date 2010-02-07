@@ -70,7 +70,7 @@ $Map->connect('/dev_panel/:controller/:action/:id', array(
         <div class="text-block">
             <p>_{By default it can <strong>only</strong> be accessed from when the environment is set to <tt>development</tt> from the localhost machine. You can edit the file:}</p>
             <%= format_snippet 'config/environment.php' %>
-            <p>_{And set wich IPs that are allowed to access:}</p>
+            <p>_{And set which IPs that are allowed to access:}</p>
             <%= format_snippet "AkConfig::setOption('local_ips', array('1.2.3.4', '2.4.3.2'));", 'php' %>
             <p>_{These are the IP addresses that can currently access the Akelos Panel:} <strong><?php echo join(', ', $local_ips);?></strong></p>
         </div>

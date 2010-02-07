@@ -278,7 +278,7 @@ spl_autoload_register('akelos_autoload');
 /**
  * Akelos environment guessing.
  *
- * Akelos will set environment constants wich have not been defined at this point.
+ * Akelos will set environment constants which have not been defined at this point.
  * 
  * You can retrieve a list of current settings by running Ak::get_constants();
  *

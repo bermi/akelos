@@ -46,7 +46,7 @@ You will have to add the line:
 
     127.0.0.1   akelos.tests
 
-To your hosts file wich might be located at:
+To your hosts file which might be located at:
 
 *Windows*   C:\WINDOWS\drivers\etc\hosts
 *MacOS*     /private/etc/hosts

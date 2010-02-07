@@ -7,7 +7,7 @@
 /**
  * Loggin in your Akelos applications
  * 
- * Akelos provides a flexible loggin system wich includes five loggin levels
+ * Akelos provides a flexible loggin system which includes five loggin levels
  * and four log handlers.
  * 
  * In order to log events you'll have to define in your configuration file:
@@ -19,7 +19,7 @@
  *
  *     Ak::getLogger();
  * 
- * wich will log to ./log/development.log if the environment id development.
+ * which will log to ./log/development.log if the environment id development.
  *
  * You can get loggers under a different namespace by calling:
  *

@@ -10,7 +10,7 @@ defined('AK_ENVIRONMENT') || define('AK_ENVIRONMENT', 'development');
 // defined('AK_FRAMEWORK_DIR') || define('AK_FRAMEWORK_DIR', '/path/to/the/framework');
 
 // Akelos only shows debug messages if accessed from the localhost IP, you can manually tell
-// Akelos wich IP's you consider to be local by editing config/environment.php
+// Akelos which IP's you consider to be local by editing config/environment.php
 
 // Akelos bootstrapping. Don't delete this comment as it will be used by ./makelos app:define_constants
 include dirname(__FILE__).DIRECTORY_SEPARATOR.'environment.php';
