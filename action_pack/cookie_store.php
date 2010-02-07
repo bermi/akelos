@@ -51,7 +51,7 @@ class AkCookieStore {
 
     public function __destruct(){
         # Ak::getLogger('sessions')->info(__METHOD__);
-        session_write_close();
+        @session_write_close();
     }
 
     public function init($options){
