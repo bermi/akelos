@@ -673,8 +673,8 @@ class AkSintagsParser
     private function _getAvailableHelpers() {
         $helpers = array();
         if(empty($this->available_helpers)){
-            if(defined('AK_SINTAGS_AVALABLE_HELPERS')){
-                $helpers = unserialize(AK_SINTAGS_AVALABLE_HELPERS);
+            if(defined('AK_SINTAGS_AVAILABLE_HELPERS')){
+                $helpers = unserialize(AK_SINTAGS_AVAILABLE_HELPERS);
             }elseif($this->_HelperLoader){
                 $this->_HelperLoader->instantiateHelpers();
                 if($underscored_helper_names = AkHelperLoader::getInstantiatedHelperNames()){
