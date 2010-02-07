@@ -1,9 +1,9 @@
 <div id="header">
-  <div class="top-buttons"> <a href="#" class="table-content-button" onclick="if($('table-content').visible()){new Effect.SlideUp($('table-content'));}else{new Effect.SlideDown($('table-content'))}"><span>Table of contents</span></a>
+  <div class="top-buttons"> <a href="#" class="table-content-button" onclick="if($('table-content').visible()){new Effect.SlideUp($('table-content'));}else{new Effect.SlideDown($('table-content'))}"><span>_{Table of contents}</span></a>
   </div>
   <div id="search"> <span class="search-field">
     <input name="search-field" type="text" value="_{Find docs at akelos.org}" onclick="if(this.value=='_{Find docs at akelos.org}'){this.value='';}" />
-    </span><a href="#" class="search-button"><span>Search</span></a> </div>
+    </span><a href="#" class="search-button"><span>_{Search}</span></a> </div>
   <div class="logo"><a href="#">Akelos</a></div>
   <div class="application_name">{application_name}</div>
   <div id="top-nav">

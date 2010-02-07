@@ -66,9 +66,8 @@ class AkelosPanel_AkelosDashboardController extends AkelosPanelController
     }
     
     public function guide () {
-        $this->layout = 'guides';
         $this->tab = 'docs';
-        $this->docs_helper->docs_path = 'akelos'.DS.'guides';
+        $this->docs_helper->docs_path = 'guides';
         $this->guide = $this->docs_helper->get_doc_contents(
             empty($this->params['id']) ? 'getting_started' : $this->params['id']);
     }

@@ -18,7 +18,7 @@ class DocsHelper extends AkBaseHelper
     }
     
     public function link_to_guide($guide_name, $slug = '', $html_options = array()){
-        return $this->_controller->ak_url_helper->link_to($this->t($guide_name), array('controller'=>'docs', 'action'=>'guide', 'id' => $this->t($slug), 'format' =>'html'), $html_options);
+        return $this->_controller->ak_url_helper->link_to($this->t($guide_name), array('action'=>'guide', 'id' => $this->t($slug)), $html_options);
     }
 
     private function _getdocPath($doc_name, $language){

@@ -8,9 +8,9 @@
 <link href="<%= url_for :controller => 'virtual_assets', :action => "stylesheets", :id => "print", :format => "css" %>" rel="stylesheet" type="text/css" />
 <link href="<%= url_for :controller => 'virtual_assets', :action => "stylesheets", :id => "syntax", :format => "css" %>" rel="stylesheet" type="text/css" />
 
-<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "guides", :format => "js") %>
-<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "code_highlighter", :format => "js") %>
-<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "highlighters", :format => "js") %>
+<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "guides") %>
+<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "code_highlighter") %>
+<%= javascript_include_tag url_for(:controller => 'virtual_assets', :action => "javascripts", :id => "highlighters") %>
 
 </head>
 <body class="guide">
@@ -78,8 +78,7 @@
   <hr class="hide" />
   <div id="footer">
     <div class="wrapper">
-      <p>_{This work is an adaptation from the <a href="http://guides.rubyonrails.org/credits.html">Ruby on Rails guides</a> to <a href="http://www.akelos.org/">Akelos</a>}</p>
-      <p>_{This work is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-Share Alike 3.0</a> License</a>}</p>
+      <p>_{This work is based on the <a href="http://guides.rubyonrails.org/credits.html">Ruby on Rails guides</a> and can be also shared under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-Share Alike 3.0</a> License</a>}</p>
     </div>
   </div>
 </body>
