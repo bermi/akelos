@@ -6,6 +6,7 @@
 
 class AkelosPanel_AkelosDashboardController extends AkelosPanelController
 {
+    public $app_helpers = 'akelos_panel/docs';
     public function index(){
         $this->base_dir          = AK_BASE_DIR;
         $this->akelos_dir       = AK_FRAMEWORK_DIR;
