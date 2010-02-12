@@ -100,7 +100,7 @@ $Map->connect('/dev_panel/:controller/:action/:id', array(
     <?php $tweets = $akelos_dashboard_helper->get_twitter_feeds(); ?>
     {loop tweets}
     <div class="tweet">
-        <p class="message"><strong>{tweet.user.screen_name}:</strong> {tweet.text} </p>
+        <p class="message"><strong>{tweet.user.screen_name}:</strong> <%= auto_link tweet.text %> </p>
 
     </div>
     {end}
