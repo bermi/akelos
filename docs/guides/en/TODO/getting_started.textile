@@ -9,7 +9,7 @@ This guide covers getting up and running with Akelos. After reading it, you shou
 
 endprologue.
 
-WARNING. This Guide is based on Akelos 1.0.1. Some of the code shown here will not work in other versions of Akelos.
+WARNING. This Guide is based on Akelos 2.0. Some of the code shown here will not work in other versions of Akelos.
 
 h3. This Guide Assumes
 
@@ -28,7 +28,7 @@ h3. What is Akelos?
 
 Akelos is a web development framework written in the PHP language. It is designed to make programming web applications easier by making assumptions about what every developer needs to get started. It allows you to write less code while accomplishing more than many other frameworks. Akelos developers also report that it makes web application development more fun.
 
-Akelos is opinionated software. That is, it assumes that there is a best way to do things, and it's designed to encourage that best way - and in some cases to discourage alternatives. If you learn "The Akelos Way" you'll probably discover a tremendous increase in productivity. If you persist in bringing old habits from other frameworks and languages to your Akelos development, and trying to use patterns you learned elsewhere, you may have a less happy experience.
+Akelos is opinionated software. That is, it assumes that there is a best way to do things, and it's designed to encourage that best way - and in some cases to discourage alternatives. If you learn "The Akelos Way" you'll probably discover a tremendous increase in productivity. If you persist in bringing old habits from other frameworks to your Akelos development, and trying to use patterns you learned elsewhere, you may have a less happy experience.
 
 The Akelos philosophy includes several guiding principles:
 
@@ -127,22 +127,12 @@ h4. Creating the Blog Application
 Open a terminal, navigate to the folder where you uncompressed Akelos and type:
 
 <shell>
-$ ./makelos setup /path/to/your/blog
+$ ./akelos /path/to/your/blog
 </shell>
 
-This will create an Akelos application that uses a SQLite database for data storage. If you prefer to use MySQL, run this command instead:
+This will create an Akelos application.
 
-<shell>
-$ ./makelos setup /path/to/your/blog -d mysql
-</shell>
-
-And if you're using PostgreSQL for data storage, run this command:
-
-<shell>
-$ ./makelos setup /path/to/your/blog -d postgresql
-</shell>
-
-TIP: You can see all of the switches that the Akelos application builder accepts by running <tt>./makelos setup -h</tt>.
+TIP: You can see all of the switches that the Akelos application builder accepts by running <tt>./akelos -h</tt>.
 
 After you create the blog application, switch to its folder to continue work directly in that application:
 
@@ -150,18 +140,27 @@ After you create the blog application, switch to its folder to continue work dir
 $ cd /path/to/your/blog
 </shell>
 
+Now create the database configuration file by running:
+
+<shell>
+./script/configure 
+</shell>
+
+Alternatively you can edit config/config-DEFAULT.php
+
 In any case, Akelos will create a folder <tt>blog</tt>. Open up that folder and explore its contents. Most of the work in this tutorial will happen in the <tt>app/</tt> folder, but here's a basic rundown on the function of each folder that Akelos creates in a new application by default:
 
 |_.File/Folder|_.Purpose|
-|README|This is a brief instruction manual for your application. Use it to tell others what your application does, how to set it up, and so on.|
+|README.textile|This is a brief instruction manual for your application. Use it to tell others what your application does, how to set it up, and so on.|
 |makefile.php|This file contains batch jobs that can be run from the terminal.|
 |app/|Contains the controllers, models, and views for your application. You'll focus on this folder for the remainder of this guide.|
 |config/|Configure your application's runtime rules, routes, database, and more.|
 |doc/|In-depth documentation for your application.|
 |lib/|Extended modules for your application (not covered in this guide).|
 |log/|Application log files.|
+|makelos|Makelos is a general-purpose command-runner that Akelos uses for many things. You can see the list of available makelos commands in your application by running +./makelos -T+.|
 |public/|The only folder seen to the world as-is.  This is where your images, javascript, stylesheets (CSS), and other static files go.|
-|makelos.php/|Script runner provided by Akelos to do recurring tasks, such as code generation, plugin installation, and starting the console or the web server.|
+|scripts/|Script runners provided by Akelos to do recurring tasks, such as code generation, plugin installation, and starting the console or the web server.|
 |test/|Unit tests, fixtures, and other test apparatus. These are covered in "Testing Akelos Applications":testing.html |
 |tmp/|Temporary files|
 |vendor/|A place for third-party code. In a typical Akelos application, this includes Akelos source code (if you install it into your project) and plugins containing additional prepackaged functionality.|
@@ -169,7 +168,7 @@ In any case, Akelos will create a folder <tt>blog</tt>. Open up that folder and 
 h4. Configuring a Database
 
 Just about every Akelos application will interact with a database. The database to use is specified in a configuration file, +config/database.yml+.
-If you open this file in a new Akelos application, you'll see a default database configuration using SQLite. The file contains sections for three different environments in which Akelos can run by default:
+If you open this file in a new Akelos application, you'll see the database configuration created by ./script/configure. The file contains sections for three different environments in which Akelos can run by default:
 
 * The +development+ environment is used on your development computer as you interact manually with the application
 * The +test+ environment is used to run automated tests
@@ -177,7 +176,7 @@ If you open this file in a new Akelos application, you'll see a default database
 
 h5. Configuring a SQLite Database
 
-Akelos comes with built-in support for "SQLite":http://www.sqlite.org, which is a lightweight serverless database application. While a busy production environment may overload SQLite, it works well for development and testing. Akelos defaults to using a SQLite database when creating a new project, but you can always change it later.
+Akelos comes with built-in support for "SQLite":http://www.sqlite.org, which is a lightweight server-less database application. While a busy production environment may overload SQLite, it works well for development and testing.
 
 Here's the section of the default configuration file with connection information for the development environment:
 
@@ -221,16 +220,6 @@ development:
 
 Change the username and password in the +development+ section as appropriate.
 
-h4. Creating the Database
-
-Now that you have your database configured, it's time to have Akelos create an empty database for you. You can do this by running a makelos command:
-
-<shell>
-$ ./makelos db:create
-</shell>
-
-NOTE. Makelos is a general-purpose command-runner that Akelos uses for many things. You can see the list of available makelos commands in your application by running +./makelos -T+.
-
 h3. Hello, Akelos!
 
 One of the traditional places to start with a new language is by getting some text up on screen quickly. To do that in Akelos, you need to create at minimum a controller and a view. Fortunately, you can do that in a single command. Enter this command in your terminal:
@@ -239,12 +228,13 @@ One of the traditional places to start with a new language is by getting some te
 $ ./makelos generate controller home index
 </shell>
 
-TIP: If you're on Windows, or your PHP is set up in some non-standard fashion, you may need to explicitly pass Akelos +script+ commands to PHP: +php makelos generate controller home index+.
+TIP: If you're on Windows, or your PHP is set up in some non-standard fashion, you may need to explicitly pass Akelos +makelos+ commands to PHP: +php makelos generate controller home index+.
 
-Akelos will create several files for you, including +app/views/home/index.html.tpl+. This is the template that will be used to display the results of the +index+ action (method) in the +home+ controller. Open this file in your text editor and edit it to contain a single line of code:
+Akelos will create several files for you, including +app/views/home/index.html.tpl+. This is the template that will be used to display the results of the +index+ action (method) in the +home+ controller. Open this file in your text editor and edit it to contains the following code:
 
 <code class="html">
-<h1>Hello, Akelos!</h1>
+<h1>Home::index</h1>
+<p><?php echo translate('Find me in %path',array('%path'=> 'app/views/home/index.html.tpl' ))?></p>
 </code>
 
 h4. Starting up the Web Server
