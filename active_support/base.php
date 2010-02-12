@@ -2111,6 +2111,44 @@ class Ak
             }
         }
     }
+    
+    /**
+     * PHP functions proxied when running as an application server
+     */
+    static function session_start(){
+        if($SessionHandler = Ak::getStaticVar('AppServer.SessionHandler', false)){
+            $SessionHandler->session_start();
+        }else {
+            session_start();
+        }
+    }
+
+    static function session_save_path($path = null){
+        if($SessionHandler = Ak::getStaticVar('AppServer.SessionHandler', false)){
+            $SessionHandler->session_save_path($path);
+        }else {
+            session_save_path($path);
+        }
+    }
+    
+    static function header($string, $replace = null, $http_response_code = null){
+        if($SessionHandler = Ak::getStaticVar('AppServer.HeadersHandler', false)){
+            $SessionHandler->header($string, $replace, $http_response_code);
+        }else {
+            header($string, $replace, $http_response_code);
+        }
+    }
+
+    static function puts($string){
+        
+        if($SessionHandler = Ak::getStaticVar('AppServer.PutsHandler', false)){
+            $SessionHandler->puts($string);
+        }else {
+            echo $string;
+        }
+    }
+
+
 }
 
 

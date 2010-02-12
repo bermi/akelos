@@ -75,7 +75,7 @@ class AkResponse
             $this->body->stream();
         }else{
             AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message("Sending response") : null;
-            echo $this->body;
+            Ak::puts($this->body);
         }
     }
 
@@ -145,25 +145,25 @@ class AkResponse
                 }
 
                 AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message("Sending header:  $header") : null;
-                header($header);
+                Ak::header($header);
             }
         }
         $_can_add_charset = !$_can_add_charset ? false : (empty($_redirected) || (!empty($_redirected) && !empty($javascript_redirection)));
         if(!$_has_content_type && $_can_add_charset){
-            header('Content-Type: text/html; charset='.AK_CHARSET);
+            Ak::header('Content-Type: text/html; charset='.AK_CHARSET);
             $this->_headers_sent[] = 'Content-Type: text/html; charset='.AK_CHARSET;
         }
 
         if(!$_has_content_length && !$this->_streamBody()){
             $length = strlen($this->body);
             if($length > 0){
-                header('Content-Length: '.$length);
+                Ak::header('Content-Length: '.$length);
                 $this->_headers_sent[] = 'Content-Length: '.$length;
             }
         }
 
         if(!empty($javascript_redirection)){
-            echo $javascript_redirection;
+            Ak::puts($javascript_redirection);
         }
 
         $terminate_if_redirected ? (!empty($_redirected) ? exit() : null) : null;

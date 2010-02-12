@@ -527,7 +527,7 @@ class AkRequest
     }
 
     static function isLocal(){
-        return in_array(AK_REMOTE_IP, AkConfig::getOption('local_ips', array('localhost','127.0.0.1','::1')));
+        return in_array(AkConfig::getOption('Request.remote_ip', AK_REMOTE_IP), AkConfig::getOption('local_ips', array('localhost','127.0.0.1','::1')));
     }
 
     /**
@@ -739,7 +739,7 @@ class AkRequest
             $status_code = intval(empty($options['status_code']) ? 501 : $options['status_code']);
             $status_header = AkResponse::getStatusHeader($status_code);
             if(!@include(AkConfig::getDir('public').DS.$status_code.'.php')){
-                @header($status_header);
+                @Ak::header($status_header);
                 echo str_replace('HTTP/1.1 ', '', $status_header);
             }
         }
