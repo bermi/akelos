@@ -324,7 +324,7 @@ class AkRequest
     * Returns the HTTP request method as a lowercase symbol ('get, for example)
     */
     public function getMethod() {
-        return strtolower(isset($this->env['REQUEST_METHOD'])?$this->env['REQUEST_METHOD']:'get');
+        return strtolower(isset($_POST['_method'])&&in_array($_POST['_method'],array('put','delete','head'))?$_POST['_method']:(isset($this->env['REQUEST_METHOD'])?$this->env['REQUEST_METHOD']:'get'));
     }
 
     /**
@@ -345,7 +345,7 @@ class AkRequest
     * Is this a PUT request?  Equivalent to $Request->getMethod() == 'put'
     */
     public function isPut() {
-        return isset($this->env['REQUEST_METHOD']) ? $this->getMethod() == 'put' : false;
+        return $this->getMethod() == 'put';
     }
 
     /**
