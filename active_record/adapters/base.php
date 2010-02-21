@@ -103,8 +103,12 @@ class AkDbAdapter
             if(empty($database_specifications)){
                 trigger_error(Ak::t('Could not find database settings for %namespace.yml/%settings_hash', array('%namespace' => $namespace, '%settings_hash' => $settings_hash)), E_USER_ERROR);
             }
-
-            $class_name = 'AkDbAdapter';
+            
+            // Compatibility with RoR database.yml format
+            $database_specifications['user'] = isset($database_specifications['user']) ? $database_specifications['user'] : (isset($database_specifications['username']) ? $database_specifications['username'] : '');
+            $database_specifications['type'] = isset($database_specifications['type']) ? $database_specifications['type'] : $database_specifications['adapter'];
+            $database_specifications['database_name'] = isset($database_specifications['database_name']) ? $database_specifications['database_name'] : (isset($database_specifications['database']) ? $database_specifications['database'] : '');
+            
             $class_name = 'Ak'.AkInflector::camelize($database_specifications['type']).'DbAdapter';
             $adapter_class_file = AK_ACTIVE_RECORD_DIR.DS.'adapters'.DS.AkInflector::underscore($database_specifications['type']).'.php';
             if(!@include_once($adapter_class_file)){
