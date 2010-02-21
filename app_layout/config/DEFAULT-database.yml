@@ -2,29 +2,29 @@ default:
     host:                   localhost
     
 testing:
-    type:
+    adapter:
+    database:
+    username:
+    password:
     database_file:
     port:
-    database_name:
-    user:
-    password:
     options:
     
     
 development:
-    type:                   mysql
+    adapter:                mysql
+    database:
+    username:
+    password:
     database_file:
     port:
-    database_name:
-    user:
-    password:
     options:
     
 production:
-    type:                   mysql
+    adapter:                mysql
+    database:
+    username:
+    password:
     database_file:
     port:
-    database_name:
-    user:
-    password:
     options:
