@@ -3,6 +3,8 @@
 // Routes define how different parts of your application are accessed via URLs
 // if you're new to Akelos the default routes will work for you
 
+// $Map->root(array('controller' => 'home'));
+
 
 /**
  * This route will enable the Akelos development panel at /dev_panel
@@ -13,9 +15,9 @@ $Map->connect('/dev_panel/:controller/:action/:id', array(
               'action' => 'index', 
               'module' => 'akelos_panel',
               'rebase' => AK_AKELOS_UTILS_DIR.DS.'akelos_panel'
-            ));
+            ), array('module' => 'akelos_panel'));
 /* */
 
-$Map->connect('/:controller/:action/:id', array('controller' => 'page', 'action' => 'index'));
-$Map->connect('/', array('controller' => 'page', 'action' => 'index'));
 
+$Map->connect(':controller/:action/:id');
+$Map->connect(':controller/:action/:id.:format');

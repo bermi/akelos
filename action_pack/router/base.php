@@ -22,6 +22,10 @@ class AkRouter
     public function connect($url_pattern, $defaults = array(), $requirements = array(), $conditions = array()) {
         return $this->connectNamed(null,$url_pattern,$defaults,$requirements,$conditions);
     }
+    
+    public function root($defaults = array(), $requirements = array(), $conditions = array()) {
+        return $this->connectNamed('root', '/', $defaults,$requirements,$conditions);
+    }
 
     protected function handleApiShortcuts(&$url_pattern,&$defaults,&$requirements) {
         $this->addLanguageSegment($url_pattern);
@@ -184,6 +188,7 @@ class AkRouter
     }
 
     public function connectDefaultRoutes(){
+        /*
         if(AK_DEV_MODE && AkRequest::isLocal()){
             $this->connect('/:controller/:action/:id', array(
             'controller' => 'akelos_dashboard',
@@ -197,9 +202,9 @@ class AkRouter
             'module' => 'akelos_panel'));
             return;
         }
-        $this->connect('/:controller/:action/:id', array('controller' => 'page', 'action' => 'index'));
-        $this->connect('/:controller/:action/:id.:format', array('controller' => 'page', 'action' => 'index'));
-        $this->connect('/', array('controller' => 'page', 'action' => 'index'));
+        */
+        $this->connect(':controller/:action/:id');
+        $this->connect(':controller/:action/:id.:format');
     }
 
 }
