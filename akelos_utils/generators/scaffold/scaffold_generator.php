@@ -10,7 +10,11 @@ class ScaffoldGenerator extends  AkelosGenerator
     function cast() {
         $this->model_name = AkInflector::camelize($this->model_name);
         $this->model_file_path = AkInflector::toModelFilename($this->model_name);
-        $this->controller_name = empty($this->controller_name) ? $this->model_name : (AkInflector::camelize($this->controller_name));
+        if(empty($this->actions) && !empty($this->controller_name) && strstr($this->controller_name, ',')){
+            $this->controller_name = '';
+        }
+        
+        $this->controller_name = empty($this->controller_name) ? AkInflector::pluralize($this->model_name) : (AkInflector::camelize($this->controller_name));
         $this->controller_file_path = AkInflector::toControllerFilename($this->controller_name);
         $this->controller_class_name = str_replace(array('/','::'),'_', $this->controller_name.'Controller');
         $this->controller_name = AkInflector::demodulize($this->controller_name);
@@ -76,11 +80,11 @@ class ScaffoldGenerator extends  AkelosGenerator
     function generate() {
         //Generate models if they don't exist
         $model_files = array(
-        'model'=>$this->model_file_path,
-        'installer'=>AkConfig::getDir('app').DS.'installers'.DS.$this->singular_name.'_installer.php',
-        'model_unit_test'=>AK_TEST_DIR.DS.'unit'.DS.'app'.DS.'models'.DS.$this->singular_name.'.php',
-        'model_fixture'=>    AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'models'.DS.$this->singular_name.'.php',
-        'installer_fixture'=>AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'installers'.DS.$this->singular_name.'_installer.php'
+        'model'             => $this->model_file_path,
+        'installer'         => AkConfig::getDir('app').DS.'installers'.DS.$this->singular_name.'_installer.php',
+        'model_unit_test'   => AK_TEST_DIR.DS.'unit'.DS.'app'.DS.'models'.DS.$this->singular_name.'.php',
+        'model_fixture'     => AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'models'.DS.$this->singular_name.'.php',
+        'installer_fixture' => AK_TEST_DIR.DS.'fixtures'.DS.'app'.DS.'installers'.DS.$this->singular_name.'_installer.php'
         );
 
         $this->_template_vars = (array)$this;
@@ -103,10 +107,9 @@ class ScaffoldGenerator extends  AkelosGenerator
         }
 
         if(file_exists($this->model_file_path)){
-            require_once(AkConfig::getDir('models').'shared_model.php');
             require_once($this->model_file_path);
             if(class_exists($this->model_name)){
-                $ModelInstance =& new $this->model_name;
+                $ModelInstance = new $this->model_name;
                 $table_name = $ModelInstance->getTableName();
                 if(!empty($table_name)){
                     $this->content_columns = $ModelInstance->getContentColumns();
@@ -125,8 +128,6 @@ class ScaffoldGenerator extends  AkelosGenerator
                         unset($this->content_columns[$lang.'_'.$column_name]);
                     }
                 }
-
-
             }
         }
 
@@ -140,12 +141,6 @@ class ScaffoldGenerator extends  AkelosGenerator
             $this->assignVarToTemplate('action',$action);
             $this->save($file_path, $this->render('view', !empty($this->sintags)));
         }
-
-        $unit_test_runner = AK_TEST_DIR.DS.'unit.php';
-        if(!file_exists($unit_test_runner)){
-            Ak::file_put_contents($unit_test_runner, file_get_contents(AK_FRAMEWORK_DIR.DS.'test'.DS.'app.php'));
-        }
-
     }
 }
 
