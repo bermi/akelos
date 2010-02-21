@@ -2146,8 +2146,8 @@ class Ak
 
     static function puts($string){
         
-        if($SessionHandler = Ak::getStaticVar('AppServer.PutsHandler', false)){
-            $SessionHandler->puts($string);
+        if($PutsHandler = Ak::getStaticVar('AppServer.PutsHandler', false)){
+            $PutsHandler->puts($string);
         }else {
             echo $string;
         }
