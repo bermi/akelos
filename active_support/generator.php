@@ -105,7 +105,20 @@ class AkelosGenerator
     }
 
     public function hasCollisions() {
-        return false;
+        $this->collisions = array();
+        foreach (array_keys($this->getFilePaths()) as $file_name){
+            if(file_exists($file_name)){
+                $this->collisions[] = Ak::t('%file_name file already exists',array('%file_name'=>$file_name));
+            }
+        }
+        return count($this->collisions) > 0;
+    }
+    
+    /**
+     * @return array with the file path and the template to be rendered.
+     */
+    public function getFilePaths(){
+        return array();
     }
 
     public function getOptionsFromCommand($command) {
@@ -145,10 +158,18 @@ class AkelosGenerator
     public function generate() {
         return $this->manifest(false);
     }
-
+    
     public function banner() {
         $usage = @file_get_contents(@$this->_generator_base_path.DS.'USAGE');
         echo empty($usage) ? "\n".Ak::t('Could not locate usage file for this generator') : "\n".$usage."\n";
+    }
+    
+    public function generateFromFilePaths() {
+        foreach ($this->getFilePaths() as $file_path => $template){
+            $this->assignVarToTemplate('path', str_replace(AkConfig::getDir('base'), '', $file_path));
+            $this->assignVarToTemplate('file_path', $file_path);
+            $this->save($file_path, $this->render($template));
+        }
     }
     
     public function getAvailableGenerators() {
