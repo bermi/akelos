@@ -1357,6 +1357,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             $this->_runCurrentModelInstallerIfExists($column_objects);
         }
         if(is_array($column_objects)){
+            // sorting columns alphabetically will help on writting consinting tests in the long run
+            ksort($column_objects);
             foreach (array_keys($column_objects) as $k){
                 $this->_setColumnSettings($column_objects[$k]->name, $column_objects[$k]);
             }
