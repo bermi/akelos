@@ -50,12 +50,20 @@ class AkCookieStore {
     public $options = array();
 
     public function __destruct(){
-        # Ak::getLogger('sessions')->info(__METHOD__);
-        @session_write_close();
+        // Ak::getLogger('sessions')->info(__METHOD__."\n\n");
+        session_write_close();
     }
 
     public function init($options){
-        # Ak::getLogger('sessions')->info(__METHOD__);
+        // Ak::getLogger('sessions')->info(__METHOD__);
+        $this->default_options['secure'] = AK_PROTOCOL == 'https://';
+        
+        // 'session.cookie_domain' should be set to empty string for all local domain names, 
+        // not only for 'localhost' (but should not be empty for local IP addresses)
+        if(strstr(AK_HOST, '.') === false){
+            $this->default_options['domain'] = '';
+        }
+
         $this->options = array_merge($this->default_options, AkConfig::getOption('action_controller.session', array()));
         $this->options = array_merge($this->options, $options);
         $this->options['expire_after'] = time()+$this->options['expire_after'];

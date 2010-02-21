@@ -810,26 +810,28 @@ class AkActionController extends AkLazyObject
     * The redirection happens as a "302 Moved" header.
     */
     public function redirectTo($options = array(), $parameters_for_method_reference = null) {
+        if($options instanceof AkBaseModel){
+            $options = AkRouterHelper::getUrlParamsForModel($options);
+        }
+        
+        $this->_handleFlashAttribute($parameters_for_method_reference);
+        $this->_closeSession();
+
         if(is_string($options)) {
             if(preg_match('/^\w+:\/\/.*/',$options)){
                 if($this->hasPerformed()){
                     $this->_doubleRenderError();
                 }
                 AK_LOG_EVENTS && !empty($this->_Logger) ? $this->_Logger->message('Redirected to '.$options) : null;
-                $this->_handleFlashAttribute();
-                $this->_closeSession();
                 $this->Response->redirect($options);
                 $this->Response->redirected_to = $options;
                 $this->performed_redirect = true;
             }elseif ($options == 'back'){
-                $this->_closeSession();
                 $this->redirectTo($this->Request->getReferer());
             }else{
-                $this->_closeSession();
                 $this->redirectTo($this->Request->getProtocol(). $this->Request->getHostWithPort(). $options);
             }
         }else{
-            $this->_closeSession();
             if(empty($parameters_for_method_reference)){
                 $this->redirectTo($this->urlFor($options));
                 $this->Response->redirected_to = $options;
@@ -1488,7 +1490,15 @@ class AkActionController extends AkLazyObject
     public $flash_options = array();
     public $_flash_handled = false;
 
-    public function _handleFlashAttribute() {
+    public function _handleFlashAttribute(&$new_attributes = array()) {
+        
+        $flash = Ak::deleteAndGetValue($new_attributes, array('notice','error','message'));
+        if(!empty($flash)){
+            foreach ($flash as $k => $v){
+                $this->flash[$k] = $v;
+            }
+        }
+        
         if(!$this->_flash_handled){
             $this->_flash_handled = true;
             $next_flash = empty($this->flash) ? false : $this->flash;
