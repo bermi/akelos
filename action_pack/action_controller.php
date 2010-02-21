@@ -2227,5 +2227,10 @@ class AkActionController extends AkLazyObject
                 $value = '[FILTERED]';
         }
     }
+
+    protected function __getFailOver($name) {
+        $this->$name = Ak::get($name);
+        return $this->$name instanceof AkBaseModel;
+    }
 }
 

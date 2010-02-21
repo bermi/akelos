@@ -180,7 +180,7 @@ class AkLazyObject
         }
         if(((empty($this->__extenssionPointOptions[$extenssion_name]['methods']) && empty($this->__extenssionPointOptions[$extenssion_name]['methods_match'])) ||
         (!empty($this->__extenssionPointOptions[$extenssion_name]['methods']) || !empty($this->__extenssionPointOptions[$extenssion_name]['methods_match'])) && $this->extenssionImplements($extenssion_name, $method))){
-            return method_exists($this->__extenssionPoints[$extenssion_name], $method);
+            return !empty($this->__extenssionPointOptions[$extenssion_name]['accept_all_matches']) || method_exists($this->__extenssionPoints[$extenssion_name], $method);
         }
         return false;
     }
@@ -221,10 +221,18 @@ class AkLazyObject
                 return $this->$name;
             }
         }
-        if($this->_report_undefined_attributes){
+        if(!$this->__getFailOver($name) && $this->_report_undefined_attributes){
             $backtrace = debug_backtrace();
             trigger_error("Notice: Call to undefined attribute ".get_class($this)."::".$name.' in '.$backtrace[0]['file'].' on line '.$backtrace[0]['line'], E_USER_NOTICE);
         }
+
+        if(isset($this->$name)){
+            return $this->$name;
+        }
+    }
+    
+    protected function __getFailOver($name){
+        return false;
     }
 
     public function __call($name, $attributes = array()) {
@@ -270,8 +278,15 @@ class AkLazyObject
                 }
             }
         }
+        if($result = $this->__callFailOver($name, $attributes)){
+            return $result;
+        }
         $backtrace = debug_backtrace();
         trigger_error("Fatal error: Call to undefined method ".get_class($this)."::".$name.'() in '.@$backtrace[1]['file'].' on line '.@$backtrace[1]['line'], E_USER_ERROR);
+    }
+    
+    protected function __callFailOver($name, $attributes = array()){
+        return false;
     }
 }
 
