@@ -5,7 +5,7 @@ define('AK_CLI', false);
 define('AK_WEB_REQUEST', true);
 define('AK_SERVER_MODE', true);
 
-$_SERVER['SERVER_PORT'] = 8080;
+$_SERVER['SERVER_PORT'] = 3000;
 $_SERVER['HTTP_HOST'] = 'localhost';
 $_SERVER['REQUEST_URI'] = '/';
 $_SERVER['SCRIPT_NAME'] = 'server';
@@ -18,5 +18,5 @@ $_app_config_file = AK_BASE_DIR.DS.'config'.DS.'config.php';
 defined('AK_ENVIRONMENT')           || define('AK_ENVIRONMENT', 'development');
 include_once(AK_BASE_DIR.DS.'config'.DS.'config.php');
 
-require_once(AK_ACTIVE_SUPPORT_DIR.DS.'scripts'.DS.'server.php');
+require_once(AK_AKELOS_UTILS_DIR.DS.'scripts'.DS.'server.php');
 

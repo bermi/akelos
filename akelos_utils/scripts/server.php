@@ -53,16 +53,22 @@ $app = new \MFS\AppServer\Middleware\URLMap\URLMap(array( '/' => function($conte
     ob_start();
     $_headers = array('Server','Akelos (via AppServer)');
     $Dispatcher = new AkDispatcher();
-    $Dispatcher->dispatchAppServer($context);
+    $Response = $Dispatcher->dispatchAppServer($context);
+
+    if(count($_headers) == 2){
+        foreach((array)$Response->getHeaders() as $k => $v){
+            $_headers[] = $k;
+            $_headers[] = $v;
+        }
+    }
 
     $extra_content = ob_get_clean();
 
-
-
-    return array($_status, $_headers, $_puts.$extra_content);
+    return array($_status, $_headers, (empty($_puts) && is_string($Response->body) ? $Response->body : $_puts).$extra_content);
 },
 ));
 
+echo "Akelos dev server listening at 127.0.0.1:".$_SERVER['SERVER_PORT']."\n\n";
 $handler = new \MFS\AppServer\DaemonicHandler('tcp://127.0.0.1:'.$_SERVER['SERVER_PORT'], 'HTTP');
 
 // serving app
