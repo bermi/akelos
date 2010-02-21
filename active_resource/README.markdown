@@ -4,7 +4,7 @@ Active Resource (ARes) connects business objects and Representational State
 Transfer (REST) web services. It implements object-relational mapping for REST
 web services to provide transparent proxying capabilities between a client 
 (AkActiveResource) and a RESTful service (which is provided by Simply RESTful
-routing in AkActionControllerResources).
+routing in action_pack/routes/resources.php AkResources).
 
 == Philosophy
 
@@ -29,7 +29,7 @@ Putting Active Resource to use is very similar to Active Record.  It's as
 simple as creating a model class that inherits from AkActiveResource and
 providing a <tt>site</tt> class variable to it:
 
-   class Person extends AkActiveResource{
+   class Person extends AkActiveResource {
      public $site = "http://api.people.com/";
    }
 

@@ -26,7 +26,7 @@ It is highly recommended that you *familiarize yourself with PHP before diving i
 
 h3. What is Akelos?
 
-Akelos is a web development framework written in the PHP language. It is designed to make programming web applications easier by making assumptions about what every developer needs to get started. It allows you to write less code while accomplishing more than many other frameworks. Akelos developers also report that it makes web application development more fun.
+Akelos is a web development framework written in the PHP language. Many of its components and documentation have been ported from Ruby on Rails. It is designed to make programming web applications easier by making assumptions about what every developer needs to get started. It allows you to write less code while accomplishing more than many other frameworks. Akelos developers also report that it makes web application development more fun.
 
 Akelos is opinionated software. That is, it assumes that there is a best way to do things, and it's designed to encourage that best way - and in some cases to discourage alternatives. If you learn "The Akelos Way" you'll probably discover a tremendous increase in productivity. If you persist in bringing old habits from other frameworks to your Akelos development, and trying to use patterns you learned elsewhere, you may have a less happy experience.
 
@@ -245,11 +245,11 @@ You actually have a functional Akelos application already - after running only t
 $ ./makelos server
 </shell>
 
-This will fire up an instance of the Mongrel web server by default (Akelos can also use several other web servers). To see your application in action, open a browser window and navigate to +http://localhost:3000+. You should see Akelos' default information page:
+This will fire up an instance a simple PHP web server by default (Akelos can also use several other web servers). To see your application in action, open a browser window and navigate to +http://localhost:3000+. You should see Akelos' default information page:
 
 !/images/akelos_welcome.png(Welcome Aboard screenshot)!
 
-TIP: To stop the web server, hit Ctrl+C in the terminal window where it's running. In development mode, Akelos does not generally require you to stop the server; changes you make in files will be automatically picked up by the server.
+TIP: To stop the web server, hit Ctrl+C in the terminal window where it's running. Using the PHP server Akelos requires you to stop the server; changes you make in files will not be automatically picked up by the server when using script/server. You should setup Apache for reloading changed files.
 
 The "Welcome Aboard" page is the _smoke test_ for a new Akelos application: it makes sure that you have your software configured correctly enough to serve a page. To view the page you just created, navigate to +http://localhost:3000/home/index+.
 
@@ -291,27 +291,27 @@ h3. Creating a Resource
 In the case of the blog application, you can start by generating a scaffolded Post resource: this will represent a single blog posting. To do this, enter this command in your terminal:
 
 <shell>
-$ ./makelos generate scaffold Post name:string title:string content:text
+$ ./makelos generate scaffold Post name,title,content
 </shell>
 
 NOTE. While scaffolding will get you up and running quickly, the "one size fits all" code that it generates is unlikely to be a perfect fit for your application. In most cases, you'll need to customize the generated code. Many experienced Akelos developers avoid scaffolding entirely, preferring to write all or most of their source code from scratch.
 
 The scaffold generator will build 14 files in your application, along with some folders, and edit one more. Here's a quick overview of what it creates:
 
-|_.File                                        |_.Purpose|
+|_.File                                         |_.Purpose|
 |app/models/post.php                            |The Post model|
-|db/migrate/20090113124235_create_posts.php     |Migration to create the posts table in your database (your name will include a different timestamp)|
-|app/views/posts/index.html.tpl                |A view to display an index of all posts |
-|app/views/posts/show.html.tpl                 |A view to display a single post|
-|app/views/posts/new.html.tpl                  |A view to create a new post|
-|app/views/posts/edit.html.tpl                 |A view to edit an existing post|
-|app/views/layouts/posts.html.tpl              |A view to control the overall look and feel of the other posts views|
-|public/stylesheets/scaffold.css               |Cascading style sheet to make the scaffolded views look better|
+|app/installers/post_installer.php              |Instaler for creating the posts table in your database|
+|app/views/posts/index.html.tpl                 |A view to display an index of all posts |
+|app/views/posts/show.html.tpl                  |A view to display a single post|
+|app/views/posts/add.html.tpl                   |A view to create a new post|
+|app/views/posts/edit.html.tpl                  |A view to edit an existing post|
+|app/views/layouts/posts.html.tpl               |A view to control the overall look and feel of the other posts views|
+|public/stylesheets/scaffold.css                |Cascading style sheet to make the scaffolded views look better|
 |app/controllers/posts_controller.php           |The Posts controller|
 |test/functional/posts_controller_test.php      |Functional testing harness for the posts controller|
 |app/helpers/posts_helper.php                   |Helper functions to be used from the posts views|
 |config/routes.php                              |Edited to include routing information for posts|
-|test/fixtures/posts.yml                       |Dummy posts for use in testing|
+|test/fixtures/posts.yml                        |Dummy posts for use in testing|
 |test/unit/post_test.php                        |Unit testing harness for the posts model|
 |test/unit/helpers/posts_helper_test.php        |Unit testing harness for the posts helper|
 
@@ -322,32 +322,24 @@ One of the products of the +./makelos generate scaffold+ command is a _database 
 If you look in the +db/migrate/20090113124235_create_posts.php+ file (remember, yours will have a slightly different name), here's what you'll find:
 
 <php>
-class CreatePosts extends AkActiveRecordMigration{
-  public function up
-    create_table :posts do |t|
-      t.string :name
-      t.string :title
-      t.text :content
-
-      t.timestamps
-    }
+class PostInstaller extends AkInstaller {
+  public function up_1(){
+    $this->createTable('posts', 'name,title,content');
   }
 
-  public function down
-    drop_table :posts
+  public function down_1(){
+    $this->dropTable('posts');
   }
 }
 </php>
 
 If you were to translate that into words, it says something like: when this migration is run, create a table named +posts+ with two string columns (+name+ and +title+) and a text column (+content+), and generate timestamp fields to track record creation and updating. You can learn the detailed syntax for migrations in the "Akelos Database Migrations":migrations.html guide.
 
-At this point, you can use a makelos command to run the migration:
+At this point, you can use the installer script to run the migration:
 
 <shell>
-$ ./makelos db:migrate
+$ ./script/install
 </shell>
-
-Remember, you can't run migrations before running +./makelos db:create+ to create your database, as we covered earlier.
 
 NOTE. Because you're working in the development environment by default, this command will apply to the database defined in the +development+ section of your +config/database.yml+ file.
 
@@ -372,7 +364,7 @@ This is the result of Akelos rendering the +index+ view of your posts. There are
 
 TIP: In development mode (which is what you're working in by default), Akelos reloads your application with every browser request, so there's no need to stop and restart the web server.
 
-Congratulations, you're riding the akelos! Now it's time to see how it all works.
+Congratulations, you're now into akelos! Now it's time to see how it all works.
 
 h4. The Model
 
@@ -391,8 +383,10 @@ Akelos includes methods to help you validate the data that you send to models. O
 
 <php>
 class Post extends ActiveRecord {
-  validates_presence_of :name, :title
-  validates_length_of :title, 'minimum' => 5
+    public function validate(){
+        $this->validatesPresenceOf(array('name', 'title'));
+        $this->validatesLengthOf('title', array('minimum' => 5));
+    }
 }
 </php>
 
@@ -409,12 +403,12 @@ $ ./makelos console
 After the console loads, you can use it to work with your application's models:
 
 <shell>
->> p = Post.create('content' => "A new post")
-=> #<Post id: nil, name: nil, title: nil, content: "A new post",
-created_at: nil, updated_at: nil>
->> p->save()
+>> $p = Post::create(array('content' => "A new post"));
+=> #<Post id: null, name: null, title: null, content: "A new post",
+created_at: null, updated_at: null>
+>> $p->save();
 => false
->> p.errors
+>> $p->getErrors();
 => #<ActiveRecord::Errors:0x23bcf0c @base=#<Post id: nil, name: nil,
 title: nil, content: "A new post", created_at: nil, updated_at: nil>,
 @errors={"name"=>["can't be blank"], "title"=>["can't be blank",
@@ -430,21 +424,21 @@ h4. Listing All Posts
 The easiest place to start looking at functionality is with the code that lists all posts. Open the file +app/controllers/posts_controller.php + and look at the +index+ action:
 
 <php>
-public function index
-  @posts = Post.all
+public function index(){
+  $this->posts = $this->Post->findAll();
 
-  respond_to do |format|
-    format.html # index.html.tpl
-    format.xml  { render 'xml' => @posts }
+  switch($this->respondTo()){
+      case 'html': break;  // index.tpl.html
+      case 'xml': $this->render(array('xml' => $this->posts));
   }
 }
 </php>
 
-This code sets the +@posts+ instance variable to an array of all posts in the database. +Post.find(:all)+ or +Post.all+ calls the +Post+ model to return all of the posts that are currently in the database, with no limiting conditions.
+This code sets the +$this->posts+ instance variable to an array of all posts in the database. +$this->Post->find('all')+ or +$this->Post->findAll()+ calls the +Post+ model to return all of the posts that are currently in the database, with no limiting conditions.
 
 TIP: For more information on finding records with Active Record, see "Active Record Query Interface":active_record_querying.html.
 
-The +respond_to+ block handles both HTML and XML calls to this action. If you browse to +http://localhost:3000/posts.xml+, you'll see all of the posts in XML format. The HTML format looks for a view in +app/views/posts/+ with a name that corresponds to the action name. Akelos makes all of the instance variables from the action available to the view. Here's +app/views/posts/index.html.tpl+:
+The +respondTo+ switch handles both HTML and XML calls to this action. If you browse to +http://localhost:3000/posts.xml+, you'll see all of the posts in XML format. The HTML format looks for a view in +app/views/posts/+ with a name that corresponds to the action name. Akelos makes all of the instance variables from the action available to the view. Here's +app/views/posts/index.html.tpl+:
 
 <tpl>
 <h1>Listing posts</h1>
@@ -456,7 +450,7 @@ The +respond_to+ block handles both HTML and XML calls to this action. If you br
     <th>Content</th>
   </tr>
 
-<% @posts.each do |post| %>
+{loop posts}
   <tr>
     <td><%=h post.name %></td>
     <td><%=h post.title %></td>
@@ -466,7 +460,7 @@ The +respond_to+ block handles both HTML and XML calls to this action. If you br
     <td><%= link_to 'Destroy', post, 'confirm' => 'Are you sure?',
             'method' => :delete %></td>
   </tr>
-<% end %>
+{end}
 </table>
 
 <br />
@@ -474,7 +468,7 @@ The +respond_to+ block handles both HTML and XML calls to this action. If you br
 <%= link_to 'New post', new_post_path %>
 </tpl>
 
-This view iterates over the contents of the +@posts+ array to display content and links. A few things to note in the view:
+This view iterates over the contents of the +$this->posts+ array to display content and links. A few things to note in the view:
 
 * +h+ is an Akelos helper method to sanitize displayed data, preventing cross-site scripting attacks
 * +link_to+ builds a hyperlink to a particular destination
@@ -499,9 +493,9 @@ The view is only part of the story of how HTML is displayed in your web browser.
 </head>
 <body style="background: #EEEEEE;">
 
-<p style="color: green"><%= flash['notice'] %></p>
+<%= flash %>
 
-<%= yield  %>
+{content_for_layout}
 
 </body>
 </html>
@@ -511,73 +505,75 @@ Now when you refresh the +/posts+ page, you'll see a gray background to the page
 
 h4. Creating New Posts
 
-Creating a new post involves two actions. The first is the +new+ action, which instantiates an empty +Post+ object:
+Creating a new post involves two actions. The first is the +add+ action, which instantiates an empty +Post+ object:
 
 <php>
-public function new
-  @post = new Post
+public function add(){
+  $this->post = new Post();
 
-  respond_to do |format|
-    format.html # new.html.tpl
-    format.xml  { render 'xml' => @post }
+  switch($this->respondTo()){
+      case 'html': break;  // add.tpl.html
+      case 'xml': $this->render(array('xml' => $this->post));
   }
 }
 </php>
 
-The +new.html.tpl+ view displays this empty Post to the user:
+The +add.html.tpl+ view displays this empty Post to the user:
 
 <tpl>
 <h1>New post</h1>
 
-<% form_for(@post) do |f| %>
-  <%= f.error_messages %>
+<% f = form_for(post); %>
+  <?= $f->error_messages(); ?>
 
   <p>
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
+    <?= $f->label('name'); ?><br />
+    <?= $f->text_field('name'); ?>
   </p>
   <p>
-    <%= f.label :title %><br />
-    <%= f.text_field :title %>
+    <?= $f->label('title'); ?><br />
+    <?= $f->text_field('title'); ?>
   </p>
   <p>
-    <%= f.label :content %><br />
-    <%= f.text_area :content %>
+    <?= $f->label('content'); ?><br />
+    <?= $f->text_area('content'); ?>
   </p>
   <p>
-    <%= f.submit "Create" %>
+    <?= $f->submit("Create"); ?>
   </p>
-<% end %>
+</form>
 
 <%= link_to 'Back', posts_path %>
 </tpl>
 
-The +form_for+ block is used to create an HTML form. Within this block, you have access to methods to build various controls on the form. For example, +f.text_field :name+ tells Akelos to create a text input on the form, and to hook it up to the +name+ attribute of the instance being displayed. You can only use these methods with attributes of the model that the form is based on (in this case +name+, +title+, and +content+). Akelos uses +form_for+ in preference to having you write raw HTML because the code is more succinct, and because it explicitly ties the form to a particular model instance.
+The +form_for+ returns an object used to create an HTML form. Within this object, you have access to methods to build various controls on the form. For example, +f.text_field :name+ tells Akelos to create a text input on the form, and to hook it up to the +name+ attribute of the instance being displayed. You can only use these methods with attributes of the model that the form is based on (in this case +name+, +title+, and +content+). Akelos uses +form_for+ in preference to having you write raw HTML because the code is more succinct, and because it explicitly ties the form to a particular model instance.
 
 TIP: If you need to create an HTML form that displays arbitrary fields, not tied to a model, you should use the +form_tag+ method, which provides shortcuts for building forms that are not necessarily tied to a model instance.
 
-When the user clicks the +Create+ button on this form, the browser will send information back to the +create+ method of the controller (Akelos knows to call the +create+ method because the form is sent with an HTTP POST request; that's one of the conventions that I mentioned earlier):
+When the user clicks the +Create+ button on this form, the browser will send information back to the +create+ method of the controller (Akelos knows to call the +create+ method because the form is sent with an HTTP POST request; that's one of the conventions we mentioned earlier):
 
 <php>
-public function create
-  @post = new Post($this->params['post'])
-
-  respond_to do |format|
-    if @post->save()
-      flash['notice'] = 'Post was successfully created.'
-      format.html { $this->redirectTo((@post) }
-      format.xml  { render 'xml' => @post, 'status' => :created,
-	                'location' => @post }
-    else
-      format.html { render 'action' => 'new' }
-      format.xml  { render 'xml' => @post.errors,
-	                'status' => :unprocessable_entity }
-    }
+public function create(){
+  $this->post = new Post($this->params['post']);
+  if($this->post->save()){
+      $this->flash['notice'] = $this->t('Post was successfully created.');
+      switch($this->respondTo()){
+          case 'html': $this->redirectTo($this->post); break;
+          case 'xml': $this->render(array('xml' => $this->post, 
+                                          'status' => 'created',
+                                          'location' => $this->post ));
+      }
+  }else{
+      switch($this->respondTo()){
+          case 'html': $this->renderAction('add'); break;
+          case 'xml': $this->render(array('xml' => $this->post->getErrors(),
+                                          'status' => 'unprocessable_entity'));
+      }
   }
 }
 </php>
 
-The +create+ action instantiates a new Post object from the data supplied by the user on the form, which Akelos makes available in the +params+ array. After saving the new post, it uses +flash['notice']+ to create an informational message for the user, and redirects to the show action for the post. If there's any problem, the +create+ action just shows the +new+ view a second time, with any error messages.
+The +create+ action instantiates a new Post object from the data supplied by the user on the form, which Akelos makes available in the +params+ array. After saving the new post, it uses +flash['notice']+ to create an informational message for the user, and redirects to the show action for the post. If there's any problem, the +create+ action just shows the +add+ view a second time, with any error messages.
 
 Akelos provides the +flash+ array (usually just called the Flash) so that messages can be carried over to another action, providing the user with useful information on the status of their request. In the case of +create+, the user never actually sees any page rendered during the Post creation process, because it immediately redirects to the new Post as soon Akelos saves the record. The Flash carries over a message to the next action, so that when the user is redirected back to the +show+ action, they are presented with a message saying "Post was successfully created."
 
@@ -586,115 +582,117 @@ h4. Showing an Individual Post
 When you click the +show+ link for a post on the index page, it will bring you to a URL like +http://localhost:3000/posts/1+. Akelos interprets this as a call to the +show+ action for the resource, and passes in +1+ as the +'id'+ parameter. Here's the +show+ action:
 
 <php>
-public function show
-  @post = Post.find($this->params['id'])
+public function show(){
+  $this->post = $this->Post->find($this->params['id']);
 
-  respond_to do |format|
-    format.html # show.html.tpl
-    format.xml  { render 'xml' => @post }
+  switch($this->respondTo()){
+      case 'html': break; // show.tpl.html
+      case 'xml': $this->render(array('xml' => $this->posts));
   }
 }
 </php>
 
-The +show+ action uses +Post.find+ to search for a single record in the database by its id value. After finding the record, Akelos displays it by using +show.html.tpl+:
+The +show+ action uses +$this->Post->find+ to search for a single record in the database by its id value. After finding the record, Akelos displays it by using +show.html.tpl+:
 
 <tpl>
 <p>
-  <b>Name:</b>
-  <%=h @post.name %>
+  <b>_{Name}:</b>
+  <%=h post.name %>
 </p>
 
 <p>
-  <b>Title:</b>
-  <%=h @post.title %>
+  <b>_{Title}:</b>
+  <%=h post.title %>
 </p>
 
 <p>
-  <b>Content:</b>
-  <%=h @post.content %>
+  <b>_{Content}:</b>
+  <%=h post.content %>
 </p>
 
 
-<%= link_to 'Edit', edit_post_path(@post) %> |
+<%= link_to 'Edit', edit_post_path(post) %> |
 <%= link_to 'Back', posts_path %>
 </tpl>
 
 h4. Editing Posts
 
-Like creating a new post, editing a post is a two-part process. The first step is a request to +edit_post_path(@post)+ with a particular post. This calls the +edit+ action in the controller:
+Like creating a new post, editing a post is a two-part process. The first step is a request to +edit_post_path(post)+ with a particular post. This calls the +edit+ action in the controller:
 
 <php>
-public function edit
-  @post = Post.find($this->params['id'])
+public function edit(){
+  $this->post = $this->Post->find($this->params['id']);
 }
 </php>
 
 After finding the requested post, Akelos uses the +edit.html.tpl+ view to display it:
 
 <tpl>
-<h1>Editing post</h1>
+<h1>_{Editing post}</h1>
 
-<% form_for(@post) do |f| %>
-  <%= f.error_messages %>
+<% f = form_for(post); %>
+  <?= $f->error_messages(); ?>
 
   <p>
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
+    <?= $f->label('name'); ?><br />
+    <?= $f->text_field('name'); ?>
   </p>
   <p>
-    <%= f.label :title %><br />
-    <%= f.text_field :title %>
+    <?= $f->label('title') ?><br />
+    <?= $f->text_field('title') ?>
   </p>
   <p>
-    <%= f.label :content %><br />
-    <%= f.text_area :content %>
+    <?= $f->label('content')?><br />
+    <?= $f->text_area('content'); ?>
   </p>
   <p>
-    <%= f.submit "Update" %>
+    <?= $f->submit("Update"); ?>
   </p>
-<% end %>
+</form>
 
-<%= link_to 'Show', @post %> |
+<%= link_to 'Show', post %> |
 <%= link_to 'Back', posts_path %>
 </tpl>
 
 Submitting the form created by this view will invoke the +update+ action within the controller:
 
 <php>
-public function update
-  @post = Post.find($this->params['id'])
+public function update(){
+    $this->post = $this->Post->find($this->params['id']);
 
-  respond_to do |format|
-    if @post.update_attributes($this->params['post'])
-      flash['notice'] = 'Post was successfully updated.'
-      format.html { $this->redirectTo((@post) }
-      format.xml  { head :ok }
-    else
-      format.html { render 'action' => 'edit' }
-      format.xml  { render 'xml' => @post.errors,
-	                'status' => :unprocessable_entity }
+    if($this->post->updateAttributes($this->params['post'])){
+        $this->flash['notice'] = $this->t('Post was successfully updated.');
+        switch($this->respondTo()){
+            case 'html': $this->redirectTo($this->post); break;
+            case 'xml' : $this->head('ok');
+        }
+    }else{
+        switch($this->respondTo()){
+            case 'html': $this->renderAction('edit'); break;
+            case 'xml' : $this->render(array('xml' => $this->post->getErrors(),
+            'status' => 'unprocessable_entity'));
+        }
     }
-  }
 }
 </php>
 
 In the +update+ action, Akelos first uses the +'id'+ parameter passed back from the edit view to locate the database record that's being edited. The +update_attributes+ call then takes the rest of the parameters from the request and applies them to this record. If all goes well, the user is redirected to the post's +show+ view. If there are any problems, it's back to +edit+ to correct them.
 
-NOTE. Sharp-eyed readers will have noticed that the +form_for+ declaration is identical for the +new+ and +edit+ views. Akelos generates different code for the two forms because it's smart enough to notice that in the one case it's being passed a new record that has never been saved, and in the other case an existing record that has already been saved to the database. In a production Akelos application, you would ordinarily eliminate this duplication by moving identical code to a _partial template_, which you could then include in both parent templates. But the scaffold generator tries not to make too many assumptions, and generates code that's easy to modify if you want different forms for +create+ and +edit+.
+NOTE. Sharp-eyed readers will have noticed that the +form_for+ declaration is identical for the +add+ and +edit+ views. Akelos generates different code for the two forms because it's smart enough to notice that in the one case it's being passed a new record that has never been saved, and in the other case an existing record that has already been saved to the database. In a production Akelos application, you would ordinarily eliminate this duplication by moving identical code to a _partial template_, which you could then include in both parent templates. But the scaffold generator tries not to make too many assumptions, and generates code that's easy to modify if you want different forms for +create+ and +edit+.
 
 h4. Destroying a Post
 
 Finally, clicking one of the +destroy+ links sends the associated id to the +destroy+ action:
 
 <php>
-public function destroy
-  @post = Post.find($this->params['id'])
-  @post.destroy
+public function destroy(){
+    $this->post = $this->Post->find($this->params['id']);
+    $this->post->destroy();
 
-  respond_to do |format|
-    format.html { $this->redirectTo((posts_url) }
-    format.xml  { head :ok }
-  }
+    switch($this->respondTo()){
+        case 'html': $this->redirectTo(posts_url()); break;
+        case 'xml' : $this->head('ok');
+    }
 }
 </php>
 
@@ -706,12 +704,12 @@ At this point, it's worth looking at some of the tools that Akelos provides to e
 
 h4. Using Partials to Eliminate View Duplication
 
-As you saw earlier, the scaffold-generated views for the +new+ and +edit+ actions are largely identical. You can pull the shared code out into a partial template. This requires editing the new and edit views, and adding a new template. The new +_form.html.tpl+ template should be saved in the same +app/views/posts+ folder as the files from which it is being extracted. Note that the name of this file begins with an underscore; that's the Akelos naming convention for partial templates.
+As you saw earlier, the scaffold-generated views for the +add+ and +edit+ actions are largely identical. You can pull the shared code out into a partial template. This requires editing the new and edit views, and adding a new template. The new +_form.html.tpl+ template should be saved in the same +app/views/posts+ folder as the files from which it is being extracted. Note that the name of this file begins with an underscore; that's the Akelos naming convention for partial templates.
 
-<tt>new.html.tpl</tt>:
+<tt>add.html.tpl</tt>:
 
 <tpl>
-<h1>New post</h1>
+<h1>_{New post}</h1>
 
 <%= render 'partial' => 'form' %>
 
@@ -721,36 +719,36 @@ As you saw earlier, the scaffold-generated views for the +new+ and +edit+ action
 <tt>edit.html.tpl</tt>:
 
 <tpl>
-<h1>Editing post</h1>
+<h1>_{Editing post}</h1>
 
 <%= render 'partial' => 'form' %>
 
-<%= link_to 'Show', @post %> |
+<%= link_to 'Show', post %> |
 <%= link_to 'Back', posts_path %>
 </tpl>
 
 <tt>_form.html.tpl</tt>:
 
 <tpl>
-<% form_for(@post) do |f| %>
-  <%= f.error_messages %>
+<% f = form_for(post) %>
+  <?= $f->error_messages(); ?>
 
   <p>
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
+    <?= $f->label('name'); ?><br />
+    <?= $f->text_field('name'); ?>
   </p>
   <p>
-    <%= f.label :title, "title" %><br />
-    <%= f.text_field :title %>
+    <?= $f->label('title', 'title'); ?><br />
+    <?= $f->text_field('title'); ?>
   </p>
   <p>
-    <%= f.label :content %><br />
-    <%= f.text_area :content %>
+    <?= $f->label('content'); ?><br />
+    <?= $f->text_area('content'); ?>
   </p>
   <p>
-    <%= f.submit "Save" %>
+    <?= $f->submit("Save"); ?>
   </p>
-<% end %>
+</form>
 </tpl>
 
 Now, when Akelos renders the +new+ or +edit+ view, it will insert the +_form+ partial at the indicated point. Note the naming convention for partials: if you refer to a partial named +form+ inside of a view, the corresponding file is +_form.html.tpl+, with a leading underscore.
@@ -762,59 +760,61 @@ h4. Using Filters to Eliminate Controller Duplication
 At this point, if you look at the controller for posts, you'll see some duplication:
 
 <php>
-class PostsController extends ApplicationController
-  # ...
-  public function show() {
-    @post = Post.find($this->params['id'])
-  # ...
-  }
-
-  public function edit() {
-    @post = Post.find($this->params['id'])
-  }
-
-  public function update() {
-    @post = Post.find($this->params['id'])
+class PostsController extends ApplicationController {
     # ...
-  }
+    public function show() {
+        $this->post = $this->Post->find($this->params['id']);
+        # ...
+    }
 
-  public function destroy() {
-    @post = Post.find($this->params['id'])
-    # ...
-  }
+    public function edit() {
+        $this->post = $this->Post->find($this->params['id']);
+    }
+
+    public function update() {
+        $this->post = $this->Post->find($this->params['id']);
+        # ...
+    }
+
+    public function destroy() {
+        $this->post = $this->Post->find($this->params['id']);
+        # ...
+    }
 }
 </php>
 
 Four instances of the exact same line of code doesn't seem very DRY. Akelos provides _filters_ as a way to address this sort of repeated code. In this case, you can DRY things up by using a +before_filter+:
 
 <php>
-class PostsController extends ApplicationController
-  before_filter :find_post,
-    'only' => [:show, :edit, :update, :destroy]
-  # ...
-  public function show() {
-  # ...
-  }
-
-  public function edit() {
-  }
-
-  public function update() {
+class PostsController extends ApplicationController{
+    public function __construct(){
+        $this->beforeFilter('_findPost', array('only' => array('show','edit','update','destroy')));
+    }
     # ...
-  }
+    public function show() {
+        # ...
+    }
 
-  public function destroy() {
-    # ...
-  }
+    public function edit() {
+    }
 
-private
-  public function find_post() {
-    @post = Post.find($this->params['id'])
-  }
+    public function update() {
+        # ...
+    }
+
+    public function destroy() {
+        # ...
+    }
+
+    public function _findPost() {
+        $this->post = $this->Post->find($this->params['id']);
+    }
 }
 </php>
 
 Akelos runs _before filters_ before any action in the controller. You can use the +'only'+ clause to limit a before filter to only certain actions, or an +'except'+ clause to specifically skip a before filter for certain actions. Akelos also allows you to define _after filters_ that run after processing an action, as well as _around filters_ that surround the processing of actions. Filters can also be defined in external classes to make it easy to share them between controllers.
+
+Filters need to be declared public, but we will use Akelos conventions to prevent users from calling the method by underscoring it.
 
 For more information on filters, see the "Action Controller Overview":action_controller_overview.html guide.
 
@@ -827,50 +827,43 @@ h4. Generating a Model
 Models in Akelos use a singular name, and their corresponding database tables use a plural name. For the model to hold comments, the convention is to use the name Comment. Even if you don't want to use the entire apparatus set up by scaffolding, most Akelos developers still use generators to make things like models and controllers. To create the new model, run this command in your terminal:
 
 <shell>
-$ ./makelos generate model Comment commenter:string body:text
-    post:references
+$ ./makelos generate model Comment commenter,body,post_id
 </shell>
 
 This command will generate four files:
 
 * +app/models/comment.php+ - The model
-* +db/migrate/20091013214407_create_comments.php+ - The migration
+* +app/installers/comment_installer_.php+ - The installer
 * +test/unit/comment_test.php+ and +test/fixtures/comments.yml+ - The test harness.
 
 First, take a look at +comment.php+:
 
 <php>
 class Comment extends ActiveRecord {
-  belongs_to :post
+  public $belongs_to = array('post');
 }
 </php>
 
-This is very similar to the +post.php+ model that you saw earlier. The difference is the line +belongs_to :post+, which sets up an Active Record _association_. You'll learn a little about associations in the next section of this guide.
+This is very similar to the +post.php+ model that you saw earlier. The difference is the line +public $belongs_to = array('post');+, which sets up an Active Record _association_. You'll learn a little about associations in the next section of this guide.
 
 In addition to the model, Akelos has also made a migration to create the corresponding database table:
 
 <php>
-class CreateComments extends ActiveRecord::Migration
-  public function up
-    create_table :comments do |t|
-      t.string :commenter
-      t.text :body
-      t.references :post
-
-      t.timestamps
+class CreateComments extends AkInstaller {
+    public function up_1(){
+        $this->createTable('comments', 'commenter,body,post_id');
     }
-  }
 
-  public function down
-    drop_table :comments
-  }
+    public function down_1(){
+        $this->dropTable('comments');
+    }
 }
 </php>
 
-The +t.references+ line sets up a foreign key column for the association between the two models. Go ahead and run the migration:
+The +post_id+ fields sets up a foreign key column for the association between the two models. Go ahead and run the installer:
 
 <shell>
-$ ./makelos db:migrate
+$ ./script/install
 </shell>
 
 Akelos is smart enough to only execute the migrations that have not already been run against the current database.
@@ -886,7 +879,7 @@ In fact, this is very close to the syntax that Akelos uses to declare this assoc
 
 <php>
 class Comment extends ActiveRecord {
-  belongs_to :post
+  public $belongs_to = array('post');
 }
 </php>
 
@@ -894,13 +887,15 @@ You'll need to edit the +post.php+ file to add the other side of the association
 
 <php>
 class Post extends ActiveRecord {
-  validates_presence_of :name, :title
-  validates_length_of :title, 'minimum' => 5
-  has_many :comments
+    public $has_many = array('comments');
+    public function validate(){
+        $this->validatesPresenceOf(array('name', 'title'));
+        $this->validatesLengthOf('title', array('minimum' => 5));
+    }
 }
 </php>
 
-These two declarations enable a good bit of automatic behavior. For example, if you have an instance variable +@post+ containing a post, you can retrieve all the comments belonging to that post as the array +@post.comments+.
+These two declarations enable a good bit of automatic behavior. For example, if you have an instance variable +post+ containing a post, you can retrieve all the comments belonging to that post as the array +post->comments+.
 
 TIP: For more information on Active Record associations, see the "Active Record Associations":association_basics.html guide.
 
@@ -909,7 +904,7 @@ h4. Adding a Route
 _Routes_ are entries in the +config/routes.php+ file that tell Akelos how to match incoming HTTP requests to controller actions. Open up that file and find the existing line referring to +posts+ (it will be right at the top of the file). Then edit it as follows:
 
 <php>
-map.resources :posts, 'has_many' => :comments
+$Map->resources('posts', array('has_many' => 'comments'));
 </php>
 
 This creates +comments+ as a _nested resource_ within +posts+. This is another part of capturing the hierarchical relationship that exists between posts and comments.
@@ -921,7 +916,7 @@ h4. Generating a Controller
 With the model in hand, you can turn your attention to creating a matching controller. Again, there's a generator for this:
 
 <shell>
-$ ./makelos generate controller Comments index show new edit
+$ ./makelos generate controller Comments index show add edit
 </shell>
 
 This creates eight files:
@@ -930,7 +925,7 @@ This creates eight files:
 * +app/helpers/comments_helper.php+ - A view helper file
 * +app/views/comments/index.html.tpl+ - The view for the index action
 * +app/views/comments/show.html.tpl+ - The view for the show action
-* +app/views/comments/new.html.tpl+ - The view for the new action
+* +app/views/comments/add.html.tpl+ - The view for the add action
 * +app/views/comments/edit.html.tpl+ - The view for the edit action
 * +test/functional/comments_controller_test.php+ - The functional tests for the controller
 * +test/unit/helpers/comments_helper_test.php+ - The unit tests for the helper
@@ -938,82 +933,83 @@ This creates eight files:
 The controller will be generated with empty methods and views for each action that you specified in the call to +./makelos generate controller+:
 
 <php>
-class CommentsController extends ApplicationController
-  public function index() {
-  }
+class CommentsController extends ApplicationController {
+    public function index() {
+    }
 
-  public function show() {
-  }
+    public function show() {
+    }
 
-  public function add
-  }
+    public function add(){
+    }
 
-  public function edit() {
-  }
-
+    public function edit() {
+    }
 }
 </php>
 
 You'll need to flesh this out with code to actually process requests appropriately in each method. Here's a version that (for simplicity's sake) only responds to requests that require HTML:
 
 <php>
-class CommentsController extends ApplicationController
-  before_filter :find_post
+class CommentsController extends ApplicationController {
 
-  public function index() {
-    @comments = @post.comments
-  }
-
-  public function show() {
-    @comment = @post.comments.find($this->params['id'])
-  }
-
-  public function add
-    @comment = @post.comments.build
-  }
-
-  public function create() {
-    @comment = @post.comments.build($this->params['comment'])
-    if @comment->save()
-      $this->redirectTo( post_comment_url(@post, @comment)
-    else
-      render 'action' => 'new'
+    public function __construct(){
+        $this->beforeFilter('_findPost', array('only' => array('show','edit','update','destroy'));
     }
-  }
 
-  public function edit() {
-    @comment = @post.comments.find($this->params['id'])
-  }
-
-  public function update() {
-    @comment = Comment.find($this->params['id'])
-    if @comment.update_attributes($this->params['comment'])
-      $this->redirectTo( post_comment_url(@post, @comment)
-    else
-      render 'action' => 'edit'
+    public function index() {
+        $this->comments = $this->post->comments;
     }
-  }
 
-  public function destroy() {
-    @comment = Comment.find($this->params['id'])
-    @comment.destroy
-    $this->redirectTo( post_comments_path(@post)
-  }
+    public function show() {
+        $this->comment = $this->post->comments->find($this->params['id']);
+    }
 
-private
-  public function find_post() {
-    @post = Post.find($this->params['post_id'])
-  }
+    public function add(){
+        $this->comment = $this->post->comments->build();
+    }
+
+    public function create() {
+        $this->comment = $this->post->comments->build($this->params['comment']);
+        if($this->comment->save()){
+            $this->redirectTo( post_comment_url($this->post, $this->comment) );
+        }else{
+            $this->renderAction('add');
+        }
+    }
+
+    public function edit() {
+        $this->comment = $this->post->comments->find($this->params['id']);
+    }
+
+    public function update() {
+        $this->comment = $this->Comment->find($this->params['id']);
+        if($this->comment->updateAttributes($this->params['comment'])){
+            $this->redirectTo( post_comment_url($this->post, $this->comment) );
+        }else{
+            $this->renderAction('edit');
+        }
+    }
+
+    public function destroy() {
+        $this->comment = Comment.find($this->params['id']);
+        $this->comment->destroy();
+        $this->redirectTo( post_comments_path($this->post) );
+    }
+
+    public function _findPost() {
+        $this->post = $this->Post->find($this->params['post_id']);
+    }
 
 }
 </php>
 
 You'll see a bit more complexity here than you did in the controller for posts. That's a side-effect of the nesting that you've set up; each request for a comment has to keep track of the post to which the comment is attached.
 
-In addition, the code takes advantage of some of the methods available for an association. For example, in the +new+ method, it calls
+In addition, the code takes advantage of some of the methods available for an association. For example, in the +add+ method, it calls
 
 <php>
-@comment = @post.comments.build
+$this->comment = $this->post->comments->build();
 </php>
 
 This creates a new +Comment+ object _and_ sets up the +post_id+ field to have the +id+ from the specified +Post+ object in a single operation.
@@ -1025,102 +1021,102 @@ Because you skipped scaffolding, you'll need to build views for comments "by han
 The +views/comments/index.html.tpl+ view:
 
 <tpl>
-<h1>Comments for <%= @post.title %></h1>
+<h1>_{Comments for %post.title}</h1>
 
 <table>
   <tr>
-    <th>Commenter</th>
-    <th>Body</th>
+    <th>_{Commenter}</th>
+    <th>_{Body}</th>
   </tr>
 
-<% for comment in @comments %>
+{loop comments}
   <tr>
-    <td><%=h comment.commenter %></td>
-    <td><%=h comment.body %></td>
-    <td><%= link_to 'Show', post_comment_path(@post, comment) %></td>
+    <td>{\comment.commenter}</td>
+    <td>{\comment.body}</td>
+    <td><%= link_to 'Show', post_comment_path(post, comment) %></td>
     <td>
-        <%= link_to 'Edit', edit_post_comment_path(@post, comment) %>
+        <%= link_to 'Edit', edit_post_comment_path(post, comment) %>
     </td>
     <td>
-        <%= link_to 'Destroy', post_comment_path(@post, comment),
+        <%= link_to 'Destroy', post_comment_path(post, comment),
             'confirm' => 'Are you sure?', 'method' => :delete %>
     </td>
   </tr>
-<% end %>
+{end}
 </table>
 
 <br />
 
-<%= link_to 'New comment', new_post_comment_path(@post) %>
-<%= link_to 'Back to Post', @post %>
+<%= link_to 'New comment', new_post_comment_path(post) %>
+<%= link_to 'Back to Post', post %>
 </tpl>
 
-The +views/comments/new.html.tpl+ view:
+The +views/comments/add.html.tpl+ view:
 
 <tpl>
-<h1>New comment</h1>
+<h1>_{New comment}</h1>
 
-<% form_for([@post, @comment]) do |f| %>
-  <%= f.error_messages %>
+<% f = form_for([post, comment]) %>
+  <?= $f->error_messages(); ?>
 
   <p>
-    <%= f.label :commenter %><br />
-    <%= f.text_field :commenter %>
+    <?= $f->label('commenter'); ?><br />
+    <?= $f->text_field('commenter'); ?>
   </p>
   <p>
-    <%= f.label :body %><br />
-    <%= f.text_area :body %>
+    <?= $f->label('body'); ?><br />
+    <?= $f->text_area('body'); ?>
   </p>
   <p>
-    <%= f.submit "Create" %>
+    <?= $f->submit("Create"); ?>
   </p>
-<% end %>
+</form>
 
-<%= link_to 'Back', post_comments_path(@post) %>
+<%= link_to 'Back', post_comments_path(post) %>
 </tpl>
 
 The +views/comments/show.html.tpl+ view:
 
 <tpl>
-<h1>Comment on <%= @post.title %></h1>
+<h1>_{Comment on %post.title}</h1>
 
 <p>
-  <b>Commenter:</b>
-  <%=h @comment.commenter %>
+  <b>_{Commenter}:</b>
+  {\comment.commenter}
 </p>
 
 <p>
-  <b>Comment:</b>
-  <%=h @comment.body %>
+  <b>_{Comment}:</b>
+  {\comment.body}
 </p>
 
-<%= link_to 'Edit', edit_post_comment_path(@post, @comment) %> |
-<%= link_to 'Back', post_comments_path(@post) %>
+<%= link_to 'Edit', edit_post_comment_path(post,comment) %> |
+<%= link_to 'Back', post_comments_path(post) %>
 </tpl>
 
 The +views/comments/edit.html.tpl+ view:
 
 <tpl>
-<h1>Editing comment</h1>
+<h1>_{Editing comment}</h1>
 
-<% form_for([@post, @comment]) do |f| %>
-  <%= f.error_messages %>
+<% f = form_for([post, comment]) %>
+  <?= $f->error_messages(); ?>
 
   <p>
-    <%= f.label :commenter %><br />
-    <%= f.text_field :commenter %>
+    <?= $f->label('commenter'); ?><br />
+    <?= $f->text_field('commenter'); ?>
   </p>
   <p>
-    <%= f.label :body %><br />
-    <%= f.text_area :body %>
+    <?= $f->label('body'); ?><br />
+    <?= $f->text_area('body'); ?>
   </p>
   <p>
-    <%= f.submit "Update" %>
+    <?= $f->submit("Update"); ?>
   </p>
-<% end %>
+</form>
 
-<%= link_to 'Show', post_comment_path(@post, @comment) %> |
-<%= link_to 'Back', post_comments_path(@post) %>
+<%= link_to 'Show', post_comment_path(post, comment) %> |
+<%= link_to 'Back', post_comments_path(post) %>
 </tpl>
 
 Again, the added complexity here (compared to the views you saw for managing posts) comes from the necessity of juggling a post and its comments at the same time.
@@ -1131,39 +1127,39 @@ As a next step, I'll modify the +views/posts/show.html.tpl+ view to show the com
 
 <tpl>
 <p>
-  <b>Name:</b>
-  <%=h @post.name %>
+  <b>_{Name}:</b>
+  {\post.name}
 </p>
 
 <p>
-  <b>Title:</b>
-  <%=h @post.title %>
+  <b>_{Title}:</b>
+  {\post.title}
 </p>
 
 <p>
-  <b>Content:</b>
-  <%=h @post.content %>
+  <b>_{Content}:</b>
+  {\post.content}
 </p>
 
-<h2>Comments</h2>
-<% @post.comments.each do |c| %>
+<h2>_{Comments}</h2>
+{loop comments}
   <p>
-    <b>Commenter:</b>
-    <%=h c.commenter %>
+    <b>_{Commenter}:</b>
+    {\comment.commenter}
   </p>
 
   <p>
-    <b>Comment:</b>
-    <%=h c.body %>
+    <b>_{Comment}:</b>
+    {\comment.body}
   </p>
-<% end %>
+{end}
 
-<%= link_to 'Edit Post', edit_post_path(@post) %> |
+<%= link_to 'Edit Post', edit_post_path(post) %> |
 <%= link_to 'Back to Posts', posts_path %> |
-<%= link_to 'Manage Comments', post_comments_path(@post) %>
+<%= link_to 'Manage Comments', post_comments_path(post) %>
 </tpl>
 
-Note that each post has its own individual comments collection, accessible as +@post.comments+. That's a consequence of the declarative associations in the models. Path helpers such as +post_comments_path+ come from the nested route declaration in +config/routes.php+.
+Note that each post has its own individual comments collection, accessible as +$this->post->comments+. That's a consequence of the declarative associations in the models. Path helpers such as +post_comments_path+ come from the nested route declaration in +config/routes.php+.
 
 h4. Deleting Associated Objects
 
@@ -1171,84 +1167,14 @@ If you decide at some point to delete a post, you likely want to delete the comm
 
 <php>
 class Post extends ActiveRecord {
-  validates_presence_of :name, :title
-  validates_length_of :title, 'minimum' => 5
-  has_many :comments, 'dependent' => :destroy
+    public $has_many = array('comments' => array('dependent' => 'destroy'));
+    public function validate(){
+        $this->validatesPresenceOf(array('name', 'title'));
+        $this->validatesLengthOf('title', array('minimum' => 5));
+    }
 }
 </php> 
 
-h3. Building a Multi-Model Form
-
-Comments and posts are edited on two separate forms - which makes sense, given the flow of this mini-application. But what if you want to edit more than one thing on a single form? Akelos 2.3 offers new support for nested forms. Let's add support for giving each post multiple tags, right in the form where you create the post. First, create a new model to hold the tags:
-
-<shell>
-$ ./makelos generate model tag name:string post:references
-</shell>
-
-Run the migration to create the database table:
-
-<shell>
-$ ./makelos db:migrate
-</shell>
-
-Next, edit the +post.php+ file to create the other side of the association, and to tell Akelos (via the +accepts_nested_attributes+ macro) that you intend to edit tags via posts:
-
-<php>
-class Post extends ActiveRecord {
-  validates_presence_of :name, :title
-  validates_length_of :title, 'minimum' => 5
-  has_many :comments
-  has_many :tags
-
-  accepts_nested_attributes_for :tags, 'allow_destroy' => :true,
-    'reject_if' => proc { |attrs| attrs.all? { |k, v| v.blank? } }
-}
-</php>
-
-The +'allow_destroy'+ option on the nested attribute declaration tells Akelos to display a "remove" checkbox on the view that you'll build shortly. The +'reject_if'+ option prevents saving new tags that do not have any attributes filled in.
-
-You'll also need to modify +views/posts/_form.html.tpl+ to include the tags:
-
-<tpl>
-<% @post.tags.build if @post.tags.empty? %>
-<% form_for(@post) do |post_form| %>
-  <%= post_form.error_messages %>
-
-  <p>
-    <%= post_form.label :name %><br />
-    <%= post_form.text_field :name %>
-  </p>
-  <p>
-    <%= post_form.label :title, "Title" %><br />
-    <%= post_form.text_field :title %>
-  </p>
-  <p>
-    <%= post_form.label :content %><br />
-    <%= post_form.text_area :content %>
-  </p>
-  <h2>Tags</h2>
-  <% post_form.fields_for :tags do |tag_form| %>
-    <p>
-      <%= tag_form.label :name, 'Tag:' %>
-      <%= tag_form.text_field :name %>
-    </p>
-    <% unless tag_form.object.nil? || tag_form.object.new_record? %>
-      <p>
-        <%= tag_form.label :_delete, 'Remove:' %>
-        <%= tag_form.check_box :_delete %>
-      </p>
-    <% end %>
-  <% end %>
-
-  <p>
-    <%= post_form.submit "Save" %>
-  </p>
-<% end %>
-</tpl>
-
-With these changes in place, you'll find that you can edit a post and its tags directly on the same view.
-
-NOTE. You may want to use JavaScript to dynamically add additional tags on a single form. For an example of this and other advanced techniques, see the "complex form examples application":http://github.com/alloy/complex-form-examples/tree/master.
 
 h3. What's Next?
 
