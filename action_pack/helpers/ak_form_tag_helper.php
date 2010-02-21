@@ -172,5 +172,30 @@ class AkFormTagHelper extends AkBaseHelper
     public function image_submit_tag($source, $options = array()) {
         return AkTagHelper::tag('input',array_merge(array('type'=>'image','src'=>$this->_controller->ak_asset_tag_helper->image_path($source)),$options));
     }
+    
+    /**
+    * Creates a label field
+    *
+    * ==== Options  
+    * * Creates standard HTML attributes for the tag.
+    *
+    * ==== Examples
+    *   label_tag 'name'
+    *   # => <label for="name">Name</label>
+    *
+    *   label_tag 'name', 'Your name'
+    *   # => <label for="name">Your Name</label>
+    *
+    *   label_tag 'name', nil, :class => 'small_label'
+    *   # => <label for="name" class="small_label">Name</label>
+    */
+    static function label_tag($name, $text = null, $options = array()){
+        return AkTagHelper::content_tag('label', empty($text) ? AkInflector::humanize($name) : $text, array_merge($options, array('for' => self::sanitize_to_id($name))));
+    }
+
+    # see http://www.w3.org/TR/html4/types.html#type-name
+    static function sanitize_to_id($name) {
+        return str_replace(']','', preg_replace('/[^-a-zA-Z0-9:.]/', '_', $name));
+    }
 }
 

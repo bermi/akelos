@@ -104,9 +104,26 @@ class AkFormHelper extends AkBaseHelper
       * Note: This also works for the methods in FormOptionHelper and DateHelper that are designed to work with an object as base.
       * Like collection_select and datetime_select.
       */
-    public function form_for($object_name, &$object, $options = array()) {
+    public function form_for($object_name, &$object = null, $options = array()) {
+        $this->object_name = $object_name;
+        if(empty($object)){
+            $object = $this->_controller->$object_name;
+        }
+        if(!$object instanceof AkBaseModel){
+            throw new Exception('$object is of type '.gettype($object).'. Expected instance of AkBaseModel.');
+        }
+        if(empty($options['url'])) {
+            $options['url'] = AkRouterHelper::getUrlParamsForModel($object);
+        }
+
         $url_for_options = $options['url'];
+        $_SESSION['_csrf_token'] = sha1(Ak::uuid().AK_REMOTE_IP.time());
+        
         echo $this->_controller->ak_form_tag_helper->form_tag($url_for_options, $options);
+        echo '<div style="margin:0;padding:0;display:inline"><input name="authenticity_token" type="hidden" value="'.$_SESSION['_csrf_token'].'" /></div>';
+        if(!$object->isNewRecord()){
+            echo '<div style="margin:0;padding:0;display:inline"><input name="_method" type="hidden" value="put" /></div>';
+        }
         return $this->fields_for($object_name, $object);
     }
 
@@ -132,6 +149,35 @@ class AkFormHelper extends AkBaseHelper
     public function end_form_tag() {
         return '</form>';
     }
+
+    /**
+    * Returns a label tag tailored for labelling an input field for a specified attribute (identified by +method+) on an object
+    * assigned to the template (identified by +object+). The text of label will default to the attribute name unless you specify
+    * it explicitly. Additional options on the label tag can be passed as an array with +options+. These options will be tagged
+    * onto the HTML as an HTML element attribute as in the example shown, except for the <tt>value</tt> option, which is designed to
+    * target labels for radio_button tags (where the value is used in the ID of the input tag).
+    *
+    * ==== Examples
+    *   label('post', 'title')
+    *   # => <label for="post_title">Title</label>
+    *
+    *   label('post', 'title', 'A short title')
+    *   # => <label for="post_title">A short title</label>
+    *
+    *   label('post', 'title', 'A short title', :class => 'title_label')
+    *   # => <label for="post_title" class="title_label">A short title</label>
+    *
+    *   label('post', 'privacy', 'Public Post', :value => 'public')
+    *   # => <label for="post_privacy_public">Public Post</label>
+    */
+    function label($method, $text = null, $options = array()){
+        return $this->_field($this->object_name, $method, array_merge($options, array('text'=>empty($text) ? $this->t(AkInflector::humanize($method)) : $text)), 'label');
+    }
+    
+    public function submit($value = null, $options = array()){
+        return AkFormTagHelper::submit_tag($value, array_merge(array('id' => $this->object_name.'_submit'), $options));
+    }
+    
     /**
       * Returns an input tag of the "text" type tailored for accessing a specified attribute (identified by +column_name+) on an object
       * assigned to the template (identified by +object+). Additional options on the input tag can be passed as an
@@ -259,9 +305,25 @@ class AkFormHelper extends AkBaseHelper
             case 'check_box':
                 return $InstanceTag->to_check_box_tag($options, $extra_param_1, $extra_param_2);
                 break;
+            case 'label':
+                return $InstanceTag->to_label_tag($options['text'], $options);
+                break;
             default:
                 break;
         }
+    }
+
+    /**
+     * @todo implement CSRF prevention
+     */
+    static public function csrf_meta_tag(){
+    }
+    
+    static public function form_authenticity_token(){
+        if(!isset($_SESSION['_csrf_token'])){
+            $_SESSION['_csrf_token'] = sha1(Ak::uuid().Ak::randomString());
+        }
+        return $_SESSION['_csrf_token'];
     }
 }
 
@@ -276,7 +338,7 @@ class AkFormHelperInstanceTag
     public $_auto_index;
 
     public function __construct($object_name, $column_name, &$template_object, $local_binding = null, $object = null) {
-                
+
         $controller = $template_object->getController();
 
         $this->object_name = $object_name;
@@ -397,6 +459,15 @@ class AkFormHelperInstanceTag
         return AkTagHelper::content_tag($tag_name, $this->getValue(), $options);
     }
 
+    public function to_label_tag($text = null, $options = array()){
+        $tag_value = Ak::deleteAndGetValue($options, 'value');
+        $name_and_id = $options;
+        $this->add_default_name_and_id_for_value($tag_value, $name_and_id);
+        Ak::deleteAndGetValue($options, 'index');
+        $options['for'] = !empty($options['for']) ? $options['for'] : @$name_and_id['id'];
+        return AkFormTagHelper::label_tag(@$name_and_id['id'], $text, $options);
+    }
+
     public function &getObject($object_name = null) {
         if(!empty($this->object)){
             return $this->object;
@@ -444,6 +515,19 @@ class AkFormHelperInstanceTag
             if(substr($options['name'],-2) != '[]'){
                 $options['name'] = $options['name'].'[]';
             }
+        }
+    }
+
+    public function add_default_name_and_id_for_value($tag_value, $options) {
+        if($tag_value){
+            $pretty_tag_value = AkInflector::slugize($tag_value);
+            $specified_id = $options['id'];
+            $this->add_default_name_and_id($options);
+            if(!$specified_id){
+                $options['id'] .= '_'.$pretty_tag_value;
+            }
+        }else{
+            $this->add_default_name_and_id($options);
         }
     }
 

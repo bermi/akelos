@@ -19,6 +19,9 @@ class AkUrlHelper
     * http://example.com/controller/action part (makes it harder to parse httpd log files)
     */
     public function url_for($options = array(), $parameters_for_method_reference = null) {
+        if($options instanceof AkBaseModel){
+            $options = AkRouterHelper::getUrlParamsForModel($options);
+        }
         $default_options = array(
         'only_path' => true
         );
@@ -260,11 +263,10 @@ class AkUrlHelper
 
 
     public function convert_options_to_javascript(&$html_options) {
-        foreach (array('confirm', 'popup', 'post') as $option){
+        foreach (array('confirm', 'popup', 'post', 'method') as $option){
             $$option = isset($html_options[$option]) ? $html_options[$option] : false;
             unset($html_options[$option]);
         }
-
         $onclick = '';
         if ($popup && $post){
             trigger_error(Ak::t("You can't use popup and post in the same link"), E_USER_ERROR);
@@ -274,6 +276,9 @@ class AkUrlHelper
 
         }elseif ($confirm && $post) {
             $onclick = 'if ('.$this->_confirm_javascript_function($confirm).') { '.$this->_post_javascript_function().' };return false;';
+
+        }elseif ($confirm && $method == 'delete') {
+            $onclick = 'if ('.$this->_confirm_javascript_function($confirm).') { '.$this->_post_javascript_function($method).' };return false;';
 
         }elseif ($confirm) {
             $onclick = 'return '.$this->_confirm_javascript_function($confirm).';';
@@ -298,8 +303,28 @@ class AkUrlHelper
         return is_array($popup) ? "window.open(this.href,'".array_shift($popup)."','".array_pop($popup)."');" : "window.open(this.href);";
     }
 
-    public function _post_javascript_function() {
-        return "var f = document.createElement('form'); document.body.appendChild(f); f.method = 'POST'; f.action = this.href; f.submit();";
+    public function _post_javascript_function($method = null) {
+        $method = empty($method) ? '' : 
+        "m.setAttribute('type', 'hidden'); ".
+        "m.setAttribute('name', '_method'); ".
+        "m.setAttribute('value', 'delete'); ";
+        
+        //     <td><a href="/credit_cards/3" onclick="if (confirm('Are you sure?')) { 
+        return "var f = document.createElement('form'); ".
+        "f.style.display = 'none'; ".
+        "this.parentNode.appendChild(f); ".
+        "f.method = 'POST'; ".
+        "f.action = this.href;".
+        "var m = document.createElement('input'); ".
+        $method.
+        "f.appendChild(m);".
+        "var s = document.createElement('input'); ".
+        "s.setAttribute('type', 'hidden'); ".
+        "s.setAttribute('name', 'authenticity_token'); ".
+        "s.setAttribute('value', '".AkJavascriptHelper::escape_javascript(AkFormHelper::form_authenticity_token())."'); ".
+        "f.appendChild(s);".
+        "f.submit();";
+         
     }
 
     /**
