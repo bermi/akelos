@@ -2373,6 +2373,106 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 }
 
 
+class AkActiveRecordIterator implements Iterator, ArrayAccess
+{
+    private $_ResultSet;
+    private $_records = array();
+    private $_options = array();
+    private $_returnCurrentHandler;
+    private $_FinderInstance;
+    private $_ActiveRecord;
+
+    public function __construct(&$ResultSet, &$options = array()){
+        $this->_ResultSet = $ResultSet;
+        $this->_options = $options;
+        $this->_returnCurrentHandler = '_returns'.ucfirst($options['returns']);
+        $this->_FinderInstance  = $options['Finder'];
+        $this->_ActiveRecord   = $options['ActiveRecord'];
+    }
+    
+    public function __destruct(){
+        $this->_ResultSet->Close();
+    }
+
+    public function rewind() {
+        $this->_ResultSet->MoveFirst();
+    }
+
+    public function valid() {        
+        return !$this->_ResultSet->EOF;
+    }
+
+    public function key() {
+        return $this->_ResultSet->_currentRow;
+    }
+
+    public function current() {
+        return $this->{$this->_returnCurrentHandler}($this->_ResultSet->fields);
+    }
+
+    public function next() {
+        $this->_ResultSet->MoveNext();
+    }
+
+    public function hasMore() {
+        return !$this->_ResultSet->EOF;
+    }
+
+    private function _enableArrayAccess(){
+        if(empty($this->_records)){
+            $this->rewind();
+            $i = 0;
+            foreach ($this as $Record){
+                $this->_records[$i] = $Record;
+                $i++;
+            }
+        }
+    }
+
+    public function offsetSet($offset, $value) {
+        $this->_enableArrayAccess();
+        $this->_records[$offset] = $value;
+    }
+
+    public function offsetExists($offset) {
+        $this->_enableArrayAccess();
+        return isset($this->_records[$offset]);
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->_records[$offset]);
+    }
+
+    public function offsetGet($offset) {
+        $this->_enableArrayAccess();
+        return isset($this->_records[$offset]) ? $this->_records[$offset] : null;
+    }
+    
+
+    private function _returnsDefault($attributes){
+        return $this->_FinderInstance->instantiate($this->_ActiveRecord->getOnlyAvailableAttributes($attributes), false);
+    }
+    
+    private function _returnsSimulated($attributes){
+        $false = false;
+        return $this->_FinderInstance->generateStdClasses($this->_options['simulation_class'], $attributes, $this->_ActiveRecord->getType(), $false, $false, array('__owner'=>array('pk'=>$this->_ActiveRecord->getPrimaryKey(),'class'=>$this->_ActiveRecord->getType())));
+    }
+    
+    private function _returnsArray($attributes){
+        return $this->_ActiveRecord->castAttributesFromDatabase($this->_ActiveRecord->getOnlyAvailableAttributes($attributes));
+    }
+    
+
+    public function toXml() {
+        return $this[0]->toXml(array('collection' => $this));
+    }
+
+    public function toJson() {
+        return $this[0]->toJson(array('collection' => $this));
+    }
+}
+
+
 
 class AkActiveRecordExtenssion
 {

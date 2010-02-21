@@ -17,6 +17,7 @@ class AkExceptionDispatcher
     'MissingTemplateException'              => 'missing_template',
     'ControllerException'                   => 'exception',
     'CookieOverflowException'               => 'exception',
+    'RecordNotFoundException'               => 'exception',
     );
     
     public function __construct($consider_all_requests_local = false){
@@ -27,7 +28,7 @@ class AkExceptionDispatcher
     public function renderException($Exception){
         $this->logError($Exception);
 
-        if($this->consider_all_requests_local || $this->isLocalRequest()){
+        if( ($this->consider_all_requests_local || $this->isLocalRequest()) ){
             $this->rescueActionLocally($Exception);
         }else{
             $this->rescueActionInPublic($Exception);
@@ -101,7 +102,7 @@ class AkExceptionDispatcher
         if(!$Logger = Ak::getLogger()){
             return;
         }
-        $message = $Exception->getMessage();
+        $message = $Exception->getMessage()."\n".$Exception->getTraceAsString();
 
         $original_faltal_setting    = AkConfig::getOption('logger.exit_on_fatal',   true);
         $original_display_setting   = AkConfig::getOption('logger.display_message', true);

@@ -320,18 +320,29 @@ class AkDbAdapter
     * Returns an array of record hashes with the column names as keys and
     * column values as values.
     */
-    public function select($sql, $message = '') {
+    public function select($sql, $message = '', $options = array()) {
+        $options['start_time'] = microtime();
+        
         $result = $this->execute($sql, $message);
-        if (!$result){
-            return array();
-        }
 
-        $records = array();
-        while ($record = $result->FetchRow()) {
-            $records[] = $record;
+        if(empty($options['returns'])){
+            if (!$result){
+                return array();
+            }
+            $records = array();
+            while ($record = $result->FetchRow()) {
+                $records[] = $record;
+            }
+            $result->Close();
+            return $records;
         }
-        $result->Close();
-        return $records;
+        
+        AK_LOG_EVENTS && $this->logger->info('['.substr((microtime()-$options['start_time']), 0, 9).'] '.$options['ActiveRecord']->getModelName().': '.$sql);
+        
+        if($result->EOF){
+            throw new RecordNotFoundException("Couldn't find record");
+        }
+        return new AkActiveRecordIterator($result, $options);
     }
 
     /* TRANSACTIONS */

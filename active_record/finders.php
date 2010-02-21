@@ -12,7 +12,12 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     * $Person->exists(5);
     */
     public function exists($id) {
-        return $this->find('first',array('conditions' => array($this->_ActiveRecord->getPrimaryKey().' = '.$id))) !== false;
+        try{
+            $this->find('first',array('conditions' => array($this->_ActiveRecord->getPrimaryKey().' = '.$id)));
+            return true;
+        }catch (RecordNotFoundException $e){
+            return false;
+        }
     }
 
     /**
@@ -108,24 +113,14 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             Ak::deprecateWarning("You're calling AR::findBySql with \$limit or \$offset parameters. This has been deprecated.");
             $this->_ActiveRecord->_db->addLimitAndOffset($sql, array('limit'=>$limit,'offset'=>$offset));
         }
-        $objects = array();
-        $records = $this->_ActiveRecord->_db->select ($sql,'selecting');
-        foreach ($records as $record){
-            if ($returns == 'default') {
-                $objects[] = $this->instantiate($this->_ActiveRecord->getOnlyAvailableAttributes($record), false);
-            } else if ($returns == 'simulated') {
-                $objects[] = $this->_ActiveRecord->castAttributesFromDatabase($this->_ActiveRecord->getOnlyAvailableAttributes($record));
-            } else if ($returns == 'array') {
 
-                $objects[] = $this->_ActiveRecord->castAttributesFromDatabase($this->_ActiveRecord->getOnlyAvailableAttributes($record));
-            }
-        }
-        if ($returns == 'simulated') {
-            $false = false;
-            $objects = $this->_generateStdClasses($simulation_class,$objects,$this->_ActiveRecord->getType(),$false,$false,array('__owner'=>array('pk'=>$this->_ActiveRecord->getPrimaryKey(),'class'=>$this->_ActiveRecord->getType())));
-        }
-
-        return $objects;
+        $records = $this->_ActiveRecord->_db->select($sql, 'selecting', array(
+        'returns'           => $returns,
+        'simulation_class'  => $simulation_class,
+        'ActiveRecord'      => $this->_ActiveRecord,
+        'Finder'            => $this
+        ));
+        return $records;
     }
 
     /**
@@ -259,12 +254,12 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
 
 
     public function constructFinderSql($options, $select_from_prefix = 'default') {
-        $sql = isset($options['select_prefix']) ? 
-            $options['select_prefix'] : 
-            ($select_from_prefix == 'default' ? 
-                'SELECT '.(!empty($options['joins'])?$this->_ActiveRecord->getTableName().'.':'') .
-                    '* FROM '.$this->_quoteTableName($this->_ActiveRecord->getTableName()) : 
-                $select_from_prefix);
+        $sql = isset($options['select_prefix']) ?
+        $options['select_prefix'] :
+        ($select_from_prefix == 'default' ?
+        'SELECT '.(!empty($options['joins'])?$this->_ActiveRecord->getTableName().'.':'') .
+        '* FROM '.$this->_quoteTableName($this->_ActiveRecord->getTableName()) :
+        $select_from_prefix);
         $sql .= !empty($options['joins']) ? ' '.$options['joins'] : '';
 
         $sql = $this->sanitizeConditions($sql, isset($options['conditions']) ? $options['conditions'] : array());
@@ -586,40 +581,32 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         // actually we fetch_all and return only the first row
         $options = array_merge($options, array((!empty($options['include']) ?'virtual_limit':'limit')=>1));
         $result = $this->_findEvery($options);
-
-        if(!empty($result) && is_array($result)){
-            return $result[0];
-        }else{
-            $_result = false;
-            return  $_result;
-        }
+        return $result[0];
     }
 
     protected function &_findEvery($options) {
-        if((!empty($options['include']) && $this->_ActiveRecord->hasAssociations())){
-            $result = $this->findWithAssociations($options);
-        }else{
-            $sql = $this->constructFinderSql($options);
-            if (isset($options['wrap'])) {
-                $sql = str_replace('{query}',$sql,$options['wrap']);
+        try{
+            if((!empty($options['include']) && $this->_ActiveRecord->hasAssociations())){
+                $result = $this->findWithAssociations($options);
+            }else{
+                $sql = $this->constructFinderSql($options);
+                if (isset($options['wrap'])) {
+                    $sql = str_replace('{query}',$sql,$options['wrap']);
+                }
+                if(!empty($options['bind']) && is_array($options['bind']) && strstr($sql,'?')){
+                    $sql = array_merge(array($sql),$options['bind']);
+                }
+                if (!empty($options['returns']) && $options['returns']!='default') {
+                    $options['returns'] = in_array($options['returns'],array('simulated','default','array'))?$options['returns']:'default';
+                    $simulation_class = !empty($options['simulation_class']) && class_exists($options['simulation_class'])?$options['simulation_class']:'AkActiveRecordMock';
+                    $result = $this->findBySql($sql,null,null,null,$options['returns'],$simulation_class);
+                } else {
+                    $result = $this->findBySql($sql);
+                }
             }
-            if(!empty($options['bind']) && is_array($options['bind']) && strstr($sql,'?')){
-                $sql = array_merge(array($sql),$options['bind']);
-            }
-            if (!empty($options['returns']) && $options['returns']!='default') {
-                $options['returns'] = in_array($options['returns'],array('simulated','default','array'))?$options['returns']:'default';
-                $simulation_class = !empty($options['simulation_class']) && class_exists($options['simulation_class'])?$options['simulation_class']:'AkActiveRecordMock';
-                $result = $this->findBySql($sql,null,null,null,$options['returns'],$simulation_class);
-            } else {
-                $result = $this->findBySql($sql);
-            }
-        }
-
-        if(!empty($result) && is_array($result)){
             return $result;
-        }else{
-            $_result = false;
-            return  $_result;
+        }catch(RecordNotFoundException $e){
+            throw new RecordNotFoundException("Could not find records with options: ".json_encode($options));
         }
     }
 
@@ -634,8 +621,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         $conditions=!empty($options['conditions'])?$options['conditions']:'';
         switch ($num_ids){
             case 0 :
-                trigger_error($this->_ActiveRecord->t('Couldn\'t find %object_name without an ID%conditions',array('%object_name'=>$this->_ActiveRecord->getModelName(),'%conditions'=>$conditions)).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
-                break;
+                throw new RecordNotFoundException($this->_ActiveRecord->t('Couldn\'t find %object_name without an ID%conditions',array('%object_name'=>$this->_ActiveRecord->getModelName(),'%conditions'=>$conditions)));
 
             case 1 :
                 $table_name = !empty($options['include']) && $this->_ActiveRecord->hasAssociations() ? '__owner' : $this->_ActiveRecord->getTableName();
@@ -654,7 +640,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
 
                 $result = $this->_findEvery($options);
                 if (!$expects_array && $result !== false){
-                    return $result[0];
+                    $result = $result[0];
                 }
                 return  $result;
                 break;
@@ -676,7 +662,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
 
                 $result = $this->_findEvery($options);
                 if(is_array($result) && ($num_ids==1 && count($result) != $num_ids && $without_conditions)){
-                    $result = false;
+                    throw new RecordNotFoundException("Couldn't find record frOm ids: ".json_encode($ids));
                 }
                 return $result;
                 break;
@@ -885,7 +871,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
 
         $result = & $this->_findBySqlWithAssociations($sql, empty($options ['virtual_limit']) ? false : $options ['virtual_limit'], $load_acts, $returns,$simulation_class, $config);
         if (empty($result)) {
-            $result = false;
+            throw new RecordNotFoundException("Couldn't find record with associations using options: ".json_encode($options));
         }
         return $result;
     }
@@ -1005,7 +991,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             $return = $owner;
         } else if ($returns == 'simulated') {
             $false = false;
-            $return = $this->_generateStdClasses($simulation_class, $owner, $this->_ActiveRecord->getType(), $false, $false, $config);
+            $return = $this->generateStdClasses($simulation_class, $owner, $this->_ActiveRecord->getType(), $false, $false, $config);
         }
         return $return;
     }
@@ -1020,7 +1006,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             }
         }
     }
-    public function &_generateStdClasses($simulation_class,$owner, $class, $handler_name, &$parent, $config = array(), $config_key = '__owner') {
+    public function &generateStdClasses($simulation_class,$owner, $class, $handler_name, &$parent, $config = array(), $config_key = '__owner') {
         $return = array();
         $singularize=false;
         $pk = isset($config[$config_key]['pk'])?$config[$config_key]['pk']:'id';
@@ -1042,7 +1028,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
                         } else if (is_array($value)) {
                             $assoc = isset($config[$config_key][$key]['association_id'])?$config[$config_key][$key]['association_id']:false;
                             if ($assoc) {
-                                $obj->$assoc = $this->_generateStdClasses($simulation_class, $value, @$config[$config_key][$key]['class'], $key, $obj, @$config[$config_key], $key);
+                                $obj->$assoc = $this->generateStdClasses($simulation_class, $value, @$config[$config_key][$key]['class'], $key, $obj, @$config[$config_key], $key);
                                 $obj->addAssociated($assoc, $key);
                             }
                         }
