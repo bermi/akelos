@@ -41,7 +41,7 @@ class AkDispatcher
     public function dispatchAppServer($context) {
 
         $_ENV = $_SERVER = $context['env'];
-        
+
         @parse_str($_ENV['QUERY_STRING'], $_GET);
         
         $_GET['ak'] = $_ENV['PATH_INFO'];
@@ -56,12 +56,27 @@ class AkDispatcher
             AK_ENABLE_PROFILER &&  Ak::profile(__CLASS__.'::'.__FUNCTION__.'() call');
             $this->Request = AkRequest::getInstance();
             $this->Response = new AkResponse();
-            if($this->Controller = $this->Request->recognize()){
+            
+            $path = ltrim(str_replace('..', '.', $context['env']['REQUEST_URI']), '/. ');
+            
+            if(empty($path) && file_exists(AK_PUBLIC_DIR.DS.'index.html')){
+              $Controller = new AkActionController();
+              $Controller->Response = $this->Response;
+              $Controller->renderText(file_get_contents(AK_PUBLIC_DIR.DS.'index.html'));
+              return $Controller->Response;
+            }elseif(!empty($path) && file_exists(AK_PUBLIC_DIR.DS.$path)){
+              $Controller = new AkActionController();
+              $Controller->Response = $this->Response;
+              $Controller->sendFile(AK_PUBLIC_DIR.DS.$path, array('stream'=>false));
+              return $Controller->Response;
+            }else{
+              if($this->Controller = $this->Request->recognize()){
                 $this->Controller->ak_time_start = $time_start;
                 AK_ENABLE_PROFILER && Ak::profile('Request::recognize() completed');
                 $this->Controller->process($this->Request, $this->Response);
+              }
+              return $this->Response;
             }
-            return $this->Response;
         }catch(Exception $e){
             if(isset($this->Controller) && method_exists($this->Controller, 'render_error')){
                 $this->Controller->render_error($e);
