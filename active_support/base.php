@@ -2132,10 +2132,15 @@ class Ak
     }
     
     static function header($string, $replace = null, $http_response_code = null){
-        if($SessionHandler = Ak::getStaticVar('AppServer.HeadersHandler', false)){
-            $SessionHandler->header($string, $replace, $http_response_code);
+        if($HeadersHandler = Ak::getStaticVar('AppServer.HeadersHandler', false)){
+            $HeadersHandler->header($string, $replace, $http_response_code);
         }else {
-            header($string, $replace, $http_response_code);
+            // If replace is null and the headers is meant to be unset we need to call header with just one parameter
+            if(is_null($replace)){
+                header($string);
+            }else{
+                header($string, $replace, $http_response_code);
+            }
         }
     }
 

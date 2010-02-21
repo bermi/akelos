@@ -7,7 +7,9 @@
 class AkResponse
 {
     public $_resutl_stack = array();
-    public $_headers = array();
+    public $_headers = array(
+    'X-Powered-By' => 'Akelos',
+    );
     public $_headers_sent = array();
     public $body = '';
     public $__Logger;
@@ -45,11 +47,11 @@ class AkResponse
 
     public function addHeader() {
         $args = func_get_args();
-        if(!empty($args[1])){
+        if(isset($args[1])){
             $this->_headers[$args[0]] = $args[1];
-        }elseif (!empty($args[0]) && is_array($args[0])){
+        }elseif (isset($args[0]) && is_array($args[0])){
             $this->_headers = array_merge($this->_headers,$args[0]);
-        }elseif (!empty($args[0])){
+        }elseif (isset($args[0])){
             $this->_headers[] = $args[0];
         }
     }
@@ -246,3 +248,13 @@ class AkResponse
     }
 }
 
+
+/**
+* @todo Implement generic ETag support
+if(empty($this->_headers['ETag'])){ 
+    $this->addHeader('ETag', '"'.md5($this->body.serialize($this->_headers)).'"'); 
+    $this->addHeader('Expires', '');
+    $this->addHeader('Cache-Control', '');
+    $this->addHeader('Pragma', '');
+}
+*/
