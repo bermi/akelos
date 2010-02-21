@@ -2148,9 +2148,9 @@ class AkActionController extends AkLazyObject
         return $this->_CacheHandler->getCachedPage($path, $lang);
     }
 
-    public function expirePage($options) {
+    public function expirePage($options, $forced_language = null) {
         if (!isset($this->_CacheHandler)) return false;
-        return $this->_CacheHandler->expirePage($options);
+        return $this->_CacheHandler->expirePage($options, $forced_language);
     }
     
     public function fragmentCacheKey($key) {
