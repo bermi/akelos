@@ -491,7 +491,7 @@ defined('AK_PROFILER_GET_MEMORY')                       || define('AK_PROFILER_G
 
 // ERROR LOGGING
 defined('AK_LOG_DIR')                                   || define('AK_LOG_DIR', AK_BASE_DIR.DS.'log');
-defined('AK_LOG_EVENTS')                                || define('AK_LOG_EVENTS', false);
+defined('AK_LOG_EVENTS')                                || define('AK_LOG_EVENTS', AK_DEV_MODE && is_writable(AK_LOG_DIR));
 
 defined('AK_ROUTES_MAPPING_FILE')                       || define('AK_ROUTES_MAPPING_FILE', AK_CONFIG_DIR.DS.'routes.php');
 defined('AK_CHARSET')                                   || define('AK_CHARSET', 'UTF-8');
