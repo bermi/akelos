@@ -635,6 +635,10 @@ class AkActionController extends AkLazyObject
                 }else{
                     return $this->renderPartial($options['partial'], @$options['object'], @$options['locals'], @$options['status']);
                 }
+            }elseif(!empty($options['xml'])){
+                return $this->renderXml($options, @$options['status']);
+            }elseif(!empty($options['json'])){
+                return $this->renderJson($options, @$options['status']);
             }elseif(!empty($options['nothing'])){
                 // Safari doesn't pass the _headers of the return if the Response is zero length
                 return $this->renderText(' ', @$options['status']);
@@ -688,6 +692,22 @@ class AkActionController extends AkLazyObject
         }
         $this->Response->body = $text;
         return $text;
+    }
+    
+    public function renderXml($options = array(),  $status = self::DEFAULT_RENDER_STATUS_CODE) {
+        $this->performed_render = true;
+        if($status != null) {
+            $this->Response->_headers['Status'] = $status;
+        }
+        return $this->Response->body = $options['xml']->toXml();
+    }
+    
+    public function renderJson($options = array(),  $status = self::DEFAULT_RENDER_STATUS_CODE) {
+        $this->performed_render = true;
+        if($status != null) {
+            $this->Response->_headers['Status'] = $status;
+        }
+        return $this->Response->body = $options['json']->toJson();
     }
 
     public function renderNothing($status = null) {
