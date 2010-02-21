@@ -1348,4 +1348,19 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         return $this->_ActiveRecord->_db->quoteColumnName($attribute);
     }
 
+    public function __call ($method, $args) {
+        if(substr($method,0,4) == 'find'){
+            $finder = substr(AkInflector::underscore($method), 5);
+            list($type, $columns) = explode('by_', $finder);
+            $callback = strstr($type,'create') ?  'findOrCreateBy' : (strstr($type,'first') || !strstr($type,'all') ? 'findFirstBy' : 'findAllBy');
+            $columns = strstr($columns, '_and_') ? explode('_and_', $columns) : array($columns);
+            array_unshift($args, join(' AND ', $columns));
+            return call_user_func_array(array($this->_ActiveRecord, $callback), $args);
+        }
+
+        $backtrace = debug_backtrace();
+        trigger_error("Notice: Call to undefined attribute ".get_class($this)."::".$name.' in '.$backtrace[0]['file'].' on line '.$backtrace[0]['line'], E_USER_NOTICE);
+    }
+
+
 }

@@ -2296,15 +2296,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         array(
         'methods' => array(
         'exists',
-        'find',
-        'findFirst',
-        'findAll',
-        'findBySql',
-        'findFirstBy',
-        'findLastBy',
-        'findAllBy',
-        'findBy',
-        'findOrCreateBy',
         'getVariableSqlCondition',
         'constructFinderSql',
         'constructFinderSqlWithAssociations',
@@ -2313,7 +2304,9 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         'getConditions',
         'instantiate',
         ),
-        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'finders.php'
+        'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'finders.php',
+        'methods_match' => '/^find.*/',
+        'accept_all_matches' => true // required for running __call on dynamic finders
         ));
     }
 
