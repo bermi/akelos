@@ -2295,6 +2295,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         $this->extendClassLazily('AkActiveRecordFinders',
         array(
         'methods' => array(
+        'all',
         'exists',
         'getVariableSqlCondition',
         'constructFinderSql',

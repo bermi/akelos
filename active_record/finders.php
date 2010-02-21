@@ -91,6 +91,12 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         return $result;
     }
 
+    public function &all() {
+        $args = func_get_args();
+        $result = call_user_func_array(array($this,'find'), array_merge(array('all'),$args));
+        return $result;
+    }
+
 
     /**
     * Works like find_all, but requires a complete SQL string. Examples:
