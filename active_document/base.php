@@ -462,78 +462,7 @@ class AkActiveDocument extends AkBaseModel
         empty($options['skip_validations']) && $this->_enableValidations();
     }
 
-    protected function _enableObservers() {
-        $this->extendClassLazily('AkModelObserver',
-        array(
-        'methods' => array (
-        'notifyObservers',
-        'setObservableState',
-        'getObservableState',
-        'addObserver',
-        'getObservers',
-        ),
-        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'observer.php'
-        ));
-    }
-
-
-
-    protected function _enableErrors() {
-        $this->extendClassLazily('AkModelErrors',
-        array(
-        'methods' => array(
-        'addError',
-        'addErrorOnBlank',
-        'addErrorOnBoundaryBreaking',
-        'addErrorOnBoundryBreaking',
-        'addErrorOnEmpty',
-        'addErrorToBase',
-        'clearErrors',
-        'countErrors',
-        'errorsToString',
-        'getBaseErrors',
-        'getDefaultErrorMessageFor',
-        'getErrors',
-        'getErrorsOn',
-        'getFullErrorMessages',
-        'hasErrors',
-        'isInvalid',
-        'yieldEachError',
-        'yieldEachFullError',
-        'yieldError',
-        ),
-        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'errors.php'
-        ));
-    }
-
-
-    protected function _enableValidations() {
-        $this->extendClassLazily('AkModelValidations',
-        array(
-        'methods' => array(
-        'validate',
-        'validateOnCreate',
-        'validateOnUpdate',
-        'needsValidation',
-        'isBlank',
-        'validatesPresenceOf',
-        'validatesUniquenessOf',
-        'validatesLengthOf',
-        'validatesInclusionOf',
-        'validatesExclusionOf',
-        'validatesNumericalityOf',
-        'validatesFormatOf',
-        'validatesAcceptanceOf',
-        'validatesConfirmationOf',
-        'validatesSizeOf',
-        ),
-        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'validations.php'
-        ));
-    }
-
     // Magic callback methods
-
-
     public function __get($attribute){
         return $this->_attributes[$attribute];
     }

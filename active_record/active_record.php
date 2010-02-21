@@ -2287,59 +2287,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         ));
     }
 
-    protected function _enableErrors() {
-        $this->extendClassLazily('AkModelErrors',
-        array(
-        'methods' => array(
-        'addError',
-        'addErrorOnBlank',
-        'addErrorOnBoundaryBreaking',
-        'addErrorOnBoundryBreaking',
-        'addErrorOnEmpty',
-        'addErrorToBase',
-        'clearErrors',
-        'countErrors',
-        'errorsToString',
-        'getBaseErrors',
-        'getDefaultErrorMessageFor',
-        'getErrors',
-        'getErrorsOn',
-        'getFullErrorMessages',
-        'hasErrors',
-        'isInvalid',
-        'yieldEachError',
-        'yieldEachFullError',
-        'yieldError',
-        ),
-        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'errors.php'
-        ));
-    }
 
-
-    protected function _enableValidations() {
-        $this->extendClassLazily('AkModelValidations',
-        array(
-        'methods' => array(
-        'isBlank',
-        'isValid',
-        'validate',
-        'validateOnCreate',
-        'validateOnUpdate',
-        'validatesAcceptanceOf',
-        'validatesAssociated',
-        'validatesConfirmationOf',
-        'validatesExclusionOf',
-        'validatesFormatOf',
-        'validatesInclusionOf',
-        'validatesLengthOf',
-        'validatesNumericalityOf',
-        'validatesPresenceOf',
-        'validatesSizeOf',
-        'validatesUniquenessOf',
-        ),
-        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'validations.php'
-        ));
-    }
 
     protected function _enableFinders() {
         $this->extendClassLazily('AkActiveRecordFinders',
@@ -2401,45 +2349,6 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         'getAvailableCombinedAttributes',
         ),
         'autoload_path' => AK_ACTIVE_RECORD_DIR.DS.'combined_attributes.php'
-        ));
-    }
-    protected function _enableUtilities() {
-        $this->extendClassLazily('AkModelUtilities',
-        array(
-        'methods' => array(
-        'fromXml',
-        'toJson',
-        'fromJson',
-        'toXml',
-        'toYaml',
-        ),
-        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'utilities.php'
-        ));
-    }
-    protected function _enableDebug() {
-        $this->extendClassLazily('AkModelDebug',
-        array(
-        'methods' => array(
-        'dbug',
-        'toString',
-        'dbugging',
-        'debug'
-        ),
-        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'debug.php'
-        ));
-    }
-
-    protected function _enableObservers() {
-        $this->extendClassLazily('AkModelObserver',
-        array(
-        'methods' => array (
-        'notifyObservers',
-        'setObservableState',
-        'getObservableState',
-        'addObserver',
-        'getObservers',
-        ),
-        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'observer.php'
         ));
     }
 

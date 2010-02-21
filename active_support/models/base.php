@@ -81,15 +81,108 @@ class AkBaseModel extends AkLazyObject
     }
 
 
-
     public function getAttributeCondition($argument) {
         return is_array($argument) ? 'IN (?)' : (is_null($argument) ? 'IS ?' : '= ?');
     }
 
 
+    protected function _enableObservers() {
+        $this->extendClassLazily('AkModelObserver',
+        array(
+        'methods' => array (
+        'notifyObservers',
+        'setObservableState',
+        'getObservableState',
+        'addObserver',
+        'getObservers',
+        ),
+        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'observer.php'
+        ));
+    }
+
+
+    protected function _enableErrors() {
+        $this->extendClassLazily('AkModelErrors',
+        array(
+        'methods' => array(
+        'addError',
+        'addErrorOnBlank',
+        'addErrorOnBoundaryBreaking',
+        'addErrorOnBoundryBreaking',
+        'addErrorOnEmpty',
+        'addErrorToBase',
+        'clearErrors',
+        'countErrors',
+        'errorsToString',
+        'getBaseErrors',
+        'getDefaultErrorMessageFor',
+        'getErrors',
+        'getErrorsOn',
+        'getFullErrorMessages',
+        'hasErrors',
+        'isInvalid',
+        'yieldEachError',
+        'yieldEachFullError',
+        'yieldError',
+        ),
+        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'errors.php'
+        ));
+    }
+
+
+    protected function _enableValidations() {
+        $this->extendClassLazily('AkModelValidations',
+        array(
+        'methods' => array(
+        'validate',
+        'validateOnCreate',
+        'validateOnUpdate',
+        'needsValidation',
+        'isBlank',
+        'isValid',
+        'validatesPresenceOf',
+        'validatesUniquenessOf',
+        'validatesLengthOf',
+        'validatesInclusionOf',
+        'validatesExclusionOf',
+        'validatesNumericalityOf',
+        'validatesFormatOf',
+        'validatesAcceptanceOf',
+        'validatesConfirmationOf',
+        'validatesSizeOf',
+        ),
+        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'validations.php'
+        ));
+    }
+    
+
+    protected function _enableUtilities() {
+        $this->extendClassLazily('AkModelUtilities',
+        array(
+        'methods' => array(
+        'fromXml',
+        'toJson',
+        'fromJson',
+        'toXml',
+        'toYaml',
+        ),
+        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'utilities.php'
+        ));
+    }
+    protected function _enableDebug() {
+        $this->extendClassLazily('AkModelDebug',
+        array(
+        'methods' => array(
+        'dbug',
+        'toString',
+        'dbugging',
+        'debug'
+        ),
+        'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'debug.php'
+        ));
+    }
 
 }
-
 
 class AkModelExtenssion
 {
