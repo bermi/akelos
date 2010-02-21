@@ -9,13 +9,13 @@ class AkRouterHelper
     private static $defined_functions = array();
 
     static function getDefinedFunctions() {
-        return self::$defined_functions;    
+        return self::$defined_functions;
     }
 
     static function generateHelperFunctionsFor($name,AkRoute $Route) {
         $names_array_as_string = var_export($Route->getNamesOfDynamicSegments(),true);
         $names_array_as_string = str_replace(array("\n","  "),'',$names_array_as_string);
-        
+
         self::generateFunction($name,'url',$names_array_as_string,'',str_replace(array("\n","  "),'',var_export($Route->getDefaults(), true)));
         self::generateFunction($name,'path',$names_array_as_string,"'only_path'=>true", str_replace(array("\n","  "),'',var_export($Route->getDefaults(), true)));
     }
@@ -29,10 +29,13 @@ class AkRouterHelper
         if (function_exists($function_name)) return;
 
         $additional_parameters ? $additional_parameters .= ',' : null;
-        
+
         $code = <<<BANNER
 function $function_name(\$params=array())
 {
+    if(\$params instanceof AkBaseModel){
+        \$params = \$params->isNewRecord() ? array() : array('id' => \$params->getId());
+    }
     \$url_writer = AkUrlWriter::getInstance();
     \$my_params = array(
         'use_named_route'=>'$route_name',
@@ -47,12 +50,15 @@ BANNER;
         //echo $code;
         eval($code);
         self::$defined_functions[] = $function_name;
-        
+
         if (function_exists($parameters_function_name)) return $code;
-        
+
         $parameters_code = <<<BANNER
 function $parameters_function_name(\$params=array())
 {
+    if(\$params instanceof AkBaseModel){
+        \$params = \$params->isNewRecord() ? array() : array('id' => \$params->getId());
+    }
     return array_merge($default_parameters,\$params);
 }
 
@@ -60,8 +66,16 @@ BANNER;
 
         eval($parameters_code);
         self::$defined_functions[] = $parameters_function_name;
-                
+
         return $code;
+    }
+
+    static public function getUrlParamsForModel(AkBaseModel $Model){
+        $url_function = AkInflector::underscore($Model->getModelName()).'_params';
+        if(!function_exists($url_function)){
+            throw new Exception($url_function.' function not found for AkRouterHelper::getUrlOptionsForModel');
+        }
+        return $url_function($Model);
     }
 }
 
