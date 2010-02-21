@@ -2221,10 +2221,10 @@ class AkActionController extends AkLazyObject
         }
         $this->_log('Parameters', array_diff(Ak::delete($log_params, $this->skip_parameter_logging), array('')));
     }
-    
-    function _filterRequestParamsForLogging(&$value, $key) {
+
+    protected function _filterRequestParamsForLogging(&$value, $key) {
         if(in_array($key, $this->filter_parameter_logging)){
-                $value = '[FILTERED]';
+            $value = '[FILTERED]';
         }
     }
 
