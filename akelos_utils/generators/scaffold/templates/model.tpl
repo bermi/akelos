@@ -6,4 +6,3 @@ class <?php  echo $model_name?> extends ActiveRecord
 
 }
 
-?>
