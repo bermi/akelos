@@ -317,6 +317,7 @@ Example:
     public function addColumn($table_name, $column_details) {
         $this->clearSchemaCacheForTable($table_name);
         $this->timestamps = false;
+        $this->id = false;
         $column_details = $this->_getColumnsAsAdodbDataDictionaryString($column_details);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->AddColumnSQL($table_name, $column_details));
     }
@@ -324,6 +325,7 @@ Example:
     public function changeColumn($table_name, $column_details) {
         $this->clearSchemaCacheForTable($table_name);
         $this->timestamps = false;
+        $this->id = false;
         $column_details = $this->_getColumnsAsAdodbDataDictionaryString($column_details);
         return $this->data_dictionary->ExecuteSQLArray($this->data_dictionary->AlterColumnSQL($table_name, $column_details));
     }
@@ -346,6 +348,7 @@ Example:
         }
         $this->timestamps = (!isset($table_options['timestamp']) || (isset($table_options['timestamp']) && $table_options['timestamp'])) &&
         (!strstr($column_options, 'created') && !strstr($column_options, 'updated'));
+        $this->id = (isset($table_options['id']) && $table_options['id']) || !isset($table_options['id']);
         return $this->_createOrModifyTable($table_name, $column_options, $table_options);
     }
 
@@ -472,6 +475,7 @@ Example:
             $this->db->quoteTableName($table_name), 
             str_replace(array(' UNIQUE', ' INDEX', ' FULLTEXT', ' HASH'), '', $column_string), 
             $table_options);
+
         $result = $this->data_dictionary->ExecuteSQLArray($create_or_alter_table_sql, false);
 
         if($result){
@@ -537,6 +541,9 @@ Example:
     }
 
     protected function _setColumnDefaults($columns) {
+        if(!isset($this->id) || $this->id){
+            $single_columns = array('id' => $this->_setColumnDefault('id'));
+        }
         $columns = Ak::toArray($columns);
         foreach ((array)$columns as $column){
             $column = trim($column, "\n\t\r, ");
