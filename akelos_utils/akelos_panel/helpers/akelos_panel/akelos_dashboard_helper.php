@@ -72,17 +72,17 @@ class AkelosDashboardHelper extends AkBaseHelper {
 
         $snippet_corner_image = $this->_controller->ak_url_helper->url_for(array('action' => "images", 'controller' => 'virtual_assets', 'module' => 'akelos_panel', 'id' => "$snippet_type-box-corner", 'format' => "gif"));
 
-        $snippet_type_description = (!$snippet_type_set ? '' : "<div class=\"code-snippet-title\"><span class=\"snippet-title-$snippet_type\">$snippet_type_uc</span></div>");
+        $snippet_type_description = (!$snippet_type_set ? '' : "<div class=\"code-snippet-title no-print\"><span class=\"snippet-title-$snippet_type\">$snippet_type_uc</span></div>");
 
         $snippet_template = <<<SNIPPET
       $snippet_type_description
       <div class="code-snippet-holder">
-        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <table class="snippet" width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr>
-            <td align="left" valign="top"><pre class="line-numbers"><code>$line_numbers</code></pre></td>
-            <td class="code-snippet-$snippet_type-separator">&nbsp;</td>
+            <td align="left" valign="top"><pre class="line-numbers"><code class='no-print'>$line_numbers</code></pre></td>
+            <td class="snippet-separator code-snippet-$snippet_type-separator">&nbsp;</td>
             <td align="left" valign="top" class="code-snippet-$snippet_type snippet-cell"><div class="code_container"><pre><code class="$snippet_type">$code</pre></code></div>
-            <img src="$snippet_corner_image" width="30" height="35" alt="" class="snippet-corner" />
+            <img src="$snippet_corner_image" width="30" height="35" alt="" class="no-print snippet-corner" />
             </td>
           </tr>
         </table>

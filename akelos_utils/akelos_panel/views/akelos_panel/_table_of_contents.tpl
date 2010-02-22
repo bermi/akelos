@@ -1,4 +1,4 @@
-<div id="table-content" style="display:none;">
+<div id="table-content" style="display:none;" class="no-print">
   <div class="inner-table-content">
     <div class="inner_col border">
       <h2>_{Start Here}</h2>

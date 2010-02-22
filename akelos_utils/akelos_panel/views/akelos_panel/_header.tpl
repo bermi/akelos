@@ -1,5 +1,5 @@
-<div id="header">
-  <div class="top-buttons"> <a href="#" class="table-content-button" onclick="if($('table-content').visible()){new Effect.SlideUp($('table-content'));}else{new Effect.SlideDown($('table-content'))}"><span>_{Table of contents}</span></a>
+<div id="header" class="no-print">
+  <div class="top-buttons"> <a href="#" class="table-content-button" onclick="if($('table-content').visible()){new Effect.SlideUp($('table-content'));}else{new Effect.SlideDown($('table-content'))}"><span>_{Guides}</span></a>
   </div>
   <div id="search"> <span class="search-field">
     <input name="search-field" type="text" value="_{Find docs at akelos.org}" onclick="if(this.value=='_{Find docs at akelos.org}'){this.value='';}" />
