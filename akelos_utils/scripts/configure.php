@@ -275,37 +275,37 @@ CONFIG;
 
         $configuration_template = <<<CONFIG
 production:
-        type: %production_database_type
-        database_file: %production_database_file
+        adapter: %production_database_type
         host: %production_database_host
-        port:
-        database_name: %production_database_name
-        user: %production_database_user
+        database: %production_database_name
+        username: %production_database_user
         password: %production_database_password
+        port:
+        database_file: %production_database_file
         options:
 
 
 development:
-        type: %development_database_type
-        database_file: %development_database_file
+        adapter: %development_database_type
         host: %development_database_host
-        port:
-        database_name: %development_database_name
-        user: %development_database_user
+        database: %development_database_name
+        username: %development_database_user
         password: %development_database_password
+        port:
+        database_file: %development_database_file
         options:
 
 # Warning: The database defined as 'testing' will be erased and
 # re-generated from your development database when you run './script/test app'.
 # Do not set this db to the same as development or production.
 testing:
-        type: %testing_database_type
-        database_file: %testing_database_file
+        adapter: %testing_database_type
         host: %testing_database_host
-        port:
-        database_name: %testing_database_name
-        user: %testing_database_user
+        database: %testing_database_name
+        username: %testing_database_user
         password: %testing_database_password
+        port:
+        database_file: %testing_database_file
         options:
 
 CONFIG;
