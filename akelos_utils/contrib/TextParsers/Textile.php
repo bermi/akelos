@@ -465,35 +465,41 @@ class Textile
 // -------------------------------------------------------------
     function fList($m)
     {
-        $text = explode("\n", $m[0]);
-        foreach($text as $line) {
-            $nextline = next($text);
-            if (preg_match("/^([#*]+)($this->a$this->c) (.*)$/s", $line, $m)) {
-                list(, $tl, $atts, $content) = $m;
-                $nl = '';
-                if (preg_match("/^([#*]+)\s.*/", $nextline, $nm))
-                	$nl = $nm[1];
-                if (!isset($lists[$tl])) {
-                    $lists[$tl] = true;
-                    $atts = $this->pba($atts);
-                    $line = "\t<" . $this->lT($tl) . "l$atts>\n\t\t<li>" . $this->graf($content);
-                } else {
-                    $line = "\t\t<li>" . $this->graf($content);
-                }
-
-                if(strlen($nl) <= strlen($tl)) $line .= "</li>";
-                foreach(array_reverse($lists) as $k => $v) {
-                    if(strlen($k) > strlen($nl)) {
-                        $line .= "\n\t</" . $this->lT($k) . "l>";
-                        if(strlen($k) > 1)
-                            $line .= "</li>";
-                        unset($lists[$k]);
+            $text = explode("\n", $m[0]);
+            $i = 0;
+            foreach($text as $line) {
+                    if ($i >= count($text)-1) {
+                            $nextline = false;
+                    } else {
+                            $nextline = $text[$i+1];
                     }
-                }
+                    if (preg_match("/^([#*]+)($this->a$this->c) (.*)$/s", $line, $m)) {
+                            list(, $tl, $atts, $content) = $m;
+                            $nl = preg_replace("/^([#*]+)\s.*/", "$1", $nextline);
+                            if (!isset($lists[$tl])) {
+                                    $lists[$tl] = true;
+                                    $atts = $this->pba($atts);
+                                    $line = "\t<" . $this->lT($tl) . "l$atts>\n\t\t<li>" . $content;
+                            } else {
+                                    $line = "\t\t<li>" . $content;
+                            }
+                            if ($nl == $tl) {
+                                    $line .= "</li>";
+                            } else if($nl=="*" or $nl=="#") {
+                                    $line .= "</li>\n\t</".$this->lT($tl)."l>\n\t</li>";
+                                    unset($lists[$tl]);
+                            }
+                            if (!$nextline) {
+                                    foreach($lists as $k => $v) {
+                                            $line .= "</li>\n\t</" . $this->lT($k) . "l>";
+                                            unset($lists[$k]);
+                                    }
+                            }
+                    }
+                    $out[] = $line;
+                    $i++;
             }
-            $out[] = $line;
-        }
-        return join("\n", $out);
+            return join("\n", $out);
     }
 
 // -------------------------------------------------------------
