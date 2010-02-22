@@ -9,10 +9,6 @@ body {
   padding: 0 3%;
   }
 
-.hide, .nav {
-  display: none !important;
-  }
-
 a:link, a:visited {
   background: transparent;
   font-weight: bold;
@@ -44,3 +40,9 @@ blockquote {
 
 .small  { font-size: .9em; }
 .large  { font-size: 1.1em; }
+
+
+.hide, .nav, .no-print, img.no-print {
+  display: none !important;
+  }
+  
