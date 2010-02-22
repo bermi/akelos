@@ -52,7 +52,7 @@ class MakelosRequest
                 array_shift($arguments);
             }
 
-            if(preg_match('/^(-{0,2})((?![\w\d-_:\/\\\]+\/\/)[\w\d-_:\/\\\]+ ?)(=?)( ?.*)/', $argument, $matches)){
+            if(preg_match('/^(-{0,2})((?![\w\d\.-_:\/\\\]+\/\/)[\w\d\.-_:\/\\\]+ ?)(=?)( ?.*)/', $argument, $matches)){
                 $constant_or_attribute = ((strtoupper($matches[2]) === $matches[2]) ? 'constants' : 'attributes');
                 $is_constant = $constant_or_attribute == 'constants';
                 if(($matches[3] == '=' || ($matches[3] == '' && $matches[4] != ''))){
