@@ -9,7 +9,7 @@ class AkelosPanelController extends AkActionController {
     
     public function __construct(){
         if(!(AK_DEV_MODE && AkRequest::isLocal())){
-            die('Disabled for security reasons');
+            throw new ForbiddenActionException('You can only access the Akelos Panel from localhost and when running development environment.');
         }
     }
 
