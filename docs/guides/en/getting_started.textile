@@ -150,7 +150,7 @@ Alternatively you can edit config/config-DEFAULT.php
 
 In any case, Akelos will create a folder <tt>blog</tt>. Open up that folder and explore its contents. Most of the work in this tutorial will happen in the <tt>app/</tt> folder, but here's a basic rundown on the function of each folder that Akelos creates in a new application by default:
 
-|_.File/Folder|_.Purpose|
+|_. File/Folder |_. Purpose |
 |README.textile|This is a brief instruction manual for your application. Use it to tell others what your application does, how to set it up, and so on.|
 |makefile.php|This file contains batch jobs that can be run from the terminal.|
 |app/|Contains the controllers, models, and views for your application. You'll focus on this folder for the remainder of this guide.|
@@ -298,7 +298,7 @@ NOTE. While scaffolding will get you up and running quickly, the "one size fits 
 
 The scaffold generator will build 14 files in your application, along with some folders, and edit one more. Here's a quick overview of what it creates:
 
-|_.File                                         |_.Purpose|
+|_. File                                        |_. Purpose |
 |app/models/post.php                            |The Post model|
 |app/installers/post_installer.php              |Instaler for creating the posts table in your database|
 |app/views/posts/index.html.tpl                 |A view to display an index of all posts |
@@ -347,10 +347,10 @@ h4. Adding a Link
 
 To hook the posts up to the home page you've already created, you can add a link to the home page. Open +app/views/home/index.html.tpl+ and modify it as follows:
 
-<code lang="php">
+<php>
 <h1>Hello, Akelos!</h1>
 <%= link_to "My Blog", posts_path %>
-</code>
+</php>
 
 The +link_to+ method is one of Akelos' built-in view helpers. It creates a hyperlink based on text to display and where to go - in this case, to the path for posts.
 
