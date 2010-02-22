@@ -2,35 +2,79 @@
     {?new_install}
         <h1>_{It works!}</h1>
         <h2>_{Congratulations on your first Akelos-powered page.}</h2>
-        <p>_{Of course you haven't coded your app yet. Continue reading to learn what you need to do to create your Akelos application.}</p>
-
-        
-        <h2>_{Some files are missing at config/}</h2>
-        {!has_configuration}
-            <%= flash_warning _("Configuration file #{base_dir}/config/config.php not found") %>
-        {end}
-        {!has_routes}
-            <%= flash_warning _("Routes file #{base_dir}/config/routes.php not found.") %>
-        {end}
-        
-        <h2>_{Configuring your Akelos application environment.}</h2>
-        {!has_configuration}
-            <p>_{The fastest way configure your Akelos application is by running}:</p>
-            <%= format_snippet "$ cd #{base_dir}", 'shell' %>
-            
-            <h5>_{on windows}</h5>
-            <%= format_snippet "\n$ php makelos akelos:configure", 'shell' %>
-            
-            <h5>_{on Linux/Mac}</h5>
-            <%= format_snippet "\n$ ./makelos akelos:configure", 'shell' %>
-            
-            <p>_{and follow the steps.}</p>
-
-        {end}
-        
+        <p>_{Of course you haven't coded your app yet. Continue reading to learn what you need to do to create your Akelos application.}</p>       
     {else}
         <h1>_{Akelos Panel for %application_name}</h1>
     {end}
+
+    <?php if(!$has_configuration || !$has_routes) : ?>
+    <h2>_{Some files are missing at config/}</h2>
+    {!has_configuration}
+        <%= flash_warning _("Configuration file #{base_dir}/config/config.php not found") %>
+    {end}
+    {!has_routes}
+        <%= flash_warning _("Routes file #{base_dir}/config/routes.php not found.") %>
+    {end}
+    
+    <h2>_{Configuring your Akelos application environment.}</h2>
+    {!has_configuration}
+        <p>_{The fastest way configure your Akelos application is by running}:</p>
+        <%= format_snippet "$ cd #{base_dir}", 'shell' %>
+        
+        <h5>_{on windows}</h5>
+        <%= format_snippet "\n$ php makelos akelos:configure", 'shell' %>
+        
+        <h5>_{on Linux/Mac}</h5>
+        <%= format_snippet "\n$ ./makelos akelos:configure", 'shell' %>
+        
+        <p>_{and follow the steps.}</p>
+
+    {end}
+    
+    <?php endif; ?>
+        
+        {?new_install}
+            <h2>_{Quickstart}</h2>
+            <div class="important-item-list quickstart">
+                <ul>
+                    <li>_{Create the config/database.yml file by running} 
+                    <%= format_snippet "./script/configure", 'shell' %> 
+                    _{you can also rename and edit config/DEFAULT-database.yml}
+                    </li>
+                    <li>_{Edit your config/routes.php to disable this panel and setup the default controller.}</li>
+                    <li>_{Check available generators by running} 
+                    <%= format_snippet "./makelos generate", 'shell' %> 
+                    _{and start coding}
+                    </li>
+                </ul>
+            </div>
+
+            <h3>_{Must read documentation}</h3>
+            <div class="important-item-list">
+                <ul>
+                    <li><%= link_to_guide _'Getting Started with Akelos', 'getting_started' %></li>
+                    <li><%= link_to_guide _'Akelos Routing from the Outside In', 'routing' %></li>
+                </ul>
+            </div>
+            
+           <hr />
+          
+           <h2>_{Why I'm seeing this screen?}</h2>
+            <p>_{This dashboard is only available on fresh installs when browsing from the localhost.}</p>
+            <p>_{You need to edit your config/routes.php file and disable or change the base path for the Akelos Panel panel by editing the folowing route:}</p>
+            <%= capture_snippet 'php' %>
+            $Map->connect('/:controller/:action/:id', array(
+                          'controller' => 'akelos_dashboard', 
+                          'action' => 'index', 
+                          'module' => 'akelos_panel',
+                          'rebase' => AK_AKELOS_UTILS_DIR.DS.'akelos_panel'
+                        ));
+            <%= format_snippet %>
+            
+            
+           <hr />
+        {end}
+        
 
         <h2>_{%application_name information}</h2>
         <div class="text-block radius_5">
@@ -50,21 +94,6 @@
         
         </div>
     
-        
-        {?new_install}
-            <h2>_{Why I'm seeing this screen?}</h2>
-            <p>_{This dashboard is only available on fresh installs if the file config/routes.php file can't be found.}</p>
-            <p>_{Once you create a config/routes.php file you can enable this panel by adding the folowing route:}</p>
-<%= capture_snippet 'php' %>
-$Map->connect('/dev_panel/:controller/:action/:id', array(
-              'controller' => 'akelos_dashboard', 
-              'action' => 'index', 
-              'module' => 'akelos_panel',
-              'rebase' => AK_AKELOS_UTILS_DIR.DS.'akelos_panel'
-            ));
-<%= format_snippet %>
-
-        {end}
         
         <h2>_{Who can access the Akelos Panel?}</h2>
         <div class="text-block">
