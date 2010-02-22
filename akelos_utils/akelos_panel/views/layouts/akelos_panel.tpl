@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>{application_name}, Akelos Panel</title>
+<title>{!title}{application_name}, Akelos Panel{else}{title}{end}</title>
 <%= javascript_include_tag %>
 
 <link href="<%= url_for :controller => 'virtual_assets', :action => "stylesheets", :id => "akelos", :format => "css" %>" rel="stylesheet" type="text/css" />
