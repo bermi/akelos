@@ -1,11 +1,7 @@
 {?guide}
 <div id="guide">
-    <div class="blue-banner rounded">
-        <div class="inner-blue-banner">
-            <%= render_exerpt guide %>
-        </div>
-    </div>
     <div id="guide-content">
+        <div id="prologue"><%= render_prologue guide %></div>
         <%= render_doc guide %>
     </div>
 </div>

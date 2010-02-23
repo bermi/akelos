@@ -5,7 +5,7 @@
 <title>{!title}{application_name}, Akelos Panel{else}{title}{end}</title>
 <%= javascript_include_tag %>
 
-<link href="<%= url_for :controller => 'virtual_assets', :action => "stylesheets", :id => "akelos", :format => "css" %>" rel="stylesheet" type="text/css" />
+<link href="<%= url_for :controller => 'virtual_assets', :action => "stylesheets", :id => "akelos", :format => "css" %>" rel="stylesheet" type="text/css" media="screen" />
 <link href="<%= url_for :controller => 'virtual_assets', :action => "stylesheets", :id => "syntax", :format => "css" %>" rel="stylesheet" type="text/css" />
 <link href="<%= url_for :controller => 'virtual_assets', :action => "stylesheets", :id => "print", :format => "css" %>" rel="stylesheet" type="text/css" media="print" />
 

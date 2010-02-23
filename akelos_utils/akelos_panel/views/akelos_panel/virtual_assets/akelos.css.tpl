@@ -888,12 +888,52 @@ hr{
 
 /* Guide */
 
+
+#guide{
+   width:709px;
+   position:relative;
+}
+
+
+#toc{
+  width:180px;
+  float:right;
+  border-left:1px solid #eee;
+  font-size:10px;
+  color:#666;
+  top:42px;
+  position:absolute;
+  left:720px;
+}
+
+#toc ul.sections a:link,
+#toc ul.sections a:visited{
+  color:#666;
+}
+
+#toc h3{
+  margin:0 0 0 18px;
+}
+
+
+#toc ol li.chapter{
+  margin-left:28px;
+  margin-bottom:6px;
+  font-weight:bold;
+}
+
+#toc ol ul{
+  margin-bottom:0;
+  font-weight:normal;
+}
+
+
+
 #guide-content {
   padding: 44px 27px 23px 59px;
   color: #333;
   font-size: 12px;
 }
-
 
 #guide h2 {
   font-size: 16px;
@@ -934,13 +974,20 @@ hr{
 }
 
 
-/* prologue */
 
-.blue-banner {
+#prologue{
+  margin:0 0 20px 0;
+  border:1px solid #00b0ca;
+  padding:0 20px;
+  -moz-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
   background: #00b0ca;
   color: #fff;
-  padding:20px;
 }
+
+
 
 
 /* Chapters */
@@ -1085,7 +1132,7 @@ table.snippet td.snippet-cell{
   background: #333;
 }
 
-.code-snippet-title span.snippet-title-css {
+.code-snippet-title span.snippet-title-tpl {
   background: #f8008b;
   width: 50px; 
 }
@@ -1135,10 +1182,10 @@ table.snippet .code-snippet-php-separator {
   background: #cceff4;
 }
 
-table.snippet .code-snippet-css {
+table.snippet .code-snippet-tpl {
   background: #ffe8f5;
 }
-table.snippet .code-snippet-css-separator {
+table.snippet .code-snippet-tpl-separator {
   background: #f8bdde;
 }
 

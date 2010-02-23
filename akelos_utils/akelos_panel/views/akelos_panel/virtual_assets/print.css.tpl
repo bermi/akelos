@@ -13,7 +13,9 @@ a:link, a:visited {
   background: transparent;
   font-weight: bold;
   text-decoration: underline;
-  }
+}
+
+
 
 hr {
   background:#ccc;
@@ -25,8 +27,9 @@ hr {
   border:none;
 }
 
+
 h1,h2,h3,h4,h5,h6 { font-family: "Helvetica Neue", Arial, "Lucida Grande", sans-serif; }
-code { font:.9em "Courier New", Monaco, Courier, monospace; }
+code { font:.9em Monaco, "Courier New", Courier, monospace; line-height:0.8em; }
 
 img { float:left; margin:1.5em 1.5em 1.5em 0; }
 a img { border:none; }
@@ -36,6 +39,14 @@ blockquote {
   padding:1em;
   font-style:italic;
   font-size:.9em;
+}
+
+.break-before{
+  page-break-before: always;
+}
+
+.break-after{
+  page-break-after: always;
 }
 
 .small  { font-size: .9em; }

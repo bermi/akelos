@@ -39,7 +39,7 @@ Then the routing engine is the piece that translates that to a link to a URL suc
 
 NOTE: Patient needs to be declared as a resource for this style of translation via a named route to be available.
 
-h3. Quick Tour of +routes.php+
+h3. Quick Tour of routes.php
 
 There are two components to routing in Akelos: the routing engine itself, which is supplied as part of Akelos, and the file +config/routes.php+, which contains the actual routes that will be used by your application. Learning exactly what you can put in +routes.php+ is the main topic of this guide, but before we dig in let's get a quick overview.
 
@@ -129,7 +129,7 @@ $Map->resources('photos');
 
 creates seven different routes in your application:
 
-|_.HTTP verb|_.URL           |_.controller|_.action |_.used for|
+|_. HTTP verb |_. URL           |_. controller |_. action |_. used for |
 |GET        |/photos         |Photos      |index    |display a list of all photos|
 |GET        |/photos/add     |Photos      |add      |return an HTML form for creating a new photo|
 |POST       |/photos         |Photos      |create   |create a new photo|
@@ -186,7 +186,7 @@ $Map->resource('geocoder');
 
 creates six different routes in your application:
 
-|_.HTTP verb|_.URL            |_.controller|_.action |_.used for|
+|_. HTTP verb |_. URL           |_. controller |_. action |_. used for |
 |GET        |/geocoder/add    |Geocoders   |add      |return an HTML form for creating the new geocoder|
 |POST       |/geocoder        |Geocoders   |create   |create the new geocoder|
 |GET        |/geocoder        |Geocoders   |show     |display the one and only geocoder resource|
@@ -229,7 +229,7 @@ $Map->resources('photos', array('controller' => 'images'));
 
 will recognize incoming URLs containing +photos+ but route the requests to the Images controller:
 
-|_.HTTP verb|_.URL           |_.controller|_.action |_.used for|
+|_. HTTP verb |_. URL           |_. controller |_. action |_. used for |
 |GET        |/photos         |Images      |index    |display a list of all images|
 |GET        |/photos/add     |Images      |add      |return an HTML form for creating a new image|
 |POST       |/photos         |Images      |create   |create a new image|
@@ -301,7 +301,7 @@ $Map->resources('photos', array('as' => 'images'));
 
 will recognize incoming URLs containing +image+ but route the requests to the Photos controller:
 
-|_.HTTP verb|_.URL           |_.controller|_.action |_:used for|
+|_. HTTP verb |_. URL           |_. controller |_. action |_. used for |
 |GET        |/images         |Photos      |index    |display a list of all photos|
 |GET        |/images/add     |Photos      |add      |return an HTML form for creating a new photo|
 |POST       |/images         |Photos      |create   |create a new photo|
@@ -414,7 +414,7 @@ $Map->resources('magazines')
 
 In addition to the routes for magazines, this declaration will also create routes for ads, each of which requires the specification of a magazine in the URL:
 
-|_.HTTP verb|_.URL                    |_.controller|_.action |_.used for|
+|_. HTTP verb |_. URL           |_. controller |_. action |_. used for |
 |GET        |/magazines/1/ads         |Ads         |index    |display a list of all ads for a specific magazine|
 |GET        |/magazines/1/ads/add     |Ads         |add      |return an HTML form for creating a new ad belonging to a specific magazine|
 |POST       |/magazines/1/ads         |Ads         |create   |create a new ad belonging to a specific magazine|

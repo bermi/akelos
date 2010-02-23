@@ -1,4 +1,15 @@
-h1. Sintags
+h2. The Sintags Template Language
+
+This guide covers Sintags, the default template language for Akelos Views. By referring to this guide, you will be able to:
+
+* Write multilingual views.
+* Iterate collections.
+* Use rubiesque helper calls in your views.
+* Extend Sintags with dialects.
+
+endprologue.
+
+h3. Introduction
 
 Sintags is a template language extracted from the [[http://www.akelos.org|Akelos PHP Framework]]. The initial goal when designing the Sintags was to allow WYSIWYG HTML editor compatibility using a simplistic approach to looping collections and printing variables.
 
@@ -6,14 +17,7 @@ Sintags will not prevent users from running PHP code on your views. The goal wit
 
 The name Sintags comes uses the Spanish word “Sin” which means without. Ironically, the only tag allowed in Sintags is the <hidden></hidden> tag, which will skip the content within the tags.
 
-In this document you’ll find the following information about Sintags:
-
-  * [[http://www.bermi.org/projects/sintags#basic|Basic Sintags syntax]]
-  * [[http://www.bermi.org/projects/sintags#ruby-esque|Ruby-esque Sintags syntax]]
-  * [[http://www.bermi.org/projects/sintags#integrating|Download and integrate Sintags in your project]]
-  * [[http://www.bermi.org/projects/sintags#contributing|Bugs and Contributions]]
-
-h2. *Basic Sintags syntax*
+h3. Basic Sintags syntax
 
 Basic Sintags is what most designers will need to learn to work with the views. It is composed of the following elements:
 
@@ -31,19 +35,19 @@ Basic Sintags is what most designers will need to learn to work with the views. 
 
 The following examples will show you how Sintags is converted into PHP. These have been taken from the test suite.
 
-h2. Printing variables, object attributes and array members
+h3. Printing variables, object attributes and array members
 
-Printing variables.
+h4. Printing variables.
 
-Sintags
+<tpl>
+{comment}
+</tpl>
 
-    {comment}
+<php>
+<?php echo $comment; ?>
+</php>
 
-PHP
-
-    <?php echo $comment; ?>
-
-Printing object attributes.
+h4. Printing object attributes.
 
 Sintags
 

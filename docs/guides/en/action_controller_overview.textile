@@ -53,11 +53,11 @@ You will probably want to access data sent in by the user or other parameters in
 
 <php>
 class ClientsController extends AkActionController {
-  # This action uses query string parameters because it gets run
-  # by an HTTP GET request, but this does not make any difference
-  # to the way in which the parameters are accessed. The URL for
-  # this action would look like this in order to list activated
-  # clients: /clients?status=activated
+  // This action uses query string parameters because it gets run
+  // by an HTTP GET request, but this does not make any difference
+  // to the way in which the parameters are accessed. The URL for
+  // this action would look like this in order to list activated
+  // clients: /clients?status=activated
   public function index() {
     if($this->params['status'] == 'activated'){
       $this->clients = Client::getActivated();
@@ -66,17 +66,17 @@ class ClientsController extends AkActionController {
     }
   }
 
-  # This action uses POST parameters. They are most likely coming
-  # from an HTML form which the user has submitted. The URL for
-  # this RESTful request will be '/clients', and the data will be
-  # sent as part of the request body.
+  // This action uses POST parameters. They are most likely coming
+  // from an HTML form which the user has submitted. The URL for
+  // this RESTful request will be '/clients', and the data will be
+  // sent as part of the request body.
   public function create() {
     $this->client = new Client($this->params['client']);
     if($this->client->save()){
       $this->redirectTo($this->client);
     }else{
-      # This line overrides the default rendering behavior, which
-      # would have been to render the 'create' view.
+      // This line overrides the default rendering behavior, which
+      // would have been to render the 'create' view.
       $this->renderAction('add');
     }
   }
@@ -128,7 +128,7 @@ You can set global default parameters that will be used when generating URLs wit
 
 <php>
 class ApplicationController extends AkActionController
-  # The options parameter is the array passed in to 'url_for'
+  // The options parameter is the array passed in to 'url_for'
   public function defaultUrlOptions($options) {
       return array('locale' => Ak::lang());
   }
@@ -136,7 +136,6 @@ class ApplicationController extends AkActionController
 </php>
 
 These options will be used as a starting-point when generating URLs, so it's possible they'll be overridden by +urlFor+. Because this method is defined in the controller, you can define it on +ApplicationController+ so it would be used for all URL generation, or you could define it on only one controller for all URLs generated there.
-
 
 h3. Session
 
@@ -162,21 +161,15 @@ If you need a different session storage mechanism, you can define it in your +co
 * 3 - Memcached sessions
 * 4 - Cookie based sessions (default)
 
-<php>
-# Use the database for sessions instead of the cookie-based default,
-# which shouldn't be used to store highly confidential information
-# (create the session table with './makelos db:sessions:create')
-# You can also create the table from your migrations by running
-# AkDbSession::install();
-</php>
+IMPORTANT: Use the database for sessions instead of the cookie-based default, which shouldn't be used to store highly confidential information (create the session table with './makelos db:sessions:create').  You can also create the table from your migrations by running +AkDbSession::install();+
 
 Akelos sets up a session key (the name of the cookie) and (for the CookieStore) a secret key used when signing the session data. These can also be changed in +config/environment.php+:
 
 <php>
-# Your secret key for verifying cookie session data integrity.
-# If you change this key, all old sessions will become invalid!
-# Make sure the secret is at least 30 characters and all random, 
-# no regular words or you'll be exposed to dictionary attacks.
+// Your secret key for verifying cookie session data integrity.
+// If you change this key, all old sessions will become invalid!
+// Make sure the secret is at least 30 characters and all random, 
+// no regular words or you'll be exposed to dictionary attacks.
 AkConfig::setOption('action_controller.session', array(
   'key'     => '_yourappname_session', 
   'secret'  => '4f50711b8f0f49572...'
@@ -194,10 +187,10 @@ Session values are stored using key/value pairs like an array:
 <php>
 class ApplicationController extends AkActionController {
 
-  # Finds the User with the ID stored in the session with the key
-  # 'current_user_id' This is a common way to handle user login in
-  # an Akelos application; logging in sets the session value and
-  # logging out removes it.
+  // Finds the User with the ID stored in the session with the key
+  // 'current_user_id' This is a common way to handle user login in
+  // an Akelos application; logging in sets the session value and
+  // logging out removes it.
   private function _loadCurrentUser() {
     $this->CurrentUser = $this->User->findFirstBy('id', @$_SESSION['current_user_id']);
   }
@@ -208,12 +201,12 @@ To store something in the session, just assign it to the key like an array:
 
 <php>
 class LoginsController extends ApplicationController {
-  # 'Create' a login, aka 'log the user in'
+  // 'Create' a login, aka 'log the user in'
   public function create() {
     if($this->User = User::authenticate(
       $this->params['username'], $this->params['password'])) {
-      # Save the user ID in the session so it can be used in
-      # subsequent requests
+      // Save the user ID in the session so it can be used in
+      // subsequent requests
       $_SESSION['current_user_id'] = $this->User;
       $this->redirectTo(root_url());
     }
@@ -225,9 +218,9 @@ To remove something from the session, unset that key with +unset($_SESSION['key'
 
 <php>
 class LoginsController extends ApplicationController {
-  # 'Delete' a login, aka 'log the user out'
+  // 'Delete' a login, aka 'log the user out'
   public function destroy() {
-    # Remove the user id from the session
+    // Remove the user id from the session
     unset($_SESSION['current_user_id']);
     $this->redirectTo(root_url());
   }
@@ -273,7 +266,7 @@ class ClientsController extends ApplicationController {
   public function create() {
     $this->client = new Client($this->params['client']);
     if($this->client->save()){
-      # ...
+      // ...
     }else{
       $this->flash_now['error'] = 'Could not save client';
       $this->renderAction('add');
@@ -289,7 +282,7 @@ Your application can store small amounts of data on the client -- called cookies
 <php>
 class CommentsController extends ApplicationController {
   public function add() {
-    # Auto-fill the commenter's name if it has been stored in a cookie
+    // Auto-fill the commenter's name if it has been stored in a cookie
     $this->comment = new Comment(array(
                                   'name' => $_COOKIES['commenter_name']));
   }
@@ -299,10 +292,10 @@ class CommentsController extends ApplicationController {
     if($this->comment->save()){
       $this->flash['notice'] = 'Thanks for your comment!';
       if($this->params['remember_name']){
-        # Remember the commenter's name.
+        // Remember the commenter's name.
         $_COOKIES['commenter_name'] = $this->comment['name'];
       }else{
-        # Delete cookie for the commenter's name cookie, if any.
+        // Delete cookie for the commenter's name cookie, if any.
         unset($_COOKIES['commenter_name']);
       }
       $this->redirectTo($this->comment->article);
@@ -312,7 +305,6 @@ class CommentsController extends ApplicationController {
   }
 }
 </php>
-
 
 h3. Filters
 
@@ -331,13 +323,13 @@ class ApplicationController extends AkActionController {
   function _requireLogin() {
     if(!$this->_isLoggedIn()){
       $this->flash['error'] = 'You must be logged in to access this section';
-      $this->redirectTo(new_login_url()); # halts request cycle
+      $this->redirectTo(new_login_url()); // halts request cycle
     }
   }
 
-  # The _isLoggedIn() method simply returns true if the user is logged
-  # in and false otherwise. It does this by inspecting the
-  # $this->CurrentUser instance we created previously.
+  // The _isLoggedIn() method simply returns true if the user is logged
+  // in and false otherwise. It does this by inspecting the
+  // $this->CurrentUser instance we created previously.
   public function _isLoggedIn() {
     return !empty($this->CurrentUser);
   }
@@ -401,7 +393,7 @@ h4. The +Request+ Object
 
 The request object contains a lot of useful information about the request coming in from the client. To get a full list of the available methods, refer to the 'API documentation':http://api.akelos.org/classes/AkRequest.html. Among the properties that you can access on this object are:
 
-|_.Method of +Request+|_.Purpose|
+|_. Method of +Request+ |_. Purpose |
 |getHost()|The hostname used for this request.|
 |getDomain($n=2)|The hostname's first +n+ segments, starting from the right (the TLD).|
 |getFormat|The content type requested by the client.|
@@ -418,7 +410,7 @@ h4. The +Response+ Object
 
 The response object is not usually used directly, but is built up during the execution of the action and rendering of the data that is being sent back to the user, but sometimes - like in an after filter - it can be useful to access the response directly.
 
-|_.Method of +response+|_.Purpose|
+|_. Method of +Request+ |_. Purpose |
 |get/setBody()|This is the string of data being sent back to the client. This is most often HTML.|
 |get/SetStatus()|The HTTP status code for the response, like 200 for a successful request or 404 for file not found.|
 |getLocation()|The URL the client is being redirected to, if any.|
@@ -479,7 +471,6 @@ class AdminController extends ApplicationController {
 }
 </php>
 
-
 h3. Streaming and File Downloads
 
 Sometimes you may want to send a file to the user instead of rendering an HTML page. All controllers in Akelos have the +sendData()+ and the +sendFile()+ methods, which will both stream data to the client. +sendFile()+ is a convenience method that lets you provide the name of a file on the disk and it will stream the contents of that file for you.
@@ -487,13 +478,13 @@ Sometimes you may want to send a file to the user instead of rendering an HTML p
 To stream data to the client, use +sendData()+:
 
 <php>
-# This example uses dompdf http://www.digitaljunkies.ca/dompdf/
-# for converting an html rendred page into a pdf
+// This example uses dompdf http://www.digitaljunkies.ca/dompdf/
+// for converting an html rendred page into a pdf
 require_once("dompdf_config.inc.php");
 
 class ClientsController extends ApplicationController {
-  # Generates a PDF document with information on the client and
-  # returns it. The user will get the PDF as a file download.
+  // Generates a PDF document with information on the client and
+  // returns it. The user will get the PDF as a file download.
   public function download_pdf() {
     $this->Client = $this->Client->find($this->params['id']);
     $this->sendData($this->_generatePdf(), array(
@@ -510,7 +501,7 @@ class ClientsController extends ApplicationController {
   }
   
   public function show() {
-    # ...
+    // ...
   }
 
 }
@@ -524,7 +515,7 @@ If you want to send a file that already exists on disk, use the +sendFile()+ met
 
 <php>
 class ClientsController extends ApplicationController {
-  # Stream a file that has already been generated and stored on disk.
+  // Stream a file that has already been generated and stored on disk.
   public function download_pdf() {
     $this->Client = $this->Client->find($this->params['id']);
     $this->sendFile('/files/clients/$Client->id.pdf", array(
@@ -546,7 +537,7 @@ While +sendData+ works just fine, if you are creating a RESTful application havi
 
 <php>
 class ClientsController extends ApplicationController {
-  # The user can request to receive this resource as HTML or PDF.
+  // The user can request to receive this resource as HTML or PDF.
   public function show() {
     $this->Client = $this->Client->find($this->params['id']);
     if ($this->respondTo()) {
@@ -628,17 +619,17 @@ class ApplicationController extends AkActionController {
 }
 
 class ClientsController extends ApplicationController {
-  # Check that the user has the right authorization to access clients.
+  // Check that the user has the right authorization to access clients.
   public function __construct(){
     $this->beforeFilter('_checkAuthorization');
   }
 
-  # Note how the actions don't have to worry about all the auth stuff.
+  // Note how the actions don't have to worry about all the auth stuff.
   public function edit() {
     $this->client = $this->Client->find($this->params['id'])
   }
 
-  # If the user is not authorized, just throw the exception.
+  // If the user is not authorized, just throw the exception.
   protected function _checkAuthorization() {
     if(!$this->CurrentUser->isAdmin()) throw new UserNotAuthorized();
   }

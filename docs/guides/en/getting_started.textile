@@ -23,8 +23,7 @@ It is highly recommended that you *familiarize yourself with PHP before diving i
 * "PHP Simple tutorial":http://php.net/manual/en/tutorial.php
 * "PHP Tutorial by W3Schools":http://www.w3schools.com/PHP/php_intro.asp
 
-
-h3. What is Akelos?
+h3. What is Akelos ?
 
 Akelos is a web development framework written in the PHP language. Many of its components and documentation have been ported from Ruby on Rails. It is designed to make programming web applications easier by making assumptions about what every developer needs to get started. It allows you to write less code while accomplishing more than many other frameworks. Akelos developers also report that it makes web application development more fun.
 
@@ -1175,8 +1174,7 @@ class Post extends ActiveRecord {
 }
 </php> 
 
-
-h3. What's Next?
+h3. What's next?
 
 Now that you've seen your first Akelos application, you should feel free to update it and experiment on your own. But you don't have to do everything without help. As you need assistance getting up and running with Akelos, feel free to consult these support resources:
 
@@ -1190,3 +1188,11 @@ Akelos also comes with built-in help that you can generate using the makelos com
 * Running +./makelos doc:guides+ will put a full copy of the Akelos Guides in the +doc/guides+ folder of your application. Open +doc/guides/index.html+ in your web browser to explore the Guides.
 * Running +./makelos doc:akelos+ will put a full copy of the API documentation for Akelos in the +doc/api+ folder of your application. Open +doc/api/index.html+ in your web browser to explore the API documentation.
 
+
+
+h3. Changelog
+
+"Lighthouse ticket":http://akelos.lighthouseapp.com/projects/47137-akelos-guides/tickets/1
+
+* February 23, 2010: Guide adapted to Akelos by "Bermi Ferrer":credits.html#bermi-ferrer
+* Original Rails guide by "Mike Gunderloy":http://twitter.com/MikeG1
