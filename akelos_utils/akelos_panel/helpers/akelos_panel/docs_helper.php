@@ -8,28 +8,41 @@ class DocsHelper extends AkBaseHelper
 {
     public $docs_path;
     public $insert_toc = false;
+    public $is_todo = false;
     public $prologue = '';
 
     public function get_doc_contents($doc_name){
         $doc_file = $this->_getdocPath($doc_name, Ak::lang());
-        return file_exists($doc_file) ? file_get_contents($doc_file) : @file_get_contents($this->_getdocPath($doc_name, 'en'));
+        if(file_exists($doc_file)){
+            return file_get_contents($doc_file);
+        }
+        $doc_file = $this->_getTodoDocPath($doc_name, Ak::lang());
+        if(file_exists($doc_file)){
+            $this->is_todo = true;
+            return file_get_contents($doc_file);
+        }
+        $doc_file = $this->_getdocPath($doc_name, 'en');
+        return @file_get_contents($doc_file);
     }
 
     public function render_prologue($doc_contents){
-        $doc_contents = explode('endprologue.', $doc_contents.'endprologue.');
+        list($prologue,) = explode('endprologue.', $doc_contents.'endprologue.');
         $this->insert_toc = false;
-        return $this->_afterRender(AkTextHelper::textilize($this->_beforeRender($doc_contents[0])));
+        return $this->_afterRender(AkTextHelper::textilize($this->_beforeRender($prologue)));
     }
+
     public function render_doc($doc_contents){
-        $doc_contents = explode('endprologue.', $doc_contents.'endprologue.');
+        list(,$content) = explode('endprologue.', $doc_contents.'endprologue.');
         $this->insert_toc = true;
-        return $this->_afterRender(AkTextHelper::textilize($this->_beforeRender($doc_contents[1])));
+        if($this->is_todo){
+            $content = $this->t("WARNING: This guide has *NOT* been fully ported from Rails. Check how you can \"contribute to improve Akelos\":/contribute\n").$content;
+        }
+        return $this->_afterRender(AkTextHelper::textilize($this->_beforeRender($content)));
     }
 
     public function link_to_guide($guide_name, $slug = '', $html_options = array()){
         return $this->_controller->ak_url_helper->link_to($this->t($guide_name), array('action'=>'guide', 'id' => $this->t($slug)), $html_options);
     }
-
 
 
     public function processIndex($string, $current_level= 3, $counters = array(1)){
@@ -84,7 +97,7 @@ class DocsHelper extends AkBaseHelper
 
         foreach ($this->toc as $chapter => $details){
             $chapter_details = array_shift($details);
-            $toc .= '<li class="chapter"><a href="#'.$chapter_details['id'].'">'.$chapter_details['title'].'</a>';
+            $toc .= '<li class="chapter"><a href="#'.$chapter_details['id'].'"><span class="only-print">'.$chapter_details['index'].' </span>'.$chapter_details['title'].'</a>';
             if(!empty($details)){
                 $toc .= '<ul class="sections">';
                 foreach ($details as $detail){
@@ -101,7 +114,12 @@ class DocsHelper extends AkBaseHelper
 
     private function _getdocPath($doc_name, $language){
         $doc_name = AkInflector::underscore($language != 'en' ? Ak::untranslate($doc_name, $language) : $doc_name);
-        return AkConfig::getDir('docs').DS.(empty($this->docs_path) ? '' : trim($this->docs_path, DS).DS).$language.DS.$doc_name.'.textile';
+        return AkConfig::getDir('docs').DS.( empty($this->docs_path)?'':trim($this->docs_path,DS).DS ).$language.DS.$doc_name.'.textile';
+    }
+
+    private function _getTodoDocPath($doc_name, $language){
+        $doc_name = AkInflector::underscore($language != 'en' ? Ak::untranslate($doc_name, $language) : $doc_name);
+        return AkConfig::getDir('docs').DS.( empty($this->docs_path)?'':trim($this->docs_path,DS).DS ).$language.DS.'TODO'.DS.$doc_name.'.textile';
     }
 
     private function _afterRender($html){

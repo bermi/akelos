@@ -1132,7 +1132,7 @@ table.snippet td.snippet-cell{
   background: #333;
 }
 
-.code-snippet-title span.snippet-title-tpl {
+.code-snippet-title span.snippet-title-sql {
   background: #f8008b;
   width: 50px; 
 }
@@ -1145,7 +1145,7 @@ table.snippet td.snippet-cell{
   background: #009df6;
 }
 
-.code-snippet-title span.snippet-title-sql {
+.code-snippet-title span.snippet-title-tpl {
   background: #eb7708;
   width: 50px; 
 }
@@ -1182,10 +1182,10 @@ table.snippet .code-snippet-php-separator {
   background: #cceff4;
 }
 
-table.snippet .code-snippet-tpl {
+table.snippet .code-snippet-sql {
   background: #ffe8f5;
 }
-table.snippet .code-snippet-tpl-separator {
+table.snippet .code-snippet-sql-separator {
   background: #f8bdde;
 }
 
@@ -1201,16 +1201,16 @@ table.snippet .html-code-color-1 {
 table.snippet .html-code-color-2 {
   color: #007c92;
 }
-table.snippet .code-snippet-sql {
+table.snippet .code-snippet-tpl {
   background: #fbecdc;
 }
-table.snippet .code-snippet-sql-separator {
+table.snippet .code-snippet-tpl-separator {
   background: #ebcaab;
 }
-table.snippet .sql-code-color-1 {
+table.snippet .tpl-code-color-1 {
   color: #0600ff;
 }
-table.snippet .sql-code-color-2 {
+table.snippet .tpl-code-color-2 {
 	color: #007c92;
 }
 table.snippet .code-snippet-shell {

@@ -16,6 +16,15 @@ a:link, a:visited {
 }
 
 
+#toc a:link, #toc a:visited {
+  font-weight: normal;
+  text-decoration: none;
+  color:#000;
+}
+
+#toc li {
+  list-style:none;
+}
 
 hr {
   background:#ccc;
