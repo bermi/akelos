@@ -120,7 +120,6 @@ In most cases, the easiest way to install Akelos is to unpack the Akelos tar.gz/
 
 NOTE: If you want to keep up with cutting-edge changes to Akelos, you'll want to clone the "Akelos source code":http://github.com/akelos/akelos/tree/master from github. This is not recommended as an option for beginners, though.
 
-
 h4. Creating the Blog Application
 
 Open a terminal, navigate to the folder where you uncompressed Akelos and type:

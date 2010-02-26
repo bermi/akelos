@@ -357,7 +357,6 @@ In addition to before filters, you can run filters after an action has run or bo
 
 Around filters are responsible for running the action, but they can choose not to, which is the around filter's way of stopping it.
 
-
 h4. Other Ways to Use Filters
 
 While the most common way to use filters is by adding methods using *Filter, there is another way to do the same thing.
@@ -613,7 +612,7 @@ class ApplicationController extends AkActionController {
     );
 
   private function _userNotAuthorized() {
-    $this->flash['error'] = 'You don't have access to this section.';
+    $this->flash['error'] = "You don't have access to this section.";
     $this->redirectTo('back');
   }
 }

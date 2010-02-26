@@ -582,7 +582,7 @@ $Map->resources('photos, array('add' => array('upload' => 'post')));
 
 This will enable Akelos to recognize URLs such as +/photos/add/upload+ using the POST HTTP verb, and route them to the upload action of the Photos controller. It will also create the +upload_add_photos_path+ and +upload_add_photos_url+ route helpers.
 
-TIP: If you want to redefine the verbs accepted by one of the standard actions, you can do so by explicitly mapping that action. For example:<br/>+$Map->resources('photos, array('add' => array('add' => ANY))+<br/>This will allow the new action to be invoked by any request to +photos/add+, no matter what HTTP verb you use.
+TIP: If you want to redefine the verbs accepted by one of the standard actions, you can do so by explicitly mapping that action. For example:<br/>+$Map->resources('photos', array('add' => array('add' => ANY))+<br/>This will allow the new action to be invoked by any request to +photos/add+, no matter what HTTP verb you use.
 
 h5. A Note of Caution
 
