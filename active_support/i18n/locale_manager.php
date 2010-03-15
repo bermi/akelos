@@ -29,7 +29,7 @@ class AkLocaleManager
 
         if(empty($available_locales)){
             $available_locales = array();
-            $d = dir(AK_CONFIG_DIR.DS.'locales');
+            $d = dir(AkConfig::getDir('config').DS.'locales');
             while (false !== ($entry = $d->read())) {
                 if (preg_match('/\\.php$/', $entry)){
                     $locale = str_replace('.php','',$entry);
@@ -253,7 +253,7 @@ class AkLocaleManager
 
     static function getCoreDictionary($language,$set=false,$set_data=null) {
         static $dictionaries=array();
-        $path = AK_CONFIG_DIR.DS.'locales'.DS.basename($language).'.php';
+        $path = AkConfig::getDir('config').DS.'locales'.DS.basename($language).'.php';
         if($set===true && is_array($set_data)) {
             $dictionaries[$path]=$set_data;
             return;
@@ -293,7 +293,7 @@ class AkLocaleManager
 
     static function setCoreDictionary($locale, $dictionary, $language, $comment=null) {
 
-        $path = AK_CONFIG_DIR.DS.'locales'.DS.basename($language).'.php';
+        $path = AkConfig::getDir('config').DS.'locales'.DS.basename($language).'.php';
         AkLocaleManager::getCoreDictionary($language,true,array($locale,$dictionary));
         return Ak::file_put_contents($path,"<?php\n/** $comment */\n\n\$locale=".var_export((array)$locale,true).";\n\n\$dictionary=".var_export((array)$dictionary,true).";\n");
     }
@@ -306,7 +306,7 @@ class AkLocaleManager
     }
 
     static function deleteCoreDictionary($language) {
-        $path = AK_CONFIG_DIR.DS.'locales'.DS.basename($language).'.php';
+        $path = AkConfig::getDir('config').DS.'locales'.DS.basename($language).'.php';
         AkLocaleManager::getCoreDictionary($language,true,array(array(),array()));
         clearstatcache();
         return (file_exists($path)?@unlink($path):false);

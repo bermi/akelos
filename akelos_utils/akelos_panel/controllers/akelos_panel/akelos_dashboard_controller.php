@@ -11,9 +11,9 @@ class AkelosPanel_AkelosDashboardController extends AkelosPanelController
         $this->base_dir          = AK_BASE_DIR;
         $this->akelos_dir       = AK_FRAMEWORK_DIR;
         $this->tasks_dir        = AK_TASKS_DIR;
-        $this->has_configuration    = file_exists(AK_CONFIG_DIR.DS.'config.php');
-        $this->has_routes           = file_exists(AK_CONFIG_DIR.DS.'routes.php');
-        $this->has_database         = file_exists(AK_CONFIG_DIR.DS.'database.yml');
+        $this->has_configuration    = file_exists(AkConfig::getDir('config').DS.'config.php');
+        $this->has_routes           = file_exists(AkConfig::getDir('config').DS.'routes.php');
+        $this->has_database         = file_exists(AkConfig::getDir('config').DS.'database.yml');
         $this->using_root_path      =   $this->Request->getPath() == '/';
         $this->new_install          =   !$this->has_configuration || !$this->has_routes || $this->using_root_path;
         $this->environment          = AK_ENVIRONMENT;

@@ -48,7 +48,7 @@ HELP
 );
 }
 $default_app_name = (AK_APP_NAME == 'Application') ? basename(MAKELOS_BASE_DIR) : AK_APP_NAME;
-$is_akelos_core = empty($options['app_name']) && $default_app_name=='Application' && !file_exists(AK_CONFIG_DIR.DS.'config.php');
+$is_akelos_core = empty($options['app_name']) && $default_app_name=='Application' && !file_exists(AkConfig::getDir('config').DS.'config.php');
 
 $available_formats = array_diff(explode("\n", @`git archive -l`), array(''));
 if(empty($available_formats)){

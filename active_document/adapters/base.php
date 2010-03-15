@@ -75,7 +75,7 @@ class AkOdbAdapter
     }
 
     private function _useCustomNamespace($namespace) {
-        if(file_exists(AK_CONFIG_DIR.DS.$namespace.'.yml')){
+        if(file_exists(AkConfig::getDir('config').DS.$namespace.'.yml')){
             $this->settings_namespace = $namespace;
         }
     }

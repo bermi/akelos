@@ -58,7 +58,7 @@ class FileHandling_TestCase extends ActiveSupportUnitTest
         $copy_path = $original_path.'.copy';
         $this->assertTrue(Ak::copy($original_path, $copy_path));
         $this->assertEqual(Ak::file_get_contents($original_path), Ak::file_get_contents($copy_path));
-        $this->assertTrue(Ak::file_delete($copy_path));
+        $this->assertTrue(Ak::file_delete($copy_path, array('debug'=>true)));
     }
 
     public function Test_copy_directories() {
@@ -100,7 +100,7 @@ class FileHandling_TestCase extends ActiveSupportUnitTest
     }
 
     public function test_should_read_files_using_scoped_file_get_contents_function() {
-        $this->assertEqual(Ak::file_get_contents(AK_FRAMEWORK_DIR.DS.'active_record'.DS.'active_record.php'), file_get_contents(AK_FRAMEWORK_DIR.DS.'active_record'.DS.'active_record.php'));
+        $this->assertEqual(Ak::file_get_contents(__FILE__, array('base_path' => dirname(__FILE__))), file_get_contents(__FILE__));
     }
 
     public function test_dir_should_not_recurse_when_set_to_false() {
@@ -122,12 +122,12 @@ class FileHandling_TestCase extends ActiveSupportUnitTest
         clearstatcache();
         $this->assertFalse(is_dir($tmp_dir));
     }
-    
+
     public function test_should_create_base_path_ticket_148() {
         $tmp_dir = AkConfig::getDir('tmp').DS.Ak::randomString();
         $base_path = AkConfig::getDir('tmp').'new_dir_'.time();
         Ak::make_dir($base_path, array('base_path'=>$base_path));
-        
+
         $this->assertTrue(is_dir($base_path), 'Could base_path directory '.$base_path);
         clearstatcache();
     }

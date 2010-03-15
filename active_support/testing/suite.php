@@ -172,7 +172,7 @@ class AkUnitTestSuite extends TestSuite
     }
 
     static function createTestingDatabaseIfNotAvailable() {
-        if(!file_exists(AK_CONFIG_DIR.DS.'database.yml')){
+        if(!file_exists(AkConfig::getDir('config').DS.'database.yml')){
             $Config = new AkConfig();
             $Config->readConfigYaml('database', 'default:
     type: sqlite

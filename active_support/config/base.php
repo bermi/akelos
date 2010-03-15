@@ -85,8 +85,6 @@
 
 class AkConfig
 {
-    const CONFIG_DIR = AK_CONFIG_DIR;
-
     public $options = array(
     'skip_cache' => false
     );
@@ -341,7 +339,7 @@ CACHE;
 
     protected function _generateConfigFileName($namespace) {
         $namespace = Ak::sanitize_include($namespace, 'high');
-        $yaml_file_name = self::CONFIG_DIR.DS.$namespace.'.yml';
+        $yaml_file_name = AkConfig::getDir('config').DS.$namespace.'.yml';
         return $yaml_file_name;
     }
 

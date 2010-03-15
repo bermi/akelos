@@ -17,16 +17,16 @@ class DocumentAdapter_TestCase extends ActiveDocumentUnitTest
     }
 
     public function test_should_connect_using_config_namespace_as_parameter() {
-        file_put_contents(AK_CONFIG_DIR.'/mongo_db.yml', AkConfig::getDir('fixtures').'/sample_config.yml');
+        file_put_contents(AkConfig::getDir('config').'/mongo_db.yml', AkConfig::getDir('fixtures').'/sample_config.yml');
         $this->assertTrue($this->db->setupAdapter('mongo_db'));
-        unlink(AK_CONFIG_DIR.'/mongo_db.yml');
+        unlink(AkConfig::getDir('config').'/mongo_db.yml');
     }
 
     public function test_should_connect_using_custom_namespace() {
-        file_put_contents(AK_CONFIG_DIR.'/testing_object_database.yml', AkConfig::getDir('fixtures').'/sample_config.yml');
+        file_put_contents(AkConfig::getDir('config').'/testing_object_database.yml', AkConfig::getDir('fixtures').'/sample_config.yml');
         $this->db->settings_namespace = 'testing_object_database';
         $this->assertTrue($this->db->setupAdapter());
-        unlink(AK_CONFIG_DIR.'/testing_object_database.yml');
+        unlink(AkConfig::getDir('config').'/testing_object_database.yml');
     }
 
     public function test_should_get_adapter_type() {

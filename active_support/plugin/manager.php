@@ -469,7 +469,7 @@ class AkPluginManager
      */
     public function _getRepositoriesConfigPath() {
         if(empty($this->tmp_repositories)){
-            return AK_CONFIG_DIR.DS.'plugin_repositories.txt';
+            return AkConfig::getDir('config').DS.'plugin_repositories.txt';
         }else{
             return AK_TMP_DIR.DS.'plugin_repositories.'.md5(serialize($this->tmp_repositories));
         }

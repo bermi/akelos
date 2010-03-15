@@ -40,16 +40,16 @@ class ConnectionHandling_TestCase extends ActiveRecordUnitTest
     public function test_should_establish_multiple_connections() {
 
         $db_file_existed = false;
-        if(file_exists(AK_CONFIG_DIR.DS.'database.yml')){
+        if(file_exists(AkConfig::getDir('config').DS.'database.yml')){
             $db_file_existed = true;
-            $db_settings = Ak::convert('yaml', 'array', AK_CONFIG_DIR.DS.'database.yml');
+            $db_settings = Ak::convert('yaml', 'array', AkConfig::getDir('config').DS.'database.yml');
         }
         $db_settings['sqlite_databases'] = array(
         'database_file' => AK_TMP_DIR.DS.'testing_sqlite_database.sqlite',
         'type' => 'sqlite'
         );
 
-        file_put_contents(AK_CONFIG_DIR.DS.'database.yml', Ak::convert('array', 'yaml', $db_settings));
+        file_put_contents(AkConfig::getDir('config').DS.'database.yml', Ak::convert('array', 'yaml', $db_settings));
         @unlink(AK_TMP_DIR.DS.'testing_sqlite_database.sqlite');
 
         $this->installAndIncludeModels(array('TestOtherConnection'));
@@ -65,9 +65,9 @@ class ConnectionHandling_TestCase extends ActiveRecordUnitTest
 
         unset($db_settings['sqlite_databases']);
         if($db_file_existed){
-            file_put_contents(AK_CONFIG_DIR.DS.'database.yml', Ak::convert('array', 'yaml', $db_settings));
+            file_put_contents(AkConfig::getDir('config').DS.'database.yml', Ak::convert('array', 'yaml', $db_settings));
         }else{
-            unlink(AK_CONFIG_DIR.DS.'database.yml');
+            unlink(AkConfig::getDir('config').DS.'database.yml');
         }
     }
 

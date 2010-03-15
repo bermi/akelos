@@ -9,7 +9,7 @@ class LocaleManager_TestCase extends ActionPackUnitTest
 
     public function __construct() {
         parent::__construct();
-        foreach (glob(AK_CONFIG_DIR.'/locales/*.php') as $file){
+        foreach (glob(AkConfig::getDir('config').'/locales/*.php') as $file){
             $this->original_locales[$file] = file_get_contents($file);
         }
     }

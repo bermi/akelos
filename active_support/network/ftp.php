@@ -96,9 +96,9 @@ class AkFtp
                 if(AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION && empty($_pass_encoded)){
 
                     @register_shutdown_function(create_function('',
-                    "@Ak::file_put_contents(AK_CONFIG_DIR.DS.'config.php',
+                    "@Ak::file_put_contents(AkConfig::getDir('config').DS.'config.php',
                 str_replace(AK_FTP_PATH,'PROTECTED:'.base64_encode(Ak::encrypt(AK_FTP_PATH,'HR23JHR93JZ0ALi1UvTZ0ALi1UvTk7MD70')),
-                Ak::file_get_contents(AK_CONFIG_DIR.DS.'config.php')));"));
+                Ak::file_get_contents(AkConfig::getDir('config').DS.'config.php')));"));
                 }
             }
         }
