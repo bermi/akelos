@@ -316,269 +316,76 @@ class Ak
     }
 
 
-
-    static function dir($path, $options = array()) {
-        $result = array();
-
-        $path = rtrim($path, '/\\');
-        $default_options = array(
-        'files' => true,
-        'dirs' => true,
-        'recurse' => false,
-        );
-
-        $options = array_merge($default_options, $options);
-
-        if(is_file($path)){
-            $result = array($path);
-        }elseif(is_dir($path)){
-            if ($id_dir = opendir($path)){
-                while (false !== ($file = readdir($id_dir))){
-                    if ($file != "." && $file != ".." && $file != '.svn' && $file != '.git'){
-                        if(!empty($options['files']) && !is_dir($path.DS.$file)){
-                            $result[] = $file;
-                        }elseif(!empty($options['dirs'])){
-                            $result[][$file] = !empty($options['recurse']) ? Ak::dir($path.DS.$file, $options) : $file;
-                        }
-                    }
-                }
-                closedir($id_dir);
-            }
-        }
-
-        return array_reverse($result);
-    }
-
-
-    static function file_put_contents($file_name, $content, $options = array()) {
-
-        $default_options = array(
-        'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
-        'base_path' => strstr($file_name, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
-        );
-        $options = array_merge($default_options, $options);
-
-        $file_name = trim(str_replace($options['base_path'], '',$file_name),DS);
-
-        if($options['ftp']){
-            $file_name = trim(str_replace(array(DS,'//'),array('/','/'),$file_name),'/');
-            if(!AkFtp::is_dir(dirname($file_name))){
-                AkFtp::make_dir(dirname($file_name));
-            }
-
-            return AkFtp::put_contents($file_name, $content);
-        }else{
-            $base_path = (AK_WIN&&empty($options['base_path'])?'':$options['base_path'].DS);
-            if(!is_dir(dirname($base_path.$file_name))){
-                Ak::make_dir(dirname($base_path.$file_name), $options);
-            }
-
-            if(!$result = file_put_contents($base_path.$file_name, $content)){
-                if(!empty($content)){
-                    trigger_error(Ak::t("Could not write to file: %file_name. Please change file/dir permissions or enable FTP file handling on your Akelos application.", array('%file_name' => '"'.$base_path.$file_name.'"')),  E_USER_ERROR);
-                }
-            }
-            return $result;
-        }
-    }
-
-
-    static function file_get_contents($file_name, $options = array()) {
-        $default_options = array(
-        'ftp' => defined('AK_READ_FILES_USING_FTP') && AK_READ_FILES_USING_FTP,
-        'base_path' => strstr($file_name, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
-        );
-        $options = array_merge($default_options, $options);
-
-        $file_name = trim(str_replace($options['base_path'], '',$file_name),DS);
-
-        if($options['ftp']){
-            $file_name = trim(str_replace(array(DS,'//'),array('/','/'),$file_name),'/');
-            return AkFtp::get_contents($file_name);
-        }else{
-            $base_path = (AK_WIN && empty($options['base_path']) ? '' : $options['base_path'] . DS);
-            return file_get_contents($base_path.$file_name);
-        }
-    }
-
     /**
-     * @todo Optimize this code (dirty add-on to log command line interpreter results)
+     * @deprecated 
+     * @uses AkFileSystem::dir
+     */
+    static function dir($path, $options = array()) {
+        return AkFileSystem::dir($path, $options);
+    }
+    
+    /**
+     * @deprecated 
+     * @uses AkFileSystem::file_get_contents
+     */
+    static function file_get_contents($file_name, $options = array()) {
+        return AkFileSystem::file_get_contents($file_name, $options);
+    }
+    
+    /**
+     * @deprecated 
+     * @uses AkFileSystem::file_put_contents
+     */
+    static function file_put_contents($file_name, $content, $options = array()) {
+        return AkFileSystem::file_put_contents($file_name, $content, $options);
+    }
+    
+    /**
+     * @deprecated 
+     * @uses AkFileSystem::file_add_contents
      */
     static function file_add_contents($file_name, $content, $options = array()) {
-        $original_content = @Ak::file_get_contents($file_name, $options);
-        return Ak::file_put_contents($file_name, $original_content.$content, $options);
-    }
-
-    static function file_delete($file_name, $options = array()) {
-        $default_options = array(
-        'ftp' => defined('AK_DELETE_FILES_USING_FTP') && AK_DELETE_FILES_USING_FTP,
-        'base_path' => strstr($file_name, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
-        );
-        $options = array_merge($default_options, $options);
-
-        $file_name = trim(str_replace($options['base_path'], '',$file_name),DS);
-        $base_path = (AK_WIN&&empty($options['base_path'])?'':$options['base_path'].DS);
-        if($options['ftp']){
-            $file_name = trim(str_replace(array(DS,'//'),array('/','/'),$file_name),'/');
-            return AkFtp::delete($file_name, true);
-        }elseif (file_exists($base_path.$file_name)){
-            return unlink($base_path.$file_name);
-        }
-        return false;
-    }
-
-    static function directory_delete($dir_name, $options = array()) {
-        $default_options = array(
-        'ftp' => defined('AK_DELETE_FILES_USING_FTP') && AK_DELETE_FILES_USING_FTP,
-        'base_path' => strstr($dir_name, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
-        );
-        $options = array_merge($default_options, $options);
-
-        $sucess = true;
-        $dir_name = Ak::getRestrictedPath($dir_name, $options);
-
-        if(empty($dir_name)){
-            return false;
-        }
-
-        if($options['ftp']){
-            return AkFtp::delete($dir_name);
-        }else{
-            $base_path = (AK_WIN&&empty($options['base_path'])?'':$options['base_path'].DS);
-            $items = glob($base_path.$dir_name."/*");
-            $hidden_items = glob($base_path.$dir_name."/.*");
-            $fs_items = $items || $hidden_items ? array_merge((array)$items, (array)$hidden_items) : false;
-            if($fs_items){
-                $items_to_delete = array('directories'=>array(), 'files'=>array());
-                foreach($fs_items as $fs_item) {
-                    if($fs_item[strlen($fs_item)-1] != '.'){
-                        $items_to_delete[ (is_dir($fs_item) ? 'directories' : 'files') ][] = $fs_item;
-                    }
-                }
-                foreach ($items_to_delete['files'] as $file){
-                    Ak::file_delete($file, $options);
-                }
-                foreach ($items_to_delete['directories'] as $directory){
-                    $sucess = $sucess ? Ak::directory_delete($directory, $options) : $sucess;
-                }
-            }
-            return $sucess ? @rmdir($base_path.$dir_name) : $sucess;
-        }
-    }
-
-    static function make_dir($path, $options = array()) {
-
-        $default_options = array(
-        'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
-        'base_path' => AK_BASE_DIR
-        );
-
-        $options = array_merge($default_options, $options);
-
-        if(!is_dir($options['base_path']) && !Ak::make_dir($options['base_path'], array('base_path' => dirname($options['base_path'])))){
-            trigger_error(Ak::t('Base path %path must exist in order to use it as base_path in Ak::make_dir()', array('%path' => $options['base_path'])), E_USER_ERROR);
-        }
-
-        $path = trim(str_replace($options['base_path'], '',$path),DS);
-
-        if($options['ftp']){
-            $path = trim(str_replace(array(DS,'//'),array('/','/'),$path),'/');
-            return AkFtp::make_dir($path);
-        }else{
-            $base_path = (AK_WIN&&empty($options['base_path'])?'':$options['base_path'].DS);
-            $path = rtrim($base_path.$path, DS);
-
-            if (!file_exists($path)){
-                Ak::make_dir(dirname($path), $options);
-                return mkdir($path);
-            }else{
-                return true;
-            }
-        }
-        return false;
-    }
-
-    static function rmdir_tree($directory) {
-        $files = glob($directory.'*', GLOB_MARK);
-        foreach($files as $file){
-            if(substr($file, -1) == DS){
-                Ak::rmdir_tree($file);
-            } else{
-                unlink($file);
-            }
-        }
-        if (is_dir($directory)){
-            rmdir($directory);
-        }
+        return AkFileSystem::file_add_contents($file_name, $content, $options);
     }
 
     /**
-    * This static method will copy recursively all the files or directories from one
-    * path within an Akelos application to another.
-    *
-    * It uses current installation settings, so it can perform copies via the filesystem or via FTP
-    */
-    static function copy($origin, $target, $options = array()) {
-        $default_options = array(
-        'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
-        'base_path' => strstr($origin, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
-        );
-        $options = array_merge($default_options, $options);
-
-        $sucess = true;
-
-        $origin = Ak::getRestrictedPath($origin, $options);
-        $target = Ak::getRestrictedPath($target, $options);
-
-        if(empty($origin) || empty($target)){
-            return false;
-        }
-
-        $destination = str_replace($origin, $target, $origin);
-        $base_path = (AK_WIN&&empty($options['base_path'])?'':$options['base_path'].DS);
-        if(is_file($base_path.$origin)){
-            return Ak::file_put_contents($base_path.$destination, Ak::file_get_contents($base_path.$origin, $options), $options);
-        }
-        Ak::make_dir($base_path.$destination);
-        if($fs_items = glob($base_path.$origin."/*")){
-            $items_to_copy = array('directories'=>array(), 'files'=>array());
-            foreach($fs_items as $fs_item) {
-                $items_to_copy[ (is_dir($fs_item) ? 'directories' : 'files') ][] = $fs_item;
-            }
-            foreach ($items_to_copy['files'] as $file){
-                $destination = str_replace($origin, $target, $file);
-                $sucess = $sucess ? Ak::file_put_contents($destination, Ak::file_get_contents($file, $options), $options) : $sucess;
-            }
-            foreach ($items_to_copy['directories'] as $directory){
-                $destination = str_replace($origin, $target, $directory);
-                $sucess = $sucess ? Ak::copy($directory, $destination, $options) : $sucess;
-            }
-        }
-        return $sucess;
-    }
-
-    /**
-     * Returns a path restricting it to a base location
-     *
-     * This is used by Akelos to prevent functions namespaced under Ak
-     * from writing out of the Akelos base directory for security reasons.
+     * @deprecated 
+     * @uses AkFileSystem::file_delete
      */
-    static function getRestrictedPath($path, $options = array()) {
-        if(!empty($options['skip_path_restriction'])) return $path;
-        $default_options = array(
-        'ftp' => false,
-        'base_path' => strstr($path, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
-        );
-        $options = array_merge($default_options, $options);
+    static function file_delete($file_name, $options = array()) {
+        return AkFileSystem::file_delete($file_name, $options);
+    }
 
-        $path = str_replace('..','', rtrim($path,'\\/. '));
-        $path = trim(str_replace($options['base_path'], '',$path),DS);
+    /**
+     * @deprecated 
+     * @uses AkFileSystem::directory_delete
+     */
+    static function directory_delete($dir_name, $options = array()) {
+        return AkFileSystem::directory_delete($dir_name, $options);
+    }
 
-        if($options['ftp']){
-            $path = trim(str_replace(array(DS,'//'),array('/','/'), $path),'/');
-        }
+    /**
+     * @deprecated 
+     * @uses AkFileSystem::make_dir
+     */
+    static function make_dir($path, $options = array()) {
+        return AkFileSystem::make_dir($path, $options);
+    }
 
-        return $path;
+    /**
+     * @deprecated 
+     * @uses AkFileSystem::rmdir_tree
+     */
+    static function rmdir_tree($directory) {
+        return AkFileSystem::rmdir_tree($directory);
+    }
+
+    /**
+     * @deprecated 
+     * @uses AkFileSystem::copy
+     */
+    static function copy($origin, $target, $options = array()) {
+        return AkFileSystem::copy($origin, $target, $options);
     }
 
 
@@ -604,274 +411,93 @@ class Ak
     }
 
 
-    /**
-    * Trace helper function for development purposes
-    *
-    * @access public
-    * @static
-    * @param    string    $text    Helper text
-    * @param    string    $line    Helper line
-    * @param    string    $file    Helper file
-    * @return echoes result to screen
+    /**#@+
+     * Debug methods
+     */
+    
+   /**
+    * @deprecated
+    * @uses  AkDebug::trace
     */
     static function trace($text = null, $line = null, $file = null, $method = null, $escape_html_entities = true) {
-        static $counter = 0;
-        if(AK_PRODUCTION_MODE){
-            return;
-        }
-        $html_entities_function = $escape_html_entities ? 'htmlentities' : 'trim';
-        list($default_file, $default_line, $default_method) = Ak::getLastFileAndLineAndMethod();
-        $default_method = is_bool($text) || empty($text)  ? 'var_dump' : $default_method;
-        $line = is_null($line) ? $default_line : $line;
-        $file = is_null($file) ? $default_file : $file;
-        $method = is_null($method) ? $default_method : $method;
-
-        if(AK_CLI){
-            $text = Ak::dump($text, 'print_r');
-        }elseif (!empty($text) && !is_scalar($text)){
-            $rand = Ak::randomString();
-            $formatted = '';
-            $methods = array('print_r', 'var_dump', 'var_export');
-            foreach ($methods as $method){
-                $pre_style = 'display:none;';
-                if(defined('AK_TRACE_DUMP_METHOD')){
-                    if(AK_TRACE_DUMP_METHOD == $method){
-                        $pre_style = '';
-                    }
-                }elseif ($method == 'print_r'){
-                    $pre_style = '';
-                }
-                $element_id = $method.'_'.$rand;
-                $formatted .= "<div style='margin:10px;'><a href='javascript:void(0);' onclick='e_$element_id = document.getElementById(\"$element_id\"); e_$element_id.style.display = (e_$element_id.style.display == \"none\"?\"block\":\"none\");' title='Set the constant AK_TRACE_DUMP_METHOD to your favourite default method'>$method</a><br />".
-                '<pre style="'.$pre_style.'" id="'.$element_id.'">'.$html_entities_function(Ak::dump($text, $method)).'</pre></div>';
-            }
-            $text = $formatted;
-        }elseif (is_bool($text) || empty($text)){
-            $text = '<pre style="margin:10px;">'.$html_entities_function(Ak::dump($text, $default_method)).'</pre>';
-        }elseif (is_scalar($text)){
-            $text = '<pre style="margin:10px;">'.$html_entities_function($text).'</pre>';
-        }
-
-        if(!isset($text)){
-            $counter++;
-            $text = '';
-        }else {
-            $text = AK_CLI?'---> '.$text : ($text);
-        }
-
-        $include_file_and_line = strlen(trim($file.$line)) > 0;
-
-        if($include_file_and_line){
-            echo AK_CLI?"----------------\n$file ($line):\n $text\n----------------\n":"<div style='background-color:#fff;margin:10px;color:#000;font-family:sans-serif;border:3px solid #fc0;font-size:12px;'><div style='background-color:#ffc;padding:10px;color:#000;font-family:sans-serif;'>$file <span style='font-weight:bold'>$line</span></div>".$text."</div>\n";
-        }else{
-            echo AK_CLI?"----------------\n $text\n----------------\n":"<div style='background-color:#fff;margin:10px;color:#000;font-family:sans-serif;border:1px solid #ccc;font-size:12px;'>".$text."</div>\n";
-        }
+        return AkDebug::trace($text, $line, $file, $method, $escape_html_entities);
     }
-
-    /**
-     * Returns a string representation of one of these PHP methods var_dump, var_export, or print_r
-     */
-    static function dump($var, $method = null, $max_length = null) {
-        $method = empty($method) ? (defined('AK_TRACE_DUMP_METHOD') ? AK_TRACE_DUMP_METHOD : 'var_dump') : $method;
-        $methods = array('var_dump', 'var_export', 'print_r');
-        if(!in_array($method, $methods)){
-            trigger_error(Ak::t('Invalid dump method, valid options are %methods', array('%methods'=>join(", ", $methods))), E_USER_ERROR);
-            return false;
-        }
-        ob_start();
-        if(is_object($var)){
-            !method_exists($var, '__toString') ? $method($var) : print($var);
-        }else{
-            $method($var);
-        }
-
-        $contents = ob_get_contents();
-        $max_length = defined('AK_DUMP_MAX_LENGTH') ? AK_DUMP_MAX_LENGTH : 10000000;
-        $result = $max_length ? substr($contents, 0, $max_length) : $contents;
-        if($contents != $result){
-            $result .= ' ...dump truncated at max length of '.$max_length.' chars define AK_DUMP_MAX_LENGTH to false or to a larger number';
-        }
-        ob_end_clean();
-        return $result;
-    }
-
-    static function getLastFileAndLineAndMethod($only_app = false, $start_level = 1) {
-        $backtrace = debug_backtrace();
-        if(!$only_app){
-            return array(@$backtrace[$start_level]['file'], @$backtrace[$start_level]['line'], @$backtrace[$start_level]['function']);
-        }else{
-            for($i = $start_level-1; $i <= count($backtrace) - 1; $i++){
-                if(isset($backtrace[$i]["line"])){
-                    if(strstr($backtrace[$i]["file"], AK_COMPILED_VIEWS_DIR) || strstr($backtrace[$i]["file"], AkConfig::getDir('app'))){
-                        return array($backtrace[$i]["file"], $backtrace[$i]["line"], $backtrace[$i]["function"]);
-                    }
-                }
-            }
-        }
-    }
-
-    static function getFileAndNumberTextForError($levels = 0) {
-        list($file,$line,$method) = Ak::getLastFileAndLineAndMethod(false, $levels+1);
-        return Ak::t('In %file line %line', array('%file' => $file, '%line' => $line));
-    }
-
-    /**
-    * Outputs debug info given a PHP resource (vars, objects,
-    * arrays...)
-    *
-    * @access public
-    * @static
-    * @param    mixed    $data    Data to debug. It can be an object, array,
-    * resource..
-    * @return void Prints debug info.
+    
+   /**
+    * @deprecated
+    * @uses  AkDebug::dump
     */
-    static function debug ($data, $_functions=0) {
-        if(!AK_DEBUG && !AK_DEV_MODE){
-            return;
-        }
-
-        if($_functions!=0) {
-            $sf=1;
-        } else {
-            $sf=0 ;
-        }
-        if(is_object($data) && method_exists($data, 'debug')){
-            echo AK_CLI ?
-            "\n------------------------------------\nEntering on ".get_class($data)." debug() method\n\n":
-            "<hr /><h2>Entering on ".get_class($data)." debug() method</h2>";
-            if(!empty($data->__activeRecordObject)){
-                $data->toString(true);
-            }
-            $data->debug();
-            return ;
-        }
-        if (isset ($data)) {
-            if (is_array($data) || is_object($data)) {
-
-                if (count ($data)) {
-                    echo AK_CLI ? "/--\n" : "<ol>\n";
-                    while (list ($key,$value) = each ($data)) {
-                        $type=gettype($value);
-                        if ($type=="array" || $type == "object") {
-                            ob_start();
-                            Ak::debug ($value,$sf);
-                            $lines = explode("\n",ob_get_clean()."\n");
-                            foreach ($lines as $line){
-                                echo "\t".$line."\n";
-                            }
-                        } elseif (stristr($type, "function")) {
-                            if ($sf) {
-                                AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key, $value) :
-                                printf ("<li>(%s) <b>%s</b> </li>\n",$type, $key, $value);
-                            }
-                        } else {
-                            if (!$value) {
-                                $value="(none)";
-                            }
-                            AK_CLI ? printf ("\t* (%s) %s = %s\n",$type, $key, $value) :
-                            printf ("<li>(%s) <b>%s</b> = %s</li>\n",$type, $key, $value);
-                        }
-                    }
-                    echo AK_CLI ? "\n--/\n" : "</ol>fin.\n";
-                } else {
-                    echo "(empty)";
-                }
-            }
-        }
+    static function dump($var, $method = null, $max_length = null) {
+        return AkDebug::dump($var, $method, $max_length);
+    }
+    
+   /**
+    * @deprecated
+    * @uses  AkDebug::getLastFileAndLineAndMethod
+    */
+    static function getLastFileAndLineAndMethod($only_app = false, $start_level = 1) {
+        return AkDebug::getLastFileAndLineAndMethod($only_app, $start_level);
     }
 
+   /**
+    * @deprecated
+    * @uses  AkDebug::getFileAndNumberTextForError
+    */
+    static function getFileAndNumberTextForError($levels = 0) {
+        return AkDebug::getFileAndNumberTextForError($levels);
+    }
+    
+   /**
+    * @deprecated
+    * @uses  AkDebug::debug
+    */
+    static function debug($data, $_functions=0) {
+        return AkDebug::debug($data, $_functions);
+    }
 
-
-
-
-    /**
-    * Gets information about given object
-    *
-    * @access public
-    * @static
-    * @uses Ak::get_this_object_methods
-    * @uses Ak::get_this_object_attributes
-    * @param    object    &$object    Object to get info from
-    * @param    boolean    $include_inherited_info    By setting this to true, parent Object properties
-    * and methods will be included.
-    * @return string html output with Object info
+   /**
+    * @deprecated
+    * @uses  AkDebug::get_object_info
     */
     static function get_object_info($object, $include_inherited_info = false) {
-        $object_name = get_class($object);
-        $methods = $include_inherited_info ? get_class_methods($object) : Ak::get_this_object_methods($object);
-        $vars = $include_inherited_info ? get_class_vars($object_name) : Ak::get_this_object_attributes($object);
-        $var_desc = '';
-        if(is_array($vars)){
-            $var_desc = '<ul>';
-            foreach ($vars as $varname=>$var_value){
-                $var_desc .= "<li>$varname = $var_value (". gettype($var_value) .")</li>\n";
-            }
-            $var_desc .= "</ul>";
-        }
-        return Ak::t('Object <b>%object_name</b> information:<hr> <b>object Vars:</b><br>%var_desc <hr> <b>object Methods:</b><br><ul><li>%methods</li></ul>',array('%object_name'=>$object_name,'%var_desc'=>$var_desc,'%methods'=>join("();</li>\n<li>",$methods) .'();'));
+        return AkDebug::get_object_info($object, $include_inherited_info);
     }
 
-
-
-
-    /**
-    * Gets selected object methods.
-    *
-    * WARNING: Inherited methods are not returned by this
-    * function. You can fetch them by using PHP native function
-    * get_class_methods
-    *
-    * @access public
-    * @static
-    * @see get_this_object_attributes
-    * @see get_object_info
-    * @param    object    &$object    Object to inspect
-    * @return array Returns an array with selected object methods. It
-    * does not return inherited methods
+   /**
+    * @deprecated
+    * @uses  AkDebug::get_this_object_methods
     */
     static function get_this_object_methods($object) {
-        $array1 = get_class_methods($object);
-        if($parent_object = get_parent_class($object)){
-            $array2 = get_class_methods($parent_object);
-            $array3 = array_diff($array1, $array2);
-        }else{
-            $array3 = $array1;
-        }
-        return array_values((array)$array3);
+        return AkDebug::get_this_object_methods($object);
     }
 
-
-
-
-    /**
-    * Get selected objects default attributes
-    *
-    * WARNING: Inherited attributes are not returned by this
-    * function. You can fetch them by using PHP native function
-    * get_class_vars
-    *
-    * @access public
-    * @static
-    * @see get_this_object_methods
-    * @see get_object_info
-    * @param    object    &$object    Object to inspect
-    * @return void Returns an array with selected object attributes.
-    * It does not return inherited attributes
+   /**
+    * @deprecated
+    * @uses  AkDebug::get_this_object_attributes
     */
     static function get_this_object_attributes($object) {
-        $object = get_class($object);
-        $array1 = get_class_vars($object);
-        if($parent_object = get_parent_class($object)){
-            $array2 = get_class_vars($parent_object);
-            $array3 = array_diff_assoc($array1, $array2);
-        }else{
-            $array3 = $array1;
-        }
-        return (array)$array3;
+        return AkDebug::get_this_object_attributes($object);
+    }
+
+   /**
+    * @deprecated
+    * @uses  AkDebug::get_constants
+    */
+    static function get_constants() {
+        return AkDebug::get_constants();
+    }
+    
+    /**
+     * @deprecated
+     * @uses AkDebug::profile
+     */
+    static function profile($message = '') {
+        return AkDebug::profile($message);
     }
 
 
-
+    
+    
     static function &getLogger($namespace = AK_ENVIRONMENT) {
         static $Logger = array();
         if(empty($Logger[$namespace])){
@@ -886,19 +512,6 @@ class Ak
         }
         return $Logger[$namespace];
     }
-
-    static function get_constants() {
-        $constants = get_defined_constants();
-        $keys = array_keys($constants);
-        foreach ($keys as $k){
-            if(substr($k,0,3) != 'AK_'){
-                unset($constants[$k]);
-            }
-        }
-        return $constants;
-    }
-
-
     /**
     * @todo Use timezone time
     */
@@ -1068,49 +681,6 @@ class Ak
 
         return $mail_connector->send($recipients, $headers, $body) == true;
     }
-
-
-    /**
-     * Add a profile message that can be displayed after executing the script
-     *
-     * You can add benchmark markers by calling
-     *
-     *    Ak::profile('Searching for books');
-     *
-     * To display the results you need to call
-     *
-     *     Ak::profile(true);
-     *
-     * You might also find handy adding this to your application controller.
-     *
-     *     class ApplicationController extends BaseActionController
-     *     {
-     *         static function __construct(){
-     *             $this->afterFilter('_displayBenchmark');
-     *             parent::__construct();
-     *         }
-     *         static function _displayBenchmark(){
-     *             Ak::profile(true);
-     *         }
-     *     }
-     *
-     * IMPORTANT NOTE: You must define AK_ENABLE_PROFILER to true for this to work.
-    */
-    static function profile($message = '') {
-        if(AK_ENABLE_PROFILER){
-            if(!$ProfileTimer = $Timer = Ak::getStaticVar('ProfileTimer')){
-                require_once 'Benchmark/Timer.php';
-                $ProfileTimer = new Benchmark_Timer();
-                $ProfileTimer->start();
-                Ak::setStaticVar('ProfileTimer', $ProfileTimer);
-            }elseif($message === true){
-                $ProfileTimer->display();
-            }else {
-                $ProfileTimer->setMarker($message);
-            }
-        }
-    }
-
 
     /**
     * Gets the size of given element. Counts arrays, returns numbers, string length or executes size() method on given object
