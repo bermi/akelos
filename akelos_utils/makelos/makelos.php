@@ -8,9 +8,16 @@ defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 
 if(!defined('AK_BASE_DIR')){
     $__ak_base_dir = array_slice(get_included_files(),-2,1);
-    define('AK_BASE_DIR', dirname($__ak_base_dir[0]));
+    $__ak_base_dir = dirname($__ak_base_dir[0]);
+    if(is_dir($__ak_base_dir.DS.'app_layout')){
+        defined('AK_FRAMEWORK_DIR') || define('AK_FRAMEWORK_DIR', $__ak_base_dir);
+        defined('AK_TEST_DIR')      || define('AK_TEST_DIR', AK_FRAMEWORK_DIR.DS.'test');
+        define('AK_SKIP_CONFIG', false);
+        $__ak_base_dir .= DS.'app_layout';
+    }
+    define('AK_BASE_DIR', $__ak_base_dir);
     unset($__ak_base_dir);
-    define('AK_SKIP_CONFIG', true);
+    defined('AK_SKIP_CONFIG') || define('AK_SKIP_CONFIG', true);
 }
 
 defined('MAKELOS_BASE_DIR') || define('MAKELOS_BASE_DIR', AK_BASE_DIR);
