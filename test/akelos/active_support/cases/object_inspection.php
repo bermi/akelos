@@ -95,50 +95,6 @@ class ObjectInspection_TestCase extends ActiveSupportUnitTest
     }
 
 
-    public function Test_for_getTimestamp() {
-        $this->assertEqual(Ak::getTimestamp(), Ak::time());
-        $this->assertEqual('17:52:03', Ak::getDate(Ak::getTimestamp('17:52:03'),'H:i:s'));
-        $this->assertEqual(date('Y-m-d').' 17:52:03', Ak::getDate(Ak::getTimestamp('17:52:03')));
-        $this->assertEqual('2005-12-25 00:00:00', Ak::getDate(Ak::getTimestamp('2005-12-25')));
-        $this->assertEqual('1592-10-09 00:00:00', Ak::getDate(Ak::getTimestamp('1592-10-09')));
-        $this->assertEqual('2192-10-09 00:00:00', Ak::getDate(Ak::getTimestamp('2192-10-09')));
-        $this->assertEqual('2192-10-09 01:02:03', Ak::getDate(Ak::getTimestamp('2192-10-9 01:02:03')));
-    }
-
-    public function Test_for_getDate() {
-    }
-
-
-    public function Test_of_encrypt_decrypt() {
-        $original = "Este es el texto que quiero encriptar";
-        $this->assertEqual(Ak::decrypt(Ak::encrypt($original)), $original);
-
-        $key = Ak::randomString(20);
-        $file = Ak::file_get_contents(__FILE__);
-        $ecripted = Ak::encrypt($file, $key);
-        $this->assertEqual(Ak::decrypt($ecripted,$key), $file);
-
-    }
-
-
-    /**/
-
-    public function Test_of_compress_decompress() {
-        $original = Ak::file_get_contents(__FILE__);
-        $compressed = Ak::compress($original);
-
-        Ak::file_put_contents(AK_TMP_DIR.DS.'gzip_test.gz', $compressed, array('base_path'=>AK_TMP_DIR));
-        $this->assertTrue(strlen($compressed) < strlen($original));
-
-        $compressed_file = Ak::file_get_contents(AK_TMP_DIR.DS.'gzip_test.gz', array('base_path'=>AK_TMP_DIR));
-        $this->assertEqual($compressed_file, $compressed);
-        $uncompressed_from_file = Ak::uncompress($compressed_file);
-        $uncompressed_from_string = Ak::uncompress($compressed);
-        $this->assertEqual($uncompressed_from_file, $uncompressed_from_string);
-
-    }
-    /**/
-
     public function Test_for_StatusKeys() {
         $Object = new Ak();
 
