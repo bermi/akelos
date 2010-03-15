@@ -124,7 +124,7 @@ class TimeZone_TestCase extends ActiveSupportUnitTest
     }
 
     public function test_should_be_sorted() {
-        $Zones =& AkTimeZone::all();
+        $Zones = AkTimeZone::all();
         foreach (range(1,count($Zones)-1) as $i){
             $this->assertTrue($Zones[$i-1]->compare($Zones[$i]) == -1);
         }
