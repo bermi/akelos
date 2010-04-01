@@ -413,7 +413,7 @@ class AkUnitTest extends UnitTestCase
         }
         return $Mock;
     }
-    
+
     /**
      * Assert that an array contains another array partially
      * 
@@ -430,18 +430,18 @@ class AkUnitTest extends UnitTestCase
         $this->assertTrue(isset($array[$scope]), 'Could not find key '.$scope.' in array '.print_r($array, true));
         $this->assertPattern('/'.$value.'/',@$array[$scope]);
     }
-    
+
     protected function _enableAssertions(){
     }
-    
+
     /**
      * PHPUnit compatibility assertions
      */
-    
+
     public function assertType($type, $instance){
         $this->assertIsA($instance, $type);
     }
-    
+
     public function assertArrayHasKey($array, $key){
         $this->assertTrue(isset($array[$key]));
     }
@@ -461,7 +461,8 @@ class AkWebTestCase extends WebTestCase
     }
 }
 
-class AkelosTextReporter extends TextReporter {
+class AkelosTextReporter extends TextReporter
+{
     public $time_log = array();
     public $log_time = true;
     public $verbose = false;
@@ -489,18 +490,21 @@ class AkelosTextReporter extends TextReporter {
     public function paintFooter($test_name) {
         $duration   = microtime(true) - $this->testsStart;
         $memory     = memory_get_usage() - $this->memoryStart;
+        $style = $this->getFailCount() > 0 ? 'error' : ($this->getExceptionCount() > 0 ? 'warning' : 'success');
+
         if ($this->getFailCount() + $this->getExceptionCount() == 0) {
-            print "OK\n";
+            print AkAnsiColor::style("\nOK", $style);
         } else {
             $this->log_time = false;
-            print "FAILURES!!!\n";
+            print AkAnsiColor::style("\nFAILURES!!!", $style);
         }
         $this->time_log['total'] = array($duration, $memory);
-        print "Test cases completed in ".$duration."/s using ".AkNumberHelper::human_size($memory).":\n ". $this->getTestCaseProgress() .
+        
+        print AkAnsiColor::style("\n\nTest cases completed in ".$duration."/s using ".AkNumberHelper::human_size($memory).":\n ". $this->getTestCaseProgress() .
         "/" . $this->getTestCaseCount() .
         ", Passes: " . $this->getPassCount() .
         ", Failures: " . $this->getFailCount() .
-        ", Exceptions: " . $this->getExceptionCount() . "\n";
+        ", Exceptions: " . $this->getExceptionCount() . "\n", $style);
     }
 
     public function paintCaseStart($case) {
@@ -530,6 +534,11 @@ class AkelosTextReporter extends TextReporter {
         $memory     = memory_get_usage() - $this->methodMemoryStart;
         $this->time_log['methods'][$test] = array($duration, $memory);
         if($this->verbose) print " completed in $duration using $memory bytes/s\n";
+    }
+    
+
+    public function paintSkip($message) {
+        parent::paintSkip(AkAnsiColor::style($message, 'warning'));
     }
 
     public function logTestRunime() {
@@ -562,9 +571,11 @@ class AkelosTextReporter extends TextReporter {
 }
 
 class AkelosVerboseTextReporter extends AkelosTextReporter {
+    
     public $verbose = true;
     public $paint_skips = true;
-    function paintSkip($message) {
+    
+    public function paintSkip($message) {
         if($this->paint_skips){
             parent::paintSkip($message);
         }
@@ -572,10 +583,10 @@ class AkelosVerboseTextReporter extends AkelosTextReporter {
 }
 
 class AkXUnitXmlReporter extends SimpleReporter {
-    private
-    $_fp;
+    
+    private $_fp;
 
-    function __construct() {
+    public function __construct() {
         parent::__construct();
         $this->doc = new DOMDocument();
         $this->doc->loadXML('<testsuite/>');
@@ -586,11 +597,11 @@ class AkXUnitXmlReporter extends SimpleReporter {
         $this->_fp = @fopen($file_path, 'a');
     }
 
-    function __destruct(){
+    public function __destruct(){
         @fclose($this->_fp);
     }
 
-    function paintHeader($test_name) {
+    public function paintHeader($test_name) {
         $this->testsStart = microtime(true);
         $this->root->setAttribute('name', $test_name);
         $this->root->setAttribute('timestamp', date('c'));
@@ -603,7 +614,7 @@ class AkXUnitXmlReporter extends SimpleReporter {
      *    @param string $test_name        Name class of test.
      *    @access public
      */
-    function paintFooter($test_name) {
+    public function paintFooter($test_name) {
         $duration = microtime(true) - $this->testsStart;
         $this->root->setAttribute('tests', $this->getPassCount() + $this->getFailCount() + $this->getExceptionCount());
         $this->root->setAttribute('failures', $this->getFailCount());
@@ -616,20 +627,20 @@ class AkXUnitXmlReporter extends SimpleReporter {
         @fwrite($this->_fp, preg_replace('/<\?[^>]*\?>/', "", $xml));
     }
 
-    function paintCaseStart($case) {
+    public function paintCaseStart($case) {
         $this->currentCaseName = $case;
     }
 
-    function paintCaseEnd($case) {
+    public function paintCaseEnd($case) {
         // No output here
     }
 
-    function paintMethodStart($test) {
+    public function paintMethodStart($test) {
         $this->methodStart = microtime(true);
         $this->currCase = $this->doc->createElement('testcase');
     }
 
-    function paintMethodEnd($test) {
+    public function paintMethodEnd($test) {
         $duration = microtime(true) - $this->methodStart;
 
         $this->currCase->setAttribute('name', $test);
@@ -638,21 +649,21 @@ class AkXUnitXmlReporter extends SimpleReporter {
         $this->root->appendChild($this->currCase);
     }
 
-    function paintFail($message) {
+    public function paintFail($message) {
         parent::paintFail($message);
 
         error_log("Failure: " . $message);
         $this->terminateAbnormally($message);
     }
 
-    function paintException($exception) {
+    public function paintException($exception) {
         parent::paintException($exception);
 
         error_log("Exception: " . $exception);
         $this->terminateAbnormally($exception);
     }
 
-    function terminateAbnormally($message) {
+    public function terminateAbnormally($message) {
         if (!$this->currCase) {
             error_log("!! currCase was not set.");
             return;
