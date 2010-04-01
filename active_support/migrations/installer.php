@@ -323,22 +323,34 @@ Example:
         return $this->db->renameColumn($table_name, $old_column_name, $new_column_name);
     }
 
-
     public function createTable($table_name, $column_options = null, $table_options = array()) {
         if($this->tableExists($table_name)){
             trigger_error(Ak::t('Table %table_name already exists on the database', array('%table_name'=>$table_name)), E_USER_NOTICE);
             return false;
         }
-        $this->timestamps = (!isset($table_options['timestamp']) || (isset($table_options['timestamp']) && $table_options['timestamp'])) &&
-        (!strstr($column_options, 'created') && !strstr($column_options, 'updated'));
-        $this->id = (isset($table_options['id']) && $table_options['id']) || !isset($table_options['id']);
+
+        $this->_setAutomaticTimestampColumns($column_options, $table_options);
+        $this->_setAutomaticIdColumn($column_options, $table_options);
+        
         return $this->_createOrModifyTable($table_name, $column_options, $table_options);
     }
-
+    
     public function clearSchemaCacheForTable($table_name) {
         AkDbSchemaCache::clear($table_name);
     }
-
+    
+    protected function _setAutomaticTimestampColumns($column_options, $table_options) {
+        $this->timestamps = (!isset($table_options['timestamp']) || (isset($table_options['timestamp']) && $table_options['timestamp'])) &&
+        (!strstr($column_options, 'created') && !strstr($column_options, 'updated'));
+    }
+    
+    protected function _setAutomaticIdColumn($column_options, $table_options) {
+        if(preg_match('/^id[, ]/', trim($column_options))){
+            $this->id = false;
+        }else{
+            $this->id = (isset($table_options['id']) && $table_options['id']) || !isset($table_options['id']);
+        }
+    }
 
     protected function _upgradeOrDowngrade($action, $version = null, $options = array()) {
         AkDbSchemaCache::clearAll();
