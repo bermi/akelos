@@ -173,7 +173,7 @@ class Makelos
         $this->Installer = new AkInstaller();
         $this->makefiles = $this->getMakeFiles();
     }
-    
+
     public function loadMakefiles() {
         foreach ($this->makefiles as $makefile){
             if(file_exists($makefile)){
@@ -443,7 +443,7 @@ class Makelos
         $task_name.'*.'.$autocomplete_accessor.'.*',
         $task_name.DS.$task_name.'.'.$autocomplete_accessor.'.*'
         ));
-        
+
         if(!empty($autocompletion_executables)){
             ob_start();
             foreach ($autocompletion_executables as $file){
@@ -484,7 +484,7 @@ class Makelos
         '*/*/*/makefile.php',
         '*/*/*/*/makefile.php'));
     }
-    
+
     public function multiGlob($patterns = array(), $task_path = null){
         $task_paths = empty($task_path) ? AkConfig::getOption('makelos_task_paths', array_merge($this->task_paths, array(dirname(__FILE__).DS.'tasks'))) : (array)$task_path;
 
@@ -516,7 +516,7 @@ class Makelos
             }
         }
         $task_files = $this->multiGlob($search_patterns);
-        
+
         //
         $task_files = array_diff($task_files, array(''));
         if($bark_on_error && empty($this->tasks[$task_name]['run']) && empty($task_files)){
@@ -533,6 +533,7 @@ class Makelos
             trigger_error('pcntl functions not available. Please compile PHP with --enable-pcntl', E_USER_ERROR);
         }
     }
+
 }
 
 Ak::setStaticVar('Makelos', new Makelos($MakelosRequest));
