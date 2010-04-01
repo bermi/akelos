@@ -1,7 +1,8 @@
 <IfModule mod_rewrite.c>
    RewriteEngine on
   
-   RewriteRule ^(.*/)?\.(svn|git)/ - [F,L]
+   RewriteRule ^(.*/)?\.(svn|git|hg|bzr)/ - [F,L]
+   
    ErrorDocument 403 "Access Forbidden"
 
    RewriteRule    ^$ public/    [L]
