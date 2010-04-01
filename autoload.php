@@ -164,6 +164,7 @@ function akelos_autoload($name, $path = null) {
         'AkCache'                   => 'active_support/cache/base.php',
         'AkMemcache'                => 'active_support/cache/memcache.php',
         'AkColor'                   => 'active_support/color/base.php',
+        'AkConsole'                 => 'active_support/console/base.php',
         'AkConfig'                  => 'active_support/config/base.php',
         'AkClassExtender'           => 'active_support/core/class_extender.php',
         'AkDebug'                   => 'active_support/core/debug.php',

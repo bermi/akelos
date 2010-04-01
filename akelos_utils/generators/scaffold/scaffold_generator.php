@@ -59,7 +59,7 @@ class ScaffoldGenerator extends  AkelosGenerator
             $user_answer = 5;
             if($user_answer != 3 && file_exists($file_name)){
                 $message = Ak::t('%file_name file already exists',array('%file_name'=>$file_name));
-                $user_answer = AkInstaller::promptUserVar($message."\n".
+                $user_answer = AkConsole::promptUserVar($message."\n".
                 "Would you like to:\n".
                 " 1) overwrite file\n".
                 " 2) keep existing file\n".

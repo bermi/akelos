@@ -210,7 +210,7 @@ class AkPluginInstaller extends AkInstaller
                     echo "\n";
                     echo Ak::t("The following %plugin %dependent depend on the plugin you are about to uninstall.",array('%plugin'=>AkT('plugin','quantify('.count($dependendPlugins).')'),'%dependent'=>AkT($dependendPlugins,'toSentence')));
                     echo "\n";
-                    $uninstall = AkInstaller::promptUserVar(
+                    $uninstall = AkConsole::promptUserVar(
                     'Are you sure you want to continue uninstalling (Answer with Yes)? The other plugins will malfunction.', array('default'=>'N'));
                     if ($uninstall != 'Yes') {
                         echo Ak::t('Uninstall cancelled.');

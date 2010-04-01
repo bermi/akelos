@@ -677,7 +677,7 @@ function prompt_var($question, $default_value = null, $cli_value = null)
     if(empty($options['interactive']) && isset($cli_value)){
         return $cli_value;
     }else{
-        return AkInstaller::promptUserVar($question, array('default'=>$default_value, 'optional'=>true));
+        return AkConsole::promptUserVar($question, array('default'=>$default_value, 'optional'=>true));
     }
 }
 

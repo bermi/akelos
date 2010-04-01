@@ -275,28 +275,11 @@ Example:
 
 
     /**
-     * Promts for a variable on console scripts
+     * @deprecated
      */
     static function promptUserVar($message, $options = array()) {
-        $f = fopen("php://stdin","r");
-        $default_options = array(
-        'default' => null,
-        'optional' => false,
-        );
-        $options = is_string($options) ? array('default' => $options) : $options;
-        $options = array_merge($default_options, $options);
-
-        echo "\n".$message.(empty($options['default'])?'': ' ['.$options['default'].']').': ';
-        $user_input = fgets($f, 25600);
-        $value = trim($user_input,"\n\r\t ");
-        $value = empty($value) ? $options['default'] : $value;
-        if(empty($value) && empty($options['optional'])){
-            echo "\n\nThis setting is not optional.";
-            fclose($f);
-            return AkInstaller::promptUserVar($message, $options);
-        }
-        fclose($f);
-        return empty($value) ? $options['default'] : $value;
+        Ak::deprecateMethod('promptUserVar', 'AkConsole::promptUserVar');
+        AkConsole::promptUserVar($message, $options);
     }
 
     public function installVersion($version, $options = array()) {
@@ -811,7 +794,7 @@ Example:
                 $new_file_location = $this->app_base_dir.str_replace($src_path, '', $original_file);
                 if(is_file($new_file_location)){
                     $message = Ak::t('File %file exists.', array('%file'=>$new_file_location));
-                    $user_response = AkInstaller::promptUserVar($message."\n d (overwrite mine), i (keep mine), a (abort), O (overwrite all), K (keep all)", 'i');
+                    $user_response = AkConsole::promptUserVar($message."\n d (overwrite mine), i (keep mine), a (abort), O (overwrite all), K (keep all)", 'i');
                     if($user_response == 'i'){
                         unset($directory_structure[$k]);
                     }    elseif($user_response == 'O'){
@@ -851,7 +834,7 @@ Example:
                     unset($directory_structure[$k]);
                 }elseif(md5_file($new_file_location) != md5_file($original_file)){
                     $message = Ak::t('The file %file exists has local modifications.', array('%file'=>$new_file_location));
-                    $user_response = AkInstaller::promptUserVar($message."\n k (keep mine), d (delete), a (abort), D (delete all), K (keep all)", 'k');
+                    $user_response = AkConsole::promptUserVar($message."\n k (keep mine), d (delete), a (abort), D (delete all), K (keep all)", 'k');
                     if($user_response == 'k'){
                         unset($directory_structure[$k]);
                     }elseif($user_response == 'd'){

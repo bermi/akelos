@@ -424,7 +424,7 @@ if($prompt){
     if($force)
     "OVERWRITE EXISTING FILES in $directory\n";
 
-    AkInstaller::promptUserVar("Shall web proceed installing? \nPress enter to continue", array('optional' => true));
+    AkConsole::promptUserVar("Shall web proceed installing? \nPress enter to continue", array('optional' => true));
 }
 
 
