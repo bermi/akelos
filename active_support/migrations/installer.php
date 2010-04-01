@@ -433,13 +433,12 @@ Example:
 
     protected function _createOrModifyTable($table_name, $column_options = null, $table_options = array()) {
         $this->clearSchemaCacheForTable($table_name);
-        if(empty($column_options) && $this->_loadDbDesignerDbSchema()){
-            $column_options = $this->db_designer_schema[$table_name];
-        }elseif(empty($column_options)){
+
+        if(empty($column_options)){
             trigger_error(Ak::t('You must supply details for the table you are creating.'), E_USER_ERROR);
             return false;
         }
-        
+
         $column_options = is_string($column_options) ? array('columns'=>$column_options) : $column_options;
 
         $default_column_options = array(
@@ -455,9 +454,9 @@ Example:
         $column_string = $this->_getColumnsAsAdodbDataDictionaryString($column_options['columns']);
 
         $create_or_alter_table_sql = $this->data_dictionary->ChangeTableSQL(
-            $this->db->quoteTableName($table_name), 
-            str_replace(array(' UNIQUE', ' INDEX', ' FULLTEXT', ' HASH'), '', $column_string), 
-            $table_options);
+        $this->db->quoteTableName($table_name),
+        str_replace(array(' UNIQUE', ' INDEX', ' FULLTEXT', ' HASH'), '', $column_string),
+        $table_options);
 
         $result = $this->data_dictionary->ExecuteSQLArray($create_or_alter_table_sql, false);
 
@@ -517,7 +516,7 @@ Example:
         $result = preg_replace('/([A-Za-z_0-9-]+)([^,]+)/', '`$1`$2', $result);
         return $result;
     }
-    
+
     private function _quoteColumnForDataDictionary($matches){
         // '`$1`$2'    , array($this, '_quoteColumnForDataDictionary')
         return str_replace($matches[1],  $this->db->quoteColumnName(trim($matches[1], '"\'`')), $matches[0]);
@@ -623,19 +622,6 @@ Example:
             }
         }
         return false;
-    }
-
-    protected function _loadDbDesignerDbSchema() {
-        if($path = $this->_getDbDesignerFilePath()){
-            $this->db_designer_schema = Ak::convert('DBDesigner','AkelosDatabaseDesign', Ak::file_get_contents($path));
-            return !empty($this->db_designer_schema);
-        }
-        return false;
-    }
-
-    protected function _getDbDesignerFilePath() {
-        $path = $this->app_installers_dir.DS.$this->getInstallerName().'.xml';
-        return file_exists($path) ? $path : false;
     }
 
     protected function _ensureColumnNameCompatibility($columns) {
@@ -955,8 +941,8 @@ Example:
             }
         }
     }
-    
-     /**
+
+    /**
      * Shortcuts for running migrations.
      * 
      * This can be useful for running individual migraitons from your application_installer.php
