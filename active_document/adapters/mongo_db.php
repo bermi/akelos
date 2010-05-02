@@ -44,6 +44,7 @@ class AkOdbMongoDbAdapter
             $this->getConnection()->close();
             unset($this->_Mongo[$this->_connetion_signature]);
             unset($this->_MongoDatabases[$this->_connetion_signature]);
+            Ak::unsetStaticVar(__CLASS__.'_'.$this->_connetion_signature);
         }
         return !$this->isConnected();
     }

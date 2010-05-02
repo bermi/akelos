@@ -52,8 +52,6 @@ class DocumentFinders_TestCase extends ActiveDocumentUnitTest
         
         $this->assertFalse($FoundUserMinds->isNewRecord());
         $this->assertEqual($FoundUserMinds->getId(), $UserMinds->getId());
-        
-        
     }
 }
 
