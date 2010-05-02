@@ -247,6 +247,10 @@ class AkConfig
     static function getCacheBasePath() {
         return AK_TMP_DIR;
     }
+    
+    static function getConstants(){
+        return AkDebug::get_constants();
+    }
 
     public function readCache($namespace, $environment = AK_ENVIRONMENT, $force = false) {
         if ((!$force && !$this->_useReadCache($environment))){
