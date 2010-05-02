@@ -14,7 +14,7 @@ class RenderPartial_TestCase extends AkWebTestCase
     }
 
     public function skip(){
-        $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
+        $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled');
     }
 
     public function test_check_if_tests_can_be_accesed() {

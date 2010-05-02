@@ -20,7 +20,7 @@ class HttpClient_TestCase extends ActiveResourceUnitTest
     }
 
     public function skip(){
-        $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
+        $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled');
     }
 
     public function setup() {

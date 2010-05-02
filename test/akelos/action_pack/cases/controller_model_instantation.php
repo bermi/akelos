@@ -19,7 +19,7 @@ class Controller_model_instantiation_TestCase extends AkWebTestCase
     }
 
     public function skip(){
-        $this->skipIf(!AkConfig::getOption('webserver_enabled', false), '['.get_class($this).'] Web server not enabled.');
+        $this->skipIf(!AkConfig::getOption('webserver_enabled', false), '['.get_class($this).'] Web server not enabled');
     }
 
     public function test_should_access_public_action() {

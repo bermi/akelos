@@ -101,4 +101,5 @@ config/environments/development.php file',
   'You need to edit your config/routes.php file and disable or change the base path for the Akelos Panel panel by editing the folowing route:' => 'You need to edit your config/routes.php file and disable or change the base path for the Akelos Panel panel by editing the folowing route:',
   'Ooops! Can\'t find the guide you\'re looking for' => 'Ooops! Can\'t find the guide you\'re looking for',
   'Akelos is a trademark of <a href="http://www.bermi.org/">Bermi Ferrer</a>.' => 'Akelos is a trademark of <a href="http://www.bermi.org/">Bermi Ferrer</a>.',
+  'On' => 'On',
 );

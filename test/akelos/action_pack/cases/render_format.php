@@ -14,7 +14,7 @@ class RenderFormat_TestCase extends AkWebTestCase
     }
     
     public function skip(){
-        $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled.');
+        $this->skipIf(!$this->webserver_enabled, '['.get_class($this).'] Web server not enabled');
     }
 
     public function test_should_render_requested_format() {
