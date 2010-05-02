@@ -245,7 +245,7 @@ class AkActiveDocument extends AkBaseModel
 
     public function getId(){
         $pk = $this->getPrimaryKey();
-        return isset($this->_attributes[$pk]) ? $this->$pk : null;
+        return isset($this->_attributes[$pk]) ? (string)$this->$pk : null;
     }
 
 
