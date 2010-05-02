@@ -143,7 +143,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         if(!AK_DEBUG_OUTPUT_AS_HTML){
             echo $message."\n";
         }else{
-            Ak::trace($message, $details[1], $details[0], $details[2]);
+            AkDebug::trace($message, $details[1], $details[0], $details[2]);
         }
     }
 }

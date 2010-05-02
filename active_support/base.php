@@ -420,6 +420,7 @@ class Ak
     * @uses  AkDebug::trace
     */
     static function trace($text = null, $line = null, $file = null, $method = null, $escape_html_entities = true) {
+        Ak::deprecateMethod(__METHOD__, 'AkDebug::trace()');
         return AkDebug::trace($text, $line, $file, $method, $escape_html_entities);
     }
     
@@ -428,6 +429,7 @@ class Ak
     * @uses  AkDebug::dump
     */
     static function dump($var, $method = null, $max_length = null) {
+        Ak::deprecateMethod(__METHOD__, 'AkDebug::dump()');
         return AkDebug::dump($var, $method, $max_length);
     }
     
@@ -436,6 +438,7 @@ class Ak
     * @uses  AkDebug::getLastFileAndLineAndMethod
     */
     static function getLastFileAndLineAndMethod($only_app = false, $start_level = 1) {
+        Ak::deprecateMethod(__METHOD__, 'AkDebug::getLastFileAndLineAndMethod()');
         return AkDebug::getLastFileAndLineAndMethod($only_app, $start_level);
     }
 
@@ -444,6 +447,7 @@ class Ak
     * @uses  AkDebug::getFileAndNumberTextForError
     */
     static function getFileAndNumberTextForError($levels = 0) {
+        Ak::deprecateMethod(__METHOD__, 'AkDebug::getFileAndNumberTextForError()');
         return AkDebug::getFileAndNumberTextForError($levels);
     }
     
@@ -452,6 +456,7 @@ class Ak
     * @uses  AkDebug::debug
     */
     static function debug($data, $_functions=0) {
+        Ak::deprecateMethod(__METHOD__, 'AkDebug::debug()');
         return AkDebug::debug($data, $_functions);
     }
 
@@ -460,6 +465,7 @@ class Ak
     * @uses  AkDebug::get_object_info
     */
     static function get_object_info($object, $include_inherited_info = false) {
+        Ak::deprecateMethod(__METHOD__, 'AkDebug::get_object_info()');
         return AkDebug::get_object_info($object, $include_inherited_info);
     }
 
@@ -468,6 +474,7 @@ class Ak
     * @uses  AkDebug::get_this_object_methods
     */
     static function get_this_object_methods($object) {
+        Ak::deprecateMethod(__METHOD__, 'AkDebug::get_this_object_methods()');
         return AkDebug::get_this_object_methods($object);
     }
 
@@ -476,6 +483,7 @@ class Ak
     * @uses  AkDebug::get_this_object_attributes
     */
     static function get_this_object_attributes($object) {
+        Ak::deprecateMethod(__METHOD__, 'AkDebug::get_this_object_attributes()');
         return AkDebug::get_this_object_attributes($object);
     }
 
@@ -484,6 +492,7 @@ class Ak
     * @uses  AkDebug::get_constants
     */
     static function get_constants() {
+        Ak::deprecateMethod(__METHOD__, 'AkDebug::getConstants()');
         return AkDebug::get_constants();
     }
     
@@ -492,6 +501,7 @@ class Ak
      * @uses AkDebug::profile
      */
     static function profile($message = '') {
+        Ak::deprecateMethod(__METHOD__, 'AkConfig::profile()');
         return AkDebug::profile($message);
     }
 

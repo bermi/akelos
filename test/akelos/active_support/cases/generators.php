@@ -23,6 +23,7 @@ class ControllerGenerator_TestCase extends ActiveSupportUnitTest
     }
 
     public function test_should_generate_controller_and_auxiliary_files(){
+        
         $files = array(
         AkConfig::getDir('controllers').DS.'credit_card_controller.php',
         AkConfig::getDir('helpers').DS.'credit_card_helper.php',
@@ -58,7 +59,7 @@ class ControllerGenerator_TestCase extends ActiveSupportUnitTest
         foreach ($files as $file){
             $this->assertTrue(file_exists($file));
             if(!file_exists($file)){
-                Ak::trace($file);
+                AkDebug::trace($file);
             }
             @unlink($file);
         }

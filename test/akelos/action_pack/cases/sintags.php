@@ -37,9 +37,9 @@ class Sintags_TestCase extends ActionPackUnitTest
             $AkSintags = new AkSintagsParser();
             $php = $AkSintags->parse($sintags);
             if($php != $expected_php){
-                Ak::trace("GENERATED: \n".$php);
-                Ak::trace("EXPECTED: \n".$expected_php);
-                Ak::trace("SINTAGS: \n".$sintags);
+                AkDebug::trace("GENERATED: \n".$php);
+                AkDebug::trace("EXPECTED: \n".$expected_php);
+                AkDebug::trace("SINTAGS: \n".$sintags);
             }
 
             $this->assertEqual($php, $expected_php);
@@ -49,9 +49,9 @@ class Sintags_TestCase extends ActionPackUnitTest
             $AkSintags = new AkSintagsParser();
             $php = $AkSintags->parse($multiple_sintags);
             if($php != $multiple_expected_php){
-                Ak::trace("GENERATED: \n".$php);
-                Ak::trace("EXPECTED: \n".$expected_php);
-                Ak::trace("SINTAGS: \n".$sintags);
+                AkDebug::trace("GENERATED: \n".$php);
+                AkDebug::trace("EXPECTED: \n".$expected_php);
+                AkDebug::trace("SINTAGS: \n".$sintags);
             }
             $this->assertEqual($php, $multiple_expected_php);
         }

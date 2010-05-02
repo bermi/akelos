@@ -140,7 +140,7 @@ class SourceParser
 
     public function PhpCode($match, $state)
     {
-        //Ak::trace(__FUNCTION__.' '.$match.' '.$state);
+        //AkDebug::trace(__FUNCTION__.' '.$match.' '.$state);
         if($match == AK_LEXER_UNMATCHED){
         }
         return true;
@@ -167,7 +167,7 @@ class SourceParser
         }elseif (AK_LEXER_ENTER == $state){
             $this->_is_reference = strstr($match,'&');
         }
-        //Ak::trace(__FUNCTION__.' '.$match.' '.$state);
+        //AkDebug::trace(__FUNCTION__.' '.$match.' '.$state);
         return true;
     }
 
@@ -176,7 +176,7 @@ class SourceParser
         if(AK_LEXER_EXIT == $state){
             $this->_current_class_extends = trim($match);
         }
-        //Ak::trace(__FUNCTION__.' '.$match.' '.$state);
+        //AkDebug::trace(__FUNCTION__.' '.$match.' '.$state);
         return true;
     }
 
@@ -201,7 +201,7 @@ class SourceParser
                 );
             }
 
-            //Ak::trace($this->_current_category_details);
+            //AkDebug::trace($this->_current_category_details);
 
             $this->_current_method = null;
             $this->_current_params = array();
@@ -211,7 +211,7 @@ class SourceParser
             $this->_current_category_details = '';
             $this->_current_category_relations = array();
         }
-        //Ak::trace(__FUNCTION__.' '.$match.' '.$state);
+        //AkDebug::trace(__FUNCTION__.' '.$match.' '.$state);
         return true;
     }
     public function FunctionParameter($match, $state)
@@ -242,7 +242,7 @@ class SourceParser
             'value' => trim($value),
             ));
         }
-        //Ak::trace(__FUNCTION__.' '.$match.' '.$state);
+        //AkDebug::trace(__FUNCTION__.' '.$match.' '.$state);
         return true;
     }
 
@@ -259,7 +259,7 @@ class SourceParser
                 $this->parsed['categories'][$this->_current_category]['relations'] = $this->_current_category_relations;
             }
         }
-        // Ak::trace(__FUNCTION__.' '.$match.' '.$state);
+        // AkDebug::trace(__FUNCTION__.' '.$match.' '.$state);
         return true;
     }
 
@@ -271,7 +271,7 @@ class SourceParser
         }
         $this->_current_category_details .= trim($match, '/*');
 
-        // Ak::trace(__FUNCTION__.' '.$match.' '.$state);
+        // AkDebug::trace(__FUNCTION__.' '.$match.' '.$state);
         return true;
     }
 
@@ -280,19 +280,19 @@ class SourceParser
         if(AK_LEXER_SPECIAL == $state){
             $this->_current_category_details .= trim($match, '/* ');
         }
-        //Ak::trace($this->_current_category_details);
+        //AkDebug::trace($this->_current_category_details);
         return true;
     }
 
     public function DefaultOptions($match, $state)
     {
-        //Ak::trace(__FUNCTION__.' '.$match.' '.$state);
+        //AkDebug::trace(__FUNCTION__.' '.$match.' '.$state);
         return true;
     }
 
     public function DefaultOption($match, $state)
     {
-        //Ak::trace(__FUNCTION__.' '.$match.' '.$state);
+        //AkDebug::trace(__FUNCTION__.' '.$match.' '.$state);
         return true;
     }
 
@@ -305,7 +305,7 @@ class SourceParser
             $this->_latest_docs .= (trim($match) == '*'?'':$match)."\n";
         }
 
-        //Ak::trace(__FUNCTION__.' '.$match.' '.$state);
+        //AkDebug::trace(__FUNCTION__.' '.$match.' '.$state);
         return true;
     }
 
@@ -324,7 +324,7 @@ class SourceParser
                 }
             }
         }
-        //Ak::trace(__FUNCTION__.$match.$state);
+        //AkDebug::trace(__FUNCTION__.$match.$state);
         return true;
     }
 
@@ -344,13 +344,13 @@ class SourceParser
     public function handlePackage($package_description)
     {
         $this->package = AkInflector::titleize($package_description);
-        //Ak::trace($this->package);
+        //AkDebug::trace($this->package);
     }
 
     public function handleSubpackage($subpackage_description)
     {
         $this->subpackage = AkInflector::titleize($subpackage_description);
-        //Ak::trace($this->subpackage);
+        //AkDebug::trace($this->subpackage);
     }
 
 }

@@ -357,7 +357,7 @@ class AkDbAdapter
 
     public function failTransaction() {
         if(AK_DEBUG && !empty($this->connection->debug) && function_exists('ak_backtrace')){
-            Ak::trace(ak_backtrace(), null, null, null, false);
+            AkDebug::trace(ak_backtrace(), null, null, null, false);
         }
         return $this->connection->FailTrans();
     }

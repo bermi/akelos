@@ -351,9 +351,9 @@ class AkLogger implements AkLoggerInterface
         if(AkConfig::getOption('logger.display_message', true)){
             if(!empty($this->options['print'])){
                 list($file,$line,$method) = Ak::getLastFileAndLineAndMethod(false, 3);
-                Ak::trace("<strong>[$error_level]</strong> - ".AkTextHelper::html_escape($message), $line, $file, $method, false);
+                AkDebug::trace("<strong>[$error_level]</strong> - ".AkTextHelper::html_escape($message), $line, $file, $method, false);
                 if(!empty($parameters)) {
-                    Ak::trace($parameters, $line, $file, $method);
+                    AkDebug::trace($parameters, $line, $file, $method);
                 }
             }
         }

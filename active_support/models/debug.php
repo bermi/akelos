@@ -47,7 +47,7 @@ class AkModelDebug extends AkModelExtenssion
     public function dbugging($trace_this_on_debug_mode = null) {
         if(!empty($this->_Model->getAdapter()->debug) && !empty($trace_this_on_debug_mode)){
             $message = !is_scalar($trace_this_on_debug_mode) ? var_export($trace_this_on_debug_mode, true) : (string)$trace_this_on_debug_mode;
-            Ak::trace($message);
+            AkDebug::trace($message);
         }
         return !empty($this->_Model->getAdapter()->debug);
     }

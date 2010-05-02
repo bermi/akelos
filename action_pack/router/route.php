@@ -36,7 +36,7 @@ class AkRoute
     protected function extractParamsFromUrl($url) {
         if ($url=='/') $url = '';
 
-        // Ak::trace($this->getRegex()."\n".$url);
+        // AkDebug::trace($this->getRegex()."\n".$url);
         if (!preg_match($this->getRegex(),rtrim($url, '/'),$matches)) throw new RouteDoesNotMatchRequestException("Url doesn't match the regex of the route.");
         array_shift($matches);   //throw away the "all-match", we only need the groups
 

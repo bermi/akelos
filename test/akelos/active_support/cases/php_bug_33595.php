@@ -66,7 +66,7 @@ class PHP_Bug_33595_TestCase extends ActiveSupportUnitTest
         if($reset || empty($this->initial)) $this->initial = memory_get_usage();
         $this->current = memory_get_usage();
         $this->difference = $this->current - $this->initial;
-        $this->difference && $vervose && Ak::trace(($this->difference/1048576).' MB increased');
+        $this->difference && $vervose && AkDebug::trace(($this->difference/1048576).' MB increased');
         return $this->difference;
     }
 }

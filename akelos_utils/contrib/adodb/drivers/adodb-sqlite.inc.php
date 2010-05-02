@@ -106,28 +106,28 @@ class ADODB_sqlite extends ADOConnection {
                 $fld->type = $query_array[1];
                 $fld->max_length = is_numeric($query_array[2]) ? $query_array[2] : -1;
                 $fld->scale = is_numeric($query_array[3]) ? $query_array[3] : -1;
-                //if($debug_field && $fld->name == $debug_field) Ak::trace(__LINE__);
+                //if($debug_field && $fld->name == $debug_field) AkDebug::trace(__LINE__);
             } elseif (preg_match("/^(.+)\((\d+)/", $type, $query_array)) {
                 $fld->type = $query_array[1] == 'DECIMAL' ? 'INTEGER' : $query_array[1];
                 $fld->max_length = is_numeric($query_array[2]) ? $query_array[2] : -1;
                 if($fld->max_length == '1'){
                     $fld->type = 'BOOLEAN';
                 }
-                //if($debug_field && $fld->name == $debug_field) Ak::trace(__LINE__);
+                //if($debug_field && $fld->name == $debug_field) AkDebug::trace(__LINE__);
             } elseif (preg_match("/^(enum)\((.*)\)$/i", $type, $query_array)) {
                 $fld->type = $query_array[1];
                 $arr = explode(",",$query_array[2]);
                 $fld->enums = $arr;
                 $zlen = max(array_map("strlen",$arr)) - 2; // PHP >= 4.0.6
                 $fld->max_length = ($zlen > 0) ? $zlen : 1;
-                //if($debug_field && $fld->name == $debug_field) Ak::trace(__LINE__);
+                //if($debug_field && $fld->name == $debug_field) AkDebug::trace(__LINE__);
             } else {
                 if($type == 'DATE' && (preg_match('/_at$/', $fld->name) || preg_match('/time/i', $fld->name))){
                     $type = 'DATETIME';
                 }
                 $fld->type = $type;
                 $fld->max_length = -1;
-                //if($debug_field && $fld->name == $debug_field) Ak::trace(__LINE__);
+                //if($debug_field && $fld->name == $debug_field) AkDebug::trace(__LINE__);
             }
             $fld->not_null = ($rs->fields[3] != 0);
             $fld->primary_key = ($rs->fields[5] == 1);
@@ -144,7 +144,7 @@ class ADODB_sqlite extends ADOConnection {
                     $fld->has_default = false;
                 }
             }
-            //if($debug_field && $fld->name == $debug_field) Ak::trace($fld);
+            //if($debug_field && $fld->name == $debug_field) AkDebug::trace($fld);
             if ($save == ADODB_FETCH_NUM) {
                 $retarr[] = $fld;
             } else {
