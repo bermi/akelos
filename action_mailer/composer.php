@@ -229,7 +229,7 @@ class AkMailComposer
     protected function _getAvailableTemplates() {
         $path = $this->ActionMailer->getTemplatePath();
         if(!isset($templates[$path])){
-            $templates[$path] = array_map('basename', Ak::dir($path, array('dirs'=>false)));
+            $templates[$path] = array_map('basename', AkFileSystem::dir($path, array('dirs'=>false)));
         }
         return $templates[$path];
     }

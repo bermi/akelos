@@ -25,7 +25,7 @@ class AkImageColorScheme
 
     public function __destruct() {
         if(file_exists($this->_tmp_file)){
-            @Ak::file_delete($this->_tmp_file);
+            @AkFileSystem::file_delete($this->_tmp_file);
         }
     }
 

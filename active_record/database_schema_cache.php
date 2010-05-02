@@ -39,7 +39,7 @@ class AkDbSchemaCache
             $Logger = Ak::getLogger();
             $Logger->message('Clearing all database settings from cache');
         }
-        Ak::rmdir_tree(AkDbSchemaCache::getCacheDir());
+        AkFileSystem::rmdir_tree(AkDbSchemaCache::getCacheDir());
     }
 
     static function get($key, $environment = AK_ENVIRONMENT) {
@@ -74,7 +74,7 @@ class AkDbSchemaCache
                     $Logger->message('Updating database settings on '.$file_name);
                 }
 
-                Ak::file_put_contents($file_name, serialize($config), array('base_path'=> AK_TMP_DIR));
+                AkFileSystem::file_put_contents($file_name, serialize($config), array('base_path'=> AK_TMP_DIR));
                 //file_put_contents($file_name, serialize($config));
 
             } else if(AK_LOG_EVENTS){

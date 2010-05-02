@@ -233,7 +233,7 @@ class AkMailParser
                     $image_name = Ak::uuid().'.'.$extenssion;
                     $html_images[$original_image_name] = 'cid:'.$image_name;
                     $Mail->setAttachment('image/'.$extenssion, array(
-                    'body' => Ak::file_get_contents($image, array('base_path' => strstr($image, $app_dir) ? null : $tmp_dir)),
+                    'body' => AkFileSystem::file_get_contents($image, array('base_path' => strstr($image, $app_dir) ? null : $tmp_dir)),
                     'filename' => $image_name,
                     'content_disposition' => 'inline',
                     'content_id' => '<'.$image_name.'>',
@@ -438,7 +438,7 @@ class AkMailParser
             $cssRules=array('id'=>array(),'class'=>array(),'element'=>array());
         }
         $path = $this->_getStylesheetPath($path);
-        $contents = Ak::file_get_contents($path);
+        $contents = AkFileSystem::file_get_contents($path);
         $cssRules=$this->_extractCssRulesFromContent($contents);
         return $cssRules;
     }
@@ -627,7 +627,7 @@ class AkMailParser
             }else{
                 $local_path = AK_TMP_DIR.DS.'mailer'.DS.'remote_css'.DS.md5($base_file_name['dirname']).DS.$base_file_name.'.'.$path_info['extension'];
                 if(!file_exists($local_path) || (time() > @filemtime($local_path)+7200)){
-                    if(!Ak::file_put_contents($local_path, Ak::url_get_contents($path))){
+                    if(!AkFileSystem::file_put_contents($local_path, Ak::url_get_contents($path))){
                         return '';
                     }
                 }
@@ -653,7 +653,7 @@ class AkMailParser
             }else{
                 $local_path = $tmp_dir.DS.'mailer'.DS.'remote_images'.DS.md5($path).DS.$base_file_name.'.'.$path_info['extension'];
                 if(!file_exists($local_path) || (time() > filemtime($local_path) + 7200)){
-                    if(!Ak::file_put_contents($local_path, Ak::url_get_contents($path), array('base_path' => $tmp_dir))){
+                    if(!AkFileSystem::file_put_contents($local_path, Ak::url_get_contents($path), array('base_path' => $tmp_dir))){
                         return '';
                     }
 

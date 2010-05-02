@@ -11,7 +11,7 @@ class AssociationFinders_TestCase extends ActiveRecordUnitTest
 
     public function tearDown() {
         foreach (explode(',', 'aa_ee,bb_cc,dd_ee') as $file){
-            @Ak::file_delete(AkConfig::getDir('models').DS.$file.'.php');
+            @AkFileSystem::file_delete(AkConfig::getDir('models').DS.$file.'.php');
         }
     }
 

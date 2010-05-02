@@ -16,9 +16,9 @@ class AkMsExcelToMany
         $excel->Quit();
         unset($excel);
 
-        $result = Ak::file_get_contents($this->destination_file);
-        $this->delete_source_file ? @Ak::file_delete($this->source_file) : null;
-        $this->keep_destination_file ? null : Ak::file_delete($this->destination_file);
+        $result = AkFileSystem::file_get_contents($this->destination_file);
+        $this->delete_source_file ? @AkFileSystem::file_delete($this->source_file) : null;
+        $this->keep_destination_file ? null : AkFileSystem::file_delete($this->destination_file);
 
         return $result;
     }
@@ -28,7 +28,7 @@ class AkMsExcelToMany
         $this->tmp_name = Ak::randomString();
         if(empty($this->source_file)){
             $this->source_file = AK_TMP_DIR.DS.$this->tmp_name.'.'.$this->ext;
-            Ak::file_put_contents($this->source_file,$this->source);
+            AkFileSystem::file_put_contents($this->source_file,$this->source);
             $this->delete_source_file = true;
             $this->keep_destination_file = empty($this->keep_destination_file) ? (empty($this->destination_file) ? false : true) : $this->keep_destination_file;
         }else{

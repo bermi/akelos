@@ -295,7 +295,7 @@ class AkLocaleManager
 
         $path = AkConfig::getDir('config').DS.'locales'.DS.basename($language).'.php';
         AkLocaleManager::getCoreDictionary($language,true,array($locale,$dictionary));
-        return Ak::file_put_contents($path,"<?php\n/** $comment */\n\n\$locale=".var_export((array)$locale,true).";\n\n\$dictionary=".var_export((array)$dictionary,true).";\n");
+        return AkFileSystem::file_put_contents($path,"<?php\n/** $comment */\n\n\$locale=".var_export((array)$locale,true).";\n\n\$dictionary=".var_export((array)$dictionary,true).";\n");
     }
 
     static function deleteDictionary($language, $namespace) {
@@ -315,7 +315,7 @@ class AkLocaleManager
     static function setDictionary($dictionary,$language,$namespace=false,$comment=null) {
         $path = AkConfig::getDir('app').DS.'locales'.DS.($namespace?trim(Ak::sanitize_include($namespace,'high'),DS).DS:'').basename($language).'.php';
         AkLocaleManager::getDictionary($language,$namespace,true,$dictionary);
-        Ak::file_put_contents($path,"<?php\n/** $comment */\n\n\$dictionary=".var_export((array)$dictionary,true).";\n");
+        AkFileSystem::file_put_contents($path,"<?php\n/** $comment */\n\n\$dictionary=".var_export((array)$dictionary,true).";\n");
         return $path;
     }
 

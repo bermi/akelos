@@ -215,7 +215,7 @@
 *
 *           $this->addAttachment(array(
 *               'content_type' => 'image/jpeg',
-*               'body' => Ak::file_get_contents("an-image.jpg")));
+*               'body' => AkFileSystem::file_get_contents("an-image.jpg")));
 *
 *           $this->addAttachment('application/pdf', generate_your_pdf_here());
 *       }
@@ -433,7 +433,7 @@ class AkActionMailer extends AkBaseModel
      *
      *           $this->addAttachment(array(
      *               'content_type' => 'image/jpeg',
-     *               'body' => Ak::file_get_contents("an-image.jpg")));
+     *               'body' => AkFileSystem::file_get_contents("an-image.jpg")));
      *
      *           $this->addAttachment('application/pdf', generate_your_pdf_here());
      *       }

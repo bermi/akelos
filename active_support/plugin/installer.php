@@ -30,7 +30,7 @@ class AkPluginInstaller extends AkInstaller
 
     public function autoInstallExtensions() {
         $path = $this->app_plugins_dir.DS.$this->plugin_name.DS.'extensions';
-        $extensionFiles = Ak::dir($path,array('recurse'=>true));
+        $extensionFiles = AkFileSystem::dir($path,array('recurse'=>true));
         foreach($extensionFiles as $extensionFile) {
             $this->installExtensions('extensions'.DS.$extensionFile);
         }
@@ -118,7 +118,7 @@ class AkPluginInstaller extends AkInstaller
                 }
                 $dependendPlugins = array_diff($dependendPlugins,array($this->plugin_name));
                 if (!empty($dependendPlugins)) {
-                    Ak::file_put_contents($dependencyFile,implode("\n",$dependendPlugins));
+                    AkFileSystem::file_put_contents($dependencyFile,implode("\n",$dependendPlugins));
                 } else if ($fileExists) {
                     unlink($dependencyFile);
                 }
@@ -270,7 +270,7 @@ class AkPluginInstaller extends AkInstaller
 
                     }
                     if (!empty($dependendPlugins)) {
-                        Ak::file_put_contents($dependencyFile,implode("\n",$dependendPlugins));
+                        AkFileSystem::file_put_contents($dependencyFile,implode("\n",$dependendPlugins));
                     } else if ($fileExists) {
                         unlink($dependencyFile);
                     }
@@ -291,9 +291,9 @@ class AkPluginInstaller extends AkInstaller
                 return false;
             }
         }
-        $contents = @Ak::file_get_contents($path);
+        $contents = @AkFileSystem::file_get_contents($path);
 
-        return (Ak::file_put_contents($path, preg_replace('|class '.$class.'(.*?)\n.*?{|i',"class $class\\1
+        return (AkFileSystem::file_put_contents($path, preg_replace('|class '.$class.'(.*?)\n.*?{|i',"class $class\\1
 {
 /** AUTOMATED START: $pluginName::$name */
 $methodString
@@ -303,7 +303,7 @@ $methodString
     }
 
     protected function _removeMethodFromClass($path,$name,$pluginName) {
-        return Ak::file_put_contents($path, preg_replace("|(\n[^\n]*?/\*\* AUTOMATED START: $pluginName::$name \*/.*?/\*\* AUTOMATED END: $pluginName::$name \*/\n)|s","",Ak::file_get_contents($path)));
+        return AkFileSystem::file_put_contents($path, preg_replace("|(\n[^\n]*?/\*\* AUTOMATED START: $pluginName::$name \*/.*?/\*\* AUTOMATED END: $pluginName::$name \*/\n)|s","",AkFileSystem::file_get_contents($path)));
     }
 }
 

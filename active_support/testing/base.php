@@ -563,7 +563,7 @@ class AkelosTextReporter extends TextReporter
         }
         $this->time_log['stats'] = $stats;
 
-        Ak::file_put_contents($log_path, '<?php $runtime['.$this->timeStart.'] = '.var_export($this->time_log, true).'; return $runtime['.$this->timeStart.'];');
+        AkFileSystem::file_put_contents($log_path, '<?php $runtime['.$this->timeStart.'] = '.var_export($this->time_log, true).'; return $runtime['.$this->timeStart.'];');
 
         @unlink(AK_LOG_DIR.DS.'unit_test_runtime'.DS.'last_run.php');
         link($log_path, AK_LOG_DIR.DS.'unit_test_runtime'.DS.'last_run.php');
@@ -593,7 +593,7 @@ class AkXUnitXmlReporter extends SimpleReporter {
         $this->root = $this->doc->documentElement;
         $base_path = (defined('MAKELOS_BASE_DIR') ? MAKELOS_BASE_DIR : AK_BASE_DIR);
         $file_path = AkConfig::getOption('report_path', $base_path.DS.'reports'.DS.'units.xml');
-        Ak::file_put_contents($file_path, "<?xml version=\"1.0\"?>\n", array('base_path' => $base_path));
+        AkFileSystem::file_put_contents($file_path, "<?xml version=\"1.0\"?>\n", array('base_path' => $base_path));
         $this->_fp = @fopen($file_path, 'a');
     }
 

@@ -74,7 +74,7 @@ class AkRouterConfig
                     // In some cases where session.name cant be set up by htaccess file,
                     // we can check for modrewrite status on this file
                 }elseif (file_exists(AK_BASE_DIR.DS.'.htaccess')){
-                    $htaccess_file = Ak::file_get_contents(AK_BASE_DIR.DS.'.htaccess');
+                    $htaccess_file = AkFileSystem::file_get_contents(AK_BASE_DIR.DS.'.htaccess');
                     if(stristr($htaccess_file,'RewriteEngine on')){
                         $url_rewrite_status = true;
                     }
@@ -91,8 +91,8 @@ class AkRouterConfig
             $url_rewrite_status = strstr(@file_get_contents($url_rewrite_test_url), 'AK_URL_REWRITE_ENABLED');
             $AK_URL_REWRITE_ENABLED = "define(\\'AK_URL_REWRITE_ENABLED\\', ".($url_rewrite_status ? 'true' : 'false').");\n";
 
-            register_shutdown_function(create_function('',"Ak::file_put_contents(AkConfig::getDir('config').DS.'config.php',
-            str_replace('<?php\n','<?php\n\n$AK_URL_REWRITE_ENABLED',Ak::file_get_contents(AkConfig::getDir('config').DS.'config.php')));"));
+            register_shutdown_function(create_function('',"AkFileSystem::file_put_contents(AkConfig::getDir('config').DS.'config.php',
+            str_replace('<?php\n','<?php\n\n$AK_URL_REWRITE_ENABLED',AkFileSystem::file_get_contents(AkConfig::getDir('config').DS.'config.php')));"));
         }
 
         if(!defined('AK_URL_REWRITE_ENABLED')){

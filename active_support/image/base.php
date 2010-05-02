@@ -112,7 +112,7 @@ class AkImage extends Image_Transform
 
         $path = empty($path) ? $this->image_path : $path;
         $this->Transform->save($tmp_image_name, $this->getExtension($path), $quality);
-        Ak::file_put_contents($path, file_get_contents($tmp_image_name), $options);
+        AkFileSystem::file_put_contents($path, file_get_contents($tmp_image_name), $options);
         @unlink($tmp_image_name);
     }
 
@@ -208,7 +208,7 @@ class AkImage extends Image_Transform
     public function saveFilterChain($name, $filter_chain = null, $filters_directory = null, $options = array()) {
         $path = $this->_getFilterChainPath($name, $filters_directory);
         $filter_chain = empty($filter_chain) ? $this->getFilterChain() : $filter_chain;
-        return Ak::file_put_contents($path, '<?php $filter_chain = '.var_export($filter_chain, true).'; ?>', $options);
+        return AkFileSystem::file_put_contents($path, '<?php $filter_chain = '.var_export($filter_chain, true).'; ?>', $options);
     }
 
     public function getFilterChain() {

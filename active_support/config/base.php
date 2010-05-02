@@ -285,7 +285,7 @@ return \$config;
 CACHE;
         $cache_file_name = $this->getCacheFileName($namespace, $environment);
 
-        if(!Ak::file_put_contents($cache_file_name, $cache, array('base_path' => AkConfig::getCacheBasePath()))){
+        if(!AkFileSystem::file_put_contents($cache_file_name, $cache, array('base_path' => AkConfig::getCacheBasePath()))){
             trigger_error(Ak::t('Could not create config cache file %file', array('%file'=>$cache_file_name)).' '.Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
             return false;
         }else{

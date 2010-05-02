@@ -75,13 +75,13 @@ abstract class TemplateUnitTest extends ActionPackUnitTest
     public function createTemplate($file_name,$content='Dummy') {
         $file_name = str_replace('/',DS,$file_name);
         $file_name = AkConfig::getDir('views').DS.$file_name;
-        $this->assertTrue((boolean)Ak::file_put_contents($file_name,$content));
+        $this->assertTrue((boolean)AkFileSystem::file_put_contents($file_name,$content));
         $this->created_files[] = $file_name;
     }
 
     public function deleteCreatedFiles() {
         foreach ($this->created_files as $file_name){
-            $this->assertTrue(Ak::file_delete($file_name));
+            $this->assertTrue(AkFileSystem::file_delete($file_name));
         }
     }
 

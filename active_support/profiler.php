@@ -70,7 +70,7 @@ class AkProfiler
         if($this->report == ''){
             $this->renderReport();
         }
-        Ak::file_put_contents('profiler_results.txt',$this->report);
+        AkFileSystem::file_put_contents('profiler_results.txt',$this->report);
     }
 
     public function showReport() {

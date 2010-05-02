@@ -17,15 +17,15 @@ class Config_TestCase extends  ActiveSupportUnitTest
     }
 
     public function tearDown() {
-        Ak::file_delete($this->_base_config_path.DS.'testing'.DS.'testconfig1.php', array('base_path' => $this->_base_config_path));
-        Ak::file_delete($this->_base_config_path.DS.'development'.DS.'testconfig1.php', array('base_path' => $this->_base_config_path));
-        Ak::file_delete($this->_base_config_path.DS.'production'.DS.'testconfig1.php', array('base_path' => $this->_base_config_path));
-        Ak::rmdir_tree($this->_base_config_path.DS.'testing');
-        Ak::rmdir_tree($this->_base_config_path.DS.'development');
-        Ak::rmdir_tree($this->_base_config_path.DS.'production');
-        Ak::file_delete(AkConfig::getDir('config').DS.'testconfig1.yml', array('base_path' => $this->_base_config_path));
-        Ak::rmdir_tree($this->_base_config_path);
-        Ak::rmdir_tree(AkConfig::getDir('tmp').DS.'ak_config');
+        AkFileSystem::file_delete($this->_base_config_path.DS.'testing'.DS.'testconfig1.php', array('base_path' => $this->_base_config_path));
+        AkFileSystem::file_delete($this->_base_config_path.DS.'development'.DS.'testconfig1.php', array('base_path' => $this->_base_config_path));
+        AkFileSystem::file_delete($this->_base_config_path.DS.'production'.DS.'testconfig1.php', array('base_path' => $this->_base_config_path));
+        AkFileSystem::rmdir_tree($this->_base_config_path.DS.'testing');
+        AkFileSystem::rmdir_tree($this->_base_config_path.DS.'development');
+        AkFileSystem::rmdir_tree($this->_base_config_path.DS.'production');
+        AkFileSystem::file_delete(AkConfig::getDir('config').DS.'testconfig1.yml', array('base_path' => $this->_base_config_path));
+        AkFileSystem::rmdir_tree($this->_base_config_path);
+        AkFileSystem::rmdir_tree(AkConfig::getDir('tmp').DS.'ak_config');
     }
 
     public function test_generate_cache_filename() {

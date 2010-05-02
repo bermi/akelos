@@ -310,7 +310,7 @@ class BelongsTo_TestCase extends ActiveRecordUnitTest
     }
 
     public function test_cleanup() {
-        @Ak::file_delete(AkConfig::getDir('models').DS.'group_user.php');
+        @AkFileSystem::file_delete(AkConfig::getDir('models').DS.'group_user.php');
     }
 
 }

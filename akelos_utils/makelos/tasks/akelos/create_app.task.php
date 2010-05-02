@@ -70,8 +70,8 @@ class AkelosInstaller
             trigger_error('You must supply a valid destination path', E_USER_ERROR);
         }
 
-        $this->source_tree = Ak::dir($this->options['source'],array('dirs'=>true,'recurse'=>true));
-        $this->destination_tree = Ak::dir($this->options['directory'],array('dirs'=>true,'recurse'=>true));
+        $this->source_tree = AkFileSystem::dir($this->options['source'],array('dirs'=>true,'recurse'=>true));
+        $this->destination_tree = AkFileSystem::dir($this->options['directory'],array('dirs'=>true,'recurse'=>true));
     }
 
     public function install() {

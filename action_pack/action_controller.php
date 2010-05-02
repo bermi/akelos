@@ -1976,7 +1976,7 @@ class AkActionController extends AkLazyObject
         if(!empty($options['stream'])){
             $this->render(array('text'=> new AkStream($path,$options['buffer_size'])));
         }else{
-            $this->render(array('text'=> Ak::file_get_contents($path)));
+            $this->render(array('text'=> AkFileSystem::file_get_contents($path)));
         }
     }
 

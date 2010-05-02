@@ -347,7 +347,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
     public function test_should_remove_associated_using_the_right_key() {
         $Installer = new AkInstaller();
         @$Installer->dropTable('groups_users');
-        @Ak::file_delete(AkConfig::getDir('models').DS.'group_user.php');
+        @AkFileSystem::file_delete(AkConfig::getDir('models').DS.'group_user.php');
 
 
         $this->installAndIncludeModels('User', 'Group', array('instantiate' => true));
@@ -531,7 +531,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
 
     public function _cleanUpAutomaticGeneratedFiles() {
         foreach (explode(',', 'post_tag,post_user,friend_friend,aa_ee,bb_cc,dd_ee,group_user') as $file){
-            @Ak::file_delete(AkConfig::getDir('models').DS.$file.'.php');
+            @AkFileSystem::file_delete(AkConfig::getDir('models').DS.$file.'.php');
         }
     }
 

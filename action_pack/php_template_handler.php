@@ -153,7 +153,7 @@ class AkPhpTemplateHandler
         if(defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP && !strstr($options['base_path'], AkConfig::getDir('base'))){
             $options['ftp'] = false;
         }
-        Ak::file_put_contents($this->_getCompiledTemplatePath(), $this->_options['code'], $options);
+        AkFileSystem::file_put_contents($this->_getCompiledTemplatePath(), $this->_options['code'], $options);
     }
 
 

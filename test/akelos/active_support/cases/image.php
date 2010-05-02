@@ -11,17 +11,17 @@ class Image_TestCase extends ActiveSupportUnitTest
             $this->photo_path = AkConfig::getDir('fixtures').DS.'Image_TestCase'.DS.'cristobal.jpg';
             $this->watermark = AkConfig::getDir('fixtures').DS.'Image_TestCase'.DS.'watermark.png';
 
-            Ak::copy(AkConfig::getDir('fixtures').'/old_logo.png', $this->image_path);
+            AkFileSystem::copy(AkConfig::getDir('fixtures').'/old_logo.png', $this->image_path);
             $cristobal = @Ak::url_get_contents('http://www.akelos.org/testing_resources/images/cristobal.jpg', array('cache'=>100000));
-            if(!empty($cristobal)) Ak::file_put_contents($this->photo_path, $cristobal);
+            if(!empty($cristobal)) AkFileSystem::file_put_contents($this->photo_path, $cristobal);
             $watermark = @Ak::url_get_contents('http://www.akelos.org/testing_resources/images/watermark.png', array('cache'=>100000));
-            if(!empty($watermark)) Ak::file_put_contents($this->watermark, $watermark);
+            if(!empty($watermark)) AkFileSystem::file_put_contents($this->watermark, $watermark);
             $this->_run_extra_tests = file_exists($this->photo_path);
         }
     }
 
     public function __destruct() {
-        Ak::directory_delete(AkConfig::getDir('fixtures').DS.'Image_TestCase');
+        AkFileSystem::directory_delete(AkConfig::getDir('fixtures').DS.'Image_TestCase');
     }
 
     public function skip(){

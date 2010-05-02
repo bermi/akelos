@@ -336,13 +336,13 @@ CONFIG;
     }
     public function writeConfigurationFile($configuration_details) {
         if($this->canWriteConfigurationFile()){
-            return Ak::file_put_contents(AK_CONFIG_DIR.DS.'config.php', $configuration_details);
+            return AkFileSystem::file_put_contents(AK_CONFIG_DIR.DS.'config.php', $configuration_details);
         }
         return false;
     }
     public function writeDatabaseConfigurationFile($configuration_details) {
         if($this->canWriteDbConfigurationFile()){
-            return Ak::file_put_contents(AK_CONFIG_DIR.DS.'database.yml', $configuration_details);
+            return AkFileSystem::file_put_contents(AK_CONFIG_DIR.DS.'database.yml', $configuration_details);
         }
         return false;
     }
@@ -371,15 +371,15 @@ CONFIG;
         }
         $file_1 = AK_BASE_DIR.DS.'.htaccess';
         $file_2 = AK_PUBLIC_DIR.DS.'.htaccess';
-        $file_1_content = @Ak::file_get_contents($file_1);
-        $file_2_content = @Ak::file_get_contents($file_2);
+        $file_1_content = @AkFileSystem::file_get_contents($file_1);
+        $file_2_content = @AkFileSystem::file_get_contents($file_2);
 
         $url_suffix = $this->getUrlSuffix();
 
         $url_suffix = $url_suffix[0] != '/' ? '/'.$url_suffix : $url_suffix;
 
-        empty($file_1_content) || @Ak::file_put_contents($file_1, str_replace('# RewriteBase /framework',' RewriteBase '.$url_suffix, $file_1_content));
-        empty($file_2_content) || @Ak::file_put_contents($file_2, str_replace('# RewriteBase /framework',' RewriteBase '.$url_suffix, $file_2_content));
+        empty($file_1_content) || @AkFileSystem::file_put_contents($file_1, str_replace('# RewriteBase /framework',' RewriteBase '.$url_suffix, $file_1_content));
+        empty($file_2_content) || @AkFileSystem::file_put_contents($file_2, str_replace('# RewriteBase /framework',' RewriteBase '.$url_suffix, $file_2_content));
     }
 
     public function isUrlRewriteEnabled() {
@@ -605,9 +605,9 @@ CONFIG;
         defined('AK_FTP_PATH')               || define('AK_FTP_PATH',                  $ftp_path);
         defined('AK_FTP_AUTO_DISCONNECT')    || define('AK_FTP_AUTO_DISCONNECT',       true);
 
-        if(@Ak::file_put_contents(AK_CONFIG_DIR.DS.'test_file.txt','hello from ftp')){
-            $text = @Ak::file_get_contents(AK_CONFIG_DIR.DS.'test_file.txt');
-            @Ak::file_delete(AK_CONFIG_DIR.DS.'test_file.txt');
+        if(@AkFileSystem::file_put_contents(AK_CONFIG_DIR.DS.'test_file.txt','hello from ftp')){
+            $text = @AkFileSystem::file_get_contents(AK_CONFIG_DIR.DS.'test_file.txt');
+            @AkFileSystem::file_delete(AK_CONFIG_DIR.DS.'test_file.txt');
         }
 
         $this->ftp_enabled = (isset($text) && $text == 'hello from ftp');
@@ -652,8 +652,8 @@ CONFIG;
             }
             foreach ($this->stylesheets as $stylesheet) {
                 $filename = AK_PUBLIC_DIR.DS.'stylesheets'.DS.$stylesheet.'.css';
-                $relativized_css = preg_replace("/url\((\'|\")?\/images/","url($1/$url_suffix/images", @Ak::file_get_contents($filename));
-                empty($relativized_css) || @Ak::file_put_contents($filename, $relativized_css);
+                $relativized_css = preg_replace("/url\((\'|\")?\/images/","url($1/$url_suffix/images", @AkFileSystem::file_get_contents($filename));
+                empty($relativized_css) || @AkFileSystem::file_put_contents($filename, $relativized_css);
             }
         }
     }

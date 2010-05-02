@@ -321,6 +321,7 @@ class Ak
      * @uses AkFileSystem::dir
      */
     static function dir($path, $options = array()) {
+        Ak::deprecateMethod(__METHOD__, 'AkFileSystem::dir()');
         return AkFileSystem::dir($path, $options);
     }
     
@@ -329,6 +330,7 @@ class Ak
      * @uses AkFileSystem::file_get_contents
      */
     static function file_get_contents($file_name, $options = array()) {
+        Ak::deprecateMethod(__METHOD__, 'AkFileSystem::file_get_contents()');
         return AkFileSystem::file_get_contents($file_name, $options);
     }
     
@@ -337,6 +339,7 @@ class Ak
      * @uses AkFileSystem::file_put_contents
      */
     static function file_put_contents($file_name, $content, $options = array()) {
+        Ak::deprecateMethod(__METHOD__, 'AkFileSystem::file_put_contents()');
         return AkFileSystem::file_put_contents($file_name, $content, $options);
     }
     
@@ -345,6 +348,7 @@ class Ak
      * @uses AkFileSystem::file_add_contents
      */
     static function file_add_contents($file_name, $content, $options = array()) {
+        Ak::deprecateMethod(__METHOD__, 'AkFileSystem::file_add_contents()');
         return AkFileSystem::file_add_contents($file_name, $content, $options);
     }
 
@@ -353,6 +357,7 @@ class Ak
      * @uses AkFileSystem::file_delete
      */
     static function file_delete($file_name, $options = array()) {
+        Ak::deprecateMethod(__METHOD__, 'AkFileSystem::file_delete()');
         return AkFileSystem::file_delete($file_name, $options);
     }
 
@@ -361,6 +366,7 @@ class Ak
      * @uses AkFileSystem::directory_delete
      */
     static function directory_delete($dir_name, $options = array()) {
+        Ak::deprecateMethod(__METHOD__, 'AkFileSystem::directory_delete()');
         return AkFileSystem::directory_delete($dir_name, $options);
     }
 
@@ -369,6 +375,7 @@ class Ak
      * @uses AkFileSystem::make_dir
      */
     static function make_dir($path, $options = array()) {
+        Ak::deprecateMethod(__METHOD__, 'AkFileSystem::make_dir()');
         return AkFileSystem::make_dir($path, $options);
     }
 
@@ -377,6 +384,7 @@ class Ak
      * @uses AkFileSystem::rmdir_tree
      */
     static function rmdir_tree($directory) {
+        Ak::deprecateMethod(__METHOD__, 'AkFileSystem::rmdir_tree()');
         return AkFileSystem::rmdir_tree($directory);
     }
 
@@ -385,6 +393,7 @@ class Ak
      * @uses AkFileSystem::copy
      */
     static function copy($origin, $target, $options = array()) {
+        Ak::deprecateMethod(__METHOD__, 'AkFileSystem::copy()');
         return AkFileSystem::copy($origin, $target, $options);
     }
 
@@ -913,7 +922,7 @@ class Ak
         $key = Ak::randomString(15);
         $compressed_file = AK_TMP_DIR.DS.'d'.$key;
         $uncompressed_file = AK_TMP_DIR.DS.'s'.$key;
-        if(Ak::file_put_contents($uncompressed_file, $data, array('base_path'=>AK_TMP_DIR)) !== false){
+        if(AkFileSystem::file_put_contents($uncompressed_file, $data, array('base_path'=>AK_TMP_DIR)) !== false){
             $compressed = gzopen($compressed_file,'w9');
             $uncompressed = fopen($uncompressed_file, 'rb');
             while(!feof($uncompressed)){
@@ -925,9 +934,9 @@ class Ak
         }else{
             trigger_error(Ak::t('Could not write to temporary directory for generating compressed file using Ak::compress(). Please provide write access to %dirname', array('%dirname'=>AK_TMP_DIR)), E_USER_ERROR);
         }
-        $result = Ak::file_get_contents($compressed_file, array('base_path'=>AK_TMP_DIR));
-        Ak::file_delete($compressed_file, array('base_path'=>AK_TMP_DIR));
-        Ak::file_delete($uncompressed_file, array('base_path'=>AK_TMP_DIR));
+        $result = AkFileSystem::file_get_contents($compressed_file, array('base_path'=>AK_TMP_DIR));
+        AkFileSystem::file_delete($compressed_file, array('base_path'=>AK_TMP_DIR));
+        AkFileSystem::file_delete($uncompressed_file, array('base_path'=>AK_TMP_DIR));
         return $result;
     }
 
@@ -936,7 +945,7 @@ class Ak
         $compressed_file = AK_TMP_DIR.DS.'s'.$key;
         $uncompressed_file = AK_TMP_DIR.DS.'d'.$key;
 
-        if(Ak::file_put_contents($compressed_file, $compressed_data, array('base_path'=>AK_TMP_DIR)) !== false){
+        if(AkFileSystem::file_put_contents($compressed_file, $compressed_data, array('base_path'=>AK_TMP_DIR)) !== false){
             $compressed = gzopen($compressed_file, "r");
             $uncompressed = fopen($uncompressed_file, "w");
             while(!gzeof($compressed)){
@@ -948,9 +957,9 @@ class Ak
         }else{
             trigger_error(Ak::t('Could not write to temporary directory for generating uncompressing file using Ak::uncompress(). Please provide write access to %dirname', array('%dirname'=>AK_TMP_DIR)), E_USER_ERROR);
         }
-        $result = Ak::file_get_contents($uncompressed_file, array('base_path'=>AK_TMP_DIR));
-        Ak::file_delete($uncompressed_file, array('base_path'=>AK_TMP_DIR));
-        Ak::file_delete($compressed_file, array('base_path'=>AK_TMP_DIR));
+        $result = AkFileSystem::file_get_contents($uncompressed_file, array('base_path'=>AK_TMP_DIR));
+        AkFileSystem::file_delete($uncompressed_file, array('base_path'=>AK_TMP_DIR));
+        AkFileSystem::file_delete($compressed_file, array('base_path'=>AK_TMP_DIR));
         return $result;
     }
 

@@ -132,7 +132,7 @@ class AkHelperLoader
         $handler->helpers = !isset($handler->helpers) ? 'default' : $handler->helpers;
 
         if($handler->helpers == 'default'){
-            $available_helpers = Ak::dir(AK_ACTION_PACK_DIR.DS.'helpers',array('dirs'=>false));
+            $available_helpers = AkFileSystem::dir(AK_ACTION_PACK_DIR.DS.'helpers',array('dirs'=>false));
             $helper_names = array();
             foreach ($available_helpers as $available_helper){
                 $helper_names[$available_helper] = AkInflector::classify(substr($available_helper,0,-10));
@@ -151,7 +151,7 @@ class AkHelperLoader
         $helpers_dir = AkConfig::getDir('helpers');
         $helper_names = array();
         if ($handler->app_helpers == 'all'){
-            $available_helpers = Ak::dir($helpers_dir, array('dirs'=>false));
+            $available_helpers = AkFileSystem::dir($helpers_dir, array('dirs'=>false));
             $helper_names = array();
             foreach ($available_helpers as $available_helper){
                 $helper_names[$helpers_dir.DS.$available_helper] = AkInflector::classify(substr($available_helper,0,-10));

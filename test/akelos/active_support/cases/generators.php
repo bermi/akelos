@@ -41,7 +41,7 @@ class ControllerGenerator_TestCase extends ActiveSupportUnitTest
             $this->assertFalse(file_exists($file));
         }
 
-        Ak::file_put_contents(AkConfig::getDir('views').DS.'credit_card'.DS.'credit.html.tpl', 'foo');
+        AkFileSystem::file_put_contents(AkConfig::getDir('views').DS.'credit_card'.DS.'credit.html.tpl', 'foo');
         clearstatcache();
 
         $this->assertPattern('/collisions/', $this->runGeneratorCommand('controller CreditCard open debit credit close'));

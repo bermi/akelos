@@ -102,7 +102,7 @@ $options['tag'] = empty($options['tag']) ? '' : '-'.$options['tag'];
 $skip_updating_version_number = !empty($options['skip_version_update']) || $options['tag'] == 'ci' || $options['tag'] == 'nighly';
 
 $options['path'] = empty($options['path']) ? MAKELOS_BASE_DIR.DS.'releases' : $options['path'];
-strstr($options['path'], MAKELOS_BASE_DIR) && Ak::make_dir($options['path'], array('base_path'=>MAKELOS_BASE_DIR));
+strstr($options['path'], MAKELOS_BASE_DIR) && AkFileSystem::make_dir($options['path'], array('base_path'=>MAKELOS_BASE_DIR));
 
 echo "Building version ".$options['version'].$options['tag']."\n";
 if(!$skip_updating_version_number){

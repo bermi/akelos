@@ -86,7 +86,7 @@ class AkFileUploadHelper extends AkBaseHelper
         $key = preg_replace('/[^A-Z^a-z^0-9]/','',$key);
         $file = $this->get_persisted_file($key);
         if(!empty($file)){
-            Ak::file_put_contents($this->_getTempDir().DS.'_file_uploader_file_'.$key, base64_decode($file['contents']), array('ftp'=>false));
+            AkFileSystem::file_put_contents($this->_getTempDir().DS.'_file_uploader_file_'.$key, base64_decode($file['contents']), array('ftp'=>false));
             return array('tmp_name'=>$this->_getTempDir().DS.'_file_uploader_file_'.$key,'size'=>$file['size'], 'name'=>$file['name'],'type'=>$file['type'], 'error'=>0);
         }else{
             return false;

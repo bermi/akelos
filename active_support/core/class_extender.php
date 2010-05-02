@@ -47,7 +47,7 @@ class AkClassExtender
         if(!$this->_canIncludeMergedFile($class_name_to_extend, $checksum)){
             foreach ($file_paths as $file_path){
                 if(is_file($file_path)){
-                    $file_contents .= Ak::file_get_contents($file_path);
+                    $file_contents .= AkFileSystem::file_get_contents($file_path);
                 }
             }
             return array($checksum, $file_contents);
@@ -88,8 +88,8 @@ class AkClassExtender
             }
             $source = "$source<?php class Extensible$class_name_to_extend extends $last_method{} ?>";
             if(md5($source) != @md5_file($merge_path.DS.'Extensible'.$class_name_to_extend.'.php')){
-                Ak::file_put_contents($merge_path.DS.'Extensible'.$class_name_to_extend.'.php', $source);
-                Ak::file_put_contents($merge_path.DS.'checksums'.DS.'Extensible'.$class_name_to_extend, $checksum);
+                AkFileSystem::file_put_contents($merge_path.DS.'Extensible'.$class_name_to_extend.'.php', $source);
+                AkFileSystem::file_put_contents($merge_path.DS.'checksums'.DS.'Extensible'.$class_name_to_extend, $checksum);
             }
         }
 
@@ -99,7 +99,7 @@ class AkClassExtender
     function _canIncludeMergedFile($class_name_to_extend, $checksum) {
         $merge_path = AK_TMP_DIR.DS.'.lib';
         if(AK_CLASS_EXTENDER_ENABLE_CACHE && file_exists($merge_path.DS.'Extensible'.$class_name_to_extend.'.php') &&
-        Ak::file_get_contents($merge_path.DS.'checksums'.DS.'Extensible'.$class_name_to_extend) == $checksum){
+        AkFileSystem::file_get_contents($merge_path.DS.'checksums'.DS.'Extensible'.$class_name_to_extend) == $checksum){
             return true;
         }
         return false;

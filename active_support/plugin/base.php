@@ -258,7 +258,7 @@ class AkPluginLoader
      * @access private
      */
     public function _findPlugins() {
-        $plugin_dirs = Ak::dir(AK_PLUGINS_DIR, array('dirs' => true, 'files' => false));
+        $plugin_dirs = AkFileSystem::dir(AK_PLUGINS_DIR, array('dirs' => true, 'files' => false));
         $this->_available_plugins = array();
         foreach ($plugin_dirs as $plugin_dir){
             $plugin_dir = array_pop($plugin_dir);

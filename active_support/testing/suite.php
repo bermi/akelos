@@ -228,7 +228,7 @@ class AkUnitTestSuite extends TestSuite
                     @unlink($file);
                 }
             }else{
-                @Ak::rmdir_tree($file);
+                @AkFileSystem::rmdir_tree($file);
             }
         }
     }

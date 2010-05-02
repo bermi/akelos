@@ -11,10 +11,10 @@ class Ak_TestCase extends ActiveSupportUnitTest
         $tmp_file2 = $tmp_dir.DS.'ak_test_dir'.DS.'level_one'.DS.'file.txt';
         $this->assertTrue(is_dir($tmp_dir), 'Could not find temporary directory at: '.$tmp_dir);
         $this->assertTrue(touch($tmp_dir.DS.'ak_test_'.__CLASS__), 'Can\'t touch files on the temporary directory '.$tmp_dir);
-        $this->assertTrue(Ak::file_put_contents($tmp_file, 'abc'), 'Can\'t write on the temporary file '.$tmp_file);
-        $this->assertTrue(Ak::file_get_contents($tmp_file) == 'abc', 'Can\'t write on the temporary file '.$tmp_file);
-        $this->assertTrue(Ak::file_put_contents($tmp_file2, 'abce'), 'Can\'t write on the temporary file '.$tmp_file2);
-        $this->assertTrue(Ak::file_get_contents($tmp_file2) == 'abce', 'Can\'t write on the temporary file '.$tmp_file2);
+        $this->assertTrue(AkFileSystem::file_put_contents($tmp_file, 'abc'), 'Can\'t write on the temporary file '.$tmp_file);
+        $this->assertTrue(AkFileSystem::file_get_contents($tmp_file) == 'abc', 'Can\'t write on the temporary file '.$tmp_file);
+        $this->assertTrue(AkFileSystem::file_put_contents($tmp_file2, 'abce'), 'Can\'t write on the temporary file '.$tmp_file2);
+        $this->assertTrue(AkFileSystem::file_get_contents($tmp_file2) == 'abce', 'Can\'t write on the temporary file '.$tmp_file2);
         $this->assertEqual($tmp_dir, AK_TMP_DIR);
     }
 

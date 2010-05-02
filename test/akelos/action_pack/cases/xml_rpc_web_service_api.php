@@ -70,7 +70,7 @@ class XmlRpcWebServiceApi_TestCase extends ActionPackUnitTest
     }
 
     public function test_clear() {
-        Ak::file_delete(AkConfig::getDir('models').DS.'todo_service.php');
+        AkFileSystem::file_delete(AkConfig::getDir('models').DS.'todo_service.php');
     }
 }
 

@@ -745,9 +745,9 @@ Example:
 
     protected function _removeOldVersionsFileAndUseMigrationsTable($options) {
         $oldfile = $this->_versionPath($options);
-        $version = Ak::file_get_contents($oldfile);
-        Ak::copy($oldfile, $oldfile.'.backup');
-        Ak::file_delete($oldfile);
+        $version = AkFileSystem::file_get_contents($oldfile);
+        AkFileSystem::copy($oldfile, $oldfile.'.backup');
+        AkFileSystem::file_delete($oldfile);
         $this->log('message','got old version from file:'.$oldfile.'='.$version.' moved to backup-file:'.$oldfile.'.backup');
         $this->setInstalledVersion($version, $options);
         $this->AkelosMigration->create(array('name' => $this->getInstallerName(), 'version' => $version));
@@ -908,7 +908,7 @@ Example:
     }
 
     public function copyFilesIntoApp($files_dir, $options = array()) {
-        $this->files = Ak::dir($files_dir, array('recurse'=> true));
+        $this->files = AkFileSystem::dir($files_dir, array('recurse'=> true));
         empty($this->options['force']) ? $this->_checkForCollisions($this->files, $files_dir, $files_dir) : null;
         $this->_copyFiles($this->files, $files_dir, $files_dir);
         if(!empty($options['relative_url'])){
@@ -917,7 +917,7 @@ Example:
     }
 
     public function removeFilesFromApp($files_dir) {
-        $this->files = Ak::dir($files_dir, array('recurse'=> true));
+        $this->files = AkFileSystem::dir($files_dir, array('recurse'=> true));
         empty($this->options['force']) ? $this->_checkForModified($this->files, $files_dir, $files_dir) : null;
         $installed_files = $this->_getInstalledFiles($this->files, $files_dir, $files_dir);
         foreach ($installed_files as $installed_file){
@@ -943,7 +943,7 @@ Example:
         );
         $keys = array_keys($replacements);
         $values = array_values($replacements);
-        $this->files = Ak::dir($files_dir, array('recurse'=> true));
+        $this->files = AkFileSystem::dir($files_dir, array('recurse'=> true));
         empty($this->options['force']) ? $this->_checkForModified($this->files, $files_dir, $files_dir) : null;
         $installed_files = $this->_getInstalledFiles($this->files, $files_dir, $files_dir);
         foreach ($installed_files as $installed_file){

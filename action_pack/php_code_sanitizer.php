@@ -74,7 +74,7 @@ class AkPhpCodeSanitizer
                 '<h1>'.Ak::t('Template %template_file security error', array('%template_file'=>@$this->_options['file_path'])).':</h1>'.
                 "<ul><li>".join("</li>\n<li>",$this->getErrors())."</li></ul><hr />\n".
                 '<h2>'.Ak::t('Showing template source from %file:',array('%file'=>$this->_options['file_path'])).'</h2>'.
-                (isset($this->_options['file_path']) ? '<pre>'.htmlentities(Ak::file_get_contents($this->_options['file_path'])).'</pre><hr />':'').
+                (isset($this->_options['file_path']) ? '<pre>'.htmlentities(AkFileSystem::file_get_contents($this->_options['file_path'])).'</pre><hr />':'').
                 '<h2>'.Ak::t('Showing compiled template source:').'</h2>'.highlight_string($code,true);
 
                 die();

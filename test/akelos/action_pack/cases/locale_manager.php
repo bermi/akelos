@@ -252,7 +252,7 @@ class LocaleManager_TestCase extends ActionPackUnitTest
         $this->assertTrue(AkLocaleManager::deleteDictionary(AK_FRAMEWORK_LANGUAGE,$namespace));
         $this->assertEqual(array(),AkLocaleManager::getDictionary(AK_FRAMEWORK_LANGUAGE,$namespace));
         foreach ($locale_files as $locale_file){
-            Ak::file_delete($locale_file);
+            AkFileSystem::file_delete($locale_file);
         }
     }
 
@@ -269,7 +269,7 @@ class LocaleManager_TestCase extends ActionPackUnitTest
             $this->assertTrue(isset($core_dictionary[$translation_key]));
         }
         foreach ($locale_files as $locale_file){
-            Ak::file_delete($locale_file);
+            AkFileSystem::file_delete($locale_file);
         }
     }
 

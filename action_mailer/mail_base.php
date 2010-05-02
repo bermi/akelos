@@ -391,7 +391,7 @@ class AkMailBase extends Mail
      * content-disposition set to "attachment".
      *
      *     $this->setAttachment("image/jpg", array(
-     *       'body' => Ak::file_get_contents('hello.jpg'),
+     *       'body' => AkFileSystem::file_get_contents('hello.jpg'),
      *       'filename' => "hello.jpg"
      *     ));
      */

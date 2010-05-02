@@ -277,7 +277,7 @@ class AkLogger implements AkLoggerInterface
         $this->error_file = $file_name;
         if(!is_file($file_name)){
             if(is_writable($log_dir)){
-                Ak::file_put_contents($file_name, '', array('base_path' => AkConfig::getDir('log')));
+                AkFileSystem::file_put_contents($file_name, '', array('base_path' => AkConfig::getDir('log')));
             }else{
                 $this->error_file = false;
             }

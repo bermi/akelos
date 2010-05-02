@@ -22,7 +22,7 @@ class MenuHelper_TestCase extends HelperUnitTest
 
     public function test_should_get_all_controllers_with_their_actions()
     {
-        $available_controllers = (array)Ak::dir(AkConfig::getDir('controllers'), array('dirs'=>false));
+        $available_controllers = (array)AkFileSystem::dir(AkConfig::getDir('controllers'), array('dirs'=>false));
         $got = $this->menu_helper->_get_default_full_menu();
         foreach ($available_controllers as $controller_filename){
             $controller_name = str_replace('_controller.php','',$controller_filename);

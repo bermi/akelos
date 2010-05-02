@@ -35,7 +35,7 @@ function ak_print_available_installers($files, $preffix = '')
 }
 
 if($installer_class_name == 'Installer'){
-    $files = Ak::dir(AkConfig::getDir('app').DS.'installers', array('recurse' => true));
+    $files = AkFileSystem::dir(AkConfig::getDir('app').DS.'installers', array('recurse' => true));
     if(empty($files)){
         echo Ak::t("\n  Could not find installers at %dir  \n", array('%dir'=>AkConfig::getDir('app').DS.'installers'));
     }else{

@@ -7,7 +7,7 @@ class Finders_TestCase extends ActiveRecordUnitTest
 
     public function setup() {
         $this->installAndIncludeModels(array('Post', 'Comment', 'Tagging', 'Tag'));
-        @Ak::file_delete(AkConfig::getDir('models').DS.'post_tag.php');
+        @AkFileSystem::file_delete(AkConfig::getDir('models').DS.'post_tag.php');
     }
 
 

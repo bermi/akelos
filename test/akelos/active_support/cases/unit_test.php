@@ -72,7 +72,7 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
 
         $yaml_path = AkConfig::getDir('fixtures').DS.'the_models.yml';
         $this->assertFalse(file_exists($yaml_path));
-        Ak::file_put_contents($yaml_path, $yaml);
+        AkFileSystem::file_put_contents($yaml_path, $yaml);
 
         $unit_tester->installAndIncludeModels(array('TheModel'=>'id,name'));
         $this->assertFalse($TheModel->find());

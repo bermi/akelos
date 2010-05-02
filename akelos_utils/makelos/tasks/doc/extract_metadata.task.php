@@ -120,14 +120,14 @@ foreach ($packages as $package_name => $file_path){
 
 $destination = rtrim($options['destination'], DS).DS.'metadata';
 foreach ($package_files as $package_name => $files){
-    Ak::file_put_contents($destination.DS.'files'.DS.$package_name.'.php',
+    AkFileSystem::file_put_contents($destination.DS.'files'.DS.$package_name.'.php',
     '<?php $metadata = '.var_export(array('files' => $files), true). '; return $metadata;');
 }
 
 $destination = rtrim($options['destination'], DS).DS.'refactored';
 foreach ($package_files as $package_name => $files){
     foreach ($files as $base_file_path => $file){
-        Ak::file_put_contents(
+        AkFileSystem::file_put_contents(
         $destination.DS.$package_name.DS.$base_file_path,
         file_get_contents($file));
     }
@@ -136,7 +136,7 @@ foreach ($package_files as $package_name => $files){
 $destination = rtrim($options['destination'], DS).DS.'textile';
 foreach ($package_files as $package_name => $files){
     foreach ($files as $base_file_path => $file){
-        Ak::file_put_contents(
+        AkFileSystem::file_put_contents(
         $destination.DS.$package_name.DS.str_replace('.php', '.textile', $base_file_path),
         file_get_contents($file));
     }

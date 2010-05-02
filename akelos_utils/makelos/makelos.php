@@ -380,8 +380,8 @@ class Makelos
 
         if(!file_exists($pid_file)){
             if(empty($options['attributes']['kill'])){
-                Ak::file_put_contents($pid_file, '');
-                Ak::file_delete($pid_file);
+                AkFileSystem::file_put_contents($pid_file, '');
+                AkFileSystem::file_delete($pid_file);
             }else{
                 $this->error("Could not kill process for $task_name", true);
             }
@@ -391,7 +391,7 @@ class Makelos
                 if(!empty($options['attributes']['kill'])){
                     $this->message("Killing process $pid");
                     `kill $pid`;
-                    Ak::file_delete($pid_file);
+                    AkFileSystem::file_delete($pid_file);
                     die();
                 }elseif(!empty($options['attributes']['restart'])){
                     $this->message("Restarting $task_name.");
@@ -408,7 +408,7 @@ class Makelos
         unset($options['attributes']['restart']);
 
         if(!file_exists($log_file)){
-            Ak::file_put_contents($log_file, '');
+            AkFileSystem::file_put_contents($log_file, '');
         }
 
         System_Daemon::setOption('appName', $app_name);
@@ -423,7 +423,7 @@ class Makelos
         defined('AK_SKIP_DB_CONNECTION') && AK_SKIP_DB_CONNECTION ? null : Ak::db($dsn);
         $this->runTask($task_name, $options);
         System_Daemon::stop();
-        Ak::file_delete($pid_file);
+        AkFileSystem::file_delete($pid_file);
         die();
     }
 

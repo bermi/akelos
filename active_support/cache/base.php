@@ -220,7 +220,7 @@ class AkCache
                     $options['cacheDir'].=DS;
                 }
                 if(!is_dir($options['cacheDir'])){
-                    Ak::make_dir($options['cacheDir'], array('base_path'=>dirname($options['cacheDir'])));
+                    AkFileSystem::make_dir($options['cacheDir'], array('base_path'=>dirname($options['cacheDir'])));
                 }
                 $this->DriverInstance = new Cache_Lite($options);
                 break;

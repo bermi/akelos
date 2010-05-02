@@ -62,7 +62,7 @@ class MailerGenerator extends  AkelosGenerator
         }
 
         $mailer_views_folder = AK_VIEWS_DIR.DS.AkInflector::underscore($this->class_name);
-        @Ak::make_dir($mailer_views_folder);
+        @AkFileSystem::make_dir($mailer_views_folder);
 
         foreach ($this->actions as $action){
             $this->assignVarToTemplate('action', $action);

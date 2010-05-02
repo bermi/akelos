@@ -76,7 +76,7 @@ class AkMenuHelper extends AkBaseHelper
 
     public function _get_default_full_menu() {
         $controllers_dir = AkConfig::getDir('controllers');
-        $controller_file_names = array_map('array_pop', (array)Ak::dir($controllers_dir, array('files'=>false)));
+        $controller_file_names = array_map('array_pop', (array)AkFileSystem::dir($controllers_dir, array('files'=>false)));
 
         sort($controller_file_names);
 

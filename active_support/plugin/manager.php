@@ -63,7 +63,7 @@ class AkPluginManager
         if($force_reload || empty($this->repositories)){
             $this->repositories = array($this->main_repository);
             if(file_exists($this->_getRepositoriesConfigPath())){
-                $repository_candidates = array_diff(array_map('trim', explode("\n",Ak::file_get_contents($this->_getRepositoriesConfigPath()))), array(''));
+                $repository_candidates = array_diff(array_map('trim', explode("\n",AkFileSystem::file_get_contents($this->_getRepositoriesConfigPath()))), array(''));
                 if(!empty($repository_candidates)){
                     foreach ($repository_candidates as $repository_candidate){
                         if(strlen($repository_candidate) > 0 && $repository_candidate[0] != '#' && strstr($repository_candidate,'plugins')){
@@ -87,7 +87,7 @@ class AkPluginManager
      */
     public function addRepository($repository_path) {
         if(!in_array(trim($repository_path), $this->getAvailableRepositories(true))){
-            Ak::file_add_contents($this->_getRepositoriesConfigPath(), $repository_path."\n");
+            AkFileSystem::file_add_contents($this->_getRepositoriesConfigPath(), $repository_path."\n");
         }
     }
 
@@ -102,12 +102,12 @@ class AkPluginManager
      */
     public function removeRepository($repository_path) {
         if(file_exists($this->_getRepositoriesConfigPath())){
-            $repositories = Ak::file_get_contents($this->_getRepositoriesConfigPath());
+            $repositories = AkFileSystem::file_get_contents($this->_getRepositoriesConfigPath());
             if(!strstr($repositories, $repository_path)){
                 return false;
             }
             $repositories = str_replace(array($repository_path, "\r", "\n\n"), array('', "\n", "\n"), $repositories);
-            Ak::file_put_contents($this->_getRepositoriesConfigPath(), $repositories);
+            AkFileSystem::file_put_contents($this->_getRepositoriesConfigPath(), $repositories);
         }
     }
 
@@ -130,7 +130,7 @@ class AkPluginManager
             }
         }
 
-        return array_map('trim', Ak::convert('yaml', 'array', Ak::file_get_contents($this->_getRepositoriesCahePath())));
+        return array_map('trim', Ak::convert('yaml', 'array', AkFileSystem::file_get_contents($this->_getRepositoriesCahePath())));
     }
 
 
@@ -259,7 +259,7 @@ class AkPluginManager
         $plugin_name = Ak::sanitize_include($plugin_name, 'high');
         $this->_runInstaller($plugin_name, 'uninstall');
         if(is_dir(AK_PLUGINS_DIR.DS.$plugin_name)){
-            Ak::directory_delete(AK_PLUGINS_DIR.DS.$plugin_name);
+            AkFileSystem::directory_delete(AK_PLUGINS_DIR.DS.$plugin_name);
         }
         if($this->_shouldUseSvnExternals()){
             $this->_uninstallExternals($plugin_name);
@@ -365,7 +365,7 @@ class AkPluginManager
      */
     public function _copyRemoteDir($source, $destination) {
         $dir_name = trim(substr($source, strrpos(rtrim($source, '/'), '/')),'/');
-        Ak::make_dir($destination.DS.$dir_name);
+        AkFileSystem::make_dir($destination.DS.$dir_name);
 
         list($directories, $files) = $this->_parseRemoteAndGetDirectoriesAndFiles($source);
 
@@ -389,7 +389,7 @@ class AkPluginManager
      * @access private
      */
     public function _copyRemoteFile($source, $destination) {
-        Ak::file_put_contents($destination, Ak::url_get_contents($source));
+        AkFileSystem::file_put_contents($destination, Ak::url_get_contents($source));
     }
 
 
@@ -409,7 +409,7 @@ class AkPluginManager
             trigger_error(Ak::t('Could not fetch remote plugins from one of these repositories: %repositories', array('%repositories' => "\n".join("\n", $this->getAvailableRepositories()))), E_USER_NOTICE);
             return false;
         }
-        return Ak::file_put_contents($this->_getRepositoriesCahePath(), Ak::convert('array', 'yaml', $new_plugins));
+        return AkFileSystem::file_put_contents($this->_getRepositoriesCahePath(), Ak::convert('array', 'yaml', $new_plugins));
     }
 
 
@@ -561,9 +561,9 @@ class AkPluginManager
         }
         $tmp_file = AK_TMP_DIR.DS.Ak::uuid();
         $plugins_dir = AK_PLUGINS_DIR;
-        Ak::file_put_contents($tmp_file, join("\n", $externals));
+        AkFileSystem::file_put_contents($tmp_file, join("\n", $externals));
         `svn propset $extras -q svn:externals -F "$tmp_file" "$plugins_dir"`;
-        Ak::file_delete($tmp_file);
+        AkFileSystem::file_delete($tmp_file);
     }
 
     public function _uninstallExternals($name) {

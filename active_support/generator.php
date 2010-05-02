@@ -93,7 +93,7 @@ class AkelosGenerator
 
     public function save($file_path, $content) {
         $this->log[] = $file_path;
-        Ak::file_put_contents($file_path, $content);
+        AkFileSystem::file_put_contents($file_path, $content);
     }
 
     public function printLog() {
@@ -245,7 +245,7 @@ class AkelosGenerator
     private function _getPluginGenerators() {
         $generators = array();
         defined('AK_PLUGINS_DIR') ? null : define('AK_PLUGINS_DIR', AkConfig::getDir('app').DS.'vendor'.DS.'plugins');
-        foreach (Ak::dir(AK_PLUGINS_DIR,array('files'=>false,'dirs'=>true)) as $folder){
+        foreach (AkFileSystem::dir(AK_PLUGINS_DIR,array('files'=>false,'dirs'=>true)) as $folder){
             $plugin_name = Ak::first(array_keys($folder));
             $generators = array_merge($generators, $this->_getGeneratorsInsidePath(AK_PLUGINS_DIR.DS.$plugin_name.DS.'generators'));
         }
@@ -271,7 +271,7 @@ class AkelosGenerator
     private function _getGeneratorsInsidePath($path) {
         $generators = array();
         if(is_dir($path)){
-            foreach (Ak::dir($path,array('files'=>false,'dirs'=>true)) as $folder){
+            foreach (AkFileSystem::dir($path,array('files'=>false,'dirs'=>true)) as $folder){
                 $generator = Ak::first(array_keys($folder));
                 if(strstr($generator,'.php') || is_file($path.DS.$generator)){
                     continue;
