@@ -331,19 +331,19 @@ Example:
 
         $this->_setAutomaticTimestampColumns($column_options, $table_options);
         $this->_setAutomaticIdColumn($column_options, $table_options);
-        
+
         return $this->_createOrModifyTable($table_name, $column_options, $table_options);
     }
-    
+
     public function clearSchemaCacheForTable($table_name) {
         AkDbSchemaCache::clear($table_name);
     }
-    
+
     protected function _setAutomaticTimestampColumns($column_options, $table_options) {
         $this->timestamps = (!isset($table_options['timestamp']) || (isset($table_options['timestamp']) && $table_options['timestamp'])) &&
         (!strstr($column_options, 'created') && !strstr($column_options, 'updated'));
     }
-    
+
     protected function _setAutomaticIdColumn($column_options, $table_options) {
         if(preg_match('/^id[, ]/', trim($column_options))){
             $this->id = false;
@@ -687,7 +687,10 @@ Example:
      */
 
     public function getInstalledVersion($options = array()) {
-        if(!$Migration = $this->AkelosMigration->findFirstBy('name', $this->getInstallerName())) {
+        try{
+            $Migration = $this->AkelosMigration->findFirstBy('name', $this->getInstallerName());
+            $version = $Migration->version;
+        } catch (RecordNotFoundException $e){
             $version_file = $this->_versionPath($options);
             if(!is_file($version_file)){
                 $version = 0;
@@ -695,9 +698,6 @@ Example:
             } else {
                 $this->_removeOldVersionsFileAndUseMigrationsTable($options);
             }
-
-        }else{
-            $version = $Migration->version;
         }
         $this->log('Installed version of '.$this->getInstallerName().':'.$version);
         return $version;
@@ -705,10 +705,11 @@ Example:
 
     public function setInstalledVersion($version, $options = array()) {
         $this->log('Setting version of '.$this->getInstallerName().' to '.$version);
-        if($Migration = $this->AkelosMigration->findFirstBy('name', $this->getInstallerName())){
+        try{
+            $Migration = $this->AkelosMigration->findFirstBy('name', $this->getInstallerName());
             $Migration->version = $version;
             return $Migration->save();
-        }else{
+        } catch (RecordNotFoundException $e){
             return false != $this->AkelosMigration->create(array('name' => $this->getInstallerName(), 'version' => $version));
         }
     }
