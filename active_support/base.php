@@ -1529,7 +1529,9 @@ class Ak
                 unset($_memory[$pid][$name]);
             } else {
                 foreach ($_memory[$pid] as $name => $value) {
-                    Ak::unsetStaticVar($name);
+                    if(!preg_match('/^Ak.+/', $name)){
+                        Ak::unsetStaticVar($name);
+                    }
                 }
             }
         }
