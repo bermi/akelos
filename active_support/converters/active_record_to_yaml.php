@@ -8,10 +8,10 @@ class AkActiveRecordToYaml
 {
     public function convert() {
         $attributes = array();
-        if(is_array($this->source)){
-            foreach (array_keys($this->source) as $k){
-                if($this->source[$k] instanceof AkBaseModel){
-                    $attributes[$this->source[$k]->getId()] = $this->source[$k]->getAttributes();
+        if($this->source instanceof ArrayAccess){
+            foreach ($this->source as $Model){
+                if($Model instanceof AkBaseModel){
+                    $attributes[$Model->getId()] = $Model->getAttributes();
                 }
             }
         } elseif ($this->source instanceof AkBaseModel){
