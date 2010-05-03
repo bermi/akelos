@@ -42,12 +42,12 @@ class AkFileSystem
     static function file_put_contents($file_name, $content, $options = array()) {
         $default_options = array(
         'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
-        'base_path' => strstr($file_name, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
+        'base_path' => self::getDefaultBasePath($file_name)
         );
         $options = array_merge($default_options, $options);
 
         $file_name = self::getRestrictedPath($file_name, $options);
-        
+
         if($options['ftp']){
             if(!AkFtp::is_dir(dirname($file_name))){
                 AkFtp::make_dir(dirname($file_name));
@@ -72,7 +72,7 @@ class AkFileSystem
     static function file_get_contents($file_name, $options = array()) {
         $default_options = array(
         'ftp' => defined('AK_READ_FILES_USING_FTP') && AK_READ_FILES_USING_FTP,
-        'base_path' => strstr($file_name, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
+        'base_path' => self::getDefaultBasePath($file_name)
         );
         $options = array_merge($default_options, $options);
 
@@ -97,13 +97,13 @@ class AkFileSystem
     static function file_delete($file_name, $options = array()) {
         $default_options = array(
         'ftp' => defined('AK_DELETE_FILES_USING_FTP') && AK_DELETE_FILES_USING_FTP,
-        'base_path' => strstr($file_name, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
+        'base_path' => self::getDefaultBasePath($file_name)
         );
         $options = array_merge($default_options, $options);
 
         $file_name = self::getRestrictedPath($file_name, $options);
         $base_path = self::getNormalizedBasePath($options);
-        
+
         if($options['ftp']){
             return AkFtp::delete($file_name, true);
         }elseif (file_exists($base_path.$file_name)){
@@ -115,7 +115,7 @@ class AkFileSystem
     static function directory_delete($dir_name, $options = array()) {
         $default_options = array(
         'ftp' => defined('AK_DELETE_FILES_USING_FTP') && AK_DELETE_FILES_USING_FTP,
-        'base_path' => strstr($dir_name, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
+        'base_path' => self::getDefaultBasePath($dir_name)
         );
         $options = array_merge($default_options, $options);
 
@@ -155,7 +155,7 @@ class AkFileSystem
 
         $default_options = array(
         'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
-        'base_path' => AK_BASE_DIR
+        'base_path' => AkConfig::getDir('base')
         );
 
         $options = array_merge($default_options, $options);
@@ -205,7 +205,7 @@ class AkFileSystem
     static function copy($origin, $target, $options = array()) {
         $default_options = array(
         'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
-        'base_path' => strstr($origin, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
+        'base_path' => self::getDefaultBasePath($origin)
         );
         $options = array_merge($default_options, $options);
 
@@ -219,7 +219,7 @@ class AkFileSystem
         }
 
         $destination = str_replace($origin, $target, $origin);
-            $base_path = self::getNormalizedBasePath($options);
+        $base_path = self::getNormalizedBasePath($options);
         if(is_file($base_path.$origin)){
             return self::file_put_contents($base_path.$destination, self::file_get_contents($base_path.$origin, $options), $options);
         }
@@ -253,25 +253,29 @@ class AkFileSystem
         }
         $default_options = array(
         'ftp' => false,
-        'base_path' => strstr($path, AK_TMP_DIR) ?  AK_TMP_DIR : AK_BASE_DIR,
+        'base_path' => self::getDefaultBasePath($path)
         );
         $options = array_merge($default_options, $options);
 
         $path = str_replace('..','', rtrim($path,'\\/. '));
         $path = trim(str_replace($options['base_path'], '', $path), DS);
-        
+
         if($options['ftp']){
             $path = trim(str_replace(array(DS,'//'),array('/','/'), $path),'/');
         }
 
         return $path;
     }
-    
+
     /**
      * Gets a normalized base path for a base_path in options
      */
     static function getNormalizedBasePath($options = array()) {
         return (AK_WIN && empty($options['base_path']) ? '' : $options['base_path'].DS);
     }
-    
+
+    static function getDefaultBasePath($for_path = null){
+        return strstr($for_path, AK_TMP_DIR) ?  AK_TMP_DIR : AkConfig::getDir(defined('AK_CORE_DIR')? 'core' : 'base');
+    }
+
 }
