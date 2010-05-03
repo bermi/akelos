@@ -18,11 +18,13 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
         $this->assertTrue($someModel->hasColumn('id'));
         $this->assertTrue($someModel->hasColumn('body'));
         $this->assertTrue($someModel->create(array('body'=>'something')));
+
         $this->assertTrue($someModel->find('first',array('body'=>'something')));
 
         $unit_tester->installAndIncludeModels(array('SomeSillyModel'=>'id,body'));
 
-        $this->assertFalse($someModel->find('all'));
+        $this->expectException('RecordNotFoundException');
+        $someModel->find('all');
 
     }
 
@@ -68,14 +70,22 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
         $this->assertEqual($TheModel->count(),4);
 
         $this->assertTrue($AllRecords = $TheModel->find());
+
         $yaml = $TheModel->toYaml($AllRecords);
 
         $yaml_path = AkConfig::getDir('fixtures').DS.'the_models.yml';
+
         $this->assertFalse(file_exists($yaml_path));
         AkFileSystem::file_put_contents($yaml_path, $yaml);
 
         $unit_tester->installAndIncludeModels(array('TheModel'=>'id,name'));
-        $this->assertFalse($TheModel->find());
+
+        try{
+            $TheModel->find();
+        } catch (RecordNotFoundException $e){
+            $this->pass();
+        }
+
         $this->assertEqual($TheModel->count(),0);
 
         $unit_tester->installAndIncludeModels(array('TheModel'=>'id,name'), array('populate'=>true));
@@ -111,7 +121,9 @@ class UnitTest_TestCase extends ActiveSupportUnitTest
         $this->assertTrue($unit_tester->DummyPicture->find('first', array('title'=>__FUNCTION__)));
 
         $unit_tester->uninstallAndInstallMigration('DummyPicture');
-        $this->assertFalse($unit_tester->DummyPicture->find('all'));
+
+        $this->expectException('RecordNotFoundException');
+        $unit_tester->DummyPicture->find('all');
     }
 
 }
