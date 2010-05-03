@@ -1593,13 +1593,6 @@ class Ak
         return $default_value;
     }
 
-    static function _parseSettingsConstants($settingsStr) {
-        return preg_replace_callback('/\$\{(AK_.*?)\}/',array('Ak','getConstant'),$settingsStr);
-    }
-
-    static function getConstant($name) {
-        return defined($name[1])?constant($name[1]):'';
-    }
 
     /**
      * Get a models a model instance. Including and instantiating the model for us.

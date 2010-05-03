@@ -112,10 +112,6 @@ class AkConfig
         return $_configs[$namespace][$environment];
     }
 
-    static function getConstant($name) {
-        return defined($name[1]) ? constant($name[1]) : '';
-    }
-
     static function getDir($type, $_set_value = false, $fail_if_not_found = true) {
         static $dir_names = array();
         if($_set_value){
