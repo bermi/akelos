@@ -12,6 +12,7 @@ if(!defined('AK_BASE_DIR')){
     if(is_dir($__ak_base_dir.DS.'app_layout')){
         defined('AK_FRAMEWORK_DIR') || define('AK_FRAMEWORK_DIR', $__ak_base_dir);
         defined('AK_TEST_DIR')      || define('AK_TEST_DIR', AK_FRAMEWORK_DIR.DS.'test');
+        defined('AK_CORE_DIR')      || define('AK_CORE_DIR', AK_FRAMEWORK_DIR);
         define('AK_SKIP_CONFIG', false);
         $__ak_base_dir .= DS.'app_layout';
     }
