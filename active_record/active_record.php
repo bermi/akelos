@@ -559,7 +559,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         if ($this->isLockingEnabled() && $affected_rows != 1){
             $this->setAttribute('lock_version', $previous_value);
-            trigger_error(Ak::t('Attempted to update a stale object').Ak::getFileAndNumberTextForError(1), E_USER_NOTICE);
+            trigger_error(Ak::t('Attempted to update a stale object').AkDebug::getFileAndNumberTextForError(1), E_USER_NOTICE);
             return $this->transactionFail();
         }
 
@@ -1162,7 +1162,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
     */
     public function setPrimaryKey($primary_key = 'id') {
         if(!$this->hasColumn($primary_key)){
-            trigger_error($this->t('Opps! We could not find primary key column %primary_key on the table %table, for the model %model',array('%primary_key'=>$primary_key,'%table'=>$this->getTableName(), '%model'=>$this->getModelName())).' '.Ak::getFileAndNumberTextForError(1),E_USER_ERROR);
+            trigger_error($this->t('Opps! We could not find primary key column %primary_key on the table %table, for the model %model',array('%primary_key'=>$primary_key,'%table'=>$this->getTableName(), '%model'=>$this->getModelName())).' '.AkDebug::getFileAndNumberTextForError(1),E_USER_ERROR);
         }else {
             $this->_primaryKey = $primary_key;
         }
@@ -1196,7 +1196,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
                     trigger_error(Ak::t('Unable to set "%table_name" table for the model "%model".'.
                     '  There is no "%table_name" available into current database layout.'.
                     ' Set AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES constant to false in order to'.
-                    ' avoid table name validation',array('%table_name'=>$table_name,'%model'=>$this->getModelName())).Ak::getFileAndNumberTextForError(1),E_USER_WARNING);
+                    ' avoid table name validation',array('%table_name'=>$table_name,'%model'=>$this->getModelName())).AkDebug::getFileAndNumberTextForError(1),E_USER_WARNING);
                 }
                 return false;
             }
@@ -1350,7 +1350,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         !$this->_runCurrentModelInstallerIfExists($column_objects)){
             // akelos_migrations is the first active record to be installed, therefore the table will be created after the first run.
             if($this->getTableName() != 'akelos_migrations'){
-                trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())).Ak::getFileAndNumberTextForError(4), E_USER_NOTICE);
+                trigger_error(Ak::t('Ooops! Could not fetch details for the table %table_name.', array('%table_name'=>$this->getTableName())).AkDebug::getFileAndNumberTextForError(4), E_USER_NOTICE);
             }
             return false;
         }elseif (empty($column_objects)){
@@ -2053,7 +2053,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
             }
         }
         if(!class_exists($class_name)){
-            trigger_error(Ak::t('The class %class used for handling an "act_as %class" does not exist',array('%class'=>$class_name)).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
+            trigger_error(Ak::t('The class %class used for handling an "act_as %class" does not exist',array('%class'=>$class_name)).AkDebug::getFileAndNumberTextForError(1), E_USER_ERROR);
             $false = false;
             return $false;
         }else{

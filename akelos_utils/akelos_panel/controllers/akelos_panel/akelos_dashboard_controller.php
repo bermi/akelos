@@ -18,7 +18,7 @@ class AkelosPanel_AkelosDashboardController extends AkelosPanelController
         $this->new_install          =   !$this->has_configuration || !$this->has_routes || $this->using_root_path;
         $this->environment          = AK_ENVIRONMENT;
         $this->memcached_on         = AkMemcache::isServerUp();
-        $this->constants            = Ak::get_constants();
+        $this->constants            = AkDebug::get_constants();
         $this->langs                = Ak::langs();
         $this->database_settings    = Ak::getSettings('database', false);
 

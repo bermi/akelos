@@ -106,7 +106,7 @@ class AkActiveRecordCombinedAttributes extends AkActiveRecordExtenssion
         }
         if(!empty($invalid_columns)){
             trigger_error(Ak::t('There was an error while setting the composed field "%field_name", the following mapping column/s "%columns" do not exist',
-            array('%field_name'=>$args[0],'%columns'=>join(', ',$invalid_columns))).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
+            array('%field_name'=>$args[0],'%columns'=>join(', ',$invalid_columns))).AkDebug::getFileAndNumberTextForError(1), E_USER_ERROR);
         }else{
             $attribute = array_shift($args);
             $this->_ActiveRecord->_combinedAttributes[$attribute] = $args;

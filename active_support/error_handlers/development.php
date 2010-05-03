@@ -135,7 +135,7 @@ if(defined('AK_DEBUG') && AK_DEBUG){
         if(!AK_TRACE_DB_QUERIES_INCLUDES_DB_TYPE){
             $message = preg_replace('/\([a-z0-9]+\): /','', trim($message, "\n-"));
         }
-        $details = Ak::getLastFileAndLineAndMethod(AK_TRACE_ONLY_APP_DB_QUERIES);
+        $details = AkDebug::getLastFileAndLineAndMethod(AK_TRACE_ONLY_APP_DB_QUERIES);
         if(empty($details)){
             $details = array(null, null, null);
         }

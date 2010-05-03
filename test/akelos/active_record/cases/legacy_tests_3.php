@@ -105,7 +105,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
         $this->assertEqual(count($AkTestFields->findAll()), 3);
 
         // 20 - 30
-        //Ak::debug($ids);
+        //AkDebug::debug($ids);
 
     }
 

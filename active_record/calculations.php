@@ -134,7 +134,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
         count($conditions=null, $joins=null)
         */
         if(count($args) > 2){
-            trigger_error(Ak::t("Unexpected parameters passed to count(\$options=array())").Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
+            trigger_error(Ak::t("Unexpected parameters passed to count(\$options=array())").AkDebug::getFileAndNumberTextForError(1), E_USER_ERROR);
         }elseif(count($args) > 0){
             if(!empty($args[0]) && is_array($args[0])){
                 $options = $args[0];
@@ -207,7 +207,7 @@ class AkActiveRecordCalculations extends AkActiveRecordExtenssion
     protected function _validateCalculationOptions($options = array()) {
         $invalid_options = array_diff(array_keys($options),$this->_calculation_options);
         if(!empty($invalid_options)){
-            trigger_error(Ak::t('%options are not valid calculation options.', array('%options'=>join(', ',$invalid_options))).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
+            trigger_error(Ak::t('%options are not valid calculation options.', array('%options'=>join(', ',$invalid_options))).AkDebug::getFileAndNumberTextForError(1), E_USER_ERROR);
         }
     }
 

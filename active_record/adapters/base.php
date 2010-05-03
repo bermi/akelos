@@ -224,7 +224,7 @@ class AkDbAdapter
             $error_message = '['.$this->connection->ErrorNo().'] '.$this->connection->ErrorMsg();
             $this->_log('SQL Error: '.$error_message);
             if ($this->debug || AK_DEBUG) {
-                trigger_error("Tried '$sql_string'. Got: $error_message.".Ak::getFileAndNumberTextForError(4), E_USER_NOTICE);
+                trigger_error("Tried '$sql_string'. Got: $error_message.".AkDebug::getFileAndNumberTextForError(4), E_USER_NOTICE);
             }
         }
         return $result;

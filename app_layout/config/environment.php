@@ -5,7 +5,7 @@
  * environment guessing. You can override most Akelos constants by declaring them in 
  * this file.
  *
- * You can retrieve a list of current settings by running Ak::get_constants();
+ * You can retrieve a list of current settings by running AkDebug::get_constants();
  *
  * If you're running a high load site you might want to fine tune this options
  * according to your environment. If you set the options implicitly you might

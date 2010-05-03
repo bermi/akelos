@@ -18,12 +18,12 @@ class AkDispatcher
         try{
             if(!$this->dispatchCached()){
                 $time_start = microtime(true);
-                AK_ENABLE_PROFILER &&  Ak::profile(__CLASS__.'::'.__FUNCTION__.'() call');
+                AK_ENABLE_PROFILER &&  AkDebug::profile(__CLASS__.'::'.__FUNCTION__.'() call');
                 $this->Request = AkRequest::getInstance();
                 $this->Response = new AkResponse();
                 if($this->Controller = $this->Request->recognize()){
                     $this->Controller->ak_time_start = $time_start;
-                    AK_ENABLE_PROFILER && Ak::profile('Request::recognize() completed');
+                    AK_ENABLE_PROFILER && AkDebug::profile('Request::recognize() completed');
                     $this->Controller->process($this->Request, $this->Response);
                 }
             }
@@ -53,7 +53,7 @@ class AkDispatcher
 
         try{
             $time_start = microtime(true);
-            AK_ENABLE_PROFILER &&  Ak::profile(__CLASS__.'::'.__FUNCTION__.'() call');
+            AK_ENABLE_PROFILER &&  AkDebug::profile(__CLASS__.'::'.__FUNCTION__.'() call');
             $this->Request = AkRequest::getInstance();
             $this->Response = new AkResponse();
             
@@ -72,7 +72,7 @@ class AkDispatcher
             }else{
               if($this->Controller = $this->Request->recognize()){
                 $this->Controller->ak_time_start = $time_start;
-                AK_ENABLE_PROFILER && Ak::profile('Request::recognize() completed');
+                AK_ENABLE_PROFILER && AkDebug::profile('Request::recognize() completed');
                 $this->Controller->process($this->Request, $this->Response);
               }
               return $this->Response;

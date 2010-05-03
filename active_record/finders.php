@@ -390,7 +390,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
                 "This error is raised because the column '%column' is reserved for storing the class in case of inheritance. ".
                 "Please rename this column if you didn't intend it to be used for storing the inheritance class ".
                 "or overwrite #{self.to_s}.inheritance_column to use another column for that information.",
-                array('%class_name'=>$inheritance_model_name, '%column'=>$this->_ActiveRecord->getInheritanceColumn())).Ak::getFileAndNumberTextForError(1),E_USER_ERROR);
+                array('%class_name'=>$inheritance_model_name, '%column'=>$this->_ActiveRecord->getInheritanceColumn())).AkDebug::getFileAndNumberTextForError(1),E_USER_ERROR);
             }
         }
 

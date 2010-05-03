@@ -176,7 +176,7 @@ class SourceAnalyzer
                 $Classes = $ClassInstance->updateClassDetails($UnIndexedPages[$k], $Component, $this);
 
                 if(!empty($Classes)){
-                    //Ak::debug($Classes);
+                    //AkDebug::debug($Classes);
                 }
 
                 $UnIndexedPages[$k]->set('has_been_analyzed', true);
@@ -205,7 +205,7 @@ class SourceAnalyzer
             $Classes = $ClassInstance->updateClassDetails($UnIndexedPage, $Component, $this);
 
             if(!empty($Classes)){
-                //Ak::debug($Classes);
+                //AkDebug::debug($Classes);
             }
 
             $UnIndexedPage->set('has_been_analyzed', true);

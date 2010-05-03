@@ -70,27 +70,27 @@ class ObjectInspection_TestCase extends ActiveSupportUnitTest
 
     public function Test_debug() {
         ob_start();
-        Ak::debug($this->AkTestingObjectInspectionChildInstance);
+        AkDebug::debug($this->AkTestingObjectInspectionChildInstance);
         $debug_str = ob_get_contents();
         ob_end_clean();
-        $this->assertFalse($debug_str == '','Ak::debug not working properly');
+        $this->assertFalse($debug_str == '','AkDebug::debug not working properly');
     }
 
     public function Test_get_object_info() {
-        $this->assertNotEqual(md5(serialize(Ak::get_object_info($this->AkTestingObjectInspectionChildInstance))),
-        md5(serialize(Ak::get_object_info($this->AkTestingObjectInspectionChildInstance,true))),'Object inspection does not exclude parent class methods');
+        $this->assertNotEqual(md5(serialize(AkDebug::get_object_info($this->AkTestingObjectInspectionChildInstance))),
+        md5(serialize(AkDebug::get_object_info($this->AkTestingObjectInspectionChildInstance,true))),'Object inspection does not exclude parent class methods');
 
     }
 
     public function Test_get_this_object_methods() {
         $expected_methods = array('AkTestingObjectInspectionChild','child_function','child_method');
-        $resulting_methods = Ak::get_this_object_methods($this->AkTestingObjectInspectionChildInstance);
+        $resulting_methods = AkDebug::get_this_object_methods($this->AkTestingObjectInspectionChildInstance);
         $this->assertEqual($expected_methods,$resulting_methods);
     }
 
     public function Test_get_this_object_attributes() {
         $expected_attributes = array('child_var'=>null,'child_var_null'=>null,'child_var_string'=>'abc','child_var_int'=>123);
-        $resulting_attributes = Ak::get_this_object_attributes($this->AkTestingObjectInspectionChildInstance);
+        $resulting_attributes = AkDebug::get_this_object_attributes($this->AkTestingObjectInspectionChildInstance);
         $this->assertEqual($expected_attributes,$resulting_attributes);
     }
 

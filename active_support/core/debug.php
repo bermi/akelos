@@ -280,11 +280,11 @@ class AkDebug
      *
      * You can add benchmark markers by calling
      *
-     *    Ak::profile('Searching for books');
+     *    AkDebug::profile('Searching for books');
      *
      * To display the results you need to call
      *
-     *     Ak::profile(true);
+     *     AkDebug::profile(true);
      *
      * You might also find handy adding this to your application controller.
      *
@@ -295,7 +295,7 @@ class AkDebug
      *             parent::__construct();
      *         }
      *         static function _displayBenchmark(){
-     *             Ak::profile(true);
+     *             AkDebug::profile(true);
      *         }
      *     }
      *

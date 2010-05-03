@@ -350,7 +350,7 @@ class AkLogger implements AkLoggerInterface
     public function handleDisplayMessage($error_level, $message, $parameters = array()){
         if(AkConfig::getOption('logger.display_message', true)){
             if(!empty($this->options['print'])){
-                list($file,$line,$method) = Ak::getLastFileAndLineAndMethod(false, 3);
+                list($file,$line,$method) = AkDebug::getLastFileAndLineAndMethod(false, 3);
                 AkDebug::trace("<strong>[$error_level]</strong> - ".AkTextHelper::html_escape($message), $line, $file, $method, false);
                 if(!empty($parameters)) {
                     AkDebug::trace($parameters, $line, $file, $method);

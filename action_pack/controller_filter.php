@@ -368,11 +368,11 @@ class AkControllerFilter
 
     public function performActionWithFilters($method = '') {
         if ($this->beforeAction($method) !== false && !empty($this->_FilteredObject) && method_exists($this->_FilteredObject, 'hasPerformed') && !$this->_FilteredObject->hasPerformed()){
-            if(AK_ENABLE_PROFILER) Ak::profile("Called $method  before filters");
+            if(AK_ENABLE_PROFILER) AkDebug::profile("Called $method  before filters");
             $this->_FilteredObject->performActionWithoutFilters($method);
-            if(AK_ENABLE_PROFILER) Ak::profile("Performed $method  action");
+            if(AK_ENABLE_PROFILER) AkDebug::profile("Performed $method  action");
             $this->afterAction($method);
-            if(AK_ENABLE_PROFILER) Ak::profile("Called $method  after filters");
+            if(AK_ENABLE_PROFILER) AkDebug::profile("Called $method  after filters");
             return true;
         }
         return false;

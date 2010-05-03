@@ -102,7 +102,7 @@ class NestedFinders_TestCase extends ActiveRecordUnitTest
         $babies = array($bb1,$bb2);
         $aa->babies->set($babies);
 
-        //Ak::debug($aa);
+        //AkDebug::debug($aa);
 
         $this->assertEqual(2,count($aa->bbs));
 
@@ -172,7 +172,7 @@ class NestedFinders_TestCase extends ActiveRecordUnitTest
         $babies = array($bb1,$bb2);
         $aa->babies->set($babies);
 
-        //Ak::debug($aa);
+        //AkDebug::debug($aa);
 
         $this->assertEqual(2,count($aa->bbs));
 
@@ -240,13 +240,13 @@ class NestedFinders_TestCase extends ActiveRecordUnitTest
         $dd1 = $this->Dd->create(array('name'=>'first dd'));
         $dd2 = $this->Dd->create(array('name'=>'second dd'));
         $dd3 = $this->Dd->create(array('name'=>'third dd'));
-        //Ak::debug($dd1);
-        //Ak::debug($cc1->dd);
+        //AkDebug::debug($dd1);
+        //AkDebug::debug($cc1->dd);
         $cc1->dd->assign($dd1);
         $cc2->dd->assign($dd2);
         $cc3->dd->assign($dd3);
 
-        //Ak::debug($dd1->easy);
+        //AkDebug::debug($dd1->easy);
         //die;
 
         $ee1 = $this->Ee->create(array('name'=>'first ee'));
@@ -362,7 +362,7 @@ class NestedFinders_TestCase extends ActiveRecordUnitTest
         $babies = array($bb1,$bb2);
         $aa->babies->set($babies);
 
-        //Ak::debug($aa);
+        //AkDebug::debug($aa);
 
         $this->assertEqual(2,count($aa->bbs));
 

@@ -34,10 +34,10 @@ class AkActiveRecordTableInheritance extends AkActiveRecordExtenssion
      */
     public function setInheritanceColumn($column_name) {
         if(!$this->_ActiveRecord->hasColumn($column_name)){
-            trigger_error(Ak::t('Could not set "%column_name" as the inheritance column as this column is not available on the database.',array('%column_name'=>$column_name)).' '.Ak::getFileAndNumberTextForError(1), E_USER_NOTICE);
+            trigger_error(Ak::t('Could not set "%column_name" as the inheritance column as this column is not available on the database.',array('%column_name'=>$column_name)).' '.AkDebug::getFileAndNumberTextForError(1), E_USER_NOTICE);
             return false;
         }elseif($this->_ActiveRecord->getColumnType($column_name) != 'string'){
-            trigger_error(Ak::t('Could not set %column_name as the inheritance column as this column type is "%column_type" instead of "string".',array('%column_name'=>$column_name,'%column_type'=>$this->_ActiveRecord->getColumnType($column_name))).' '.Ak::getFileAndNumberTextForError(1), E_USER_NOTICE);
+            trigger_error(Ak::t('Could not set %column_name as the inheritance column as this column type is "%column_type" instead of "string".',array('%column_name'=>$column_name,'%column_type'=>$this->_ActiveRecord->getColumnType($column_name))).' '.AkDebug::getFileAndNumberTextForError(1), E_USER_NOTICE);
             return false;
         }else{
             $this->_ActiveRecord->_inheritanceColumn = $column_name;

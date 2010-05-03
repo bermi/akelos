@@ -129,7 +129,7 @@ class AkConfig
         }
         if(!isset($dir_names[$type])){
             if($fail_if_not_found){
-                trigger_error(Ak::t('Can\'t find path for directory %dir', array('%dir'=>$type)).' '.Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
+                trigger_error(Ak::t('Can\'t find path for directory %dir', array('%dir'=>$type)).' '.AkDebug::getFileAndNumberTextForError(1), E_USER_ERROR);
             }else{
                 return false;
             }
@@ -196,18 +196,18 @@ class AkConfig
 
     static function getLocalesReady() {
         Ak::t('Akelos');
-        AK_ENABLE_PROFILER &&  Ak::profile('Got multilingual ');
+        AK_ENABLE_PROFILER &&  AkDebug::profile('Got multilingual ');
     }
 
     static function parseSettingsConstants($settingsStr) {
-        return preg_replace_callback('/\$\{(AK_.*?)\}/',array('AkConfig','getConstant'),$settingsStr);
+        return preg_replace_callback('/\$\{(AK_.*?)\}/', create_function('$arr', 'return defined($arr[1]) ? constant($arr[1]) : "";'), $settingsStr);
     }
 
     public function readConfig($namespace, $environment = AK_ENVIRONMENT, $raise_error_if_config_file_not_found = true) {
         $yaml_file_name = $this->_generateConfigFileName($namespace);
         if (!file_exists($yaml_file_name)){
             if($raise_error_if_config_file_not_found){
-                trigger_error(Ak::t('Could not find %namespace settings file in %path.', array('%namespace'=>$namespace, '%path'=>$yaml_file_name)).' '.Ak::getFileAndNumberTextForError(1)."\n", E_USER_ERROR);
+                trigger_error(Ak::t('Could not find %namespace settings file in %path.', array('%namespace'=>$namespace, '%path'=>$yaml_file_name)).' '.AkDebug::getFileAndNumberTextForError(1)."\n", E_USER_ERROR);
             }
             return false;
         }
@@ -286,7 +286,7 @@ CACHE;
         $cache_file_name = $this->getCacheFileName($namespace, $environment);
 
         if(!AkFileSystem::file_put_contents($cache_file_name, $cache, array('base_path' => AkConfig::getCacheBasePath()))){
-            trigger_error(Ak::t('Could not create config cache file %file', array('%file'=>$cache_file_name)).' '.Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
+            trigger_error(Ak::t('Could not create config cache file %file', array('%file'=>$cache_file_name)).' '.AkDebug::getFileAndNumberTextForError(1), E_USER_ERROR);
             return false;
         }else{
             return true;

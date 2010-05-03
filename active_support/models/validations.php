@@ -252,14 +252,14 @@ class AkModelValidations extends AkModelExtenssion
         // Ensure that one and only one range option is specified.
         switch (count($range_options)) {
             case 0:
-                trigger_error(Ak::t('Range unspecified.  Specify the "within", "maximum", "minimum, or "is" option.').Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
+                trigger_error(Ak::t('Range unspecified.  Specify the "within", "maximum", "minimum, or "is" option.').AkDebug::getFileAndNumberTextForError(1), E_USER_ERROR);
                 return false;
                 break;
             case 1:
                 $options = array_merge($default_options, $options);
                 break;
             default:
-                trigger_error(Ak::t('Too many range options specified.  Choose only one.').Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
+                trigger_error(Ak::t('Too many range options specified.  Choose only one.').AkDebug::getFileAndNumberTextForError(1), E_USER_ERROR);
                 return false;
                 break;
         }
@@ -269,7 +269,7 @@ class AkModelValidations extends AkModelExtenssion
             case 'within':
             case 'in':
                 if(empty($option_value) || !is_array($option_value) || count($option_value) != 2 || !is_numeric($option_value[0]) || !is_numeric($option_value[1])){
-                    trigger_error(Ak::t('%option must be a Range (array(min, max))',array('%option',$option)).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
+                    trigger_error(Ak::t('%option must be a Range (array(min, max))',array('%option',$option)).AkDebug::getFileAndNumberTextForError(1), E_USER_ERROR);
                     return false;
                 }
                 $attribute_names = Ak::toArray($attribute_names);
@@ -289,7 +289,7 @@ class AkModelValidations extends AkModelExtenssion
             case 'maximum':
 
                 if(empty($option_value) || !is_numeric($option_value) || $option_value <= 0){
-                    trigger_error(Ak::t('%option must be a nonnegative Integer',array('%option',$option_value)).Ak::getFileAndNumberTextForError(1), E_USER_ERROR);
+                    trigger_error(Ak::t('%option must be a nonnegative Integer',array('%option',$option_value)).AkDebug::getFileAndNumberTextForError(1), E_USER_ERROR);
                     return false;
                 }
 

@@ -131,12 +131,12 @@ class AkActionController extends AkLazyObject
 
 
     public function process(&$Request, &$Response, $options = array()) {
-        if(AK_ENABLE_PROFILER) Ak::profile('AkActionController::process() start');
+        if(AK_ENABLE_PROFILER) AkDebug::profile('AkActionController::process() start');
 
         $this->setRequestAndResponse($Request, $Response);
 
         if(AK_LOG_EVENTS) $this->_logRequestParams($this->params);
-        if(AK_ENABLE_PROFILER) Ak::profile('Got request paramenters');
+        if(AK_ENABLE_PROFILER) AkDebug::profile('Got request paramenters');
 
         $actionExists = $this->_ensureActionExists();
 
@@ -150,11 +150,11 @@ class AkActionController extends AkLazyObject
         if($this->_high_load_mode !== true){
             if(!empty($this->_auto_instantiate_models)){
                 $this->instantiateIncludedModelClasses();
-                if(AK_ENABLE_PROFILER) Ak::profile('Instantiated models');
+                if(AK_ENABLE_PROFILER) AkDebug::profile('Instantiated models');
             }
             if(!empty($this->_enable_plugins)){
                 $this->loadPlugins();
-                if(AK_ENABLE_PROFILER)  Ak::profile('Instantiated plugins');
+                if(AK_ENABLE_PROFILER)  AkDebug::profile('Instantiated plugins');
             }
         }
 

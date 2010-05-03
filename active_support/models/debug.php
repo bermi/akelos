@@ -81,7 +81,7 @@ class AkModelDebug extends AkModelExtenssion
                             AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key) :
                             printf ("<li>(%s) <b>%s</b>:\n",$type, $key);
                             ob_start();
-                            Ak::debug ($value,$sf);
+                            AkDebug::debug ($value,$sf);
                             $lines = explode("\n",ob_get_clean()."\n");
                             foreach ($lines as $line){
                                 echo "\t".$line."\n";
@@ -92,7 +92,7 @@ class AkModelDebug extends AkModelExtenssion
                                 AK_CLI ? printf ("\t* (%s) %s:\n",$type, $key) :
                                 printf ("<li>(%s) <b>%s</b>:\n",$type, $key);
                                 ob_start();
-                                Ak::debug ($value,$sf);
+                                AkDebug::debug ($value,$sf);
                                 $lines = explode("\n",ob_get_clean()."\n");
                                 foreach ($lines as $line){
                                     echo "\t".$line."\n";
