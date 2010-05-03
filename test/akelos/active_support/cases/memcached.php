@@ -13,7 +13,7 @@ class Memcached_TestCase extends ActiveSupportUnitTest
     }
 
     public function skip(){
-        $this->skipIf(!$this->memcached_enabled, '['.get_class($this).'] Can\'t connec to to memcached server.');
+        $this->skipIf(!$this->memcached_enabled, '['.get_class($this).'] Can\'t connect to to memcached server.');
     }
 
     public function setUp() {
