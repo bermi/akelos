@@ -524,7 +524,7 @@ defined('AK_ACTIVE_RECORD_CACHE_DATABASE_SCHEMA_LIFE')          || define('AK_AC
 defined('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES')                || define('AK_ACTIVE_RECORD_VALIDATE_TABLE_NAMES', true);
 defined('AK_ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS') || define('AK_ACTIVE_RECORD_SKIP_SETTING_ACTIVE_RECORD_DEFAULTS', false);
 defined('AK_NOT_EMPTY_REGULAR_EXPRESSION')                      || define('AK_NOT_EMPTY_REGULAR_EXPRESSION','/.+/');
-defined('AK_EMAIL_REGULAR_EXPRESSION')                          || define('AK_EMAIL_REGULAR_EXPRESSION',"/^([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)$/i");
+defined('AK_EMAIL_REGULAR_EXPRESSION')                          || define('AK_EMAIL_REGULAR_EXPRESSION',"/^([\w\!\#$\%\&\'\*\+\-\/\=\?\^\`{\|\}\~]+\.)*[\w\!\#$\%\&\'\*\+\-\/\=\?\^\`{\|\}\~]+@((((([a-z0-9]{1}[a-z0-9\-]{0,62}[a-z0-9]{1})|[a-z])\.)+[a-z]{2,6})|(\d{1,3}\.){3}\d{1,3}(\:\d{1,5})?)$/i");
 defined('AK_NUMBER_REGULAR_EXPRESSION')                         || define('AK_NUMBER_REGULAR_EXPRESSION',"/^[0-9]+$/");
 defined('AK_PHONE_REGULAR_EXPRESSION')                          || define('AK_PHONE_REGULAR_EXPRESSION',"/^([\+]?[(]?[\+]?[ ]?[0-9]{2,3}[)]?[ ]?)?[0-9 ()\-]{4,25}$/");
 defined('AK_DATE_REGULAR_EXPRESSION')                           || define('AK_DATE_REGULAR_EXPRESSION',"/^(([0-9]{1,2}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{2,4})|([0-9]{2,4}(\-|\/|\.| )[0-9]{1,2}(\-|\/|\.| )[0-9]{1,2})){1}$/");
@@ -552,13 +552,10 @@ defined('AK_TESTING_NAMESPACE')                 || define('AK_TESTING_NAMESPACE'
 defined('AK_ACTION_MAILER_DELIVERY_METHOD')                 || define('AK_ACTION_MAILER_DELIVERY_METHOD', AK_TEST_MODE ? 'test' : 'php');
 defined('AK_ACTION_MAILER_DEFAULT_CHARSET')                 || define('AK_ACTION_MAILER_DEFAULT_CHARSET', AK_CHARSET);
 defined('AK_ACTION_MAILER_EOL')                             || define('AK_ACTION_MAILER_EOL', "\r\n");
-defined('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION')        || define('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION', "([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)");
+defined('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION')        || define('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION', trim(AK_EMAIL_REGULAR_EXPRESSION, '/^$i'));
 defined('AK_ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION')|| define('AK_ACTION_MAILER_RFC_2822_DATE_REGULAR_EXPRESSION', "(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun), *)?(\d\d?) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d\d\d\d) (\d{2}:\d{2}(?::\d\d)) (UT|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|[A-Z]|(?:\+|\-)\d{4})");
 defined('AK_ACTION_MAILER_CHARS_NEEDING_QUOTING_REGEX')     || define('AK_ACTION_MAILER_CHARS_NEEDING_QUOTING_REGEX', "/[\\000-\\011\\013\\014\\016-\\037\\177-\\377]/");
 defined('AK_ACTION_MAILER_EMULATE_IMAP_8_BIT')              || define('AK_ACTION_MAILER_EMULATE_IMAP_8_BIT', true);
-defined('AK_ACTION_MAILER_DEFAULT_CHARSET')                 || define('AK_ACTION_MAILER_DEFAULT_CHARSET', AK_CHARSET);
-defined('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION')        || define('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION', '([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)');
-defined('AK_ACTION_MAILER_EMULATE_IMAP_8_BIT')              || define('AK_ACTION_MAILER_EMAIL_REGULAR_EXPRESSION', '([a-z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-z0-9\-]+\.)+))([a-z]{2,4}|[0-9]{1,3})(\]?)');
 defined('AK_CLASS_EXTENDER_ENABLE_CACHE')                   || define('AK_CLASS_EXTENDER_ENABLE_CACHE', !AK_DEV_MODE);
 
 defined('AK_GENERATE_HELPER_FUNCTIONS_FOR_NAMED_ROUTES')    || define('AK_GENERATE_HELPER_FUNCTIONS_FOR_NAMED_ROUTES',true);
