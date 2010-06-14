@@ -426,7 +426,7 @@ class AkPaginator
         return $this->paginator->numPages();
     }
 
-    public function lenght() {
+    public function length() {
         return $this->pageCount();
     }
 
