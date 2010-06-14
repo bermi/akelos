@@ -1665,9 +1665,9 @@ class Ak
             if(empty($dir)){
                 trigger_error('Could not find a path for temporary files. Please define AK_TMP_DIR in your config.php', E_USER_ERROR);
             }
-            $dir = rtrim(realpath($dir), DS).DS.'ak_'.md5(AK_BASE_DIR);
+            $dir = rtrim(realpath($dir), DS).DS.'ak_'.md5(AK_BASE_DIR).DS.(AK_WEB_REQUEST ? 'web' : 'cli');
             if(!is_dir($dir)){
-                mkdir($dir);
+                mkdir($dir, 0777, true);
             }
             return $dir;
         }
