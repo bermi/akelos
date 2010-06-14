@@ -107,7 +107,7 @@ class AkCookieStore {
             throw new ArgumentException(
             Ak::t('Secret should be something secure, '.
             'like "%rand". The value you provided "%secret", '.
-            'is shorter than the minimum length of %length characters', array('%length' => self::SECRET_MIN_LENGTH, '%rand' => Ak::uuid())));
+            'is shorter than the minimum length of %length characters', array('%length' => self::SECRET_MIN_LENGTH, '%rand' => Ak::uuid(), '%secret' => $this->options['secret'])));
         }
     }
 
