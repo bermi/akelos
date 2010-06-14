@@ -12,9 +12,9 @@
  * 
  * You need to comment this route or point it to a different base in order to accept
  * Requests in your applicaiton.
- */
-// $Map->connect('/dev_panel/:controller/:action/:id', array(
-$Map->connect('/:controller/:action/:id', array(
+ * /
+ // $Map->connect('/dev_panel/:controller/:action/:id', array(
+ $Map->connect('/:controller/:action/:id', array(
               'controller' => 'akelos_dashboard', 
               'action' => 'index', 
               'module' => 'akelos_panel',
