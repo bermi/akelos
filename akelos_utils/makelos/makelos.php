@@ -13,12 +13,12 @@ if(!defined('AK_BASE_DIR')){
         defined('AK_FRAMEWORK_DIR') || define('AK_FRAMEWORK_DIR', $__ak_base_dir);
         defined('AK_TEST_DIR')      || define('AK_TEST_DIR', AK_FRAMEWORK_DIR.DS.'test');
         defined('AK_CORE_DIR')      || define('AK_CORE_DIR', AK_FRAMEWORK_DIR);
-        define('AK_SKIP_CONFIG', false);
+        define('AK_SKIP_ENV_CONFIG', false);
         $__ak_base_dir .= DS.'app_layout';
     }
     define('AK_BASE_DIR', $__ak_base_dir);
     unset($__ak_base_dir);
-    defined('AK_SKIP_CONFIG') || define('AK_SKIP_CONFIG', true);
+    defined('AK_SKIP_ENV_CONFIG') || define('AK_SKIP_ENV_CONFIG', true);
 }
 
 defined('MAKELOS_BASE_DIR') || define('MAKELOS_BASE_DIR', AK_BASE_DIR);
@@ -144,7 +144,7 @@ if(MAKELOS_RUN){
     if(!@include $_config_file){
         defined('AK_ENVIRONMENT')   || define('AK_ENVIRONMENT', 'testing');
         if(!@include AK_BASE_DIR.DS.'config'.DS.'environment.php'){
-            defined('AK_SKIP_CONFIG') || define('AK_SKIP_CONFIG', true);
+            defined('AK_SKIP_ENV_CONFIG') || define('AK_SKIP_ENV_CONFIG', true);
             include AK_BASE_DIR.DS.'autoload.php';
         }
     }

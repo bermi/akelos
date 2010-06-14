@@ -28,10 +28,10 @@ if(!defined('AK_BASE_DIR')){
     $__ak_base_dir = array_slice(get_included_files(),-2,1);
     define('AK_BASE_DIR', dirname($__ak_base_dir[0]));
     unset($__ak_base_dir);
-    define('AK_SKIP_CONFIG', true);
+    define('AK_SKIP_ENV_CONFIG', true);
 }
 
-defined('AK_SKIP_CONFIG')       || define('AK_SKIP_CONFIG',         false);
+defined('AK_SKIP_ENV_CONFIG')       || define('AK_SKIP_ENV_CONFIG',         false);
 defined('AK_FRAMEWORK_DIR')     || define('AK_FRAMEWORK_DIR',       str_replace(DS.'autoload.php','',__FILE__));
 defined('AK_TESTING_NAMESPACE') || define('AK_TESTING_NAMESPACE',   'akelos');
 
@@ -321,8 +321,8 @@ defined('AK_CAN_FORK')                                  || define('AK_CAN_FORK',
 defined('AK_CLI')                       || define('AK_CLI', php_sapi_name() == 'cli');
 defined('AK_WEB_REQUEST')               || define('AK_WEB_REQUEST', !empty($_SERVER['REQUEST_URI']));
 
-if(AK_ENVIRONMENT != 'setup' && !AK_SKIP_CONFIG){
-    require_once(AK_CONFIG_DIR.DS.'environments'.DS.AK_ENVIRONMENT.'.php');
+if(AK_ENVIRONMENT != 'setup' && !AK_SKIP_ENV_CONFIG){
+    include_once AK_CONFIG_DIR.DS.'environments'.DS.AK_ENVIRONMENT.'.php';
 }
 
 defined('AK_CACHE_HANDLER')                 || define('AK_CACHE_HANDLER', AK_CACHE_HANDLER_PEAR);
