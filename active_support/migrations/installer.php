@@ -589,7 +589,7 @@ Example:
         '/^(.+_on)$/i' => '\1 date',
         '/^(is_|has_|do_|does_|are_)([A-Z0-9_]+)$/i' => '\1\2 boolean not null default \'0\' index', //
         '/^([A-Z0-9_]+) *(\([0-9]+\))?$/i' => '\1 string\2', // Everything else will default to string
-        '/^((.+ )string([^\(.]*))$/i' => '\2string(255)\3', // If we don't set the string lenght it will fail, so if not present will set it to 255
+        '/^((.+ )string([^\(.]*))$/i' => '\2string(255)\3', // If we don't set the string length it will fail, so if not present will set it to 255
         );
     }
 
