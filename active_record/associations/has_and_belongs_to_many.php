@@ -239,7 +239,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 }";
         $class_file_code .= $class_code. "\n\n?>";
         $join_file = AkInflector::toModelFilename($options['join_class_name']);
-        if($this->_automatically_create_join_model_files && !file_exists($join_file) && @AkFileSystem::file_put_contents($join_file, $class_file_code)){
+        if($this->_automatically_create_join_model_files && !file_exists($join_file) && @AkFileSystem::file_put_contents($join_file, $class_file_code, array('base_path' => AkConfig::getDir('models')))){
             require_once($join_file);
         }else{
             eval($class_code);
