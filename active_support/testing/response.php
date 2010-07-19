@@ -67,7 +67,7 @@ class AkTestResponse extends AkResponse
         }
         return $headers;
     }
-    public function getHeader($name) {
+    public function getHeader($name, $default = null) {
         $headers = $this->_parseHeaders();
         $sentHeader = isset($headers[strtolower($name)])?$headers[strtolower($name)]:false;
         if (!$sentHeader) {

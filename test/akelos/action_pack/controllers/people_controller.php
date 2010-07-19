@@ -34,9 +34,9 @@ class PeopleController extends ApplicationController
         $this->renderText("$Title|$Filename");
     }
     
-    protected function renderXml($xml_string,$status=null,$location=null) {
+    public function renderXml($options = array(),  $status = self::DEFAULT_RENDER_STATUS_CODE) {
         $this->Response->addHeader(array('content-type'=>'text/xml'));
-        $this->renderText((string)$xml_string,$status);
+        $this->renderText((string)$options,$status);
     }
     
 }
