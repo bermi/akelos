@@ -272,11 +272,14 @@ class AkActiveRecord extends AkAssociatedActiveRecord
         /**
         * @todo clear cache
         */
-        if($object = $this->find($this->getId())){
+        try{
+            $object = $this->find($this->getId());
             $this->setAttributes($object->getAttributes(), true);
             return true;
-        }else {
+        } catch (RecordNotFoundException $e) {
             return false;
+        } catch (Exception $e) {
+            throw $e;
         }
     }
 
@@ -2113,7 +2116,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      */
     public function select(&$source_array) {
         $resulting_array = array();
-        if(!empty($source_array) && is_array($source_array) && func_num_args() > 1) {
+        if(!empty($source_array) && Ak::is_array($source_array) && func_num_args() > 1) {
         (array)$args = array_filter(array_slice(func_get_args(),1),array($this,'hasColumn'));
         foreach ($source_array as $source_item){
             $item_fields = array();
@@ -2143,7 +2146,8 @@ class AkActiveRecord extends AkAssociatedActiveRecord
      */
     public function collect($source_array, $key_index, $value_index) {
         $resulting_array = array();
-        if(!empty($source_array) && is_array($source_array)) {
+
+        if(!empty($source_array) && Ak::is_array($source_array)) {
             foreach ($source_array as $source_item){
                 $resulting_array[$source_item->get($key_index)] = $source_item->get($value_index);
             }
@@ -2448,7 +2452,6 @@ class AkActiveRecordIterator implements Iterator, ArrayAccess, Countable
         return isset($this->_records[$offset]) ? $this->_records[$offset] : null;
     }
     
-
     private function _returnsDefault($attributes){
         return $this->_FinderInstance->instantiate($this->_ActiveRecord->getOnlyAvailableAttributes($attributes), false);
     }
@@ -2480,6 +2483,12 @@ class AkActiveRecordIterator implements Iterator, ArrayAccess, Countable
         $this->rewind();
         return $this->current();
     }
+    
+    public function toArray() {
+        $this->_enableArrayAccess();
+        return $this->_records;
+    }
+    
 }
 
 
