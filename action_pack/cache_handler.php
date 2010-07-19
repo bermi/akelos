@@ -1123,6 +1123,9 @@ EOF;
 
             $this->_caching_type = 'action';
             $this->_action_include_get_parameters = $this->_caches_action[$actionName]['include_get_parameters'];
+            if(!empty($this->_caches_action[$actionName]['host'])) { 
+                $this->_action_cache_host = $this->_caches_action[$actionName]['host']; 
+            }
             $path = $this->_caches_action[$actionName]['cache_path'];
             $parts = parse_url($path);
             if (isset($parts['host'])) {
