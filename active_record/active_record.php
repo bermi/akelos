@@ -2373,7 +2373,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 }
 
 
-class AkActiveRecordIterator implements Iterator, ArrayAccess
+class AkActiveRecordIterator implements Iterator, ArrayAccess, Countable
 {
     private $_ResultSet;
     private $_records = array();
@@ -2469,6 +2469,16 @@ class AkActiveRecordIterator implements Iterator, ArrayAccess
 
     public function toJson() {
         return $this[0]->toJson(array('collection' => $this));
+    }
+    
+    public function count() {
+        $this->_enableArrayAccess();
+        return count($this->_records);
+    }
+    
+    public function first() {
+        $this->rewind();
+        return $this->current();
     }
 }
 
