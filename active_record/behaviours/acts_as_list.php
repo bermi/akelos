@@ -206,7 +206,7 @@ class AkActsAsList extends AkObserver
         if(isset($except)){
             $conditions .= " AND id != $except";
         }
-        return $this->_ActiveRecordInstance->find('first', array('conditions' => $conditions, 'order' => "{$this->column} DESC", 'default' => false));
+        return $this->_ActiveRecordInstance->find('first', array('default' => false, 'conditions' => $conditions, 'order' => "{$this->column} DESC", 'default' => false));
     }
 
     public function isInList() {
@@ -293,14 +293,14 @@ class AkActsAsList extends AkObserver
 
     public function getHigherItem() {
         if($this->isInList()){
-            return $this->_ActiveRecordInstance->find('first', array('conditions' => $this->getScopeCondition()." AND {$this->column} = ".($this->_ActiveRecordInstance->getAttribute($this->column) - 1)));
+            return $this->_ActiveRecordInstance->find('first', array('default' => false, 'conditions' => $this->getScopeCondition()." AND {$this->column} = ".($this->_ActiveRecordInstance->getAttribute($this->column) - 1)));
         }
         return false;
     }
 
     public function getLowerItem() {
         if($this->isInList()){
-            return $this->_ActiveRecordInstance->find('first', array('conditions' => $this->getScopeCondition()." AND {$this->column} = ".($this->_ActiveRecordInstance->getAttribute($this->column) + 1)));
+            return $this->_ActiveRecordInstance->find('first', array('default' => false, 'conditions' => $this->getScopeCondition()." AND {$this->column} = ".($this->_ActiveRecordInstance->getAttribute($this->column) + 1)));
         }
         return false;
     }

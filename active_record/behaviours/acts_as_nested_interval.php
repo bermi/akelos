@@ -711,14 +711,14 @@ class AkActsAsNestedInterval extends AkObserver
      * Returns the single root
      */
     public function getRoot() {
-        return $this->_ActiveRecordInstance->find('first', array('conditions' => " ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." IS NULL "));
+        return $this->_ActiveRecordInstance->find('first', array('default' => false, 'conditions' => " ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." IS NULL "));
     }
 
     /**
      * Returns roots when multiple roots (or virtual root, which is the same)
      */
     public function getRoots() {
-        return $this->_ActiveRecordInstance->find('all', array('conditions' => " ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." IS NULL ",'order' => $this->getLeftColumnName()));
+        return $this->_ActiveRecordInstance->find('all', array('default' => false, 'conditions' => " ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." IS NULL ",'order' => $this->getLeftColumnName()));
     }
 
 
@@ -726,7 +726,7 @@ class AkActsAsNestedInterval extends AkObserver
      * Returns an array of all parents
      */
     public function &getAncestors() {
-        $Ancestors =& $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
+        $Ancestors =& $this->_ActiveRecordInstance->find('all', array('default' => false, 'conditions' => ' '.$this->getScopeCondition().' AND '.
         $this->getLeftColumnName().' < '.$this->_ActiveRecordInstance->get($this->getLeftColumnName()).' AND '.
         $this->getRightColumnName().' > '.$this->_ActiveRecordInstance->get($this->getRightColumnName())
         ,'order' => $this->getLeftColumnName()));
@@ -750,7 +750,7 @@ class AkActsAsNestedInterval extends AkObserver
      * Returns the array of all children of the parent, except self
      */
     public function getSiblings($search_for_self = false) {
-        return $this->_ActiveRecordInstance->find('all', array('conditions' => ' (('.$this->getScopeCondition().' AND '.
+        return $this->_ActiveRecordInstance->find('all', array('default' => false, 'conditions' => ' (('.$this->getScopeCondition().' AND '.
         $this->getParentColumnName().' = '.$this->_ActiveRecordInstance->get($this->getParentColumnName()).' AND '.
         $this->_ActiveRecordInstance->getPrimaryKey().' <> '.$this->_ActiveRecordInstance->getId().
         ($search_for_self&&!$this->_ActiveRecordInstance->isNewRecord()?') OR ('.$this->_ActiveRecordInstance->getPrimaryKey().' = '.$this->_ActiveRecordInstance->quotedId().'))':'))')
@@ -797,7 +797,7 @@ class AkActsAsNestedInterval extends AkObserver
      * Returns a set of only this entry's immediate children
      */
     public function getChildren() {
-        return $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
+        return $this->_ActiveRecordInstance->find('all', array('default' => false, 'conditions' => ' '.$this->getScopeCondition().' AND '.
         $this->getParentColumnName().' = '.$this->_ActiveRecordInstance->getId()
         ,'order' => $this->getLeftColumnName()));
     }
@@ -817,7 +817,7 @@ class AkActsAsNestedInterval extends AkObserver
                     if($Item instanceof $parent_class_name){
                         $ItemToExclude =& $Item;
                     }else{
-                        $ItemToExclude =& $this->_ActiveRecordInstance->find($Item);
+                        $ItemToExclude =& $this->_ActiveRecordInstance->find($Item, array('default' => false));
                     }
                     if($ItemSet = $ItemToExclude->nested_set->getFullSet()){
                         foreach (array_keys($ItemSet) as $l){
@@ -828,7 +828,7 @@ class AkActsAsNestedInterval extends AkObserver
                 $excluded_ids = array_unique(array_diff($excluded_ids,array('')));
             }
         }
-        return $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
+        return $this->_ActiveRecordInstance->find('all', array('default' => false, 'conditions' => ' '.$this->getScopeCondition().' AND '.
         (empty($excluded_ids) ? '' : ' id NOT IN ('.join(',',$excluded_ids).') AND ').
         $this->getLeftColumnName().' > '.$this->_ActiveRecordInstance->get($this->getLeftColumnName()).' AND '.
         $this->getRightColumnName().' < '.$this->_ActiveRecordInstance->get($this->getRightColumnName())
@@ -881,7 +881,7 @@ class AkActsAsNestedInterval extends AkObserver
 
         // load object if node is not an object
         if (is_numeric($target)){
-            $target =& $this->_ActiveRecordInstance->find($target);
+            $target =& $this->_ActiveRecordInstance->find($target, array('default' => false));
         }
         if(!$target){
             trigger_error(Ak::t('Invalid target'), E_USER_NOTICE);

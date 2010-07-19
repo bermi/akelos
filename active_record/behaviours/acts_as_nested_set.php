@@ -273,7 +273,7 @@ class AkActsAsNestedSet extends AkObserver
         }else{
             $result = $this->_ActiveRecordInstance->find(
             // str_replace(array_keys($options['conditions']), array_values($this->getSanitizedConditionsArray($options['conditions'])),$pattern);
-            'first', array('conditions' => " ".$this->getScopeCondition()." AND ".$this->_ActiveRecordInstance->getPrimaryKey()." = ".$this->_ActiveRecordInstance->{$this->getParentColumnName()})
+            'first', array('default' => false, 'conditions' => " ".$this->getScopeCondition()." AND ".$this->_ActiveRecordInstance->getPrimaryKey()." = ".$this->_ActiveRecordInstance->{$this->getParentColumnName()})
             );
         }
         return $result;
@@ -306,8 +306,7 @@ class AkActsAsNestedSet extends AkObserver
         $object->transactionStart();
 
         if(!empty($ObjectsToDelete)){
-            foreach (array_keys($ObjectsToDelete) as $k){
-                $Child = $ObjectsToDelete[$k];
+            foreach ($ObjectsToDelete as $Child){
                 $Child->__avoid_nested_set_before_destroy_recursion = true;
                 if($Child->beforeDestroy()){
                     if($Child->notifyObservers('beforeDestroy') === false){
@@ -331,8 +330,7 @@ class AkActsAsNestedSet extends AkObserver
 
 
         if(!empty($ObjectsToDelete)){
-            foreach (array_keys($ObjectsToDelete) as $k){
-                $Child = $ObjectsToDelete[$k];
+            foreach ($ObjectsToDelete as $Child){
                 $Child->__avoid_nested_set_before_destroy_recursion = true;
                 if(!$Child->afterDestroy() || $Child->notifyObservers('afterDestroy') === false){
                     $Child->transactionFail();
@@ -372,14 +370,14 @@ class AkActsAsNestedSet extends AkObserver
      * Returns the single root
      */
     public function getRoot() {
-        return $this->_ActiveRecordInstance->find('first', array('conditions' => " ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." IS NULL "));
+        return $this->_ActiveRecordInstance->find('first', array('default' => false, 'conditions' => " ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." IS NULL "));
     }
 
     /**
      * Returns roots when multiple roots (or virtual root, which is the same)
      */
     public function getRoots() {
-        return $this->_ActiveRecordInstance->find('all', array('conditions' => " ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." IS NULL ",'order' => $this->getLeftColumnName()));
+        return $this->_ActiveRecordInstance->find('all', array('default' => false, 'conditions' => " ".$this->getScopeCondition()." AND ".$this->getParentColumnName()." IS NULL ",'order' => $this->getLeftColumnName()));
     }
 
 
@@ -387,7 +385,7 @@ class AkActsAsNestedSet extends AkObserver
      * Returns an array of all parents
      */
     public function &getAncestors() {
-        $Ancestors = $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
+        $Ancestors = $this->_ActiveRecordInstance->find('all', array('default' => false, 'conditions' => ' '.$this->getScopeCondition().' AND '.
         $this->getLeftColumnName().' < '.$this->_ActiveRecordInstance->get($this->getLeftColumnName()).' AND '.
         $this->getRightColumnName().' > '.$this->_ActiveRecordInstance->get($this->getRightColumnName())
         ,'order' => $this->getLeftColumnName()));
@@ -399,6 +397,9 @@ class AkActsAsNestedSet extends AkObserver
      */
     public function &getSelfAndAncestors() {
         if($result = $this->getAncestors()){
+            if($result instanceof AkActiveRecordIterator) {
+                $result = $result->toArray();
+            }
             array_push($result, $this->_ActiveRecordInstance);
         }else{
             $result = array($this->_ActiveRecordInstance);
@@ -411,7 +412,7 @@ class AkActsAsNestedSet extends AkObserver
      * Returns the array of all children of the parent, except self
      */
     public function getSiblings($search_for_self = false) {
-        return $this->_ActiveRecordInstance->find('all', array('conditions' => ' (('.$this->getScopeCondition().' AND '.
+        return $this->_ActiveRecordInstance->find('all', array('default' => false, 'conditions' => ' (('.$this->getScopeCondition().' AND '.
         $this->getParentColumnName().' = '.$this->_ActiveRecordInstance->get($this->getParentColumnName()).' AND '.
         $this->_ActiveRecordInstance->getPrimaryKey().' <> '.$this->_ActiveRecordInstance->getId().
         ($search_for_self && !$this->_ActiveRecordInstance->isNewRecord()?') OR ('.$this->_ActiveRecordInstance->getPrimaryKey().' = '.$this->_ActiveRecordInstance->quotedId().'))':'))')
@@ -458,7 +459,7 @@ class AkActsAsNestedSet extends AkObserver
      * Returns a set of only this entry's immediate children
      */
     public function getChildren() {
-        return $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
+        return $this->_ActiveRecordInstance->find('all', array('default' => false, 'conditions' => ' '.$this->getScopeCondition().' AND '.
         $this->getParentColumnName().' = '.$this->_ActiveRecordInstance->getId()
         ,'order' => $this->getLeftColumnName()));
     }
@@ -478,18 +479,18 @@ class AkActsAsNestedSet extends AkObserver
                     if($Item instanceof $parent_class_name){
                         $ItemToExclude = $Item;
                     }else{
-                        $ItemToExclude = $this->_ActiveRecordInstance->find($Item);
+                        $ItemToExclude = $this->_ActiveRecordInstance->find($Item, array('default' => false));
                     }
-                    if($ItemSet = $ItemToExclude->nested_set->getFullSet()){
-                        foreach (array_keys($ItemSet) as $l){
-                            $excluded_ids[] = $ItemSet[$l]->getId();
+                    if($ItemSets = $ItemToExclude->nested_set->getFullSet()){
+                        foreach ($ItemSets as $ItemSet){
+                            $excluded_ids[] = $ItemSet->getId();
                         }
                     }
                 }
                 $excluded_ids = array_unique(array_diff($excluded_ids,array('')));
             }
         }
-        return $this->_ActiveRecordInstance->find('all', array('conditions' => ' '.$this->getScopeCondition().' AND '.
+        return $this->_ActiveRecordInstance->find('all', array('default' => false, 'conditions' => ' '.$this->getScopeCondition().' AND '.
         (empty($excluded_ids) ? '' : ' id NOT IN ('.join(',',$excluded_ids).') AND ').
         $this->getLeftColumnName().' > '.$this->_ActiveRecordInstance->get($this->getLeftColumnName()).' AND '.
         $this->getRightColumnName().' < '.$this->_ActiveRecordInstance->get($this->getRightColumnName())
@@ -502,9 +503,11 @@ class AkActsAsNestedSet extends AkObserver
     public function getFullSet($exclude = null) {
         if($this->_ActiveRecordInstance->isNewRecord() || $this->_ActiveRecordInstance->get($this->getRightColumnName()) - $this->_ActiveRecordInstance->get($this->getLeftColumnName()) == 1 ){
             $result = array($this->_ActiveRecordInstance);
-        }else{
-        (array)$result = $this->getAllChildren($exclude);
-        array_unshift($result, $this->_ActiveRecordInstance);
+        }elseif($result = $this->getAllChildren($exclude)){
+            if($result instanceof AkActiveRecordIterator) {
+                $result = $result->toArray();
+            }
+            array_unshift($result, $this->_ActiveRecordInstance);
         }
         return $result;
     }
@@ -542,7 +545,7 @@ class AkActsAsNestedSet extends AkObserver
 
         // load object if node is not an object
         if (is_numeric($target)){
-            $target = $this->_ActiveRecordInstance->find($target);
+            $target = $this->_ActiveRecordInstance->find($target, array('default' => false));
         }
         $_klass = get_class($this->_ActiveRecordInstance);
         if(!$target || !($target instanceof $_klass)){

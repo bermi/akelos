@@ -75,7 +75,7 @@ class ActsAsNestedSet_TestCase extends ActiveRecordUnitTest
     // New tests for Better Nested Set implementation
 
     public function getLocation($Location) {
-        if(is_array($Location)){
+        if(Ak::is_array($Location)){
             return array_values($this->Location->collect($Location,'id','name'));
         }else{
             return $Location->get('name');
@@ -134,6 +134,7 @@ class ActsAsNestedSet_TestCase extends ActiveRecordUnitTest
 
 
     public function test_getSelfAndAncestors() {
+
         $this->assertEqual(array('Europe','Spain','Valencia','Carlet'), array_values($this->Location->collect($this->Carlet->nested_set->getSelfAndAncestors(),'id','name')));
 
         $this->assertEqual(array('Europe','Spain'), array_values($this->Location->collect($this->Spain->nested_set->getSelfAndAncestors(),'id','name')));

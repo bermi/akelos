@@ -225,7 +225,7 @@ class AkActsAsTree extends AkObserver
             return false;
         } else {
             return $this->_ActiveRecordInstance->find('first',
-            array('conditions' => ' '.$this->getScopeCondition().' AND '.$this->_ActiveRecordInstance->getPrimaryKey()." = ".$this->_ActiveRecordInstance->{$this->getParentColumnName()}));
+            array('default' => false, 'conditions' => ' '.$this->getScopeCondition().' AND '.$this->_ActiveRecordInstance->getPrimaryKey()." = ".$this->_ActiveRecordInstance->{$this->getParentColumnName()}));
         }
     }
 
