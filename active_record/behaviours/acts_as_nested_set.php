@@ -493,7 +493,7 @@ class AkActsAsNestedSet extends AkObserver
         (empty($excluded_ids) ? '' : ' id NOT IN ('.join(',',$excluded_ids).') AND ').
         $this->getLeftColumnName().' > '.$this->_ActiveRecordInstance->get($this->getLeftColumnName()).' AND '.
         $this->getRightColumnName().' < '.$this->_ActiveRecordInstance->get($this->getRightColumnName())
-        ,'order' => $this->getLeftColumnName()));
+        ,'order' => $this->getLeftColumnName(), 'default' => false));
     }
 
     /**

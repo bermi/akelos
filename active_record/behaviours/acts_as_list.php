@@ -206,7 +206,7 @@ class AkActsAsList extends AkObserver
         if(isset($except)){
             $conditions .= " AND id != $except";
         }
-        return $this->_ActiveRecordInstance->find('first', array('conditions' => $conditions, 'order' => "{$this->column} DESC"));
+        return $this->_ActiveRecordInstance->find('first', array('conditions' => $conditions, 'order' => "{$this->column} DESC", 'default' => false));
     }
 
     public function isInList() {

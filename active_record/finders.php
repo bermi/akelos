@@ -605,7 +605,10 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
                 }
             }
             return $result;
-        }catch(RecordNotFoundException $e){
+        } catch (RecordNotFoundException $e) {
+            if(isset($options['default'])) {
+                return $options['default'];
+            }
             throw new RecordNotFoundException("Could not find records with options: ".json_encode($options));
         }
     }

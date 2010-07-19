@@ -265,10 +265,13 @@ class AkHasAndBelongsToMany extends AkAssociation
                 $this->constructSql();
                 $options = $this->getOptions($this->association_id);
                 $Associated = $this->getAssociatedModelInstance();
-                if($FoundAssociates = $Associated->findBySql($options['finder_sql'])){
+                try{
+                    $FoundAssociates = $Associated->findBySql($options['finder_sql']);
                     array_map(array( $this,'_setAssociatedMemberId'),$FoundAssociates);
                     $this->Owner->{$this->association_id} = $FoundAssociates;
                 }
+                catch (RecordNotFoundException $e) { }
+                catch (Exception $e) { throw $e; }
             }
             if(empty($this->Owner->{$this->association_id})){
                 $this->Owner->{$this->association_id} = array();

@@ -58,7 +58,7 @@ class BelongsTo_TestCase extends ActiveRecordUnitTest
 
         $this->assertTrue($Picture->save());
 
-        $this->assertFalse($Picture->findFirstBy('title:has','Carlet', array('include'=>'main_thumbnail')));
+        $this->assertFalse($Picture->findFirstBy('title:has','Carlet', array('include'=>'main_thumbnail', 'default'=>false)));
 
         $this->assertTrue($CarletPic = $Picture->findFirstBy('title:has','Carlet', array('include'=>array('main_thumbnail'=>array('conditions'=>false)))));
         $this->assertEqual($CarletPic->title,'The Bermi Labs Team at Carlet');
@@ -89,9 +89,9 @@ class BelongsTo_TestCase extends ActiveRecordUnitTest
 
         $this->assertTrue($SimoPic->destroy());
 
-        $this->assertFalse($Picture->findFirstBy('title:has','SIMO', array('include'=>'main_thumbnail')));
+        $this->assertFalse($Picture->findFirstBy('title:has','SIMO', array('include'=>'main_thumbnail', 'default' => false)));
 
-        $this->assertFalse($Thumbnail->findFirstBy('caption','SIMO 2005'));
+        $this->assertFalse($Thumbnail->findFirstBy('caption','SIMO 2005', array('default' => false)));
 
         $Thumbnail = new Thumbnail(array('caption'=>'Our Office'));
 
@@ -106,7 +106,7 @@ class BelongsTo_TestCase extends ActiveRecordUnitTest
 
         $this->assertEqual($CarletPic->main_thumbnail->caption, 'Our Office');
 
-        $this->assertFalse($Thumbnail->findFirstBy('caption','Carlet'));
+        $this->assertFalse($Thumbnail->findFirstBy('caption','Carlet', array('default'=>false)));
 
         $this->assertTrue($OfficeThumbnail = $Thumbnail->findFirstBy('caption', 'Our Office'));
         $this->assertEqual($OfficeThumbnail->getId(), $CarletPic->main_thumbnail->getId());
@@ -122,7 +122,7 @@ class BelongsTo_TestCase extends ActiveRecordUnitTest
         $CarletPic->main_thumbnail->load();
         $this->assertEqual($CarletPic->main_thumbnail->caption, 'Lucky (our pet)');
 
-        $this->assertFalse($NewThumbnail->findFirstBy('caption','Our Office'));
+        $this->assertFalse($NewThumbnail->findFirstBy('caption','Our Office', array('default'=>false)));
 
     }
 
@@ -216,7 +216,7 @@ class BelongsTo_TestCase extends ActiveRecordUnitTest
         $this->assertFalse($Altea->main_thumbnail->isNewRecord());
 
         $Thumbnail = new Thumbnail();
-        $this->assertFalse($Thumbnail->findFirstBy('caption','Altea3'));
+        $this->assertFalse($Thumbnail->findFirstBy('caption','Altea3', array('default'=>false)));
 
         $Panorama = new Panorama(array('title'=>'Views from the old town'));
         $this->assertTrue($Panorama->save());
@@ -302,15 +302,16 @@ class BelongsTo_TestCase extends ActiveRecordUnitTest
         $this->assertTrue($Location->save());
 
         $Location = $this->Location->findFirstBy('name', 'Palafolls', array('include'=>'group'));
+        
         $Location->destroy();
 
-        $this->assertFalse($this->Location->findFirstBy('name', 'Palafolls'));
-        $this->assertFalse($this->Group->findFirstBy('name', 'Crafters'));
+        $this->assertFalse($this->Location->findFirstBy('name', 'Palafolls', array('default'=>false)));
+        $this->assertFalse($this->Group->findFirstBy('name', 'Crafters', array('default'=>false)));
 
     }
 
     public function test_cleanup() {
-        @AkFileSystem::file_delete(AkConfig::getDir('models').DS.'group_user.php');
+        @AkFileSystem::file_delete(AkConfig::getDir('models').DS.'group_user.php', array('base_path' => AkConfig::getDir('models')));
     }
 
 }

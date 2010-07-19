@@ -299,15 +299,17 @@ class AkHasOne extends AkAssociation
         'order' => trim($this->Owner->$association_id->addTableAliasesToAssociatedSql($table_name, $this->Owner->$association_id->getAssociationOption('order')))
         );
 
-        /**
-        * todo we will use a select statement later
-        */
-        $sql = $this->Owner->constructFinderSqlWithAssociations($finder_options, false);//.' LIMIT 1';
-        if($results = $this->Owner->$association_id->findBySql($sql)){
-            return $results[0];
-        }
 
-        return $false;
+        $sql = $this->Owner->constructFinderSqlWithAssociations($finder_options, false);
+
+        try {
+            $result = $this->Owner->$association_id->findBySql($sql)->first();
+            return $result;
+        } catch (RecordNotFoundException $e){
+            return $false;
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
 

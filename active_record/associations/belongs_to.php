@@ -84,18 +84,26 @@ class AkBelongsTo extends AkAssociation
     }
 
     public function &findAssociated($association_id) {
+        
         $result = false;
         $primary_key_name = $this->Owner->$association_id->getAssociationOption('primary_key_name');
         $primary_key_name_value = $this->Owner->get($primary_key_name);
+        
         if(!$primary_key_name_value){
             return $result;
         }
+        
         if(!($this->Owner->$association_id instanceof AkActiveRecord)){
             $this->build($association_id, array(), false);
         }
-
-        $result = $this->Owner->$association_id->find($primary_key_name_value);
-
+        
+        try {
+            $result = $this->Owner->$association_id->find($primary_key_name_value);
+        } catch (RecordNotFoundException $e){
+            return $false;
+        } catch (Exception $e) {
+            throw $e;
+        }
         return $result;
     }
 
