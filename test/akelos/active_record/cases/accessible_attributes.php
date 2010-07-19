@@ -117,13 +117,13 @@ class AccessibleAttributes_TestCase extends ActiveRecordUnitTest
     public function test_using_instantiating() {
         $ProtectedPerson = new ProtectedPerson();
         $this->assertNull($ProtectedPerson->name);
+        $this->assertNull($ProtectedPerson->created_at);
+        $this->assertTrue($ProtectedPerson->is_active);
+        
         $Melanie = new ProtectedPerson(array('name'=> 'Melanie Klein','created_by'=> 11));
         $this->assertEqual($Melanie->name,'Melanie Klein');
         $this->assertNull($Melanie->created_by);
         $this->assertNull($Melanie->birthday);
-
-        $this->assertNull($ProtectedPerson->created_at);
-        $this->assertTrue($ProtectedPerson->is_active);
         $Melanie->save();
 
         $Anna = new ProtectedPerson(array('name'=> 'Anna Freud','birthday'=> '1912-04-12'));
@@ -131,7 +131,7 @@ class AccessibleAttributes_TestCase extends ActiveRecordUnitTest
         $Anna->save();
 
         $this->assertNotNull($Anna->GetId());
-        $this->assertEqual($Anna->created_by,$Melanie->GetId());
+        $this->assertEqual($Anna->created_by, $Melanie->GetId());
 
         $PeopleWithUnknownAge = $ProtectedPerson->find('all','birthday IS null');
         $this->assertEqual(count($PeopleWithUnknownAge),3);
