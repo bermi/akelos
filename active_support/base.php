@@ -47,7 +47,7 @@ class Ak
         $backtrace = debug_backtrace();
         $file = @$backtrace[1]['file'];
         $line = @$backtrace[1]['line'];
-        if (is_array($message)){
+        if (is_array($message)) {
             trigger_error(Ak::t("DEPRECATED WARNING: ".array_shift($message), $message).' '.Ak::t('Called in %file line %line', array('%file' => $file, '%line' => $line)), E_USER_NOTICE);
         } else {
             trigger_error(Ak::t("DEPRECATED WARNING: ".$message).' '.Ak::t('Called in %file line %line', array('%file' => $file, '%line' => $line)), E_USER_NOTICE);
@@ -705,7 +705,7 @@ class Ak
     * Gets the size of given element. Counts arrays, returns numbers, string length or executes size() method on given object
     */
     static function size($element) {
-        if(is_array($element)){
+        if(is_array($element) || ($element instanceof Countable)){
             return count($element);
         }elseif (is_numeric($element) && !is_string($element)){
             return $element;
@@ -744,14 +744,14 @@ class Ak
 
     static function select(&$source_array) {
         $resulting_array = array();
-        if(!empty($source_array) && is_array($source_array) && func_num_args() > 1) {
+        if(!empty($source_array) && Ak::is_array($source_array) && func_num_args() > 1) {
             $args = array_slice(func_get_args(),1);
             foreach ($source_array as $source_item){
                 $item_fields = array();
                 foreach ($args as $arg){
                     if(is_object($source_item) && isset($source_item->$arg)){
                         $item_fields[$arg] = $source_item->$arg;
-                    }elseif(is_array($source_item) && isset($source_item[$arg])){
+                    }elseif(Ak::is_array($source_item) && isset($source_item[$arg])){
                         $item_fields[$arg] = $source_item[$arg];
                     }
                 }
@@ -766,11 +766,11 @@ class Ak
     static function collect($source_array, $key_index, $value_index = null) {
         $value_index = empty($value_index) ? $key_index : $value_index;
         $resulting_array = array();
-        if(!empty($source_array) && is_array($source_array)) {
+        if(!empty($source_array) && Ak::is_array($source_array)) {
             foreach ($source_array as $source_item){
                 if(is_object($source_item)){
                     $resulting_array[@$source_item->$key_index] = @$source_item->$value_index;
-                }elseif(is_array($source_item)){
+                }elseif(Ak::is_array($source_item)){
                     $resulting_array[@$source_item[$key_index]] = @$source_item[$value_index];
                 }
             }
@@ -1013,7 +1013,7 @@ class Ak
 
     static function toArray() {
         $args = func_get_args();
-        return is_array($args[0]) ? $args[0] : (func_num_args() === 1 ? Ak::stringToArray($args[0]) : $args);
+        return Ak::is_array($args[0]) ? $args[0] : (func_num_args() === 1 ? Ak::stringToArray($args[0]) : $args);
     }
 
     /**
@@ -1047,7 +1047,7 @@ class Ak
      */
     static function first() {
         $args = func_get_args();
-        $arr = array_slice(is_array($args[0]) ? $args[0] : $args , 0);
+        $arr = array_slice(Ak::is_array($args[0]) ? $args[0] : $args , 0);
         return array_shift($arr);
     }
 
@@ -1056,7 +1056,7 @@ class Ak
      */
     static function last() {
         $args = func_get_args();
-        $arr = array_slice(is_array($args[0]) ? $args[0] : $args , -1);
+        $arr = array_slice(Ak::is_array($args[0]) ? $args[0] : $args , -1);
         return array_shift($arr);
     }
 
@@ -1067,7 +1067,18 @@ class Ak
         ak_compat($function_name);
     }
 
-
+    /**
+     * This method will act like PHP type check is_array() but will return true when 
+     * the given parameter implements ArrayAccess
+     *
+     * @param array or ArrayAccess $array
+     * @return bool
+     */
+    static function is_array($array)
+    {
+        return (is_array($array) || $array instanceof ArrayAccess);
+    }
+    
     /**
     * The Akelos Framework has an standardized way to convert between formats.
     * You can find available converters on AkConverters
@@ -1093,7 +1104,7 @@ class Ak
         $number_of_arguments = func_num_args();
         if($number_of_arguments > 1){
             $options = array();
-            if($number_of_arguments > 3 && is_array($args[$number_of_arguments-1])){
+            if($number_of_arguments > 3 && Ak::is_array($args[$number_of_arguments-1])){
                 $options = array_pop($args);
             }
             $options['from'] = $args[0];

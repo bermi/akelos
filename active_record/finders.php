@@ -175,10 +175,8 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
 
         list($sql, $requested_args) = $this->_getFindBySqlAndColumns($find_by_sql, $query_values);
 
-        if($query_arguments_count != count($requested_args)){
-            trigger_error(Ak::t('Argument list did not match expected set. Requested arguments are:').join(', ',$requested_args), E_USER_ERROR);
-            $false = false;
-            return $false;
+        if($query_arguments_count != count($requested_args)) {
+            throw new InvalidArgumentException(Ak::t('Argument list did not match expected set. Requested arguments are:').join(', ',$requested_args));
         }
 
         $true_bool_values = array(true,1,'true','True','TRUE','1','y','Y','yes','Yes','YES','s','Si','SI','V','v','T','t');
@@ -362,7 +360,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             $model_instance = $this;
         }
         $new_conditions = array();
-        if(is_array($model_conditions)){
+        if(Ak::is_array($model_conditions)){
             foreach ($model_conditions as $col=>$value){
                 if($model_instance->hasColumn($col)){
                     $new_conditions[$prefix.$col] = $value;
@@ -414,14 +412,14 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
 
     protected function _extractOptionsFromArgs(&$args) {
         $last_arg = count($args)-1;
-        return isset($args[$last_arg]) && is_array($args[$last_arg]) && $this->_isOptionsHash($args[$last_arg]) ? array_pop($args) : array();
+        return isset($args[$last_arg]) && Ak::is_array($args[$last_arg]) && $this->_isOptionsHash($args[$last_arg]) ? array_pop($args) : array();
     }
 
     protected function _isOptionsHash($options) {
         if (isset($options[0])){
             return false;
         }
-        $valid_keys = array('simulation_class','returns','load_acts','wrap','conditions', 'include', 'joins', 'limit', 'offset', 'group', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly', 'load_associations', 'load_acts');
+        $valid_keys = array('simulation_class','returns','load_acts','wrap','conditions', 'include', 'joins', 'limit', 'offset', 'group', 'order', 'sort', 'bind', 'select','select_prefix', 'readonly', 'load_associations', 'load_acts', 'default');
         return count($options) != count(array_diff(array_keys($options), $valid_keys));
     }
 
@@ -442,7 +440,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         } //end
 
         // set fetch_mode to 'all' if none is given
-        if (!is_numeric($fetch) && !is_array($fetch) && $fetch != 'all' && $fetch != 'first') {
+        if (!is_numeric($fetch) && !Ak::is_array($fetch) && $fetch != 'all' && $fetch != 'first') {
             array_unshift($args, 'all');
             $num_args = count($args);
         }
@@ -451,7 +449,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
                 //  $Users->find(:fetch_mode,"first_name = ?",'Tim');
                 $fetch = array_shift($args);
                 $options = array_merge($options, array('conditions'=>$args));   //TODO: merge_conditions
-            }elseif (is_array($args[1])) {
+            }elseif (Ak::is_array($args[1])) {
                 //  $Users->find(:fetch_mode,array('first_name = ?,'Tim'));
                 $fetch = array_shift($args);
                 $options = array_merge($options, array('conditions'=>$args[0]));   //TODO: merge_conditions
@@ -462,7 +460,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     }
 
     protected function _sanitizeConditionsVariables(&$options) {
-        if(!empty($options['conditions']) && is_array($options['conditions'])){
+        if(!empty($options['conditions']) && Ak::is_array($options['conditions'])){
             if (isset($options['conditions'][0]) && strstr($options['conditions'][0], '?') && count($options['conditions']) > 1){
                 //array('conditions' => array("name=?",$name))
                 $pattern = array_shift($options['conditions']);
@@ -481,10 +479,10 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     }
 
     protected function _sanitizeConditionsCollections(&$options) {
-        if(!empty($options['bind']) && is_array($options['bind']) && preg_match_all('/([a-zA-Z_]+)\s+IN\s+\(?\?\)?/i', $options['conditions'], $matches)){
+        if(!empty($options['bind']) && Ak::is_array($options['bind']) && preg_match_all('/([a-zA-Z_]+)\s+IN\s+\(?\?\)?/i', $options['conditions'], $matches)){
             $i = 0;
             foreach($options['bind'] as $k => $v){
-                if(isset($matches[1][$i]) && is_array($v)){
+                if(isset($matches[1][$i]) && Ak::is_array($v)){
                     $value = join(', ', $this->_ActiveRecord->castAttributesForDatabase($matches[1][$i], $v));
                     $startpos=strpos($options['conditions'],$matches[0][$i]);
                     $endpos=$startpos+strlen($matches[0][$i]);
@@ -581,19 +579,22 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         // actually we fetch_all and return only the first row
         $options = array_merge($options, array((!empty($options['include']) ?'virtual_limit':'limit')=>1));
         $result = $this->_findEvery($options);
+        if ($result instanceof AkActiveRecordIterator) {
+        	$result = array($result->first());
+        }
         return $result[0];
     }
 
     protected function &_findEvery($options) {
         try{
-            if((!empty($options['include']) && $this->_ActiveRecord->hasAssociations())){
+            if ((!empty($options['include']) && $this->_ActiveRecord->hasAssociations())){
                 $result = $this->findWithAssociations($options);
-            }else{
+            } else {
                 $sql = $this->constructFinderSql($options);
                 if (isset($options['wrap'])) {
                     $sql = str_replace('{query}',$sql,$options['wrap']);
                 }
-                if(!empty($options['bind']) && is_array($options['bind']) && strstr($sql,'?')){
+                if (!empty($options['bind']) && Ak::is_array($options['bind']) && strstr($sql,'?')){
                     $sql = array_merge(array($sql),$options['bind']);
                 }
                 if (!empty($options['returns']) && $options['returns']!='default') {
@@ -614,7 +615,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
     }
 
     protected function &_findFromIds($ids, $options) {
-        $expects_array = is_array($ids[0]);
+        $expects_array = Ak::is_array($ids[0]);
 
         $ids = array_map(array($this->_ActiveRecord, 'quotedId'),array_unique($expects_array ? (isset($ids[1]) ? array_merge($ids[0],$ids) : $ids[0]) : $ids));
         $num_ids = count($ids);
@@ -664,7 +665,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
                 }
 
                 $result = $this->_findEvery($options);
-                if(is_array($result) && ($num_ids==1 && count($result) != $num_ids && $without_conditions)){
+                if(Ak::is_array($result) && ($num_ids==1 && count($result) != $num_ids && $without_conditions)){
                     throw new RecordNotFoundException("Couldn't find record frOm ids: ".json_encode($ids));
                 }
                 return $result;
@@ -750,7 +751,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             }
             $config['__owner'][$handler_name] = array('class'=>$class,'association_id'=>$association_id,'pk'=>$pk_name,'instance'=>$instance);
 
-            if(isset($association_options['conditions']) && is_array($association_options['conditions'])) {
+            if(isset($association_options['conditions']) && Ak::is_array($association_options['conditions'])) {
                 $true=true;
                 $_conditions = array_shift($association_options['conditions']);
                 if(empty($association_options['bind'])) {
@@ -868,7 +869,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             //}
         }
 
-        if (! empty($options ['bind']) && is_array($options ['bind']) && strstr($sql, '?')) {
+        if (! empty($options ['bind']) && Ak::is_array($options ['bind']) && strstr($sql, '?')) {
             $sql = array_merge(array ($sql ), $options ['bind']);
         }
 
@@ -1004,7 +1005,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             $array = array_values($array);
         }
         foreach($array as $key => $value) {
-            if (is_array($value)) {
+            if (Ak::is_array($value)) {
                 $this->_reindexArray($array[$key]);
             }
         }
@@ -1019,16 +1020,16 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             $key = isset($owner[$pk])?$owner[$pk]:0;
             $owner = array($key=>$owner);
         }
-        if(is_array($owner)){
+        if(Ak::is_array($owner)){
             foreach($owner as $id=>$data) {
                 $id = isset($data[$pk])?$data[$pk]:$id;
                 $obj = new $simulation_class($id, $class, $handler_name, $parent);
-                if(is_array($data)){
+                if(Ak::is_array($data)){
                     foreach($data as $key => $value) {
                         if ($key{0}=='_') continue;
                         if ( is_scalar($value)) {
                             $obj->$key = $value;
-                        } else if (is_array($value)) {
+                        } else if (Ak::is_array($value)) {
                             $assoc = isset($config[$config_key][$key]['association_id'])?$config[$config_key][$key]['association_id']:false;
                             if ($assoc) {
                                 $obj->$assoc = $this->generateStdClasses($simulation_class, $value, @$config[$config_key][$key]['class'], $key, $obj, @$config[$config_key], $key);
@@ -1111,7 +1112,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
         }
 
         foreach ( $association_options ['include'] as $idx=>$sub_association_id ) {
-            if (!is_numeric($idx) && is_array($sub_association_id)) {
+            if (!is_numeric($idx) && Ak::is_array($sub_association_id)) {
                 $sub_options = $sub_association_id;
 
                 $sub_association_id = $idx;
@@ -1267,7 +1268,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             if (!isset($diff)) {
                 $diff = @array_diff(@array_keys($data),$available_attributes);
                 $nondiff = array();
-                if(is_array($diff)) {
+                if(Ak::is_array($diff)) {
                     foreach(array_keys($diff) as $d) {
                         $nondiff[$d] = null;
                     }
@@ -1289,7 +1290,7 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             $obj->_newRecord = false;
             $parent->$assoc_name->_loaded=true;
             $obj->_loaded=true;
-            if(is_array($diff)) {
+            if(Ak::is_array($diff)) {
                 foreach(array_values($diff) as $rel) {
                     $this->_setAssociations($rel,$data[$rel],$obj);
                 }
