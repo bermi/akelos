@@ -1,5 +1,14 @@
 <?php
 
+if(!defined('AK_BASE_DIR') && !defined('AK_FRAMEWORK_DIR'))
+{
+    define('AK_FRAMEWORK_DIR', realpath(dirname(__FILE__).'/../../'));
+    if(is_dir(AK_FRAMEWORK_DIR.DIRECTORY_SEPARATOR.'app_layout'))
+    {
+        define('AK_BASE_DIR', AK_FRAMEWORK_DIR.DIRECTORY_SEPARATOR.'app_layout');
+    }
+}
+
 require_once(dirname(__FILE__).'/../shared/config/config.php');
 
 AkConfig::setOption('testing_url', 'http://akelos.tests/akelos');
