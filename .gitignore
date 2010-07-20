@@ -7,5 +7,6 @@ app_layout/cache/
 app_layout/docs/akelos/doc.sqlite
 test/_fixtures/
 nbproject/
+akelos.kpf
 releases/
 reports/
