@@ -2385,8 +2385,10 @@ class AkActiveRecordIterator implements Iterator, ArrayAccess, Countable
     private $_returnCurrentHandler;
     private $_FinderInstance;
     private $_ActiveRecord;
+    private $_current = 0;
+    private $_total;
 
-    public function __construct(&$ResultSet, &$options = array()){
+    public function __construct(ADORecordSet &$ResultSet, &$options = array()){
         $this->_ResultSet = $ResultSet;
         $this->_options = $options;
         $this->_returnCurrentHandler = '_returns'.ucfirst($options['returns']);
@@ -2399,11 +2401,18 @@ class AkActiveRecordIterator implements Iterator, ArrayAccess, Countable
     }
 
     public function rewind() {
+        $this->_current = 0;
         $this->_ResultSet->MoveFirst();
     }
 
-    public function valid() {        
-        return !$this->_ResultSet->EOF;
+    public function valid() {
+        $is_valid = !$this->_ResultSet->EOF;
+        // When iterating more than once we need to keep an internal track of the
+        // position as ADODB does not provide a consistent way for interating twice over the same result set.
+        if(!$is_valid && is_null($this->_total)){
+          $this->_total = $this->_current;
+        }
+        return (!is_null($this->_total) && $this->_total > $this->_current) || $is_valid;
     }
 
     public function key() {
@@ -2411,10 +2420,15 @@ class AkActiveRecordIterator implements Iterator, ArrayAccess, Countable
     }
 
     public function current() {
-        return $this->{$this->_returnCurrentHandler}($this->_ResultSet->fields);
+        if(isset($this->_records[$this->_current])){
+          return $this->_records[$this->_current];
+        }
+        $this->_records[$this->_current] = $this->{$this->_returnCurrentHandler}($this->_ResultSet->fields);
+        return $this->_records[$this->_current];
     }
 
     public function next() {
+        $this->_current++;
         $this->_ResultSet->MoveNext();
     }
 
