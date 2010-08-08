@@ -212,23 +212,28 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
 
     public function &findOrCreateBy() {
         $args = func_get_args();
-        $Item = call_user_func_array(array($this,'findFirstBy'), $args);
-        if(!$Item){
-            $attributes = array();
 
-            list($sql, $columns) = $this->_getFindBySqlAndColumns(array_shift($args), $args);
-
-            if(!empty($columns)){
-                foreach ($columns as $column){
-                    $attributes[$column] = array_shift($args);
-                }
-            }
-            $Item = $this->_ActiveRecord->create($attributes);
-            $Item->has_been_created = true;
-        }else{
+        try{
+            $Item = call_user_func_array(array($this,'findFirstBy'), $args);
             $Item->has_been_created = false;
+            $Item->has_been_found = true;
+            return $Item;
+        }catch(RecordNotFoundException $e){
+        }catch(Exception $e){
+            throw $e;
         }
-        $Item->has_been_found = !$Item->has_been_created;
+
+        $attributes = array();
+        list($sql, $columns) = $this->_getFindBySqlAndColumns(array_shift($args), $args);
+        if(!empty($columns)){
+            foreach ($columns as $column){
+                $attributes[$column] = array_shift($args);
+            }
+        }
+
+        $Item = $this->_ActiveRecord->create($attributes);
+        $Item->has_been_created = true;
+        $Item->has_been_found = false;
         return $Item;
     }
 
