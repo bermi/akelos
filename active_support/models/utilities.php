@@ -51,9 +51,10 @@ class AkModelUtilities extends AkModelExtenssion
      * @return string in Json Format
      */
     public function toJson($options = array()) {
-        if (is_array($options) && isset($options[0]) && ($options[0] instanceof ArrayAccess)) {
+        if (is_array($options) && isset($options[0])) {
             $options = array('collection'=>$options);
         }
+
         if (isset($options['collection']) && (is_array($options['collection']) || ($options['collection'] instanceof ArrayAccess)) && $options['collection'][0]->_modelName == $this->_Model->getModelName()) {
             $json = '';
 
@@ -96,6 +97,11 @@ class AkModelUtilities extends AkModelExtenssion
                 if (($type == 'serial' || $type=='integer') && $val!==null) $val = intval($val);
                 if ($type == 'float' && $val!==null) $val = floatval($val);
                 if ($type == 'boolean') $val = $val?1:0;
+                if ($type == 'datetime' && !empty($val)) {
+                    // UTC (Coordinated Universal Time) http://www.w3.org/TR/NOTE-datetime
+                    $val = gmdate('Y-m-d\TH:i:s\Z', Ak::getTimestamp($val));
+                }
+
                 $data[$key] = $val;
             }
         }
@@ -115,6 +121,10 @@ class AkModelUtilities extends AkModelExtenssion
                                     if (($type == 'serial' || $type=='integer') && $av!==null) $av = intval($av);
                                     if ($type == 'float' && $av!==null) $av = floatval($av);
                                     if ($type == 'boolean') $av = $av?1:0;
+                                    if ($type == 'datetime' && !empty($av)) {
+                                       // UTC (Coordinated Universal Time) http://www.w3.org/TR/NOTE-datetime
+                                       $av = gmdate('Y-m-d\TH:i:s\Z', Ak::getTimestamp($av));
+                                    }
                                     $attributes[$ak]=$av;
                                 }
                                 $data[$associationElement][] = $attributes;
@@ -129,6 +139,10 @@ class AkModelUtilities extends AkModelExtenssion
                                 if (($type == 'serial' || $type=='integer') && $av!==null) $av = intval($av);
                                 if ($type == 'float' && $av!==null) $av = floatval($av);
                                 if ($type == 'boolean') $av = $av?1:0;
+                                if ($type == 'datetime' && !empty($av)) {
+                                    // UTC (Coordinated Universal Time) http://www.w3.org/TR/NOTE-datetime
+                                    $av = gmdate('Y-m-d\TH:i:s\Z', Ak::getTimestamp($av));
+                                }
                                 $attributes[$ak]=$av;
                             }
                             $data[$associationElement] = $attributes;

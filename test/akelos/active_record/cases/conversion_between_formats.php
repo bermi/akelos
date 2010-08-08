@@ -13,17 +13,18 @@ class ConversionBetweenFormats_TestCase extends ActiveRecordUnitTest
         $person = new Person();
         $person->setAttributes(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
         $expected = <<<EOX
-<?xml version="1.0" encoding="UTF-8"?><person>
-<id></id>
+<?xml version="1.0" encoding="UTF-8"?>
+<person>
+<id nil="true"></id>
 <first-name>Hansi</first-name>
 <last-name>Müller</last-name>
 <email>hans@mueller.com</email>
-<created-at type="datetime"></created-at>
+<created-at type="datetime" nil="true"></created-at>
 </person>
 EOX;
         $xml = $person->toXml();
 
-        $this->assertEqual(trim($expected),$xml);
+        $this->_compareXml($expected, $xml);
 
         $person_reloaded = $person->fromXml($xml);
         $this->assertEqual($person->first_name,$person_reloaded->first_name);
@@ -32,12 +33,13 @@ EOX;
 
     public function test_with_relations_xml() {
         $person = $this->Person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
-        $person_created_at = $person->created_at;
+        $person_created_at = gmdate('Y-m-d\TH:i:s\Z', Ak::getTimestamp($person->created_at));
         $person->account->create(array('username'=>'hansi','password'=>'wilma'));
-        $account_created_at = $person->account->created_at;
+        $account_created_at = gmdate('Y-m-d\TH:i:s\Z', Ak::getTimestamp($person->account->created_at));
         $expected = <<<EOX
-<?xml version="1.0" encoding="UTF-8"?><person>
-<id>{$person->id}</id>
+<?xml version="1.0" encoding="UTF-8"?>
+<person>
+<id type="integer">{$person->id}</id>
 <first-name>Hansi</first-name>
 <last-name>Müller</last-name>
 <email>hans@mueller.com</email>
@@ -48,14 +50,15 @@ EOX;
 <username>hansi</username>
 <password>wilma</password>
 <is-enabled type="boolean">0</is-enabled>
-<credit-limit type="integer"></credit-limit>
-<firm-id type="integer"></firm-id>
-<reset-key></reset-key>
+<credit-limit type="integer" nil="true"></credit-limit>
+<firm-id type="integer" nil="true"></firm-id>
+<reset-key nil="true"></reset-key>
 <created-at type="datetime">$account_created_at</created-at>
 </account></person>
 EOX;
         $xml = $person->toXml(array('include'=>'account'));
-        $this->assertEqual(trim($expected),$xml);
+
+        $this->_compareXml($expected, $xml);
 
         $person_reloaded = $person->fromXml($xml);
         $this->assertEqual($person->first_name,$person_reloaded->first_name);
@@ -88,7 +91,8 @@ EOX;
 {"id":null,"first_name":"Hansi","last_name":"M\u00fcller","email":"hans@mueller.com","created_at":null}
 EOX;
         $json = $person->toJson();
-        $this->assertEqual(trim($expected),$json);
+
+        $this->_compareJson($expected, $json);
 
         $person_reloaded = $person->fromJson($json);
 
@@ -106,7 +110,8 @@ EOX;
 [{"id":null,"first_name":"Hansi","last_name":"M\u00fcller","email":"hans@mueller.com","created_at":null},{"id":null,"first_name":"Friedrich","last_name":"Holz","email":"friedel@holz.de","created_at":null}]
 EOX;
         $json = $person->toJson(array($person,$person2));
-        $this->assertEqual(trim($expected),$json);
+
+        $this->_compareJson($expected, $json);
 
         $people_reloaded = $person->fromJson($json);
 
@@ -132,21 +137,37 @@ EOX;
         $this->assertEqual($p1->account->id,$people_reloaded[0]->account->id);
         $this->assertEqual($p2->account->id,$people_reloaded[1]->account->id);
     }
+
     public function test_with_relations_json() {
         $person = $this->Person->create(array('first_name'=>'Hansi','last_name'=>'Müller','email'=>'hans@mueller.com'));
-        $person_created_at = $person->created_at;
+        $person_created_at = gmdate('Y-m-d\TH:i:s\Z', Ak::getTimestamp($person->created_at));
         $person->account->create(array('username'=>'hansi','password'=>'wilma'));
-        $account_created_at = $person->account->created_at;
+        $account_created_at = gmdate('Y-m-d\TH:i:s\Z', Ak::getTimestamp($person->account->created_at));
+
         $expected = <<<EOX
-{"id":$person->id,"first_name":"Hansi","last_name":"M\u00fcller","email":"hans@mueller.com","created_at":"{$person->created_at}","account":{"id":{$person->account->id},"person_id":{$person->id},"username":"hansi","password":"wilma","is_enabled":0,"credit_limit":null,"firm_id":null,"reset_key":null,"created_at":"{$person->account->created_at}"}}
+{"id":$person->id,"first_name":"Hansi","last_name":"M\u00fcller","email":"hans@mueller.com","created_at":"{$person_created_at}","account":{"id":{$person->account->id},"person_id":{$person->id},"username":"hansi","password":"wilma","is_enabled":0,"credit_limit":null,"firm_id":null,"reset_key":null,"created_at":"{$account_created_at}"}}
 EOX;
         $json = $person->toJson(array('include'=>'account'));
-        $this->assertEqual(trim($expected),$json);
+        $this->_compareJson($expected,$json);
 
         $person_reloaded = $person->fromJson($json);
         $this->assertEqual($person->first_name,$person_reloaded->first_name);
         $this->assertEqual($person->last_name,$person_reloaded->last_name);
         $this->assertEqual($person->account->id,$person_reloaded->account->id);
+    }
+
+    private function _compareXml($expected, $given)
+    {
+        $expected = Ak::convert('xml', 'array', $expected);
+        $given = Ak::convert('xml', 'array', $given);
+        $this->assertEqual($expected, $given);
+    }
+
+    private function _compareJson($expected, $given)
+    {
+        $expected = json_decode($expected, true);
+        $given = json_decode($given, true);
+        $this->assertEqual($expected, $given);
     }
 }
 
