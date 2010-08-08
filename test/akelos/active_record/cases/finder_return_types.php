@@ -20,19 +20,19 @@ class FinderReturnTypes_TestCase extends ActiveRecordUnitTest
 
         $returned=$this->Aa->findAll(array('returns'=>'array','select_prefix'=>'SELECT name FROM aas'));
         $this->assertTrue($returned);
-        $this->assertEqual(array(array('name'=>'first aa'),array('name'=>'second aa')), $returned);
+        $this->assertEqual(array(array('name'=>'first aa'),array('name'=>'second aa')), $returned->toArray());
 
         $returned=$this->Aa->findAll(array('returns'=>'array','select_prefix'=>'SELECT name FROM aas', 'order'=>'name DESC'));
         $this->assertTrue($returned);
-        $this->assertEqual(array(array('name'=>'second aa'),array('name'=>'first aa')), $returned);
+        $this->assertEqual(array(array('name'=>'second aa'),array('name'=>'first aa')), $returned->toArray());
 
         $returned=$this->Aa->findAll(array('returns'=>'array','select_prefix'=>'SELECT name FROM aas', 'order'=>'name DESC','limit'=>1));
         $this->assertTrue($returned);
-        $this->assertEqual(array(array('name'=>'second aa')), $returned);
+        $this->assertEqual(array(array('name'=>'second aa')), $returned->toArray());
 
         $returned=$this->Aa->findAll(array('returns'=>'array','select_prefix'=>'SELECT name FROM aas', 'order'=>'name DESC','limit'=>1,'offset'=>1));
         $this->assertTrue($returned);
-        $this->assertEqual(array(array('name'=>'first aa')), $returned);
+        $this->assertEqual(array(array('name'=>'first aa')), $returned->toArray());
 
         $returned=$this->Aa->findFirst(array('returns'=>'array','select_prefix'=>'SELECT name FROM aas', 'order'=>'name DESC'));
         $this->assertTrue($returned);
