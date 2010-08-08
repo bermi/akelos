@@ -164,7 +164,7 @@ class AssociationFinders_TestCase extends ActiveRecordUnitTest
         $this->assertTrue($firstcc);
         $this->assertEqual('first cc',$firstcc->name);
 
-        $nonexistingCc = $aa->bbs[1]->cc->find('first',array('conditions'=>'name LIKE ?','bind'=>'%first%','order'=>'id ASC'));
+        $nonexistingCc = $aa->bbs[1]->cc->find('first',array('conditions'=>'name LIKE ?','bind'=>'%first%','order'=>'id ASC', 'default' => false));
         $this->assertFalse($nonexistingCc);
         //die;
         $thirdcc = $aa->bbs[1]->cc->find('first',array('conditions'=>'name LIKE ?','bind'=>'third%','order'=>'id ASC'));
@@ -226,7 +226,7 @@ class AssociationFinders_TestCase extends ActiveRecordUnitTest
         $this->assertTrue($firstcc);
         $this->assertEqual('first cc',$firstcc->name);
 
-        $nonexistingCc = $aa->bbs[1]->cc->find('first',array('conditions'=>array('name LIKE ?','%first%'),'order'=>'id ASC'));
+        $nonexistingCc = $aa->bbs[1]->cc->find('first',array('conditions'=>array('name LIKE ?','%first%'),'order'=>'id ASC', 'default' => false));
         $this->assertFalse($nonexistingCc);
 
         $thirdcc = $aa->bbs[1]->cc->find('first',array('conditions'=>'name LIKE ?','bind'=>'third%','order'=>'id ASC'));
