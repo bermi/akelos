@@ -150,6 +150,7 @@ class AkBaseModel extends AkLazyObject
         'validatesAcceptanceOf',
         'validatesConfirmationOf',
         'validatesSizeOf',
+        'validatesAssociated',
         ),
         'autoload_path' => AK_ACTIVE_SUPPORT_DIR.DS.'models'.DS.'validations.php'
         ));

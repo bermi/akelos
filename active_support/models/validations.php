@@ -419,8 +419,13 @@ class AkModelValidations extends AkModelExtenssion
             if($is_active_record){
                 array_unshift($condition_params,$condition_sql);
             }
-            if ($Record = $this->_Model->find('first', array('conditions' => $condition_params))){
+
+            try{
+                $this->_Model->find('first', array('conditions' => $condition_params));
                 $this->_Model->addError($attribute_name, $message);
+            }catch(RecordNotFoundException $e){
+            }catch(Exception $e){
+                throw $e;
             }
         }
     }
