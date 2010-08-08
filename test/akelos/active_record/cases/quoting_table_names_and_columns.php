@@ -17,7 +17,9 @@ class Adapter_quoting_table_names_and_attributes_TestCase extends ActiveRecordUn
         $Installer = new AkInstaller();
         $this->assertTrue($Installer->tableExists('exists'));
         $Exist = new Exist();
-        $this->assertEqual(array_keys($Exist->getColumns()), array('id', 'order', 'index'));
+        $columns= array_keys($Exist->getColumns());
+        sort($columns);
+        $this->assertEqual($columns, array('id', 'index', 'order'));
     }
 
     public function test_should_crud_using_conflictive_column_names(){
@@ -37,7 +39,7 @@ class Adapter_quoting_table_names_and_attributes_TestCase extends ActiveRecordUn
         $id = $Same->getId();
         $Same->destroy();
 
-        $this->assertFalse($Exist->findFirstBy($id));
+        $this->assertFalse($Exist->findFirstBy($id, array('default' => false)));
     }
 }
 
