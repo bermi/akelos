@@ -159,11 +159,12 @@ class AkHasMany extends AkAssociation
                 $finder_options['default'] = false;
 
                 try{
-                    $FoundAssociates = $Associated->find('all', $finder_options);
-                    foreach($FoundAssociates as $FoundAssociate){
-                        $this->_setAssociatedMemberId($FoundAssociate);
+                    if($FoundAssociates = $Associated->find('all', $finder_options)) {
+                        foreach($FoundAssociates as $FoundAssociate){
+                            $this->_setAssociatedMemberId($FoundAssociate);
+                        }
+                        $this->Owner->{$this->association_id} = $FoundAssociates;
                     }
-                    $this->Owner->{$this->association_id} = $FoundAssociates;
                 }
                 catch(RecordNotFoundException $e){ }
                 catch(Exception $e){ throw $e; }
