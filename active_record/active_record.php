@@ -187,7 +187,7 @@ class AkActiveRecord extends AkAssociatedActiveRecord
 
         // new AkActiveRecord(23); //Returns object with primary key 23
         if(isset($attributes[0]) && count($attributes) === 1 && $attributes[0] > 0){
-            $record = $this->find($attributes[0]);
+            $record = $this->find($attributes[0], array('default' => false));
             if(!$record){
                 return false;
             }else {

@@ -206,7 +206,7 @@ class HasMany_TestCase extends ActiveRecordUnitTest
 
         $Picture = new Picture();
 
-        $this->assertFalse($Picture->find($pic_id));
+        $this->assertFalse($Picture->find($pic_id, array('default' => false)));
 
     }
 

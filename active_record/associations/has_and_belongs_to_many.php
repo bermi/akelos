@@ -369,7 +369,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
     public function addId($id) {
         $AssociatedModel = $this->getAssociatedModelInstance();
-        if($NewAssociated = $AssociatedModel->find($id)){
+        if($NewAssociated = $AssociatedModel->find($id, array('default' => false))){
             return $this->add($NewAssociated);
         }
         return false;
@@ -393,7 +393,7 @@ class AkHasAndBelongsToMany extends AkAssociation
 
             foreach (array_keys($Associated) as $k){
                 $id = $Associated[$k]->getId();
-                if($JoinObjectsToDelete = $this->JoinObject->findAllBy($options['foreign_key'].' AND '.$options['association_foreign_key'], $this->Owner->getId(), $id)){
+                if($JoinObjectsToDelete = $this->JoinObject->findAllBy($options['foreign_key'].' AND '.$options['association_foreign_key'], $this->Owner->getId(), $id, array('default' => false))->toArray()){
                     foreach (array_keys($JoinObjectsToDelete) as $k) {
                         if($JoinObjectsToDelete[$k]->destroy()){
                             $this->_deleted_join_object_values[$this->Owner->getId()][$id]=$JoinObjectsToDelete[$k]->getAttributes();
@@ -1037,7 +1037,7 @@ class AkHasAndBelongsToMany extends AkAssociation
             if($object->isNewRecord()){
                 $ids = array();
             }else{
-                if($existing = $CollectionHandler->find()){
+                if($existing = $CollectionHandler->find(array('default' => false))){
                     $ids = $existing[0]->collect($existing,'id','id');
                 }else{
                     $ids = array();

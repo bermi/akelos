@@ -58,7 +58,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($AkTestFields->delete(3, 4), 2);
         $this->assertEqual($AkTestFields->delete(array(5, 6)), 2);
 
-        $this->assertFalse($AkTestFields->find(2, 3, 4, 5, 6));
+        $this->assertFalse($AkTestFields->find(2, 3, 4, 5, 6, array('default' => false)));
     }
 
 
@@ -78,7 +78,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
 
         $this->assertEqual($AkTestFields->deleteAll(), 5);
 
-        $this->assertFalse($AkTestFields->findAll());
+        $this->assertFalse($AkTestFields->findAll(array('default' => false)));
     }
 
 
@@ -122,7 +122,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
         $this->assertEqual(count($AkTestFields->findAll()), 3);
 
         $AkTestFields->destroyAll('');
-        $this->assertFalse($AkTestFields->findAll());
+        $this->assertFalse($AkTestFields->findAll(array('default' => false)));
     }
 
     public function Test_of_deleteAll_with_binds() {
@@ -150,7 +150,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
 
         $AkTestUser->transactionComplete();
 
-        $this->assertFalse($AkTestUser->find('all', array('conditions'=>"country = 100")),'Transactions are not working on current database. If you are using MySQL please check that  your server supports InnoDB tables');
+        $this->assertFalse($AkTestUser->find('all', array('conditions'=>"country = 100", 'default' => false)),'Transactions are not working on current database. If you are using MySQL please check that  your server supports InnoDB tables');
 
         $AkTestUser->transactionStart();
         for ($i=1; $i <= 5; $i++){
@@ -188,7 +188,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
         $User = $Users->find('first', array('conditions' => array("last_name = :last_name", ':last_name' => "O'Reilly")));
         $this->assertTrue($User->first_name=='Tim' && $User->last_name == "O'Reilly" && $User->user_name == 'tim_oreilly');
 
-        $this->assertFalse($Users->find('first', array('conditions' => array("last_name = :last_name", ':last_name' => "' OR 1=1 AND first_name='Tim"))));
+        $this->assertFalse($Users->find('first', array('default' => false, 'conditions' => array("last_name = :last_name", ':last_name' => "' OR 1=1 AND first_name='Tim"))));
 
         $params = array('last_name'=>"O'Reilly");
         $User = $Users->find('first', array('conditions' => $params));
@@ -196,7 +196,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
 
         //Trying sql inyection on values
         $params = array('last_name'=>"' OR 1=1 AND first_name='Tim");
-        $this->assertFalse($Users->find('first', array('conditions' => $params)));
+        $this->assertFalse($Users->find('first', array('conditions' => $params, 'default' => false)));
 
         //Trying sql inyection on keys
         $params = array("last_name ='Tim' OR last_name"=>"Not available name");
@@ -219,7 +219,7 @@ class LegacyTests3_TestCase extends ActiveRecordUnitTest
         $this->assertTrue($FoundUsers[0]->first_name=='Tim');
         $this->assertTrue($FoundUsers[1]->first_name=='Alicia');
 
-        $this->assertFalse($Users->find("last_name = ?","' OR 1=1 AND first_name='Tim"));
+        $this->assertFalse($Users->find("last_name = ?","' OR 1=1 AND first_name='Tim", array('default' => false)));
 
     }
 

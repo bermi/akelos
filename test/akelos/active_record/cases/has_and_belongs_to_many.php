@@ -478,7 +478,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $oldConnection = $Mary->_db->connection;
         $Mary->_db->connection = $connection;
         //$Mary->_db = $db;
-        $Mary->friend->find(array('conditions'=>"name = 'James'"));
+        $Mary->friend->find(array('conditions'=>"name = 'James'", 'default' => false));
         $Mary->_db->connection = $oldConnection;
     }
     public function test_find_on_association_with_conditions_string() {
@@ -512,7 +512,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $oldConnection = $Mary->_db->connection;
         $Mary->_db->connection = $connection;
         //$Mary->_db = $db;
-        $Mary->friend->find(array('conditions'=>array('name = ?','James')));
+        $Mary->friend->find(array('conditions'=>array('name = ?','James'), 'default' => false));
         $Mary->_db->connection = $oldConnection;
     }
     public function test_find_on_association_with_conditions_array() {

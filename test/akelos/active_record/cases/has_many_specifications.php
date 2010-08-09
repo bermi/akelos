@@ -30,7 +30,7 @@ class HasManySpecifications_TestCase extends ActiveRecordUnitTest
 
         $StoredProperty = $this->Property->find('first');
         $this->assertEqual($Property->getId(), $StoredProperty->getId());
-        $this->assertFalse($this->Picture->find('first'));
+        $this->assertFalse($this->Picture->find('first', array('default' => false)));
     }
 
     public function test_destroying_should_cascade() {
@@ -39,8 +39,8 @@ class HasManySpecifications_TestCase extends ActiveRecordUnitTest
 
         $Property->destroy();
 
-        $this->assertFalse($this->Property->find('first'));
-        $this->assertFalse($this->Picture->find('first'));
+        $this->assertFalse($this->Property->find('first', array('default' => false)));
+        $this->assertFalse($this->Picture->find('first', array('default' => false)));
     }
 }
 

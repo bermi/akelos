@@ -29,14 +29,14 @@ class HasOneCascadingDestroy_TestCase extends ActiveRecordUnitTest
         $Picture = $this->Picture->find('first',array('include'=>'main_thumbnail'));
         $Picture->destroy();
 
-        $this->assertFalse($this->Thumbnail->find('first'));
+        $this->assertFalse($this->Thumbnail->find('first', array('default' => false)));
     }
 
     public function test_should_destroy_the_thumbnail_even_when_not_loaded() {
         $Picture = $this->Picture->find('first');
         $Picture->destroy();
 
-        $this->assertFalse($this->Thumbnail->find('first'),'Issue #125');
+        $this->assertFalse($this->Thumbnail->find('first', array('default' => false)),'Issue #125');
     }
 
 }

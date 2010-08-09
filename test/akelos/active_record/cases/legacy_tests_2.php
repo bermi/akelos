@@ -137,7 +137,7 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
 
 
         $Users = new AkTestUser();
-        $this->assertFalse($Users->find('first', array('order' => "last_name DESC", 'offset' => 5)));
+        $this->assertFalse($Users->find('first', array('order' => "last_name DESC", 'offset' => 5, 'default' => false)));
 
         $Users = new AkTestUser();
         $User = $Users->find('first', array('order' => "last_name ASC", 'offset' => 2));
