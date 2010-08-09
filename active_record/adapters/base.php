@@ -339,10 +339,13 @@ class AkDbAdapter
         
         AK_LOG_EVENTS && $this->logger->info('['.substr((microtime()-$options['start_time']), 0, 9).'] '.$options['ActiveRecord']->getModelName().': '.$sql);
         
-        if($result->EOF){
-            throw new RecordNotFoundException("Couldn't find record");
+        if(isset($result->EOF))
+        {
+            if($result->EOF){
+                throw new RecordNotFoundException("Couldn't find record");
+            }
+            return new AkActiveRecordIterator($result, $options);
         }
-        return new AkActiveRecordIterator($result, $options);
     }
 
     /* TRANSACTIONS */
