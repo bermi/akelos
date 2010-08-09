@@ -266,7 +266,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                 $options = $this->getOptions($this->association_id);
                 $Associated = $this->getAssociatedModelInstance();
                 try{
-                    $FoundAssociates = $Associated->findBySql($options['finder_sql']);
+                    $FoundAssociates = $Associated->findBySql($options['finder_sql'])->toArray();
                     array_map(array( $this,'_setAssociatedMemberId'),$FoundAssociates);
                     $this->Owner->{$this->association_id} = $FoundAssociates;
                 }
@@ -288,6 +288,9 @@ class AkHasAndBelongsToMany extends AkAssociation
      * their foreign keys to the collection?s primary key. Items are saved automatically when parent has been saved.
      */
     public function add(&$Associated) {
+        if($Associated instanceof AkActiveRecordIterator){
+            $Associated = $Associated->toArray();
+        }
         if(is_array($Associated)){
             $external_key = '__associated_to_model_'.$this->Owner->getModelName().'_as_'.$this->association_id;
             $succes = true;
@@ -357,8 +360,13 @@ class AkHasAndBelongsToMany extends AkAssociation
         $ids = is_array($ids[0]) ? $ids[0] : $ids;
         $AssociatedModel = $this->getAssociatedModelInstance();
         if(!empty($ids)){
-            $NewAssociates = $AssociatedModel->find($ids);
-            $this->set($NewAssociates);
+
+            try{
+                $NewAssociates = $AssociatedModel->find($ids)->toArray();
+                $this->set($NewAssociates);
+            }
+            catch (RecordNotFoundException $e) { }
+            catch (Exception $e) { throw $e; }
         }
     }
 
@@ -378,6 +386,9 @@ class AkHasAndBelongsToMany extends AkAssociation
 
     public function delete(&$Associated) {
         $success = true;
+        if($Associated instanceof AkActiveRecordIterator){
+            $Associated = $Associated->toArray();
+        }
         if(!is_array($Associated)){
             $associated_elements = array();
             $associated_elements[] = $Associated;
@@ -396,7 +407,7 @@ class AkHasAndBelongsToMany extends AkAssociation
                 if($JoinObjectsToDelete = $this->JoinObject->findAllBy($options['foreign_key'].' AND '.$options['association_foreign_key'], $this->Owner->getId(), $id, array('default' => false))->toArray()){
                     foreach (array_keys($JoinObjectsToDelete) as $k) {
                         if($JoinObjectsToDelete[$k]->destroy()){
-                            $this->_deleted_join_object_values[$this->Owner->getId()][$id]=$JoinObjectsToDelete[$k]->getAttributes();
+                            $this->_deleted_join_object_values[$this->Owner->getId()][$id] = $JoinObjectsToDelete[$k]->getAttributes();
                             $items_to_remove_from_collection[] = $id;
                         }else{
                             $success = false;
@@ -419,6 +430,9 @@ class AkHasAndBelongsToMany extends AkAssociation
     * Remove records from the collection. Use delete() in order to trigger database dependencies
     */
     public function removeFromCollection(&$records) {
+        if($records instanceof AkActiveRecordIterator){
+            $records = $records->toArray();
+        }
         if(!is_array($records)){
             $records_array = array();
             $records_array[] = $records;
@@ -497,7 +511,9 @@ class AkHasAndBelongsToMany extends AkAssociation
 
 
     public function _relateAssociatedWithOwner(&$Associated) {
-
+        if($Associated instanceof AkActiveRecordIterator){
+            $Associated = $Associated->toArray();
+        }
         if(!$this->Owner->isNewRecord()){
             $success = true;
             $options = $this->getOptions($this->association_id);
@@ -545,6 +561,9 @@ class AkHasAndBelongsToMany extends AkAssociation
     }
 
     public function &_build($association_id, &$AssociatedObject, $reference_associated = true) {
+        if($AssociatedObject instanceof AkActiveRecordIterator){
+            $AssociatedObject = $AssociatedObject->toArray();
+        }
         if($reference_associated){
             $this->Owner->$association_id = $AssociatedObject;
         }else{
@@ -807,65 +826,6 @@ class AkHasAndBelongsToMany extends AkAssociation
             $ModelInstances[$class_name] = new $class_name();
         }
         return $ModelInstances[$class_name];
-    }
-
-    public function _notWorkingYetfind() {
-        $result = false;
-        if(!$this->Owner->isNewRecord()){
-            $args = func_get_args();
-            $num_args = func_num_args();
-            if(!empty($args[$num_args-1]) && is_array($args[$num_args-1])){
-                $options_in_args = true;
-                $options = $args[$num_args-1];
-            }else{
-                $options_in_args = false;
-                $options = array();
-            }
-            $is_sqlite = $this->Owner->_db->type()=='sqlite';
-            $has_and_belongs_to_many_options = $this->getOptions($this->association_id);
-            if (!is_array($options['conditions'])) {
-                $has_and_belongs_to_many_options['conditions'] = (!empty($options['conditions'])?$options['conditions'].' AND ':'').(!empty($has_and_belongs_to_many_options['conditions'])?$has_and_belongs_to_many_options['conditions'].' AND ':'').
-                ''.'__owner__'.$has_and_belongs_to_many_options['handler_name'].'__'.$has_and_belongs_to_many_options['join_class_name'].'.'.$has_and_belongs_to_many_options['foreign_key'].($is_sqlite ? ' LIKE ' : ' = ').' '.$this->Owner->quotedId();
-            } else {
-                $has_and_belongs_to_many_options['conditions'] = array(
-                $options['conditions'][0].' AND '.(!empty($has_and_belongs_to_many_options['conditions'])?$has_and_belongs_to_many_options['conditions'].' AND ':'').'__owner__'.$has_and_belongs_to_many_options['handler_name'].'__'.$has_and_belongs_to_many_options['join_class_name'].'.'.$has_and_belongs_to_many_options['foreign_key'].
-                ($is_sqlite ? ' LIKE ' : ' = ').' '.$this->Owner->quotedId());
-                $has_and_belongs_to_many_options['conditions'][1] = $options['conditions'][1];
-            }
-            if (!empty($has_and_belongs_to_many_options['bind'])) {
-                $has_and_belongs_to_many_options['bind'] = @Ak::toArray($has_and_belongs_to_many_options['bind']);
-            } else {
-                $has_and_belongs_to_many_options['bind'] = array();
-            }
-            if(!empty($options['bind'])) {
-                $has_and_belongs_to_many_options['bind'] = array_merge(Ak::toArray($options['bind']),$has_and_belongs_to_many_options['bind']);
-            }
-
-            $finder_options = $this->getAssociatedFinderSqlOptionsForInclusionChain('owner','__owner',$has_and_belongs_to_many_options,true);
-
-            //$finder_options['include'] = array($this->association_id => array('include'=>Ak::toArray(@$options['include'])));
-            $finder_options['include'] = Ak::toArray(@$options['include']);
-
-            $finder_options = array('conditions'=>@$finder_options['conditions'],'include'=>@$finder_options['include']);
-
-            if(!empty($has_and_belongs_to_many_options['bind'])) {
-                if (!is_array($finder_options['conditions'])) {
-                    $finder_options['conditions'] = array($finder_options['conditions']);
-                }
-                $finder_options['conditions'] = array_merge($finder_options['conditions'],$has_and_belongs_to_many_options['bind']);
-            }
-
-            if($options_in_args){
-                $args[$num_args-1] = $finder_options;
-            }else{
-                $args = empty($args) ? array('all') : $args;
-                array_push($args, $finder_options);
-            }
-            $Associated = $this->getAssociatedModelInstance();
-            $result = call_user_func_array(array( $Associated,'find'), $args);
-
-        }
-        return $result;
     }
 
     public function &find() {

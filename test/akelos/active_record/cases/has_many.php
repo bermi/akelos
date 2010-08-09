@@ -77,6 +77,7 @@ class HasMany_TestCase extends ActiveRecordUnitTest
         $Pictures = $Picture->find();
 
         $Property->picture->set($Pictures);
+
         $this->assertEqual($Property->picture->count(), count($Pictures));
 
         $Property = $Property->find('first');
@@ -184,6 +185,7 @@ class HasMany_TestCase extends ActiveRecordUnitTest
 
         $this->assertEqual($VillaAltea->pictures[0]->get('title'), 'Garden');
     }
+
     public function test_association_create_and_reference_back_to_belongsTo() {
         $Property = new Property(array('description'=>'Hollywood Mansion'));
         $this->assertTrue($Property->save());
@@ -191,6 +193,7 @@ class HasMany_TestCase extends ActiveRecordUnitTest
         $this->assertReference($Pool, $Property->pictures[0]);
         $this->assertReference($Property, $Property->pictures[0]->property);
     }
+
     public function test_clean_up_dependencies() {
         $Property = new Property(array('description'=>'Ruins in Matamon'));
         $this->assertTrue($Property->save());
@@ -246,7 +249,6 @@ class HasMany_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($Result->comments[0]->get('name'), 'Aditya');
     }
 
-
     public function test_remove_existing_associates_before_setting_by_id() {
         $this->installAndIncludeModels(array('Post', 'Comment'));
 
@@ -298,6 +300,7 @@ class HasMany_TestCase extends ActiveRecordUnitTest
         $Loaded = $Property->picture->find('all',array('include'=>'landlord'));
         $this->assertEqual('and a landlord',$Loaded[0]->landlord->name);
     }
+
     public function xtest_has_many_finder_sql_with_foreign_key_value_replacement() {
         $this->installAndIncludeModels('Group,Location');
 

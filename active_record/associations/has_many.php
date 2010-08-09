@@ -163,7 +163,7 @@ class AkHasMany extends AkAssociation
                         foreach($FoundAssociates as $FoundAssociate){
                             $this->_setAssociatedMemberId($FoundAssociate);
                         }
-                        $this->Owner->{$this->association_id} = $FoundAssociates;
+                        $this->Owner->{$this->association_id} = $FoundAssociates->toArray();
                     }
                 }
                 catch(RecordNotFoundException $e){ }
@@ -183,6 +183,10 @@ class AkHasMany extends AkAssociation
      * their foreign keys to the collection?s primary key. Items are saved automatically when parent has been saved.
      */
     public function add(&$Associated) {
+        if($Associated instanceof AkActiveRecordIterator)
+        {
+            $Associated = $Associated->toArray();
+        }
         if(is_array($Associated)){
             $succes = true;
             $succes = $this->Owner->notifyObservers('beforeAdd') ? $succes : false;
@@ -235,6 +239,10 @@ class AkHasMany extends AkAssociation
     }
 
     public function set(&$objects) {
+        if($objects instanceof AkActiveRecordIterator)
+        {
+            $objects = $objects->toArray();
+        }
         $this->deleteAll($objects);
         $this->add($objects);
     }
@@ -266,6 +274,12 @@ class AkHasMany extends AkAssociation
 
     public function delete(&$Associated, $Skip = null) {
         $success = true;
+        if($Associated instanceof AkActiveRecordIterator){
+            $Associated = $Associated->toArray();
+        }
+        if($Skip instanceof AkActiveRecordIterator){
+            $Skip = $Skip->toArray();
+        }
         if(!is_array($Associated)){
             $associated_elements = array();
             $associated_elements[] = $Associated;
