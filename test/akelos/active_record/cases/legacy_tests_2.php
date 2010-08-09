@@ -191,13 +191,19 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
 
     public function Test_of_getContentColumns() {
         $Comment = new AkTestComment();
-        $this->assertEqual(array_keys($Comment->getContentColumns()), array('private_comment','birth_date'));
+        $columns = array_keys($Comment->getContentColumns());
+        sort($columns);
+        $this->assertEqual($columns, array('birth_date', 'private_comment'));
 
         $Users = new AkTestUser();
-        $this->assertEqual(array_keys($Users->getContentColumns()), array('user_name', 'first_name', 'last_name', 'email', 'country', 'password', 'created_at', 'updated_at', 'expires_on'));
+        $columns = array_keys($Users->getContentColumns());
+        sort($columns);
+        $this->assertEqual($columns, array ('country','created_at','email','expires_on','first_name','last_name','password','updated_at','user_name'));
         $Users = new AkTestUser();
         $Users->setInheritanceColumn('first_name');
-        $this->assertEqual(array_keys($Users->getContentColumns()), array('user_name', 'last_name', 'email', 'country', 'password', 'created_at', 'updated_at', 'expires_on'));
+        $columns = array_keys($Users->getContentColumns());
+        sort($columns);
+        $this->assertEqual($columns, array('country','created_at','email','expires_on','last_name','password','updated_at','user_name'));
 
     }
 
@@ -317,7 +323,6 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
         }
     }
 
-
     public function Test_of_createOrUpdate() {
         $Users = new AkTestUser();
         $Bermi = $Users->findFirst("first_name = 'Bermi'");
@@ -346,8 +351,6 @@ class LegacyTests2_TestCase extends ActiveRecordUnitTest
         $Bermi->reload();
         $this->assertEqual($Bermi->last_name,'Ferrer Martínez');
     }
-
-
 
 
     public function Test_of_updateAll() {

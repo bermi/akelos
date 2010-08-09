@@ -228,7 +228,6 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         }
     }
 
-
     public function test_clean_up_dependencies() {
         $Property = new Property(array('description' =>'Luxury Estate'));
         $PropertyType = new PropertyType();
@@ -250,7 +249,6 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($PropertyType->property->count(), 0);
 
     }
-
 
     public function test_double_assignation() {
         $AkelosOffice = new Property(array('description'=>'Akelos new Office'));
@@ -304,9 +302,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($PisoJose->property_types[0]->getId(), $Apartamento->getId());
         $this->assertEqual($PisoBermi->property_type->count(), 2);
 
-
     }
-
 
     public function test_associated_uniqueness() {
         $Property = new Property();
@@ -343,7 +339,6 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $this->assertEqual($RanchoMaria->getId(), $Rancho->properties[0]->getId());
     }
 
-
     public function test_should_remove_associated_using_the_right_key() {
         $Installer = new AkInstaller();
         @$Installer->dropTable('groups_users');
@@ -379,7 +374,6 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
 
     }
 
-
     public function test_remove_existing_associates_before_setting_by_id() {
 
         foreach (range(1,10) as $i){
@@ -409,10 +403,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $this->assertTrue($Tag = $Tag->find(10, array('include'=>'posts')));
         $this->assertEqual($Tag->posts[0]->getId(), 11);
 
-
     }
-
-
 
     public function test_should_allow_multiple_habtm_associates_on_fresh_association_owner() {
         $Bermi = new User(array('name'=>'Bermi'));
@@ -423,7 +414,6 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
 
         $this->assertEqual($Bermi->posts[0]->title, 'Bermi Post');
     }
-
 
     public function test_should_remove_existing_associates_when_setting_new_ones_and_parent_is_saved() {
         $Bermi = $this->User->findFirstBy('name', 'Bermi');
@@ -444,7 +434,6 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $PostUsers = $PostUser->findAllBy('post_id', $Post->id);
         $this->assertEqual(count($PostUsers), 1);
     }
-
 
     public function test_should_allow_same_model_habtm_associations() {
         $this->installAndIncludeModels(array('Friend'=>'id,name'));
@@ -481,6 +470,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $Mary->friend->find(array('conditions'=>"name = 'James'", 'default' => false));
         $Mary->_db->connection = $oldConnection;
     }
+
     public function test_find_on_association_with_conditions_string() {
         $this->installAndIncludeModels(array('Friend'=>'id,name'));
         $Mary = $this->Friend->create(array('name' => 'Mary'));
@@ -515,6 +505,7 @@ class HasAndBelongsToMany_TestCase extends ActiveRecordUnitTest
         $Mary->friend->find(array('conditions'=>array('name = ?','James'), 'default' => false));
         $Mary->_db->connection = $oldConnection;
     }
+
     public function test_find_on_association_with_conditions_array() {
         $this->installAndIncludeModels(array('Friend'=>'id,name'));
         $Mary = $this->Friend->create(array('name' => 'Mary'));
