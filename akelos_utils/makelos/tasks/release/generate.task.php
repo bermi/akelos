@@ -48,7 +48,7 @@ HELP
 );
 }
 $default_app_name = (AK_APP_NAME == 'Application') ? basename(MAKELOS_BASE_DIR) : AK_APP_NAME;
-$is_akelos_core = empty($options['app_name']) && $default_app_name=='Application' && !file_exists(AkConfig::getDir('config').DS.'config.php');
+$is_akelos_core = defined('AK_CORE_DIR');
 
 $available_formats = array_diff(explode("\n", @`git archive -l`), array(''));
 if(empty($available_formats)){
@@ -74,6 +74,7 @@ $options['revision'] = trim($options['revision'], '. ');
 $options['commit'] = isset($options['commit']) ? $is_akelos_core : false;
 
 $version_file = empty($options['version_file']) ? MAKELOS_BASE_DIR.DS.'version.txt' : $options['version_file'];
+if(!is_file($version_file)) $version_file = MAKELOS_BASE_DIR.DS.'..'.DS.'version.txt';
 
 if(!isset($options['version'])){
     $version_candidate = @file_get_contents($version_file);
