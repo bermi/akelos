@@ -172,7 +172,7 @@ class AkModelErrors extends AkModelExtenssion
 
         foreach ($this->_errors as $attribute=>$errors){
             $full_messages[$attribute] = array();
-            $attribute_name = AkInflector::humanize($this->_Model->internationalize ? $this->_Model->delocalizeAttribute($attribute) : $attribute);
+            $attribute_name = AkInflector::humanize(isset($this->_Model->internationalize) && $this->_Model->internationalize ? $this->_Model->delocalizeAttribute($attribute) : $attribute);
             foreach ($errors as $error){
                 $full_messages[$attribute][] = $this->_Model->t('%attribute_name %error', array(
                 '%attribute_name' => $attribute_name,
