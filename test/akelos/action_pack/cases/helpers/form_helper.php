@@ -158,7 +158,11 @@ class FormHelper_TestCase extends HelperUnitTest
 
         ob_start();
         $f = $form_helper->form_for('person', $person, array('url' => array('action' => 'update')));
-        $this->assertEqual(ob_get_clean(),'<form action="/url/for/test" method="post">');
+        $form_opening_markup = ob_get_clean();
+        $this->assertTrue(strstr($form_opening_markup, '<form action="/url/for/test" method="post">'), 'Form open tag not found');
+        $this->assertTrue(strstr($form_opening_markup, '<div style="margin:0;padding:0;display:inline"><input name="authenticity_token" type="hidden" value='), 'Form authenticity_token tag not found');
+        $this->assertTrue(strstr($form_opening_markup, '<div style="margin:0;padding:0;display:inline"><input name="_method" type="hidden" value="put" /></div>'), 'Form PUT method tag not found');
+
 
         $this->assertEqual(
         $form_helper->text_field('task', 'description'),
