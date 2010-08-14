@@ -325,7 +325,7 @@ class AkModelValidations extends AkModelExtenssion
      * Alias for validatesLengthOf
      */
     public function validatesSizeOf($attribute_names, $options = array()) {
-        return validatesLengthOf($attribute_names, $options);
+        return $this->validatesLengthOf($attribute_names, $options);
     }
 
     /**
@@ -430,12 +430,15 @@ class AkModelValidations extends AkModelExtenssion
             }
 
             try{
-                $this->_Model->find('first', array('conditions' => $condition_params));
-                $this->_Model->addError($attribute_name, $message);
+                if($this->_Model->find('first', array('conditions' => $condition_params))){
+                    $this->_Model->addError($attribute_name, $message);
+                    return false;
+                }
             }catch(RecordNotFoundException $e){
             }catch(Exception $e){
                 throw $e;
             }
+            return true;
         }
     }
 
