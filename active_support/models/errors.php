@@ -110,7 +110,7 @@ class AkModelErrors extends AkModelExtenssion
     }
 
     /**
-    * Returns true if the specified $attribute has errors associated with it.
+    * @return bool Returns true if the specified $attribute has errors associated with it.
     */
     public function isInvalid($attribute) {
         return $this->getErrorsOn($attribute);
@@ -144,6 +144,9 @@ class AkModelErrors extends AkModelExtenssion
         }
     }
 
+    /**
+     * Prints the error as HTML.
+     */
     public function yieldError($message) {
         $messages = is_array($message) ? $message : array($message);
         foreach ($messages as $message){
@@ -210,6 +213,9 @@ class AkModelErrors extends AkModelExtenssion
         return $error_count;
     }
 
+    /**
+     * Generate a HTML list that contains current errors.
+     */
     public function errorsToString($print = false) {
         $result = "\n<div id='errors'>\n<ul class='error'>\n";
         foreach ($this->getFullErrorMessages() as $error){
@@ -223,6 +229,10 @@ class AkModelErrors extends AkModelExtenssion
         return $result;
     }
 
+    /**
+     * Returns the default error message for an specific error type.
+     * @return string Error message.
+     */
     public function getDefaultErrorMessageFor($type, $translated = false) {
         if(isset($this->_Model->default_error_messages[$type])){
             $message = $this->_Model->default_error_messages[$type];

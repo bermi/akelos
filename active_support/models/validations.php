@@ -70,32 +70,35 @@ class AkModelValidations extends AkModelExtenssion
     public function validateOnUpdate() {
     }
 
+    /**
+     * @return bool Returns true if the model needs validation.
+     */
     public function needsValidation() {
         return true;
     }
 
     /**
-      * Encapsulates the pattern of wanting to validate a password or email address field with a confirmation. Example:
-      *
-      *  Model:
-      *     class Person extends ActiveRecord
-      *     {
-      *         public function validate()
-      *         {
-      *             $this->validatesConfirmationOf('password');
-      *             $this->validatesConfirmationOf('email_address', "should match confirmation");
-      *         }
-      *    }
-      *
-      *  View:
-      *    <?=$form_helper->password_field("person", "password"); ?>
-      *    <?=$form_helper->password_field("person", "password_confirmation"); ?>
-      *
-      * The person has to already have a password attribute (a column in the people table), but the password_confirmation is virtual.
-      * It exists only as an in-memory variable for validating the password. This check is performed only if password_confirmation
-      * is not null.
-      *
-      */
+    * Encapsulates the pattern of wanting to validate a password or email address field with a confirmation. Example:
+    *
+    *  Model:
+    *     class Person extends ActiveRecord
+    *     {
+    *         public function validate()
+    *         {
+    *             $this->validatesConfirmationOf('password');
+    *             $this->validatesConfirmationOf('email_address', "should match confirmation");
+    *         }
+    *    }
+    *
+    *  View:
+    *    <?=$form_helper->password_field("person", "password"); ?>
+    *    <?=$form_helper->password_field("person", "password_confirmation"); ?>
+    *
+    * The person has to already have a password attribute (a column in the people table), but the password_confirmation is virtual.
+    * It exists only as an in-memory variable for validating the password. This check is performed only if password_confirmation
+    * is not null.
+    *
+    */
     public function validatesConfirmationOf($attribute_names, $message = 'confirmation') {
         $message = $this->_Model->getDefaultErrorMessageFor($message, true);
         $attribute_names = Ak::toArray($attribute_names);
@@ -108,24 +111,24 @@ class AkModelValidations extends AkModelExtenssion
     }
 
     /**
-      * Encapsulates the pattern of wanting to validate the acceptance of a terms of service check box (or similar agreement). Example:
-      *
-      * class Person extends ActiveRecord
-      * {
-      *     public function validateOnCreate()
-      *     {
-      *         $this->validatesAcceptanceOf('terms_of_service');
-      *         $this->validatesAcceptanceOf('eula', "must be abided");
-      *     }
-      * }
-      *
-      * The terms_of_service attribute is entirely virtual. No database column is needed. This check is performed only if
-      * terms_of_service is not null.
-      *
-      *
-      * @param accept 1
-      * Specifies value that is considered accepted.  The default value is a string "1", which makes it easy to relate to an HTML checkbox.
-      */
+    * Encapsulates the pattern of wanting to validate the acceptance of a terms of service check box (or similar agreement). Example:
+    *
+    * class Person extends ActiveRecord
+    * {
+    *     public function validateOnCreate()
+    *     {
+    *         $this->validatesAcceptanceOf('terms_of_service');
+    *         $this->validatesAcceptanceOf('eula', "must be abided");
+    *     }
+    * }
+    *
+    * The terms_of_service attribute is entirely virtual. No database column is needed. This check is performed only if
+    * terms_of_service is not null.
+    *
+    *
+    * @param accept 1
+    * Specifies value that is considered accepted.  The default value is a string "1", which makes it easy to relate to an HTML checkbox.
+    */
     public function validatesAcceptanceOf($attribute_names, $message = 'accepted', $accept = 1) {
         $message = $this->_Model->getDefaultErrorMessageFor($message, true);
 
@@ -184,13 +187,16 @@ class AkModelValidations extends AkModelExtenssion
         }
     }
 
+    /**
+     * @return bool Returns true if the value is a blank string or null.
+     */
     public function isBlank($value = null) {
         return trim((string)$value) == '';
     }
 
     /**
-      * Validates that the specified attributes are not blank (as defined by AkActiveRecord::isBlank()).
-      */
+    * Validates that the specified attributes are not blank (as defined by AkBaseModel::isBlank()).
+    */
     public function validatesPresenceOf($attribute_names, $message = 'blank') {
         $message = $this->_Model->getDefaultErrorMessageFor($message, true);
 
@@ -201,36 +207,36 @@ class AkModelValidations extends AkModelExtenssion
     }
 
     /**
-      * Validates that the specified attribute matches the length restrictions supplied. Only one option can be used at a time:
-      *
-      * class Person extends ActiveRecord
-      * {
-      *     public function validate()
-      *     {
-      *         $this->validatesLengthOf('first_name', array('maximum'=>30));
-      *         $this->validatesLengthOf('last_name', array('maximum'=>30,'message'=> "less than %d if you don't mind"));
-      *         $this->validatesLengthOf('last_name', array('within'=>array(7, 32)));
-      *         $this->validatesLengthOf('last_name', array('in'=>array(6, 20), 'too_long' => "pick a shorter name", 'too_short' => "pick a longer name"));
-      *         $this->validatesLengthOf('fav_bra_size', array('minimum'=>1, 'too_short'=>"please enter at least %d character"));
-      *         $this->validatesLengthOf('smurf_leader', array('is'=>4, 'message'=>"papa is spelled with %d characters... don't play me."));
-      *     }
-      * }
-      *
-      * NOTE: Be aware that $this->validatesLengthOf('field', array('is'=>5)); Will match a string containing 5 characters (Ie. "Spain"), an integer 5, and an array with 5 elements. You must supply additional checking to check for appropriate types.
-      *
-      * Configuration options:
-      * <tt>minimum</tt> - The minimum size of the attribute
-      * <tt>maximum</tt> - The maximum size of the attribute
-      * <tt>is</tt> - The exact size of the attribute
-      * <tt>within</tt> - A range specifying the minimum and maximum size of the attribute
-      * <tt>in</tt> - A synonym(or alias) for :within
-      * <tt>allow_null</tt> - Attribute may be null; skip validation.
-      *
-      * <tt>too_long</tt> - The error message if the attribute goes over the maximum (default "is" "is too long (max is %d characters)")
-      * <tt>too_short</tt> - The error message if the attribute goes under the minimum (default "is" "is too short (min is %d characters)")
-      * <tt>wrong_length</tt> - The error message if using the "is" method and the attribute is the wrong size (default "is" "is the wrong length (should be %d characters)")
-      * <tt>message</tt> - The error message to use for a "minimum", "maximum", or "is" violation.  An alias of the appropriate too_long/too_short/wrong_length message
-      */
+    * Validates that the specified attribute matches the length restrictions supplied. Only one option can be used at a time:
+    *
+    * class Person extends ActiveRecord
+    * {
+    *     public function validate()
+    *     {
+    *         $this->validatesLengthOf('first_name', array('maximum'=>30));
+    *         $this->validatesLengthOf('last_name', array('maximum'=>30,'message'=> "less than %d if you don't mind"));
+    *         $this->validatesLengthOf('last_name', array('within'=>array(7, 32)));
+    *         $this->validatesLengthOf('last_name', array('in'=>array(6, 20), 'too_long' => "pick a shorter name", 'too_short' => "pick a longer name"));
+    *         $this->validatesLengthOf('fav_bra_size', array('minimum'=>1, 'too_short'=>"please enter at least %d character"));
+    *         $this->validatesLengthOf('smurf_leader', array('is'=>4, 'message'=>"papa is spelled with %d characters... don't play me."));
+    *     }
+    * }
+    *
+    * NOTE: Be aware that $this->validatesLengthOf('field', array('is'=>5)); Will match a string containing 5 characters (Ie. "Spain"), an integer 5, and an array with 5 elements. You must supply additional checking to check for appropriate types.
+    *
+    * Configuration options:
+    * <tt>minimum</tt> - The minimum size of the attribute
+    * <tt>maximum</tt> - The maximum size of the attribute
+    * <tt>is</tt> - The exact size of the attribute
+    * <tt>within</tt> - A range specifying the minimum and maximum size of the attribute
+    * <tt>in</tt> - A synonym(or alias) for :within
+    * <tt>allow_null</tt> - Attribute may be null; skip validation.
+    *
+    * <tt>too_long</tt> - The error message if the attribute goes over the maximum (default "is" "is too long (max is %d characters)")
+    * <tt>too_short</tt> - The error message if the attribute goes under the minimum (default "is" "is too short (min is %d characters)")
+    * <tt>wrong_length</tt> - The error message if using the "is" method and the attribute is the wrong size (default "is" "is the wrong length (should be %d characters)")
+    * <tt>message</tt> - The error message to use for a "minimum", "maximum", or "is" violation.  An alias of the appropriate too_long/too_short/wrong_length message
+    */
     public function validatesLengthOf($attribute_names, $options = array()) {
         // Merge given options with defaults.
         $default_options = array(
@@ -315,6 +321,9 @@ class AkModelValidations extends AkModelExtenssion
         return true;
     }
 
+    /**
+     * Alias for validatesLengthOf
+     */
     public function validatesSizeOf($attribute_names, $options = array()) {
         return validatesLengthOf($attribute_names, $options);
     }
@@ -539,7 +548,7 @@ class AkModelValidations extends AkModelExtenssion
 
 
     /**
-    * Vos whether the value of the specified attribute is numeric.
+    * Validates whether the value of the specified attribute is numeric.
     *
     *   class Person extends ActiveRecord
     *   {
@@ -579,7 +588,7 @@ class AkModelValidations extends AkModelExtenssion
 
 
     /**
-    * Returns true if no errors were added otherwise false.
+    * @return bool Returns true if no errors were added otherwise false.
     */
     public function isValid() {
         $this->_Model->clearErrors();

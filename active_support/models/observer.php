@@ -44,11 +44,17 @@ class AkModelObserver extends AkModelExtenssion
         return true;
     }
 
-
+    /**
+     * Sets current observable state.
+     */
     public function setObservableState($state_message) {
         $this->_observable_state = $state_message;
     }
 
+    /**
+     * Returns current observable state.
+     * @return string
+     */
     public function getObservableState() {
         return $this->_observable_state;
     }
@@ -82,8 +88,8 @@ class AkModelObserver extends AkModelExtenssion
         }
     }
     /**
-    * Register the reference to an object object
-    * @return void
+    * Gets the list of observers for the current model.
+    * @return array
     */
     public function &getObservers() {
         $staticVarNs='AkActiveModel::observers::' . $this->_Model->getModelName();

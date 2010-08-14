@@ -6,6 +6,9 @@
 
 class AkModelDebug extends AkModelExtenssion
 {
+    /**
+     * Toggles SQL query output
+     */
     public function dbug() {
         if(!$this->_Model->isConnected()){
             $this->_Model->establishConnection();
@@ -14,6 +17,9 @@ class AkModelDebug extends AkModelExtenssion
         $this->_Model->db_debug = $this->_Model->getAdapter()->connection->debug;
     }
 
+    /**
+     * Displays a tring representation of the model for debugging.
+     */
     public function toString($print = false) {
         $result = '';
         if(!AK_CLI || (AK_ENVIRONMENT == 'testing' && !AK_CLI)){

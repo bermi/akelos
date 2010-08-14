@@ -22,10 +22,10 @@ class AkModelUtilities extends AkModelExtenssion
      *    <created-at type="datetime">2008-01-01 13:01:23</created-at>
      * </person>
      *
-     * and returns an ActiveRecord Object
+     * and returns an AkBaseModel Object
      *
      * @param string $xml
-     * @return AkActiveRecord
+     * @return AkBaseModel
      */
     public function fromXml($xml) {
         $array = Ak::convert('xml','array', $xml);
@@ -162,10 +162,10 @@ class AkModelUtilities extends AkModelExtenssion
      * {"id":1,"first_name":"Hansi","last_name":"M\u00fcller",
      *  "email":"hans@mueller.com","created_at":"2008-01-01 13:01:23"}
      *
-     * and returns an ActiveRecord Object
+     * and returns an AkBaseModel Object
      *
      * @param string $json
-     * @return AkActiveRecord
+     * @return AkBaseModel
      */
     public function fromJson($json) {
         $json = Ak::fromJson($json);
@@ -311,7 +311,7 @@ class AkModelUtilities extends AkModelExtenssion
     }
     
     /**
-     * converts to yaml-strings
+     * Generate a YAML representation of the model record.
      *
      * examples:
      * User::toYaml($users->find('all'));
