@@ -144,7 +144,7 @@ function akelos_autoload($name, $path = null) {
         'AkActionWebServiceServer'  => 'action_pack/action_web_service/server.php',
 
         // Active Record
-        'AkActiveRecord'            => 'active_record/active_record.php',
+        'AkActiveRecord'            => 'active_record/base.php',
         'AkDbAdapter'               => 'active_record/adapters/base.php',
         'AkAssociatedActiveRecord'  => 'active_record/associated_active_record.php',
         'AkAssociation'             => 'active_record/associations/base.php',
