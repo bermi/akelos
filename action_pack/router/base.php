@@ -146,7 +146,7 @@ class AkRouter
         $this->handleApiShortcuts($url_pattern, $defaults,  $requirements);
 
         if(isset($defaults['conditions'])){
-            throw new Exception();
+            throw new Exception('Could not connect named route with conditions');
         }
 
         $Route = new AkRoute($url_pattern,$defaults,$requirements,$conditions);
