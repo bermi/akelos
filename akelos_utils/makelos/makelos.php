@@ -74,11 +74,11 @@ class MakelosRequest
                     $task = trim($matches[2], ' :');
                     $this->tasks[$task] = array();
                     $task_set = true;
-                }elseif($matches[1] == '-'){
+                }elseif($matches[1] == '-' && isset($task)){
                     foreach (str_split($matches[2]) as $k){
                         $this->tasks[$task]['attributes'][$k] = true;
                     }
-                }elseif($task_set){
+                }elseif($task_set && isset($task)){
                     if($matches[1] == '--'){
                         $this->tasks[$task]['attributes'][trim($matches[2], ' :')] = true;
                     }else{
@@ -335,6 +335,8 @@ class Makelos
         $this->message("    ./makelos task:name ENVIROMENT=production parameter=value param -abc --param=value");
 
         $this->message("\nShowing tasks avalable at ".AK_TASKS_DIR.":\n");
+
+        ksort($this->tasks);
 
         foreach ($this->tasks as $task => $details){
             $this->showTaskDocumentation($task);
