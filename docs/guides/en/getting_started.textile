@@ -231,8 +231,8 @@ TIP: If you're on Windows, or your PHP is set up in some non-standard fashion, y
 Akelos will create several files for you, including +app/views/home/index.html.tpl+. This is the template that will be used to display the results of the +index+ action (method) in the +home+ controller. Open this file in your text editor and edit it to contains the following code:
 
 <code class="html">
-<h1>Home::index</h1>
-<p><?php echo translate('Find me in %path',array('%path'=> 'app/views/home/index.html.tpl' ))?></p>
+<h1>Home#index</h1>
+<p>Find me in app/views/home/index.html.tpl</p>
 </code>
 
 h4. Starting up the Web Server
