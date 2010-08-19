@@ -240,7 +240,7 @@ h4. Starting up the Web Server
 You actually have a functional Akelos application already - after running only two commands! To see it, you need to start a web server on your development machine. You can do this by running another command:
 
 <shell>
-$ ./makelos server
+$ ./script/server
 </shell>
 
 This will fire up an instance a simple PHP web server by default (Akelos can also use several other web servers). To see your application in action, open a browser window and navigate to +http://localhost:3000+. You should see Akelos' default information page:
