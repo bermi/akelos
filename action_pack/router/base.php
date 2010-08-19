@@ -188,21 +188,6 @@ class AkRouter
     }
 
     public function connectDefaultRoutes(){
-        /*
-        if(AK_DEV_MODE && AkRequest::isLocal()){
-            $this->connect('/:controller/:action/:id', array(
-            'controller' => 'akelos_dashboard',
-            'action' => 'index',
-            'module' => 'akelos_panel',
-            'rebase' => AK_AKELOS_UTILS_DIR.DS.'akelos_panel'
-            ));
-            $this->connect('/', array(
-            'controller' => 'akelos_dashboard',
-            'action' => 'index',
-            'module' => 'akelos_panel'));
-            return;
-        }
-        */
         $this->connect(':controller/:action/:id');
         $this->connect(':controller/:action/:id.:format');
     }
