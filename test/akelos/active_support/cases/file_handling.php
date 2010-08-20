@@ -13,6 +13,8 @@ class FileHandling_TestCase extends ActiveSupportUnitTest
         $content = 'This is the NEW content for file 1';
         $this->assertFalse(!AkFileSystem::file_put_contents($file_name, $content));
 
+        AkFileSystem::file_delete($file_name);
+
         $file_name = AkConfig::getDir('tmp').DS.'test_file_2.txt';
         $content = "\n\rThis is the content of file 2\n";
         $this->assertFalse(!AkFileSystem::file_put_contents($file_name, $content));
