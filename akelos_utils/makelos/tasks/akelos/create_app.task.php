@@ -48,7 +48,7 @@ HELP
 );
 }
 
-class AkelosInstaller
+class AkelosAppInstaller
 {
     public $options = array();
     public $errors = array();
@@ -405,11 +405,11 @@ foreach ($options as $k => $v){
 }
 
 
-$directory   = AkelosInstaller::getAbsolutePath(
+$directory   = AkelosAppInstaller::getAbsolutePath(
 get_command_value($options, 'd', 'directory',   $directory_candidate,
 'Destination directory can\'t be blank'));
 $public_html = get_command_value($options, 'p', 'public_html', false);
-$public_html = empty($public_html) ? false : AkelosInstaller::getAbsolutePath($public_html);
+$public_html = empty($public_html) ? false : AkelosAppInstaller::getAbsolutePath($public_html);
 $force       = get_command_value($options, 'f', 'force', false);
 $quiet       = get_command_value($options, 'q', 'quiet', false);
 $skip        = get_command_value($options, 's', 'skip', false);
@@ -428,7 +428,7 @@ if($prompt){
 }
 
 
-$Installer = new AkelosInstaller(array(
+$Installer = new AkelosAppInstaller(array(
 'directory'     =>$directory,
 'public_html'   =>$public_html,
 'public_html'   =>$public_html,

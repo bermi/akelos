@@ -7,3 +7,7 @@
 makelos_task('akelos:create_app', array(
 'description' => 'Creates a new Akelos application'
 ));
+
+makelos_task('akelos:install', array(
+'description' => 'Installs the Akelos Framework in your system.'
+));
