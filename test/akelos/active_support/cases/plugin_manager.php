@@ -74,7 +74,7 @@ class PluginManager_TestCase extends ActiveSupportUnitTest
     }
 
     public function test_should_get_remote_repositories_listing() {
-        $repositories = $this->PluginManager->_getRepositoriesFromRemotePage();
+        $repositories = $this->PluginManager->getRepositoriesFromRemotePage();
         $this->assertEqual($repositories[0], $this->PluginManager->main_repository);
     }
 
