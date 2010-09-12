@@ -121,7 +121,7 @@ if($command == 'list') {
     ));
 
     if(isset($options['local']) && isset($options['remote'])){
-        die("Local and remote arguments can not be used simultaneously\n");
+        AkConsole::displayError("Local and remote arguments can not be used simultaneously", true);
     }
     if(!empty($options['source'])){
         $PluginManager->tmp_repositories = Ak::toArray($options['source']);
@@ -130,7 +130,7 @@ if($command == 'list') {
     if(isset($options['local'])){
         $plugins_dir = $ak_app_dir.DS.'vendor'.DS.'plugins';
         if(empty($installed_plugins)){
-            die("There are not plugins intalled at $plugins_dir\n");
+            AkConsole::displayError("There are not plugins intalled at $plugins_dir", true);
         }else{
             echo "Plugins installed at  $plugins_dir:\n\n";
             foreach ($installed_plugins as $plugin){
@@ -141,7 +141,7 @@ if($command == 'list') {
     }else{
         $plugins = $PluginManager->getPlugins(true);
         if(empty($plugins)){
-            die("Could not find remote plugins\n");
+            AkConsole::displayError("Could not find remote plugins", true);
         }else{
             $repsositories = array();
             foreach ($plugins as $plugin => $repository){
@@ -192,7 +192,7 @@ if($command == 'source') {
     $options = Ak::toArray($argv);
 
     if(empty($options)){
-        die("You need to provide at least one repository to add to the default search list.\n");
+        AkConsole::displayError("You need to provide at least one repository to add to the default search list.", true);
     }
 
     foreach ($options as $repository){
@@ -214,7 +214,7 @@ if($command == 'unsource') {
     $options = Ak::toArray($argv);
 
     if(empty($options)){
-        die("You need to provide at least one repository to remove from the default search list.\n");
+        AkConsole::displayError("You need to provide at least one repository to remove from the default search list.", true);
     }
 
     foreach ($options as $repository){
@@ -290,16 +290,16 @@ if($command == 'install') {
     ));
 
     if(empty($options['parameters'])){
-        die("You must supply at least one plugin name or plugin URL to install.\n");
+        AkConsole::displayError("You must supply at least one plugin name or plugin URL to install.", true);
     }
 
     $best = $PluginManager->guessBestInstallMethod($options);
     if($best == 'http' && (!empty($options['externals']) ||  !empty($options['checkout']))){
-        die("Cannot install using subversion because `svn' cannot be found in your PATH\n");
+        AkConsole::displayError("Cannot install using subversion because `svn' cannot be found in your PATH", true);
     }elseif ($best == 'export' && !empty($options['externals'])){
-        die("Cannot install using externals because this project is not under subversion.");
+        AkConsole::displayError("Cannot install using externals because this project is not under subversion.", true);
     }elseif ($best == 'export' && !empty($options['checkout'])){
-        die("Cannot install using checkout because this project is not under subversion.");
+        AkConsole::displayError("Cannot install using checkout because this project is not under subversion.", true);
     }
 
     $plugins = Ak::toArray($options['parameters']);
@@ -336,11 +336,11 @@ if($command == 'update') {
 
     $best = $PluginManager->guessBestInstallMethod($options);
     if($best == 'http' && (!empty($options['externals']) ||  !empty($options['checkout']))){
-        die("Cannot install using subversion because `svn' cannot be found in your PATH\n");
+        AkConsole::displayError("Cannot install using subversion because `svn' cannot be found in your PATH", true);
     }elseif ($best == 'export' && !empty($options['externals'])){
-        die("Cannot install using externals because this project is not under subversion.");
+        AkConsole::displayError("Cannot install using externals because this project is not under subversion.", true);
     }elseif ($best == 'export' && !empty($options['checkout'])){
-        die("Cannot install using checkout because this project is not under subversion.");
+        AkConsole::displayError("Cannot install using checkout because this project is not under subversion.", true);
     }
     $installed_plugins = $PluginManager->getInstalledPlugins();
     foreach ($installed_plugins as $plugin){
@@ -389,7 +389,7 @@ if($command == 'info') {
     CONSOLE_GETARGS_PARAMS => array('short' => 'p', 'desc' =>  "Plugin names as given in 'plugin list' output or absolute URL to a plugin repository.", 'max' => 1, 'min' => 1)));
 
     if(empty($options['parameters'])){
-        die("You must supply a plugins name or plugin URL.\n");
+        AkConsole::displayError("You must supply a plugins name or plugin URL.", true);
     }
 
     $plugin = $options['parameters'];
@@ -410,7 +410,7 @@ if($command == 'test') {
      $options = get_console_options_for('Test plugin', array(CONSOLE_GETARGS_PARAMS=>array('min'=>1,'max'=>1,'short' => 'p', 'desc' =>  "Specify the plugin name you wish to test"),'phpbin'=>array('short'=>'b','max'=>1,'min'=>1,'desc'=>'Path to the php binary','default'=>'/usr/bin/env php')));
 
     if(empty($options['parameters'])){
-        die("You must supply a plugin name.\n");
+        AkConsole::displayError("You must supply a plugin name.", true);
     }
     $plugin = $options['parameters'];
     $plugin_name = basename($plugin);
@@ -430,7 +430,7 @@ if($command == 'help') {
      $options = get_console_options_for('Plugin help', array(CONSOLE_GETARGS_PARAMS=>array('min'=>1,'max'=>1,'short' => 'p', 'desc' =>  "Specify a plugin name."),'phpbin'=>array('short'=>'b','max'=>1,'min'=>1,'desc'=>'Path to the php binary','default'=>'/usr/bin/env php')));
 
     if(empty($options['parameters'])){
-        die("You must supply a plugin name.\n");
+        AkConsole::displayError("You must supply a plugin name.", true);
     }
     $plugin = $options['parameters'];
     $plugin_name = basename($plugin);
