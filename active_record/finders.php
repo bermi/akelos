@@ -408,8 +408,6 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             $object->afterInstantiate();
             $object->notifyObservers('afterInstantiate');
         }
-        (AK_CLI && AK_ENVIRONMENT == 'development') ? $object ->toString() : null;
-
         return $object;
     }
 
@@ -825,13 +823,6 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
             }
 
             if (! empty($values) && $option!='include') {
-                if(!empty($true)) {
-                    //echo "<pre>";
-                    //var_dump($option);
-                    //var_dump($values);
-                    //var_dump($associated_options);
-                    //die;
-                }
                 $separator = $option == 'joins' ? ' ' : (in_array($option, array ('selection', 'order' )) ? ', ' : ' AND ');
                 $values = array_map('trim', $values);
 
@@ -1283,7 +1274,6 @@ class AkActiveRecordFinders extends AkActiveRecordExtenssion
 
             if(empty($available[$instance->getPrimaryKey()])) {
                 $parent->$assoc_name->_loaded=true;
-                //return;
                 continue;
             }
             $available['load_associations'] = false;
