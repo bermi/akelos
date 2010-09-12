@@ -271,7 +271,7 @@ class AkelosAppInstaller
         @mkdir($destination);
         @self::equalPermissions($source, $destination);
         while(false !== ($file = readdir($dir))) {
-            if ($file != '.' && $file != '..' && $file != '.git' && $file != '.svn' && $file != '.empty_directory') {
+            if ($file != '.' && $file != '..' && $file != '.git' && $file != '.svn' && $file != '.DS_Store' && $file != '.empty_directory') {
                 if (is_dir($source.DS.$file)) {
                     self::copyRecursivelly($source.DS.$file,$destination.DS.$file);
                 } else {
@@ -310,10 +310,18 @@ class AkelosAppInstaller
 
             foreach ($writable_files as $file){
                 $file = $this->options['directory'].DS.$file;
+                if(!is_file($file)) touch($file);
                 `chmod -R 777 $file`;
             }
         }
         
+        $dirs_to_remove = array(
+        'releases',
+        'reports'
+        );
+        foreach ($dirs_to_remove as $dir) {
+            self::removeDir($this->options['directory'].DS.$dir);
+        }
         $files_and_replacements = array(
         'config/environment.php' => array('[SECRET]' => Ak::uuid())
         );
@@ -348,6 +356,18 @@ class AkelosAppInstaller
             return !empty($this->options['skip']) ? false : !empty($this->options['force']);
         }
         return true;
+    }
+    static function removeDir($path)
+    {
+        $dir = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::CHILD_FIRST);
+        for ($dir->rewind(); $dir->valid(); $dir->next()) {
+            if ($dir->isDir()) {
+                rmdir($dir->getPathname());
+            } else {
+                unlink($dir->getPathname());
+            }
+        }
+        rmdir($path);
     }
 
     static function getAbsolutePath($path) {
