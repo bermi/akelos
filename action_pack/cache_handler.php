@@ -939,7 +939,7 @@ EOF;
     }
 
     public function _convertGroup($group) {
-        if ($group == '127.0.0.1') return 'localhost';
+        if ($group == '127.0.0.1' || $group == '::1') return 'localhost';
         else return $group;
     }
     /*

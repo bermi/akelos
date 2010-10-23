@@ -17,7 +17,6 @@ AkConfig::setOption('action_controller.session', array("key" => "_myapp_session"
 AkUnitTestSuite::checkIfTestingWebserverIsAccesible(array('base_path' => dirname(__FILE__)));
 AkConfig::setOption('memcached_enabled', AkMemcache::isServerUp());
 
-
-if(AK_WEB_REQUEST && AK_REMOTE_IP != '127.0.0.1'){
+if(AK_WEB_REQUEST && !(AK_REMOTE_IP == '127.0.0.1' || AK_REMOTE_IP == '::1')){
     die('Web tests can only be called from localhost(127.0.0.1), you can change this beahviour in '.__FILE__);
 }
