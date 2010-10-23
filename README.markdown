@@ -15,8 +15,7 @@ http://www.akelos.org
 
 The tutorial
 ---------------------------------------
-Perhaps the easiest way to lear about Akelos is to get your hands on the tutorials
-you can find on the docs folder.
+Perhaps the easiest way to lear about Akelos is to get your hands on the tutorials you can find on the docs folder.
 
 
 Setting up the framework.
@@ -30,8 +29,9 @@ Then just point your browser to that url and follow the steps.
 
 You will also need to make sure that mod_rewrite is loaded into Apache,
 and that it can be controlled from .htaccess files, to do this make sure that
-the Apache configuration directive AllowOverride is set to 'All' (you may allow only the specific directives for mod_rewrite),
-for the directory your project will be accessed from.
+the Apache configuration directive AllowOverride is set to 'All' (you may
+allow only the specific directives for mod_rewrite), for the directory your
+project will be accessed from.
 
 
 If you have problems with the web setup you can copy and edit
@@ -39,9 +39,10 @@ config/DEFAULT-config.php and config/DEFAULT-routes.php. You might also need
 to edit the  .htaccess files in ./ and ./public/  and un-comment/edit the
 "# RewriteBase" directive so it matches to your url path.
 
-All the configuration params are on /lib/constants.php If you define any of them
-in your /config/config.php, /config/development.php, /config/production.php
-or /config/testing.php the default setting will be overwritten.
+All the configuration params are on /lib/constants.php If you define any of
+them in your /config/config.php, /config/development.php, 
+/config/production.php or /config/testing.php the default setting will be
+overwritten.
 
 
 Accessing the Command Line interface

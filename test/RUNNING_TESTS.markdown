@@ -12,7 +12,7 @@ cases at once providing the suite name like:
     ./makelos test:case active_support
 
 
-This will runn all the cases available at
+This will run all the cases available at
 
     test/appname/active_support/cases/*.php
 
@@ -72,4 +72,6 @@ You can Run Akelos core tests on a fresh copy by calling
 
     php makelos tests:units
 
-This will use sqlite are
+ActiveRecord tests will use sqlite by default.
+
+You will need to point your web server to the framework path and you should be able to access http://akelos.tests/akelos/ping.php

@@ -763,6 +763,9 @@ class Ak
         return $resulting_array;
     }
 
+    /**
+    * This method will return a version of the given array with only the desired keys.
+    */
     static function collect($source_array, $key_index, $value_index = null) {
         $value_index = empty($value_index) ? $key_index : $value_index;
         $resulting_array = array();
@@ -792,6 +795,9 @@ class Ak
         return $values;
     }
 
+    /**
+    * This method will return and array without the deleted keys.
+    */
     static function delete($source_array, $attributes_to_delete_from_array) {
         $resulting_array = (array)$source_array;
         $args = array_slice(func_get_args(),1);
@@ -802,6 +808,10 @@ class Ak
         return $resulting_array;
     }
 
+    /**
+    * This method will modify an array discarding a given key. The value of the discarded key
+    * will be returned.
+    */
     static function deleteAndGetValue(&$source_array, $attributes_to_discard_from_array) {
         $discarded_items = array();
         $args = array_slice(func_get_args(),1);
