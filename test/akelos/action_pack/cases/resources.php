@@ -391,7 +391,7 @@ class ResourcesTestCase extends AkControllerUnitTest{
         $this->assertRecognizes(array('action'=>'add', 'controller'=>'messages'), array('path'=>'/messages/add', 'method'=>'get'));
 
         $this->expectException('NoMatchingRouteException');
-        $this->recognizeRouteForPath('/messages/add', array('method'=>'post'));
+        $this->recognizeRouteForPath('/messages/add', 'post');
 
         $this->useRestfulRoutingMapper('messages', array('add'=> array('add'=>'any')));
         $this->assertRestfulRoutesFor('messages');
