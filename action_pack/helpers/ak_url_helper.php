@@ -234,7 +234,8 @@ class AkUrlHelper
         }elseif ($encode == 'hex'){
             $encoded_email_address = '';
             $encoded_email_for_name = '';
-            for ($i=0;$i<strlen($email_address);$i++){
+            $length = strlen($email_address);
+            for ($i=0;$i<$length;$i++){
                 if(preg_match('/\w/',$email_address[$i])){
                     $encoded_email_address .= sprintf('%%%x',ord($email_address[$i]));
                 }else{
