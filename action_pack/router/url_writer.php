@@ -114,8 +114,16 @@ class AkUrlWriter
                 }
                 $old_params[$k] = $v;
             }
-            $params = array_diff(array_merge($old_params, $params),  array(''));
+            $params = array_filter(array_merge($old_params, $params), array($this, '_isNull'));
         }
+    }
+
+    private function _isNull($value)
+    {
+        if(is_null($value)){
+            return false;
+        }
+        return $value !== '';
     }
 
     private function getParametersFromActualRequest(&$params) {

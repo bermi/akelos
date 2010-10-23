@@ -74,7 +74,12 @@ require_once(dirname(__FILE__).'/../../lib/url_writer.php');
         $this->withRequestTo(array('lang'=>'en','controller'=>'author','action'=>'show'));
         $this->urlFor(array('skip_old_parameters_except'=>array()))
         ->isRewrittenTo(array());
+    }
 
+    public function testShouldAllowImplicitBooleanParameters() {
+        $this->withRequestTo(array('controller'=>'users','action'=>'destroy', 'module'=>'admin'));
+        $this->urlFor(array('controller'=>'account','action'=>'sign_in', 'module'=>false))
+        ->isRewrittenTo(array('controller'=>'account','action'=>'sign_in', 'module'=>false));
     }
 
     public function testUseNamedRouteIfSpecified() {

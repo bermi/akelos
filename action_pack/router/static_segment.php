@@ -11,10 +11,10 @@ class AkStaticSegment extends AkSegment
     }
 
     public function getRegEx() {
-        return preg_quote($this->delimiter,'@').$this->name;    
+        return preg_quote($this->delimiter,'@').$this->name;
     }
 
-    public function generateUrlFromValue($value,$omit_optional_segments) {
+    public function generateUrlFromValue($value, $omit_optional_segments) {
         return $this->delimiter.$this->name;    
     }
 }

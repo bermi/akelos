@@ -30,6 +30,7 @@ class AkRoute
 
         $this->addDefaults($params);
         $this->urlDecode($params);
+
         return $params;
     }
 
@@ -102,8 +103,8 @@ class AkRoute
     protected function assembleUrlFromSegments(&$params) {
         $url_pieces    = array();
         $omit_defaults = true;
-        foreach (array_reverse($this->getSegments()) as $name=>$segment){
-            if (!$url_piece = $segment->generateUrlFromValue(@$params[$name],$omit_defaults)) continue;
+        foreach (array_reverse($this->getSegments()) as $name => $segment){
+            if (!$url_piece = $segment->generateUrlFromValue(@$params[$name], $omit_defaults)) continue;
 
             $url_pieces[] = $url_piece;
             unset ($params[$name]);

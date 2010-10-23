@@ -26,8 +26,8 @@ abstract class UrlWriterUnitTest extends AkUnitTest
     }
     
     public function isRewrittenTo($expected_params) {
-        $this->Router = $Router = $this->createRouter('urlize',$expected_params);
-        $UrlWriter = new AkUrlWriter($this->Request,$Router);
+        $this->Router = $Router = $this->createRouter('urlize', $expected_params);
+        $UrlWriter = new AkUrlWriter($this->Request, $Router);
         $UrlWriter->urlFor($this->asked_url_for_parameters);
     }
     
@@ -44,7 +44,7 @@ abstract class UrlWriterUnitTest extends AkUnitTest
      * @return AkRouter
      */
     public function createRouter($method_name,$expected_params=array()) {
-        $Router = $this->partialMock('AkRouter',array($method_name),array($method_name => new AkUrl('')));
+        $Router = $this->partialMock('AkRouter',array($method_name), array($method_name => new AkUrl('')));
         $Router->expectOnce($method_name, array($expected_params, null));
         return $this->Router = $Router;
     }
