@@ -16,21 +16,6 @@
         <%= flash_warning _("Routes file #{base_dir}/config/routes.php not found.") %>
     {end}
     
-    <h2>_{Configuring your Akelos application environment.}</h2>
-    {!has_configuration}
-        <p>_{The fastest way configure your Akelos application is by running}:</p>
-        <%= format_snippet "$ cd #{base_dir}", 'shell' %>
-        
-        <h5>_{on windows}</h5>
-        <%= format_snippet "\n$ php makelos akelos:configure", 'shell' %>
-        
-        <h5>_{on Linux/Mac}</h5>
-        <%= format_snippet "\n$ ./makelos akelos:configure", 'shell' %>
-        
-        <p>_{and follow the steps.}</p>
-
-    {end}
-    
     <?php endif; ?>
         
         {?new_install}
