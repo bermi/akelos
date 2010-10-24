@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 # This file is part of the Akelos Framework
 # (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
@@ -359,6 +359,9 @@ class AkelosAppInstaller
     }
     static function removeDir($path)
     {
+        if(!is_dir($path)){
+            return;
+        }
         $dir = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::CHILD_FIRST);
         for ($dir->rewind(); $dir->valid(); $dir->next()) {
             if ($dir->isDir()) {
