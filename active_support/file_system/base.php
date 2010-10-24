@@ -223,7 +223,7 @@ class AkFileSystem
         if(is_file($base_path.$origin)){
             return self::file_put_contents($base_path.$destination, self::file_get_contents($base_path.$origin, $options), $options);
         }
-        self::make_dir($base_path.$destination);
+        self::make_dir($base_path.$destination, $options);
         if($fs_items = glob($base_path.$origin."/*")){
             $items_to_copy = array('directories'=>array(), 'files'=>array());
             foreach($fs_items as $fs_item) {
@@ -239,6 +239,32 @@ class AkFileSystem
             }
         }
         return $sucess;
+    }
+
+    static function move($origin, $target, $options = array())
+    {
+        $default_options = array(
+         'ftp' => defined('AK_UPLOAD_FILES_USING_FTP') && AK_UPLOAD_FILES_USING_FTP,
+         'base_path' => self::getDefaultBasePath($origin)
+        );
+        $options = array_merge($default_options, $options);
+
+        $origin = self::getRestrictedPath($origin, $options);
+        $target = self::getRestrictedPath($target, $options);
+
+        if(empty($origin) || empty($target)){
+            return false;
+        }
+
+        self::make_dir(dirname($target), $options);
+
+        if($options['ftp']){
+            self::file_put_contents($target, self::file_get_contents($origin), $options);
+            self::file_delete($origin, $options);
+        }else{
+            rename($origin, $target);
+            self::file_delete($origin, $options);
+        }
     }
 
     /**
