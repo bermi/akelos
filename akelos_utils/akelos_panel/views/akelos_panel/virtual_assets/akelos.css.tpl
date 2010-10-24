@@ -1276,6 +1276,10 @@ table.snippet .js-code-color-2 {
 
 /* Highlighted boxes: Warning, info, notes and tips boxes */
 
+#rewrite_warning{
+    display: none;
+}
+
 .highlighted-box {
   padding: 14px 27px !important;
   font-size: 12px;

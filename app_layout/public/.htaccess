@@ -17,7 +17,7 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
   RewriteEngine on
   
-  RewriteRule ^(.*/)?\.(svn|git)/ - [F,L]
+  RewriteRule ^(.*/)?\.(svn|git|hg)/ - [F,L]
   ErrorDocument 403 "Access Forbidden"
 
   # If your Akelos Framework application is accessed via an Alias directive,
@@ -25,7 +25,7 @@ DirectoryIndex index.php
   #
   # Example:
   #   Alias /myakelosapp /path/to/myakelosapp/public
-  # RewriteBase /public
+  # RewriteBase /
 
   # If you don't want The Akelos Framework to look in certain directories,
   # use the following rewrite rules so that Apache won't rewrite certain requests

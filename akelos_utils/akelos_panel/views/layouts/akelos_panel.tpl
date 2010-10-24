@@ -15,6 +15,10 @@
 
 </head>
 <body>
+<div id="rewrite_warning" style="border:3px solid red;padding:20px;color:red">
+    If you are seeing this page without stylesheets you might need to edit the
+    RewriteBase / directive on your .htaccess file.
+</div>
 <%= render :partial => 'akelos_panel/table_of_contents' %>
 <div id="wrapper">
   <%= render :partial => 'akelos_panel/header' %>
