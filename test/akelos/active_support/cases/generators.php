@@ -12,6 +12,7 @@ class ControllerGenerator_TestCase extends ActiveSupportUnitTest
     public function runGeneratorCommand($command){
         ob_start();
         $Generator = new AkelosGenerator();
+        $Generator->setFileOptions(array('base_path'=>AK_FRAMEWORK_DIR));
         $Generator->runCommand($command);
         $result = ob_get_clean();
         //AK::trace($result);
@@ -41,12 +42,12 @@ class ControllerGenerator_TestCase extends ActiveSupportUnitTest
             $this->assertFalse(file_exists($file));
         }
 
-        AkFileSystem::file_put_contents(AkConfig::getDir('views').DS.'credit_card'.DS.'credit.html.tpl', 'foo');
+        AkFileSystem::file_put_contents(AkConfig::getDir('views').DS.'credit_card'.DS.'credit.html.tpl', 'foo', array('base_path'=>AK_FRAMEWORK_DIR));
         clearstatcache();
 
         $this->assertPattern('/collisions/', $this->runGeneratorCommand('controller CreditCard open debit credit close'));
 
-        unlink(AkConfig::getDir('views').DS.'credit_card'.DS.'credit.html.tpl');
+        AkFileSystem::file_delete(AkConfig::getDir('views').DS.'credit_card'.DS.'credit.html.tpl', array('base_path'=>AK_FRAMEWORK_DIR));
 
         clearstatcache();
         foreach ($files as $file){

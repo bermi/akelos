@@ -11,6 +11,7 @@ class AkelosGenerator
     public $_template_vars = array();
     public $collisions = array();
     public $generators_dir = AK_GENERATORS_DIR;
+    private $_file_options = array();
 
     public function runCommand($command) {
         $commands = $this->getOptionsFromCommand($command);
@@ -31,6 +32,7 @@ class AkelosGenerator
 
             $generator_class_name = AkInflector::camelize($generator_name.'_generator');
             $generator = new $generator_class_name();
+            $generator->setFileOptions($this->getFileOptions());
             $generator->_generator_base_path = dirname($generator_file_name);
 
             if(count(array_diff($commands,array('help','-help','--help','usage','-usage','h','-h','USAGE','-USAGE'))) != count($commands) || count($commands) == 0){
@@ -93,7 +95,7 @@ class AkelosGenerator
 
     public function save($file_path, $content) {
         $this->log[] = $file_path;
-        AkFileSystem::file_put_contents($file_path, $content);
+        AkFileSystem::file_put_contents($file_path, $content, $this->getFileOptions());
     }
 
     public function printLog() {
@@ -179,6 +181,17 @@ class AkelosGenerator
             $this->_getApplicationGenerators(), 
             $this->_getExtraGenerators());
     }
+
+    public function getFileOptions()
+    {
+        return $this->_file_options;
+    }
+
+    public function setFileOptions($options)
+    {
+        $this->_file_options = $options;
+    }
+
 
     private function _identifyUnnamedCommands(&$commands) {
         $i = 0;

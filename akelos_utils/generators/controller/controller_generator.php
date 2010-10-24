@@ -66,7 +66,7 @@ class ControllerGenerator extends  AkelosGenerator
         $this->save(AkConfig::getDir('test').DS.'functional'.DS.$this->controller_test_path, $this->render('functional_test'));
         $this->save(AkConfig::getDir('test').DS.'unit'.DS.'helpers'.DS.$this->underscored_controller_name."_helper_test.php", $this->render('helper_test'));
 
-        @AkFileSystem::make_dir(AkConfig::getDir('views').DS.$this->module_path.AkInflector::underscore($this->controller_name));
+        @AkFileSystem::make_dir(AkConfig::getDir('views').DS.$this->module_path.AkInflector::underscore($this->controller_name), $this->getFileOptions());
 
         foreach ($this->actions as $action){
             //$this->action = $action;
