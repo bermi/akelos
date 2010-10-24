@@ -88,6 +88,7 @@ class AkelosAppInstaller
             $this->_linkPublicHtmlFolder();
             $this->_copyAkelosToVendors();
             $this->_cleanUpAndCreateEmptyFolders();
+            $this->_enableDevPanelRoute();
             $this->runEvironmentSpecificTasks();
 
 
@@ -334,6 +335,12 @@ class AkelosAppInstaller
         // Copy docs
         self::copyRecursivelly($this->options['directory'].DS.'vendor'.DS.'akelos'.DS.'docs', $this->options['directory'].DS.'docs');
 
+    }
+    
+    protected function _enableDevPanelRoute()
+    {
+        $routes_path = $this->options['directory'].DS.'config'.DS.'routes.php';
+        file_put_contents($routes_path, str_replace('* /', '*/', file_get_contents($routes_path)));
     }
 
     /**
