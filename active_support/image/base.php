@@ -89,7 +89,7 @@ class AkImage extends Image_Transform
     public $Transform;
     public $filters = array();
 
-    public function AkImage($image_path = null, $tranform_using = AK_IMAGE_DRIVER) {
+    public function __construct($image_path = null, $tranform_using = AK_IMAGE_DRIVER) {
         $this->Transform = Image_Transform::factory($tranform_using);
 
         if(PEAR::isError($this->Transform)){
@@ -112,8 +112,7 @@ class AkImage extends Image_Transform
 
         $path = empty($path) ? $this->image_path : $path;
         $this->Transform->save($tmp_image_name, $this->getExtension($path), $quality);
-        AkFileSystem::file_put_contents($path, file_get_contents($tmp_image_name), $options);
-        @unlink($tmp_image_name);
+        AkFileSystem::move($tmp_image_name, $path, $options);
     }
 
     public function transform($transformation, $options = array()) {
