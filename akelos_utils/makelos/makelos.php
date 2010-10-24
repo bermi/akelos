@@ -59,10 +59,18 @@ class MakelosRequest
                 $argument .= $arguments[0];
                 array_shift($arguments);
             }
-
-            if(preg_match('/^(-{0,2})((?![\w\d\.-_:\/\\\]+\/\/)[\w\d\.-_:\/\\\]+ ?)(=?)( ?.*)/', $argument, $matches)){
+            if(preg_match('/^
+                                (-{0,2})
+                                (
+                                     (?![\w\d\.\-_:\/\\\]+\/\/) # If its not a protocol
+                                        [\w\d\.\-_:\/\\\]+\s?
+                                )
+                                (=?)
+                                (\s?.*)
+                            $/x', $argument, $matches)){
                 $constant_or_attribute = ((strtoupper($matches[2]) === $matches[2]) ? 'constants' : 'attributes');
                 $is_constant = $constant_or_attribute == 'constants';
+
                 if(($matches[3] == '=' || ($matches[3] == '' && $matches[4] != ''))){
                     $matches[4] = ($matches[4] === '') ? array_shift($arguments) : $matches[4];
                     if(!empty($task) && !$is_constant){
