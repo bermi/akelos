@@ -11,7 +11,7 @@
  * when browsing from localhost.
  * 
  * You need to comment this route or point it to a different base in order to accept
- * Requests in your applicaiton.
+ * Requests in your application.
  * /
  // $Map->connect('/dev_panel/:controller/:action/:id', array(
  $Map->connect('/:controller/:action/:id', array(
