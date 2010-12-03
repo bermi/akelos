@@ -11,6 +11,6 @@ if (strstr(@$argv[1], 'test:')){
 
 if(defined('AK_FRAMEWORK_DIR')){
     include AK_FRAMEWORK_DIR.DS.'akelos_utils'.DS.'makelos'.DS.'makelos.php';
-}else{
-    include 'akelos_utils'.DS.'makelos'.DS.'makelos.php';
+}elseif(!@include 'akelos_utils'.DS.'makelos'.DS.'makelos.php'){
+    include 'vendor'.DS.'akelos'.DS.'akelos_utils'.DS.'makelos'.DS.'makelos.php';
 }
