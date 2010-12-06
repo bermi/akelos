@@ -8,9 +8,9 @@ class AkelosPanel_AkelosDashboardController extends AkelosPanelController
 {
     public $app_helpers = 'akelos_panel/docs';
     public function index(){
-        $this->base_dir          = AK_BASE_DIR;
-        $this->akelos_dir       = AK_FRAMEWORK_DIR;
-        $this->tasks_dir        = AK_TASKS_DIR;
+        $this->base_dir             = AK_BASE_DIR;
+        $this->akelos_dir           = AK_FRAMEWORK_DIR;
+        $this->tasks_dir            = AK_TASKS_DIR;
         $this->has_configuration    = file_exists(AkConfig::getDir('config').DS.'config.php');
         $this->has_routes           = file_exists(AkConfig::getDir('config').DS.'routes.php');
         $this->has_database         = file_exists(AkConfig::getDir('config').DS.'database.yml');
@@ -22,7 +22,7 @@ class AkelosPanel_AkelosDashboardController extends AkelosPanelController
         $this->langs                = Ak::langs();
         $this->database_settings    = Ak::getSettings('database', false);
 
-        $this->server_user                 = trim(AK_WIN ? `ECHO %USERNAME%` : `whoami`);
+        $this->server_user          = trim(AK_WIN ? `ECHO %USERNAME%` : `whoami`);
 
         $this->local_ips = AkConfig::getOption('local_ips', array('localhost','127.0.0.1','::1'));
 

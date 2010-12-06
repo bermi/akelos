@@ -1,3 +1,12 @@
+/* Show content when CSS is enabled */
+#styled-content{
+    display: block !important;
+}
+/* Hide CSS warning */
+#unstyled-content{
+    display: none !important;
+}
+
 /* Main CSS Start */
 * {
 	padding: 0;
@@ -1275,10 +1284,6 @@ table.snippet .js-code-color-2 {
 }
 
 /* Highlighted boxes: Warning, info, notes and tips boxes */
-
-#rewrite_warning{
-    display: none;
-}
 
 .highlighted-box {
   padding: 14px 27px !important;

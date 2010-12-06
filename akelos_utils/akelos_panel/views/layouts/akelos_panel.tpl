@@ -15,18 +15,53 @@
 
 </head>
 <body>
-<div id="rewrite_warning" style="border:3px solid red;padding:20px;color:red">
-    If you are seeing this page without stylesheets you might need to edit the
-    RewriteBase / directive on your .htaccess file.
+<div id="styled-content" style="display:none;">
+    <%= render :partial => 'akelos_panel/table_of_contents' %>
+    <div id="wrapper">
+      <%= render :partial => 'akelos_panel/header' %>
+      <div id="content">
+        {content_for_layout}
+        <div class="clear"></div>
+      </div>
+      <%= render :partial => 'akelos_panel/footer' %>
+    </div>
 </div>
-<%= render :partial => 'akelos_panel/table_of_contents' %>
-<div id="wrapper">
-  <%= render :partial => 'akelos_panel/header' %>
-  <div id="content">
-    {content_for_layout}
-    <div class="clear"></div>
-  </div>
-  <%= render :partial => 'akelos_panel/footer' %>
+
+<div id="unstyled-content">
+    <h1>The server is not resolving nice URLs.</h1>
+    
+    <p>Please check the following items.</p>
+    
+    <ol>
+        <li>Is mod_rewrite is enabled in your web server?</li>
+        <li>Is your web server applying the configuration directives in your .htaccess? <br />
+            You might want to check this host settings in your main Apache configuration file. <br />
+            A common Directory setting looks like:
+            <pre>
+                &lt;Directory &quot;/path/to/public&quot;&gt;
+                        Options Indexes FollowSymLinks
+                        AllowOverride All
+                        Order allow,deny
+                        Allow from all
+                &lt;/Directory&gt;
+            </pre>
+        </li>
+        <li>If the above did not fixed the issue, try setting the RewriteBase directive by replacing:
+        
+            <pre>
+                # RewriteBase /public
+            </pre>
+        
+            with
+        
+            <pre>
+                RewriteBase /
+            </pre>
+            
+            in your .htaccess files
+        </li>
+    </ol>
 </div>
+
 </body>
 </html>
