@@ -17,7 +17,7 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
   RewriteEngine on
   
-  RewriteRule ^(.*/)?\.(svn|git|hg)/ - [F,L]
+  RewriteRule ^(.*/)?\.(svn|git|hg|bzr)/ - [F,L]
   ErrorDocument 403 "Access Forbidden"
 
   # If your Akelos Framework application is accessed via an Alias directive,
