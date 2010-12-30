@@ -1,6 +1,11 @@
 #!/usr/bin/env php
 <?php
 
+// Setup constants via the command line before loading the configuration
+foreach($argv as $arg){
+  if(preg_match('/^(AK_[^=]+)=([^ ]+)/', $arg, $matches)) define($matches[1], $matches[2]); 
+}
+
 include(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
 require_once(AK_AKELOS_UTILS_DIR.DS.'scripts'.DS.'migrate.php');
 

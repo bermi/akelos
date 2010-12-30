@@ -1,6 +1,11 @@
 #!/usr/bin/env php
 <?php
 
+// Setup constants via the command line before loading the configuration
+foreach($argv as $arg){
+  if(preg_match('/^(AK_[^=]+)=([^ ]+)/', $arg, $matches)) define($matches[1], $matches[2]); 
+}
+
 define('AK_CLI', false);
 define('AK_WEB_REQUEST', true);
 define('AK_SERVER_MODE', true);
