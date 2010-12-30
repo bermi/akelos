@@ -10,6 +10,7 @@ This guide is an introduction to Active Record. After reading this guide we hope
 
 endprologue.
 
+
 h3. What is Active Record?
 
 Active Record is the M in "MVC":getting_started.html#the-mvc-architecture - the model - which is the layer of the system responsible for representing business data and logic. Active Record facilitates the creation and use of business objects whose data requires persistent storage to a database. It is an implementation of the Active Record pattern which itself is a description of an Object Relational Mapping system.
@@ -38,17 +39,18 @@ When writing applications using other programming languages or frameworks, it ma
 
 h4. Naming Conventions
 
-By default, ActiveRecord uses some naming conventions to find out how the mapping between models and database tables should be created. Akelos will pluralize your class names to find the respective database table. So, for a class +Book+, you should have a database table called *books*. The Akelos pluralization mechanisms are very powerful, being capable to pluralize (and singularize) both regular and irregular words. When using class names composed of two or more words, the model class name should follow the PHP conventions, using the camelCase form, while the table name must contain the words separated by underscores. Examples:
+By default, ActiveRecord uses some naming conventions to find out how the mapping between models and database tables should be created. Akelos will pluralize your class names to find the respective database table. So, for a class +Book+, you should have a database table called *books*. The Akelos pluralization mechanisms are very powerful, being capable to pluralize (and singularize) both regular and irregular words. When using class names composed of two or more words, the model class name should follow the CamelCase form convention, while the table name must contain the words separated by underscores. Examples:
 
 * Database Table - Plural with underscores separating words i.e. (book_clubs)
 * Model Class - Singular with the first letter of each word capitalized i.e. (BookClub)
 
-|_.Model / Class |_.Table / Schema |
+|_. Model / Class |_. Table / Schema |
 |Post          |posts|
 |LineItem      |line_items|
 |Deer          |deer|
 |Mouse         |mice|
 |Person        |people|
+
 
 
 h4. Schema Conventions
@@ -62,9 +64,9 @@ There are also some optional column names that will create additional features t
 
 * *created_at / created_on* - ActiveRecord will store the current date and time to this field when creating the record.
 * *updated_at / updated_on* - ActiveRecord will store the current date and times to this field when updating the record.
-* *lock_version* - Adds "optimistic locking":http://api.akelos.com/classes/ActiveRecord/Locking.html to a model.
-* *type* - Specifies that the model uses "Single Table Inheritance":http://api.akelos.com/classes/ActiveRecord/Base.html
-* *(table_name)_count* - Used to cache the number of belonging objects on associations. For example, a +comments_count+ column in a +Post+ class that has many instances of +Comment+ will cache the number of existent comments for each post.
+* *lock_version* - Adds _optimistic locking_ to a model.
+* *type* - Specifies that the model uses _Single Table Inheritance_
+* *+table_name+_count* - Used to cache the number of belonging objects on associations. For example, a +comments_count+ column in a +Post+ class that has many instances of +Comment+ will cache the number of existent comments for each post.
 
 NOTE: While these column names are optional they are in fact reserved by ActiveRecord. Steer clear of reserved keywords unless you want the extra functionality. For example, "type" is a reserved keyword used to designate a table using Single Table Inheritance. If you are not using STI, try an analogous keyword like "context", that may still accurately describe the data you are modeling.
 
@@ -73,7 +75,7 @@ h3. Creating ActiveRecord Models
 It's very easy to create ActiveRecord models. All you have to do is to subclass the ActiveRecord class and you're good to go:
 
 <php>
-class Product extends ActiveRecord {; }
+class Product extends ActiveRecord { }
 </php>
 
 This will create a +Product+ model, mapped to a *products* table at the database. By doing this you'll also have the ability to map the columns of each row in that table with the attributes of the instances of your model. So, suppose that the *products* table was created using a SQL sentence like:
@@ -89,28 +91,41 @@ CREATE TABLE products (
 Following the table schema above, you would be able to write code like the following:
 
 <php>
-p = new Product
-p.name = "Some Book"
-puts p.name # "Some Book"
+$Product = new Product();
+$Product->name = "Some Book";
+echo $Product->name; // Outputs "Some Book"
 </php>
+
+
 
 h3. Overriding the Naming Conventions
 
 What if you need to follow a different naming convention or need to use your Akelos application with a legacy database? No problem, you can easily override the default conventions.
 
-You can use the +ActiveRecord.set_table_name+ method to specify the table name that should be used:
+You can use the +ActiveRecord::setTableName+ method to specify the table name that should be used:
+
 <php>
 class Product extends ActiveRecord {
-  set_table_name "PRODUCT"
+  public function __construct() {
+    $this->setTableName("PRODUCT");
+    // We need to call the parent constructor
+    parent::__construct(@(array)func_get_args());
+  }
 }
 </php>
 
-It's also possible to override the column that should be used as the table's primary key. Use the +ActiveRecord.set_primary_key+ method for that:
+It's also possible to override the column that should be used as the table's primary key. Use the +ActiveRecord::setPrimaryKey+ method for that:
 <php>
 class Product extends ActiveRecord {
-  set_primary_key "product_id"
+  public function __construct() {
+    $this->setPrimaryKey("product_id");
+    // We need to call the parent constructor
+    parent::__construct(@(array)func_get_args());
+  }
 }
 </php>
+
+
 
 h3. Reading and Writing Data
 
@@ -118,87 +133,89 @@ CRUD is an acronym for the four verbs we use to operate on data: Create, Read, U
 
 h4. Create
 
-Active Record objects can be created from an array, a block or have its attributes manually set after creation. The _new_ method will return a new object while _create_ will return the object and save it to the database. 
+Active Record objects can be created from an array or have its attributes manually set after creation. The _create_ method will return the object and save it to the database.
 
 For example, given a model +User+ with attributes of +name+ and +occupation+, the _create_ method call will create and save a new record into the database:
 
 <php>
-  user = User.create('name' => 'David', 'occupation' => "Code Artist")
+$User = new User();
+$David = $User->create(array('name'=>'David', 'occupation'=>"Code Artist"));
 </php>
 
-Using the _new_ method, an object can be created without being saved:
+Using the __constructor_ an object can be created without being saved:
 
 <php>
-  user = new User
-  user.name = "David"
-  user.occupation = "Code Artist"
+$User = new User();
+$User->name = "David";
+$User->occupation = "Code Artist";
 </php>
 
-A call to _user->save()_ will commit the record to the database.
+A call to _$User->save();_ will commit the record to the database.
 
-Finally, passing a block to either create or new will return a new User object:
 
-<php>
-  user = new User do |u|
-    u.name = "David"
-    u.occupation = "Code Artist"
-  }
-</php>
 
 h4. Read
 
 ActiveRecord provides a rich API for accessing data within a database. Below are a few examples of different data access methods provided by ActiveRecord.
 
 <php>
-  # return all records
-  users = User.all
+// return all records
+$Users = $User->findAll();
 </php>
 
 <php>
-  # return first record
-  user = User.first
+// return first record
+$User = $User->findFirst();
 </php>
 
 <php>
-  # return the first user named David
-  david = User.find_by_name('David')
+// return the first user named David
+$David = $User->findByName('David');
 </php>
 
 <php>
-  # find all users named David who are Code Artists and sort by created_at in reverse chronological order
-  users = User.all('conditions' => { 'name' => 'David', 'occupation' => 'Code Artist'}, 'order' => 'created_at DESC')
+// find all users named David who are Code Artists and sort by created_at in reverse chronological order
+$Users = $User->findAll(array('conditions' => array( 'name'=>'David', 'occupation'=>'Code Artist'), 'order' => 'created_at DESC'));
 </php>
 
-You can learn more about querying an Active Record model in the "Active Record Query Interface":"active_record_querying.html" guide.
+You can learn more about querying an Active Record model in the "Active Record Query Interface":active_record_querying.html guide.
+
+
 
 h4. Update
 
 Once an Active Record object has been retrieved, its attributes can be modified and it can be saved to the database.
 
 <php>
-  user = User.find_by_name('David')
-  user.name = 'Dave'
-  user->save()
+$User = $User->findByName('David');
+$User->name = 'Dave';
+$User->save();
 </php>
+
 
 h4. Delete
 
 Likewise, once retrieved an Active Record object can be destroyed which removes it from the database.
 
 <php>
-  user = User.find_by_name('David')
-  user.destroy
+$User = $User->findByName('David');
+$User->destroy();
 </php>
+
 
 
 h3. Validations
 
 Active Record allows you to validate the state of a model before it gets written into the database. There are several methods that you can use to check your models and validate that an attribute value is not empty, is unique and not already in the database, follows a specific format and many more. You can learn more about validations in the "Active Record Validations and Callbacks guide":activerecord_validations_callbacks.html#validations-overview.
 
+
+
 h3. Callbacks
 
 Active Record callbacks allow you to attach code to certain events in the life-cycle of your models. This enables you to add behavior to your models by transparently executing code when those events occur, like when you create a new record, update it, destroy it and so on. You can learn more about callbacks in the "Active Record Validations and Callbacks guide":activerecord_validations_callbacks.html#callbacks-overview.
 
+
+
 h3. Migrations
 
-Akelos provides a domain-specific language for managing a database schema called migrations. Migrations are stored in files which are executed against any database that Active Record support using ./makelos. Akelos keeps track of which files have been committed to the database and provides rollback features. You can learn more about migrations in the "Active Record Migrations guide":migrations.html
+Akelos provides a domain-specific language for managing a database schema called migrations. Migrations are stored in files which are executed against any database that Active Record support using _./makelos_. Akelos keeps track of which files have been committed to the database and provides rollback features. You can learn more about migrations in the "Active Record Migrations guide":migrations.html
