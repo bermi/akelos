@@ -501,6 +501,8 @@ defined('AK_ROUTES_MAPPING_FILE')                       || define('AK_ROUTES_MAP
 defined('AK_CHARSET')                                   || define('AK_CHARSET', 'UTF-8');
 defined('AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE')    || define('AK_ACTION_CONTROLLER_DEFAULT_REQUEST_TYPE', 'web_request');
 defined('AK_ACTION_CONTROLLER_DEFAULT_ACTION')          || define('AK_ACTION_CONTROLLER_DEFAULT_ACTION', 'index');
+defined('AK_ACTION_CONTROLLER_PERFORM_CACHING')         || define('AK_ACTION_CONTROLLER_PERFORM_CACHING', AK_PRODUCTION_MODE);
+
 defined('AK_FRAMEWORK_LANGUAGE')                        || define('AK_FRAMEWORK_LANGUAGE', 'en');
 defined('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION')          || define('AK_AUTOMATIC_CONFIG_VARS_ENCRYPTION', false);
 defined('AK_VERBOSE_INSTALLER')                         || define('AK_VERBOSE_INSTALLER', AK_DEV_MODE);
