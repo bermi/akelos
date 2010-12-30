@@ -7,6 +7,7 @@
       </ul>
       <h2>_{Models}</h2>
       <ul>
+        <li><%= link_to_guide _'Active Record Basics', 'active_record_basics' %></li>
         <li><%= link_to_guide _'Akelos Database Migrations', 'migrations' %></li>
         <li><%= link_to_guide _'Active Record Validations and Callbacks', 'activerecord_validations_callbacks' %></li>
         <li><%= link_to_guide _'Active Record Associations', 'association_basics' %></li>
