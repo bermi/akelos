@@ -111,8 +111,12 @@ class AkModelErrors extends AkModelExtenssion
 
     /**
     * @return bool Returns true if the specified $attribute has errors associated with it.
+    *              If no attribute is given returns true if errors were added to the model.
     */
-    public function isInvalid($attribute) {
+    public function isInvalid($attribute = null) {
+        if($attribute == null){
+            return !$this->_Model->isValid();
+        }
         return $this->getErrorsOn($attribute);
     }
 
