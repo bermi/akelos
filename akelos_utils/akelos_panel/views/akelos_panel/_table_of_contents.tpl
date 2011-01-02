@@ -19,6 +19,7 @@
         <h2>_{Views}</h2>
         <ul>
             <li><%= link_to_guide _'Layouts and Rendering in Akelos', 'layouts_and_rendering' %></li>
+            <li><%= link_to_guide _'Sintags Markup', 'sintags' %></li>
             <li><%= link_to_guide _'Action View Form Helpers', 'form_helpers' %></li>
         </ul>
         <h2>_{Controllers}</h2>
