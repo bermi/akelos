@@ -12,6 +12,10 @@ In this guide you will learn how controllers work and how they fit into the requ
 
 endprologue.
 
+WARNING. This Guide is based on Akelos 2.0. Some of the code shown here will not work in other versions of Akelos.
+
+
+
 h3. What Does a Controller Do?
 
 Action Controller is the C in MVC. After routing has determined which controller to use for a request, your controller is responsible for making sense of the request and producing the appropriate output. Luckily, Action Controller does most of the groundwork for you and uses smart conventions to make this as straightforward as possible.

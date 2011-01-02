@@ -9,6 +9,10 @@ This guide covers the user-facing features of Akelos routing. By referring to th
 
 endprologue.
 
+WARNING. This Guide is based on Akelos 2.0. Some of the code shown here will not work in other versions of Akelos.
+
+
+
 h3. The Dual Purpose of Routing
 
 Akelos routing is a two-way piece of machinery - rather as if you could turn trees into paper, and then turn paper back into trees. Specifically, it both connects incoming HTTP requests to the code in your application's controllers, and helps you generate URLs without having to hard-code them as strings.

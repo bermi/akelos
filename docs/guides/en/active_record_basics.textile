@@ -10,6 +10,8 @@ This guide is an introduction to Active Record. After reading this guide we hope
 
 endprologue.
 
+WARNING. This Guide is based on Akelos 2.0. Some of the code shown here will not work in other versions of Akelos.
+
 
 
 h3. What is Active Record?
