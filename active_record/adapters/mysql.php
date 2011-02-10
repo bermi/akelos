@@ -28,9 +28,9 @@ class AkMysqlDbAdapter extends AkDbAdapter
     public function addLimitAndOffset(&$sql,$options) {
         if (isset($options['limit']) && $limit = $options['limit']){
             if (isset($options['offset']) && $offset = $options['offset'])
-            $sql .= " LIMIT $offset, $limit";
+            $sql .= " LIMIT ".intval($offset).", ".intval($limit);
             else
-            $sql .= " LIMIT $limit";
+            $sql .= " LIMIT ".intval($limit);
         }
         return $sql;
     }

@@ -199,9 +199,9 @@ class AkDbAdapter
 
     public function addLimitAndOffset(&$sql,$options) {
         if (isset($options['limit']) && $limit = $options['limit']){
-            $sql .= " LIMIT $limit";
+            $sql .= " LIMIT ".intval($limit);
             if (isset($options['offset']) && $offset = $options['offset']){
-                $sql .= " OFFSET $offset";
+                $sql .= " OFFSET ".intval($offset);
             }
         }
         return $sql;
