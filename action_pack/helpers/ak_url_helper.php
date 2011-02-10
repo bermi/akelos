@@ -225,8 +225,11 @@ class AkUrlHelper
         $html_options = Ak::delete($html_options, 'cc','bcc','subject','body','encode');
 
         if ($encode == 'javascript'){
-            $tmp  = "document.write('".AkTagHelper::content_tag('a', AkTextHelper::html_escape($name, null), array_merge($html_options,array('href' => 'mailto:'.$email_address.$extras )))."');";
-            for ($i=0; $i < strlen($tmp); $i++){
+            $html = AkTagHelper::content_tag('a', AkTextHelper::html_escape($name, null), array_merge($html_options,array('href' => 'mailto:'.$email_address.$extras )));
+            $html = AkJavascriptHelper::escape_javascript($html);
+            $tmp = "document.write('$html');";
+            $len = strlen($tmp);
+            for ($i=0; $i < $len; $i++){
                 $string.='%'.dechex(ord($tmp[$i]));
             }
             return "<script type=\"text/javascript\">eval(unescape('$string'))</script>";
