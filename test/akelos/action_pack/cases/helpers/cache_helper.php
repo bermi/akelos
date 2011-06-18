@@ -37,7 +37,7 @@ class CacheHelper_TestCase extends HelperUnitTest
 
         if($this->controller->_CacheHandler instanceof AkCacheHandler) {
             foreach ($cacheHandlers as $class=>$type) {
-                $this->controller->_CacheHandler->_setCacheStore($type);
+                $this->controller->_CacheHandler->setCacheStore($type);
                 $this->_test_init();
                 foreach ($unitTests as $test) {
                     $this->$test($class);

@@ -372,7 +372,7 @@ class AkCacheHandler
         } else {
             return;
         }
-        $this->_setCacheStore($this->_settings);
+        $this->setCacheStore($this->_settings);
     }
     protected function _configure($settings) {
         $configuration_object = $this->_controller;
@@ -1243,7 +1243,7 @@ EOF;
      *
      * @param array $options
      */
-    protected function _setCacheStore($options=array()) {
+    public function setCacheStore($options=array()) {
         $this->_cache_store = AkCache::lookupStore($options);
     }
 
