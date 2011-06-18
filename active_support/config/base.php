@@ -299,7 +299,7 @@ CACHE;
             $error_reporting_level = error_reporting();
         }
         $_constants = get_defined_constants(true);
-        $internal_constants = !empty($_constants['internal']) ? $_constants['internal'] : (array)@$_constants['mhash'];
+        $internal_constants = !empty($_constants['internal']) ? $_constants['internal'] : (isset($_constants['mhash'])?$_constants['mhash']:array());
         unset($_constants);
 
         $result = array();
@@ -334,7 +334,7 @@ CACHE;
     protected function _configNeedsToBeCached($namespace,$environment) {
         $cache_file = $this->getCacheFileName($namespace,$environment);
         $config_file = $this->_generateConfigFileName($namespace);
-        return (@filemtime($config_file) > @filemtime($cache_file)) || !file_exists($config_file);
+        return !file_exists($config_file) || (filemtime($config_file) > (file_exists($cache_file) ? filemtime($cache_file) : 0));
     }
 
     protected function _generateConfigFileName($namespace) {

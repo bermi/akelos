@@ -38,7 +38,7 @@ class ControllerGenerator_TestCase extends ActiveSupportUnitTest
 
         clearstatcache();
         foreach ($files as $file){
-            @unlink($file);
+            file_exists($file) && unlink($file);
             $this->assertFalse(file_exists($file));
         }
 

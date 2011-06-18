@@ -371,8 +371,8 @@ CONFIG;
         }
         $file_1 = AK_BASE_DIR.DS.'.htaccess';
         $file_2 = AK_PUBLIC_DIR.DS.'.htaccess';
-        $file_1_content = @AkFileSystem::file_get_contents($file_1);
-        $file_2_content = @AkFileSystem::file_get_contents($file_2);
+        $file_1_content = file_exists($file_1) ? AkFileSystem::file_get_contents($file_1) : '';
+        $file_2_content = file_exists($file_2) ? AkFileSystem::file_get_contents($file_2) : '';
 
         $url_suffix = $this->getUrlSuffix();
 
@@ -605,9 +605,9 @@ CONFIG;
         defined('AK_FTP_PATH')               || define('AK_FTP_PATH',                  $ftp_path);
         defined('AK_FTP_AUTO_DISCONNECT')    || define('AK_FTP_AUTO_DISCONNECT',       true);
 
-        if(@AkFileSystem::file_put_contents(AK_CONFIG_DIR.DS.'test_file.txt','hello from ftp')){
-            $text = @AkFileSystem::file_get_contents(AK_CONFIG_DIR.DS.'test_file.txt');
-            @AkFileSystem::file_delete(AK_CONFIG_DIR.DS.'test_file.txt');
+        if(AkFileSystem::file_put_contents(AK_CONFIG_DIR.DS.'test_file.txt','hello from ftp')){
+            $text = AkFileSystem::file_get_contents(AK_CONFIG_DIR.DS.'test_file.txt');
+            AkFileSystem::file_delete(AK_CONFIG_DIR.DS.'test_file.txt');
         }
 
         $this->ftp_enabled = (isset($text) && $text == 'hello from ftp');

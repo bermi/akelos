@@ -147,7 +147,7 @@ class AkFileSystem
                     $sucess = $sucess ? self::directory_delete($directory, $options) : $sucess;
                 }
             }
-            return $sucess ? @rmdir($base_path.$dir_name) : $sucess;
+            return $sucess ? (is_dir($base_path.$dir_name) ? rmdir($base_path.$dir_name) : $sucess) : $sucess;
         }
     }
 
