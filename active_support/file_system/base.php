@@ -83,7 +83,10 @@ class AkFileSystem
         }else{
             $base_path = self::getNormalizedBasePath($options);
             if(!file_exists($base_path.$file_name)){
-                throw new Exception('File '.$base_path.$file_name.' not found.');
+                if(empty($options['skip_raising_errors'])){
+                    throw new Exception('File '.$base_path.$file_name.' not found.');
+                }
+                return;
             }
             return file_get_contents($base_path.$file_name);
         }
@@ -93,7 +96,7 @@ class AkFileSystem
      * @todo Optimize this code (dirty add-on to log command line interpreter results)
      */
     static function file_add_contents($file_name, $content, $options = array()) {
-        $original_content = @self::file_get_contents($file_name, $options);
+        $original_content = self::file_get_contents($file_name, array_merge($options, array('skip_raising_errors'=>true)));
         return self::file_put_contents($file_name, $original_content.$content, $options);
     }
 
@@ -300,6 +303,9 @@ class AkFileSystem
      * Gets a normalized base path for a base_path in options
      */
     static function getNormalizedBasePath($options = array()) {
+        if(!empty($options['skip_path_restriction'])){
+            return '';
+        }
         return (AK_WIN && empty($options['base_path']) ? '' : $options['base_path'].DS);
     }
 
