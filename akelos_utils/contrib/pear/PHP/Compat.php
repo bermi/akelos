@@ -39,7 +39,7 @@ class PHP_Compat
      * @param   string|array    $function The function or functions to load
      * @return  bool|array      TRUE if loaded, FALSE if not
      */
-    function loadFunction($function)
+    static function loadFunction($function)
     {
         // Recursiveness
         if (is_array($function)) {

@@ -149,7 +149,7 @@ class ADODB_ads extends ADOConnection {
         }
 
         // returns true or false
-        function DropSequence($seqname)
+        function DropSequence($seqname='')
   {
                 $res = $this->Execute("DROP TABLE $seqname");
                 if(!$res){

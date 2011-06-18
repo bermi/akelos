@@ -257,7 +257,7 @@ class ADODB_ibase extends ADOConnection {
 		return $this->Execute("SET GENERATOR $seqname TO ".($startID-1).';');
 	}
 	
-	function DropSequence($seqname)
+	function DropSequence($seqname='')
 	{
 		$seqname = strtoupper($seqname);
 		$this->Execute("delete from RDB\$GENERATORS where RDB\$GENERATOR_NAME='$seqname'");

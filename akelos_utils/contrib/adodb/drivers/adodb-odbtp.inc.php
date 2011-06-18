@@ -120,7 +120,7 @@ class ADODB_odbtp extends ADOConnection{
 		return $this->Execute("insert into adodb_seq values('$seqname',$start)");
 	}
 
-	function DropSequence($seqname)
+	function DropSequence($seqname='')
 	{
 		if (empty($this->_dropSeqSQL)) return false;
 		return $this->Execute(sprintf($this->_dropSeqSQL,$seqname));

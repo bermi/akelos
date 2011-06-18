@@ -336,7 +336,7 @@ class Cache_Lite
                     $data = $this->_read();
                 }
             } else {
-                if ((file_exists($this->_file)) && (@filemtime($this->_file) > $this->_refreshTime)) {
+                if ((file_exists($this->_file)) && (filemtime($this->_file) > $this->_refreshTime)) {
                     $data = $this->_read();
                 }
             }

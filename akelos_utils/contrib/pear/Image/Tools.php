@@ -49,7 +49,7 @@ require_once 'PHP/Compat.php';
 /**
  * image_type_to_mime_type, since PHP 4.3.0
  */
-@PHP_Compat::loadFunction('image_type_to_mime_type');
+PHP_Compat::loadFunction('image_type_to_mime_type');
 
 // }}}
 // {{{ Constants

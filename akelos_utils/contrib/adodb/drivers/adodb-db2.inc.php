@@ -233,7 +233,7 @@ class ADODB_db2 extends ADOConnection {
 		return true;
 	}
 	
-	function DropSequence($seqname)
+	function DropSequence($seqname='')
 	{
 		if (empty($this->_dropSeqSQL)) return false;
 		return $this->Execute(sprintf($this->_dropSeqSQL,$seqname));

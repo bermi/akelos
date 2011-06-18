@@ -303,7 +303,7 @@ class PEAR
      * @since PHP 4.0.5
      */
 
-    public function setErrorHandling($mode = null, $options = null)
+    static function setErrorHandling($mode = null, $options = null)
     {
         if (isset($this) && ($this instanceof PEAR)) {
             $setmode     = &$this->_default_error_mode;
