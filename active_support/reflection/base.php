@@ -17,7 +17,8 @@ class AkReflection
             trigger_error('Function "token_get_all" is not defined');
             return false;
         }
-        $source = @preg_match('/<\?php.*'.$source.'.*/', $source)?$source:"<?php ".$source;
+
+        $source = preg_match('/^<\?php.*/', $source)?$source:"<?php ".$source;
         $this->tokens = token_get_all($source);
         $this->definitions = array();
         reset($this->tokens);
