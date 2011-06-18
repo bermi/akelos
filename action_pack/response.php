@@ -131,7 +131,7 @@ class AkResponse
         $_has_content_type = $_has_content_length = false;
         $_can_add_charset = defined('AK_CHARSET');
         if(!empty($this->_headers) && is_array($this->_headers)){
-            $this->addHeader('Connection: close');
+            $this->addHeader('Connection', 'close');
             foreach ($this->_headers as $k=>$v){
                 $header = trim((!is_numeric($k) ? $k.': ' : '').$v);
                 $this->_headers_sent[] = $header;
@@ -251,13 +251,3 @@ class AkResponse
     }
 }
 
-
-/**
-* @todo Implement generic ETag support
-if(empty($this->_headers['ETag'])){ 
-    $this->addHeader('ETag', '"'.md5($this->body.serialize($this->_headers)).'"'); 
-    $this->addHeader('Expires', '');
-    $this->addHeader('Cache-Control', '');
-    $this->addHeader('Pragma', '');
-}
-*/
