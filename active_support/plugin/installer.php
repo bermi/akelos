@@ -30,7 +30,7 @@ class AkPluginInstaller extends AkInstaller
 
     public function autoInstallExtensions() {
         $path = $this->app_plugins_dir.DS.$this->plugin_name.DS.'extensions';
-        $extensionFiles = AkFileSystem::dir($path,array('recurse'=>true));
+        $extensionFiles = AkFileSystem::dir($path,array('recurse'=>true, 'skip_path_restriction'=>true));
         foreach($extensionFiles as $extensionFile) {
             $this->installExtensions('extensions'.DS.$extensionFile);
         }
@@ -118,7 +118,7 @@ class AkPluginInstaller extends AkInstaller
                 }
                 $dependendPlugins = array_diff($dependendPlugins,array($this->plugin_name));
                 if (!empty($dependendPlugins)) {
-                    AkFileSystem::file_put_contents($dependencyFile,implode("\n",$dependendPlugins));
+                    AkFileSystem::file_put_contents($dependencyFile,implode("\n",$dependendPlugins), array('skip_path_restriction'=>true));
                 } else if ($fileExists) {
                     unlink($dependencyFile);
                 }
@@ -270,7 +270,7 @@ class AkPluginInstaller extends AkInstaller
 
                     }
                     if (!empty($dependendPlugins)) {
-                        AkFileSystem::file_put_contents($dependencyFile,implode("\n",$dependendPlugins));
+                        AkFileSystem::file_put_contents($dependencyFile,implode("\n",$dependendPlugins), array('skip_path_restriction'=>true));
                     } else if ($fileExists) {
                         unlink($dependencyFile);
                     }
@@ -291,19 +291,19 @@ class AkPluginInstaller extends AkInstaller
                 return false;
             }
         }
-        $contents = @AkFileSystem::file_get_contents($path);
+        $contents = file_exists($path) ? AkFileSystem::file_get_contents($path, array('skip_path_restriction'=>true)) : '';
 
         return (AkFileSystem::file_put_contents($path, preg_replace('|class '.$class.'(.*?)\n.*?{|i',"class $class\\1
 {
 /** AUTOMATED START: $pluginName::$name */
 $methodString
 /** AUTOMATED END: $pluginName::$name */
-",$contents))>0?true:'Could not write to '.$path);
+",$contents), array('skip_path_restriction'=>true))>0?true:'Could not write to '.$path);
 
     }
 
     protected function _removeMethodFromClass($path,$name,$pluginName) {
-        return AkFileSystem::file_put_contents($path, preg_replace("|(\n[^\n]*?/\*\* AUTOMATED START: $pluginName::$name \*/.*?/\*\* AUTOMATED END: $pluginName::$name \*/\n)|s","",AkFileSystem::file_get_contents($path)));
+        return AkFileSystem::file_put_contents($path, preg_replace("|(\n[^\n]*?/\*\* AUTOMATED START: $pluginName::$name \*/.*?/\*\* AUTOMATED END: $pluginName::$name \*/\n)|s","",AkFileSystem::file_get_contents($path)), array('skip_path_restriction'=>true));
     }
 }
 
