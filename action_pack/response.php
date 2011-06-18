@@ -123,7 +123,10 @@ class AkResponse
 
         $status = $this->getStatusHeader($this->_headers['Status']);
         array_unshift($this->_headers,  $status ? $status : (strstr('HTTP/1.1 '.$this->_headers['Status'],'HTTP') ? $this->_headers['Status'] : 'HTTP/1.1 '.$this->_headers['Status']));
-        unset($this->_headers['Status']);
+
+        if(is_numeric($this->_headers['Status'])){
+          $this->_headers['Status'] = str_replace('HTTP/1.1 ','', $status);
+        }
 
         $_has_content_type = $_has_content_length = false;
         $_can_add_charset = defined('AK_CHARSET');
