@@ -21,7 +21,7 @@ class AkActiveRecordHelper extends AkBaseHelper
     *     <input id="post_title" name="post[title]" size="30" type="text" value="Hello World" />
     */
     public function input($record_name, $method, $options = array()) {
-        $InstanceTag = new ActiveRecordInstanceTag($record_name, $method, $this);
+        $InstanceTag = new AkActiveRecordInstanceTag($record_name, $method, $this);
         return $InstanceTag->to_tag($options);
     }
 
@@ -156,7 +156,7 @@ class AkActiveRecordHelper extends AkBaseHelper
     }
 }
 
-class ActiveRecordInstanceTag extends AkFormHelperInstanceTag
+class AkActiveRecordInstanceTag extends AkFormHelperInstanceTag
 {
     public $method_name;
 
