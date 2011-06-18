@@ -82,6 +82,9 @@ class AkFileSystem
             return AkFtp::get_contents($file_name);
         }else{
             $base_path = self::getNormalizedBasePath($options);
+            if(!file_exists($base_path.$file_name)){
+                throw new Exception('File '.$base_path.$file_name.' not found.');
+            }
             return file_get_contents($base_path.$file_name);
         }
     }
