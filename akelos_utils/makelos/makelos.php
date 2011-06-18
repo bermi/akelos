@@ -149,9 +149,9 @@ if(MAKELOS_RUN){
 
     $_config_file = AK_BASE_DIR.DS.'config'.DS.'config.php';
 
-    if(!@include $_config_file){
+    if(!is_file($_config_file) || !include($_config_file)){
         defined('AK_ENVIRONMENT')   || define('AK_ENVIRONMENT', 'testing');
-        if(!@include AK_BASE_DIR.DS.'config'.DS.'environment.php'){
+        if(!is_file(AK_BASE_DIR.DS.'config'.DS.'environment.php') || !include(AK_BASE_DIR.DS.'config'.DS.'environment.php')){
             defined('AK_SKIP_ENV_CONFIG') || define('AK_SKIP_ENV_CONFIG', true);
             include AK_BASE_DIR.DS.'autoload.php';
         }
@@ -160,7 +160,7 @@ if(MAKELOS_RUN){
     Ak::setStaticVar('dsn', $dsn);
     defined('AK_RECODE_UTF8_ON_CONSOLE_TO') ? null : define('AK_RECODE_UTF8_ON_CONSOLE_TO', false);
 
-    @ini_set('memory_limit', -1);
+    ini_set('memory_limit', -1);
     set_time_limit(0);
     //error_reporting(E_ALL);
 }
@@ -211,7 +211,8 @@ class Makelos
     public function runTask($task_name, $options = array(), $only_registered_tasks = true) {
         $this->removeAutocompletionOptions($task_name);
         if(!empty($this->tasks[$task_name]['with_defaults'])){
-            $options['attributes'] = array_merge((array)$this->tasks[$task_name]['with_defaults'], (array)@$options['attributes']);
+            $attributes = isset($options['attributes']) ? (array)$options['attributes'] : array();
+            $options['attributes'] = array_merge((array)$this->tasks[$task_name]['with_defaults'], $attributes);
             unset($this->tasks[$task_name]['with_defaults']);
         }
         if(!empty($options['attributes']['daemon'])){
@@ -229,10 +230,12 @@ class Makelos
                 $this->error("\nInvalid task $task_name, use \n\n   $ ./makelos -T\n\nto show available tasks.\n");
             }
         }else{
-            //$this->message(@$this->tasks[$task_name]['description']);
-            $parameters = $this->getParameters(@$this->tasks[$task_name]['parameters'], @(array)$options['attributes']);
+            $parameters = isset($this->tasks[$task_name]['parameters']) ? $this->tasks[$task_name]['parameters'] : array();
+            $attributes = isset($options['attributes']) ? (array)$options['attributes'] : array();
+            $parameters = $this->getParameters($parameters, $attributes);
             $this->runTaskFiles($task_name, $parameters);
-            $this->runTaskCode(@$this->tasks[$task_name]['run'], $parameters);
+            $snippets = isset($this->tasks[$task_name]['run']) ? $this->tasks[$task_name]['run'] : '';
+            $this->runTaskCode($snippets, $parameters);
         }
     }
 
@@ -251,7 +254,7 @@ class Makelos
     }
 
     public function showTaskDocumentation($task) {
-        $this->message(sprintf("%-30s",$task).'  '.@$this->tasks[$task]['description']);
+        $this->message(sprintf("%-30s",$task).'  '.(isset($this->tasks[$task]['description'])?$this->tasks[$task]['description']:''));
     }
 
     public function run($task_name, $options = array()) {
@@ -259,16 +262,18 @@ class Makelos
     }
 
     public function runTaskCode($code_snippets = array(), $options = array()) {
-        foreach (@(array)$code_snippets as $language => $code_snippets){
-            $code_snippets = is_array($code_snippets) ? $code_snippets : array($code_snippets);
-            $language_method = AkInflector::camelize('run_'.$language.'_snippet');
+        if(!empty($code_snippets)){
+            foreach ((array)$code_snippets as $language => $code_snippets){
+                $code_snippets = is_array($code_snippets) ? $code_snippets : array($code_snippets);
+                $language_method = AkInflector::camelize('run_'.$language.'_snippet');
 
-            if(method_exists($this, $language_method)){
-                foreach ($code_snippets as $code_snippet){
-                    $this->$language_method($code_snippet, $options);
+                if(method_exists($this, $language_method)){
+                    foreach ($code_snippets as $code_snippet){
+                        $this->$language_method($code_snippet, $options);
+                    }
+                }else{
+                    $this->error("Could not find a handler for running $language code on $this->current_task task", true);
                 }
-            }else{
-                $this->error("Could not find a handler for running $language code on $this->current_task task", true);
             }
         }
     }
@@ -278,9 +283,9 @@ class Makelos
         $task_name = str_replace(':', DS, $task_name);
         $Makelos = $this;
         $Logger = Ak::getLogger('makelos'.DS.AkInflector::underscore($task_name));
-        foreach ($files as $file){
-            $pathinfo = @pathinfo($file);
-            if(@$pathinfo['extension'] == 'php'){
+        foreach ($files as $file) {
+            $pathinfo = pathinfo($file);
+            if(isset($pathinfo['extension']) && $pathinfo['extension'] == 'php'){
                 include($file);
             }else{
                 echo `$file`;
@@ -458,8 +463,8 @@ class Makelos
         if(!empty($autocompletion_executables)){
             ob_start();
             foreach ($autocompletion_executables as $file){
-                $pathinfo = @pathinfo($file);
-                if(@$pathinfo['extension'] == 'php'){
+                $pathinfo = pathinfo($file);
+                if(isset($pathinfo['extension']) && $pathinfo['extension'] == 'php'){
                     include($file);
                 }else{
                     echo `$file`;
