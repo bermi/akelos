@@ -10,3 +10,6 @@ nbproject/
 akelos.kpf
 releases/
 reports/
+dist/
+docs/doxygen.log
+*.komodoproject
