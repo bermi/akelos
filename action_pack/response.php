@@ -157,7 +157,7 @@ class AkResponse
         }
 
         if(!$_has_content_length && !$this->_streamBody()){
-            $length = strlen($this->body);
+            $length = !in_array('Content-Encoding: gzip', headers_list()) ? strlen($this->body) : mb_strlen($this->body,'latin1');
             if($length > 0){
                 Ak::header('Content-Length: '.$length);
                 $this->_headers_sent[] = 'Content-Length: '.$length;
