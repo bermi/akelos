@@ -114,7 +114,7 @@ class AkConfig
 
     static function getDir($type, $_set_value = false, $fail_if_not_found = true) {
         static $dir_names = array();
-        if($_set_value){
+        if($_set_value !== false){
             $dir_names[$type] = $_set_value;
         }
         if(!isset($dir_names[$type])){
