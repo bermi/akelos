@@ -9,7 +9,7 @@ function ak_testing_error_handler($error_number, $error_message, $file, $line) {
     if($error_number == 0){
         return false;
     }
-    throw new Exception($error_message);
+    throw new Exception(AkAnsiColor::style($error_message, 'error'));
 }
 
 include_once(dirname(__FILE__).DS.'error_functions.php');
