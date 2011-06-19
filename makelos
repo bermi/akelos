@@ -7,12 +7,16 @@ if (isset($argv[1]) && strstr($argv[1], 'test:')){
     define('AK_ENVIRONMENT', 'testing');
 }
 
-if(is_file(dirname(__FILE__).DS.'config'.DS.'config.php')){
-    include(dirname(__FILE__).DS.'config'.DS.'config.php');
+if(is_file(dirname(realpath(__FILE__)).DS.'config'.DS.'config.php')){
+    include(dirname(realpath(__FILE__)).DS.'config'.DS.'config.php');
 }
 
 if(defined('AK_FRAMEWORK_DIR')){
     include AK_FRAMEWORK_DIR.DS.'akelos_utils'.DS.'makelos'.DS.'makelos.php';
-}elseif(!is_file('akelos_utils'.DS.'makelos'.DS.'makelos.php') || !include('akelos_utils'.DS.'makelos'.DS.'makelos.php')){
-    include 'vendor'.DS.'akelos'.DS.'akelos_utils'.DS.'makelos'.DS.'makelos.php';
+}elseif(!is_file(dirname(realpath(__FILE__)).DS.'akelos_utils'.DS.'makelos'.DS.'makelos.php') ||
+        !include(dirname(realpath(__FILE__)).DS.'akelos_utils'.DS.'makelos'.DS.'makelos.php')) {
+
+    if(is_file('vendor'.DS.'akelos'.DS.'akelos_utils'.DS.'makelos'.DS.'makelos.php')){
+        include 'vendor'.DS.'akelos'.DS.'akelos_utils'.DS.'makelos'.DS.'makelos.php';
+    }
 }
