@@ -220,15 +220,23 @@ class AkUnitTestSuite extends TestSuite
         }
     }
 
-    static function cleanupTmpDir(){
-        $files = array_diff(glob(AK_TMP_DIR.DS.'*'), array(''));
+    static function cleanupTmpDir() {
+        clearstatcache();
+        $files = glob(AK_TMP_DIR.DS.'*');
+        $files = array_diff($files, array(''));
+
+        $framework_testing_tmp = AK_FRAMEWORK_DIR.DS.'app_layout'.DS.'tmp'.DS.'testing';
+        if(is_dir($framework_testing_tmp)){
+            AkFileSystem::directory_delete($framework_testing_tmp);
+        }
+
         foreach ($files as $file){
             if(!is_dir($file)){
                 if($file != '.gitignore'){
-                    @unlink($file);
+                    unlink($file);
                 }
             }else{
-                @AkFileSystem::rmdir_tree($file);
+                AkFileSystem::rmdir_tree($file);
             }
         }
     }
