@@ -109,7 +109,7 @@ class AkImage extends Image_Transform
         if(!$tmp_image_name = tempnam(AK_TMP_DIR,'ak_image_')){
             trigger_error(Ak::t('Could not create the temporary file %tmp_image_name for apliying changes and saving', array('%tmp_image_name'=>$tmp_image_name)), E_USER_ERROR);
         }
-
+        $options['skip_restricting_origin'] = true;
         $path = empty($path) ? $this->image_path : $path;
         $this->Transform->save($tmp_image_name, $this->getExtension($path), $quality);
         AkFileSystem::move($tmp_image_name, $path, $options);
