@@ -241,6 +241,9 @@ with the following code
     _makelos()
     {
        local cur colonprefixes arguments
+       local -a makelos_cmd
+       cvsroots=( $CVSROOT )
+       
        COMPREPLY=()
        cur=${COMP_WORDS[COMP_CWORD]}
        # Work-around bash_completion issue where bash
@@ -250,7 +253,13 @@ with the following code
        # work-around for the same issue.
        colonprefixes=${cur%"${cur##*:}"}
        arguments=("${COMP_WORDS[@]:1}")
-       COMPREPLY=( $(compgen -W '$($1 makelos:autocomplete \
+       if [ -f makelos ]
+       then 
+         makelos_cmd="./makelos"
+       else
+         makelos_cmd="makelos"
+       fi
+       COMPREPLY=( $(compgen -W '$($makelos_cmd makelos:autocomplete \
        ${arguments[@]})'  -- $cur))
        local i=${#COMPREPLY[*]}
        while [ $((--i)) -ge 0 ]; do

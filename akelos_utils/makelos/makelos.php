@@ -149,7 +149,7 @@ if(MAKELOS_RUN){
 
     $_config_file = AK_BASE_DIR.DS.'config'.DS.'config.php';
 
-    if(!is_file($_config_file) || !include($_config_file)){
+    if(!is_file($_config_file) || !include_once($_config_file)){
         defined('AK_ENVIRONMENT')   || define('AK_ENVIRONMENT', 'testing');
         if(!is_file(AK_BASE_DIR.DS.'config'.DS.'environment.php') || !include(AK_BASE_DIR.DS.'config'.DS.'environment.php')){
             defined('AK_SKIP_ENV_CONFIG') || define('AK_SKIP_ENV_CONFIG', true);
