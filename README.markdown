@@ -250,7 +250,7 @@ with the following code
        # work-around for the same issue.
        colonprefixes=${cur%"${cur##*:}"}
        arguments=("${COMP_WORDS[@]:1}")
-       COMPREPLY=( $(compgen -W '$(./makelos makelos:autocomplete \
+       COMPREPLY=( $(compgen -W '$($1 makelos:autocomplete \
        ${arguments[@]})'  -- $cur))
        local i=${#COMPREPLY[*]}
        while [ $((--i)) -ge 0 ]; do
@@ -258,9 +258,13 @@ with the following code
        done
        return 0
     } &&
-
-complete -o bashdefault -o default -F _makelos ./makelos 2>/dev/null \
+    
+    complete -o bashdefault -o default -F _makelos ./makelos 2>/dev/null \
     || complete -o default -F _makelos ./makelos
+    
+    complete -o bashdefault -o default -F _makelos makelos 2>/dev/null \
+    || complete -o default -F _makelos makelos
+
 
 
 cd to your app dir in a new prompt and enjoy makelos autocompletion.
