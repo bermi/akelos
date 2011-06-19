@@ -4,7 +4,7 @@
 # (Copyright) 2004-2010 Bermi Ferrer bermi a t bermilabs com
 # See LICENSE and CREDITS for details
 
-define('AKELOS_VERSION', '1.2.3');
+define('AKELOS_VERSION', '2.0.1');
 
 /**
  * This file will bootstrap the Akelos framework by:
