@@ -255,8 +255,12 @@ class AkFileSystem
         );
         $options = array_merge($default_options, $options);
 
-        $origin = self::getRestrictedPath($origin, $options);
-        $target = self::getRestrictedPath($target, $options);
+        if(empty($options['skip_restricting_origin'])){
+            $origin = self::getRestrictedPath($origin, $options);
+        }
+        if(empty($options['skip_restricting_target'])){
+            $target = self::getRestrictedPath($target, $options);
+        }
 
         if(empty($origin) || empty($target)){
             return false;
