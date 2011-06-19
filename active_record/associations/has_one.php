@@ -375,7 +375,7 @@ class AkHasOne extends AkAssociation
                 if ($object->$associated_id->getType() == 'hasOne'){
                     $object->$associated_id->load();
                 }
-                if(empty($object->$associated_id->id) || $object->$associated_id->getType() == 'hasOne' || $object->$associated_id->isNewRecord()) return true;
+                if(empty($object->$associated_id->id) || $object->$associated_id->getType() == 'hasOne' || $object->$associated_id->isNewRecord()) continue;
                 switch ($dependency) {
 
                     case 'delete':
